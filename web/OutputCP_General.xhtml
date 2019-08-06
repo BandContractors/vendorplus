@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Cash Payment Voucher</title>
+        <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+    </h:head>
+    <h:body>
+        <!-- RECEIPT/VOUCHER STARTS HERE -->
+        <p:panel style="text-align: center;">
+            <p:commandButton id="cmdbvPrint" value="PRINT" icon="ui-icon-print" type="button">
+                <p:printer target="vTransactionGrid" rendered="false"/>
+            </p:commandButton>
+        </p:panel>
+        <h:panelGrid id="vTransactionGrid">
+            <h:panelGrid id="IpgrdSalesInvoice" columns="1">
+
+                <h:panelGrid id="IpgrdSalesInvoiceHeader1" style="width: 290px;text-align: center;background-color: black;color: white;-webkit-print-color-adjust: exact;" columns="1">
+                    <h:outputLabel id="IolblSalesInvoiceCompany" style="font-size: 20px;font-weight: bold;" value="#{companySetting.getLICENSE_CLIENT_NAME()}"/>
+                    <p:panel style="width: 290px;text-align: center; border-style: none !important;">
+                        <h:outputLabel id="IolblSalesInvoiceBranch" value="#{companySetting.getBranchCode()} " rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowBranchInvoice(),'Yes')}"/>
+                        <h:outputLabel id="IolblSalesInvoiceStore" value="(#{generalUserSetting.outputDetailParent.store.storeName})" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowStoreInvoice(),'Yes')}"/>
+                    </p:panel>
+                </h:panelGrid>
+
+                <h:panelGrid style="width: 290px; margin: 0px;" columns="2" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowLogoInvoice(),'Yes') and companySetting.getLogoUrl().length()>1}">
+                    <h:panelGrid>
+                        <p:graphicImage value="#{companySetting.getLogoUrl()}" width="45" height="65" style="float: left;" />
+                    </h:panelGrid>
+                    <h:panelGrid>
+                        <h:outputLabel style="font-size: 10px;" value="#{companySetting.getPhysicalAddress()}"/>
+                        <h:outputLabel style="font-size: 12px;" value="Tel:#{companySetting.getPhone()}" rendered="#{companySetting.getPhone().length()>0}"/>
+                        <h:outputLabel style="font-size: 12px;" value="TIN:#{companySetting.getTaxIdentity()}" rendered="#{companySetting.getTaxIdentity().length()>0}"/>
+                    </h:panelGrid>
+                </h:panelGrid>
+                <h:panelGrid style="width: 290px; margin: 0px;text-align: center;" columns="1" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowLogoInvoice(),'No') or companySetting.getLogoUrl().length()==0}">
+                    <h:outputLabel style="font-size: 10px;" value="#{companySetting.getPhysicalAddress()}"/>
+                    <h:outputLabel style="font-size: 12px;" value="Tel:#{companySetting.getPhone()}" rendered="#{companySetting.getPhone().length()>0}"/>
+                    <h:outputLabel style="font-size: 12px;" value="TIN:#{companySetting.getTaxIdentity()}" rendered="#{companySetting.getTaxIdentity().length()>0}"/>
+                </h:panelGrid>
+
+                <h:panelGrid id="IpgrdSalesInvoiceHeader34" style="width: 290px; margin: 0px;" columns="1">
+                    <h:outputLabel id="IolblSalesInvoiceWebsite" value="Website: #{companySetting.getWebsite()}" rendered="#{companySetting.getWebsite().length()>0}"/>
+                    <h:outputLabel id="IolblSalesInvoiceEmail" value="Email: #{companySetting.getEmail()}" rendered="#{companySetting.getEmail().length()>0}"/>
+                </h:panelGrid>
+
+                <h:panelGrid id="IpgrdSalesInvoiceHeader434" style="width: 290px; margin: 0px;background-color: black;color: white;font-size: 20px;font-weight: bold;text-align: center;-webkit-print-color-adjust: exact; ">
+                    <h:outputLabel style="font-size: 12px;" value="PAYMENT VOUCHER"/>
+                </h:panelGrid>
+
+                <h:panelGrid id="IpgrdSalesInvoiceHeader4" style="width: 290px; margin: 0px;" columns="2">
+                    <h:outputLabel style="font-size: 12px;" value="No:"/>
+                    <h:outputLabel id="IolblSalesInvoiceNo" style="font-size: 20px;font-weight: bold;" value="#{generalUserSetting.outputDetailParent.pay.pay_number}"/>
+                    <h:outputLabel style="font-size: 12px;" value="Date:"/>
+                    <h:outputLabel id="IolblSalesInvoiceDate" style="font-size: 12px;" value="#{utilityBean.formatDateTime(generalUserSetting.outputDetailParent.pay.addDate)}"/>
+                </h:panelGrid>
+
+                <h:panelGrid id="IpgrdSalesInvoiceHeader5" style="width: 290px; margin: 0px;" columns="1">
+                    <h:outputLabel style="font-size: 16px;font-weight: bold;border-bottom-style: solid;" value="Paid To"/>
+                    <h:outputLabel style="font-size: 16px;" value="#{generalUserSetting.outputDetailParent.bill_transactor.transactorNames}" rendered="#{generalUserSetting.outputDetailParent.pay.payReasonId==25 or generalUserSetting.outputDetailParent.pay.payReasonId==26 or generalUserSetting.outputDetailParent.pay.payReasonId==91 or generalUserSetting.outputDetailParent.pay.payReasonId==105}"/>
+                    <h:outputText style="font-size: 16px;" value="#{generalUserSetting.outputDetailParent.acc_child_account2.childAccountName}"  rendered="#{generalUserSetting.outputDetailParent.pay.payReasonId==34}"/>
+                    <h:outputText style="font-size: 16px;" value="#{generalUserSetting.outputDetailParent.acc_child_account2.childAccountName}"  rendered="#{generalUserSetting.outputDetailParent.pay.payReasonId==33}"/>
+                    <h:outputLabel style="font-size: 16px;font-weight: bold;border-bottom-style: solid;" value="Paid For"/>
+                    <h:outputLabel style="font-size: 16px;" value="Goods/Services Supplied" rendered="#{generalUserSetting.outputDetailParent.pay.payReasonId==25 or generalUserSetting.outputDetailParent.pay.payReasonId==26}"/>
+                    <h:outputLabel style="font-size: 16px;" value="Owner Cash Drawing" rendered="#{generalUserSetting.outputDetailParent.pay.payReasonId==34}"/>
+                    <h:outputLabel style="font-size: 16px;" value="Loan Installment" rendered="#{generalUserSetting.outputDetailParent.pay.payReasonId==33}"/>
+                    <h:outputLabel style="font-size: 16px;" value="Cash Advance to Supplier" rendered="#{generalUserSetting.outputDetailParent.pay.payReasonId==91}"/>
+                    <h:outputLabel style="font-size: 16px;" value="Liability Payment" rendered="#{generalUserSetting.outputDetailParent.pay.payReasonId==105}"/>
+                </h:panelGrid>
+
+                <h:panelGrid id="IpgrdSalesInvoiceTotals" style="width: 290px; margin: 0px;border-bottom-style: dotted" columns="2">
+                    <h:outputLabel style="font-size: 16px; font-weight: bold;" value="AMOUNT(#{generalUserSetting.outputDetailParent.pay.currencyCode})"/>
+                    <h:outputLabel style="font-size: 16px; font-weight: bold;" id="IolblSalesInvoiceAmountTendered" value="#{generalUserSetting.outputDetailParent.pay.paidAmount}">
+                        <f:convertNumber pattern="#{accCurrencyBean.getNumberFormatByCurrency(generalUserSetting.outputDetailParent.pay.currencyCode)}" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputLabel>
+                    <h:outputLabel style="font-size: 16px;" value="Payment Method"/>
+                    <h:outputLabel value=": #{generalUserSetting.outputDetailParent.pay_method.payMethodName}"/>
+                    <h:outputLabel style="font-size: 16px;" value="Payment Ref"/>
+                    <h:outputLabel value=": #{generalUserSetting.outputDetailParent.pay.payRefNo}"/>
+                </h:panelGrid>
+
+                <h:panelGrid id="IpgrdSalesInvoiceFooter1" style="width: 290px; margin: 0px;border-bottom-style: dotted" columns="2">
+                    <h:outputLabel style="font-size: 16px;" value="Paid By:"/>
+                    <h:outputLabel value="#{generalUserSetting.outputDetailParent.trans_user_detail.firstName} #{generalUserSetting.outputDetailParent.trans_user_detail.secondName}"/>
+                </h:panelGrid>
+
+                <h:panelGrid id="IpgrdSalesInvoiceFooter2" style="width: 290px; margin: 0px;border-bottom-style: dotted" columns="1" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getIsShowDeveloper(),'Yes')}">
+                    <h:outputLabel style="font-size: 10px;" value="System developed by WINGERsoft Technologies Ltd"/>
+                    <h:outputLabel style="font-size: 10px;" value="#{companySetting.getDeveloperEmail()} | #{companySetting.getDeveloperPhone()}"/>
+                </h:panelGrid>
+            </h:panelGrid>
+        </h:panelGrid>
+        <!-- RECEIPT/VOUCHER ENDS HERE -->
+    </h:body>
+</html>
+

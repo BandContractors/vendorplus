@@ -1,0 +1,1684 @@
+package beans;
+
+import connections.DBConnection;
+import entities.AccCurrency;
+import entities.Stock;
+import entities.TransItem;
+import java.io.Serializable;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
+
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+/**
+ *
+ * @author btwesigye
+ */
+@ManagedBean
+@SessionScoped
+public class StockBean implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    private List<Stock> Stocks;
+    private String ActionMessage = null;
+    private Stock SelectedStock = null;
+    private Long SelectedStockId;
+    private List<Stock> StocksList;
+    private List<Stock> StocksSummary;
+    private List<Stock> BatchList;
+    private List<Stock> SpecificList;
+
+    public void setStockFromResultset(Stock aStock, ResultSet aResultSet) {
+        try {
+            try {
+                aStock.setStockId(aResultSet.getInt("stock_id"));
+            } catch (NullPointerException npe) {
+                aStock.setStockId(0);
+            }
+            try {
+                aStock.setStoreId(aResultSet.getInt("store_id"));
+            } catch (NullPointerException npe) {
+                aStock.setStoreId(0);
+            }
+            try {
+                aStock.setItemId(aResultSet.getLong("item_id"));
+            } catch (NullPointerException npe) {
+                aStock.setItemId(0);
+            }
+            try {
+                aStock.setBatchno(aResultSet.getString("batchno"));
+            } catch (NullPointerException npe) {
+                aStock.setBatchno("");
+            }
+            try {
+                aStock.setUnitCost(aResultSet.getDouble("unit_cost"));
+            } catch (NullPointerException npe) {
+                aStock.setUnitCost(0);
+            }
+            try {
+                aStock.setCurrentqty(aResultSet.getDouble("currentqty"));
+            } catch (NullPointerException npe) {
+                aStock.setCurrentqty(0);
+            }
+            try {
+                aStock.setItemMnfDate(new Date(aResultSet.getDate("item_mnf_date").getTime()));
+            } catch (NullPointerException npe) {
+                aStock.setItemMnfDate(null);
+            }
+            try {
+                aStock.setItemExpDate(new Date(aResultSet.getDate("item_exp_date").getTime()));
+            } catch (NullPointerException npe) {
+                aStock.setItemExpDate(null);
+            }
+            try {
+                aStock.setCodeSpecific(aResultSet.getString("code_specific"));
+            } catch (NullPointerException npe) {
+                aStock.setCodeSpecific("");
+            }
+            try {
+                aStock.setDescSpecific(aResultSet.getString("desc_specific"));
+            } catch (NullPointerException npe) {
+                aStock.setDescSpecific("");
+            }
+            try {
+                aStock.setDescMore(aResultSet.getString("desc_more"));
+            } catch (NullPointerException npe) {
+                aStock.setDescMore("");
+            }
+            try {
+                aStock.setWarrantyDesc(aResultSet.getString("warranty_desc"));
+            } catch (NullPointerException npe) {
+                aStock.setWarrantyDesc("");
+            }
+            try {
+                aStock.setWarrantyExpiryDate(new Date(aResultSet.getDate("warranty_expiry_date").getTime()));
+            } catch (NullPointerException npe) {
+                aStock.setWarrantyExpiryDate(null);
+            }
+            try {
+                aStock.setPurchaseDate(new Date(aResultSet.getDate("purchase_date").getTime()));
+            } catch (NullPointerException npe) {
+                aStock.setPurchaseDate(null);
+            }
+            try {
+                aStock.setDepStartDate(new Date(aResultSet.getDate("dep_start_date").getTime()));
+            } catch (NullPointerException npe) {
+                aStock.setDepStartDate(null);
+            }
+            try {
+                aStock.setDepMethodId(aResultSet.getInt("dep_method_id"));
+            } catch (NullPointerException npe) {
+                aStock.setDepMethodId(0);
+            }
+            try {
+                aStock.setDepRate(aResultSet.getDouble("dep_rate"));
+            } catch (NullPointerException npe) {
+                aStock.setDepRate(0);
+            }
+            try {
+                aStock.setAverageMethodId(aResultSet.getInt("average_method_id"));
+            } catch (NullPointerException npe) {
+                aStock.setAverageMethodId(0);
+            }
+            try {
+                aStock.setEffectiveLife(aResultSet.getInt("effective_life"));
+            } catch (NullPointerException npe) {
+                aStock.setEffectiveLife(0);
+            }
+            try {
+                aStock.setAccountCode(aResultSet.getString("account_code"));
+            } catch (NullPointerException npe) {
+                aStock.setAccountCode("");
+            }
+            try {
+                aStock.setResidualValue(aResultSet.getDouble("residual_value"));
+            } catch (NullPointerException npe) {
+                aStock.setResidualValue(0);
+            }
+            try {
+                aStock.setAssetStatusId(aResultSet.getInt("asset_status_id"));
+            } catch (NullPointerException npe) {
+                aStock.setAssetStatusId(0);
+            }
+            try {
+                aStock.setAssetStatusDesc(aResultSet.getString("asset_status_desc"));
+            } catch (NullPointerException npe) {
+                aStock.setAssetStatusDesc("");
+            }
+            try {
+                aStock.setQty_damage(aResultSet.getDouble("qty_damage"));
+            } catch (NullPointerException npe) {
+                aStock.setQty_damage(0);
+            }
+
+        } catch (SQLException se) {
+            System.err.println("setStockFromResultset:" + se.getMessage());
+        }
+    }
+
+    public void setStockFromResultsetReport(Stock aStock, ResultSet aResultSet) {
+        try {
+            try {
+                aStock.setStockId(aResultSet.getInt("stock_id"));
+            } catch (NullPointerException npe) {
+                aStock.setStockId(0);
+            }
+            try {
+                aStock.setStoreId(aResultSet.getInt("store_id"));
+            } catch (NullPointerException npe) {
+                aStock.setStoreId(0);
+            }
+            try {
+                aStock.setItemId(aResultSet.getLong("item_id"));
+            } catch (NullPointerException npe) {
+                aStock.setItemId(0);
+            }
+            try {
+                aStock.setBatchno(aResultSet.getString("batchno"));
+            } catch (NullPointerException npe) {
+                aStock.setBatchno("");
+            }
+            try {
+                aStock.setUnitCost(aResultSet.getDouble("unit_cost"));
+            } catch (NullPointerException npe) {
+                aStock.setUnitCost(0);
+            }
+            try {
+                aStock.setCurrentqty(aResultSet.getDouble("currentqty"));
+            } catch (NullPointerException npe) {
+                aStock.setCurrentqty(0);
+            }
+            try {
+                aStock.setItemMnfDate(new Date(aResultSet.getDate("item_mnf_date").getTime()));
+            } catch (NullPointerException npe) {
+                aStock.setItemMnfDate(null);
+            }
+            try {
+                aStock.setItemExpDate(new Date(aResultSet.getDate("item_exp_date").getTime()));
+            } catch (NullPointerException npe) {
+                aStock.setItemExpDate(null);
+            }
+            try {
+                aStock.setCodeSpecific(aResultSet.getString("code_specific"));
+            } catch (NullPointerException npe) {
+                aStock.setCodeSpecific("");
+            }
+            try {
+                aStock.setDescSpecific(aResultSet.getString("desc_specific"));
+            } catch (NullPointerException npe) {
+                aStock.setDescSpecific("");
+            }
+            try {
+                aStock.setDescMore(aResultSet.getString("desc_more"));
+            } catch (NullPointerException npe) {
+                aStock.setDescMore("");
+            }
+            try {
+                aStock.setWarrantyDesc(aResultSet.getString("warranty_desc"));
+            } catch (NullPointerException npe) {
+                aStock.setWarrantyDesc("");
+            }
+            try {
+                aStock.setWarrantyExpiryDate(new Date(aResultSet.getDate("warranty_expiry_date").getTime()));
+            } catch (NullPointerException npe) {
+                aStock.setWarrantyExpiryDate(null);
+            }
+            try {
+                aStock.setPurchaseDate(new Date(aResultSet.getDate("purchase_date").getTime()));
+            } catch (NullPointerException npe) {
+                aStock.setPurchaseDate(null);
+            }
+            try {
+                aStock.setDepStartDate(new Date(aResultSet.getDate("dep_start_date").getTime()));
+            } catch (NullPointerException npe) {
+                aStock.setDepStartDate(null);
+            }
+            try {
+                aStock.setDepMethodId(aResultSet.getInt("dep_method_id"));
+            } catch (NullPointerException npe) {
+                aStock.setDepMethodId(0);
+            }
+            try {
+                aStock.setDepRate(aResultSet.getDouble("dep_rate"));
+            } catch (NullPointerException npe) {
+                aStock.setDepRate(0);
+            }
+            try {
+                aStock.setAverageMethodId(aResultSet.getInt("average_method_id"));
+            } catch (NullPointerException npe) {
+                aStock.setAverageMethodId(0);
+            }
+            try {
+                aStock.setEffectiveLife(aResultSet.getInt("effective_life"));
+            } catch (NullPointerException npe) {
+                aStock.setEffectiveLife(0);
+            }
+            try {
+                aStock.setAccountCode(aResultSet.getString("account_code"));
+            } catch (NullPointerException npe) {
+                aStock.setAccountCode("");
+            }
+            try {
+                aStock.setResidualValue(aResultSet.getDouble("residual_value"));
+            } catch (NullPointerException npe) {
+                aStock.setResidualValue(0);
+            }
+            try {
+                aStock.setAssetStatusId(aResultSet.getInt("asset_status_id"));
+            } catch (NullPointerException npe) {
+                aStock.setAssetStatusId(0);
+            }
+            try {
+                aStock.setAssetStatusDesc(aResultSet.getString("asset_status_desc"));
+            } catch (NullPointerException npe) {
+                aStock.setAssetStatusDesc("");
+            }
+
+            //for Report
+            try {
+                aStock.setItemCode(aResultSet.getString("item_code"));
+            } catch (NullPointerException npe) {
+                aStock.setItemCode("");
+            }
+            try {
+                aStock.setDescription(aResultSet.getString("description"));
+            } catch (NullPointerException npe) {
+                aStock.setDescription("");
+            }
+            try {
+                aStock.setUnitSymbol(aResultSet.getString("unit_symbol"));
+            } catch (NullPointerException npe) {
+                aStock.setUnitSymbol("");
+            }
+            try {
+                aStock.setCurrencyCode(aResultSet.getString("currency_code"));
+            } catch (NullPointerException npe) {
+                aStock.setCurrencyCode("");
+            }
+            try {
+                aStock.setReorderLevel(aResultSet.getInt("reorder_level"));
+            } catch (NullPointerException npe) {
+                aStock.setReorderLevel(0);
+            }
+            try {
+                aStock.setUnitCostPrice(aResultSet.getDouble("unit_cost_price"));
+            } catch (NullPointerException npe) {
+                aStock.setUnitCostPrice(0);
+            }
+            try {
+                aStock.setUnitRetailsalePrice(aResultSet.getDouble("unit_retailsale_price"));
+            } catch (NullPointerException npe) {
+                aStock.setUnitRetailsalePrice(0);
+            }
+            try {
+                aStock.setUnitWholesalePrice(aResultSet.getDouble("unit_wholesale_price"));
+            } catch (NullPointerException npe) {
+                aStock.setUnitWholesalePrice(0);
+            }
+            try {
+                aStock.setStoreName(aResultSet.getString("store_name"));
+            } catch (NullPointerException npe) {
+                aStock.setStoreName("");
+            }
+            try {
+                aStock.setCategoryName(aResultSet.getString("category_name"));
+            } catch (NullPointerException npe) {
+                aStock.setCategoryName("");
+            }
+            try {
+                aStock.setUnitName(aResultSet.getString("unit_name"));
+            } catch (NullPointerException npe) {
+                aStock.setUnitName("");
+            }
+            try {
+                aStock.setSubCategoryName(aResultSet.getString("sub_category_name"));
+            } catch (NullPointerException npe) {
+                aStock.setSubCategoryName("");
+            }
+            try {
+                aStock.setCostValue(aResultSet.getDouble("cost_value"));
+            } catch (NullPointerException npe) {
+                aStock.setCostValue(0);
+            }
+            try {
+                aStock.setRetailsaleValue(aResultSet.getDouble("retailsale_value"));
+            } catch (NullPointerException npe) {
+                aStock.setRetailsaleValue(0);
+            }
+            try {
+                aStock.setWholesaleValue(aResultSet.getDouble("wholesale_value"));
+            } catch (NullPointerException npe) {
+                aStock.setWholesaleValue(0);
+            }
+            try {
+                aStock.setQty_damage(aResultSet.getDouble("qty_damage"));
+            } catch (NullPointerException npe) {
+                aStock.setQty_damage(0);
+            }
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+        }
+    }
+
+    public int saveStock(Stock stock) {
+        String sql = null;
+        int status = 0;
+        if (stock.getStockId() == 0) {
+            sql = "{call sp_insert_stock(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+        } else if (stock.getStockId() > 0) {
+            sql = "{call sp_update_stock(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+        }
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                CallableStatement cs = conn.prepareCall(sql);) {
+            if (stock.getStockId() > 0) {
+                cs.setLong("in_stock_id", stock.getStockId());
+            }
+            cs.setInt("in_store_id", stock.getStoreId());
+            cs.setLong("in_item_id", stock.getItemId());
+            cs.setString("in_batchno", stock.getBatchno());
+            cs.setDouble("in_currentqty", stock.getCurrentqty());
+            try {
+                cs.setDate("in_item_mnf_date", new java.sql.Date(stock.getItemMnfDate().getTime()));
+            } catch (NullPointerException npe) {
+                cs.setDate("in_item_mnf_date", null);
+            }
+            try {
+                cs.setDate("in_item_exp_date", new java.sql.Date(stock.getItemExpDate().getTime()));
+            } catch (NullPointerException npe) {
+                cs.setDate("in_item_exp_date", null);
+            }
+            try {
+                cs.setDouble("in_unit_cost", stock.getUnitCost());
+            } catch (NullPointerException npe) {
+                cs.setDouble("in_unit_cost", 0);
+            }
+            try {
+                cs.setString("in_code_specific", stock.getCodeSpecific());
+            } catch (NullPointerException npe) {
+                cs.setString("in_code_specific", "");
+            }
+            try {
+                cs.setString("in_desc_specific", stock.getDescSpecific());
+            } catch (NullPointerException npe) {
+                cs.setString("in_desc_specific", "");
+            }
+            try {
+                cs.setString("in_desc_more", stock.getDescMore());
+            } catch (NullPointerException npe) {
+                cs.setString("in_desc_more", "");
+            }
+            try {
+                cs.setString("in_warranty_desc", stock.getWarrantyDesc());
+            } catch (NullPointerException npe) {
+                cs.setString("in_warranty_desc", "");
+            }
+            try {
+                cs.setDate("in_warranty_expiry_date", new java.sql.Date(stock.getWarrantyExpiryDate().getTime()));
+            } catch (NullPointerException npe) {
+                cs.setDate("in_warranty_expiry_date", null);
+            }
+            try {
+                cs.setDate("in_purchase_date", new java.sql.Date(stock.getPurchaseDate().getTime()));
+            } catch (NullPointerException npe) {
+                cs.setDate("in_purchase_date", null);
+            }
+            try {
+                cs.setDate("in_dep_start_date", new java.sql.Date(stock.getDepStartDate().getTime()));
+            } catch (NullPointerException npe) {
+                cs.setDate("in_dep_start_date", null);
+            }
+            try {
+                cs.setInt("in_dep_method_id", stock.getDepMethodId());
+            } catch (NullPointerException npe) {
+                cs.setInt("in_dep_method_id", 0);
+            }
+            try {
+                cs.setDouble("in_dep_rate", stock.getDepRate());
+            } catch (NullPointerException npe) {
+                cs.setDouble("in_dep_rate", 0);
+            }
+            try {
+                cs.setInt("in_average_method_id", stock.getAverageMethodId());
+            } catch (NullPointerException npe) {
+                cs.setInt("in_average_method_id", 0);
+            }
+            try {
+                cs.setInt("in_effective_life", stock.getEffectiveLife());
+            } catch (NullPointerException npe) {
+                cs.setInt("in_effective_life", 0);
+            }
+            try {
+                cs.setInt("in_asset_status_id", stock.getAssetStatusId());
+            } catch (NullPointerException npe) {
+                cs.setInt("in_asset_status_id", 0);
+            }
+            try {
+                cs.setString("in_asset_status_desc", stock.getAssetStatusDesc());
+            } catch (NullPointerException npe) {
+                cs.setString("in_asset_status_desc", "");
+            }
+            try {
+                cs.setString("in_account_code", stock.getAccountCode());
+            } catch (NullPointerException npe) {
+                cs.setString("in_account_code", "");
+            }
+            try {
+                cs.setDouble("in_residual_value", stock.getResidualValue());
+            } catch (NullPointerException npe) {
+                cs.setDouble("in_residual_value", 0);
+            }
+            try {
+                cs.setDouble("in_qty_damage", stock.getQty_damage());
+            } catch (NullPointerException npe) {
+                cs.setDouble("in_qty_damage", 0);
+            }
+            cs.executeUpdate();
+            status = 1;
+        } catch (SQLException se) {
+            status = 0;
+            System.err.println(se.getMessage());
+        }
+        return status;
+    }
+
+    public int addStock(Stock aStock, double aQty) {
+        String sql = "{call sp_add_stock_bms(?,?,?,?,?,?,?)}";
+        int status = 0;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                CallableStatement cs = conn.prepareCall(sql);) {
+            cs.setInt("in_store_id", aStock.getStoreId());
+            cs.setLong("in_item_id", aStock.getItemId());
+            cs.setString("in_batchno", aStock.getBatchno());
+            cs.setString("in_code_specific", aStock.getCodeSpecific());
+            cs.setString("in_desc_specific", aStock.getDescSpecific());
+            cs.setDouble("in_qty", aQty);
+            cs.setDouble("in_unit_cost", aStock.getUnitCost());
+            cs.executeUpdate();
+            status = 1;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            status = 0;
+        }
+        return status;
+    }
+
+    public int subtractStock(Stock aStock, double aQty) {
+        String sql = "{call sp_subtract_stock_bms(?,?,?,?,?,?)}";
+        int status = 0;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                CallableStatement cs = conn.prepareCall(sql);) {
+            cs.setInt("in_store_id", aStock.getStoreId());
+            cs.setLong("in_item_id", aStock.getItemId());
+            cs.setString("in_batchno", aStock.getBatchno());
+            cs.setString("in_code_specific", aStock.getCodeSpecific());
+            cs.setString("in_desc_specific", aStock.getDescSpecific());
+            cs.setDouble("in_qty", aQty);
+            cs.executeUpdate();
+            status = 1;
+        } catch (SQLException ex) {
+            status = 0;
+            Logger.getLogger(StockBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return status;
+    }
+
+    public int updateStockDamage(Stock aStock, double aQty, String aType) {
+        String sql = "";
+        if (aType.equals("Add")) {
+            sql = "{call sp_update_stock_damage_add(?,?,?,?,?,?)}";
+        } else if (aType.equals("Subtract")) {
+            sql = "{call sp_update_stock_damage_subtract(?,?,?,?,?,?)}";
+        }
+        int status = 0;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                CallableStatement cs = conn.prepareCall(sql);) {
+            cs.setInt("in_store_id", aStock.getStoreId());
+            cs.setLong("in_item_id", aStock.getItemId());
+            cs.setString("in_batchno", aStock.getBatchno());
+            cs.setString("in_code_specific", aStock.getCodeSpecific());
+            cs.setString("in_desc_specific", aStock.getDescSpecific());
+            cs.setDouble("in_qty", aQty);
+            cs.executeUpdate();
+            status = 1;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            status = 0;
+        }
+        return status;
+    }
+
+    public Stock getStock(Long StockId) {
+        String sql = "{call sp_search_stock_by_id(?)}";
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, StockId);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                Stock stock = new Stock();
+                this.setStockFromResultset(stock, rs);
+                return stock;
+            } else {
+                return null;
+            }
+        } catch (SQLException se) {
+            System.err.println("getStock:" + se.getMessage());
+            return null;
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.err.println("getStock:" + ex.getMessage());
+                }
+            }
+        }
+
+    }
+
+    public Stock getStock(int aStoreId, long aItemId, String aBatchNo, String aCodeSpecific, String aDescSpecific) {
+        String sql = "{call sp_search_stock_bms(?,?,?,?,?)}";
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setInt(1, aStoreId);
+            ps.setLong(2, aItemId);
+            ps.setString(3, aBatchNo);
+            ps.setString(4, aCodeSpecific);
+            ps.setString(5, aDescSpecific);
+
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                Stock stock = new Stock();
+                this.setStockFromResultset(stock, rs);
+                return stock;
+            } else {
+                return null;
+            }
+        } catch (SQLException | NullPointerException se) {
+            System.err.println("getStock:" + se.getMessage());
+            return null;
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.err.println("getStock:" + ex.getMessage());
+                }
+            }
+        }
+    }
+
+    public void setStockCurrentQty(Stock aStock, int aStoreId, long aItemId, String aBatchNo, String aCodeSpecific, String aDescSpecific) {
+        double CurrentQty = 0;
+        if (null == aStock) {
+            //do nothing
+        } else {
+            if (aItemId == 0 || aStoreId == 0) {
+                //do nothing
+            } else {
+                try {
+                    CurrentQty = this.getStock(aStoreId, aItemId, aBatchNo, aCodeSpecific, aDescSpecific).getCurrentqty();
+                } catch (Exception e) {
+                    //do nothing
+                }
+            }
+            aStock.setCurrentqty(CurrentQty);
+        }
+    }
+
+    public void setStockCurrentQty(Stock aStock, int aStoreId, long aItemId, long aStockId) {
+        //System.out.println("aStockId:" + aStockId + " aItemId:" + aItemId);
+        double CurrentQty = 0;
+        if (null == aStock) {
+            //do nothing
+        } else {
+            if (aStockId == 0 && aItemId == 0) {
+                //do nothing
+            } else {
+                try {
+                    if (aStockId > 0) {
+                        Stock st = this.getStock(aStockId);
+                        CurrentQty = this.getStock(aStoreId, st.getItemId(), st.getBatchno(), st.getCodeSpecific(), st.getDescSpecific()).getCurrentqty();
+                    } else if (aItemId > 0) {
+                        List<Stock> sts = this.getStocks(aStoreId, aItemId);
+                        if (sts.size() > 1) {
+                            //many stocks, do nothing
+                        } else if (sts.size() == 1) {
+                            Stock st2 = sts.get(0);
+                            //CurrentQty = this.getStock(aStoreId, st2.getItemId(), st2.getBatchno(), st2.getCodeSpecific(), st2.getDescSpecific()).getCurrentqty();
+                            CurrentQty = sts.get(0).getCurrentqty();
+                        }
+                    }
+                } catch (Exception e) {
+                    //do nothing
+                }
+            }
+            aStock.setCurrentqty(CurrentQty);
+        }
+    }
+
+    public void setStockCurrentQty(TransItem aTransItem, int aStoreId, long aItemId, long aStockId) {
+        //System.out.println("aStockId:" + aStockId + " aItemId:" + aItemId);
+        double CurrentQty = 0;
+        if (null == aTransItem) {
+            //do nothing
+        } else {
+            if (aStockId == 0 && aItemId == 0) {
+                //do nothing
+            } else {
+                try {
+                    if (aStockId > 0) {
+                        Stock st = this.getStock(aStockId);
+                        CurrentQty = this.getStock(aStoreId, st.getItemId(), st.getBatchno(), st.getCodeSpecific(), st.getDescSpecific()).getCurrentqty();
+                    } else if (aItemId > 0) {
+                        List<Stock> sts = this.getStocks(aStoreId, aItemId);
+                        if (sts.size() > 1) {
+                            //many stocks, do nothing
+                        } else if (sts.size() == 1) {
+                            Stock st2 = sts.get(0);
+                            //CurrentQty = this.getStock(aStoreId, st2.getItemId(), st2.getBatchno(), st2.getCodeSpecific(), st2.getDescSpecific()).getCurrentqty();
+                            CurrentQty = sts.get(0).getCurrentqty();
+                        }
+                    }
+                } catch (Exception e) {
+                    //do nothing
+                }
+            }
+            aTransItem.setQty_total(CurrentQty);
+        }
+    }
+
+    public double getItemUnitCostPrice(int aStoreId, long aItemId, String aBatchNo, String aCodeSpecific, String aDescSpecific) {
+        String sql = "{call sp_search_stock_bms(?,?,?,?,?)}";
+        ResultSet rs = null;
+        double UnitCostPrice = 0;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setInt(1, aStoreId);
+            ps.setLong(2, aItemId);
+            ps.setString(3, aBatchNo);
+            ps.setString(4, aCodeSpecific);
+            ps.setString(5, aDescSpecific);
+
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                Stock stock = new Stock();
+                try {
+                    UnitCostPrice = rs.getDouble("unit_cost");
+                } catch (NullPointerException npe) {
+                    UnitCostPrice = 0;
+                }
+                return UnitCostPrice;
+            } else {
+                return UnitCostPrice;
+            }
+        } catch (SQLException | NullPointerException se) {
+            System.err.println(se.getMessage());
+            return 0;
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.err.println(ex.getMessage());
+                }
+            }
+        }
+    }
+
+    public void addStock(int StoreId, Long ItemId, String BatchNo, double AddQty) {
+        String sql = "{call sp_add_stock_by_store_item_batch(?,?,?,?)}";
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setInt(1, StoreId);
+            ps.setLong(2, ItemId);
+            ps.setString(3, BatchNo);
+            ps.setDouble(4, AddQty);
+            ps.executeUpdate();
+            //clean stock
+            StockBean.deleteZeroQtyStock();
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.err.println(ex.getMessage());
+                }
+            }
+        }
+    }
+
+    public void subtractStock(int StoreId, Long ItemId, String BatchNo, double SubtractQty) {
+        String sql = "{call sp_subtract_stock_by_store_item_batch(?,?,?,?)}";
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setInt(1, StoreId);
+            ps.setLong(2, ItemId);
+            ps.setString(3, BatchNo);
+            ps.setDouble(4, SubtractQty);
+            ps.executeUpdate();
+            //clean stock
+            StockBean.deleteZeroQtyStock();
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.err.println(ex.getMessage());
+                }
+            }
+        }
+    }
+
+    public void deleteStock() {
+        this.deleteStockById(this.getSelectedStockId());
+    }
+
+    public void deleteStockByObject(Stock stock) {
+        this.deleteStockById(stock.getStockId());
+    }
+
+    public void deleteStockById(Long StockId) {
+        String sql = "DELETE FROM stock WHERE stock_id=?";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, StockId);
+            ps.executeUpdate();
+            this.setActionMessage("Deleted Successfully!");
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+            this.setActionMessage("Stock NOT deleted");
+        }
+    }
+
+    public void displayStock(Stock StockFrom, Stock StockTo) {
+        StockTo.setStockId(StockFrom.getStockId());
+        StockTo.setStoreId(StockFrom.getStoreId());
+        StockTo.setItemId(StockFrom.getItemId());
+        StockTo.setBatchno(StockFrom.getBatchno());
+        StockTo.setCurrentqty(StockFrom.getCurrentqty());
+        StockTo.setItemMnfDate(StockFrom.getItemMnfDate());
+        StockTo.setItemExpDate(StockFrom.getItemExpDate());
+    }
+
+    public void clearStock(Stock stock) {
+        stock.setStockId(0);
+        stock.setStockId(0);
+        stock.setStoreId(0);
+        stock.setItemId(0);
+        stock.setBatchno("");
+        stock.setCurrentqty(0);
+        //stock.setItemMnfDate(null);
+        //stock.setItemExpDate(null);
+    }
+
+    /**
+     * @return the Stocks
+     */
+    public List<Stock> getStocks() {
+        String sql;
+        sql = "SELECT * FROM stock";
+        ResultSet rs = null;
+        Stocks = new ArrayList<Stock>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Stock stock = new Stock();
+                this.setStockFromResultset(stock, rs);
+                Stocks.add(stock);
+            }
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.err.println(ex.getMessage());
+                }
+            }
+        }
+        return Stocks;
+    }
+
+    public List<Stock> getStocks(int StoreId, long ItemId) {
+        String sql;
+        sql = "{call sp_search_stock_by_store_item(?,?)}";
+        ResultSet rs = null;
+        Stocks = new ArrayList<Stock>();
+        if (ItemId == 0 || StoreId == 0) {
+            //do nothing
+        } else {
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                ps.setInt(1, StoreId);
+                ps.setLong(2, ItemId);
+                rs = ps.executeQuery();
+                while (rs.next()) {
+                    Stock stock = new Stock();
+                    this.setStockFromResultset(stock, rs);
+                    Stocks.add(stock);
+                }
+            } catch (SQLException se) {
+                System.err.println(se.getMessage());
+            } finally {
+                if (rs != null) {
+                    try {
+                        rs.close();
+                    } catch (SQLException ex) {
+                        System.err.println(ex.getMessage());
+                    }
+                }
+            }
+        }
+        return Stocks;
+    }
+
+    public void setStocks(List<Stock> aStockList, int StoreId, long ItemId) {
+        String sql;
+        sql = "{call sp_search_stock_by_store_item(?,?)}";
+        ResultSet rs = null;
+        try {
+            aStockList.clear();
+        } catch (Exception e) {
+            aStockList = new ArrayList<Stock>();
+        }
+        if (ItemId == 0 || StoreId == 0) {
+            //do nothing
+        } else {
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                ps.setInt(1, StoreId);
+                ps.setLong(2, ItemId);
+                rs = ps.executeQuery();
+                while (rs.next()) {
+                    Stock stock = new Stock();
+                    this.setStockFromResultset(stock, rs);
+                    aStockList.add(stock);
+                }
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+            }
+        }
+    }
+
+    public void refreshBatchList(int StoreId, long ItemId) {
+        String sql;
+        sql = "{call sp_search_stock_distinct_batch_by_store_item(?,?)}";
+        ResultSet rs = null;
+        try {
+            this.BatchList.clear();
+        } catch (Exception e) {
+            this.BatchList = new ArrayList<>();
+        }
+        try {
+            this.SpecificList.clear();
+        } catch (Exception e) {
+            this.SpecificList = new ArrayList<>();
+        }
+        if (ItemId == 0 || StoreId == 0) {
+            //do nothing
+        } else {
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                ps.setInt(1, StoreId);
+                ps.setLong(2, ItemId);
+                rs = ps.executeQuery();
+                while (rs.next()) {
+                    Stock stock = new Stock();
+                    //this.setStockFromResultset(stock, rs);
+                    try {
+                        stock.setBatchno(rs.getString("batchno"));
+                    } catch (NullPointerException npe) {
+                        stock.setBatchno("");
+                    }
+                    try {
+                        stock.setItemExpDate(new Date(rs.getDate("item_exp_date").getTime()));
+                    } catch (NullPointerException npe) {
+                        stock.setItemExpDate(null);
+                    }
+                    this.BatchList.add(stock);
+                }
+                //update for the specific items if list has 1 item
+                try {
+                    if (this.BatchList.size() == 1) {
+                        this.refreshSpecificList(StoreId, ItemId, this.BatchList.get(0).getBatchno());
+                    }
+                } catch (Exception e) {
+
+                }
+            } catch (SQLException se) {
+                System.err.println("refreshSpecificList:" + se.getMessage());
+            } finally {
+                if (rs != null) {
+                    try {
+                        rs.close();
+                    } catch (SQLException ex) {
+                        System.err.println("refreshSpecificList:" + ex.getMessage());
+                    }
+                }
+            }
+        }
+    }
+
+    public void clearLists() {
+        try {
+            this.BatchList.clear();
+        } catch (Exception e) {
+            this.BatchList = new ArrayList<>();
+        }
+        try {
+            this.SpecificList.clear();
+        } catch (Exception e) {
+            this.SpecificList = new ArrayList<>();
+        }
+    }
+
+    public List<Stock> getStocks(int aStoreId, long aItemId, String aBatchno) {
+        String sql;
+        sql = "{call sp_search_stock_by_store_item_batch(?,?,?)}";
+        ResultSet rs = null;
+        Stocks = new ArrayList<Stock>();
+        if (aItemId == 0 || aStoreId == 0) {
+            //do nothing
+        }
+        {
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                ps.setInt(1, aStoreId);
+                ps.setLong(2, aItemId);
+                ps.setString(3, aBatchno);
+                rs = ps.executeQuery();
+                while (rs.next()) {
+                    Stock stock = new Stock();
+                    this.setStockFromResultset(stock, rs);
+                    Stocks.add(stock);
+                }
+            } catch (SQLException se) {
+                System.err.println(se.getMessage());
+            } finally {
+                if (rs != null) {
+                    try {
+                        rs.close();
+                    } catch (SQLException ex) {
+                        System.err.println(ex.getMessage());
+                    }
+                }
+            }
+        }
+        return Stocks;
+    }
+
+    public void refreshSpecificList(int aStoreId, long aItemId, String aBatchno) {
+        String sql;
+        sql = "{call sp_search_stock_by_store_item_batch(?,?,?)}";
+        ResultSet rs = null;
+        try {
+            this.SpecificList.clear();
+        } catch (Exception e) {
+            this.SpecificList = new ArrayList<>();
+        }
+        if (aItemId == 0 || aStoreId == 0) {
+            //do nothing
+        }
+        {
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                ps.setInt(1, aStoreId);
+                ps.setLong(2, aItemId);
+                ps.setString(3, aBatchno);
+                rs = ps.executeQuery();
+                while (rs.next()) {
+                    Stock stock = new Stock();
+                    this.setStockFromResultset(stock, rs);
+                    this.SpecificList.add(stock);
+                }
+            } catch (SQLException se) {
+                System.err.println("refreshSpecificList:" + se.getMessage());
+            } finally {
+                if (rs != null) {
+                    try {
+                        rs.close();
+                    } catch (SQLException ex) {
+                        System.err.println("refreshSpecificList:" + ex.getMessage());
+                    }
+                }
+            }
+        }
+    }
+
+    public void refreshSpecificList(int aStoreId, long aItemId) {
+        String sql;
+        sql = "{call sp_search_stock_by_store_item(?,?)}";
+        ResultSet rs = null;
+        try {
+            this.SpecificList.clear();
+        } catch (Exception e) {
+            this.SpecificList = new ArrayList<>();
+        }
+        if (aItemId == 0 || aStoreId == 0) {
+            //do nothing
+        }
+        {
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                ps.setInt(1, aStoreId);
+                ps.setLong(2, aItemId);
+                rs = ps.executeQuery();
+                while (rs.next()) {
+                    Stock stock = new Stock();
+                    this.setStockFromResultset(stock, rs);
+                    this.SpecificList.add(stock);
+                }
+            } catch (SQLException se) {
+                System.err.println("refreshSpecificList2:" + se.getMessage());
+            } finally {
+                if (rs != null) {
+                    try {
+                        rs.close();
+                    } catch (SQLException ex) {
+                        System.err.println("refreshSpecificList2:" + ex.getMessage());
+                    }
+                }
+            }
+        }
+    }
+
+    public List<Stock> getStocksByItem(long ItemId) {
+        String sql;
+        sql = "{call sp_search_stock_by_item_id(?)}";
+        ResultSet rs = null;
+        Stocks = new ArrayList<Stock>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, ItemId);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Stock stock = new Stock();
+                this.setStockFromResultset(stock, rs);
+                Stocks.add(stock);
+            }
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.err.println(ex.getMessage());
+                }
+            }
+        }
+        //GeneralSetting.setLIST_ITEMS_COUNT(Stocks.size());
+        return Stocks;
+    }
+
+    public List<Stock> getStocks(int aStoreId) {
+        String sql;
+        sql = "{call sp_search_stock_by_store_id(?)}";
+        ResultSet rs = null;
+        Stocks = new ArrayList<Stock>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setInt(1, aStoreId);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Stock stock = new Stock();
+                this.setStockFromResultset(stock, rs);
+                Stocks.add(stock);
+            }
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.err.println(ex.getMessage());
+                }
+            }
+        }
+        return Stocks;
+    }
+
+    public double getStockAtHandCostPriceValue() {
+        double CpValue = 0;
+        String sql = "";
+        sql = "select sv.currency_code,sum(cp_value) as cp_value from view_stock_value sv group by sv.currency_code";
+        ResultSet rs = null;
+        List<Stock> stocks = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            //for stock currency is different from local currency currency, we first convert
+            double xrate = 1;
+            double XrateMultiply = 1;
+            AccCurrency LocalCurrency = null;
+            LocalCurrency = new AccCurrencyBean().getLocalCurrency();
+            while (rs.next()) {
+                String cur = "";
+                double amt = 0;
+                double amt_lc = 0;
+                try {
+                    cur = rs.getString("currency_code");
+                } catch (NullPointerException npe) {
+                }
+                try {
+                    amt = rs.getDouble("cp_value");
+                } catch (NullPointerException npe) {
+                }
+                try {
+                    xrate = new AccXrateBean().getXrate(cur, LocalCurrency.getCurrencyCode());
+                } catch (NullPointerException npe) {
+                    xrate = 1;
+                }
+                try {
+                    if (cur.equals(LocalCurrency.getCurrencyCode()) && !LocalCurrency.getCurrencyCode().equals(LocalCurrency.getCurrencyCode())) {
+                        XrateMultiply = 1 / xrate;
+                    } else {
+                        XrateMultiply = xrate;
+                    }
+                } catch (NullPointerException npe) {
+                    XrateMultiply = 1;
+                }
+                amt_lc = amt * XrateMultiply;
+                CpValue = CpValue + amt_lc;
+            }
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.err.println(ex.getMessage());
+                }
+            }
+        }
+        return CpValue;
+    }
+
+    public int getSnapshotMaxNoStockValue(int aAccPeriodId) {
+        String sql;
+        sql = "select max(snapshot_no) as snapshot_no from snapshot_stock_value where acc_period_id=" + aAccPeriodId;
+        ResultSet rs = null;
+        int SnapshotMaxNo = 0;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                try {
+                    SnapshotMaxNo = rs.getInt("snapshot_no");
+                } catch (NullPointerException npe) {
+                    SnapshotMaxNo = 0;
+                }
+            }
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.err.println(ex.getMessage());
+                }
+            }
+        }
+        return SnapshotMaxNo;
+    }
+
+    public double getStockAtHandCostPriceValueSnapshot(int aAccPeriodId) {
+        double CpValue = 0;
+        int SnapshopMaxNo = 0;
+        SnapshopMaxNo = this.getSnapshotMaxNoStockValue(aAccPeriodId);
+        String sql = "";
+        sql = "select sv.currency_code,sum(cp_value) as cp_value from snapshot_stock_value sv where snapshot_no=" + SnapshopMaxNo + " group by sv.currency_code";
+        ResultSet rs = null;
+        List<Stock> stocks = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            //for stock currency is different from local currency currency, we first convert
+            double xrate = 1;
+            double XrateMultiply = 1;
+            AccCurrency LocalCurrency = null;
+            LocalCurrency = new AccCurrencyBean().getLocalCurrency();
+            while (rs.next()) {
+                String cur = "";
+                double amt = 0;
+                double amt_lc = 0;
+                try {
+                    cur = rs.getString("currency_code");
+                } catch (NullPointerException npe) {
+                }
+                try {
+                    amt = rs.getDouble("cp_value");
+                } catch (NullPointerException npe) {
+                }
+                try {
+                    xrate = new AccXrateBean().getXrateSnapshot(cur, LocalCurrency.getCurrencyCode(), aAccPeriodId);
+                } catch (NullPointerException npe) {
+                    xrate = 1;
+                }
+                try {
+                    if (cur.equals(LocalCurrency.getCurrencyCode()) && !LocalCurrency.getCurrencyCode().equals(LocalCurrency.getCurrencyCode())) {
+                        XrateMultiply = 1 / xrate;
+                    } else {
+                        XrateMultiply = xrate;
+                    }
+                } catch (NullPointerException npe) {
+                    XrateMultiply = 1;
+                }
+                amt_lc = amt * XrateMultiply;
+                CpValue = CpValue + amt_lc;
+            }
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.err.println(ex.getMessage());
+                }
+            }
+        }
+        return CpValue;
+    }
+
+    public void reportInventoryStock(int aStoreId, int aCategoryId, Date aDate1, Date aDate2) {
+        String sql = "SELECT * FROM view_inventory_stock WHERE 1=1";
+        //unit_cost_price excahnged for unit_cost
+        String sqlsum = "SELECT currency_code,sum(currentqty*unit_cost) as cost_value,"
+                + "sum(currentqty*unit_retailsale_price) as retailsale_value,"
+                + "sum(currentqty*unit_wholesale_price) as wholesale_value FROM view_inventory_stock WHERE 1=1";
+        String wheresql = "";
+        String ordersql = "";
+        String ordersqlsum = "";
+        String groupbysql = " GROUP BY currency_code";
+        ResultSet rs = null;
+        this.StocksList = new ArrayList<>();
+        this.StocksSummary = new ArrayList<>();
+        if (aStoreId > 0) {
+            wheresql = wheresql + " AND store_id=" + aStoreId;
+        }
+        if (aCategoryId > 0) {
+            wheresql = wheresql + " AND category_id=" + aCategoryId;
+        }
+        if (aDate1 != null && aDate2 != null) {
+            wheresql = wheresql + " AND item_exp_date BETWEEN '" + new java.sql.Timestamp(aDate1.getTime()) + "' AND '" + new java.sql.Timestamp(aDate2.getTime()) + "'";
+        }
+        ordersql = " ORDER BY description ASC";
+        ordersqlsum = " ORDER BY currency_code ASC";
+        sql = sql + wheresql + ordersql;
+        sqlsum = sqlsum + wheresql + groupbysql + ordersqlsum;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            Stock stock = null;
+            while (rs.next()) {
+                stock = new Stock();
+                this.setStockFromResultsetReport(stock, rs);
+                this.StocksList.add(stock);
+            }
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+        }
+
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sqlsum);) {
+            rs = ps.executeQuery();
+            Stock stocksum = null;
+            while (rs.next()) {
+                stocksum = new Stock();
+                try {
+                    stocksum.setCurrencyCode(rs.getString("currency_code"));
+                } catch (NullPointerException npe) {
+                    stocksum.setCurrencyCode("");
+                }
+                try {
+                    stocksum.setCostValue(rs.getDouble("cost_value"));
+                } catch (NullPointerException npe) {
+                    stocksum.setCostValue(0);
+                }
+                try {
+                    stocksum.setRetailsaleValue(rs.getDouble("retailsale_value"));
+                } catch (NullPointerException npe) {
+                    stocksum.setRetailsaleValue(0);
+                }
+                try {
+                    stocksum.setWholesaleValue(rs.getDouble("wholesale_value"));
+                } catch (NullPointerException npe) {
+                    stocksum.setWholesaleValue(0);
+                }
+                this.StocksSummary.add(stocksum);
+            }
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+        }
+    }
+
+    public void reportInventoryExpense(int aStoreId, int aCategoryId, Date aDate1, Date aDate2) {
+        String sql = "SELECT * FROM view_inventory_expense WHERE 1=1";
+        String sqlsum = "SELECT currency_code,sum(currentqty*unit_cost) as cost_value FROM view_inventory_expense WHERE 1=1";
+        String wheresql = "";
+        String ordersql = "";
+        String ordersqlsum = "";
+        String groupbysql = " GROUP BY currency_code";
+        ResultSet rs = null;
+        this.StocksList = new ArrayList<>();
+        this.StocksSummary = new ArrayList<>();
+        if (aStoreId > 0) {
+            wheresql = wheresql + " AND store_id=" + aStoreId;
+        }
+        if (aCategoryId > 0) {
+            wheresql = wheresql + " AND category_id=" + aCategoryId;
+        }
+        if (aDate1 != null && aDate2 != null) {
+            wheresql = wheresql + " AND item_exp_date BETWEEN '" + new java.sql.Timestamp(aDate1.getTime()) + "' AND '" + new java.sql.Timestamp(aDate2.getTime()) + "'";
+        }
+        ordersql = " ORDER BY description ASC";
+        ordersqlsum = " ORDER BY currency_code ASC";
+        sql = sql + wheresql + ordersql;
+        sqlsum = sqlsum + wheresql + groupbysql + ordersqlsum;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            Stock stock = null;
+            while (rs.next()) {
+                stock = new Stock();
+                this.setStockFromResultsetReport(stock, rs);
+                this.StocksList.add(stock);
+            }
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+        }
+
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sqlsum);) {
+            rs = ps.executeQuery();
+            Stock stocksum = null;
+            while (rs.next()) {
+                stocksum = new Stock();
+                try {
+                    stocksum.setCurrencyCode(rs.getString("currency_code"));
+                } catch (NullPointerException npe) {
+                    stocksum.setCurrencyCode("");
+                }
+                try {
+                    stocksum.setCostValue(rs.getDouble("cost_value"));
+                } catch (NullPointerException npe) {
+                    stocksum.setCostValue(0);
+                }
+                this.StocksSummary.add(stocksum);
+            }
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+        }
+    }
+
+    public void reportInventoryAsset(int aStoreId, String aAssetType) {
+        String sql = "SELECT * FROM view_inventory_asset WHERE 1=1";
+        //unit_cost_price excahnged for unit_cost
+        String sqlsum = "SELECT currency_code,sum(currentqty*unit_cost) as cost_value FROM view_inventory_asset WHERE 1=1";
+        String wheresql = "";
+        String ordersql = "";
+        String ordersqlsum = "";
+        String groupbysql = " GROUP BY currency_code";
+        ResultSet rs = null;
+        this.StocksList = new ArrayList<>();
+        this.StocksSummary = new ArrayList<>();
+        if (aStoreId > 0) {
+            wheresql = wheresql + " AND store_id=" + aStoreId;
+        }
+        if (aAssetType.length() > 0) {
+            wheresql = wheresql + " AND asset_type='" + aAssetType + "'";
+        }
+        ordersql = " ORDER BY description ASC";
+        ordersqlsum = " ORDER BY currency_code ASC";
+        sql = sql + wheresql + ordersql;
+        sqlsum = sqlsum + wheresql + groupbysql + ordersqlsum;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            Stock stock = null;
+            while (rs.next()) {
+                stock = new Stock();
+                this.setStockFromResultsetReport(stock, rs);
+                try {
+                    stock.setQty_out(new Stock_outBean().getStock_outTotal(stock.getStoreId(), stock.getItemId(), stock.getBatchno(), stock.getCodeSpecific(), stock.getDescSpecific()));
+                } catch (NullPointerException npe) {
+
+                }
+                this.StocksList.add(stock);
+            }
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+        }
+
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sqlsum);) {
+            rs = ps.executeQuery();
+            Stock stocksum = null;
+            while (rs.next()) {
+                stocksum = new Stock();
+                try {
+                    stocksum.setCurrencyCode(rs.getString("currency_code"));
+                } catch (NullPointerException npe) {
+                    stocksum.setCurrencyCode("");
+                }
+                try {
+                    stocksum.setCostValue(rs.getDouble("cost_value"));
+                } catch (NullPointerException npe) {
+                    stocksum.setCostValue(0);
+                }
+                this.StocksSummary.add(stocksum);
+            }
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+        }
+    }
+
+    /**
+     * @param Stocks the Stocks to set
+     */
+    public void setStocks(List<Stock> Stocks) {
+        this.Stocks = Stocks;
+    }
+
+    /**
+     * @return the ActionMessage
+     */
+    public String getActionMessage() {
+        return ActionMessage;
+    }
+
+    /**
+     * @param ActionMessage the ActionMessage to set
+     */
+    public void setActionMessage(String ActionMessage) {
+        this.ActionMessage = ActionMessage;
+    }
+
+    /**
+     * @return the SelectedStock
+     */
+    public Stock getSelectedStock() {
+        return SelectedStock;
+    }
+
+    /**
+     * @param SelectedStock the SelectedStock to set
+     */
+    public void setSelectedStock(Stock SelectedStock) {
+        this.SelectedStock = SelectedStock;
+    }
+
+    /**
+     * @return the SelectedStockId
+     */
+    public Long getSelectedStockId() {
+        return SelectedStockId;
+    }
+
+    /**
+     * @param SelectedStockId the SelectedStockId to set
+     */
+    public void setSelectedStockId(Long SelectedStockId) {
+        this.SelectedStockId = SelectedStockId;
+    }
+
+    public static void deleteZeroQtyStock() {
+        String sql = "DELETE FROM stock WHERE currentqty=0";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.executeUpdate();
+        } catch (SQLException se) {
+            System.err.println("deleteZeroQtyStock:" + se.getMessage());
+        }
+    }
+
+    public String getExpiryListString(Date aExpiryDate) {
+        String dateString = "";
+        SimpleDateFormat sdfr = new SimpleDateFormat("dd/MMM/yyyy");
+        try {
+            dateString = "(" + sdfr.format(aExpiryDate) + ")";
+        } catch (Exception ex) {
+            dateString = "";
+        }
+        return dateString;
+    }
+
+    public void initClearStock(Stock aStock, List<Stock> aStockList, List<Stock> aStockListSummary) {
+        if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
+            // Skip ajax requests.
+        } else {
+            try {
+                if (aStock != null) {
+                    this.clearStock(aStock);
+                }
+            } catch (NullPointerException npe) {
+            }
+            try {
+                if (null != aStockList) {
+                    aStockList.clear();
+                }
+            } catch (NullPointerException npe) {
+            }
+            try {
+                if (null != aStockListSummary) {
+                    aStockListSummary.clear();
+                }
+            } catch (NullPointerException npe) {
+            }
+        }
+    }
+
+    /**
+     * @return the StocksList
+     */
+    public List<Stock> getStocksList() {
+        return StocksList;
+    }
+
+    /**
+     * @param StocksList the StocksList to set
+     */
+    public void setStocksList(List<Stock> StocksList) {
+        this.StocksList = StocksList;
+    }
+
+    /**
+     * @return the StocksSummary
+     */
+    public List<Stock> getStocksSummary() {
+        return StocksSummary;
+    }
+
+    /**
+     * @param StocksSummary the StocksSummary to set
+     */
+    public void setStocksSummary(List<Stock> StocksSummary) {
+        this.StocksSummary = StocksSummary;
+    }
+
+    /**
+     * @return the BatchList
+     */
+    public List<Stock> getBatchList() {
+        return BatchList;
+    }
+
+    /**
+     * @param BatchList the BatchList to set
+     */
+    public void setBatchList(List<Stock> BatchList) {
+        this.BatchList = BatchList;
+    }
+
+    /**
+     * @return the SpecificList
+     */
+    public List<Stock> getSpecificList() {
+        return SpecificList;
+    }
+
+    /**
+     * @param SpecificList the SpecificList to set
+     */
+    public void setSpecificList(List<Stock> SpecificList) {
+        this.SpecificList = SpecificList;
+    }
+}

@@ -1,0 +1,392 @@
+package beans;
+
+import sessions.GeneralUserSetting;
+import connections.DBConnection;
+import entities.GroupRight;
+import entities.UserDetail;
+import entities.Category;
+import java.io.Serializable;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.*;
+import javax.faces.context.FacesContext;
+
+@ManagedBean
+@SessionScoped
+public class CategoryBean implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+    private List<Category> Categories;
+    private String ActionMessage;
+    private Category SelectedCategory = null;
+    private int SelectedCategoryId;
+    private String SearchCategoryName = "";
+    private int TempId1;
+    private String TempString1;
+    private int TempId2;
+    private String TempString2;
+
+    public void saveCategory(Category cat) {
+        String sql = null;
+        String msg = null;
+
+        UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
+        List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
+        GroupRightBean grb = new GroupRightBean();
+
+        if (cat.getCategoryId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Add") == 0) {
+            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+        } else if (cat.getCategoryId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Edit") == 0) {
+            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+        } else if (cat.getCategoryName().length() <= 0) {
+            msg = "Category Name Needed...";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+        } else {
+            if (cat.getCategoryId() == 0) {
+                sql = "{call sp_insert_category(?,?,?)}";
+            } else if (cat.getCategoryId() > 0) {
+                sql = "{call sp_update_category(?,?,?,?)}";
+            }
+
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    CallableStatement cs = conn.prepareCall(sql);) {
+                if (cat.getCategoryId() == 0) {
+                    cs.setString(1, cat.getCategoryName());
+                    cs.setInt(2, cat.getDisplay_quick_order());
+                    cs.setInt(3, cat.getList_rank());
+                    cs.executeUpdate();
+                    this.setActionMessage("Saved Successfully");
+                    this.clearCategory(cat);
+                } else if (cat.getCategoryId() > 0) {
+                    cs.setInt(1, cat.getCategoryId());
+                    cs.setString(2, cat.getCategoryName());
+                    cs.setInt(3, cat.getDisplay_quick_order());
+                    cs.setInt(4, cat.getList_rank());
+                    cs.executeUpdate();
+                    this.setActionMessage("Saved Successfully");
+                    this.clearCategory(cat);
+                }
+            } catch (SQLException se) {
+                System.err.println(se.getMessage());
+                this.setActionMessage("Category NOT saved");
+            }
+        }
+    }
+
+    public void setCategoryFromResultset(Category aCategory, ResultSet aResultSet) {
+        try {
+            try {
+                aCategory.setCategoryId(aResultSet.getInt("category_id"));
+            } catch (NullPointerException npe) {
+                aCategory.setCategoryId(0);
+            }
+            try {
+                aCategory.setCategoryName(aResultSet.getString("category_name"));
+            } catch (NullPointerException npe) {
+                aCategory.setCategoryName("");
+            }
+            try {
+                aCategory.setDisplay_quick_order(aResultSet.getInt("display_quick_order"));
+            } catch (NullPointerException npe) {
+                aCategory.setDisplay_quick_order(0);
+            }
+            try {
+                aCategory.setList_rank(aResultSet.getInt("list_rank"));
+            } catch (NullPointerException npe) {
+                aCategory.setList_rank(0);
+            }
+        } catch (SQLException se) {
+            System.err.println("setCategoryFromResultset:" + se.getMessage());
+        }
+    }
+
+    public Category getCategory(int CatId) {
+        String sql = "{call sp_search_category_by_id(?)}";
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setInt(1, CatId);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                Category cat = new Category();
+                this.setCategoryFromResultset(cat, rs);
+                return cat;
+            } else {
+                return null;
+            }
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+            return null;
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.err.println(ex.getMessage());
+                }
+            }
+        }
+
+    }
+
+    public void deleteCategory() {
+        this.deleteCategoryById(this.SelectedCategoryId);
+    }
+
+    public void deleteCategoryByObject(Category Cat) {
+        this.deleteCategoryById(Cat.getCategoryId());
+    }
+
+    public void deleteCategoryById(int CatId) {
+        String msg;
+        UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
+        List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
+        GroupRightBean grb = new GroupRightBean();
+
+        if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Delete") == 0) {
+            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+        } else {
+            String sql = "DELETE FROM category WHERE category_id=?";
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                ps.setInt(1, CatId);
+                ps.executeUpdate();
+                this.setActionMessage("Deleted Successfully!");
+            } catch (SQLException se) {
+                System.err.println(se.getMessage());
+                this.setActionMessage("Category NOT deleted");
+            }
+        }
+    }
+
+    public void displayCategory(Category CatFrom, Category CatTo) {
+        CatTo.setCategoryId(CatFrom.getCategoryId());
+        CatTo.setCategoryName(CatFrom.getCategoryName());
+        CatTo.setDisplay_quick_order(CatFrom.getDisplay_quick_order());
+        CatTo.setList_rank(CatFrom.getList_rank());
+    }
+
+    public void clearCategory(Category Cat) {
+        Cat.setCategoryId(0);
+        Cat.setCategoryName("");
+        Cat.setDisplay_quick_order(0);
+        Cat.setList_rank(0);
+    }
+
+    public List<Category> getCategories() {
+        String sql;
+        sql = "{call sp_search_category_by_none()}";
+        ResultSet rs = null;
+        Categories = new ArrayList<Category>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Category cat = new Category();
+                this.setCategoryFromResultset(cat, rs);
+                Categories.add(cat);
+            }
+        } catch (SQLException se) {
+            System.err.println("getCategories:" + se.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.err.println("getCategories:" + ex.getMessage());
+                }
+            }
+        }
+        return Categories;
+    }
+    
+    public List<Category> getCategoriesQuickOrder() {
+        String sql;
+        sql = "SELECT * FROM category where display_quick_order=1 ORDER BY list_rank DESC,category_name ASC";
+        ResultSet rs = null;
+        Categories = new ArrayList<Category>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Category cat = new Category();
+                this.setCategoryFromResultset(cat, rs);
+                Categories.add(cat);
+            }
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.err.println(ex.getMessage());
+                }
+            }
+        }
+        return Categories;
+    }
+
+    /**
+     * @param aCategoryName
+     * @return the Categories
+     */
+    public List<Category> getCategoriesByCategoryName(String aCategoryName) {
+        String sql;
+        sql = "{call sp_search_category_by_name(?)}";
+        ResultSet rs = null;
+        Categories = new ArrayList<Category>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setString(1, aCategoryName);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Category cat = new Category();
+                this.setCategoryFromResultset(cat, rs);
+                Categories.add(cat);
+            }
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.err.println(ex.getMessage());
+                }
+            }
+        }
+        return Categories;
+    }
+
+    /**
+     * @param Categories the Categories to set
+     */
+    public void setCategories(List<Category> Categories) {
+        this.Categories = Categories;
+    }
+
+    /**
+     * @return the SelectedCategory
+     */
+    public Category getSelectedCategory() {
+        return SelectedCategory;
+    }
+
+    /**
+     * @param SelectedCategory the SelectedCategory to set
+     */
+    public void setSelectedCategory(Category SelectedCategory) {
+        this.SelectedCategory = SelectedCategory;
+    }
+
+    /**
+     * @return the SelectedCategoryId
+     */
+    public int getSelectedCategoryId() {
+        return SelectedCategoryId;
+    }
+
+    /**
+     * @param SelectedCategoryId the SelectedCategoryId to set
+     */
+    public void setSelectedCategoryId(int SelectedCategoryId) {
+        this.SelectedCategoryId = SelectedCategoryId;
+    }
+
+    /**
+     * @return the SearchCategoryName
+     */
+    public String getSearchCategoryName() {
+        return SearchCategoryName;
+    }
+
+    /**
+     * @param SearchCategoryName the SearchCategoryName to set
+     */
+    public void setSearchCategoryName(String SearchCategoryName) {
+        this.SearchCategoryName = SearchCategoryName;
+    }
+
+    /**
+     * @return the ActionMessage
+     */
+    public String getActionMessage() {
+        return ActionMessage;
+    }
+
+    /**
+     * @param ActionMessage the ActionMessage to set
+     */
+    public void setActionMessage(String ActionMessage) {
+        this.ActionMessage = ActionMessage;
+    }
+
+    /**
+     * @return the TempId1
+     */
+    public int getTempId1() {
+        return TempId1;
+    }
+
+    /**
+     * @param TempId1 the TempId1 to set
+     */
+    public void setTempId1(int TempId1) {
+        this.TempId1 = TempId1;
+    }
+
+    /**
+     * @return the TempString1
+     */
+    public String getTempString1() {
+        return TempString1;
+    }
+
+    /**
+     * @param TempString1 the TempString1 to set
+     */
+    public void setTempString1(String TempString1) {
+        this.TempString1 = TempString1;
+    }
+
+    /**
+     * @return the TempId2
+     */
+    public int getTempId2() {
+        return TempId2;
+    }
+
+    /**
+     * @param TempId2 the TempId2 to set
+     */
+    public void setTempId2(int TempId2) {
+        this.TempId2 = TempId2;
+    }
+
+    /**
+     * @return the TempString2
+     */
+    public String getTempString2() {
+        return TempString2;
+    }
+
+    /**
+     * @param TempString2 the TempString2 to set
+     */
+    public void setTempString2(String TempString2) {
+        this.TempString2 = TempString2;
+    }
+
+}

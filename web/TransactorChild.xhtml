@@ -1,0 +1,275 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Transactor</title>
+        <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:metadata>
+        <f:viewAction action="#{transactorBean.initTransactorObj()}"/>
+    </f:metadata>
+    <h:body>
+        <h:form id="form" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
+                    return false;">
+
+            <h:panelGrid styleClass="clsGridMainHeader" columns="1">
+                <h:outputLabel styleClass="clsLabelTop" id="olblTransactorHeader" value="#{transactorBean.transactorObj.transactorType} DETAIL"/>
+            </h:panelGrid>
+            
+            <h:panelGrid styleClass="clsGridMainInput" columns="3">
+                <h:panelGrid columns="2">
+                    <h:outputLabel  value="Type:"/>
+                    <h:selectOneMenu styleClass="clsMenu" id="menuTransactorType" value="#{transactorBean.transactorObj.transactorType}" style="width: 220px;">
+                        <f:selectItem itemLabel="#{transactorBean.transactorObj.transactorType}" itemValue="#{transactorBean.transactorObj.transactorType}"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel  value="Category:"/>
+                    <h:selectOneMenu styleClass="clsMenu" id="menuTransactorCategory" value="#{transactorBean.transactorObj.category}" style="width: 220px;">
+                        <f:selectItem itemLabel="" />
+                        <f:selectItem itemLabel="Individual" itemValue="Individual"/>
+                        <f:selectItem itemLabel="Company" itemValue="Company"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel  value="Reference No:"/>
+                    <h:inputText styleClass="clsInput" id="itxtRef" value="#{transactorBean.transactorObj.transactorRef}" autocomplete="off">
+                    </h:inputText>
+                    <h:outputLabel  value="Names:"/>
+                    <h:inputText styleClass="clsInput" id="itxtTransactorNames" value="#{transactorBean.transactorObj.transactorNames}" autocomplete="off">
+                    </h:inputText>
+                    <h:outputLabel  value="Title:"/>
+                    <h:inputText styleClass="clsInput" id="itxtTitle" value="#{transactorBean.transactorObj.title}" autocomplete="off">
+                    </h:inputText>
+                    <h:outputLabel  value="Phone:"/>
+                    <h:inputText styleClass="clsInput" id="itxtPhone" value="#{transactorBean.transactorObj.phone}" autocomplete="off">
+                    </h:inputText>
+                    <h:outputLabel  value="Email:"/>
+                    <h:inputText styleClass="clsInput" id="itxtEmail" value="#{transactorBean.transactorObj.email}" autocomplete="off">
+                    </h:inputText>
+                    <h:outputLabel  value="Position:"/>
+                    <h:inputText styleClass="clsInput" id="itxtPosition" value="#{transactorBean.transactorObj.position}" autocomplete="off">
+                    </h:inputText>
+                    <h:outputLabel  value="Tax Identity No:"/>
+                    <h:inputText styleClass="clsInput" id="itxtTaxIdentity" value="#{transactorBean.transactorObj.taxIdentity}" autocomplete="off">
+                    </h:inputText>
+                    <h:outputLabel  value="Website:"/>
+                    <h:inputText styleClass="clsInput" id="itxtWebsite" value="#{transactorBean.transactorObj.website}" autocomplete="off">
+                    </h:inputText>
+
+                    <h:outputLabel  value="Contact Person(CP):"/>
+                    <h:inputText styleClass="clsInput" id="itxtCpName" value="#{transactorBean.transactorObj.cpName}" autocomplete="off">
+                    </h:inputText>
+                    <h:outputLabel  value="CP Title:"/>
+                    <h:inputText styleClass="clsInput" id="itxtCpTitle" value="#{transactorBean.transactorObj.cpTitle}" autocomplete="off">
+                    </h:inputText>
+
+                    <h:outputLabel  value="CP Phone:"/>
+                    <h:inputText styleClass="clsInput" id="itxtCpPhone" value="#{transactorBean.transactorObj.cpPhone}" autocomplete="off">
+                    </h:inputText>
+                    <h:outputLabel  value="CP Email:"/>
+                    <h:inputText styleClass="clsInput" id="itxtCpEmail" value="#{transactorBean.transactorObj.cpEmail}" autocomplete="off">
+                    </h:inputText>
+                    <h:outputLabel  value="Date of Birth(DOB):"/>
+                    <p:calendar styleClass="clsInput" id="calDOB" navigator="true" showButtonPanel="true" value="#{transactorBean.transactorObj.DOB}" pattern="#{companySetting.getDateFormat()}" size="18"/>
+                </h:panelGrid>
+                <h:panelGrid columns="2">
+                    <h:outputLabel  value="Sex:"/>
+                    <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.sex}" autocomplete="off"/>
+                    <h:outputLabel  value="Occupation:"/>
+                    <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.occupation}" autocomplete="off"/>
+                    <h:outputLabel  value="Country:"/>
+                    <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.locCountry}" autocomplete="on"/>
+                    <h:outputLabel  value="District:"/>
+                    <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.locDistrict}" autocomplete="on"/>
+                    <h:outputLabel  value="Town/Village:"/>
+                    <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.locTown}" autocomplete="on"/>
+                    <h:outputLabel  value="Physical Address:"/>
+                    <h:inputTextarea styleClass="clsInput" id="itxaPhysicalAddress" rows="2" value="#{transactorBean.transactorObj.physicalAddress}"/>
+                    <h:outputLabel  value="First Date:"/>
+                    <p:calendar styleClass="clsInput" navigator="true" showButtonPanel="true" value="#{transactorBean.transactorObj.firstDate}" pattern="#{companySetting.getDateFormat()}" size="18"/>
+                    <h:outputLabel  value="File Ref:"/>
+                    <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.fileReference}" autocomplete="off"/>
+                    <h:outputLabel  value="ID Type:"/>
+                    <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.idType}" autocomplete="off"/>
+                    <h:outputLabel  value="ID Number:"/>
+                    <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.idNumber}" autocomplete="off"/>
+                    <h:outputLabel  value="ID Expiry Date:"/>
+                    <p:calendar styleClass="clsInput" navigator="true" showButtonPanel="true" value="#{transactorBean.transactorObj.idExpiryDate}" pattern="#{companySetting.getDateFormat()}" size="18"/>
+                    <h:outputLabel  value="Account Details:"/>
+                    <h:inputTextarea styleClass="clsInput" id="itxaAccountDetails" rows="2" value="#{transactorBean.transactorObj.accountDetails}">
+                    </h:inputTextarea>
+                    <h:outputLabel  value="Is Suspended?:"/>
+                    <h:selectOneMenu styleClass="clsMenu" value="#{transactorBean.transactorObj.isSuspended}" style="width: 220px;">
+                        <f:selectItem itemLabel="No" itemValue="No"/>
+                        <f:selectItem itemLabel="Yes" itemValue="Yes"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel  value="Suspended Reason:"/>
+                    <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.suspendedReason}" autocomplete="off" style="color: red"/>
+                </h:panelGrid>
+                <h:panelGrid id="pnlSalary" columns="1" rendered="#{transactorBean.transactorObj.transactorType.equals('EMPLOYEE')}">
+                    <h:outputLabel  value="Gross Pay (Monthly):"/>
+                    <h:inputText id="itxtGrossPay" styleClass="clsInput" value="#{transactorBean.transactorObj.monthGrossPay}" autocomplete="off">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:ajax event="change" listener="#{transactorBean.refreshTotalSalaryDeductions(transactorBean.transactorObj)}" execute="@form" render="@form"/>
+                    </h:inputText>
+                    <p:dataTable rowIndexVar="rowIndex" id="dtblDeductions" value="#{transactorBean.salaryDeductions}" var="sd" 
+                                 styleClass="cls-table" tableStyle="width:auto;" 
+                                 >
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">Deductions</f:facet>
+                            <!-- row record -->
+                            <h:selectOneMenu styleClass="clsMenu" value="#{sd.deductionName}" style="width: 100px;">
+                                <f:selectItem itemLabel="" itemValue=""/>
+                                <f:selectItem itemLabel="MEDICAL" itemValue="MEDICAL"/>
+                                <f:selectItem itemLabel="HOUSING" itemValue="HOUSING"/>
+                                <f:selectItem itemLabel="RBS" itemValue="RBS"/>
+                                <f:selectItem itemLabel="PAYE" itemValue="PAYE"/>
+                                <f:selectItem itemLabel="NSSF" itemValue="NSSF"/>
+                                <f:selectItem itemLabel="Other" itemValue="OTHER"/>
+                            </h:selectOneMenu>
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">Perc (%)</f:facet>
+                            <!-- row record -->
+                            <h:inputText id="itxtInnerPerc" value="#{sd.perc}" style="width: 50px;">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:ajax event="change" listener="#{transactorBean.calcSalaryDeductionAmount(transactorBean.transactorObj,sd)}" execute="@form" render="@form"/>
+                            </h:inputText>
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">Amount</f:facet>
+                            <!-- row record -->
+                            <h:inputText id="itxtInnerAmount" value="#{sd.amount}" style="width: 80px;">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:ajax event="change" listener="#{transactorBean.calcSalaryDeductionPerc(transactorBean.transactorObj,sd)}" execute="@form" render="@form"/>
+                            </h:inputText>
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">
+                                <h:commandButton id="cmdbAddItem" value="+">
+                                    <f:ajax listener="#{transactorBean.addSalaryDeduction()}" execute="@form" render="@form"/>
+                                </h:commandButton>
+                            </f:facet>
+                            <!-- row record -->
+                            <h:commandButton id="cmdbRemoveItem" value="-">
+                                <f:ajax listener="#{transactorBean.removeSalaryDeduction(transactorBean.transactorObj,sd)}" execute="@form" render="@form"/>
+                            </h:commandButton>
+                        </p:column> 
+                    </p:dataTable>
+                    <h:outputLabel  value="Net Pay (Monthly):"/>
+                    <h:inputText id="itxtMonthNetPay" styleClass="clsInput" value="#{transactorBean.transactorObj.monthNetPay}" autocomplete="off" disabled="true">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:ajax event="change" execute="@this" render="@this"/>
+                    </h:inputText>
+                </h:panelGrid>
+            </h:panelGrid>
+                
+            <h:panelGrid styleClass="clsGridMainCommands" columns="1">
+                <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
+                    <p:commandButton styleClass="clsButtonBig" id="cmdbSave" value="SAVE (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                        <f:ajax listener="#{transactorBean.saveTransactor(transactorBean.transactorObj,transactorBean.salaryDeductions)}" execute="@form" render="@form" />
+                    </p:commandButton>
+                    <p:commandButton styleClass="clsButtonBig" id="cmdbClear" value="CLEAR (ALT+C)" accesskey="c">
+                        <f:ajax listener="#{transactorBean.clearTransactor2(transactorBean.transactorObj,transactorBean.salaryDeductions)}" execute="@form" render="@form" />
+                    </p:commandButton>
+                </h:panelGrid>
+            </h:panelGrid>
+
+            <h:panelGrid styleClass="clsGridMainMessages" columns="1">
+                <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{transactorBean.actionMessage}"/>
+                <h:messages id="msgsMainMessage" style="color: red"/><br/>
+            </h:panelGrid>
+            <p:growl/>
+
+            <h:panelGrid styleClass="clsGridMainSearch" columns="1">
+                <h:outputLabel id="olblMainSearch" value="SEARCH #{transactorBean.transactorObj.transactorType}S"/>
+                <h:outputLabel id="olblMainSearchDesc" value="(Type Name/Ref/File)"/>
+                <h:inputText id="itxtMainSearch" value="#{transactorBean.searchTransactorNames}" autocomplete="off">
+                    <f:ajax event="keyup" render="dtblTransactor" listener="#{transactorBean.refreshTransactorsListByNameRefFile(transactorBean.searchTransactorNames,transactorBean.transactorObj.transactorType)}"/>
+                </h:inputText>
+            </h:panelGrid>
+
+            <p:dataTable tableStyle="width:auto;" id="dtblTransactor" value="#{transactorBean.transactorList}" var="t" 
+                         > 
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Type</f:facet>
+                    <!-- row record -->
+                    #{t.transactorType}
+                </p:column>
+
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Names</f:facet>
+                    <!-- row record -->
+                    #{t.transactorNames}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Ref No</f:facet>
+                    <!-- row record -->
+                    #{t.transactorRef}
+                </p:column>
+
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Phone</f:facet>
+                    <!-- row record -->
+                    #{t.phone}
+                </p:column>
+
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Email</f:facet>
+                    <!-- row record -->
+                    #{t.email}
+                </p:column>
+
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Contact Person</f:facet>
+                    <!-- row record -->
+                    #{t.cpName}
+                </p:column>
+                
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">File Ref</f:facet>
+                    <!-- row record -->
+                    #{t.fileReference}
+                </p:column>
+
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Action</f:facet>
+                    <!-- row record -->
+                    <h:commandLink value="View/Edit">
+                        <f:ajax listener="#{transactorBean.displayTransactor(t,transactorBean.transactorObj)}" execute="@form" render="@form"/>
+                    </h:commandLink>
+                    &nbsp;
+                </p:column>
+
+            </p:dataTable>
+
+        </h:form>
+    </h:body>
+</html>
+

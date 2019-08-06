@@ -1,0 +1,168 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Item Combination</title>
+        <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:event listener="#{navigationBean.checkAccessDenied('8', 'View')}" type="preRenderView" />
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="ItemMapForm" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
+                    return false;">
+
+            <h:panelGrid styleClass="clsGridMainHeader" columns="1">
+                <h:outputLabel styleClass="clsLabelTop" id="olblItemMapHeader" value="Product Inputs"/>
+            </h:panelGrid>
+
+            <h:panelGrid id="gridParentItem" styleClass="clsGridMainInput" columns="3">
+                <p:outputLabel value="Product Item"/>
+                <p:autoComplete id="autcItem1" widgetVar="WautcItem1" value="#{itemBean.selectedItem}"  
+                                completeMethod="#{itemBean.getItemObjectListForSale}" 
+                                var="itm" 
+                                itemLabel="#{itm.description}" 
+                                itemValue="#{itm}" 
+                                converter="ItemConverter" style="text-align: left" 
+                                forceSelection="true" queryDelay="0" 
+                                >
+                    <p:column headerText="Item Description" style="text-align: left" >  
+                        #{itm.description} 
+                    </p:column>
+                    <p:column headerText="Alias" style="text-align: left" >  
+                        #{itm.alias_name} 
+                    </p:column>
+                    <p:column headerText="Unit" style="text-align: left">  
+                        #{itm.unitSymbol}
+                    </p:column> 
+                    <p:column headerText="Category" style="text-align: left">  
+                        #{itm.categoryName}
+                    </p:column>
+                    <p:ajax event="itemSelect" listener="#{itemProductionMap.setOutputItemId(itemBean.selectedItem.itemId)}" process="@this" update="dtblList"/>
+                    <p:ajax event="change" listener="#{itemProductionMap.setOutputItemId(itemBean.selectedItem.itemId)}" rendered="#{itemBean.selectedItem!=null}" process="@this"/>
+                    <p:ajax event="itemSelect" listener="#{itemProductionMapBean.refreshChildList(itemProductionMap.outputItemId, itemProductionMapBean.itemProductionMapsList)}" process="@this"/>
+                    <p:ajax event="change" listener="#{itemProductionMapBean.refreshChildList(itemProductionMap.outputItemId, itemProductionMapBean.itemProductionMapsList)}" rendered="#{itemBean.selectedItem!=null}" process="@this" update="dtblList"/>
+                </p:autoComplete>
+
+            </h:panelGrid>
+            <p:fieldset legend="Raw Material Item(s)">
+                <p:panelGrid id="gridChildItems"  styleClass="clsGridMainInput" columns="3">
+                    <p:outputLabel value="Item Description"/>
+                    <p:outputLabel value="QTY"/>
+                    <p:outputLabel value=""/>
+                    <p:autoComplete id="proItem" widgetVar="WproItem" value="#{itemBean.selectedItemX}"  
+                                    completeMethod="#{itemBean.getProductionItemObjectList}" 
+                                    var="pro_itm" 
+                                    itemLabel="#{pro_itm.description}" 
+                                    itemValue="#{pro_itm}" 
+                                    converter="ItemConverter" style="text-align: left" 
+                                    forceSelection="true" queryDelay="0" 
+                                    >
+                        <p:column headerText="Item Description" style="text-align: left" >  
+                            #{pro_itm.description} 
+                        </p:column> 
+                        <p:column headerText="Item Code" style="text-align: left" >  
+                            #{pro_itm.itemCode} 
+                        </p:column> 
+                        <p:column headerText="Unit" style="text-align: left">  
+                            #{unitBean.getUnit(pro_itm.unitId).unitSymbol}
+                        </p:column> 
+                        <p:column headerText="Category" style="text-align: left">  
+                            #{categoryBean.getCategory(pro_itm.categoryId).categoryName}
+                        </p:column>
+                        <p:column headerText="Currency" style="text-align: left">
+                            <h:outputText value="#{pro_itm.currencyCode}">
+                            </h:outputText>
+                        </p:column>
+                        <p:ajax event="itemSelect" listener="#{itemProductionMap.setInputItemId(itemBean.selectedItemX.itemId)}" process="@this"/>
+                        <p:ajax event="change" listener="#{itemProductionMap.setInputItemId(itemBean.selectedItemX.itemId)}" rendered="#{itemBean.selectedItemX!=null}" process="@this"/>
+                    </p:autoComplete>
+                    <p:inputText value="#{itemProductionMap.inputQty}"/>                    
+                    <p:commandButton id="cmdbAddItem" value="Add Item" >
+                        <p:ajax listener="#{itemProductionMapBean.addItem(itemProductionMap,itemProductionMapBean.itemProductionMapsListEdit,itemBean.selectedItemX)}" process="@form" update="gridChildItems dtblListEdit growl1"/>
+                    </p:commandButton>
+                </p:panelGrid>
+                <p:growl id="growl1" sticky="true"/>
+                <p:dataTable rowIndexVar="rowIndex" style="width: 790px" id="dtblListEdit" value="#{itemProductionMapBean.itemProductionMapsListEdit}" var="itm1" 
+                             styleClass="cls-table" 
+                             >
+                    <p:column>
+                        <!-- column header -->
+                        <f:facet name="header">Child Item</f:facet>
+                        <!-- row record -->
+                        #{itm1.inputItemName}
+                    </p:column>
+                    <p:column>
+                        <!-- column header -->
+                        <f:facet name="header">Qty</f:facet>
+                        <!-- row record -->
+                        #{itm1.inputQty}
+                    </p:column>
+                    <p:column>
+                        <!-- column header -->
+                        <f:facet name="header"></f:facet>
+                        <!-- row record -->
+                        <h:commandLink value="Remove" action="#{itemProductionMapBean.itemProductionMapsListEdit.remove(itm1)}">
+                            <f:ajax execute="@form" render="dtblListEdit"/>
+                        </h:commandLink>
+                    </p:column> 
+                </p:dataTable>
+                <h:commandButton styleClass="clsButtonBig" value="Save" >
+                    <f:ajax listener="#{itemProductionMapBean.saveItemProductionMap(itemProductionMap,itemProductionMapBean.itemProductionMapsListEdit,itemProductionMapBean.itemProductionMapsList)}" execute="gridParentItem gridChildItems" render="dtblList growl2"/>
+                </h:commandButton>
+            </p:fieldset>
+            <p:growl id="growl2" sticky="true"/>
+            <p:dataTable rowIndexVar="rowIndex" style="width: 790px" id="dtblList" value="#{itemProductionMapBean.itemProductionMapsList}" var="itm2" 
+                         styleClass="cls-table" 
+                         >  
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Parent Item</f:facet>
+                    <!-- row record -->
+                    #{itm2.outputItemName}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Child Item</f:facet>
+                    <!-- row record -->
+                    #{itm2.inputItemName}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Qty</f:facet>
+                    <!-- row record -->
+                    #{itm2.inputQty}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header"></f:facet>
+                    <!-- row record -->
+                    <h:commandLink value="Delete" action="#{itemProductionMapBean.deleteItemProductionMap(itm2,itemProductionMap,itemProductionMapBean.itemProductionMapsList)}" onclick="return confirmDelete();">
+                        <f:ajax execute="@form" render="ItemMapForm:dtblList ItemMapForm:growl2"/>
+                    </h:commandLink>
+                </p:column> 
+            </p:dataTable>
+
+            <h:panelGrid id="grdMainMessages" styleClass="clsGridMainMessages" columns="1">
+                <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{itemProductionMapBean.actionMessage}"/>
+                <h:messages id="msgsMainMessage" style="color: red"/><br/>
+            </h:panelGrid>
+
+        </h:form>
+    </h:body>
+</html>
+

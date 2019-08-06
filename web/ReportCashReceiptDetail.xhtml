@@ -1,0 +1,245 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Report Cash Receipt</title>
+        <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:metadata>
+        <f:viewAction action="#{navigationBean.checkAccessDenied('83', 'View')}"/>
+        <f:viewAction action="#{payBean.initResetPayReportDetail(trans,pay,payBean,transactorBean.selectedBillTransactor)}"/>
+    </f:metadata>
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="formReport">
+            <h:panelGrid id="pnlgHeader" columns="3" styleClass="clsPanelReportFilterTitle">
+                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="Cash Receipts Detail Report"/>
+                <p:commandLink id="cmdbToday" value="Today's Date" style="color: white;">
+                    <p:ajax listener="#{payBean.setDateToToday()}" process="@this" update="pnlgFilter1"/>
+                </p:commandLink>
+                <p:commandLink id="cmdbYesturday" value="Yesterday's Date" style="color: white;">
+                    <p:ajax listener="#{payBean.setDateToYesturday()}" process="@this" update="pnlgFilter1"/>
+                </p:commandLink>
+            </h:panelGrid>
+            <div class="ui-fluid">
+                <h:panelGrid id="pnlgFilter1" columns="7" styleClass="clsPanelReportFilter">
+                    <p:outputLabel value="Store/Section"/>
+                    <p:outputLabel value="Date Type"/>
+                    <p:outputLabel value="From #{payBean.dateType}" id="lblDate1"/>
+                    <p:outputLabel value="To #{payBean.dateType}" id="lblDate2"/>
+                    <p:outputLabel value="Receipt No"/>
+                    <p:outputLabel value="Transaction No"/>
+                    <p:outputLabel value="Client/Partner"/>
+                    <p:selectOneMenu id="menuFromStore" value="#{pay.storeId}" >
+                        <f:selectItem itemLabel="Select" itemValue="0"/>
+                        <f:selectItems value="#{storeBean.stores}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
+                    </p:selectOneMenu>
+                    <p:selectOneMenu id="menuDateType" value="#{payBean.dateType}">
+                        <f:selectItem itemLabel="Select" itemValue=""/>
+                        <f:selectItem itemValue="Add Date" itemLabel="Add Date"/>
+                        <f:selectItem itemValue="Receipt Date" itemLabel="Receipt Date"/>
+                        <f:ajax event="change" execute="@this" render="lblDate1 lblDate2"/>
+                    </p:selectOneMenu>
+                    <p:calendar id="calDate1"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{payBean.date1}" size="12"/>
+                    <p:calendar id="calDate2"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{payBean.date2}" size="12"/>
+                    <p:inputText id="itxtPayId" value="#{pay.payId}" style="width: 140px;"/>
+                    <p:inputText id="itxtInvoiceNo" value="#{trans.transactionNumber}" style="width: 140px;"/>
+                    <p:autoComplete id="autcTransactor" value="#{transactorBean.selectedTransactor}"  
+                                    completeMethod="#{transactorBean.getTransactorObjectList}" 
+                                    var="trct" 
+                                    itemLabel="#{trct.transactorNames}" 
+                                    itemValue="#{trct}" 
+                                    converter="TransactorConverter" style="text-align: left" 
+                                    forceSelection="true" queryDelay="0" 
+                                    >
+                        <p:column headerText="Names" style="text-align: left" >  
+                            #{trct.transactorNames} 
+                        </p:column> 
+                        <p:column headerText="Type" style="text-align: left" >  
+                            #{trct.transactorType} 
+                        </p:column> 
+                        <p:column headerText="Contact Person" style="text-align: left">  
+                            #{trct.cpName} 
+                        </p:column> 
+                        <p:ajax event="itemSelect" listener="#{pay.setBillTransactorId(transactorBean.selectedTransactor.transactorId)}"/>
+                        <p:ajax event="change" listener="#{pay.setBillTransactorId(transactorBean.selectedTransactor.transactorId)}" rendered="#{transactorBean.selectedTransactor!=null}"/>
+                    </p:autoComplete>
+                </h:panelGrid>
+                <h:panelGrid id="pnlgFilter2" columns="7" styleClass="clsPanelReportFilter">
+                    <p:outputLabel value="Added By"/>
+                    <h:outputLabel value="Received By"/>
+                    <p:outputLabel value="Cash Receipt Type"/>
+                    <p:outputLabel value="ShareHolder/LoanAccount"/>  
+                    <h:outputLabel value="SUMMARIZE RESULTS BY:"/>
+                    <h:outputLabel value=""/>
+                    <h:outputLabel value=""/>
+                    <p:selectOneMenu id="menuAddUser" value="#{pay.addUserDetailId}">
+                        <f:selectItem itemLabel="Select" itemValue="0"/>
+                        <f:selectItems value="#{userDetailBean.getUserDetails()}" var="ut" itemLabel="#{ut.firstName} #{ut.secondName} #{ut.thirdName}" itemValue="#{ut.userDetailId}"/>
+                    </p:selectOneMenu>
+                    <p:selectOneMenu id="menuTransUser" value="#{pay.addUserDetailId}">
+                        <f:selectItem itemLabel="Select"/>
+                        <f:selectItems value="#{userDetailBean.getUserDetails()}" var="ua" itemLabel="#{ua.firstName} #{ua.secondName} #{ua.thirdName}" itemValue="#{ua.userDetailId}"/>
+                    </p:selectOneMenu>
+                    <p:selectOneMenu id="menuTransType" value="#{pay.payReasonId}" >
+                        <f:selectItem itemLabel="Select" itemValue="0"/>
+                        <f:selectItems value="#{transactionReasonBean.getTransactionReasonsByTypes('14')}" var="tr" itemLabel="#{tr.transactionReasonName}" itemValue="#{tr.transactionReasonId}"/>
+                        <p:ajax event="change" process="@this" update="menuAccount2CapitalLoan"/>
+                    </p:selectOneMenu>
+                    <h:selectOneMenu id="menuAccount2CapitalLoan" value="#{pay.accChildAccountId2}">
+                        <f:selectItem itemValue="" itemLabel=""/>
+                        <f:selectItems value="#{accChildAccountBean.getChildAccountsByPayReason('3-10-000-010','2-00-000-050','2-10-000-010',pay.payReasonId)}" var="ca" itemLabel="#{ca.childAccountCode} (#{ca.childAccountName})" itemValue="#{ca.accChildAccountId}"/>
+                    </h:selectOneMenu>
+                    <p:selectOneMenu id="menuSummariseBy" value="#{payBean.fieldName}">
+                        <f:selectItem itemLabel="Select" itemValue=""/>
+                        <f:selectItem itemLabel="Received By" itemValue="add_user_detail_id"/>
+                        <f:selectItem itemLabel="Client/Partner" itemValue="bill_transactor_id"/>
+                        <f:selectItem itemLabel="ShareHolder/LoanAcc" itemValue="acc_child_account_id2"/>
+                        <f:selectItem itemLabel="Receipt Date" itemValue="pay_date"/>
+                        <f:selectItem itemLabel="Cash Receipt Type" itemValue="pay_reason_id"/>
+                    </p:selectOneMenu> 
+                    <h:outputLabel value=""/>
+                    <h:outputLabel value=""/>
+                </h:panelGrid>
+                <h:panelGrid id="pnlgFilterButton" columns="6" styleClass="clsPanelReportFilter">
+                    <h:outputLabel value="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/>
+                    <h:outputLabel value="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/>
+                    <p:commandButton id="cmdbSearch" value="SEARCH (ALT+S)" accesskey="s" style="width: 200px;" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                        <p:ajax listener="#{payBean.reportCashReceiptDetail(trans,pay,payBean)}" process="@this pnlgFilter1 pnlgFilter2" update="pnlgFilter1 pnlgFilter2 pnlgMessage tblDetail"/>
+                    </p:commandButton>
+                    <p:commandButton id="cmdbReset" value="RESET (ALT+R)" accesskey="r" style="width: 200px;">
+                        <p:ajax listener="#{payBean.resetPayReportDetail(trans,pay,payBean,transactorBean.selectedBillTransactor)}" process="@this pnlgFilter1 pnlgFilter2" update="pnlgFilter1 pnlgFilter2 pnlgMessage tblDetail"/>
+                    </p:commandButton>
+                    <h:outputLabel value="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/>
+                    <h:outputLabel value="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/>
+                </h:panelGrid>
+            </div>
+            <h:panelGrid id="pnlgMessage">
+                <p:outputLabel value="#{payBean.actionMessage}" style="color: red;"/>
+            </h:panelGrid>
+            <p:dataTable id="tblDetail" tableStyle="width:auto;" var="itm" value="#{payBean.payList}" 
+                         paginator="true" rows="50" 
+                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
+                         rowsPerPageTemplate="50,100,200,400">
+                <f:facet name="header">
+                    <p:dataTable id="tblSummary" var="sm" value="#{payBean.payListSummary}">
+                        <p:column headerText="Received By" style="text-align: left;" rendered="#{payBean.fieldName.equals('add_user_detail_id')}">
+                            <h:outputText value="#{userDetailBean.getUserDetail(sm.addUserDetailId).userName}" rendered="#{sm.addUserDetailId>0}"/>
+                        </p:column>
+                        <p:column headerText="Client/Partner" style="text-align: left;" rendered="#{payBean.fieldName.equals('bill_transactor_id')}">
+                            <h:outputText value="#{transactorBean.getTransactor(sm.billTransactorId).transactorNames}"/>
+                        </p:column>
+                        <p:column headerText="Cash Receipt Type" style="text-align: left;" rendered="#{payBean.fieldName.equals('pay_reason_id')}">
+                            <h:outputText value="#{transactionReasonBean.getTransactionReason(sm.payReasonId).transactionReasonName}"/>
+                        </p:column>
+                        <p:column headerText="Receipt Date" style="text-align: left;" rendered="#{payBean.fieldName.equals('pay_date')}">
+                            <h:outputText value="#{utilityBean.formatDate(sm.payDate)}"/>
+                        </p:column> 
+                        <p:column headerText="Share Holder" style="text-align: left;" rendered="#{payBean.fieldName.equals('acc_child_account_id2') and pay.payReasonId==23}">
+                            <h:outputText value="#{accChildAccountBean.getAccChildAccById(sm.accChildAccountId2).childAccountName}"/>
+                        </p:column>
+                        <p:column headerText="Loan Account" style="text-align: left;" rendered="#{payBean.fieldName.equals('acc_child_account_id2') and pay.payReasonId==24}">
+                            <h:outputText value="#{accChildAccountBean.getAccChildAccById(sm.accChildAccountId2).childAccountName}"/>
+                        </p:column>
+                        <p:column headerText="Receipt Account" style="text-align: left;">
+                            <h:outputText value="#{accChildAccountBean.getAccChildAccById(sm.accChildAccountId).childAccountName}"/>
+                        </p:column>
+                        <p:column headerText="Currency" style="text-align: left;">
+                            <h:outputText value="#{sm.currencyCode}"/>
+                        </p:column>
+                        <p:column headerText="Total Amount Received" style="text-align: right;">
+                            <h:outputText value="#{sm.paidAmount}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </p:column>
+                    </p:dataTable>
+                    #{payBean.payList.size()} Records Found
+                    <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
+                    <p:columnToggler datasource="tblDetail" trigger="toggler" />
+                </f:facet>
+                <f:facet name="{Exporters}">
+                    <h:commandLink>
+                        <p:graphicImage name="images/excel.png" width="24"/>
+                        <p:dataExporter type="xls" target="tblDetail" fileName="Cash_Receipt_Detail" />
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/pdf.png" width="24"/>
+                        <p:dataExporter type="pdf" target="tblDetail" fileName="Cash_Receipt_Detail"/>
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/csv.png" width="24"/>
+                        <p:dataExporter type="csv" target="tblDetail" fileName="Cash_Receipt_Detail" />
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/xml.png" width="24"/>
+                        <p:dataExporter type="xml" target="tblDetail" fileName="Cash_Receipt_Detail" />
+                    </h:commandLink>
+                </f:facet>
+                <p:column headerText="View/Cancel" exportable="false">
+                    <p:commandButton id="cmdbViewCRSales" icon="ui-icon-search" oncomplete="PF('dlgCRSales').show();" actionListener="#{payBean.initPaySession(itm.payId,'View')}" update=":formTransactionCRSales" rendered="#{itm.payReasonId==21 or itm.payReasonId==22}"/>
+                    <p:commandButton id="cmdbcancelCRSales" icon="ui-icon-closethick" oncomplete="PF('dlgCRSales').show();" actionListener="#{payBean.initPaySession(itm.payId,'Cancel')}" update=":formTransactionCRSales" rendered="#{itm.payReasonId==22}"/>
+                    <p:commandButton id="cmdbViewCRCapital" icon="ui-icon-search" oncomplete="PF('dlgCRCapital').show();" actionListener="#{payBean.initPaySession(itm.payId,'View')}" update=":formTransactionCRCapital" rendered="#{itm.payReasonId==23}"/>
+                    <p:commandButton id="cmdbcancelCRCapital" icon="ui-icon-closethick" oncomplete="PF('dlgCRCapital').show();" actionListener="#{payBean.initPaySession(itm.payId,'Cancel')}" update=":formTransactionCRCapital" rendered="#{itm.payReasonId==23}"/>
+                    <p:commandButton id="cmdbViewCRLoan" icon="ui-icon-search" oncomplete="PF('dlgCRLoan').show();" actionListener="#{payBean.initPaySession(itm.payId,'View')}" update=":formTransactionCRLoan" rendered="#{itm.payReasonId==24}"/>
+                    <p:commandButton id="cmdbcancelCRLoan" icon="ui-icon-closethick" oncomplete="PF('dlgCRLoan').show();" actionListener="#{payBean.initPaySession(itm.payId,'Cancel')}" update=":formTransactionCRLoan" rendered="#{itm.payReasonId==24}"/>
+                    <p:commandButton id="cmdbViewCRDeposit" icon="ui-icon-search" oncomplete="PF('dlgCRDeposit').show();" actionListener="#{payBean.initPaySession(itm.payId,'View')}" update=":formTransactionCRDeposit" rendered="#{itm.payReasonId==90}"/>
+                    <p:commandButton id="cmdbcancelCRDeposit" icon="ui-icon-closethick" oncomplete="PF('dlgCRDeposit').show();" actionListener="#{payBean.initPaySession(itm.payId,'Cancel')}" update=":formTransactionCRDeposit" rendered="#{itm.payReasonId==90}"/>
+                </p:column>
+                <p:column headerText="Cash Receipt Type">
+                    <h:outputLabel value="#{transactionReasonBean.getTransactionReason(itm.payReasonId).transactionReasonName}"/>
+                </p:column>
+                <p:column headerText="Receipt No">
+                    <h:outputLabel value="#{itm.pay_number}"/>
+                </p:column>
+                <p:column headerText="Receipt Date" rendered="#{payBean.dateType.equals('Receipt Date')}">
+                    <h:outputText value="#{utilityBean.formatDate(itm.payDate)}"/>
+                </p:column>
+                <p:column headerText="Add Date" rendered="#{payBean.dateType.equals('Add Date')}">
+                    <h:outputText value="#{utilityBean.formatDate(itm.addDate)}"/>
+                </p:column>
+                <p:column headerText="Received From">
+                    <h:outputText value="#{transactorBean.getTransactor(itm.billTransactorId).transactorNames}"  rendered="#{itm.billTransactorId>0 and (itm.payReasonId==21 or itm.payReasonId==22 or itm.payReasonId==90)}"/>
+                    <h:outputText value="#{accChildAccountBean.getAccChildAccById(itm.accChildAccountId2).childAccountName}"  rendered="#{itm.accChildAccountId2>0 and itm.payReasonId==23}"/>
+                    <h:outputText value="#{accChildAccountBean.getAccChildAccById(itm.accChildAccountId2).childAccountName}"  rendered="#{itm.accChildAccountId2>0 and itm.payReasonId==24}"/>
+                </p:column>
+                <p:column headerText="Receipt Account">
+                    <h:outputText value="#{accChildAccountBean.getAccChildAccById(itm.accChildAccountId).childAccountName}"/>
+                </p:column>
+                <p:column headerText="Currency">
+                    <h:outputText value="#{itm.currencyCode}"/>
+                </p:column>
+                <p:column headerText="Amount Received" style="text-align: right;">
+                    <h:outputText value="#{itm.paidAmount}">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Received By">
+                    <h:outputText value="#{userDetailBean.getUserDetail(itm.addUserDetailId).userName}"/>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+        <ui:include src="ViewCashReceiptSalesTrans.xhtml"/>
+        <ui:include src="ViewCashReceiptCapitalTrans.xhtml"/>
+        <ui:include src="ViewCashReceiptLoanTrans.xhtml"/>
+        <ui:include src="ViewCashReceiptDepositTrans.xhtml"/>
+    </h:body>
+</html>
+

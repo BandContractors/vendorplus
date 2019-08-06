@@ -1,0 +1,227 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Balance Sheet</title>
+        <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:event listener="#{navigationBean.checkAccessDenied('47', 'View')}" type="preRenderView" />
+    <f:event listener="#{accLedgerBean.initResetAccBalanceSheet(accBalanceSheet)}" type="preRenderView" />
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="formReport">
+            <h:panelGrid id="pnlgHeader" columns="1" styleClass="clsPanelReportFilterTitle">
+                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="Balance Sheet (Statement of Financial Position)"/>
+            </h:panelGrid>
+            <h:panelGrid id="pnlgFilter" columns="7" styleClass="clsPanelReportFilter">
+                <h:outputLabel value="Accouting Period"/>
+                <h:selectOneMenu id="menuAccPeriod" value="#{accBalanceSheet.accPeriodId}" >
+                    <f:selectItems value="#{accPeriodBean.returnAccPeriodsCurrentFirst()}" var="ap" itemLabel="#{ap.accPeriodName}" itemValue="#{ap.accPeriodId}"/>
+                </h:selectOneMenu>
+                <p:commandButton id="cmdbSearch" value="BALANCE SHEET" accesskey="b" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.refreshAccBalanceSheet(accBalanceSheet)}" process="@form" update="@form"/>
+                </p:commandButton>
+            </h:panelGrid>
+            <h:panelGrid id="pnlgMessage">
+                <p:outputLabel value="#{accLedgerBean.actionMessage}" style="color: red;"/>
+            </h:panelGrid>
+            <p:panelGrid id="pnlgDetail" columns="4">
+                <f:facet name="header">
+                    <p:row>
+                        <p:column colspan="4">#{companySetting.getLICENSE_CLIENT_NAME()} #{companySetting.getBranchCode()}</p:column>
+                    </p:row>
+                </f:facet>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="#{accCurrencyBean.localCurrency.currencyCode}"/>
+
+                <p:outputLabel value="ASSETS"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Fixed Assets"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Property, Plant and Equipment"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.assetFixedPPE)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Accumulated Depreciation"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.assetFixedAccumDep)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Other Noncurrent Assets"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.assetFixedOtherNonCur)}"/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Current Assets"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Cash and Cash Equivalents"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.assetCurCash)}" style="text-align: right;"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Receivables"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.assetCurRec)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Inventory"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.assetCurInv)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Prepaid Expenses"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.assetCurPreExp)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Other Current Assets"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.assetCurOtherCur)}"/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value="TOTAL ASSETS"/>
+                <p:outputLabel value="(Fixed Assets + Current Assets)"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.assetTotal)}" style="color: blue;"/>
+
+
+                <p:outputLabel value="LIABILITIES"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Long Term Liabilities"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Long Term Debt"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.liabLongDebt)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Deferred Taxes"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.liabLongDefTax)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Other Noncurrent Liabilities"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.liabLongOtherNonCur)}"/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Current Liabilities"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Payables"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.liabCurPay)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Accrued Compensation"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.liabCurAccrComp)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Accrued Taxes"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.liabCurAccrTax)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Other Current Liabilities"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.liabCurOtherCur)}"/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value="TOTAL LIABILITIES"/>
+                <p:outputLabel value="(Long Term Liabilities + Current Liabilities)"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.liabTotal)}" style="color: blue;"/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="NET ASSETS"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="(Total Assets - Total Liabilities)"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.netAssets)}" style="color: blue;background-color: yellow;"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+
+                <p:outputLabel value="EQUITY"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Equity"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Paid in Capital"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.equityPaidCap)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Partners Capital"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.equityPartCap)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Common Stock"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.equityCommStock)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Preferred Stock"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.equityPrefStock)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Member Contribution"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.equityMembCont)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Retained Earnings"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.equityRetEarn)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Drawing Account (Contra Equity)"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.equityDrawing)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Dividends (Contra Equity)"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.equityDividend)}"/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value="TOTAL EQUITY"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.equityTotal)}" style="color: blue;background-color: yellow;"/>
+
+            </p:panelGrid>
+        </h:form>
+    </h:body>
+</html>
+

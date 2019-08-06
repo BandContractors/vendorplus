@@ -1,0 +1,118 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Goods Delivery Note</title>
+        <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/> 
+    </h:head>
+
+    <h:body>
+        <h:form id="vTransactionForm">  
+            <ui:composition>
+                <p:panel style="text-align: center;">
+                    <p:commandButton id="cmdbvPrint" value="PRINT" icon="ui-icon-print" type="button">
+                        <p:printer target="vTransactionGrid" rendered="false"/>
+                    </p:commandButton>
+                </p:panel>
+                <h:panelGrid id="vTransactionGrid" style="border-style: solid;"> 
+                    <h:panelGrid columns="3" style="width:100%;margin: 0px;">
+                        <h:panelGrid style="width: 350px; margin: 0px;" columns="2">
+                            <p:graphicImage value="#{companySetting.getLogoUrl()}" style="float: left;" width="45" height="70" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowLogoInvoice(),'Yes')}" />
+                            <h:outputLabel value="#{companySetting.getPhysicalAddress()}"/>
+                        </h:panelGrid>
+                        <h:panelGrid style="width: 350px;text-align: center;" columns="1">
+                            <h:outputLabel style="font-size: 20px;font-weight: bold;" value="#{companySetting.getLICENSE_CLIENT_NAME()}"/>
+                            <h:outputLabel style="font-size: 16px;" value="#{companySetting.getBranchCode()}" rendered="#{companySetting.getShowBranchInvoice().equals('Yes')}"/>
+                            <h:outputLabel style="font-size: 16px;" value="#{generalUserSetting.outputDetailParent.store.storeName}" rendered="#{companySetting.getShowStoreInvoice().equals('Yes')}"/>
+                        </h:panelGrid>
+                        <h:panelGrid style="margin: 0px;" columns="1">
+                            <h:outputLabel value=" Tel:#{companySetting.getPhone()} "/>
+                            <h:outputLabel value=" TIN:#{companySetting.getTaxIdentity()} "/>
+                            <h:outputLabel value=" Email:#{companySetting.getEmail()} "/>
+                        </h:panelGrid>
+                    </h:panelGrid>
+
+                    <h:panelGrid columns="1" style="text-align: center; width:100%;margin: 0px;background-color: gray;color: white;-webkit-print-color-adjust: exact;">
+                        <h:outputLabel value="#{generalUserSetting.outputDetailParent.transaction_type.transactionOutputLabel}" style="font-size:30px;font-weight: bold;"/>
+                        <h:outputLabel value="#{generalUserSetting.outputDetailParent.transaction_type.transactionNumberLabel}:#{generalUserSetting.outputDetailParent.trans.transactionNumber}" style="font-weight: bold;"/>
+                    </h:panelGrid>
+
+                    <h:panelGrid columns="3" style="width:100%;margin: 0px;">
+                        <h:panelGrid style="margin: 0px;text-align:left;" columns="1">
+                            <h:outputLabel value="#{generalUserSetting.outputDetailParent.transaction_type.transactorLabel}" style="border-bottom-style: solid;"/>
+                            <h:outputLabel value="ID:#{generalUserSetting.outputDetailParent.trans.transactorId}"/>
+                            <h:outputLabel value="#{generalUserSetting.outputDetailParent.transactor.transactorNames}"/>
+                            <h:outputLabel value="#{generalUserSetting.outputDetailParent.transactor.physicalAddress}"/>
+                            <h:outputLabel value="#{generalUserSetting.outputDetailParent.transactor.phone}"/>
+                        </h:panelGrid>
+                        <h:panelGrid style="margin: 0px;text-align: left;" columns="1">
+                            <h:outputLabel value="#{generalUserSetting.outputDetailParent.transaction_type.transactionRefLabel}" style="border-bottom-style: solid;"/>
+                            <h:outputLabel value="#{generalUserSetting.outputDetailParent.trans.transactionRef}"/>
+                        </h:panelGrid>
+                        <h:panelGrid style="margin: 0px;text-align: left;" columns="1">
+                            <h:outputLabel value="Delivery from" style="border-bottom-style: solid;"/>
+                            <h:outputLabel value="#{generalUserSetting.outputDetailParent.store.storeName}"/>
+                        </h:panelGrid>
+                    </h:panelGrid>
+
+                    <p:dataTable rowIndexVar="rowIndex" id="dtblvTransactionItem" value="#{generalUserSetting.outputDetailParent.trans_items}" var="ti2" 
+                                 styleClass="cls-table" tableStyle="width:auto;" 
+                                 >  
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#</f:facet>
+                            <!-- row record -->
+                            #{rowIndex+1}
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">Item Description</f:facet>
+                            <!-- row record -->
+                            <p:outputLabel value="#{transItemBean.showItemDescriptionCEC(ti2)}" escape="false"/>
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">Unit</f:facet>
+                            <!-- row record -->
+                            #{unitBean.getUnit(itemBean.getItem(ti2.itemId).unitId).unitSymbol}
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">Qty</f:facet>
+                            <!-- row record -->
+                            <h:outputLabel value="#{ti2.itemQty}" style="font-size: 14px;">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputLabel>
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">Manuf.Date</f:facet>
+                            <!-- row record -->
+                            <h:outputLabel value="#{utilityBean.formatDate(ti2.itemMnfDate)}"/>
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">Expiry.Date</f:facet>
+                            <!-- row record -->
+                            <h:outputLabel value="#{utilityBean.formatDate(ti2.itemExpryDate)}"/>
+                        </p:column>
+                    </p:dataTable>
+
+                    <h:panelGrid styleClass="clsGridMainInput" columns="2" style="width: 100%">
+                        <h:outputLabel styleClass="clsLabelTransItem" style="border-bottom-style: solid;" value="#{generalUserSetting.outputDetailParent.transaction_type.transactionDateLabel}"/>
+                        <h:outputLabel styleClass="clsInput" style="border-bottom-style: solid;" value="Delivery Address"/>
+                        <h:outputText styleClass="clsInput" value="#{utilityBean.formatDate(generalUserSetting.outputDetailParent.trans.transactionDate)}"/>
+                        <div style="width: 250px;">
+                            #{generalUserSetting.outputDetailParent.trans.deliveryAddress}
+                        </div>
+                    </h:panelGrid>
+                </h:panelGrid>
+            </ui:composition>
+        </h:form>
+    </h:body>
+</html>
+

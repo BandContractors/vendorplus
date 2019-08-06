@@ -1,0 +1,486 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>#{menuItemBean.menuItemObj.SYSTEM_NAME}</title>
+        <style>
+            .user .ui-menuitem-text{color:white;} .ui-menu .ui-menuitem .ui-state-hover{
+                color : white;
+                background: #FF0000;
+                -webkit-box-shadow: 0px 0px 8px #85b2cb;
+                box-shadow: 0px 0px 8px #85b2cb;
+            } .ui-menubar,.ui-menu-child,.ui-menu {background: yellow !important;}
+        </style>
+    </h:head>
+    <h:body>
+        <h:form id="frmMenu">  
+            <h:panelGrid columns="2" style="background-color: #00B259;width: 100%;color: white;">
+                <p:outputLabel style="float: left;" id="olblTitle"  value="#{menuItemBean.menuItemObj.SYSTEM_NAME_CLIENT} #{menuItemBean.menuItemObj.SYSTEM_VERSION}"/>
+                <p:outputLabel style="float: right"  value="#{menuItemBean.menuItemObj.LICENSE_CLIENT_NAME}  (#{companySetting.getBranchCode()} - #{menuItemBean.menuItemObj.CURRENT_STORE.storeName})"/>
+            </h:panelGrid>
+            <p:menubar>  
+                <p:menuitem value="Home" action="#{navigationBean.redirectToHome()}" icon="ui-icon-home" />
+                <p:submenu label="Transaction" rendered="#{menuItemBean.menuItemObj.LOGIN_TYPE==1}" icon="ui-icon-plus"> 
+                    <p:separator />
+                    <p:submenu label="Purchase &amp; Expense">  
+                        <p:separator />
+                        <p:submenu label="Purchase Order">
+                            <p:separator />
+                            <p:menuitem value="Goods and Services" action="#{navigationBean.redirectToPurchaseOrderGoods()}" />
+                            <p:separator />
+                            <p:menuitem value="Expenses" action="#{navigationBean.redirectToPurchaseOrderExpenses()}" />
+                            <p:separator />
+                            <p:menuitem value="Assets" action="#{navigationBean.redirectToPurchaseOrderAssets()}" />
+                            <p:separator />
+                        </p:submenu>
+                        <p:separator />
+                        <p:submenu label="Item Received">
+                            <p:separator />
+                            <p:menuitem value="Goods and Services" action="#{navigationBean.redirectToItemReceivedGoods()}" />
+                            <p:separator />
+                            <p:menuitem value="Expenses" action="#{navigationBean.redirectToItemReceivedExpenses()}" />
+                            <p:separator />
+                        </p:submenu>
+                        <p:separator />
+                        <p:submenu label="Purchase Invoice">
+                            <p:separator />
+                            <p:menuitem value="Goods and Services" action="#{navigationBean.redirectToPurchaseInvoiceGoods()}" />
+                            <p:separator />
+                            <p:menuitem value="Expenses" action="#{navigationBean.redirectToPurchaseInvoiceExpenses()}" />
+                            <p:separator />
+                            <p:menuitem value="Assets" action="#{navigationBean.redirectToPurchaseInvoiceAssets()}" />
+                            <p:separator />
+                        </p:submenu>
+                        <p:separator />
+                        <p:menuitem value="Record Expense" action="#{navigationBean.redirectToExpenseEntry()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="Sales">
+                        <p:separator />
+                        <p:submenu label="Sale Quotation">  
+                            <p:separator />
+                            <p:menuitem value="Retailsale Quotation" action="#{navigationBean.redirectToRetailSaleQuotation()}" />
+                            <p:separator />
+                            <p:menuitem value="Wholesale Quotation" action="#{navigationBean.redirectToWholeSaleQuotation()}" />
+                            <p:separator />
+                            <p:menuitem value="Specialsale Quotation" action="#{navigationBean.redirectToSpecialSaleQuotation()}" />
+                            <p:separator />
+                        </p:submenu>
+                        <p:separator />
+                        <p:submenu label="Sale Order">  
+                            <p:separator />
+                            <p:menuitem value="Retailsale Order" action="#{navigationBean.redirectToSaleOrderRetail()}" />
+                            <p:separator />
+                            <p:menuitem value="Wholesale Order" action="#{navigationBean.redirectToSaleOrderWhole()}" />
+                            <p:separator />
+                            <p:menuitem value="Specialsale Order" action="#{navigationBean.redirectToSaleOrderSpecial()}" />
+                            <p:separator />
+                            <p:menuitem value="Quick Order" action="#{navigationBean.redirectToSaleOrderQuick()}" />
+                            <p:separator />
+                            <p:menuitem value="Order Dashboard" action="SaleOrderQuickDashboard?faces-redirect=true" />
+                            <p:separator />
+                        </p:submenu>
+                        <p:separator />
+                        <p:submenu label="Sale Invoice">  
+                            <p:separator />
+                            <p:menuitem value="Retailsale Invoice" action="#{navigationBean.redirectToRetailSaleInvoice()}" />
+                            <p:separator />
+                            <p:menuitem value="Wholesale Invoice" action="#{navigationBean.redirectToWholeSaleInvoice()}" />
+                            <p:separator />
+                            <p:menuitem value="Specialsale Invoice" action="#{navigationBean.redirectToSpecialSaleInvoice()}" />
+                            <p:separator />
+                        </p:submenu>
+                        <p:separator />
+                        <p:menuitem value="Goods Delivery" action="#{navigationBean.redirectToGoodsDelivery()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator rendered="#{menuItemBean.menuItemObj.HIRE_MODULE_ON==1}"/>
+                    <p:submenu label="Hire" rendered="#{menuItemBean.menuItemObj.HIRE_MODULE_ON==1}">
+                        <p:separator />
+                        <p:menuitem value="Hire Quotation" action="#{navigationBean.redirectToHireQuotation()}" />
+                        <p:separator />
+                        <p:menuitem value="Hire Invoice" action="#{navigationBean.redirectToHireInvoice()}" />
+                        <p:separator />
+                        <p:menuitem value="Delivery Note" action="#{navigationBean.redirectToHireDeliveryNote()}" />
+                        <p:separator />
+                        <p:menuitem value="Return Note" action="#{navigationBean.redirectToHireReturnNote()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="Production">  
+                        <p:separator />
+                        <p:menuitem value="Product Inputs" action="#{navigationBean.redirectToProductionMap()}" /> 
+                        <p:separator />
+                        <p:menuitem value="Production" action="#{navigationBean.redirectToProduction()}" /> 
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="Manage Stock">  
+                        <p:separator /> 
+                        <p:submenu label="Item Transfers">  
+                            <p:separator />
+                            <p:menuitem value="Item Transfer Request" action="#{navigationBean.redirectToTransferRequest()}" /> 
+                            <p:separator />
+                            <p:menuitem value="Item Transfer" action="#{navigationBean.redirectToTransfer()}" /> 
+                            <p:separator />
+                        </p:submenu>
+                        <p:separator />
+                        <p:menuitem value="UnPack Stock" action="#{navigationBean.redirectToUnpackStock()}" /> 
+                        <p:separator />
+                        <p:menuitem value="Dispose Stock" action="#{navigationBean.redirectToDisposeStock()}" /> 
+                        <p:separator />
+                        <p:menuitem value="Adjust Stock" action="#{navigationBean.redirectToAdjustStock()}" /> 
+                        <p:separator />
+                        <p:menuitem value="Consume Stock" action="#{navigationBean.redirectToConsumeStock()}" /> 
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="Cash Receipts">  
+                        <p:separator />
+                        <p:menuitem value="Cash Receipt from Credit Sale (Receivable)" action="#{navigationBean.redirectToCashReceiptCS()}" />  
+                        <p:separator />
+                        <p:menuitem value="Capital contribution from Shareholder" action="#{navigationBean.redirectToCashReceiptCC()}" />
+                        <p:separator />
+                        <p:menuitem value="Receipt of Loan" action="#{navigationBean.redirectToCashReceiptLOAN()}" />
+                        <p:separator />
+                        <p:menuitem value="Receipt of Customer Deposit (Prepaid Income)" action="#{navigationBean.redirectToCashReceiptPrepaidIncome()}" />  
+                        <p:separator />
+                    </p:submenu>
+                    <p:submenu label="Cash Payments">  
+                        <p:separator />
+                        <p:menuitem value="Payment for Credit Purchase(Payable)" action="#{navigationBean.redirectToCashPaymentPI()}" />  
+                        <p:separator />
+                        <p:menuitem value="Loan Repayment" action="#{navigationBean.redirectToCashPaymentLOAN()}" />  
+                        <p:separator />
+                        <p:menuitem value="Cash Drawing by Owner" action="#{navigationBean.redirectToCashPaymentDRAW()}" />  
+                        <p:separator />
+                        <p:menuitem value="Prepayment for Expenses (Prepaid Expense)" action="#{navigationBean.redirectToCashPaymentPrepaidExpense()}" />  
+                        <p:separator />
+                        <p:menuitem value="Payment against Liability" action="#{navigationBean.redirectToCashPaymentLIABILITY()}" />  
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                </p:submenu>  
+                <p:submenu label="Item" rendered="#{menuItemBean.menuItemObj.LOGIN_TYPE==1}" icon="ui-icon-pencil">  
+                    <p:separator />
+                    <p:menuitem value="Units of Measure" action="#{navigationBean.redirectToUnit()}"/> 
+                    <p:separator />
+                    <p:submenu label="Categorise Items">   
+                        <p:separator />
+                        <p:menuitem value="Category" action="#{navigationBean.redirectToCategory()}" /> 
+                        <p:separator />
+                        <p:menuitem value="SubCategory" action="#{navigationBean.redirectToSubCategory()}" />  
+                        <p:separator />
+                    </p:submenu> 
+                    <p:separator /> 
+                    <p:submenu label="Item Details">   
+                        <p:separator />
+                        <p:menuitem value="Stock Items for Sale" action="#{navigationBean.redirectToItem('Stock')}" /> 
+                        <p:separator />
+                        <p:menuitem value="Expense Items" action="#{navigationBean.redirectToItem('Expense')}" />  
+                        <p:separator />
+                        <p:menuitem value="Asset Items" action="#{navigationBean.redirectToItem('Asset')}" />  
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:menuitem value="Item Location" action="#{navigationBean.redirectToItemLocation()}" />
+                    <p:separator />
+                    <p:menuitem value="Big Small Item Map" action="#{navigationBean.redirectToItemMap()}" /> 
+                    <p:separator />
+                    <p:menuitem value="Sale Packages" action="#{navigationBean.redirectToItemCombination()}" /> 
+                    <p:separator />
+                    <p:submenu label="Trade Discount">   
+                        <p:separator />
+                        <p:menuitem value="Packages" action="#{navigationBean.redirectToDiscountPackage()}" /> 
+                        <p:separator />
+                        <p:menuitem value="Package Items" action="#{navigationBean.redirectToDiscountPackageItem()}" />  
+                        <p:separator />
+                    </p:submenu> 
+                    <p:separator />
+                </p:submenu> 
+                <p:submenu label="Partner" rendered="#{menuItemBean.menuItemObj.LOGIN_TYPE==1}" icon="ui-icon-suitcase">  
+                    <p:separator />
+                    <p:menuitem value="Customer Details" action="#{navigationBean.redirectToTransactorCustomer()}" /> 
+                    <p:separator />
+                    <p:menuitem value="Supplier Details" action="#{navigationBean.redirectToTransactorSupplier()}" /> 
+                    <p:separator />
+                    <p:menuitem value="Scheme Details" action="#{navigationBean.redirectToTransactorScheme()}" /> 
+                    <p:separator />
+                    <p:menuitem value="Provider Details" action="#{navigationBean.redirectToTransactorProvider()}" /> 
+                    <p:separator />
+                    <p:menuitem value="Bulk Email" action="#{navigationBean.redirectToEmail()}" /> 
+                    <p:separator />
+                    <p:menuitem value="Contact List" action="#{navigationBean.redirectToContactList()}" /> 
+                    <p:separator />
+                </p:submenu>
+                <p:submenu label="Accounts" rendered="#{menuItemBean.menuItemObj.LOGIN_TYPE==1}" icon="ui-icon-lightbulb">  
+                    <p:separator />
+                    <p:menuitem value="Accouting Period" action="#{navigationBean.redirectToAccountPeriod()}" /> 
+                    <p:separator />
+                    <p:submenu label="Chart of Accounts">   
+                        <p:menuitem value="Chart of Accounts" action="#{navigationBean.redirectToChartOfAccounts()}" /> 
+                        <p:separator />
+                        <p:menuitem value="Child Accounts" action="#{navigationBean.redirectToChildAccounts()}" /> 
+                        <p:separator />
+                    </p:submenu> 
+                    <p:separator />
+                    <p:submenu label="Human Resource">   
+                        <p:separator />
+                        <p:menuitem value="Employee Details" action="#{navigationBean.redirectToTransactorEmployee()}" /> 
+                        <p:separator />
+                    </p:submenu> 
+                    <p:separator />
+                    <p:menuitem value="Record Journal Entry" action="#{navigationBean.redirectToJournalEntryTrans()}" /> 
+                    <p:separator />
+                    <p:submenu label="Banking">   
+                        <p:separator />
+                        <p:menuitem value="Cash Transfer(Cash)" action="#{navigationBean.redirectToBankTransferCash()}" /> 
+                        <p:separator />
+                    </p:submenu> 
+                    <p:separator />
+                </p:submenu>
+                <p:submenu label="Settings" rendered="#{menuItemBean.menuItemObj.LOGIN_TYPE==1}" icon="ui-icon-gear"> 
+                    <p:separator />
+                    <p:submenu label="Branch Settings">  
+                        <p:separator />
+                        <p:menuitem value="Basic Settings" action="#{navigationBean.redirectToCompanySetting()}" />
+                        <p:separator />
+                        <p:menuitem value="More Settings" action="#{navigationBean.redirectToMoreSetting()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="Branch Stores">  
+                        <p:separator />
+                        <p:menuitem value="Stores Details" action="#{navigationBean.redirectToStore()}" /> 
+                        <p:separator />
+                        <p:menuitem value="Store Item Locations" action="#{navigationBean.redirectToLocation()}" /> 
+                        <p:separator />
+                    </p:submenu> 
+                    <p:separator />
+                    <p:menuitem value="Transaction Types" action="#{navigationBean.redirectToTransactionType()}" /> 
+                    <p:separator />
+                    <p:menuitem value="Transaction SubTypes" action="#{navigationBean.redirectToTransactionReason()}" />   
+                    <p:separator />
+                    <p:menuitem value="Payment Methods" action="#{navigationBean.redirectToPayMethod()}" />   
+                    <p:separator />
+                    <p:submenu label="Users and Groups">  
+                        <p:separator />
+                        <p:menuitem value="Group Details" action="#{navigationBean.redirectToGroupDetail()}" /> 
+                        <p:separator />
+                        <p:menuitem value="Group Rights" action="#{navigationBean.redirectToGroupRight()}" /> 
+                        <p:separator />
+                        <p:menuitem value="User Details" action="#{navigationBean.redirectToUserDetail()}" /> 
+                        <p:separator />
+                        <p:menuitem value="Group Users" action="#{navigationBean.redirectToGroupUser()}" /> 
+                        <p:separator />
+                        <p:menuitem value="User Category" action="#{navigationBean.redirectToUserCategory()}" /> 
+                        <p:separator />
+                        <p:menuitem value="User Item Earning" action="#{navigationBean.redirectToUserItemEarn()}" /> 
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:menuitem value="Currency Details" action="#{navigationBean.redirectToCurrency()}" /> 
+                    <p:separator />
+                    <p:menuitem value="View License Details" action="#{navigationBean.redirectToLicenseDetail()}" />   
+                    <p:separator />
+                </p:submenu>  
+                <p:submenu label="Inter-Branch" rendered="#{menuItemBean.menuItemObj.LOGIN_TYPE==2}"> 
+                    <p:separator />
+                    <p:menuitem value="Branch Details" action="#{navigationBean.redirectToBranch()}" /> 
+                    <p:separator />
+                    <p:submenu label="Points">  
+                        <p:separator />
+                        <p:menuitem value="Points Card Details" action="#{navigationBean.redirectToPointsCard()}" />
+                        <p:separator />
+                        <p:menuitem value="Points Transactions" action="#{navigationBean.redirectToPointsTransaction()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                </p:submenu>
+                <p:submenu label="Reports" rendered="#{menuItemBean.menuItemObj.LOGIN_TYPE==1}" icon="ui-icon-document">
+                    <p:separator />
+                    <p:submenu label="Item Detail">
+                        <p:separator />
+                        <p:menuitem value="Stock Items" action="#{navigationBean.redirectToReportItemDetailStock()}" />
+                        <p:separator />
+                        <p:menuitem value="Expense Items" action="#{navigationBean.redirectToReportItemDetailExpense()}" />
+                        <p:separator />
+                        <p:menuitem value="Asset Items" action="#{navigationBean.redirectToReportItemDetailAsset()}" />
+                        <p:separator />
+                        <p:menuitem value="Items Location" action="#{navigationBean.redirectToReportItemDetailLocation()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="Partner Reports">
+                        <p:separator />
+                        <p:menuitem value="Customer List" action="#{navigationBean.redirectToReportPartnerCustomer()}" />
+                        <p:separator />
+                        <p:menuitem value="Supplier List" action="#{navigationBean.redirectToReportPartnerSupplier()}" />
+                        <p:separator />
+                        <p:menuitem value="Scheme List" action="#{navigationBean.redirectToReportPartnerScheme()}" />
+                        <p:separator />
+                        <p:menuitem value="Provider List" action="#{navigationBean.redirectToReportPartnerProvider()}" />
+                        <p:separator />
+                        <p:menuitem value="Provider Bill Report" action="#{navigationBean.redirectToReportProviderBill()}" />
+                        <p:separator />
+                        <p:menuitem value="Customer Card" action="#{navigationBean.redirectToReportCustomerCard()}" />
+                        <p:separator />
+                        <p:menuitem value="Supplier Card" action="#{navigationBean.redirectToReportSupplierCard()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="Employee">
+                        <p:separator />
+                        <p:menuitem value="Employee List" action="#{navigationBean.redirectToReportEmployee()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="Inventory">
+                        <p:separator />
+                        <p:menuitem value="Stock Inventory" action="#{navigationBean.redirectToReportInventoryStock()}" />
+                        <p:separator />
+                        <p:menuitem value="Expenses Inventory" action="#{navigationBean.redirectToReportInventoryExpense()}" />
+                        <p:separator />
+                        <p:menuitem value="Asset Inventory" action="#{navigationBean.redirectToReportInventoryAsset()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="Sales Reports">  
+                        <p:separator />
+                        <p:menuitem value="Sales Invoices" action="#{navigationBean.redirectToReportSalesInvoiceDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="Sales Quotations" action="#{navigationBean.redirectToReportSalesQuotationDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="Sales Orders" action="#{navigationBean.redirectToReportSalesOrderDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="Goods Delivery" action="#{navigationBean.redirectToReportSalesDeliveryDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="User Earn Report" action="#{navigationBean.redirectToReportSalesUserEarnDetail()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="Purchase &amp; Expense">  
+                        <p:separator />
+                        <p:menuitem value="Purchase &amp; Expense" action="#{navigationBean.redirectToReportPurchaseInvoiceDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="Purchase Orders" action="#{navigationBean.redirectToReportPurchaseOrderDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="Items Received" action="#{navigationBean.redirectToReportPurchaseItemReceivedDetail()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator rendered="#{menuItemBean.menuItemObj.HIRE_MODULE_ON==1}"/>
+                    <p:submenu label="Hire Reports" rendered="#{menuItemBean.menuItemObj.HIRE_MODULE_ON==1}">
+                        <p:separator />
+                        <p:menuitem value="Hire Quotations" action="#{navigationBean.redirectToReportHireQuotationDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="Hire Invoices" action="#{navigationBean.redirectToReportHireInvoiceDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="Delivery Notes" action="#{navigationBean.redirectToReportHireDeliveryNoteDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="Return Notes" action="#{navigationBean.redirectToReportHireReturnNoteDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="UnReturned Items" action="#{navigationBean.redirectToReportHireUnReturnedDetail()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator/>
+                    <p:submenu label="Production">  
+                        <p:separator />
+                        <p:menuitem value="Production Report" action="#{navigationBean.redirectToReportProductionDetail()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator/>
+                    <p:submenu label="Stock Mgt Reports">  
+                        <p:separator />
+                        <p:submenu label="Item Transfers">  
+                            <p:separator />
+                            <p:menuitem value="Requests" action="#{navigationBean.redirectToReportTransferRequestDetail()}" />
+                            <p:separator />
+                            <p:menuitem value="Transfers" action="#{navigationBean.redirectToReportTransferDetail()}" />
+                            <p:separator />
+                        </p:submenu>
+                        <p:separator />
+                        <p:menuitem value="Stock Disposal" action="#{navigationBean.redirectToReportDisposeStockDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="Stock Adjustment" action="#{navigationBean.redirectToReportAdjustStockDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="Stock Consumption" action="#{navigationBean.redirectToReportConsumeStockDetail()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="Item Transactions">  
+                        <p:separator />
+                        <p:menuitem value="Item Transactions" action="#{navigationBean.redirectToItemTransaction()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="Cash Report">
+                        <p:separator />
+                        <p:menuitem value="Cash Flow By User" action="#{navigationBean.redirectToReportCashFlowUser()}" />
+                        <p:separator />
+                        <p:menuitem value="Cash Accounts Balance" action="#{navigationBean.redirectToReportCashAccBalances()}" />
+                        <p:separator />
+                        <p:menuitem value="Cash Receipts" action="#{navigationBean.redirectToReportCashReceiptDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="Cash Payments" action="#{navigationBean.redirectToReportCashPaymentDetail()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="Receivables">
+                        <p:separator />
+                        <p:menuitem value="Receivables Detail" action="#{navigationBean.redirectToReportReceivableDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="Receivables Summary" action="#{navigationBean.redirectToReportReceivableSummary()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="Payables">
+                        <p:separator />
+                        <p:menuitem value="Payables Detail" action="#{navigationBean.redirectToReportPayableDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="Payables Summary" action="#{navigationBean.redirectToReportPayableSummary()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="Accounts">
+                        <p:separator />
+                        <p:menuitem value="Journal Entry" action="#{navigationBean.redirectToReportJournal()}" />
+                        <p:separator />
+                        <p:menuitem value="Account Balances (Trial.Balance)" action="#{navigationBean.redirectToTrialBalance()}" />
+                        <p:separator />
+                        <p:menuitem value="Post-Closing Trial.Balance" action="#{navigationBean.redirectToPostCloseTrialBalance()}" />
+                        <p:separator />
+                        <p:menuitem value="Balance Sheet" action="#{navigationBean.redirectToBalanceSheet()}" /> 
+                        <p:separator />
+                        <p:menuitem value="Income Statement" action="#{navigationBean.redirectToIncomeStatement()}" /> 
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                </p:submenu>  
+                <p:submenu label="Dashboards" rendered="#{1==1}" icon="ui-icon-document">  
+                    <p:separator />
+                    <p:menuitem value="Day Closing" action="DashboardDayClose?faces-redirect=true" />
+                    <p:separator />
+                    <p:menuitem value="Sales Trend" action="DashboardSales?faces-redirect=true" />
+                    <p:separator />
+                    <p:menuitem value="Top Selling" action="DashboardSalesItems?faces-redirect=true" />
+                    <p:separator />
+                    <p:menuitem value="Expenses Trend" action="DashboardExpenses?faces-redirect=true" />
+                    <p:separator />
+                    <p:menuitem value="Top Expenses" action="DashboardExpensesItems?faces-redirect=true" />
+                    <p:separator />
+                </p:submenu>   
+                <p:submenu label="#{menuItemBean.menuItemObj.CURRENT_USER.userName}" style="background-color:#FF0000;color: #ffffff;float: right;" icon="ui-icon-person">  
+                    <p:separator />
+                    <p:menuitem value="Logout" action="#{login.userLogout()}" icon="ui-icon-power" />
+                    <p:separator />
+                    <p:menuitem value="My Account" action="#{navigationBean.redirectToMyAccount()}" icon="ui-icon-pencil" />
+                    <p:separator />
+                </p:submenu> 
+            </p:menubar>   
+        </h:form>  
+    </h:body>
+</html>
+

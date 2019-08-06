@@ -1,0 +1,519 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Income Statement</title>
+        <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:event listener="#{navigationBean.checkAccessDenied('48', 'View')}" type="preRenderView" />
+    <f:event listener="#{accLedgerBean.initResetAccIncomeStatement(accIncomeStatement,accJournalBean)}" type="preRenderView" />
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="formReport">
+            <h:panelGrid id="pnlgHeader" columns="1" styleClass="clsPanelReportFilterTitle">
+                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="Income Statement (Profit and Loss Statement)"/>
+            </h:panelGrid>
+            <h:panelGrid id="pnlgFilter" columns="7" styleClass="clsPanelReportFilter">
+                <h:outputLabel value="Accouting Period:"/>
+                <h:selectOneMenu id="menuAccPeriod" value="#{accIncomeStatement.accPeriodId}" >
+                    <f:selectItems value="#{accPeriodBean.returnAccPeriodsCurrentFirst()}" var="ap" itemLabel="#{ap.accPeriodName}" itemValue="#{ap.accPeriodId}"/>
+                </h:selectOneMenu>
+                <h:outputLabel value="From Trans Date:"/>
+                <p:calendar id="calDate1"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{accJournalBean.date1}" size="8"/>
+                <h:outputLabel value="To Trans Date:"/>
+                <p:calendar id="calDate2"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{accJournalBean.date2}" size="8"/>
+                <p:commandButton id="cmdbSearch" value="INCOME STATEMENT" accesskey="i" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.refreshAccIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2)}" process="@form" update="@form"/>
+                </p:commandButton>
+            </h:panelGrid>
+            <h:panelGrid id="pnlgMessage">
+                <p:outputLabel value="#{accLedgerBean.actionMessage}" style="color: red;"/>
+            </h:panelGrid>
+            <p:panelGrid id="pnlgDetail" columns="4">
+                <f:facet name="header">
+                    <p:row>
+                        <p:column colspan="4">#{companySetting.getLICENSE_CLIENT_NAME()} #{companySetting.getBranchCode()}</p:column>
+                    </p:row>
+                </f:facet>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="#{accCurrencyBean.localCurrency.currencyCode}"/>
+
+                <p:outputLabel value="REVENUE"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Operating Revenue(Sales)"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="SALES Products"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.revORSaleProduct)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="SALES Services"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.revORSaleService)}"/>
+                
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="SALES Hire"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.revORSaleHire)}"/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="SALES Discounts (Contra-Revenue Acc)"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.revORSaleDisc)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="SALES Returns and Allowances (Contra-Revenue Acc)"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.revORSaleReturn)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Total Operating Revenue(Sales)"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.revORSaleTotal)}" style="color: blue;"/>
+
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Non-Operating Revenue"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Interest Income"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.revNORInterest)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Dividends"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.revNORDividend)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Commissions"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.revNORCommission)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Rental Income"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.revNORRental)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Gain On Sale Of Assets"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.revNORGainSaleAsset)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Gift-Related Gain"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.revNORGainGift)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Exchange-Related Gain"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.revNORGainExchange)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Other Non-Operating Revenue"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.revNOROther)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Total Non-Operating Revenue"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.revNORTotal)}" style="color: blue;"/>
+
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value="TOTAL REVENUE"/>
+                <p:outputLabel value="(Operating Revenue(Sales) + Non-Operating Revenue)"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.revTotal)}" style="color: blue;"/>
+
+
+
+
+                <p:outputLabel value="EXPENSES"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Cost of Sales(Goods Sold)"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Cost of Purchase - Products"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expCOGSProduct)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Cost of Purchase - Services"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expCOGSService)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Cost of Purchase - Freight"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expCOGSFreight)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Cost of Purchase - Inventory Adjustments"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expCOGSInvAdj)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Purchase Returns and Allowances (Contra Account)"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expCOGSReturn)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Purchase Discounts (Contra Account)"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expCOGSDisc)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Cost of Goods Manufactured and Sold"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expCOGSManfSold)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Cost of Sales - Loyalties"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expCOGSLoyalty)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Loss on inventory write off"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expCOGSInvWriteOff)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Total Cost of Sales(Goods Sold)"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expCOGSTotal)}" style="color: blue;"/>
+
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Gross Profit"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="(Total Revenue - Total Cost of Sales(Goods Sold))"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.grossProfit)}" style="color: blue;background-color: yellow;"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>                
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Operating Expenses"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Advertisement"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEAdvertise)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Audit Expenses"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEAudit)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Bad Debts"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEBadDebts)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Commission"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOECommission)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Computer Expenses"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEComputer)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Donations"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEDonations)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Entertainment"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEEntertainment)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Freight and Transport"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEFreightTransport)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Gift Expenses"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEGift)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Hotel, Boarding and Lodging Expenses"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEHotelLodging)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Legal expenses"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOELegal)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Utility Expenses"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEUtility)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Rent"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOERent)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Rates"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOERates)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Repairs and Maintenance"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOERepairMaint)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Sales Promotion"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOESalesPromotion)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Staff Welfare Expenses"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEStaffWelfare)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Startup cost/ pre- operating expenses"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEStartupPreOperate)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Stationery and printing"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEStationeryPrint)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Subsistence Allowance"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOESubsAllowance)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Telephone Expenses"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOETelephone)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Training Expenditure"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOETraining)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Travelling Expenses including foreign travelling"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOETravel)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Workshop - Conference Expenses"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEWorkshopConf)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Internet Expenses"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEInternet)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Depriciation"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEDepriciation)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Loss on disposal of assets"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOELossDisposalAsset)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Management Fees"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEManagementFees)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Scientific Research Expenses"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEScientificResearch)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Employment Expenses"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEEmployment)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Financial Expenses"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEFinancial)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Short-Term Insurance Business Expenses"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEShortInsurance)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Income Tax Expense"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEIncomeTax)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Proposed Dividend"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEProposedDividend)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Other Operating Expenses"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEOther)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Total Operating Expenses"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOETotal)}" style="color: blue;"/>
+
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Non-Operating Expenses"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Non-Operating Expenses"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expNOE)}"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Total Non-Operating Expenses"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expNOETotal)}" style="color: blue;"/>
+
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="Net Profit"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="(Gross Profit - Operating Expenses - Non-Operating Expenses)"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.netProfit)}" style="color: blue;background-color: yellow;"/>
+
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>     
+
+            </p:panelGrid>
+        </h:form>
+    </h:body>
+</html>
+

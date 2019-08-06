@@ -1,0 +1,164 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>View Purchase Item Received</title>
+        <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+            function confirmUpdate()
+            {
+                return confirm('Are you sure you want to UPDATE this Transaction?');
+            }
+            function doPrintHiddenClick() {
+                document.getElementById("formTransaction:cmdbvPrint").click();
+            }
+        </script> 
+    </h:head>
+    <h:body>
+        <p:dialog header="" widgetVar="dlgPIR" modal="true" height="100%" width="100%" dynamic="true" maximizable="true">
+            <h:form id="formTransactionPIR" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
+                        return false;"> 
+                <p:panel id="pnlTransaction">
+                    <h:panelGrid styleClass="clsGridMainHeader" columns="4" style="width: 100%">
+                        <h:outputLabel style="background-color:#00B461;color: white;" value="VIEW" rendered="#{transBean.actionType.equals('View')}"/>
+                        <h:outputLabel style="background-color:#00B461;color: white;" value="EDIT" rendered="#{transBean.actionType.equals('Edit')}"/>
+                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{transactionTypeBean.getTransactionType(9).transactionOutputLabel} - #{transactionReasonBean.getTransactionReason(transBean.transObj.transactionReasonId).transactionReasonName} : #{transBean.transObj.transactionNumber}"/>
+                        <h:outputLabel style="background-color:#00B461;color: white;" value="Stock↑"/>
+                        <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:No effect"/>
+                    </h:panelGrid>
+                    <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="6">
+                        <h:outputLabel  value="From:"/>
+                        <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{storeBean.getStore(transBean.transObj.storeId).storeName}" style="width: 170px;"/>
+                        <h:outputLabel  value="#{transactionTypeBean.getTransactionType(9).transactionDateLabel}:"/>
+                        <h:inputText id="itxtTransactionDate" value="#{utilityBean.formatDate(transBean.transObj.transactionDate)}" disabled="true"/>
+                        <h:outputLabel  value="#{transactionTypeBean.getTransactionType(9).transactionRefLabel}:"/>
+                        <h:inputText styleClass="clsInput" id="itxtTransactionRef" value="#{transBean.transObj.transactionRef}" autocomplete="off" style="width: 170px;" disabled="true"/>
+                        <h:outputLabel  value="#{transactionTypeBean.getTransactionType(9).transactorLabel}:"/>
+                        <h:inputText styleClass="clsInput" id="itxtTransactor" value="#{transactorBean.getTransactor(transBean.transObj.transactorId).transactorNames}" autocomplete="off" style="width: 170px;" disabled="true"/>
+                    </h:panelGrid>
+                    <p:dataTable rowIndexVar="rowIndex" id="dtblTransactionItem" value="#{transBean.transItemList}" var="ati" 
+                                 styleClass="cls-table" tableStyle="width:auto;" 
+                                 >  
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#</f:facet>
+                            <!-- row record -->
+                            #{rowIndex+1}
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">Item Description</f:facet>
+                            <!-- row record -->
+                            <p:outputLabel value="#{transItemBean.showItemDescriptionCEC(ati)}" escape="false"/>
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">Unit</f:facet>
+                            <!-- row record -->
+                            #{unitBean.getUnit(itemBean.getItem(ati.itemId).getUnitId()).unitSymbol}
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">Batch No</f:facet>
+                            <!-- row record -->
+                            <p:outputLabel value="#{ati.batchno}"/>
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">Qty</f:facet>
+                            <!-- row record -->
+                            <h:inputText value="#{ati.itemQty}" style="width: 50px;" disabled="#{transBean.actionType.equals('View') or generalUserSetting.currentStore.storeId!=transBean.transObj.storeId}" autocomplete="off">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:ajax event="change" listener="#{transItemBean.editTransItemV2(2,transBean.transObj, transBean.transItemList,ati)}" execute="dtblTransactionItem" render="@form"/>
+                            </h:inputText>
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">Unit.Cost</f:facet>
+                            <!-- row record -->
+                            <h:inputText value="#{ati.unitCostPrice}" style="width: 100px;" disabled="#{transBean.actionType.equals('View') or generalUserSetting.currentStore.storeId!=transBean.transObj.storeId}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:ajax event="change" execute="dtblTransactionItem" render="dtblTransactionItem"/>
+                            </h:inputText>
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">Cur</f:facet>
+                            <!-- row record -->
+                            <h:outputLabel value="#{itemBean.getItem(ati.itemId).currencyCode}" style="width: 50px;"/>
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">Manuf.Date</f:facet>
+                            <!-- row record -->
+                            <p:outputLabel value="#{utilityBean.formatDate(ati.itemMnfDate)}"/>
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">Expiry.Date</f:facet>
+                            <!-- row record -->
+                            <p:outputLabel value="#{utilityBean.formatDate(ati.itemExpryDate)}"/>
+                        </p:column>
+                    </p:dataTable>
+                    <h:panelGrid style="background-color: yellow;width: 100%"/>
+                    <h:panelGrid id="pgrdOther" styleClass="clsGridMainInput" columns="3">
+                        <h:outputLabel styleClass="clsLabelTransItem" value="#{transactionTypeBean.getTransactionType(9).transactionUserLabel}"/>
+                        <h:inputText disabled="true" style="width: 170px;" value="#{userDetailBean.getUserDetail(transBean.transObj.transactionUserDetailId).userName}"/>
+                    </h:panelGrid>
+                    <h:panelGrid id="pgrdApprove">
+                        <h:panelGrid rendered="#{transBean.isApproveNeeded(transBean.transObj)}" id="pgrdApprove2" styleClass="clsGridApprove" columns="6" style="background-color: lightsalmon">
+                            <h:outputLabel  value="User Name:"/>
+                            <h:inputText styleClass="clsInput" id="itxtUserName" value="#{transBean.transObj.approveUserName}" autocomplete="off"> </h:inputText>
+                            <h:outputLabel  value="Password:"/>
+                            <h:inputSecret styleClass="clsInput" id="itxtPassword" value="#{transBean.transObj.approveUserPassword}" autocomplete="off"></h:inputSecret>
+                            <h:commandButton value="Approve DISCOUNT">
+                                <f:ajax listener="#{login.userApprove(transBean.transObj.approveUserName,generalUserSetting.getCurrentStore().storeId,transBean.transObj.approveUserPassword,'DISCOUNT', 'Add')}" execute="itxtUserName itxtPassword" render="olblDiscountApprove"/>
+                            </h:commandButton>
+                            <h:commandButton value="Approve SPEND POINT(S)">
+                                <f:ajax listener="#{login.userApprove(transBean.transObj.approveUserName,generalUserSetting.getCurrentStore().storeId,transBean.transObj.approveUserPassword,'SPEND POINT', 'Add')}" execute="itxtUserName itxtPassword" render="olblPointsApprove"/>
+                            </h:commandButton>
+
+                            <h:outputLabel  value=""/>
+                            <h:outputLabel  value=""/>
+                            <h:outputLabel  value=""/>
+                            <h:outputLabel  value=""/>
+                            <h:outputLabel id="olblDiscountApprove" style="background-color: black;color: white" value="#{generalUserSetting.getCurrentApproveDiscountStatus()}"/>
+                            <h:outputLabel id="olblPointsApprove" style="background-color: black;color: white" value="#{generalUserSetting.getCurrentApprovePointsStatus()}"/>  
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <h:panelGrid styleClass="clsGridMainCommands" columns="1" style="width: 100%">
+                        <h:panelGrid styleClass="clsGridMainCommands1" columns="2">
+                            <h:commandButton styleClass="clsButtonVeryBig" id="cmdbUpdate" value="UPDATE (ALT+U)" onclick="return confirmUpdate();" accesskey="u" rendered="#{transBean.actionType.equals('Edit') and generalUserSetting.currentStore.storeId==transBean.transObj.storeId}">
+                                <f:ajax listener="#{transBean.updateTransCEC('PARENT',transBean.transObj.storeId,transBean.transObj.transactionTypeId,transBean.transObj.transactionReasonId,'',transBean.transObj,transBean.transItemList,transBean.payObj)}" execute="pnlTransaction" render="pnlTransaction"/>
+                            </h:commandButton>
+                        </h:panelGrid>
+                    </h:panelGrid>
+
+                    <h:panelGrid styleClass="clsGridMainMessages" columns="1">
+                        <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{transBean.actionMessage}"/>
+                        <h:messages id="msgsMainMessage" style="color: red"/><br/>
+                    </h:panelGrid>
+                    
+                    <p:growl/>
+                    <!-- INVOICE STARTS HERE -->
+                    <ui:include src="#{transBean.getPrintFileName('PARENT',transactionTypeBean.getTransactionType(9),0)}"/>
+                    <!-- INVOICE ENDS HERE -->
+                </p:panel>
+            </h:form>
+        </p:dialog>
+    </h:body>
+</html>
+
