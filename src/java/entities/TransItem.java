@@ -111,6 +111,7 @@ public class TransItem implements Serializable {
     private double qty_damage_total;
     private int item_no;
     private String item_currency_code;
+    private int is_general;
     
 
     /**
@@ -1315,6 +1316,20 @@ public class TransItem implements Serializable {
      */
     public void setDisplay_alias_name(int display_alias_name) {
         this.display_alias_name = display_alias_name;
+    }
+
+    /**
+     * @return the is_general
+     */
+    public int getIs_general() {
+        return is_general;
+    }
+
+    /**
+     * @param is_general the is_general to set
+     */
+    public void setIs_general(int is_general) {
+        this.is_general = is_general;
     }
 
 }

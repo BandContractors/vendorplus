@@ -7768,6 +7768,7 @@ public class TransItemBean implements Serializable {
             tri.setDuration_value(0);
             tri.setQty_damage(0);
             tri.setDuration_passed(0);
+            tri.setIs_general(0);
         }
     }
 
@@ -7821,6 +7822,7 @@ public class TransItemBean implements Serializable {
             ToObj.setDuration_value(FromObj.getDuration_value());
             ToObj.setQty_damage(FromObj.getQty_damage());
             ToObj.setDuration_passed(FromObj.getDuration_passed());
+            ToObj.setIs_general(0);
         }
     }
 
@@ -7874,6 +7876,7 @@ public class TransItemBean implements Serializable {
             tri.setDuration_value(0);
             tri.setQty_damage(0);
             tri.setDuration_passed(0);
+            tri.setIs_general(0);
         }
     }
 

@@ -38,6 +38,8 @@ public class TransProduction implements Serializable {
     private String TransactionRef;
     private long OutputItemId;
     private String OutputItemName;
+    private String OutputItemUnit;
+    private double OrderedQty;
     private double OutputQty;
     private double OutputUnitCost;
     private double OutputTotalCost;
@@ -638,6 +640,34 @@ public class TransProduction implements Serializable {
      */
     public void setTransactor_names(String transactor_names) {
         this.transactor_names = transactor_names;
+    }
+
+    /**
+     * @return the OutputItemUnit
+     */
+    public String getOutputItemUnit() {
+        return OutputItemUnit;
+    }
+
+    /**
+     * @param OutputItemUnit the OutputItemUnit to set
+     */
+    public void setOutputItemUnit(String OutputItemUnit) {
+        this.OutputItemUnit = OutputItemUnit;
+    }
+
+    /**
+     * @return the OrderedQty
+     */
+    public double getOrderedQty() {
+        return OrderedQty;
+    }
+
+    /**
+     * @param OrderedQty the OrderedQty to set
+     */
+    public void setOrderedQty(double OrderedQty) {
+        this.OrderedQty = OrderedQty;
     }
     
     

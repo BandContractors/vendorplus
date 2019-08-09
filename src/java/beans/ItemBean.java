@@ -456,7 +456,7 @@ public class ItemBean implements Serializable {
                 aItem.setIs_free(aResultSet.getInt("is_free"));
             } catch (NullPointerException npe) {
                 aItem.setIs_free(0);
-            }    
+            }
         } catch (SQLException se) {
             System.err.println("setItemFromResultset:" + se.getMessage());
         }
@@ -672,6 +672,25 @@ public class ItemBean implements Serializable {
             }
         }
 
+    }
+
+    public void setItem(long aItemId, Item aItem) {
+        String sql = "{call sp_search_item_by_id(?)}";
+        ResultSet rs = null;
+        if (null == aItem) {
+            aItem = new Item();
+        }
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aItemId);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                this.setItemFromResultset(aItem, rs);
+            }
+        } catch (Exception e) {
+            System.err.println("setItem:" + e.getMessage());
+        }
     }
 
     public Item findItem(long ItemId) {

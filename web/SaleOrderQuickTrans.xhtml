@@ -194,7 +194,7 @@
                                     <p:ajax event="blur" listener="#{trans.setDeliveryAddress(transactorBean.selectedTransactor.physicalAddress)}" update="TransactionFormSales:itxtDelAddress"/>
                                     <p:ajax event="blur" listener="#{transBean.refreshCustomerBalances(trans)}" update="olblDebtCredit itxtDebtCredit itxtPrepaidAcc"/>
                                 </p:autoComplete>
-                                <h:outputLabel value="--Deliver To--"/>
+                                <h:outputLabel value="Deliver To"/>
                                 <h:inputTextarea id="itxtDelAddress" value="#{trans.deliveryAddress}" style="font-size: 10px;height: 20px;width: 234px;"/>
                             </h:panelGrid>
                             <p:scrollPanel mode="native" style="width:450px;height:150px">
