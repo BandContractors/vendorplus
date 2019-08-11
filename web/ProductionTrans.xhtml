@@ -44,7 +44,7 @@
                 <h:selectOneMenu styleClass="clsMenu" id="menuTransactionReason" value="#{trans.transactionReasonId}">
                     <f:selectItem itemValue="#{transBean.transReasonObj.transactionReasonId}" itemLabel="#{generalUserSetting.getCurrentStore().getStoreName()} / #{transBean.transReasonObj.transactionReasonName}"/>
                 </h:selectOneMenu>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="Stock:No effect"/>
+                <h:outputLabel style="background-color:#00B461;color: white;" value="Stock:Output↑ Input↓"/>
                 <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:No effect"/>
             </h:panelGrid>
 
@@ -79,6 +79,7 @@
                     <p:selectOneMenu id="menuTransNumber" value="#{trans.transactionRef}" editable="true" dynamic="true">
                         <f:selectItem itemLabel="Select or Type..." itemValue="0"/>
                         <f:selectItems value="#{transBean.transList}" var="stl" itemLabel="#{stl.transactionNumber}" itemValue="#{stl.transactionNumber}"/>
+                        <p:ajax listener="#{transProductionBean.refreshOrderProducedList(trans,transProductionBean.orderProducedList,transItem)}" process="@form" update="TransFormProd:pnlgProduced TransFormProd:gridTransItem TransFormProd:pgrdSpecific TransFormProd:gridRawMaterialItem TransFormProd:dtbRawItem "/>
                     </p:selectOneMenu>
                     <p:commandButton id="cbtnAcquire" value="OK" style="background-color: black;color: white;font-weight: bold;" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" >
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
@@ -103,8 +104,9 @@
                                             itemLabel="#{pro_itm.description}" 
                                             itemValue="#{pro_itm}" 
                                             converter="ItemConverter" style="text-align: left" 
-                                            forceSelection="true" queryDelay="0" 
-                                             rendered="#{transItem.transactionItemId==0}"
+                                            forceSelection="true" queryDelay="0"  
+                                            rendered="#{transItem.transactionItemId==0}" 
+                                            disabled="#{trans.transactionRef.length()>0}"
                                             >
                                 <p:column headerText="Item Description" style="text-align: left" >  
                                     #{pro_itm.description} 
@@ -303,7 +305,7 @@
                         <p:dataTable rowIndexVar="rowIndex" id="dtblProduced"  value="#{transProductionBean.orderProducedList}" var="ati" 
                                      styleClass="cls-table" tableStyle="width:auto;" 
                                      >  
-                            <p:column>
+                            <p:column style="font-size: 12px;">
                                 <!-- column header -->
                                 <f:facet name="header">#</f:facet>
                                 <!-- row record -->
@@ -313,21 +315,21 @@
                                     <p:ajax listener="#{transProductionBean.updateUnitCostProduction(transItem,generalUserSetting.currentStore.storeId)}" process="@this" update="TransFormProd:itxtUnitCost"/>
                                 </p:commandButton>
                             </p:column>
-                            <p:column>
+                            <p:column style="font-size: 12px;">
                                 <!-- column header -->
-                                <f:facet name="header">Produced Item</f:facet>
+                                <f:facet name="header">Production Item</f:facet>
                                 <!-- row record -->
-                                #{ati.outputItemName}
-                                #{ati.descSpecific}
+                                #{ati.outputItemName} 
+                                #{ati.descSpecific} 
                                 #{ati.codeSpecific}
                             </p:column>
-                            <p:column>
+                            <p:column style="font-size: 12px;">
                                 <!-- column header -->
                                 <f:facet name="header">Unit</f:facet>
                                 <!-- row record -->
                                 #{ati.outputItemUnit}
                             </p:column>
-                            <p:column>
+                            <p:column style="font-size: 12px;">
                                 <!-- column header -->
                                 <f:facet name="header">Ordered Qty</f:facet>
                                 <!-- row record -->
@@ -335,7 +337,7 @@
                                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </p:outputLabel>
                             </p:column>                      
-                            <p:column>
+                            <p:column style="font-size: 12px;">
                                 <!-- column header -->
                                 <f:facet name="header">Produced Qty</f:facet>
                                 <!-- row record -->

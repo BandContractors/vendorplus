@@ -195,7 +195,7 @@ public class TransProductionItemBean implements Serializable {
         String sql = null;
         String msg = "";
         long InsertedTransId = 0;
-        double calInputQty = 0;
+        double calInputQty = 0.0;
         TransactionTypeBean TransTypeBean = new TransactionTypeBean();
         StockBean StkBean = new StockBean();
         TransProductionItem aTransProductionItem = new TransProductionItem();
@@ -216,13 +216,13 @@ public class TransProductionItemBean implements Serializable {
                     }
                     cs.setLong("in_transaction_id", aTransProductionID);
                     cs.setLong("in_input_item_id", aItemProductionMap.getInputItemId());
-                    if (aOutputQty >= 1) {
-                        calInputQty = aItemProductionMap.getInputQty() * aOutputQty;
-                        cs.setDouble("in_input_qty", calInputQty);
-                    } else {
-                        calInputQty = aItemProductionMap.getInputQty();
-                        cs.setDouble("in_input_qty", calInputQty);
-                    }
+                    //if (aOutputQty >= 1) {
+                    calInputQty = aItemProductionMap.getInputQty() * aOutputQty;
+                    cs.setDouble("in_input_qty", calInputQty);
+                    //} else {
+                    //    calInputQty = aItemProductionMap.getInputQty();
+                    //    cs.setDouble("in_input_qty", calInputQty);
+                    //}
                     try {
                         cs.setDouble("in_input_unit_cost", 0);
                     } catch (NullPointerException npe) {

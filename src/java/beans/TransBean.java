@@ -4407,8 +4407,8 @@ public class TransBean implements Serializable {
                     this.setActionMessage("No sale order record loaded");
                 }
             } else {
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Select a valid sales order number that matches with client..."));
-                this.setActionMessage("No sale order record loaded");
+                //FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Select a valid sales order number that matches with client..."));
+                //this.setActionMessage("No sale order record loaded");
             }
         } catch (Exception e) {
             System.out.println("loadOrderTrans:" + e.getMessage());

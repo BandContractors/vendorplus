@@ -77,12 +77,7 @@
                 <h:outputLabel  value="#{transBean.transTypeObj.transactionDateLabel}"/>
                 <h:outputLabel  value="Currency"/>
                 <p:commandLink actionListener="#{transactorBean.openChildTransactor('CUSTOMER')}" value="#{transBean.transTypeObj.transactorLabel}"/>
-                <p:commandLink id="cmdbOrder" value="#{transBean.transTypeObj.transactionRefLabel}" onclick="PF('statusDialog4').show()" onsuccess="PF('statusDialog4').hide()">
-                    <p:dialog widgetVar="statusDialog4" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
-                        <p:graphicImage name="/images/ajax-loader.gif"/>
-                    </p:dialog>
-                    <p:ajax listener="#{transBean.loadOrderTrans(trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor,transBean.authorisedByUserDetail,transItemBean.selectedAccCoa)}" process="@form" update="pnlHeader gridTransItem pgrdOverrideWarranty pgrdSpecific gridItemStatus dtblTransactionItem pgrdTotals pgrdScheme pgrdPayment pgrdMsgs pgrdTransUser pgrdApprove growl1"/>
-                </p:commandLink>
+                <h:outputLabel  value="#{transBean.transTypeObj.transactionRefLabel}"/>
                 <h:outputLabel id="olblDebtCredit" style="color: coral;font-weight: bold;" value="Receivable (#{generalUserSetting.LOCAL_CURRENCY.currencyCode})"/>
                 <h:outputLabel id="olblDeposit" style="color: green;font-weight: bold;" value="Deposit (#{trans.currencyCode})"/>
                 <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}" style="width: 120px;"/>
@@ -118,6 +113,7 @@
                 <p:selectOneMenu id="menuTransRefNumber" value="#{trans.transactionRef}" editable="true" dynamic="true" style="width: 140px;">
                     <f:selectItem itemLabel="Select or Type..." itemValue="0"/>
                     <f:selectItems value="#{transBean.transList}" var="stl" itemLabel="#{stl.transactionNumber}" itemValue="#{stl.transactionNumber}"/>
+                    <p:ajax listener="#{transBean.loadOrderTrans(trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor,transBean.authorisedByUserDetail,transItemBean.selectedAccCoa)}" process="@form" update="pnlHeader gridTransItem pgrdOverrideWarranty pgrdSpecific gridItemStatus dtblTransactionItem pgrdTotals pgrdScheme pgrdPayment pgrdMsgs pgrdTransUser pgrdApprove growl1"/>
                 </p:selectOneMenu>
                 <h:inputText disabled="true" style="color: coral;font-weight: bold;width: 160px;" styleClass="clsInput" id="itxtDebtCredit" value="#{accJournalBean.returnBalanceString(trans.balance_receivable)}">
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
