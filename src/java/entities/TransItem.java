@@ -112,7 +112,8 @@ public class TransItem implements Serializable {
     private int item_no;
     private String item_currency_code;
     private int is_general;
-    
+    private double unit_size;
+    private double unit_size_qty;
 
     /**
      * @return the TransactionItemId
@@ -1330,6 +1331,34 @@ public class TransItem implements Serializable {
      */
     public void setIs_general(int is_general) {
         this.is_general = is_general;
+    }
+
+    /**
+     * @return the unit_size
+     */
+    public double getUnit_size() {
+        return unit_size;
+    }
+
+    /**
+     * @param unit_size the unit_size to set
+     */
+    public void setUnit_size(double unit_size) {
+        this.unit_size = unit_size;
+    }
+
+    /**
+     * @return the unit_size_qty
+     */
+    public double getUnit_size_qty() {
+        return unit_size_qty;
+    }
+
+    /**
+     * @param unit_size_qty the unit_size_qty to set
+     */
+    public void setUnit_size_qty(double unit_size_qty) {
+        this.unit_size_qty = unit_size_qty;
     }
 
 }

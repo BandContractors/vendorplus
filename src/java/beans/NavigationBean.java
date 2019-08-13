@@ -592,7 +592,8 @@ public class NavigationBean implements Serializable {
             httpSession.setAttribute("TRANSACTION_NUMBER_LABEL", TempTransType.getTransactionNumberLabel());
             httpSession.setAttribute("TRANSACTION_OUTPUT_LABEL", TempTransType.getTransactionOutputLabel());
         }
-        return "SaleOrderTrans?faces-redirect=true";
+        int orderV=Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "ORDER_VERSION").getParameter_value());
+        return "SaleOrderTransV" + orderV + "?faces-redirect=true";
     }
     
     public String redirectToSaleOrderWhole() {
@@ -611,7 +612,8 @@ public class NavigationBean implements Serializable {
             httpSession.setAttribute("TRANSACTION_NUMBER_LABEL", TempTransType.getTransactionNumberLabel());
             httpSession.setAttribute("TRANSACTION_OUTPUT_LABEL", TempTransType.getTransactionOutputLabel());
         }
-        return "SaleOrderTrans?faces-redirect=true";
+        int orderV=Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "ORDER_VERSION").getParameter_value());
+        return "SaleOrderTransV" + orderV + "?faces-redirect=true";
     }
     
     public String redirectToSaleOrderSpecial() {
@@ -630,7 +632,8 @@ public class NavigationBean implements Serializable {
             httpSession.setAttribute("TRANSACTION_NUMBER_LABEL", TempTransType.getTransactionNumberLabel());
             httpSession.setAttribute("TRANSACTION_OUTPUT_LABEL", TempTransType.getTransactionOutputLabel());
         }
-        return "SaleOrderTrans?faces-redirect=true";
+        int orderV=Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "ORDER_VERSION").getParameter_value());
+        return "SaleOrderTransV" + orderV + "?faces-redirect=true";
     }
 
     public String redirectToSaleOrderQuick() {

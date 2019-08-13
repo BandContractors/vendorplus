@@ -173,9 +173,9 @@ public class ItemBean implements Serializable {
         int save_status = 0;
         String sql = null;
         if (aItem.getItemId() == 0) {
-            sql = "{call sp_insert_item(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_insert_item(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         } else if (aItem.getItemId() > 0) {
-            sql = "{call sp_update_item(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_update_item(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         }
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -285,6 +285,16 @@ public class ItemBean implements Serializable {
                 cs.setInt("in_is_free", aItem.getIs_free());
             } catch (NullPointerException npe) {
                 cs.setInt("in_is_free", 0);
+            }
+            try {
+                cs.setInt("in_specify_size", aItem.getSpecify_size());
+            } catch (NullPointerException npe) {
+                cs.setInt("in_specify_size", 0);
+            }
+            try {
+                cs.setInt("in_size_to_specific_name", aItem.getSize_to_specific_name());
+            } catch (NullPointerException npe) {
+                cs.setInt("in_size_to_specific_name", 0);
             }
             cs.executeUpdate();
             save_status = 1;
@@ -456,6 +466,16 @@ public class ItemBean implements Serializable {
                 aItem.setIs_free(aResultSet.getInt("is_free"));
             } catch (NullPointerException npe) {
                 aItem.setIs_free(0);
+            }
+            try {
+                aItem.setSpecify_size(aResultSet.getInt("specify_size"));
+            } catch (NullPointerException npe) {
+                aItem.setSpecify_size(0);
+            }
+            try {
+                aItem.setSize_to_specific_name(aResultSet.getInt("size_to_specific_name"));
+            } catch (NullPointerException npe) {
+                aItem.setSize_to_specific_name(0);
             }
         } catch (SQLException se) {
             System.err.println("setItemFromResultset:" + se.getMessage());
@@ -638,6 +658,16 @@ public class ItemBean implements Serializable {
                 aItem.setIs_free(aResultSet.getInt("is_free"));
             } catch (NullPointerException npe) {
                 aItem.setIs_free(0);
+            }
+            try {
+                aItem.setSpecify_size(aResultSet.getInt("specify_size"));
+            } catch (NullPointerException npe) {
+                aItem.setSpecify_size(0);
+            }
+            try {
+                aItem.setSize_to_specific_name(aResultSet.getInt("size_to_specific_name"));
+            } catch (NullPointerException npe) {
+                aItem.setSize_to_specific_name(0);
             }
         } catch (SQLException se) {
             System.err.println("setItemFromResultsetReport:" + se.getMessage());
@@ -854,6 +884,8 @@ public class ItemBean implements Serializable {
                 this.ItemObj.setAlias_name("");
                 this.ItemObj.setDisplay_alias_name(0);
                 this.ItemObj.setIs_free(0);
+                this.ItemObj.setSpecify_size(0);
+                this.ItemObj.setSize_to_specific_name(0);
                 this.ItemObj.setUnitCostPrice(0);
                 this.setSearchItemDesc("");
                 this.refreshStockLocation(0);
@@ -899,6 +931,8 @@ public class ItemBean implements Serializable {
                 aItem.setAlias_name("");
                 aItem.setDisplay_alias_name(0);
                 aItem.setIs_free(0);
+                aItem.setSpecify_size(0);
+                aItem.setSize_to_specific_name(0);
                 this.setSearchItemDesc("");
                 this.refreshStockLocation(0);
             }

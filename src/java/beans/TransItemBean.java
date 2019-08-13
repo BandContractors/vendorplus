@@ -14,7 +14,6 @@ import entities.TransactionType;
 import entities.UserDetail;
 import entities.ItemMap;
 import entities.DiscountPackageItem;
-import entities.Location;
 import entities.Stock_out;
 import entities.Store;
 import entities.SubCategory;
@@ -38,8 +37,6 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import utilities.UtilityBean;
 /*
  * To change this template, choose Tools | Templates
@@ -73,6 +70,19 @@ public class TransItemBean implements Serializable {
     private List<Item> ItemList;
     private String CategoryName;
     private String SubCategoryName;
+
+    public void specifySize(TransItem aTransItem) {
+        if (null != aTransItem) {
+            Item item = new ItemBean().getItem(aTransItem.getItemId());
+            int SizeToSpecificName = item.getSize_to_specific_name();
+            String UnitSym = new UnitBean().getUnit(item.getUnitId()).getUnitSymbol();
+            aTransItem.setItemQty(aTransItem.getUnit_size() * aTransItem.getUnit_size_qty());
+            aTransItem.setAmount(aTransItem.getItemQty() * aTransItem.getUnitPrice());
+            if (SizeToSpecificName == 1 && item.getIsGeneral() == 1) {
+                aTransItem.setDescSpecific(new UtilityBean().formatDoubleToString(aTransItem.getUnit_size_qty()) + " PCs of " + new UtilityBean().formatDoubleToString(aTransItem.getUnit_size()) + " " + UnitSym);
+            }
+        }
+    }
 
     public void saveTransItems(Trans aTrans, List<TransItem> aActiveTransItems, long TransactionId) {
         List<TransItem> ati = aActiveTransItems;
@@ -7769,6 +7779,8 @@ public class TransItemBean implements Serializable {
             tri.setQty_damage(0);
             tri.setDuration_passed(0);
             tri.setIs_general(0);
+            tri.setUnit_size_qty(1);
+            tri.setUnit_size(1);
         }
     }
 
@@ -7823,6 +7835,8 @@ public class TransItemBean implements Serializable {
             ToObj.setQty_damage(FromObj.getQty_damage());
             ToObj.setDuration_passed(FromObj.getDuration_passed());
             ToObj.setIs_general(0);
+            ToObj.setUnit_size_qty(FromObj.getUnit_size_qty());
+            ToObj.setUnit_size(FromObj.getUnit_size_qty());
         }
     }
 
@@ -7877,6 +7891,8 @@ public class TransItemBean implements Serializable {
             tri.setQty_damage(0);
             tri.setDuration_passed(0);
             tri.setIs_general(0);
+            tri.setUnit_size_qty(0);
+            tri.setUnit_size(0);
         }
     }
 

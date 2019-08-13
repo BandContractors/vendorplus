@@ -56,6 +56,8 @@ public class Item implements Serializable {
     private String alias_name;
     private int display_alias_name;
     private int is_free;
+    private int specify_size;
+    private int size_to_specific_name;
     
     /**
      * @return the ItemId
@@ -594,6 +596,34 @@ public class Item implements Serializable {
      */
     public void setIs_free(int is_free) {
         this.is_free = is_free;
+    }
+
+    /**
+     * @return the specify_size
+     */
+    public int getSpecify_size() {
+        return specify_size;
+    }
+
+    /**
+     * @param specify_size the specify_size to set
+     */
+    public void setSpecify_size(int specify_size) {
+        this.specify_size = specify_size;
+    }
+
+    /**
+     * @return the size_to_specific_name
+     */
+    public int getSize_to_specific_name() {
+        return size_to_specific_name;
+    }
+
+    /**
+     * @param size_to_specific_name the size_to_specific_name to set
+     */
+    public void setSize_to_specific_name(int size_to_specific_name) {
+        this.size_to_specific_name = size_to_specific_name;
     }
 
 }

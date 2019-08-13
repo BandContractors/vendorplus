@@ -641,7 +641,9 @@ CREATE PROCEDURE sp_insert_item
 	IN in_expense_type varchar(50),
 	IN in_alias_name varchar(50),
 	In in_display_alias_name int,
-	IN in_is_free int
+	IN in_is_free int,
+	IN in_specify_size int,
+	IN in_size_to_specific_name int
 ) 
 BEGIN 
 	SET @new_id=0;
@@ -710,7 +712,9 @@ BEGIN
 		expense_type,
 		alias_name,
 		display_alias_name,
-		is_free
+		is_free,
+		specify_size,
+		size_to_specific_name
 	) 
     VALUES
 	(
@@ -747,7 +751,9 @@ BEGIN
 		in_expense_type,
 		in_alias_name,
 		in_display_alias_name,
-		in_is_free
+		in_is_free,
+		in_specify_size,
+		in_size_to_specific_name
 	); 
 END//
 DELIMITER ;
@@ -787,7 +793,9 @@ CREATE PROCEDURE sp_update_item
 	IN in_expense_type varchar(50),
 	IN in_alias_name varchar(50),
 	IN in_display_alias_name int,
-	IN in_is_free int
+	IN in_is_free int,
+	IN in_specify_size int,
+	IN in_size_to_specific_name int
 ) 
 BEGIN 
 	SET @sub_category_id=NULL;
@@ -851,7 +859,9 @@ BEGIN
 		expense_type=in_expense_type,
 		alias_name=in_alias_name,
 		display_alias_name=in_display_alias_name,
-		is_free=in_is_free 
+		is_free=in_is_free,
+		specify_size=in_specify_size,
+		size_to_specific_name=in_size_to_specific_name 
 	WHERE item_id=in_item_id; 
 END//
 DELIMITER ;
