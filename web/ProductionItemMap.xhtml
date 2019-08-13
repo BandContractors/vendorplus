@@ -102,7 +102,7 @@
                     </p:commandButton>
                 </h:panelGrid>
                 <p:growl id="growl1" sticky="true"/>
-                <p:dataTable rowIndexVar="rowIndex" style="width: 790px" id="dtblListEdit" value="#{itemProductionMapBean.itemProductionMapsListEdit}" var="itm1" 
+                <p:dataTable rowIndexVar="rowIndex" style="width: auto;" id="dtblListEdit" value="#{itemProductionMapBean.itemProductionMapsListEdit}" var="itm1" 
                              styleClass="cls-table" 
                              >
                     <p:column>
@@ -111,19 +111,19 @@
                         <!-- row record -->
                         #{itm1.inputItemName}
                     </p:column>
-                    <p:column>
+                    <p:column style="width: 50px;">
                         <!-- column header -->
                         <f:facet name="header">Unit</f:facet>
                         <!-- row record -->
                         #{itm1.inputItemUnit}
                     </p:column>
-                    <p:column>
+                    <p:column style="width: 100px;">
                         <!-- column header -->
                         <f:facet name="header">Qty</f:facet>
                         <!-- row record -->
                         #{itm1.inputQty}
                     </p:column>
-                    <p:column>
+                    <p:column style="width: 100px;">
                         <!-- column header -->
                         <f:facet name="header"></f:facet>
                         <!-- row record -->
@@ -137,7 +137,7 @@
                 </h:commandButton>
             </p:fieldset>
             <p:growl id="growl2" sticky="true"/>
-            <p:dataTable rowIndexVar="rowIndex" style="width: 790px" id="dtblList" value="#{itemProductionMapBean.itemProductionMapsList}" var="itm2" 
+            <p:dataTable rowIndexVar="rowIndex" style="width: auto;" id="dtblList" value="#{itemProductionMapBean.itemProductionMapsList}" var="itm2" 
                          styleClass="cls-table" 
                          >  
                 <p:column>
@@ -146,7 +146,7 @@
                     <!-- row record -->
                     #{itm2.outputItemName}
                 </p:column>
-                <p:column>
+                <p:column style="width: 50px;">
                     <!-- column header -->
                     <f:facet name="header"></f:facet>
                     <!-- row record -->
@@ -158,19 +158,19 @@
                     <!-- row record -->
                     #{itm2.inputItemName}
                 </p:column>
-                <p:column>
+                <p:column style="width: 50px;">
                     <!-- column header -->
                     <f:facet name="header"></f:facet>
                     <!-- row record -->
                     #{itm2.inputItemUnit}
                 </p:column>
-                <p:column>
+                <p:column style="width: 50px;">
                     <!-- column header -->
                     <f:facet name="header">Qty</f:facet>
                     <!-- row record -->
                     #{itm2.inputQty}
                 </p:column>
-                <p:column>
+                <p:column style="width: 50px;">
                     <!-- column header -->
                     <f:facet name="header"></f:facet>
                     <!-- row record -->
