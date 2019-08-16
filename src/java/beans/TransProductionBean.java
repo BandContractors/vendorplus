@@ -34,6 +34,7 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import utilities.UtilityBean;
 
 /*
  * To change this template, choose Tools | Templates
@@ -46,7 +47,7 @@ import javax.servlet.http.HttpSession;
 @ManagedBean
 @SessionScoped
 public class TransProductionBean implements Serializable {
-
+    
     private static final long serialVersionUID = 1L;
     private String ActionMessage = null;
     private UserDetail TransUserDetail;
@@ -68,7 +69,53 @@ public class TransProductionBean implements Serializable {
     private TransProduction TransProdObj;
     private String ActionType;
     private List<TransProduction> OrderProducedList = new ArrayList<>();
-
+    
+    public void specifySizeProduced(TransItem aTransItem) {
+        if (null != aTransItem) {
+            aTransItem.setItemQty(aTransItem.getSpecific_size() * aTransItem.getSpecific_size_qty());
+        }
+    }
+    
+    public String getPCsOrdered(TransProduction aTransProduction) {
+        String outpstr = "";
+        double outp = 1.0;
+        double qty = 0;
+        double sze = 1;
+        if (null != aTransProduction) {
+            qty = aTransProduction.getOrderedQty();
+            sze = aTransProduction.getSpecific_size();
+            if (sze > 0) {
+                outp = qty / sze;
+            }
+        }
+        if (sze == 1) {
+            //do nothng
+        } else {
+            outpstr = " (" + new UtilityBean().formatDoubleToString(outp) + "PCs)";
+        }
+        return outpstr;
+    }
+    
+    public String getPCsProduced(TransProduction aTransProduction) {
+        String outpstr = "";
+        double outp = 1.0;
+        double qty = 0;
+        double sze = 1;
+        if (null != aTransProduction) {
+            qty = aTransProduction.getOutputQty();
+            sze = aTransProduction.getSpecific_size();
+            if (sze > 0) {
+                outp = qty / sze;
+            }
+        }
+        if (sze == 1) {
+            //do nothng
+        } else {
+            outpstr = " (" + new UtilityBean().formatDoubleToString(outp) + "PCs)";
+        }
+        return outpstr;
+    }
+    
     public void refreshOrderProducedList(Trans aTrans, List<TransProduction> aOrderProducedList, TransItem aTransItem) {
         String sql = "";
         ResultSet rs = null;
@@ -87,7 +134,7 @@ public class TransProductionBean implements Serializable {
         if (null == aTrans) {
             //do nothing
         } else {
-            sql = "SELECT  ti.item_id,ti.item_qty,IFNULL(ti.batchno, '') as batchno,IFNULL(ti.code_specific, '') as code_specific,IFNULL(ti.desc_specific, '') as desc_specific, "
+            sql = "SELECT  ti.item_id,ti.item_qty,ti.specific_size,IFNULL(ti.batchno, '') as batchno,IFNULL(ti.code_specific, '') as code_specific,IFNULL(ti.desc_specific, '') as desc_specific, "
                     + "("
                     + "select IFNULL(sum(p.output_qty),0) as output_qty from trans_production p where p.output_item_id=ti.item_id and p.transaction_ref=t.transaction_number and p.transactor_id=t.transactor_id "
                     + "and IFNULL(p.batchno, '')=IFNULL(ti.batchno, '') and IFNULL(p.code_specific, '')=IFNULL(ti.code_specific, '') and IFNULL(p.desc_specific, '')=IFNULL(ti.desc_specific, '') "
@@ -128,6 +175,15 @@ public class TransProductionBean implements Serializable {
                         transprod.setOrderedQty(0);
                     }
                     try {
+                        if (rs.getDouble("specific_size") > 0) {
+                            transprod.setSpecific_size(rs.getDouble("specific_size"));
+                        } else {
+                            transprod.setSpecific_size(1);
+                        }
+                    } catch (NullPointerException npe) {
+                        transprod.setSpecific_size(1);
+                    }
+                    try {
                         transprod.setOutputQty(rs.getDouble("qty_produced"));
                     } catch (NullPointerException npe) {
                         transprod.setOutputQty(0);
@@ -156,7 +212,7 @@ public class TransProductionBean implements Serializable {
             }
         }
     }
-
+    
     public void setItemForProduction(TransProduction aTransProduction, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aTrans, TransItem aTransItemToUpdate, Item aItem) {
         if (null == aItem) {
             aItem = new Item();
@@ -175,8 +231,14 @@ public class TransProductionBean implements Serializable {
         aTransItemToUpdate.setCodeSpecific(aTransProduction.getCodeSpecific());
         aTransItemToUpdate.setDescMore(aTransProduction.getDescMore());
         aTransItemToUpdate.setIs_general(aItem.getIsGeneral());
+        aTransItemToUpdate.setSpecific_size(aTransProduction.getSpecific_size());
+        double pcs4prod = 0;
+        if (aTransItemToUpdate.getSpecific_size() > 0) {
+            pcs4prod = aTransItemToUpdate.getItemQty() / aTransItemToUpdate.getSpecific_size();
+        }
+        aTransItemToUpdate.setSpecific_size_qty(pcs4prod);
     }
-
+    
     public double getQtyOrded(int aTransTypeId, long aTransactorId, String aTransactionNumber, long aItemId, String aBatchno, String aCodeSpe, String aDescSpe) {
         double qty = 0;
         String sql = "";
@@ -196,7 +258,7 @@ public class TransProductionBean implements Serializable {
         }
         return qty;
     }
-
+    
     public void updateTransItemBatchSpecific(ItemProductionMap aItemProductionMap, long aStockId) {
         try {
             aItemProductionMap.setBatchno("");
@@ -231,7 +293,7 @@ public class TransProductionBean implements Serializable {
             System.err.println(e.getMessage());
         }
     }
-
+    
     public TransProduction getTransProductionById(long aTransProductionId) {
         String sql = "{call sp_search_trans_production_by_id(?)}";
         ResultSet rs = null;
@@ -258,14 +320,14 @@ public class TransProductionBean implements Serializable {
             }
         }
     }
-
+    
     public TransProduction getTransProductionFromResultset(ResultSet aResultSet) {
         try {
             TransProduction transProduction = new TransProduction();
             transProduction.setTransactionId(aResultSet.getLong("transaction_id"));
             transProduction.setTransactionDate(new Date(aResultSet.getDate("transaction_date").getTime()));
             transProduction.setStoreId(aResultSet.getInt("store_id"));
-
+            
             try {
                 transProduction.setStore2Id(aResultSet.getInt("store2_id"));
             } catch (NullPointerException npe) {
@@ -386,13 +448,18 @@ public class TransProductionBean implements Serializable {
             } catch (NullPointerException npe) {
                 transProduction.setTransaction_number("");
             }
+            try {
+                transProduction.setSpecific_size(aResultSet.getDouble("specific_size"));
+            } catch (NullPointerException npe) {
+                transProduction.setSpecific_size(1);
+            }
             return transProduction;
         } catch (SQLException se) {
             System.err.println(se.getMessage());
             return null;
         }
     }
-
+    
     public void updateUnitCostProduction(TransItem aTransItem, int aStoreId) {
         if (new Parameter_listBean().getParameter_listByContextNameMemory("PRODUCTION", "CALC_OUTPUT_UNIT_COST_FROM_INPUT").getParameter_value().equals("1")) {
             double costprice = 0;
@@ -402,7 +469,7 @@ public class TransProductionBean implements Serializable {
             this.updateUnitCostProductionFromOutput(aTransItem, aStoreId);
         }
     }
-
+    
     public void updateUnitCostProductionFromOutput(TransItem aTransItem, int aStoreId) {
         long LatestTransId = 0;
         try {
@@ -417,7 +484,7 @@ public class TransProductionBean implements Serializable {
             }
         }
     }
-
+    
     public double getTotalUnitCostRawMaterials(int aStoreId) {
         double TotalUnitCost = 0;
         long LatestTransItemId = 0;
@@ -437,7 +504,7 @@ public class TransProductionBean implements Serializable {
         }
         return TotalUnitCost;
     }
-
+    
     public long getItemUnitCostPriceLatestTransItemId(int aTransTypeId, int aTransReasId, int aStoreId, long aItemId, String aBatchno, String aCodeSpec, String aDescSpec) {
         String sql = "{call sp_item_unit_cost_price_latest_production(?,?,?,?,?)}";
         long transid = 0;
@@ -464,7 +531,7 @@ public class TransProductionBean implements Serializable {
         }
         return transid;
     }
-
+    
     public void addTransProductionItem(TransItem aTransItem, Item aItem, ItemProductionMap aItemProductionMap) {
         String msg = "";
         if (null == aItemProductionMap || null == aItem) {
@@ -495,12 +562,12 @@ public class TransProductionBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage("Add", new FacesMessage(msg));
         }
     }
-
+    
     public void removeTransProductionItem(TransItem aTransItem, ItemProductionMap aItemProductionMap) {
         this.getItmCombinationList().remove(aItemProductionMap);
         this.updateUnitCostProduction(aTransItem, new GeneralUserSetting().getCurrentStore().getStoreId());
     }
-
+    
     public int itemExists(List<ItemProductionMap> aItmCombinationList, Long ItemIdent, String BatchNumb, String aCodeSpec, String aDescSpec) {
         List<ItemProductionMap> ati = aItmCombinationList;
         int ItemFoundAtIndex = -1;
@@ -518,7 +585,7 @@ public class TransProductionBean implements Serializable {
         }
         return ItemFoundAtIndex;
     }
-
+    
     public void clearTransProductionItem(ItemProductionMap aItemProductionMap) {
         try {
             if (aItemProductionMap != null) {
@@ -531,7 +598,7 @@ public class TransProductionBean implements Serializable {
             System.out.println("clearTransProductionItem:" + e.getMessage());
         }
     }
-
+    
     public void initAutoCompleteItems(Item aItem1, Item aItem2) {
         try {
             if (null == aItem1) {
@@ -544,14 +611,14 @@ public class TransProductionBean implements Serializable {
             e.printStackTrace();
         }
     }
-
+    
     public void initTransProduction(ItemProductionMap aItemProductionMap, List<ItemProductionMap> aActiveTransItems, Item aParentItem, Item aChildItem) {
         this.clearTransProductionItem(aItemProductionMap);
         new ItemBean().clearItem(aParentItem);
         new ItemBean().clearItem(aChildItem);
         aActiveTransItems.clear();
     }
-
+    
     public String getAnyItemTotalQtyGreaterThanCurrentQty(TransItem transItem, List<ItemProductionMap> aActiveTransItems, int aStoreId) {
         List<ItemProductionMap> ati = aActiveTransItems;
         int ListItemIndex = 0;
@@ -570,7 +637,7 @@ public class TransProductionBean implements Serializable {
         }
         return ItemString;
     }
-
+    
     public String getAnyItemProducedQtyGreaterThanOrderedQty(TransItem aProducedItem, List<TransProduction> aOrderProducedList) {
         List<TransProduction> ati = aOrderProducedList;
         int ListItemIndex = 0;
@@ -587,7 +654,7 @@ public class TransProductionBean implements Serializable {
         }
         return ItemString;
     }
-
+    
     public String validateTransProduction(int aStoreId, int aTransTypeId, int aTransReasonId, TransItem transItem, List<ItemProductionMap> aActiveTransItems, UserDetail aTransUserDetail, Trans trans, List<TransProduction> aOrderProducedList) {
         String msg = "";
         String ItemMessage = "";
@@ -615,7 +682,7 @@ public class TransProductionBean implements Serializable {
             UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
             List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
             GroupRightBean grb = new GroupRightBean();
-
+            
             if (null == transtype) {
                 msg = "-.-.-. INVALID TRANSACTION -.-.-.";
             } else if (trans.getTransactionId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, Integer.toString(transreason.getTransactionReasonId()), "Add") == 0) {
@@ -642,11 +709,11 @@ public class TransProductionBean implements Serializable {
         }
         return msg;
     }
-
+    
     public void saveTransProductionCEC(int aStoreId, int aTransTypeId, int aTransReasonId, TransItem transItem, List<ItemProductionMap> aActiveTransItems, UserDetail aTransUserDetail, Trans trans, Item aProducedItem, Transactor aSelectedTransactor, List<TransProduction> aOrderProducedList) {
         try {
             String ValidationMessage = this.validateTransProduction(aStoreId, aTransTypeId, aTransReasonId, transItem, aActiveTransItems, aTransUserDetail, trans, aOrderProducedList);
-
+            
             if (ValidationMessage.length() > 0) {
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ValidationMessage));
             } else {
@@ -672,7 +739,7 @@ public class TransProductionBean implements Serializable {
             npe.printStackTrace();
         }
     }
-
+    
     public void saveTransProduction(int aStoreId, int aTransTypeId, int aTransReasonId, TransItem transItem, List<ItemProductionMap> aTransProducts, Trans trans) {
         String sql = null;
         String msg = "";
@@ -683,22 +750,22 @@ public class TransProductionBean implements Serializable {
         StockBean StkBean = new StockBean();
         TransProduction aTransProduction = new TransProduction();
         List<TransProduction> trasProductItems = new ArrayList<>();
-
+        
         if (1 == 2) {
         } else {
             if (aTransProduction.getTransactionId() == 0) {
-                sql = "{call sp_insert_trans_production(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+                sql = "{call sp_insert_trans_production(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
             }
             try (
                     Connection conn = DBConnection.getMySQLConnection();
                     CallableStatement cs = conn.prepareCall(sql);) {
-
+                
                 if (aTransProduction.getTransactionId() == 0) {
                     //clean batch
                     TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
                     TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
                     Store store = new StoreBean().getStore(aStoreId);
-
+                    
                     cs.setDate("in_transaction_date", new java.sql.Date(trans.getTransactionDate().getTime()));
                     cs.setInt("in_store_id", store.getStoreId());
                     aTransProduction.setStoreId(store.getStoreId());
@@ -824,6 +891,15 @@ public class TransProductionBean implements Serializable {
                     } catch (NullPointerException npe) {
                         cs.setLong("in_transactor_id", 0);
                     }
+                    try {
+                        if (transItem.getSpecific_size() > 0) {
+                            cs.setDouble("in_specific_size", transItem.getSpecific_size());
+                        } else {
+                            cs.setDouble("in_specific_size", 1);
+                        }
+                    } catch (NullPointerException npe) {
+                        cs.setDouble("in_specific_size", 1);
+                    }
                     //save
                     cs.executeUpdate();
                     InsertedTransId = cs.getLong("out_transaction_id");
@@ -862,13 +938,22 @@ public class TransProductionBean implements Serializable {
                         stock.setWarrantyExpiryDate(null);
                         stock.setAssetStatusId(1);
                         stock.setAssetStatusDesc("");
+                        try {
+                            if (transItem.getSpecific_size() > 0) {
+                                stock.setSpecific_size(transItem.getSpecific_size());
+                            } else {
+                                stock.setSpecific_size(1);
+                            }
+                        } catch (NullPointerException npe) {
+                            stock.setSpecific_size(1);
+                        }
                         i = new StockBean().saveStock(stock);
                     }
                     new TransProductionItemBean().saveTransProductionItemsCEC(InsertedTransId, InsertedOutputQty, InsertedStoreId, aTransProducts);
                     //update stock
                     TransTypeBean = null;
                     StkBean = null;
-
+                    
                 } else if (aTransProduction.getTransactionId() > 0) {
                     //do nothing; this is for edit
                 }
@@ -878,10 +963,10 @@ public class TransProductionBean implements Serializable {
                 this.setActionMessage("TransProduction NOT saved");
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("TransProduction NOT saved!"));
             }
-
+            
         }
     }
-
+    
     public void reportProductionDetail(TransProduction aTransProd, TransProductionBean aTransProdBean) {
         if (aTransProdBean.getDateType().length() == 0) {
             aTransProdBean.setDateType("Add Date");
@@ -955,7 +1040,7 @@ public class TransProductionBean implements Serializable {
         } catch (SQLException se) {
             System.err.println(se.getMessage());
         }
-
+        
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sqlsum);) {
@@ -999,7 +1084,7 @@ public class TransProductionBean implements Serializable {
             System.err.println(se.getMessage());
         }
     }
-
+    
     public void initResetProductionDetail(TransProduction aTransProd, TransProductionBean aTransProdBean, String aMode) {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -1007,7 +1092,7 @@ public class TransProductionBean implements Serializable {
             this.resetProductionDetail(aTransProd, aTransProdBean, aMode);
         }
     }
-
+    
     public void resetProductionDetail(TransProduction aTransProd, TransProductionBean aTransProdBean, String aMode) {
         aTransProdBean.setActionMessage("");
         try {
@@ -1024,13 +1109,13 @@ public class TransProductionBean implements Serializable {
         } catch (NullPointerException npe) {
         }
     }
-
+    
     public void clearAll(Trans t, List<ItemProductionMap> aActiveTransItems, TransItem ti, Item aSelectedItem, Transactor aSelectedTransactor, int ClearNo, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {//Clear No: 0-do not clear, 1 - clear trans item only, 2 - clear all  
         TransItemBean tib = new TransItemBean();
         ItemBean itmB = new ItemBean();
         TransactorBean trB = new TransactorBean();
         AccCoaBean acBean = new AccCoaBean();
-
+        
         if (ClearNo == 1 || ClearNo == 2) {//Clear No: 0-do not clear, 1 - clear trans item only, 2 - clear all
             //clear autoCompletetd item
             itmB.clearSelectedItem();
@@ -1060,7 +1145,7 @@ public class TransProductionBean implements Serializable {
             new UserDetailBean().clearUserDetail(aAuthorisedByUserDetail);
         }
     }
-
+    
     public void initClearAll(String aLevel, Trans t, List<ItemProductionMap> aActiveTransItems, TransItem ti, Item aSelectedItem, Transactor aSelectedTransactor, int ClearNo, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor) {//Clear No: 0-do not clear, 1 - clear trans item only, 2 - clear all  
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -1068,7 +1153,7 @@ public class TransProductionBean implements Serializable {
             TransItemBean tib = new TransItemBean();
             ItemBean itmB = new ItemBean();
             TransactorBean trB = new TransactorBean();
-
+            
             if (ClearNo == 1 || ClearNo == 2) {//Clear No: 0-do not clear, 1 - clear trans item only, 2 - clear all
                 //clear autoCompletetd item
                 itmB.clearSelectedItem();
@@ -1113,7 +1198,7 @@ public class TransProductionBean implements Serializable {
             new OutputDetailBean().refreshOutput(aLevel, "");
         }
     }
-
+    
     public void getItemProductionMapsByParentItemId(long aParentId) {
         String sql = "{call sp_search_item_production_map_by_output_item_id(?)}";
         ResultSet rs = null;
@@ -1153,7 +1238,7 @@ public class TransProductionBean implements Serializable {
             }
         }
     }
-
+    
     public void clearTransProduction(TransProduction aTransProduction, String aMode) {
         aTransProduction.setTransactionId(0);
         if (aMode.equals("ADD")) {
@@ -1189,14 +1274,16 @@ public class TransProductionBean implements Serializable {
         aTransProduction.setDescMore("");
         aTransProduction.setTransactor_id(0);
         aTransProduction.setTransaction_number("");
+        aTransProduction.setSpecific_size(1);
+        aTransProduction.setSpecific_size_qty(0);
     }
-
+    
     public void clearAll(Trans t, List<TransItem> aActiveTransItems, TransItem ti, Item aSelectedItem, Transactor aSelectedTransactor, int ClearNo, AccCoa aSelectedAccCoa) {//Clear No: 0-do not clear, 1 - clear trans item only, 2 - clear all  
         TransItemBean tib = new TransItemBean();
         ItemBean itmB = new ItemBean();
         TransactorBean trB = new TransactorBean();
         AccCoaBean acBean = new AccCoaBean();
-
+        
         if (ClearNo == 1 || ClearNo == 2) {//Clear No: 0-do not clear, 1 - clear trans item only, 2 - clear all
             //clear autoCompletetd item
             itmB.clearSelectedItem();
@@ -1218,14 +1305,14 @@ public class TransProductionBean implements Serializable {
             new TransBean().clearTrans(t);
         }
     }
-
+    
     public void initCurrencyCode(int aTransTypeId, Trans trans) {
         try {
             TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
             String DefaultCurrencyCode = "";
             String TransTypeCurrencyCode = "";
             String LocalCurrencyCode = "";
-
+            
             try {
                 LocalCurrencyCode = new AccCurrencyBean().getLocalCurrency().getCurrencyCode();
                 if (null == LocalCurrencyCode) {
@@ -1250,7 +1337,7 @@ public class TransProductionBean implements Serializable {
             } catch (NullPointerException npe) {
                 TransTypeCurrencyCode = "";
             }
-
+            
             if (TransTypeCurrencyCode.length() > 0) {
                 trans.setCurrencyCode(TransTypeCurrencyCode);
             } else if (DefaultCurrencyCode.length() > 0) {
@@ -1262,7 +1349,7 @@ public class TransProductionBean implements Serializable {
             trans.setCurrencyCode("");
         }
     }
-
+    
     public void initTransType(int aTransTypeId, int aTransReasonId) {
         try {
             this.setTransTypeObj(new TransactionTypeBean().getTransactionType(aTransTypeId));
@@ -1271,7 +1358,7 @@ public class TransProductionBean implements Serializable {
             e.printStackTrace();
         }
     }
-
+    
     public void initTransTypeRef(int aTransTypeId, int aTransReasonId) {
         try {
             this.setTransTypeRefObj(new TransactionTypeBean().getTransactionType(aTransTypeId));
@@ -1280,7 +1367,7 @@ public class TransProductionBean implements Serializable {
             e.printStackTrace();
         }
     }
-
+    
     public String getFieldName(String aFieldId, String aFieldName) {
         UserDetailBean udb = new UserDetailBean();
         TransactorBean tb = new TransactorBean();
@@ -1303,10 +1390,10 @@ public class TransProductionBean implements Serializable {
             return "";
         }
     }
-
+    
     public void setDateToToday() {
         Date CurrentServerDate = new CompanySetting().getCURRENT_SERVER_DATE();
-
+        
         this.setDate1(CurrentServerDate);
         Calendar cal = Calendar.getInstance();
         cal.setTime(this.getDate1());
@@ -1316,7 +1403,7 @@ public class TransProductionBean implements Serializable {
         cal.set(Calendar.MILLISECOND, 0);
         // Put it back in the Date object  
         this.setDate1(cal.getTime());
-
+        
         this.setDate2(CurrentServerDate);
         Calendar cal2 = Calendar.getInstance();
         cal2.setTime(this.getDate2());
@@ -1327,11 +1414,11 @@ public class TransProductionBean implements Serializable {
         // Put it back in the Date object  
         this.setDate2(cal2.getTime());
     }
-
+    
     public void setDateToYesturday() {
         //Date CurrentServerDate=new CompanySetting().getCURRENT_SERVER_DATE();
         Date CurrentServerDate = new CompanySetting().getCURRENT_SERVER_DATE();
-
+        
         this.setDate1(CurrentServerDate);
         Calendar cal = Calendar.getInstance();
         cal.setTime(this.getDate1());
@@ -1342,7 +1429,7 @@ public class TransProductionBean implements Serializable {
         cal.set(Calendar.MILLISECOND, 0);
         // Put it back in the Date object  
         this.setDate1(cal.getTime());
-
+        
         this.setDate2(CurrentServerDate);
         Calendar cal2 = Calendar.getInstance();
         cal2.setTime(this.getDate2());
@@ -1354,11 +1441,11 @@ public class TransProductionBean implements Serializable {
         // Put it back in the Date object  
         this.setDate2(cal2.getTime());
     }
-
+    
     public void setTransDateToYesturday(TransProduction aTransProduction) {
         //Date CurrentServerDate=new CompanySetting().getCURRENT_SERVER_DATE();
         Date CurrentServerDate = new CompanySetting().getCURRENT_SERVER_DATE();
-
+        
         aTransProduction.setTransactionDate(CurrentServerDate);
         Calendar cal = Calendar.getInstance();
         cal.setTime(aTransProduction.getTransactionDate());
@@ -1369,7 +1456,7 @@ public class TransProductionBean implements Serializable {
         cal.set(Calendar.MILLISECOND, 0);
         // Put it back in the Date object  
         aTransProduction.setTransactionDate(cal.getTime());
-
+        
         aTransProduction.setTransactionDate2(CurrentServerDate);
         Calendar cal2 = Calendar.getInstance();
         cal2.setTime(aTransProduction.getTransactionDate2());
@@ -1381,7 +1468,7 @@ public class TransProductionBean implements Serializable {
         // Put it back in the Date object  
         aTransProduction.setTransactionDate2(cal2.getTime());
     }
-
+    
     public void initTransProductionSession(long aTransId, String aAction) {
         //first set current selection in session
         FacesContext context = FacesContext.getCurrentInstance();
@@ -1397,7 +1484,7 @@ public class TransProductionBean implements Serializable {
         //refresh output
         new OutputDetailBean().refreshOutputProduction("PARENT", "");
     }
-
+    
     public void updateLookup(TransProduction aTransProduction) {
         if (null != aTransProduction) {
             try {

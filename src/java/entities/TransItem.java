@@ -112,8 +112,8 @@ public class TransItem implements Serializable {
     private int item_no;
     private String item_currency_code;
     private int is_general;
-    private double unit_size;
-    private double unit_size_qty;
+    private double specific_size;
+    private double specific_size_qty;
 
     /**
      * @return the TransactionItemId
@@ -1334,31 +1334,31 @@ public class TransItem implements Serializable {
     }
 
     /**
-     * @return the unit_size
+     * @return the specific_size
      */
-    public double getUnit_size() {
-        return unit_size;
+    public double getSpecific_size() {
+        return specific_size;
     }
 
     /**
-     * @param unit_size the unit_size to set
+     * @param specific_size the specific_size to set
      */
-    public void setUnit_size(double unit_size) {
-        this.unit_size = unit_size;
+    public void setSpecific_size(double specific_size) {
+        this.specific_size = specific_size;
     }
 
     /**
-     * @return the unit_size_qty
+     * @return the specific_size_qty
      */
-    public double getUnit_size_qty() {
-        return unit_size_qty;
+    public double getSpecific_size_qty() {
+        return specific_size_qty;
     }
 
     /**
-     * @param unit_size_qty the unit_size_qty to set
+     * @param specific_size_qty the specific_size_qty to set
      */
-    public void setUnit_size_qty(double unit_size_qty) {
-        this.unit_size_qty = unit_size_qty;
+    public void setSpecific_size_qty(double specific_size_qty) {
+        this.specific_size_qty = specific_size_qty;
     }
 
 }

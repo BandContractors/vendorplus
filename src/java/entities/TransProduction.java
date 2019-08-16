@@ -67,6 +67,8 @@ public class TransProduction implements Serializable {
     private long transactor_id;
     private String transaction_number;
     private String transactor_names;
+    private double specific_size;
+    private double specific_size_qty;
 
     /**
      * @return the TransactionId
@@ -668,6 +670,34 @@ public class TransProduction implements Serializable {
      */
     public void setOrderedQty(double OrderedQty) {
         this.OrderedQty = OrderedQty;
+    }
+
+    /**
+     * @return the specific_size
+     */
+    public double getSpecific_size() {
+        return specific_size;
+    }
+
+    /**
+     * @param specific_size the specific_size to set
+     */
+    public void setSpecific_size(double specific_size) {
+        this.specific_size = specific_size;
+    }
+
+    /**
+     * @return the specific_size_qty
+     */
+    public double getSpecific_size_qty() {
+        return specific_size_qty;
+    }
+
+    /**
+     * @param specific_size_qty the specific_size_qty to set
+     */
+    public void setSpecific_size_qty(double specific_size_qty) {
+        this.specific_size_qty = specific_size_qty;
     }
     
     

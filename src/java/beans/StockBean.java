@@ -165,7 +165,11 @@ public class StockBean implements Serializable {
             } catch (NullPointerException npe) {
                 aStock.setQty_damage(0);
             }
-
+            try {
+                aStock.setSpecific_size(aResultSet.getDouble("specific_size"));
+            } catch (NullPointerException npe) {
+                aStock.setSpecific_size(1);
+            }
         } catch (SQLException se) {
             System.err.println("setStockFromResultset:" + se.getMessage());
         }
@@ -370,6 +374,11 @@ public class StockBean implements Serializable {
             } catch (NullPointerException npe) {
                 aStock.setQty_damage(0);
             }
+            try {
+                aStock.setSpecific_size(aResultSet.getDouble("specific_size"));
+            } catch (NullPointerException npe) {
+                aStock.setSpecific_size(1);
+            }
         } catch (SQLException se) {
             System.err.println(se.getMessage());
         }
@@ -379,9 +388,9 @@ public class StockBean implements Serializable {
         String sql = null;
         int status = 0;
         if (stock.getStockId() == 0) {
-            sql = "{call sp_insert_stock(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_insert_stock(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         } else if (stock.getStockId() > 0) {
-            sql = "{call sp_update_stock(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_update_stock(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         }
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -487,6 +496,15 @@ public class StockBean implements Serializable {
                 cs.setDouble("in_qty_damage", stock.getQty_damage());
             } catch (NullPointerException npe) {
                 cs.setDouble("in_qty_damage", 0);
+            }
+            try {
+                if (stock.getSpecific_size() > 0) {
+                    cs.setDouble("in_specific_size", stock.getSpecific_size());
+                } else {
+                    cs.setDouble("in_specific_size", 1);
+                }
+            } catch (NullPointerException npe) {
+                cs.setDouble("in_specific_size", 1);
             }
             cs.executeUpdate();
             status = 1;

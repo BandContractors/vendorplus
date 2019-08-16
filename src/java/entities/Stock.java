@@ -60,8 +60,8 @@ public class Stock implements Serializable {
     private double RetailsaleValue;
     private double WholesaleValue;
     private double qty_damage;
-    //for report only
     private double qty_out;
+    private double specific_size;
 
     /**
      * @return the StockId
@@ -621,5 +621,19 @@ public class Stock implements Serializable {
      */
     public void setQty_out(double qty_out) {
         this.qty_out = qty_out;
+    }
+
+    /**
+     * @return the specific_size
+     */
+    public double getSpecific_size() {
+        return specific_size;
+    }
+
+    /**
+     * @param specific_size the specific_size to set
+     */
+    public void setSpecific_size(double specific_size) {
+        this.specific_size = specific_size;
     }
 }

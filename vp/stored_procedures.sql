@@ -1359,7 +1359,8 @@ CREATE PROCEDURE sp_insert_transaction_item
 	IN in_qty_balance double,
 	IN in_duration_value double,
 	IN in_qty_damage double,
-	IN in_duration_passed double
+	IN in_duration_passed double,
+	IN in_specific_size double
 ) 
 BEGIN 
 	SET @new_id=0;
@@ -1423,6 +1424,10 @@ BEGIN
 		if (in_item_id!=0) then
 			set @in_item_id=in_item_id;
 		end if;
+		SET @in_specific_size=1;
+		if (in_specific_size!=0) then
+			set @in_specific_size=in_specific_size;
+		end if;
 
 	INSERT INTO transaction_item
 	(
@@ -1466,7 +1471,8 @@ BEGIN
 		qty_balance,
 		duration_value,
 		qty_damage,
-		duration_passed
+		duration_passed,
+		specific_size
 	) 
     VALUES
 	(
@@ -1510,7 +1516,8 @@ BEGIN
 		in_qty_balance,
 		in_duration_value,
 		in_qty_damage,
-		in_duration_passed
+		in_duration_passed,
+		@in_specific_size
 	); 
 END//
 DELIMITER ;
@@ -1559,7 +1566,8 @@ CREATE PROCEDURE sp_update_transaction_item
 	IN in_qty_balance double,
 	IN in_duration_value double,
 	IN in_qty_damage double,
-	IN in_duration_passed double
+	IN in_duration_passed double,
+	IN in_specific_size double
 ) 
 BEGIN 
 	SET @item_expiry_date=NULL;
@@ -1620,6 +1628,10 @@ BEGIN
 		if (in_item_id!=0) then
 			set @in_item_id=in_item_id;
 		end if;
+		SET @in_specific_size=1;
+		if (in_specific_size!=0) then
+			set @in_specific_size=in_specific_size;
+		end if;
 
 	UPDATE transaction_item SET 
 		transaction_id=in_transaction_id,
@@ -1661,7 +1673,8 @@ BEGIN
 		qty_balance=in_qty_balance,
 		duration_value=in_duration_value,
 		qty_damage=in_qty_damage,
-		duration_passed=in_duration_passed 
+		duration_passed=in_duration_passed,
+		specific_size=@in_specific_size 
 	WHERE transaction_item_id=in_transaction_item_id; 
 END//
 DELIMITER ;
@@ -2881,7 +2894,8 @@ CREATE PROCEDURE sp_insert_stock
 		IN in_residual_value double,
 		IN in_asset_status_id int,
 		IN in_asset_status_desc varchar(100),
-		IN in_qty_damage double
+		IN in_qty_damage double,
+		IN in_specific_size double
 ) 
 BEGIN 
 		SET @new_id=0;
@@ -2931,6 +2945,10 @@ BEGIN
 		if (in_desc_specific is not null) then 
 			set @in_desc_specific=in_desc_specific;
 		end if;
+		SET @in_specific_size=1;
+		if (in_specific_size!=0) then
+			set @in_specific_size=in_specific_size;
+		end if;
 
 		INSERT INTO stock
 		(
@@ -2957,7 +2975,8 @@ BEGIN
 		residual_value,
 		asset_status_id,
 		asset_status_desc,
-		qty_damage
+		qty_damage,
+		specific_size
 	) 
     VALUES
 	(
@@ -2984,7 +3003,8 @@ BEGIN
 		in_residual_value,
 		@in_asset_status_id,
 		in_asset_status_desc,
-		in_qty_damage
+		in_qty_damage,
+		@in_specific_size
 	); 
 END//
 DELIMITER ;
@@ -3016,7 +3036,8 @@ CREATE PROCEDURE sp_update_stock
 		IN in_residual_value double,
 		IN in_asset_status_id int,
 		IN in_asset_status_desc varchar(100),
-		IN in_qty_damage double
+		IN in_qty_damage double,
+		IN in_specific_size double
 ) 
 BEGIN 
 		SET @in_item_exp_date=NULL;
@@ -3055,6 +3076,10 @@ BEGIN
 		if (in_asset_status_id!=0) then
 			set @in_asset_status_id=in_asset_status_id;
 		end if;
+		SET @in_specific_size=1;
+		if (in_specific_size!=0) then
+			set @in_specific_size=in_specific_size;
+		end if;
 
 		UPDATE stock SET 
 		store_id=in_store_id,
@@ -3079,7 +3104,8 @@ BEGIN
 		residual_value=in_residual_value,
 		asset_status_id=@in_asset_status_id,
 		asset_status_desc=in_asset_status_desc,
-		qty_damage=in_qty_damage 
+		qty_damage=in_qty_damage,
+		specific_size=@in_specific_size 
 		WHERE stock_id=in_stock_id;
 END//
 DELIMITER ;
@@ -9535,7 +9561,8 @@ CREATE PROCEDURE sp_insert_trans_production
 	IN in_currency_code varchar(10),
 	IN in_account_code varchar(20),
 	IN in_transaction_number varchar(50),
-	IN in_transactor_id bigint
+	IN in_transactor_id bigint,
+	IN in_specific_size double
 ) 
 BEGIN 
 	SET @new_id=0;
@@ -9578,6 +9605,10 @@ BEGIN
 	if (in_transaction_number!='') then
 		set @in_transaction_number=in_transaction_number;
 	end if;
+	SET @in_specific_size=1;
+		if (in_specific_size!=0) then
+		set @in_specific_size=in_specific_size;
+	end if;
 
 	INSERT INTO trans_production
 	(
@@ -9606,7 +9637,8 @@ BEGIN
 		currency_code,
 		account_code,
 		transaction_number,
-		transactor_id
+		transactor_id,
+		specific_size
 	) 
     VALUES
 	(
@@ -9635,7 +9667,8 @@ BEGIN
 		in_currency_code,
 		in_account_code,
 		@in_transaction_number,
-		@in_transactor_id
+		@in_transactor_id,
+		@in_specific_size
 	); 
 SET out_transaction_id=@new_id;	
 SET out_output_qty=in_output_qty;
