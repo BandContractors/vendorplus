@@ -9249,7 +9249,8 @@ CREATE PROCEDURE sp_insert_transaction_item_hist
 	IN in_qty_balance double,
 	IN in_duration_value double,
 	IN in_qty_damage double,
-	IN in_duration_passed double
+	IN in_duration_passed double,
+	IN in_specific_size double
 ) 
 BEGIN 
 	SET @new_id=0;
@@ -9313,6 +9314,10 @@ BEGIN
 		if (in_item_id!=0) then
 			set @in_item_id=in_item_id;
 		end if;
+		SET @in_specific_size=1;
+		if (in_specific_size!=0) then
+			set @in_specific_size=in_specific_size;
+		end if;
 
 	INSERT INTO transaction_item_hist
 	(
@@ -9358,7 +9363,8 @@ BEGIN
 		qty_balance,
 		duration_value,
 		qty_damage,
-		duration_passed
+		duration_passed,
+		specific_size
 	) 
     VALUES
 	(
@@ -9404,7 +9410,8 @@ BEGIN
 		in_qty_balance,
 		in_duration_value,
 		in_qty_damage,
-		in_duration_passed
+		in_duration_passed,
+		in_specific_size
 	); 
 END//
 DELIMITER ;

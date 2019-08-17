@@ -163,9 +163,9 @@ public class TransItemBean implements Serializable {
         } else {
 
             if (transitem.getTransactionItemId() == 0) {
-                sql = "{call sp_insert_transaction_item(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+                sql = "{call sp_insert_transaction_item(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
             } else if (transitem.getTransactionItemId() > 0) {
-                sql = "{call sp_update_transaction_item(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+                sql = "{call sp_update_transaction_item(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
             }
 
             try (
@@ -343,6 +343,15 @@ public class TransItemBean implements Serializable {
                     } catch (NullPointerException npe) {
                         cs.setDouble("in_duration_passed", 0);
                     }
+                    try {
+                        if (transitem.getSpecific_size() > 0) {
+                            cs.setDouble("in_specific_size", transitem.getSpecific_size());
+                        } else {
+                            cs.setDouble("in_specific_size", 1);
+                        }
+                    } catch (NullPointerException npe) {
+                        cs.setDouble("in_specific_size", 1);
+                    }
                     //save
                     cs.executeUpdate();
                     //repeat for the unpacked ones
@@ -465,6 +474,7 @@ public class TransItemBean implements Serializable {
                                 stock.setResidualValue(transitem.getResidualValue());
                                 stock.setAssetStatusId(1);
                                 stock.setAssetStatusDesc("");
+                                stock.setSpecific_size(transitem.getSpecific_size());
                                 i = new StockBean().saveStock(stock);
                             }
                         }
@@ -544,6 +554,7 @@ public class TransItemBean implements Serializable {
                                 stock.setResidualValue(transitem.getResidualValue());
                                 stock.setAssetStatusId(1);
                                 stock.setAssetStatusDesc("");
+                                stock.setSpecific_size(transitem.getSpecific_size());
                                 i = new StockBean().saveStock(stock);
                             }
                         }
@@ -645,6 +656,7 @@ public class TransItemBean implements Serializable {
                                 } catch (NullPointerException npe) {
                                     stock.setItemExpDate(null);
                                 }
+                                stock.setSpecific_size(transitem.getSpecific_size());
                                 i = new StockBean().saveStock(stock);
                             }
                         }
@@ -861,9 +873,13 @@ public class TransItemBean implements Serializable {
                         cs.setDouble("in_duration_passed", 0);
                     }
                     try {
-                        cs.setDouble("in_specific_size", transitem.getSpecific_size());
+                        if (transitem.getSpecific_size() > 0) {
+                            cs.setDouble("in_specific_size", transitem.getSpecific_size());
+                        } else {
+                            cs.setDouble("in_specific_size", 1);
+                        }
                     } catch (NullPointerException npe) {
-                        cs.setDouble("in_specific_size", 0);
+                        cs.setDouble("in_specific_size", 1);
                     }
                     //save
                     cs.executeUpdate();
@@ -998,6 +1014,7 @@ public class TransItemBean implements Serializable {
                                 stock.setResidualValue(transitem.getResidualValue());
                                 stock.setAssetStatusId(1);
                                 stock.setAssetStatusDesc("");
+                                stock.setSpecific_size(transitem.getSpecific_size());
                                 i = new StockBean().saveStock(stock);
                             }
                         }
@@ -1077,6 +1094,7 @@ public class TransItemBean implements Serializable {
                                 stock.setResidualValue(transitem.getResidualValue());
                                 stock.setAssetStatusId(1);
                                 stock.setAssetStatusDesc("");
+                                stock.setSpecific_size(transitem.getSpecific_size());
                                 i = new StockBean().saveStock(stock);
                             }
                         }
@@ -1168,6 +1186,7 @@ public class TransItemBean implements Serializable {
                                 } catch (NullPointerException npe) {
                                     stock.setItemExpDate(null);
                                 }
+                                stock.setSpecific_size(transitem.getSpecific_size());
                                 i = new StockBean().saveStock(stock);
                             }
                         }
@@ -1203,7 +1222,7 @@ public class TransItemBean implements Serializable {
         String msg = "";
         if (1 == 2) {
         } else {
-            sql = "{call sp_insert_transaction_item_hist(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_insert_transaction_item_hist(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
             try (
                     Connection conn = DBConnection.getMySQLConnection();
                     CallableStatement cs = conn.prepareCall(sql);) {
@@ -1345,6 +1364,15 @@ public class TransItemBean implements Serializable {
                 } catch (NullPointerException npe) {
                     cs.setDouble("in_duration_passed", 0);
                 }
+                try {
+                    if (transitem.getSpecific_size() > 0) {
+                        cs.setDouble("in_specific_size", transitem.getSpecific_size());
+                    } else {
+                        cs.setDouble("in_specific_size", 1);
+                    }
+                } catch (NullPointerException npe) {
+                    cs.setDouble("in_specific_size", 1);
+                }
                 //save
                 cs.executeUpdate();
             } catch (SQLException se) {
@@ -1367,9 +1395,9 @@ public class TransItemBean implements Serializable {
         } else {
 
             if (transitem.getTransactionItemId() == 0) {
-                sql = "{call sp_insert_transaction_item(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+                sql = "{call sp_insert_transaction_item(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
             } else if (transitem.getTransactionItemId() > 0) {
-                sql = "{call sp_update_transaction_item(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+                sql = "{call sp_update_transaction_item(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
             }
 
             try (
@@ -1490,6 +1518,7 @@ public class TransItemBean implements Serializable {
                     } catch (NullPointerException npe) {
                         cs.setDouble("in_duration_passed", 0);
                     }
+                    cs.setDouble("in_specific_size", 1);
                     //save
                     cs.executeUpdate();
 
@@ -1583,7 +1612,7 @@ public class TransItemBean implements Serializable {
         String sql = null;
         String sql2 = null;
         StockBean StkBean = new StockBean();
-        sql = "{call sp_insert_transaction_item(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+        sql = "{call sp_insert_transaction_item(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 CallableStatement cs = conn.prepareCall(sql);) {
@@ -1719,6 +1748,15 @@ public class TransItemBean implements Serializable {
             } catch (NullPointerException npe) {
                 cs.setDouble("in_duration_passed", 0);
             }
+            try {
+                if (transitem.getSpecific_size() > 0) {
+                    cs.setDouble("in_specific_size", transitem.getSpecific_size());
+                } else {
+                    cs.setDouble("in_specific_size", 1);
+                }
+            } catch (NullPointerException npe) {
+                cs.setDouble("in_specific_size", 1);
+            }
             //save
             cs.executeUpdate();
 
@@ -1783,6 +1821,15 @@ public class TransItemBean implements Serializable {
                     AddObj.setAssetStatusId(1);
                     AddObj.setAssetStatusDesc("");
                     //temp fix -- end
+                    try {
+                        if (transitem.getSpecific_size() > 0) {
+                            cs.setDouble("in_specific_size", transitem.getSpecific_size());
+                        } else {
+                            cs.setDouble("in_specific_size", 1);
+                        }
+                    } catch (NullPointerException npe) {
+                        cs.setDouble("in_specific_size", 1);
+                    }
                     AddStatus = new StockBean().saveStock(AddObj);
                 }
             }
@@ -2262,6 +2309,15 @@ public class TransItemBean implements Serializable {
                             s.setItemExpDate(null);
                             s.setItemMnfDate(null);
                         }
+                        try {
+                            if (aTransItem.getSpecific_size() > 0) {
+                                s.setSpecific_size(aTransItem.getSpecific_size());
+                            } else {
+                                s.setSpecific_size(1);
+                            }
+                        } catch (NullPointerException npe) {
+                            s.setSpecific_size(1);
+                        }
                         int x = 0;
                         x = new StockBean().saveStock(s);
                     }
@@ -2312,6 +2368,15 @@ public class TransItemBean implements Serializable {
                         } catch (NullPointerException npe) {
                             s.setItemExpDate(null);
                             s.setItemMnfDate(null);
+                        }
+                        try {
+                            if (aTransItem.getSpecific_size() > 0) {
+                                s.setSpecific_size(aTransItem.getSpecific_size());
+                            } else {
+                                s.setSpecific_size(1);
+                            }
+                        } catch (NullPointerException npe) {
+                            s.setSpecific_size(1);
                         }
                         int x = 0;
                         x = new StockBean().saveStock(s);
@@ -2388,6 +2453,15 @@ public class TransItemBean implements Serializable {
                             s.setItemExpDate(null);
                             s.setItemMnfDate(null);
                         }
+                        try {
+                            if (aTransItem.getSpecific_size() > 0) {
+                                s.setSpecific_size(aTransItem.getSpecific_size());
+                            } else {
+                                s.setSpecific_size(1);
+                            }
+                        } catch (NullPointerException npe) {
+                            s.setSpecific_size(1);
+                        }
                         int x = 0;
                         x = new StockBean().saveStock(s);
                     }
@@ -2439,6 +2513,15 @@ public class TransItemBean implements Serializable {
                         } catch (NullPointerException npe) {
                             s.setItemExpDate(null);
                             s.setItemMnfDate(null);
+                        }
+                        try {
+                            if (aTransItem.getSpecific_size() > 0) {
+                                s.setSpecific_size(aTransItem.getSpecific_size());
+                            } else {
+                                s.setSpecific_size(1);
+                            }
+                        } catch (NullPointerException npe) {
+                            s.setSpecific_size(1);
                         }
                         int x = 0;
                         x = new StockBean().saveStock(s);
@@ -2495,6 +2578,15 @@ public class TransItemBean implements Serializable {
                             s.setItemExpDate(null);
                             s.setItemMnfDate(null);
                         }
+                        try {
+                            if (aTransItem.getSpecific_size() > 0) {
+                                s.setSpecific_size(aTransItem.getSpecific_size());
+                            } else {
+                                s.setSpecific_size(1);
+                            }
+                        } catch (NullPointerException npe) {
+                            s.setSpecific_size(1);
+                        }
                         int x = 0;
                         x = new StockBean().saveStock(s);
                     }
@@ -2545,6 +2637,15 @@ public class TransItemBean implements Serializable {
                         } catch (NullPointerException npe) {
                             s.setItemExpDate(null);
                             s.setItemMnfDate(null);
+                        }
+                        try {
+                            if (aTransItem.getSpecific_size() > 0) {
+                                s.setSpecific_size(aTransItem.getSpecific_size());
+                            } else {
+                                s.setSpecific_size(1);
+                            }
+                        } catch (NullPointerException npe) {
+                            s.setSpecific_size(1);
                         }
                         int x = 0;
                         x = new StockBean().saveStock(s);
@@ -3023,6 +3124,15 @@ public class TransItemBean implements Serializable {
             } catch (NullPointerException npe) {
                 transitem.setDuration_passed(0);
             }
+            try {
+                if (aResultSet.getDouble("specific_size") > 0) {
+                    transitem.setSpecific_size(aResultSet.getDouble("specific_size"));
+                } else {
+                    transitem.setSpecific_size(1);
+                }
+            } catch (NullPointerException npe) {
+                transitem.setSpecific_size(1);
+            }
             return transitem;
         } catch (SQLException se) {
             System.err.println(se.getMessage());
@@ -3330,6 +3440,15 @@ public class TransItemBean implements Serializable {
                 transitem.setDuration_passed(aResultSet.getDouble("duration_passed"));
             } catch (NullPointerException npe) {
                 transitem.setDuration_passed(0);
+            }
+            try {
+                if (aResultSet.getDouble("specific_size") > 0) {
+                    transitem.setSpecific_size(aResultSet.getDouble("specific_size"));
+                } else {
+                    transitem.setSpecific_size(1);
+                }
+            } catch (NullPointerException npe) {
+                transitem.setSpecific_size(1);
             }
         } catch (SQLException se) {
             System.err.println(se.getMessage());
@@ -4163,7 +4282,6 @@ public class TransItemBean implements Serializable {
             aTransItemToUpdate.setItemExpryDate(null);
             aTransItemToUpdate.setItemMnfDate(null);
         }
-
     }
 
     public void addTransItem(Trans aTrans, StatusBean aStatusBean, List<TransItem> aActiveTransItems, TransItem NewTransItem, Item aSelectedItem) {
@@ -4414,7 +4532,15 @@ public class TransItemBean implements Serializable {
                 } catch (NullPointerException npe) {
                     ti.setNarration("");
                 }
-
+                try {
+                    if (NewTransItem.getSpecific_size() > 0) {
+                        ti.setSpecific_size(NewTransItem.getSpecific_size());
+                    } else {
+                        ti.setSpecific_size(1);
+                    }
+                } catch (NullPointerException npe) {
+                    ti.setSpecific_size(1);
+                }
                 //check if itme+batchno already exists
                 int ItemFoundAtIndex = itemExists(aActiveTransItems, ti.getItemId(), ti.getBatchno(), ti.getCodeSpecific(), ti.getDescSpecific());
                 if (ItemFoundAtIndex == -1) {
@@ -4741,7 +4867,15 @@ public class TransItemBean implements Serializable {
                 } catch (NullPointerException npe) {
                     ti.setQty_total(0);
                 }
-
+                try {
+                    if (NewTransItem.getSpecific_size() > 0) {
+                        ti.setSpecific_size(NewTransItem.getSpecific_size());
+                    } else {
+                        ti.setSpecific_size(1);
+                    }
+                } catch (NullPointerException npe) {
+                    ti.setSpecific_size(1);
+                }
                 //check if itme+batchno already exists
                 int ItemFoundAtIndex = 1 - 2;//==-1
                 if (!"HIRE RETURN INVOICE".equals(transtype.getTransactionTypeName())) {
@@ -5004,7 +5138,15 @@ public class TransItemBean implements Serializable {
                 } catch (NullPointerException npe) {
                     ti.setAccountCode("");
                 }
-
+                try {
+                    if (NewTransItem.getSpecific_size() > 0) {
+                        ti.setSpecific_size(NewTransItem.getSpecific_size());
+                    } else {
+                        ti.setSpecific_size(1);
+                    }
+                } catch (NullPointerException npe) {
+                    ti.setSpecific_size(1);
+                }
                 //check if itme+batchno already exists
                 int ItemFoundAtIndex = itemExists(aActiveTransItems, ti.getItemId(), ti.getBatchno(), ti.getCodeSpecific(), ti.getDescSpecific());
                 if (ItemFoundAtIndex == -1) {
@@ -5398,6 +5540,15 @@ public class TransItemBean implements Serializable {
                     ti.setDuration_passed(NewTransItem.getDuration_passed());
                 } catch (NullPointerException npe) {
                     ti.setDuration_passed(0);
+                }
+                try {
+                    if (NewTransItem.getSpecific_size() > 0) {
+                        ti.setSpecific_size(NewTransItem.getSpecific_size());
+                    } else {
+                        ti.setSpecific_size(1);
+                    }
+                } catch (NullPointerException npe) {
+                    ti.setSpecific_size(1);
                 }
                 //check if itme+batchno already exists
                 int ItemFoundAtIndex = itemExists(aActiveTransItems, ti.getItemId(), ti.getBatchno(), ti.getCodeSpecific(), ti.getDescSpecific());
@@ -5808,6 +5959,15 @@ public class TransItemBean implements Serializable {
             } catch (NullPointerException npe) {
                 ti.setDuration_passed(0);
             }
+            try {
+                if (NewTransItem.getSpecific_size() > 0) {
+                    ti.setSpecific_size(NewTransItem.getSpecific_size());
+                } else {
+                    ti.setSpecific_size(1);
+                }
+            } catch (NullPointerException npe) {
+                ti.setSpecific_size(1);
+            }
             //check if itme+batchno already exists
             int ItemFoundAtIndex = itemExists(aActiveTransItems, ti.getItemId(), ti.getBatchno(), ti.getCodeSpecific(), ti.getDescSpecific());
             if (ItemFoundAtIndex == -1) {
@@ -6177,7 +6337,15 @@ public class TransItemBean implements Serializable {
             } catch (NullPointerException npe) {
                 ti.setNarration("");
             }
-
+            try {
+                if (NewTransItem.getSpecific_size() > 0) {
+                    ti.setSpecific_size(NewTransItem.getSpecific_size());
+                } else {
+                    ti.setSpecific_size(1);
+                }
+            } catch (NullPointerException npe) {
+                ti.setSpecific_size(1);
+            }
             //check if itme+batchno already exists
             int ItemFoundAtIndex = itemExists(aActiveTransItems, ti.getItemId(), ti.getBatchno(), ti.getCodeSpecific(), ti.getDescSpecific());
             if (ItemFoundAtIndex == -1) {
@@ -6334,7 +6502,15 @@ public class TransItemBean implements Serializable {
                 } catch (NullPointerException npe) {
                     ti.setNarration("");
                 }
-
+                try {
+                    if (NewTransItem.getSpecific_size() > 0) {
+                        ti.setSpecific_size(NewTransItem.getSpecific_size());
+                    } else {
+                        ti.setSpecific_size(1);
+                    }
+                } catch (NullPointerException npe) {
+                    ti.setSpecific_size(1);
+                }
                 //check if itme+batchno already exists
                 int ItemFoundAtIndex = itemExists(aActiveTransItems, ti.getItemId(), ti.getBatchno(), ti.getCodeSpecific(), ti.getDescSpecific());
                 if (ItemFoundAtIndex == -1) {
@@ -6504,6 +6680,15 @@ public class TransItemBean implements Serializable {
             } catch (NullPointerException npe) {
                 ti.setDuration_passed(0);
             }
+            try {
+                if (NewTransItem.getSpecific_size() > 0) {
+                    ti.setSpecific_size(NewTransItem.getSpecific_size());
+                } else {
+                    ti.setSpecific_size(1);
+                }
+            } catch (NullPointerException npe) {
+                ti.setSpecific_size(1);
+            }
             //check if itme+batchno already exists
             int ItemFoundAtIndex = itemExistsJournalEntry(aActiveTransItems, ti.getAccountCode(), ti.getCodeSpecific());
             if (ItemFoundAtIndex == -1) {
@@ -6659,6 +6844,15 @@ public class TransItemBean implements Serializable {
                 ti.setDuration_passed(NewTransItem.getDuration_passed());
             } catch (NullPointerException npe) {
                 ti.setDuration_passed(0);
+            }
+            try {
+                if (NewTransItem.getSpecific_size() > 0) {
+                    ti.setSpecific_size(NewTransItem.getSpecific_size());
+                } else {
+                    ti.setSpecific_size(1);
+                }
+            } catch (NullPointerException npe) {
+                ti.setSpecific_size(1);
             }
             //check if itme+batchno already exists
             int ItemFoundAtIndex = itemExistsJournalEntry(aActiveTransItems, ti.getAccountCode(), ti.getCodeSpecific());
@@ -6819,6 +7013,15 @@ public class TransItemBean implements Serializable {
                     ti.setDuration_passed(NewTransItem.getDuration_passed());
                 } catch (NullPointerException npe) {
                     ti.setDuration_passed(0);
+                }
+                try {
+                    if (NewTransItem.getSpecific_size() > 0) {
+                        ti.setSpecific_size(NewTransItem.getSpecific_size());
+                    } else {
+                        ti.setSpecific_size(1);
+                    }
+                } catch (NullPointerException npe) {
+                    ti.setSpecific_size(1);
                 }
                 //check if itme+batchno already exists
                 int ItemFoundAtIndex = itemExists(aActiveTransItems, ti.getItemId(), ti.getBatchno(), ti.getCodeSpecific(), ti.getDescSpecific());
@@ -6992,6 +7195,15 @@ public class TransItemBean implements Serializable {
                 } catch (NullPointerException npe) {
                     ti.setDuration_passed(0);
                 }
+                try {
+                    if (NewTransItem.getSpecific_size() > 0) {
+                        ti.setSpecific_size(NewTransItem.getSpecific_size());
+                    } else {
+                        ti.setSpecific_size(1);
+                    }
+                } catch (NullPointerException npe) {
+                    ti.setSpecific_size(1);
+                }
                 //check if itme+batchno already exists
                 int ItemFoundAtIndex = itemExists(aActiveTransItems, ti.getItemId(), ti.getBatchno(), ti.getCodeSpecific(), ti.getDescSpecific());
                 if (ItemFoundAtIndex == -1) {
@@ -7159,6 +7371,15 @@ public class TransItemBean implements Serializable {
                     ti.setDuration_passed(NewTransItem.getDuration_passed());
                 } catch (NullPointerException npe) {
                     ti.setDuration_passed(0);
+                }
+                try {
+                    if (NewTransItem.getSpecific_size() > 0) {
+                        ti.setSpecific_size(NewTransItem.getSpecific_size());
+                    } else {
+                        ti.setSpecific_size(1);
+                    }
+                } catch (NullPointerException npe) {
+                    ti.setSpecific_size(1);
                 }
                 //check if itme+batchno already exists
                 int ItemFoundAtIndex = itemExists(aActiveTransItems, ti.getItemId(), ti.getBatchno(), ti.getCodeSpecific(), ti.getDescSpecific());
@@ -7334,6 +7555,15 @@ public class TransItemBean implements Serializable {
                     ti.setDuration_passed(NewTransItem.getDuration_passed());
                 } catch (NullPointerException npe) {
                     ti.setDuration_passed(0);
+                }
+                try {
+                    if (NewTransItem.getSpecific_size() > 0) {
+                        ti.setSpecific_size(NewTransItem.getSpecific_size());
+                    } else {
+                        ti.setSpecific_size(1);
+                    }
+                } catch (NullPointerException npe) {
+                    ti.setSpecific_size(1);
                 }
                 //check if itme+batchno already exists
                 int ItemFoundAtIndex = itemExists(aActiveTransItems, ti.getItemId(), ti.getBatchno(), ti.getCodeSpecific(), ti.getDescSpecific());
@@ -7529,6 +7759,15 @@ public class TransItemBean implements Serializable {
                     ti.setDuration_passed(NewTransItem.getDuration_passed());
                 } catch (NullPointerException npe) {
                     ti.setDuration_passed(0);
+                }
+                try {
+                    if (NewTransItem.getSpecific_size() > 0) {
+                        ti.setSpecific_size(NewTransItem.getSpecific_size());
+                    } else {
+                        ti.setSpecific_size(1);
+                    }
+                } catch (NullPointerException npe) {
+                    ti.setSpecific_size(1);
                 }
                 //check if itme+batchno already exists
                 int ItemFoundAtIndex = itemExists(aActiveTransItems, ti.getItemId(), ti.getBatchno(), ti.getCodeSpecific(), ti.getDescSpecific());

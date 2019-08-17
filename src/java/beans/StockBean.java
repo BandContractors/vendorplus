@@ -166,7 +166,11 @@ public class StockBean implements Serializable {
                 aStock.setQty_damage(0);
             }
             try {
-                aStock.setSpecific_size(aResultSet.getDouble("specific_size"));
+                if (aResultSet.getDouble("specific_size") > 0) {
+                    aStock.setSpecific_size(aResultSet.getDouble("specific_size"));
+                } else {
+                    aStock.setSpecific_size(1);
+                }
             } catch (NullPointerException npe) {
                 aStock.setSpecific_size(1);
             }
@@ -375,7 +379,11 @@ public class StockBean implements Serializable {
                 aStock.setQty_damage(0);
             }
             try {
-                aStock.setSpecific_size(aResultSet.getDouble("specific_size"));
+                if (aResultSet.getDouble("specific_size") > 0) {
+                    aStock.setSpecific_size(aResultSet.getDouble("specific_size"));
+                } else {
+                    aStock.setSpecific_size(1);
+                }
             } catch (NullPointerException npe) {
                 aStock.setSpecific_size(1);
             }
