@@ -9,7 +9,7 @@
         <title>Goods Delivery Note</title>
         <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/> 
     </h:head>
-
+    
     <h:body>
         <h:form id="vTransactionForm">  
             <ui:composition>
@@ -102,13 +102,17 @@
                         </p:column>
                     </p:dataTable>
 
-                    <h:panelGrid styleClass="clsGridMainInput" columns="2" style="width: 100%">
-                        <h:outputLabel styleClass="clsLabelTransItem" style="border-bottom-style: solid;" value="#{generalUserSetting.outputDetailParent.transaction_type.transactionDateLabel}"/>
-                        <h:outputLabel styleClass="clsInput" style="border-bottom-style: solid;" value="Delivery Address"/>
-                        <h:outputText styleClass="clsInput" value="#{utilityBean.formatDate(generalUserSetting.outputDetailParent.trans.transactionDate)}"/>
+                    <h:panelGrid styleClass="clsGridMainInput" columns="4" style="width: 100%">
+                        <h:outputLabel style="border-bottom-style: solid;" value="#{generalUserSetting.outputDetailParent.transaction_type.transactionDateLabel}"/>
+                        <h:outputLabel style="border-bottom-style: solid;" value="Delivery Address"/>
+                        <h:outputLabel style="border-bottom-style: solid;" value="Vehicle"/>
+                        <h:outputLabel style="border-bottom-style: solid;" value="Delivered by"/>
+                        <h:outputText value="#{utilityBean.formatDate(generalUserSetting.outputDetailParent.trans.transactionDate)}"/>
                         <div style="width: 250px;">
                             #{generalUserSetting.outputDetailParent.trans.deliveryAddress}
                         </div>
+                        <h:outputText value="#{generalUserSetting.outputDetailParent.trans.transactor_vehicle}"/>
+                        <h:outputText value="#{generalUserSetting.outputDetailParent.trans.transactor_driver}"/>
                     </h:panelGrid>
                 </h:panelGrid>
             </ui:composition>

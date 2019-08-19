@@ -23,6 +23,7 @@
     <f:metadata>
         <f:viewAction action="#{navigationBean.checkAccessDenied('83', 'View')}"/>
         <f:viewAction action="#{payBean.initResetPayReportDetail(trans,pay,payBean,transactorBean.selectedBillTransactor)}"/>
+        <f:viewAction action="#{payMethodBean.refreshPayMethodsPayReport()}"/>
     </f:metadata>
     <h:body>
         <ui:include src="Menu.xhtml"/>
@@ -57,7 +58,7 @@
                     </p:selectOneMenu>
                     <p:calendar id="calDate1"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{payBean.date1}" size="12"/>
                     <p:calendar id="calDate2"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{payBean.date2}" size="12"/>
-                    <p:inputText id="itxtPayId" value="#{pay.payId}" style="width: 140px;"/>
+                    <p:inputText id="itxtPayNo" value="#{pay.pay_number}" style="width: 140px;"/>
                     <p:inputText id="itxtInvoiceNo" value="#{trans.transactionNumber}" style="width: 140px;"/>
                     <p:autoComplete id="autcTransactor" value="#{transactorBean.selectedTransactor}"  
                                     completeMethod="#{transactorBean.getTransactorObjectList}" 
@@ -81,13 +82,18 @@
                     </p:autoComplete>
                 </h:panelGrid>
                 <h:panelGrid id="pnlgFilter2" columns="7" styleClass="clsPanelReportFilter">
+                    <h:outputLabel value="Pay Method"/>
                     <p:outputLabel value="Added By"/>
                     <h:outputLabel value="Received By"/>
                     <p:outputLabel value="Cash Receipt Type"/>
                     <p:outputLabel value="ShareHolder/LoanAccount"/>  
                     <h:outputLabel value="SUMMARIZE RESULTS BY:"/>
                     <h:outputLabel value=""/>
-                    <h:outputLabel value=""/>
+                    
+                    <h:selectOneMenu id="menuPayMethod" value="#{pay.payMethodId}">
+                        <f:selectItem itemLabel="Select" itemValue="0"/>
+                        <f:selectItems value="#{payMethodBean.payMethodsList}" var="pm" itemLabel="#{pm.payMethodName}" itemValue="#{pm.payMethodId}"/>
+                    </h:selectOneMenu>
                     <p:selectOneMenu id="menuAddUser" value="#{pay.addUserDetailId}">
                         <f:selectItem itemLabel="Select" itemValue="0"/>
                         <f:selectItems value="#{userDetailBean.getUserDetails()}" var="ut" itemLabel="#{ut.firstName} #{ut.secondName} #{ut.thirdName}" itemValue="#{ut.userDetailId}"/>
@@ -112,8 +118,8 @@
                         <f:selectItem itemLabel="ShareHolder/LoanAcc" itemValue="acc_child_account_id2"/>
                         <f:selectItem itemLabel="Receipt Date" itemValue="pay_date"/>
                         <f:selectItem itemLabel="Cash Receipt Type" itemValue="pay_reason_id"/>
+                        <f:selectItem itemLabel="Pay Method" itemValue="pay_method_id"/>
                     </p:selectOneMenu> 
-                    <h:outputLabel value=""/>
                     <h:outputLabel value=""/>
                 </h:panelGrid>
                 <h:panelGrid id="pnlgFilterButton" columns="6" styleClass="clsPanelReportFilter">
@@ -141,6 +147,9 @@
                          rowsPerPageTemplate="50,100,200,400">
                 <f:facet name="header">
                     <p:dataTable id="tblSummary" var="sm" value="#{payBean.payListSummary}">
+                        <p:column headerText="Pay Method" style="text-align: left;" rendered="#{payBean.fieldName.equals('pay_method_id')}">
+                            <h:outputText value="#{payMethodBean.getPayMethod(sm.payMethodId).payMethodName}" rendered="#{sm.payMethodId>0}"/>
+                        </p:column>
                         <p:column headerText="Received By" style="text-align: left;" rendered="#{payBean.fieldName.equals('add_user_detail_id')}">
                             <h:outputText value="#{userDetailBean.getUserDetail(sm.addUserDetailId).userName}" rendered="#{sm.addUserDetailId>0}"/>
                         </p:column>

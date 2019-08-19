@@ -101,11 +101,15 @@
                         </p:column>
                     </p:dataTable>
                     <h:panelGrid style="background-color: yellow;width: 100%"/>
-                    <h:panelGrid styleClass="clsGridMainInput" columns="4">
+                    <h:panelGrid styleClass="clsGridMainInput" columns="8">
                         <h:outputLabel  value="#{transactionTypeBean.getTransactionType(12).transactionUserLabel}:"/>
                         <h:inputText disabled="true" style="width: 170px;" value="#{userDetailBean.getUserDetail(transBean.transObj.transactionUserDetailId).userName}"/>
-                        <h:outputLabel styleClass="clsLabelTransItem" value="ShipTo/Delivery.Address"/>
+                        <h:outputLabel styleClass="clsLabelTransItem" value="Delivery.Address"/>
                         <h:inputTextarea styleClass="clsInput" id="itxaDeliveryAddress" rows="4" value="#{transBean.transObj.deliveryAddress}" disabled="true"/>
+                        <h:outputLabel value="Vehicle"/>
+                        <h:inputText id="itxtVehicle" value="#{transBean.transObj.transactor_vehicle}" style="width: 150px;" disabled="true"/>
+                        <h:outputLabel value="Delivered by"/>
+                        <h:inputText id="itxtDriver" value="#{transBean.transObj.transactor_driver}" style="width: 150px;" disabled="true"/>
                     </h:panelGrid>
                     <h:panelGrid id="pgrdApprove">
                         <h:panelGrid rendered="#{transBean.isApproveNeeded(transBean.transObj)}" id="pgrdApprove2" styleClass="clsGridApprove" columns="6" style="background-color: lightsalmon">

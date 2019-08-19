@@ -62,7 +62,7 @@
                     <p:outputLabel value="Added By"/>
                     <h:outputLabel value="#{transactionTypeBean.getTransactionType(70).transactionUserLabel}"/>              
                     <h:outputLabel value="SUMMARIZE RESULTS BY:"/>
-                    
+
                     <p:autoComplete id="autcTransactor" value="#{transactorBean.selectedTransactor}" 
                                     completeMethod="#{transactorBean.getTransactorObjectList}" 
                                     var="trct" 
@@ -163,9 +163,6 @@
                     <p:commandButton id="cmdbView" icon="ui-icon-search" oncomplete="PF('dlgPIR').show();" actionListener="#{transProductionBean.initTransProductionSession(itm.transactionId,'View')}" update=":formTransactionPIR"/>
                     <p:commandButton id="cmdbEdit" icon="ui-icon-pencil" oncomplete="PF('dlgPIR').show();" actionListener="#{transProductionBean.initTransProductionSession(itm.transactionId,'Edit')}" update=":formTransactionPIR"/>
                 </p:column>
-                <p:column headerText="Transaction Type">
-                    <h:outputLabel value="#{transactionTypeBean.getTransactionType(itm.transactionTypeId).transactionTypeName} "/>
-                </p:column>
                 <p:column headerText="#{transactionTypeBean.getTransactionType(70).transactionNumberLabel}">
                     <h:outputLabel value="#{itm.transaction_number}"/>
                 </p:column>
@@ -175,6 +172,15 @@
                 <p:column headerText="#{transactionTypeBean.getTransactionType(11).transactionNumberLabel}">
                     <h:outputLabel value="#{itm.transactionRef}"/>
                 </p:column>
+                <p:column headerText="Order Qty">
+                    <h:outputText value="#{itm.orderedQty}">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Order Unit">
+                    #{itm.outputItemUnit}
+                    #{transProductionBean.getPCsOrdered(itm)}
+                </p:column>
                 <p:column headerText="Produced Item">
                     <h:outputLabel value="#{transItemBean.showItemDescriptionCEC(itm.outputItemName,itm.codeSpecific,itm.descSpecific,itm.descMore)}"/>
                 </p:column>
@@ -182,6 +188,10 @@
                     <h:outputText value="#{itm.outputQty}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
+                </p:column>
+                <p:column headerText="Produced Unit">
+                    #{itm.outputItemUnit}
+                    #{transProductionBean.getPCsProduced(itm)}
                 </p:column>
                 <p:column headerText="Unit Cost">
                     <h:outputText value="#{itm.outputUnitCost}">
@@ -194,10 +204,10 @@
                 <p:column headerText="Add Date" rendered="#{transProductionBean.dateType.equals('Add Date')}">
                     <h:outputText value="#{utilityBean.formatDate(itm.addDate)}"/>
                 </p:column>
-                <p:column headerText="#{transactionTypeBean.getTransactionType(70).transactionUserLabel}">
+                <p:column headerText="#{transactionTypeBean.getTransactionType(70).transactionUserLabel}" rendered="#{transProductionBean.dateType.equals('Production Date')}">
                     <h:outputText value="#{userDetailBean.getUserDetail(itm.transactionUserDetailId).userName}"/>
                 </p:column>
-                <p:column headerText="Added By">
+                <p:column headerText="Added By" rendered="#{transProductionBean.dateType.equals('Add Date')}">
                     <h:outputText value="#{userDetailBean.getUserDetail(itm.addUserDetailId).userName}"/>
                 </p:column>
             </p:dataTable>

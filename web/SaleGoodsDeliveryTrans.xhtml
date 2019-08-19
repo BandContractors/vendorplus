@@ -226,9 +226,13 @@
                 </p:column> 
             </p:dataTable>
 
-            <h:panelGrid id="pnlgTermsConditions" styleClass="clsGridMainInput" columns="2">
+            <h:panelGrid id="pnlgTermsConditions" styleClass="clsGridMainInput" columns="6">
                 <h:outputLabel styleClass="clsLabelTransItem" value="Delivery.Address"/>
                 <h:inputTextarea styleClass="clsInput" id="itxaDeliveryAddress" rows="4" value="#{trans.deliveryAddress}"/>
+                <h:outputLabel value="Vehicle"/>
+                <h:inputText id="itxtVehicle" value="#{trans.transactor_vehicle}" style="width: 150px;"/>
+                <h:outputLabel value="Delivered by"/>
+                <h:inputText id="itxtDriver" value="#{trans.transactor_driver}" style="width: 150px;"/>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainCommands" columns="1">

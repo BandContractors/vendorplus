@@ -177,11 +177,14 @@
                 <p:column headerText="#{transactionTypeBean.getTransactionType(12).transactorLabel}">
                     <h:outputText value="#{transactorBean.getTransactor(itm.transactorId).transactorNames}"/>
                 </p:column>
-                <p:column headerText="#{transactionTypeBean.getTransactionType(12).transactionUserLabel}">
-                    <h:outputText value="#{userDetailBean.getUserDetail(itm.transactionUserDetailId).userName}"/>
-                </p:column>
                 <p:column headerText="Added By">
                     <h:outputText value="#{userDetailBean.getUserDetail(itm.addUserDetailId).userName}"/>
+                </p:column>
+                <p:column headerText="Delivered by">
+                    <h:outputText value="#{itm.transactor_driver}"/>
+                </p:column>
+                <p:column headerText="Vehicle">
+                    <h:outputText value="#{itm.transactor_vehicle}"/>
                 </p:column>
             </p:dataTable>
         </h:form>

@@ -24,6 +24,7 @@ public class PayMethodBean implements Serializable {
     private PayMethod SelectedPayMethod = null;
     private int SelectedPayMethodId;
     private String SearchPayMethodName = "";
+    private List<PayMethod> PayMethodsList;
 
     public void setPayMethodFromResultset(PayMethod aPayMethod, ResultSet aResultSet) {
         try {
@@ -246,6 +247,56 @@ public class PayMethodBean implements Serializable {
         return PayMethods;
     }
 
+    public void refreshPayMethodsActive() {
+        this.PayMethods = new PayMethodBean().getPayMethodsActive();
+    }
+
+    public void refreshPayMethodsPayReport() {
+        String sql;
+        sql = "select * from pay_method where pay_method_id!=6 and pay_method_id!=7";
+        ResultSet rs = null;
+        try {
+            this.PayMethodsList.clear();
+        } catch (Exception e) {
+            this.PayMethodsList = new ArrayList<>();
+        }
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                PayMethod pm = new PayMethod();
+                this.setPayMethodFromResultset(pm, rs);
+                this.PayMethodsList.add(pm);
+            }
+        } catch (SQLException se) {
+            System.err.println("refreshPayMethodsPayReport:" + se.getMessage());
+        }
+    }
+
+    public void refreshPayMethodsPayReport(List<PayMethod> aPayMethods) {
+        String sql;
+        sql = "select * from pay_method where pay_method_id!=6 and pay_method_id!=7";
+        ResultSet rs = null;
+        try {
+            aPayMethods.clear();
+        } catch (Exception e) {
+            aPayMethods = new ArrayList<>();
+        }
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                PayMethod pm = new PayMethod();
+                this.setPayMethodFromResultset(pm, rs);
+                aPayMethods.add(pm);
+            }
+        } catch (SQLException se) {
+            System.err.println("refreshPayMethodsPayReport2:" + se.getMessage());
+        }
+    }
+
     public List<PayMethod> getPayMethodsActive() {
         String sql;
         sql = "{call sp_search_pay_method_active()}";
@@ -331,7 +382,7 @@ public class PayMethodBean implements Serializable {
         return PayMethods;
     }
 
-    public List<PayMethod> getPayMethodsActiveInAssign(String aPayMethodIDs,Trans aTrans) {
+    public List<PayMethod> getPayMethodsActiveInAssign(String aPayMethodIDs, Trans aTrans) {
         String sql;
         sql = "{call sp_search_pay_method_active_in(?)}";
         ResultSet rs = null;
@@ -546,6 +597,20 @@ public class PayMethodBean implements Serializable {
      */
     public void setActionMessage(String ActionMessage) {
         this.ActionMessage = ActionMessage;
+    }
+
+    /**
+     * @return the PayMethodsList
+     */
+    public List<PayMethod> getPayMethodsList() {
+        return PayMethodsList;
+    }
+
+    /**
+     * @param PayMethodsList the PayMethodsList to set
+     */
+    public void setPayMethodsList(List<PayMethod> PayMethodsList) {
+        this.PayMethodsList = PayMethodsList;
     }
 
 }

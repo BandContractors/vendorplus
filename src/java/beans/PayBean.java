@@ -2223,6 +2223,8 @@ public class PayBean implements Serializable {
         }
         try {
             this.clearPay(aPay);
+            aPay.setPayMethodId(0);
+            aPay.setCurrencyCode("");
         } catch (NullPointerException npe) {
         }
         try {
@@ -2264,8 +2266,8 @@ public class PayBean implements Serializable {
         } else {
             groupbysql = " GROUP BY acc_child_account_id,currency_code";
         }
-        if (aPay.getPayId() > 0) {
-            wheresql = wheresql + " AND pay_id=" + aPay.getPayId();
+        if (aPay.getPay_number().length() > 0) {
+            wheresql = wheresql + " AND pay_number='" + aPay.getPay_number() + "'";
         }
         if (aPay.getStoreId() > 0) {
             wheresql = wheresql + " AND store_id=" + aPay.getStoreId();
@@ -2278,6 +2280,9 @@ public class PayBean implements Serializable {
         }
         if (aPay.getPayReasonId() > 0) {
             wheresql = wheresql + " AND pay_reason_id=" + aPay.getPayReasonId();
+        }
+        if (aPay.getPayMethodId() > 0) {
+            wheresql = wheresql + " AND pay_method_id=" + aPay.getPayMethodId();
         }
         if (aPay.getBillTransactorId() > 0) {
             wheresql = wheresql + " AND bill_transactor_id=" + aPay.getBillTransactorId();
@@ -2354,6 +2359,13 @@ public class PayBean implements Serializable {
                                 paysum.setBillTransactorId(0);
                             }
                             break;
+                        case "pay_method_id":
+                            try {
+                                paysum.setPayMethodId(rs.getInt("pay_method_id"));
+                            } catch (NullPointerException npe) {
+                                paysum.setPayMethodId(0);
+                            }
+                            break;
                         case "pay_date":
                             try {
                                 paysum.setPayDate(new Date(rs.getDate("pay_date").getTime()));
@@ -2409,8 +2421,11 @@ public class PayBean implements Serializable {
         } else {
             groupbysql = " GROUP BY acc_child_account_id,currency_code";
         }
-        if (aPay.getPayId() > 0) {
-            wheresql = wheresql + " AND pay_id=" + aPay.getPayId();
+        if (aPay.getPay_number().length() > 0) {
+            wheresql = wheresql + " AND pay_number='" + aPay.getPay_number() + "'";
+        }
+        if (aPay.getPayMethodId() > 0) {
+            wheresql = wheresql + " AND pay_method_id=" + aPay.getPayMethodId();
         }
         if (aPay.getStoreId() > 0) {
             wheresql = wheresql + " AND store_id=" + aPay.getStoreId();
@@ -2497,6 +2512,13 @@ public class PayBean implements Serializable {
                                 paysum.setBillTransactorId(rs.getLong("bill_transactor_id"));
                             } catch (NullPointerException npe) {
                                 paysum.setBillTransactorId(0);
+                            }
+                            break;
+                        case "pay_method_id":
+                            try {
+                                paysum.setPayMethodId(rs.getInt("pay_method_id"));
+                            } catch (NullPointerException npe) {
+                                paysum.setPayMethodId(0);
                             }
                             break;
                         case "pay_date":
