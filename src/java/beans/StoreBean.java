@@ -37,6 +37,31 @@ public class StoreBean implements Serializable {
     private Store SelectedStore = null;
     private int SelectedStoreId;
     private String SearchStoreName = "";
+    private List<Store> StoresList;
+
+    public void refreshStoresList() {
+        String sql;
+        sql = "{call sp_search_store_by_none()}";
+        ResultSet rs = null;
+        try {
+            this.StoresList.clear();
+        } catch (Exception e) {
+            this.StoresList = new ArrayList<>();
+        }
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Store store = new Store();
+                store.setStoreId(rs.getInt("store_id"));
+                store.setStoreName(rs.getString("store_name"));
+                this.StoresList.add(store);
+            }
+        } catch (Exception e) {
+            System.err.println("refreshStoresList:" + e.getMessage());
+        }
+    }
 
     public void saveStore(Store store) {
         String sql = null;
@@ -368,6 +393,20 @@ public class StoreBean implements Serializable {
      */
     public void setSearchStoreName(String SearchStoreName) {
         this.SearchStoreName = SearchStoreName;
+    }
+
+    /**
+     * @return the StoresList
+     */
+    public List<Store> getStoresList() {
+        return StoresList;
+    }
+
+    /**
+     * @param StoresList the StoresList to set
+     */
+    public void setStoresList(List<Store> StoresList) {
+        this.StoresList = StoresList;
     }
 
 }

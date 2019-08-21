@@ -22,6 +22,7 @@ public class TransProductionItem implements Serializable {
     private long TransProductionId;
     private long InputItemId;
     private String InputItemName;
+    private String InputItemUnit;
     private double InputQty;
     private double InputUnitCost;
     private String Batchno;
@@ -168,6 +169,20 @@ public class TransProductionItem implements Serializable {
      */
     public void setInputItemName(String InputItemName) {
         this.InputItemName = InputItemName;
+    }
+
+    /**
+     * @return the InputItemUnit
+     */
+    public String getInputItemUnit() {
+        return InputItemUnit;
+    }
+
+    /**
+     * @param InputItemUnit the InputItemUnit to set
+     */
+    public void setInputItemUnit(String InputItemUnit) {
+        this.InputItemUnit = InputItemUnit;
     }
 
  

@@ -1589,4 +1589,8 @@ public class NavigationBean implements Serializable {
     public String redirectToReportProductionDetail() {
         return "ReportProductionDetail?faces-redirect=true";
     }
+
+    public String redirectToReportProdInputOutputDetail() {
+        return "ReportProdInputOutput?faces-redirect=true";
+    }
 }

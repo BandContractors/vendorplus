@@ -69,6 +69,8 @@ public class TransProductionBean implements Serializable {
     private TransProduction TransProdObj;
     private String ActionType;
     private List<TransProduction> OrderProducedList = new ArrayList<>();
+    private List<TransProduction> TransProdList;
+    private List<TransProductionItem> TransProdItemList;
 
     public void specifySizeProduced(TransItem aTransItem) {
         if (null != aTransItem) {
@@ -1161,6 +1163,131 @@ public class TransProductionBean implements Serializable {
         }
     }
 
+    public void initResetProdInputOutput(TransProduction aTransProd, TransProductionItem aTransProdItem) {
+        if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
+            // Skip ajax requests.
+        } else {
+            this.resetProdInputOutput(aTransProd, aTransProdItem);
+        }
+    }
+
+    public void resetProdInputOutput(TransProduction aTransProd, TransProductionItem aTransProdItem) {
+        try {
+            this.clearTransProduction(aTransProd, "");
+        } catch (NullPointerException npe) {
+        }
+        try {
+            aTransProdItem.setInputItemId(0);
+        } catch (NullPointerException npe) {
+        }
+        try {
+            this.TransProdList.clear();
+            this.TransProdItemList.clear();
+        } catch (NullPointerException npe) {
+        }
+    }
+
+    public void reportProdInputOutput(TransProduction aTransProd, TransProductionItem aTransProdItem) {
+        ResultSet rs = null;
+        try {
+            this.TransProdItemList.clear();
+        } catch (Exception e) {
+            this.TransProdItemList = new ArrayList<>();
+        }
+        String wheresql = "";
+        if (aTransProd.getStoreId() > 0) {
+            wheresql = wheresql + " AND t.store_id=" + aTransProd.getStoreId();
+        }
+        if (aTransProdItem.getInputItemId() > 0) {
+            wheresql = wheresql + " AND ti.input_item_id=" + aTransProdItem.getInputItemId();
+        }
+        if (aTransProd.getTransactionDate() != null && aTransProd.getTransactionDate2() != null) {
+            wheresql = wheresql + " AND transaction_date BETWEEN '" + new java.sql.Date(aTransProd.getTransactionDate().getTime()) + "' AND '" + new java.sql.Date(aTransProd.getTransactionDate2().getTime()) + "'";
+        }
+        String sql = "SELECT ti.input_item_id,ti.batchno,ti.code_specific,ti.desc_specific,sum(ti.input_qty) as input_qty "
+                + "FROM trans_production_item ti inner join trans_production t on ti.transaction_id=t.transaction_id "
+                + "WHERE 1=1 " + wheresql + " "
+                + "GROUP BY  ti.input_item_id,ti.batchno,ti.code_specific,ti.desc_specific "
+                + "ORDER BY ti.input_item_id,ti.batchno,ti.code_specific,ti.desc_specific";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            TransProductionItem transProductionItem = null;
+            while (rs.next()) {
+                transProductionItem = new TransProductionItem();
+                try {
+                    transProductionItem.setInputItemId(rs.getLong("input_item_id"));
+                } catch (NullPointerException npe) {
+                    transProductionItem.setInputItemId(0);
+                }
+                try {
+                    transProductionItem.setInputQty(rs.getDouble("input_qty"));
+                } catch (NullPointerException npe) {
+                    transProductionItem.setInputQty(0);
+                }
+                try {
+                    transProductionItem.setBatchno(rs.getString("batchno"));
+                } catch (NullPointerException npe) {
+                    transProductionItem.setBatchno("");
+                }
+                try {
+                    transProductionItem.setCodeSpecific(rs.getString("code_specific"));
+                } catch (NullPointerException npe) {
+                    transProductionItem.setCodeSpecific("");
+                }
+                try {
+                    transProductionItem.setDescSpecific(rs.getString("desc_specific"));
+                } catch (NullPointerException npe) {
+                    transProductionItem.setDescSpecific("");
+                }
+                try {
+                    Item item = new ItemBean().getItem(transProductionItem.getInputItemId());
+                    transProductionItem.setInputItemName(item.getDescription());
+                    transProductionItem.setInputItemUnit(new UnitBean().getUnit(item.getUnitId()).getUnitSymbol());
+                } catch (Exception e) {
+                    transProductionItem.setInputItemName("");
+                    transProductionItem.setInputItemUnit("");
+                }
+                this.TransProdItemList.add(transProductionItem);
+            }
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+        }
+    }
+
+    public List<TransProduction> getProducedItems(long aInputItemId, TransProduction aTransProd, TransProductionItem aTransProdItem) {
+        List<TransProduction> tpil = new ArrayList<>();
+        ResultSet rs = null;
+        String wheresql = "";
+        if (aTransProd.getStoreId() > 0) {
+            wheresql = wheresql + " AND t.store_id=" + aTransProd.getStoreId();
+        }
+        //if (aTransProdItem.getInputItemId() > 0) {
+        wheresql = wheresql + " AND ti.input_item_id=" + aInputItemId;
+        //}
+        if (aTransProd.getTransactionDate() != null && aTransProd.getTransactionDate2() != null) {
+            wheresql = wheresql + " AND transaction_date BETWEEN '" + new java.sql.Date(aTransProd.getTransactionDate().getTime()) + "' AND '" + new java.sql.Date(aTransProd.getTransactionDate2().getTime()) + "'";
+        }
+        String sql = "SELECT t.* "
+                + "FROM trans_production_item ti inner join trans_production t on ti.transaction_id=t.transaction_id "
+                + "WHERE 1=1 " + wheresql;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            TransProduction transProduction = null;
+            while (rs.next()) {
+                transProduction = this.getTransProductionFromResultset(rs);
+                this.updateLookup(transProduction);
+                tpil.add(transProduction);
+            }
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+        }
+        return tpil;
+    }
+
     public void clearAll(Trans t, List<ItemProductionMap> aActiveTransItems, TransItem ti, Item aSelectedItem, Transactor aSelectedTransactor, int ClearNo, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {//Clear No: 0-do not clear, 1 - clear trans item only, 2 - clear all  
         TransItemBean tib = new TransItemBean();
         ItemBean itmB = new ItemBean();
@@ -1847,5 +1974,33 @@ public class TransProductionBean implements Serializable {
      */
     public void setOrderProducedList(List<TransProduction> OrderProducedList) {
         this.OrderProducedList = OrderProducedList;
+    }
+
+    /**
+     * @return the TransProdList
+     */
+    public List<TransProduction> getTransProdList() {
+        return TransProdList;
+    }
+
+    /**
+     * @param TransProdList the TransProdList to set
+     */
+    public void setTransProdList(List<TransProduction> TransProdList) {
+        this.TransProdList = TransProdList;
+    }
+
+    /**
+     * @return the TransProdItemList
+     */
+    public List<TransProductionItem> getTransProdItemList() {
+        return TransProdItemList;
+    }
+
+    /**
+     * @param TransProdItemList the TransProdItemList to set
+     */
+    public void setTransProdItemList(List<TransProductionItem> TransProdItemList) {
+        this.TransProdItemList = TransProdItemList;
     }
 }
