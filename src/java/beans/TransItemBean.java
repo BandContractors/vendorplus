@@ -85,6 +85,26 @@ public class TransItemBean implements Serializable {
         }
     }
 
+    public String getSpecificSizeQtyFromQtyAndSizeStr(TransItem aTransItem) {
+        String outpstr = "";
+        double outp = 1.0;
+        double qty = 0;
+        double sze = 1;
+        if (null != aTransItem) {
+            qty = aTransItem.getItemQty();
+            sze = aTransItem.getSpecific_size();
+            if (sze > 0) {
+                outp = qty / sze;
+            }
+        }
+        if (sze == 1) {
+            //do nothng
+        } else {
+            outpstr = " (" + new UtilityBean().formatDoubleToString(outp) + "PCs)";
+        }
+        return outpstr;
+    }
+
     public double getSpecificSizeQtyFromQtyAndSize(TransItem aTransItem) {
         double outp = 1.0;
         if (null != aTransItem) {

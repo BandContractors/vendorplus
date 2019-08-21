@@ -80,6 +80,7 @@
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                 <f:ajax event="change" listener="#{transItemBean.editTransItemCEC(transBean.transObj.transactionTypeId,transBean.transObj.transactionReasonId,'',transBean.transObj, transBean.transItemList,ati)}" execute="dtblTransactionItem" render="@form"/>
                             </h:inputText>
+                            #{transItemBean.getSpecificSizeQtyFromQtyAndSizeStr(ati)}
                         </p:column>
                         <p:column>
                             <!-- column header -->
