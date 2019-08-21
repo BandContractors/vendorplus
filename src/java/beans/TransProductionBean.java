@@ -1163,15 +1163,15 @@ public class TransProductionBean implements Serializable {
         }
     }
 
-    public void initResetProdInputOutput(TransProduction aTransProd, TransProductionItem aTransProdItem) {
+    public void initResetProdInputOutput(TransProduction aTransProd, TransProductionItem aTransProdItem, TransProductionBean aTransProdBean) {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
         } else {
-            this.resetProdInputOutput(aTransProd, aTransProdItem);
+            this.resetProdInputOutput(aTransProd, aTransProdItem, aTransProdBean);
         }
     }
 
-    public void resetProdInputOutput(TransProduction aTransProd, TransProductionItem aTransProdItem) {
+    public void resetProdInputOutput(TransProduction aTransProd, TransProductionItem aTransProdItem, TransProductionBean aTransProdBean) {
         try {
             this.clearTransProduction(aTransProd, "");
         } catch (NullPointerException npe) {
@@ -1182,12 +1182,22 @@ public class TransProductionBean implements Serializable {
         }
         try {
             this.TransProdList.clear();
+        } catch (NullPointerException npe) {
+        }
+        try {
             this.TransProdItemList.clear();
+        } catch (NullPointerException npe) {
+        }
+        try {
+            //aTransProdBean.setDate1(null);
+            //aTransProdBean.setDate2(null);
+            //initialise filter to ToDay
+            this.setDateToToday();
         } catch (NullPointerException npe) {
         }
     }
 
-    public void reportProdInputOutput(TransProduction aTransProd, TransProductionItem aTransProdItem) {
+    public void reportProdInputOutput(TransProduction aTransProd, TransProductionItem aTransProdItem, TransProductionBean aTransProductionBean) {
         ResultSet rs = null;
         try {
             this.TransProdItemList.clear();
@@ -1201,8 +1211,8 @@ public class TransProductionBean implements Serializable {
         if (aTransProdItem.getInputItemId() > 0) {
             wheresql = wheresql + " AND ti.input_item_id=" + aTransProdItem.getInputItemId();
         }
-        if (aTransProd.getTransactionDate() != null && aTransProd.getTransactionDate2() != null) {
-            wheresql = wheresql + " AND transaction_date BETWEEN '" + new java.sql.Date(aTransProd.getTransactionDate().getTime()) + "' AND '" + new java.sql.Date(aTransProd.getTransactionDate2().getTime()) + "'";
+        if (aTransProductionBean.getDate1() != null && aTransProductionBean.getDate2() != null) {
+            wheresql = wheresql + " AND transaction_date BETWEEN '" + new java.sql.Date(aTransProductionBean.getDate1().getTime()) + "' AND '" + new java.sql.Date(aTransProductionBean.getDate2().getTime()) + "'";
         }
         String sql = "SELECT ti.input_item_id,ti.batchno,ti.code_specific,ti.desc_specific,sum(ti.input_qty) as input_qty "
                 + "FROM trans_production_item ti inner join trans_production t on ti.transaction_id=t.transaction_id "
@@ -1256,7 +1266,7 @@ public class TransProductionBean implements Serializable {
         }
     }
 
-    public List<TransProduction> getProducedItems(long aInputItemId, TransProduction aTransProd, TransProductionItem aTransProdItem) {
+    public List<TransProduction> getProducedItems(long aInputItemId, TransProduction aTransProd, TransProductionItem aTransProdItem, TransProductionBean aTransProductionBean) {
         List<TransProduction> tpil = new ArrayList<>();
         ResultSet rs = null;
         String wheresql = "";
@@ -1266,8 +1276,8 @@ public class TransProductionBean implements Serializable {
         //if (aTransProdItem.getInputItemId() > 0) {
         wheresql = wheresql + " AND ti.input_item_id=" + aInputItemId;
         //}
-        if (aTransProd.getTransactionDate() != null && aTransProd.getTransactionDate2() != null) {
-            wheresql = wheresql + " AND transaction_date BETWEEN '" + new java.sql.Date(aTransProd.getTransactionDate().getTime()) + "' AND '" + new java.sql.Date(aTransProd.getTransactionDate2().getTime()) + "'";
+        if (aTransProductionBean.getDate1() != null && aTransProductionBean.getDate2() != null) {
+            wheresql = wheresql + " AND transaction_date BETWEEN '" + new java.sql.Date(aTransProductionBean.getDate1().getTime()) + "' AND '" + new java.sql.Date(aTransProductionBean.getDate2().getTime()) + "'";
         }
         String sql = "SELECT t.* "
                 + "FROM trans_production_item ti inner join trans_production t on ti.transaction_id=t.transaction_id "
