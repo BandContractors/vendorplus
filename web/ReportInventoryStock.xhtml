@@ -102,7 +102,7 @@
                         </p:column>
                         <p:column headerText="Stock Value">
                             <h:commandButton id="cmdbSnapshot" value="Save Snaphot" accesskey="s">
-                                <f:ajax listener="#{accPeriodBean.saveSnapshotStockValue(accPeriodBean.getAccPeriodCurrent())}" execute="@this"/>
+                                <f:ajax listener="#{cdc_generalBean.takeNewSnapshot_stock()}" execute="@this"/>
                             </h:commandButton>
                         </p:column>
                     </p:dataTable>

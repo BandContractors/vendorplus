@@ -8476,6 +8476,26 @@ BEGIN
 END//
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS sp_insert_snapshot_stock_value;
+DELIMITER //
+CREATE PROCEDURE sp_insert_snapshot_stock_value
+(
+		IN in_acc_period_id int,
+		IN in_snapshot_no long,
+		IN in_snapshot_date datetime,
+		IN in_cdc_id varchar(20)
+) 
+BEGIN 
+		INSERT INTO snapshot_stock_value(snapshot_no,snapshot_date,acc_period_id,item_id,batchno,code_specific,desc_specific,
+		currency_code,currentqty,unit_cost_price,cp_value,wp_value,rp_value,cdc_id,specific_size,qty_damage) 
+		select in_snapshot_no,in_snapshot_date,in_acc_period_id,s.item_id,s.batchno,s.code_specific,
+		s.desc_specific,i.currency_code,s.currentqty,s.unit_cost as unit_cost_price,
+		(s.currentqty*s.unit_cost) as cp_value,(s.currentqty*i.unit_wholesale_price) as wp_value,
+		(s.currentqty*i.unit_retailsale_price) as rp_value,in_cdc_id,s.specific_size,s.qty_damage 
+		from stock s inner join item i on s.item_id=i.item_id where i.is_suspended!='Yes' and i.is_track=1 and i.is_asset=0;
+END//
+DELIMITER ;
+
 DROP PROCEDURE IF EXISTS sp_take_snapshot_xrate;
 DELIMITER //
 CREATE PROCEDURE sp_take_snapshot_xrate
