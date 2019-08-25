@@ -1,7 +1,6 @@
 package beans;
 
 import connections.DBConnection;
-import entities.AccPeriod;
 import entities.Cdc_general;
 import entities.Snapshot_stock_value;
 import java.io.Serializable;
@@ -56,7 +55,7 @@ public class Snapshot_stock_valueBean implements Serializable {
                 aSnapshot_stock_value.setAcc_period_id(0);
             }
             try {
-                aSnapshot_stock_value.setItem_id(aResultSet.getInt("item_id"));
+                aSnapshot_stock_value.setItem_id(aResultSet.getLong("item_id"));
             } catch (NullPointerException npe) {
                 aSnapshot_stock_value.setItem_id(0);
             }
@@ -120,6 +119,11 @@ public class Snapshot_stock_valueBean implements Serializable {
             } catch (NullPointerException npe) {
                 aSnapshot_stock_value.setCdc_id("");
             }
+            try {
+                aSnapshot_stock_value.setStore_id(aResultSet.getInt("store_id"));
+            } catch (NullPointerException npe) {
+                aSnapshot_stock_value.setStore_id(0);
+            }
         } catch (SQLException se) {
             System.err.println("setSnapshot_stock_valueFromResultset:" + se.getMessage());
         }
@@ -147,7 +151,7 @@ public class Snapshot_stock_valueBean implements Serializable {
     }
 
     public long getRecordsByCdc_id(String aCdc_id) {
-        String sql = "SLECT count(*) as cdc_id FROM snapshot_stock_value WHERE cdc_id=?";
+        String sql = "SELECT count(*) as cdc_id FROM snapshot_stock_value WHERE cdc_id=?";
         ResultSet rs = null;
         long n = 0;
         try (
@@ -232,6 +236,7 @@ public class Snapshot_stock_valueBean implements Serializable {
         aSnapshot_stock_value.setSpecific_size(0);
         aSnapshot_stock_value.setQty_damage(0);
         aSnapshot_stock_value.setCdc_id("");
+        aSnapshot_stock_value.setStore_id(0);
     }
 
     /**

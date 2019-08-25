@@ -14,6 +14,12 @@ alter table snapshot_stock_value add column qty_damage double default 0;
 alter table snapshot_stock_value add column cdc_id varchar(20);
 alter table cdc_general add column snapshot_no int(11);
 alter table cdc_general add column acc_period_id int(11);
+alter table snapshot_stock_value add column store_id int(11);
+
+create table stock_ledger (stock_ledger_id bigint(20) not null auto_increment, store_id int(11), item_id bigint(20), batchno varchar(100), code_specific varchar(50), desc_specific varchar(100), specific_size double default 1, qty_added double, qty_subtracted double, transaction_type_id int(11), action_type varchar(20), transaction_id bigint(20), user_detail_id int(11), add_date datetime null, primary key (stock_ledger_id));
+
+
+
 
 
 

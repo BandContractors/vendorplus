@@ -36,6 +36,7 @@ public class Snapshot_stock_value implements Serializable {
     private double specific_size;
     private double qty_damage;
     private String cdc_id;
+    private int store_id;
 
     /**
      * @return the snapshot_stock_value_id
@@ -273,6 +274,20 @@ public class Snapshot_stock_value implements Serializable {
      */
     public void setCdc_id(String cdc_id) {
         this.cdc_id = cdc_id;
+    }
+
+    /**
+     * @return the store_id
+     */
+    public int getStore_id() {
+        return store_id;
+    }
+
+    /**
+     * @param store_id the store_id to set
+     */
+    public void setStore_id(int store_id) {
+        this.store_id = store_id;
     }
 
 }

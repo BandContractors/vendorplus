@@ -3,6 +3,7 @@ package beans;
 import connections.DBConnection;
 import entities.Cdc_general;
 import entities.CompanySetting;
+import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.Format;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -134,6 +136,36 @@ public class Cdc_generalBean implements Serializable {
         return cdcid;
     }
 
+    public Date getStartTime(int aHourOfDay, int aMinute) {
+        try {
+            Date CurrentTime = new CompanySetting().getCURRENT_SERVER_DATE();
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(CurrentTime);
+            cal.set(Calendar.HOUR_OF_DAY, aHourOfDay);
+            cal.set(Calendar.MINUTE, aMinute);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+            Date StartTime = cal.getTime();
+            if (CurrentTime.compareTo(StartTime) > 0) {
+                cal.add(Calendar.DAY_OF_MONTH, 1);
+                StartTime = cal.getTime();
+            }
+            return StartTime;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+//    public static void main(String[] args){
+//        try {
+//            DBConnection.readConnectionConfigurations("configurations.ConfigFile");
+//            new Parameter_listBean().refreshSavedParameterLists();
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//        Cdc_generalBean gb=new Cdc_generalBean();
+//        gb.getStartTime(11,59);
+//    }
     public long getNewSnapshot_no() {
         String sql;
         sql = "SELECT max(snapshot_no) as snapshot_no FROM cdc_general";
@@ -178,19 +210,19 @@ public class Cdc_generalBean implements Serializable {
     public Cdc_general getCdc_generalByJobId(String aCdc_id) {
         String sql = "SELECT * FROM cdc_general WHERE cdc_id='" + aCdc_id + "'";
         ResultSet rs = null;
-        Cdc_general coa = null;
+        Cdc_general cg = null;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             rs = ps.executeQuery();
             if (rs.next()) {
-                coa = new Cdc_general();
-                this.setCdc_generalFromResultset(coa, rs);
+                cg = new Cdc_general();
+                this.setCdc_generalFromResultset(cg, rs);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            System.err.println("getCdc_generalByJobId:" + e.getMessage());
         }
-        return coa;
+        return cg;
     }
 
     public void takeNewSnapshot_stock() {
@@ -225,6 +257,7 @@ public class Cdc_generalBean implements Serializable {
                 cdcgenUpdate.setCdc_end_time(new CompanySetting().getCURRENT_SERVER_DATE());
                 cdcgenUpdate.setLast_update_date(new CompanySetting().getCURRENT_SERVER_DATE());
                 cdcgenUpdate.setLast_update_by(UserDetailBean.getSystemUserDetailId());
+                this.saveCdc_general(cdcgenUpdate);
             }
         } catch (Exception e) {
             System.out.println("takeNewSnapshot_stock:" + e.getMessage());
@@ -234,7 +267,7 @@ public class Cdc_generalBean implements Serializable {
     public void saveCdc_general(Cdc_general aCdc_general) {
         String sql = null;
         if (aCdc_general.getCdc_general_id() == 0) {
-            sql = "INSERT INTO cdc_general(cdc_function,cdc_id,cdc_date,cdc_start_time,add_date,add_by,acc_period_id) VALUES (?,?,?,?,?,?,?)";
+            sql = "INSERT INTO cdc_general(cdc_function,cdc_id,cdc_date,cdc_start_time,add_date,add_by,acc_period_id,snapshot_no) VALUES (?,?,?,?,?,?,?,?)";
         } else if (aCdc_general.getCdc_general_id() > 0) {
             sql = "UPDATE cdc_general SET cdc_end_time=?,is_passed=?,records_affected=?,last_update_date=?,last_update_by=?";
         }
@@ -262,6 +295,7 @@ public class Cdc_generalBean implements Serializable {
                 }
                 ps.setInt(6, aCdc_general.getAdd_by());
                 ps.setInt(7, aCdc_general.getAcc_period_id());
+                ps.setLong(8, aCdc_general.getSnapshot_no());
             }
             //update
             if (aCdc_general.getCdc_general_id() > 0) {

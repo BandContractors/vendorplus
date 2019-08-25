@@ -13,9 +13,18 @@
         <servlet-name>Servlet1</servlet-name>
         <servlet-class>serv.Servlet1</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>TaskStarter</servlet-name>
+        <servlet-class>api.TaskStarter</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Faces Servlet</servlet-name>
         <url-pattern>/faces/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>TaskStarter</servlet-name>
+        <url-pattern>/TaskStarter</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
