@@ -394,6 +394,8 @@ public class TransItemBean implements Serializable {
                             stock.setCodeSpecific(transitem.getCodeSpecific());
                             stock.setDescSpecific(transitem.getDescSpecific());
                             i = new StockBean().subtractStock(stock, transitem.getItemQty());
+                            stock.setSpecific_size(transitem.getSpecific_size());
+                            new Stock_ledgerBean().callInsertStock_ledger("Subtract", stock, transitem.getItemQty(), "Add", new GeneralUserSetting().getCurrentTransactionTypeId(), transitem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
                         }
                         if ("HIRE INVOICE".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
                             Stock_out sout = new Stock_out();
@@ -462,6 +464,8 @@ public class TransItemBean implements Serializable {
                                 }
                                 stock.setUnitCost(UnitCostPrice);
                                 i = new StockBean().addStock(stock, transitem.getItemQty());
+                                stock.setSpecific_size(transitem.getSpecific_size());
+                                new Stock_ledgerBean().callInsertStock_ledger("Add", stock, transitem.getItemQty(), "Add", new GeneralUserSetting().getCurrentTransactionTypeId(), transitem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
                             } else {
                                 //insert
                                 Stock stock = new Stock();
@@ -496,6 +500,7 @@ public class TransItemBean implements Serializable {
                                 stock.setAssetStatusDesc("");
                                 stock.setSpecific_size(transitem.getSpecific_size());
                                 i = new StockBean().saveStock(stock);
+                                new Stock_ledgerBean().callInsertStock_ledger("Add", stock, transitem.getItemQty(), "Add", new GeneralUserSetting().getCurrentTransactionTypeId(), transitem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
                             }
                         }
 
@@ -515,6 +520,8 @@ public class TransItemBean implements Serializable {
                             } catch (NullPointerException npe) {
 
                             }
+                            stock.setSpecific_size(transitem.getSpecific_size());
+                            new Stock_ledgerBean().callInsertStock_ledger("Subtract", stock, transitem.getItemQty(), "Add", new GeneralUserSetting().getCurrentTransactionTypeId(), transitem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
                         }
                         //TRANSFER - 2. Add/Insert stock to the destination store
                         if ("TRANSFER".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
@@ -528,6 +535,8 @@ public class TransItemBean implements Serializable {
                                 stock.setCodeSpecific(transitem.getCodeSpecific());
                                 stock.setDescSpecific(transitem.getDescSpecific());
                                 i = new StockBean().addStock(stock, transitem.getItemQty());
+                                stock.setSpecific_size(transitem.getSpecific_size());
+                                new Stock_ledgerBean().callInsertStock_ledger("Add", stock, transitem.getItemQty(), "Add", new GeneralUserSetting().getCurrentTransactionTypeId(), transitem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
                             } else {
                                 //insert
                                 Stock stock = new Stock();
@@ -542,23 +551,6 @@ public class TransItemBean implements Serializable {
                                 stock.setCurrentqty(transitem.getItemQty());
                                 stock.setItemMnfDate(transitem.getItemMnfDate());
                                 stock.setItemExpDate(transitem.getItemExpryDate());
-
-//                                //get the last unit cost price
-//                                long LatestTransItemId = 0;
-//                                double LatestTransItemUnitCostPrice = 0;
-//                                LatestTransItemId = this.getItemUnitCostPriceLatestTransItemId(9, 13, new GeneralUserSetting().getCurrentStore().getStoreId(), stock.getItemId(), stock.getBatchno(), stock.getCodeSpecific(), stock.getDescSpecific());
-//                                if (LatestTransItemId > 0) {
-//                                    try {
-//                                        LatestTransItemUnitCostPrice = this.getTransItem(LatestTransItemId).getUnitCostPrice();
-//                                    } catch (NullPointerException npe) {
-//                                        LatestTransItemUnitCostPrice = 0;
-//                                    }
-//                                }
-//                                if (LatestTransItemUnitCostPrice > 0) {
-//                                    stock.setUnitCost(LatestTransItemUnitCostPrice);
-//                                } else {
-//                                    stock.setUnitCost(transitem.getUnitCostPrice());
-//                                }
                                 //get cost price from the mother store
                                 stock.setUnitCost(FromUnitCost);
 
@@ -576,6 +568,7 @@ public class TransItemBean implements Serializable {
                                 stock.setAssetStatusDesc("");
                                 stock.setSpecific_size(transitem.getSpecific_size());
                                 i = new StockBean().saveStock(stock);
+                                new Stock_ledgerBean().callInsertStock_ledger("Add", stock, transitem.getItemQty(), "Add", new GeneralUserSetting().getCurrentTransactionTypeId(), transitem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
                             }
                         }
                         //UNPACK - 1. Subtract stock from the source BigItem
@@ -588,6 +581,8 @@ public class TransItemBean implements Serializable {
                             stock.setCodeSpecific(transitem.getCodeSpecific());
                             stock.setDescSpecific(transitem.getDescSpecific());
                             i = new StockBean().subtractStock(stock, transitem.getItemQty());
+                            stock.setSpecific_size(transitem.getSpecific_size());
+                            new Stock_ledgerBean().callInsertStock_ledger("Subtract", stock, transitem.getItemQty(), "Add", new GeneralUserSetting().getCurrentTransactionTypeId(), transitem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
                         }
                         //UNPACK - 2. Add/Insert stock to the destination small item
                         if ("UNPACK".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
@@ -601,6 +596,8 @@ public class TransItemBean implements Serializable {
                                 stock.setCodeSpecific(transitem.getCodeSpecific());
                                 stock.setDescSpecific(transitem.getDescSpecific());
                                 i = new StockBean().addStock(stock, transitem.getItemQty2());
+                                stock.setSpecific_size(transitem.getSpecific_size());
+                                new Stock_ledgerBean().callInsertStock_ledger("Add", stock, transitem.getItemQty2(), "Add", new GeneralUserSetting().getCurrentTransactionTypeId(), transitem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
                             } else {
                                 //insert
                                 Stock stock = new Stock();
@@ -633,7 +630,6 @@ public class TransItemBean implements Serializable {
                                         LatestTransItemUnitCostPrice = 0;
                                     }
                                 }
-
                                 //incase the small item has never been supplied; try to get the the latest unit cost for the bigger item and divide
                                 if (LatestTransItemUnitCostPrice <= 0) {
                                     long LatestTransItemIdBig = 0;
@@ -678,6 +674,7 @@ public class TransItemBean implements Serializable {
                                 }
                                 stock.setSpecific_size(transitem.getSpecific_size());
                                 i = new StockBean().saveStock(stock);
+                                new Stock_ledgerBean().callInsertStock_ledger("Add", stock, transitem.getItemQty2(), "Add", new GeneralUserSetting().getCurrentTransactionTypeId(), transitem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
                             }
                         }
                     }
@@ -934,6 +931,8 @@ public class TransItemBean implements Serializable {
                             stock.setCodeSpecific(transitem.getCodeSpecific());
                             stock.setDescSpecific(transitem.getDescSpecific());
                             i = new StockBean().subtractStock(stock, transitem.getItemQty());
+                            stock.setSpecific_size(transitem.getSpecific_size());
+                            new Stock_ledgerBean().callInsertStock_ledger("Subtract", stock, transitem.getItemQty(), "Add", aTransTypeId, transitem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
                         }
                         if ("HIRE INVOICE".equals(transtype.getTransactionTypeName())) {
                             Stock_out sout = new Stock_out();
@@ -1002,6 +1001,8 @@ public class TransItemBean implements Serializable {
                                 }
                                 stock.setUnitCost(UnitCostPrice);
                                 i = new StockBean().addStock(stock, transitem.getItemQty());
+                                stock.setSpecific_size(transitem.getSpecific_size());
+                                new Stock_ledgerBean().callInsertStock_ledger("Add", stock, transitem.getItemQty(), "Add", aTransTypeId, transitem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
                             } else {
                                 //insert
                                 Stock stock = new Stock();
@@ -1036,6 +1037,7 @@ public class TransItemBean implements Serializable {
                                 stock.setAssetStatusDesc("");
                                 stock.setSpecific_size(transitem.getSpecific_size());
                                 i = new StockBean().saveStock(stock);
+                                new Stock_ledgerBean().callInsertStock_ledger("Add", stock, transitem.getItemQty(), "Add", aTransTypeId, transitem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
                             }
                         }
 
@@ -1055,6 +1057,8 @@ public class TransItemBean implements Serializable {
                             } catch (NullPointerException npe) {
 
                             }
+                            stock.setSpecific_size(transitem.getSpecific_size());
+                            new Stock_ledgerBean().callInsertStock_ledger("Subtract", stock, transitem.getItemQty(), "Add", aTransTypeId, transitem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
                         }
                         //TRANSFER - 2. Add/Insert stock to the destination store
                         if ("TRANSFER".equals(transtype.getTransactionTypeName())) {
@@ -1068,6 +1072,8 @@ public class TransItemBean implements Serializable {
                                 stock.setCodeSpecific(transitem.getCodeSpecific());
                                 stock.setDescSpecific(transitem.getDescSpecific());
                                 i = new StockBean().addStock(stock, transitem.getItemQty());
+                                stock.setSpecific_size(transitem.getSpecific_size());
+                                new Stock_ledgerBean().callInsertStock_ledger("Add", stock, transitem.getItemQty(), "Add", aTransTypeId, transitem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
                             } else {
                                 //insert
                                 Stock stock = new Stock();
@@ -1082,26 +1088,8 @@ public class TransItemBean implements Serializable {
                                 stock.setCurrentqty(transitem.getItemQty());
                                 stock.setItemMnfDate(transitem.getItemMnfDate());
                                 stock.setItemExpDate(transitem.getItemExpryDate());
-
-//                                //get the last unit cost price
-//                                long LatestTransItemId = 0;
-//                                double LatestTransItemUnitCostPrice = 0;
-//                                LatestTransItemId = this.getItemUnitCostPriceLatestTransItemId(9, 13, store.getStoreId(), stock.getItemId(), stock.getBatchno(), stock.getCodeSpecific(), stock.getDescSpecific());
-//                                if (LatestTransItemId > 0) {
-//                                    try {
-//                                        LatestTransItemUnitCostPrice = this.getTransItem(LatestTransItemId).getUnitCostPrice();
-//                                    } catch (NullPointerException npe) {
-//                                        LatestTransItemUnitCostPrice = 0;
-//                                    }
-//                                }
-//                                if (LatestTransItemUnitCostPrice > 0) {
-//                                    stock.setUnitCost(LatestTransItemUnitCostPrice);
-//                                } else {
-//                                    stock.setUnitCost(transitem.getUnitCostPrice());
-//                                }
                                 //get cost price from the mother store
                                 stock.setUnitCost(FromUnitCost);
-
                                 stock.setWarrantyDesc(transitem.getWarrantyDesc());
                                 stock.setWarrantyExpiryDate(transitem.getWarrantyExpiryDate());
                                 stock.setPurchaseDate(transitem.getPurchaseDate());
@@ -1116,6 +1104,7 @@ public class TransItemBean implements Serializable {
                                 stock.setAssetStatusDesc("");
                                 stock.setSpecific_size(transitem.getSpecific_size());
                                 i = new StockBean().saveStock(stock);
+                                new Stock_ledgerBean().callInsertStock_ledger("Add", stock, transitem.getItemQty(), "Add", aTransTypeId, transitem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
                             }
                         }
                         //UNPACK - 1. Subtract stock from the source BigItem
@@ -1128,6 +1117,8 @@ public class TransItemBean implements Serializable {
                             stock.setCodeSpecific(transitem.getCodeSpecific());
                             stock.setDescSpecific(transitem.getDescSpecific());
                             i = new StockBean().subtractStock(stock, transitem.getItemQty());
+                            stock.setSpecific_size(transitem.getSpecific_size());
+                            new Stock_ledgerBean().callInsertStock_ledger("Subtract", stock, transitem.getItemQty(), "Add", aTransTypeId, transitem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
                         }
                         //UNPACK - 2. Add/Insert stock to the destination small item
                         if ("UNPACK".equals(transtype.getTransactionTypeName())) {
@@ -1141,6 +1132,8 @@ public class TransItemBean implements Serializable {
                                 stock.setCodeSpecific(transitem.getCodeSpecific());
                                 stock.setDescSpecific(transitem.getDescSpecific());
                                 i = new StockBean().addStock(stock, transitem.getItemQty2());
+                                stock.setSpecific_size(transitem.getSpecific_size());
+                                new Stock_ledgerBean().callInsertStock_ledger("Add", stock, transitem.getItemQty2(), "Add", aTransTypeId, transitem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
                             } else {
                                 //insert
                                 Stock stock = new Stock();
@@ -1151,7 +1144,6 @@ public class TransItemBean implements Serializable {
                                 stock.setCodeSpecific(transitem.getCodeSpecific());
                                 stock.setDescSpecific(transitem.getDescSpecific());
                                 stock.setCurrentqty(transitem.getItemQty2());
-
                                 //get the last unit cost price
                                 long LatestTransItemId = 0;
                                 double LatestTransItemUnitCostPrice = 0;
@@ -1163,7 +1155,6 @@ public class TransItemBean implements Serializable {
                                         LatestTransItemUnitCostPrice = 0;
                                     }
                                 }
-
                                 //incase the small item has never been supplied; try to get the the latest unit cost for the bigger item and divide
                                 if (LatestTransItemUnitCostPrice <= 0) {
                                     long LatestTransItemIdBig = 0;
@@ -1208,6 +1199,7 @@ public class TransItemBean implements Serializable {
                                 }
                                 stock.setSpecific_size(transitem.getSpecific_size());
                                 i = new StockBean().saveStock(stock);
+                                new Stock_ledgerBean().callInsertStock_ledger("Add", stock, transitem.getItemQty2(), "Add", aTransTypeId, transitem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
                             }
                         }
                     }
@@ -1798,6 +1790,8 @@ public class TransItemBean implements Serializable {
             SubtractObj.setCodeSpecific(transitem.getCodeSpecific());
             SubtractObj.setDescSpecific(transitem.getDescSpecific());
             SubtractStatus = new StockBean().subtractStock(SubtractObj, transitem.getItemQty());
+            SubtractObj.setSpecific_size(transitem.getSpecific_size());
+            new Stock_ledgerBean().callInsertStock_ledger("Subtract", SubtractObj, transitem.getItemQty(), "Add", 7, transitem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
 
             //UNPACK - 2. Add/Insert stock to the destination small item
             Stock ExistingStockObj = StkBean.getStock(new GeneralUserSetting().getCurrentStore().getStoreId(), transitem.getItemId2(), transitem.getBatchno(), transitem.getCodeSpecific(), transitem.getDescSpecific());
@@ -1811,6 +1805,8 @@ public class TransItemBean implements Serializable {
                     AddObj.setDescSpecific(transitem.getDescSpecific());
                     AddObj.setUnitCost(ExistingStockObj.getUnitCost());
                     AddStatus = new StockBean().addStock(AddObj, transitem.getItemQty2());
+                    AddObj.setSpecific_size(transitem.getSpecific_size());
+                    new Stock_ledgerBean().callInsertStock_ledger("Add", AddObj, transitem.getItemQty2(), "Add", 7, transitem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
                 }
             } else {
                 //insert
@@ -1851,6 +1847,7 @@ public class TransItemBean implements Serializable {
                         cs.setDouble("in_specific_size", 1);
                     }
                     AddStatus = new StockBean().saveStock(AddObj);
+                    new Stock_ledgerBean().callInsertStock_ledger("Add", AddObj, transitem.getItemQty2(), "Add", 7, transitem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
                 }
             }
             StkBean = null;
@@ -2438,6 +2435,8 @@ public class TransItemBean implements Serializable {
                         s.setDescSpecific(aTransItem.getDescSpecific());
                         int x = 0;
                         x = new StockBean().subtractStock(s, aDiffHistNewQty);
+                        s.setSpecific_size(aTransItem.getSpecific_size());
+                        new Stock_ledgerBean().callInsertStock_ledger("Subtract", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
                     } else {
                         //insert
                         Stock s = new Stock();
@@ -2448,7 +2447,6 @@ public class TransItemBean implements Serializable {
                         s.setCodeSpecific(aTransItem.getCodeSpecific());
                         s.setDescSpecific(aTransItem.getDescSpecific());
                         s.setCurrentqty(-1 * aDiffHistNewQty);
-
                         //get the last unit cost price
                         long LatestTransItemId = 0;
                         double LatestTransItemUnitCostPrice = 0;
@@ -2484,6 +2482,7 @@ public class TransItemBean implements Serializable {
                         }
                         int x = 0;
                         x = new StockBean().saveStock(s);
+                        new Stock_ledgerBean().callInsertStock_ledger("Add", s, (-1*aDiffHistNewQty), "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
                     }
 
                 } else if (aDiffHistNewQty < 0) {
@@ -2499,6 +2498,8 @@ public class TransItemBean implements Serializable {
                         s.setDescSpecific(aTransItem.getDescSpecific());
                         int x = 0;
                         x = new StockBean().addStock(s, aDiffHistNewQty);
+                        s.setSpecific_size(aTransItem.getSpecific_size());
+                        new Stock_ledgerBean().callInsertStock_ledger("Add", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
                     } else {
                         //insert
                         Stock s = new Stock();
@@ -2509,7 +2510,6 @@ public class TransItemBean implements Serializable {
                         s.setCodeSpecific(aTransItem.getCodeSpecific());
                         s.setDescSpecific(aTransItem.getDescSpecific());
                         s.setCurrentqty(aDiffHistNewQty);
-
                         //get the last unit cost price
                         long LatestTransItemId = 0;
                         double LatestTransItemUnitCostPrice = 0;
@@ -2545,6 +2545,7 @@ public class TransItemBean implements Serializable {
                         }
                         int x = 0;
                         x = new StockBean().saveStock(s);
+                        new Stock_ledgerBean().callInsertStock_ledger("Add", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
                     }
                 }
 
@@ -2563,6 +2564,8 @@ public class TransItemBean implements Serializable {
                         s.setDescSpecific(aTransItem.getDescSpecific());
                         int x = 0;
                         x = new StockBean().addStock(s, aDiffHistNewQty);
+                        s.setSpecific_size(aTransItem.getSpecific_size());
+                        new Stock_ledgerBean().callInsertStock_ledger("Add", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
                     } else {
                         //insert
                         Stock s = new Stock();
@@ -2573,7 +2576,6 @@ public class TransItemBean implements Serializable {
                         s.setCodeSpecific(aTransItem.getCodeSpecific());
                         s.setDescSpecific(aTransItem.getDescSpecific());
                         s.setCurrentqty(aDiffHistNewQty);
-
                         //get the last unit cost price
                         long LatestTransItemId = 0;
                         double LatestTransItemUnitCostPrice = 0;
@@ -2609,6 +2611,8 @@ public class TransItemBean implements Serializable {
                         }
                         int x = 0;
                         x = new StockBean().saveStock(s);
+                        s.setSpecific_size(aTransItem.getSpecific_size());
+                        new Stock_ledgerBean().callInsertStock_ledger("Add", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
                     }
                 } else if (aDiffHistNewQty < 0) {
                     //subtract stock
@@ -2623,6 +2627,8 @@ public class TransItemBean implements Serializable {
                         s.setDescSpecific(aTransItem.getDescSpecific());
                         int x = 0;
                         x = new StockBean().subtractStock(s, aDiffHistNewQty);
+                        s.setSpecific_size(aTransItem.getSpecific_size());
+                        new Stock_ledgerBean().callInsertStock_ledger("Subtract", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
                     } else {
                         //insert
                         Stock s = new Stock();
@@ -2633,7 +2639,6 @@ public class TransItemBean implements Serializable {
                         s.setCodeSpecific(aTransItem.getCodeSpecific());
                         s.setDescSpecific(aTransItem.getDescSpecific());
                         s.setCurrentqty(-1 * aDiffHistNewQty);
-
                         //get the last unit cost price
                         long LatestTransItemId = 0;
                         double LatestTransItemUnitCostPrice = 0;
@@ -2669,6 +2674,7 @@ public class TransItemBean implements Serializable {
                         }
                         int x = 0;
                         x = new StockBean().saveStock(s);
+                        new Stock_ledgerBean().callInsertStock_ledger("Add", s, (-1*aDiffHistNewQty), "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
                     }
                 }
             }

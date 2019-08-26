@@ -963,6 +963,8 @@ public class TransProductionBean implements Serializable {
                         UnitCostPrice = transItem.getUnitCostPrice();
                         stock.setUnitCost(UnitCostPrice);
                         i = new StockBean().addStock(stock, transItem.getItemQty());
+                        stock.setSpecific_size(transItem.getSpecific_size());
+                        new Stock_ledgerBean().callInsertStock_ledger("Add", stock, transItem.getItemQty(), "Add", aTransTypeId, InsertedTransId, new GeneralUserSetting().getCurrentUser().getUserDetailId());
                     } else {
                         //insert
                         Stock stock = new Stock();
@@ -992,6 +994,7 @@ public class TransProductionBean implements Serializable {
                             stock.setSpecific_size(1);
                         }
                         i = new StockBean().saveStock(stock);
+                        new Stock_ledgerBean().callInsertStock_ledger("Add", stock, transItem.getItemQty(), "Add", aTransTypeId, InsertedTransId, new GeneralUserSetting().getCurrentUser().getUserDetailId());
                     }
                     new TransProductionItemBean().saveTransProductionItemsCEC(InsertedTransId, InsertedOutputQty, InsertedStoreId, aTransProducts);
                     //update stock

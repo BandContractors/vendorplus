@@ -1,6 +1,8 @@
 package beans;
 
 import connections.DBConnection;
+import entities.CompanySetting;
+import entities.Stock;
 import entities.Stock_ledger;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -123,6 +125,93 @@ public class Stock_ledgerBean implements Serializable {
             System.err.println(se.getMessage());
         }
         return sl;
+    }
+
+    public void callInsertStock_ledger(String aAddSubtract, Stock aStock, double aQty, String aAction_type, int aTrans_type_id, long aTrans_id, int aUser_detail_id) {
+        try {
+            Stock_ledger stockledger = new Stock_ledger();
+            try {
+                stockledger.setStore_id(aStock.getStoreId());
+            } catch (NullPointerException npe) {
+                stockledger.setStore_id(0);
+            }
+            try {
+                stockledger.setItem_id(aStock.getItemId());
+            } catch (NullPointerException npe) {
+                stockledger.setItem_id(0);
+            }
+            try {
+                stockledger.setBatchno(aStock.getBatchno());
+            } catch (NullPointerException npe) {
+                stockledger.setBatchno("");
+            }
+            try {
+                stockledger.setCode_specific(aStock.getCodeSpecific());
+            } catch (NullPointerException npe) {
+                stockledger.setCode_specific("");
+            }
+            try {
+                stockledger.setDesc_specific(aStock.getDescSpecific());
+            } catch (NullPointerException npe) {
+                stockledger.setDesc_specific("");
+            }
+            try {
+                if (aStock.getSpecific_size() > 0) {
+                    stockledger.setSpecific_size(aStock.getSpecific_size());
+                } else {
+                    stockledger.setSpecific_size(1);
+                }
+            } catch (NullPointerException npe) {
+                stockledger.setSpecific_size(1);
+            }
+            try {
+                if (aAddSubtract.equals("Add")) {
+                    stockledger.setQty_added(aQty);
+                } else {
+                    stockledger.setQty_added(0);
+                }
+            } catch (NullPointerException npe) {
+                stockledger.setQty_added(0);
+            }
+            try {
+                if (aAddSubtract.equals("Subtract")) {
+                    stockledger.setQty_subtracted(aQty);
+                } else {
+                    stockledger.setQty_subtracted(0);
+                }
+            } catch (NullPointerException npe) {
+                stockledger.setQty_subtracted(0);
+            }
+            try {
+                stockledger.setTransaction_type_id(aTrans_type_id);
+            } catch (NullPointerException npe) {
+                stockledger.setTransaction_type_id(0);
+            }
+            try {
+                stockledger.setAction_type(aAction_type);
+            } catch (NullPointerException npe) {
+                stockledger.setAction_type("");
+            }
+            try {
+                stockledger.setTransaction_id(aTrans_id);
+            } catch (NullPointerException npe) {
+                stockledger.setTransaction_id(0);
+            }
+            try {
+                stockledger.setUser_detail_id(aUser_detail_id);
+            } catch (NullPointerException npe) {
+                stockledger.setUser_detail_id(0);
+            }
+            try {
+                stockledger.setAdd_date(new CompanySetting().getCURRENT_SERVER_DATE());
+            } catch (NullPointerException npe) {
+                stockledger.setAdd_date(null);
+            }
+            //insert
+            this.insertStock_ledger(stockledger);
+        } catch (Exception e) {
+            System.err.println("callInsertStock_ledger:" + e.getMessage());
+        }
     }
 
     public void insertStock_ledger(Stock_ledger aStock_ledger) {

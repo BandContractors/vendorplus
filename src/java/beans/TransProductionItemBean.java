@@ -22,6 +22,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
+import sessions.GeneralUserSetting;
 
 /*
  * To change this template, choose Tools | Templates
@@ -264,6 +265,8 @@ public class TransProductionItemBean implements Serializable {
                     stock.setCodeSpecific(aItemProductionMap.getCodeSpecific());
                     stock.setDescSpecific(aItemProductionMap.getDescSpecific());
                     i = new StockBean().subtractStock(stock, calInputQty);
+                    stock.setSpecific_size(1);
+                    new Stock_ledgerBean().callInsertStock_ledger("Subtract", stock, calInputQty, "Add", 70, aTransProductionID, new GeneralUserSetting().getCurrentUser().getUserDetailId());
                     try {
                         FromUnitCost = new StockBean().getStock(stock.getStoreId(), stock.getItemId(), stock.getBatchno(), stock.getCodeSpecific(), stock.getDescSpecific()).getUnitCost();
                     } catch (NullPointerException npe) {
@@ -345,7 +348,6 @@ public class TransProductionItemBean implements Serializable {
                     }
                     //save
                     cs.executeUpdate();
-                    System.out.println("Added Pro Item");
                     //repeat for the unpacked ones
 
                     //update stock
