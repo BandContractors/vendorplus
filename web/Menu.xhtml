@@ -112,7 +112,7 @@
                     <p:separator />
                     <p:submenu label="Production">  
                         <p:separator />
-                        <p:menuitem value="Product Inputs" action="#{navigationBean.redirectToProductionMap()}" /> 
+                        <p:menuitem value="Map Product and Inputs" action="#{navigationBean.redirectToProductionMap()}" /> 
                         <p:separator />
                         <p:menuitem value="Production" action="#{navigationBean.redirectToProduction()}" /> 
                         <p:separator />
@@ -237,7 +237,7 @@
                     <p:separator />
                     <p:submenu label="Banking">   
                         <p:separator />
-                        <p:menuitem value="Cash Transfer(Cash)" action="#{navigationBean.redirectToBankTransferCash()}" /> 
+                        <p:menuitem value="Cash Transfer" action="#{navigationBean.redirectToBankTransferCash()}" /> 
                         <p:separator />
                     </p:submenu> 
                     <p:separator />
@@ -340,6 +340,8 @@
                     <p:separator />
                     <p:submenu label="Inventory">
                         <p:separator />
+                        <p:menuitem value="Stock Movement" action="#{navigationBean.redirectToReportInventoryLedger()}" />
+                        <p:separator />
                         <p:menuitem value="Stock Inventory" action="#{navigationBean.redirectToReportInventoryStock()}" />
                         <p:separator />
                         <p:menuitem value="Expenses Inventory" action="#{navigationBean.redirectToReportInventoryExpense()}" />
@@ -388,9 +390,9 @@
                     <p:separator/>
                     <p:submenu label="Production">  
                         <p:separator />
-                        <p:menuitem value="Production Detail" action="#{navigationBean.redirectToReportProductionDetail()}" />
+                        <p:menuitem value="Production Report" action="#{navigationBean.redirectToReportProductionDetail()}" />
                         <p:separator />
-                        <p:menuitem value="Input Output Detail" action="#{navigationBean.redirectToReportProdInputOutputDetail()}" />
+                        <p:menuitem value="Input Output Report" action="#{navigationBean.redirectToReportProdInputOutputDetail()}" />
                         <p:separator />
                     </p:submenu>
                     <p:separator/>

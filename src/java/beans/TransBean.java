@@ -12805,23 +12805,9 @@ public class TransBean implements Serializable {
         aTransBean.setActionMessage("");
         ResultSet rs = null;
         this.TransItemList = new ArrayList<>();
-        //this.TransListSummary = new ArrayList<>();
         String sql = "SELECT ti.* FROM transaction_item ti,transaction t WHERE ti.transaction_id=t.transaction_id";
-        //String sqlsum = "";
-//        if (aTransBean.getFieldName().length() > 0) {
-//            sqlsum = "SELECT " + aTransBean.getFieldName() + ",currency_code,sum(grand_total) as grand_total,sum(total_profit_margin) as total_profit_margin,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount FROM transaction WHERE transaction_type_id=2";
-//        } else {
-//            sqlsum = "SELECT currency_code,sum(grand_total) as grand_total,sum(total_profit_margin) as total_profit_margin,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount FROM transaction WHERE transaction_type_id=2";
-//        }
         String wheresql = "";
         String ordersql = "";
-        //String ordersqlsum = "";
-        //String groupbysql = "";
-//        if (aTransBean.getFieldName().length() > 0) {
-//            groupbysql = " GROUP BY " + aTransBean.getFieldName() + ",currency_code";
-//        } else {
-//            groupbysql = " GROUP BY currency_code";
-//        }
         if (aTrans.getStoreId() > 0) {
             wheresql = wheresql + " AND t.store_id=" + aTrans.getStoreId();
         }
@@ -12862,13 +12848,7 @@ public class TransBean implements Serializable {
             }
         }
         ordersql = " ORDER BY t.add_date DESC,t.transaction_id DESC";
-//        if (aTransBean.getFieldName().length() > 0) {
-//            ordersqlsum = " ORDER BY " + aTransBean.getFieldName() + ",currency_code";
-//        } else {
-//            ordersqlsum = " ORDER BY currency_code";
-//        }
         sql = sql + wheresql + ordersql;
-        //sqlsum = sqlsum + wheresql + groupbysql + ordersqlsum;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -12883,83 +12863,6 @@ public class TransBean implements Serializable {
         } catch (SQLException se) {
             System.err.println(se.getMessage());
         }
-
-//        try (
-//                Connection conn = DBConnection.getMySQLConnection();
-//                PreparedStatement ps = conn.prepareStatement(sqlsum);) {
-//            rs = ps.executeQuery();
-//            Trans transsum = null;
-//            while (rs.next()) {
-//                transsum = new Trans();
-//                if (aTransBean.getFieldName().length() > 0) {
-//                    switch (aTransBean.getFieldName()) {
-//                        case "add_user_detail_id":
-//                            try {
-//                                transsum.setAddUserDetailId(rs.getInt("add_user_detail_id"));
-//                            } catch (NullPointerException npe) {
-//                                transsum.setAddUserDetailId(0);
-//                            }
-//                            break;
-//                        case "transaction_user_detail_id":
-//                            try {
-//                                transsum.setTransactionUserDetailId(rs.getInt("transaction_user_detail_id"));
-//                            } catch (NullPointerException npe) {
-//                                transsum.setTransactionUserDetailId(0);
-//                            }
-//                            break;
-//                        case "bill_transactor_id":
-//                            try {
-//                                transsum.setBillTransactorId(rs.getLong("bill_transactor_id"));
-//                            } catch (NullPointerException npe) {
-//                                transsum.setBillTransactorId(0);
-//                            }
-//                            break;
-//                        case "transactor_id":
-//                            try {
-//                                transsum.setTransactorId(rs.getLong("transactor_id"));
-//                            } catch (NullPointerException npe) {
-//                                transsum.setTransactorId(0);
-//                            }
-//                            break;
-//                        case "transaction_date":
-//                            try {
-//                                transsum.setTransactionDate(new Date(rs.getDate("transaction_date").getTime()));
-//                            } catch (NullPointerException | SQLException npe) {
-//                                transsum.setTransactionDate(null);
-//                            }
-//                            break;
-//                    }
-//                }
-//                try {
-//                    transsum.setCurrencyCode(rs.getString("currency_code"));
-//                } catch (NullPointerException npe) {
-//                    transsum.setCurrencyCode("");
-//                }
-//                try {
-//                    transsum.setGrandTotal(rs.getDouble("grand_total"));
-//                } catch (NullPointerException npe) {
-//                    transsum.setGrandTotal(0);
-//                }
-//                try {
-//                    transsum.setTotalProfitMargin(rs.getDouble("total_profit_margin"));
-//                } catch (NullPointerException npe) {
-//                    transsum.setTotalProfitMargin(0);
-//                }
-//                try {
-//                    transsum.setTotalVat(rs.getDouble("total_vat"));
-//                } catch (NullPointerException npe) {
-//                    transsum.setTotalVat(0);
-//                }
-//                try {
-//                    transsum.setCashDiscount(rs.getDouble("cash_discount"));
-//                } catch (NullPointerException npe) {
-//                    transsum.setCashDiscount(0);
-//                }
-//                this.TransListSummary.add(transsum);
-//            }
-//        } catch (SQLException se) {
-//            System.err.println(se.getMessage());
-//        }
     }
 
     public void refreshTransListChoice(int aChoiceId, long aTransactorId, int aLimit) {

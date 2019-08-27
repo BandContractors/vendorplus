@@ -1328,6 +1328,10 @@ public class NavigationBean implements Serializable {
     public String redirectToReportInventoryStock() {
         return "ReportInventoryStock?faces-redirect=true";
     }
+    
+    public String redirectToReportInventoryLedger() {
+        return "ReportInventoryLedger?faces-redirect=true";
+    }
 
     public String redirectToReportInventoryExpense() {
         return "ReportInventoryExpense?faces-redirect=true";

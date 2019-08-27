@@ -2,17 +2,24 @@ package beans;
 
 import connections.DBConnection;
 import entities.CompanySetting;
+import entities.Item;
 import entities.Stock;
 import entities.Stock_ledger;
+import entities.Trans;
+import entities.TransItem;
+import entities.Transactor;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
 
 /*
  * To change this template, choose Tools | Templates
@@ -29,8 +36,10 @@ public class Stock_ledgerBean implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String ActionMessage = null;
-    private List<Stock_ledger> Stock_ledgerObjectList;
+    private List<Stock_ledger> Stock_ledgerList;
     private Stock_ledger Stock_ledgerObj;
+    private Date Date1;
+    private Date Date2;
 
     public void setStock_ledgerFromResultset(Stock_ledger aStock_ledger, ResultSet aResultSet) {
         try {
@@ -103,6 +112,11 @@ public class Stock_ledgerBean implements Serializable {
                 aStock_ledger.setAdd_date(new Date(aResultSet.getTimestamp("add_date").getTime()));
             } catch (NullPointerException npe) {
                 aStock_ledger.setAdd_date(null);
+            }
+            try {
+                aStock_ledger.setQty_bal(aResultSet.getDouble("qty_bal"));
+            } catch (NullPointerException npe) {
+                aStock_ledger.setQty_bal(0);
             }
         } catch (SQLException se) {
             System.err.println(se.getMessage());
@@ -207,6 +221,13 @@ public class Stock_ledgerBean implements Serializable {
             } catch (NullPointerException npe) {
                 stockledger.setAdd_date(null);
             }
+            double qtybal = 0;
+            try {
+                qtybal = new StockBean().getStock(stockledger.getStore_id(), stockledger.getItem_id(), stockledger.getBatchno(), stockledger.getCode_specific(), stockledger.getDesc_specific()).getCurrentqty();
+            } catch (Exception e) {
+                qtybal = 0;
+            }
+            stockledger.setQty_bal(qtybal);
             //insert
             this.insertStock_ledger(stockledger);
         } catch (Exception e) {
@@ -217,8 +238,8 @@ public class Stock_ledgerBean implements Serializable {
     public void insertStock_ledger(Stock_ledger aStock_ledger) {
         String sql = "INSERT INTO stock_ledger"
                 + "(store_id,item_id,batchno,code_specific,desc_specific,specific_size,"
-                + "qty_added,qty_subtracted,transaction_type_id,action_type,transaction_id,user_detail_id,add_date)"
-                + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                + "qty_added,qty_subtracted,transaction_type_id,action_type,transaction_id,user_detail_id,add_date,qty_bal)"
+                + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -239,6 +260,7 @@ public class Stock_ledgerBean implements Serializable {
             } catch (NullPointerException npe) {
                 ps.setTimestamp(13, null);
             }
+            ps.setDouble(14, aStock_ledger.getQty_bal());
             ps.executeUpdate();
         } catch (Exception e) {
             System.err.println("insertStock_ledger:" + e.getMessage());
@@ -261,21 +283,159 @@ public class Stock_ledgerBean implements Serializable {
             aStock_ledger.setTransaction_id(0);
             aStock_ledger.setUser_detail_id(0);
             aStock_ledger.setAdd_date(null);
+            aStock_ledger.setQty_bal(0);
+            aStock_ledger.setDescription("");
+            aStock_ledger.setUnit_symbol("");
+            aStock_ledger.setTransaction_type_name("");
+            aStock_ledger.setUser_name("");
+            aStock_ledger.setStore_name("");
+        }
+    }
+
+    public void setDateToToday() {
+        Date CurrentServerDate = new CompanySetting().getCURRENT_SERVER_DATE();
+        this.setDate1(CurrentServerDate);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(this.getDate1());
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        // Put it back in the Date object  
+        this.setDate1(cal.getTime());
+
+        this.setDate2(CurrentServerDate);
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTime(this.getDate2());
+        cal2.set(Calendar.HOUR_OF_DAY, 23);
+        cal2.set(Calendar.MINUTE, 59);
+        cal2.set(Calendar.SECOND, 0);
+        cal2.set(Calendar.MILLISECOND, 0);
+        // Put it back in the Date object  
+        this.setDate2(cal2.getTime());
+    }
+
+    public void setDateToYesturday() {
+        Date CurrentServerDate = new CompanySetting().getCURRENT_SERVER_DATE();
+
+        this.setDate1(CurrentServerDate);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(this.getDate1());
+        cal.add(Calendar.DATE, -1);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        // Put it back in the Date object  
+        this.setDate1(cal.getTime());
+
+        this.setDate2(CurrentServerDate);
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTime(this.getDate2());
+        cal2.add(Calendar.DATE, -1);
+        cal2.set(Calendar.HOUR_OF_DAY, 23);
+        cal2.set(Calendar.MINUTE, 59);
+        cal2.set(Calendar.SECOND, 0);
+        cal2.set(Calendar.MILLISECOND, 0);
+        // Put it back in the Date object  
+        this.setDate2(cal2.getTime());
+    }
+
+    public void reportStock_ledgerDetail(Stock_ledger aStock_ledger, Stock_ledgerBean aStock_ledgerBean, Item aItem) {
+        aStock_ledgerBean.setActionMessage("");
+        ResultSet rs = null;
+        this.Stock_ledgerList = new ArrayList<>();
+        String sql = "SELECT l.*,i.description,un.unit_symbol,tt.transaction_type_name,us.user_name,s.store_name "
+                + "FROM stock_ledger l "
+                + "INNER JOIN item i ON l.item_id=i.item_id "
+                + "INNER JOIN unit un ON i.unit_id=un.unit_id "
+                + "INNER JOIN transaction_type tt ON l.transaction_type_id=tt.transaction_type_id "
+                + "INNER JOIN user_detail us ON l.user_detail_id=us.user_detail_id "
+                + "INNER JOIN store s ON l.store_id=s.store_id "
+                + "WHERE 1=1";
+        String wheresql = "";
+        String ordersql = "";
+        if (aStock_ledger.getStore_id() > 0) {
+            wheresql = wheresql + " AND l.store_id=" + aStock_ledger.getStore_id();
+        }
+        if (aStock_ledger.getTransaction_type_id() > 0) {
+            wheresql = wheresql + " AND l.transaction_type_id=" + aStock_ledger.getTransaction_type_id();
+        }
+        if (aStock_ledger.getUser_detail_id() > 0) {
+            wheresql = wheresql + " AND l.user_detail_id=" + aStock_ledger.getUser_detail_id();
+        }
+        try {
+            if (null != aItem && aItem.getItemId() > 0) {
+                wheresql = wheresql + " AND l.item_id=" + aItem.getItemId();
+            }
+        } catch (NullPointerException npe) {
+
+        }
+        if (aStock_ledgerBean.getDate1() != null && aStock_ledgerBean.getDate2() != null) {
+            wheresql = wheresql + " AND l.add_date BETWEEN '" + new java.sql.Timestamp(aStock_ledgerBean.getDate1().getTime()) + "' AND '" + new java.sql.Timestamp(aStock_ledgerBean.getDate2().getTime()) + "'";
+        }
+        ordersql = " ORDER BY l.add_date DESC,l.stock_ledger_id DESC";
+        sql = sql + wheresql + ordersql;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            Stock_ledger sl = null;
+            Stock_ledgerBean slb = new Stock_ledgerBean();
+            while (rs.next()) {
+                sl = new Stock_ledger();
+                slb.setStock_ledgerFromResultset(sl, rs);
+                sl.setDescription(rs.getString("description"));
+                sl.setUnit_symbol(rs.getString("unit_symbol"));
+                sl.setTransaction_type_name(rs.getString("transaction_type_name"));
+                sl.setUser_name(rs.getString("user_name"));
+                sl.setStore_name(rs.getString("store_name"));
+                this.Stock_ledgerList.add(sl);
+            }
+        } catch (Exception e) {
+            System.err.println("reportStock_ledgerDetail:" + e.getMessage());
+        }
+    }
+
+    public void initResetStock_ledgerDetail(Stock_ledger aStock_ledger, Stock_ledgerBean aStock_ledgerBean, Item aItem) {
+        if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
+            // Skip ajax requests.
+        } else {
+            this.resetStock_ledgerDetail(aStock_ledger, aStock_ledgerBean, aItem);
+        }
+    }
+
+    public void resetStock_ledgerDetail(Stock_ledger aStock_ledger, Stock_ledgerBean aStock_ledgerBean, Item aItem) {
+        aStock_ledgerBean.setActionMessage("");
+        try {
+            this.clearStock_ledger(aStock_ledger);
+        } catch (NullPointerException npe) {
+        }
+        try {
+            new ItemBean().clearItem(aItem);
+        } catch (NullPointerException npe) {
+        }
+        try {
+            //aStock_ledgerBean.setDate1(null);
+            //aStock_ledgerBean.setDate2(null);
+            this.setDateToToday();
+            aStock_ledgerBean.Stock_ledgerList.clear();
+        } catch (NullPointerException npe) {
         }
     }
 
     /**
-     * @return the Stock_ledgerObjectList
+     * @return the Stock_ledgerList
      */
-    public List<Stock_ledger> getStock_ledgerObjectList() {
-        return Stock_ledgerObjectList;
+    public List<Stock_ledger> getStock_ledgerList() {
+        return Stock_ledgerList;
     }
 
     /**
-     * @param Stock_ledgerObjectList the Stock_ledgerObjectList to set
+     * @param Stock_ledgerList the Stock_ledgerList to set
      */
-    public void setStock_ledgerObjectList(List<Stock_ledger> Stock_ledgerObjectList) {
-        this.Stock_ledgerObjectList = Stock_ledgerObjectList;
+    public void setStock_ledgerList(List<Stock_ledger> Stock_ledgerList) {
+        this.Stock_ledgerList = Stock_ledgerList;
     }
 
     /**
@@ -290,5 +450,47 @@ public class Stock_ledgerBean implements Serializable {
      */
     public void setStock_ledgerObj(Stock_ledger Stock_ledgerObj) {
         this.Stock_ledgerObj = Stock_ledgerObj;
+    }
+
+    /**
+     * @return the Date1
+     */
+    public Date getDate1() {
+        return Date1;
+    }
+
+    /**
+     * @param Date1 the Date1 to set
+     */
+    public void setDate1(Date Date1) {
+        this.Date1 = Date1;
+    }
+
+    /**
+     * @return the Date2
+     */
+    public Date getDate2() {
+        return Date2;
+    }
+
+    /**
+     * @param Date2 the Date2 to set
+     */
+    public void setDate2(Date Date2) {
+        this.Date2 = Date2;
+    }
+
+    /**
+     * @return the ActionMessage
+     */
+    public String getActionMessage() {
+        return ActionMessage;
+    }
+
+    /**
+     * @param ActionMessage the ActionMessage to set
+     */
+    public void setActionMessage(String ActionMessage) {
+        this.ActionMessage = ActionMessage;
     }
 }

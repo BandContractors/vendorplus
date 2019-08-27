@@ -32,6 +32,12 @@ public class Stock_ledger implements Serializable {
     private long transaction_id;
     private int user_detail_id;
     private Date add_date;
+    private double qty_bal;
+    private String description;
+    private String unit_symbol;
+    private String transaction_type_name;
+    private String user_name;
+    private String store_name;
 
     /**
      * @return the stock_ledger_id
@@ -227,5 +233,89 @@ public class Stock_ledger implements Serializable {
      */
     public void setAdd_date(Date add_date) {
         this.add_date = add_date;
+    }
+
+    /**
+     * @return the qty_bal
+     */
+    public double getQty_bal() {
+        return qty_bal;
+    }
+
+    /**
+     * @param qty_bal the qty_bal to set
+     */
+    public void setQty_bal(double qty_bal) {
+        this.qty_bal = qty_bal;
+    }
+
+    /**
+     * @return the description
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * @param description the description to set
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+     * @return the unit_symbol
+     */
+    public String getUnit_symbol() {
+        return unit_symbol;
+    }
+
+    /**
+     * @param unit_symbol the unit_symbol to set
+     */
+    public void setUnit_symbol(String unit_symbol) {
+        this.unit_symbol = unit_symbol;
+    }
+
+    /**
+     * @return the transaction_type_name
+     */
+    public String getTransaction_type_name() {
+        return transaction_type_name;
+    }
+
+    /**
+     * @param transaction_type_name the transaction_type_name to set
+     */
+    public void setTransaction_type_name(String transaction_type_name) {
+        this.transaction_type_name = transaction_type_name;
+    }
+
+    /**
+     * @return the user_name
+     */
+    public String getUser_name() {
+        return user_name;
+    }
+
+    /**
+     * @param user_name the user_name to set
+     */
+    public void setUser_name(String user_name) {
+        this.user_name = user_name;
+    }
+
+    /**
+     * @return the store_name
+     */
+    public String getStore_name() {
+        return store_name;
+    }
+
+    /**
+     * @param store_name the store_name to set
+     */
+    public void setStore_name(String store_name) {
+        this.store_name = store_name;
     }
 }
