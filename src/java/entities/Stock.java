@@ -62,6 +62,7 @@ public class Stock implements Serializable {
     private double qty_damage;
     private double qty_out;
     private double specific_size;
+    private String stock_type;
 
     /**
      * @return the StockId
@@ -635,5 +636,19 @@ public class Stock implements Serializable {
      */
     public void setSpecific_size(double specific_size) {
         this.specific_size = specific_size;
+    }
+
+    /**
+     * @return the stock_type
+     */
+    public String getStock_type() {
+        return stock_type;
+    }
+
+    /**
+     * @param stock_type the stock_type to set
+     */
+    public void setStock_type(String stock_type) {
+        this.stock_type = stock_type;
     }
 }

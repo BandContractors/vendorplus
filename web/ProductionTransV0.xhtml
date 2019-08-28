@@ -249,6 +249,7 @@
                                 <f:facet name="header">Batch</f:facet>
                                 <!-- row record -->
                                 <h:selectOneMenu id="menuBatchInputInside" value="#{ati.batchno}" style="width: 100px;">
+                                    <f:selectItem itemLabel="Select..." itemValue=""/>
                                     <f:selectItems value="#{stockBean.getStocks(generalUserSetting.getCurrentStore().getStoreId(),ati.inputItemId)}" var="ic2" itemLabel="#{ic2.batchno} #{ic2.codeSpecific} #{ic2.descSpecific}" itemValue="#{ic2.batchno}"/>
                                 </h:selectOneMenu>
                             </p:column>

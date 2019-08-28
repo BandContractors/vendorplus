@@ -58,6 +58,10 @@ public class Item implements Serializable {
     private int is_free;
     private int specify_size;
     private int size_to_specific_name;
+    private String stock_type;
+    private double qty_total;
+    private String stock_status;
+    private double stock_status_perc;
     
     /**
      * @return the ItemId
@@ -624,6 +628,62 @@ public class Item implements Serializable {
      */
     public void setSize_to_specific_name(int size_to_specific_name) {
         this.size_to_specific_name = size_to_specific_name;
+    }
+
+    /**
+     * @return the stock_type
+     */
+    public String getStock_type() {
+        return stock_type;
+    }
+
+    /**
+     * @param stock_type the stock_type to set
+     */
+    public void setStock_type(String stock_type) {
+        this.stock_type = stock_type;
+    }
+
+    /**
+     * @return the qty_total
+     */
+    public double getQty_total() {
+        return qty_total;
+    }
+
+    /**
+     * @param qty_total the qty_total to set
+     */
+    public void setQty_total(double qty_total) {
+        this.qty_total = qty_total;
+    }
+
+    /**
+     * @return the stock_status
+     */
+    public String getStock_status() {
+        return stock_status;
+    }
+
+    /**
+     * @param stock_status the stock_status to set
+     */
+    public void setStock_status(String stock_status) {
+        this.stock_status = stock_status;
+    }
+
+    /**
+     * @return the stock_status_perc
+     */
+    public double getStock_status_perc() {
+        return stock_status_perc;
+    }
+
+    /**
+     * @param stock_status_perc the stock_status_perc to set
+     */
+    public void setStock_status_perc(double stock_status_perc) {
+        this.stock_status_perc = stock_status_perc;
     }
 
 }

@@ -76,7 +76,7 @@
                 </p:commandButton>
             </h:panelGrid>
             <h:panelGrid id="pnlgMessage">
-                <p:outputLabel value="#{itemBean.actionMessage}" style="color: red;"/>
+                <p:outputLabel value="#{itemBean.actionMessage}" style="color: red;" rendered="false"/>
             </h:panelGrid>
             <p:dataTable id="tblDetail" tableStyle="width:auto;" var="itm" value="#{itemBean.itemsList}" 
                          paginator="true" rows="50" 

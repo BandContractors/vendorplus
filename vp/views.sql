@@ -282,6 +282,61 @@ CREATE OR REPLACE VIEW view_inventory_asset AS
 	INNER JOIN unit u ON i.unit_id=u.unit_id 
 	LEFT JOIN sub_category sc ON i.sub_category_id=sc.sub_category_id;
 
+CREATE OR REPLACE VIEW view_inventory_in AS
+	SELECT 1 as stock_type_order,'Goods for Sale' as stock_type,
+	s.*,i.item_code,i.description,i.currency_code,i.reorder_level,i.category_id,i.sub_category_id,
+	s.unit_cost as unit_cost_price,i.unit_retailsale_price,i.unit_wholesale_price,
+	t.store_name,c.category_name,u.unit_name,u.unit_symbol,sc.sub_category_name,
+	0 as cost_value,0 as retailsale_value,0 as wholesale_value 
+	FROM stock s 
+	INNER JOIN item i ON s.item_id=i.item_id AND i.is_sale=1 AND i.is_asset=0 AND i.is_track=1 
+	INNER JOIN store t ON s.store_id=t.store_id 
+	INNER JOIN category c ON i.category_id=c.category_id 
+	INNER JOIN unit u ON i.unit_id=u.unit_id 
+	LEFT JOIN sub_category sc ON i.sub_category_id=sc.sub_category_id 
+UNION ALL 
+	SELECT  2 as stock_type_order,i.expense_type as stock_type,
+	s.*,i.item_code,i.description,i.currency_code,i.reorder_level,i.category_id,i.sub_category_id,
+	s.unit_cost as unit_cost_price,i.unit_retailsale_price,i.unit_wholesale_price,
+	t.store_name,c.category_name,u.unit_name,u.unit_symbol,sc.sub_category_name,
+	0 as cost_value,0 as retailsale_value,0 as wholesale_value 
+	FROM stock s 
+	INNER JOIN item i ON s.item_id=i.item_id AND i.is_sale=0 AND i.is_asset=0 AND i.is_track=1 AND i.is_buy=1 
+	INNER JOIN store t ON s.store_id=t.store_id 
+	INNER JOIN category c ON i.category_id=c.category_id 
+	INNER JOIN unit u ON i.unit_id=u.unit_id 
+	LEFT JOIN sub_category sc ON i.sub_category_id=sc.sub_category_id;
+
+CREATE OR REPLACE VIEW view_inventory_low_out AS
+	SELECT 1 as stock_type_order,'Goods for Sale' as stock_type,i.*,
+	(select ifnull(sum(s.currentqty),0) from stock s where s.item_id=i.item_id) as qty_total,
+	c.category_name,u.unit_symbol,sc.sub_category_name 
+	FROM item i  
+	INNER JOIN category c ON i.category_id=c.category_id 
+	INNER JOIN unit u ON i.unit_id=u.unit_id 
+	LEFT JOIN sub_category sc ON i.sub_category_id=sc.sub_category_id 
+	WHERE i.is_sale=1 AND i.is_asset=0 AND i.is_track=1
+UNION ALL 
+	SELECT  2 as stock_type_order,i.expense_type as stock_type,i.*,
+	(select ifnull(sum(s.currentqty),0) from stock s where s.item_id=i.item_id) as qty_total,
+	c.category_name,u.unit_symbol,sc.sub_category_name 
+	FROM item i  
+	INNER JOIN category c ON i.category_id=c.category_id 
+	INNER JOIN unit u ON i.unit_id=u.unit_id 
+	LEFT JOIN sub_category sc ON i.sub_category_id=sc.sub_category_id 
+	WHERE i.is_sale=0 AND i.is_asset=0 AND i.is_track=1 AND i.is_buy=1;
+
+CREATE OR REPLACE VIEW view_inventory_low_out_vw AS 
+	SELECT v.*,
+	CASE
+		WHEN v.reorder_level=0 THEN 'No Reorder Level' 
+		WHEN v.reorder_level>0 and v.qty_total<=0 THEN 'Out of Stock' 
+		WHEN v.reorder_level>0 and v.qty_total<=v.reorder_level THEN 'Low Stock'  
+		WHEN v.reorder_level>0 and v.qty_total>v.reorder_level THEN 'Stocked'  
+		ELSE ''
+	END as stock_status 
+FROM view_inventory_low_out v;
+
 CREATE OR REPLACE VIEW view_item_detail_stock AS
 	SELECT i.*,c.category_name,sc.sub_category_name,u.unit_symbol 
 	FROM item i 

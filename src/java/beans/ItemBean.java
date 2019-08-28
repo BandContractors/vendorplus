@@ -669,6 +669,21 @@ public class ItemBean implements Serializable {
             } catch (NullPointerException npe) {
                 aItem.setSize_to_specific_name(0);
             }
+            try {
+                aItem.setStock_type(aResultSet.getString("stock_type"));
+            } catch (Exception e) {
+                aItem.setStock_type("");
+            }
+            try {
+                aItem.setQty_total(aResultSet.getDouble("qty_total"));
+            } catch (Exception e) {
+                aItem.setQty_total(0);
+            }
+            try {
+                aItem.setStock_status(aResultSet.getString("stock_status"));
+            } catch (Exception e) {
+                aItem.setStock_status("");
+            }
         } catch (SQLException se) {
             System.err.println("setItemFromResultsetReport:" + se.getMessage());
         }
@@ -1851,6 +1866,138 @@ public class ItemBean implements Serializable {
         }
     }
 
+    public void reportItemStockLowOut(String aItemType, int aCategoryId, int aSubCategoryId, String aCurrency, int aIsGeneral, String aStockType) {
+        String sql = "SELECT * FROM view_inventory_low_out_vw WHERE is_suspended='No'";
+        String sqlsum = "SELECT stock_status,count(*) as qty_total FROM view_inventory_low_out_vw WHERE is_suspended='No'";
+        String wheresql = "";
+        String ordersql = " ORDER BY stock_type_order,stock_type,description ASC";
+        String ordersqlsum = " ORDER BY qty_total DESC";
+        String groupbysum = " GROUP BY stock_status";
+        ResultSet rs = null;
+        ResultSet rs2 = null;
+        this.setItemsList(new ArrayList<>());
+        this.setItemsSummary(new ArrayList<>());
+        if (aStockType.length() > 0) {
+            wheresql = wheresql + " AND stock_type='" + aStockType + "'";
+        }
+        if (aItemType.length() > 0) {
+            wheresql = wheresql + " AND item_type='" + aItemType + "'";
+        }
+        if (aCategoryId > 0) {
+            wheresql = wheresql + " AND category_id=" + aCategoryId;
+        }
+        if (aSubCategoryId > 0) {
+            wheresql = wheresql + " AND sub_category_id=" + aSubCategoryId;
+        }
+        if (aCurrency.length() > 0) {
+            wheresql = wheresql + " AND currency_code='" + aCurrency + "'";
+        }
+        if (aIsGeneral == 10) {
+            wheresql = wheresql + " AND is_general=0";
+        }
+        if (aIsGeneral == 11) {
+            wheresql = wheresql + " AND is_general=1";
+        }
+        sql = sql + wheresql + ordersql;
+        sqlsum = sqlsum + wheresql + groupbysum + ordersqlsum;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            Item item = null;
+            while (rs.next()) {
+                item = new Item();
+                this.setItemFromResultsetReport(item, rs);
+                this.getItemsList().add(item);
+            }
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+        }
+
+        //summary
+        double totalitems = this.getItemsList().size();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps2 = conn.prepareStatement(sqlsum);) {
+            rs2 = ps2.executeQuery();
+            Item item2 = null;
+            while (rs2.next()) {
+                item2 = new Item();
+                try {
+                    item2.setStock_status(rs2.getString("stock_status"));
+                } catch (NullPointerException npe) {
+                    item2.setStock_status("");
+                }
+                try {
+                    item2.setQty_total(rs2.getDouble("qty_total"));
+                } catch (NullPointerException npe) {
+                    item2.setQty_total(0);
+                }
+                if (totalitems > 0) {
+                    item2.setStock_status_perc(100.0 * item2.getQty_total() / totalitems);
+                }
+                this.getItemsSummary().add(item2);
+            }
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+        }
+    }
+
+//    public void reportItemStockLowOut(String aItemType, int aCategoryId, int aSubCategoryId, String aCurrency, int aIsGeneral, String aStockType) {
+//        String sql = "SELECT * FROM view_inventory_low_out WHERE is_suspended='No'";
+//        String wheresql = "";
+//        String ordersql = "";
+//        ResultSet rs = null;
+//        this.setItemsList(new ArrayList<>());
+//        this.setItemsSummary(new ArrayList<>());
+//        if (aStockType.length() > 0) {
+//            wheresql = wheresql + " AND stock_type='" + aStockType + "'";
+//        }
+//        if (aItemType.length() > 0) {
+//            wheresql = wheresql + " AND item_type='" + aItemType + "'";
+//        }
+//        if (aCategoryId > 0) {
+//            wheresql = wheresql + " AND category_id=" + aCategoryId;
+//        }
+//        if (aSubCategoryId > 0) {
+//            wheresql = wheresql + " AND sub_category_id=" + aSubCategoryId;
+//        }
+//        if (aCurrency.length() > 0) {
+//            wheresql = wheresql + " AND currency_code='" + aCurrency + "'";
+//        }
+//        if (aIsGeneral == 10) {
+//            wheresql = wheresql + " AND is_general=0";
+//        }
+//        if (aIsGeneral == 11) {
+//            wheresql = wheresql + " AND is_general=1";
+//        }
+//        ordersql = " ORDER BY stock_type_order,stock_type,description ASC";
+//        sql = sql + wheresql + ordersql;
+//        try (
+//                Connection conn = DBConnection.getMySQLConnection();
+//                PreparedStatement ps = conn.prepareStatement(sql);) {
+//            rs = ps.executeQuery();
+//            Item item = null;
+//            while (rs.next()) {
+//                item = new Item();
+//                this.setItemFromResultsetReport(item, rs);
+//                if (item.getReorderLevel() == 0) {
+//                    item.setStock_status("No Reorder Level");
+//                } else if (item.getReorderLevel() > 0 && item.getQty_total() <= 0) {
+//                    item.setStock_status("Out of Stock");
+//                } else if (item.getReorderLevel() > 0 && item.getQty_total() <= item.getReorderLevel()) {
+//                    item.setStock_status("Low Stock");
+//                } else if (item.getReorderLevel() > 0 && item.getQty_total() > item.getReorderLevel()) {
+//                    item.setStock_status("Stocked");
+//                } else {
+//                    item.setStock_status("");
+//                }
+//                this.getItemsList().add(item);
+//            }
+//        } catch (SQLException se) {
+//            System.err.println(se.getMessage());
+//        }
+//    }
     public void initItemObj() {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.

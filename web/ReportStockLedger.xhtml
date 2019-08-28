@@ -152,7 +152,10 @@
                     <h:outputLabel value="#{itm.transaction_type_name} "/>
                 </p:column>
                 <p:column headerText="Item Description">
-                    <h:outputLabel value="#{itm.description}"/>
+                    #{itm.description}
+                    #{itm.batchno}
+                    #{itm.code_specific}
+                    #{itm.desc_specific}
                 </p:column>
                 <p:column headerText="Unit">
                     <h:outputLabel value="#{itm.unit_symbol}"/>
