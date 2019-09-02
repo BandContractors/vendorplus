@@ -1970,8 +1970,10 @@ public class TransBean implements Serializable {
                     //save trans items
                     trans.setStoreId(VARCHAR);
                     TransItemBean tib = new TransItemBean();
-                    if (trans.getTransactionTypeId() == 16 || trans.getTransactionTypeId() == 18) {//Journal Entry, Cash Transfer
+                    if (trans.getTransactionTypeId() == 16) {//Journal Entry
                         tib.saveTransItemsJournalEntry(trans, aActiveTransItems, trans.getTransactionId());
+                    } else if (trans.getTransactionTypeId() == 18) {//Cash Transfer
+                        tib.saveTransItemsCashTransfer(trans, aActiveTransItems, trans.getTransactionId());
                     } else {
                         tib.saveTransItemsCEC(aStoreId, aTransTypeId, aTransReasonId, aSaleType, trans, aActiveTransItems, trans.getTransactionId());
                     }

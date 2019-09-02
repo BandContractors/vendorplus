@@ -23,7 +23,6 @@
     <f:event listener="#{navigationBean.checkCurrentPage('CASH TRANSFER','','')}" type="preRenderView" />
     <f:event listener="#{statusBean.initClearStatus()}" type="preRenderView" />
     <f:metadata>
-        <f:viewAction action="#{accCurrencyBean.refreshCurrencyListActive()}"/>
         <f:viewAction action="#{navigationBean.checkAccessDenied('41', 'View')}"/>
         <f:viewAction action="#{navigationBean.checkLicenseExpired()}"/>
         <f:viewAction action="#{transBean.initClearAll(trans,transItemBean.activeTransItems,transItem,itemBean.selectedItem,transactorBean.selectedTransactor,2,transItemBean.selectedAccCoa)}"/>
@@ -46,34 +45,68 @@
             <h:panelGrid styleClass="clsGridMainInput" columns="8">
                 <h:outputLabel  value="From:"/>
                 <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}" style="width: 170px;"/>
-                <h:outputLabel  value="Currency:"/>
-                <h:selectOneMenu styleClass="clsMenu" id="menuCurrency" value="#{trans.currencyCode}">
-                    <f:selectItem itemLabel="" itemValue=""/>
-                    <f:selectItems value="#{accCurrencyBean.currencyList}" var="ac" itemLabel="#{ac.currencyCode}" itemValue="#{ac.currencyCode}"/>
-                    <f:ajax event="change" execute="@form" render="@form"/>
-                </h:selectOneMenu>
                 <h:outputLabel  value="Tranfer Date:"/>
                 <p:calendar styleClass="clsInput" id="calTransactionDate" pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.transactionDate}" size="10"/> 
                 <h:outputLabel  value="Transfer Ref:"/>
                 <h:inputText styleClass="clsInput" id="itxtTransactionRef" value="#{trans.transactionRef}" autocomplete="off" style="width: 170px;"/>
             </h:panelGrid>
-            <h:panelGrid id="gridTransItem" styleClass="clsGridMainInput" columns="4">
-                <h:outputLabel styleClass="clsLabelTransItem" value="From.Account"/>
-                <h:outputLabel styleClass="clsLabelTransItem" value="To.Account"/>
-                <h:outputLabel styleClass="clsLabelTransItem" value="Transfer.Amount"/>
-                <h:outputLabel styleClass="clsLabelTransItem" value="Narration"/>
-                <h:selectOneMenu styleClass="clsMenu" id="menuChildAcc1" value="#{transItem.accountCode}" style="width: 240px">
-                    <f:selectItem itemLabel="" itemValue=""/>
-                    <f:selectItems value="#{accChildAccountBean.getAccChildAccountsByCurrencyParentStartWith(trans.currencyCode,'1-00-000')}" var="ea" itemLabel="#{ea.childAccountName}" itemValue="#{ea.childAccountCode}"/>
-                </h:selectOneMenu>
-                <h:selectOneMenu styleClass="clsMenu" id="menuChildAcc2" value="#{transItem.codeSpecific}" style="width: 240px">
-                    <f:selectItem itemLabel="" itemValue=""/>
-                    <f:selectItems value="#{accChildAccountBean.getAccChildAccountsByCurrencyParentStartWith(trans.currencyCode,'1-00-000')}" var="ea" itemLabel="#{ea.childAccountName}" itemValue="#{ea.childAccountCode}"/>
-                </h:selectOneMenu>
-                <h:inputText id="itxtTransferAmount" style="width: 140px" value="#{transItem.amountExcVat}" autocomplete="off">
-                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                </h:inputText>
-                <h:inputText id="itxtNarration" value="#{transItem.narration}" autocomplete="off" style="width: 170px;"/>
+            <h:panelGrid id="gridTransItem" styleClass="clsGridMainInput" columns="3">
+                <h:panelGrid id="pnlFromAcc" columns="2" styleClass="red" style="text-align: right;">
+                    <h:outputLabel value="From Account:"/>
+                    <h:selectOneMenu styleClass="clsMenu" id="menuChildAcc1" value="#{transItem.accountCode}" style="width: 180px">
+                        <f:selectItem itemLabel="" itemValue=""/>
+                        <f:selectItems value="#{accChildAccountBean.getAccChildAccountsByParentStartWith('1-00-000')}" var="ea" itemLabel="#{ea.childAccountName}" itemValue="#{ea.childAccountCode}"/>
+                        <f:ajax event="change" listener="#{accLedgerBean.refreshBalancesXrate(transItem)}" execute="@form" render="menuCurrency1 itxtBalance1 pnlXrate itxtAmountTo"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel value="Currency:"/>
+                    <h:selectOneMenu styleClass="clsMenu" id="menuCurrency1" value="#{transItem.batchno}" style="width: 180px">
+                        <f:selectItem itemLabel="" itemValue=""/>
+                        <f:selectItems value="#{accCurrencyBean.getAccCurrenciesActiveByChildAccount(transItem.accountCode)}" var="ac" itemLabel="#{ac.currencyCode}" itemValue="#{ac.currencyCode}"/>
+                        <f:ajax event="change" listener="#{accLedgerBean.refreshBalancesXrate(transItem)}" execute="@form" render="itxtBalance1 pnlXrate itxtAmountTo"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel value="Currency Balance:"/>
+                    <h:inputText id="itxtBalance1" value="#{transItem.unitPrice}" autocomplete="off" style="width: 176px;" disabled="true">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:inputText>
+                    <h:outputLabel value="Amount from Account:"/>
+                    <h:inputText id="itxtAmountFrom" value="#{transItem.amountIncVat}" autocomplete="off" style="width: 176px;">
+                        <f:ajax event="change" listener="#{accLedgerBean.refreshBalancesXrate(transItem)}" execute="@form" render="itxtAmountTo pnlXrate"/>
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:inputText>
+                </h:panelGrid>
+                <h:panelGrid id="pnlToAcc" columns="2" styleClass="green" style="text-align: right;">
+                    <h:outputLabel value="To Account:"/>
+                    <h:selectOneMenu styleClass="clsMenu" id="menuChildAcc2" value="#{transItem.codeSpecific}" style="width: 180px">
+                        <f:selectItem itemLabel="" itemValue=""/>
+                        <f:selectItems value="#{accChildAccountBean.getAccChildAccountsByParentStartWith('1-00-000')}" var="ea" itemLabel="#{ea.childAccountName}" itemValue="#{ea.childAccountCode}"/>
+                        <f:ajax event="change" listener="#{accLedgerBean.refreshBalancesXrate(transItem)}" execute="@form" render="menuCurrency2 itxtBalance2 pnlXrate itxtAmountTo"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel value="Currency:"/>
+                    <h:selectOneMenu styleClass="clsMenu" id="menuCurrency2" value="#{transItem.descSpecific}" style="width: 180px">
+                        <f:selectItem itemLabel="" itemValue=""/>
+                        <f:selectItems value="#{accCurrencyBean.getAccCurrenciesActiveByChildAccount(transItem.codeSpecific)}" var="ac" itemLabel="#{ac.currencyCode}" itemValue="#{ac.currencyCode}"/>
+                        <f:ajax event="change" listener="#{accLedgerBean.refreshBalancesXrate(transItem)}" execute="@form" render="itxtBalance2 pnlXrate itxtAmountTo"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel value="Currency Balance:"/>
+                    <h:inputText id="itxtBalance2" value="#{transItem.unitPrice2}" autocomplete="off" style="width: 176px;" disabled="true">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:inputText>
+                    <h:outputLabel value="Amount to Account:"/>
+                    <h:inputText id="itxtAmountTo" style="width: 176px" value="#{transItem.amountExcVat}" autocomplete="off">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:inputText>
+                </h:panelGrid>
+                <h:panelGrid id="pnlXrate" columns="2" styleClass="amber" style="text-align: right;">
+                    <h:outputLabel value="Exchange Rate:"/>
+                    <h:inputText id="itxtXrate" value="#{transItem.vatPerc}" autocomplete="off" style="width: 180px;">
+                        <f:ajax event="change" listener="#{accLedgerBean.refreshXrate(transItem)}" execute="@form" render="itxtAmountTo itxtFactor"/>
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:inputText>
+                    <h:outputLabel value="Multiply Factor:"/>
+                    <h:inputText id="itxtFactor" value="#{transItem.depRate}" autocomplete="off" style="width: 180px;" disabled="true"/>
+                    <h:outputLabel value="Narration:"/>
+                    <h:inputText id="itxtNarration" value="#{transItem.narration}" autocomplete="off" style="width: 180px;"/>
+                </h:panelGrid>
             </h:panelGrid>
             <h:panelGrid id="gridItemCommands" styleClass="clsGridMainInput" columns="7">
                 <h:commandButton styleClass="clsButtonMedium" value="Add Item (ALT+A)" accesskey="a" >
@@ -104,6 +137,15 @@
                     <p:outputLabel value="#{ati.accountCode} "/>
                     <p:outputLabel value="#{accChildAccountBean.getAccChildAccByCode(ati.accountCode).childAccountName}"/>
                 </p:column>
+                <p:column style="text-align: right;">
+                    <!-- column header -->
+                    <f:facet name="header">Amount from Account</f:facet>
+                    <!-- row record -->
+                    #{ati.batchno} 
+                    <h:outputLabel value="#{ati.amountIncVat}">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputLabel>
+                </p:column>
                 <p:column>
                     <!-- column header -->
                     <f:facet name="header">To Account</f:facet>
@@ -111,10 +153,11 @@
                     <p:outputLabel value="#{ati.codeSpecific} "/>
                     <p:outputLabel value="#{accChildAccountBean.getAccChildAccByCode(ati.codeSpecific).childAccountName}"/>
                 </p:column>
-                <p:column>
+                <p:column style="text-align: right;">
                     <!-- column header -->
-                    <f:facet name="header">Transfer Amount</f:facet>
+                    <f:facet name="header">Amount to Account</f:facet>
                     <!-- row record -->
+                    #{ati.descSpecific} 
                     <h:outputLabel value="#{ati.amountExcVat}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
@@ -135,13 +178,6 @@
 
                 </p:column> 
             </p:dataTable>
-
-            <h:panelGrid id="pgrdTotals" styleClass="clsGridMainInput" columns="2">
-                <h:outputLabel styleClass="clsLabelTransItem" value="Total Transfer Amount:"/>
-                <h:inputText id="itxtTotalDebit" value="#{trans.totalDebit}" styleClass="clsInputTransItem" style="width: 150px" disabled="true">
-                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                </h:inputText>
-            </h:panelGrid>
             <h:panelGrid styleClass="clsGridMainCommands" columns="1">
                 <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
                     <p:commandButton styleClass="clsButtonBig" id="cmdbSave" value="SAVE (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">

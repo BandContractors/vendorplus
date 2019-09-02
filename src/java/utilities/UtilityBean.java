@@ -18,6 +18,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.faces.bean.*;
 import sessions.GeneralUserSetting;
 
@@ -26,6 +28,16 @@ import sessions.GeneralUserSetting;
 public class UtilityBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    private Pattern pattern;
+    private Matcher matcher;
+    private static final String TIME24HOURS_PATTERN = "([01]?[0-9]|2[0-3]):[0-5][0-9]";
+
+    public boolean isTime24Hour(String time) {
+        pattern = Pattern.compile(TIME24HOURS_PATTERN);
+        matcher = pattern.matcher(time);
+        return matcher.matches();
+    }
 
     public static String combineTwoStr(String aStr1, String aStr2, int aBracket) {
         String CombStr = "";
@@ -189,66 +201,11 @@ public class UtilityBean implements Serializable {
     }
 
 //    public static void main(String[] args) {
-//        try {
-//            ////        // TODO code application logic here
-////
-////        java.util.Calendar calendar = new GregorianCalendar();
-////        Date trialTime = new CompanySetting().getCURRENT_SERVER_DATE();
-////        calendar.setTime(trialTime);
-////        System.out.println("Time Second:" + (calendar.get(java.util.Calendar.SECOND)));
-////        System.out.println("Time Minute:" + (calendar.get(java.util.Calendar.MINUTE)));
-////        System.out.println("Time Hour:" + (calendar.get(java.util.Calendar.HOUR)));
-////        System.out.println("Time Hour:" + (calendar.get(java.util.Calendar.HOUR_OF_DAY)));
-////        System.out.println("Week number:" + (calendar.get(java.util.Calendar.WEEK_OF_YEAR)));
-////        System.out.println("Day of week number:" + (calendar.get(java.util.Calendar.DAY_OF_WEEK)));
-////        System.out.println("Day of month number:" + (calendar.get(java.util.Calendar.DAY_OF_MONTH)));
-////        System.out.println("Month number:" + (calendar.get(java.util.Calendar.MONTH)));
-////        System.out.println("Year number:" + (calendar.get(java.util.Calendar.YEAR)));
-////
-////        String input = "20171231";
-////        String format = "yyyyMMdd";
-////        try {
-////            SimpleDateFormat df = new SimpleDateFormat(format);
-////            Date date = df.parse(input);
-////            java.util.Calendar cal = java.util.Calendar.getInstance();
-////            cal.setTime(date);
-////            int week = cal.get(java.util.Calendar.WEEK_OF_YEAR);
-////            int year = cal.get(java.util.Calendar.YEAR);
-////            int day = cal.get(java.util.Calendar.DAY_OF_MONTH);
-////
-////            System.out.println("Input " + input + " is in week " + week);
-////            System.out.println("Input " + input + " is in year " + year);
-////            System.out.println("Input " + input + " is in day " + day);
-////            System.out.println("Month=" + new DateTime().withWeekyear(2017).withWeekOfWeekyear(2).getMonthOfYear());
-////            //return week;
-////        } catch (ParseException e) {
-////            System.out.println("Could not find a week in " + input);
-////            //return 0;
-////        }
-//        String transno="";
-//        int curdayno=0;
-//        int NewDayNo=curdayno+1;
-//        //logic basing on the transaction type - number format
-//        //X
-//        String X=String.format("%04d", NewDayNo);
-//        //Y M D
-//        java.util.Calendar calendar = new GregorianCalendar();
-//        Date aDate = new CompanySetting().getCURRENT_SERVER_DATE();
-//        calendar.setTime(aDate);
-//        int d=calendar.get(java.util.Calendar.DAY_OF_MONTH);
-//        String D=String.format("%02d", d);
-//        int m=calendar.get(java.util.Calendar.MONTH) + 1;
-//        String M=String.format("%02d", m);
-//        int y=calendar.get(java.util.Calendar.YEAR);
-//        Format formatter = new SimpleDateFormat("YY");
-//        String Y=formatter.format(aDate);
-//        transno=Y + M + D + X;
-//            new DBConnection().readConnectionConfigurations("configurations.ConfigFile");
-//        } catch (FileNotFoundException ex) {
-//            Logger.getLogger(UtilityBean.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//        new UtilityBean().convertDateUserToDbTz(new CompanySetting().getCURRENT_SERVER_DATE());
+//        System.out.println(new UtilityBean().isTime24Hour("6:00"));
+//        String[] hm = "6:00".split(":", 2);
+//        System.out.println("H:" + hm[0] + " M:" + hm[1]);
 //    }
+
     public int countIntegers(String input) {
         int count = 0;
         boolean isPreviousDigit = false;
@@ -588,4 +545,38 @@ public class UtilityBean implements Serializable {
 ////        System.out.println("0:" + container.get(0));
 ////        System.out.println("1:" + container.get(1));
 //    }
+    /**
+     * @return the pattern
+     */
+    public Pattern getPattern() {
+        return pattern;
+    }
+
+    /**
+     * @param pattern the pattern to set
+     */
+    public void setPattern(Pattern pattern) {
+        this.pattern = pattern;
+    }
+
+    /**
+     * @return the matcher
+     */
+    public Matcher getMatcher() {
+        return matcher;
+    }
+
+    /**
+     * @param matcher the matcher to set
+     */
+    public void setMatcher(Matcher matcher) {
+        this.matcher = matcher;
+    }
+
+    /**
+     * @return the TIME24HOURS_PATTERN
+     */
+    public static String getTIME24HOURS_PATTERN() {
+        return TIME24HOURS_PATTERN;
+    }
 }

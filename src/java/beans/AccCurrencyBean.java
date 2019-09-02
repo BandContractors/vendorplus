@@ -324,6 +324,36 @@ public class AccCurrencyBean implements Serializable {
         return acs;
     }
 
+    public List<AccCurrency> getAccCurrenciesActiveByChildAccount(String aChildAccountCode) {
+        String AndCurrency = "";
+        String AccountCurrencyCode = "";
+        try {
+            AccountCurrencyCode = new AccChildAccountBean().getAccChildAccByCode(aChildAccountCode).getCurrencyCode();
+            if (AccountCurrencyCode.length() > 0) {
+                AndCurrency = " AND currency_code='" + AccountCurrencyCode + "'";
+            }
+        } catch (Exception e) {
+            AccountCurrencyCode = "";
+        }
+        String sql;
+        sql = "SELECT * FROM acc_currency WHERE is_deleted=0 AND is_Active=1" + AndCurrency + " ORDER BY is_local_currency DESC,currency_code ASC";
+        ResultSet rs = null;
+        List<AccCurrency> acs = new ArrayList<AccCurrency>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                AccCurrency ac = new AccCurrency();
+                this.setAccCurrencyFromResultset(ac, rs);
+                acs.add(ac);
+            }
+        } catch (Exception e) {
+            System.err.println("getAccCurrenciesActiveByAccount:" + e.getMessage());
+        }
+        return acs;
+    }
+
     public void initCurrencyList() {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.

@@ -19,7 +19,7 @@ alter table snapshot_stock_value add column store_id int(11);
 create table stock_ledger (stock_ledger_id bigint(20) not null auto_increment, store_id int(11), item_id bigint(20), batchno varchar(100), code_specific varchar(50), desc_specific varchar(100), specific_size double default 1, qty_added double, qty_subtracted double, transaction_type_id int(11), action_type varchar(20), transaction_id bigint(20), user_detail_id int(11), add_date datetime null, primary key (stock_ledger_id));
 alter table stock_ledger add column qty_bal double;
 INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value) VALUES ('40', 'COMPANY_SETTING', 'QUOTATION_VERSION', '0');
-INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) VALUES ('41', 'SNAPSHOT', 'DAILY_SNAPSHOT_TIME', '1','0:server_start,1:first_login,2:specific_time_e.g_00:00');
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) VALUES ('41', 'SNAPSHOT', 'DAILY_SNAPSHOT_TIME', '1','0:server_start,1:first_login,specific_time_e.g_00:00');
 
 
 

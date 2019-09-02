@@ -449,6 +449,34 @@ public class AccChildAccountBean implements Serializable {
         }
         return cas;
     }
+    
+    public List<AccChildAccount> getAccChildAccountsByParentStartWith(String aParentCodeStartWith) {
+        String sql;
+        sql = "SELECT * FROM acc_child_account WHERE (acc_coa_account_code LIKE '" + aParentCodeStartWith + "%')  AND is_active=1 AND is_deleted=0";
+        ResultSet rs = null;
+        List<AccChildAccount> cas = new ArrayList<AccChildAccount>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                AccChildAccount ca = new AccChildAccount();
+                this.setAccChildAccountFromResultset(ca, rs);
+                cas.add(ca);
+            }
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.err.println(ex.getMessage());
+                }
+            }
+        }
+        return cas;
+    }
 
     public List<AccChildAccount> getAccChildAccountsForCashReceipt(String aCurrencyCode, int aPayMethodId, int aStoreId, int aUserDetailId) {
         String ParentAccCode;

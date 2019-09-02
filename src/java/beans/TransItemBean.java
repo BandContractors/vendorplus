@@ -170,6 +170,17 @@ public class TransItemBean implements Serializable {
         }
     }
 
+    public void saveTransItemsCashTransfer(Trans aTrans, List<TransItem> aActiveTransItems, long TransactionId) {
+        List<TransItem> ati = aActiveTransItems;
+        int ListItemIndex = 0;
+        int ListItemNo = ati.size();
+        while (ListItemIndex < ListItemNo) {
+            ati.get(ListItemIndex).setTransactionId(TransactionId);
+            this.saveTransItemCashTransfer(aTrans, ati.get(ListItemIndex));
+            ListItemIndex = ListItemIndex + 1;
+        }
+    }
+
     public void saveTransItem(Trans aTrans, TransItem transitem) {
         String sql = null;
         String sql2 = null;
@@ -1549,6 +1560,160 @@ public class TransItemBean implements Serializable {
         }
     }
 
+    public void saveTransItemCashTransfer(Trans aTrans, TransItem transitem) {
+        String sql = null;
+        String sql2 = null;
+        String msg = "";
+        TransactionTypeBean TransTypeBean = new TransactionTypeBean();
+        TransactionType TransType = new TransactionType();
+        StockBean StkBean = new StockBean();
+
+        if (1 == 2) {
+        } else {
+
+            if (transitem.getTransactionItemId() == 0) {
+                sql = "{call sp_insert_transaction_item(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            } else if (transitem.getTransactionItemId() > 0) {
+                sql = "{call sp_update_transaction_item(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            }
+
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    CallableStatement cs = conn.prepareCall(sql);) {
+                if (transitem.getTransactionItemId() == 0) {
+                    cs.setString("in_is_trade_discount_vat_liable", CompanySetting.getIsTradeDiscountVatLiable());
+                    cs.setLong("in_transaction_id", transitem.getTransactionId());
+                    cs.setLong("in_item_id", 0);
+                    cs.setString("in_batchno", transitem.getBatchno());
+                    cs.setDate("in_item_expiry_date", null);
+                    cs.setDate("in_item_mnf_date", null);
+                    cs.setDouble("in_item_qty", transitem.getItemQty());
+                    cs.setDouble("in_unit_price", transitem.getUnitPrice());
+                    cs.setDouble("in_unit_trade_discount", transitem.getUnitTradeDiscount());
+                    cs.setDouble("in_unit_vat", transitem.getUnitVat());
+                    cs.setDouble("in_amount", transitem.getAmount());
+                    cs.setString("in_vat_rated", transitem.getVatRated());
+                    cs.setDouble("in_vat_perc", transitem.getVatPerc());
+                    cs.setDouble("in_unit_price_inc_vat", transitem.getUnitPriceIncVat());
+                    cs.setDouble("in_unit_price_exc_vat", transitem.getUnitPriceExcVat());
+                    cs.setDouble("in_amount_inc_vat", transitem.getAmountIncVat());
+                    cs.setDouble("in_amount_exc_vat", transitem.getAmountExcVat());
+                    cs.setString("in_stock_effect", "");
+                    //for profit margin
+                    cs.setDouble("in_unit_cost_price", transitem.getUnitCostPrice());
+                    cs.setDouble("in_unit_profit_margin", transitem.getUnitProfitMargin());
+                    //for user earning
+                    cs.setDouble("in_earn_perc", 0);
+                    cs.setDouble("in_earn_amount", 0);
+                    try {
+                        cs.setString("in_code_specific", transitem.getCodeSpecific());
+                    } catch (NullPointerException npe) {
+                        cs.setString("in_code_specific", "");
+                    }
+                    try {
+                        cs.setString("in_desc_specific", transitem.getDescSpecific());
+                    } catch (NullPointerException npe) {
+                        cs.setString("in_desc_specific", "");
+                    }
+                    try {
+                        cs.setString("in_desc_more", transitem.getDescMore());
+                    } catch (NullPointerException npe) {
+                        cs.setString("in_desc_more", "");
+                    }
+                    try {
+                        cs.setString("in_warranty_desc", transitem.getWarrantyDesc());
+                    } catch (NullPointerException npe) {
+                        cs.setString("in_warranty_desc", "");
+                    }
+                    try {
+                        cs.setDate("in_warranty_expiry_date", new java.sql.Date(transitem.getWarrantyExpiryDate().getTime()));
+                    } catch (NullPointerException npe) {
+                        cs.setDate("in_warranty_expiry_date", null);
+                    }
+                    try {
+                        cs.setString("in_account_code", transitem.getAccountCode());
+                    } catch (NullPointerException npe) {
+                        cs.setString("in_account_code", "");
+                    }
+                    try {
+                        cs.setDate("in_purchase_date", new java.sql.Date(transitem.getPurchaseDate().getTime()));
+                    } catch (NullPointerException npe) {
+                        cs.setDate("in_purchase_date", null);
+                    }
+                    try {
+                        cs.setDate("in_dep_start_date", new java.sql.Date(transitem.getDepStartDate().getTime()));
+                    } catch (NullPointerException npe) {
+                        cs.setDate("in_dep_start_date", null);
+                    }
+                    try {
+                        cs.setInt("in_dep_method_id", transitem.getDepMethodId());
+                    } catch (NullPointerException npe) {
+                        cs.setInt("in_dep_method_id", 0);
+                    }
+                    try {
+                        cs.setDouble("in_dep_rate", transitem.getDepRate());
+                    } catch (NullPointerException npe) {
+                        cs.setDouble("in_dep_rate", 0);
+                    }
+                    try {
+                        cs.setInt("in_average_method_id", transitem.getAverageMethodId());
+                    } catch (NullPointerException npe) {
+                        cs.setInt("in_average_method_id", 0);
+                    }
+                    try {
+                        cs.setInt("in_effective_life", transitem.getEffectiveLife());
+                    } catch (NullPointerException npe) {
+                        cs.setInt("in_effective_life", 0);
+                    }
+                    try {
+                        cs.setDouble("in_residual_value", transitem.getResidualValue());
+                    } catch (NullPointerException npe) {
+                        cs.setDouble("in_residual_value", 0);
+                    }
+                    try {
+                        cs.setString("in_narration", transitem.getNarration());
+                    } catch (NullPointerException npe) {
+                        cs.setString("in_narration", "");
+                    }
+                    try {
+                        cs.setDouble("in_qty_balance", transitem.getQty_balance());
+                    } catch (NullPointerException npe) {
+                        cs.setDouble("in_qty_balance", 0);
+                    }
+                    try {
+                        cs.setDouble("in_duration_value", transitem.getDuration_value());
+                    } catch (NullPointerException npe) {
+                        cs.setDouble("in_duration_value", 0);
+                    }
+                    try {
+                        cs.setDouble("in_qty_damage", transitem.getQty_damage());
+                    } catch (NullPointerException npe) {
+                        cs.setDouble("in_qty_damage", 0);
+                    }
+                    try {
+                        cs.setDouble("in_duration_passed", transitem.getDuration_passed());
+                    } catch (NullPointerException npe) {
+                        cs.setDouble("in_duration_passed", 0);
+                    }
+                    cs.setDouble("in_specific_size", 1);
+                    //save
+                    cs.executeUpdate();
+
+                    TransType = null;
+                    TransTypeBean = null;
+                    StkBean = null;
+
+                } else if (transitem.getTransactionItemId() > 0) {
+                    //do nothing; this is for edit
+                }
+            } catch (SQLException se) {
+                System.err.println(se.getMessage());
+                this.setActionMessage("TransItem NOT saved");
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("TransItem NOT saved!"));
+            }
+        }
+    }
+
     public void updateTransItem(TransItem transitem) {
         int success = 0;
         String sql = "{call sp_update_transaction_item(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
@@ -2482,7 +2647,7 @@ public class TransItemBean implements Serializable {
                         }
                         int x = 0;
                         x = new StockBean().saveStock(s);
-                        new Stock_ledgerBean().callInsertStock_ledger("Add", s, (-1*aDiffHistNewQty), "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                        new Stock_ledgerBean().callInsertStock_ledger("Add", s, (-1 * aDiffHistNewQty), "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
                     }
 
                 } else if (aDiffHistNewQty < 0) {
@@ -2674,7 +2839,7 @@ public class TransItemBean implements Serializable {
                         }
                         int x = 0;
                         x = new StockBean().saveStock(s);
-                        new Stock_ledgerBean().callInsertStock_ledger("Add", s, (-1*aDiffHistNewQty), "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                        new Stock_ledgerBean().callInsertStock_ledger("Add", s, (-1 * aDiffHistNewQty), "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
                     }
                 }
             }
@@ -6746,167 +6911,203 @@ public class TransItemBean implements Serializable {
     }
 
     public void addTransItemCashTransfer(Trans aTrans, StatusBean aStatusBean, List<TransItem> aActiveTransItems, TransItem NewTransItem, Item aSelectedItem, AccCoa aSelectedAccCoa) {
-        if (NewTransItem.getAccountCode().length() <= 0 || NewTransItem.getAccountCode().length() <= 0) {
-            aStatusBean.setItemAddedStatus("");
-            aStatusBean.setItemNotAddedStatus("PLEASE ENTER VALID FROM/TO ACCOUNTS...!");
-            aStatusBean.setShowItemAddedStatus(0);
-            aStatusBean.setShowItemNotAddedStatus(1);
-        } else if (NewTransItem.getAccountCode().equals(NewTransItem.getCodeSpecific())) {
-            aStatusBean.setItemAddedStatus("");
-            aStatusBean.setItemNotAddedStatus("FROM AND TO ACCOUNTS CANNOT BE THE SAME...!");
-            aStatusBean.setShowItemAddedStatus(0);
-            aStatusBean.setShowItemNotAddedStatus(1);
-        } else if (NewTransItem.getAmountExcVat() == 0) {
-            aStatusBean.setItemAddedStatus("");
-            aStatusBean.setItemNotAddedStatus("PLEASE ENTER TRANSFER AMOUNT...!");
-            aStatusBean.setShowItemAddedStatus(0);
-            aStatusBean.setShowItemNotAddedStatus(1);
-        } else {
-            TransItem ti = new TransItem();
-            ti.setTransactionItemId(0);
-            ti.setTransactionId(0);
-            ti.setItemId(0);
-            ti.setBatchno("");
-            ti.setItemQty(1);
-            ti.setUnitPrice(0);
-            ti.setUnitTradeDiscount(0);
-            ti.setAmount(0);
-            ti.setVatRated("");
-            ti.setVatPerc(CompanySetting.getVatPerc());
-            ti.setUnitVat(0);
-            ti.setUnitPriceExcVat(0);
-            ti.setUnitPriceIncVat(0);
-            ti.setAmountExcVat(NewTransItem.getAmountExcVat());
-            ti.setAmountIncVat(0);
-            ti.setItemExpryDate(null);
-            ti.setItemMnfDate(null);
-            //bms veraibales
+        String FromCurCode = "";
+        String ToCurCode = "";
+        String FromAccCode = "";
+        String ToAccCode = "";
+        double FromAmount = 0;
+        double ToAmount = 0;
+        double FromAccBalance = 0;
+        int BalCheckerOn = 0;
+        String LocalCurrencyCode = "";
+        try {
+            LocalCurrencyCode = new AccCurrencyBean().getLocalCurrency().getCurrencyCode();
+        } catch (Exception e) {
+
+        }
+        if (null != NewTransItem) {
+            FromCurCode = NewTransItem.getBatchno();
+            ToCurCode = NewTransItem.getDescSpecific();
+            FromAccCode = NewTransItem.getAccountCode();
+            ToAccCode = NewTransItem.getCodeSpecific();
+            FromAmount = NewTransItem.getAmountIncVat();
+            ToAmount = NewTransItem.getAmountExcVat();
+            FromAccBalance = NewTransItem.getUnitPrice();
             try {
-                ti.setCodeSpecific(NewTransItem.getCodeSpecific());
-            } catch (NullPointerException npe) {
-                ti.setCodeSpecific("");
+                BalCheckerOn = new AccChildAccountBean().getAccChildAccByCode(FromAccCode).getBalance_checker_on();
+            } catch (Exception e) {
+
             }
-            try {
-                ti.setDescSpecific(NewTransItem.getDescSpecific());
-            } catch (NullPointerException npe) {
-                ti.setDescSpecific("");
-            }
-            try {
-                ti.setDescMore(NewTransItem.getDescMore());
-            } catch (NullPointerException npe) {
-                ti.setDescMore("");
-            }
-            try {
-                ti.setWarrantyDesc(NewTransItem.getWarrantyDesc());
-            } catch (NullPointerException npe) {
-                ti.setWarrantyDesc("");
-            }
-            try {
-                ti.setWarrantyExpiryDate(NewTransItem.getWarrantyExpiryDate());
-            } catch (NullPointerException npe) {
-                ti.setWarrantyExpiryDate(null);
-            }
-            try {
-                ti.setAccountCode(NewTransItem.getAccountCode());
-            } catch (NullPointerException npe) {
-                ti.setAccountCode("");
-            }
-            try {
-                ti.setPurchaseDate(new java.sql.Date(NewTransItem.getPurchaseDate().getTime()));
-            } catch (NullPointerException npe) {
-                ti.setPurchaseDate(null);
-            }
-            try {
-                ti.setDepStartDate(new java.sql.Date(NewTransItem.getDepStartDate().getTime()));
-            } catch (NullPointerException npe) {
-                ti.setDepStartDate(null);
-            }
-            try {
-                ti.setDepMethodId(NewTransItem.getDepMethodId());
-            } catch (NullPointerException npe) {
-                ti.setDepMethodId(0);
-            }
-            try {
-                ti.setDepRate(NewTransItem.getDepRate());
-            } catch (NullPointerException npe) {
-                ti.setDepRate(0);
-            }
-            try {
-                ti.setAverageMethodId(NewTransItem.getAverageMethodId());
-            } catch (NullPointerException npe) {
-                ti.setAverageMethodId(0);
-            }
-            try {
-                ti.setEffectiveLife(NewTransItem.getEffectiveLife());
-            } catch (NullPointerException npe) {
-                ti.setEffectiveLife(0);
-            }
-            try {
-                ti.setResidualValue(NewTransItem.getResidualValue());
-            } catch (NullPointerException npe) {
-                ti.setResidualValue(0);
-            }
-            try {
-                ti.setNarration(NewTransItem.getNarration());
-            } catch (NullPointerException npe) {
-                ti.setNarration("");
-            }
-            try {
-                ti.setQty_balance(NewTransItem.getQty_balance());
-            } catch (NullPointerException npe) {
-                ti.setQty_balance(0);
-            }
-            try {
-                ti.setDuration_value(NewTransItem.getDuration_value());
-            } catch (NullPointerException npe) {
-                ti.setDuration_value(0);
-            }
-            try {
-                ti.setQty_damage(NewTransItem.getQty_damage());
-            } catch (NullPointerException npe) {
-                ti.setQty_damage(0);
-            }
-            try {
-                ti.setDuration_passed(NewTransItem.getDuration_passed());
-            } catch (NullPointerException npe) {
-                ti.setDuration_passed(0);
-            }
-            try {
-                if (NewTransItem.getSpecific_size() > 0) {
-                    ti.setSpecific_size(NewTransItem.getSpecific_size());
-                } else {
+            if (FromAccCode.length() <= 0 || ToAccCode.length() <= 0) {
+                aStatusBean.setItemAddedStatus("");
+                aStatusBean.setItemNotAddedStatus("PLEASE ENTER VALID FROM/TO ACCOUNTS...!");
+                aStatusBean.setShowItemAddedStatus(0);
+                aStatusBean.setShowItemNotAddedStatus(1);
+            } else if (FromAccCode.equals(ToAccCode) && FromCurCode.equals(ToCurCode)) {
+                aStatusBean.setItemAddedStatus("");
+                aStatusBean.setItemNotAddedStatus("FROM/TO ACCOUNTS AND CURRENCIES CANNOT BE THE SAME...!");
+                aStatusBean.setShowItemAddedStatus(0);
+                aStatusBean.setShowItemNotAddedStatus(1);
+            } else if (!FromCurCode.equals(LocalCurrencyCode) && !ToCurCode.equals(LocalCurrencyCode)) {
+                aStatusBean.setItemAddedStatus("");
+                aStatusBean.setItemNotAddedStatus("ONE OF THE ACCOUNTS BETWEEN FROM AND TO MUST BE A LOCAL CURRENCY...!");
+                aStatusBean.setShowItemAddedStatus(0);
+                aStatusBean.setShowItemNotAddedStatus(1);
+            } else if (FromAmount <= 0 || ToAmount <= 0) {
+                aStatusBean.setItemAddedStatus("");
+                aStatusBean.setItemNotAddedStatus("PLEASE ENTER TRANSFER AMOUNT...!");
+                aStatusBean.setShowItemAddedStatus(0);
+                aStatusBean.setShowItemNotAddedStatus(1);
+            } else if (BalCheckerOn == 1 && (FromAccBalance <= 0 || FromAmount > FromAccBalance)) {
+                aStatusBean.setItemAddedStatus("");
+                aStatusBean.setItemNotAddedStatus("AVAILABLE ACC BALANCE IS LESS THAN AMOUNT FOR TRANSFER...!");
+                aStatusBean.setShowItemAddedStatus(0);
+                aStatusBean.setShowItemNotAddedStatus(1);
+            } else {
+                TransItem ti = new TransItem();
+                ti.setTransactionItemId(0);
+                ti.setTransactionId(0);
+                ti.setItemId(0);
+                ti.setBatchno(NewTransItem.getBatchno());
+                ti.setItemQty(1);
+                ti.setUnitPrice(NewTransItem.getUnitPrice());
+                ti.setUnitPrice2(NewTransItem.getUnitPrice2());
+                ti.setUnitTradeDiscount(0);
+                ti.setAmount(0);
+                ti.setVatRated("");
+                ti.setVatPerc(NewTransItem.getVatPerc());
+                ti.setUnitVat(0);
+                ti.setUnitPriceExcVat(0);
+                ti.setUnitPriceIncVat(0);
+                ti.setAmountExcVat(NewTransItem.getAmountExcVat());
+                ti.setAmountIncVat(NewTransItem.getAmountIncVat());
+                ti.setItemExpryDate(null);
+                ti.setItemMnfDate(null);
+                //bms veraibales
+                try {
+                    ti.setCodeSpecific(NewTransItem.getCodeSpecific());
+                } catch (NullPointerException npe) {
+                    ti.setCodeSpecific("");
+                }
+                try {
+                    ti.setDescSpecific(NewTransItem.getDescSpecific());
+                } catch (NullPointerException npe) {
+                    ti.setDescSpecific("");
+                }
+                try {
+                    ti.setDescMore(NewTransItem.getDescMore());
+                } catch (NullPointerException npe) {
+                    ti.setDescMore("");
+                }
+                try {
+                    ti.setWarrantyDesc(NewTransItem.getWarrantyDesc());
+                } catch (NullPointerException npe) {
+                    ti.setWarrantyDesc("");
+                }
+                try {
+                    ti.setWarrantyExpiryDate(NewTransItem.getWarrantyExpiryDate());
+                } catch (NullPointerException npe) {
+                    ti.setWarrantyExpiryDate(null);
+                }
+                try {
+                    ti.setAccountCode(NewTransItem.getAccountCode());
+                } catch (NullPointerException npe) {
+                    ti.setAccountCode("");
+                }
+                try {
+                    ti.setPurchaseDate(new java.sql.Date(NewTransItem.getPurchaseDate().getTime()));
+                } catch (NullPointerException npe) {
+                    ti.setPurchaseDate(null);
+                }
+                try {
+                    ti.setDepStartDate(new java.sql.Date(NewTransItem.getDepStartDate().getTime()));
+                } catch (NullPointerException npe) {
+                    ti.setDepStartDate(null);
+                }
+                try {
+                    ti.setDepMethodId(NewTransItem.getDepMethodId());
+                } catch (NullPointerException npe) {
+                    ti.setDepMethodId(0);
+                }
+                try {
+                    ti.setDepRate(NewTransItem.getDepRate());
+                } catch (NullPointerException npe) {
+                    ti.setDepRate(0);
+                }
+                try {
+                    ti.setAverageMethodId(NewTransItem.getAverageMethodId());
+                } catch (NullPointerException npe) {
+                    ti.setAverageMethodId(0);
+                }
+                try {
+                    ti.setEffectiveLife(NewTransItem.getEffectiveLife());
+                } catch (NullPointerException npe) {
+                    ti.setEffectiveLife(0);
+                }
+                try {
+                    ti.setResidualValue(NewTransItem.getResidualValue());
+                } catch (NullPointerException npe) {
+                    ti.setResidualValue(0);
+                }
+                try {
+                    ti.setNarration(NewTransItem.getNarration());
+                } catch (NullPointerException npe) {
+                    ti.setNarration("");
+                }
+                try {
+                    ti.setQty_balance(NewTransItem.getQty_balance());
+                } catch (NullPointerException npe) {
+                    ti.setQty_balance(0);
+                }
+                try {
+                    ti.setDuration_value(NewTransItem.getDuration_value());
+                } catch (NullPointerException npe) {
+                    ti.setDuration_value(0);
+                }
+                try {
+                    ti.setQty_damage(NewTransItem.getQty_damage());
+                } catch (NullPointerException npe) {
+                    ti.setQty_damage(0);
+                }
+                try {
+                    ti.setDuration_passed(NewTransItem.getDuration_passed());
+                } catch (NullPointerException npe) {
+                    ti.setDuration_passed(0);
+                }
+                try {
+                    if (NewTransItem.getSpecific_size() > 0) {
+                        ti.setSpecific_size(NewTransItem.getSpecific_size());
+                    } else {
+                        ti.setSpecific_size(1);
+                    }
+                } catch (NullPointerException npe) {
                     ti.setSpecific_size(1);
                 }
-            } catch (NullPointerException npe) {
-                ti.setSpecific_size(1);
-            }
-            //check if itme+batchno already exists
-            int ItemFoundAtIndex = itemExistsJournalEntry(aActiveTransItems, ti.getAccountCode(), ti.getCodeSpecific());
-            if (ItemFoundAtIndex == -1) {
-                if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "LIST_ITEMS_APPEND").getParameter_value().equals("0")) {
-                    this.updateLookUpsUI(ti);
-                    aActiveTransItems.add(0, ti);
+                //check if itme+batchno already exists
+                int ItemFoundAtIndex = itemExistsCashTransfer(aActiveTransItems, ti);
+                if (ItemFoundAtIndex == -1) {
+                    if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "LIST_ITEMS_APPEND").getParameter_value().equals("0")) {
+                        //this.updateLookUpsUI(ti);
+                        aActiveTransItems.add(0, ti);
+                    } else {
+                        //this.updateLookUpsUI(ti);
+                        aActiveTransItems.add(ti);
+                    }
                 } else {
-                    this.updateLookUpsUI(ti);
-                    aActiveTransItems.add(ti);
+                    //this.updateLookUpsUI(ti);
+                    aActiveTransItems.add(ItemFoundAtIndex, ti);
+                    aActiveTransItems.remove(ItemFoundAtIndex + 1);
                 }
-            } else {
-                this.updateLookUpsUI(ti);
-                aActiveTransItems.add(ItemFoundAtIndex, ti);
-                aActiveTransItems.remove(ItemFoundAtIndex + 1);
+                //for profit margin
+                ti.setUnitCostPrice(0);
+                ti.setUnitProfitMargin(0);
+                TransBean transB = new TransBean();
+                transB.clearAll(null, aActiveTransItems, NewTransItem, aSelectedItem, null, 1, aSelectedAccCoa);
+                aStatusBean.setItemAddedStatus("ITEM ADDED");
+                aStatusBean.setItemNotAddedStatus("");
+                aStatusBean.setShowItemAddedStatus(1);
+                aStatusBean.setShowItemNotAddedStatus(0);
             }
-            //for profit margin
-            ti.setUnitCostPrice(0);
-            ti.setUnitProfitMargin(0);
-            TransBean transB = new TransBean();
-            transB.clearAll(null, aActiveTransItems, NewTransItem, aSelectedItem, null, 1, aSelectedAccCoa);
-            aStatusBean.setItemAddedStatus("ITEM ADDED");
-            aStatusBean.setItemNotAddedStatus("");
-            aStatusBean.setShowItemAddedStatus(1);
-            aStatusBean.setShowItemNotAddedStatus(0);
-
-            //update totals
-            new TransBean().setTransTotalsAndUpdateJournalEntry(aTrans, aActiveTransItems);
         }
     }
 
@@ -7864,6 +8065,37 @@ public class TransItemBean implements Serializable {
         int ListItemNo = ati.size();
         while (ListItemIndex < ListItemNo) {
             if (ati.get(ListItemIndex).getAccountCode().equals(aAccountCode) && aChildAccountCode.equals(ati.get(ListItemIndex).getCodeSpecific())) {
+                ItemFoundAtIndex = ListItemIndex;
+                break;
+            } else {
+                ItemFoundAtIndex = -1;
+            }
+            ListItemIndex = ListItemIndex + 1;
+        }
+        return ItemFoundAtIndex;
+    }
+
+    public int itemExistsCashTransfer(List<TransItem> aActiveTransItems, TransItem aTransItem) {
+        List<TransItem> ati = aActiveTransItems;
+        int ItemFoundAtIndex = -1;
+        int ListItemIndex = 0;
+        int ListItemNo = ati.size();
+        String FromCurCode = "";
+        String ToCurCode = "";
+        String FromAccCode = "";
+        String ToAccCode = "";
+        double FromAmount = 0;
+        double ToAmount = 0;
+        if (null != aTransItem) {
+            FromCurCode = aTransItem.getBatchno();
+            ToCurCode = aTransItem.getDescSpecific();
+            FromAccCode = aTransItem.getAccountCode();
+            ToAccCode = aTransItem.getCodeSpecific();
+            FromAmount = aTransItem.getAmountIncVat();
+            ToAmount = aTransItem.getAmountExcVat();
+        }
+        while (ListItemIndex < ListItemNo) {
+            if (ati.get(ListItemIndex).getAccountCode().equals(FromAccCode) && ToAccCode.equals(ati.get(ListItemIndex).getCodeSpecific()) && ati.get(ListItemIndex).getBatchno().equals(FromCurCode) && ToCurCode.equals(ati.get(ListItemIndex).getDescSpecific())) {
                 ItemFoundAtIndex = ListItemIndex;
                 break;
             } else {

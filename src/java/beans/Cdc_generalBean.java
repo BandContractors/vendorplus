@@ -17,6 +17,8 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
+import sessions.GeneralUserSetting;
+import utilities.UtilityBean;
 
 /*
  * To change this template, choose Tools | Templates
@@ -225,6 +227,44 @@ public class Cdc_generalBean implements Serializable {
         return cg;
     }
 
+    public Cdc_general getLatestCdc_general() {
+        String sql = "SELECT c1.* FROM cdc_general c1 WHERE c1.cdc_general_id=(select max(c2.cdc_general_id) from cdc_general c2)";
+        ResultSet rs = null;
+        Cdc_general cg = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                cg = new Cdc_general();
+                this.setCdc_generalFromResultset(cg, rs);
+            }
+        } catch (Exception e) {
+            System.err.println("getLatestCdc_general:" + e.getMessage());
+        }
+        return cg;
+    }
+
+    public boolean isTodaySnapshotFound() {
+        boolean res = false;
+        Date today = new CompanySetting().getCURRENT_SERVER_DATE();
+        Cdc_general cdcg = this.getLatestCdc_general();
+        if (null == cdcg) {
+            res = false;
+        } else {
+            if (new UtilityBean().isDatesEqual(today, cdcg.getCdc_date()) == 1) {
+                if (cdcg.getIs_passed() == 1) {
+                    res = true;
+                } else {
+                    res = false;
+                }
+            } else {
+                res = false;
+            }
+        }
+        return res;
+    }
+
     public void takeNewSnapshot_stock() {
         try {
             //1. insert cdc_record
@@ -261,6 +301,22 @@ public class Cdc_generalBean implements Serializable {
             }
         } catch (Exception e) {
             System.out.println("takeNewSnapshot_stock:" + e.getMessage());
+        }
+    }
+
+    public void takeNewSnapshot_stockAtLogin() {
+        try {
+            String DailySnapshotTime = new Parameter_listBean().getParameter_listByContextNameMemory("SNAPSHOT", "DAILY_SNAPSHOT_TIME").getParameter_value();
+            if (DailySnapshotTime.equals("1")) {//first login
+                //check if it hasnt been taken
+                if (new Cdc_generalBean().isTodaySnapshotFound()) {
+                    //ignore
+                } else {
+                    this.takeNewSnapshot_stock();
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("takeNewSnapshot_stockAtLogin:" + e.getMessage());
         }
     }
 

@@ -351,7 +351,7 @@ public class AccJournalBean implements Serializable {
             } else if (aAccountCode.length() > 0 && aAccountCode.startsWith("2-00-000-010")) {//AP Trade
                 TableNameJournal = "acc_journal_payable";
                 TableNameLedger = "acc_ledger_payable";
-            }else if (aAccountCode.length() > 0 && aAccountCode.startsWith("2-00-000-070")) {//Prepaid Income/Cust Dep
+            } else if (aAccountCode.length() > 0 && aAccountCode.startsWith("2-00-000-070")) {//Prepaid Income/Cust Dep
                 TableNameJournal = "acc_journal_prepaid";
                 TableNameLedger = "acc_ledger_prepaid";
             } else if (aAccountCode.length() > 0 && aAccountCode.startsWith("1-00-030-050")) {//Prepaid Expense/Sup Dep
@@ -1013,6 +1013,7 @@ public class AccJournalBean implements Serializable {
 
     public void postJournalCashTransfer(Trans aTrans, List<TransItem> aActiveTransItems, int aAccPeriodId) {
         long JobId = 0;
+        String LocalCurrencyCode = "";
         try {
             AccJournal accjournal = new AccJournal();
             //get job Id
@@ -1020,6 +1021,11 @@ public class AccJournalBean implements Serializable {
                 JobId = new UtilityBean().getNewTableColumnSeqNumber("acc_journal", "job_id");
             } catch (NullPointerException npe) {
                 JobId = 0;
+            }
+            try {
+                LocalCurrencyCode = new AccCurrencyBean().getLocalCurrency().getCurrencyCode();
+            } catch (Exception e) {
+
             }
             accjournal.setJobId(JobId);
             accjournal.setAccJournalId(0);
@@ -1033,8 +1039,8 @@ public class AccJournalBean implements Serializable {
             accjournal.setStoreId(aTrans.getStoreId());
             accjournal.setLedgerFolio("");
             accjournal.setAccPeriodId(aAccPeriodId);
-            accjournal.setCurrencyCode(aTrans.getCurrencyCode());
-            accjournal.setXrate(aTrans.getXrate());
+            //accjournal.setCurrencyCode(aTrans.getCurrencyCode());
+            //accjournal.setXrate(aTrans.getXrate());
             accjournal.setAddBy(new GeneralUserSetting().getCurrentUser().getUserDetailId());
             accjournal.setBillTransactorId(aTrans.getBillTransactorId());
             //1. post cash transfer entries
@@ -1049,9 +1055,19 @@ public class AccJournalBean implements Serializable {
             int ToAccountId = 0;
             int FromChildAccountId = 0;
             int ToChildAccountId = 0;
-            double TransferAmount = 0;
+            //double TransferAmount = 0;
             String Narration = "";
+            String FromCurrencyCode = "";
+            String ToCurrencyCode = "";
+            double FromXrate = 1;
+            double ToXrate = 1;
+            double FromAmount = 0;
+            double ToAmount = 0;
             while (ListItemIndex < ListItemNo) {
+                //set general
+                Narration = ati.get(ListItemIndex).getNarration();
+                accjournal.setNarration(Narration);
+                //set from
                 FromChildAccountCode = ati.get(ListItemIndex).getAccountCode();
                 try {
                     FromChildAccountId = new AccChildAccountBean().getAccChildAccByCode(FromChildAccountCode).getAccChildAccountId();
@@ -1068,6 +1084,14 @@ public class AccJournalBean implements Serializable {
                 } catch (NullPointerException npe) {
                     FromAccountId = 0;
                 }
+                FromCurrencyCode = ati.get(ListItemIndex).getBatchno();
+                if (FromCurrencyCode.equals(LocalCurrencyCode)) {
+                    FromXrate = 1;
+                } else {
+                    FromXrate = ati.get(ListItemIndex).getVatPerc();
+                }
+                FromAmount = ati.get(ListItemIndex).getAmountIncVat();
+                //set to
                 ToChildAccountCode = ati.get(ListItemIndex).getCodeSpecific();
                 try {
                     ToChildAccountId = new AccChildAccountBean().getAccChildAccByCode(ToChildAccountCode).getAccChildAccountId();
@@ -1084,22 +1108,30 @@ public class AccJournalBean implements Serializable {
                 } catch (NullPointerException npe) {
                     ToAccountId = 0;
                 }
-                TransferAmount = ati.get(ListItemIndex).getAmountExcVat();
-                Narration = ati.get(ListItemIndex).getNarration();
-                accjournal.setNarration(Narration);
-
+                ToCurrencyCode = ati.get(ListItemIndex).getDescSpecific();
+                if (ToCurrencyCode.equals(LocalCurrencyCode)) {
+                    ToXrate = 1;
+                } else {
+                    ToXrate = ati.get(ListItemIndex).getVatPerc();
+                }
+                ToAmount = ati.get(ListItemIndex).getAmountExcVat();
+                //save from (credit)
                 accjournal.setAccCoaId(FromAccountId);
                 accjournal.setAccountCode(FromAccountCode);
                 accjournal.setAccChildAccountId(FromChildAccountId);
                 accjournal.setDebitAmount(0);
-                accjournal.setCreditAmount(TransferAmount);
+                accjournal.setCreditAmount(FromAmount);
+                accjournal.setCurrencyCode(FromCurrencyCode);
+                accjournal.setXrate(FromXrate);
                 this.saveAccJournal(accjournal);
-
+                //save to (debit)
                 accjournal.setAccCoaId(ToAccountId);
                 accjournal.setAccountCode(ToAccountCode);
                 accjournal.setAccChildAccountId(ToChildAccountId);
-                accjournal.setDebitAmount(TransferAmount);
+                accjournal.setDebitAmount(ToAmount);
                 accjournal.setCreditAmount(0);
+                accjournal.setCurrencyCode(ToCurrencyCode);
+                accjournal.setXrate(ToXrate);
                 this.saveAccJournal(accjournal);
 
                 ListItemIndex = ListItemIndex + 1;

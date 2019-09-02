@@ -2,10 +2,12 @@ package beans;
 
 import connections.DBConnection;
 import entities.AccBalanceSheet;
+import entities.AccCurrency;
 import entities.AccIncomeStatement;
 import entities.AccJournal;
 import entities.AccLedger;
 import entities.AccPeriod;
+import entities.TransItem;
 import java.io.Serializable;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -543,10 +545,118 @@ public class AccLedgerBean implements Serializable {
                     bal = accledger.getDebitAmount() - accledger.getCreditAmount();
                 }
             } catch (SQLException se) {
-                System.err.println("reportCashAccBalances:" + se.getMessage());
+                System.err.println("getCashAccBalance:" + se.getMessage());
             }
         }
         return bal;
+    }
+
+    public double getCashAccBalanceByAccCode(String aChildAccCode, String aCurrencyCode) {
+        double bal = 0;
+        int childaccid = 0;
+        try {
+            childaccid = new AccChildAccountBean().getAccChildAccByCode(aChildAccCode).getAccChildAccountId();
+        } catch (Exception e) {
+
+        }
+        if (childaccid > 0) {
+            bal = this.getCashAccBalance(childaccid, aCurrencyCode);
+        }
+        return bal;
+    }
+
+    public void refreshBalancesXrate(TransItem aTransItem) {
+        String FromCurCode = "";
+        String ToCurCode = "";
+        String FromAccCode = "";
+        String ToAccCode = "";
+        if (null != aTransItem) {
+            FromCurCode = aTransItem.getBatchno();
+            ToCurCode = aTransItem.getDescSpecific();
+            FromAccCode = aTransItem.getAccountCode();
+            ToAccCode = aTransItem.getCodeSpecific();
+            try {
+                aTransItem.setUnitPrice(this.getCashAccBalanceByAccCode(FromAccCode, FromCurCode));
+            } catch (Exception e) {
+                aTransItem.setUnitPrice(0);
+            }
+            try {
+                aTransItem.setUnitPrice2(this.getCashAccBalanceByAccCode(ToAccCode, ToCurCode));
+            } catch (Exception e) {
+                aTransItem.setUnitPrice2(0);
+            }
+
+            //for where item currency is different from trans currency, we first get the factor to convert to trans currency
+            double xrate = 1;
+            double XrateMultiply = 1;
+            AccCurrency LocalCurrency = null;
+            LocalCurrency = new AccCurrencyBean().getLocalCurrency();
+            try {
+                xrate = new AccXrateBean().getXrate(FromCurCode, ToCurCode);
+            } catch (NullPointerException npe) {
+                xrate = 1;
+            }
+            try {
+                if (FromCurCode.equals(LocalCurrency.getCurrencyCode()) && !ToCurCode.equals(LocalCurrency.getCurrencyCode())) {
+                    XrateMultiply = 1 / xrate;
+                } else {
+                    XrateMultiply = xrate;
+                }
+            } catch (NullPointerException npe) {
+                XrateMultiply = 1;
+            }
+            aTransItem.setVatPerc(xrate);//to xrate:vatPerc
+            aTransItem.setDepRate(XrateMultiply);//multi-factor:depRate
+            aTransItem.setAmountExcVat(aTransItem.getAmountIncVat() * XrateMultiply);
+        }
+    }
+
+    public void refreshXrate(TransItem aTransItem) {
+        String FromCurCode = "";
+        String ToCurCode = "";
+        String FromAccCode = "";
+        String ToAccCode = "";
+        if (null != aTransItem) {
+            FromCurCode = aTransItem.getBatchno();
+            ToCurCode = aTransItem.getDescSpecific();
+            FromAccCode = aTransItem.getAccountCode();
+            ToAccCode = aTransItem.getCodeSpecific();
+            try {
+                aTransItem.setUnitPrice(this.getCashAccBalanceByAccCode(FromAccCode, FromCurCode));
+            } catch (Exception e) {
+                aTransItem.setUnitPrice(0);
+            }
+            try {
+                aTransItem.setUnitPrice2(this.getCashAccBalanceByAccCode(ToAccCode, ToCurCode));
+            } catch (Exception e) {
+                aTransItem.setUnitPrice2(0);
+            }
+
+            //for where item currency is different from trans currency, we first get the factor to convert to trans currency
+            double xrate = 1;
+            double XrateMultiply = 1;
+            AccCurrency LocalCurrency = null;
+            LocalCurrency = new AccCurrencyBean().getLocalCurrency();
+            try {
+                if (aTransItem.getVatPerc() > 0) {
+                    xrate = aTransItem.getVatPerc();
+                }
+            } catch (NullPointerException npe) {
+                xrate = 1;
+            }
+            try {
+                if (FromCurCode.equals(LocalCurrency.getCurrencyCode()) && !ToCurCode.equals(LocalCurrency.getCurrencyCode())) {
+                    XrateMultiply = 1 / xrate;
+                } else {
+                    XrateMultiply = xrate;
+                }
+            } catch (NullPointerException npe) {
+                XrateMultiply = 1;
+            }
+            aTransItem.setVatPerc(xrate);//to xrate:vatPerc
+            aTransItem.setDepRate(XrateMultiply);//multi-factor:depRate
+            aTransItem.setAmountExcVat(aTransItem.getAmountIncVat() * XrateMultiply);
+        }
     }
 
     public boolean checkerBalancePass(int aPayMethodId, int aChildAccId, String aCurrencyCode, double aPayAmount, int aTransTypeId, int aTransReasId, int aPayTypeId, int aPayReasId) {
