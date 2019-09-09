@@ -20,6 +20,9 @@
             }
         </script> 
     </h:head>
+    <f:metadata>
+        <f:viewAction action="#{utilityBean.clearList(accLedgerBean.accLedgerCashAccBal)}"/>
+    </f:metadata>
     <f:event listener="#{navigationBean.checkAccessDenied('55', 'View')}" type="preRenderView" />
     <h:body>
         <ui:include src="Menu.xhtml"/>
@@ -79,7 +82,7 @@
                     <h:outputText value="#{accJournalBean.returnBalanceString(itm.debitAmountLc-itm.creditAmountLc)}"/>
                 </p:column>
             </p:dataTable>
-            
+
         </h:form>
     </h:body>
 </html>

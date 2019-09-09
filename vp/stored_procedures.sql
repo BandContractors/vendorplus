@@ -10031,3 +10031,11 @@ BEGIN
 	WHERE parameter_list_id=in_parameter_list_id; 
 END//
 DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_test;
+DELIMITER //
+CREATE PROCEDURE sp_test() 
+BEGIN 
+	SELECT * FROM store;
+END//
+DELIMITER ;

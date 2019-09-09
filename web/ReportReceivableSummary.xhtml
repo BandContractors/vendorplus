@@ -19,6 +19,9 @@
             }
         </script> 
     </h:head>
+    <f:metadata>
+        <f:viewAction action="#{utilityBean.clearList(accLedgerBean.accLedgerReceivablesAccBal)}"/>
+    </f:metadata>
     <f:event listener="#{navigationBean.checkAccessDenied('58', 'View')}" type="preRenderView" />
     <h:body>
         <ui:include src="Menu.xhtml"/>

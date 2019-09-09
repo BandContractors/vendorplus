@@ -25,7 +25,11 @@ public class TaskManager {
             DBConnection.readConnectionConfigurations("configurations.ConfigFile");
             new Parameter_listBean().refreshSavedParameterLists();
             //0:server_start,1:first_login,specific_time_e.g_00:00
-            String DailySnapshotTime = new Parameter_listBean().getParameter_listByContextNameMemory("SNAPSHOT", "DAILY_SNAPSHOT_TIME").getParameter_value();
+            String DailySnapshotTime = "";
+            try {
+                DailySnapshotTime = new Parameter_listBean().getParameter_listByContextNameMemory("SNAPSHOT", "DAILY_SNAPSHOT_TIME").getParameter_value();
+            } catch (Exception e) {
+            }
             if (DailySnapshotTime.equals("0")) {//server/tomcat start
                 //check if it hasnt been taken
                 if (new Cdc_generalBean().isTodaySnapshotFound()) {
@@ -43,6 +47,7 @@ public class TaskManager {
                 }
             }
         } catch (FileNotFoundException e) {
+            System.out.println("startTask:" + e.getMessage());
         }
     }
 

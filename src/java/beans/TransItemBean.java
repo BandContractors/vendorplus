@@ -6948,7 +6948,7 @@ public class TransItemBean implements Serializable {
                 aStatusBean.setItemNotAddedStatus("FROM/TO ACCOUNTS AND CURRENCIES CANNOT BE THE SAME...!");
                 aStatusBean.setShowItemAddedStatus(0);
                 aStatusBean.setShowItemNotAddedStatus(1);
-            } else if (!FromCurCode.equals(LocalCurrencyCode) && !ToCurCode.equals(LocalCurrencyCode)) {
+            } else if (!FromCurCode.equals(LocalCurrencyCode) && !ToCurCode.equals(LocalCurrencyCode) && !FromCurCode.equals(ToCurCode)) {
                 aStatusBean.setItemAddedStatus("");
                 aStatusBean.setItemNotAddedStatus("ONE OF THE ACCOUNTS BETWEEN FROM AND TO MUST BE A LOCAL CURRENCY...!");
                 aStatusBean.setShowItemAddedStatus(0);
