@@ -1507,7 +1507,7 @@ public class NavigationBean implements Serializable {
     }
 
     public void checkLicenseExpired() {
-        if (CompanySetting.getLicenseDaysLeft() <= 0) {
+        if (CompanySetting.getLicenseDaysLeft() <= 0 && CompanySetting.getLicenseType()!=9) {
             this.setNavMsg("--- LICENSE IS EXPIRED, CONTACT SYSTEM VENDOR ---");
             FacesContext.getCurrentInstance().addMessage("License", new FacesMessage(getNavMsg()));
             FacesContext fc = FacesContext.getCurrentInstance();

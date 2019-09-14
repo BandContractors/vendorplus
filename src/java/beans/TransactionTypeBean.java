@@ -266,7 +266,16 @@ public class TransactionTypeBean implements Serializable {
         } catch (Exception e) {
             tt.setTrans_number_format("");
         }
-
+        try {
+            tt.setOutput_footer_message(rs.getString("output_footer_message"));
+        } catch (Exception e) {
+            tt.setOutput_footer_message("");
+        }
+        try {
+            tt.setDefault_term_condition(rs.getString("default_term_condition"));
+        } catch (Exception e) {
+            tt.setDefault_term_condition("");
+        }
     }
 
     public TransactionType getTransactionTypeFromResultset(ResultSet rs) {
@@ -401,6 +410,16 @@ public class TransactionTypeBean implements Serializable {
         } catch (Exception e) {
             tt.setTrans_number_format("");
         }
+        try {
+            tt.setOutput_footer_message(rs.getString("output_footer_message"));
+        } catch (Exception e) {
+            tt.setOutput_footer_message("");
+        }
+        try {
+            tt.setDefault_term_condition(rs.getString("default_term_condition"));
+        } catch (Exception e) {
+            tt.setDefault_term_condition("");
+        }
         return tt;
     }
 
@@ -408,7 +427,7 @@ public class TransactionTypeBean implements Serializable {
         String sql = null;
         this.setActionMessage("");
         if (tt.getTransactionTypeId() > 0) {
-            sql = "{call sp_update_transaction_type(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_update_transaction_type(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
             try (
                     Connection conn = DBConnection.getMySQLConnection();
                     CallableStatement cs = conn.prepareCall(sql);) {
@@ -439,6 +458,8 @@ public class TransactionTypeBean implements Serializable {
                     cs.setString("in_transaction_type_code", tt.getTransaction_type_code());
                     cs.setString("in_default_currency_code", tt.getDefault_currency_code());
                     cs.setString("in_trans_number_format", tt.getTrans_number_format());
+                    cs.setString("in_output_footer_message", tt.getOutput_footer_message());
+                    cs.setString("in_default_term_condition", tt.getDefault_term_condition());
                     cs.executeUpdate();
                     String mg = "Transaction Settings Updated Successfully";
                     FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(mg));
@@ -623,6 +644,8 @@ public class TransactionTypeBean implements Serializable {
                 tt.setTransaction_type_code("");
                 tt.setDefault_currency_code("");
                 tt.setTrans_number_format("");
+                tt.setOutput_footer_message("");
+                tt.setDefault_term_condition("");
             }
         } catch (NullPointerException npe) {
 

@@ -63,7 +63,7 @@
                             <td style="text-align: left;width: 2%;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
                                 #
                             </td>
-                            <td style="text-align: left;width: 33%;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
+                            <td style="text-align: left;width: 47%;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
                                 DESCRIPTION
                             </td>
                             <td style="text-align: right;width: 6%;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
@@ -74,9 +74,6 @@
                             </td>
                             <td style="text-align: right;width: 14%;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
                                 UNIT VAT
-                            </td>
-                            <td style="text-align: right;width: 14%;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
-                                UNIT AMOUNT
                             </td>
                             <td style="text-align: right;width: 16%;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
                                 AMOUNT
@@ -101,9 +98,6 @@
                                     #{utilityBean.formatDoubleToString(ti.unitVat)}
                                 </td>
                                 <td style="text-align: right;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                    #{utilityBean.formatDoubleToString(ti.unitPriceIncVat)}
-                                </td>
-                                <td style="text-align: right;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
                                     #{utilityBean.formatDoubleToString(ti.amountIncVat)}
                                 </td>
                             </tr>
@@ -114,9 +108,6 @@
                                     &#160;
                                 </td>
                                 <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                    &#160;
-                                </td>
-                                <td style="text-align: right;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
                                     &#160;
                                 </td>
                                 <td style="text-align: right;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
@@ -154,8 +145,7 @@
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
 
-                            <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 9pt;color:#000000;font-weight: normal;text-decoration: none;" rendered="#{generalUserSetting.outputDetailParent.trans.totalVat>0}">#{utilityBean.formatDoubleToString(generalUserSetting.outputDetailParent.trans.vatPerc)}%</h:outputLabel>
-                            <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 9pt;color:#000000;font-weight: normal;text-decoration: none;" rendered="#{0>=generalUserSetting.outputDetailParent.trans.totalVat}">%</h:outputLabel>
+                            <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 9pt;color:#000000;font-weight: normal;text-decoration: none;">#{utilityBean.formatDoubleToString(generalUserSetting.outputDetailParent.trans.vatPerc)}%</h:outputLabel>
                             <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 12pt;color:#000000;font-weight: bold;text-decoration: none;">VAT:</h:outputLabel>
                             <h:outputText style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 12pt;color:#000000;font-weight: bold;text-decoration: none;" value="#{generalUserSetting.outputDetailParent.trans.totalVat}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>

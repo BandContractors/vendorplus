@@ -200,11 +200,11 @@ public class UtilityBean implements Serializable {
         return ToDate;
     }
 
-//    public static void main(String[] args) {
-//        System.out.println(new UtilityBean().isTime24Hour("6:00"));
-//        String[] hm = "6:00".split(":", 2);
-//        System.out.println("H:" + hm[0] + " M:" + hm[1]);
-//    }
+    public static void main(String[] args) {
+//        String lt = "98888888";//CompanySetting.getLICENSE_CLIENT_ID();
+//        System.out.println("LT:" + lt + ",1stC:" + lt.substring(0, 0));
+//        System.out.println("LT:" + lt + ",1stC:" + lt.substring(0, 1));
+    }
 
     public int countIntegers(String input) {
         int count = 0;

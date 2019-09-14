@@ -43,9 +43,11 @@
                 <h:outputLabel value="#{companySetting.displayPackageUsers(companySetting.getPackageUsers(companySetting.getPACKAGE_NAME()))}"/> 
                 
                 <h:outputLabel  value="LICENSE-EXPIRY-DATE:"/>
-                <h:inputText styleClass="clsInput" value="#{utilityBean.formatDate(companySetting.getLICENSE_EXPIRY_DATE())}" disabled="true"/>
+                <h:inputText value="#{utilityBean.formatDate(companySetting.getLICENSE_EXPIRY_DATE())}" disabled="true" rendered="#{companySetting.getLicenseType() ne 9 and companySetting.getLicenseType() ne 0}"/>
+                <h:inputText value="N/A" disabled="true" rendered="#{companySetting.getLicenseType() eq 9}"/>
                 <h:outputLabel  value="LICENSE-DAYS-LEFT:"/>
-                <h:outputLabel value="#{companySetting.getLicenseDaysLeft()}"/> 
+                <h:outputLabel value="#{companySetting.getLicenseDaysLeft()}" rendered="#{companySetting.getLicenseType() ne 9}"/>
+                <h:outputLabel value="N/A" rendered="#{companySetting.getLicenseType() eq 9}"/>
                 <h:outputLabel value=""/>
                 <h:outputLabel value=""/>
                 <h:outputLabel  value="BRANCH-PASSWORD-CODE:"/>

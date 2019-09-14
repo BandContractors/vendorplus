@@ -1483,6 +1483,17 @@ public class CompanySetting implements Serializable {
         return diffDays;
     }
 
+    public static long getLicenseType() {
+        long licenseType = 0;
+        try {
+            String lt = CompanySetting.getLICENSE_CLIENT_ID();
+            licenseType = Long.parseLong(lt.substring(0, 1));
+        } catch (Exception e) {
+            licenseType = 0;
+        }
+        return licenseType;
+    }
+
     public static long getDaysBetweenNowAndDate(Date aDate) {
         Date d1 = null;
         Date d2 = null;

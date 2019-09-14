@@ -730,7 +730,7 @@ public class TransBean implements Serializable {
             if ("UNPACK".equals(CurrentTransactionType.getTransactionTypeName())) {
                 aActiveTransItems.clear();
             }
-        } else if (new GeneralUserSetting().getDaysFromDateToLicenseExpiryDate(trans.getTransactionDate()) <= 0 || new GeneralUserSetting().getDaysFromDateToLicenseExpiryDate(new CompanySetting().getCURRENT_SERVER_DATE()) <= 0) {
+        } else if ((new GeneralUserSetting().getDaysFromDateToLicenseExpiryDate(trans.getTransactionDate()) <= 0 || new GeneralUserSetting().getDaysFromDateToLicenseExpiryDate(new CompanySetting().getCURRENT_SERVER_DATE()) <= 0) && CompanySetting.getLicenseType() != 9) {
             this.setActionMessage("");
             msg = "INCORRECT SERVER DATE or LICENSE HAS EXPIRED !";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
@@ -1417,7 +1417,7 @@ public class TransBean implements Serializable {
                 if ("UNPACK".equals(transtype.getTransactionTypeName())) {
                     aActiveTransItems.clear();
                 }
-            } else if (new GeneralUserSetting().getDaysFromDateToLicenseExpiryDate(trans.getTransactionDate()) <= 0 || new GeneralUserSetting().getDaysFromDateToLicenseExpiryDate(new CompanySetting().getCURRENT_SERVER_DATE()) <= 0) {
+            } else if ((new GeneralUserSetting().getDaysFromDateToLicenseExpiryDate(trans.getTransactionDate()) <= 0 || new GeneralUserSetting().getDaysFromDateToLicenseExpiryDate(new CompanySetting().getCURRENT_SERVER_DATE()) <= 0) && CompanySetting.getLicenseType() != 9) {
                 msg = "INCORRECT SERVER DATE or LICENSE HAS EXPIRED !";
             } else if (trans.getTransactorId() == 0 && transtype.getIsTransactorMandatory().equals("Yes")) {
                 msg = "Select " + transtype.getTransactorLabel();
@@ -6838,6 +6838,15 @@ public class TransBean implements Serializable {
             }
             if (TransTypeId > 0) {
                 this.initCurrencyCode(TransTypeId, trans);
+            }
+            //init other trans type defaults
+            if (TransTypeId > 0) {
+                try {
+                    TransactionType TransType = new TransactionTypeBean().getTransactionType(TransTypeId);
+                    trans.setTermsConditions(TransType.getDefault_term_condition());
+                } catch (Exception e) {
+                    //do nothing
+                }
             }
         }
     }

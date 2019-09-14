@@ -34,6 +34,8 @@ public class TransactionType implements Serializable {
     private String transaction_type_code;
     private String default_currency_code;
     private String trans_number_format;
+    private String output_footer_message;
+    private String default_term_condition;
 
     /**
      * @return the TransactionTypeId
@@ -397,6 +399,34 @@ public class TransactionType implements Serializable {
      */
     public void setTrans_number_format(String trans_number_format) {
         this.trans_number_format = trans_number_format;
+    }
+
+    /**
+     * @return the output_footer_message
+     */
+    public String getOutput_footer_message() {
+        return output_footer_message;
+    }
+
+    /**
+     * @param output_footer_message the output_footer_message to set
+     */
+    public void setOutput_footer_message(String output_footer_message) {
+        this.output_footer_message = output_footer_message;
+    }
+
+    /**
+     * @return the default_term_condition
+     */
+    public String getDefault_term_condition() {
+        return default_term_condition;
+    }
+
+    /**
+     * @param default_term_condition the default_term_condition to set
+     */
+    public void setDefault_term_condition(String default_term_condition) {
+        this.default_term_condition = default_term_condition;
     }
 
 }

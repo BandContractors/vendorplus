@@ -148,6 +148,10 @@
                 </h:selectOneMenu>
                 <h:outputLabel value="Transaction Number Format(C,Y,M,D,X)"/>
                 <h:inputText value="#{transactionTypeBean.transactionTypeForEdit.trans_number_format}"/>
+                <h:outputLabel value="Output Footer Message"/>
+                <h:inputText value="#{transactionTypeBean.transactionTypeForEdit.output_footer_message}"/>
+                <h:outputLabel value="Default Terms and Conditions"/>
+                <h:inputText value="#{transactionTypeBean.transactionTypeForEdit.default_term_condition}"/>
             </h:panelGrid>
 
             <h:panelGrid id="pgrdTransactionTypeSave" styleClass="clsLikeMainFromWidth" style="background-color: red;text-align: center;">

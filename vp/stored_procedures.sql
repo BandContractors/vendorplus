@@ -973,7 +973,9 @@ CREATE PROCEDURE sp_update_transaction_type
 	IN in_default_print_file int,
 	IN in_transaction_type_code varchar(4),
 	IN in_default_currency_code varchar(10),
-	IN in_trans_number_format varchar(20)
+	IN in_trans_number_format varchar(20),
+	IN in_output_footer_message varchar(250),
+	IN in_default_term_condition varchar(250)
 ) 
 BEGIN 
 	UPDATE transaction_type SET 
@@ -1000,7 +1002,9 @@ BEGIN
 		default_print_file=in_default_print_file,
 		transaction_type_code=in_transaction_type_code,
 		default_currency_code=in_default_currency_code,
-		trans_number_format=in_trans_number_format 
+		trans_number_format=in_trans_number_format,
+		output_footer_message=in_output_footer_message,
+		default_term_condition=in_default_term_condition 
 	WHERE transaction_type_id=in_transaction_type_id; 
 END//
 DELIMITER ;
@@ -3120,7 +3124,7 @@ CREATE PROCEDURE sp_add_stock_by_store_item_batch
 		IN in_qty double 
 ) 
 BEGIN 
-		UPDATE Stock s SET currentqty=currentqty+in_qty 
+		UPDATE stock s SET currentqty=currentqty+in_qty 
 		WHERE s.store_id=in_store_id AND s.item_id=in_item_id AND s.batchno=in_batchno;
 END//
 DELIMITER ;
@@ -3135,7 +3139,7 @@ CREATE PROCEDURE sp_subtract_stock_by_store_item_batch
 		IN in_qty double 
 ) 
 BEGIN 
-		UPDATE Stock s SET currentqty=currentqty-in_qty 
+		UPDATE stock s SET currentqty=currentqty-in_qty 
 		WHERE s.store_id=in_store_id AND s.item_id=in_item_id AND s.batchno=in_batchno;
 END//
 DELIMITER ;
@@ -3163,12 +3167,12 @@ BEGIN
 		end if;
 	
 		if (in_unit_cost<=0) then 
-			UPDATE Stock s SET currentqty=currentqty+in_qty 
+			UPDATE stock s SET currentqty=currentqty+in_qty 
 			WHERE s.store_id=in_store_id AND s.item_id=in_item_id AND s.batchno=in_batchno 
 			AND s.code_specific=@in_code_specific AND s.desc_specific=@in_desc_specific;
 		end if;
 		if (in_unit_cost>0) then 
-			UPDATE Stock s SET currentqty=currentqty+in_qty,unit_cost=in_unit_cost 
+			UPDATE stock s SET currentqty=currentqty+in_qty,unit_cost=in_unit_cost 
 			WHERE s.store_id=in_store_id AND s.item_id=in_item_id AND s.batchno=in_batchno 
 			AND s.code_specific=@in_code_specific AND s.desc_specific=@in_desc_specific;
 		end if;
@@ -3195,7 +3199,7 @@ BEGIN
 		if (in_desc_specific is not null) then 
 			set @in_desc_specific=in_desc_specific;
 		end if;
-		UPDATE Stock s SET currentqty=currentqty-in_qty 
+		UPDATE stock s SET currentqty=currentqty-in_qty 
 		WHERE s.store_id=in_store_id AND s.item_id=in_item_id AND s.batchno=in_batchno 
 		AND s.code_specific=@in_code_specific AND s.desc_specific=@in_desc_specific;
 END//
@@ -3222,11 +3226,11 @@ BEGIN
 			set @in_desc_specific=in_desc_specific;
 		end if;
 	
-		UPDATE Stock s SET qty_damage=qty_damage+in_qty 
+		UPDATE stock s SET qty_damage=qty_damage+in_qty 
 		WHERE s.store_id=in_store_id AND s.item_id=in_item_id AND s.batchno=in_batchno 
 		AND s.code_specific=@in_code_specific AND s.desc_specific=@in_desc_specific AND qty_damage is not null;
 
-		UPDATE Stock s SET qty_damage=in_qty 
+		UPDATE stock s SET qty_damage=in_qty 
 		WHERE s.store_id=in_store_id AND s.item_id=in_item_id AND s.batchno=in_batchno 
 		AND s.code_specific=@in_code_specific AND s.desc_specific=@in_desc_specific AND qty_damage is null;
 END//
@@ -3253,7 +3257,7 @@ BEGIN
 			set @in_desc_specific=in_desc_specific;
 		end if;
 	
-		UPDATE Stock s SET qty_damage=qty_damage-in_qty 
+		UPDATE stock s SET qty_damage=qty_damage-in_qty 
 		WHERE s.store_id=in_store_id AND s.item_id=in_item_id AND s.batchno=in_batchno 
 		AND s.code_specific=@in_code_specific AND s.desc_specific=@in_desc_specific AND qty_damage is not null;
 END//
@@ -10029,13 +10033,5 @@ BEGIN
 		description=in_description,
 		store_id=in_store_id
 	WHERE parameter_list_id=in_parameter_list_id; 
-END//
-DELIMITER ;
-
-DROP PROCEDURE IF EXISTS sp_test;
-DELIMITER //
-CREATE PROCEDURE sp_test() 
-BEGIN 
-	SELECT * FROM store;
 END//
 DELIMITER ;

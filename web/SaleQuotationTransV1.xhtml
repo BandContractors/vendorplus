@@ -396,10 +396,10 @@
                 <p:calendar styleClass="clsInput" id="calExpiredDate" pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.expiryDate}"/>
                 <h:outputLabel styleClass="clsLabelTransItem" value="ShipTo/Delivery.Address"/>
                 <h:outputLabel styleClass="clsLabelTransItem" value="Terms.Conditions"/>
-                <h:outputLabel styleClass="clsLabelTransItem" value="Payment.Terms"/>
-                <h:inputTextarea styleClass="clsInput" id="itxaDeliveryAddress" rows="4" value="#{trans.deliveryAddress}"/>
-                <h:inputTextarea styleClass="clsInput" id="itxaTermsConditions" rows="4" value="#{trans.termsConditions}"/>
-                <h:inputTextarea styleClass="clsInput" id="itxaPayTerms" rows="4" value="#{trans.payTerms}"/>
+                <h:outputLabel value=""/>
+                <h:inputTextarea styleClass="clsInput" id="itxaDeliveryAddress" rows="4" cols="25" value="#{trans.deliveryAddress}"/>
+                <h:inputTextarea styleClass="clsInput" id="itxaTermsConditions" rows="4" cols="25" value="#{trans.termsConditions}"/>
+                <h:outputLabel value=""/>
             </h:panelGrid>
 
             <h:panelGrid id="pgrdApprove">

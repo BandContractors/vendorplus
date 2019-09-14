@@ -83,7 +83,7 @@
                         </p:dialog>
                         <f:ajax listener="#{login.userLogin(2)}" execute="menuStore itxtUserName itxtPassword" render="olblActionMessageSuccess olblActionMessageFailure pnlgLoginHeader"/>
                     </p:commandButton>
-                    <h:panelGrid rendered="#{60>login.LICENSE_DAYS_LEFT}">
+                    <h:panelGrid rendered="#{60 gt login.LICENSE_DAYS_LEFT and login.LICENSE_TYPE ne 9 and login.LICENSE_TYPE ne 0}">
                         <p:spacer/>
                         <p:spacer/>
                         <p:outputLabel value="License Expiry Notice!" style="color: red;font-size: 20px;font-weight: bold;"/>

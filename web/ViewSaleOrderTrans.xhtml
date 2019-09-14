@@ -156,10 +156,10 @@
                         <h:inputText id="itxtExpiryDate" value="#{utilityBean.formatDate(transBean.transObj.expiryDate)}" disabled="true"/>
                         <h:outputLabel styleClass="clsLabelTransItem" value="ShipTo/Delivery.Address"/>
                         <h:outputLabel styleClass="clsLabelTransItem" value="Terms.Conditions"/>
-                        <h:outputLabel styleClass="clsLabelTransItem" value="Payment.Terms"/>
+                        <h:outputLabel value=""/>
                         <h:inputTextarea styleClass="clsInput" id="itxaDeliveryAddress" rows="4" value="#{transBean.transObj.deliveryAddress}" disabled="true"/>
                         <h:inputTextarea styleClass="clsInput" id="itxaTermsConditions" rows="4" value="#{transBean.transObj.termsConditions}" disabled="true"/>
-                        <h:inputTextarea styleClass="clsInput" id="itxaPayTerms" rows="4" value="#{transBean.transObj.payTerms}" disabled="true"/>
+                        <h:outputLabel value=""/>
                     </h:panelGrid>
                     <h:panelGrid id="pgrdApprove">
                         <h:panelGrid rendered="#{transBean.isApproveNeeded(transBean.transObj)}" id="pgrdApprove2" styleClass="clsGridApprove" columns="6" style="background-color: lightsalmon">

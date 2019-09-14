@@ -242,7 +242,7 @@ public class PayBean implements Serializable {
         Transactor NewTransactor;
         Transactor NewBillTransactor;
         TransactorBean NewTransactorBean;
-
+        
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
