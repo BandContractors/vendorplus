@@ -43,9 +43,9 @@ import javax.servlet.http.HttpSession;
 @ManagedBean
 @SessionScoped
 public class PayBean implements Serializable {
-
+    
     private static final long serialVersionUID = 1L;
-
+    
     private List<Pay> Pays;
     private String ActionMessage = null;
     private Pay SelectedPay = null;
@@ -66,7 +66,7 @@ public class PayBean implements Serializable {
     private String ActionType;
     private int OverridePrintVersion;
     private boolean PayAll;
-
+    
     public long payInsertUpdate(Pay pay) {
         long PayId = 0;
         String sql = null;
@@ -230,7 +230,7 @@ public class PayBean implements Serializable {
         }
         return PayId;
     }
-
+    
     public void saveCashReceipt(Pay pay, List<PayTrans> aPayTranss, int aPayTypeId, int aPayReasId) {
         String sql = null;
         String sql2 = null;
@@ -246,7 +246,7 @@ public class PayBean implements Serializable {
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
-
+        
         if (pay.getPayId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, Integer.toString(aPayReasId), "Add") == 0) {
             msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
@@ -311,7 +311,7 @@ public class PayBean implements Serializable {
             HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
             HttpSession httpSession = request.getSession(true);
             httpSession.setAttribute("CURRENT_PAY_ID", SavedPayId);
-
+            
             pay.setPayId(SavedPayId);
             //insert pay transs items
             if (aPayReasId == 21 || aPayReasId == 22) {
@@ -335,7 +335,7 @@ public class PayBean implements Serializable {
             this.PayAll = false;
         }
     }
-
+    
     public void saveCashPaymentLIABILITY(Pay pay, List<PayTrans> aPayTranss, int aPayTypeId, int aPayReasId, PayTrans aPayTrans) {
         try {
             if (aPayTrans.getAccount_code().length() <= 0) {
@@ -354,7 +354,7 @@ public class PayBean implements Serializable {
             npe.printStackTrace();
         }
     }
-
+    
     public void saveCashPayment(Pay pay, List<PayTrans> aPayTranss, int aPayTypeId, int aPayReasId) {
         String sql = null;
         String sql2 = null;
@@ -366,11 +366,11 @@ public class PayBean implements Serializable {
         Transactor NewTransactor;
         Transactor NewBillTransactor;
         TransactorBean NewTransactorBean;
-
+        
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
-
+        
         if (pay.getPayId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, Integer.toString(aPayReasId), "Add") == 0) {
             msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
@@ -463,9 +463,9 @@ public class PayBean implements Serializable {
             this.clearPayPayTranss(pay, aPayTranss);
             this.PayAll = false;
         }
-
+        
     }
-
+    
     public boolean updatePay(Pay pay) {
         String sql = "{call sp_update_pay(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         try (
@@ -507,7 +507,7 @@ public class PayBean implements Serializable {
             return false;
         }
     }
-
+    
     public Pay getPay(long PayId) {
         String sql = "{call sp_search_pay_by_pay_id(?)}";
         ResultSet rs = null;
@@ -534,7 +534,7 @@ public class PayBean implements Serializable {
             }
         }
     }
-
+    
     public String getPaidLiabilityAccount(long PayId) {
         String sql = "SELECT * FROM pay_trans WHERE pay_id=" + PayId;
         ResultSet rs = null;
@@ -559,7 +559,7 @@ public class PayBean implements Serializable {
         }
         return AccName;
     }
-
+    
     public void setPayFromResultset(Pay pay, ResultSet rs) {
         try {
             try {
@@ -696,10 +696,10 @@ public class PayBean implements Serializable {
             se.printStackTrace();
         }
     }
-
+    
     public Pay getPayFromResultset(ResultSet rs) {
         try {
-
+            
             Pay pay = new Pay();
             try {
                 pay.setPayId(rs.getLong("pay_id"));
@@ -836,10 +836,10 @@ public class PayBean implements Serializable {
             return null;
         }
     }
-
+    
     public static Pay getPayFromResultset2(ResultSet rs) {
         try {
-
+            
             Pay pay = new Pay();
             try {
                 pay.setPayId(rs.getLong("pay_id"));
@@ -976,7 +976,7 @@ public class PayBean implements Serializable {
             return null;
         }
     }
-
+    
     public void setPayById(long PayId, Pay pay) {
         String sql = "{call sp_search_pay_by_pay_id(?)}";
         ResultSet rs = null;
@@ -1002,9 +1002,9 @@ public class PayBean implements Serializable {
                 }
             }
         }
-
+        
     }
-
+    
     public int getCountPayByDeletePayId(long aDeletePayId) {
         String sql = "{call sp_search_pay_count_by_delete_pay_id(?)}";
         ResultSet rs = null;
@@ -1030,9 +1030,9 @@ public class PayBean implements Serializable {
                 }
             }
         }
-
+        
     }
-
+    
     public boolean isAllowCancelPay(Pay aPay) {
         if (aPay.getBillTransactorId() == 0 || (aPay.getPaidAmount() <= 0 && aPay.getPointsSpentAmount() <= 0)) {
             return false;
@@ -1040,14 +1040,14 @@ public class PayBean implements Serializable {
             return true;
         }
     }
-
+    
     public void deletePay(Pay pay) {
         String sql = "DELETE FROM pay WHERE pay_id=?";
         String msg;
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
-
+        
         if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Delete") == 0) {
             msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
             FacesContext.getCurrentInstance().addMessage("Delete", new FacesMessage(msg));
@@ -1065,7 +1065,7 @@ public class PayBean implements Serializable {
             }
         }
     }
-
+    
     public void cancelPayV2(Pay aPay, List<PayTrans> aPayTransList) {
         //1. copy
         //2. Zero/nullfy/cancel pay
@@ -1084,7 +1084,7 @@ public class PayBean implements Serializable {
         int hasReversed = 0;
         long x = 0;
         TransactionType tt = new TransactionTypeBean().getTransactionType(aPay.getPayTypeId());
-
+        
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
@@ -1203,7 +1203,7 @@ public class PayBean implements Serializable {
                 }
                 hasReversed = 1;
             }
-
+            
             if (isPayUpdateSuccess && isPayTransUpdateSuccess && hasReversed == 1) {
                 this.setActionMessage("Transaction Cancelled Successfully");
             } else {
@@ -1211,7 +1211,7 @@ public class PayBean implements Serializable {
             }
         }
     }
-
+    
     public void displayPay(Pay PayFrom, Pay PayTo) {
         PayTo.setPayId(PayFrom.getPayId());
         PayTo.setPayDate(PayFrom.getPayDate());
@@ -1225,7 +1225,7 @@ public class PayBean implements Serializable {
         PayTo.setPointsSpentAmount(PayFrom.getPointsSpentAmount());
         PayTo.setDeletePayId(PayFrom.getDeletePayId());
     }
-
+    
     public void clearPay(Pay pay) {
         pay.setPayId(0);
         pay.setPayDate(null);
@@ -1257,7 +1257,7 @@ public class PayBean implements Serializable {
         pay.setInterestAmount(0);
         pay.setPay_number("");
     }
-
+    
     public void initClearPay(Pay pay, Transactor transactor) {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -1293,11 +1293,11 @@ public class PayBean implements Serializable {
                 pay.setPay_number("");
                 new TransactorBean().clearTransactor(transactor);
             } catch (Exception e) {
-
+                
             }
         }
     }
-
+    
     public void initClearPayReceipt() {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -1308,11 +1308,11 @@ public class PayBean implements Serializable {
                 HttpSession httpSession = request.getSession(true);
                 httpSession.setAttribute("CURRENT_PAY_ID", 0);
             } catch (Exception e) {
-
+                
             }
         }
     }
-
+    
     public void clearPayPayTranss(Pay pay, List<PayTrans> aPayTranss) {
         if (pay != null) {
             pay.setPayId(0);
@@ -1349,7 +1349,7 @@ public class PayBean implements Serializable {
             aPayTranss.clear();
         }
     }
-
+    
     public void clearPayPayTranss(Pay pay, List<PayTrans> aPayTranss, PayBean aPayBean, Trans aTrans) {
         if (pay != null) {
             pay.setPayId(0);
@@ -1393,7 +1393,7 @@ public class PayBean implements Serializable {
             aTrans.setTransactionNumber2("");
         }
     }
-
+    
     public void initClearPayPayTranss(Pay pay, Transactor transactor, List<PayTrans> aPayTranss) {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -1435,14 +1435,14 @@ public class PayBean implements Serializable {
             }
         }
     }
-
+    
     public void initCurrencyCode(int aTransTypeId, Pay pay) {
         try {
             TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
             String DefaultCurrencyCode = "";
             String TransTypeCurrencyCode = "";
             String LocalCurrencyCode = "";
-
+            
             try {
                 LocalCurrencyCode = new AccCurrencyBean().getLocalCurrency().getCurrencyCode();
                 if (null == LocalCurrencyCode) {
@@ -1467,7 +1467,7 @@ public class PayBean implements Serializable {
             } catch (NullPointerException npe) {
                 TransTypeCurrencyCode = "";
             }
-
+            
             if (TransTypeCurrencyCode.length() > 0) {
                 pay.setCurrencyCode(TransTypeCurrencyCode);
             } else if (DefaultCurrencyCode.length() > 0) {
@@ -1479,7 +1479,7 @@ public class PayBean implements Serializable {
             pay.setCurrencyCode("");
         }
     }
-
+    
     public void initClearPayPayTranss(Pay pay, Transactor transactor, List<PayTrans> aPayTranss, PayBean aPayBean, Trans aTrans) {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -1561,7 +1561,7 @@ public class PayBean implements Serializable {
         }
         return Pays;
     }
-
+    
     public List<Pay> getPaysByTransaction(long TransId) {
         String sql = "{call sp_search_pay_by_transaction_id(?)}";
         ResultSet rs = null;
@@ -1587,7 +1587,7 @@ public class PayBean implements Serializable {
         }
         return Pays;
     }
-
+    
     public List<Pay> getPaysByTransIdTransType(long TransId, int aTransTypeId) {
         String sql = "{call sp_search_pay_by_transaction_id_type(?,?)}";
         ResultSet rs = null;
@@ -1614,7 +1614,7 @@ public class PayBean implements Serializable {
         }
         return Pays;
     }
-
+    
     public List<Pay> getPaysByTransIdPayCat(long TransId, String aPayCat) {
         String sql = "{call sp_search_pay_by_transaction_id_paycat(?,?)}";
         ResultSet rs = null;
@@ -1641,7 +1641,7 @@ public class PayBean implements Serializable {
         }
         return Pays;
     }
-
+    
     public List<Pay> getPaysByTransNoPayCat(String TransNo, String aPayCat) {
         String sql = "{call sp_search_pay_by_transaction_number_paycat(?,?)}";
         ResultSet rs = null;
@@ -1668,7 +1668,7 @@ public class PayBean implements Serializable {
         }
         return Pays;
     }
-
+    
     public Pay getTransactionFirstPay(long aTransactionId) {
         String sql = "{call sp_search_pay_first_by_transaction_id(?)}";
         ResultSet rs = null;
@@ -1695,7 +1695,7 @@ public class PayBean implements Serializable {
         }
         return pay;
     }
-
+    
     public Pay getTransactionFirstPayByTransNo(String aTransactionNumber) {
         String sql = "{call sp_search_pay_first_by_transaction_number(?)}";
         ResultSet rs = null;
@@ -1722,7 +1722,7 @@ public class PayBean implements Serializable {
         }
         return pay;
     }
-
+    
     public List<Pay> getPaysByTransactor(long TracId) {
         String sql = "{call sp_search_pay_by_transactor_id(?)}";
         ResultSet rs = null;
@@ -1748,7 +1748,7 @@ public class PayBean implements Serializable {
         }
         return Pays;
     }
-
+    
     public List<Pay> getPaysByTrTcTt(long aTransactionId, long aTransactorId, String aTransactorType) {
         List<Pay> aPays = new ArrayList<Pay>();
         aPays.clear();
@@ -1763,7 +1763,7 @@ public class PayBean implements Serializable {
         }
         return aPays;
     }
-
+    
     public List<Pay> getPaysByBillTrTcTt(long aTransactionId, long aBillTransactorId, String aTransactorType) {
         List<Pay> aPays = new ArrayList<Pay>();
         aPays.clear();
@@ -1778,7 +1778,7 @@ public class PayBean implements Serializable {
         }
         return aPays;
     }
-
+    
     public List<Pay> getPaysByBillTrPaCa(long aTransactionId, long aBillTransactorId, String aPayCat) {
         List<Pay> aPays = new ArrayList<Pay>();
         aPays.clear();
@@ -1789,7 +1789,7 @@ public class PayBean implements Serializable {
         }
         return aPays;
     }
-
+    
     public List<Pay> getPaysByBillTrPaCaTransNo(String aTransactionNumber, long aBillTransactorId, String aPayCat) {
         List<Pay> aPays = new ArrayList<Pay>();
         aPays.clear();
@@ -1800,7 +1800,7 @@ public class PayBean implements Serializable {
         }
         return aPays;
     }
-
+    
     public List<Pay> getPaysByTransactorTransType(long TracId, String aTransactorType) {
         String sql = "{call sp_search_pay_by_transactor_transtype(?,?)}";
         ResultSet rs = null;
@@ -1833,7 +1833,7 @@ public class PayBean implements Serializable {
         }
         return Pays;
     }
-
+    
     public List<Pay> getPaysByBillTransactorTransType(long TracId, String aTransactorType) {
         String sql = "{call sp_search_pay_by_bill_transactor_transtype(?,?)}";
         ResultSet rs = null;
@@ -1866,7 +1866,7 @@ public class PayBean implements Serializable {
         }
         return Pays;
     }
-
+    
     public List<Pay> getPaysByBillTransactorPayCat(long aBillTransactorId, String aPayCategory) {
         String sql = "{call sp_search_pay_by_bill_transactor_paycat(?,?)}";
         ResultSet rs = null;
@@ -1893,7 +1893,7 @@ public class PayBean implements Serializable {
         }
         return Pays;
     }
-
+    
     public long getOverPayIdReadyForTransFULL(long aBillTransactorId, String aPayCategory, Double aTransBalToPayAmount) {
         String sql = "{call sp_search_pay_total_trans_bal(?,?)}";
         ResultSet rs = null;
@@ -1936,7 +1936,7 @@ public class PayBean implements Serializable {
         }
         return payid;
     }
-
+    
     public Pay getOverPayIdReadyForTransPART(long aBillTransactorId, String aPayCategory, Double aTransBalToPayAmount) {
         String sql = "{call sp_search_pay_total_trans_bal(?,?)}";
         ResultSet rs = null;
@@ -1995,7 +1995,7 @@ public class PayBean implements Serializable {
         }
         return returnpay;
     }
-
+    
     public void ViewReceiptVoucher(long aPayId) {
         //manage session variables
         FacesContext context = FacesContext.getCurrentInstance();
@@ -2005,7 +2005,7 @@ public class PayBean implements Serializable {
         //: org.primefaces.context.RequestContext.getCurrentInstance().openDialog("PayReceipt.xhtml", null, null);
         org.primefaces.PrimeFaces.current().dialog().openDynamic("PayReceipt.xhtml", null, null);
     }
-
+    
     public void ViewCashReceipt(long aPayId) {
         try {
             //manage session variables
@@ -2035,7 +2035,7 @@ public class PayBean implements Serializable {
             e.printStackTrace();
         }
     }
-
+    
     public void ViewCashPayment(long aPayId) {
         //manage session variables
         FacesContext context = FacesContext.getCurrentInstance();
@@ -2045,7 +2045,7 @@ public class PayBean implements Serializable {
         //org.primefaces.context.RequestContext.getCurrentInstance().openDialog("CashPayment.xhtml", null, null);
         org.primefaces.PrimeFaces.current().dialog().openDynamic("CashPayment.xhtml", null, null);
     }
-
+    
     public int getTransTypeIdByPayCat(String aPayCat) {
         int x = 0;
         if (aPayCat.equals("IN")) {//SALES INVOICE
@@ -2055,7 +2055,7 @@ public class PayBean implements Serializable {
         }
         return x;
     }
-
+    
     public void setDateToToday() {
         Date CurrentServerDate = new CompanySetting().getCURRENT_SERVER_DATE();
         this.setDate1(CurrentServerDate);
@@ -2067,7 +2067,7 @@ public class PayBean implements Serializable {
         cal.set(Calendar.MILLISECOND, 0);
         // Put it back in the Date object  
         this.setDate1(cal.getTime());
-
+        
         this.setDate2(CurrentServerDate);
         Calendar cal2 = Calendar.getInstance();
         cal2.setTime(this.getDate2());
@@ -2078,10 +2078,10 @@ public class PayBean implements Serializable {
         // Put it back in the Date object  
         this.setDate2(cal2.getTime());
     }
-
+    
     public void setDateToYesturday() {
         Date CurrentServerDate = new CompanySetting().getCURRENT_SERVER_DATE();
-
+        
         this.setDate1(CurrentServerDate);
         Calendar cal = Calendar.getInstance();
         cal.setTime(this.getDate1());
@@ -2092,7 +2092,7 @@ public class PayBean implements Serializable {
         cal.set(Calendar.MILLISECOND, 0);
         // Put it back in the Date object  
         this.setDate1(cal.getTime());
-
+        
         this.setDate2(CurrentServerDate);
         Calendar cal2 = Calendar.getInstance();
         cal2.setTime(this.getDate2());
@@ -2104,10 +2104,10 @@ public class PayBean implements Serializable {
         // Put it back in the Date object  
         this.setDate2(cal2.getTime());
     }
-
+    
     public void setDateToToday(Pay aPay) {
         Date CurrentServerDate = new CompanySetting().getCURRENT_SERVER_DATE();
-
+        
         aPay.setAddDate(CurrentServerDate);
         Calendar cal = Calendar.getInstance();
         cal.setTime(aPay.getAddDate());
@@ -2117,7 +2117,7 @@ public class PayBean implements Serializable {
         cal.set(Calendar.MILLISECOND, 0);
         // Put it back in the Date object  
         aPay.setAddDate(cal.getTime());
-
+        
         aPay.setAddDate2(CurrentServerDate);
         Calendar cal2 = Calendar.getInstance();
         cal2.setTime(aPay.getAddDate2());
@@ -2128,10 +2128,10 @@ public class PayBean implements Serializable {
         // Put it back in the Date object  
         aPay.setAddDate2(cal2.getTime());
     }
-
+    
     public void setTransDateToToday(Pay aPay) {
         Date CurrentServerDate = new CompanySetting().getCURRENT_SERVER_DATE();
-
+        
         aPay.setPayDate(CurrentServerDate);
         Calendar cal = Calendar.getInstance();
         cal.setTime(aPay.getPayDate());
@@ -2141,7 +2141,7 @@ public class PayBean implements Serializable {
         cal.set(Calendar.MILLISECOND, 0);
         // Put it back in the Date object  
         aPay.setPayDate(cal.getTime());
-
+        
         aPay.setPayDate2(CurrentServerDate);
         Calendar cal2 = Calendar.getInstance();
         cal2.setTime(aPay.getPayDate2());
@@ -2152,11 +2152,11 @@ public class PayBean implements Serializable {
         // Put it back in the Date object  
         aPay.setPayDate2(cal2.getTime());
     }
-
+    
     public void setDateToYesturday(Pay aPay) {
         //Date CurrentServerDate=new CompanySetting().getCURRENT_SERVER_DATE();
         Date CurrentServerDate = new CompanySetting().getCURRENT_SERVER_DATE();
-
+        
         aPay.setAddDate(CurrentServerDate);
         Calendar cal = Calendar.getInstance();
         cal.setTime(aPay.getAddDate());
@@ -2167,7 +2167,7 @@ public class PayBean implements Serializable {
         cal.set(Calendar.MILLISECOND, 0);
         // Put it back in the Date object  
         aPay.setAddDate(cal.getTime());
-
+        
         aPay.setAddDate2(CurrentServerDate);
         Calendar cal2 = Calendar.getInstance();
         cal2.setTime(aPay.getAddDate2());
@@ -2179,11 +2179,11 @@ public class PayBean implements Serializable {
         // Put it back in the Date object  
         aPay.setAddDate2(cal2.getTime());
     }
-
+    
     public void setTransDateToYesturday(Pay aPay) {
         //Date CurrentServerDate=new CompanySetting().getCURRENT_SERVER_DATE();
         Date CurrentServerDate = new CompanySetting().getCURRENT_SERVER_DATE();
-
+        
         aPay.setPayDate(CurrentServerDate);
         Calendar cal = Calendar.getInstance();
         cal.setTime(aPay.getPayDate());
@@ -2194,7 +2194,7 @@ public class PayBean implements Serializable {
         cal.set(Calendar.MILLISECOND, 0);
         // Put it back in the Date object  
         aPay.setPayDate(cal.getTime());
-
+        
         aPay.setPayDate2(CurrentServerDate);
         Calendar cal2 = Calendar.getInstance();
         cal2.setTime(aPay.getPayDate2());
@@ -2206,7 +2206,7 @@ public class PayBean implements Serializable {
         // Put it back in the Date object  
         aPay.setPayDate2(cal2.getTime());
     }
-
+    
     public void initResetPayReportDetail(Trans aTrans, Pay aPay, PayBean aPayBean, Transactor aBillTransactor) {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -2214,7 +2214,7 @@ public class PayBean implements Serializable {
             this.resetPayReportDetail(aTrans, aPay, aPayBean, aBillTransactor);
         }
     }
-
+    
     public void resetPayReportDetail(Trans aTrans, Pay aPay, PayBean aPayBean, Transactor aBillTransactor) {
         aPayBean.setActionMessage("");
         try {
@@ -2241,7 +2241,7 @@ public class PayBean implements Serializable {
         } catch (NullPointerException npe) {
         }
     }
-
+    
     public void reportCashReceiptDetail(Trans aTrans, Pay aPay, PayBean aPayBean) {
         if (aPayBean.getDateType().length() == 0) {
             aPayBean.setDateType("Add Date");
@@ -2316,12 +2316,13 @@ public class PayBean implements Serializable {
             while (rs.next()) {
                 pay = new Pay();
                 this.setPayFromResultset(pay, rs);
+                this.updateLookupPay(pay);
                 this.PayList.add(pay);
             }
         } catch (SQLException se) {
             System.err.println(se.getMessage());
         }
-
+        
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sqlsum);) {
@@ -2396,7 +2397,7 @@ public class PayBean implements Serializable {
             System.err.println(se.getMessage());
         }
     }
-
+    
     public void reportCashPaymentDetail(Trans aTrans, Pay aPay, PayBean aPayBean) {
         if (aPayBean.getDateType().length() == 0) {
             aPayBean.setDateType("Add Date");
@@ -2471,12 +2472,13 @@ public class PayBean implements Serializable {
             while (rs.next()) {
                 pay = new Pay();
                 this.setPayFromResultset(pay, rs);
+                this.updateLookupPay(pay);
                 this.PayList.add(pay);
             }
         } catch (SQLException se) {
             System.err.println(se.getMessage());
         }
-
+        
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sqlsum);) {
@@ -2551,7 +2553,13 @@ public class PayBean implements Serializable {
             System.err.println(se.getMessage());
         }
     }
-
+    
+    public void updateLookupPay(Pay aPay) {
+        if (null != aPay) {
+            aPay.setPaidForSummary(new PayTransBean().getPaidForSummary(aPay.getPayId()));
+        }
+    }
+    
     public void initPaySession(long aPayId, String aAction) {
         //first set current selection in session
         FacesContext context = FacesContext.getCurrentInstance();
@@ -2565,7 +2573,7 @@ public class PayBean implements Serializable {
         //refresh output
         new OutputDetailBean().refreshOutput("PARENT", "SOURCE-PAY");
     }
-
+    
     public String getPrintoutJsfFile(int aTranstypeId, int aOverrideVersion) {
         String the_file = "";
         switch (aTranstypeId) {
@@ -2628,10 +2636,10 @@ public class PayBean implements Serializable {
                 the_file = "CashPayment.xhtml";
                 break;
         }
-
+        
         return the_file;
     }
-
+    
     public String getStatus(int aStatusId) {
         if (aStatusId == 0) {
             return "Not Cleared";
@@ -2641,7 +2649,7 @@ public class PayBean implements Serializable {
             return "";
         }
     }
-
+    
     public void doPayAll(List<PayTrans> aPayTranss, boolean aPayAll, Pay aPay) {
         int ListItemIndex = 0;
         int ListItemNo = 0;

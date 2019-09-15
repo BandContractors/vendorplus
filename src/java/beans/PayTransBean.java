@@ -689,6 +689,46 @@ public class PayTransBean implements Serializable {
         return RecGreaterBal;
     }
 
+    public String getPaidForSummary(long aPayId) {
+        String PaidForSummary = "";
+        List<PayTrans> pts = this.getPayTranssByPayId(aPayId);
+        PayTrans pt = null;
+        for (int i = 0; i < pts.size(); i++) {
+            pt = pts.get(i);
+            String AccountName = "";
+            String TransNo = "";
+            try {
+                if (pt.getAccount_code().length() > 0) {
+                    AccountName = new AccCoaBean().getAccCoaByCodeOrId(pt.getAccount_code(), 0).getAccountName();
+                }
+            } catch (Exception e) {
+                //do nothing 
+            }
+            try {
+                if (pt.getTransactionNumber().length() > 0) {
+                    TransNo = pt.getTransactionNumber();
+                }
+            } catch (Exception e) {
+                //do nothing 
+            }
+            if (AccountName.length() > 0) {
+                if (PaidForSummary.length() > 0) {
+                    PaidForSummary = PaidForSummary + ", " + AccountName;
+                } else {
+                    PaidForSummary = AccountName;
+                }
+            }
+            if (TransNo.length() > 0) {
+                if (PaidForSummary.length() > 0) {
+                    PaidForSummary = PaidForSummary + ", " + TransNo;
+                } else {
+                    PaidForSummary = TransNo;
+                }
+            }
+        }
+        return PaidForSummary;
+    }
+
     /**
      * @return the PayTranss
      */

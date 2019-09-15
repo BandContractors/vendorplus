@@ -194,10 +194,10 @@
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
-                        <p:ajax listener="#{payBean.saveCashPayment(pay,payTransBean.payTranss,15,25)}" process="@form" update="pnlSearch pnlInput msgPanel pnlReceipt pnlButtons"/>
+                        <p:ajax listener="#{payBean.saveCashPayment(pay,payTransBean.payTranss,15,25)}" process="@form" update="@this pnlSearch pnlInput msgPanel pnlReceipt"/>
                     </p:commandButton>
                     <p:commandButton styleClass="clsButtonBig" value="CLEAR (ALT+C)" accesskey="c">
-                        <p:ajax listener="#{payBean.clearPayPayTranss(pay,payTransBean.payTranss,payBean,trans)}" process="@form" update="pnlSearch pnlInput msgPanel pnlReceipt pnlButtons"/>
+                        <p:ajax listener="#{payBean.clearPayPayTranss(pay,payTransBean.payTranss,payBean,trans)}" process="@form" update="pnlSearch pnlInput msgPanel pnlReceipt"/>
                         <p:ajax listener="#{payBean.setPayAll(false)}" process="pnlInput" update="pnlInput"/>
                     </p:commandButton>
                 </h:panelGrid>

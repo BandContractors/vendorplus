@@ -52,6 +52,7 @@ public class Pay implements Serializable {
     private Date EditDate2;
     
     private String pay_number;
+    private String PaidForSummary;
 
     /**
      * @return the PayId
@@ -457,5 +458,19 @@ public class Pay implements Serializable {
      */
     public void setPay_number(String pay_number) {
         this.pay_number = pay_number;
+    }
+
+    /**
+     * @return the PaidForSummary
+     */
+    public String getPaidForSummary() {
+        return PaidForSummary;
+    }
+
+    /**
+     * @param PaidForSummary the PaidForSummary to set
+     */
+    public void setPaidForSummary(String PaidForSummary) {
+        this.PaidForSummary = PaidForSummary;
     }
 }

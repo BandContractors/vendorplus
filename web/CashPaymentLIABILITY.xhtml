@@ -121,15 +121,15 @@
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
-                        <p:ajax listener="#{payBean.saveCashPaymentLIABILITY(pay,payTransBean.payTranss,15,105,payTrans)}" process="@form" update="@form"/>
+                        <p:ajax listener="#{payBean.saveCashPaymentLIABILITY(pay,payTransBean.payTranss,15,105,payTrans)}" process="@form" update="@this pnlSearch pnlInput pnlgMessage pnlReceipt"/>
                     </p:commandButton>
                     <p:commandButton styleClass="clsButtonBig" value="CLEAR (ALT+C)" accesskey="c">
-                        <p:ajax listener="#{payBean.clearPayPayTranss(pay,payTransBean.payTranss)}" process="@form" update="@form"/>
+                        <p:ajax listener="#{payBean.clearPayPayTranss(pay,payTransBean.payTranss)}" process="@form" update="pnlSearch pnlInput pnlgMessage pnlReceipt"/>
                     </p:commandButton>
                 </h:panelGrid>
             </h:panelGrid>
 
-            <h:panelGrid styleClass="clsGridMainMessages" columns="1">
+            <h:panelGrid id="pnlgMessage" styleClass="clsGridMainMessages" columns="1">
                 <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{payBean.actionMessage}"/>
                 <h:messages id="msgsMainMessage" style="color: red"/><br/>
             </h:panelGrid>

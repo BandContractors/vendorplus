@@ -216,7 +216,8 @@
                     <p:commandButton id="cmdbcancelCPLiab" icon="ui-icon-closethick" oncomplete="PF('dlgCPLiab').show();" actionListener="#{payBean.initPaySession(itm.payId,'Cancel')}" update=":formTransactionCPLiab" rendered="#{itm.payReasonId==105}"/>
                 </p:column>
                 <p:column headerText="Cash Payment Type">
-                    <h:outputLabel value="#{transactionReasonBean.getTransactionReason(itm.payReasonId).transactionReasonName}"/>
+                    <h:outputLabel value="#{transactionReasonBean.getTransactionReason(itm.payReasonId).transactionReasonName}"/><br/>
+                    <h:outputLabel value="#{itm.paidForSummary}"/>
                 </p:column>
                 <p:column headerText="Pay No">
                     <h:outputLabel value="#{itm.pay_number}"/>
@@ -228,7 +229,7 @@
                     <h:outputText value="#{utilityBean.formatDate(itm.addDate)}"/>
                 </p:column>
                 <p:column headerText="Paid To">
-                    <h:outputText value="#{transactorBean.getTransactor(itm.billTransactorId).transactorNames}"  rendered="#{itm.billTransactorId>0 and (itm.payReasonId==25 or itm.payReasonId==26 or itm.payReasonId==91)}"/>
+                    <h:outputText value="#{transactorBean.getTransactor(itm.billTransactorId).transactorNames}"  rendered="#{itm.billTransactorId>0}"/>
                     <h:outputText value="#{accChildAccountBean.getAccChildAccById(itm.accChildAccountId2).childAccountName}"  rendered="#{itm.accChildAccountId2>0 and itm.payReasonId==34}"/>
                     <h:outputText value="#{accChildAccountBean.getAccChildAccById(itm.accChildAccountId2).childAccountName}"  rendered="#{itm.accChildAccountId2>0 and itm.payReasonId==33}"/>
                 </p:column>
