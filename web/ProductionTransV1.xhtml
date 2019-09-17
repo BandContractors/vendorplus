@@ -72,8 +72,8 @@
                         </p:column> 
                         <p:ajax event="itemSelect" listener="#{trans.setTransactorId(transactorBean.selectedTransactor.transactorId)}" />
                         <p:ajax event="change" listener="#{trans.setTransactorId(transactorBean.selectedTransactor.transactorId)}" rendered="#{transactorBean.selectedTransactor!=null}" />
-                        <p:ajax event="itemSelect" listener="#{transBean.refreshTransList(11,transactorBean.selectedTransactor.transactorId,20)}" update="menuTransNumber" />
-                        <p:ajax event="change" listener="#{transBean.refreshTransList(11,transactorBean.selectedTransactor.transactorId,20)}" rendered="#{transactorBean.selectedTransactor!=null}" update="menuTransNumber" />
+                        <p:ajax event="itemSelect" listener="#{transBean.refreshTransList(11,transactorBean.selectedTransactor.transactorId,20,'is_processed','0,2')}" update="menuTransNumber" />
+                        <p:ajax event="change" listener="#{transBean.refreshTransList(11,transactorBean.selectedTransactor.transactorId,20,'is_processed','0,2')}" rendered="#{transactorBean.selectedTransactor!=null}" update="menuTransNumber" />
                     </p:autoComplete>
                     <h:outputLabel  value="#{transBean.transTypeRefObj.transactionNumberLabel}:"/>
                     <p:selectOneMenu id="menuTransNumber" value="#{trans.transactionRef}" editable="true" dynamic="true">

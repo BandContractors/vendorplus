@@ -215,6 +215,78 @@ public class TransProductionBean implements Serializable {
         }
     }
 
+    public void updateOrderProductionStatus(Trans aOrderTrans) {
+        String sql = "";
+        ResultSet rs = null;
+        int ItemsForProduction = 0;
+        int ItemsFullyProduced = 0;
+        int ItemsPartiallyProduced = 0;
+        int ItemsNotProduced = 0;
+        if (null == aOrderTrans) {
+            //do nothing
+        } else {
+            sql = "SELECT  ti.item_id,ti.item_qty,ti.specific_size,IFNULL(ti.batchno, '') as batchno,IFNULL(ti.code_specific, '') as code_specific,IFNULL(ti.desc_specific, '') as desc_specific, "
+                    + "("
+                    + "select IFNULL(sum(p.output_qty),0) as output_qty from trans_production p where p.output_item_id=ti.item_id and p.transaction_ref=t.transaction_number and p.transactor_id=t.transactor_id "
+                    + "and IFNULL(p.batchno, '')=IFNULL(ti.batchno, '') and IFNULL(p.code_specific, '')=IFNULL(ti.code_specific, '') and IFNULL(p.desc_specific, '')=IFNULL(ti.desc_specific, '') "
+                    + ") as qty_produced "
+                    + "FROM transaction_item ti "
+                    + "INNER JOIN transaction t ON ti.transaction_id=t.transaction_id "
+                    + "WHERE transaction_type_id=11 AND t.transactor_id=" + aOrderTrans.getTransactorId() + " AND t.transaction_number='" + aOrderTrans.getTransactionNumber() + "'";
+            //System.out.println("SQL:" + sql);
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                rs = ps.executeQuery();
+                TransProduction transprod = null;
+                while (rs.next()) {
+                    transprod = new TransProduction();
+                    try {
+                        transprod.setOutputItemId(rs.getLong("item_id"));
+                    } catch (NullPointerException npe) {
+                        transprod.setOutputItemId(0);
+                    }
+                    try {
+                        transprod.setOrderedQty(rs.getDouble("item_qty"));
+                    } catch (NullPointerException npe) {
+                        transprod.setOrderedQty(0);
+                    }
+                    try {
+                        transprod.setOutputQty(rs.getDouble("qty_produced"));
+                    } catch (NullPointerException npe) {
+                        transprod.setOutputQty(0);
+                    }
+                    Item outputItem = new Item();
+                    try {
+                        outputItem = new ItemBean().getItem(transprod.getOutputItemId());
+                    } catch (Exception e) {
+                    }
+                    if (outputItem.getIsBuy() == 0) {
+                        ItemsForProduction = ItemsForProduction + 1;
+                        if (transprod.getOutputQty() >= transprod.getOrderedQty()) {
+                            ItemsFullyProduced = ItemsFullyProduced + 1;
+                        } else if (transprod.getOutputQty() < transprod.getOrderedQty() && transprod.getOutputQty() > 0) {
+                            ItemsPartiallyProduced = ItemsPartiallyProduced + 1;
+                        } else if (transprod.getOutputQty() == 0) {
+                            ItemsNotProduced = ItemsNotProduced + 1;
+                        }
+                    }
+                }
+                //update production status
+                if (ItemsPartiallyProduced > 0 || (ItemsNotProduced > 0 && ItemsFullyProduced > 0)) {
+                    //update status 2
+                    new TransBean().updateOrderStatus(aOrderTrans.getTransactionId(), "is_processed", 2);
+                } else if (ItemsFullyProduced == ItemsForProduction) {
+                    //update status 1
+                    new TransBean().updateOrderStatus(aOrderTrans.getTransactionId(), "is_processed", 1);
+                }
+            } catch (Exception e) {
+                System.err.println("updateOrderProductionStatus:" + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+
     public void setItemForProduction(TransProduction aTransProduction, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aTrans, TransItem aTransItemToUpdate, Item aItem) {
         if (null == aItem) {
             aItem = new Item();
@@ -775,7 +847,11 @@ public class TransProductionBean implements Serializable {
                 if (PrevTransRef.length() > 0) {
                     this.refreshOrderProducedList(trans, aOrderProducedList, transItem);
                 }
-
+                //update production status
+                Trans OrderTrans = new TransBean().getTransByTransNumber(PrevTransRef);
+                if (null != OrderTrans) {
+                    this.updateOrderProductionStatus(OrderTrans);
+                }
                 //display success message
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Saved Successfully"));
             }

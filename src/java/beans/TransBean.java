@@ -39,6 +39,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.faces.application.ConfigurableNavigationHandler;
@@ -1890,6 +1891,141 @@ public class TransBean implements Serializable {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    public double getOrderInvoiceQtyBalance(long aTransactorId, String aTransNo, TransItem aTransItem) {
+        String sql = "";
+        ResultSet rs = null;
+        double InvoiceQtyBalance = 0;
+        if (aTransactorId == 0 || aTransNo.length() == 0 || null == aTransItem) {
+            //do nothing
+        } else {
+            sql = "SELECT  ti.item_id,ti.item_qty,ti.specific_size,IFNULL(ti.batchno, '') as batchno,IFNULL(ti.code_specific, '') as code_specific,IFNULL(ti.desc_specific, '') as desc_specific, "
+                    + "("
+                    + "select IFNULL(sum(ti2.item_qty),0) as sum_qty from transaction_item ti2 INNER JOIN transaction t2 ON ti2.transaction_id=t2.transaction_id WHERE t2.transaction_type_id=2 AND ti2.item_id=ti.item_id AND t2.transaction_ref=t.transaction_number AND t2.transactor_id=t.transactor_id "
+                    + "AND IFNULL(ti2.batchno, '')=IFNULL(ti.batchno, '') and IFNULL(ti2.code_specific, '')=IFNULL(ti.code_specific, '') and IFNULL(ti2.desc_specific, '')=IFNULL(ti.desc_specific, '') "
+                    + ") as qty_invoiced "
+                    + "FROM transaction_item ti "
+                    + "INNER JOIN transaction t ON ti.transaction_id=t.transaction_id "
+                    + "WHERE transaction_type_id=11 AND t.transactor_id=" + aTransactorId + " AND t.transaction_number='" + aTransNo + "' "
+                    + "AND ti.item_id=" + aTransItem.getItemId() + " "
+                    + "AND IFNULL(ti.batchno, '')='" + aTransItem.getBatchno() + "' and IFNULL(ti.code_specific, '')='" + aTransItem.getCodeSpecific() + "' and IFNULL(ti.desc_specific, '')='" + aTransItem.getDescSpecific() + "' ";
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                rs = ps.executeQuery();
+                if (rs.next()) {
+                    double QtyOrdered = 0;
+                    double QtyInvoiced = 0;
+                    try {
+                        QtyOrdered = rs.getDouble("item_qty");
+                    } catch (NullPointerException npe) {
+                        QtyOrdered = 0;
+                    }
+                    try {
+                        QtyInvoiced = rs.getDouble("qty_invoiced");
+                    } catch (NullPointerException npe) {
+                        QtyInvoiced = 0;
+                    }
+                    InvoiceQtyBalance = QtyOrdered - QtyInvoiced;
+                }
+            } catch (Exception e) {
+                System.err.println("getOrderInvoiceQtyBalance:" + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        return InvoiceQtyBalance;
+    }
+
+    public int getOrderInvoiceStatus(Trans aOrderTrans) {
+        String sql = "";
+        ResultSet rs = null;
+        int ItemsForInvoice = 0;
+        int ItemsFullyInvoiced = 0;
+        int ItemsPartiallyInvoiced = 0;
+        int ItemsNotInvoiced = 0;
+        int InvoiceStatus = 0;
+        if (null == aOrderTrans) {
+            //do nothing
+        } else {
+            sql = "SELECT  ti.item_id,ti.item_qty,ti.specific_size,IFNULL(ti.batchno, '') as batchno,IFNULL(ti.code_specific, '') as code_specific,IFNULL(ti.desc_specific, '') as desc_specific, "
+                    + "("
+                    + "select IFNULL(sum(ti2.item_qty),0) as sum_qty from transaction_item ti2 INNER JOIN transaction t2 ON ti2.transaction_id=t2.transaction_id WHERE t2.transaction_type_id=2 AND ti2.item_id=ti.item_id AND t2.transaction_ref=t.transaction_number AND t2.transactor_id=t.transactor_id "
+                    + "AND IFNULL(ti2.batchno, '')=IFNULL(ti.batchno, '') and IFNULL(ti2.code_specific, '')=IFNULL(ti.code_specific, '') and IFNULL(ti2.desc_specific, '')=IFNULL(ti.desc_specific, '') "
+                    + ") as qty_invoiced "
+                    + "FROM transaction_item ti "
+                    + "INNER JOIN transaction t ON ti.transaction_id=t.transaction_id "
+                    + "WHERE transaction_type_id=11 AND t.transactor_id=" + aOrderTrans.getTransactorId() + " AND t.transaction_number='" + aOrderTrans.getTransactionNumber() + "'";
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                rs = ps.executeQuery();
+                TransItem transitem = null;
+                while (rs.next()) {
+                    transitem = new TransItem();
+                    double QtyOrdered = 0;
+                    double QtyInvoiced = 0;
+                    try {
+                        transitem.setItemId(rs.getLong("item_id"));
+                    } catch (NullPointerException npe) {
+                        transitem.setItemId(0);
+                    }
+                    try {
+                        QtyOrdered = rs.getDouble("item_qty");
+                    } catch (NullPointerException npe) {
+                        QtyOrdered = 0;
+                    }
+                    try {
+                        QtyInvoiced = rs.getDouble("qty_invoiced");
+                    } catch (NullPointerException npe) {
+                        QtyInvoiced = 0;
+                    }
+                    Item item = new Item();
+                    try {
+                        item = new ItemBean().getItem(transitem.getItemId());
+                    } catch (Exception e) {
+                    }
+                    ItemsForInvoice = ItemsForInvoice + 1;
+                    if (QtyInvoiced >= QtyOrdered) {
+                        ItemsFullyInvoiced = ItemsFullyInvoiced + 1;
+                    } else if (QtyInvoiced < QtyOrdered && QtyInvoiced > 0) {
+                        ItemsPartiallyInvoiced = ItemsPartiallyInvoiced + 1;
+                    } else if (QtyInvoiced == 0) {
+                        ItemsNotInvoiced = ItemsNotInvoiced + 1;
+                    }
+                }
+                //InvoiceStatus
+                if (ItemsPartiallyInvoiced > 0 || (ItemsNotInvoiced > 0 && ItemsFullyInvoiced > 0)) {
+                    //status 2
+                    InvoiceStatus = 2;
+                } else if (ItemsFullyInvoiced == ItemsForInvoice) {
+                    //status 1
+                    InvoiceStatus = 1;
+                }
+            } catch (Exception e) {
+                System.err.println("getOrderInvoiceStatus:" + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        return InvoiceStatus;
+    }
+
+    public void saveTransCECcallFromSI(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
+        //get some details
+        String OrderTransNo = trans.getTransactionRef();
+        //save
+        this.saveTransCEC(aLevel, aStoreId, aTransTypeId, aTransReasonId, aSaleType, trans, aActiveTransItems, aSelectedTransactor, aSelectedBillTransactor, aTransUserDetail, aSelectedSchemeTransactor, aAuthorisedByUserDetail, aSelectedAccCoa);
+        //update a few things needed after sales invoice saving
+        if (OrderTransNo.length() > 0) {
+            Trans OrderTrans = this.getTransByNumberType(OrderTransNo, 11);
+            //get order's invoioce status 0,1,2
+            int InvoiceStatus = this.getOrderInvoiceStatus(OrderTrans);
+            //get order's invoioce pay status 0,1,2
+            //save invoice status if not 0
+            if (InvoiceStatus > 0) {
+                this.updateOrderStatus(OrderTrans.getTransactionId(), "is_invoiced", InvoiceStatus);
             }
         }
     }
@@ -4403,6 +4539,80 @@ public class TransBean implements Serializable {
                         }
                         tib.updateLookUpsUI(aActiveTransItems.get(i));
                     }
+                    this.setTransTotalsAndUpdateCEC(trans.getTransactionTypeId(), trans.getTransactionReasonId(), trans, aActiveTransItems);
+                } else {
+                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Select a valid sales order number that matches with client..."));
+                    this.setActionMessage("No sale order record loaded");
+                }
+            } else {
+                //FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Select a valid sales order number that matches with client..."));
+                //this.setActionMessage("No sale order record loaded");
+            }
+        } catch (Exception e) {
+            System.out.println("loadOrderTrans:" + e.getMessage());
+        }
+    }
+
+    public void loadOrderForInvoiceTrans(Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
+        String sql = null;
+        String msg = "";
+        long OrderId = 0;
+        String OrderNumber = trans.getTransactionRef();
+        long TransactorId = 0;
+        try {
+            TransactorId = aSelectedTransactor.getTransactorId();
+        } catch (Exception e) {
+        }
+        try {
+            if (OrderNumber.length() > 0 && TransactorId > 0) {
+                this.setTransFromOrder(trans, OrderNumber, TransactorId);
+                OrderId = trans.getTransactionId();
+                new TransItemBean().setTransItemsByTransactionId(aActiveTransItems, OrderId);
+                try {
+                    new TransactorBean().setTransactor(aSelectedTransactor, trans.getTransactorId());
+                } catch (NullPointerException npe) {
+                }
+                if (TransactorId == trans.getTransactorId() && trans.getTransactionTypeId() == 11) {
+                    //some cleanups and reset
+                    //1. for trans
+                    trans.setTransactionTypeId(new GeneralUserSetting().getCurrentTransactionTypeId());
+                    trans.setTransactionReasonId(new GeneralUserSetting().getCurrentTransactionReasonId());
+                    trans.setTransactionId(0);
+                    trans.setTransactionNumber("");
+                    trans.setTransactionRef(OrderNumber);
+                    trans.setTransactionDate(new CompanySetting().getCURRENT_SERVER_DATE());
+                    trans.setPayMethod(new PayMethodBean().getPayMethodDefault().getPayMethodId());
+                    this.refreshCustomerBalances(trans);
+                    //2. for trans items
+                    TransItemBean tib = new TransItemBean();
+                    ItemBean ib = new ItemBean();
+                    Item item = new Item();
+                    for (int i = 0; i < aActiveTransItems.size(); i++) {
+                        aActiveTransItems.get(i).setTransactionItemId(0);
+                        aActiveTransItems.get(i).setTransactionId(0);
+                        item = ib.getItem(aActiveTransItems.get(i).getItemId());
+                        if (item.getItemType().equals("PRODUCT")) {//4-10-000-010 - SALES Products
+                            aActiveTransItems.get(i).setAccountCode("4-10-000-010");
+                        } else if (item.getItemType().equals("SERVICE")) {//4-10-000-020 - SALES Services	
+                            aActiveTransItems.get(i).setAccountCode("4-10-000-020");
+                        }
+                        double OrderInvoiceQtyBalance = this.getOrderInvoiceQtyBalance(TransactorId, OrderNumber, aActiveTransItems.get(i));
+                        if (OrderInvoiceQtyBalance > 0) {
+                            aActiveTransItems.get(i).setItemQty(OrderInvoiceQtyBalance);
+                        } else {
+                            aActiveTransItems.get(i).setItemQty(0);
+                        }
+                        tib.updateLookUpsUI(aActiveTransItems.get(i));
+                    }
+                    //remove those already invoiced
+                    Iterator<TransItem> iterator = aActiveTransItems.iterator();
+                    while (iterator.hasNext()) {
+                        TransItem titem = iterator.next();
+                        if (titem.getItemQty() == 0) {
+                            iterator.remove();
+                        }
+                    }
+                    //set totals
                     this.setTransTotalsAndUpdateCEC(trans.getTransactionTypeId(), trans.getTransactionReasonId(), trans, aActiveTransItems);
                 } else {
                     FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Select a valid sales order number that matches with client..."));
@@ -12901,6 +13111,17 @@ public class TransBean implements Serializable {
         }
     }
 
+    public void refreshTransList(int aTransTypeId, long aTransactorId, int aLimit, String aStatusColumn, String aStatusValues) {
+        try {
+            this.TransList.clear();
+        } catch (NullPointerException npe) {
+            this.TransList = new ArrayList<>();
+        }
+        if (aTransactorId > 0) {
+            this.TransList = this.getTranss(aTransTypeId, aTransactorId, aLimit, aStatusColumn, aStatusValues);
+        }
+    }
+
     public void setRecentHirePuporse(Trans aTrans, long aTransactorId) {
         aTrans.setTransactionComment("");
         long TransId = this.getMostRecentTransId(65, 94, aTransactorId);
@@ -12941,6 +13162,39 @@ public class TransBean implements Serializable {
                 sql = "SELECT * FROM transaction WHERE transaction_type_id=" + aTransTypeId + " AND transactor_id=" + aTransactorId + " ORDER BY transaction_id DESC LIMIT " + aLimit;
             } else {
                 sql = "SELECT * FROM transaction WHERE transaction_type_id=" + aTransTypeId + " AND transactor_id=" + aTransactorId + " ORDER BY transaction_id DESC";
+            }
+        } catch (NullPointerException npe) {
+        }
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                TempTranss.add(this.getTransFromResultset(rs));
+            }
+        } catch (SQLException se) {
+            System.err.println("getTranss:" + se.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.err.println("getTranss:" + ex.getMessage());
+                }
+            }
+        }
+        return TempTranss;
+    }
+
+    public List<Trans> getTranss(int aTransTypeId, long aTransactorId, int aLimit, String aStatusColumn, String aStatusValues) {
+        String sql = "";
+        List<Trans> TempTranss = new ArrayList<>();
+        ResultSet rs = null;
+        try {
+            if (aLimit > 0) {
+                sql = "SELECT * FROM transaction WHERE transaction_type_id=" + aTransTypeId + " AND transactor_id=" + aTransactorId + " AND " + aStatusColumn + " IN(" + aStatusValues + ") ORDER BY transaction_id DESC LIMIT " + aLimit;
+            } else {
+                sql = "SELECT * FROM transaction WHERE transaction_type_id=" + aTransTypeId + " AND transactor_id=" + aTransactorId + " AND " + aStatusColumn + " IN(" + aStatusValues + ") ORDER BY transaction_id DESC";
             }
         } catch (NullPointerException npe) {
         }
@@ -14484,6 +14738,18 @@ public class TransBean implements Serializable {
             }
         }
         return msg;
+    }
+
+    public void updateOrderStatus(long aOrderId, String aStatusColumnName, int aStatusValue) {
+        //aStatus=is_invoiced,is_cancel,is_processed,is_pad
+        String sql = "UPDATE transaction SET " + aStatusColumnName + "=" + aStatusValue + " WHERE transaction_id=" + aOrderId;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.executeUpdate();
+        } catch (Exception e) {
+            System.err.println("updateOrderStatus:" + e.getMessage());
+        }
     }
 
     public int deleteTranssByIDs(String aAffectedTranssIDs) {
