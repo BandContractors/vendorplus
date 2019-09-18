@@ -36,40 +36,52 @@
                     <p:ajax listener="#{transBean.setDateToYesturday()}" process="@this" update="pnlgFilter"/>
                 </p:commandLink>
             </h:panelGrid>
-            <div class="ui-fluid">
-                <h:panelGrid id="pnlgFilter" columns="5" styleClass="clsPanelReportFilter">
-                    <p:outputLabel value="Store/Section"/>
-                    <p:outputLabel value="Date Type"/>
-                    <p:outputLabel value="From #{transBean.dateType}" id="lblDate1"/>
-                    <p:outputLabel value="To #{transBean.dateType}" id="lblDate2"/>
-                    <p:outputLabel value="#{transactionTypeBean.getTransactionType(2).transactionNumberLabel}"/>
-                    <p:selectOneMenu id="menuFromStore" value="#{trans.storeId}" >
+            <h:panelGrid id="pnlgFilter" columns="3" styleClass="clsPanelReportFilter">
+                <h:panelGrid columns="2">
+                    <p:outputLabel value="Store/Section:"/>
+                    <p:selectOneMenu id="menuFromStore" value="#{trans.storeId}" style="width: 200px;">
                         <f:selectItem itemLabel="Select" itemValue="0"/>
                         <f:selectItems value="#{storeBean.stores}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
                     </p:selectOneMenu>
-                    <p:selectOneMenu id="menuDateType" value="#{transBean.dateType}">
+                    <p:outputLabel value="Date Type:"/>
+                    <p:selectOneMenu id="menuDateType" value="#{transBean.dateType}" style="width: 200px;">
                         <f:selectItem itemLabel="Select" itemValue=""/>
                         <f:selectItem itemValue="Add Date" itemLabel="Add Date"/>
                         <f:selectItem itemValue="Invoice Date" itemLabel="Invoice Date"/>
                         <f:ajax event="change" execute="@this" render="lblDate1 lblDate2"/>
                     </p:selectOneMenu>
-                    <p:calendar id="calDate1"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{transBean.date1}" size="12"/>
-                    <p:calendar id="calDate2"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{transBean.date2}" size="12"/>
-                    <p:inputText id="itxtInvoiceNo" value="#{trans.transactionNumber}"/>
-
-                    <p:outputLabel value="Added By"/>
-                    <h:outputLabel value="#{transactionTypeBean.getTransactionType(2).transactionUserLabel}"/>
-                    <p:outputLabel value="#{transactionTypeBean.getTransactionType(2).billTransactorLabel}"/>
-                    <p:outputLabel value="#{transactionTypeBean.getTransactionType(2).transactorLabel}"/>                
-                    <h:outputLabel value="SUMMARIZE RESULTS BY:"/>
-                    <p:selectOneMenu id="menuAddUser" value="#{trans.addUserDetailId}">
+                    <p:outputLabel value="From #{transBean.dateType}:" id="lblDate1"/>
+                    <p:calendar id="calDate1"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{transBean.date1}" size="18"/>
+                    <p:outputLabel value="To #{transBean.dateType}:" id="lblDate2"/>
+                    <p:calendar id="calDate2"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{transBean.date2}" size="18"/>
+                </h:panelGrid>
+                <h:panelGrid columns="2">
+                    <p:outputLabel value="#{transactionTypeBean.getTransactionType(2).transactionNumberLabel}:"/>
+                    <p:inputText id="itxtInvoiceNo" value="#{trans.transactionNumber}" style="width: 215px;"/>
+                    <p:outputLabel value="Added By:"/>
+                    <p:selectOneMenu id="menuAddUser" value="#{trans.addUserDetailId}" style="width: 200px;">
                         <f:selectItem itemLabel="Select"/>
                         <f:selectItems value="#{userDetailBean.getUserDetails()}" var="ua" itemLabel="#{ua.firstName} #{ua.secondName} #{ua.thirdName}" itemValue="#{ua.userDetailId}"/>
                     </p:selectOneMenu>
-                    <p:selectOneMenu id="menuTransUser" value="#{trans.transactionUserDetailId}">
+                    <h:outputLabel value="#{transactionTypeBean.getTransactionType(2).transactionUserLabel}:"/>
+                    <p:selectOneMenu id="menuTransUser" value="#{trans.transactionUserDetailId}" style="width: 200px;">
                         <f:selectItem itemLabel="Select" itemValue="0"/>
                         <f:selectItems value="#{userDetailBean.getUserDetails()}" var="ut" itemLabel="#{ut.firstName} #{ut.secondName} #{ut.thirdName}" itemValue="#{ut.userDetailId}"/>
                     </p:selectOneMenu>
+                    <p:commandButton id="cmdbSearch" value="SEARCH (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" style="width: 200px;">
+                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                        <p:ajax listener="#{transBean.reportSalesInvoiceDetail(trans,transBean)}" process="pnlgFilter" update="menuDateType pnlgFilter pnlgMessage tblDetail"/>
+                    </p:commandButton>
+                    <p:commandButton id="cmdbReset" value="RESET (ALT+R)" accesskey="r" style="width: 225px;">
+                        <p:ajax listener="#{transBean.resetSalesInvoiceDetail(trans,transBean,transactorBean.selectedBillTransactor,transactorBean.selectedTransactor)}" process="pnlgFilter" update="pnlgFilter pnlgMessage tblDetail"/>
+                    </p:commandButton>
+                </h:panelGrid>
+                <h:panelGrid columns="2">
+                    <p:outputLabel value="#{transactionTypeBean.getTransactionType(2).transactionRefLabel}:"/>
+                    <p:inputText id="itxtRefNo" value="#{trans.transactionRef}" style="width: 235px;"/>
+                    <p:outputLabel value="#{transactionTypeBean.getTransactionType(2).billTransactorLabel}:"/>
                     <p:autoComplete id="autcBillTransactor" value="#{transactorBean.selectedBillTransactor}" 
                                     completeMethod="#{transactorBean.getTransactorObjectList}" 
                                     var="trct2" 
@@ -87,6 +99,7 @@
                         <p:ajax event="itemSelect" listener="#{trans.setBillTransactorId(transactorBean.selectedBillTransactor.transactorId)}"/>
                         <p:ajax event="change" listener="#{trans.setBillTransactorId(transactorBean.selectedBillTransactor.transactorId)}" rendered="#{transactorBean.selectedBillTransactor!=null} "/>
                     </p:autoComplete>
+                    <p:outputLabel value="#{transactionTypeBean.getTransactionType(2).transactorLabel}:"/> 
                     <p:autoComplete id="autcTransactor" value="#{transactorBean.selectedTransactor}" 
                                     completeMethod="#{transactorBean.getTransactorObjectList}" 
                                     var="trct" 
@@ -107,7 +120,8 @@
                         <p:ajax event="itemSelect" listener="#{trans.setTransactorId(transactorBean.selectedTransactor.transactorId)}"/>
                         <p:ajax event="change" listener="#{trans.setTransactorId(transactorBean.selectedTransactor.transactorId)}" rendered="#{transactorBean.selectedTransactor!=null}"/>
                     </p:autoComplete>
-                    <p:selectOneMenu id="menuSummariseBy" value="#{transBean.fieldName}">
+                    <h:outputLabel value="SUMMARIZE RESULTS BY:"/>
+                    <p:selectOneMenu id="menuSummariseBy" value="#{transBean.fieldName}" style="width: 220px;">
                         <f:selectItem itemLabel="Select" itemValue=""/>
                         <f:selectItem itemLabel="Added By" itemValue="add_user_detail_id"/>
                         <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(2).transactionUserLabel}" itemValue="transaction_user_detail_id"/>
@@ -115,17 +129,8 @@
                         <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(2).transactorLabel}" itemValue="transactor_id"/>
                         <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(2).transactionDateLabel}" itemValue="transaction_date"/>
                     </p:selectOneMenu>
-                    <p:commandButton id="cmdbSearch" value="SEARCH (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
-                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
-                            <p:graphicImage name="/images/ajax-loader.gif"/>
-                        </p:dialog>
-                        <p:ajax listener="#{transBean.reportSalesInvoiceDetail(trans,transBean)}" process="pnlgFilter" update="menuDateType pnlgFilter pnlgMessage tblDetail"/>
-                    </p:commandButton>
-                    <p:commandButton id="cmdbReset" value="RESET (ALT+R)" accesskey="r">
-                        <p:ajax listener="#{transBean.resetSalesInvoiceDetail(trans,transBean,transactorBean.selectedBillTransactor,transactorBean.selectedTransactor)}" process="pnlgFilter" update="pnlgFilter pnlgMessage tblDetail"/>
-                    </p:commandButton>
                 </h:panelGrid>
-            </div>
+            </h:panelGrid>
             <h:panelGrid id="pnlgMessage">
                 <p:outputLabel value="#{transBean.actionMessage}" style="color: red;"/>
             </h:panelGrid>
@@ -136,7 +141,7 @@
                 <f:facet name="header">
                     <p:dataTable id="tblSummary" var="sm" value="#{transBean.transListSummary}">
                         <p:column headerText="" style="text-align: left;" rendered="#{transBean.fieldName.equals('')}">
-                            
+
                         </p:column>
                         <p:column headerText="Added By" style="text-align: left;" rendered="#{transBean.fieldName.equals('add_user_detail_id')}">
                             <h:outputText value="#{userDetailBean.getUserDetail(sm.addUserDetailId).userName}" rendered="#{sm.addUserDetailId>0}"/>

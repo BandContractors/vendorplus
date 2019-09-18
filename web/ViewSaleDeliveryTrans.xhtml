@@ -46,7 +46,7 @@
                         <h:inputText id="itxtTransactionDate" value="#{utilityBean.formatDate(transBean.transObj.transactionDate)}" disabled="true"/>
                         <h:outputLabel  value=""/>
                         <h:outputLabel  value=""/>
-                        <h:outputLabel  value="#{transactionTypeBean.getTransactionType(12).transactionRefLabel}:"/>
+                        <h:outputLabel  value="Order/Sales No:"/>
                         <h:inputText styleClass="clsInput" id="itxtTransactionRef" value="#{transBean.transObj.transactionRef}" autocomplete="off" style="width: 170px;" disabled="true"/>
                         <h:outputLabel  value="#{transactionTypeBean.getTransactionType(12).transactorLabel}:"/>
                         <h:inputText styleClass="clsInput" id="itxtTransactor" value="#{transactorBean.getTransactor(transBean.transObj.transactorId).transactorNames}" autocomplete="off" disabled="true"/>
@@ -136,7 +136,7 @@
                     <h:panelGrid styleClass="clsGridMainCommands" columns="1" style="width: 100%">
                         <h:panelGrid styleClass="clsGridMainCommands1" columns="2">
                             <h:commandButton styleClass="clsButtonVeryBig" id="cmdbUpdate" value="UPDATE (ALT+U)" onclick="return confirmUpdate();" accesskey="u" rendered="#{transBean.actionType.equals('Edit') and generalUserSetting.currentStore.storeId==transBean.transObj.storeId}">
-                                <f:ajax listener="#{transBean.updateTransCEC('PARENT',transBean.transObj.storeId,transBean.transObj.transactionTypeId,transBean.transObj.transactionReasonId,'',transBean.transObj,transBean.transItemList,transBean.payObj)}" execute="pnlTransaction" render="pnlTransaction"/>
+                                <f:ajax listener="#{transBean.updateTransCECcallFromGDN('PARENT',transBean.transObj.storeId,transBean.transObj.transactionTypeId,transBean.transObj.transactionReasonId,'',transBean.transObj,transBean.transItemList,transBean.payObj)}" execute="pnlTransaction" render="pnlTransaction"/>
                             </h:commandButton>
                         </h:panelGrid>
                     </h:panelGrid>

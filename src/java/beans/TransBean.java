@@ -3416,6 +3416,47 @@ public class TransBean implements Serializable {
         }
     }
 
+    public void updateTransCECcallFromSI(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aNewTrans, List<TransItem> aNewTransItems, Pay aPay) {
+        //get some details
+        String OrderTransNo = aNewTrans.getTransactionRef();
+        //save
+        this.updateTransCEC(aLevel, aStoreId, aTransTypeId, aTransReasonId, aSaleType, aNewTrans, aNewTransItems, aPay);
+        //update a few things needed after sales invoice saving
+        if (OrderTransNo.length() > 0) {
+            Trans OrderTrans = this.getTransByNumberType(OrderTransNo, 11);
+            //get order's invoioce status 0,1,2
+            int InvoiceStatus = this.getOrderInvoiceStatus(OrderTrans);
+            //get order's invoioce pay status 0,1,2
+            //save invoice status if not 0
+            this.updateOrderStatus(OrderTrans.getTransactionId(), "is_invoiced", InvoiceStatus);
+        }
+    }
+
+    public void updateTransCECcallFromGDN(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aNewTrans, List<TransItem> aNewTransItems, Pay aPay) {
+        long aChoiceId = 99;
+        int TransTypeId = 0;
+        aChoiceId = aNewTrans.getSite_id();
+        if (aChoiceId == 1) {
+            TransTypeId = 2;
+        } else if (aChoiceId == 0) {
+            TransTypeId = 11;
+        } else {
+            TransTypeId = 0;
+        }
+        //get some details
+        String XTransNo = aNewTrans.getTransactionRef();
+        //save
+        this.updateTransCEC(aLevel, aStoreId, aTransTypeId, aTransReasonId, aSaleType, aNewTrans, aNewTransItems, aPay);
+        //update a few things needed after GDN saving
+        if (XTransNo.length() > 0 && TransTypeId > 0 && TransTypeId == 11) {
+            Trans XTrans = this.getTransByNumberType(XTransNo, TransTypeId);
+            //get order's GDN status 0,1,2
+            int DeliveryStatus = this.getOrderDeliveryStatus(XTrans);
+            //save GDN status if not 0
+            this.updateOrderStatus(XTrans.getTransactionId(), "is_delivered", DeliveryStatus);
+        }
+    }
+
     public void updateTransCEC(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aNewTrans, List<TransItem> aNewTransItems, Pay aPay) {
         //1. copy
         //2. reverse stock(for TIs)
@@ -10835,6 +10876,9 @@ public class TransBean implements Serializable {
         if (aTrans.getTransactionNumber().length() > 0) {
             wheresql = wheresql + " AND transaction_number='" + aTrans.getTransactionNumber() + "'";
         }
+        if (aTrans.getTransactionRef().length() > 0) {
+            wheresql = wheresql + " AND transaction_ref='" + aTrans.getTransactionRef() + "'";
+        }
         if (aTrans.getAddUserDetailId() > 0) {
             wheresql = wheresql + " AND add_user_detail_id=" + aTrans.getAddUserDetailId();
         }
@@ -12745,6 +12789,9 @@ public class TransBean implements Serializable {
         }
         if (aTrans.getTransactionNumber().length() > 0) {
             wheresql = wheresql + " AND transaction_number='" + aTrans.getTransactionNumber() + "'";
+        }
+        if (aTrans.getTransactionRef().length() > 0) {
+            wheresql = wheresql + " AND transaction_ref='" + aTrans.getTransactionRef() + "'";
         }
         if (aTrans.getAddUserDetailId() > 0) {
             wheresql = wheresql + " AND add_user_detail_id=" + aTrans.getAddUserDetailId();
