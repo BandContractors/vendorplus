@@ -56,8 +56,8 @@
                 <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}"/>
                 <p:calendar pattern="#{companySetting.getDateFormat()}" styleClass="clsInput" id="calTransactionDate" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.transactionDate}" size="8"/>
                 <p:selectOneMenu id="menuDeliveryFor" value="#{trans.site_id}" style="width: 100px;">
-                    <f:selectItem itemLabel="Sale" itemValue="0"/>
-                    <f:selectItem itemLabel="Order" itemValue="1"/>
+                    <f:selectItem itemLabel="Order" itemValue="0"/>
+                    <f:selectItem itemLabel="Sale" itemValue="1"/>
                     <p:ajax event="blur" listener="#{transBean.refreshTransListChoice(trans.site_id,transactorBean.selectedTransactor.transactorId,20)}" update="menuTransNumber" />
                 </p:selectOneMenu>
                 <p:autoComplete id="autcTransactorSearch" value="#{transactorBean.selectedTransactor}" 
@@ -79,8 +79,8 @@
                     </p:column> 
                     <p:ajax event="itemSelect" listener="#{trans.setTransactorId(transactorBean.selectedTransactor.transactorId)}" />
                     <p:ajax event="change" listener="#{trans.setTransactorId(transactorBean.selectedTransactor.transactorId)}" rendered="#{transactorBean.selectedTransactor!=null}" />
-                    <p:ajax event="blur" listener="#{transBean.refreshTransListChoice(trans.site_id,transactorBean.selectedTransactor.transactorId,20)}" update="menuTransNumber" />
-                    <p:ajax event="blur" listener="#{transBean.refreshTransListChoice(trans.site_id,transactorBean.selectedTransactor.transactorId,20)}" rendered="#{transactorBean.selectedTransactor!=null}" update="menuTransNumber" />
+                    <p:ajax event="blur" listener="#{transBean.refreshTransListChoice(trans.site_id,transactorBean.selectedTransactor.transactorId,20,'is_delivered','0,2')}" update="menuTransNumber" />
+                    <p:ajax event="blur" listener="#{transBean.refreshTransListChoice(trans.site_id,transactorBean.selectedTransactor.transactorId,20,'is_delivered','0,2')}" rendered="#{transactorBean.selectedTransactor!=null}" update="menuTransNumber" />
                 </p:autoComplete>
                 <p:selectOneMenu id="menuTransNumber" value="#{trans.transactionRef}" editable="true" dynamic="true">
                     <f:selectItem itemLabel="Select or Type..." itemValue="0"/>
@@ -241,7 +241,7 @@
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
-                        <p:ajax listener="#{transBean.saveTransCEC('PARENT',generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,trans.transactionReasonId,generalUserSetting.currentSaleType,trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,null,transBean.transUserDetail,null,null,null)}" process="@form" update="@this pnlgSearch gridTransItem pnlgItemStatus dtblTransactionItem pnlgTermsConditions growl1 pnlgMessage pnlgOutput"/>
+                        <p:ajax listener="#{transBean.saveTransCECcallFromGDN('PARENT',generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,trans.transactionReasonId,generalUserSetting.currentSaleType,trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,null,transBean.transUserDetail,null,null,null)}" process="@form" update="@this pnlgSearch gridTransItem pnlgItemStatus dtblTransactionItem pnlgTermsConditions growl1 pnlgMessage pnlgOutput"/>
                     </p:commandButton>
                     <p:commandButton styleClass="clsButtonBig" id="cmdbClear" value="CLEAR (ALT+C)" accesskey="c">
                         <p:ajax listener="#{transBean.clearAll2(trans,transItemBean.activeTransItems,transItem,itemBean.selectedItem,transactorBean.selectedTransactor,2,null,transBean.transUserDetail,null,null,null)}" process="@form" update="pnlgSearch gridTransItem pnlgItemStatus dtblTransactionItem pnlgTermsConditions growl1 pnlgMessage pnlgOutput"/>

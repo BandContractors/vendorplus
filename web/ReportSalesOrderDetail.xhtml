@@ -217,10 +217,19 @@
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="#{transactionTypeBean.getTransactionType(11).transactionUserLabel}">
+                <p:column headerText="Processed">
+                    <p:commandButton value="#{itm.is_processed eq 1 ? 'Yes':itm.is_processed eq 2 ? 'Part':'No'}" styleClass="#{itm.is_processed eq 1 ? 'green':itm.is_processed eq 2 ? 'amber':'red'}" style="width: 60px;color: #ffffff !important;"/>
+                </p:column>
+                <p:column headerText="Invoiced">
+                    <p:commandButton value="#{itm.is_invoiced eq 1 ? 'Yes':itm.is_invoiced eq 2 ? 'Part':'No'}" styleClass="#{itm.is_invoiced eq 1 ? 'green':itm.is_invoiced eq 2 ? 'amber':'red'}" style="width: 60px;color: #ffffff !important;"/>
+                </p:column>
+                <p:column headerText="Delivered">
+                    <p:commandButton value="#{itm.is_delivered eq 1 ? 'Yes':itm.is_delivered eq 2 ? 'Part':'No'}" styleClass="#{itm.is_delivered eq 1 ? 'green':itm.is_delivered eq 2 ? 'amber':'red'}" style="width: 60px;color: #ffffff !important;"/>
+                </p:column>
+                <p:column headerText="#{transactionTypeBean.getTransactionType(11).transactionUserLabel}" visible="false">
                     <h:outputText value="#{userDetailBean.getUserDetail(itm.transactionUserDetailId).userName}"/>
                 </p:column>
-                <p:column headerText="Added By">
+                <p:column headerText="Added By" visible="false">
                     <h:outputText value="#{userDetailBean.getUserDetail(itm.addUserDetailId).userName}"/>
                 </p:column>
             </p:dataTable>

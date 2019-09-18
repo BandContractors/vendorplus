@@ -136,6 +136,8 @@ public class Trans implements Serializable {
     private int is_invoiced;
     private String TransItemsString;
     private Category category;
+    private int is_delivered;
+    private String source_code;
     
 
     /**
@@ -1662,6 +1664,34 @@ public class Trans implements Serializable {
      */
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    /**
+     * @return the is_delivered
+     */
+    public int getIs_delivered() {
+        return is_delivered;
+    }
+
+    /**
+     * @param is_delivered the is_delivered to set
+     */
+    public void setIs_delivered(int is_delivered) {
+        this.is_delivered = is_delivered;
+    }
+
+    /**
+     * @return the source_code
+     */
+    public String getSource_code() {
+        return source_code;
+    }
+
+    /**
+     * @param source_code the source_code to set
+     */
+    public void setSource_code(String source_code) {
+        this.source_code = source_code;
     }
 
 }

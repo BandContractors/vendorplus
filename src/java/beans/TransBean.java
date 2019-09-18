@@ -551,9 +551,9 @@ public class TransBean implements Serializable {
         int CurrStoreId = 0;
         int RetrieveTransTypeId = 0;
         if (aTransTypeIdChoice == 1) {
-            RetrieveTransTypeId = 11;
-        } else {
             RetrieveTransTypeId = 2;
+        } else {
+            RetrieveTransTypeId = 11;
         }
         CurrStoreId = new GeneralUserSetting().getCurrentStore().getStoreId();
         try {
@@ -2012,6 +2012,81 @@ public class TransBean implements Serializable {
         return InvoiceStatus;
     }
 
+    public int getOrderDeliveryStatus(Trans aOrderTrans) {
+        String sql = "";
+        ResultSet rs = null;
+        int ItemsToBeDelivered = 0;
+        int ItemsFullyDelivered = 0;
+        int ItemsPartiallyDelivered = 0;
+        int ItemsNotDelivered = 0;
+        int DeliveryStatus = 0;
+        if (null == aOrderTrans) {
+            //do nothing
+        } else {
+            sql = "SELECT  ti.item_id,ti.item_qty,ti.specific_size,IFNULL(ti.batchno, '') as batchno,IFNULL(ti.code_specific, '') as code_specific,IFNULL(ti.desc_specific, '') as desc_specific, "
+                    + "("
+                    + "select IFNULL(sum(ti2.item_qty),0) as sum_qty from transaction_item ti2 INNER JOIN transaction t2 ON ti2.transaction_id=t2.transaction_id WHERE t2.transaction_type_id=12 AND ti2.item_id=ti.item_id AND t2.transaction_ref=t.transaction_number AND t2.transactor_id=t.transactor_id "
+                    + "AND IFNULL(ti2.batchno, '')=IFNULL(ti.batchno, '') and IFNULL(ti2.code_specific, '')=IFNULL(ti.code_specific, '') and IFNULL(ti2.desc_specific, '')=IFNULL(ti.desc_specific, '') "
+                    + ") as qty_delivered "
+                    + "FROM transaction_item ti "
+                    + "INNER JOIN transaction t ON ti.transaction_id=t.transaction_id "
+                    + "WHERE transaction_type_id=11 AND t.transactor_id=" + aOrderTrans.getTransactorId() + " AND t.transaction_number='" + aOrderTrans.getTransactionNumber() + "'";
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                rs = ps.executeQuery();
+                TransItem transitem = null;
+                while (rs.next()) {
+                    transitem = new TransItem();
+                    double QtyOrdered = 0;
+                    double QtyDelivered = 0;
+                    try {
+                        transitem.setItemId(rs.getLong("item_id"));
+                    } catch (NullPointerException npe) {
+                        transitem.setItemId(0);
+                    }
+                    try {
+                        QtyOrdered = rs.getDouble("item_qty");
+                    } catch (NullPointerException npe) {
+                        QtyOrdered = 0;
+                    }
+                    try {
+                        QtyDelivered = rs.getDouble("qty_delivered");
+                    } catch (NullPointerException npe) {
+                        QtyDelivered = 0;
+                    }
+                    Item item = new Item();
+                    try {
+                        item = new ItemBean().getItem(transitem.getItemId());
+                    } catch (Exception e) {
+                    }
+                    if (item.getItemType().equals("PRODUCT")) {
+                        ItemsToBeDelivered = ItemsToBeDelivered + 1;
+                        if (QtyDelivered >= QtyOrdered) {
+                            ItemsFullyDelivered = ItemsFullyDelivered + 1;
+                        } else if (QtyDelivered < QtyOrdered && QtyDelivered > 0) {
+                            ItemsPartiallyDelivered = ItemsPartiallyDelivered + 1;
+                        } else if (QtyDelivered == 0) {
+                            ItemsNotDelivered = ItemsNotDelivered + 1;
+                        }
+                    }
+                }
+                //DeliveryStatus
+                if (ItemsPartiallyDelivered > 0 || (ItemsNotDelivered > 0 && ItemsFullyDelivered > 0)) {
+                    //status 2
+                    DeliveryStatus = 2;
+                } else if (ItemsFullyDelivered == ItemsToBeDelivered) {
+                    //status 1
+                    DeliveryStatus = 1;
+                }
+            } catch (Exception e) {
+                System.err.println("getOrderDeliveryStatus:" + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        return DeliveryStatus;
+    }
+
     public void saveTransCECcallFromSI(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
         //get some details
         String OrderTransNo = trans.getTransactionRef();
@@ -2026,6 +2101,33 @@ public class TransBean implements Serializable {
             //save invoice status if not 0
             if (InvoiceStatus > 0) {
                 this.updateOrderStatus(OrderTrans.getTransactionId(), "is_invoiced", InvoiceStatus);
+            }
+        }
+    }
+
+    public void saveTransCECcallFromGDN(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
+        long aChoiceId = 99;
+        int TransTypeId = 0;
+        aChoiceId = trans.getSite_id();
+        if (aChoiceId == 1) {
+            TransTypeId = 2;
+        } else if (aChoiceId == 0) {
+            TransTypeId = 11;
+        } else {
+            TransTypeId = 0;
+        }
+        //get some details
+        String XTransNo = trans.getTransactionRef();
+        //save
+        this.saveTransCEC(aLevel, aStoreId, aTransTypeId, aTransReasonId, aSaleType, trans, aActiveTransItems, aSelectedTransactor, aSelectedBillTransactor, aTransUserDetail, aSelectedSchemeTransactor, aAuthorisedByUserDetail, aSelectedAccCoa);
+        //update a few things needed after GDN saving
+        if (XTransNo.length() > 0 && TransTypeId > 0 && TransTypeId == 11) {
+            Trans XTrans = this.getTransByNumberType(XTransNo, TransTypeId);
+            //get order's GDN status 0,1,2
+            int DeliveryStatus = this.getOrderDeliveryStatus(XTrans);
+            //save GDN status if not 0
+            if (DeliveryStatus > 0) {
+                this.updateOrderStatus(XTrans.getTransactionId(), "is_delivered", DeliveryStatus);
             }
         }
     }
@@ -5440,6 +5542,16 @@ public class TransBean implements Serializable {
             } catch (NullPointerException npe) {
                 trans.setIs_invoiced(0);
             }
+            try {
+                trans.setIs_delivered(aResultSet.getInt("is_delivered"));
+            } catch (NullPointerException npe) {
+                trans.setIs_delivered(0);
+            }
+            try {
+                trans.setSource_code(aResultSet.getString("source_code"));
+            } catch (NullPointerException npe) {
+                trans.setSource_code("");
+            }
             return trans;
 
         } catch (SQLException se) {
@@ -5804,6 +5916,16 @@ public class TransBean implements Serializable {
                 trans.setIs_invoiced(aResultSet.getInt("is_invoiced"));
             } catch (NullPointerException npe) {
                 trans.setIs_invoiced(0);
+            }
+            try {
+                trans.setIs_delivered(aResultSet.getInt("is_delivered"));
+            } catch (NullPointerException npe) {
+                trans.setIs_delivered(0);
+            }
+            try {
+                trans.setSource_code(aResultSet.getString("source_code"));
+            } catch (NullPointerException npe) {
+                trans.setSource_code("");
             }
             return trans;
 
@@ -6170,6 +6292,16 @@ public class TransBean implements Serializable {
             } catch (NullPointerException npe) {
                 trans.setIs_invoiced(0);
             }
+            try {
+                trans.setIs_delivered(aResultSet.getInt("is_delivered"));
+            } catch (NullPointerException npe) {
+                trans.setIs_delivered(0);
+            }
+            try {
+                trans.setSource_code(aResultSet.getString("source_code"));
+            } catch (NullPointerException npe) {
+                trans.setSource_code("");
+            }
         } catch (SQLException se) {
             System.err.println(se.getMessage());
         }
@@ -6515,6 +6647,16 @@ public class TransBean implements Serializable {
                 trans.setIs_invoiced(aResultSet.getInt("is_invoiced"));
             } catch (NullPointerException npe) {
                 trans.setIs_invoiced(0);
+            }
+            try {
+                trans.setIs_delivered(aResultSet.getInt("is_delivered"));
+            } catch (NullPointerException npe) {
+                trans.setIs_delivered(0);
+            }
+            try {
+                trans.setSource_code(aResultSet.getString("source_code"));
+            } catch (NullPointerException npe) {
+                trans.setSource_code("");
             }
             //return trans;
         } catch (SQLException se) {
@@ -7039,6 +7181,8 @@ public class TransBean implements Serializable {
             trans.setLocation_name("");
             trans.setIs_selected(0);
             trans.setIs_invoiced(0);
+            trans.setIs_delivered(0);
+            trans.setSource_code("");
             //lookups
             trans.setTransactorName("");
             //init currency
@@ -7156,6 +7300,8 @@ public class TransBean implements Serializable {
         trans.setLocation_name("");
         trans.setIs_selected(0);
         trans.setIs_invoiced(0);
+        trans.setIs_delivered(0);
+        trans.setSource_code("");
         //lookups
         trans.setTransactorName("");
     }
@@ -7496,6 +7642,8 @@ public class TransBean implements Serializable {
         aTransTo.setLocation_name(aTransFrom.getLocation_name());
         aTransTo.setIs_selected(aTransFrom.getIs_selected());
         aTransTo.setIs_invoiced(aTransFrom.getIs_invoiced());
+        aTransTo.setIs_delivered(aTransFrom.getIs_delivered());
+        aTransTo.setSource_code(aTransFrom.getSource_code());
     }
 
     public void initOrderForEdit(Trans aTrans, List<TransItem> aActiveTransItems) {
@@ -13090,14 +13238,32 @@ public class TransBean implements Serializable {
         int TransTypeId = 0;
         long TransactorId = 0;
         if (aChoiceId == 1) {
-            TransTypeId = 11;
-        } else {
             TransTypeId = 2;
+        } else {
+            TransTypeId = 11;
         }
         if (aTransactorId > 0) {
             TransactorId = aTransactorId;
         }
         this.refreshTransList(TransTypeId, TransactorId, aLimit);
+    }
+
+    public void refreshTransListChoice(int aChoiceId, long aTransactorId, int aLimit, String aStatusColumn, String aStatusValues) {
+        int TransTypeId = 0;
+        long TransactorId = 0;
+        if (aChoiceId == 1) {
+            TransTypeId = 2;
+        } else {
+            TransTypeId = 11;
+        }
+        if (aTransactorId > 0) {
+            TransactorId = aTransactorId;
+        }
+        if (TransTypeId == 11) {
+            this.refreshTransList(TransTypeId, TransactorId, aLimit, aStatusColumn, aStatusValues);
+        } else if (TransTypeId == 2) {
+            this.refreshTransList(TransTypeId, TransactorId, aLimit);
+        }
     }
 
     public void refreshTransList(int aTransTypeId, long aTransactorId, int aLimit) {
