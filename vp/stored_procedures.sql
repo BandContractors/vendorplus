@@ -9772,6 +9772,20 @@ BEGIN
 END//
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS sp_search_item_for_production_old;
+DELIMITER //
+CREATE PROCEDURE sp_search_item_for_production_old
+(
+	IN in_code_desc varchar(100)
+) 
+BEGIN  
+		SELECT * FROM item 
+		WHERE is_suspended='No' AND is_sale=0 AND is_buy=1 AND is_asset=0 AND expense_type='Raw Material' AND 
+		(description LIKE concat('%',in_code_desc,'%') OR item_code LIKE concat('%',in_code_desc,'%')) 
+		ORDER BY description ASC LIMIT 10;
+END//
+DELIMITER ;
+
 DROP PROCEDURE IF EXISTS sp_search_item_for_production;
 DELIMITER //
 CREATE PROCEDURE sp_search_item_for_production
@@ -9780,7 +9794,21 @@ CREATE PROCEDURE sp_search_item_for_production
 ) 
 BEGIN  
 		SELECT * FROM item 
-		WHERE is_suspended='No' AND is_sale=0 AND is_buy=1 AND is_asset=0 AND expense_type='Raw Material' AND 
+		WHERE is_suspended='No' AND is_track=1 AND is_asset=0 AND 
+		(description LIKE concat('%',in_code_desc,'%') OR item_code LIKE concat('%',in_code_desc,'%')) 
+		ORDER BY description ASC LIMIT 10;
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_item_for_raw_material;
+DELIMITER //
+CREATE PROCEDURE sp_search_item_for_raw_material
+(
+	IN in_code_desc varchar(100)
+) 
+BEGIN  
+		SELECT * FROM item 
+		WHERE is_suspended='No' AND is_track=1 AND is_asset=0 AND 
 		(description LIKE concat('%',in_code_desc,'%') OR item_code LIKE concat('%',in_code_desc,'%')) 
 		ORDER BY description ASC LIMIT 10;
 END//

@@ -36,7 +36,7 @@
             <h:panelGrid id="gridParentItem" styleClass="clsGridMainInput" columns="3">
                 <p:outputLabel value="Product (Output)"/>
                 <p:autoComplete id="autcItem1" widgetVar="WautcItem1" value="#{itemBean.selectedItem}"  
-                                completeMethod="#{itemBean.getItemObjectListForSale}" 
+                                completeMethod="#{itemBean.getItemObjectListForProduction}" 
                                 var="itm" 
                                 itemLabel="#{itm.description}" 
                                 itemValue="#{itm}" 
@@ -69,7 +69,7 @@
                     <p:outputLabel value="Qty"/>
                     <p:outputLabel value=""/>
                     <p:autoComplete id="proItem" widgetVar="WproItem" value="#{itemBean.selectedItemX}"  
-                                    completeMethod="#{itemBean.getProductionItemObjectList}" 
+                                    completeMethod="#{itemBean.getItemObjectListForRawMaterial}" 
                                     var="pro_itm" 
                                     itemLabel="#{pro_itm.description}" 
                                     itemValue="#{pro_itm}" 

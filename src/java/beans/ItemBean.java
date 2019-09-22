@@ -1117,6 +1117,37 @@ public class ItemBean implements Serializable {
         }
         return ItemObjectList;
     }
+    
+    public List<Item> getItemObjectListForProduction(String Query) {
+        this.setTypedItemCode(Query);
+        String sql;
+        sql = "{call sp_search_item_for_production(?)}";
+        ResultSet rs = null;
+        this.ItemObjectList = new ArrayList<Item>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setString(1, Query);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Item item = new Item();
+                this.setItemFromResultset(item, rs);
+                this.updateLookUpsUI(item);
+                this.ItemObjectList.add(item);
+            }
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.err.println(ex.getMessage());
+                }
+            }
+        }
+        return ItemObjectList;
+    }
 
     public List<Item> getItemObjectListForHire(String Query) {
         this.setTypedItemCode(Query);
@@ -2109,6 +2140,37 @@ public class ItemBean implements Serializable {
         this.setTypedItemCode(Query);
         String sql;
         sql = "{call sp_search_item_for_production(?)}";
+        ResultSet rs = null;
+        this.ItemObjectList = new ArrayList<Item>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setString(1, Query);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Item item = new Item();
+                this.setItemFromResultset(item, rs);
+                this.updateLookUpsUI(item);
+                this.ItemObjectList.add(item);
+            }
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.err.println(ex.getMessage());
+                }
+            }
+        }
+        return ItemObjectList;
+    }
+    
+    public List<Item> getItemObjectListForRawMaterial(String Query) {
+        this.setTypedItemCode(Query);
+        String sql;
+        sql = "{call sp_search_item_for_raw_material(?)}";
         ResultSet rs = null;
         this.ItemObjectList = new ArrayList<Item>();
         try (

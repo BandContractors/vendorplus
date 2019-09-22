@@ -78,7 +78,7 @@
                 <h:outputLabel value="Narration"/>
 
                 <p:autoComplete id="autcItem" widgetVar="WautcItem" value="#{itemBean.selectedItem}"  
-                                completeMethod="#{itemBean.getItemObjectListForConsumption}" 
+                                completeMethod="#{itemBean.getItemObjectListForStockDispose}" 
                                 var="itm" 
                                 itemLabel="#{itm.description}" 
                                 itemValue="#{itm}" 

@@ -1467,7 +1467,7 @@ public class TransBean implements Serializable {
             } else if ("PURCHASE INVOICE".equals(transtype.getTransactionTypeName()) && trans.getAmountTendered() >= 0 && trans.getAccChildAccountId() == 0) {
                 msg = "Please select the Payment Account";
             } else if ("JOURNAL ENTRY".equals(transtype.getTransactionTypeName()) && trans.getTotalDebit() != trans.getTotalCredit()) {
-                msg = "TOTAL DEBIT IS NOT EQUAL TO TOTAL CREIDT...!";
+                msg = "TOTAL DEBIT IS NOT EQUAL TO TOTAL CREDIT...!";
             } else if ("EXPENSE ENTRY".equals(transtype.getTransactionTypeName()) && (trans.getAmountTendered() <= 0 && trans.getGrandTotal() <= 0)) {
                 msg = "Please enter Spent/Paid Amount";
             } else if ("EXPENSE ENTRY".equals(transtype.getTransactionTypeName()) && trans.getAccChildAccountId() == 0) {

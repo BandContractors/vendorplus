@@ -598,6 +598,13 @@ public class TransProductionBean implements Serializable {
                 aTransItem.setUnitCostPrice(this.getTransProductionById(LatestTransId).getOutputUnitCost());
             } catch (NullPointerException npe) {
             }
+        } else {
+            try {
+                Item itm = new ItemBean().getItem(aTransItem.getItemId());
+                aTransItem.setUnitCostPrice(itm.getUnitCostPrice());
+            } catch (Exception e) {
+                //do nothing
+            }
         }
     }
 
@@ -605,16 +612,46 @@ public class TransProductionBean implements Serializable {
         double TotalUnitCost = 0;
         long LatestTransItemId = 0;
         for (int i = 0; i < this.getItmCombinationList().size(); i++) {
+            Item itm = null;
             LatestTransItemId = 0;
+            double ItemUnitCost = 0;
+            double InputQty = 0;
             try {
-                LatestTransItemId = new TransItemBean().getItemUnitCostPriceLatestTransItemId(9, 32, aStoreId, this.getItmCombinationList().get(i).getInputItemId(), "", "", "");
-            } catch (NullPointerException npe) {
-                LatestTransItemId = 0;
+                itm = new ItemBean().getItem(this.getItmCombinationList().get(i).getInputItemId());
+            } catch (Exception e) {
+                //do nothing
             }
-            if (LatestTransItemId > 0) {
+            try {
+                InputQty = this.getItmCombinationList().get(i).getInputQty();
+            } catch (Exception e) {
+                //do nothing
+            }
+            if (null != itm) {
                 try {
-                    TotalUnitCost = TotalUnitCost + new TransItemBean().getTransItem(LatestTransItemId).getUnitCostPrice();
+                    if (itm.getExpense_type().equals("Raw Material")) {
+                        LatestTransItemId = new TransItemBean().getItemUnitCostPriceLatestTransItemId(9, 32, aStoreId, this.getItmCombinationList().get(i).getInputItemId(), "", "", "");
+                    } else if (itm.getExpense_type().equals("Consumption")) {
+                        LatestTransItemId = new TransItemBean().getItemUnitCostPriceLatestTransItemId(9, 32, aStoreId, this.getItmCombinationList().get(i).getInputItemId(), "", "", "");
+                    } else {
+                        LatestTransItemId = new TransItemBean().getItemUnitCostPriceLatestTransItemId(9, 13, aStoreId, this.getItmCombinationList().get(i).getInputItemId(), "", "", "");
+                    }
                 } catch (NullPointerException npe) {
+                    LatestTransItemId = 0;
+                }
+                if (LatestTransItemId > 0) {
+                    try {
+                        ItemUnitCost = new TransItemBean().getTransItem(LatestTransItemId).getUnitCostPrice();
+                    } catch (NullPointerException npe) {
+                    }
+                }
+                if (ItemUnitCost > 0) {
+                    try {
+                        TotalUnitCost = TotalUnitCost + (ItemUnitCost * InputQty);
+                    } catch (NullPointerException npe) {
+                    }
+                } else {
+                    ItemUnitCost = itm.getUnitCostPrice();
+                    TotalUnitCost = TotalUnitCost + (ItemUnitCost * InputQty);
                 }
             }
         }

@@ -99,7 +99,7 @@
                             <h:outputLabel value="Unit.Cost"/>
 
                             <p:autoComplete id="proItem" widgetVar="WproItem" value="#{itemBean.selectedItem}"  
-                                            completeMethod="#{itemBean.getItemObjectListForSale}" 
+                                            completeMethod="#{itemBean.getItemObjectListForProduction}" 
                                             var="pro_itm" 
                                             itemLabel="#{pro_itm.description}" 
                                             itemValue="#{pro_itm}" 
@@ -177,7 +177,7 @@
                             <h:outputLabel value="Unit Qty Used"/>  
                             <h:outputLabel value=""/> 
                             <p:autoComplete id="rawItem" widgetVar="WrawItem" value="#{itemBean.selectedItemX}"  
-                                            completeMethod="#{itemBean.getProductionItemObjectList}" 
+                                            completeMethod="#{itemBean.getItemObjectListForRawMaterial}" 
                                             var="raw_itm" 
                                             itemLabel="#{raw_itm.description}" 
                                             itemValue="#{raw_itm}" 
@@ -259,7 +259,7 @@
                                 <!-- row record -->
                                 <p:inputText value="#{ati.inputQty}" style="width: 50px;">
                                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                                    <f:ajax event="keyup" execute="@this" render="totQty" />
+                                    <f:ajax event="keyup" listener="#{transProductionBean.updateUnitCostProduction(transItem,generalUserSetting.currentStore.storeId)}" execute="@this" render="totQty TransFormProd:itxtUnitCost" />
                                 </p:inputText>
                             </p:column>                      
                             <p:column>
