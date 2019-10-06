@@ -367,6 +367,7 @@
                     <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
                 <h:selectOneMenu styleClass="clsMenu" id="menuPayMethod" value="#{trans.payMethod}" style="width: 150px">
+                    <f:selectItem itemValue="0" itemLabel=""/>
                     <f:selectItems value="#{transBean.payMethodList}" var="pm" itemLabel="#{pm.payMethodName}" itemValue="#{pm.payMethodId}"/>
                     <f:ajax event="change" listener="#{transBean.refreshAccChildAccountsForCashReceipt(trans.currencyCode, trans.payMethod,generalUserSetting.getCurrentStore().storeId,generalUserSetting.getCurrentUser().userDetailId)}" execute="@this menuCurrency" render="menuPayMethod menuAccount"/>
                 </h:selectOneMenu>

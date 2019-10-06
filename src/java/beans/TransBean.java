@@ -7201,7 +7201,12 @@ public class TransBean implements Serializable {
             trans.setTotalDebit(0);
             trans.setTotalCredit(0);
             try {
-                trans.setPayMethod(new PayMethodBean().getPayMethodDefault().getPayMethodId());
+                //trans.setPayMethod(new PayMethodBean().getPayMethodDefault().getPayMethodId());
+                if (new Parameter_listBean().getParameter_listByContextNameMemory("PAY_METHOD", "FORCE_SELECTION").getParameter_value().equals("1")) {
+                    trans.setPayMethod(0);
+                } else {
+                    trans.setPayMethod(new PayMethodBean().getPayMethodDefault().getPayMethodId());
+                }
             } catch (NullPointerException npe) {
                 trans.setPayMethod(0);
             }
@@ -10536,7 +10541,24 @@ public class TransBean implements Serializable {
 
     public double getChangeAmount(Trans aTrans) {
         double ChangeAmt = 0;
-        ChangeAmt = (aTrans.getAmountTendered() + aTrans.getSpendPointsAmount()) - aTrans.getGrandTotal();
+        if (aTrans.getPayMethod() == 6) {
+            //6 customer deposit used
+            if (aTrans.getBillTransactorId() > 0) {
+                ChangeAmt = aTrans.getDeposit_customer2() - aTrans.getAmountTendered();
+            } else {
+                ChangeAmt = aTrans.getDeposit_customer() - aTrans.getAmountTendered();
+            }
+        } else if (aTrans.getPayMethod() == 7) {
+            //7 supplier deposit used
+            if (aTrans.getBillTransactorId() > 0) {
+                ChangeAmt = aTrans.getDeposit_supplier2() - aTrans.getAmountTendered();
+            } else {
+                ChangeAmt = aTrans.getDeposit_supplier() - aTrans.getAmountTendered();
+            }
+        } else {
+            //other cash, bank, mm, eft, etc.
+            ChangeAmt = (aTrans.getAmountTendered() + aTrans.getSpendPointsAmount()) - aTrans.getGrandTotal();
+        }
         return ChangeAmt;
     }
 

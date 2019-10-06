@@ -150,7 +150,7 @@
                             <h:inputText id="itxtvSpendPointsAmount" value="#{generalUserSetting.outputDetailParent.pay.pointsSpentAmount}" styleClass="clsInputTransItem" style="width: 150px;border: none;" disabled="true">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:inputText>
-                            <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="Change.Amount" rendered="#{generalUserSetting.outputDetailParent.trans.changeAmount>=0}"/>
+                            <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="Balanace" rendered="#{generalUserSetting.outputDetailParent.trans.changeAmount>=0}"/>
                             <h:inputText id="itxtvChange" value="#{generalUserSetting.outputDetailParent.trans.changeAmount}" styleClass="clsInputTransItem" style="width: 150px;border: none;" disabled="true" rendered="#{generalUserSetting.outputDetailParent.trans.changeAmount>=0}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:inputText>

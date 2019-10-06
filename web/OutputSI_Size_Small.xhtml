@@ -140,7 +140,7 @@
                             <h:outputLabel style="font-size: 16px; font-weight: bold;" id="IolblSalesInvoiceAmountTendered" value="#{generalUserSetting.outputDetailParent.trans.amountTendered}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
-                            <h:outputLabel style="font-size: 16px; font-weight: bold;" value="CHANGE AMT:" rendered="#{generalUserSetting.outputDetailParent.trans.changeAmount>=0}"/>
+                            <h:outputLabel style="font-size: 16px; font-weight: bold;" value="BALANCE:" rendered="#{generalUserSetting.outputDetailParent.trans.changeAmount>=0}"/>
                             <h:outputLabel style="font-size: 16px; font-weight: bold;" id="IolblSalesInvoiceChangeAmount" value="#{generalUserSetting.outputDetailParent.trans.changeAmount}" rendered="#{generalUserSetting.outputDetailParent.trans.changeAmount>=0}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>

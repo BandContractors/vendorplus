@@ -38,6 +38,7 @@ public class Stock_ledger implements Serializable {
     private String transaction_type_name;
     private String user_name;
     private String store_name;
+    private String transaction_number;
 
     /**
      * @return the stock_ledger_id
@@ -317,5 +318,19 @@ public class Stock_ledger implements Serializable {
      */
     public void setStore_name(String store_name) {
         this.store_name = store_name;
+    }
+
+    /**
+     * @return the transaction_number
+     */
+    public String getTransaction_number() {
+        return transaction_number;
+    }
+
+    /**
+     * @param transaction_number the transaction_number to set
+     */
+    public void setTransaction_number(String transaction_number) {
+        this.transaction_number = transaction_number;
     }
 }

@@ -499,7 +499,7 @@
             <h:panelGrid id="pgrdPayment" styleClass="clsGridMainInput" columns="1">
                 <h:panelGrid styleClass="clsGridMainInput" columns="5">
                     <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="Amount.Tendered (ALT+T)" for="itxtAmountTendered" accesskey="t"/>
-                    <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="Change.Amount"/>
+                    <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="Balance"/>
                     <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="Payment.Method"/>
                     <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="Receipt.Account"/>
                     <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="Loyalty"/>
@@ -513,6 +513,7 @@
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
                     <h:selectOneMenu styleClass="clsMenu" id="menuPayMethod" value="#{trans.payMethod}">
+                        <f:selectItem itemValue="0" itemLabel=""/>
                         <f:selectItems value="#{transBean.payMethodList}" var="pm" itemLabel="#{pm.payMethodName}" itemValue="#{pm.payMethodId}"/>
                         <f:ajax event="change" listener="#{transBean.refreshAccChildAccountsForCashReceipt(trans.currencyCode, trans.payMethod,generalUserSetting.getCurrentStore().storeId,generalUserSetting.getCurrentUser().userDetailId)}" execute="@this menuCurrency" render="menuPayMethod menuAccount"/>
                     </h:selectOneMenu>

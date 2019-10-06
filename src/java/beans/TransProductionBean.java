@@ -1324,6 +1324,9 @@ public class TransProductionBean implements Serializable {
         if (aTransProd.getStoreId() > 0) {
             wheresql = wheresql + " AND t.store_id=" + aTransProd.getStoreId();
         }
+        if (aTransProd.getTransactor_id() > 0) {
+            wheresql = wheresql + " AND t.transactor_id=" + aTransProd.getTransactor_id();
+        }
         if (aTransProdItem.getInputItemId() > 0) {
             wheresql = wheresql + " AND ti.input_item_id=" + aTransProdItem.getInputItemId();
         }
@@ -1389,7 +1392,9 @@ public class TransProductionBean implements Serializable {
         if (aTransProd.getStoreId() > 0) {
             wheresql = wheresql + " AND t.store_id=" + aTransProd.getStoreId();
         }
-        //if (aTransProdItem.getInputItemId() > 0) {
+        if (aTransProd.getTransactor_id() > 0) {
+            wheresql = wheresql + " AND t.transactor_id=" + aTransProd.getTransactor_id();
+        }
         wheresql = wheresql + " AND ti.input_item_id=" + aInputItemId;
         //}
         if (aTransProductionBean.getDate1() != null && aTransProductionBean.getDate2() != null) {

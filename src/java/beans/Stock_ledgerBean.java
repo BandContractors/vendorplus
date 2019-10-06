@@ -382,6 +382,7 @@ public class Stock_ledgerBean implements Serializable {
             rs = ps.executeQuery();
             Stock_ledger sl = null;
             Stock_ledgerBean slb = new Stock_ledgerBean();
+            String TransNo = "";
             while (rs.next()) {
                 sl = new Stock_ledger();
                 slb.setStock_ledgerFromResultset(sl, rs);
@@ -390,6 +391,17 @@ public class Stock_ledgerBean implements Serializable {
                 sl.setTransaction_type_name(rs.getString("transaction_type_name"));
                 sl.setUser_name(rs.getString("user_name"));
                 sl.setStore_name(rs.getString("store_name"));
+                TransNo = "";
+                try {
+                    if (sl.getTransaction_type_id() == 70) {
+                        TransNo = new TransProductionBean().getTransProductionById(sl.getTransaction_id()).getTransaction_number();
+                    } else {
+                        TransNo = new TransBean().getTrans(sl.getTransaction_id()).getTransactionNumber();
+                    }
+                } catch (Exception e) {
+                    //do nothing
+                }
+                sl.setTransaction_number(TransNo);
                 this.Stock_ledgerList.add(sl);
             }
         } catch (Exception e) {

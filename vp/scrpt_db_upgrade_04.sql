@@ -1,0 +1,2 @@
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) VALUES ('42', 'INVOICE', 'SHOW_PAYMENT_SUMMARY', '0','');
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) VALUES ('43', 'PAY_METHOD', 'FORCE_SELECTION', '0','');
