@@ -53,6 +53,8 @@ public class Pay implements Serializable {
     
     private String pay_number;
     private String PaidForSummary;
+    private String PayReasonName;
+    private String ChildAccountName;
 
     /**
      * @return the PayId
@@ -472,5 +474,33 @@ public class Pay implements Serializable {
      */
     public void setPaidForSummary(String PaidForSummary) {
         this.PaidForSummary = PaidForSummary;
+    }
+
+    /**
+     * @return the PayReasonName
+     */
+    public String getPayReasonName() {
+        return PayReasonName;
+    }
+
+    /**
+     * @param PayReasonName the PayReasonName to set
+     */
+    public void setPayReasonName(String PayReasonName) {
+        this.PayReasonName = PayReasonName;
+    }
+
+    /**
+     * @return the ChildAccountName
+     */
+    public String getChildAccountName() {
+        return ChildAccountName;
+    }
+
+    /**
+     * @param ChildAccountName the ChildAccountName to set
+     */
+    public void setChildAccountName(String ChildAccountName) {
+        this.ChildAccountName = ChildAccountName;
     }
 }

@@ -4,7 +4,8 @@
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:p="http://primefaces.org/ui"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     <h:head>
         <title>Day Closing</title>
         <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
@@ -49,17 +50,19 @@
                 <h:panelGrid id="pnlgHeader" styleClass="clsPanelReportFilterTitle">
                     <h:outputLabel styleClass="clsLabelReportFilterTitle" value="Day Closing Dashboard"/>
                 </h:panelGrid>
-                <h:panelGrid id="pnlgFilter" columns="4" styleClass="clsPanelReportFilter">
-                    <p:outputLabel value="Date:"/>
-                    <p:datePicker id="multiselect" selectionMode="multiple" value="#{dashboardBean.multipleDates}" readonlyInput="false" pattern="#{companySetting.getDateFormat()}" autocomplete="false" />
+                <h:panelGrid id="pnlgFilter" columns="6" styleClass="clsPanelReportFilter">
+                    <p:outputLabel value="From Date:"/>
+                    <p:calendar pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{dashboardBean.fromDate}" size="8"/>
+                    <p:outputLabel id="id11" value="To Date:"/>
+                    <p:calendar pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{dashboardBean.toDate}" size="8"/>
                     <p:commandButton id="cmdbSearch" value="SEARCH" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
-                        <p:ajax listener="#{dashboardBean.searchDayCloseDashboard()}" process="pnlgFilter" update="growl1 sales receipts purchases payments"/>
+                        <p:ajax listener="#{dashboardBean.searchDayCloseDashboard()}" process="pnlgFilter" update="growl1 formReport:pnlSales formReport:pnlCashReceipt"/>
                     </p:commandButton>
                     <p:commandButton id="cmdbReset" value="RESET">
-                        <p:ajax listener="#{dashboardBean.initDayCloseDashboard()}" process="pnlgFilter" update="pnlgFilter growl1 sales receipts purchases payments"/>
+                        <p:ajax listener="#{dashboardBean.initDayCloseDashboard()}" process="pnlgFilter" update="pnlgFilter growl1 formReport:pnlSales formReport:pnlCashReceipt"/>
                     </p:commandButton>
                 </h:panelGrid>
 
@@ -67,111 +70,139 @@
 
                 <div class="col-container">
                     <div class="col">
-                        <p:panel id="sales" header="Sales" style="background-color: #007500;">
-                            <p:dataTable var="sl" value="#{dashboardBean.dayCloseSalesList}">
-                                <p:column headerText="By Sales Date" style="font-size: 11px;">
-                                    #{sl.transactionReasonName}
-                                </p:column>
-                                <p:column headerText="Currency" style="font-size: 11px;">
-                                    #{sl.currencyCode}
-                                </p:column>
-                                <p:column headerText="Amount" style="font-size: 11px;text-align: right;">
-                                    #{utilityBean.formatDoubleToString(sl.grandTotal,sl.currencyCode)}
-                                </p:column>
-                            </p:dataTable>
-                            <p:dataTable var="sl2" value="#{dashboardBean.dayCloseSalesList2}">
-                                <p:column headerText="By Add Date" style="font-size: 11px;">
-                                    #{sl2.transactionReasonName}
-                                </p:column>
-                                <p:column headerText="Currency" style="font-size: 11px;">
-                                    #{sl2.currencyCode}
-                                </p:column>
-                                <p:column headerText="Amount" style="font-size: 11px;text-align: right;">
-                                    #{utilityBean.formatDoubleToString(sl2.grandTotal,sl2.currencyCode)}
-                                </p:column>
-                            </p:dataTable>
-                        </p:panel>
+                        <h:panelGrid id="pnlSales">
+                            <table cellspacing="0" cellpadding="2" border="0" style="background-color: #00B461;width: 100%;">
+                                <tr style="background-color: yellow;">
+                                    <td colspan="3" align="center" valign="bottom">
+                                        <b>SALES</b>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" align="center" valign="bottom">
+                                        <b>#{utilityBean.formatDoubleToString(dashboardBean.totalSales,accCurrencyBean.localCurrency.currencyCode)}</b>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" align="center" valign="bottom">
+                                        #{accCurrencyBean.localCurrency.currencyCode}
+                                    </td>
+                                </tr>
+                                <tr style="background-color: yellow;">
+                                    <td colspan="3" align="center" valign="bottom">
+                                        <b>Cash Sales</b>
+                                    </td>
+                                </tr>
+                                <ui:repeat var="cs" value="#{dashboardBean.dayCloseSalesCash}">
+                                    <tr>
+                                        <td align="left" valign="middle">
+                                            #{cs.currencyCode}
+                                        </td>
+                                        <td colspan="2" align="right" valign="middle">
+                                            #{utilityBean.formatDoubleToString(cs.grandTotal)}
+                                        </td>
+                                    </tr>
+                                </ui:repeat>
+                                <tr style="background-color: yellow;">
+                                    <td colspan="3" align="center" valign="bottom">
+                                        <b>Credit Sales</b>
+                                    </td>
+                                </tr>
+                                <ui:repeat var="cc" value="#{dashboardBean.dayCloseSalesCredit}">
+                                    <tr>
+                                        <td align="left" valign="middle">
+                                            #{cc.currencyCode}
+                                        </td>
+                                        <td colspan="2" align="right" valign="middle">
+                                            #{utilityBean.formatDoubleToString(cc.grandTotal)}
+                                        </td>
+                                    </tr>
+                                </ui:repeat>
+                                <tr style="background-color: yellow;">
+                                    <td colspan="3" align="center" valign="bottom">
+                                        <b>Store/Section Sales</b>
+                                    </td>
+                                </tr>
+                                <ui:repeat var="st" value="#{dashboardBean.dayCloseSalesStore}">
+                                    <tr>
+                                        <td align="left" valign="middle">
+                                            #{st.storeName}
+                                        </td>
+                                        <td align="left" valign="middle">
+                                            #{st.currencyCode}
+                                        </td>
+                                        <td align="right" valign="middle">
+                                            #{utilityBean.formatDoubleToString(st.grandTotal)}
+                                        </td>
+                                    </tr>
+                                </ui:repeat>
+                            </table>
+                        </h:panelGrid>
                     </div>
 
                     <div class="col">
-                        <p:panel  id="receipts" header="Cash Receipts" style="background-color: #007500;">
-                            <p:dataTable var="cr" value="#{dashboardBean.dayCloseCashReceiptList}">
-                                <p:column headerText="By Receipt Date" style="font-size: 11px;">
-                                    #{cr.payRefNo}
-                                </p:column>
-                                <p:column headerText="Currency" style="font-size: 11px;">
-                                    #{cr.currencyCode}
-                                </p:column>
-                                <p:column headerText="Received" style="font-size: 11px;text-align: right;">
-                                    #{utilityBean.formatDoubleToString(cr.paidAmount,cr.currencyCode)}
-                                </p:column>
-                            </p:dataTable>
-                            <p:dataTable var="cr2" value="#{dashboardBean.dayCloseCashReceiptList2}">
-                                <p:column headerText="By Add Date" style="font-size: 11px;">
-                                    #{cr2.payRefNo}
-                                </p:column>
-                                <p:column headerText="Currency" style="font-size: 11px;">
-                                    #{cr2.currencyCode}
-                                </p:column>
-                                <p:column headerText="Received" style="font-size: 11px;text-align: right;">
-                                    #{utilityBean.formatDoubleToString(cr2.paidAmount,cr2.currencyCode)}
-                                </p:column>
-                            </p:dataTable>
-                        </p:panel>
+                        <h:panelGrid id="pnlCashReceipt">
+                            <table cellspacing="0" cellpadding="2" border="0" style="background-color: #00B461;width: 100%;">
+                                <tr style="background-color: yellow;">
+                                    <td colspan="3" align="center" valign="bottom">
+                                        <b>CASH RECEIVED</b>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" align="center" valign="bottom">
+                                        <b>#{utilityBean.formatDoubleToString(dashboardBean.totalCashReceipt,accCurrencyBean.localCurrency.currencyCode)}</b>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" align="center" valign="bottom">
+                                        #{accCurrencyBean.localCurrency.currencyCode}
+                                    </td>
+                                </tr>
+                                <tr style="background-color: yellow;">
+                                    <td colspan="3" align="center" valign="bottom">
+                                        <b>Cash Receipt Type</b>
+                                    </td>
+                                </tr>
+                                <ui:repeat var="crt" value="#{dashboardBean.dayCloseCashReceiptType}">
+                                    <tr>
+                                        <td align="left" valign="middle">
+                                            #{crt.payReasonName}
+                                        </td>
+                                        <td align="left" valign="middle">
+                                            #{crt.currencyCode}
+                                        </td>
+                                        <td align="right" valign="middle">
+                                            #{utilityBean.formatDoubleToString(crt.paidAmount)}
+                                        </td>
+                                    </tr>
+                                </ui:repeat>
+                                <tr style="background-color: yellow;">
+                                    <td colspan="3" align="center" valign="bottom">
+                                        <b>Cash Receipt Account</b>
+                                    </td>
+                                </tr>
+                                <ui:repeat var="cra" value="#{dashboardBean.dayCloseCashReceiptAccount}">
+                                    <tr>
+                                        <td align="left" valign="middle">
+                                            #{cra.childAccountName}
+                                        </td>
+                                        <td align="left" valign="middle">
+                                            #{cra.currencyCode}
+                                        </td>
+                                        <td align="right" valign="middle">
+                                            #{utilityBean.formatDoubleToString(cra.paidAmount)}
+                                        </td>
+                                    </tr>
+                                </ui:repeat>
+                            </table>
+                        </h:panelGrid>
                     </div>
 
                     <div class="col">
-                        <p:panel  id="purchases" header="Purchases and Expenses" style="background-color: #E60000;">
-                            <p:dataTable var="pl" value="#{dashboardBean.dayClosePurchaseList}">
-                                <p:column headerText="By Purchase Date" style="font-size: 11px;">
-                                    #{pl.transactionReasonName}
-                                </p:column>
-                                <p:column headerText="Currency" style="font-size: 11px;">
-                                    #{pl.currencyCode}
-                                </p:column>
-                                <p:column headerText="Amount" style="font-size: 11px;text-align: right;">
-                                    #{utilityBean.formatDoubleToString(pl.grandTotal,pl.currencyCode)}
-                                </p:column>
-                            </p:dataTable>
-                            <p:dataTable var="pl2" value="#{dashboardBean.dayClosePurchaseList2}">
-                                <p:column headerText="By Purchase Date" style="font-size: 11px;">
-                                    #{pl2.transactionReasonName}
-                                </p:column>
-                                <p:column headerText="Currency" style="font-size: 11px;">
-                                    #{pl2.currencyCode}
-                                </p:column>
-                                <p:column headerText="Amount" style="font-size: 11px;text-align: right;">
-                                    #{utilityBean.formatDoubleToString(pl2.grandTotal,pl2.currencyCode)}
-                                </p:column>
-                            </p:dataTable>
-                        </p:panel>
+
                     </div>
 
                     <div class="col">
-                        <p:panel  id="payments" header="Cash Payments" style="background-color:#E60000;">
-                            <p:dataTable var="cp" value="#{dashboardBean.dayCloseCashReceiptList}">
-                                <p:column headerText="By Pay Date" style="font-size: 11px;">
-                                    #{cp.payRefNo}
-                                </p:column>
-                                <p:column headerText="Currency" style="font-size: 11px;">
-                                    #{cp.currencyCode}
-                                </p:column>
-                                <p:column headerText="Paid" style="font-size: 11px;text-align: right;">
-                                    #{utilityBean.formatDoubleToString(cp.paidAmount,cp.currencyCode)}
-                                </p:column>
-                            </p:dataTable>
-                            <p:dataTable var="cp2" value="#{dashboardBean.dayCloseCashReceiptList2}">
-                                <p:column headerText="By Pay Date" style="font-size: 11px;">
-                                    #{cp2.payRefNo}
-                                </p:column>
-                                <p:column headerText="Currency" style="font-size: 11px;">
-                                    #{cp2.currencyCode}
-                                </p:column>
-                                <p:column headerText="Paid" style="font-size: 11px;text-align: right;">
-                                    #{utilityBean.formatDoubleToString(cp2.paidAmount,cp2.currencyCode)}
-                                </p:column>
-                            </p:dataTable>
-                        </p:panel>
+
                     </div>
                 </div>
             </h:form>

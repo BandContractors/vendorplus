@@ -24,18 +24,23 @@
     </h:head>
     <f:metadata>
         <f:viewAction action="#{navigationBean.checkAccessDenied('72', 'View')}"/>
-        <f:viewAction action="#{dashboardBean.initDayCloseDashboardUI()}"/>
         <f:viewAction action="#{dashboardBean.initDayCloseDashboard()}"/>
     </f:metadata>
     <h:body>
         <style type="text/css">
-            .ui-panel, div.ui-state-hover {
-                margin: 5px;
-                width:300px;
+            .col-container {
+                display: table; /* Make the container element behave like a table */
+                width: 100%; /* Set full-width to expand the whole page */
             }
-
-            .ui-dashboard-column {
-                width:315px;
+            .col {
+                display: table-cell; /* Make elements inside the container behave like table cells */
+            }
+            /* If the browser window is smaller than 600px, make the columns stack on top of each other */
+            @media only screen and (max-width: 600px) {
+                .col { 
+                    display: block;
+                    width: 100%;
+                }
             }
         </style>
         <div>
@@ -51,237 +56,124 @@
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
-                        <p:ajax listener="#{dashboardBean.searchDayCloseDashboard()}" process="pnlgFilter" update="growl1 board"/>
+                        <p:ajax listener="#{dashboardBean.searchDayCloseDashboard()}" process="pnlgFilter" update="growl1 sales receipts purchases payments"/>
                     </p:commandButton>
                     <p:commandButton id="cmdbReset" value="RESET">
-                        <p:ajax listener="#{dashboardBean.initDayCloseDashboard()}" process="pnlgFilter" update="pnlgFilter growl1 board"/>
+                        <p:ajax listener="#{dashboardBean.initDayCloseDashboard()}" process="pnlgFilter" update="pnlgFilter growl1 sales receipts purchases payments"/>
                     </p:commandButton>
                 </h:panelGrid>
 
                 <p:growl id="growl1" showDetail="true" />
 
-                <p:dashboard id="board" model="#{dashboardBean.model}" style="display: table;">
-                    <p:panel id="sales" header="Sales">
-                        <table border="0" cellspacing="0" cellpadding="5">
-                            <tr style="background-color:#007500;">
-                                <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
-                                    By TransDate
-                                </td>
-                                <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
-                                    Currency
-                                </td>
-                                <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
-                                    Amount
-                                </td>
-                            </tr>
-                            <ui:repeat var="sl" value="#{dashboardBean.dayCloseSalesList}">
-                                <tr style="background-color:lightgreen;">
-                                    <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                        #{sl.transactionReasonName}
-                                    </td>
-                                    <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                        #{sl.currencyCode}
-                                    </td>
-                                    <td style="text-align: right;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                        #{utilityBean.formatDoubleToString(sl.grandTotal,sl.currencyCode)}
-                                    </td>
-                                </tr>
-                            </ui:repeat>
-                        </table>
-                        <table border="0" cellspacing="0" cellpadding="5">
-                            <tr style="background-color:#007500;">
-                                <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
-                                    By AddDate
-                                </td>
-                                <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
-                                    Currency
-                                </td>
-                                <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
-                                    Amount
-                                </td>
-                            </tr>
-                            <ui:repeat var="sl2" value="#{dashboardBean.dayCloseSalesList2}">
-                                <tr style="background-color:lightgreen;">
-                                    <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                        #{sl2.transactionReasonName}
-                                    </td>
-                                    <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                        #{sl2.currencyCode}
-                                    </td>
-                                    <td style="text-align: right;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                        #{utilityBean.formatDoubleToString(sl2.grandTotal,sl2.currencyCode)}
-                                    </td>
-                                </tr>
-                            </ui:repeat>
-                        </table>
-                    </p:panel>
+                <div class="col-container">
+                    <div class="col">
+                        <p:panel id="sales" header="Sales" style="background-color: #007500;">
+                            <p:dataTable var="sl" value="#{dashboardBean.dayCloseSalesList}">
+                                <p:column headerText="By Sales Date" style="font-size: 11px;">
+                                    #{sl.transactionReasonName}
+                                </p:column>
+                                <p:column headerText="Currency" style="font-size: 11px;">
+                                    #{sl.currencyCode}
+                                </p:column>
+                                <p:column headerText="Amount" style="font-size: 11px;text-align: right;">
+                                    #{utilityBean.formatDoubleToString(sl.grandTotal,sl.currencyCode)}
+                                </p:column>
+                            </p:dataTable>
+                            <p:dataTable var="sl2" value="#{dashboardBean.dayCloseSalesList2}">
+                                <p:column headerText="By Add Date" style="font-size: 11px;">
+                                    #{sl2.transactionReasonName}
+                                </p:column>
+                                <p:column headerText="Currency" style="font-size: 11px;">
+                                    #{sl2.currencyCode}
+                                </p:column>
+                                <p:column headerText="Amount" style="font-size: 11px;text-align: right;">
+                                    #{utilityBean.formatDoubleToString(sl2.grandTotal,sl2.currencyCode)}
+                                </p:column>
+                            </p:dataTable>
+                        </p:panel>
+                    </div>
 
-                    <p:panel id="purchases" header="Purchases and Expenses">
-                        <table border="0" cellspacing="0" cellpadding="5">
-                            <tr style="background-color:#E60000;">
-                                <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
-                                    By TransDate
-                                </td>
-                                <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
-                                    Currency
-                                </td>
-                                <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
-                                    Amount
-                                </td>
-                            </tr>
-                            <ui:repeat var="pl" value="#{dashboardBean.dayClosePurchaseList}">
-                                <tr style="background-color:#FFE4C4;">
-                                    <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                        #{pl.transactionReasonName}
-                                    </td>
-                                    <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                        #{pl.currencyCode}
-                                    </td>
-                                    <td style="text-align: right;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                        #{utilityBean.formatDoubleToString(pl.grandTotal,pl.currencyCode)}
-                                    </td>
-                                </tr>
-                            </ui:repeat>
-                        </table>
-                        <table border="0" cellspacing="0" cellpadding="5">
-                            <tr style="background-color:#E60000;">
-                                <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
-                                    By AddDate
-                                </td>
-                                <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
-                                    Currency
-                                </td>
-                                <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
-                                    AMount
-                                </td>
-                            </tr>
-                            <ui:repeat var="pl2" value="#{dashboardBean.dayClosePurchaseList2}">
-                                <tr style="background-color:#FFE4C4;">
-                                    <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                        #{pl2.transactionReasonName}
-                                    </td>
-                                    <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                        #{pl2.currencyCode}
-                                    </td>
-                                    <td style="text-align: right;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                        #{utilityBean.formatDoubleToString(pl2.grandTotal,pl2.currencyCode)}
-                                    </td>
-                                </tr>
-                            </ui:repeat>
-                        </table>
-                    </p:panel>
+                    <div class="col">
+                        <p:panel  id="receipts" header="Cash Receipts" style="background-color: #007500;">
+                            <p:dataTable var="cr" value="#{dashboardBean.dayCloseCashReceiptList}">
+                                <p:column headerText="By Receipt Date" style="font-size: 11px;">
+                                    #{cr.payRefNo}
+                                </p:column>
+                                <p:column headerText="Currency" style="font-size: 11px;">
+                                    #{cr.currencyCode}
+                                </p:column>
+                                <p:column headerText="Received" style="font-size: 11px;text-align: right;">
+                                    #{utilityBean.formatDoubleToString(cr.paidAmount,cr.currencyCode)}
+                                </p:column>
+                            </p:dataTable>
+                            <p:dataTable var="cr2" value="#{dashboardBean.dayCloseCashReceiptList2}">
+                                <p:column headerText="By Add Date" style="font-size: 11px;">
+                                    #{cr2.payRefNo}
+                                </p:column>
+                                <p:column headerText="Currency" style="font-size: 11px;">
+                                    #{cr2.currencyCode}
+                                </p:column>
+                                <p:column headerText="Received" style="font-size: 11px;text-align: right;">
+                                    #{utilityBean.formatDoubleToString(cr2.paidAmount,cr2.currencyCode)}
+                                </p:column>
+                            </p:dataTable>
+                        </p:panel>
+                    </div>
 
-                    <p:panel id="receipts" header="Cash Receipts">
-                        <table border="0" cellspacing="0" cellpadding="5">
-                            <tr style="background-color:#007500;">
-                                <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
-                                    By ReceiptDate
-                                </td>
-                                <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
-                                    Currency
-                                </td>
-                                <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
-                                    Received
-                                </td>
-                            </tr>
-                            <ui:repeat var="cr" value="#{dashboardBean.dayCloseCashReceiptList}">
-                                <tr style="background-color:lightgreen;">
-                                    <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                        #{cr.payRefNo}
-                                    </td>
-                                    <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                        #{cr.currencyCode}
-                                    </td>
-                                    <td style="text-align: right;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                        #{utilityBean.formatDoubleToString(cr.paidAmount,cr.currencyCode)}
-                                    </td>
-                                </tr>
-                            </ui:repeat>
-                        </table>
-                        <table border="0" cellspacing="0" cellpadding="5">
-                            <tr style="background-color:#007500;">
-                                <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
-                                    By AddDate
-                                </td>
-                                <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
-                                    Currency
-                                </td>
-                                <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
-                                    Received
-                                </td>
-                            </tr>
-                            <ui:repeat var="cr2" value="#{dashboardBean.dayCloseCashReceiptList2}">
-                                <tr style="background-color:lightgreen;">
-                                    <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                        #{cr2.payRefNo}
-                                    </td>
-                                    <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                        #{cr2.currencyCode}
-                                    </td>
-                                    <td style="text-align: right;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                        #{utilityBean.formatDoubleToString(cr2.paidAmount,cr2.currencyCode)}
-                                    </td>
-                                </tr>
-                            </ui:repeat>
-                        </table>
-                    </p:panel>
+                    <div class="col">
+                        <p:panel  id="purchases" header="Purchases and Expenses" style="background-color: #E60000;">
+                            <p:dataTable var="pl" value="#{dashboardBean.dayClosePurchaseList}">
+                                <p:column headerText="By Purchase Date" style="font-size: 11px;">
+                                    #{pl.transactionReasonName}
+                                </p:column>
+                                <p:column headerText="Currency" style="font-size: 11px;">
+                                    #{pl.currencyCode}
+                                </p:column>
+                                <p:column headerText="Amount" style="font-size: 11px;text-align: right;">
+                                    #{utilityBean.formatDoubleToString(pl.grandTotal,pl.currencyCode)}
+                                </p:column>
+                            </p:dataTable>
+                            <p:dataTable var="pl2" value="#{dashboardBean.dayClosePurchaseList2}">
+                                <p:column headerText="By Purchase Date" style="font-size: 11px;">
+                                    #{pl2.transactionReasonName}
+                                </p:column>
+                                <p:column headerText="Currency" style="font-size: 11px;">
+                                    #{pl2.currencyCode}
+                                </p:column>
+                                <p:column headerText="Amount" style="font-size: 11px;text-align: right;">
+                                    #{utilityBean.formatDoubleToString(pl2.grandTotal,pl2.currencyCode)}
+                                </p:column>
+                            </p:dataTable>
+                        </p:panel>
+                    </div>
 
-                    <p:panel id="payments" header="Cash Payments">
-                        <table border="0" cellspacing="0" cellpadding="5">
-                            <tr style="background-color:#E60000;">
-                                <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
-                                    By PayDate
-                                </td>
-                                <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
-                                    Currency
-                                </td>
-                                <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
-                                    Paid
-                                </td>
-                            </tr>
-                            <ui:repeat var="cp" value="#{dashboardBean.dayCloseCashPaymentList}">
-                                <tr style="background-color:#FFE4C4;">
-                                    <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                        #{cp.payRefNo}
-                                    </td>
-                                    <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                        #{cp.currencyCode}
-                                    </td>
-                                    <td style="text-align: right;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                        #{utilityBean.formatDoubleToString(cp.paidAmount,cp.currencyCode)}
-                                    </td>
-                                </tr>
-                            </ui:repeat>
-                        </table>
-                        <table border="0" cellspacing="0" cellpadding="5">
-                            <tr style="background-color:#E60000;">
-                                <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
-                                    By AddDate
-                                </td>
-                                <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
-                                    Currency
-                                </td>
-                                <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
-                                    Paid
-                                </td>
-                            </tr>
-                            <ui:repeat var="cp2" value="#{dashboardBean.dayCloseCashPaymentList2}">
-                                <tr style="background-color:#FFE4C4;">
-                                    <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                        #{cp2.payRefNo}
-                                    </td>
-                                    <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                        #{cp2.currencyCode}
-                                    </td>
-                                    <td style="text-align: right;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                        #{utilityBean.formatDoubleToString(cp2.paidAmount,cp2.currencyCode)}
-                                    </td>
-                                </tr>
-                            </ui:repeat>
-                        </table>
-                    </p:panel>
-                </p:dashboard>
-
+                    <div class="col">
+                        <p:panel  id="payments" header="Cash Payments" style="background-color:#E60000;">
+                            <p:dataTable var="cp" value="#{dashboardBean.dayCloseCashReceiptList}">
+                                <p:column headerText="By Pay Date" style="font-size: 11px;">
+                                    #{cp.payRefNo}
+                                </p:column>
+                                <p:column headerText="Currency" style="font-size: 11px;">
+                                    #{cp.currencyCode}
+                                </p:column>
+                                <p:column headerText="Paid" style="font-size: 11px;text-align: right;">
+                                    #{utilityBean.formatDoubleToString(cp.paidAmount,cp.currencyCode)}
+                                </p:column>
+                            </p:dataTable>
+                            <p:dataTable var="cp2" value="#{dashboardBean.dayCloseCashReceiptList2}">
+                                <p:column headerText="By Pay Date" style="font-size: 11px;">
+                                    #{cp2.payRefNo}
+                                </p:column>
+                                <p:column headerText="Currency" style="font-size: 11px;">
+                                    #{cp2.currencyCode}
+                                </p:column>
+                                <p:column headerText="Paid" style="font-size: 11px;text-align: right;">
+                                    #{utilityBean.formatDoubleToString(cp2.paidAmount,cp2.currencyCode)}
+                                </p:column>
+                            </p:dataTable>
+                        </p:panel>
+                    </div>
+                </div>
             </h:form>
         </div>
     </h:body>
