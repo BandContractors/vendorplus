@@ -3,6 +3,7 @@ package beans;
 import connections.DBConnection;
 import entities.CompanySetting;
 import entities.Pay;
+import entities.Stock_ledger;
 import entities.Trans;
 import utilities.UtilityBean;
 import java.io.Serializable;
@@ -85,6 +86,19 @@ public class DashboardBean implements Serializable {
     private double TotalCashReceipt;
     private List<Pay> DayCloseCashReceiptType;
     private List<Pay> DayCloseCashReceiptAccount;
+    private double TotalPurchases;
+    private List<Trans> DayClosePurchasesCash;
+    private List<Trans> DayClosePurchasesCredit;
+    private List<Trans> DayClosePurchasesType;
+    private List<Trans> DayClosePurchasesStore;
+    private double TotalCashPayment;
+    private List<Pay> DayCloseCashPaymentType;
+    private List<Pay> DayCloseCashPaymentAccount;
+
+    private long CountItemsAdded;
+    private long CountItemsSubtracted;
+    private List<Stock_ledger> DayCloseStockMovementAdded;
+    private List<Stock_ledger> DayCloseStockMovementSubtracted;
 
     public void initSalesDashboard() {
         try {
@@ -783,89 +797,255 @@ public class DashboardBean implements Serializable {
                 } catch (NullPointerException npe) {
                     storesale.setStoreName("");
                 }
-                this.DayCloseSalesStore.add(storesale);
+                if (storesale.getGrandTotal() > 0) {
+                    this.DayCloseSalesStore.add(storesale);
+                }
             }
         } catch (Exception e) {
             System.err.println("refreshDayCloseSalesList:" + e.getMessage());
         }
     }
 
-    public void refreshDayClosePurchaseList(String aDatesString) {
+    public void refreshDayClosePurchaseList(String aBtnFrmToDate) {
         ResultSet rs;
         ResultSet rs2;
-        this.DayClosePurchaseList = new ArrayList<>();
-        this.DayClosePurchaseList2 = new ArrayList<>();
+        ResultSet rs3;
+        ResultSet rs4;
+        double totalpurchases = 0;
+        this.DayClosePurchasesCash = new ArrayList<>();
+        this.DayClosePurchasesCredit = new ArrayList<>();
+        this.DayClosePurchasesType = new ArrayList<>();
+        this.DayClosePurchasesStore = new ArrayList<>();
         String sql = "SELECT "
-                + "tr.transaction_reason_name,t.currency_code,sum(t.grand_total) as grand_total "
-                + "FROM transaction t inner join transaction_reason tr on t.transaction_reason_id=tr.transaction_reason_id "
+                + "sum(t.grand_total*t.xrate) as grand_total "
+                + "FROM transaction t "
                 + "WHERE t.transaction_type_id IN(1,19) "
-                + "AND cast(t.transaction_date as date) IN(" + aDatesString + ") "
-                + "GROUP BY tr.transaction_reason_name,t.currency_code";
+                + "AND t.transaction_date " + aBtnFrmToDate;
         String sql2 = "SELECT "
+                + "t.currency_code,"
+                + "SUM(IF(t.amount_tendered=0,t.grand_total,0)) as credit_purchase,SUM(IF(t.amount_tendered>0,t.grand_total,0)) as cash_purchase "
+                + "FROM transaction t WHERE t.transaction_type_id IN(1,19) "
+                + "AND t.transaction_date " + aBtnFrmToDate + " "
+                + "GROUP BY t.currency_code";
+        String sql3 = "SELECT "
                 + "tr.transaction_reason_name,t.currency_code,sum(t.grand_total) as grand_total "
                 + "FROM transaction t inner join transaction_reason tr on t.transaction_reason_id=tr.transaction_reason_id "
                 + "WHERE t.transaction_type_id IN(1,19) "
-                + "AND cast(t.add_date as date) IN(" + aDatesString + ") "
-                + "GROUP BY tr.transaction_reason_name,t.currency_code";
-        //for TransDate
+                + "AND t.transaction_date " + aBtnFrmToDate + " "
+                + "GROUP BY tr.transaction_reason_name,t.currency_code "
+                + "ORDER BY tr.transaction_reason_name,t.currency_code";
+        String sql4 = "SELECT "
+                + "st.store_name,t.currency_code,sum(t.grand_total) as grand_total "
+                + "FROM transaction t inner join store st on t.store_id=st.store_id "
+                + "WHERE t.transaction_type_id IN(1,19) "
+                + "AND t.transaction_date " + aBtnFrmToDate + " "
+                + "GROUP BY st.store_name,t.currency_code "
+                + "ORDER BY st.store_name,t.currency_code ";
+        //for total
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             rs = ps.executeQuery();
-            Trans trans;
             while (rs.next()) {
-                trans = new Trans();
                 try {
-                    trans.setCurrencyCode(rs.getString("currency_code"));
+                    totalpurchases = totalpurchases + rs.getDouble("grand_total");
                 } catch (NullPointerException npe) {
-                    trans.setCurrencyCode("");
+                    //do nothing
                 }
-                try {
-                    trans.setGrandTotal(rs.getDouble("grand_total"));
-                } catch (NullPointerException npe) {
-                    trans.setGrandTotal(0);
-                }
-                try {
-                    trans.setTransactionReasonName(rs.getString("transaction_reason_name"));
-                } catch (NullPointerException npe) {
-                    trans.setTransactionReasonName("");
-                }
-                this.DayClosePurchaseList.add(trans);
             }
+            this.TotalPurchases = totalpurchases;
         } catch (Exception e) {
-            System.err.println("refreshDayClosePurchaseList:" + e.getMessage());
+            System.err.println("refreshDayClosePurchaseList-Total:" + e.getMessage());
         }
-
-        //for AddDate
+        //credit and cash purchase
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql2);) {
             rs2 = ps.executeQuery();
-            Trans trans2;
+            Trans cashpurchase;
+            Trans creditpurchase;
+            long i = 0;
             while (rs2.next()) {
-                trans2 = new Trans();
+                i = i + 1;
+                //cash purchase
+                cashpurchase = new Trans();
+                cashpurchase.setTransactionId(i);
                 try {
-                    trans2.setCurrencyCode(rs2.getString("currency_code"));
+                    cashpurchase.setCurrencyCode(rs2.getString("currency_code"));
                 } catch (NullPointerException npe) {
-                    trans2.setCurrencyCode("");
+                    cashpurchase.setCurrencyCode("");
                 }
                 try {
-                    trans2.setGrandTotal(rs2.getDouble("grand_total"));
+                    cashpurchase.setGrandTotal(rs2.getDouble("cash_purchase"));
                 } catch (NullPointerException npe) {
-                    trans2.setGrandTotal(0);
+                    cashpurchase.setGrandTotal(0);
+                }
+                if (cashpurchase.getGrandTotal() > 0) {
+                    this.DayClosePurchasesCash.add(cashpurchase);
+                }
+                //credit purchase
+                creditpurchase = new Trans();
+                creditpurchase.setTransactionId(i);
+                try {
+                    creditpurchase.setCurrencyCode(rs2.getString("currency_code"));
+                } catch (NullPointerException npe) {
+                    creditpurchase.setCurrencyCode("");
                 }
                 try {
-                    trans2.setTransactionReasonName(rs2.getString("transaction_reason_name"));
+                    creditpurchase.setGrandTotal(rs2.getDouble("credit_purchase"));
                 } catch (NullPointerException npe) {
-                    trans2.setTransactionReasonName("");
+                    creditpurchase.setGrandTotal(0);
                 }
-                this.DayClosePurchaseList2.add(trans2);
+                if (creditpurchase.getGrandTotal() > 0) {
+                    this.DayClosePurchasesCredit.add(creditpurchase);
+                }
             }
         } catch (Exception e) {
-            System.err.println("refreshDayClosePurchaseList2:" + e.getMessage());
+            System.err.println("refreshDayClosePurchaseList-CashCredit:" + e.getMessage());
+        }
+        //for type
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql3);) {
+            rs3 = ps.executeQuery();
+            Trans typepurchase;
+            long i = 0;
+            while (rs3.next()) {
+                i = i + 1;
+                typepurchase = new Trans();
+                typepurchase.setTransactionId(i);
+                try {
+                    typepurchase.setCurrencyCode(rs3.getString("currency_code"));
+                } catch (NullPointerException npe) {
+                    typepurchase.setCurrencyCode("");
+                }
+                try {
+                    typepurchase.setGrandTotal(rs3.getDouble("grand_total"));
+                } catch (NullPointerException npe) {
+                    typepurchase.setGrandTotal(0);
+                }
+                try {
+                    typepurchase.setTransactionReasonName(rs3.getString("transaction_reason_name"));
+                } catch (NullPointerException npe) {
+                    typepurchase.setTransactionReasonName("");
+                }
+                if (typepurchase.getGrandTotal() > 0) {
+                    this.DayClosePurchasesType.add(typepurchase);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("refreshDayClosePurchaseList-Type:" + e.getMessage());
+        }
+        //for store
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql4);) {
+            rs4 = ps.executeQuery();
+            Trans storepurchase;
+            long i = 0;
+            while (rs4.next()) {
+                i = i + 1;
+                storepurchase = new Trans();
+                storepurchase.setTransactionId(i);
+                try {
+                    storepurchase.setCurrencyCode(rs4.getString("currency_code"));
+                } catch (NullPointerException npe) {
+                    storepurchase.setCurrencyCode("");
+                }
+                try {
+                    storepurchase.setGrandTotal(rs4.getDouble("grand_total"));
+                } catch (NullPointerException npe) {
+                    storepurchase.setGrandTotal(0);
+                }
+                try {
+                    storepurchase.setStoreName(rs4.getString("store_name"));
+                } catch (NullPointerException npe) {
+                    storepurchase.setStoreName("");
+                }
+                if (storepurchase.getGrandTotal() > 0) {
+                    this.DayClosePurchasesStore.add(storepurchase);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("refreshDayClosePurchaseList-Store:" + e.getMessage());
         }
     }
 
+//    public void refreshDayClosePurchaseList(String aDatesString) {
+//        ResultSet rs;
+//        ResultSet rs2;
+//        this.DayClosePurchaseList = new ArrayList<>();
+//        this.DayClosePurchaseList2 = new ArrayList<>();
+//        String sql = "SELECT "
+//                + "tr.transaction_reason_name,t.currency_code,sum(t.grand_total) as grand_total "
+//                + "FROM transaction t inner join transaction_reason tr on t.transaction_reason_id=tr.transaction_reason_id "
+//                + "WHERE t.transaction_type_id IN(1,19) "
+//                + "AND cast(t.transaction_date as date) IN(" + aDatesString + ") "
+//                + "GROUP BY tr.transaction_reason_name,t.currency_code";
+//        String sql2 = "SELECT "
+//                + "tr.transaction_reason_name,t.currency_code,sum(t.grand_total) as grand_total "
+//                + "FROM transaction t inner join transaction_reason tr on t.transaction_reason_id=tr.transaction_reason_id "
+//                + "WHERE t.transaction_type_id IN(1,19) "
+//                + "AND cast(t.add_date as date) IN(" + aDatesString + ") "
+//                + "GROUP BY tr.transaction_reason_name,t.currency_code";
+//        //for TransDate
+//        try (
+//                Connection conn = DBConnection.getMySQLConnection();
+//                PreparedStatement ps = conn.prepareStatement(sql);) {
+//            rs = ps.executeQuery();
+//            Trans trans;
+//            while (rs.next()) {
+//                trans = new Trans();
+//                try {
+//                    trans.setCurrencyCode(rs.getString("currency_code"));
+//                } catch (NullPointerException npe) {
+//                    trans.setCurrencyCode("");
+//                }
+//                try {
+//                    trans.setGrandTotal(rs.getDouble("grand_total"));
+//                } catch (NullPointerException npe) {
+//                    trans.setGrandTotal(0);
+//                }
+//                try {
+//                    trans.setTransactionReasonName(rs.getString("transaction_reason_name"));
+//                } catch (NullPointerException npe) {
+//                    trans.setTransactionReasonName("");
+//                }
+//                this.DayClosePurchaseList.add(trans);
+//            }
+//        } catch (Exception e) {
+//            System.err.println("refreshDayClosePurchaseList:" + e.getMessage());
+//        }
+//
+//        //for AddDate
+//        try (
+//                Connection conn = DBConnection.getMySQLConnection();
+//                PreparedStatement ps = conn.prepareStatement(sql2);) {
+//            rs2 = ps.executeQuery();
+//            Trans trans2;
+//            while (rs2.next()) {
+//                trans2 = new Trans();
+//                try {
+//                    trans2.setCurrencyCode(rs2.getString("currency_code"));
+//                } catch (NullPointerException npe) {
+//                    trans2.setCurrencyCode("");
+//                }
+//                try {
+//                    trans2.setGrandTotal(rs2.getDouble("grand_total"));
+//                } catch (NullPointerException npe) {
+//                    trans2.setGrandTotal(0);
+//                }
+//                try {
+//                    trans2.setTransactionReasonName(rs2.getString("transaction_reason_name"));
+//                } catch (NullPointerException npe) {
+//                    trans2.setTransactionReasonName("");
+//                }
+//                this.DayClosePurchaseList2.add(trans2);
+//            }
+//        } catch (Exception e) {
+//            System.err.println("refreshDayClosePurchaseList2:" + e.getMessage());
+//        }
+//    }
     public void refreshDayCloseCashReceiptList(String aBtnFrmToDate) {
         ResultSet rs;
         ResultSet rs2;
@@ -932,10 +1112,12 @@ public class DashboardBean implements Serializable {
                 } catch (NullPointerException npe) {
                     typereceipt.setPaidAmount(0);
                 }
-                this.DayCloseCashReceiptType.add(typereceipt);
+                if (typereceipt.getPaidAmount() > 0) {
+                    this.DayCloseCashReceiptType.add(typereceipt);
+                }
             }
         } catch (Exception e) {
-            System.err.println("refreshDayCloseSalesList:" + e.getMessage());
+            System.err.println("refreshDayCloseCashReceiptList-Type:" + e.getMessage());
         }
         //Cash Receipt Account
         try (
@@ -963,10 +1145,12 @@ public class DashboardBean implements Serializable {
                 } catch (NullPointerException npe) {
                     accreceipt.setPaidAmount(0);
                 }
-                this.DayCloseCashReceiptAccount.add(accreceipt);
+                if (accreceipt.getPaidAmount() > 0) {
+                    this.DayCloseCashReceiptAccount.add(accreceipt);
+                }
             }
         } catch (Exception e) {
-            System.err.println("refreshDayCloseSalesList:" + e.getMessage());
+            System.err.println("refreshDayCloseCashReceiptList-Account:" + e.getMessage());
         }
     }
 
@@ -1045,91 +1229,334 @@ public class DashboardBean implements Serializable {
 //            System.err.println("refreshDayCloseCashReceiptList2:" + e.getMessage());
 //        }
 //    }
-    public void refreshDayCloseCashPaymentList(String aDatesString) {
+    public void refreshDayCloseStockMovementList(String aBtnFrmToDate) {
         ResultSet rs;
         ResultSet rs2;
-        this.DayCloseCashPaymentList = new ArrayList<>();
-        this.DayCloseCashPaymentList2 = new ArrayList<>();
+        ResultSet rs3;
+        ResultSet rs4;
+        long totaladded = 0;
+        long totalsubtracted = 0;
+        this.DayCloseStockMovementAdded = new ArrayList<>();
+        this.DayCloseStockMovementSubtracted = new ArrayList<>();
         String sql = "SELECT "
-                + "tr.transaction_reason_name,p.currency_code,sum(p.paid_amount) as paid_amount "
-                + "FROM pay p inner join transaction_reason tr on p.pay_reason_id=tr.transaction_reason_id "
-                + "WHERE p.pay_type_id=15 AND p.pay_method_id!=7 "
-                + "AND cast(p.pay_date as date) IN(" + aDatesString + ") "
-                + "GROUP BY tr.transaction_reason_name,p.currency_code";
+                + "count(distinct item_id) as items_added from stock_ledger "
+                + "WHERE qty_added>0 "
+                + "AND cast(add_date as date) " + aBtnFrmToDate;
         String sql2 = "SELECT "
-                + "tr.transaction_reason_name,p.currency_code,sum(p.paid_amount) as paid_amount "
-                + "FROM pay p inner join transaction_reason tr on p.pay_reason_id=tr.transaction_reason_id "
-                + "WHERE p.pay_type_id=15 AND p.pay_method_id!=7 "
-                + "AND cast(p.add_date as date) IN(" + aDatesString + ") "
-                + "GROUP BY tr.transaction_reason_name,p.currency_code";
-        //for PayDate
+                + "count(distinct item_id) as items_subtracted "
+                + "from stock_ledger "
+                + "WHERE qty_subtracted>0 "
+                + "AND cast(add_date as date) " + aBtnFrmToDate;
+        String sql3 = "SELECT "
+                + "tt.transaction_type_name,"
+                + "count(distinct sl.item_id) as items_added,"
+                + "sum(sl.qty_added) as qty_added "
+                + "from stock_ledger sl INNER JOIN transaction_type tt ON tt.transaction_type_id=sl.transaction_type_id "
+                + "WHERE sl.qty_added>0 "
+                + "AND cast(sl.add_date as date) " + aBtnFrmToDate + " "
+                + "GROUP BY tt.transaction_type_name";
+        String sql4 = "SELECT "
+                + "tt.transaction_type_name,"
+                + "count(distinct sl.item_id) as items_subtracted,"
+                + "sum(sl.qty_subtracted) as qty_subtracted "
+                + "from stock_ledger sl INNER JOIN transaction_type tt ON tt.transaction_type_id=sl.transaction_type_id "
+                + "WHERE sl.qty_subtracted>0 "
+                + "AND cast(sl.add_date as date) " + aBtnFrmToDate + " "
+                + "GROUP BY tt.transaction_type_name";
+        //added
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             rs = ps.executeQuery();
-            Pay pay;
             while (rs.next()) {
-                pay = new Pay();
                 try {
-                    pay.setCurrencyCode(rs.getString("currency_code"));
+                    totaladded = totaladded + rs.getLong("items_added");
                 } catch (NullPointerException npe) {
-                    pay.setCurrencyCode("");
+                    //do nothing
                 }
-                try {
-                    pay.setPaidAmount(rs.getDouble("paid_amount"));
-                } catch (NullPointerException npe) {
-                    pay.setPaidAmount(0);
-                }
-                try {
-                    pay.setPayRefNo(rs.getString("transaction_reason_name"));
-                } catch (NullPointerException npe) {
-                    pay.setPayRefNo("");
-                }
-                this.DayCloseCashPaymentList.add(pay);
             }
+            this.CountItemsAdded = totaladded;
         } catch (Exception e) {
-            System.err.println("refreshDayCloseCashPaymentList:" + e.getMessage());
+            System.err.println("refreshDayCloseStockMovementList-Added:" + e.getMessage());
         }
-
-        //for AddDate
+        //subtracted
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql2);) {
             rs2 = ps.executeQuery();
-            Pay pay2;
             while (rs2.next()) {
-                pay2 = new Pay();
                 try {
-                    pay2.setCurrencyCode(rs2.getString("currency_code"));
+                    totalsubtracted = totalsubtracted + rs2.getLong("items_subtracted");
                 } catch (NullPointerException npe) {
-                    pay2.setCurrencyCode("");
+                    //do nothing
+                }
+            }
+            this.CountItemsSubtracted = totalsubtracted;
+        } catch (Exception e) {
+            System.err.println("refreshDayCloseStockMovementList-Subtracted:" + e.getMessage());
+        }
+        //added-type
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql3);) {
+            rs3 = ps.executeQuery();
+            Stock_ledger typeadded;
+            long i = 0;
+            while (rs3.next()) {
+                i = i + 1;
+                typeadded = new Stock_ledger();
+                typeadded.setStock_ledger_id(i);
+                try {
+                    typeadded.setTransaction_type_name(rs3.getString("transaction_type_name"));
+                } catch (NullPointerException npe) {
+                    typeadded.setTransaction_type_name("");
                 }
                 try {
-                    pay2.setPaidAmount(rs2.getDouble("paid_amount"));
+                    typeadded.setItem_id(rs3.getLong("items_added"));
                 } catch (NullPointerException npe) {
-                    pay2.setPaidAmount(0);
+                    typeadded.setItem_id(0);
                 }
                 try {
-                    pay2.setPayRefNo(rs2.getString("transaction_reason_name"));
+                    typeadded.setQty_added(rs3.getLong("qty_added"));
                 } catch (NullPointerException npe) {
-                    pay2.setPayRefNo("");
+                    typeadded.setQty_added(0);
                 }
-                this.DayCloseCashPaymentList2.add(pay2);
+                if (typeadded.getQty_added() > 0) {
+                    this.DayCloseStockMovementAdded.add(typeadded);
+                }
             }
         } catch (Exception e) {
-            System.err.println("refreshDayCloseCashPaymentList2:" + e.getMessage());
+            System.err.println("refreshDayCloseStockMovementList-Added-Type:" + e.getMessage());
+        }
+        //subtracted-type
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql4);) {
+            rs4 = ps.executeQuery();
+            Stock_ledger typesubtracted;
+            long i = 0;
+            while (rs4.next()) {
+                i = i + 1;
+                typesubtracted = new Stock_ledger();
+                typesubtracted.setStock_ledger_id(i);
+                try {
+                    typesubtracted.setTransaction_type_name(rs4.getString("transaction_type_name"));
+                } catch (NullPointerException npe) {
+                    typesubtracted.setTransaction_type_name("");
+                }
+                try {
+                    typesubtracted.setItem_id(rs4.getLong("items_subtracted"));
+                } catch (NullPointerException npe) {
+                    typesubtracted.setItem_id(0);
+                }
+                try {
+                    typesubtracted.setQty_subtracted(rs4.getLong("qty_subtracted"));
+                } catch (NullPointerException npe) {
+                    typesubtracted.setQty_subtracted(0);
+                }
+                if (typesubtracted.getQty_subtracted() > 0) {
+                    this.DayCloseStockMovementSubtracted.add(typesubtracted);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("refreshDayCloseStockMovementList-Subtracted-Type:" + e.getMessage());
         }
     }
 
+    public void refreshDayCloseCashPaymentList(String aBtnFrmToDate) {
+        ResultSet rs;
+        ResultSet rs2;
+        ResultSet rs3;
+        double totalpayment = 0;
+        this.DayCloseCashPaymentType = new ArrayList<>();
+        this.DayCloseCashPaymentAccount = new ArrayList<>();
+        String sql = "SELECT "
+                + "sum(p.paid_amount*p.xrate) as paid_amount FROM pay p "
+                + "WHERE p.pay_type_id=15 AND p.pay_method_id!=7 "
+                + "AND p.pay_date " + aBtnFrmToDate;
+        String sql2 = "SELECT "
+                + "tr.transaction_reason_name,p.currency_code,sum(p.paid_amount) as paid_amount "
+                + "FROM pay p inner join transaction_reason tr on p.pay_reason_id=tr.transaction_reason_id "
+                + "WHERE p.pay_type_id=15 AND p.pay_method_id!=7 "
+                + "AND p.pay_date " + aBtnFrmToDate + " "
+                + "GROUP BY tr.transaction_reason_name,p.currency_code "
+                + "ORDER BY tr.transaction_reason_name,p.currency_code";
+        String sql3 = "SELECT "
+                + "ca.child_account_name,p.currency_code,sum(p.paid_amount) as paid_amount "
+                + "FROM pay p inner join acc_child_account ca on p.acc_child_account_id=ca.acc_child_account_id "
+                + "WHERE p.pay_type_id=15 AND p.pay_method_id!=7 "
+                + "AND p.pay_date " + aBtnFrmToDate + " "
+                + "GROUP BY ca.child_account_name,p.currency_code "
+                + "ORDER BY ca.child_account_name,p.currency_code";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                try {
+                    totalpayment = totalpayment + rs.getDouble("paid_amount");
+                } catch (NullPointerException npe) {
+                    //do nothing
+                }
+            }
+            this.TotalCashPayment = totalpayment;
+        } catch (Exception e) {
+            System.err.println("refreshDayCloseCashPaymentList-Total:" + e.getMessage());
+        }
+        //Cash Payment Type
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql2);) {
+            rs2 = ps.executeQuery();
+            Pay typepayment;
+            long i = 0;
+            while (rs2.next()) {
+                i = i + 1;
+                typepayment = new Pay();
+                typepayment.setPayId(i);
+                try {
+                    typepayment.setCurrencyCode(rs2.getString("currency_code"));
+                } catch (NullPointerException npe) {
+                    typepayment.setCurrencyCode("");
+                }
+                try {
+                    typepayment.setPayReasonName(rs2.getString("transaction_reason_name"));
+                } catch (NullPointerException npe) {
+                    typepayment.setPayReasonName("");
+                }
+                try {
+                    typepayment.setPaidAmount(rs2.getDouble("paid_amount"));
+                } catch (NullPointerException npe) {
+                    typepayment.setPaidAmount(0);
+                }
+                if (typepayment.getPaidAmount() > 0) {
+                    this.DayCloseCashPaymentType.add(typepayment);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("refreshDayCloseCashPaymentList-Type:" + e.getMessage());
+        }
+        //Cash Payment Account
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql3);) {
+            rs3 = ps.executeQuery();
+            Pay accpayment;
+            long i = 0;
+            while (rs3.next()) {
+                i = i + 1;
+                accpayment = new Pay();
+                accpayment.setPayId(i);
+                try {
+                    accpayment.setCurrencyCode(rs3.getString("currency_code"));
+                } catch (NullPointerException npe) {
+                    accpayment.setCurrencyCode("");
+                }
+                try {
+                    accpayment.setChildAccountName(rs3.getString("child_account_name"));
+                } catch (NullPointerException npe) {
+                    accpayment.setChildAccountName("");
+                }
+                try {
+                    accpayment.setPaidAmount(rs3.getDouble("paid_amount"));
+                } catch (NullPointerException npe) {
+                    accpayment.setPaidAmount(0);
+                }
+                if (accpayment.getPaidAmount() > 0) {
+                    this.DayCloseCashPaymentAccount.add(accpayment);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("refreshDayCloseCashPaymentList-Account:" + e.getMessage());
+        }
+    }
+
+//    public void refreshDayCloseCashPaymentList(String aDatesString) {
+//        ResultSet rs;
+//        ResultSet rs2;
+//        this.DayCloseCashPaymentList = new ArrayList<>();
+//        this.DayCloseCashPaymentList2 = new ArrayList<>();
+//        String sql = "SELECT "
+//                + "tr.transaction_reason_name,p.currency_code,sum(p.paid_amount) as paid_amount "
+//                + "FROM pay p inner join transaction_reason tr on p.pay_reason_id=tr.transaction_reason_id "
+//                + "WHERE p.pay_type_id=15 AND p.pay_method_id!=7 "
+//                + "AND cast(p.pay_date as date) IN(" + aDatesString + ") "
+//                + "GROUP BY tr.transaction_reason_name,p.currency_code";
+//        String sql2 = "SELECT "
+//                + "tr.transaction_reason_name,p.currency_code,sum(p.paid_amount) as paid_amount "
+//                + "FROM pay p inner join transaction_reason tr on p.pay_reason_id=tr.transaction_reason_id "
+//                + "WHERE p.pay_type_id=15 AND p.pay_method_id!=7 "
+//                + "AND cast(p.add_date as date) IN(" + aDatesString + ") "
+//                + "GROUP BY tr.transaction_reason_name,p.currency_code";
+//        //for PayDate
+//        try (
+//                Connection conn = DBConnection.getMySQLConnection();
+//                PreparedStatement ps = conn.prepareStatement(sql);) {
+//            rs = ps.executeQuery();
+//            Pay pay;
+//            while (rs.next()) {
+//                pay = new Pay();
+//                try {
+//                    pay.setCurrencyCode(rs.getString("currency_code"));
+//                } catch (NullPointerException npe) {
+//                    pay.setCurrencyCode("");
+//                }
+//                try {
+//                    pay.setPaidAmount(rs.getDouble("paid_amount"));
+//                } catch (NullPointerException npe) {
+//                    pay.setPaidAmount(0);
+//                }
+//                try {
+//                    pay.setPayRefNo(rs.getString("transaction_reason_name"));
+//                } catch (NullPointerException npe) {
+//                    pay.setPayRefNo("");
+//                }
+//                this.DayCloseCashPaymentList.add(pay);
+//            }
+//        } catch (Exception e) {
+//            System.err.println("refreshDayCloseCashPaymentList:" + e.getMessage());
+//        }
+//
+//        //for AddDate
+//        try (
+//                Connection conn = DBConnection.getMySQLConnection();
+//                PreparedStatement ps = conn.prepareStatement(sql2);) {
+//            rs2 = ps.executeQuery();
+//            Pay pay2;
+//            while (rs2.next()) {
+//                pay2 = new Pay();
+//                try {
+//                    pay2.setCurrencyCode(rs2.getString("currency_code"));
+//                } catch (NullPointerException npe) {
+//                    pay2.setCurrencyCode("");
+//                }
+//                try {
+//                    pay2.setPaidAmount(rs2.getDouble("paid_amount"));
+//                } catch (NullPointerException npe) {
+//                    pay2.setPaidAmount(0);
+//                }
+//                try {
+//                    pay2.setPayRefNo(rs2.getString("transaction_reason_name"));
+//                } catch (NullPointerException npe) {
+//                    pay2.setPayRefNo("");
+//                }
+//                this.DayCloseCashPaymentList2.add(pay2);
+//            }
+//        } catch (Exception e) {
+//            System.err.println("refreshDayCloseCashPaymentList2:" + e.getMessage());
+//        }
+//    }
     public void searchDayCloseDashboard() {
         try {
             String BtnFrmToDate = "";
             if (null != this.FromDate && null != this.ToDate) {
                 BtnFrmToDate = "BETWEEN '" + new java.sql.Date(this.FromDate.getTime()) + "' AND '" + new java.sql.Date(this.ToDate.getTime()) + "'";
                 this.refreshDayCloseSalesList(BtnFrmToDate);
-                //this.refreshDayClosePurchaseList(BtnFrmToDate);
+                this.refreshDayClosePurchaseList(BtnFrmToDate);
                 this.refreshDayCloseCashReceiptList(BtnFrmToDate);
-                //this.refreshDayCloseCashPaymentList(BtnFrmToDate);
+                this.refreshDayCloseCashPaymentList(BtnFrmToDate);
+                this.refreshDayCloseStockMovementList(BtnFrmToDate);
+
             } else {
 
             }
@@ -1162,6 +1589,31 @@ public class DashboardBean implements Serializable {
         this.setToDate(CurrentServerDate);
         Calendar cal2 = Calendar.getInstance();
         cal2.setTime(this.getToDate());
+        cal2.set(Calendar.HOUR_OF_DAY, 23);
+        cal2.set(Calendar.MINUTE, 59);
+        cal2.set(Calendar.SECOND, 0);
+        cal2.set(Calendar.MILLISECOND, 0);
+        // Put it back in the Date object  
+        this.setToDate(cal2.getTime());
+    }
+    
+    public void setDateToYesturday() {
+        Date CurrentServerDate = new CompanySetting().getCURRENT_SERVER_DATE();
+        this.setFromDate(CurrentServerDate);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(this.getFromDate());
+        cal.add(Calendar.DATE, -1);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        // Put it back in the Date object  
+        this.setFromDate(cal.getTime());
+
+        this.setToDate(CurrentServerDate);
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTime(this.getToDate());
+        cal2.add(Calendar.DATE, -1);
         cal2.set(Calendar.HOUR_OF_DAY, 23);
         cal2.set(Calendar.MINUTE, 59);
         cal2.set(Calendar.SECOND, 0);
@@ -1987,6 +2439,175 @@ public class DashboardBean implements Serializable {
      */
     public void setDayCloseCashReceiptAccount(List<Pay> DayCloseCashReceiptAccount) {
         this.DayCloseCashReceiptAccount = DayCloseCashReceiptAccount;
+    }
+
+    /**
+     * @return the TotalPurchases
+     */
+    public double getTotalPurchases() {
+        return TotalPurchases;
+    }
+
+    /**
+     * @param TotalPurchases the TotalPurchases to set
+     */
+    public void setTotalPurchases(double TotalPurchases) {
+        this.TotalPurchases = TotalPurchases;
+    }
+
+    /**
+     * @return the DayClosePurchasesCash
+     */
+    public List<Trans> getDayClosePurchasesCash() {
+        return DayClosePurchasesCash;
+    }
+
+    /**
+     * @param DayClosePurchasesCash the DayClosePurchasesCash to set
+     */
+    public void setDayClosePurchasesCash(List<Trans> DayClosePurchasesCash) {
+        this.DayClosePurchasesCash = DayClosePurchasesCash;
+    }
+
+    /**
+     * @return the DayClosePurchasesCredit
+     */
+    public List<Trans> getDayClosePurchasesCredit() {
+        return DayClosePurchasesCredit;
+    }
+
+    /**
+     * @param DayClosePurchasesCredit the DayClosePurchasesCredit to set
+     */
+    public void setDayClosePurchasesCredit(List<Trans> DayClosePurchasesCredit) {
+        this.DayClosePurchasesCredit = DayClosePurchasesCredit;
+    }
+
+    /**
+     * @return the DayClosePurchasesType
+     */
+    public List<Trans> getDayClosePurchasesType() {
+        return DayClosePurchasesType;
+    }
+
+    /**
+     * @param DayClosePurchasesType the DayClosePurchasesType to set
+     */
+    public void setDayClosePurchasesType(List<Trans> DayClosePurchasesType) {
+        this.DayClosePurchasesType = DayClosePurchasesType;
+    }
+
+    /**
+     * @return the DayClosePurchasesStore
+     */
+    public List<Trans> getDayClosePurchasesStore() {
+        return DayClosePurchasesStore;
+    }
+
+    /**
+     * @param DayClosePurchasesStore the DayClosePurchasesStore to set
+     */
+    public void setDayClosePurchasesStore(List<Trans> DayClosePurchasesStore) {
+        this.DayClosePurchasesStore = DayClosePurchasesStore;
+    }
+
+    /**
+     * @return the TotalCashPayment
+     */
+    public double getTotalCashPayment() {
+        return TotalCashPayment;
+    }
+
+    /**
+     * @param TotalCashPayment the TotalCashPayment to set
+     */
+    public void setTotalCashPayment(double TotalCashPayment) {
+        this.TotalCashPayment = TotalCashPayment;
+    }
+
+    /**
+     * @return the DayCloseCashPaymentType
+     */
+    public List<Pay> getDayCloseCashPaymentType() {
+        return DayCloseCashPaymentType;
+    }
+
+    /**
+     * @param DayCloseCashPaymentType the DayCloseCashPaymentType to set
+     */
+    public void setDayCloseCashPaymentType(List<Pay> DayCloseCashPaymentType) {
+        this.DayCloseCashPaymentType = DayCloseCashPaymentType;
+    }
+
+    /**
+     * @return the DayCloseCashPaymentAccount
+     */
+    public List<Pay> getDayCloseCashPaymentAccount() {
+        return DayCloseCashPaymentAccount;
+    }
+
+    /**
+     * @param DayCloseCashPaymentAccount the DayCloseCashPaymentAccount to set
+     */
+    public void setDayCloseCashPaymentAccount(List<Pay> DayCloseCashPaymentAccount) {
+        this.DayCloseCashPaymentAccount = DayCloseCashPaymentAccount;
+    }
+
+    /**
+     * @return the CountItemsAdded
+     */
+    public long getCountItemsAdded() {
+        return CountItemsAdded;
+    }
+
+    /**
+     * @param CountItemsAdded the CountItemsAdded to set
+     */
+    public void setCountItemsAdded(long CountItemsAdded) {
+        this.CountItemsAdded = CountItemsAdded;
+    }
+
+    /**
+     * @return the CountItemsSubtracted
+     */
+    public long getCountItemsSubtracted() {
+        return CountItemsSubtracted;
+    }
+
+    /**
+     * @param CountItemsSubtracted the CountItemsSubtracted to set
+     */
+    public void setCountItemsSubtracted(long CountItemsSubtracted) {
+        this.CountItemsSubtracted = CountItemsSubtracted;
+    }
+
+    /**
+     * @return the DayCloseStockMovementAdded
+     */
+    public List<Stock_ledger> getDayCloseStockMovementAdded() {
+        return DayCloseStockMovementAdded;
+    }
+
+    /**
+     * @param DayCloseStockMovementAdded the DayCloseStockMovementAdded to set
+     */
+    public void setDayCloseStockMovementAdded(List<Stock_ledger> DayCloseStockMovementAdded) {
+        this.DayCloseStockMovementAdded = DayCloseStockMovementAdded;
+    }
+
+    /**
+     * @return the DayCloseStockMovementSubtracted
+     */
+    public List<Stock_ledger> getDayCloseStockMovementSubtracted() {
+        return DayCloseStockMovementSubtracted;
+    }
+
+    /**
+     * @param DayCloseStockMovementSubtracted the
+     * DayCloseStockMovementSubtracted to set
+     */
+    public void setDayCloseStockMovementSubtracted(List<Stock_ledger> DayCloseStockMovementSubtracted) {
+        this.DayCloseStockMovementSubtracted = DayCloseStockMovementSubtracted;
     }
 
 }
