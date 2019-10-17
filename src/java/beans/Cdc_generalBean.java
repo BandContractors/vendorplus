@@ -325,7 +325,7 @@ public class Cdc_generalBean implements Serializable {
         if (aCdc_general.getCdc_general_id() == 0) {
             sql = "INSERT INTO cdc_general(cdc_function,cdc_id,cdc_date,cdc_start_time,add_date,add_by,acc_period_id,snapshot_no) VALUES (?,?,?,?,?,?,?,?)";
         } else if (aCdc_general.getCdc_general_id() > 0) {
-            sql = "UPDATE cdc_general SET cdc_end_time=?,is_passed=?,records_affected=?,last_update_date=?,last_update_by=?";
+            sql = "UPDATE cdc_general SET cdc_end_time=?,is_passed=?,records_affected=?,last_update_date=?,last_update_by=? WHERE cdc_general_id=?";
         }
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -368,6 +368,7 @@ public class Cdc_generalBean implements Serializable {
                     ps.setTimestamp(4, null);
                 }
                 ps.setInt(5, aCdc_general.getLast_update_by());
+                ps.setLong(6, aCdc_general.getCdc_general_id());
             }
             ps.executeUpdate();
         } catch (Exception e) {
