@@ -100,7 +100,7 @@
             <p:dataTable id="tblDetail" tableStyle="width:auto;" var="itm" value="#{itemBean.itemsList}" 
                          paginator="true" rows="50" 
                          paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
-                         rowsPerPageTemplate="100,400,800,1000,2000" 
+                         rowsPerPageTemplate="50,100,400,800,1000,2000" 
                          rowStyleClass="#{itm.stock_status eq 'No Reorder Level' ? 'white' : itm.stock_status eq 'Out of Stock' ? 'red' : itm.stock_status eq 'Low Stock' ? 'amber' : itm.stock_status eq 'Stocked' ? 'green' : 'white'}">
                 <f:facet name="header">
                     #{itemBean.itemsList.size()} Records Found

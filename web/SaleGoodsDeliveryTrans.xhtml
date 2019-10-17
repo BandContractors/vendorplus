@@ -52,16 +52,15 @@
                 <h:outputLabel value="#{transBean.transTypeRefObj.transactorLabel}"/>
                 <p:outputLabel value="Order/Sales No"/>
                 <p:outputLabel value=""/>
-
                 <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}"/>
                 <p:calendar pattern="#{companySetting.getDateFormat()}" styleClass="clsInput" id="calTransactionDate" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.transactionDate}" size="8"/>
                 <p:selectOneMenu id="menuDeliveryFor" value="#{trans.site_id}" style="width: 100px;">
-                    <f:selectItem itemLabel="Order" itemValue="0"/>
-                    <f:selectItem itemLabel="Sale" itemValue="1"/>
+                    <f:selectItem itemLabel="" itemValue="0"/>
+                    <f:selectItems value="#{categoryBean.getDeliveryFor()}" var="df" itemValue="#{df.categoryId}" itemLabel="#{df.categoryName}"/>
                     <p:ajax event="blur" listener="#{transBean.refreshTransListChoice(trans.site_id,transactorBean.selectedTransactor.transactorId,20)}" update="menuTransNumber" />
                 </p:selectOneMenu>
                 <p:autoComplete id="autcTransactorSearch" value="#{transactorBean.selectedTransactor}" 
-                                completeMethod="#{transactorBean.getTransactorObjectList}" 
+                                completeMethod="#{transactorBean.getTransactorActiveObjectList}" 
                                 var="trct" 
                                 itemLabel="#{trct.transactorNames}" 
                                 itemValue="#{trct}" 

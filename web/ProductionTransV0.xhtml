@@ -54,7 +54,7 @@
                 <h:panelGrid id="pnlSearch" columns="5" style="background-color: #b3f2b3;width: 100%;">
                     <h:outputLabel value="#{transBean.transTypeRefObj.transactorLabel}:"/>
                     <p:autoComplete id="autcTransactorSearch" value="#{transactorBean.selectedTransactor}" 
-                                    completeMethod="#{transactorBean.getTransactorObjectList}" 
+                                    completeMethod="#{transactorBean.getTransactorActiveObjectList}" 
                                     var="trct" 
                                     itemLabel="#{trct.transactorNames}" 
                                     itemValue="#{trct}" 

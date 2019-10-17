@@ -1279,6 +1279,19 @@ BEGIN
 END//
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS sp_search_transactor_active_by_name;
+DELIMITER //
+CREATE PROCEDURE sp_search_transactor_active_by_name
+(
+	IN in_transactor_names varchar(100) 
+) 
+BEGIN 
+	SELECT * FROM transactor t 
+	WHERE t.is_suspended='No' AND (t.transactor_names LIKE concat('%',in_transactor_names,'%') OR t.transactor_ref LIKE concat('%',in_transactor_names,'%') OR t.file_reference LIKE concat('%',in_transactor_names,'%')) 
+	ORDER BY t.transactor_names ASC LIMIT 10; 
+END//
+DELIMITER ;
+
 DROP PROCEDURE IF EXISTS sp_search_transactor_by_name_ref_file;
 DELIMITER //
 CREATE PROCEDURE sp_search_transactor_by_name_ref_file
@@ -10061,5 +10074,25 @@ BEGIN
 		description=in_description,
 		store_id=in_store_id
 	WHERE parameter_list_id=in_parameter_list_id; 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_records_by_transactor;
+DELIMITER //
+CREATE PROCEDURE sp_search_records_by_transactor
+(
+	IN in_transactor_id bigint
+) 
+BEGIN 
+	SELECT 'transaction' as table_name,count(*) as records FROM transaction t1 where t1.transactor_id=in_transactor_id or t1.bill_transactor_id=in_transactor_id 
+	UNION 
+	SELECT 'trans_production' as table_name,count(*) as records FROM trans_production t2 where t2.transactor_id=in_transactor_id 
+	UNION 
+	SELECT 'pay' as table_name,count(*) as records FROM pay t3 where t3.bill_transactor_id=in_transactor_id 
+	UNION 
+	SELECT 'acc_journal' as table_name,count(*) as records FROM acc_journal t4 where t4.bill_transactor_id=in_transactor_id 
+	UNION 
+	SELECT 'acc_ledger' as table_name,count(*) as records FROM acc_ledger t5 where t5.bill_transactor_id=in_transactor_id
+	; 
 END//
 DELIMITER ;

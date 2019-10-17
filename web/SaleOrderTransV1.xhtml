@@ -71,7 +71,7 @@
                     <f:ajax event="change" execute="@this" render="@this"/>
                 </h:selectOneMenu>
                 <p:autoComplete id="autcTransactor" value="#{transactorBean.selectedTransactor}" 
-                                completeMethod="#{transactorBean.getTransactorObjectList}" 
+                                completeMethod="#{transactorBean.getTransactorActiveObjectList}" 
                                 var="trct" 
                                 itemLabel="#{trct.transactorNames}" 
                                 itemValue="#{trct}" 

@@ -89,7 +89,7 @@
                     <f:ajax event="change" listener="#{transItemBean.clearTransItems(trans,transItemBean.activeTransItems)}" execute="@this pgrdPayment" render="dtblTransactionItem pgrdTotals itxtPrepaidAcc olblDeposit itxtPrepaidAcc2 olblDeposit2"/>
                 </h:selectOneMenu>
                 <p:autoComplete id="autcTransactor" value="#{transactorBean.selectedTransactor}" 
-                                completeMethod="#{transactorBean.getTransactorObjectList}" 
+                                completeMethod="#{transactorBean.getTransactorActiveObjectList}" 
                                 var="trct" 
                                 itemLabel="#{trct.transactorNames}" 
                                 itemValue="#{trct}" 
@@ -440,7 +440,7 @@
                 <h:panelGrid id="pgrdScheme2" columns="6" rendered="#{trans.billOther}">
                     <h:outputLabel  value="#{transBean.transTypeObj.billTransactorLabel}:"/>
                     <p:autoComplete id="autcBillTransactor" value="#{transactorBean.selectedBillTransactor}" 
-                                    completeMethod="#{transactorBean.getTransactorObjectList}" 
+                                    completeMethod="#{transactorBean.getTransactorActiveObjectList}" 
                                     var="trct" 
                                     itemLabel="#{trct.transactorNames}" 
                                     itemValue="#{trct}" 
@@ -470,7 +470,7 @@
                     </h:inputText>
                     <h:outputLabel  value="Scheme.Name:"/>
                     <p:autoComplete id="autcSchemeTransactor" value="#{transactorBean.selectedSchemeTransactor}" 
-                                    completeMethod="#{transactorBean.getTransactorObjectList}" 
+                                    completeMethod="#{transactorBean.getTransactorActiveObjectList}" 
                                     var="trct3" 
                                     itemLabel="#{trct3.transactorNames}" 
                                     itemValue="#{trct3}" 

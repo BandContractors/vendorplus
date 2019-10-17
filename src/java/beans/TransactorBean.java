@@ -750,31 +750,34 @@ public class TransactorBean implements Serializable {
         }
     }
 
-    public void deleteTransactor(Transactor transactor) {
+    public void deleteTransactor(Transactor aTransactor, List<SalaryDeduction> aSalaryDeductions) {
         String sql = "DELETE FROM transactor WHERE transactor_id=?";
         String msg = "";
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
 
-        if ("TRANSACTOR".equals(new GeneralUserSetting().getCurrentTransactionTypeName()) && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, new GeneralUserSetting().getCurrentTransactionReasonIdStr(), "Delete") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if ("TRANSACTOR".equals(new GeneralUserSetting().getCurrentTransactionTypeName()) && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, new GeneralUserSetting().getCurrentTransactionReasonIdStr(), "Delete") == 0) {
+        if (aTransactor.getTransactorId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, new NavigationBean().getTransactorReasonStr(new GeneralUserSetting().getTransactorType()), "Delete") == 0) {
             msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
         } else {
-
-            try (
-                    Connection conn = DBConnection.getMySQLConnection();
-                    PreparedStatement ps = conn.prepareStatement(sql);) {
-                ps.setLong(1, transactor.getTransactorId());
-                ps.executeUpdate();
-                this.setActionMessage("Deleted Successfully!");
-                this.clearTransactor(transactor);
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
-                this.setActionMessage("Transactor NOT deleted");
+            if (this.getTransactorRecords(aTransactor.getTransactorId()) > 0) {
+                msg = new GeneralUserSetting().getTransactorType() + " has transactions in the system; cannot be deleted; try suspending instead!";
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            } else {
+                try (
+                        Connection conn = DBConnection.getMySQLConnection();
+                        PreparedStatement ps = conn.prepareStatement(sql);) {
+                    ps.setLong(1, aTransactor.getTransactorId());
+                    ps.executeUpdate();
+                    msg = "Deleted Successfully!";
+                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+                    this.clearTransactor2(aTransactor, aSalaryDeductions);
+                } catch (Exception e) {
+                    System.err.println("deleteTransactor:" + e.getMessage());
+                    msg = "Transactor NOT deleted";
+                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+                }
             }
         }
     }
@@ -1145,6 +1148,37 @@ public class TransactorBean implements Serializable {
         }
         return TransactorObjectList;
     }
+    
+    /**
+     * @param Query
+     * @return the TransactorObjectList
+     */
+    public List<Transactor> getTransactorActiveObjectList(String Query) {
+        String sql;
+        sql = "{call sp_search_transactor_active_by_name(?)}";
+        ResultSet rs = null;
+        TransactorObjectList = new ArrayList<Transactor>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setString(1, Query);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                TransactorObjectList.add(this.getTransactorFromResultSet(rs));
+            }
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.err.println(ex.getMessage());
+                }
+            }
+        }
+        return TransactorObjectList;
+    }
 
     public List<Transactor> getReportTransactors(Transactor aTransactor, boolean RETRIEVE_REPORT) {
         String sql = "{call sp_report_transactor(?)}";
@@ -1317,6 +1351,24 @@ public class TransactorBean implements Serializable {
         options.put("maximizable", true);
         options.put("dynamic", true);
         org.primefaces.PrimeFaces.current().dialog().openDynamic("TransactorChild", options, null);
+    }
+
+    public long getTransactorRecords(long aTransactorId) {
+        String sql = "{call sp_search_records_by_transactor(?)}";
+        ResultSet rs = null;
+        long records = 0;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aTransactorId);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                records = records + rs.getLong("records");
+            }
+        } catch (Exception e) {
+            System.err.println("getTransactorRecords:" + e.getMessage());
+        }
+        return records;
     }
 
     public void refreshTotalSalaryDeductions(Transactor aTransactor) {

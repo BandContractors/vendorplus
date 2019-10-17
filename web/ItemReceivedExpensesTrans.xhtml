@@ -59,7 +59,7 @@
                     <p:commandLink actionListener="#{transactorBean.openChildTransactor('SUPPLIER')}" value="#{transBean.transTypeObj.transactorLabel}"/>
                     <h:inputText id="itxtRetrievedTransactor" value="#{transactorBean.getTransactor(trans.transactorId).transactorNames}" disabled="true" rendered="#{trans.transactionRef.length()>0}"/>
                     <p:autoComplete id="autcTransactor" value="#{transactorBean.selectedTransactor}" 
-                                    completeMethod="#{transactorBean.getTransactorObjectList}" 
+                                    completeMethod="#{transactorBean.getTransactorActiveObjectList}" 
                                     var="trct" 
                                     itemLabel="#{trct.transactorNames}" 
                                     itemValue="#{trct}" 

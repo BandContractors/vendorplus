@@ -61,7 +61,7 @@
                     <f:ajax event="change" listener="#{transItemBean.clearTransItems(trans,transItemBean.activeTransItems)}" execute="@this pgrdPayment" render="dtblTransactionItem pgrdTotals itxtPrepaidAcc olblDeposit"/>
                 </h:selectOneMenu>
                 <p:autoComplete id="autcTransactor" value="#{transactorBean.selectedTransactor}" 
-                                completeMethod="#{transactorBean.getTransactorObjectList}" 
+                                completeMethod="#{transactorBean.getTransactorActiveObjectList}" 
                                 var="trct" 
                                 itemLabel="#{trct.transactorNames}" 
                                 itemValue="#{trct}" 

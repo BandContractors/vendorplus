@@ -82,7 +82,7 @@
                         <f:ajax event="blur" render="olblDebtCredit itxtDebtCredit itxtPrepaidAcc"/>
                     </h:inputText>
                     <p:autoComplete id="autcTransactor" value="#{transactorBean.selectedTransactor}" 
-                                    completeMethod="#{transactorBean.getTransactorObjectList}" 
+                                    completeMethod="#{transactorBean.getTransactorActiveObjectList}" 
                                     var="trct" 
                                     itemLabel="#{trct.transactorNames}" 
                                     itemValue="#{trct}" 

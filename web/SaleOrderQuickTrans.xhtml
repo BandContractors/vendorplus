@@ -173,7 +173,7 @@
                             <h:panelGrid columns="2">
                                 <p:commandLink actionListener="#{transactorBean.openChildTransactor('CUSTOMER')}" value="#{transBean.transTypeObj.transactorLabel}"/>
                                 <p:autoComplete placeholder="#{utilityBean.returnOneString(trans.transactorName,'Name',1)}" id="autcTransactor" value="#{transactorBean.selectedTransactor}" 
-                                                completeMethod="#{transactorBean.getTransactorObjectList}" 
+                                                completeMethod="#{transactorBean.getTransactorActiveObjectList}" 
                                                 var="trct" 
                                                 itemLabel="#{trct.transactorNames}" 
                                                 itemValue="#{trct}" 

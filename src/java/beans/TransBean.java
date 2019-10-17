@@ -550,41 +550,41 @@ public class TransBean implements Serializable {
     public void loadTransForGDN(int aTransTypeIdChoice, Trans aTrans, List<TransItem> aTransItems) {
         int CurrStoreId = 0;
         int RetrieveTransTypeId = 0;
-        if (aTransTypeIdChoice == 1) {
-            RetrieveTransTypeId = 2;
+        if (aTransTypeIdChoice == 0) {
+            //do nothing
         } else {
-            RetrieveTransTypeId = 11;
-        }
-        CurrStoreId = new GeneralUserSetting().getCurrentStore().getStoreId();
-        try {
-            Trans RetrievedTrans = new Trans();
-            this.setTransByTransNumber(RetrievedTrans, aTrans.getTransactionRef(), aTrans.getTransactorId());
-            if (CurrStoreId == RetrievedTrans.getStoreId() && RetrieveTransTypeId == RetrievedTrans.getTransactionTypeId() && aTrans.getTransactorId() == RetrievedTrans.getTransactorId()) {
-                //trans items
-                new TransItemBean().assignTransItemsByTransactionId(RetrievedTrans.getTransactionId(), aTransItems);
-                //reset trans item IDs and prices
-                new TransItemBean().resetTransactionItem(2, aTransItems);
-                //update totals delivered
-                TransItem ti = null;
-                for (int i = 0; i < aTransItems.size(); i++) {
-                    //ti2 = getRefTransItemsTotal(4, 6, aTrans.getTransactionRef(), aTransItems.get(i));
-                    ti = new TransItem();
-                    ti = getRefTransItemsTotalNoSpecific(12, 0, aTrans.getTransactionRef(), aTransItems.get(i));
-                    aTransItems.get(i).setQty_taken(aTransItems.get(i).getItemQty());//Ordered/Sold Qty
-                    aTransItems.get(i).setQty_total(ti.getItemQty());//Delivered Qty
-                    aTransItems.get(i).setQty_balance(aTransItems.get(i).getQty_taken() - aTransItems.get(i).getQty_total());//balance
-                    if (aTransItems.get(i).getQty_balance() > 0) {
-                        aTransItems.get(i).setItemQty(aTransItems.get(i).getQty_balance());//Qty to Deliver=balance
-                    } else {
-                        aTransItems.get(i).setItemQty(0);//Qty to Deliver=0
+            RetrieveTransTypeId = aTransTypeIdChoice;
+            CurrStoreId = new GeneralUserSetting().getCurrentStore().getStoreId();
+            try {
+                Trans RetrievedTrans = new Trans();
+                this.setTransByTransNumber(RetrievedTrans, aTrans.getTransactionRef(), aTrans.getTransactorId());
+                if (CurrStoreId == RetrievedTrans.getStoreId() && RetrieveTransTypeId == RetrievedTrans.getTransactionTypeId() && aTrans.getTransactorId() == RetrievedTrans.getTransactorId()) {
+                    //trans items
+                    new TransItemBean().assignTransItemsByTransactionId(RetrievedTrans.getTransactionId(), aTransItems);
+                    //reset trans item IDs and prices
+                    new TransItemBean().resetTransactionItem(2, aTransItems);
+                    //update totals delivered
+                    TransItem ti = null;
+                    for (int i = 0; i < aTransItems.size(); i++) {
+                        //ti2 = getRefTransItemsTotal(4, 6, aTrans.getTransactionRef(), aTransItems.get(i));
+                        ti = new TransItem();
+                        ti = getRefTransItemsTotalNoSpecific(12, 0, aTrans.getTransactionRef(), aTransItems.get(i));
+                        aTransItems.get(i).setQty_taken(aTransItems.get(i).getItemQty());//Ordered/Sold Qty
+                        aTransItems.get(i).setQty_total(ti.getItemQty());//Delivered Qty
+                        aTransItems.get(i).setQty_balance(aTransItems.get(i).getQty_taken() - aTransItems.get(i).getQty_total());//balance
+                        if (aTransItems.get(i).getQty_balance() > 0) {
+                            aTransItems.get(i).setItemQty(aTransItems.get(i).getQty_balance());//Qty to Deliver=balance
+                        } else {
+                            aTransItems.get(i).setItemQty(0);//Qty to Deliver=0
+                        }
                     }
+                } else {
+                    aTransItems.clear();
+                    FacesContext.getCurrentInstance().addMessage("Retrieved", new FacesMessage("Transaction-Type or Client or Transaction Number does NOT match with selected..."));
                 }
-            } else {
-                aTransItems.clear();
-                FacesContext.getCurrentInstance().addMessage("Retrieved", new FacesMessage("Transaction-Type or Client or Transaction Number does NOT match with selected..."));
+            } catch (NullPointerException npe) {
+                npe.printStackTrace();
             }
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
         }
     }
 
@@ -13306,24 +13306,28 @@ public class TransBean implements Serializable {
     public void refreshTransListChoice(int aChoiceId, long aTransactorId, int aLimit) {
         int TransTypeId = 0;
         long TransactorId = 0;
-        if (aChoiceId == 1) {
-            TransTypeId = 2;
-        } else {
-            TransTypeId = 11;
+        if (aChoiceId > 1) {
+            TransTypeId = aChoiceId;
         }
         if (aTransactorId > 0) {
             TransactorId = aTransactorId;
         }
-        this.refreshTransList(TransTypeId, TransactorId, aLimit);
+        if (aChoiceId == 0 || aTransactorId == 0) {
+            try {
+                this.TransList.clear();
+            } catch (NullPointerException npe) {
+                this.TransList = new ArrayList<>();
+            }
+        } else {
+            this.refreshTransList(TransTypeId, TransactorId, aLimit);
+        }
     }
 
     public void refreshTransListChoice(int aChoiceId, long aTransactorId, int aLimit, String aStatusColumn, String aStatusValues) {
         int TransTypeId = 0;
         long TransactorId = 0;
-        if (aChoiceId == 1) {
-            TransTypeId = 2;
-        } else {
-            TransTypeId = 11;
+        if (aChoiceId > 0) {
+            TransTypeId = aChoiceId;
         }
         if (aTransactorId > 0) {
             TransactorId = aTransactorId;

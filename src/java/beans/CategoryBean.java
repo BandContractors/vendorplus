@@ -5,6 +5,7 @@ import connections.DBConnection;
 import entities.GroupRight;
 import entities.UserDetail;
 import entities.Category;
+import entities.Trans;
 import java.io.Serializable;
 import java.sql.*;
 import java.util.ArrayList;
@@ -208,7 +209,7 @@ public class CategoryBean implements Serializable {
         }
         return Categories;
     }
-    
+
     public List<Category> getCategoriesQuickOrder() {
         String sql;
         sql = "SELECT * FROM category where display_quick_order=1 ORDER BY list_rank DESC,category_name ASC";
@@ -268,6 +269,28 @@ public class CategoryBean implements Serializable {
             }
         }
         return Categories;
+    }
+
+    public List<Category> getDeliveryFor() {
+        List<Category> cats = new ArrayList<>();
+        try {
+            String TransRef = new Parameter_listBean().getParameter_listByContextNameMemory("GOODS_DELIVERY", "TRANSACTION_REF").getParameter_value();
+            if (TransRef.equals("0") || TransRef.equals("2")) {
+                Category cat = new Category();
+                cat.setCategoryId(2);
+                cat.setCategoryName("Sale");
+                cats.add(cat);
+            }
+            if (TransRef.equals("0") || TransRef.equals("11")) {
+                Category cat = new Category();
+                cat.setCategoryId(11);
+                cat.setCategoryName("Order");
+                cats.add(cat);
+            }
+        } catch (Exception e) {
+            //do nothing
+        }
+        return cats;
     }
 
     /**

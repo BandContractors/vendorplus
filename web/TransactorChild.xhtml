@@ -190,6 +190,12 @@
                     <p:commandButton styleClass="clsButtonBig" id="cmdbClear" value="CLEAR (ALT+C)" accesskey="c">
                         <f:ajax listener="#{transactorBean.clearTransactor2(transactorBean.transactorObj,transactorBean.salaryDeductions)}" execute="@form" render="@form" />
                     </p:commandButton>
+                    <p:commandButton styleClass="clsButtonBig" id="cmdbDelete" value="DELETE" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                        <f:ajax listener="#{transactorBean.deleteTransactor(transactorBean.transactorObj,transactorBean.salaryDeductions)}" execute="@form" render="@form" />
+                    </p:commandButton>
                 </h:panelGrid>
             </h:panelGrid>
 
@@ -197,7 +203,7 @@
                 <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{transactorBean.actionMessage}"/>
                 <h:messages id="msgsMainMessage" style="color: red"/><br/>
             </h:panelGrid>
-            <p:growl/>
+            <p:growl id="growl1"/>
 
             <h:panelGrid styleClass="clsGridMainSearch" columns="1">
                 <h:outputLabel id="olblMainSearch" value="SEARCH #{transactorBean.transactorObj.transactorType}S"/>
