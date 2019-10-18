@@ -28,9 +28,9 @@ import javax.servlet.http.HttpSession;
 @ManagedBean
 @SessionScoped
 public class Login implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     private String ActionMessageSuccess = null;
     private String ActionMessageFailure = null;
     private UserDetail LoggedInUserDetail = null;
@@ -43,7 +43,9 @@ public class Login implements Serializable {
     private MenuItemBean menuItemBean;
     private long LICENSE_DAYS_LEFT;
     private long LICENSE_TYPE;
-    
+    @ManagedProperty("#{alert_generalBean}")
+    private Alert_generalBean alert_generalBean;
+
     public void refreshLicenseDaysLeft() {
         this.setLICENSE_DAYS_LEFT(CompanySetting.getLicenseDaysLeft());
         this.setLICENSE_TYPE(CompanySetting.getLicenseType());
@@ -68,7 +70,7 @@ public class Login implements Serializable {
             this.ActionMessageFailure = "Branch database connection is off, contact systems administrator please...";
         }
     }
-    
+
     public void refreshStoresList() {
         try {
             this.StoresList.clear();
@@ -83,7 +85,7 @@ public class Login implements Serializable {
             }
         }
     }
-    
+
     public void initStoresList() {
         try {
             this.StoresList.clear();
@@ -91,7 +93,7 @@ public class Login implements Serializable {
             this.StoresList = new ArrayList<>();
         }
     }
-    
+
     public List<Store> getUserStores() {
         StoreBean sb = new StoreBean();
         if (this.LoggedInUserDetail != null) {
@@ -104,7 +106,7 @@ public class Login implements Serializable {
             return null;
         }
     }
-    
+
     public void userLogin(int aLoginType) {
         if (new DBConnection().isMySQLConnectionAvailable().equals("ON")) {
             UserDetailBean udb = new UserDetailBean();
@@ -158,21 +160,21 @@ public class Login implements Serializable {
                     } catch (NullPointerException | ClassCastException npe) {
                     }
                     httpSession.setAttribute("ITEM_IMAGE_BASE_URL", ITEM_IMAGE_BASE_URL);
-                    
+
                     String ITEM_IMAGE_LOCAL_LOCATION = "";
                     try {
                         ITEM_IMAGE_LOCAL_LOCATION = new Parameter_listBean().getParameter_listByContextName("IMAGE", "ITEM_IMAGE_LOCAL_LOCATION").getParameter_value();
                     } catch (NullPointerException | ClassCastException npe) {
                     }
                     httpSession.setAttribute("ITEM_IMAGE_LOCAL_LOCATION", ITEM_IMAGE_LOCAL_LOCATION);
-                    
+
                     String DEFAULT_DURATION_TYPE = "";
                     try {
                         DEFAULT_DURATION_TYPE = new Parameter_listBean().getParameter_listByContextName("DURATION", "DEFAULT_DURATION_TYPE").getParameter_value();
                     } catch (NullPointerException | ClassCastException npe) {
                     }
                     httpSession.setAttribute("DEFAULT_DURATION_TYPE", DEFAULT_DURATION_TYPE);
-                    
+
                     String LOCALE_COUNTRY_CODE = "en";
                     String LOCALE_LANGUAGE_CODE = "US";
                     String LOCALE_COUNT_LANG_CODE = "";
@@ -205,17 +207,17 @@ public class Login implements Serializable {
                     ls.setUserDetailId(this.LoggedInUserDetail.getUserDetailId());
                     ls.setStoreId(this.LoggedInStoreId);
                     ls.setSessionId(FacesContext.getCurrentInstance().getExternalContext().getSessionId(false));
-                    
+
                     String aRemoteIp = "";
                     String aRemoteHost = "";
                     String aRemoteUser = "";
-                    
+
                     aRemoteIp = request.getHeader("X-FORWARDED-FOR");
                     if (aRemoteIp == null) {
                         aRemoteIp = request.getRemoteAddr();
                     }
                     ls.setRemoteIp(aRemoteIp);
-                    
+
                     try {
                         aRemoteHost = request.getRemoteHost();
                         if (aRemoteHost == null) {
@@ -225,7 +227,7 @@ public class Login implements Serializable {
                         aRemoteHost = "";
                     }
                     ls.setRemoteHost(aRemoteHost);
-                    
+
                     try {
                         aRemoteUser = request.getRemoteUser();
                         if (aRemoteUser == null) {
@@ -244,6 +246,8 @@ public class Login implements Serializable {
                     menuItemBean.refreshMenuItemObj();
                     //take stock snapshot
                     new Cdc_generalBean().takeNewSnapshot_stockAtLogin();
+                    //refresh alert message
+                    alert_generalBean.refreshUserUnreadStockAlerts();
                     //Navigate to the Menu or Home page
                     FacesContext fc = FacesContext.getCurrentInstance();
                     ConfigurableNavigationHandler nav = (ConfigurableNavigationHandler) fc.getApplication().getNavigationHandler();
@@ -262,15 +266,15 @@ public class Login implements Serializable {
             this.ActionMessageFailure = "Branch database connection is off, contact systems administrator please...";
         }
     }
-    
+
     public void userApprove(String aUserName, int aStoreId, String aUserPassword, String aFunctionName, String aRole) {
         int ApproveUserId = 0;
         String ApproveDiscountStatus = "";
         String ApprovePointsStatus = "";
-        
+
         UserDetailBean udb = new UserDetailBean();
         UserDetail ud = new UserDetail();
-        
+
         ud = udb.getUserDetailByUserName(aUserName);
         if (ud != null && aUserPassword.equals(ud.getUserPassword()) && "No".equals(ud.getIsUserLocked())) {
             //it means username and password are valid and un-locked
@@ -310,7 +314,7 @@ public class Login implements Serializable {
             httpSession.setAttribute("APPROVE_POINTS_STATUS", ApprovePointsStatus);
         }
     }
-    
+
     public void userLogout() {
         ////this.LoggedInUserDetail=null;
         ////this.confirmUser();
@@ -478,5 +482,19 @@ public class Login implements Serializable {
     public void setLICENSE_TYPE(long LICENSE_TYPE) {
         this.LICENSE_TYPE = LICENSE_TYPE;
     }
-    
+
+    /**
+     * @return the alert_generalBean
+     */
+    public Alert_generalBean getAlert_generalBean() {
+        return alert_generalBean;
+    }
+
+    /**
+     * @param alert_generalBean the alert_generalBean to set
+     */
+    public void setAlert_generalBean(Alert_generalBean alert_generalBean) {
+        this.alert_generalBean = alert_generalBean;
+    }
+
 }

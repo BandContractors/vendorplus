@@ -546,7 +546,7 @@ public class UserDetailBean implements Serializable {
         }
         return UserDetails;
     }
-    
+
     public List<UserDetail> getUserDetailsNotLocked() {
         String sql;
         sql = "{call sp_search_user_detail_not_locked()}";
@@ -621,6 +621,95 @@ public class UserDetailBean implements Serializable {
             msg = "user code not saved...";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
         }
+    }
+
+    public String getUserEmailAddressesForFunction(String aFunctionName, String aRole) {
+        String EmailAddresses = "";
+        String sql;
+        sql = "select ud.* from user_detail ud where ud.is_user_locked='No' and ud.user_detail_id IN"
+                + "("
+                + " select distinct gu.user_detail_id from group_user gu where gu.group_detail_id IN "
+                + "  ("
+                + "	select distinct gr.group_detail_id from group_right gr where gr.function_name='" + aFunctionName + "' and gr." + aRole + "='Yes'"
+                + "  )"
+                + ")";
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                UserDetail userdetail = new UserDetail();
+                this.setUserDetailFromResultset(userdetail, rs);
+                if (userdetail.getEmail_address().length() > 0) {
+                    if (EmailAddresses.length() == 0) {
+                        EmailAddresses = userdetail.getEmail_address();
+                    } else {
+                        EmailAddresses = EmailAddresses + "," + userdetail.getEmail_address();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("getUserEmailAddressesForFunction:" + e.getMessage());
+        }
+        return EmailAddresses;
+    }
+
+    public String getUserDetailIDsForFunction(String aFunctionName, String aRole) {
+        String UserIDs = "";
+        String sql;
+        sql = "select ud.* from user_detail ud where ud.is_user_locked='No' and ud.user_detail_id IN"
+                + "("
+                + " select distinct gu.user_detail_id from group_user gu where gu.group_detail_id IN "
+                + "  ("
+                + "	select distinct gr.group_detail_id from group_right gr where gr.function_name='" + aFunctionName + "' and gr." + aRole + "='Yes'"
+                + "  )"
+                + ")";
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                UserDetail userdetail = new UserDetail();
+                this.setUserDetailFromResultset(userdetail, rs);
+                if (userdetail.getEmail_address().length() > 0) {
+                    if (UserIDs.length() == 0) {
+                        UserIDs = "" + userdetail.getUserDetailId() + "";
+                    } else {
+                        UserIDs = UserIDs + "," + userdetail.getUserDetailId();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("getUserDetailIDsForFunction:" + e.getMessage());
+        }
+        return UserIDs;
+    }
+
+    public String getUserEmailAddressesForIDs(String aUserIDs) {
+        String EmailAddresses = "";
+        String sql;
+        sql = "select distinct email_address from user_detail where user_detail_id IN(" + aUserIDs + ") and ifnull(email_address,'')!=''";
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                String emailaddress = rs.getString("email_address");
+                if (emailaddress.length() > 0) {
+                    if (EmailAddresses.length() == 0) {
+                        EmailAddresses = emailaddress;
+                    } else {
+                        EmailAddresses = EmailAddresses + "," + emailaddress;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("getUserEmailAddressesForIDs:" + e.getMessage());
+        }
+        return EmailAddresses;
     }
 
     /**

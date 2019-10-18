@@ -20,6 +20,7 @@ public class Alert_general implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private long alert_general_id;
+    private Date alert_date;
     private String alert_type;
     private String subject;
     private String message;
@@ -198,6 +199,20 @@ public class Alert_general implements Serializable {
      */
     public void setStatus_code(String status_code) {
         this.status_code = status_code;
+    }
+
+    /**
+     * @return the alert_date
+     */
+    public Date getAlert_date() {
+        return alert_date;
+    }
+
+    /**
+     * @param alert_date the alert_date to set
+     */
+    public void setAlert_date(Date alert_date) {
+        this.alert_date = alert_date;
     }
 
 }

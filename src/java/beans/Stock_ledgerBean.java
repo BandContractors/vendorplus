@@ -5,9 +5,6 @@ import entities.CompanySetting;
 import entities.Item;
 import entities.Stock;
 import entities.Stock_ledger;
-import entities.Trans;
-import entities.TransItem;
-import entities.Transactor;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -230,6 +227,10 @@ public class Stock_ledgerBean implements Serializable {
             stockledger.setQty_bal(qtybal);
             //insert
             this.insertStock_ledger(stockledger);
+            //check alert
+            new Alert_generalBean().checkStockStatusForAlert(stockledger.getItem_id());
+            //refresh alert message
+            //new Alert_generalBean().refreshUserUnreadStockAlerts();
         } catch (Exception e) {
             System.err.println("callInsertStock_ledger:" + e.getMessage());
         }

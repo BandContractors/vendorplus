@@ -1117,7 +1117,7 @@ public class ItemBean implements Serializable {
         }
         return ItemObjectList;
     }
-    
+
     public List<Item> getItemObjectListForProduction(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -1974,61 +1974,24 @@ public class ItemBean implements Serializable {
         }
     }
 
-//    public void reportItemStockLowOut(String aItemType, int aCategoryId, int aSubCategoryId, String aCurrency, int aIsGeneral, String aStockType) {
-//        String sql = "SELECT * FROM view_inventory_low_out WHERE is_suspended='No'";
-//        String wheresql = "";
-//        String ordersql = "";
-//        ResultSet rs = null;
-//        this.setItemsList(new ArrayList<>());
-//        this.setItemsSummary(new ArrayList<>());
-//        if (aStockType.length() > 0) {
-//            wheresql = wheresql + " AND stock_type='" + aStockType + "'";
-//        }
-//        if (aItemType.length() > 0) {
-//            wheresql = wheresql + " AND item_type='" + aItemType + "'";
-//        }
-//        if (aCategoryId > 0) {
-//            wheresql = wheresql + " AND category_id=" + aCategoryId;
-//        }
-//        if (aSubCategoryId > 0) {
-//            wheresql = wheresql + " AND sub_category_id=" + aSubCategoryId;
-//        }
-//        if (aCurrency.length() > 0) {
-//            wheresql = wheresql + " AND currency_code='" + aCurrency + "'";
-//        }
-//        if (aIsGeneral == 10) {
-//            wheresql = wheresql + " AND is_general=0";
-//        }
-//        if (aIsGeneral == 11) {
-//            wheresql = wheresql + " AND is_general=1";
-//        }
-//        ordersql = " ORDER BY stock_type_order,stock_type,description ASC";
-//        sql = sql + wheresql + ordersql;
-//        try (
-//                Connection conn = DBConnection.getMySQLConnection();
-//                PreparedStatement ps = conn.prepareStatement(sql);) {
-//            rs = ps.executeQuery();
-//            Item item = null;
-//            while (rs.next()) {
-//                item = new Item();
-//                this.setItemFromResultsetReport(item, rs);
-//                if (item.getReorderLevel() == 0) {
-//                    item.setStock_status("No Reorder Level");
-//                } else if (item.getReorderLevel() > 0 && item.getQty_total() <= 0) {
-//                    item.setStock_status("Out of Stock");
-//                } else if (item.getReorderLevel() > 0 && item.getQty_total() <= item.getReorderLevel()) {
-//                    item.setStock_status("Low Stock");
-//                } else if (item.getReorderLevel() > 0 && item.getQty_total() > item.getReorderLevel()) {
-//                    item.setStock_status("Stocked");
-//                } else {
-//                    item.setStock_status("");
-//                }
-//                this.getItemsList().add(item);
-//            }
-//        } catch (SQLException se) {
-//            System.err.println(se.getMessage());
-//        }
-//    }
+    public Item getItemCurrentStockStatus(long aItem_id) {
+        String sql = "SELECT * FROM view_inventory_low_out_vw WHERE item_id=" + aItem_id;
+        ResultSet rs = null;
+        Item item = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                item = new Item();
+                this.setItemFromResultsetReport(item, rs);
+            }
+        } catch (Exception e) {
+            System.err.println("getItemCurrentStockStatus:" + e.getMessage());
+        }
+        return item;
+    }
+
     public void initItemObj() {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -2166,7 +2129,7 @@ public class ItemBean implements Serializable {
         }
         return ItemObjectList;
     }
-    
+
     public List<Item> getItemObjectListForRawMaterial(String Query) {
         this.setTypedItemCode(Query);
         String sql;
