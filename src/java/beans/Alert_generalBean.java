@@ -14,6 +14,9 @@ import java.util.Date;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import sessions.GeneralUserSetting;
 import utilities.UtilityBean;
 
@@ -33,9 +36,6 @@ public class Alert_generalBean implements Serializable {
 
     private List<Alert_general> Alert_generalObjectList;
     private Alert_general Alert_generalObj;
-    private List<Alert_general> UserUnreadStockAlertsList = new ArrayList<>();
-    private int CountUserUnreadAlerts = 0;
-    private boolean UserUnreadAlertsIncrease = false;
 
     public void setAlert_generalFromResultset(Alert_general aAlert_general, ResultSet aResultSet) {
         try {
@@ -58,6 +58,11 @@ public class Alert_generalBean implements Serializable {
                 aAlert_general.setMessage(aResultSet.getString("message"));
             } catch (NullPointerException npe) {
                 aAlert_general.setMessage("");
+            }
+            try {
+                aAlert_general.setSubject(aResultSet.getString("subject"));
+            } catch (NullPointerException npe) {
+                aAlert_general.setSubject("");
             }
             try {
                 aAlert_general.setAlert_users(aResultSet.getString("alert_users"));
@@ -127,7 +132,7 @@ public class Alert_generalBean implements Serializable {
         if (aAlert_general.getAlert_general_id() == 0) {
             sql = "INSERT INTO alert_general(alert_type,subject,message,alert_users,read_by,alert_items,add_date,add_by,status_code,alert_date) VALUES (?,?,?,?,?,?,?,?,?,?)";
         } else if (aAlert_general.getAlert_general_id() > 0) {
-            sql = "UPDATE alert_general SET status_code=?,read_by=?,last_update_date=?,last_update_by=? WHERE alert_general_id=?";
+            sql = "UPDATE alert_general SET status_code=?,read_by=?,last_update_date=?,last_update_by=? WHERE alert_general_id=" + aAlert_general.getAlert_general_id();
         }
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -215,6 +220,24 @@ public class Alert_generalBean implements Serializable {
         }
     }
 
+    public void updateReadStockStatusAlert(Alert_general aAlertgeneral) {
+        try {
+            if (aAlertgeneral.getAlert_general_id() > 0) {
+                if (aAlertgeneral.getRead_by().length() > 0) {
+                    aAlertgeneral.setRead_by(aAlertgeneral.getRead_by() + "," + new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                } else {
+                    aAlertgeneral.setRead_by("" + new GeneralUserSetting().getCurrentUser().getUserDetailId() + "");
+                }
+                aAlertgeneral.setLast_update_date(new CompanySetting().getCURRENT_SERVER_DATE());
+                aAlertgeneral.setLast_update_by(new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                this.saveAlert_general(aAlertgeneral);
+                this.refreshAlerts();
+            }
+        } catch (Exception e) {
+            System.out.println("updateReadStockStatusAlert:" + e.getMessage());
+        }
+    }
+
     public void saveNewStockStatusAlert(Item aItem) {
         try {
             Alert_general alertgeneral = new Alert_general();
@@ -275,14 +298,48 @@ public class Alert_generalBean implements Serializable {
         return ag;
     }
 
-    public void refreshUserUnreadStockAlerts() {
+    public List<Alert_general> retrieveUserUnreadStockAlerts() {
+        int userid = new GeneralUserSetting().getCurrentUser().getUserDetailId();
+        String sql = "select * from alert_general where " + userid + " IN(alert_users) and " + userid + " NOT IN(read_by) order by add_date desc LIMIT 100";
+        ResultSet rs = null;
+        List<Alert_general> aList = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            Alert_general ag = null;
+            while (rs.next()) {
+                ag = new Alert_general();
+                this.setAlert_generalFromResultset(ag, rs);
+                aList.add(ag);
+            }
+        } catch (Exception e) {
+            System.err.println("retrieveUserUnreadStockAlerts:" + e.getMessage());
+        }
+        return aList;
+    }
+
+    public void refreshAlerts() {
+        try {
+            FacesContext context = FacesContext.getCurrentInstance();
+            HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+            HttpSession httpSession = request.getSession(true);
+            List<Alert_general> agL = this.retrieveUserUnreadStockAlerts();
+            httpSession.setAttribute("USER_UNREAD_STOCK_ALERTS_LIST", agL);
+            httpSession.setAttribute("USER_UNREAD_STOCK_ALERTS_COUNT", agL.size());
+        } catch (NullPointerException | ClassCastException npe) {
+            //
+        }
+    }
+
+    public void setUserUnreadStockAlerts(List<Alert_general> aUserUnreadStockAlertsList, int aUserUnreadAlertsCount) {
         int userid = new GeneralUserSetting().getCurrentUser().getUserDetailId();
         String sql = "select * from alert_general where " + userid + " IN(alert_users) and " + userid + " NOT IN(read_by) order by add_date desc LIMIT 100";
         ResultSet rs = null;
         try {
-            this.getUserUnreadStockAlertsList().clear();
+            aUserUnreadStockAlertsList.clear();
         } catch (NullPointerException npe) {
-            this.UserUnreadStockAlertsList = new ArrayList<>();
+            aUserUnreadStockAlertsList = new ArrayList<>();
         }
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -292,9 +349,9 @@ public class Alert_generalBean implements Serializable {
             while (rs.next()) {
                 ag = new Alert_general();
                 this.setAlert_generalFromResultset(ag, rs);
-                this.getUserUnreadStockAlertsList().add(ag);
+                aUserUnreadStockAlertsList.add(ag);
             }
-            this.CountUserUnreadAlerts = this.getUserUnreadStockAlertsList().size();
+            aUserUnreadAlertsCount = aUserUnreadStockAlertsList.size();
         } catch (Exception e) {
             System.err.println("refreshUserUnreadStockAlerts:" + e.getMessage());
         }
@@ -319,47 +376,5 @@ public class Alert_generalBean implements Serializable {
      */
     public void setAlert_generalObj(Alert_general Alert_generalObj) {
         this.Alert_generalObj = Alert_generalObj;
-    }
-
-    /**
-     * @return the UserUnreadStockAlertsList
-     */
-    public List<Alert_general> getUserUnreadStockAlertsList() {
-        return UserUnreadStockAlertsList;
-    }
-
-    /**
-     * @param UserUnreadStockAlertsList the UserUnreadStockAlertsList to set
-     */
-    public void setUserUnreadStockAlertsList(List<Alert_general> UserUnreadStockAlertsList) {
-        this.UserUnreadStockAlertsList = UserUnreadStockAlertsList;
-    }
-
-    /**
-     * @return the CountUserUnreadAlerts
-     */
-    public int getCountUserUnreadAlerts() {
-        return CountUserUnreadAlerts;
-    }
-
-    /**
-     * @param CountUserUnreadAlerts the CountUserUnreadAlerts to set
-     */
-    public void setCountUserUnreadAlerts(int CountUserUnreadAlerts) {
-        this.CountUserUnreadAlerts = CountUserUnreadAlerts;
-    }
-
-    /**
-     * @return the UserUnreadAlertsIncrease
-     */
-    public boolean isUserUnreadAlertsIncrease() {
-        return UserUnreadAlertsIncrease;
-    }
-
-    /**
-     * @param UserUnreadAlertsIncrease the UserUnreadAlertsIncrease to set
-     */
-    public void setUserUnreadAlertsIncrease(boolean UserUnreadAlertsIncrease) {
-        this.UserUnreadAlertsIncrease = UserUnreadAlertsIncrease;
     }
 }

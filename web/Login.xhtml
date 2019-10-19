@@ -81,7 +81,7 @@
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
-                        <f:ajax listener="#{login.userLogin(2)}" execute="menuStore itxtUserName itxtPassword" render="olblActionMessageSuccess olblActionMessageFailure pnlgLoginHeader"/>
+                        <p:ajax listener="#{login.userLogin(2)}" process="menuStore itxtUserName itxtPassword" update="olblActionMessageSuccess olblActionMessageFailure pnlgLoginHeader"/>
                     </p:commandButton>
                     <h:panelGrid rendered="#{60 gt login.LICENSE_DAYS_LEFT and login.LICENSE_TYPE ne 9 and login.LICENSE_TYPE ne 0}">
                         <p:spacer/>

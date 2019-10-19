@@ -7,6 +7,7 @@ package sessions;
  */
 import beans.OutputDetail;
 import entities.AccCurrency;
+import entities.Alert_general;
 import entities.CompanySetting;
 import entities.Store;
 import entities.GroupRight;
@@ -567,7 +568,7 @@ public class GeneralUserSetting implements Serializable {
         }
         return ITEM_IMAGE_BASE_URL;
     }
-    
+
     public String getITEM_IMAGE_LOCAL_LOCATION() {
         String ITEM_IMAGE_LOCAL_LOCATION = "";
         try {
@@ -692,6 +693,28 @@ public class GeneralUserSetting implements Serializable {
 
         }
         return ORDER_FOR_EDIT;
+    }
+
+    public List<Alert_general> getUserUnreadStockAlertsList() {
+        try {
+            FacesContext context = FacesContext.getCurrentInstance();
+            HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+            HttpSession httpSession = request.getSession(false);
+            return (List<Alert_general>) httpSession.getAttribute("USER_UNREAD_STOCK_ALERTS_LIST");
+        } catch (NullPointerException | ClassCastException npe) {
+            return null;
+        }
+    }
+
+    public int getUserUnreadStockAlertsCount() {
+        try {
+            FacesContext context = FacesContext.getCurrentInstance();
+            HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+            HttpSession httpSession = request.getSession(false);
+            return (int) httpSession.getAttribute("USER_UNREAD_STOCK_ALERTS_COUNT");
+        } catch (NullPointerException | ClassCastException npe) {
+            return 0;
+        }
     }
 
 }

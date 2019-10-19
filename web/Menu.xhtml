@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:p="http://primefaces.org/ui"
-      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
     <h:head>
         <title>#{menuItemBean.menuItemObj.SYSTEM_NAME}</title>
         <style>
@@ -477,7 +478,7 @@
                     <p:menuitem value="Top Expenses" action="DashboardExpensesItems?faces-redirect=true" />
                     <p:separator />
                 </p:submenu>  
-                <p:menuitem value="#{alert_generalBean.countUserUnreadAlerts}" oncomplete="PF('sbarAlert').show()" icon="fa fa-fw fa-envelope" style="background-color:#FF0000;color: #ffffff;float: right;" />
+                <p:menuitem id="mniAlert" value="#{generalUserSetting.userUnreadStockAlertsCount}" oncomplete="PF('sbarAlert').show()" icon="fa fa-fw fa-envelope" style="background-color:#FF0000;color: #ffffff;float: right;" rendered="#{generalUserSetting.userUnreadStockAlertsCount>0}"/>
                 <p:submenu label="#{menuItemBean.menuItemObj.CURRENT_USER.userName}" style="background-color:#FF0000;color: #ffffff;float: right;" icon="ui-icon-person">  
                     <p:separator />
                     <p:menuitem value="Logout" action="#{login.userLogout()}" icon="ui-icon-power" />
@@ -487,15 +488,22 @@
                 </p:submenu>
             </p:menubar>
             <p:sidebar widgetVar="sbarAlert" position="right" baseZIndex="10000">
-                <h:panelGrid columns="1" style="width: 100%;">
-                    <p:commandButton value="Unread Stock Alerts (#{alert_generalBean.countUserUnreadAlerts})" oncomplete="PF('sbarAlert').hide()" style="height: 40px;width: 100%;background-color:#FF0000;color: #ffffff;border: none;"/>
+                <h:panelGrid id="pnlAlertHeader" columns="1" style="width: 100%;">
+                    <p:commandButton value="Unread Stock Alerts (#{generalUserSetting.userUnreadStockAlertsCount})" oncomplete="PF('sbarAlert').hide()" style="height: 40px;width: 100%;background-color:#FF0000;color: #ffffff;border: none;"/>
                 </h:panelGrid>
-                <h:panelGrid columns="1">
-                    <h:panelGrid id="pnlStockAlerts" columns="1">
-                        <c:forEach var="sa" items="#{alert_generalBean.getUserUnreadStockAlertsList()}">
-                            <h:commandLink value="#{sa.subject}"/>
+                <h:panelGrid id="pnlAlertList" columns="1">
+                    <p:accordionPanel activeIndex="-1">
+                        <c:forEach var="sa" items="#{generalUserSetting.getUserUnreadStockAlertsList()}">
+                            <p:tab title="#{sa.subject}">
+                                <h:panelGrid columns="2" cellpadding="0">
+                                    <h:outputText value="#{sa.message}"/>
+                                    <h:commandButton value="OK">
+                                        <f:ajax listener="#{alert_generalBean.updateReadStockStatusAlert(sa)}" execute="@this" render="frmMenu:mniAlert frmMenu:pnlAlertHeader frmMenu:pnlAlertList"/>
+                                    </h:commandButton>
+                                </h:panelGrid>
+                            </p:tab>
                         </c:forEach>
-                    </h:panelGrid>
+                    </p:accordionPanel>
                 </h:panelGrid>
             </p:sidebar>
         </h:form>  

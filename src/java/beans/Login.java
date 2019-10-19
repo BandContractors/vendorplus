@@ -2,6 +2,7 @@ package beans;
 
 import connections.DBConnection;
 import entities.AccCurrency;
+import entities.Alert_general;
 import entities.CompanySetting;
 import entities.Store;
 import entities.LoginSession;
@@ -25,7 +26,7 @@ import javax.servlet.http.HttpSession;
  *
  * @author btwesigye
  */
-@ManagedBean
+@ManagedBean(name = "login")
 @SessionScoped
 public class Login implements Serializable {
 
@@ -43,8 +44,6 @@ public class Login implements Serializable {
     private MenuItemBean menuItemBean;
     private long LICENSE_DAYS_LEFT;
     private long LICENSE_TYPE;
-    @ManagedProperty("#{alert_generalBean}")
-    private Alert_generalBean alert_generalBean;
 
     public void refreshLicenseDaysLeft() {
         this.setLICENSE_DAYS_LEFT(CompanySetting.getLicenseDaysLeft());
@@ -246,8 +245,8 @@ public class Login implements Serializable {
                     menuItemBean.refreshMenuItemObj();
                     //take stock snapshot
                     new Cdc_generalBean().takeNewSnapshot_stockAtLogin();
-                    //refresh alert message
-                    alert_generalBean.refreshUserUnreadStockAlerts();
+                    //stock alerts
+                    new Alert_generalBean().refreshAlerts();
                     //Navigate to the Menu or Home page
                     FacesContext fc = FacesContext.getCurrentInstance();
                     ConfigurableNavigationHandler nav = (ConfigurableNavigationHandler) fc.getApplication().getNavigationHandler();
@@ -482,19 +481,4 @@ public class Login implements Serializable {
     public void setLICENSE_TYPE(long LICENSE_TYPE) {
         this.LICENSE_TYPE = LICENSE_TYPE;
     }
-
-    /**
-     * @return the alert_generalBean
-     */
-    public Alert_generalBean getAlert_generalBean() {
-        return alert_generalBean;
-    }
-
-    /**
-     * @param alert_generalBean the alert_generalBean to set
-     */
-    public void setAlert_generalBean(Alert_generalBean alert_generalBean) {
-        this.alert_generalBean = alert_generalBean;
-    }
-
 }

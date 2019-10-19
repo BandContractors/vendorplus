@@ -18,11 +18,11 @@ import sessions.GeneralUserSetting;
 @ManagedBean(name = "menuItemBean")
 @SessionScoped
 public class MenuItemBean implements Serializable {
-
+    
     private static final long serialVersionUID = 1L;
-
+    
     private MenuItem MenuItemObj;
-
+    
     public void refreshMenuItemObj() {
         try {
             if (null == this.MenuItemObj) {
@@ -71,10 +71,10 @@ public class MenuItemBean implements Serializable {
                 this.MenuItemObj.setCURRENT_STORE(null);
             }
         } catch (Exception e) {
-
+            
         }
     }
-
+    
     /**
      * @return the MenuItemObj
      */
