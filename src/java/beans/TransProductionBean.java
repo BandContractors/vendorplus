@@ -891,6 +891,8 @@ public class TransProductionBean implements Serializable {
                 }
                 //display success message
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Saved Successfully"));
+                //Refresh stock alerts
+                new UtilityBean().refreshAlerts();
             }
         } catch (NullPointerException npe) {
             npe.printStackTrace();

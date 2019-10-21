@@ -1,6 +1,7 @@
 package utilities;
 
 import beans.AccCurrencyBean;
+import beans.Alert_generalBean;
 import connections.DBConnection;
 import entities.CompanySetting;
 import entities.Item;
@@ -524,6 +525,16 @@ public class UtilityBean implements Serializable {
             aList.clear();
         } catch (NullPointerException npe) {
 
+        }
+    }
+
+    public void refreshAlerts() {
+        //Refresh stock alerts
+        try {
+            new Alert_generalBean().refreshAlerts();
+            org.primefaces.PrimeFaces.current().executeScript("doUpdateMenuSideBarClick()");
+        } catch (Exception e) {
+            System.err.println("refreshStockAlerts:" + e.getMessage());
         }
     }
 

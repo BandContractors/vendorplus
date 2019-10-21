@@ -245,7 +245,7 @@ public class Login implements Serializable {
                     menuItemBean.refreshMenuItemObj();
                     //take stock snapshot
                     new Cdc_generalBean().takeNewSnapshot_stockAtLogin();
-                    //stock alerts
+                    //Refresh stock alerts
                     new Alert_generalBean().refreshAlerts();
                     //Navigate to the Menu or Home page
                     FacesContext fc = FacesContext.getCurrentInstance();

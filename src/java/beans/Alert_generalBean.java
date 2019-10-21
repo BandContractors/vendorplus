@@ -201,18 +201,31 @@ public class Alert_generalBean implements Serializable {
 
     public void checkStockStatusForAlert(long aItem_id) {
         try {
-            //get item current stock status
-            Item item = new ItemBean().getItemCurrentStockStatus(aItem_id);
-            String stockstatus = "";
-            if (null != item) {
-                stockstatus = item.getStock_status();
+            //get STOCK_ALERTS_MODE 0(None),1(Out of stock),2(Low stock),3(Both Out and Low)
+            String STOCK_ALERTS_MODE = "0";
+            try {
+                STOCK_ALERTS_MODE = new Parameter_listBean().getParameter_listByContextNameMemory("ALERTS", "STOCK_ALERTS_MODE").getParameter_value();
+            } catch (Exception e) {
+                //do nothing
             }
-            if (stockstatus.equals("Out of Stock") || stockstatus.equals("Low Stock")) {
-                //check if it alert hasnt been taken today
-                if (this.isTodayAlertFound(aItem_id, stockstatus)) {
-                    //ignore
-                } else {
-                    this.saveNewStockStatusAlert(item);
+            if (STOCK_ALERTS_MODE.equals("0")) {
+                //do nothing
+            } else {
+                //get item current stock status
+                Item item = new ItemBean().getItemCurrentStockStatus(aItem_id);
+                String stockstatus = "";
+                if (null != item) {
+                    stockstatus = item.getStock_status();
+                }
+                if (stockstatus.equals("Out of Stock") || stockstatus.equals("Low Stock")) {
+                    if (STOCK_ALERTS_MODE.equals("3") || ((stockstatus.equals("Out of Stock") && STOCK_ALERTS_MODE.equals("1")) || (stockstatus.equals("Low Stock") && STOCK_ALERTS_MODE.equals("2")))) {
+                        //check if it alert hasnt been taken today
+                        if (this.isTodayAlertFound(aItem_id, stockstatus)) {
+                            //ignore
+                        } else {
+                            this.saveNewStockStatusAlert(item);
+                        }
+                    }
                 }
             }
         } catch (Exception e) {
@@ -232,6 +245,7 @@ public class Alert_generalBean implements Serializable {
                 aAlertgeneral.setLast_update_by(new GeneralUserSetting().getCurrentUser().getUserDetailId());
                 this.saveAlert_general(aAlertgeneral);
                 this.refreshAlerts();
+                org.primefaces.PrimeFaces.current().executeScript("doUpdateMenuClick()");
             }
         } catch (Exception e) {
             System.out.println("updateReadStockStatusAlert:" + e.getMessage());

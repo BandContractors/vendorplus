@@ -1343,6 +1343,8 @@ public class TransBean implements Serializable {
                 if ("HIRE RETURN NOTE".equals(CurrentTransactionType.getTransactionTypeName())) {
                     this.openChildReturnHireInvoice(new GeneralUserSetting().getCurrentTransactionId());
                 }
+                //Refresh stock alerts
+                new UtilityBean().refreshAlerts();
             } catch (SQLException se) {
                 System.err.println(se.getMessage() + Arrays.toString(se.getStackTrace()));
                 this.setActionMessage("Transaction NOT saved");
@@ -2460,6 +2462,8 @@ public class TransBean implements Serializable {
                             this.openChildReturnHireInvoice(new GeneralUserSetting().getCurrentTransactionId());
                         }
                     }
+                    //Refresh stock alerts
+                    new UtilityBean().refreshAlerts();
                 }
             } catch (Exception e) {
                 System.err.println(e.getMessage() + Arrays.toString(e.getStackTrace()));
@@ -2821,6 +2825,8 @@ public class TransBean implements Serializable {
                             this.openChildReturnHireInvoice(new GeneralUserSetting().getCurrentTransactionId());
                         }
                     }
+                    //Refresh stock alerts
+                    new UtilityBean().refreshAlerts();
                 }
             } catch (Exception e) {
                 System.err.println(e.getMessage() + Arrays.toString(e.getStackTrace()));
@@ -3772,6 +3778,8 @@ public class TransBean implements Serializable {
             }
             //Refresh Print output
             new OutputDetailBean().refreshOutput(aLevel, "");
+            //Refresh stock alerts
+            new UtilityBean().refreshAlerts();
             //check need for child dialogue
 //            if ("HIRE RETURN NOTE".equals(transtype.getTransactionTypeName())) {
 //                //find out if there is a return invoice candidate
