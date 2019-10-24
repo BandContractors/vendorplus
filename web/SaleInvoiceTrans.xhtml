@@ -48,7 +48,7 @@
                     <f:selectItem itemValue="#{transBean.transReasonObj.transactionReasonId}" itemLabel="#{transBean.transReasonObj.transactionReasonName}"/>
                 </h:selectOneMenu>
                 <h:outputLabel style="background-color:#00B461;color: white;" value="Prices are VAT Inclusive:#{companySetting.EIsVatInclusive}"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="Stock↓"/>
+                <h:outputLabel style="background-color:#00B461;color: white;" value="Stock#{generalUserSetting.DEPLETE_SOLD_STOCK_UPON eq '0' ? '↓':':No effect'}"/>
                 <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:Cash↑ Sales↑ AR↑ Tax↑"/>
             </h:panelGrid>
             <h:panelGrid id="pnlDraft">

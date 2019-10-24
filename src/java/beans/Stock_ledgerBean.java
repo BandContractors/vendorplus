@@ -229,8 +229,6 @@ public class Stock_ledgerBean implements Serializable {
             this.insertStock_ledger(stockledger);
             //check alert
             new Alert_generalBean().checkStockStatusForAlert(stockledger.getItem_id());
-            //refresh alert message
-            //new Alert_generalBean().refreshUserUnreadStockAlerts();
         } catch (Exception e) {
             System.err.println("callInsertStock_ledger:" + e.getMessage());
         }

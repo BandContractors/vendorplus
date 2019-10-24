@@ -3,13 +3,16 @@ package beans;
 import connections.DBConnection;
 import entities.Alert_general;
 import entities.CompanySetting;
+import entities.EmailEntity;
 import entities.Item;
+import entities.UserDetail;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
@@ -233,6 +236,71 @@ public class Alert_generalBean implements Serializable {
         }
     }
 
+    public void checkStockStatusForEmail(Alert_general aAlert_general) {
+        try {
+            //get STOCK_ALERTS_EMAIL 0(No),1(Yes-Out of stock),2(Yes-Low stock),3(Yes-Both Out and Low)
+            String STOCK_ALERTS_EMAIL = "0";
+            try {
+                STOCK_ALERTS_EMAIL = new Parameter_listBean().getParameter_listByContextNameMemory("ALERTS", "STOCK_ALERTS_EMAIL").getParameter_value();
+            } catch (Exception e) {
+                //do nothing
+            }
+            if (STOCK_ALERTS_EMAIL.equals("0")) {
+                //do nothing
+            } else {
+                //get alert current stock status
+                String stockstatus = "";
+                if (null != aAlert_general) {
+                    stockstatus = aAlert_general.getAlert_type();
+                }
+                if (stockstatus.equals("Out of Stock") || stockstatus.equals("Low Stock")) {
+                    if (STOCK_ALERTS_EMAIL.equals("3") || ((stockstatus.equals("Out of Stock") && STOCK_ALERTS_EMAIL.equals("1")) || (stockstatus.equals("Low Stock") && STOCK_ALERTS_EMAIL.equals("2")))) {
+                        EmailEntity emailentity = new EmailEntity();
+                        emailentity.setSubject(aAlert_general.getSubject());
+                        emailentity.setMessage(aAlert_general.getMessage());
+                        String emailids = this.replaceUserIDsWithEmail(aAlert_general.getAlert_users());
+                        emailentity.setToEmail(emailids);
+                        try {
+                            if (emailentity.getToEmail().length() > 0) {
+                                int sent = new EmailEntityBean().validateSendEmailBackground(emailentity);
+                            }
+                        } catch (Exception e) {
+                            //do nothing
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("checkStockStatusForEmail:" + e.getMessage());
+        }
+    }
+
+    public String replaceUserIDsWithEmail(String aUserIDs) {
+        String EmailsStr = "";
+        List<String> UserIDsList = new ArrayList<>();
+        try {
+            UserIDsList = Arrays.asList(aUserIDs.split(","));
+        } catch (Exception e) {
+            //do nothing
+        }
+        for (int i = 0; i < UserIDsList.size(); i++) {
+            String email = "";
+            try {
+                email = new UserDetailBean().getUserDetail(Integer.parseInt(UserIDsList.get(i))).getEmail_address();
+            } catch (Exception e) {
+                //do nothing
+            }
+            if (email.length() > 0) {
+                if (EmailsStr.length() > 0) {
+                    EmailsStr = EmailsStr + "," + email;
+                } else {
+                    EmailsStr = email;
+                }
+            }
+        }
+        return EmailsStr;
+    }
+
     public void updateReadStockStatusAlert(Alert_general aAlertgeneral) {
         try {
             if (aAlertgeneral.getAlert_general_id() > 0) {
@@ -273,6 +341,7 @@ public class Alert_generalBean implements Serializable {
             alertgeneral.setAlert_items("" + aItem.getItemId() + "");
             alertgeneral.setStatus_code("");
             this.saveAlert_general(alertgeneral);
+            this.checkStockStatusForEmail(alertgeneral);
         } catch (Exception e) {
             System.out.println("saveNewStockStatusAlert:" + e.getMessage());
         }

@@ -594,6 +594,19 @@ public class GeneralUserSetting implements Serializable {
         }
         return DEFAULT_DURATION_TYPE;
     }
+    
+    public String getDEPLETE_SOLD_STOCK_UPON() {
+        String DEPLETE_SOLD_STOCK_UPON = "";
+        try {
+            FacesContext context = FacesContext.getCurrentInstance();
+            HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+            HttpSession httpSession = request.getSession(false);
+            DEPLETE_SOLD_STOCK_UPON = (String) httpSession.getAttribute("DEPLETE_SOLD_STOCK_UPON");
+        } catch (NullPointerException | ClassCastException | NumberFormatException npe) {
+            DEPLETE_SOLD_STOCK_UPON = "";
+        }
+        return DEPLETE_SOLD_STOCK_UPON;
+    }
 
     public OutputDetail getOutputDetailParent() {
         try {

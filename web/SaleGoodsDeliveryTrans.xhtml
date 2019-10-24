@@ -41,7 +41,7 @@
                     <f:selectItems value="#{transactionReasonBean.getTransactionReasons(generalUserSetting.getCurrentTransactionTypeId())}" var="tr" itemLabel="#{tr.transactionReasonName}" itemValue="#{tr.transactionReasonId}"/>
                     <f:ajax event="change" execute="@this" render="@this"/>
                 </h:selectOneMenu>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="Stock:No effect"/>
+                <h:outputLabel style="background-color:#00B461;color: white;" value="Stock#{generalUserSetting.DEPLETE_SOLD_STOCK_UPON eq '1' ? '↓':':No effect'}"/>
                 <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:No effect"/>
             </h:panelGrid>
 

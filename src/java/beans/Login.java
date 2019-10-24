@@ -173,6 +173,13 @@ public class Login implements Serializable {
                     } catch (NullPointerException | ClassCastException npe) {
                     }
                     httpSession.setAttribute("DEFAULT_DURATION_TYPE", DEFAULT_DURATION_TYPE);
+                    
+                    String DEPLETE_SOLD_STOCK_UPON = "";
+                    try {
+                        DEPLETE_SOLD_STOCK_UPON = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "DEPLETE_SOLD_STOCK_UPON").getParameter_value();
+                    } catch (NullPointerException | ClassCastException npe) {
+                    }
+                    httpSession.setAttribute("DEPLETE_SOLD_STOCK_UPON", DEPLETE_SOLD_STOCK_UPON);
 
                     String LOCALE_COUNTRY_CODE = "en";
                     String LOCALE_LANGUAGE_CODE = "US";

@@ -63,7 +63,7 @@
                     <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                         <p:graphicImage name="/images/ajax-loader.gif"/>
                     </p:dialog>
-                    <p:ajax listener="#{emailEntityBean.validateSendEmailBulk(contact_listBean.contact_listObj, emailEntity)}" process="@form" update="growl1 ActionMsg"/>
+                    <p:ajax listener="#{emailEntityBean.validateSendEmail(contact_listBean.contact_listObj, emailEntity)}" process="@form" update="growl1 ActionMsg"/>
                 </p:commandButton>
             </h:panelGrid>
             <p:growl id="growl1"/>
