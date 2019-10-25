@@ -5,7 +5,6 @@ import entities.Alert_general;
 import entities.CompanySetting;
 import entities.EmailEntity;
 import entities.Item;
-import entities.UserDetail;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -262,7 +261,14 @@ public class Alert_generalBean implements Serializable {
                         emailentity.setToEmail(emailids);
                         try {
                             if (emailentity.getToEmail().length() > 0) {
-                                int sent = new EmailEntityBean().validateSendEmailBackground(emailentity);
+                                //int sent = new EmailEntityBean().validateSendEmailBackground(emailentity);
+                                new Thread(new Runnable() {
+                                    public void run() {
+                                        //CALL METHOD FOR WORK IN BACKGROUND
+                                        int sent = new EmailEntityBean().validateSendEmailBackground(emailentity);
+                                        return;
+                                    }
+                                }).start();
                             }
                         } catch (Exception e) {
                             //do nothing
