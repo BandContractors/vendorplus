@@ -21,6 +21,7 @@ public class ItemProductionMap implements Serializable {
     private long OutputItemId;
     private long InputItemId;
     private double InputQty;
+    private double InputQtyTotal;
     private String OutputItemName;
     private String InputItemName;
     private String OutputItemUnit;
@@ -196,6 +197,20 @@ public class ItemProductionMap implements Serializable {
      */
     public void setStockId(long StockId) {
         this.StockId = StockId;
+    }
+
+    /**
+     * @return the InputQtyTotal
+     */
+    public double getInputQtyTotal() {
+        return InputQtyTotal;
+    }
+
+    /**
+     * @param InputQtyTotal the InputQtyTotal to set
+     */
+    public void setInputQtyTotal(double InputQtyTotal) {
+        this.InputQtyTotal = InputQtyTotal;
     }
 
 }

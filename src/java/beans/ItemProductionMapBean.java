@@ -6,6 +6,7 @@ import entities.GroupRight;
 import entities.Item;
 import entities.UserDetail;
 import entities.ItemProductionMap;
+import entities.TransItem;
 import java.io.Serializable;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -596,6 +597,7 @@ public class ItemProductionMapBean implements Serializable {
             im.setOutputItemId(0);
             im.setInputItemId(0);
             im.setInputQty(0);
+            im.setInputQtyTotal(0);
             //im.setMapGroupId(0);
             im.setBatchno("");
             im.setCodeSpecific("");
@@ -809,6 +811,36 @@ public class ItemProductionMapBean implements Serializable {
                     aItemProductionMap.setCodeSpecific("");
                     aItemProductionMap.setDescSpecific("");
                     aItemProductionMap.setInputQty(0);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("updateLookUpsUIInput:" + e.getMessage());
+        }
+    }
+
+    public void updateModelInput(ItemProductionMap aItemProductionMap, Item aItem, TransItem aTransItem) {
+        try {
+            if (null == aItem) {
+                //do nothing
+            } else {
+                try {
+                    aItemProductionMap.setInputItemId(aItem.getItemId());
+                    aItemProductionMap.setInputItemName(aItem.getDescription());
+                    aItemProductionMap.setInputItemUnit(new UnitBean().getUnit(aItem.getUnitId()).getUnitSymbol());
+                    aItemProductionMap.setBatchno("");
+                    aItemProductionMap.setCodeSpecific("");
+                    aItemProductionMap.setDescSpecific("");
+                    aItemProductionMap.setInputQty(1);
+                    aItemProductionMap.setInputQtyTotal(aItemProductionMap.getInputQty() * aTransItem.getItemQty());
+                } catch (NullPointerException npe) {
+                    aItemProductionMap.setInputItemId(0);
+                    aItemProductionMap.setInputItemName("");
+                    aItemProductionMap.setInputItemUnit("");
+                    aItemProductionMap.setBatchno("");
+                    aItemProductionMap.setCodeSpecific("");
+                    aItemProductionMap.setDescSpecific("");
+                    aItemProductionMap.setInputQty(0);
+                    aItemProductionMap.setInputQtyTotal(0);
                 }
             }
         } catch (Exception e) {

@@ -586,6 +586,55 @@ public class TransProductionBean implements Serializable {
         }
     }
 
+    public void updateUponChangeInputUnitQtyUsed(TransItem aTransItem, int aStoreId, ItemProductionMap aItemProductionMap) {
+        try {
+            aItemProductionMap.setInputQtyTotal(aTransItem.getItemQty() * aItemProductionMap.getInputQty());
+            this.updateUnitCostProduction(aTransItem, aStoreId);
+        } catch (Exception e) {
+            //do nothing
+        }
+    }
+
+    public void updateListUponChangeOutputQty(TransItem aTransItem, int aStoreId, List<ItemProductionMap> aItemProductionMapList) {
+        try {
+            for (ItemProductionMap obj : aItemProductionMapList) {
+                obj.setInputQtyTotal(aTransItem.getItemQty() * obj.getInputQty());
+            }
+            //this.updateUnitCostProduction(aTransItem, aStoreId);
+        } catch (Exception e) {
+            //do nothing
+        }
+    }
+
+    public void updateUponChangeInputUnitQtyUsed(TransItem aTransItem, ItemProductionMap aItemProductionMap) {
+        try {
+            aItemProductionMap.setInputQtyTotal(aTransItem.getItemQty() * aItemProductionMap.getInputQty());
+        } catch (Exception e) {
+            //do nothing
+        }
+    }
+
+    public void updateUponChangeInputTotalQtyUsed(TransItem aTransItem, int aStoreId, ItemProductionMap aItemProductionMap) {
+        try {
+            if (aTransItem.getItemQty() > 0) {
+                aItemProductionMap.setInputQty(aItemProductionMap.getInputQtyTotal() / aTransItem.getItemQty());
+            }
+            this.updateUnitCostProduction(aTransItem, aStoreId);
+        } catch (Exception e) {
+            //do nothing
+        }
+    }
+
+    public void updateUponChangeInputTotalQtyUsed(TransItem aTransItem, ItemProductionMap aItemProductionMap) {
+        try {
+            if (aTransItem.getItemQty() > 0) {
+                aItemProductionMap.setInputQty(aItemProductionMap.getInputQtyTotal() / aTransItem.getItemQty());
+            }
+        } catch (Exception e) {
+            //do nothing
+        }
+    }
+
     public void updateUnitCostProductionFromOutput(TransItem aTransItem, int aStoreId) {
         long LatestTransId = 0;
         try {
@@ -704,6 +753,7 @@ public class TransProductionBean implements Serializable {
             ipm.setCodeSpecific(aItemProductionMap.getCodeSpecific());
             ipm.setDescSpecific(aItemProductionMap.getDescSpecific());
             ipm.setInputQty(aItemProductionMap.getInputQty());
+            ipm.setInputQtyTotal(aItemProductionMap.getInputQtyTotal());
             new ItemProductionMapBean().updateLookUpsUIInput(ipm);
             //add
             this.getItmCombinationList().add(0, ipm);
@@ -746,6 +796,7 @@ public class TransProductionBean implements Serializable {
                 aItemProductionMap.setOutputItemId(0);
                 aItemProductionMap.setInputItemId(0);
                 aItemProductionMap.setInputQty(0);
+                aItemProductionMap.setInputQtyTotal(0);
             }
         } catch (Exception e) {
             System.out.println("clearTransProductionItem:" + e.getMessage());
@@ -1529,6 +1580,48 @@ public class TransProductionBean implements Serializable {
                 itemProductionMap.setOutputItemId(0);
                 itemProductionMap.setInputItemId(rs.getLong("input_item_id"));
                 itemProductionMap.setInputQty(rs.getDouble("input_qty"));
+                itemProductionMap.setInputQtyTotal(rs.getDouble("input_qty"));
+                itemProductionMap.setBatchno("");
+                itemProductionMap.setCodeSpecific("");
+                itemProductionMap.setDescSpecific("");
+                ipmb.updateLookUpsUIInput(itemProductionMap);
+                getItmCombinationList().add(itemProductionMap);
+            }
+//            return ItemProductionMaps2;
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+//            return null;
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.err.println(ex.getMessage());
+                }
+            }
+        }
+    }
+
+    public void getItemProductionMapsByParentItemId(long aParentId, TransItem aTransItem) {
+        String sql = "{call sp_search_item_production_map_by_output_item_id(?)}";
+        ResultSet rs = null;
+        this.setItmCombinationList(new ArrayList<ItemProductionMap>());
+        getItmCombinationList().clear();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aParentId);
+            rs = ps.executeQuery();
+            ItemProductionMapBean ipmb = new ItemProductionMapBean();
+            while (rs.next()) {
+                ItemProductionMap itemProductionMap = new ItemProductionMap();
+                //itemProductionMap.setItemProductionMapId(rs.getLong("item_production_map_id"));
+                itemProductionMap.setItemProductionMapId(0);
+                //itemProductionMap.setOutputItemId(rs.getLong("output_item_id"));
+                itemProductionMap.setOutputItemId(0);
+                itemProductionMap.setInputItemId(rs.getLong("input_item_id"));
+                itemProductionMap.setInputQty(rs.getDouble("input_qty"));
+                itemProductionMap.setInputQtyTotal(aTransItem.getItemQty() * rs.getDouble("input_qty"));
                 itemProductionMap.setBatchno("");
                 itemProductionMap.setCodeSpecific("");
                 itemProductionMap.setDescSpecific("");
