@@ -120,7 +120,7 @@ public class Trans implements Serializable {
     private double deposit_customer;
     private double deposit_supplier;
     private double balance_receivable2;
-    private double balanace_payable2;
+    private double balance_payable2;
     private double deposit_customer2;
     private double deposit_supplier2;
     private long location_id;
@@ -1443,17 +1443,17 @@ public class Trans implements Serializable {
     }
 
     /**
-     * @return the balanace_payable2
+     * @return the balance_payable2
      */
-    public double getBalanace_payable2() {
-        return balanace_payable2;
+    public double getBalance_payable2() {
+        return balance_payable2;
     }
 
     /**
-     * @param balanace_payable2 the balanace_payable2 to set
+     * @param balance_payable2 the balance_payable2 to set
      */
-    public void setBalanace_payable2(double balanace_payable2) {
-        this.balanace_payable2 = balanace_payable2;
+    public void setBalance_payable2(double balance_payable2) {
+        this.balance_payable2 = balance_payable2;
     }
 
     /**

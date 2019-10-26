@@ -48,6 +48,10 @@ public class NavigationBean implements Serializable {
     public String redirectToCompanySetting() {
         return "CompanySetting?faces-redirect=true";
     }
+    
+    public String redirectToTransactorMerge() {
+        return "TransactorMerge?faces-redirect=true";
+    }
 
     public String redirectToDiscountPackage() {
         return "DiscountPackage?faces-redirect=true";

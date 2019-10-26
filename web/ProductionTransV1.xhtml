@@ -142,6 +142,8 @@
                                 <f:ajax event="change" listener="#{transProductionBean.specifySizeProduced(transItem)}" render="itxtQty totQty dtbRawItem"/>
                                 <f:ajax event="keyup" listener="#{transProductionBean.specifySizeProduced(transItem)}" render="itxtQty totQty dtbRawItem"/>
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:ajax event="change" listener="#{transProductionBean.updateListUponChangeOutputQty(transItem,generalUserSetting.currentStore.storeId,transProductionBean.itmCombinationList)}" execute="@this" render="totQty dtbRawItem"/>
+                                <f:ajax event="keyup" listener="#{transProductionBean.updateListUponChangeOutputQty(transItem,generalUserSetting.currentStore.storeId,transProductionBean.itmCombinationList)}" execute="@this" render="totQty dtbRawItem"/>
                             </h:inputText>
                             <h:inputText id="itxtUnitSize" style="width: 100px" value="#{transItem.specific_size}" autocomplete="off" disabled="true">
                                 <f:ajax event="change" listener="#{transProductionBean.specifySizeProduced(transItem)}" render="itxtQty totQty dtbRawItem"/>

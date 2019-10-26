@@ -194,7 +194,7 @@
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
-                        <f:ajax listener="#{transactorBean.deleteTransactor(transactorBean.transactorObj,transactorBean.salaryDeductions)}" execute="@form" render="@form" />
+                        <f:ajax listener="#{transactorBean.deleteTransactorCall(transactorBean.transactorObj,transactorBean.salaryDeductions)}" execute="@form" render="@form" />
                     </p:commandButton>
                 </h:panelGrid>
             </h:panelGrid>

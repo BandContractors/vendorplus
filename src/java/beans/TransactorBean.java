@@ -4,6 +4,7 @@ import sessions.GeneralUserSetting;
 import connections.DBConnection;
 import entities.GroupRight;
 import entities.SalaryDeduction;
+import entities.Trans;
 import entities.Transactor;
 import entities.UserDetail;
 import java.io.Serializable;
@@ -38,9 +39,9 @@ import utilities.CustomValidator;
 @ManagedBean
 @SessionScoped
 public class TransactorBean implements Serializable {
-
+    
     private static final long serialVersionUID = 1L;
-
+    
     private List<Transactor> Transactors;
     private String ActionMessage = null;
     private String SearchTransactorNames = "";
@@ -52,7 +53,7 @@ public class TransactorBean implements Serializable {
     private List<SalaryDeduction> SalaryDeductions;
     private List<Transactor> TransactorList = new ArrayList<Transactor>();
     private Transactor TransactorObj;
-
+    
     public Transactor findTransactor(Long TransactorId) {
         String sql = "{call sp_search_transactor_by_id(?)}";
         ResultSet rs = null;
@@ -79,7 +80,7 @@ public class TransactorBean implements Serializable {
             }
         }
     }
-
+    
     public void initTransactorObj() {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -92,7 +93,7 @@ public class TransactorBean implements Serializable {
             this.setNewTransctorRef(this.TransactorObj);
         }
     }
-
+    
     public void setNewTransctorRef(Transactor aTransactor) {
         try {
             long aRefNoId;
@@ -106,10 +107,10 @@ public class TransactorBean implements Serializable {
             aRefNoStr = Long.toString(aRefNoId);
             aTransactor.setTransactorRef(aRefNoStr);
         } catch (NullPointerException npe) {
-
+            
         }
     }
-
+    
     public String validateTransactor(Transactor transactor, List<SalaryDeduction> aSalaryDeductions) {
         String sql = null;
         String msg = "";
@@ -120,7 +121,7 @@ public class TransactorBean implements Serializable {
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
-
+        
         if (transactor.getTransactorId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, new NavigationBean().getTransactorReasonStr(new GeneralUserSetting().getTransactorType()), "Add") == 0) {
             msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
         } else if (transactor.getTransactorId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, new NavigationBean().getTransactorReasonStr(new GeneralUserSetting().getTransactorType()), "Edit") == 0) {
@@ -137,40 +138,40 @@ public class TransactorBean implements Serializable {
             msg = "Transactor's email cannot exceed 100 characters";
         } else if (new CustomValidator().TextSize(transactor.getWebsite(), 0, 100).equals("FAIL")) {
             msg = "Transactor's website cannot exceed 100 characters";
-
+            
         } else if (new CustomValidator().TextSize(transactor.getCpName(), 0, 100).equals("FAIL")) {
             msg = "Contact person's name cannot exceed 100 characters";
-
+            
         } else if (new CustomValidator().TextSize(transactor.getCpTitle(), 0, 100).equals("FAIL")) {
             msg = "Contact person's title cannot exceed 100 characters";
-
+            
         } else if (new CustomValidator().TextSize(transactor.getCpPhone(), 0, 100).equals("FAIL")) {
             msg = "Contact person's phone cannot exceed 100 characters";
-
+            
         } else if (new CustomValidator().TextSize(transactor.getCpEmail(), 0, 100).equals("FAIL")) {
             msg = "Contact person's email cannot exceed 100 characters";
-
+            
         } else if (new CustomValidator().TextSize(transactor.getPhysicalAddress(), 0, 255).equals("FAIL")) {
             msg = "Physical address cannot exceed 255 characters";
-
+            
         } else if (new CustomValidator().TextSize(transactor.getTaxIdentity(), 0, 100).equals("FAIL")) {
             msg = "Tax Identity cannot exceed 100 characters";
-
+            
         } else if (new CustomValidator().TextSize(transactor.getAccountDetails(), 0, 255).equals("FAIL")) {
             msg = "Account details cannot exceed 255 characters";
-
+            
         } else if ((new CustomValidator().CheckRecords(sql2) > 0 && transactor.getTransactorId() == 0) || (new CustomValidator().CheckRecords(sql3) > 0 && transactor.getTransactorId() > 0)) {
             msg = "Transactor Name(s) already exists, please enter different name(s) !";
         }
         return msg;
     }
-
+    
     public void saveTransactor(Transactor transactor, List<SalaryDeduction> aSalaryDeductions) {
         String sql = null;
         String msg = "";
         GroupRightBean grb = new GroupRightBean();
         String ValidationMsg = this.validateTransactor(transactor, aSalaryDeductions);
-
+        
         if (ValidationMsg.length() > 0) {
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ValidationMsg));
         } else {
@@ -198,7 +199,7 @@ public class TransactorBean implements Serializable {
             }
         }
     }
-
+    
     public long insertUpdateTransactor(Transactor transactor) {
         String sql = null;
         long status = 0;
@@ -291,7 +292,7 @@ public class TransactorBean implements Serializable {
         }
         return status;
     }
-
+    
     public Transactor getTransactorFromResultSet(ResultSet rs) {
         try {
             Transactor transactor = new Transactor();
@@ -415,7 +416,7 @@ public class TransactorBean implements Serializable {
             } catch (NullPointerException npe) {
                 transactor.setFirstDate(null);
             }
-
+            
             try {
                 transactor.setFileReference(rs.getString("file_reference"));
             } catch (NullPointerException npe) {
@@ -466,7 +467,7 @@ public class TransactorBean implements Serializable {
             return null;
         }
     }
-
+    
     public void setTransactorFromResultSet(Transactor transactor, ResultSet rs) {
         try {
             //Transactor transactor = new Transactor();
@@ -590,7 +591,7 @@ public class TransactorBean implements Serializable {
             } catch (NullPointerException npe) {
                 transactor.setFirstDate(null);
             }
-
+            
             try {
                 transactor.setFileReference(rs.getString("file_reference"));
             } catch (NullPointerException npe) {
@@ -639,7 +640,7 @@ public class TransactorBean implements Serializable {
         } catch (SQLException se) {
         }
     }
-
+    
     public Transactor getTransactor(long TransactorId) {
         String sql = "{call sp_search_transactor_by_id(?)}";
         ResultSet rs = null;
@@ -666,7 +667,7 @@ public class TransactorBean implements Serializable {
             }
         }
     }
-
+    
     public long getCurrentTransactorRefNo() {
         long curno = 0;
         String sql = "select cast(max(transactor_ref)+0 as SIGNED) as current_no from transactor WHERE transactor_ref>0";
@@ -702,7 +703,7 @@ public class TransactorBean implements Serializable {
         }
         return curno;
     }
-
+    
     public long getCountTransactors() {
         long curcount = 0;
         String sql = "select count(*) as current_count from transactor;";
@@ -733,7 +734,7 @@ public class TransactorBean implements Serializable {
         }
         return curcount;
     }
-
+    
     public void setTransactor(Transactor aTransactor, long TransactorId) {
         String sql = "{call sp_search_transactor_by_id(?)}";
         ResultSet rs = null;
@@ -749,39 +750,90 @@ public class TransactorBean implements Serializable {
             System.err.println("setTransactor:" + e.getMessage());
         }
     }
-
-    public void deleteTransactor(Transactor aTransactor, List<SalaryDeduction> aSalaryDeductions) {
-        String sql = "DELETE FROM transactor WHERE transactor_id=?";
+    
+    public void deleteTransactorCall(Transactor aTransactor, List<SalaryDeduction> aSalaryDeductions) {
         String msg = "";
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
-
-        if (aTransactor.getTransactorId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, new NavigationBean().getTransactorReasonStr(new GeneralUserSetting().getTransactorType()), "Delete") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else {
-            if (this.getTransactorRecords(aTransactor.getTransactorId()) > 0) {
-                msg = new GeneralUserSetting().getTransactorType() + " has transactions in the system; cannot be deleted; try suspending instead!";
+        try {
+            if (aTransactor.getTransactorId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, new NavigationBean().getTransactorReasonStr(new GeneralUserSetting().getTransactorType()), "Delete") == 0) {
+                msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
             } else {
-                try (
-                        Connection conn = DBConnection.getMySQLConnection();
-                        PreparedStatement ps = conn.prepareStatement(sql);) {
-                    ps.setLong(1, aTransactor.getTransactorId());
-                    ps.executeUpdate();
-                    msg = "Deleted Successfully!";
+                if (this.getTransactorRecords(aTransactor.getTransactorId()) > 0) {
+                    msg = new GeneralUserSetting().getTransactorType() + " has transactions in the system; cannot be deleted; try suspending instead!";
                     FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-                    this.clearTransactor2(aTransactor, aSalaryDeductions);
-                } catch (Exception e) {
-                    System.err.println("deleteTransactor:" + e.getMessage());
-                    msg = "Transactor NOT deleted";
+                } else {
+                    int status = this.deleteTransactor(aTransactor.getTransactorId());
+                    if (status == 1) {
+                        msg = "Deleted Successfully!";
+                        FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+                        this.clearTransactor2(aTransactor, aSalaryDeductions);
+                    } else {
+                        msg = "Transactor NOT deleted!";
+                        FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("deleteTransactorCall:" + e.getMessage());
+            msg = "Transactor NOT deleted";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+        }
+    }
+    
+    public int deleteTransactor(long aTransactorId) {
+        int status = 0;
+        String sql = "DELETE FROM transactor WHERE transactor_id=?";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aTransactorId);
+            ps.executeUpdate();
+            status = 1;
+        } catch (Exception e) {
+            status = 0;
+            System.err.println("deleteTransactor:" + e.getMessage());
+        }
+        return status;
+    }
+    
+    public void mergeTransactorRecordsCall(Trans aTrans, Transactor aTransactor, Transactor aBillTransactor) {
+        String msg = "";
+        UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
+        List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
+        GroupRightBean grb = new GroupRightBean();
+        try {
+            if (aTrans.getTransactorId() == 0 || aTrans.getBillTransactorId() == 0) {
+                msg = "Please select valid partner(s)...";
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            } else if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "View") == 0) {
+                msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            } else {
+                int merged = this.mergeTransactorRecords(aTrans.getTransactorId(), aTrans.getBillTransactorId());
+                int deleted = 0;
+                if (merged == 0) {
+                    msg = "Its possible records are not fully merged; please try again or contact administrator!";
+                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+                } else {
+                    deleted = this.deleteTransactor(aTrans.getBillTransactorId());
+                }
+                if (deleted == 1) {
+                    msg = "Records merged and deleted Successfully!";
+                    new TransBean().initTransactorMerge(aTrans, aTransactor, aBillTransactor);
+                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+                } else {
+                    msg = "Its possible records are fully merged but partner not deleted; please try again or contact administrator!";
                     FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
                 }
             }
+        } catch (Exception e) {
+            System.err.println("mergeTransactorRecordsCall:" + e.getMessage());
         }
     }
-
+    
     public void displayTransactor(Transactor TransactorFrom, Transactor TransactorTo) {
         TransactorTo.setTransactorId(TransactorFrom.getTransactorId());
         TransactorTo.setTransactorType(TransactorFrom.getTransactorType());
@@ -819,7 +871,7 @@ public class TransactorBean implements Serializable {
         //new SalaryDeductionBean().setSalaryDeductions(TransactorFrom.getTransactorId(), this.SalaryDeductions);
         this.SalaryDeductions = new SalaryDeductionBean().getSalaryDeductions(TransactorFrom.getTransactorId());
     }
-
+    
     public void clearTransactor(Transactor transactor) {
         if (transactor != null) {
             transactor.setTransactorId(0);
@@ -857,7 +909,7 @@ public class TransactorBean implements Serializable {
             transactor.setMonthNetPay(0);
         }
     }
-
+    
     public void clearTransactor2(Transactor transactor, List<SalaryDeduction> aSalaryDeductions) {
         if (transactor != null) {
             transactor.setTransactorId(0);
@@ -902,7 +954,7 @@ public class TransactorBean implements Serializable {
             this.setNewTransctorRef(transactor);
         }
     }
-
+    
     public void initClearTransactor(Transactor transactor) {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -945,7 +997,7 @@ public class TransactorBean implements Serializable {
             }
         }
     }
-
+    
     public void initClearTransactor2(Transactor transactor, List<SalaryDeduction> aSalaryDeductions) {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -992,15 +1044,15 @@ public class TransactorBean implements Serializable {
             }
         }
     }
-
+    
     public void clearSelectedTransactor() {
         this.clearTransactor(this.getSelectedTransactor());
     }
-
+    
     public void clearSelectedBillTransactor() {
         this.clearTransactor(this.getSelectedBillTransactor());
     }
-
+    
     public List<Transactor> getTransactors() {
         String sql;
         sql = "{call sp_search_transactor_by_name(?)}";
@@ -1027,7 +1079,7 @@ public class TransactorBean implements Serializable {
         }
         return Transactors;
     }
-
+    
     public void refreshTransactorsListByNameRefFile(String aName, String aType) {
         String sql;
         sql = "{call sp_search_transactor_by_name_ref_file(?,?)}";
@@ -1054,7 +1106,7 @@ public class TransactorBean implements Serializable {
             }
         }
     }
-
+    
     public List<Transactor> getTransactorsByNameType(String aName, String aType) {
         String sql;
         sql = "{call sp_search_transactor_by_name_type(?,?)}";
@@ -1082,7 +1134,7 @@ public class TransactorBean implements Serializable {
         }
         return NewTransactors;
     }
-
+    
     public void setTransactors(List<Transactor> Transactors) {
         this.Transactors = Transactors;
     }
@@ -1148,7 +1200,7 @@ public class TransactorBean implements Serializable {
         }
         return TransactorObjectList;
     }
-    
+
     /**
      * @param Query
      * @return the TransactorObjectList
@@ -1179,7 +1231,7 @@ public class TransactorBean implements Serializable {
         }
         return TransactorObjectList;
     }
-
+    
     public List<Transactor> getReportTransactors(Transactor aTransactor, boolean RETRIEVE_REPORT) {
         String sql = "{call sp_report_transactor(?)}";
         ResultSet rs = null;
@@ -1209,7 +1261,7 @@ public class TransactorBean implements Serializable {
         }
         return this.ReportTransactors;
     }
-
+    
     public void reportTransactors(String aTransactorType) {
         String sql = "{call sp_report_transactor(?)}";
         ResultSet rs = null;
@@ -1236,7 +1288,7 @@ public class TransactorBean implements Serializable {
             }
         }
     }
-
+    
     public void addSalaryDeduction() {
         try {
             if (null == this.getSalaryDeductions()) {
@@ -1252,19 +1304,19 @@ public class TransactorBean implements Serializable {
             npe.printStackTrace();
         }
     }
-
+    
     public void removeSalaryDeduction(Transactor aTransactor, SalaryDeduction aSalaryDeduction) {
         if (null == this.getSalaryDeductions()) {
-
+            
         } else {
             this.getSalaryDeductions().remove(aSalaryDeduction);
         }
         this.refreshTotalSalaryDeductions(aTransactor);
     }
-
+    
     public void calcSalaryDeductionPerc(Transactor aTransactor, SalaryDeduction aSalaryDeduction) {
         if (null == aSalaryDeduction) {
-
+            
         } else {
             if (aTransactor.getMonthGrossPay() > 0) {
                 aSalaryDeduction.setPerc((aSalaryDeduction.getAmount() / aTransactor.getMonthGrossPay()) * 100);
@@ -1274,16 +1326,16 @@ public class TransactorBean implements Serializable {
             aTransactor.setMonthNetPay(aTransactor.getMonthGrossPay() - this.getTotalSalaryDeductions());
         }
     }
-
+    
     public void calcSalaryDeductionAmount(Transactor aTransactor, SalaryDeduction aSalaryDeduction) {
         if (null == aSalaryDeduction) {
-
+            
         } else {
             aSalaryDeduction.setAmount((aSalaryDeduction.getPerc() * aTransactor.getMonthGrossPay()) / 100);
         }
         aTransactor.setMonthNetPay(aTransactor.getMonthGrossPay() - this.getTotalSalaryDeductions());
     }
-
+    
     public void setTotalSalaryDeductions(double aAmount) {
         List<SalaryDeduction> sds = this.getSalaryDeductions();
         int ListItemIndex = 0;
@@ -1295,7 +1347,7 @@ public class TransactorBean implements Serializable {
         }
         aAmount = Total;
     }
-
+    
     public double getTotalSalaryDeductions() {
         List<SalaryDeduction> sds = this.getSalaryDeductions();
         int ListItemIndex = 0;
@@ -1307,7 +1359,7 @@ public class TransactorBean implements Serializable {
         }
         return Total;
     }
-
+    
     public void initClearTransactor(Transactor aTransactor, List<Transactor> aTransactorList, List<Transactor> aTransactorListSummary) {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -1332,13 +1384,13 @@ public class TransactorBean implements Serializable {
             }
         }
     }
-
+    
     public void openChildTransactor(String aTransactorType) {
         FacesContext context = FacesContext.getCurrentInstance();
         HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
         HttpSession httpSession = request.getSession(false);
         httpSession.setAttribute("TRANSACTOR_TYPE", aTransactorType);
-
+        
         Map<String, Object> options = new HashMap<String, Object>();
         options.put("modal", true);
         options.put("draggable", false);
@@ -1352,7 +1404,7 @@ public class TransactorBean implements Serializable {
         options.put("dynamic", true);
         org.primefaces.PrimeFaces.current().dialog().openDynamic("TransactorChild", options, null);
     }
-
+    
     public long getTransactorRecords(long aTransactorId) {
         String sql = "{call sp_search_records_by_transactor(?)}";
         ResultSet rs = null;
@@ -1370,11 +1422,28 @@ public class TransactorBean implements Serializable {
         }
         return records;
     }
-
+    
+    public int mergeTransactorRecords(long aToTransactorId, long aFromTransactorId) {
+        int status = 0;
+        String sql = "{call sp_merge_records_by_transactor(?,?)}";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aFromTransactorId);
+            ps.setLong(2, aToTransactorId);
+            ps.executeUpdate();
+            status = 1;
+        } catch (Exception e) {
+            status = 0;
+            System.err.println("mergeTransactorRecords:" + e.getMessage());
+        }
+        return status;
+    }
+    
     public void refreshTotalSalaryDeductions(Transactor aTransactor) {
         aTransactor.setMonthNetPay(aTransactor.getMonthGrossPay() - this.getTotalSalaryDeductions());
     }
-
+    
     public long getReportTransactorsCount() {
         return this.ReportTransactors.size();
     }

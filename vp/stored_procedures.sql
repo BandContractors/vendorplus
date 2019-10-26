@@ -10092,7 +10092,42 @@ BEGIN
 	UNION 
 	SELECT 'acc_journal' as table_name,count(*) as records FROM acc_journal t4 where t4.bill_transactor_id=in_transactor_id 
 	UNION 
-	SELECT 'acc_ledger' as table_name,count(*) as records FROM acc_ledger t5 where t5.bill_transactor_id=in_transactor_id
+	SELECT 'acc_ledger' as table_name,count(*) as records FROM acc_ledger t5 where t5.bill_transactor_id=in_transactor_id 
+	UNION 
+	SELECT 'site' as table_name,count(*) as records FROM site t6 where t6.transactor_id=in_transactor_id 
+	UNION 
+	SELECT 'stock_out' as table_name,count(*) as records FROM stock_out t7 where t7.transactor_id=in_transactor_id 
 	; 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_merge_records_by_transactor;
+DELIMITER //
+CREATE PROCEDURE sp_merge_records_by_transactor
+(
+	IN in_from_transactor_id bigint,
+	IN in_to_transactor_id bigint
+) 
+BEGIN 
+	UPDATE transaction SET transactor_id=in_to_transactor_id WHERE transaction_id>0 AND transactor_id=in_from_transactor_id;
+	UPDATE transaction SET bill_transactor_id=in_to_transactor_id WHERE transaction_id>0 AND bill_transactor_id=in_from_transactor_id;
+	
+	UPDATE trans_production SET transactor_id=in_to_transactor_id WHERE transaction_id>0 AND transactor_id=in_from_transactor_id;
+	
+	UPDATE pay SET bill_transactor_id=in_to_transactor_id WHERE pay_id>0 AND bill_transactor_id=in_from_transactor_id;
+
+	UPDATE acc_journal SET bill_transactor_id=in_to_transactor_id WHERE acc_journal_id>0 AND bill_transactor_id=in_from_transactor_id;
+	UPDATE acc_journal_payable SET bill_transactor_id=in_to_transactor_id WHERE acc_journal_id>0 AND bill_transactor_id=in_from_transactor_id;
+	UPDATE acc_journal_prepaid SET bill_transactor_id=in_to_transactor_id WHERE acc_journal_id>0 AND bill_transactor_id=in_from_transactor_id;
+	UPDATE acc_journal_receivable SET bill_transactor_id=in_to_transactor_id WHERE acc_journal_id>0 AND bill_transactor_id=in_from_transactor_id;
+
+	UPDATE acc_ledger SET bill_transactor_id=in_to_transactor_id WHERE acc_ledger_id>0 AND bill_transactor_id=in_from_transactor_id; 
+	UPDATE acc_ledger_open_bal SET bill_transactor_id=in_to_transactor_id WHERE acc_ledger_open_bal_id>0 AND bill_transactor_id=in_from_transactor_id;
+	UPDATE acc_ledger_payable SET bill_transactor_id=in_to_transactor_id WHERE acc_ledger_id>0 AND bill_transactor_id=in_from_transactor_id;
+	UPDATE acc_ledger_prepaid SET bill_transactor_id=in_to_transactor_id WHERE acc_ledger_id>0 AND bill_transactor_id=in_from_transactor_id;
+	UPDATE acc_ledger_receivable SET bill_transactor_id=in_to_transactor_id WHERE acc_ledger_id>0 AND bill_transactor_id=in_from_transactor_id;
+	
+	UPDATE site SET transactor_id=in_to_transactor_id WHERE site_id>0 AND transactor_id=in_from_transactor_id;
+	UPDATE stock_out SET transactor_id=in_to_transactor_id WHERE stock_out_id>0 AND transactor_id=in_from_transactor_id;
 END//
 DELIMITER ;

@@ -340,7 +340,7 @@ public class Alert_generalBean implements Serializable {
             }
             alertgeneral.setSubject(subject);
             String message = aItem.getStock_status() + " for item (" + aItem.getDescription() + ")"
-                    + " Current Quantity:" + aItem.getQty_total() + " ReOrderLevel:" + aItem.getReorderLevel();
+                    + ", Current Quantity:" + new UtilityBean().formatDoubleToString(aItem.getQty_total()) + ", Set ReOrderLevel:" + new UtilityBean().formatDoubleToString(aItem.getReorderLevel()) + " " + new UnitBean().getUnit(aItem.getUnitId()).getUnitSymbol();
             alertgeneral.setMessage(message);
             alertgeneral.setAlert_users(new UserDetailBean().getUserDetailIDsForFunction("112", "allow_view"));
             alertgeneral.setRead_by("");

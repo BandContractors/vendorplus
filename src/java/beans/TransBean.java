@@ -7224,6 +7224,10 @@ public class TransBean implements Serializable {
             trans.setBalance_payable(0);
             trans.setDeposit_customer(0);
             trans.setDeposit_supplier(0);
+            trans.setBalance_receivable2(0);
+            trans.setBalance_payable2(0);
+            trans.setDeposit_customer2(0);
+            trans.setDeposit_supplier2(0);
             trans.setLocation_id(0);
             trans.setStatus_code("");
             trans.setStatus_date(null);
@@ -7343,6 +7347,10 @@ public class TransBean implements Serializable {
         trans.setBalance_payable(0);
         trans.setDeposit_customer(0);
         trans.setDeposit_supplier(0);
+        trans.setBalance_receivable2(0);
+        trans.setBalance_payable2(0);
+        trans.setDeposit_customer2(0);
+        trans.setDeposit_supplier2(0);
         trans.setLocation_id(0);
         trans.setStatus_code("");
         trans.setStatus_date(null);
@@ -14336,6 +14344,23 @@ public class TransBean implements Serializable {
         }
     }
 
+    public void refreshSupplierBalances2(Trans aTrans) {
+        //payable balances
+        try {
+            //aTrans.setBalance_payable(new AccLedgerBean().getPayableAccBalance(aTrans.getTransactorId()));
+            aTrans.setBalance_payable2(new AccLedgerBean().getPayableAccBalanceTrade(aTrans.getBillTransactorId()));
+        } catch (Exception e) {
+            aTrans.setBalance_payable2(0);
+        }
+        //prepaid expense
+        try {
+            //aTrans.setDeposit_supplier(new AccLedgerBean().getPrepaidExpenseAccBalance(aTrans.getTransactorId(), aTrans.getCurrencyCode()));
+            aTrans.setDeposit_supplier2(new AccLedgerBean().getPrepaidExpenseAccBalanceTrade(aTrans.getBillTransactorId(), aTrans.getCurrencyCode()));
+        } catch (Exception e) {
+            aTrans.setDeposit_supplier(0);
+        }
+    }
+
     public void openChildCashDiscount() {
         Map<String, Object> options = new HashMap<String, Object>();
         options.put("modal", true);
@@ -15073,6 +15098,17 @@ public class TransBean implements Serializable {
             ListItemIndex = ListItemIndex + 1;
         }
         this.OrderSummaryTotal = SubT;
+    }
+
+    public void initTransactorMerge(Trans aTrans, Transactor aTransactor, Transactor aBillTransactor) {
+        if (null == aTrans) {
+            //do nothing
+        } else {
+            this.clearTrans(aTrans);
+            new TransactorBean().clearTransactor(aTransactor);
+            new TransactorBean().clearTransactor(aBillTransactor);
+            aTrans.setCurrencyCode(new AccCurrencyBean().getLocalCurrency().getCurrencyCode());
+        }
     }
 
     /**

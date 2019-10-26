@@ -3,7 +3,6 @@ package beans;
 import connections.DBConnection;
 import entities.Cdc_general;
 import entities.CompanySetting;
-import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,7 +16,6 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import sessions.GeneralUserSetting;
 import utilities.UtilityBean;
 
 /*
