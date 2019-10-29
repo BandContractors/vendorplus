@@ -1344,6 +1344,7 @@ public class PayBean implements Serializable {
             pay.setPrincipalAmount(0);
             pay.setInterestAmount(0);
             pay.setPay_number("");
+            pay.setAccountBalance(0);
         }
         if (aPayTranss != null) {
             aPayTranss.clear();
@@ -1381,6 +1382,7 @@ public class PayBean implements Serializable {
             pay.setPrincipalAmount(0);
             pay.setInterestAmount(0);
             pay.setPay_number("");
+            pay.setAccountBalance(0);
         }
         if (aPayTranss != null) {
             aPayTranss.clear();
@@ -1428,6 +1430,7 @@ public class PayBean implements Serializable {
                 pay.setPrincipalAmount(0);
                 pay.setInterestAmount(0);
                 pay.setPay_number("");
+                pay.setAccountBalance(0);
             }
             new TransactorBean().clearTransactor(transactor);
             if (aPayTranss != null) {

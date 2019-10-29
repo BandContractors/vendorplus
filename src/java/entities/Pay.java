@@ -55,6 +55,8 @@ public class Pay implements Serializable {
     private String PaidForSummary;
     private String PayReasonName;
     private String ChildAccountName;
+    
+    private double AccountBalance;
 
     /**
      * @return the PayId
@@ -502,5 +504,19 @@ public class Pay implements Serializable {
      */
     public void setChildAccountName(String ChildAccountName) {
         this.ChildAccountName = ChildAccountName;
+    }
+
+    /**
+     * @return the AccountBalance
+     */
+    public double getAccountBalance() {
+        return AccountBalance;
+    }
+
+    /**
+     * @param AccountBalance the AccountBalance to set
+     */
+    public void setAccountBalance(double AccountBalance) {
+        this.AccountBalance = AccountBalance;
     }
 }

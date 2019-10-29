@@ -48,19 +48,20 @@
                 <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:Cash↓ Liability↑"/>
             </h:panelGrid>
             <h:panelGrid id="pnlSearch" styleClass="clsGridMainInput" style="background-color: #b3f2b3;width: 100%;">
-                <h:panelGrid columns="6">
+                <h:panelGrid columns="8">
                     <h:outputLabel  value="Currency:"/>
                     <h:selectOneMenu styleClass="clsMenu" id="menuCurrency" value="#{pay.currencyCode}">
                         <f:selectItems value="#{accCurrencyBean.currencyList}" var="ac" itemLabel="#{ac.currencyCode}" itemValue="#{ac.currencyCode}"/>
                         <f:ajax event="change" execute="@this" render="pnlInput pnlButtons"/>
                     </h:selectOneMenu>
                     <h:outputLabel  value="Liability Account:"/>
-                    <h:selectOneMenu styleClass="clsMenu" style="width: 350px;" id="menuAccount2" value="#{payTrans.account_code}">
+                    <h:selectOneMenu styleClass="clsMenu" style="width: 300px;" id="menuAccount2" value="#{payTrans.account_code}">
                         <f:selectItem itemValue="" itemLabel=""/>
                         <f:selectItems value="#{accCoaBean.getAccCoaObjectListBeginWith1('2-00-000')}" var="ca" itemLabel="#{ca.accountName} (#{ca.accountCode})" itemValue="#{ca.accountCode}"/>
                         <f:ajax event="change" render="pnlButtons"/>
+                        <p:ajax event="blur" listener="#{accLedgerBean.refreshPayableAccBalance(payTrans.account_code,pay.billTransactorId,pay)}" update="itxtLiabBal"/>
                     </h:selectOneMenu>
-                    <h:outputLabel  value="Paid To:"/>
+                    <h:outputLabel  value="Partner:"/>
                     <p:autoComplete id="autcTransactor" value="#{payBean.selectedBillTransactor}" 
                                     completeMethod="#{transactorBean.getTransactorObjectList}" 
                                     var="trct" 
@@ -80,7 +81,12 @@
                         </p:column> 
                         <p:ajax event="itemSelect" listener="#{pay.setBillTransactorId(payBean.selectedBillTransactor.transactorId)}"/>
                         <p:ajax event="change" listener="#{pay.setBillTransactorId(payBean.selectedBillTransactor.transactorId)}" rendered="#{payBean.selectedBillTransactor!=null}"/>
+                        <p:ajax event="blur" listener="#{accLedgerBean.refreshPayableAccBalance(payTrans.account_code,pay.billTransactorId,pay)}" update="itxtLiabBal"/>
                     </p:autoComplete>
+                    <h:outputLabel  value="Account Balance:"/>
+                    <h:inputText disabled="true" style="color: coral;font-weight: bold;width: 160px;" id="itxtLiabBal" value="#{accJournalBean.returnBalanceString(pay.accountBalance)}">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:inputText>
                 </h:panelGrid>
             </h:panelGrid>
             <h:panelGrid id="pnlInput" columns="1">

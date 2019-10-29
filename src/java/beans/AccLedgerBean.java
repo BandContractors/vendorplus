@@ -7,6 +7,7 @@ import entities.AccIncomeStatement;
 import entities.AccJournal;
 import entities.AccLedger;
 import entities.AccPeriod;
+import entities.Pay;
 import entities.TransItem;
 import java.io.Serializable;
 import java.sql.CallableStatement;
@@ -44,6 +45,7 @@ public class AccLedgerBean implements Serializable {
     private List<AccLedger> AccLedgerCashAccBal;
     private List<AccLedger> AccLedgerReceivablesAccBal;
     private List<AccLedger> AccLedgerPayablesAccBal;
+    private double AccountBalance;
 
     public void setAccLedgerFromResultset(AccLedger accledger, ResultSet aResultSet) {
         try {
@@ -1582,6 +1584,87 @@ public class AccLedgerBean implements Serializable {
                     CreditBalance = CreditBalance + (accledger.getCreditAmountLc() - accledger.getDebitAmountLc());
                 }
             } catch (SQLException se) {
+                System.err.println("getPayableAccBalanceTrade:" + se.getMessage());
+            }
+        }
+        return CreditBalance;
+    }
+
+    public void refreshPayableAccBalance(String aAccountCode, long aBillTransactorId, Pay aPay) {
+        if (null == aPay) {
+            //do nothing
+        } else {
+            aPay.setAccountBalance(this.getPayableAccBalance(aAccountCode, aBillTransactorId));
+        }
+    }
+
+    public double getPayableAccBalance(String aAccountCode, long aBillTransactorId) {
+        double CreditBalance = 0;
+        String WhereBillTra = "";
+        String WhereAccCode = "";
+        String WhereSql = "";
+        if (aBillTransactorId > 0) {
+            WhereBillTra = "bill_transactor_id=" + aBillTransactorId;
+        }
+        if (aAccountCode.length() > 0) {
+            WhereAccCode = "al.account_code='" + aAccountCode + "'";
+        }
+        if (WhereAccCode.length() > 0 && aBillTransactorId > 0) {
+            WhereSql = WhereAccCode + " AND " + WhereBillTra;
+        } else if (WhereAccCode.length() > 0) {
+            WhereSql = WhereAccCode;
+        } else if (aBillTransactorId > 0) {
+            WhereSql = WhereBillTra;
+        }
+        if (WhereSql.length() > 0) {
+            String sqlsum = "SELECT al.currency_code,sum(al.debit_amount) as debit_amount,sum(al.credit_amount) as credit_amount,"
+                    + "sum(al.debit_amount_lc) as debit_amount_lc,sum(al.credit_amount_lc) as credit_amount_lc "
+                    + "FROM acc_ledger al "
+                    + "WHERE " + WhereSql + " group by al.currency_code";
+            ResultSet rs = null;
+            String LocCurCode = "";
+            try {
+                LocCurCode = new AccCurrencyBean().getLocalCurrency().getCurrencyCode();
+            } catch (NullPointerException npe) {
+                LocCurCode = "";
+            }
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sqlsum);) {
+                rs = ps.executeQuery();
+                AccLedger accledger = null;
+                while (rs.next()) {
+                    accledger = new AccLedger();
+                    try {
+                        accledger.setCurrencyCode(rs.getString("currency_code"));
+                    } catch (NullPointerException npe) {
+                        accledger.setCurrencyCode("");
+                    }
+                    try {
+                        accledger.setDebitAmount(rs.getDouble("debit_amount"));
+                    } catch (NullPointerException npe) {
+                        accledger.setDebitAmount(0);
+                    }
+                    try {
+                        accledger.setCreditAmount(rs.getDouble("credit_amount"));
+                    } catch (NullPointerException npe) {
+                        accledger.setCreditAmount(0);
+                    }
+                    try {
+                        //accledger.setDebitAmountLc(accledger.getDebitAmount() * new AccXrateBean().getXrateMultiply(LocCurCode, accledger.getCurrencyCode()));
+                        accledger.setDebitAmountLc(accledger.getDebitAmount() * new AccXrateBean().getXrateMultiply(accledger.getCurrencyCode(), LocCurCode));
+                    } catch (NullPointerException npe) {
+                        accledger.setDebitAmountLc(0);
+                    }
+                    try {
+                        //accledger.setCreditAmountLc(accledger.getCreditAmount() * new AccXrateBean().getXrateMultiply(LocCurCode, accledger.getCurrencyCode()));
+                        accledger.setCreditAmountLc(accledger.getCreditAmount() * new AccXrateBean().getXrateMultiply(accledger.getCurrencyCode(), LocCurCode));
+                    } catch (NullPointerException npe) {
+                        accledger.setCreditAmountLc(0);
+                    }
+                    CreditBalance = CreditBalance + (accledger.getCreditAmountLc() - accledger.getDebitAmountLc());
+                }
+            } catch (SQLException se) {
                 System.err.println("getPayableAccBalance:" + se.getMessage());
             }
         }
@@ -2541,5 +2624,19 @@ public class AccLedgerBean implements Serializable {
      */
     public void setAccLedgerPayablesAccBal(List<AccLedger> AccLedgerPayablesAccBal) {
         this.AccLedgerPayablesAccBal = AccLedgerPayablesAccBal;
+    }
+
+    /**
+     * @return the AccountBalance
+     */
+    public double getAccountBalance() {
+        return AccountBalance;
+    }
+
+    /**
+     * @param AccountBalance the AccountBalance to set
+     */
+    public void setAccountBalance(double AccountBalance) {
+        this.AccountBalance = AccountBalance;
     }
 }
