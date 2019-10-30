@@ -389,7 +389,16 @@ public class Alert_generalBean implements Serializable {
 
     public List<Alert_general> retrieveUserUnreadStockAlerts() {
         int userid = new GeneralUserSetting().getCurrentUser().getUserDetailId();
-        String sql = "select * from alert_general where " + userid + " IN(alert_users) and " + userid + " NOT IN(read_by) order by add_date desc LIMIT 100";
+        //String sql = "select * from alert_general where " + userid + " IN(alert_users) and " + userid + " NOT IN(read_by) order by add_date desc LIMIT 100";
+        String sql = "select * from alert_general where "
+                + "("
+                + "(alert_users REGEXP '^" + userid + ",') OR (alert_users REGEXP '," + userid + "$') OR  (alert_users REGEXP '," + userid + ",') OR alert_users='" + userid + "'"
+                + ") "
+                + "AND "
+                + "("
+                + "(read_by NOT REGEXP '^" + userid + ",') AND (read_by NOT REGEXP '," + userid + "$') AND  (read_by NOT REGEXP '," + userid + ",') AND read_by!='" + userid + "'"
+                + ")";
+        //System.out.println("SQL-ALERT:" + sql);
         ResultSet rs = null;
         List<Alert_general> aList = new ArrayList<>();
         try (
