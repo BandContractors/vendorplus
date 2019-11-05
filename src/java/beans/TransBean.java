@@ -2110,26 +2110,23 @@ public class TransBean implements Serializable {
     public void saveTransCECcallFromGDN(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
         long aChoiceId = 99;
         int TransTypeId = 0;
-        aChoiceId = trans.getSite_id();
-        if (aChoiceId == 1) {
-            TransTypeId = 2;
-        } else if (aChoiceId == 0) {
-            TransTypeId = 11;
+        TransTypeId = (int) trans.getSite_id();
+        if (TransTypeId == 0) {
+            //do nothing
         } else {
-            TransTypeId = 0;
-        }
-        //get some details
-        String XTransNo = trans.getTransactionRef();
-        //save
-        this.saveTransCEC(aLevel, aStoreId, aTransTypeId, aTransReasonId, aSaleType, trans, aActiveTransItems, aSelectedTransactor, aSelectedBillTransactor, aTransUserDetail, aSelectedSchemeTransactor, aAuthorisedByUserDetail, aSelectedAccCoa);
-        //update a few things needed after GDN saving
-        if (XTransNo.length() > 0 && TransTypeId > 0 && TransTypeId == 11) {
-            Trans XTrans = this.getTransByNumberType(XTransNo, TransTypeId);
-            //get order's GDN status 0,1,2
-            int DeliveryStatus = this.getOrderDeliveryStatus(XTrans);
-            //save GDN status if not 0
-            if (DeliveryStatus > 0) {
-                this.updateOrderStatus(XTrans.getTransactionId(), "is_delivered", DeliveryStatus);
+            //get some details
+            String XTransNo = trans.getTransactionRef();
+            //save
+            this.saveTransCEC(aLevel, aStoreId, aTransTypeId, aTransReasonId, aSaleType, trans, aActiveTransItems, aSelectedTransactor, aSelectedBillTransactor, aTransUserDetail, aSelectedSchemeTransactor, aAuthorisedByUserDetail, aSelectedAccCoa);
+            //update a few things needed after GDN saving
+            if (XTransNo.length() > 0 && TransTypeId > 0 && TransTypeId == 11) {
+                Trans XTrans = this.getTransByNumberType(XTransNo, TransTypeId);
+                //get order's GDN status 0,1,2
+                int DeliveryStatus = this.getOrderDeliveryStatus(XTrans);
+                //save GDN status if not 0
+                if (DeliveryStatus > 0) {
+                    this.updateOrderStatus(XTrans.getTransactionId(), "is_delivered", DeliveryStatus);
+                }
             }
         }
     }

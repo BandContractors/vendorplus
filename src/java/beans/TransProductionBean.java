@@ -842,6 +842,23 @@ public class TransProductionBean implements Serializable {
         return ItemString;
     }
 
+    public String getAnyInputItemQtyEqualZero(List<ItemProductionMap> aActiveTransItems) {
+        List<ItemProductionMap> ati = aActiveTransItems;
+        int ListItemIndex = 0;
+        int ListItemNo = ati.size();
+        String ItemString = "";
+        while (ListItemIndex < ListItemNo) {
+            if (ati.get(ListItemIndex).getInputQty() <= 0) {
+                ItemString = ati.get(ListItemIndex).getInputItemName();
+                break;
+            } else {
+                ItemString = "";
+            }
+            ListItemIndex = ListItemIndex + 1;
+        }
+        return ItemString;
+    }
+
     public String getAnyItemProducedQtyGreaterThanOrderedQty(TransItem aProducedItem, List<TransProduction> aOrderProducedList) {
         List<TransProduction> ati = aOrderProducedList;
         int ListItemIndex = 0;
@@ -863,6 +880,7 @@ public class TransProductionBean implements Serializable {
         String msg = "";
         String ItemMessage = "";
         String ProduceOrderQtyMsg = "";
+        String InputQtyMsg = "";
         try {
             TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
             TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
@@ -883,6 +901,13 @@ public class TransProductionBean implements Serializable {
                 } catch (NullPointerException npe) {
                 }
             }
+            try {
+                InputQtyMsg = this.getAnyInputItemQtyEqualZero(aActiveTransItems);
+                if (null == InputQtyMsg) {
+                    InputQtyMsg = "";
+                }
+            } catch (NullPointerException npe) {
+            }
             UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
             List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
             GroupRightBean grb = new GroupRightBean();
@@ -893,6 +918,8 @@ public class TransProductionBean implements Serializable {
                 msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
             } else if (!ItemMessage.equals("")) {
                 msg = "INSUFFICIENT STOCK FOR ITEM(" + ItemMessage + ")...";
+            } else if (!InputQtyMsg.equals("")) {
+                msg = "Input Qty cannot be 0 for item (" + InputQtyMsg + ")...";
             } else if (!ProduceOrderQtyMsg.equals("")) {
                 msg = ProduceOrderQtyMsg;
             } else if (transItem.getUnitCostPrice() == 0) {

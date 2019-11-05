@@ -155,7 +155,8 @@ public class ItemProductionMapBean implements Serializable {
         aList.clear();
         List<ItemProductionMap> ics;
         if (aParent_item_id == 0) {
-            ics = this.getItemProductionMapChildList();
+            //ics = this.getItemProductionMapChildList();
+            ics=new ArrayList<>();
         } else {
             ics = this.getItemProductionMapChildList(aParent_item_id);
         }
@@ -245,7 +246,7 @@ public class ItemProductionMapBean implements Serializable {
         String msg = "";
         if (null == aItemProductionMap) {
             msg = "Select Item to add";
-        } else if (aItemProductionMap.getOutputItemId() == 0 || aItemProductionMap.getInputItemId() == 0 || aItemProductionMap.getInputQty() <= 0) {
+        } else if (aItemProductionMap.getOutputItemId() == 0 || aItemProductionMap.getInputItemId() == 0 || aItemProductionMap.getInputQty() < 0) {//aItemProductionMap.getInputQty() <= 0
             msg = "Check Parent, Child Item and Qty";
         } else if (this.combinationExists(aItemProductionMap.getOutputItemId(), aItemProductionMap.getInputItemId())) {
             msg = "Input item already exists...";

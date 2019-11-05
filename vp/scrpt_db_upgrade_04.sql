@@ -2,7 +2,7 @@ INSERT INTO parameter_list (parameter_list_id, context, parameter_name, paramete
 INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) VALUES ('43', 'PAY_METHOD', 'FORCE_SELECTION', '0','');
 
 INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) VALUES ('44', 'COMPANY_SETTING', 'DEPLETE_SOLD_STOCK_UPON', '0','0(Sales Invoice),1(Goods Delivery)');
-INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) VALUES ('45', 'GOODS_DELIVERY', 'TRANSACTION_REF', '0','2(Sales Invoice),11(Goods Delivery),0(Any)');
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) VALUES ('45', 'GOODS_DELIVERY', 'TRANSACTION_REF', '0','2(Sales Invoice),11(Sale Order),0(Any)');
 
 create table alert_general 
 (alert_general_id bigint(20) not null auto_increment,alert_date date null, alert_type varchar(50), subject varchar(150), message varchar(500), 

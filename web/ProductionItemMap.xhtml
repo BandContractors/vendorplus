@@ -55,10 +55,8 @@
                     <p:column headerText="Category" style="text-align: left">  
                         #{itm.categoryName}
                     </p:column>
-                    <p:ajax event="itemSelect" listener="#{itemProductionMap.setOutputItemId(itemBean.selectedItem.itemId)}" process="@this" update="proItemId"/>
-                    <p:ajax event="change" listener="#{itemProductionMap.setOutputItemId(itemBean.selectedItem.itemId)}" rendered="#{itemBean.selectedItem!=null}" process="@this" update="proItemId"/>
-                    <p:ajax event="itemSelect" listener="#{itemProductionMapBean.refreshChildList(itemProductionMap.outputItemId, itemProductionMapBean.itemProductionMapsList)}" process="@this" update="dtblList"/>
-                    <p:ajax event="change" listener="#{itemProductionMapBean.refreshChildList(itemProductionMap.outputItemId, itemProductionMapBean.itemProductionMapsList)}" rendered="#{itemBean.selectedItem!=null}" process="@this" update="dtblList"/>
+                    <p:ajax event="blur" listener="#{itemProductionMap.setOutputItemId(itemBean.selectedItem.itemId)}" process="@this" update="proItemId"/>
+                    <p:ajax event="blur" listener="#{itemProductionMapBean.refreshChildList(itemProductionMap.outputItemId, itemProductionMapBean.itemProductionMapsList)}" process="@this" update="dtblList"/>
                 </p:autoComplete>
                 <p:outputLabel id="proItemId" value="#{unitBean.getUnit(itemBean.selectedItem.unitId).unitSymbol}"/>
             </h:panelGrid>
