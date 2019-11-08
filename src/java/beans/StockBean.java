@@ -2,6 +2,7 @@ package beans;
 
 import connections.DBConnection;
 import entities.AccCurrency;
+import entities.ItemProductionMap;
 import entities.Stock;
 import entities.TransItem;
 import java.io.Serializable;
@@ -31,9 +32,9 @@ import javax.faces.context.FacesContext;
 @ManagedBean
 @SessionScoped
 public class StockBean implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     private List<Stock> Stocks;
     private String ActionMessage = null;
     private Stock SelectedStock = null;
@@ -43,7 +44,7 @@ public class StockBean implements Serializable {
     private List<Stock> BatchList;
     private List<Stock> SpecificList;
     private double StockTotalCostPrice;
-    
+
     public void setStockFromResultset(Stock aStock, ResultSet aResultSet) {
         try {
             try {
@@ -179,7 +180,7 @@ public class StockBean implements Serializable {
             System.err.println("setStockFromResultset:" + se.getMessage());
         }
     }
-    
+
     public void setStockFromResultsetReport(Stock aStock, ResultSet aResultSet) {
         try {
             try {
@@ -392,7 +393,7 @@ public class StockBean implements Serializable {
             System.err.println(se.getMessage());
         }
     }
-    
+
     public int saveStock(Stock stock) {
         String sql = null;
         int status = 0;
@@ -523,7 +524,7 @@ public class StockBean implements Serializable {
         }
         return status;
     }
-    
+
     public int addStock(Stock aStock, double aQty) {
         String sql = "{call sp_add_stock_bms(?,?,?,?,?,?,?)}";
         int status = 0;
@@ -545,7 +546,7 @@ public class StockBean implements Serializable {
         }
         return status;
     }
-    
+
     public int subtractStock(Stock aStock, double aQty) {
         String sql = "{call sp_subtract_stock_bms(?,?,?,?,?,?)}";
         int status = 0;
@@ -566,7 +567,7 @@ public class StockBean implements Serializable {
         }
         return status;
     }
-    
+
     public int updateStockDamage(Stock aStock, double aQty, String aType) {
         String sql = "";
         if (aType.equals("Add")) {
@@ -592,7 +593,7 @@ public class StockBean implements Serializable {
         }
         return status;
     }
-    
+
     public Stock getStock(Long StockId) {
         String sql = "{call sp_search_stock_by_id(?)}";
         ResultSet rs = null;
@@ -620,9 +621,9 @@ public class StockBean implements Serializable {
                 }
             }
         }
-        
+
     }
-    
+
     public Stock getStock(int aStoreId, long aItemId, String aBatchNo, String aCodeSpecific, String aDescSpecific) {
         String sql = "{call sp_search_stock_bms(?,?,?,?,?)}";
         ResultSet rs = null;
@@ -631,10 +632,22 @@ public class StockBean implements Serializable {
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             ps.setInt(1, aStoreId);
             ps.setLong(2, aItemId);
-            ps.setString(3, aBatchNo);
-            ps.setString(4, aCodeSpecific);
-            ps.setString(5, aDescSpecific);
-            
+            if (null == aBatchNo) {
+                ps.setString(3, "");
+            } else {
+                ps.setString(3, aBatchNo);
+            }
+            if (null == aCodeSpecific) {
+                ps.setString(4, "");
+            } else {
+                ps.setString(4, aCodeSpecific);
+            }
+            if (null == aDescSpecific) {
+                ps.setString(5, "");
+            } else {
+                ps.setString(5, aDescSpecific);
+            }
+
             rs = ps.executeQuery();
             if (rs.next()) {
                 Stock stock = new Stock();
@@ -656,7 +669,7 @@ public class StockBean implements Serializable {
             }
         }
     }
-    
+
     public void setStockCurrentQty(Stock aStock, int aStoreId, long aItemId, String aBatchNo, String aCodeSpecific, String aDescSpecific) {
         double CurrentQty = 0;
         if (null == aStock) {
@@ -674,7 +687,7 @@ public class StockBean implements Serializable {
             aStock.setCurrentqty(CurrentQty);
         }
     }
-    
+
     public void setStockCurrentQty(Stock aStock, int aStoreId, long aItemId, long aStockId) {
         //System.out.println("aStockId:" + aStockId + " aItemId:" + aItemId);
         double CurrentQty = 0;
@@ -705,7 +718,7 @@ public class StockBean implements Serializable {
             aStock.setCurrentqty(CurrentQty);
         }
     }
-    
+
     public void setStockCurrentQty(TransItem aTransItem, int aStoreId, long aItemId, long aStockId) {
         //System.out.println("aStockId:" + aStockId + " aItemId:" + aItemId);
         double CurrentQty = 0;
@@ -736,7 +749,26 @@ public class StockBean implements Serializable {
             aTransItem.setQty_total(CurrentQty);
         }
     }
-    
+
+    public void setStockCurrentQty(ItemProductionMap aItemProductionMap, int aStoreId, long aItemId) {
+        double CurrentQty = 0;
+        if (null == aItemProductionMap) {
+            //do nothing
+        } else {
+            if (aItemId == 0) {
+                //do nothing
+            } else {
+                try {
+                    CurrentQty = this.getStock(aStoreId, aItemId, aItemProductionMap.getBatchno(), aItemProductionMap.getCodeSpecific(), aItemProductionMap.getDescSpecific()).getCurrentqty();
+                } catch (Exception e) {
+                    //do nothing
+                }
+            }
+            aItemProductionMap.setInputQtyCurrent(CurrentQty);
+            aItemProductionMap.setInputQtyBalance(CurrentQty-aItemProductionMap.getInputQtyTotal());
+        }
+    }
+
     public double getItemUnitCostPrice(int aStoreId, long aItemId, String aBatchNo, String aCodeSpecific, String aDescSpecific) {
         String sql = "{call sp_search_stock_bms(?,?,?,?,?)}";
         ResultSet rs = null;
@@ -749,7 +781,7 @@ public class StockBean implements Serializable {
             ps.setString(3, aBatchNo);
             ps.setString(4, aCodeSpecific);
             ps.setString(5, aDescSpecific);
-            
+
             rs = ps.executeQuery();
             if (rs.next()) {
                 Stock stock = new Stock();
@@ -775,7 +807,7 @@ public class StockBean implements Serializable {
             }
         }
     }
-    
+
     public void addStock(int StoreId, Long ItemId, String BatchNo, double AddQty) {
         String sql = "{call sp_add_stock_by_store_item_batch(?,?,?,?)}";
         ResultSet rs = null;
@@ -801,7 +833,7 @@ public class StockBean implements Serializable {
             }
         }
     }
-    
+
     public void subtractStock(int StoreId, Long ItemId, String BatchNo, double SubtractQty) {
         String sql = "{call sp_subtract_stock_by_store_item_batch(?,?,?,?)}";
         ResultSet rs = null;
@@ -827,15 +859,15 @@ public class StockBean implements Serializable {
             }
         }
     }
-    
+
     public void deleteStock() {
         this.deleteStockById(this.getSelectedStockId());
     }
-    
+
     public void deleteStockByObject(Stock stock) {
         this.deleteStockById(stock.getStockId());
     }
-    
+
     public void deleteStockById(Long StockId) {
         String sql = "DELETE FROM stock WHERE stock_id=?";
         try (
@@ -849,7 +881,7 @@ public class StockBean implements Serializable {
             this.setActionMessage("Stock NOT deleted");
         }
     }
-    
+
     public void displayStock(Stock StockFrom, Stock StockTo) {
         StockTo.setStockId(StockFrom.getStockId());
         StockTo.setStoreId(StockFrom.getStoreId());
@@ -859,7 +891,7 @@ public class StockBean implements Serializable {
         StockTo.setItemMnfDate(StockFrom.getItemMnfDate());
         StockTo.setItemExpDate(StockFrom.getItemExpDate());
     }
-    
+
     public void clearStock(Stock stock) {
         stock.setStockId(0);
         stock.setStockId(0);
@@ -902,7 +934,7 @@ public class StockBean implements Serializable {
         }
         return Stocks;
     }
-    
+
     public List<Stock> getStocks(int StoreId, long ItemId) {
         String sql;
         sql = "{call sp_search_stock_by_store_item(?,?)}";
@@ -936,7 +968,7 @@ public class StockBean implements Serializable {
         }
         return Stocks;
     }
-    
+
     public void setStocks(List<Stock> aStockList, int StoreId, long ItemId) {
         String sql;
         sql = "{call sp_search_stock_by_store_item(?,?)}";
@@ -965,7 +997,7 @@ public class StockBean implements Serializable {
             }
         }
     }
-    
+
     public void refreshBatchList(int StoreId, long ItemId) {
         String sql;
         sql = "{call sp_search_stock_distinct_batch_by_store_item(?,?)}";
@@ -1010,7 +1042,7 @@ public class StockBean implements Serializable {
                         this.refreshSpecificList(StoreId, ItemId, this.BatchList.get(0).getBatchno());
                     }
                 } catch (Exception e) {
-                    
+
                 }
             } catch (SQLException se) {
                 System.err.println("refreshSpecificList:" + se.getMessage());
@@ -1025,7 +1057,7 @@ public class StockBean implements Serializable {
             }
         }
     }
-    
+
     public void clearLists() {
         try {
             this.BatchList.clear();
@@ -1038,7 +1070,7 @@ public class StockBean implements Serializable {
             this.SpecificList = new ArrayList<>();
         }
     }
-    
+
     public List<Stock> getStocks(int aStoreId, long aItemId, String aBatchno) {
         String sql;
         sql = "{call sp_search_stock_by_store_item_batch(?,?,?)}";
@@ -1074,7 +1106,7 @@ public class StockBean implements Serializable {
         }
         return Stocks;
     }
-    
+
     public void refreshSpecificList(int aStoreId, long aItemId, String aBatchno) {
         String sql;
         sql = "{call sp_search_stock_by_store_item_batch(?,?,?)}";
@@ -1113,7 +1145,7 @@ public class StockBean implements Serializable {
             }
         }
     }
-    
+
     public void refreshSpecificList(int aStoreId, long aItemId) {
         String sql;
         sql = "{call sp_search_stock_by_store_item(?,?)}";
@@ -1151,7 +1183,7 @@ public class StockBean implements Serializable {
             }
         }
     }
-    
+
     public List<Stock> getStocksByItem(long ItemId) {
         String sql;
         sql = "{call sp_search_stock_by_item_id(?)}";
@@ -1181,7 +1213,7 @@ public class StockBean implements Serializable {
         //GeneralSetting.setLIST_ITEMS_COUNT(Stocks.size());
         return Stocks;
     }
-    
+
     public List<Stock> getStocks(int aStoreId) {
         String sql;
         sql = "{call sp_search_stock_by_store_id(?)}";
@@ -1210,7 +1242,7 @@ public class StockBean implements Serializable {
         }
         return Stocks;
     }
-    
+
     public double getStockAtHandCostPriceValue() {
         double CpValue = 0;
         String sql = "";
@@ -1268,7 +1300,7 @@ public class StockBean implements Serializable {
         }
         return CpValue;
     }
-    
+
     public int getSnapshotMaxNoStockValue(int aAccPeriodId) {
         String sql;
         sql = "select max(snapshot_no) as snapshot_no from snapshot_stock_value where acc_period_id=" + aAccPeriodId;
@@ -1298,7 +1330,7 @@ public class StockBean implements Serializable {
         }
         return SnapshotMaxNo;
     }
-    
+
     public double getStockAtHandCostPriceValueSnapshot(int aAccPeriodId) {
         double CpValue = 0;
         int SnapshopMaxNo = 0;
@@ -1358,7 +1390,7 @@ public class StockBean implements Serializable {
         }
         return CpValue;
     }
-    
+
     public void reportInventoryStock(int aStoreId, int aCategoryId, Date aDate1, Date aDate2) {
         String sql = "SELECT * FROM view_inventory_stock WHERE 1=1";
         //unit_cost_price excahnged for unit_cost
@@ -1398,7 +1430,7 @@ public class StockBean implements Serializable {
         } catch (SQLException se) {
             System.err.println(se.getMessage());
         }
-        
+
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sqlsum);) {
@@ -1432,7 +1464,7 @@ public class StockBean implements Serializable {
             System.err.println(se.getMessage());
         }
     }
-    
+
     public void reportInventoryExpense(int aStoreId, int aCategoryId, Date aDate1, Date aDate2) {
         String sql = "SELECT * FROM view_inventory_expense WHERE 1=1";
         String sqlsum = "SELECT currency_code,sum(currentqty*unit_cost) as cost_value FROM view_inventory_expense WHERE 1=1";
@@ -1469,7 +1501,7 @@ public class StockBean implements Serializable {
         } catch (SQLException se) {
             System.err.println(se.getMessage());
         }
-        
+
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sqlsum);) {
@@ -1493,7 +1525,7 @@ public class StockBean implements Serializable {
             System.err.println(se.getMessage());
         }
     }
-    
+
     public void reportInventoryAsset(int aStoreId, String aAssetType) {
         String sql = "SELECT * FROM view_inventory_asset WHERE 1=1";
         //unit_cost_price excahnged for unit_cost
@@ -1526,14 +1558,14 @@ public class StockBean implements Serializable {
                 try {
                     stock.setQty_out(new Stock_outBean().getStock_outTotal(stock.getStoreId(), stock.getItemId(), stock.getBatchno(), stock.getCodeSpecific(), stock.getDescSpecific()));
                 } catch (NullPointerException npe) {
-                    
+
                 }
                 this.StocksList.add(stock);
             }
         } catch (SQLException se) {
             System.err.println(se.getMessage());
         }
-        
+
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sqlsum);) {
@@ -1557,7 +1589,7 @@ public class StockBean implements Serializable {
             System.err.println(se.getMessage());
         }
     }
-    
+
     public void reportStock(int aStoreId, int aCategoryId, Date aDate1, Date aDate2, String aStockyType) {
         String sql = "SELECT * FROM view_inventory_in WHERE 1=1";
         String sqlsum = "SELECT stock_type_order,stock_type,currency_code,sum(currentqty*unit_cost) as cost_value,"
@@ -1604,7 +1636,7 @@ public class StockBean implements Serializable {
         } catch (SQLException se) {
             System.err.println(se.getMessage());
         }
-        
+
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sqlsum);) {
@@ -1645,7 +1677,7 @@ public class StockBean implements Serializable {
             System.err.println(se.getMessage());
         }
     }
-    
+
     public double getXrateMultiplyToLocal(String aFromCur) {
         double xrate = 1;
         double XrateMultiply = 1;
@@ -1712,7 +1744,7 @@ public class StockBean implements Serializable {
     public void setSelectedStockId(Long SelectedStockId) {
         this.SelectedStockId = SelectedStockId;
     }
-    
+
     public static void deleteZeroQtyStock() {
         String sql = "DELETE FROM stock WHERE currentqty=0";
         try (
@@ -1723,7 +1755,7 @@ public class StockBean implements Serializable {
             System.err.println("deleteZeroQtyStock:" + se.getMessage());
         }
     }
-    
+
     public String getExpiryListString(Date aExpiryDate) {
         String dateString = "";
         SimpleDateFormat sdfr = new SimpleDateFormat("dd/MMM/yyyy");
@@ -1734,7 +1766,7 @@ public class StockBean implements Serializable {
         }
         return dateString;
     }
-    
+
     public void initClearStock(Stock aStock, List<Stock> aStockList, List<Stock> aStockListSummary) {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.

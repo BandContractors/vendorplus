@@ -115,6 +115,7 @@
                         <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(11).transactorLabel}" itemValue="transactor_id"/>
                         <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(11).transactionDateLabel}" itemValue="transaction_date"/>
                         <f:selectItem itemLabel="Delivery Mode" itemValue="delivery_mode"/>
+                        <f:selectItem itemLabel="Store/Section" itemValue="store_id"/>
                     </p:selectOneMenu>
 
                     <p:commandButton id="cmdbSearch" value="SEARCH (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
@@ -157,6 +158,9 @@
                         </p:column>
                         <p:column headerText="Delivery Mode" style="text-align: left;" rendered="#{transBean.fieldName.equals('delivery_mode')}">
                             <h:outputText value="#{sm.delivery_mode}"/>
+                        </p:column>
+                        <p:column headerText="Store/Section" style="text-align: left;" rendered="#{transBean.fieldName.equals('store_id')}">
+                            <h:outputText value="#{sm.storeName}" rendered="#{sm.storeId>0}"/>
                         </p:column>
                         <p:column headerText="Currency" style="text-align: left;">
                             <h:outputText value="#{sm.currencyCode}"/>

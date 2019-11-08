@@ -128,6 +128,7 @@
                         <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(2).billTransactorLabel}" itemValue="bill_transactor_id"/>
                         <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(2).transactorLabel}" itemValue="transactor_id"/>
                         <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(2).transactionDateLabel}" itemValue="transaction_date"/>
+                        <f:selectItem itemLabel="Store/Section" itemValue="store_id"/>
                     </p:selectOneMenu>
                 </h:panelGrid>
             </h:panelGrid>
@@ -157,6 +158,9 @@
                         </p:column>
                         <p:column headerText="#{transactionTypeBean.getTransactionType(2).transactionDateLabel}" style="text-align: left;" rendered="#{transBean.fieldName.equals('transaction_date')}">
                             <h:outputText value="#{utilityBean.formatDate(sm.transactionDate)}"/>
+                        </p:column>
+                        <p:column headerText="Store/Section" style="text-align: left;" rendered="#{transBean.fieldName.equals('store_id')}">
+                            <h:outputText value="#{sm.storeName}" rendered="#{sm.storeId>0}"/>
                         </p:column>
                         <p:column headerText="Currency" style="text-align: left;">
                             <h:outputText value="#{sm.currencyCode}"/>

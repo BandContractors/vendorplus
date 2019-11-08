@@ -30,6 +30,8 @@ public class ItemProductionMap implements Serializable {
     private String CodeSpecific;
     private String DescSpecific;
     private long StockId;
+    private double InputQtyCurrent;
+    private double InputQtyBalance;
 
     /**
      * @return the ItemProductionMapId
@@ -211,6 +213,34 @@ public class ItemProductionMap implements Serializable {
      */
     public void setInputQtyTotal(double InputQtyTotal) {
         this.InputQtyTotal = InputQtyTotal;
+    }
+
+    /**
+     * @return the InputQtyCurrent
+     */
+    public double getInputQtyCurrent() {
+        return InputQtyCurrent;
+    }
+
+    /**
+     * @param InputQtyCurrent the InputQtyCurrent to set
+     */
+    public void setInputQtyCurrent(double InputQtyCurrent) {
+        this.InputQtyCurrent = InputQtyCurrent;
+    }
+
+    /**
+     * @return the InputQtyBalance
+     */
+    public double getInputQtyBalance() {
+        return InputQtyBalance;
+    }
+
+    /**
+     * @param InputQtyBalance the InputQtyBalance to set
+     */
+    public void setInputQtyBalance(double InputQtyBalance) {
+        this.InputQtyBalance = InputQtyBalance;
     }
 
 }

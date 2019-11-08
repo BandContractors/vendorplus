@@ -589,6 +589,7 @@ public class TransProductionBean implements Serializable {
     public void updateUponChangeInputUnitQtyUsed(TransItem aTransItem, int aStoreId, ItemProductionMap aItemProductionMap) {
         try {
             aItemProductionMap.setInputQtyTotal(aTransItem.getItemQty() * aItemProductionMap.getInputQty());
+            aItemProductionMap.setInputQtyBalance(aItemProductionMap.getInputQtyCurrent() - aItemProductionMap.getInputQtyTotal());
             this.updateUnitCostProduction(aTransItem, aStoreId);
         } catch (Exception e) {
             //do nothing
@@ -609,6 +610,7 @@ public class TransProductionBean implements Serializable {
     public void updateUponChangeInputUnitQtyUsed(TransItem aTransItem, ItemProductionMap aItemProductionMap) {
         try {
             aItemProductionMap.setInputQtyTotal(aTransItem.getItemQty() * aItemProductionMap.getInputQty());
+            aItemProductionMap.setInputQtyBalance(aItemProductionMap.getInputQtyCurrent() - aItemProductionMap.getInputQtyTotal());
         } catch (Exception e) {
             //do nothing
         }
@@ -624,9 +626,33 @@ public class TransProductionBean implements Serializable {
             //do nothing
         }
     }
+    
+    public void updateUponChangeInputQtyLeft(TransItem aTransItem, int aStoreId, ItemProductionMap aItemProductionMap) {
+        try {
+            aItemProductionMap.setInputQtyTotal(aItemProductionMap.getInputQtyCurrent() - aItemProductionMap.getInputQtyBalance());
+            if (aTransItem.getItemQty() > 0) {
+                aItemProductionMap.setInputQty(aItemProductionMap.getInputQtyTotal() / aTransItem.getItemQty());
+            }
+            this.updateUnitCostProduction(aTransItem, aStoreId);
+        } catch (Exception e) {
+            //do nothing
+        }
+    }
 
     public void updateUponChangeInputTotalQtyUsed(TransItem aTransItem, ItemProductionMap aItemProductionMap) {
         try {
+            if (aTransItem.getItemQty() > 0) {
+                aItemProductionMap.setInputQty(aItemProductionMap.getInputQtyTotal() / aTransItem.getItemQty());
+            }
+            aItemProductionMap.setInputQtyBalance(aItemProductionMap.getInputQtyCurrent() - aItemProductionMap.getInputQtyTotal());
+        } catch (Exception e) {
+            //do nothing
+        }
+    }
+
+    public void updateUponChangeInputQtyLeft(TransItem aTransItem, ItemProductionMap aItemProductionMap) {
+        try {
+            aItemProductionMap.setInputQtyTotal(aItemProductionMap.getInputQtyCurrent() - aItemProductionMap.getInputQtyBalance());
             if (aTransItem.getItemQty() > 0) {
                 aItemProductionMap.setInputQty(aItemProductionMap.getInputQtyTotal() / aTransItem.getItemQty());
             }

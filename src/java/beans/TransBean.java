@@ -11002,6 +11002,15 @@ public class TransBean implements Serializable {
                                 transsum.setTransactionDate(null);
                             }
                             break;
+                        case "store_id":
+                            try {
+                                transsum.setStoreId(rs.getInt("store_id"));
+                                Store st = new StoreBean().getStore(transsum.getStoreId());
+                                transsum.setStoreName(st.getStoreName());
+                            } catch (NullPointerException npe) {
+                                transsum.setStoreName("");
+                            }
+                            break;
                     }
                 }
                 try {
@@ -11955,6 +11964,15 @@ public class TransBean implements Serializable {
                                 transsum.setTransactionDate(null);
                             }
                             break;
+                        case "store_id":
+                            try {
+                                transsum.setStoreId(rs.getInt("store_id"));
+                                Store st = new StoreBean().getStore(transsum.getStoreId());
+                                transsum.setStoreName(st.getStoreName());
+                            } catch (NullPointerException npe) {
+                                transsum.setStoreName("");
+                            }
+                            break;
                     }
                 }
                 try {
@@ -12788,6 +12806,15 @@ public class TransBean implements Serializable {
                                 transsum.setDelivery_mode(rs.getString("delivery_mode"));
                             } catch (NullPointerException npe) {
                                 transsum.setDelivery_mode("");
+                            }
+                            break;
+                        case "store_id":
+                            try {
+                                transsum.setStoreId(rs.getInt("store_id"));
+                                Store st = new StoreBean().getStore(transsum.getStoreId());
+                                transsum.setStoreName(st.getStoreName());
+                            } catch (NullPointerException npe) {
+                                transsum.setStoreName("");
                             }
                             break;
                     }
