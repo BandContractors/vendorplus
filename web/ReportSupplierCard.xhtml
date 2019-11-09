@@ -82,7 +82,7 @@
                     <tr style="background-color: yellow;font-weight: bold">
                         <td colspan="3" align="center">
                             #{transactorBean.selectedBillTransactor.transactorNames}
-                            <br/>Payable(#{accCurrencyBean.localCurrency.currencyCode}):<h:outputLabel style="color: coral;" value="#{accJournalBean.returnBalanceString(accLedgerBean.getPayableAccBalance(transactorBean.selectedBillTransactor.transactorId))}">
+                            <br/>Payable(#{accCurrencyBean.localCurrency.currencyCode}):<h:outputLabel style="color: coral;" value="#{accJournalBean.returnBalanceString(accLedgerBean.getReceivableAccBalanceTrade(transactorBean.selectedBillTransactor.transactorId))}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
                             <br/>Prepaid (#{accCurrencyBean.localCurrency.currencyCode}):<h:outputLabel style="color: green;" value="#{accJournalBean.returnBalanceString(accLedgerBean.getPrepaidExpenseAccBalanceToCur(transactorBean.selectedBillTransactor.transactorId,accCurrencyBean.localCurrency.currencyCode))}">

@@ -29,6 +29,8 @@ public class AccLedger implements Serializable {
     private double CreditAmount;
     private double DebitAmountLc;
     private double CreditAmountLc;
+    private String TransactorName;
+    private String TransactorRef;
 
     /**
      * @return the AccLedgerId
@@ -168,6 +170,34 @@ public class AccLedger implements Serializable {
      */
     public void setCreditAmountLc(double CreditAmountLc) {
         this.CreditAmountLc = CreditAmountLc;
+    }
+
+    /**
+     * @return the TransactorName
+     */
+    public String getTransactorName() {
+        return TransactorName;
+    }
+
+    /**
+     * @param TransactorName the TransactorName to set
+     */
+    public void setTransactorName(String TransactorName) {
+        this.TransactorName = TransactorName;
+    }
+
+    /**
+     * @return the TransactorRef
+     */
+    public String getTransactorRef() {
+        return TransactorRef;
+    }
+
+    /**
+     * @param TransactorRef the TransactorRef to set
+     */
+    public void setTransactorRef(String TransactorRef) {
+        this.TransactorRef = TransactorRef;
     }
     
 }

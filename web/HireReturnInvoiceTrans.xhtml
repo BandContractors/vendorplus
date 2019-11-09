@@ -52,7 +52,7 @@
                     </h:selectOneMenu>
                     <h:inputText id="itxtTransactorChild" value="#{transactorBean.getTransactor(transBean.transChild.transactorId).transactorNames}" disabled="true"/>
                     <p:calendar id="calTransDate" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{transBean.transChild.transactionDate}" pattern="#{companySetting.getDateFormat()}" size="8"/>
-                    <h:inputText disabled="true" style="color: coral;font-weight: bold;width: 160px;" id="itxtDebtCreditChild" value="#{accJournalBean.returnBalanceString(accLedgerBean.getReceivableAccBalance(transBean.transChild.transactorId))}">
+                    <h:inputText disabled="true" style="color: coral;font-weight: bold;width: 160px;" id="itxtDebtCreditChild" value="#{accJournalBean.returnBalanceString(accLedgerBean.getReceivableAccBalanceTrade(transBean.transChild.transactorId))}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
                     <h:inputText disabled="true" style="color: green;font-weight: bold;width: 160px;" id="itxtPrepaidAccChild" value="#{accJournalBean.returnBalanceString(accLedgerBean.getPrepaidIncomeAccBalance(transBean.transChild.transactorId,transBean.transChild.currencyCode))}">
@@ -250,7 +250,7 @@
                             <p:ajax event="blur" update="olblDebtCreditChild2 itxtDebtCreditChild2 olblDepositChild2 itxtPrepaidAccChild2"/>
                         </p:autoComplete>
                         <h:outputLabel id="olblDebtCreditChild2" style="color: coral;font-weight: bold;" value="Receivable (#{accCurrencyBean.localCurrency.currencyCode}):"/>
-                        <h:inputText disabled="true" style="color: coral;font-weight: bold;width: 135px;" id="itxtDebtCreditChild2" value="#{accJournalBean.returnBalanceString(accLedgerBean.getReceivableAccBalance(transBean.transChild.billTransactorId))}">
+                        <h:inputText disabled="true" style="color: coral;font-weight: bold;width: 135px;" id="itxtDebtCreditChild2" value="#{accJournalBean.returnBalanceString(accLedgerBean.getReceivableAccBalanceTrade(transBean.transChild.billTransactorId))}">
                             <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
                         <h:outputLabel id="olblDepositChild2" style="color: green;font-weight: bold;" value="Deposit (#{transBean.transChild.currencyCode})"/>

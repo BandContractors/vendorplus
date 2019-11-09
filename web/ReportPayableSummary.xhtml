@@ -69,8 +69,11 @@
                 <p:column headerText="Payable Account" style="text-align: left;">
                     <h:outputText value="#{accCoaBean.getAccCoaByCodeOrId(itm.accountCode, 0).accountName}"/>
                 </p:column>
-                <p:column headerText="Payable To">
-                    <h:outputText value="#{transactorBean.getTransactor(itm.billTransactorId).transactorNames}" rendered="#{itm.billTransactorId>0}"/>
+                <p:column headerText="Payable To (Partner)">
+                    <h:outputText value="#{itm.transactorName}"/>
+                </p:column>
+                <p:column headerText="Partner Ref">
+                    <h:outputText value="#{itm.transactorRef}"/>
                 </p:column>
                 <p:column headerText="Currency">
                     <h:outputText value="#{itm.currencyCode}"/>

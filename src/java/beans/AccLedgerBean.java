@@ -682,7 +682,9 @@ public class AccLedgerBean implements Serializable {
     }
 
     public void reportReceivableAccBalances() {
-        String sqlsum = "SELECT * FROM view_ledger_acc_rec_balances ORDER BY bill_transactor_id DESC";
+        String sqlsum = "SELECT v.*,t.transactor_names,t.transactor_ref FROM view_ledger_acc_rec_balances v "
+                + "INNER JOIN transactor t ON v.bill_transactor_id=t.transactor_id "
+                + "ORDER BY t.transactor_names ASC";
         ResultSet rs = null;
         this.AccLedgerReceivablesAccBal = new ArrayList<>();
         String LocCurCode = "";
@@ -724,16 +726,24 @@ public class AccLedgerBean implements Serializable {
                     accledger.setCreditAmount(0);
                 }
                 try {
-                    //accledger.setDebitAmountLc(accledger.getDebitAmount() * new AccXrateBean().getXrateMultiply(LocCurCode, accledger.getCurrencyCode()));
                     accledger.setDebitAmountLc(accledger.getDebitAmount() * new AccXrateBean().getXrateMultiply(accledger.getCurrencyCode(), LocCurCode));
                 } catch (NullPointerException npe) {
                     accledger.setDebitAmountLc(0);
                 }
                 try {
-                    //accledger.setCreditAmountLc(accledger.getCreditAmount() * new AccXrateBean().getXrateMultiply(LocCurCode, accledger.getCurrencyCode()));
                     accledger.setCreditAmountLc(accledger.getCreditAmount() * new AccXrateBean().getXrateMultiply(accledger.getCurrencyCode(), LocCurCode));
                 } catch (NullPointerException npe) {
                     accledger.setCreditAmountLc(0);
+                }
+                try {
+                    accledger.setTransactorName(rs.getString("transactor_names"));
+                } catch (Exception e) {
+                    accledger.setTransactorName("");
+                }
+                try {
+                    accledger.setTransactorRef(rs.getString("transactor_ref"));
+                } catch (Exception e) {
+                    accledger.setTransactorRef("");
                 }
                 this.getAccLedgerReceivablesAccBal().add(accledger);
             }
@@ -1329,7 +1339,9 @@ public class AccLedgerBean implements Serializable {
     }
 
     public void reportPayableAccBalances() {
-        String sqlsum = "SELECT * FROM view_ledger_acc_pay_balances ORDER BY bill_transactor_id DESC";
+        String sqlsum = "SELECT v.*,t.transactor_names,t.transactor_ref FROM view_ledger_acc_pay_balances v "
+                + "INNER JOIN transactor t ON v.bill_transactor_id=t.transactor_id "
+                + "ORDER BY t.transactor_names ASC";
         ResultSet rs = null;
         this.AccLedgerPayablesAccBal = new ArrayList<>();
         String LocCurCode = "";
@@ -1371,16 +1383,24 @@ public class AccLedgerBean implements Serializable {
                     accledger.setCreditAmount(0);
                 }
                 try {
-                    //accledger.setDebitAmountLc(accledger.getDebitAmount() * new AccXrateBean().getXrateMultiply(LocCurCode, accledger.getCurrencyCode()));
                     accledger.setDebitAmountLc(accledger.getDebitAmount() * new AccXrateBean().getXrateMultiply(accledger.getCurrencyCode(), LocCurCode));
                 } catch (NullPointerException npe) {
                     accledger.setDebitAmountLc(0);
                 }
                 try {
-                    //accledger.setCreditAmountLc(accledger.getCreditAmount() * new AccXrateBean().getXrateMultiply(LocCurCode, accledger.getCurrencyCode()));
                     accledger.setCreditAmountLc(accledger.getCreditAmount() * new AccXrateBean().getXrateMultiply(accledger.getCurrencyCode(), LocCurCode));
                 } catch (NullPointerException npe) {
                     accledger.setCreditAmountLc(0);
+                }
+                try {
+                    accledger.setTransactorName(rs.getString("transactor_names"));
+                } catch (Exception e) {
+                    accledger.setTransactorName("");
+                }
+                try {
+                    accledger.setTransactorRef(rs.getString("transactor_ref"));
+                } catch (Exception e) {
+                    accledger.setTransactorRef("");
                 }
                 this.getAccLedgerPayablesAccBal().add(accledger);
             }

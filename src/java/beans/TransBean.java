@@ -8625,6 +8625,11 @@ public class TransBean implements Serializable {
                             } catch (NullPointerException | SQLException npe) {
                                 trans.setTransactorName("");
                             }
+//                            try {
+//                                trans.setTransactionComment(rs.getString("pay_nos"));
+//                            } catch (NullPointerException | SQLException npe) {
+//                                trans.setTransactionComment("");
+//                            }
                         } catch (SQLException se) {
                             System.err.println("getReportCustomerCardInner:" + se.getMessage());
                         }

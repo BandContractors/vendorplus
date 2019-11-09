@@ -1,5 +1,0 @@
-Database1:wingerso_branch
-Database2:wingerso_inter_branch
-
-User:wingerso_ie
-Password:Default_123
