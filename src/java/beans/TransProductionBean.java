@@ -600,8 +600,8 @@ public class TransProductionBean implements Serializable {
         try {
             for (ItemProductionMap obj : aItemProductionMapList) {
                 obj.setInputQtyTotal(aTransItem.getItemQty() * obj.getInputQty());
+                obj.setInputQtyBalance(obj.getInputQtyCurrent() - obj.getInputQtyTotal());
             }
-            //this.updateUnitCostProduction(aTransItem, aStoreId);
         } catch (Exception e) {
             //do nothing
         }
@@ -621,12 +621,13 @@ public class TransProductionBean implements Serializable {
             if (aTransItem.getItemQty() > 0) {
                 aItemProductionMap.setInputQty(aItemProductionMap.getInputQtyTotal() / aTransItem.getItemQty());
             }
+            aItemProductionMap.setInputQtyBalance(aItemProductionMap.getInputQtyCurrent() - aItemProductionMap.getInputQtyTotal());
             this.updateUnitCostProduction(aTransItem, aStoreId);
         } catch (Exception e) {
             //do nothing
         }
     }
-    
+
     public void updateUponChangeInputQtyLeft(TransItem aTransItem, int aStoreId, ItemProductionMap aItemProductionMap) {
         try {
             aItemProductionMap.setInputQtyTotal(aItemProductionMap.getInputQtyCurrent() - aItemProductionMap.getInputQtyBalance());
@@ -780,6 +781,8 @@ public class TransProductionBean implements Serializable {
             ipm.setDescSpecific(aItemProductionMap.getDescSpecific());
             ipm.setInputQty(aItemProductionMap.getInputQty());
             ipm.setInputQtyTotal(aItemProductionMap.getInputQtyTotal());
+            ipm.setInputQtyCurrent(aItemProductionMap.getInputQtyCurrent());
+            ipm.setInputQtyBalance(aItemProductionMap.getInputQtyBalance());
             new ItemProductionMapBean().updateLookUpsUIInput(ipm);
             //add
             this.getItmCombinationList().add(0, ipm);
@@ -823,6 +826,8 @@ public class TransProductionBean implements Serializable {
                 aItemProductionMap.setInputItemId(0);
                 aItemProductionMap.setInputQty(0);
                 aItemProductionMap.setInputQtyTotal(0);
+                aItemProductionMap.setInputQtyCurrent(0);
+                aItemProductionMap.setInputQtyBalance(0);
             }
         } catch (Exception e) {
             System.out.println("clearTransProductionItem:" + e.getMessage());
@@ -1627,9 +1632,7 @@ public class TransProductionBean implements Serializable {
             ItemProductionMapBean ipmb = new ItemProductionMapBean();
             while (rs.next()) {
                 ItemProductionMap itemProductionMap = new ItemProductionMap();
-                //itemProductionMap.setItemProductionMapId(rs.getLong("item_production_map_id"));
                 itemProductionMap.setItemProductionMapId(0);
-                //itemProductionMap.setOutputItemId(rs.getLong("output_item_id"));
                 itemProductionMap.setOutputItemId(0);
                 itemProductionMap.setInputItemId(rs.getLong("input_item_id"));
                 itemProductionMap.setInputQty(rs.getDouble("input_qty"));
@@ -1638,6 +1641,7 @@ public class TransProductionBean implements Serializable {
                 itemProductionMap.setCodeSpecific("");
                 itemProductionMap.setDescSpecific("");
                 ipmb.updateLookUpsUIInput(itemProductionMap);
+                new StockBean().setStockCurrentQty(itemProductionMap, new GeneralUserSetting().getCurrentStore().getStoreId(), itemProductionMap.getInputItemId());
                 getItmCombinationList().add(itemProductionMap);
             }
 //            return ItemProductionMaps2;
@@ -1668,9 +1672,7 @@ public class TransProductionBean implements Serializable {
             ItemProductionMapBean ipmb = new ItemProductionMapBean();
             while (rs.next()) {
                 ItemProductionMap itemProductionMap = new ItemProductionMap();
-                //itemProductionMap.setItemProductionMapId(rs.getLong("item_production_map_id"));
                 itemProductionMap.setItemProductionMapId(0);
-                //itemProductionMap.setOutputItemId(rs.getLong("output_item_id"));
                 itemProductionMap.setOutputItemId(0);
                 itemProductionMap.setInputItemId(rs.getLong("input_item_id"));
                 itemProductionMap.setInputQty(rs.getDouble("input_qty"));
@@ -1679,20 +1681,11 @@ public class TransProductionBean implements Serializable {
                 itemProductionMap.setCodeSpecific("");
                 itemProductionMap.setDescSpecific("");
                 ipmb.updateLookUpsUIInput(itemProductionMap);
+                new StockBean().setStockCurrentQty(itemProductionMap, new GeneralUserSetting().getCurrentStore().getStoreId(), itemProductionMap.getInputItemId());
                 getItmCombinationList().add(itemProductionMap);
             }
-//            return ItemProductionMaps2;
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-//            return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
         }
     }
 

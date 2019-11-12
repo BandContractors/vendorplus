@@ -156,7 +156,7 @@ public class ItemProductionMapBean implements Serializable {
         List<ItemProductionMap> ics;
         if (aParent_item_id == 0) {
             //ics = this.getItemProductionMapChildList();
-            ics=new ArrayList<>();
+            ics = new ArrayList<>();
         } else {
             ics = this.getItemProductionMapChildList(aParent_item_id);
         }
@@ -599,12 +599,14 @@ public class ItemProductionMapBean implements Serializable {
             im.setInputItemId(0);
             im.setInputQty(0);
             im.setInputQtyTotal(0);
-            //im.setMapGroupId(0);
+            im.setInputQtyCurrent(0);
+            im.setInputQtyBalance(0);
             im.setBatchno("");
             im.setCodeSpecific("");
             im.setDescSpecific("");
             im.setInputItemUnit("");
             im.setInputItemName("");
+            im.setBatchno("");
         }
     }
 

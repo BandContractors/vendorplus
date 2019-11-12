@@ -6,3 +6,4 @@ alter table transaction add column source_code varchar(20);
 alter table transaction_hist add column is_delivered int(1) default 0;
 alter table transaction_hist add column source_code varchar(20);
 
+

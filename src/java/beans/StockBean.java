@@ -765,7 +765,7 @@ public class StockBean implements Serializable {
                 }
             }
             aItemProductionMap.setInputQtyCurrent(CurrentQty);
-            aItemProductionMap.setInputQtyBalance(CurrentQty-aItemProductionMap.getInputQtyTotal());
+            aItemProductionMap.setInputQtyBalance(CurrentQty - aItemProductionMap.getInputQtyTotal());
         }
     }
 
@@ -954,16 +954,8 @@ public class StockBean implements Serializable {
                     this.setStockFromResultset(stock, rs);
                     Stocks.add(stock);
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
-            } finally {
-                if (rs != null) {
-                    try {
-                        rs.close();
-                    } catch (SQLException ex) {
-                        System.err.println(ex.getMessage());
-                    }
-                }
+            } catch (Exception e) {
+                System.err.println("getStocks:" + e.getMessage());
             }
         }
         return Stocks;
@@ -991,6 +983,35 @@ public class StockBean implements Serializable {
                     Stock stock = new Stock();
                     this.setStockFromResultset(stock, rs);
                     aStockList.add(stock);
+                }
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+            }
+        }
+    }
+
+    public void refreshItemBatchList(int StoreId, long ItemId) {
+        String sql;
+        sql = "{call sp_search_stock_by_store_item(?,?)}";
+        ResultSet rs = null;
+        try {
+            this.BatchList.clear();
+        } catch (Exception e) {
+            this.BatchList = new ArrayList<Stock>();
+        }
+        if (ItemId == 0 || StoreId == 0) {
+            //do nothing
+        } else {
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                ps.setInt(1, StoreId);
+                ps.setLong(2, ItemId);
+                rs = ps.executeQuery();
+                while (rs.next()) {
+                    Stock stock = new Stock();
+                    this.setStockFromResultset(stock, rs);
+                    this.BatchList.add(stock);
                 }
             } catch (Exception e) {
                 System.err.println(e.getMessage());
