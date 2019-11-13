@@ -27,7 +27,7 @@
         </script> 
     </h:head>
     <h:body>
-        <p:dialog header="" widgetVar="dlgPIR" modal="true" height="100%" width="100%" dynamic="true" maximizable="true">
+        <p:dialog header="" widgetVar="dlgPIR" modal="true" height="100%" width="84%" dynamic="true" maximizable="true">
             <h:form id="formTransactionPIR" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
                         return false;"> 
                 <p:panel id="pnlTransaction">
@@ -40,25 +40,32 @@
                     </h:panelGrid>
                     <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="4">
                         <h:outputLabel  value="From:"/>
-                        <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{storeBean.getStore(transProductionBean.transProdObj.storeId).storeName}" style="width: 170px;"/>
+                        <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{storeBean.getStore(transProductionBean.transProdObj.storeId).storeName}" style="width: 200px;"/>  
+                        <h:outputLabel  value="#{transactionTypeBean.getTransactionType(70).transactorLabel}:"/>
+                        <h:inputText styleClass="clsInput" disabled="true" value="#{transProductionBean.transProdObj.transactor_names}" style="width: 500px;"/>
+
                         <h:outputLabel  value="#{transactionTypeBean.getTransactionType(70).transactionDateLabel}:"/>
-                        <h:inputText id="itxtTransactionDate" value="#{utilityBean.formatDate(transProductionBean.transProdObj.transactionDate)}" disabled="true"/>
+                        <h:inputText id="itxtTransactionDate" value="#{utilityBean.formatDate(transProductionBean.transProdObj.transactionDate)}" disabled="true" style="width: 200px;"/>
+                        <h:outputLabel value="Product:"/>
+                        <h:inputText disabled="true" value="#{transItemBean.showItemDescriptionCEC(transProductionBean.transProdObj.outputItemName, transProductionBean.transProdObj.codeSpecific, transProductionBean.transProdObj.descSpecific, transProductionBean.transProdObj.descMore)}" style="width: 500px;"/>
+
+                        <h:outputLabel value="Unit Cost:"/>
+                        <h:inputText value="#{transProductionBean.transProdObj.outputUnitCost}" style="width: 200px;" disabled="true">
+                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:inputText>
+                        <h:outputLabel value="Produced Qty:"/>
+                        <h:inputText value="#{utilityBean.formatDoubleToString(transProductionBean.transProdObj.outputQty)} #{transProductionBean.transProdObj.outputItemUnit} #{transProductionBean.getPCsProduced(transProductionBean.transProdObj)}" style="width: 500px;" disabled="true"/>
+
+                        <h:outputLabel value="Total Cost:"/>
+                        <h:inputText value="#{transProductionBean.transProdObj.outputTotalCost}" style="width: 200px;" disabled="true">
+                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:inputText>
+                        <h:outputLabel value="#{transactionTypeBean.getTransactionType(70).transactionUserLabel}"/>
+                        <h:inputText disabled="true" value="#{userDetailBean.getUserDetail(transProductionBean.transProdObj.transactionUserDetailId).userName}" style="width: 500px;"/>
+
                     </h:panelGrid>
                     <h:panelGrid id="pnlProduct" styleClass="clsGridMainInput" columns="8">
-                        <h:outputLabel value="Product:"/>
-                        <h:inputText disabled="true" value="#{transItemBean.showItemDescriptionCEC(transProductionBean.transProdObj.outputItemName, transProductionBean.transProdObj.codeSpecific, transProductionBean.transProdObj.descSpecific, transProductionBean.transProdObj.descMore)}" style="width: 250px;"/>
-                        <h:outputLabel value="Produced Qty:"/>
-                        <h:inputText value="#{transProductionBean.transProdObj.outputQty}" style="width: 50px;" disabled="true">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                        </h:inputText>
-                        <h:outputLabel value="Unit Cost:"/>
-                        <h:inputText value="#{transProductionBean.transProdObj.outputUnitCost}" style="width: 80px;" disabled="true">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                        </h:inputText>
-                        <h:outputLabel value="Total Cost:"/>
-                        <h:inputText value="#{transProductionBean.transProdObj.outputQty*transProductionBean.transProdObj.outputTotalCost}" style="width: 100px;" disabled="true">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                        </h:inputText>
+
                     </h:panelGrid>
                     <p:dataTable rowIndexVar="rowIndex" id="dtblTransactionItem" value="#{transProductionBean.transItemList}" var="ati" 
                                  styleClass="cls-table" tableStyle="width:auto;" 
@@ -89,7 +96,15 @@
                         </p:column>
                         <p:column>
                             <!-- column header -->
-                            <f:facet name="header">Qty</f:facet>
+                            <f:facet name="header">Unit Qty Used</f:facet>
+                            <!-- row record -->
+                            <h:inputText value="#{ati.inputQty/transProductionBean.transProdObj.outputQty}" style="width: 50px;" disabled="true" autocomplete="off">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:inputText>
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">Total Qty Used</f:facet>
                             <!-- row record -->
                             <h:inputText value="#{ati.inputQty}" style="width: 50px;" disabled="true" autocomplete="off">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -104,8 +119,7 @@
                     </p:dataTable>
                     <h:panelGrid style="background-color: yellow;width: 100%"/>
                     <h:panelGrid id="pgrdOther" styleClass="clsGridMainInput" columns="3">
-                        <h:outputLabel styleClass="clsLabelTransItem" value="#{transactionTypeBean.getTransactionType(70).transactionUserLabel}"/>
-                        <h:inputText disabled="true" style="width: 170px;" value="#{userDetailBean.getUserDetail(transProductionBean.transProdObj.transactionUserDetailId).userName}"/>
+
                     </h:panelGrid>
                     <h:panelGrid styleClass="clsGridMainCommands" columns="1" style="width: 100%">
 

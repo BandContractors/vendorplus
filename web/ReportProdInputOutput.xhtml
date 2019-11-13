@@ -141,7 +141,7 @@
                                 #{ti.inputItemUnit}
                             </td>
                         </tr>
-                        <ui:repeat var="t" value="#{transProductionBean.getProducedItems(ti.inputItemId,transProduction,transProductionItem,transProductionBean)}">
+                        <ui:repeat var="t" value="#{transProductionBean.getProducedItems(ti,transProduction,transProductionBean)}">
                             <tr>
                                 <td colspan="2"></td>
                                 <td colspan="2">
@@ -150,7 +150,15 @@
                                     #{t.batchno}
                                     #{t.codeSpecific}
                                 </td>
-                                <td colspan="2">#{t.transactor_names}</td>
+                                <td colspan="2">
+                                    <p:commandButton value="#{t.transaction_number}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgPIR').show();">
+                                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                                        </p:dialog>
+                                        <p:ajax listener="#{transProductionBean.initTransProductionSession(t.transactionId,'View')}" process="@form" update=":formTransactionPIR"/>
+                                    </p:commandButton>
+                                    #{t.transactor_names}
+                                </td>
                                 <td>
                                     <h:outputText value="#{t.outputQty}" style="color: #00B461;">
                                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -158,13 +166,16 @@
                                     #{t.outputItemUnit}
                                     #{transProductionBean.getPCsProduced(t)}
                                 </td>
-                                <td></td>
+                                <td>
+                                    #{utilityBean.formatDoubleToString(t.input_qty)}
+                                </td>
                             </tr>
                         </ui:repeat>
                     </ui:repeat>
                 </table>
             </p:panel>
         </h:form>
+        <ui:include src="ViewProductionTrans.xhtml"/>
     </h:body>
 </html>
 

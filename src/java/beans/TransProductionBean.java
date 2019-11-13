@@ -1530,6 +1530,47 @@ public class TransProductionBean implements Serializable {
         return tpil;
     }
 
+    public List<TransProduction> getProducedItems(TransProductionItem aTransProdItem, TransProduction aTransProd, TransProductionBean aTransProductionBean) {
+        List<TransProduction> tpil = new ArrayList<>();
+        ResultSet rs = null;
+        String wheresql = "";
+        if (aTransProd.getStoreId() > 0) {
+            wheresql = wheresql + " AND t.store_id=" + aTransProd.getStoreId();
+        }
+        if (aTransProd.getTransactor_id() > 0) {
+            wheresql = wheresql + " AND t.transactor_id=" + aTransProd.getTransactor_id();
+        }
+        if (null != aTransProdItem) {
+            wheresql = wheresql + " AND ti.input_item_id=" + aTransProdItem.getInputItemId() + " AND ti.batchno='" + aTransProdItem.getBatchno() + "' AND ti.code_specific='" + aTransProdItem.getCodeSpecific() + "' AND ti.desc_specific='" + aTransProdItem.getDescSpecific() + "'";
+        }
+        //}
+        if (aTransProductionBean.getDate1() != null && aTransProductionBean.getDate2() != null) {
+            wheresql = wheresql + " AND transaction_date BETWEEN '" + new java.sql.Date(aTransProductionBean.getDate1().getTime()) + "' AND '" + new java.sql.Date(aTransProductionBean.getDate2().getTime()) + "'";
+        }
+        String sql = "SELECT t.*,ti.input_qty "
+                + "FROM trans_production_item ti inner join trans_production t on ti.transaction_id=t.transaction_id "
+                + "WHERE 1=1 " + wheresql;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            TransProduction transProduction = null;
+            while (rs.next()) {
+                transProduction = this.getTransProductionFromResultset(rs);
+                try {
+                    transProduction.setInput_qty(rs.getDouble("input_qty"));
+                } catch (Exception e) {
+                    //do nothing
+                }
+                this.updateLookup(transProduction);
+                tpil.add(transProduction);
+            }
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+        return tpil;
+    }
+
     public void clearAll(Trans t, List<ItemProductionMap> aActiveTransItems, TransItem ti, Item aSelectedItem, Transactor aSelectedTransactor, int ClearNo, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {//Clear No: 0-do not clear, 1 - clear trans item only, 2 - clear all  
         TransItemBean tib = new TransItemBean();
         ItemBean itmB = new ItemBean();
