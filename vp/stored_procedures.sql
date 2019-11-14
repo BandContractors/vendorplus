@@ -9732,7 +9732,10 @@ CREATE PROCEDURE sp_insert_trans_production_item
 	IN in_batchno varchar(100),
 	IN in_code_specific varchar(50),
 	IN in_desc_specific varchar(100),
-	IN in_desc_more varchar(250)
+	IN in_desc_more varchar(250),
+	IN in_input_unit_qty double,
+	IN in_input_qty_bfr_prod double,
+	IN in_input_qty_afr_prod double
 ) 
 BEGIN 
 	SET @new_id=0;
@@ -9769,7 +9772,10 @@ BEGIN
 		batchno,
 		code_specific,
 		desc_specific,
-		desc_more
+		desc_more,
+		input_unit_qty,
+		input_qty_bfr_prod,
+		input_qty_afr_prod
 		) 
     VALUES
 	(
@@ -9781,7 +9787,10 @@ BEGIN
 		in_batchno,
 		in_code_specific,
 		in_desc_specific,
-		in_desc_more
+		in_desc_more,
+		in_input_unit_qty,
+		in_input_qty_bfr_prod,
+		in_input_qty_afr_prod
 		); 
 END//
 DELIMITER ;

@@ -29,6 +29,9 @@ public class TransProductionItem implements Serializable {
     private String CodeSpecific;
     private String DescSpecific;
     private String DescMore;
+    private double input_unit_qty;
+    private double input_qty_bfr_prod;
+    private double input_qty_afr_prod;
     
 
     /**
@@ -183,6 +186,48 @@ public class TransProductionItem implements Serializable {
      */
     public void setInputItemUnit(String InputItemUnit) {
         this.InputItemUnit = InputItemUnit;
+    }
+
+    /**
+     * @return the input_unit_qty
+     */
+    public double getInput_unit_qty() {
+        return input_unit_qty;
+    }
+
+    /**
+     * @param input_unit_qty the input_unit_qty to set
+     */
+    public void setInput_unit_qty(double input_unit_qty) {
+        this.input_unit_qty = input_unit_qty;
+    }
+
+    /**
+     * @return the input_qty_bfr_prod
+     */
+    public double getInput_qty_bfr_prod() {
+        return input_qty_bfr_prod;
+    }
+
+    /**
+     * @param input_qty_bfr_prod the input_qty_bfr_prod to set
+     */
+    public void setInput_qty_bfr_prod(double input_qty_bfr_prod) {
+        this.input_qty_bfr_prod = input_qty_bfr_prod;
+    }
+
+    /**
+     * @return the input_qty_afr_prod
+     */
+    public double getInput_qty_afr_prod() {
+        return input_qty_afr_prod;
+    }
+
+    /**
+     * @param input_qty_afr_prod the input_qty_afr_prod to set
+     */
+    public void setInput_qty_afr_prod(double input_qty_afr_prod) {
+        this.input_qty_afr_prod = input_qty_afr_prod;
     }
 
  

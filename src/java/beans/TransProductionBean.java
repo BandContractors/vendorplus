@@ -27,7 +27,9 @@ import static java.sql.Types.VARCHAR;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
@@ -1445,7 +1447,8 @@ public class TransProductionBean implements Serializable {
             wheresql = wheresql + " AND transaction_date BETWEEN '" + new java.sql.Date(aTransProductionBean.getDate1().getTime()) + "' AND '" + new java.sql.Date(aTransProductionBean.getDate2().getTime()) + "'";
         }
         String sql = "SELECT ti.input_item_id,ti.batchno,ti.code_specific,ti.desc_specific,sum(ti.input_qty) as input_qty "
-                + "FROM trans_production_item ti inner join trans_production t on ti.transaction_id=t.transaction_id "
+                + "FROM trans_production_item ti "
+                + "INNER JOIN trans_production t ON ti.transaction_id=t.transaction_id "
                 + "WHERE 1=1 " + wheresql + " "
                 + "GROUP BY  ti.input_item_id,ti.batchno,ti.code_specific,ti.desc_specific "
                 + "ORDER BY ti.input_item_id,ti.batchno,ti.code_specific,ti.desc_specific";
@@ -1547,9 +1550,10 @@ public class TransProductionBean implements Serializable {
         if (aTransProductionBean.getDate1() != null && aTransProductionBean.getDate2() != null) {
             wheresql = wheresql + " AND transaction_date BETWEEN '" + new java.sql.Date(aTransProductionBean.getDate1().getTime()) + "' AND '" + new java.sql.Date(aTransProductionBean.getDate2().getTime()) + "'";
         }
-        String sql = "SELECT t.*,ti.input_qty "
+        String sql = "SELECT t.*,ti.input_qty,ti.input_qty_bfr_prod,ti.input_qty_afr_prod "
                 + "FROM trans_production_item ti inner join trans_production t on ti.transaction_id=t.transaction_id "
-                + "WHERE 1=1 " + wheresql;
+                + "WHERE 1=1 " + wheresql + " "
+                + "ORDER BY t.transaction_id DESC";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -1559,6 +1563,16 @@ public class TransProductionBean implements Serializable {
                 transProduction = this.getTransProductionFromResultset(rs);
                 try {
                     transProduction.setInput_qty(rs.getDouble("input_qty"));
+                } catch (Exception e) {
+                    //do nothing
+                }
+                try {
+                    transProduction.setInput_qty_bfr_prod(rs.getDouble("input_qty_bfr_prod"));
+                } catch (Exception e) {
+                    //do nothing
+                }
+                try {
+                    transProduction.setInput_qty_afr_prod(rs.getDouble("input_qty_afr_prod"));
                 } catch (Exception e) {
                     //do nothing
                 }
@@ -1974,6 +1988,22 @@ public class TransProductionBean implements Serializable {
         this.TransItemList = new TransProductionItemBean().getTransProductionItemsByTransProductionId(aTransId);
         //refresh output
         new OutputDetailBean().refreshOutputProduction("PARENT", "");
+    }
+    
+    public void openTransProduction(long aTransId, String aAction) {
+        this.initTransProductionSession(aTransId, aAction);
+        Map<String, Object> options = new HashMap<String, Object>();
+        options.put("modal", true);
+        options.put("draggable", false);
+        options.put("resizable", false);
+        options.put("width", 600);
+        options.put("height", 300);
+        options.put("contentWidth", "100%");
+        options.put("contentHeight", "100%");
+        options.put("scrollable", true);
+        options.put("maximizable", true);
+        options.put("dynamic", true);
+        org.primefaces.PrimeFaces.current().dialog().openDynamic("ViewProductionTrans", options, null);
     }
 
     public void updateLookup(TransProduction aTransProduction) {

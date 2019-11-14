@@ -169,7 +169,21 @@ public class TransProductionItemBean implements Serializable {
             } catch (NullPointerException npe) {
                 transProductionItem.setDescMore("");
             }
-
+            try {
+                transProductionItem.setInput_unit_qty(aResultSet.getDouble("input_unit_qty"));
+            } catch (NullPointerException npe) {
+                transProductionItem.setInput_unit_qty(0);
+            }
+            try {
+                transProductionItem.setInput_qty_bfr_prod(aResultSet.getDouble("input_qty_bfr_prod"));
+            } catch (NullPointerException npe) {
+                transProductionItem.setInput_qty_bfr_prod(0);
+            }
+            try {
+                transProductionItem.setInput_qty_afr_prod(aResultSet.getDouble("input_qty_afr_prod"));
+            } catch (NullPointerException npe) {
+                transProductionItem.setInput_qty_afr_prod(0);
+            }
             return transProductionItem;
 
         } catch (SQLException se) {
@@ -196,7 +210,7 @@ public class TransProductionItemBean implements Serializable {
         String sql = null;
         String msg = "";
         long InsertedTransId = 0;
-        double calInputQty = 0.0;
+        //double calInputQty = 0.0;
         TransactionTypeBean TransTypeBean = new TransactionTypeBean();
         StockBean StkBean = new StockBean();
         TransProductionItem aTransProductionItem = new TransProductionItem();
@@ -204,7 +218,7 @@ public class TransProductionItemBean implements Serializable {
         if (1 == 2) {
         } else {
             if (aTransProductionItem.getTransProductionItemId() == 0) {
-                sql = "{call sp_insert_trans_production_item(?,?,?,?,?,?,?,?)}";
+                sql = "{call sp_insert_trans_production_item(?,?,?,?,?,?,?,?,?,?,?)}";
             }
             try (
                     Connection conn = DBConnection.getMySQLConnection();
@@ -217,13 +231,28 @@ public class TransProductionItemBean implements Serializable {
                     }
                     cs.setLong("in_transaction_id", aTransProductionID);
                     cs.setLong("in_input_item_id", aItemProductionMap.getInputItemId());
-                    //if (aOutputQty >= 1) {
-                    calInputQty = aItemProductionMap.getInputQty() * aOutputQty;
-                    cs.setDouble("in_input_qty", calInputQty);
-                    //} else {
-                    //    calInputQty = aItemProductionMap.getInputQty();
-                    //    cs.setDouble("in_input_qty", calInputQty);
-                    //}
+                    try {
+                        cs.setDouble("in_input_qty_bfr_prod", aItemProductionMap.getInputQtyCurrent());
+                    } catch (NullPointerException npe) {
+                        cs.setDouble("in_input_qty_bfr_prod", 0);
+                    }
+                    try {
+                        cs.setDouble("in_input_qty_afr_prod", aItemProductionMap.getInputQtyBalance());
+                    } catch (NullPointerException npe) {
+                        cs.setDouble("in_input_qty_afr_prod", 0);
+                    }
+                    try {
+                        cs.setDouble("in_input_unit_qty", aItemProductionMap.getInputQty());
+                    } catch (NullPointerException npe) {
+                        cs.setDouble("in_input_unit_qty", 0);
+                    }
+                    //calInputQty = aItemProductionMap.getInputQty() * aOutputQty;
+                    //cs.setDouble("in_input_qty", calInputQty);
+                    try {
+                        cs.setDouble("in_input_qty", aItemProductionMap.getInputQtyTotal());
+                    } catch (NullPointerException npe) {
+                        cs.setDouble("in_input_qty", 0);
+                    }
                     try {
                         cs.setDouble("in_input_unit_cost", 0);
                     } catch (NullPointerException npe) {
@@ -264,9 +293,11 @@ public class TransProductionItemBean implements Serializable {
                     stock.setBatchno(aItemProductionMap.getBatchno());
                     stock.setCodeSpecific(aItemProductionMap.getCodeSpecific());
                     stock.setDescSpecific(aItemProductionMap.getDescSpecific());
-                    i = new StockBean().subtractStock(stock, calInputQty);
+                    //i = new StockBean().subtractStock(stock, calInputQty);
+                    i = new StockBean().subtractStock(stock, aItemProductionMap.getInputQtyTotal());
                     stock.setSpecific_size(1);
-                    new Stock_ledgerBean().callInsertStock_ledger("Subtract", stock, calInputQty, "Add", 70, aTransProductionID, new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                    //new Stock_ledgerBean().callInsertStock_ledger("Subtract", stock, calInputQty, "Add", 70, aTransProductionID, new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                    new Stock_ledgerBean().callInsertStock_ledger("Subtract", stock, aItemProductionMap.getInputQtyTotal(), "Add", 70, aTransProductionID, new GeneralUserSetting().getCurrentUser().getUserDetailId());
                     try {
                         FromUnitCost = new StockBean().getStock(stock.getStoreId(), stock.getItemId(), stock.getBatchno(), stock.getCodeSpecific(), stock.getDescSpecific()).getUnitCost();
                     } catch (NullPointerException npe) {

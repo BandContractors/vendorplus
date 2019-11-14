@@ -60,8 +60,13 @@
                         <h:inputText value="#{transProductionBean.transProdObj.outputTotalCost}" style="width: 200px;" disabled="true">
                             <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
-                        <h:outputLabel value="#{transactionTypeBean.getTransactionType(70).transactionUserLabel}"/>
+                        <h:outputLabel value="#{transactionTypeBean.getTransactionType(70).transactionUserLabel}:"/>
                         <h:inputText disabled="true" value="#{userDetailBean.getUserDetail(transProductionBean.transProdObj.transactionUserDetailId).userName}" style="width: 500px;"/>
+                        
+                        <h:outputLabel  value="#{transactionTypeBean.getTransactionType(70).transactionNumberLabel}:"/>
+                        <h:inputText styleClass="clsInput" disabled="true" value="#{transProductionBean.transProdObj.transaction_number}" style="width: 200px;"/>
+                        <h:outputLabel  value="#{transactionTypeBean.getTransactionType(70).transactionRefLabel}:"/>
+                        <h:inputText styleClass="clsInput" disabled="true" value="#{transProductionBean.transProdObj.transactionRef}" style="width: 500px;"/>
 
                     </h:panelGrid>
                     <h:panelGrid id="pnlProduct" styleClass="clsGridMainInput" columns="8">
@@ -96,9 +101,17 @@
                         </p:column>
                         <p:column>
                             <!-- column header -->
+                            <f:facet name="header">Qty Before Prod</f:facet>
+                            <!-- row record -->
+                            <h:outputLabel value="#{ati.input_qty_bfr_prod}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputLabel>
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
                             <f:facet name="header">Unit Qty Used</f:facet>
                             <!-- row record -->
-                            <h:inputText value="#{ati.inputQty/transProductionBean.transProdObj.outputQty}" style="width: 50px;" disabled="true" autocomplete="off">
+                            <h:inputText value="#{ati.input_unit_qty}" style="width: 60px;" disabled="true" autocomplete="off">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:inputText>
                         </p:column>
@@ -106,9 +119,17 @@
                             <!-- column header -->
                             <f:facet name="header">Total Qty Used</f:facet>
                             <!-- row record -->
-                            <h:inputText value="#{ati.inputQty}" style="width: 50px;" disabled="true" autocomplete="off">
+                            <h:inputText value="#{ati.inputQty}" style="width: 80px;" disabled="true" autocomplete="off">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:inputText>
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">Qty After Prod</f:facet>
+                            <!-- row record -->
+                            <h:outputLabel value="#{ati.input_qty_afr_prod}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputLabel>
                         </p:column>
                         <p:column>
                             <!-- column header -->

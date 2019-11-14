@@ -69,8 +69,11 @@ public class TransProduction implements Serializable {
     private String transactor_names;
     private double specific_size;
     private double specific_size_qty;
-    //for view only
-    private Double input_qty;
+    //for report only
+    private double input_qty;
+    private double input_unit_qty;
+    private double input_qty_bfr_prod;
+    private double input_qty_afr_prod;
 
     /**
      * @return the TransactionId
@@ -705,15 +708,57 @@ public class TransProduction implements Serializable {
     /**
      * @return the input_qty
      */
-    public Double getInput_qty() {
+    public double getInput_qty() {
         return input_qty;
     }
 
     /**
      * @param input_qty the input_qty to set
      */
-    public void setInput_qty(Double input_qty) {
+    public void setInput_qty(double input_qty) {
         this.input_qty = input_qty;
+    }
+
+    /**
+     * @return the input_unit_qty
+     */
+    public double getInput_unit_qty() {
+        return input_unit_qty;
+    }
+
+    /**
+     * @param input_unit_qty the input_unit_qty to set
+     */
+    public void setInput_unit_qty(double input_unit_qty) {
+        this.input_unit_qty = input_unit_qty;
+    }
+
+    /**
+     * @return the input_qty_bfr_prod
+     */
+    public double getInput_qty_bfr_prod() {
+        return input_qty_bfr_prod;
+    }
+
+    /**
+     * @param input_qty_bfr_prod the input_qty_bfr_prod to set
+     */
+    public void setInput_qty_bfr_prod(double input_qty_bfr_prod) {
+        this.input_qty_bfr_prod = input_qty_bfr_prod;
+    }
+
+    /**
+     * @return the input_qty_afr_prod
+     */
+    public double getInput_qty_afr_prod() {
+        return input_qty_afr_prod;
+    }
+
+    /**
+     * @param input_qty_afr_prod the input_qty_afr_prod to set
+     */
+    public void setInput_qty_afr_prod(double input_qty_afr_prod) {
+        this.input_qty_afr_prod = input_qty_afr_prod;
     }
     
     

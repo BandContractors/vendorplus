@@ -13,3 +13,8 @@ alter table transaction_hist add column is_cancel int(1) default 0;
 
 UPDATE acc_currency SET decimal_places=0 WHERE acc_currency_id>0 and currency_code='UGX';
 
+alter table trans_production_item add column input_unit_qty double default 0 not null;
+alter table trans_production_item add column input_qty_bfr_prod double default 0 not null;
+alter table trans_production_item add column input_qty_afr_prod double default 0 not null;
+
+
