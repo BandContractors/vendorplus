@@ -83,7 +83,7 @@
                     </h:inputText>
 
                     <h:outputLabel  value="Payment Date:"/>
-                    <p:calendar styleClass="clsInput" id="calPaymentDate"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{pay.payDate}" size="11"/>
+                    <p:calendar styleClass="clsInput" id="calPaymentDate"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{pay.payDate}" size="11" disabled="#{generalUserSetting.isAllowedToBackDate==0}"/>
                     <h:outputLabel  value="Payment Method:"/>
                     <h:selectOneMenu styleClass="clsMenu" id="menuPayMethod" value="#{pay.payMethodId}" style="width: 150px;">
                         <f:selectItem itemValue="" itemLabel=""/>

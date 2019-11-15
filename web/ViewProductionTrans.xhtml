@@ -103,7 +103,7 @@
                             <!-- column header -->
                             <f:facet name="header">Qty Before Prod</f:facet>
                             <!-- row record -->
-                            <h:outputLabel value="#{ati.input_qty_bfr_prod}">
+                            <h:outputLabel value="#{ati.input_qty_bfr_prod}" rendered="#{ati.input_qty_bfr_prod>0}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
                         </p:column>
@@ -111,7 +111,7 @@
                             <!-- column header -->
                             <f:facet name="header">Unit Qty Used</f:facet>
                             <!-- row record -->
-                            <h:inputText value="#{ati.input_unit_qty}" style="width: 60px;" disabled="true" autocomplete="off">
+                            <h:inputText value="#{ati.input_unit_qty}" style="width: 60px;" disabled="true" autocomplete="off" rendered="#{ati.input_unit_qty>0}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:inputText>
                         </p:column>
@@ -127,7 +127,7 @@
                             <!-- column header -->
                             <f:facet name="header">Qty After Prod</f:facet>
                             <!-- row record -->
-                            <h:outputLabel value="#{ati.input_qty_afr_prod}">
+                            <h:outputLabel value="#{ati.input_qty_afr_prod}" rendered="#{ati.input_qty_afr_prod>0}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
                         </p:column>

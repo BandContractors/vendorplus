@@ -1989,7 +1989,7 @@ public class TransProductionBean implements Serializable {
         //refresh output
         new OutputDetailBean().refreshOutputProduction("PARENT", "");
     }
-    
+
     public void openTransProduction(long aTransId, String aAction) {
         this.initTransProductionSession(aTransId, aAction);
         Map<String, Object> options = new HashMap<String, Object>();
@@ -2004,6 +2004,21 @@ public class TransProductionBean implements Serializable {
         options.put("maximizable", true);
         options.put("dynamic", true);
         org.primefaces.PrimeFaces.current().dialog().openDynamic("ViewProductionTrans", options, null);
+    }
+
+    public void openPageTemp() {
+        Map<String, Object> options = new HashMap<String, Object>();
+        options.put("modal", true);
+        options.put("draggable", false);
+        options.put("resizable", false);
+        options.put("width", 600);
+        options.put("height", 300);
+        options.put("contentWidth", "100%");
+        options.put("contentHeight", "100%");
+        options.put("scrollable", true);
+        options.put("maximizable", true);
+        options.put("dynamic", true);
+        org.primefaces.PrimeFaces.current().dialog().openDynamic("PageTemp", options, null);
     }
 
     public void updateLookup(TransProduction aTransProduction) {

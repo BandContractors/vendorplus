@@ -72,8 +72,7 @@
                         <f:ajax event="change" execute="@form" render="@form"/>
                     </h:inputText>
                     <h:outputLabel  style="width: 250px;" value="Receipt Date:"/>
-                    <p:calendar styleClass="clsInput" style="width: 250px;" id="calPaymentDate"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{pay.payDate}">
-                    </p:calendar>
+                    <p:calendar styleClass="clsInput" style="width: 250px;" id="calPaymentDate"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{pay.payDate}" disabled="#{generalUserSetting.isAllowedToBackDate==0}"/>
                     <h:outputLabel  style="width: 250px;" value="Payment Method:"/>
                     <h:selectOneMenu styleClass="clsMenu" style="width: 250px;" id="menuPayMethod" value="#{pay.payMethodId}">
                         <f:selectItem itemValue="" itemLabel=""/>

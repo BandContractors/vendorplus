@@ -152,6 +152,19 @@ public class GeneralUserSetting implements Serializable {
         }
         return IntResponse;
     }
+    
+    public int getIsAllowedToBackDate() {
+        int IntResponse;
+        try {
+            FacesContext context = FacesContext.getCurrentInstance();
+            HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+            HttpSession httpSession = request.getSession(false);
+            IntResponse = (int) httpSession.getAttribute("IS_ALLOWED_TO_BACKDATE");
+        } catch (NullPointerException npe) {
+            IntResponse = 0;
+        }
+        return IntResponse;
+    }
 
     public int getCurrentTransactionTypeId() {
         int IntResponse;

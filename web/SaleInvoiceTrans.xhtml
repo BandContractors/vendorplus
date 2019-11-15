@@ -81,7 +81,7 @@
                 <h:outputLabel id="olblDebtCredit" style="color: coral;font-weight: bold;" value="Receivable (#{generalUserSetting.LOCAL_CURRENCY.currencyCode})"/>
                 <h:outputLabel id="olblDeposit" style="color: green;font-weight: bold;" value="Deposit (#{trans.currencyCode})"/>
                 <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}" style="width: 120px;"/>
-                <p:calendar styleClass="clsInput" id="calTransactionDate" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.transactionDate}" pattern="#{companySetting.getDateFormat()}" size="8"/>
+                <p:calendar styleClass="clsInput" id="calTransactionDate" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.transactionDate}" pattern="#{companySetting.getDateFormat()}" size="8" disabled="#{generalUserSetting.isAllowedToBackDate==0}"/>
                 <h:selectOneMenu styleClass="clsMenu" id="menuCurrency" value="#{trans.currencyCode}" style="width: 80px;">
                     <f:selectItems value="#{accCurrencyBean.currencyList}" var="ac" itemLabel="#{ac.currencyCode}" itemValue="#{ac.currencyCode}"/>
                     <f:ajax event="change" listener="#{transBean.refreshAccChildAccountsForCashReceipt(trans.currencyCode, trans.payMethod,generalUserSetting.getCurrentStore().storeId,generalUserSetting.getCurrentUser().userDetailId)}" execute="@this pgrdPayment" render="pgrdPayment"/>

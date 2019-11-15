@@ -285,7 +285,7 @@ public class GroupRightBean implements Serializable {
     }
 
     public List<GroupRight> retrieveGroupRightsForEdit() {
-        this.GroupRightsForEdit = new ArrayList<GroupRight>();
+        this.GroupRightsForEdit = new ArrayList<GroupRight>(); 
         if (this.SelectedGroupDetailId == 0 || this.SelectedStoreId == 0) {
             return null;
         } else {

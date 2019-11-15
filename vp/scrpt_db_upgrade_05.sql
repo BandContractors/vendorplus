@@ -17,4 +17,7 @@ alter table trans_production_item add column input_unit_qty double default 0 not
 alter table trans_production_item add column input_qty_bfr_prod double default 0 not null;
 alter table trans_production_item add column input_qty_afr_prod double default 0 not null;
 
+INSERT INTO transaction_type (transaction_type_id, transaction_type_name) VALUES ('74', 'BACKDATING');
+INSERT INTO transaction_reason (transaction_reason_id, transaction_reason_name, transaction_type_id) VALUES ('113', 'BACKDATING', '74');
+
 

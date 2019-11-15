@@ -136,6 +136,12 @@ public class Login implements Serializable {
                     } else {
                         httpSession.setAttribute("IS_APPROVE_POINTS_NEEDED", 1);
                     }
+                    //Set is allowed to backdate in session
+                    if (new GroupRightBean().IsUserGroupsFunctionAccessAllowed(this.LoggedInUserDetail, new GroupRightBean().getCurrentGroupRights(this.LoggedInStoreId, this.LoggedInUserDetail.getUserDetailId()), "113", "View") == 1) {
+                        httpSession.setAttribute("IS_ALLOWED_TO_BACKDATE", 1);
+                    } else {
+                        httpSession.setAttribute("IS_ALLOWED_TO_BACKDATE", 0);
+                    }
                     //Set LOGIN_TYPE in session
                     httpSession.setAttribute("LOGIN_TYPE", aLoginType); //1=BRANCH, 2=INTER-BRANCH
                     //set MODULES sessions
