@@ -258,7 +258,8 @@ public class AccJournalBean implements Serializable {
             //Post Jounal to Ledger
             new AccLedgerBean().postJounalToLedger(aAccJournal);
             //Post Jounal to specific table
-            this.saveAccJournalSpecify(aAccJournal);
+            //this.saveAccJournalSpecify(aAccJournal);
+            this.saveAccJournalSpecific(aAccJournal);
         } catch (SQLException se) {
             System.err.println("saveAccJournal:" + se.getMessage());
         }
@@ -336,6 +337,82 @@ public class AccJournalBean implements Serializable {
                 new AccLedgerBean().postJounalToLedgerSpecify(aAccJournal);
             } catch (SQLException se) {
                 System.err.println("saveAccJournalSpecify:" + se.getMessage());
+            }
+        }
+    }
+
+    public void saveAccJournalSpecific(AccJournal aAccJournal) {
+        String sql = "";
+        String TableName = this.getSpecificTableName(aAccJournal.getAccountCode(), "JOURNAL");
+        sql = "{call sp_insert_" + TableName + "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+        if (TableName.length() > 0) {
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    CallableStatement cs = conn.prepareCall(sql);) {
+                cs.setDate("in_journal_date", new java.sql.Date(aAccJournal.getJournalDate().getTime()));
+                try {
+                    cs.setLong("in_transaction_id", aAccJournal.getTransactionId());
+                } catch (NullPointerException npe) {
+                    cs.setLong("in_transaction_id", 0);
+                }
+                try {
+                    cs.setInt("in_transaction_type_id", aAccJournal.getTransactionTypeId());
+                } catch (NullPointerException npe) {
+                    cs.setInt("in_transaction_type_id", 0);
+                }
+                try {
+                    cs.setInt("in_transaction_reason_id", aAccJournal.getTransactionReasonId());
+                } catch (NullPointerException npe) {
+                    cs.setInt("in_transaction_reason_id", 0);
+                }
+                try {
+                    cs.setLong("in_pay_id", aAccJournal.getPayId());
+                } catch (NullPointerException npe) {
+                    cs.setLong("in_pay_id", 0);
+                }
+                try {
+                    cs.setInt("in_pay_type_id", aAccJournal.getPayTypeId());
+                } catch (NullPointerException npe) {
+                    cs.setInt("in_pay_type_id", 0);
+                }
+                try {
+                    cs.setInt("in_pay_reason_id", aAccJournal.getPayReasonId());
+                } catch (NullPointerException npe) {
+                    cs.setInt("in_pay_reason_id", 0);
+                }
+                cs.setInt("in_store_id", aAccJournal.getStoreId());
+                try {
+                    cs.setLong("in_bill_transactor_id", aAccJournal.getBillTransactorId());
+                } catch (NullPointerException npe) {
+                    cs.setLong("in_bill_transactor_id", 0);
+                }
+                cs.setString("in_ledger_folio", aAccJournal.getLedgerFolio());
+                cs.setInt("in_acc_coa_id", aAccJournal.getAccCoaId());
+                cs.setString("in_account_code", aAccJournal.getAccountCode());
+                cs.setDouble("in_debit_amount", aAccJournal.getDebitAmount());
+                cs.setDouble("in_credit_amount", aAccJournal.getCreditAmount());
+                cs.setString("in_narration", aAccJournal.getNarration());
+                cs.setInt("in_acc_period_id", aAccJournal.getAccPeriodId());
+                //cs.setInt("in_store_id", aAccJournal.getStoreId());
+                try {
+                    cs.setLong("in_acc_child_account_id", aAccJournal.getAccChildAccountId());
+                } catch (NullPointerException npe) {
+                    cs.setLong("in_acc_child_account_id", 0);
+                }
+                cs.setString("in_currency_code", aAccJournal.getCurrencyCode());
+                cs.setDouble("in_xrate", aAccJournal.getXrate());
+                cs.setInt("in_add_by", aAccJournal.getAddBy());
+                try {
+                    cs.setLong("in_job_id", aAccJournal.getJobId());
+                } catch (NullPointerException npe) {
+                    cs.setLong("in_job_id", 0);
+                }
+                cs.executeUpdate();
+                //Post JounalSpecify to LedgerSpecify
+                //new AccLedgerBean().postJounalToLedgerSpecify(aAccJournal);
+                new AccLedgerBean().postJounalToLedgerSpecific(aAccJournal);
+            } catch (Exception e) {
+                System.err.println("saveAccJournalSpecific:" + e.getMessage());
             }
         }
     }

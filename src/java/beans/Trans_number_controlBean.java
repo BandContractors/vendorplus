@@ -11,11 +11,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.Format;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
+import sessions.GeneralUserSetting;
 
 /*
  * To change this template, choose Tools | Templates
@@ -144,11 +144,24 @@ public class Trans_number_controlBean implements Serializable {
         } catch (NullPointerException npe) {
         }
         NewDayNo = CurDayNo + 1;
-        String X = String.format("%04d", NewDayNo);
+        String X = "";
+        if (NewDayNo <= 9999) {
+            X = String.format("%04d", NewDayNo);
+        } else if (NewDayNo <= 99999) {
+            X = String.format("%05d", NewDayNo);
+        } else if (NewDayNo <= 999999) {
+            X = String.format("%06d", NewDayNo);
+        } else {
+            X = String.format("%07d", NewDayNo);
+        }
 
         String C = aTransType.getTransaction_type_code();
         if (null == C) {
             C = "";
+        }
+        String S = new GeneralUserSetting().getCurrentStore().getStore_code();
+        if (null == S || S.length() == 0) {
+            S = "";
         }
         String TransNumberFormat = aTransType.getTrans_number_format();
         for (int i = 0; i < TransNumberFormat.length(); i++) {
@@ -162,6 +175,8 @@ public class Trans_number_controlBean implements Serializable {
                 transno = transno + D;
             } else if (TransNumberFormat.charAt(i) == 'X') {
                 transno = transno + X;
+            } else if (TransNumberFormat.charAt(i) == 'S') {
+                transno = transno + S;
             }
         }
         return transno;

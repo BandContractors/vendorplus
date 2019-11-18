@@ -150,14 +150,14 @@
                 <p:column headerText="Sub Type">
                     <h:outputLabel value="#{transactionReasonBean.getTransactionReason(itm.payReasonId).transactionReasonName} " rendered="#{null==itm.transactionReasonId or itm.transactionReasonId==0}"/>
                     <h:outputLabel value="#{transactionReasonBean.getTransactionReason(itm.transactionReasonId).transactionReasonName} "/>
-                    <h:outputText value="#{itm.payId}" rendered="#{itm.transactionId==0}"/>
-                    <h:outputText value="#{itm.transactionId}"/>
+                    <h:outputText value="#{payBean.getPay(itm.payId).pay_number}" rendered="#{itm.transactionId==0}"/>
+                    <h:outputText value="#{transBean.getTrans(itm.transactionId).transactionNumber}"/>
                 </p:column>
                 <p:column headerText="Receivable From">
                     <h:outputText value="#{transactorBean.getTransactor(itm.billTransactorId).transactorNames} " rendered="#{itm.billTransactorId>0}"/>
                     <h:outputText value="#{accChildAccountBean.getAccChildAccById(payBean.getPay(itm.payId).accChildAccountId2).childAccountName}"  rendered="#{itm.billTransactorId==0}"/>
                 </p:column>
-                <p:column headerText="Cash Account" style="text-align: left;">
+                <p:column headerText="Account" style="text-align: left;">
                     <h:outputText value="#{accCoaBean.getAccCoaByCodeOrId(itm.accountCode, 0).accountName}"/>
                 </p:column>
                 <p:column headerText="Currency">

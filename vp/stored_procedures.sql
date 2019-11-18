@@ -277,7 +277,8 @@ DROP PROCEDURE IF EXISTS sp_insert_store;
 DELIMITER //
 CREATE PROCEDURE sp_insert_store
 (
-	IN in_store_name varchar(20)
+	IN in_store_name varchar(20),
+	IN in_store_code varchar(10)
 ) 
 BEGIN 
 	SET @new_id=0;
@@ -285,12 +286,14 @@ BEGIN
 	INSERT INTO store
 	(
 		store_id,
-		store_name
+		store_name,
+		store_code
 	) 
     VALUES
 	(
 		@new_id,
-		in_store_name
+		in_store_name,
+		in_store_code
 	); 
 END//
 DELIMITER ;
@@ -300,11 +303,11 @@ DELIMITER //
 CREATE PROCEDURE sp_update_store
 (
 	IN in_store_id int,
-	IN in_store_name varchar(20)
+	IN in_store_name varchar(20),
+	In in_store_code varchar(10)
 ) 
 BEGIN 
-	UPDATE store SET 
-		store_name=in_store_name
+	UPDATE store SET store_name=in_store_name,store_code=in_store_code 
 	WHERE store_id=in_store_id; 
 END//
 DELIMITER ;
@@ -7591,6 +7594,372 @@ BEGIN
 END//
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS sp_insert_acc_journal_receivable;
+DELIMITER //
+CREATE PROCEDURE sp_insert_acc_journal_receivable
+(
+	IN in_journal_date date,
+	IN in_transaction_id bigint,
+	IN in_transaction_type_id int,
+	IN in_transaction_reason_id int,
+	IN in_pay_id bigint,
+	IN in_pay_type_id int,
+	IN in_pay_reason_id int,
+	IN in_store_id int,
+	IN in_bill_transactor_id bigint,
+	IN in_ledger_folio varchar(3),
+	IN in_acc_coa_id int,
+	IN in_account_code varchar(20),
+	IN in_debit_amount double,
+	IN in_credit_amount double,
+	IN in_narration varchar(200),
+	IN in_acc_period_id int,
+	IN in_acc_child_account_id int,
+	IN in_currency_code varchar(10),
+	IN in_xrate double,
+	IN in_add_by int,
+	IN in_job_id bigint
+) 
+BEGIN 
+	SET @cur_sys_datetime=NULL;
+	CALL sp_get_current_system_datetime(@cur_sys_datetime);
+
+	SET @bill_transactor_id=NULL;
+	if (in_bill_transactor_id!=0) then
+		set @bill_transactor_id=in_bill_transactor_id;
+	end if;
+	SET @acc_child_account_id=NULL;
+	if (in_acc_child_account_id!=0) then
+		set @acc_child_account_id=in_acc_child_account_id;
+	end if;
+
+	SET @transaction_id=NULL;
+	if (in_transaction_id!=0) then
+		set @transaction_id=in_transaction_id;
+	end if;
+	SET @transaction_type_id=NULL;
+	if (in_transaction_type_id!=0) then
+		set @transaction_type_id=in_transaction_type_id;
+	end if;
+	SET @transaction_reason_id=NULL;
+	if (in_transaction_reason_id!=0) then
+		set @transaction_reason_id=in_transaction_reason_id;
+	end if;
+
+	SET @pay_id=NULL;
+	if (in_pay_id!=0) then
+		set @pay_id=in_pay_id;
+	end if;
+	SET @pay_type_id=NULL;
+	if (in_pay_type_id!=0) then
+		set @pay_type_id=in_pay_type_id;
+	end if;
+	SET @pay_reason_id=NULL;
+	if (in_pay_reason_id!=0) then
+		set @pay_reason_id=in_pay_reason_id;
+	end if;
+
+	INSERT INTO acc_journal_receivable
+	(
+		journal_date,
+		transaction_id,
+		transaction_type_id,
+		transaction_reason_id,
+		pay_id,
+		pay_type_id,
+		pay_reason_id,
+		store_id,
+		bill_transactor_id,
+		ledger_folio,
+		acc_coa_id,
+		account_code,
+		debit_amount,
+		credit_amount,
+		narration,
+		acc_period_id,
+		acc_child_account_id,
+		currency_code,
+		xrate,
+		add_date,
+		add_by,
+		is_active,
+		is_deleted,
+		job_id
+	) 
+    VALUES
+	(
+		in_journal_date,
+		@transaction_id,
+		@transaction_type_id,
+		@transaction_reason_id,
+		@pay_id,
+		@pay_type_id,
+		@pay_reason_id,
+		in_store_id,
+		@bill_transactor_id,
+		in_ledger_folio,
+		in_acc_coa_id,
+		in_account_code,
+		in_debit_amount,
+		in_credit_amount,
+		in_narration,
+		in_acc_period_id,
+		@acc_child_account_id,
+		in_currency_code,
+		in_xrate,
+		@cur_sys_datetime,
+		in_add_by,
+		1,
+		0,
+		in_job_id
+	);
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_insert_acc_journal_payable;
+DELIMITER //
+CREATE PROCEDURE sp_insert_acc_journal_payable
+(
+	IN in_journal_date date,
+	IN in_transaction_id bigint,
+	IN in_transaction_type_id int,
+	IN in_transaction_reason_id int,
+	IN in_pay_id bigint,
+	IN in_pay_type_id int,
+	IN in_pay_reason_id int,
+	IN in_store_id int,
+	IN in_bill_transactor_id bigint,
+	IN in_ledger_folio varchar(3),
+	IN in_acc_coa_id int,
+	IN in_account_code varchar(20),
+	IN in_debit_amount double,
+	IN in_credit_amount double,
+	IN in_narration varchar(200),
+	IN in_acc_period_id int,
+	IN in_acc_child_account_id int,
+	IN in_currency_code varchar(10),
+	IN in_xrate double,
+	IN in_add_by int,
+	IN in_job_id bigint
+) 
+BEGIN 
+	SET @cur_sys_datetime=NULL;
+	CALL sp_get_current_system_datetime(@cur_sys_datetime);
+
+	SET @bill_transactor_id=NULL;
+	if (in_bill_transactor_id!=0) then
+		set @bill_transactor_id=in_bill_transactor_id;
+	end if;
+	SET @acc_child_account_id=NULL;
+	if (in_acc_child_account_id!=0) then
+		set @acc_child_account_id=in_acc_child_account_id;
+	end if;
+
+	SET @transaction_id=NULL;
+	if (in_transaction_id!=0) then
+		set @transaction_id=in_transaction_id;
+	end if;
+	SET @transaction_type_id=NULL;
+	if (in_transaction_type_id!=0) then
+		set @transaction_type_id=in_transaction_type_id;
+	end if;
+	SET @transaction_reason_id=NULL;
+	if (in_transaction_reason_id!=0) then
+		set @transaction_reason_id=in_transaction_reason_id;
+	end if;
+
+	SET @pay_id=NULL;
+	if (in_pay_id!=0) then
+		set @pay_id=in_pay_id;
+	end if;
+	SET @pay_type_id=NULL;
+	if (in_pay_type_id!=0) then
+		set @pay_type_id=in_pay_type_id;
+	end if;
+	SET @pay_reason_id=NULL;
+	if (in_pay_reason_id!=0) then
+		set @pay_reason_id=in_pay_reason_id;
+	end if;
+
+	INSERT INTO acc_journal_payable
+	(
+		journal_date,
+		transaction_id,
+		transaction_type_id,
+		transaction_reason_id,
+		pay_id,
+		pay_type_id,
+		pay_reason_id,
+		store_id,
+		bill_transactor_id,
+		ledger_folio,
+		acc_coa_id,
+		account_code,
+		debit_amount,
+		credit_amount,
+		narration,
+		acc_period_id,
+		acc_child_account_id,
+		currency_code,
+		xrate,
+		add_date,
+		add_by,
+		is_active,
+		is_deleted,
+		job_id
+	) 
+    VALUES
+	(
+		in_journal_date,
+		@transaction_id,
+		@transaction_type_id,
+		@transaction_reason_id,
+		@pay_id,
+		@pay_type_id,
+		@pay_reason_id,
+		in_store_id,
+		@bill_transactor_id,
+		in_ledger_folio,
+		in_acc_coa_id,
+		in_account_code,
+		in_debit_amount,
+		in_credit_amount,
+		in_narration,
+		in_acc_period_id,
+		@acc_child_account_id,
+		in_currency_code,
+		in_xrate,
+		@cur_sys_datetime,
+		in_add_by,
+		1,
+		0,
+		in_job_id
+	);
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_insert_acc_journal_prepaid;
+DELIMITER //
+CREATE PROCEDURE sp_insert_acc_journal_prepaid
+(
+	IN in_journal_date date,
+	IN in_transaction_id bigint,
+	IN in_transaction_type_id int,
+	IN in_transaction_reason_id int,
+	IN in_pay_id bigint,
+	IN in_pay_type_id int,
+	IN in_pay_reason_id int,
+	IN in_store_id int,
+	IN in_bill_transactor_id bigint,
+	IN in_ledger_folio varchar(3),
+	IN in_acc_coa_id int,
+	IN in_account_code varchar(20),
+	IN in_debit_amount double,
+	IN in_credit_amount double,
+	IN in_narration varchar(200),
+	IN in_acc_period_id int,
+	IN in_acc_child_account_id int,
+	IN in_currency_code varchar(10),
+	IN in_xrate double,
+	IN in_add_by int,
+	IN in_job_id bigint
+) 
+BEGIN 
+	SET @cur_sys_datetime=NULL;
+	CALL sp_get_current_system_datetime(@cur_sys_datetime);
+
+	SET @bill_transactor_id=NULL;
+	if (in_bill_transactor_id!=0) then
+		set @bill_transactor_id=in_bill_transactor_id;
+	end if;
+	SET @acc_child_account_id=NULL;
+	if (in_acc_child_account_id!=0) then
+		set @acc_child_account_id=in_acc_child_account_id;
+	end if;
+
+	SET @transaction_id=NULL;
+	if (in_transaction_id!=0) then
+		set @transaction_id=in_transaction_id;
+	end if;
+	SET @transaction_type_id=NULL;
+	if (in_transaction_type_id!=0) then
+		set @transaction_type_id=in_transaction_type_id;
+	end if;
+	SET @transaction_reason_id=NULL;
+	if (in_transaction_reason_id!=0) then
+		set @transaction_reason_id=in_transaction_reason_id;
+	end if;
+
+	SET @pay_id=NULL;
+	if (in_pay_id!=0) then
+		set @pay_id=in_pay_id;
+	end if;
+	SET @pay_type_id=NULL;
+	if (in_pay_type_id!=0) then
+		set @pay_type_id=in_pay_type_id;
+	end if;
+	SET @pay_reason_id=NULL;
+	if (in_pay_reason_id!=0) then
+		set @pay_reason_id=in_pay_reason_id;
+	end if;
+
+	INSERT INTO acc_journal_prepaid
+	(
+		journal_date,
+		transaction_id,
+		transaction_type_id,
+		transaction_reason_id,
+		pay_id,
+		pay_type_id,
+		pay_reason_id,
+		store_id,
+		bill_transactor_id,
+		ledger_folio,
+		acc_coa_id,
+		account_code,
+		debit_amount,
+		credit_amount,
+		narration,
+		acc_period_id,
+		acc_child_account_id,
+		currency_code,
+		xrate,
+		add_date,
+		add_by,
+		is_active,
+		is_deleted,
+		job_id
+	) 
+    VALUES
+	(
+		in_journal_date,
+		@transaction_id,
+		@transaction_type_id,
+		@transaction_reason_id,
+		@pay_id,
+		@pay_type_id,
+		@pay_reason_id,
+		in_store_id,
+		@bill_transactor_id,
+		in_ledger_folio,
+		in_acc_coa_id,
+		in_account_code,
+		in_debit_amount,
+		in_credit_amount,
+		in_narration,
+		in_acc_period_id,
+		@acc_child_account_id,
+		in_currency_code,
+		in_xrate,
+		@cur_sys_datetime,
+		in_add_by,
+		1,
+		0,
+		in_job_id
+	);
+END//
+DELIMITER ;
+
 DROP PROCEDURE IF EXISTS sp_search_pay_trans_by_transaction_id;
 DELIMITER //
 CREATE PROCEDURE sp_search_pay_trans_by_transaction_id
@@ -8356,6 +8725,159 @@ BEGIN
 END//
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS sp_insert_acc_ledger_receivable;
+DELIMITER //
+CREATE PROCEDURE sp_insert_acc_ledger_receivable
+(
+	IN in_acc_period_id int,
+	IN in_bill_transactor_id bigint,
+	IN in_account_code varchar(20),
+	IN in_acc_child_account_id int,
+	IN in_currency_code varchar(10),
+	IN in_debit_amount double,
+	IN in_credit_amount double,
+	IN in_debit_amount_lc double,
+	IN in_credit_amount_lc double
+) 
+BEGIN 
+	SET @bill_transactor_id=NULL;
+	if (in_bill_transactor_id!=0) then
+		set @bill_transactor_id=in_bill_transactor_id;
+	end if;
+	SET @acc_child_account_id=NULL;
+	if (in_acc_child_account_id!=0) then
+		set @acc_child_account_id=in_acc_child_account_id;
+	end if;
+
+	INSERT INTO acc_ledger_receivable
+	(
+		acc_period_id,
+		bill_transactor_id,
+		account_code,
+		acc_child_account_id,
+		currency_code,
+		debit_amount,
+		credit_amount,
+		debit_amount_lc,
+		credit_amount_lc
+	) 
+    VALUES
+	(
+		in_acc_period_id,
+		@bill_transactor_id,
+		in_account_code,
+		@acc_child_account_id,
+		in_currency_code,
+		in_debit_amount,
+		in_credit_amount,
+		in_debit_amount_lc,
+		in_credit_amount_lc
+	); 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_insert_acc_ledger_payable;
+DELIMITER //
+CREATE PROCEDURE sp_insert_acc_ledger_payable
+(
+	IN in_acc_period_id int,
+	IN in_bill_transactor_id bigint,
+	IN in_account_code varchar(20),
+	IN in_acc_child_account_id int,
+	IN in_currency_code varchar(10),
+	IN in_debit_amount double,
+	IN in_credit_amount double,
+	IN in_debit_amount_lc double,
+	IN in_credit_amount_lc double
+) 
+BEGIN 
+	SET @bill_transactor_id=NULL;
+	if (in_bill_transactor_id!=0) then
+		set @bill_transactor_id=in_bill_transactor_id;
+	end if;
+	SET @acc_child_account_id=NULL;
+	if (in_acc_child_account_id!=0) then
+		set @acc_child_account_id=in_acc_child_account_id;
+	end if;
+
+	INSERT INTO acc_ledger_payable
+	(
+		acc_period_id,
+		bill_transactor_id,
+		account_code,
+		acc_child_account_id,
+		currency_code,
+		debit_amount,
+		credit_amount,
+		debit_amount_lc,
+		credit_amount_lc
+	) 
+    VALUES
+	(
+		in_acc_period_id,
+		@bill_transactor_id,
+		in_account_code,
+		@acc_child_account_id,
+		in_currency_code,
+		in_debit_amount,
+		in_credit_amount,
+		in_debit_amount_lc,
+		in_credit_amount_lc
+	); 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_insert_acc_ledger_prepaid;
+DELIMITER //
+CREATE PROCEDURE sp_insert_acc_ledger_prepaid
+(
+	IN in_acc_period_id int,
+	IN in_bill_transactor_id bigint,
+	IN in_account_code varchar(20),
+	IN in_acc_child_account_id int,
+	IN in_currency_code varchar(10),
+	IN in_debit_amount double,
+	IN in_credit_amount double,
+	IN in_debit_amount_lc double,
+	IN in_credit_amount_lc double
+) 
+BEGIN 
+	SET @bill_transactor_id=NULL;
+	if (in_bill_transactor_id!=0) then
+		set @bill_transactor_id=in_bill_transactor_id;
+	end if;
+	SET @acc_child_account_id=NULL;
+	if (in_acc_child_account_id!=0) then
+		set @acc_child_account_id=in_acc_child_account_id;
+	end if;
+
+	INSERT INTO acc_ledger_prepaid
+	(
+		acc_period_id,
+		bill_transactor_id,
+		account_code,
+		acc_child_account_id,
+		currency_code,
+		debit_amount,
+		credit_amount,
+		debit_amount_lc,
+		credit_amount_lc
+	) 
+    VALUES
+	(
+		in_acc_period_id,
+		@bill_transactor_id,
+		in_account_code,
+		@acc_child_account_id,
+		in_currency_code,
+		in_debit_amount,
+		in_credit_amount,
+		in_debit_amount_lc,
+		in_credit_amount_lc
+	); 
+END//
+DELIMITER ;
+
 DROP PROCEDURE IF EXISTS sp_update_acc_ledger;
 DELIMITER //
 CREATE PROCEDURE sp_update_acc_ledger
@@ -8402,6 +8924,69 @@ BEGIN
 END//
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS sp_update_acc_ledger_receivable;
+DELIMITER //
+CREATE PROCEDURE sp_update_acc_ledger_receivable
+(
+	IN in_acc_ledger_id bigint,
+	IN in_debit_amount double,
+	IN in_credit_amount double,
+	IN in_debit_amount_lc double,
+	IN in_credit_amount_lc double
+) 
+BEGIN 
+	UPDATE acc_ledger_receivable SET 
+		debit_amount=debit_amount+in_debit_amount,
+		credit_amount=credit_amount+in_credit_amount,
+		debit_amount_lc=debit_amount_lc+in_debit_amount_lc,
+		credit_amount_lc=credit_amount_lc+in_credit_amount_lc 
+	WHERE 
+		acc_ledger_id=in_acc_ledger_id; 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_update_acc_ledger_payable;
+DELIMITER //
+CREATE PROCEDURE sp_update_acc_ledger_payable
+(
+	IN in_acc_ledger_id bigint,
+	IN in_debit_amount double,
+	IN in_credit_amount double,
+	IN in_debit_amount_lc double,
+	IN in_credit_amount_lc double
+) 
+BEGIN 
+	UPDATE acc_ledger_payable SET 
+		debit_amount=debit_amount+in_debit_amount,
+		credit_amount=credit_amount+in_credit_amount,
+		debit_amount_lc=debit_amount_lc+in_debit_amount_lc,
+		credit_amount_lc=credit_amount_lc+in_credit_amount_lc 
+	WHERE 
+		acc_ledger_id=in_acc_ledger_id; 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_update_acc_ledger_prepaid;
+DELIMITER //
+CREATE PROCEDURE sp_update_acc_ledger_prepaid
+(
+	IN in_acc_ledger_id bigint,
+	IN in_debit_amount double,
+	IN in_credit_amount double,
+	IN in_debit_amount_lc double,
+	IN in_credit_amount_lc double
+) 
+BEGIN 
+	UPDATE acc_ledger_prepaid SET 
+		debit_amount=debit_amount+in_debit_amount,
+		credit_amount=credit_amount+in_credit_amount,
+		debit_amount_lc=debit_amount_lc+in_debit_amount_lc,
+		credit_amount_lc=credit_amount_lc+in_credit_amount_lc 
+	WHERE 
+		acc_ledger_id=in_acc_ledger_id; 
+END//
+DELIMITER ;
+
 DROP PROCEDURE IF EXISTS sp_search_acc_ledger;
 DELIMITER //
 CREATE PROCEDURE sp_search_acc_ledger
@@ -8445,6 +9030,67 @@ BEGIN
 	DEALLOCATE PREPARE stmt;
 END//
 DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_acc_ledger_receivable;
+DELIMITER //
+CREATE PROCEDURE sp_search_acc_ledger_receivable
+(
+	IN in_acc_period_id int,
+	IN in_bill_transactor_id bigint,
+	IN in_account_code varchar(20),
+	IN in_acc_child_account_id int,
+	IN in_currency_code varchar(10)
+) 
+BEGIN 
+	SELECT * FROM acc_ledger_receivable WHERE 
+		acc_period_id=in_acc_period_id AND 
+		IFNULL(bill_transactor_id,0)=in_bill_transactor_id AND 
+		account_code=in_account_code AND 
+		IFNULL(acc_child_account_id,0)=in_acc_child_account_id AND 
+		currency_code=in_currency_code;
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_acc_ledger_payable;
+DELIMITER //
+CREATE PROCEDURE sp_search_acc_ledger_payable
+(
+	IN in_acc_period_id int,
+	IN in_bill_transactor_id bigint,
+	IN in_account_code varchar(20),
+	IN in_acc_child_account_id int,
+	IN in_currency_code varchar(10)
+) 
+BEGIN 
+	SELECT * FROM acc_ledger_payable WHERE 
+		acc_period_id=in_acc_period_id AND 
+		IFNULL(bill_transactor_id,0)=in_bill_transactor_id AND 
+		account_code=in_account_code AND 
+		IFNULL(acc_child_account_id,0)=in_acc_child_account_id AND 
+		currency_code=in_currency_code;
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_acc_ledger_prepaid;
+DELIMITER //
+CREATE PROCEDURE sp_search_acc_ledger_prepaid
+(
+	IN in_acc_period_id int,
+	IN in_bill_transactor_id bigint,
+	IN in_account_code varchar(20),
+	IN in_acc_child_account_id int,
+	IN in_currency_code varchar(10)
+) 
+BEGIN 
+	SELECT * FROM acc_ledger_prepaid WHERE 
+		acc_period_id=in_acc_period_id AND 
+		IFNULL(bill_transactor_id,0)=in_bill_transactor_id AND 
+		account_code=in_account_code AND 
+		IFNULL(acc_child_account_id,0)=in_acc_child_account_id AND 
+		currency_code=in_currency_code;
+END//
+DELIMITER ;
+
 
 DROP PROCEDURE IF EXISTS sp_close_account_period;
 DELIMITER //

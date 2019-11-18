@@ -56,6 +56,7 @@ public class StoreBean implements Serializable {
                 Store store = new Store();
                 store.setStoreId(rs.getInt("store_id"));
                 store.setStoreName(rs.getString("store_name"));
+                store.setStore_code(rs.getString("store_code"));
                 this.StoresList.add(store);
             }
         } catch (Exception e) {
@@ -78,9 +79,9 @@ public class StoreBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
         } else {
             if (store.getStoreId() == 0) {
-                sql = "{call sp_insert_store(?)}";
+                sql = "{call sp_insert_store(?,?)}";
             } else if (store.getStoreId() > 0) {
-                sql = "{call sp_update_store(?,?)}";
+                sql = "{call sp_update_store(?,?,?)}";
             }
 
             try (
@@ -88,12 +89,14 @@ public class StoreBean implements Serializable {
                     CallableStatement cs = conn.prepareCall(sql);) {
                 if (store.getStoreId() == 0) {
                     cs.setString(1, store.getStoreName());
+                    cs.setString(2, store.getStore_code());
                     cs.executeUpdate();
                     this.setActionMessage("Saved Successfully");
                     this.clearStore(store);
                 } else if (store.getStoreId() > 0) {
                     cs.setInt(1, store.getStoreId());
                     cs.setString(2, store.getStoreName());
+                    cs.setString(3, store.getStore_code());
                     cs.executeUpdate();
                     this.setActionMessage("Saved Successfully");
                     this.clearStore(store);
@@ -117,6 +120,7 @@ public class StoreBean implements Serializable {
                 Store store = new Store();
                 store.setStoreId(rs.getInt("store_id"));
                 store.setStoreName(rs.getString("store_name"));
+                store.setStore_code(rs.getString("store_code"));
                 return store;
             } else {
                 return null;
@@ -148,6 +152,7 @@ public class StoreBean implements Serializable {
                 Store store = new Store();
                 store.setStoreId(rs.getInt("store_id"));
                 store.setStoreName(rs.getString("store_name"));
+                store.setStore_code(rs.getString("store_code"));
                 return store;
             } else {
                 return null;
@@ -200,12 +205,14 @@ public class StoreBean implements Serializable {
     public void displayStore(Store StoreFrom, Store StoreTo) {
         StoreTo.setStoreId(StoreFrom.getStoreId());
         StoreTo.setStoreName(StoreFrom.getStoreName());
+        StoreTo.setStore_code(StoreFrom.getStore_code());
     }
 
     public void clearStore(Store store) {
         try {
             store.setStoreId(0);
             store.setStoreName("");
+            store.setStore_code("");
         } catch (NullPointerException npe) {
 
         }
@@ -227,6 +234,7 @@ public class StoreBean implements Serializable {
                 Store store = new Store();
                 store.setStoreId(rs.getInt("store_id"));
                 store.setStoreName(rs.getString("store_name"));
+                store.setStore_code(rs.getString("store_code"));
                 Stores.add(store);
             }
         } catch (SQLException se) {
@@ -257,6 +265,7 @@ public class StoreBean implements Serializable {
                 Store store = new Store();
                 store.setStoreId(rs.getInt("store_id"));
                 store.setStoreName(rs.getString("store_name"));
+                store.setStore_code(rs.getString("store_code"));
                 Stores.add(store);
             }
         } catch (SQLException se) {
@@ -294,6 +303,7 @@ public class StoreBean implements Serializable {
                 Store store = new Store();
                 store.setStoreId(rs.getInt("store_id"));
                 store.setStoreName(rs.getString("store_name"));
+                store.setStore_code(rs.getString("store_code"));
                 Stores.add(store);
             }
         } catch (SQLException se) {
@@ -323,6 +333,7 @@ public class StoreBean implements Serializable {
                 Store store = new Store();
                 store.setStoreId(rs.getInt("store_id"));
                 store.setStoreName(rs.getString("store_name"));
+                store.setStore_code(rs.getString("store_code"));
                 Stores.add(store);
             }
         } catch (SQLException se) {

@@ -217,6 +217,63 @@ public class AccLedgerBean implements Serializable {
         }
     }
 
+    public void postJounalToLedgerSpecific(AccJournal aAccJournal) {
+        String sql = "";
+        AccLedger al = this.searchAccLedgerSpecific(aAccJournal);
+        String TableName = new AccJournalBean().getSpecificTableName(aAccJournal.getAccountCode(), "LEDGER");
+        if (al.getAccLedgerId() == 0) {//Insert
+            sql = "{call sp_insert_" + TableName + "(?,?,?,?,?,?,?,?,?)}";
+        } else {//Update
+            sql = "{call sp_update_" + TableName + "(?,?,?,?,?)}";
+        }
+        if (TableName.length() > 0) {
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    CallableStatement cs = conn.prepareCall(sql);) {
+                if (al.getAccLedgerId() == 0) {//Insert
+                    try {
+                        cs.setInt("in_acc_period_id", aAccJournal.getAccPeriodId());
+                    } catch (NullPointerException npe) {
+                        cs.setInt("in_acc_period_id", 0);
+                    }
+                    try {
+                        cs.setLong("in_bill_transactor_id", aAccJournal.getBillTransactorId());
+                    } catch (NullPointerException npe) {
+                        cs.setLong("in_bill_transactor_id", 0);
+                    }
+                    try {
+                        cs.setString("in_account_code", aAccJournal.getAccountCode());
+                    } catch (NullPointerException npe) {
+                        cs.setString("in_account_code", "");
+                    }
+                    try {
+                        cs.setInt("in_acc_child_account_id", aAccJournal.getAccChildAccountId());
+                    } catch (NullPointerException npe) {
+                        cs.setInt("in_acc_child_account_id", 0);
+                    }
+                    cs.setString("in_currency_code", aAccJournal.getCurrencyCode());
+                    cs.setDouble("in_debit_amount", aAccJournal.getDebitAmount());
+                    cs.setDouble("in_credit_amount", aAccJournal.getCreditAmount());
+                    cs.setDouble("in_debit_amount_lc", aAccJournal.getDebitAmount() * aAccJournal.getXrate());
+                    cs.setDouble("in_credit_amount_lc", aAccJournal.getCreditAmount() * aAccJournal.getXrate());
+                } else {//Update
+                    try {
+                        cs.setLong("in_acc_ledger_id", al.getAccLedgerId());
+                    } catch (NullPointerException npe) {
+                        cs.setLong("in_acc_ledger_id", 0);
+                    }
+                    cs.setDouble("in_debit_amount", aAccJournal.getDebitAmount());
+                    cs.setDouble("in_credit_amount", aAccJournal.getCreditAmount());
+                    cs.setDouble("in_debit_amount_lc", aAccJournal.getDebitAmount() * aAccJournal.getXrate());
+                    cs.setDouble("in_credit_amount_lc", aAccJournal.getCreditAmount() * aAccJournal.getXrate());
+                }
+                cs.executeUpdate();
+            } catch (Exception e) {
+                System.err.println("postJounalToLedgerSpecific:" + e.getMessage());
+            }
+        }
+    }
+
     public AccLedger searchAccLedger(AccJournal aAccJournal) {
         String sql;
         sql = "{call sp_search_acc_ledger(?,?,?,?,?)}";
@@ -320,6 +377,53 @@ public class AccLedgerBean implements Serializable {
                         System.err.println(ex.getMessage());
                     }
                 }
+            }
+        }
+        return accledger;
+    }
+
+    public AccLedger searchAccLedgerSpecific(AccJournal aAccJournal) {
+        String sql;
+        String TableName = new AccJournalBean().getSpecificTableName(aAccJournal.getAccountCode(), "LEDGER");
+        sql = "{call sp_search_" + TableName + "(?,?,?,?,?)}";
+        ResultSet rs = null;
+        AccLedger accledger = new AccLedger();
+        if (TableName.length() > 0) {
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                try {
+                    ps.setInt(1, aAccJournal.getAccPeriodId());
+                } catch (NullPointerException npe) {
+                    ps.setInt(1, 0);
+                }
+                try {
+                    ps.setLong(2, aAccJournal.getBillTransactorId());
+                } catch (NullPointerException npe) {
+                    ps.setLong(2, 0);
+                }
+                try {
+                    ps.setString(3, aAccJournal.getAccountCode());
+                } catch (NullPointerException npe) {
+                    ps.setString(3, "");
+                }
+                try {
+                    ps.setInt(4, aAccJournal.getAccChildAccountId());
+                } catch (NullPointerException npe) {
+                    ps.setInt(4, 0);
+                }
+                try {
+                    ps.setString(5, aAccJournal.getCurrencyCode());
+                } catch (NullPointerException npe) {
+                    ps.setString(5, "");
+                }
+                rs = ps.executeQuery();
+                if (rs.next()) {
+                    //accledger = new AccLedger();
+                    this.setAccLedgerFromResultset(accledger, rs);
+                }
+            } catch (Exception e) {
+                System.err.println("searchAccLedgerSpecific:" + e.getMessage());
             }
         }
         return accledger;
