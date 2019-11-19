@@ -146,7 +146,7 @@
                     <f:selectItem itemLabel="" itemValue=""/>
                     <f:selectItems value="#{accCurrencyBean.currencyList}" var="ac" itemLabel="#{ac.currencyCode}" itemValue="#{ac.currencyCode}"/>
                 </h:selectOneMenu>
-                <h:outputLabel value="Transaction Number Format(S,C,Y,M,D,X)"/>
+                <h:outputLabel value="Transaction Number Format(S,C,Y,M,D,X/W/Z)"/>
                 <h:inputText value="#{transactionTypeBean.transactionTypeForEdit.trans_number_format}"/>
                 <h:outputLabel value="Output Footer Message"/>
                 <h:inputText value="#{transactionTypeBean.transactionTypeForEdit.output_footer_message}"/>

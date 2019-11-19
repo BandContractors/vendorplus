@@ -22,6 +22,17 @@ INSERT INTO transaction_reason (transaction_reason_id, transaction_reason_name, 
 
 alter table store add column store_code varchar(10);
 
+alter table trans_number_control modify column trans_number_control_id bigint(20) not null;
+alter table trans_number_control drop primary key;
+alter table trans_number_control modify column trans_number_control_id bigint(20) not null;
+alter table trans_number_control modify column day_count bigint(20);
+alter table trans_number_control add column month_count bigint(20);
+alter table trans_number_control add column year_count bigint(20);
+alter table trans_number_control add primary key(trans_number_control_id);
+alter table trans_number_control modify column trans_number_control_id bigint(20) not null auto_increment;
+
+
+
 
 
 
