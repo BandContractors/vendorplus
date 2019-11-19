@@ -39,7 +39,7 @@
                     </h:inputText>
                     <h:panelGrid id="pnlSearchResult">
                         <c:forEach var="te" items="#{transactorBean.transactorList}">
-                            <h:commandLink value="#{te.transactorNames}" style="font-size: 11px;">
+                            <h:commandLink value="#{te.transactorNames}" style="font-size: 14px;">
                                 <f:ajax listener="#{transactorBean.displayTransactor(te,transactorBean.transactorObj)}" execute="@this" render="pnlInput"/>
                             </h:commandLink>
                         </c:forEach>
@@ -57,7 +57,7 @@
                         <f:selectItem itemLabel="Company" itemValue="Company"/>
                     </h:selectOneMenu>
                     <h:outputLabel  value="Reference No:"/>
-                    <h:inputText styleClass="clsInput" id="itxtRef" value="#{transactorBean.transactorObj.transactorRef}" autocomplete="off" style="width: 203px;">
+                    <h:inputText styleClass="clsInput" id="itxtRef" value="#{transactorBean.transactorObj.transactorRef}" autocomplete="off" style="width: 203px;" disabled="#{transactorBean.transactorObj.trans_number_format.length()>0}">
                     </h:inputText>
                     <h:outputLabel  value="Names:"/>
                     <h:inputText styleClass="clsInput" id="itxtTransactorNames" value="#{transactorBean.transactorObj.transactorNames}" autocomplete="off" style="width: 203px;">

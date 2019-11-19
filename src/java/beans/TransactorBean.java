@@ -5,6 +5,7 @@ import connections.DBConnection;
 import entities.GroupRight;
 import entities.SalaryDeduction;
 import entities.Trans;
+import entities.TransactionType;
 import entities.Transactor;
 import entities.UserDetail;
 import java.io.Serializable;
@@ -90,35 +91,40 @@ public class TransactorBean implements Serializable {
                 this.TransactorObj = new Transactor();
             }
             this.TransactorObj.setTransactorType(new GeneralUserSetting().getTransactorType());
+            this.TransactorObj.setTrans_number_format(new TransactionTypeBean().getTransactionType(17).getTrans_number_format());
             //init transactor ref no
-            this.setNewTransctorRef(this.TransactorObj);
+            //this.setNewTransctorRef(this.TransactorObj);
         }
     }
 
-    public void setNewTransctorRef(Transactor aTransactor) {
-        try {
-            long aRefNoId;
-            String aRefNoStr;
-            aRefNoId = this.getCurrentTransactorRefNo();
-            if (aRefNoId > 0) {
-                aRefNoId = aRefNoId + 1;
-            } else {
-                aRefNoId = 1;
-            }
-            aRefNoStr = Long.toString(aRefNoId);
-            aTransactor.setTransactorRef(aRefNoStr);
-        } catch (NullPointerException npe) {
-
-        }
-    }
-
+//    public void setNewTransctorRef(Transactor aTransactor) {
+//        try {
+//            long aRefNoId;
+//            String aRefNoStr;
+//            aRefNoId = this.getCurrentTransactorRefNo();
+//            if (aRefNoId > 0) {
+//                aRefNoId = aRefNoId + 1;
+//            } else {
+//                aRefNoId = 1;
+//            }
+//            aRefNoStr = Long.toString(aRefNoId);
+//            aTransactor.setTransactorRef(aRefNoStr);
+//        } catch (NullPointerException npe) {
+//
+//        }
+//    }
     public String validateTransactor(Transactor transactor, List<SalaryDeduction> aSalaryDeductions) {
         String sql = null;
         String msg = "";
         String sql2 = null;
         String sql3 = null;
+        String sql4 = null;
+        String sql5 = null;
         sql2 = "SELECT * FROM transactor WHERE transactor_names='" + transactor.getTransactorNames() + "'";
         sql3 = "SELECT * FROM transactor WHERE transactor_names='" + transactor.getTransactorNames() + "' AND transactor_id!=" + transactor.getTransactorId();
+        sql4 = "SELECT * FROM transactor WHERE transactor_ref='" + transactor.getTransactorRef() + "'";
+        sql5 = "SELECT * FROM transactor WHERE transactor_ref='" + transactor.getTransactorRef() + "' AND transactor_id!=" + transactor.getTransactorId();
+        TransactionType transtype = new TransactionTypeBean().getTransactionType(17);
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
@@ -139,30 +145,24 @@ public class TransactorBean implements Serializable {
             msg = "Transactor's email cannot exceed 100 characters";
         } else if (new CustomValidator().TextSize(transactor.getWebsite(), 0, 100).equals("FAIL")) {
             msg = "Transactor's website cannot exceed 100 characters";
-
         } else if (new CustomValidator().TextSize(transactor.getCpName(), 0, 100).equals("FAIL")) {
             msg = "Contact person's name cannot exceed 100 characters";
-
         } else if (new CustomValidator().TextSize(transactor.getCpTitle(), 0, 100).equals("FAIL")) {
             msg = "Contact person's title cannot exceed 100 characters";
-
         } else if (new CustomValidator().TextSize(transactor.getCpPhone(), 0, 100).equals("FAIL")) {
             msg = "Contact person's phone cannot exceed 100 characters";
-
         } else if (new CustomValidator().TextSize(transactor.getCpEmail(), 0, 100).equals("FAIL")) {
             msg = "Contact person's email cannot exceed 100 characters";
-
         } else if (new CustomValidator().TextSize(transactor.getPhysicalAddress(), 0, 255).equals("FAIL")) {
             msg = "Physical address cannot exceed 255 characters";
-
         } else if (new CustomValidator().TextSize(transactor.getTaxIdentity(), 0, 100).equals("FAIL")) {
             msg = "Tax Identity cannot exceed 100 characters";
-
         } else if (new CustomValidator().TextSize(transactor.getAccountDetails(), 0, 255).equals("FAIL")) {
             msg = "Account details cannot exceed 255 characters";
-
         } else if ((new CustomValidator().CheckRecords(sql2) > 0 && transactor.getTransactorId() == 0) || (new CustomValidator().CheckRecords(sql3) > 0 && transactor.getTransactorId() > 0)) {
             msg = "Transactor Name(s) already exists, please enter different name(s) !";
+        } else if (transtype.getTrans_number_format().length() == 0 && ((new CustomValidator().CheckRecords(sql4) > 0 && transactor.getTransactorId() == 0) || (new CustomValidator().CheckRecords(sql5) > 0 && transactor.getTransactorId() > 0))) {
+            msg = "Transactor Reference Number already exists!";
         }
         return msg;
     }
@@ -179,6 +179,14 @@ public class TransactorBean implements Serializable {
             try {
                 long status = 0;
                 try {
+                    TransactionType transtype = new TransactionTypeBean().getTransactionType(17);
+                    if (transactor.getTransactorId() == 0) {
+                        if (transtype.getTrans_number_format().length() > 0) {
+                            transactor.setTransactorRef(new Trans_number_controlBean().getNewTransNumber(transtype));
+                            new Trans_number_controlBean().updateTrans_number_control(transtype);
+                        }
+                        transactor.setStore_id(new GeneralUserSetting().getCurrentStore().getStoreId());
+                    }
                     status = this.insertUpdateTransactor(transactor);
                 } catch (NullPointerException npe) {
                     status = 0;
@@ -187,7 +195,7 @@ public class TransactorBean implements Serializable {
                     if (transactor.getTransactorType().equals("EMPLOYEE")) {
                         new SalaryDeductionBean().saveSalaryDeductions(status, aSalaryDeductions);
                     }
-                    this.setActionMessage("Saved Successfully");
+                    this.setActionMessage("Saved Successfully : " + transactor.getTransactorRef());
                     this.clearTransactor2(transactor, aSalaryDeductions);
                 } else {
                     this.setActionMessage("Transaction NOT saved");
@@ -205,7 +213,7 @@ public class TransactorBean implements Serializable {
         String sql = null;
         long status = 0;
         if (transactor.getTransactorId() == 0) {
-            sql = "{call sp_insert_transactor(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_insert_transactor(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         } else if (transactor.getTransactorId() > 0) {
             sql = "{call sp_update_transactor(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         }
@@ -216,6 +224,9 @@ public class TransactorBean implements Serializable {
                 cs.registerOutParameter("out_transactor_id", VARCHAR);
             } else {
                 cs.setLong("in_transactor_id", transactor.getTransactorId());
+            }
+            if (transactor.getTransactorId() == 0) {
+                cs.setInt("in_store_id", transactor.getStore_id());
             }
             cs.setString("in_transactor_type", transactor.getTransactorType());
             cs.setString("in_transactor_names", transactor.getTransactorNames());
@@ -638,6 +649,11 @@ public class TransactorBean implements Serializable {
             } catch (NullPointerException npe) {
                 transactor.setMonthNetPay(0);
             }
+            try {
+                transactor.setStore_id(rs.getInt("store_id"));
+            } catch (NullPointerException npe) {
+                transactor.setStore_id(0);
+            }
         } catch (SQLException se) {
         }
     }
@@ -869,6 +885,7 @@ public class TransactorBean implements Serializable {
         TransactorTo.setPosition(TransactorFrom.getPosition());
         TransactorTo.setMonthGrossPay(TransactorFrom.getMonthGrossPay());
         TransactorTo.setMonthNetPay(TransactorFrom.getMonthNetPay());
+        TransactorTo.setStore_id(TransactorFrom.getStore_id());
         //new SalaryDeductionBean().setSalaryDeductions(TransactorFrom.getTransactorId(), this.SalaryDeductions);
         this.SalaryDeductions = new SalaryDeductionBean().getSalaryDeductions(TransactorFrom.getTransactorId());
     }
@@ -908,6 +925,7 @@ public class TransactorBean implements Serializable {
             transactor.setPosition("");
             transactor.setMonthGrossPay(0);
             transactor.setMonthNetPay(0);
+            transactor.setStore_id(0);
         }
     }
 
@@ -946,13 +964,14 @@ public class TransactorBean implements Serializable {
             transactor.setPosition("");
             transactor.setMonthGrossPay(0);
             transactor.setMonthNetPay(0);
+            transactor.setStore_id(0);
             try {
                 aSalaryDeductions.clear();
             } catch (NullPointerException npe) {
             }
             this.setSearchTransactorNames("");
             //init transactor ref no
-            this.setNewTransctorRef(transactor);
+            //this.setNewTransctorRef(transactor);
         }
     }
 
@@ -994,6 +1013,7 @@ public class TransactorBean implements Serializable {
                 transactor.setPosition("");
                 transactor.setMonthGrossPay(0);
                 transactor.setMonthNetPay(0);
+                transactor.setStore_id(0);
                 this.setSearchTransactorNames("");
             }
         }
@@ -1037,6 +1057,7 @@ public class TransactorBean implements Serializable {
                 transactor.setPosition("");
                 transactor.setMonthGrossPay(0);
                 transactor.setMonthNetPay(0);
+                transactor.setStore_id(0);
                 try {
                     aSalaryDeductions.clear();
                 } catch (NullPointerException npe) {

@@ -1088,7 +1088,8 @@ CREATE PROCEDURE sp_insert_transactor
 	IN in_title varchar(50),
 	IN in_position varchar(50),
 	IN in_month_gross_pay double,
-	In in_month_net_pay double,
+	IN in_month_net_pay double,
+	IN in_store_id int,
 	OUT out_transactor_id bigint
 ) 
 BEGIN 
@@ -1139,7 +1140,8 @@ BEGIN
 		title,
 		position,
 		month_gross_pay,
-		month_net_pay
+		month_net_pay,
+		store_id
 	) 
     VALUES
 	(
@@ -1177,7 +1179,8 @@ BEGIN
 		in_title,
 		in_position,
 		in_month_gross_pay,
-		in_month_net_pay
+		in_month_net_pay,
+		in_store_id
 	); 
 SET out_transactor_id=@new_id;
 END//

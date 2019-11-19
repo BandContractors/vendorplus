@@ -31,6 +31,8 @@ alter table trans_number_control add column year_count bigint(20);
 alter table trans_number_control add primary key(trans_number_control_id);
 alter table trans_number_control modify column trans_number_control_id bigint(20) not null auto_increment;
 
+alter table transactor add column store_id int(11);
+
 
 
 

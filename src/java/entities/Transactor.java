@@ -51,6 +51,8 @@ public class Transactor implements Serializable {
     private String Position;
     private double MonthGrossPay;
     private double MonthNetPay;
+    private int store_id;
+    private String trans_number_format;
 
     /**
      * @return the TransactorId
@@ -512,6 +514,34 @@ public class Transactor implements Serializable {
      */
     public void setMonthNetPay(double MonthNetPay) {
         this.MonthNetPay = MonthNetPay;
+    }
+
+    /**
+     * @return the store_id
+     */
+    public int getStore_id() {
+        return store_id;
+    }
+
+    /**
+     * @param store_id the store_id to set
+     */
+    public void setStore_id(int store_id) {
+        this.store_id = store_id;
+    }
+
+    /**
+     * @return the trans_number_format
+     */
+    public String getTrans_number_format() {
+        return trans_number_format;
+    }
+
+    /**
+     * @param trans_number_format the trans_number_format to set
+     */
+    public void setTrans_number_format(String trans_number_format) {
+        this.trans_number_format = trans_number_format;
     }
 
 }
