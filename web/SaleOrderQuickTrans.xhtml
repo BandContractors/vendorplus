@@ -128,13 +128,18 @@
                             <!-- column header -->
                             <f:facet name="header">Item Description</f:facet>
                             <!-- row record -->
-                            <p:outputLabel value="#{transItemBean.showItemDescriptionCEC(ati)}" escape="false"/>
+                            <p:outputLabel value="#{transItemBean.showItemDescriptionCECexcSpecific(ati)}" escape="false"/>
+                            <h:inputText style="width: 200px" value="#{ati.descSpecific}" rendered="#{ati.is_general==1}" title="Specify more details"/>
                         </p:column>
-                        <p:column style="width: 30px;">
+                        <p:column style="width: 100px;">
                             <!-- column header -->
                             <f:facet name="header">Unit</f:facet>
                             <!-- row record -->
                             #{ati.unitSymbol}
+                            <h:inputText style="width: 100px" disabled="#{ati.is_general==0}" value="#{ati.unitPrice}" autocomplete="off">
+                                <f:ajax event="change" listener="#{transItemBean.editTransItemQuickOrder(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,'',trans, transItemBean.activeTransItems,ati)}" execute="dtblTransactionItem" render="dtblTransactionItem pgrdTotals"/>
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:inputText>
                         </p:column>
                         <p:column style="width: 100px;">
                             <!-- column header -->
@@ -155,7 +160,7 @@
                             <!-- column header -->
                             <f:facet name="header">Amount</f:facet>
                             <!-- row record -->
-                            <h:outputLabel value="#{ati.amountIncVat}">
+                            <h:outputLabel id="lblAmount" value="#{ati.amountIncVat}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
                         </p:column>

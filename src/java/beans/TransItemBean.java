@@ -927,7 +927,7 @@ public class TransItemBean implements Serializable {
                             if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "DISPOSE STOCK".equals(transtype.getTransactionTypeName()) || ("STOCK ADJUSTMENT".equals(transtype.getTransactionTypeName()) && transitem.getNarration().equals("Subtract")) || "STOCK CONSUMPTION".equals(transtype.getTransactionTypeName()) || "GOODS DELIVERY".equals(transtype.getTransactionTypeName())) {
                                 Stock stock = new Stock();
                                 int i = 0;
-                            //this for purpose of orders made to store2 from store 1; 
+                                //this for purpose of orders made to store2 from store 1; 
                                 //inventory to be deducted from store 2 instead
                                 int Store2Id = 0;
                                 try {
@@ -5148,6 +5148,7 @@ public class TransItemBean implements Serializable {
                     aTransItem.setAccountName("");
                 }
                 aTransItem.setItem_currency_code(item.getCurrencyCode());
+                aTransItem.setIs_general(item.getIsGeneral());
             }
         } catch (Exception e) {
             System.out.println("updateLookUpsUI:" + e.getMessage());
@@ -5858,6 +5859,120 @@ public class TransItemBean implements Serializable {
     public void editTransItemCEC(int aTransTypeId, int aTransReasonId, String aSaleType, Trans aTrans, List<TransItem> aActiveTransItems, TransItem ti) {
         TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
         TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
+        if (ti.getItemQty() < 0) {
+            ti.setItemQty(0);
+        }
+        if (aTransTypeId == 2) {//SALE INVOICE
+            ti.setAmount(ti.getUnitPrice() * ti.getItemQty());
+            ti.setAmountIncVat((ti.getUnitPriceIncVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+            ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+        }
+        if (aTransTypeId == 10) {//SALE QUOTATION
+            ti.setAmount(ti.getUnitPrice() * ti.getItemQty());
+            ti.setAmountIncVat((ti.getUnitPriceIncVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+            ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+        }
+        if (aTransTypeId == 11) {//SALE ORDER
+            ti.setAmount(ti.getUnitPrice() * ti.getItemQty());
+            ti.setAmountIncVat((ti.getUnitPriceIncVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+            ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+        }
+        if (aTransTypeId == 12) {//GOODS DELIVERY
+            ti.setAmount(0);
+            ti.setAmountIncVat(0);
+            ti.setAmountExcVat(0);
+        }
+        if (aTransTypeId == 1) {//PURCHASE INVOICE
+            ti.setAmount(ti.getItemQty() * (ti.getUnitPrice() + ti.getUnitVat() - ti.getUnitTradeDiscount()));
+            ti.setAmountIncVat(ti.getAmount());
+            ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+        }
+        if (aTransTypeId == 8) {//PURCHASE ORDER
+            ti.setAmount(ti.getItemQty() * (ti.getUnitPrice() + ti.getUnitVat() - ti.getUnitTradeDiscount()));
+            ti.setAmountIncVat(ti.getAmount());
+            ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+        }
+        if (aTransTypeId == 9) {//GOODS RECEIVED
+            ti.setAmount(0);
+            ti.setAmountIncVat(0);
+            ti.setAmountExcVat(0);
+        }
+        if (aTransTypeId == 3) {//DISPOSE STOCK
+            aTrans.setCashDiscount(0);
+            ti.setAmount(ti.getUnitPrice() * ti.getItemQty());
+            ti.setAmountIncVat((ti.getUnitPriceIncVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+            ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+        }
+
+        if ("HIRE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE QUOTATION".equals(transtype.getTransactionTypeName())) {
+            ti.setAmount(ti.getUnitPrice() * ti.getItemQty() * ti.getDuration_value());
+            ti.setAmountIncVat((ti.getUnitPriceIncVat() - ti.getUnitTradeDiscount()) * ti.getItemQty() * ti.getDuration_value());
+            ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty() * ti.getDuration_value());
+        } else {
+            ti.setAmount(ti.getUnitPrice() * ti.getItemQty());
+            ti.setAmountIncVat((ti.getUnitPriceIncVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+            ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+        }
+        //for profit margin
+        if ("SALE INVOICE".equals(transtype.getTransactionTypeName())) {
+            ti.setUnitCostPrice(ti.getUnitCostPrice());
+            ti.setUnitProfitMargin((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) - ti.getUnitCostPrice());
+        } else {
+            ti.setUnitCostPrice(0);
+            ti.setUnitProfitMargin(0);
+        }
+        //round off amounts basing on currency rules
+        this.roundTransItemsAmount(aTrans, ti);
+        //update totals
+        new TransBean().setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems);
+    }
+
+    public void editTransItemQuickOrder(int aTransTypeId, int aTransReasonId, String aSaleType, Trans aTrans, List<TransItem> aActiveTransItems, TransItem ti) {
+        TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
+        TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
+        //first update unit prices
+        double IncludedVat;
+        double ExcludedVat;
+        double VatPercent = ti.getVatPerc();
+        //this is a vatable item
+        if ("STANDARD".equals(ti.getVatRated())) {
+            //Check if VAT is Inclusive or Excuksive
+            if ("Yes".equals(CompanySetting.getIsVatInclusive())) {
+                //VAT - Inclusive
+                if ("No".equals(CompanySetting.getIsTradeDiscountVatLiable())) {
+                    ti.setUnitPriceIncVat(ti.getUnitPrice());
+                    IncludedVat = (ti.getUnitPrice() - ti.getUnitTradeDiscount()) - (100 * (ti.getUnitPrice() - ti.getUnitTradeDiscount()) / (100 + VatPercent));
+                    ti.setUnitVat(IncludedVat);
+                    ti.setUnitPriceExcVat(ti.getUnitPrice() - IncludedVat);
+                } else {
+                    //do nothing; IncVat=IncVat
+                    ti.setUnitPriceIncVat(ti.getUnitPrice());
+                    IncludedVat = ti.getUnitPrice() - (100 * ti.getUnitPrice() / (100 + VatPercent));
+                    ti.setUnitVat(IncludedVat);
+                    ti.setUnitPriceExcVat(ti.getUnitPrice() - IncludedVat);
+                }
+            } else {
+                //VAT - Exclusive
+                ti.setUnitPriceExcVat(ti.getUnitPrice());
+                if ("No".equals(CompanySetting.getIsTradeDiscountVatLiable())) {
+                    ExcludedVat = (VatPercent / 100) * (ti.getUnitPrice() - ti.getUnitTradeDiscount());
+                } else {
+                    ExcludedVat = (VatPercent / 100) * ti.getUnitPrice();
+                }
+                ti.setUnitVat(ExcludedVat);
+                ti.setUnitPriceIncVat(ti.getUnitPrice() + ExcludedVat);
+            }
+        } else {
+            //this ISNT a vatable item
+            ti.setVatPerc(0);
+            ti.setUnitVat(0);
+            ti.setUnitPriceIncVat(ti.getUnitPrice());
+            ti.setUnitPriceExcVat(ti.getUnitPrice());
+        }
+        ti.setAmountIncVat((ti.getUnitPriceIncVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+        ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+
+        //calculate prices
         if (ti.getItemQty() < 0) {
             ti.setItemQty(0);
         }
@@ -8138,7 +8253,8 @@ public class TransItemBean implements Serializable {
                 ti.setItemQty(0);
             }
             //update totals
-            new TransBean().setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems);
+            //new TransBean().setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems);
+            this.editTransItemCEC(aTransTypeId, aTransReasonId,"", aTrans, aActiveTransItems, ti);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -8151,7 +8267,8 @@ public class TransItemBean implements Serializable {
                 ti.setItemQty(0);
             }
             //update totals
-            new TransBean().setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems);
+            //new TransBean().setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems);
+            this.editTransItemCEC(aTransTypeId, aTransReasonId,"", aTrans, aActiveTransItems, ti);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -9221,14 +9338,14 @@ public class TransItemBean implements Serializable {
             aStatusBean.setShowItemNotAddedStatus(1);
             new ItemBean().clearItem(aSelectedItem);
             this.clearTransItem2(aSelectedTransItem);
-        } else if (null != aSelectedItem && aSelectedItem.getIsGeneral() == 1) {
-            aStatusBean.setItemAddedStatus("");
-            aStatusBean.setItemNotAddedStatus("A GENERAL ITEM CANNOT BE TRANSACTED BY THIS MODE/WINDOW");
-            aStatusBean.setShowItemAddedStatus(0);
-            aStatusBean.setShowItemNotAddedStatus(1);
-            new ItemBean().clearItem(aSelectedItem);
-            this.clearTransItem2(aSelectedTransItem);
-        } else if (aSelectedItem != null) {
+        } /*else if (null != aSelectedItem && aSelectedItem.getIsGeneral() == 1) {
+         aStatusBean.setItemAddedStatus("");
+         aStatusBean.setItemNotAddedStatus("A GENERAL ITEM CANNOT BE TRANSACTED BY THIS MODE/WINDOW");
+         aStatusBean.setShowItemAddedStatus(0);
+         aStatusBean.setShowItemNotAddedStatus(1);
+         new ItemBean().clearItem(aSelectedItem);
+         this.clearTransItem2(aSelectedTransItem);
+         } */ else if (aSelectedItem != null) {
             //for where item currency is different from trans currency, we first get the factor to convert to trans currency
             double xrate = 1;
             double XrateMultiply = 1;
@@ -9892,6 +10009,71 @@ public class TransItemBean implements Serializable {
             }
         } catch (NullPointerException npe) {
         }
+        return FullItemDesc;
+    }
+
+    public String showItemDescriptionCECexcSpecific(TransItem aTransItem) {
+        int NewLineEachName = 0;//NEW_LINE_EACH_NAME
+        int LinesBtnNames = 1;//LINES_BTN_NAMES
+        NewLineEachName = Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("GENERAL_NAME", "NEW_LINE_EACH_NAME").getParameter_value());
+        LinesBtnNames = Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("GENERAL_NAME", "LINES_BTN_NAMES").getParameter_value());
+        String NewLineStr = " ";
+        if (NewLineEachName == 1 && LinesBtnNames > 0) {
+            for (int i = 1; i <= LinesBtnNames; i++) {
+                NewLineStr = NewLineStr + "<br /> ";
+            }
+        }
+        String FullItemDesc = "";
+        try {
+            if (aTransItem.getDescSpecific().length() <= 0 && aTransItem.getCodeSpecific().length() <= 0) { //indicator for non-general item
+                if (aTransItem.getAlias_name().length() > 0 && aTransItem.getDisplay_alias_name() == 1) {
+                    FullItemDesc = aTransItem.getAlias_name();
+                } else {
+                    FullItemDesc = aTransItem.getDescription();
+                }
+            } else {
+                if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "SHOW_GEN_ITEM_NAME").getParameter_value().equals("1")) {
+                    if (aTransItem.getAlias_name().length() > 0 && aTransItem.getDisplay_alias_name() == 1) {
+                        FullItemDesc = aTransItem.getAlias_name();
+                    } else {
+                        FullItemDesc = aTransItem.getDescription();
+                    }
+                }
+            }
+        } catch (NullPointerException npe) {
+        }
+        /*
+         try {
+         if (aTransItem.getDescSpecific().length() > 0) {
+         if (FullItemDesc.length() > 0) {
+         FullItemDesc = FullItemDesc + NewLineStr + aTransItem.getDescSpecific();
+         } else {
+         FullItemDesc = aTransItem.getDescSpecific();
+         }
+         }
+         } catch (NullPointerException npe) {
+         }
+         try {
+         if (aTransItem.getCodeSpecific().length() > 0) {
+         if (FullItemDesc.length() > 0) {
+         FullItemDesc = FullItemDesc + NewLineStr + aTransItem.getCodeSpecific();
+         } else {
+         FullItemDesc = aTransItem.getCodeSpecific();
+         }
+         }
+         } catch (NullPointerException npe) {
+         }
+         try {
+         if (aTransItem.getDescMore().length() > 0) {
+         if (FullItemDesc.length() > 0) {
+         FullItemDesc = FullItemDesc + NewLineStr + aTransItem.getDescMore();
+         } else {
+         FullItemDesc = aTransItem.getDescMore();
+         }
+         }
+         } catch (NullPointerException npe) {
+         }
+         */
         return FullItemDesc;
     }
 
