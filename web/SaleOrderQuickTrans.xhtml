@@ -52,14 +52,14 @@
                     return false;">  
             <h:panelGrid id="pnlHeader" styleClass="clsGridMainHeader" columns="4" style="width:100%;float:left;">
                 <h:panelGrid id="pnlOrderCategory" columns="3">
-                    <h:commandButton style="border-radius: 5px;border: none;width: 120px;height:45px;font-size: 16px;background-color:#{transBean.setBgColorIfEqual('Sit In',trans.delivery_mode,1)};" value="Sit In">
-                        <f:ajax listener="#{transBean.updateDelivery_mode(trans,'Sit In')}" execute="@this" render="pnlOrderCategory"/>
+                    <h:commandButton style="border-radius: 5px;border: none;width: 120px;height:45px;font-size: 16px;background-color:#{transBean.setBgColorIfEqual(transBean.orderMode1,trans.delivery_mode,1)};" value="#{transBean.orderMode1}" rendered="#{transBean.orderMode1.length()>0}">
+                        <f:ajax listener="#{transBean.updateDelivery_mode(trans,transBean.orderMode1)}" execute="@this" render="pnlOrderCategory"/>
                     </h:commandButton>
-                    <h:commandButton style="border-radius: 5px;border: none;width: 120px;height:45px;font-size: 16px;background-color:#{transBean.setBgColorIfEqual('Take Out',trans.delivery_mode,1)};" value="Take Out">
-                        <f:ajax listener="#{transBean.updateDelivery_mode(trans,'Take Out')}" execute="@this" render="pnlOrderCategory"/>
+                    <h:commandButton style="border-radius: 5px;border: none;width: 120px;height:45px;font-size: 16px;background-color:#{transBean.setBgColorIfEqual(transBean.orderMode2,trans.delivery_mode,1)};" value="#{transBean.orderMode2}" rendered="#{transBean.orderMode2.length()>0}">
+                        <f:ajax listener="#{transBean.updateDelivery_mode(trans,transBean.orderMode2)}" execute="@this" render="pnlOrderCategory"/>
                     </h:commandButton>
-                    <h:commandButton style="border-radius: 5px;border: none;width: 120px;height:45px;font-size: 16px;background-color:#{transBean.setBgColorIfEqual('Delivery',trans.delivery_mode,1)};" value="Delivery">
-                        <f:ajax listener="#{transBean.updateDelivery_mode(trans,'Delivery')}" execute="@this" render="pnlOrderCategory"/>
+                    <h:commandButton style="border-radius: 5px;border: none;width: 120px;height:45px;font-size: 16px;background-color:#{transBean.setBgColorIfEqual(transBean.orderMode3,trans.delivery_mode,1)};" value="#{transBean.orderMode3}" rendered="#{transBean.orderMode3.length()>0}">
+                        <f:ajax listener="#{transBean.updateDelivery_mode(trans,transBean.orderMode3)}" execute="@this" render="pnlOrderCategory"/>
                     </h:commandButton>
                 </h:panelGrid>
                 <h:panelGrid id="pnlTransNumber" rendered="#{trans.transactionId>0}">
@@ -89,7 +89,7 @@
             <h:panelGrid columns="6">
                 <h:panelGrid id="pnlCategories" columns="1">
                     <c:forEach var="cat" items="#{transItemBean.categoryList}">
-                        <h:commandButton style="min-height: 60px;border-radius: 5px;border: none;width: 120px;height:auto;font-size: 20px;word-wrap: break-word !important;white-space:normal;color: black;background-color:#{transBean.setBgColorIfEqual(cat.categoryName,transItemBean.categoryName,2)};" value="#{cat.categoryName}">
+                        <h:commandButton style="min-height: 60px;border-radius: 5px;border: none;width: 120px;height:auto;font-size: 20px;word-wrap: break-word !important;white-space:normal;color: black;background-color:#{transBean.setBgColorIfEqual(cat.categoryName,transItemBean.categoryName,4)};" value="#{cat.categoryName}">
                             <f:ajax listener="#{transItemBean.refreshSubCategoryOrItemList(cat)}" execute="@form" render="TransactionFormSales:pnlCategories TransactionFormSales:pnlSubCategories TransactionFormSales:pnlItems"/>
                         </h:commandButton>
                     </c:forEach>
@@ -133,11 +133,11 @@
                         </p:column>
                         <p:column style="width: 100px;">
                             <!-- column header -->
-                            <f:facet name="header">Unit</f:facet>
+                            <f:facet name="header">Unit Price</f:facet>
                             <!-- row record -->
                             #{ati.unitSymbol}
-                            <h:inputText style="width: 100px" disabled="#{ati.is_general==0}" value="#{ati.unitPrice}" autocomplete="off">
-                                <f:ajax event="change" listener="#{transItemBean.editTransItemQuickOrder(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,'',trans, transItemBean.activeTransItems,ati)}" execute="dtblTransactionItem" render="dtblTransactionItem pgrdTotals"/>
+                            <h:inputText id="itxtUnitPrice" style="width: 100px" disabled="#{ati.is_general==0 and ati.is_override_price==0}" value="#{ati.unitPrice}" autocomplete="off">
+                                <f:ajax event="change" listener="#{transItemBean.editTransItemQuickOrder(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,'',trans, transItemBean.activeTransItems,ati)}" execute="dtblTransactionItem" render="dtblTransactionItem TransactionFormSales:pgrdTotals"/>
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:inputText>
                         </p:column>
@@ -164,11 +164,14 @@
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
                         </p:column>
-                        <p:column style="width: 45px;">
+                        <p:column style="width: 58px;">
                             <!-- column header -->
                             <f:facet name="header"></f:facet>
                             <!-- row record -->
-                            <p:commandButton id="cmdbRemoveItem" icon="ui-icon-close" style="width: 40px;height: 25px;float: left;">
+                            <p:commandButton id="cmdbOverridePrice" icon="ui-icon-pencil" style="width: 25px;height: 40px;float: left;" disabled="#{transBean.isDisableOverridePrices(generalUserSetting.getCurrentUser(),generalUserSetting.getCurrentGroupRights())}">
+                                <f:ajax listener="#{transItemBean.overridePrice(ati)}" execute="dtblTransactionItem" render="dtblTransactionItem"/>
+                            </p:commandButton>
+                            <p:commandButton id="cmdbRemoveItem" icon="ui-icon-close" style="width: 25px;height: 40px;float: right;">
                                 <f:ajax listener="#{transItemBean.removeTransItemCEC(11,16,trans,transItemBean.activeTransItems,ati)}" execute="@form" render="dtblTransactionItem TransactionFormSales:pgrdTotals"/>
                             </p:commandButton>
                         </p:column> 
@@ -202,7 +205,7 @@
                                 <h:outputLabel value="Deliver To"/>
                                 <h:inputTextarea id="itxtDelAddress" value="#{trans.deliveryAddress}" style="font-size: 10px;height: 20px;width: 234px;"/>
                             </h:panelGrid>
-                            <p:scrollPanel mode="native" style="width:450px;height:150px">
+                            <p:scrollPanel mode="native" style="width:450px;height:#{transBean.locationList.size() gt 0? 150:0}px">
                                 <h:panelGrid id="pnlLocation" columns="7">
                                     <c:forEach var="loc" items="#{transBean.locationList}">
                                         <h:commandButton style="min-height: 45px;min-width: 45px;border-radius: 5px;border: none;font-size: 12px;word-wrap: break-word !important;white-space:normal;color: black;background-color:#{transBean.setBgColorIfEqual(loc.locationId,trans.location_id,4)};" value="#{loc.locationName}">
@@ -214,7 +217,7 @@
                             <p:scrollPanel mode="native" style="width:450px;height:100px">
                                 <h:panelGrid id="pnlUser" columns="7">
                                     <c:forEach var="usr" items="#{transBean.userDetailList}">
-                                        <h:commandButton style="min-height: 45px;min-width: 45px;border-radius: 5px;border: none;font-size: 12px;word-wrap: break-word !important;white-space:normal;color: black;background-color:#{transBean.setBgColorIfEqual(usr.userDetailId,trans.transactionUserDetailId,2)};" value="#{usr.userName}">
+                                        <h:commandButton style="min-height: 45px;min-width: 45px;border-radius: 5px;border: none;font-size: 12px;word-wrap: break-word !important;white-space:normal;color: black;background-color:#{transBean.setBgColorIfEqual(usr.userDetailId,trans.transactionUserDetailId,4)};" value="#{usr.userName}">
                                             <f:ajax listener="#{transBean.updateUserDetail(trans,usr.userDetailId)}" render="TransactionFormSales:pnlUser"/>
                                         </h:commandButton>
                                     </c:forEach>

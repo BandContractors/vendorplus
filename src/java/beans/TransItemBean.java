@@ -8245,6 +8245,10 @@ public class TransItemBean implements Serializable {
         //update totals
         new TransBean().setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems);
     }
+    
+    public void overridePrice(TransItem aTransItem) {
+        aTransItem.setIs_override_price(1);
+    }
 
     public void addQtyTransItemCEC(int aTransTypeId, int aTransReasonId, Trans aTrans, List<TransItem> aActiveTransItems, TransItem ti) {
         try {
@@ -8445,6 +8449,7 @@ public class TransItemBean implements Serializable {
             tri.setIs_general(0);
             tri.setSpecific_size_qty(1);
             tri.setSpecific_size(1);
+            tri.setIs_override_price(0);
         }
     }
 
@@ -8557,6 +8562,7 @@ public class TransItemBean implements Serializable {
             tri.setIs_general(0);
             tri.setSpecific_size_qty(0);
             tri.setSpecific_size(0);
+            tri.setIs_override_price(0);
         }
     }
 

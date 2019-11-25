@@ -114,6 +114,7 @@ public class TransItem implements Serializable {
     private int is_general;
     private double specific_size;
     private double specific_size_qty;
+    private int is_override_price;
 
     /**
      * @return the TransactionItemId
@@ -1359,6 +1360,20 @@ public class TransItem implements Serializable {
      */
     public void setSpecific_size_qty(double specific_size_qty) {
         this.specific_size_qty = specific_size_qty;
+    }
+
+    /**
+     * @return the is_override_price
+     */
+    public int getIs_override_price() {
+        return is_override_price;
+    }
+
+    /**
+     * @param is_override_price the is_override_price to set
+     */
+    public void setIs_override_price(int is_override_price) {
+        this.is_override_price = is_override_price;
     }
 
 }

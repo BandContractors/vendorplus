@@ -130,6 +130,9 @@ public class TransBean implements Serializable {
     private double GrandTotal2;
     private boolean SelectAll;
     private double OrderSummaryTotal;
+    private String OrderMode1;
+    private String OrderMode2;
+    private String OrderMode3;
 
     public String setBgColorIfEqual(String aA, String aB, int aContext) {
         if (aA.equals(aB)) {
@@ -363,6 +366,31 @@ public class TransBean implements Serializable {
             aTrans.setDelivery_mode(new Parameter_listBean().getParameter_listByContextNameMemory("ORDER", "DEFAULT_DELIVERY_MODE").getParameter_value());
         } catch (NullPointerException npe) {
             aTrans.setDelivery_mode("");
+        }
+        try {
+            String OrderModes = new Parameter_listBean().getParameter_listByContextNameMemory("ORDER", "DELIVERY_MODES").getParameter_value();
+            this.OrderMode1 = "";
+            this.OrderMode2 = "";
+            this.OrderMode3 = "";
+            if (OrderModes.length() == 0) {
+                this.OrderMode1 = "";
+                this.OrderMode2 = "";
+                this.OrderMode3 = "";
+            } else {
+                String[] items = OrderModes.split(",");
+                List<String> container = Arrays.asList(items);
+                for (int i = 0; i < container.size(); i++) {
+                    if (i == 0 && container.get(i).length() > 0) {
+                        this.OrderMode1 = container.get(i);
+                    } else if (i == 1 && container.get(i).length() > 0) {
+                        this.OrderMode2 = container.get(i);
+                    } else if (i == 2 && container.get(i).length() > 0) {
+                        this.OrderMode3 = container.get(i);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            //do nothing
         }
         try {
             aTrans.setStore2Id(Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("ORDER", "DEFAULT_ORDER_TO_STORE").getParameter_value()));
@@ -15817,6 +15845,48 @@ public class TransBean implements Serializable {
      */
     public void setOrderSummaryTotal(double OrderSummaryTotal) {
         this.OrderSummaryTotal = OrderSummaryTotal;
+    }
+
+    /**
+     * @return the OrderMode1
+     */
+    public String getOrderMode1() {
+        return OrderMode1;
+    }
+
+    /**
+     * @param OrderMode1 the OrderMode1 to set
+     */
+    public void setOrderMode1(String OrderMode1) {
+        this.OrderMode1 = OrderMode1;
+    }
+
+    /**
+     * @return the OrderMode2
+     */
+    public String getOrderMode2() {
+        return OrderMode2;
+    }
+
+    /**
+     * @param OrderMode2 the OrderMode2 to set
+     */
+    public void setOrderMode2(String OrderMode2) {
+        this.OrderMode2 = OrderMode2;
+    }
+
+    /**
+     * @return the OrderMode3
+     */
+    public String getOrderMode3() {
+        return OrderMode3;
+    }
+
+    /**
+     * @param OrderMode3 the OrderMode3 to set
+     */
+    public void setOrderMode3(String OrderMode3) {
+        this.OrderMode3 = OrderMode3;
     }
 
 }

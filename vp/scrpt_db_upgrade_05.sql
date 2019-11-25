@@ -33,6 +33,8 @@ alter table trans_number_control modify column trans_number_control_id bigint(20
 
 alter table transactor add column store_id int(11);
 
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) VALUES ('48', 'ORDER', 'DELIVERY_MODES', 'Sit In,Take Out,Delivery','E.g. Sit In,Take Out,Delivery'); 
+
 
 
 

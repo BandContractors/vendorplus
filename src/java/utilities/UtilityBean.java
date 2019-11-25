@@ -14,6 +14,7 @@ import java.text.DecimalFormat;
 import java.text.Format;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -199,12 +200,6 @@ public class UtilityBean implements Serializable {
             ToDate = null;
         }
         return ToDate;
-    }
-
-    public static void main(String[] args) {
-//        String lt = "98888888";//CompanySetting.getLICENSE_CLIENT_ID();
-//        System.out.println("LT:" + lt + ",1stC:" + lt.substring(0, 0));
-//        System.out.println("LT:" + lt + ",1stC:" + lt.substring(0, 1));
     }
 
     public int countIntegers(String input) {
@@ -539,10 +534,10 @@ public class UtilityBean implements Serializable {
     }
 
 //    public static void main(String[] args) {
-//        //UtilityBean ub=new UtilityBean();
-//        System.out.println("Enc:" + Security.Encrypt("sales_123"));
-//        //System.out.println("Enc:" + Security.Decrypt("B3JHX6Rxo5F6T4A9c8B_k6cDH1FnX4XeA6qsV0ZUR3mwD9e9"));
-//        //
+////        UtilityBean ub=new UtilityBean();
+////        System.out.println("Enc:" + Security.Encrypt("sales_123"));
+////        System.out.println("Enc:" + Security.Decrypt("B3JHX6Rxo5F6T4A9c8B_k6cDH1FnX4XeA6qsV0ZUR3mwD9e9"));
+////        
 ////        List<String> emails = new ArrayList<>();
 ////        emails.add("twenceb@gmail.com");
 ////        emails.add("twenceb@wingersoft.co.ug");
@@ -550,6 +545,7 @@ public class UtilityBean implements Serializable {
 ////        emails.add("wbenda@rea.or.ug");
 ////        EmailEntityBean eb = new EmailEntityBean();
 ////        eb.sendEmailBulk("I am the subject", emails, "I am the body here", "TO",2);
+////        
 ////        String commaSeparated = "aa@bb.com,cc@k.com";
 ////        String[] items = commaSeparated.split(",");
 ////        List<String> container = Arrays.asList(items);
