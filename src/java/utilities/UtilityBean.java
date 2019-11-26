@@ -519,7 +519,7 @@ public class UtilityBean implements Serializable {
         try {
             aList.clear();
         } catch (NullPointerException npe) {
-
+            //do nothing
         }
     }
 
@@ -533,7 +533,15 @@ public class UtilityBean implements Serializable {
         }
     }
 
-//    public static void main(String[] args) {
+    public String formatCapitaliseFirstCharacter(String aString) {
+        if (aString.length() < 2) {
+            return aString;
+        } else {
+            return aString.substring(0, 1).toUpperCase() + aString.substring(1).toLowerCase();
+        }
+    }
+
+    //public static void main(String[] args) {
 ////        UtilityBean ub=new UtilityBean();
 ////        System.out.println("Enc:" + Security.Encrypt("sales_123"));
 ////        System.out.println("Enc:" + Security.Decrypt("B3JHX6Rxo5F6T4A9c8B_k6cDH1FnX4XeA6qsV0ZUR3mwD9e9"));
@@ -551,7 +559,9 @@ public class UtilityBean implements Serializable {
 ////        List<String> container = Arrays.asList(items);
 ////        System.out.println("0:" + container.get(0));
 ////        System.out.println("1:" + container.get(1));
-//    }
+    ///String Name="BRIAN";
+    //System.out.println(Name.substring(0,1).toUpperCase() + Name.substring(1).toLowerCase());
+    //}
     /**
      * @return the pattern
      */

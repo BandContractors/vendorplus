@@ -73,7 +73,7 @@
                 <h:outputLabel  value="From"/>
                 <h:outputLabel  value="#{transBean.transTypeObj.transactionRefLabel}"/>
                 <h:outputLabel  value="Currency"/>
-                <p:commandLink actionListener="#{transactorBean.openChildTransactor('CUSTOMER')}" value="#{transBean.transTypeObj.transactorLabel}"/>
+                <p:commandLink actionListener="#{transactorBean.openChildTransactor('CUSTOMER')}" value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}"/>
                 <h:outputLabel  value="#{transBean.transTypeObj.transactionDateLabel}"/>
                 <h:outputLabel id="olblDebtCredit" style="color: coral;font-weight: bold;" value="Receivable (#{generalUserSetting.LOCAL_CURRENCY.currencyCode})"/>
                 <h:outputLabel id="olblDeposit" style="color: green;font-weight: bold;" value="Deposit (#{trans.currencyCode})"/>
@@ -443,7 +443,7 @@
 
             <h:panelGrid id="pgrdScheme" style="background-color: yellow;width: 100%">
                 <h:panelGrid id="pgrdScheme2" columns="6" rendered="#{trans.billOther}">
-                    <h:outputLabel  value="#{transBean.transTypeObj.billTransactorLabel}:"/>
+                    <h:outputLabel  value="Bill For:"/>
                     <p:autoComplete id="autcBillTransactor" value="#{transactorBean.selectedBillTransactor}" 
                                     completeMethod="#{transactorBean.getTransactorObjectList}" 
                                     var="trct" 
@@ -560,7 +560,7 @@
             <h:panelGrid id="pgrdTransUser" styleClass="clsGridMainInput" columns="2">
                 <h:outputLabel  value="#{transBean.transTypeObj.transactionUserLabel} (if different from: #{generalUserSetting.currentUser.userName}):"/>
                 <p:autoComplete id="autcTransactionUser" value="#{userDetailBean.selectedUserDetail}" 
-                                completeMethod="#{userDetailBean.getUserDetailObjectList}" 
+                                completeMethod="#{userDetailBean.getUserDetailObjectListActive}" 
                                 var="ud" 
                                 itemLabel="#{ud.firstName} #{ud.secondName} #{ud.thirdName}" 
                                 itemValue="#{ud}" 

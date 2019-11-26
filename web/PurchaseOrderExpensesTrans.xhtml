@@ -49,7 +49,7 @@
                 <h:outputLabel  value="From:"/>
                 <h:outputLabel  value="#{transBean.transTypeObj.transactionRefLabel}:"/>
                 <h:outputLabel  value="Currency:"/>
-                <p:commandLink actionListener="#{transactorBean.openChildTransactor('SUPPLIER')}" value="#{transBean.transTypeObj.transactorLabel}"/>
+                <p:commandLink actionListener="#{transactorBean.openChildTransactor('SUPPLIER')}" value="#{menuItemBean.menuItemObj.SUPPLIER_NAME}"/>
                 <h:outputLabel  value="#{transBean.transTypeObj.transactionDateLabel}:"/>
                 <h:outputLabel id="olblDebtCredit" style="color: coral;font-weight: bold;" value="Payable (#{generalUserSetting.LOCAL_CURRENCY.currencyCode})"/>
                 <h:outputLabel id="olblDeposit" style="color: green;font-weight: bold;" value="Prepaid (#{trans.currencyCode})"/>
@@ -317,7 +317,7 @@
                 <h:outputLabel styleClass="clsLabelTransItem" value="Authorised.Date"/>
                 <p:calendar styleClass="clsInput" id="calDeliveryDate" pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.deliveryDate}" size="17"/>
                 <p:autoComplete id="autcTransactionUser" value="#{transBean.authorisedByUserDetail}" 
-                                completeMethod="#{userDetailBean.getUserDetailObjectList}" 
+                                completeMethod="#{userDetailBean.getUserDetailObjectListActive}" 
                                 var="ud" 
                                 itemLabel="#{ud.firstName} #{ud.secondName} #{ud.thirdName}" 
                                 itemValue="#{ud}" 

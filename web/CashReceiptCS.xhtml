@@ -61,7 +61,7 @@
                         <h:outputLabel value="To Date:"/>
                         <p:calendar id="calDate2"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{payBean.date2}" size="12"/>
 
-                        <h:outputLabel  value="Client/Partner:"/>
+                        <h:outputLabel  value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}:"/>
                         <p:autoComplete id="autcTransactor" value="#{payBean.selectedBillTransactor}" 
                                         completeMethod="#{transactorBean.getTransactorObjectList}" 
                                         var="trct" 

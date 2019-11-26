@@ -174,7 +174,7 @@
             <h:panelGrid id="pgrdTransUser" columns="6">
                 <h:outputLabel  value="#{transactionTypeBean.getTransactionType(66).transactionUserLabel}"/>
                 <p:autoComplete id="autcTransactionUser" value="#{userDetailBean.selectedUserDetail}" 
-                                completeMethod="#{userDetailBean.getUserDetailObjectList}" 
+                                completeMethod="#{userDetailBean.getUserDetailObjectListActive}" 
                                 var="ud" 
                                 itemLabel="#{ud.firstName} #{ud.secondName} #{ud.thirdName}" 
                                 itemValue="#{ud}" 

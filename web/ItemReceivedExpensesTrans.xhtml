@@ -56,7 +56,7 @@
                     </h:inputText>
                 </p:panel>
                 <p:panel id="pnlTransactor" style="border: none;">
-                    <p:commandLink actionListener="#{transactorBean.openChildTransactor('SUPPLIER')}" value="#{transBean.transTypeObj.transactorLabel}"/>
+                    <p:commandLink actionListener="#{transactorBean.openChildTransactor('SUPPLIER')}" value="#{menuItemBean.menuItemObj.SUPPLIER_NAME}"/>
                     <h:inputText id="itxtRetrievedTransactor" value="#{transactorBean.getTransactor(trans.transactorId).transactorNames}" disabled="true" rendered="#{trans.transactionRef.length()>0}"/>
                     <p:autoComplete id="autcTransactor" value="#{transactorBean.selectedTransactor}" 
                                     completeMethod="#{transactorBean.getTransactorActiveObjectList}" 
@@ -266,7 +266,7 @@
             <h:panelGrid id="pgrdOthers" styleClass="clsGridMainInput" columns="2">
                 <h:outputLabel styleClass="clsLabelTransItem" value="#{transBean.transTypeObj.transactionUserLabel} (if different from current user):"/>
                 <p:autoComplete id="autcTransactionUser" value="#{transBean.transUserDetail}" 
-                                completeMethod="#{userDetailBean.getUserDetailObjectList}" 
+                                completeMethod="#{userDetailBean.getUserDetailObjectListActive}" 
                                 var="ud" 
                                 itemLabel="#{ud.firstName} #{ud.secondName} #{ud.thirdName}" 
                                 itemValue="#{ud}" 

@@ -21,6 +21,7 @@
     </h:head>
     <f:metadata>
         <f:viewAction action="#{transactorBean.initTransactorObj()}"/>
+        <f:viewAction action="#{utilityBean.clearList(transactorBean.transactorList)}"/>
     </f:metadata>
     <f:event listener="#{navigationBean.checkAccessDeniedTransactor(generalUserSetting.transactorType, 'View')}" type="preRenderView" />
     <h:body>

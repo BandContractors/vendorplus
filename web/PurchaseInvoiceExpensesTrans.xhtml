@@ -75,7 +75,7 @@
                     </h:inputText>
                 </p:panel>
                 <p:panelGrid columns="3" id="pnlTransactor">
-                    <p:commandLink actionListener="#{transactorBean.openChildTransactor('SUPPLIER')}" value="#{transBean.transTypeObj.transactorLabel}"/>
+                    <p:commandLink actionListener="#{transactorBean.openChildTransactor('SUPPLIER')}" value="#{menuItemBean.menuItemObj.SUPPLIER_NAME}"/>
                     <h:outputLabel id="olblDebtCredit" style="color: coral;font-weight: bold;" value="Payable (#{generalUserSetting.LOCAL_CURRENCY.currencyCode})"/>
                     <h:outputLabel id="olblDeposit" style="color: green;font-weight: bold;" value="Prepaid (#{trans.currencyCode})"/>
                     <h:inputText id="itxtRetrievedTransactor" value="#{transactorBean.getTransactor(trans.transactorId).transactorNames}" disabled="true" rendered="#{trans.transactionRef.length()>0}">

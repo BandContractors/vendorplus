@@ -124,7 +124,7 @@
                     </p:column>
                     <p:column>
                         <!-- column header -->
-                        <f:facet name="header">#{transBean.transTypeObj.transactorLabel}</f:facet>
+                        <f:facet name="header">#{menuItemBean.menuItemObj.CUSTOMER_NAME}</f:facet>
                         <!-- row record -->
                         <h:outputText value="#{t.transactorName} #{t.location_name}" style="text-decoration:#{t.is_cancel eq 1 ? 'line-through':'none'};"/>
                     </p:column>

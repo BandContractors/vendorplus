@@ -152,7 +152,7 @@
                 <h:outputLabel styleClass="clsLabelTransItem" value="Request.Authorised.By"/>
                 <h:outputLabel styleClass="clsLabelTransItem" value="Request.Authorised.Date"/>
                 <p:autoComplete id="autcTransactionUser" value="#{transBean.authorisedByUserDetail}" 
-                                completeMethod="#{userDetailBean.getUserDetailObjectList}" 
+                                completeMethod="#{userDetailBean.getUserDetailObjectListActive}" 
                                 var="ud" 
                                 itemLabel="#{ud.firstName} #{ud.secondName} #{ud.thirdName}" 
                                 itemValue="#{ud}" 

@@ -48,7 +48,7 @@
                 <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:If Applicable"/>
             </h:panelGrid>
             <h:panelGrid id="pnlSearch" columns="6" style="background-color: #b3f2b3;width: 100%;">
-                <h:outputLabel value="#{transBean.transTypeRefObj.transactorLabel}:"/>
+                <h:outputLabel value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}:"/>
                 <p:autoComplete id="autcTransactorSearch" value="#{transactorBean.selectedTransactor}" 
                                 completeMethod="#{transactorBean.getTransactorObjectList}" 
                                 var="trct" 
@@ -57,7 +57,7 @@
                                 converter="TransactorConverter" style="text-align: left;" 
                                 forceSelection="true" 
                                 >
-                    <p:column headerText="#{transBean.transTypeRefObj.transactorLabel}" style="text-align: left" >  
+                    <p:column headerText="#{menuItemBean.menuItemObj.CUSTOMER_NAME}" style="text-align: left" >  
                         #{trct.transactorNames} 
                     </p:column> 
                     <p:column headerText="Type" style="text-align: left" >  
@@ -85,7 +85,7 @@
                 <h:outputLabel value="To"/>
                 <h:outputLabel value="#{transBean.transTypeRefObj.transactionNumberLabel}"/>
                 <h:outputLabel value="#{transBean.transTypeRefObj.transactionDateLabel}"/>
-                <h:outputLabel value="#{transBean.transTypeObj.transactorLabel}"/>
+                <h:outputLabel value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}"/>
                 <h:outputLabel value="Site"/>
                 <h:outputLabel value="From Date"/>
                 <h:outputLabel value="To Date"/>
@@ -203,7 +203,7 @@
             <h:panelGrid id="pgrdTransUser" columns="4">
                 <h:outputLabel  value="#{transBean.transTypeObj.transactionUserLabel} (if different from: #{generalUserSetting.currentUser.userName}):"/>
                 <p:autoComplete id="autcTransactionUser" value="#{userDetailBean.selectedUserDetail}" 
-                                completeMethod="#{userDetailBean.getUserDetailObjectList}" 
+                                completeMethod="#{userDetailBean.getUserDetailObjectListActive}" 
                                 var="ud" 
                                 itemLabel="#{ud.firstName} #{ud.secondName} #{ud.thirdName}" 
                                 itemValue="#{ud}" 
@@ -219,7 +219,7 @@
                     <p:ajax event="itemSelect" listener="#{trans.setTransactionUserDetailId(userDetailBean.selectedUserDetail.userDetailId)}"/>
                     <p:ajax event="change" listener="#{trans.setTransactionUserDetailId(userDetailBean.selectedUserDetail.userDetailId)}" rendered="#{userDetailBean.selectedUserDetail!=null}"/>
                 </p:autoComplete>
-                <h:outputLabel value="#{transBean.transTypeObj.transactorLabel} Rep(Name and Phone):"/>
+                <h:outputLabel value="#{menuItemBean.menuItemObj.CUSTOMER_NAME} Rep(Name and Phone):"/>
                 <h:inputText value="#{trans.transactor_rep}"/>
             </h:panelGrid>
             <h:panelGrid id="pgrdCommands" styleClass="clsGridMainCommands" columns="1">

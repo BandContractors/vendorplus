@@ -513,6 +513,26 @@ BEGIN
 END//
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS sp_search_user_detail_by_names_active;
+DELIMITER //
+CREATE PROCEDURE sp_search_user_detail_by_names_active
+(
+	IN in_names varchar(100) 
+) 
+BEGIN 
+	SELECT * FROM user_detail 
+	WHERE 
+	(is_user_locked='No' AND user_name<>'system') AND 
+	(
+	user_name LIKE concat('%', in_names, '%') 
+	OR first_name LIKE concat('%', in_names, '%') 
+	OR second_name LIKE concat('%', in_names, '%') 
+	OR third_name LIKE concat('%', in_names, '%')
+	)
+	ORDER BY first_name,second_name,third_name ASC;
+END//
+DELIMITER ;
+
 DROP PROCEDURE IF EXISTS sp_search_user_detail_by_username;
 DELIMITER //
 CREATE PROCEDURE sp_search_user_detail_by_username

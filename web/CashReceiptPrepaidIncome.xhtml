@@ -54,7 +54,7 @@
                         <f:selectItems value="#{accCurrencyBean.currencyList}" var="ac" itemLabel="#{ac.currencyCode}" itemValue="#{ac.currencyCode}"/>
                         <f:ajax event="change" execute="@this" render="pnlInput pnlButtons"/>
                     </h:selectOneMenu>
-                    <h:outputLabel  value="Received from Client/Customer:"/>
+                    <h:outputLabel  value="Received from #{menuItemBean.menuItemObj.CUSTOMER_NAME}:"/>
                     <p:autoComplete id="autcTransactor" value="#{payBean.selectedBillTransactor}" 
                                     completeMethod="#{transactorBean.getTransactorObjectList}" 
                                     var="trct" 

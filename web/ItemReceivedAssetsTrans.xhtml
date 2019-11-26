@@ -249,7 +249,7 @@
             <h:panelGrid id="pgrdOthers" styleClass="clsGridMainInput" columns="2">
                 <h:outputLabel value="#{transactionTypeBean.getTransactionType(9).transactionUserLabel} (if different from current user):"/>
                 <p:autoComplete id="autcTransactionUser" value="#{transBean.transUserDetail}" 
-                                completeMethod="#{userDetailBean.getUserDetailObjectList}" 
+                                completeMethod="#{userDetailBean.getUserDetailObjectListActive}" 
                                 var="ud" 
                                 itemLabel="#{ud.firstName} #{ud.secondName} #{ud.thirdName}" 
                                 itemValue="#{ud}" 

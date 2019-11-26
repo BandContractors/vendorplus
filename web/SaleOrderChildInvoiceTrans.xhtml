@@ -11,7 +11,7 @@
             <h:panelGrid columns="1">
                 <h:panelGrid id="pnlgHeaderChild" columns="4">
                     <h:outputLabel value="Location"/>
-                    <h:outputLabel value="#{transactionTypeBean.getTransactionType(2).transactorLabel}"/>
+                    <h:outputLabel value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}"/>
                     <h:outputLabel id="olblDebtCredit" style="color: coral;font-weight: bold;" value="Receivable (#{generalUserSetting.LOCAL_CURRENCY.currencyCode})"/>
                     <h:outputLabel id="olblDeposit" style="color: green;font-weight: bold;" value="Deposit (#{transBean.transChild.currencyCode})"/>
                     <h:inputText value="#{transBean.transChild.location_name}" disabled="true" style="width: 150px"/>

@@ -18,11 +18,11 @@ import sessions.GeneralUserSetting;
 @ManagedBean(name = "menuItemBean")
 @SessionScoped
 public class MenuItemBean implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     private MenuItem MenuItemObj;
-    
+
     public void refreshMenuItemObj() {
         try {
             if (null == this.MenuItemObj) {
@@ -70,11 +70,29 @@ public class MenuItemBean implements Serializable {
             } catch (NullPointerException npe) {
                 this.MenuItemObj.setCURRENT_STORE(null);
             }
+            try {
+                String ParaValue = pb.getParameter_listByContextNameMemory("COMPANY_SETTING", "CUSTOMER_NAME").getParameter_value();
+                if (ParaValue.length() == 0) {
+                    ParaValue = "Customer";
+                }
+                this.MenuItemObj.setCUSTOMER_NAME(ParaValue);
+            } catch (Exception e) {
+                this.MenuItemObj.setCUSTOMER_NAME("Customer");
+            }
+            try {
+                String ParaValue = pb.getParameter_listByContextNameMemory("COMPANY_SETTING", "SUPPLIER_NAME").getParameter_value();
+                if (ParaValue.length() == 0) {
+                    ParaValue = "Supplier";
+                }
+                this.MenuItemObj.setSUPPLIER_NAME(ParaValue);
+            } catch (Exception e) {
+                this.MenuItemObj.setSUPPLIER_NAME("Supplier");
+            }
         } catch (Exception e) {
-            
+
         }
     }
-    
+
     /**
      * @return the MenuItemObj
      */

@@ -344,7 +344,7 @@
                 <h:panelGrid id="pgrdTransUserChild" styleClass="clsGridMainInput" columns="2">
                     <h:outputLabel value="#{transactionTypeBean.getTransactionType(68).transactionUserLabel} (if different from: #{generalUserSetting.currentUser.userName}):"/>
                     <p:autoComplete id="autcTransactionUserChild" value="#{userDetailBean.selectedUserDetail}" 
-                                    completeMethod="#{userDetailBean.getUserDetailObjectList}" 
+                                    completeMethod="#{userDetailBean.getUserDetailObjectListActive}" 
                                     var="ud" 
                                     itemLabel="#{ud.firstName} #{ud.secondName} #{ud.thirdName}" 
                                     itemValue="#{ud}" 

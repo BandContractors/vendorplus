@@ -807,6 +807,27 @@ public class UserDetailBean implements Serializable {
         return UserDetailObjectList;
     }
 
+    public List<UserDetail> getUserDetailObjectListActive(String Query) {
+        String sql;
+        sql = "{call sp_search_user_detail_by_names_active(?)}";
+        ResultSet rs = null;
+        UserDetailObjectList = new ArrayList<UserDetail>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setString(1, Query.trim());
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                UserDetail userdetail = new UserDetail();
+                this.setUserDetailFromResultset(userdetail, rs);
+                UserDetailObjectList.add(userdetail);
+            }
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+        return UserDetailObjectList;
+    }
+
     /**
      * @param UserDetailObjectList the UserDetailObjectList to set
      */

@@ -35,6 +35,12 @@ alter table transactor add column store_id int(11);
 
 INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) VALUES ('48', 'ORDER', 'DELIVERY_MODES', 'Sit In,Take Out,Delivery','E.g. Sit In,Take Out,Delivery'); 
 
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) VALUES ('49', 'COMPANY_SETTING', 'CUSTOMER_NAME', 'Customer','E.g. Customer,Client,Patient,etc.'); 
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) VALUES ('50', 'COMPANY_SETTING', 'SUPPLIER_NAME', 'Supplier','E.g. Supplier,Agent, etc.');
+UPDATE transaction_type SET transactor_label='' AND bill_transactor_label='' WHERE transaction_type_id>0;
+
+
+
 
 
 

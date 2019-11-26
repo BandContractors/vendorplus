@@ -53,7 +53,7 @@
                 <h:outputLabel  value="#{transBean.transTypeObj.transactionDateLabel}:"/>
                 <p:calendar id="calTransactionDate"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.transactionDate}" size="8"/>
                 <h:panelGrid id="pnlSearch" columns="5" style="background-color: #b3f2b3;width: 100%;">
-                    <h:outputLabel value="#{transBean.transTypeRefObj.transactorLabel}:"/>
+                    <h:outputLabel value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}:"/>
                     <p:autoComplete id="autcTransactorSearch" value="#{transactorBean.selectedTransactor}" 
                                     completeMethod="#{transactorBean.getTransactorActiveObjectList}" 
                                     var="trct" 
@@ -62,7 +62,7 @@
                                     converter="TransactorConverter" style="text-align: left;" 
                                     forceSelection="true" 
                                     >
-                        <p:column headerText="#{transBean.transTypeRefObj.transactorLabel}" style="text-align: left" >  
+                        <p:column headerText="#{menuItemBean.menuItemObj.CUSTOMER_NAME}" style="text-align: left" >  
                             #{trct.transactorNames} 
                         </p:column> 
                         <p:column headerText="Type" style="text-align: left" >  
@@ -317,7 +317,7 @@
                     <h:panelGrid id="pgrdOthers" styleClass="clsGridMainInput" columns="2">
                         <h:outputLabel value="#{transBean.transTypeObj.transactionUserLabel}:"/>
                         <p:autoComplete id="autcTransactionUser" value="#{transBean.transUserDetail}" 
-                                        completeMethod="#{userDetailBean.getUserDetailObjectList}" 
+                                        completeMethod="#{userDetailBean.getUserDetailObjectListActive}" 
                                         var="ud" 
                                         itemLabel="#{ud.firstName} #{ud.secondName} #{ud.thirdName}" 
                                         itemValue="#{ud}" 

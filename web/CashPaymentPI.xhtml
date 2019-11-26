@@ -60,7 +60,7 @@
                         <p:calendar id="calDate1"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{payBean.date1}" size="12"/>
                         <h:outputLabel value="To Date:"/>
                         <p:calendar id="calDate2"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{payBean.date2}" size="12"/>
-                        <h:outputLabel  value="#{transactionTypeBean.getTransactionType(1).transactorLabel}:"/>
+                        <h:outputLabel  value="#{menuItemBean.menuItemObj.SUPPLIER_NAME}:"/>
                         <p:autoComplete id="autcTransactor" value="#{payBean.selectedBillTransactor}" 
                                         completeMethod="#{transactorBean.getTransactorObjectList}" 
                                         var="trct" 
@@ -69,7 +69,7 @@
                                         converter="TransactorConverter" style="text-align: left;" 
                                         forceSelection="true" 
                                         >
-                            <p:column headerText="#{transactionTypeBean.getTransactionType(1).transactorLabel}" style="text-align: left" >  
+                            <p:column headerText="#{menuItemBean.menuItemObj.SUPPLIER_NAME}" style="text-align: left" >  
                                 #{trct.transactorNames} 
                             </p:column> 
                             <p:column headerText="Type" style="text-align: left" >  

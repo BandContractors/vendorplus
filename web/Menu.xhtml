@@ -157,7 +157,7 @@
                         <p:separator />
                         <p:menuitem value="Receipt of Loan" action="#{navigationBean.redirectToCashReceiptLOAN()}" />
                         <p:separator />
-                        <p:menuitem value="Receipt of Customer Deposit (Prepaid Income)" action="#{navigationBean.redirectToCashReceiptPrepaidIncome()}" />  
+                        <p:menuitem value="Receipt of #{menuItemBean.menuItemObj.CUSTOMER_NAME} Deposit (Prepaid Income)" action="#{navigationBean.redirectToCashReceiptPrepaidIncome()}" />  
                         <p:separator />
                     </p:submenu>
                     <p:submenu label="Cash Payments">  
@@ -214,9 +214,9 @@
                 </p:submenu> 
                 <p:submenu label="Partner" rendered="#{menuItemBean.menuItemObj.LOGIN_TYPE==1}" icon="ui-icon-suitcase">  
                     <p:separator />
-                    <p:menuitem value="Customer Details" action="#{navigationBean.redirectToTransactorCustomer()}" /> 
+                    <p:menuitem value="#{menuItemBean.menuItemObj.CUSTOMER_NAME} Details" action="#{navigationBean.redirectToTransactorCustomer()}" /> 
                     <p:separator />
-                    <p:menuitem value="Supplier Details" action="#{navigationBean.redirectToTransactorSupplier()}" /> 
+                    <p:menuitem value="#{menuItemBean.menuItemObj.SUPPLIER_NAME} Details" action="#{navigationBean.redirectToTransactorSupplier()}" /> 
                     <p:separator />
                     <p:menuitem value="Scheme Details" action="#{navigationBean.redirectToTransactorScheme()}" /> 
                     <p:separator />
@@ -329,9 +329,9 @@
                     <p:separator />
                     <p:submenu label="Partner Reports">
                         <p:separator />
-                        <p:menuitem value="Customer List" action="#{navigationBean.redirectToReportPartnerCustomer()}" />
+                        <p:menuitem value="#{menuItemBean.menuItemObj.CUSTOMER_NAME} List" action="#{navigationBean.redirectToReportPartnerCustomer()}" />
                         <p:separator />
-                        <p:menuitem value="Supplier List" action="#{navigationBean.redirectToReportPartnerSupplier()}" />
+                        <p:menuitem value="#{menuItemBean.menuItemObj.SUPPLIER_NAME} List" action="#{navigationBean.redirectToReportPartnerSupplier()}" />
                         <p:separator />
                         <p:menuitem value="Scheme List" action="#{navigationBean.redirectToReportPartnerScheme()}" />
                         <p:separator />
@@ -339,9 +339,9 @@
                         <p:separator />
                         <p:menuitem value="Provider Bill Report" action="#{navigationBean.redirectToReportProviderBill()}" />
                         <p:separator />
-                        <p:menuitem value="Customer Card" action="#{navigationBean.redirectToReportCustomerCard()}" />
+                        <p:menuitem value="#{menuItemBean.menuItemObj.CUSTOMER_NAME} Card" action="#{navigationBean.redirectToReportCustomerCard()}" />
                         <p:separator />
-                        <p:menuitem value="Supplier Card" action="#{navigationBean.redirectToReportSupplierCard()}" />
+                        <p:menuitem value="#{menuItemBean.menuItemObj.SUPPLIER_NAME} Card" action="#{navigationBean.redirectToReportSupplierCard()}" />
                         <p:separator />
                     </p:submenu>
                     <p:separator />

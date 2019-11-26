@@ -3,8 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui"
-      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+      xmlns:p="http://primefaces.org/ui">
     <h:head>
         <title>Transactor</title>
         <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
@@ -38,14 +37,22 @@
                         <f:ajax event="keyup" listener="#{transactorBean.refreshTransactorsListByNameRefFile(transactorBean.searchTransactorNames,transactorBean.transactorObj.transactorType)}" render="pnlSearchResult"/>
                     </h:inputText>
                     <h:panelGrid id="pnlSearchResult">
-                        <c:forEach var="te" items="#{transactorBean.transactorList}">
-                            <h:commandLink value="#{te.transactorNames}" style="font-size: 14px;">
-                                <f:ajax listener="#{transactorBean.displayTransactor(te,transactorBean.transactorObj)}" execute="@this" render="pnlInput"/>
-                            </h:commandLink>
-                        </c:forEach>
+                        <p:dataTable rowIndexVar="rowIndex" id="dtblTransactor" value="#{transactorBean.transactorList}" var="t" 
+                                     tableStyle="width:auto;" 
+                                     >  
+                            <p:column>
+                                <!-- column header -->
+                                <f:facet name="header"></f:facet>
+                                <!-- row record -->
+                                <h:commandLink value="#{t.transactorNames}" style="font-size: 14px;">
+                                    <f:ajax listener="#{transactorBean.displayTransactor(t,transactorBean.transactorObj)}" execute="dtblTransactor" render="form:pnlCol1 form:pnlCol2 form:pnlSalary"/>
+                                </h:commandLink><br /> 
+                                <h:outputLabel  value="#{t.cpName}"/>
+                            </p:column>
+                        </p:dataTable>
                     </h:panelGrid>
                 </h:panelGrid>
-                <h:panelGrid columns="2">
+                <h:panelGrid id="pnlCol1" columns="2">
                     <h:outputLabel  value="Type:"/>
                     <h:selectOneMenu styleClass="clsMenu" id="menuTransactorType" value="#{transactorBean.transactorObj.transactorType}" style="width: 206px;">
                         <f:selectItem itemLabel="#{transactorBean.transactorObj.transactorType}" itemValue="#{transactorBean.transactorObj.transactorType}"/>
@@ -97,7 +104,7 @@
                     <h:outputLabel  value="Date of Birth(DOB):"/>
                     <p:calendar styleClass="clsInput" id="calDOB" navigator="true" showButtonPanel="true" value="#{transactorBean.transactorObj.DOB}" pattern="#{companySetting.getDateFormat()}" size="16"/>
                 </h:panelGrid>
-                <h:panelGrid columns="2">
+                <h:panelGrid id="pnlCol2" columns="2">
                     <h:outputLabel  value="Sex:"/>
                     <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.sex}" autocomplete="off" style="width: 203px;"/>
                     <h:outputLabel  value="Occupation:"/>

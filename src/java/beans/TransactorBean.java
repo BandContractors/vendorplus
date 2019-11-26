@@ -89,6 +89,9 @@ public class TransactorBean implements Serializable {
         } else {
             if (null == this.TransactorObj) {
                 this.TransactorObj = new Transactor();
+            } else {
+                this.clearTransactor(this.TransactorObj);
+                this.SearchTransactorNames = "";
             }
             this.TransactorObj.setTransactorType(new GeneralUserSetting().getTransactorType());
             this.TransactorObj.setTrans_number_format(new TransactionTypeBean().getTransactionType(17).getTrans_number_format());
@@ -97,22 +100,6 @@ public class TransactorBean implements Serializable {
         }
     }
 
-//    public void setNewTransctorRef(Transactor aTransactor) {
-//        try {
-//            long aRefNoId;
-//            String aRefNoStr;
-//            aRefNoId = this.getCurrentTransactorRefNo();
-//            if (aRefNoId > 0) {
-//                aRefNoId = aRefNoId + 1;
-//            } else {
-//                aRefNoId = 1;
-//            }
-//            aRefNoStr = Long.toString(aRefNoId);
-//            aTransactor.setTransactorRef(aRefNoStr);
-//        } catch (NullPointerException npe) {
-//
-//        }
-//    }
     public String validateTransactor(Transactor transactor, List<SalaryDeduction> aSalaryDeductions) {
         String sql = null;
         String msg = "";
@@ -970,6 +957,11 @@ public class TransactorBean implements Serializable {
             } catch (NullPointerException npe) {
             }
             this.setSearchTransactorNames("");
+            try {
+                this.TransactorList.clear();
+            } catch (Exception e) {
+                //do nothing
+            }
             //init transactor ref no
             //this.setNewTransctorRef(transactor);
         }
@@ -1102,29 +1094,31 @@ public class TransactorBean implements Serializable {
         return Transactors;
     }
 
+    public void clearList() {
+        try {
+            this.TransactorList.clear();
+        } catch (NullPointerException npe) {
+            //do nothing
+        }
+    }
+
     public void refreshTransactorsListByNameRefFile(String aName, String aType) {
         String sql;
         sql = "{call sp_search_transactor_by_name_ref_file(?,?)}";
         ResultSet rs = null;
         this.TransactorList = new ArrayList<Transactor>();
-        try (
-                Connection conn = DBConnection.getMySQLConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);) {
-            ps.setString(1, aName);
-            ps.setString(2, aType);
-            rs = ps.executeQuery();
-            while (rs.next()) {
-                this.TransactorList.add(this.getTransactorFromResultSet(rs));
-            }
-        } catch (SQLException se) {
-            System.err.println("refreshTransactorsListByNameRefFile:" + se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println("refreshTransactorsListByNameRefFile:" + ex.getMessage());
+        if (aName.length() > 0) {
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                ps.setString(1, aName);
+                ps.setString(2, aType);
+                rs = ps.executeQuery();
+                while (rs.next()) {
+                    this.TransactorList.add(this.getTransactorFromResultSet(rs));
                 }
+            } catch (Exception e) {
+                System.err.println("refreshTransactorsListByNameRefFile:" + e.getMessage());
             }
         }
     }

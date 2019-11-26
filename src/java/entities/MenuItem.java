@@ -27,6 +27,8 @@ public class MenuItem implements Serializable {
     private int LOGIN_TYPE;
     private UserDetail CURRENT_USER;
     private Store CURRENT_STORE;
+    private String CUSTOMER_NAME;
+    private String SUPPLIER_NAME;
 
     /**
      * @return the SYSTEM_NAME
@@ -138,5 +140,33 @@ public class MenuItem implements Serializable {
      */
     public void setCURRENT_STORE(Store CURRENT_STORE) {
         this.CURRENT_STORE = CURRENT_STORE;
+    }
+
+    /**
+     * @return the CUSTOMER_NAME
+     */
+    public String getCUSTOMER_NAME() {
+        return CUSTOMER_NAME;
+    }
+
+    /**
+     * @param CUSTOMER_NAME the CUSTOMER_NAME to set
+     */
+    public void setCUSTOMER_NAME(String CUSTOMER_NAME) {
+        this.CUSTOMER_NAME = CUSTOMER_NAME;
+    }
+
+    /**
+     * @return the SUPPLIER_NAME
+     */
+    public String getSUPPLIER_NAME() {
+        return SUPPLIER_NAME;
+    }
+
+    /**
+     * @param SUPPLIER_NAME the SUPPLIER_NAME to set
+     */
+    public void setSUPPLIER_NAME(String SUPPLIER_NAME) {
+        this.SUPPLIER_NAME = SUPPLIER_NAME;
     }
 }
