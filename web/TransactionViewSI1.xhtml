@@ -52,9 +52,9 @@
                         <h:panelGrid id="IpgrdSalesInvoiceHeader5" style="width: 290px; margin: 0px;" columns="2">
                             <h:outputLabel style="font-size: 12px;" value="#{transactionTypeBean.getTransactionType(2).transactionRefLabel}:" rendered="#{salesInvoiceBean.getCurrentTransaction().transactionRef.length()>0}"/>
                             <h:outputLabel style="font-size: 14px;font-weight: bold;" value="#{salesInvoiceBean.getCurrentTransaction().transactionRef}" rendered="#{salesInvoiceBean.getCurrentTransaction().transactionRef.length()>0}"/>
-                            <h:outputLabel style="font-size: 12px;" value="#{transactionTypeBean.getTransactionType(2).transactorLabel}:" rendered="#{salesInvoiceBean.getCurrentTransactor().transactorId>0}"/>
+                            <h:outputLabel style="font-size: 12px;" value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}:" rendered="#{salesInvoiceBean.getCurrentTransactor().transactorId>0}"/>
                             <h:outputLabel id="IolblSalesInvoiceCustomer" style="font-size: 12px;" value="#{salesInvoiceBean.getCurrentTransactor().transactorNames}" rendered="#{salesInvoiceBean.getCurrentTransactor().transactorId>0}"/>
-                            <h:outputLabel style="font-size: 12px;" value="#{transactionTypeBean.getTransactionType(2).billTransactorLabel}:" rendered="#{salesInvoiceBean.getCurrentBillTransactor().transactorId!=salesInvoiceBean.getCurrentTransactor().transactorId}"/>
+                            <h:outputLabel style="font-size: 12px;" value="Bill For:" rendered="#{salesInvoiceBean.getCurrentBillTransactor().transactorId!=salesInvoiceBean.getCurrentTransactor().transactorId}"/>
                             <h:outputLabel id="IolblSalesInvoiceBillCustomer" style="font-size: 12px;" value="#{salesInvoiceBean.getCurrentBillTransactor().transactorNames}" rendered="#{salesInvoiceBean.getCurrentBillTransactor().transactorId!=salesInvoiceBean.getCurrentTransactor().transactorId}"/>
                         </h:panelGrid>
 

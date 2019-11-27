@@ -6,7 +6,7 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
     <h:head>
-        <title>Customer Card Report</title>
+        <title>#{menuItemBean.menuItemObj.CUSTOMER_NAME} Card Report</title>
         <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
         <script  language="javascript">
@@ -30,7 +30,7 @@
 
         <h:form id="formReport">
             <h:panelGrid id="id0" columns="1" styleClass="clsPanelReportFilterTitle">
-                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="Customer Card Report"/>
+                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="#{menuItemBean.menuItemObj.CUSTOMER_NAME} Card Report"/>
             </h:panelGrid>
             <h:panelGrid id="id1" columns="9" styleClass="clsPanelReportFilter">
                 <p:outputLabel styleClass="clsLabelReportFilter" id="id2" value="From Section/Store:"/>
@@ -43,7 +43,7 @@
                 <p:outputLabel styleClass="clsLabelReportFilter" id="id11" value="To Date:"/>
                 <p:calendar styleClass="clsInputReportFilter" id="calTransDateTo"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{trans.transactionDate2}" size="10">
                 </p:calendar>
-                <h:outputLabel styleClass="clsLabelReportFilter" value="Customer:"/>
+                <h:outputLabel styleClass="clsLabelReportFilter" value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}:"/>
                 <p:autoComplete styleClass="clsInputReportFilter" id="autcBillTransactor" value="#{transactorBean.selectedBillTransactor}" 
                                 completeMethod="#{transactorBean.getTransactorObjectList}" 
                                 var="trct2" 
@@ -71,7 +71,7 @@
             <h:panelGrid id="pnlgActionMessage">
                 <p:outputLabel value="#{transBean.actionMessage}" style="color: red;"/>
             </h:panelGrid>
-            <p:commandButton id="cmdbPrint" value="Print Customer Card (ALT+P)" icon="ui-icon-print" type="button" accesskey="p">
+            <p:commandButton id="cmdbPrint" value="Print #{menuItemBean.menuItemObj.CUSTOMER_NAME} Card (ALT+P)" icon="ui-icon-print" type="button" accesskey="p">
                 <p:printer target="pnlTransaction" rendered="false"/>
             </p:commandButton>
             <p:panel id="pnlTransaction" style="border: none;">
@@ -114,7 +114,7 @@
                         </td>
                     </tr>
                     <tr style="background-color: #ADD8E6;font-weight: bold">
-                        <td>Client/Customer</td>
+                        <td>#{menuItemBean.menuItemObj.CUSTOMER_NAME}</td>
                         <td>Invoice Type</td>
                         <td>Date</td>
                         <td>Served By</td>

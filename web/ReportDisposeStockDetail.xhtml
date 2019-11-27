@@ -104,12 +104,6 @@
                         <p:column headerText="#{transactionTypeBean.getTransactionType(3).transactionUserLabel}" style="text-align: left;" rendered="#{transBean.fieldName.equals('transaction_user_detail_id')}">
                             <h:outputText value="#{userDetailBean.getUserDetail(sm.transactionUserDetailId).userName}"/>
                         </p:column>
-                        <p:column headerText="#{transactionTypeBean.getTransactionType(3).billTransactorLabel}" style="text-align: left;" rendered="#{transBean.fieldName.equals('bill_transactor_id')}">
-                            <h:outputText value="#{transactorBean.getTransactor(sm.billTransactorId).transactorNames}"/>
-                        </p:column>
-                        <p:column headerText="#{transactionTypeBean.getTransactionType(3).transactorLabel}" style="text-align: left;" rendered="#{transBean.fieldName.equals('transactor_id')}">
-                            <h:outputText value="#{transactorBean.getTransactor(sm.transactorId).transactorNames}"/>
-                        </p:column>
                         <p:column headerText="#{transactionTypeBean.getTransactionType(3).transactionDateLabel}" style="text-align: left;" rendered="#{transBean.fieldName.equals('transaction_date')}">
                             <h:outputText value="#{utilityBean.formatDate(sm.transactionDate)}"/>
                         </p:column>

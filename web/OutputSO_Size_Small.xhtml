@@ -58,9 +58,9 @@
                         <h:panelGrid id="IpgrdSalesInvoiceHeader5" style="width: 290px; margin: 0px;" columns="2">
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transaction_type.transactionRefLabel}:" rendered="#{generalUserSetting.outputDetailParent.trans.transactionRef.length()>0}"/>
                             <h:outputLabel style="font-size: 14px;font-weight: bold;" value="#{generalUserSetting.outputDetailParent.trans.transactionRef}" rendered="#{generalUserSetting.outputDetailParent.trans.transactionRef.length()>0}"/>
-                            <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transaction_type.transactorLabel}:"/>
+                            <h:outputLabel style="font-size: 12px;" value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}:"/>
                             <h:outputLabel id="IolblSalesInvoiceCustomer" style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transactor.transactorNames} #{generalUserSetting.outputDetailParent.trans.location_name}"/>
-                            <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transaction_type.billTransactorLabel}:" rendered="#{generalUserSetting.outputDetailParent.bill_transactor.transactorId!=generalUserSetting.outputDetailParent.transactor.transactorId}"/>
+                            <h:outputLabel style="font-size: 12px;" value="Bill For:" rendered="#{generalUserSetting.outputDetailParent.bill_transactor.transactorId!=generalUserSetting.outputDetailParent.transactor.transactorId}"/>
                             <h:outputLabel id="IolblSalesInvoiceBillCustomer" style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.bill_transactor.transactorNames}" rendered="#{generalUserSetting.outputDetailParent.bill_transactor.transactorId!=generalUserSetting.outputDetailParent.transactor.transactorId}"/>
                             <h:outputLabel style="font-size: 12px;" value="Phone:" rendered="#{generalUserSetting.outputDetailParent.transactor.phone.length()>0}"/>
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transactor.phone}" rendered="#{generalUserSetting.outputDetailParent.transactor.phone.length()>0}"/>

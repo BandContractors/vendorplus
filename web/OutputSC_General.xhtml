@@ -48,7 +48,7 @@
                             <h:outputLabel value="#{generalUserSetting.outputDetailParent.store.storeName}"/>
                         </h:panelGrid>
                         <h:panelGrid columns="1">
-                            <h:outputLabel value="#{generalUserSetting.outputDetailParent.transaction_type.transactorLabel}" style="border-bottom-style: solid;"/>
+                            <h:outputLabel value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}" style="border-bottom-style: solid;"/>
                             <h:outputText styleClass="clsInput" value="#{transactorBean.getTransactor(generalUserSetting.outputDetailParent.trans.transactorId).transactorNames}"/>
                         </h:panelGrid>
                         <h:panelGrid style="margin: 0px;text-align: left;" columns="1">

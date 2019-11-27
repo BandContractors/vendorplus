@@ -57,7 +57,7 @@
 
                     <p:outputLabel value="Added By"/>
                     <h:outputLabel value="#{transactionTypeBean.getTransactionType(1).transactionUserLabel}"/>
-                    <p:outputLabel value="#{transactionTypeBean.getTransactionType(1).transactorLabel}"/>                
+                    <p:outputLabel value="#{menuItemBean.menuItemObj.SUPPLIER_NAME}"/>                
                     <p:outputLabel value="Transaction Type"/>
                     <h:outputLabel value="SUMMARIZE RESULTS BY:"/>
                     <p:selectOneMenu id="menuAddUser" value="#{trans.addUserDetailId}">
@@ -80,7 +80,7 @@
                             #{trct.transactorNames} 
                         </p:column> 
                         <p:column headerText="Type" style="text-align: left" >  
-                            #{trct.transactorType} 
+                            #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)} 
                         </p:column> 
                         <p:column headerText="Contact Person" style="text-align: left">  
                             #{trct.cpName} 
@@ -96,7 +96,7 @@
                         <f:selectItem itemLabel="Select" itemValue=""/>
                         <f:selectItem itemLabel="Added By" itemValue="add_user_detail_id"/>
                         <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(1).transactionUserLabel}" itemValue="transaction_user_detail_id"/>
-                        <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(1).transactorLabel}" itemValue="transactor_id"/>
+                        <f:selectItem itemLabel="#{menuItemBean.menuItemObj.SUPPLIER_NAME}" itemValue="transactor_id"/>
                         <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(1).transactionDateLabel}" itemValue="transaction_date"/>
                         <f:selectItem itemLabel="Transaction Type" itemValue="transaction_reason_id"/>
                         <f:selectItem itemLabel="Store/Section" itemValue="store_id"/>
@@ -131,7 +131,7 @@
                         <p:column headerText="#{transactionTypeBean.getTransactionType(1).transactionUserLabel}" style="text-align: left;" rendered="#{transBean.fieldName.equals('transaction_user_detail_id')}">
                             <h:outputText value="#{userDetailBean.getUserDetail(sm.transactionUserDetailId).userName}"/>
                         </p:column>
-                        <p:column headerText="#{transactionTypeBean.getTransactionType(1).transactorLabel}" style="text-align: left;" rendered="#{transBean.fieldName.equals('transactor_id')}">
+                        <p:column headerText="#{menuItemBean.menuItemObj.SUPPLIER_NAME}" style="text-align: left;" rendered="#{transBean.fieldName.equals('transactor_id')}">
                             <h:outputText value="#{transactorBean.getTransactor(sm.transactorId).transactorNames}"/>
                         </p:column>
                         <p:column headerText="Transaction Type" style="text-align: left;" rendered="#{transBean.fieldName.equals('transaction_reason_id')}">
@@ -207,7 +207,7 @@
                 <p:column headerText="Add Date" rendered="#{transBean.dateType.equals('Add Date')}">
                     <h:outputText value="#{utilityBean.formatDate(itm.addDate)}"/>
                 </p:column>
-                <p:column headerText="#{transactionTypeBean.getTransactionType(1).transactorLabel}">
+                <p:column headerText="#{menuItemBean.menuItemObj.SUPPLIER_NAME}">
                     <h:outputText value="#{transactorBean.getTransactor(itm.transactorId).transactorNames}"/>
                 </p:column>
                 <p:column headerText="Tax Identity">

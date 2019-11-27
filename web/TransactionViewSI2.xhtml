@@ -46,9 +46,9 @@
                         <h:outputLabel  value="From:"/>
                         <h:inputText styleClass="clsInput" id="itxtvFromStore" disabled="true" value="#{storeBean.getStore(salesInvoiceBean.getCurrentTransaction().storeId).storeName}" style="border: none;"/>
 
-                        <h:outputLabel  value="#{transactionTypeBean.getTransactionType(2).transactorLabel}:"/>
+                        <h:outputLabel  value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}:"/>
                         <h:inputText styleClass="clsInput" id="itxtvCustomerName" disabled="true" value="#{transactorBean.getTransactor(salesInvoiceBean.getCurrentTransaction().transactorId).transactorNames}" style="border: none;"/>
-                        <h:outputLabel  value="#{transactionTypeBean.getTransactionType(2).billTransactorLabel}:"/>
+                        <h:outputLabel  value="Bill For:"/>
                         <h:inputText styleClass="clsInput" id="itxtvCustomerName2" disabled="true" value="#{transactorBean.getTransactor(salesInvoiceBean.getCurrentTransaction().billTransactorId).transactorNames}" style="border: none;"/>
                         
                         <h:outputLabel  value="Client #:"/>

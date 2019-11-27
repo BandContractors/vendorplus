@@ -47,7 +47,7 @@
                             #{trct.transactorNames} 
                         </p:column> 
                         <p:column headerText="Type" style="text-align: left" >  
-                            #{trct.transactorType} 
+                            #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)} 
                         </p:column> 
                         <p:column headerText="Contact Person" style="text-align: left">  
                             #{trct.cpName} 
@@ -65,11 +65,11 @@
                     <h:inputText id="itxtPayBalance1" value="#{trans.balance_payable}" autocomplete="off" style="width: 242px;" disabled="true">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
-                    <h:outputLabel value="Customer Deposit Balance:"/>
+                    <h:outputLabel value="#{menuItemBean.menuItemObj.CUSTOMER_NAME} Deposit Balance:"/>
                     <h:inputText id="itxtDepBalance1" value="#{trans.deposit_customer}" autocomplete="off" style="width: 242px;" disabled="true">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
-                    <h:outputLabel value="Supplier Advance Balance:"/>
+                    <h:outputLabel value="#{menuItemBean.menuItemObj.SUPPLIER_NAME} Advance Balance:"/>
                     <h:inputText id="itxtAdvBalance1" value="#{trans.deposit_supplier}" autocomplete="off" style="width: 242px;" disabled="true">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
@@ -88,7 +88,7 @@
                             #{trct.transactorNames} 
                         </p:column> 
                         <p:column headerText="Type" style="text-align: left" >  
-                            #{trct.transactorType} 
+                            #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)} 
                         </p:column> 
                         <p:column headerText="Contact Person" style="text-align: left">  
                             #{trct.cpName} 
@@ -106,11 +106,11 @@
                     <h:inputText id="itxtPayBalance2" value="#{trans.balance_payable2}" autocomplete="off" style="width: 242px;" disabled="true">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
-                    <h:outputLabel value="Customer Deposit Balance:"/>
+                    <h:outputLabel value="#{menuItemBean.menuItemObj.CUSTOMER_NAME} Deposit Balance:"/>
                     <h:inputText id="itxtDepBalance2" value="#{trans.deposit_customer2}" autocomplete="off" style="width: 242px;" disabled="true">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
-                    <h:outputLabel value="Supplier Advance Balance:"/>
+                    <h:outputLabel value="#{menuItemBean.menuItemObj.SUPPLIER_NAME} Advance Balance:"/>
                     <h:inputText id="itxtAdvBalance2" value="#{trans.deposit_supplier2}" autocomplete="off" style="width: 242px;" disabled="true">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>

@@ -97,7 +97,7 @@
                         #{trct.transactorNames} 
                     </p:column> 
                     <p:column headerText="Type" style="text-align: left" >  
-                        #{trct.transactorType} 
+                        #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)} 
                     </p:column> 
                     <p:column headerText="Contact Person" style="text-align: left">  
                         #{trct.cpName} 
@@ -456,7 +456,7 @@
                             #{trct.transactorNames} 
                         </p:column> 
                         <p:column headerText="Type" style="text-align: left" >  
-                            #{trct.transactorType} 
+                            #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)} 
                         </p:column> 
                         <p:column headerText="Contact Person" style="text-align: left">  
                             #{trct.cpName} 

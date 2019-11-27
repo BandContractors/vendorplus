@@ -48,7 +48,7 @@
                         <h:outputLabel  value=""/>
                         <h:outputLabel  value="Order/Sales No:"/>
                         <h:inputText styleClass="clsInput" id="itxtTransactionRef" value="#{transBean.transObj.transactionRef}" autocomplete="off" style="width: 170px;" disabled="true"/>
-                        <h:outputLabel  value="#{transactionTypeBean.getTransactionType(12).transactorLabel}:"/>
+                        <h:outputLabel  value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}:"/>
                         <h:inputText styleClass="clsInput" id="itxtTransactor" value="#{transactorBean.getTransactor(transBean.transObj.transactorId).transactorNames}" autocomplete="off" disabled="true"/>
                     </h:panelGrid>
                     <p:dataTable rowIndexVar="rowIndex" id="dtblTransactionItem" value="#{transBean.transItemList}" var="ati" 

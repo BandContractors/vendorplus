@@ -6,7 +6,7 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:p="http://primefaces.org/ui">
     <h:head>
-        <title>Customer Deposit</title>
+        <title>#{menuItemBean.menuItemObj.CUSTOMER_NAME} Deposit</title>
         <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
         <script  language="javascript">
@@ -44,8 +44,8 @@
 
             <h:panelGrid styleClass="clsGridMainHeader" columns="3">
                 <h:outputLabel styleClass="clsLabelTop" id="olblPaymentHeader" value="Cash Receipt"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="Customer Deposit (Prepaid Income)"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:Cash↑ Customer Deposit(Prepaid Income)↑"/>
+                <h:outputLabel style="background-color:#00B461;color: white;" value="#{menuItemBean.menuItemObj.CUSTOMER_NAME} Deposit (Prepaid Income)"/>
+                <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:Cash↑ #{menuItemBean.menuItemObj.CUSTOMER_NAME} Deposit(Prepaid Income)↑"/>
             </h:panelGrid>
             <h:panelGrid id="pnlSearch" styleClass="clsGridMainInput" style="background-color: #b3f2b3;width: 100%;">
                 <h:panelGrid columns="4">
@@ -63,11 +63,11 @@
                                     converter="TransactorConverter" style="text-align: left;" 
                                     forceSelection="true" 
                                     >
-                        <p:column headerText="#{transactionTypeBean.getTransactionType(2).transactorLabel}" style="text-align: left" >  
+                        <p:column headerText="#{menuItemBean.menuItemObj.CUSTOMER_NAME}" style="text-align: left" >  
                             #{trct.transactorNames} 
                         </p:column> 
                         <p:column headerText="Type" style="text-align: left" >  
-                            #{trct.transactorType} 
+                            #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)} 
                         </p:column> 
                         <p:column headerText="Contact Person" style="text-align: left">  
                             #{trct.cpName} 

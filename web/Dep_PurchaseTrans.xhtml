@@ -50,7 +50,7 @@
                 <h:outputLabel  value="Transaction Ref:"/>
                 <h:inputText styleClass="clsInput" id="itxtTransactionRef" value="#{trans.transactionRef}" autocomplete="off">
                 </h:inputText>
-                <h:outputLabel  value="Supplier Names:"/>
+                <h:outputLabel  value="#{menuItemBean.menuItemObj.SUPPLIER_NAME} Names:"/>
                 <p:autoComplete id="autcTransactor" value="#{transactorBean.selectedTransactor}" 
                                 completeMethod="#{transactorBean.getTransactorObjectList}" 
                                 var="trct" 
@@ -63,7 +63,7 @@
                         #{trct.transactorNames} 
                     </p:column> 
                     <p:column headerText="Type" style="text-align: left" >  
-                        #{trct.transactorType} 
+                        #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)} 
                     </p:column> 
                     <p:column headerText="Contact Person" style="text-align: left">  
                         #{trct.cpName} 

@@ -39,7 +39,7 @@
                     <h:panelGrid styleClass="clsGridMainHeader" columns="4" style="width: 100%">
                         <h:outputLabel style="background-color:#00B461;color: white;" value="VIEW" rendered="#{payBean.actionType.equals('View')}"/>
                         <h:outputLabel style="background-color:#00B461;color: white;" value="CANCEL" rendered="#{payBean.actionType.equals('Cancel')}"/>
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="Advance payment to Supplier (Prepaid Expense) : Pay No : #{payBean.payObj.pay_number}"/>
+                        <h:outputLabel style="background-color:#00B461;color: white;" value="Advance payment to #{menuItemBean.menuItemObj.SUPPLIER_NAME} (Prepaid Expense) : Pay No : #{payBean.payObj.pay_number}"/>
                         <h:outputLabel style="background-color:#00B461;color: white;" value=""/>
                         <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:Cash↓ Prepaid Expense↑"/>
                     </h:panelGrid>

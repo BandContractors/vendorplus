@@ -3,6 +3,7 @@ package beans;
 import sessions.GeneralUserSetting;
 import connections.DBConnection;
 import entities.GroupRight;
+import entities.MenuItem;
 import entities.SalaryDeduction;
 import entities.Trans;
 import entities.TransactionType;
@@ -55,6 +56,20 @@ public class TransactorBean implements Serializable {
     private Transactor TransactorObj;
     private List<Transactor> TransactorListSimilar = new ArrayList<Transactor>();
     private Transactor ParentTransactor;
+
+    public String getDisplayName(MenuItem aMenuItem, Transactor aTransactor) {
+        String display_name = "";
+        if (aTransactor.getTransactorType().equals("CUSTOMER")) {
+            display_name = aMenuItem.getCUSTOMER_NAME();
+        } else if (aTransactor.getTransactorType().equals("SUPPLIER")) {
+            display_name = aMenuItem.getSUPPLIER_NAME();
+        } else if (aTransactor.getTransactorType().equals("SCHEME")) {
+            display_name = "Scheme";
+        } else if (aTransactor.getTransactorType().equals("PROVIDER")) {
+            display_name = "Provider";
+        }
+        return display_name;
+    }
 
     public Transactor findTransactor(Long TransactorId) {
         String sql = "{call sp_search_transactor_by_id(?)}";

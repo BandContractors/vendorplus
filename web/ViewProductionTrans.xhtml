@@ -41,7 +41,7 @@
                     <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="4">
                         <h:outputLabel  value="From:"/>
                         <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{storeBean.getStore(transProductionBean.transProdObj.storeId).storeName}" style="width: 200px;"/>  
-                        <h:outputLabel  value="#{transactionTypeBean.getTransactionType(70).transactorLabel}:"/>
+                        <h:outputLabel  value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}:"/>
                         <h:inputText styleClass="clsInput" disabled="true" value="#{transProductionBean.transProdObj.transactor_names}" style="width: 500px;"/>
 
                         <h:outputLabel  value="#{transactionTypeBean.getTransactionType(70).transactionDateLabel}:"/>

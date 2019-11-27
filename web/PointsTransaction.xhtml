@@ -38,7 +38,7 @@
             </h:panelGrid>
             
             <h:panelGrid styleClass="clsGridMainInput" columns="3" style="background-color: #b3f2b3">
-                <h:outputLabel  value="Customer Names/Points Card No:"/>
+                <h:outputLabel  value="#{menuItemBean.menuItemObj.CUSTOMER_NAME} Names/Points Card No:"/>
                 <p:autoComplete id="autcPointsCard" value="#{pointsCardBean.selectedPointsCard}" 
                                 completeMethod="#{pointsCardBean.getPointsCardsByObjectList}" 
                                 var="ptc" 

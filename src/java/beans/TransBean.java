@@ -1451,7 +1451,7 @@ public class TransBean implements Serializable {
             } else if ((new GeneralUserSetting().getDaysFromDateToLicenseExpiryDate(trans.getTransactionDate()) <= 0 || new GeneralUserSetting().getDaysFromDateToLicenseExpiryDate(new CompanySetting().getCURRENT_SERVER_DATE()) <= 0) && CompanySetting.getLicenseType() != 9) {
                 msg = "INCORRECT SERVER DATE or LICENSE HAS EXPIRED !";
             } else if (trans.getTransactorId() == 0 && transtype.getIsTransactorMandatory().equals("Yes")) {
-                msg = "Select " + transtype.getTransactorLabel();
+                msg = "Select a valid Individual/Company you are transacting with...";
             } else if (aActiveTransItems.size() < 1 & !"UNPACK".equals(transtype.getTransactionTypeName())) {
                 msg = "No item(s) found for this " + transtype.getTransactionOutputLabel();
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && trans.getPayMethod() == 0 && trans.getTransactionId() == 0) {
@@ -1473,7 +1473,7 @@ public class TransBean implements Serializable {
             } else if ("Yes".equals(transtype.getIsTransactionRefMandatory()) && trans.getTransactionRef().equals("")) {
                 msg = "Select " + transtype.getTransactionRefLabel();
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && trans.isBillOther() && trans.getBillTransactorId() == 0) {
-                msg = "Select " + transtype.getBillTransactorLabel();
+                msg = "Select a valid Individual/Company you are billing...";
             } else if (trans.getAuthorisedByUserDetailId() == 0 && transtype.getIsAuthoriseUserMandatory().equals("Yes")) {
                 msg = "Select Authorise User";
             } else if (trans.getAuthoriseDate() == null && transtype.getIsAuthoriseDateMandatory().equals("Yes")) {

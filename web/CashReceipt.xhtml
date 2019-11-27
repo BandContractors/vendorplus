@@ -59,7 +59,7 @@
                     <h:outputLabel style="font-size: 16px;" value="Goods/Services" rendered="#{salesInvoiceBean.getCurrentPay().payReasonId==21 or salesInvoiceBean.getCurrentPay().payReasonId==22}"/>
                     <h:outputLabel style="font-size: 16px;" value="Share Capital Contribution" rendered="#{salesInvoiceBean.getCurrentPay().payReasonId==23}"/>
                     <h:outputLabel style="font-size: 16px;" value="Current/Long-Term Loan" rendered="#{salesInvoiceBean.getCurrentPay().payReasonId==24}"/>
-                    <h:outputLabel style="font-size: 16px;" value="Customer Deposit (Prepayment)" rendered="#{salesInvoiceBean.getCurrentPay().payReasonId==90}"/>
+                    <h:outputLabel style="font-size: 16px;" value="#{menuItemBean.menuItemObj.CUSTOMER_NAME} Deposit (Prepayment)" rendered="#{salesInvoiceBean.getCurrentPay().payReasonId==90}"/>
                 </h:panelGrid>
 
                 <h:panelGrid id="IpgrdSalesInvoiceTotals" style="width: 290px; margin: 0px;border-bottom-style: dotted" columns="2">

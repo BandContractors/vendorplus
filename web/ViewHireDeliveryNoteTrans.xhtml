@@ -46,7 +46,7 @@
                 <h:inputText value="#{utilityBean.formatDate(transBean.refTrans.from_date)}" style="width: 100px;"  disabled="true"/>
                 <h:inputText value="#{utilityBean.formatDate(transBean.refTrans.to_date)}" style="width: 100px;" disabled="true"/>
                 
-                <h:outputLabel value="#{transactionTypeBean.getTransactionType(66).transactorLabel}"/>
+                <h:outputLabel value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}"/>
                 <h:outputLabel value="Site"/>
                 <h:outputLabel value=""/>
                 <h:outputLabel value=""/>
@@ -131,7 +131,7 @@
             <h:panelGrid id="pgrdTransUser" columns="4">
                 <h:outputLabel  value="#{transactionTypeBean.getTransactionType(66).transactionUserLabel}:"/>
                 <h:inputText value="#{userDetailBean.getUserDetail(transBean.transObj.transactionUserDetailId).userName}" disabled="true"/>
-                <h:outputLabel value="#{transactionTypeBean.getTransactionType(66).transactorLabel} Rep:"/>
+                <h:outputLabel value="#{menuItemBean.menuItemObj.CUSTOMER_NAME} Rep:"/>
                 <h:inputText value="#{transBean.transObj.transactor_rep}" disabled="true"/>
                 <h:outputLabel  value="Add Date"/>
                 <h:inputText value="#{utilityBean.formatDate(transBean.transObj.addDate)}" disabled="true"/>

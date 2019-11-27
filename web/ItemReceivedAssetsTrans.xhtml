@@ -60,7 +60,7 @@
                     </h:panelGrid>
                 </p:panel>
                 <p:panel id="pnlTransactor" style="border: none;">
-                    <h:outputLabel  value="#{transactionTypeBean.getTransactionType(9).transactorLabel}:"/>
+                    <h:outputLabel  value="#{menuItemBean.menuItemObj.SUPPLIER_NAME}:"/>
                     <h:inputText id="itxtRetrievedTransactor" value="#{transactorBean.getTransactor(trans.transactorId).transactorNames}" disabled="true" rendered="#{trans.transactionRef.length()>0}"/>
                     <p:autoComplete id="autcTransactor" value="#{transactorBean.selectedTransactor}" 
                                     completeMethod="#{transactorBean.getTransactorActiveObjectList}" 
@@ -75,7 +75,7 @@
                             #{trct.transactorNames} 
                         </p:column> 
                         <p:column headerText="Type" style="text-align: left" >  
-                            #{trct.transactorType} 
+                            #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)} 
                         </p:column> 
                         <p:column headerText="Contact Person" style="text-align: left">  
                             #{trct.cpName} 

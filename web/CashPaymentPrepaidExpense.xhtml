@@ -44,7 +44,7 @@
 
             <h:panelGrid styleClass="clsGridMainHeader" columns="3">
                 <h:outputLabel styleClass="clsLabelTop" id="olblPaymentHeader" value="Cash Payment"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="Advance payment to Supplier (Prepaid Expense)"/>
+                <h:outputLabel style="background-color:#00B461;color: white;" value="Advance payment to #{menuItemBean.menuItemObj.SUPPLIER_NAME} (Prepaid Expense)"/>
                 <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:Cash↓ Prepaid Expense↑"/>
             </h:panelGrid>
             <h:panelGrid id="pnlSearch" styleClass="clsGridMainInput" style="background-color: #b3f2b3;width: 100%;">
@@ -54,7 +54,7 @@
                         <f:selectItems value="#{accCurrencyBean.currencyList}" var="ac" itemLabel="#{ac.currencyCode}" itemValue="#{ac.currencyCode}"/>
                         <f:ajax event="change" execute="@this" render="pnlInput pnlButtons"/>
                     </h:selectOneMenu>
-                    <h:outputLabel  value="Cash Advanced to Supplier:"/>
+                    <h:outputLabel  value="Cash Advanced to #{menuItemBean.menuItemObj.SUPPLIER_NAME}:"/>
                     <p:autoComplete id="autcTransactor" value="#{payBean.selectedBillTransactor}" 
                                         completeMethod="#{transactorBean.getTransactorObjectList}" 
                                         var="trct" 
@@ -67,7 +67,7 @@
                                 #{trct.transactorNames} 
                             </p:column> 
                             <p:column headerText="Type" style="text-align: left" >  
-                                #{trct.transactorType} 
+                                #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)} 
                             </p:column> 
                             <p:column headerText="Contact Person" style="text-align: left">  
                                 #{trct.cpName} 

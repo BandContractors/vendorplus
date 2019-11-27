@@ -37,7 +37,7 @@
                 <h:outputLabel value="To"/>
                 <h:outputLabel value="#{transactionTypeBean.getTransactionType(65).transactionNumberLabel}"/>
                 <h:outputLabel value="#{transactionTypeBean.getTransactionType(65).transactionDateLabel}"/>
-                <h:outputLabel value="#{transactionTypeBean.getTransactionType(67).transactorLabel}"/>
+                <h:outputLabel value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}"/>
                 <h:outputLabel value="Site"/>
                 <h:outputLabel value="From Date"/>
                 <h:outputLabel value="To Date"/>
@@ -146,7 +146,7 @@
             <h:panelGrid id="pgrdTransUser" columns="4">
                 <h:outputLabel  value="#{transactionTypeBean.getTransactionType(67).transactionUserLabel}:"/>
                 <h:inputText value="#{userDetailBean.getUserDetail(transBean.transObj.transactionUserDetailId).userName}" disabled="true"/>
-                <h:outputLabel value="#{transactionTypeBean.getTransactionType(67).transactorLabel} Rep:"/>
+                <h:outputLabel value="#{menuItemBean.menuItemObj.CUSTOMER_NAME} Rep:"/>
                 <h:inputText value="#{transBean.transObj.transactor_rep}" disabled="true"/>
                 <h:outputLabel  value="Add Date"/>
                 <h:inputText value="#{utilityBean.formatDate(transBean.transObj.addDate)}" disabled="true"/>

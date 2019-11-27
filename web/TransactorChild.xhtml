@@ -28,7 +28,10 @@
                     return false;">
 
             <h:panelGrid id="pnlHeader" styleClass="clsGridMainHeader" columns="1">
-                <h:outputLabel styleClass="clsLabelTop" id="olblTransactorHeader" value="#{transactorBean.transactorObj.transactorType} DETAIL"/>
+                <h:outputLabel styleClass="clsLabelTop" value="#{menuItemBean.menuItemObj.CUSTOMER_NAME} Detail" rendered="#{transactorBean.transactorObj.transactorType.equals('CUSTOMER')}"/>
+                <h:outputLabel styleClass="clsLabelTop" value="#{menuItemBean.menuItemObj.SUPPLIER_NAME} Detail" rendered="#{transactorBean.transactorObj.transactorType.equals('SUPPLIER')}"/>
+                <h:outputLabel styleClass="clsLabelTop" value="Scheme Detail" rendered="#{transactorBean.transactorObj.transactorType.equals('SCHEME')}"/>
+                <h:outputLabel styleClass="clsLabelTop" value="Provider Detail" rendered="#{transactorBean.transactorObj.transactorType.equals('PROVIDER')}"/>
             </h:panelGrid>
             <h:panelGrid id="pnlInput" styleClass="clsGridMainInput" columns="4">
                 <h:panelGrid id="pnlSearch" columns="1">
@@ -55,7 +58,7 @@
                 <h:panelGrid id="pnlCol1" columns="2">
                     <h:outputLabel  value="Type:"/>
                     <h:selectOneMenu styleClass="clsMenu" id="menuTransactorType" value="#{transactorBean.transactorObj.transactorType}" style="width: 206px;">
-                        <f:selectItem itemLabel="#{transactorBean.transactorObj.transactorType}" itemValue="#{transactorBean.transactorObj.transactorType}"/>
+                        <f:selectItem itemLabel="#{transactorBean.getDisplayName(menuItemBean.menuItemObj,transactorBean.transactorObj)}" itemValue="#{transactorBean.transactorObj.transactorType}"/>
                     </h:selectOneMenu>
                     <h:outputLabel  value="Category:"/>
                     <h:selectOneMenu styleClass="clsMenu" id="menuTransactorCategory" value="#{transactorBean.transactorObj.category}" style="width: 206px;">

@@ -112,7 +112,7 @@
 
                 <h:outputLabel  value="#{transactionTypeBean.getTransactionType(trans.transactionTypeId).transactorLabel}"/>
                 <h:inputText styleClass="clsInput" id="itxtCustomerName" disabled="true" value="#{transactorBean.getTransactor(trans.transactorId).transactorNames}"/>
-                <h:outputLabel  value="#{transactionTypeBean.getTransactionType(trans.transactionTypeId).billTransactorLabel}"/>
+                <h:outputLabel  value="Bill For"/>
                 <h:inputText styleClass="clsInput" id="itxtCustomerName2" disabled="true" value="#{transactorBean.getTransactor(trans.billTransactorId).transactorNames}"/>
 
                 <h:outputLabel  value="Scheme Transactor"/>

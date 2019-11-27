@@ -56,11 +56,11 @@
                                 converter="TransactorConverter" style="text-align: left;" 
                                 forceSelection="true" 
                                 >
-                    <p:column headerText="#{transBean.transTypeRefObj.transactorLabel}" style="text-align: left" >  
+                    <p:column headerText="#{menuItemBean.menuItemObj.CUSTOMER_NAME}" style="text-align: left" >  
                         #{trct.transactorNames} 
                     </p:column> 
                     <p:column headerText="Type" style="text-align: left" >  
-                        #{trct.transactorType} 
+                        #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)} 
                     </p:column> 
                     <p:column headerText="Contact Person" style="text-align: left">  
                         #{trct.cpName} 

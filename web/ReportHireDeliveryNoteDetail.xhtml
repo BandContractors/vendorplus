@@ -59,8 +59,8 @@
 
                     <p:outputLabel value="Added By"/>
                     <h:outputLabel value="#{transactionTypeBean.getTransactionType(66).transactionUserLabel}"/>
-                    <p:outputLabel value="#{transactionTypeBean.getTransactionType(66).billTransactorLabel}"/>
-                    <p:outputLabel value="#{transactionTypeBean.getTransactionType(66).transactorLabel}"/>                
+                    <p:outputLabel value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}"/>
+                    <p:outputLabel value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}"/>                
                     <h:outputLabel value="SUMMARIZE RESULTS BY:"/>
                     <p:selectOneMenu id="menuAddUser" value="#{trans.addUserDetailId}">
                         <f:selectItem itemLabel="Select"/>
@@ -99,7 +99,7 @@
                             #{trct.transactorNames} 
                         </p:column> 
                         <p:column headerText="Type" style="text-align: left" >  
-                            #{trct.transactorType} 
+                            #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)} 
                         </p:column> 
                         <p:column headerText="Contact Person" style="text-align: left">  
                             #{trct.cpName} 
@@ -111,8 +111,7 @@
                         <f:selectItem itemLabel="Select" itemValue=""/>
                         <f:selectItem itemLabel="Added By" itemValue="add_user_detail_id"/>
                         <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(66).transactionUserLabel}" itemValue="transaction_user_detail_id"/>
-                        <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(66).billTransactorLabel}" itemValue="bill_transactor_id"/>
-                        <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(66).transactorLabel}" itemValue="transactor_id"/>
+                        <f:selectItem itemLabel="#{menuItemBean.menuItemObj.CUSTOMER_NAME}" itemValue="transactor_id"/>
                         <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(66).transactionDateLabel}" itemValue="transaction_date"/>
                     </p:selectOneMenu>
                     <p:commandButton id="cmdbSearch" value="SEARCH (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
@@ -170,8 +169,8 @@
                 <p:column headerText="Add Date" rendered="#{transBean.dateType.equals('Add Date')}">
                     <h:outputText value="#{utilityBean.formatDate(itm.addDate)}"/>
                 </p:column>
-                <p:column headerText="#{transactionTypeBean.getTransactionType(66).billTransactorLabel}">
-                    <h:outputText value="#{transactorBean.getTransactor(itm.billTransactorId).transactorNames}"/>
+                <p:column headerText="#{menuItemBean.menuItemObj.CUSTOMER_NAME}">
+                    <h:outputText value="#{transactorBean.getTransactor(itm.transactorId).transactorNames}"/>
                 </p:column>
                 <p:column headerText="Vehicle">
                     <h:outputText value="#{itm.transactor_vehicle}"/>

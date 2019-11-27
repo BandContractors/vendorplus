@@ -57,7 +57,7 @@
                     <p:calendar id="calDate2"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{transProductionBean.date2}"/>
                     <p:inputText value="#{transProduction.transaction_number}"/>
 
-                    <h:outputLabel value="#{transactionTypeBean.getTransactionType(70).transactorLabel}"/>
+                    <h:outputLabel value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}"/>
                     <h:outputLabel value="#{transactionTypeBean.getTransactionType(11).transactionNumberLabel}"/>
                     <p:outputLabel value="Added By"/>
                     <h:outputLabel value="#{transactionTypeBean.getTransactionType(70).transactionUserLabel}"/>              
@@ -75,7 +75,7 @@
                             #{trct.transactorNames} 
                         </p:column> 
                         <p:column headerText="Type" style="text-align: left" >  
-                            #{trct.transactorType} 
+                            #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)} 
                         </p:column> 
                         <p:column headerText="Contact Person" style="text-align: left">  
                             #{trct.cpName} 
@@ -166,7 +166,7 @@
                 <p:column headerText="#{transactionTypeBean.getTransactionType(70).transactionNumberLabel}">
                     <h:outputLabel value="#{itm.transaction_number}"/>
                 </p:column>
-                <p:column headerText="#{transactionTypeBean.getTransactionType(70).transactorLabel}">
+                <p:column headerText="#{menuItemBean.menuItemObj.CUSTOMER_NAME}">
                     <h:outputLabel value="#{itm.transactor_names}"/>
                 </p:column>
                 <p:column headerText="#{transactionTypeBean.getTransactionType(11).transactionNumberLabel}">

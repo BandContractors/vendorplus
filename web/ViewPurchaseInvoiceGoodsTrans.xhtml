@@ -48,7 +48,7 @@
                         <h:inputText id="itxtTransactionDate" value="#{utilityBean.formatDate(transBean.transObj.transactionDate)}" disabled="true"/>
                         <h:outputLabel  value="#{transactionTypeBean.getTransactionType(1).transactionRefLabel}:"/>
                         <h:inputText styleClass="clsInput" id="itxtTransactionRef" value="#{transBean.transObj.transactionRef}" autocomplete="off" style="width: 170px;" disabled="true"/>
-                        <h:outputLabel  value="#{transactionTypeBean.getTransactionType(1).transactorLabel}:"/>
+                        <h:outputLabel  value="#{menuItemBean.menuItemObj.SUPPLIER_NAME}:"/>
                         <h:inputText styleClass="clsInput" id="itxtTransactor" value="#{transactorBean.getTransactor(transBean.transObj.transactorId).transactorNames}" autocomplete="off" style="width: 170px;" disabled="true"/>
                     </h:panelGrid>
                     <p:dataTable rowIndexVar="rowIndex" id="dtblTransactionItem" value="#{transBean.transItemList}" var="ati" 

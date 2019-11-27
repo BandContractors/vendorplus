@@ -39,9 +39,9 @@
                     <h:panelGrid styleClass="clsGridMainHeader" columns="4" style="width: 100%">
                         <h:outputLabel style="background-color:#00B461;color: white;" value="VIEW" rendered="#{payBean.actionType.equals('View')}"/>
                         <h:outputLabel style="background-color:#00B461;color: white;" value="CANCEL" rendered="#{payBean.actionType.equals('Cancel')}"/>
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="Customer Deposit (Prepaid Income) : Receipt No : #{payBean.payObj.pay_number}"/>
+                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{menuItemBean.menuItemObj.CUSTOMER_NAME} Deposit (Prepaid Income) : Receipt No : #{payBean.payObj.pay_number}"/>
                         <h:outputLabel style="background-color:#00B461;color: white;" value="Stock:No effect"/>
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:Cash↑ Customer Deposit(Prepaid Income)↑"/>
+                        <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:Cash↑ #{menuItemBean.menuItemObj.CUSTOMER_NAME} Deposit(Prepaid Income)↑"/>
                     </h:panelGrid>
                     <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="6">
                         <h:outputLabel value="Amount Received:"/>

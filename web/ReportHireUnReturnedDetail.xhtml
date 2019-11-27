@@ -34,7 +34,7 @@
                 <h:panelGrid id="pnlgFilter" columns="5" styleClass="clsPanelReportFilter">
                     <p:outputLabel value="Store/Section"/>
                     <p:outputLabel value="#{transactionTypeBean.getTransactionType(65).transactionNumberLabel}"/>
-                    <p:outputLabel value="#{transactionTypeBean.getTransactionType(65).transactorLabel}"/>
+                    <p:outputLabel value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}"/>
                     <p:outputLabel value="Item Description"/> 
                     <p:outputLabel value="Only show items due/past return date"/>
 
@@ -55,7 +55,7 @@
                             #{trct.transactorNames} 
                         </p:column> 
                         <p:column headerText="Type" style="text-align: left" >  
-                            #{trct.transactorType} 
+                            #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)} 
                         </p:column> 
                         <p:column headerText="Contact Person" style="text-align: left">  
                             #{trct.cpName} 
@@ -100,7 +100,7 @@
                     <p:selectOneMenu id="menuSummariseBy" value="#{transBean.fieldName}">
                         <f:selectItem itemLabel="Select" itemValue=""/>
                         <f:selectItem itemLabel="Item Hired" itemValue="item_id"/>
-                        <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(65).transactorLabel}" itemValue="transactor_id"/>
+                        <f:selectItem itemLabel="#{menuItemBean.menuItemObj.CUSTOMER_NAME}" itemValue="transactor_id"/>
                     </p:selectOneMenu>
                     <p:commandButton id="cmdbSearch" value="SEARCH (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
@@ -143,7 +143,7 @@
                         <p:dataExporter type="xml" target="tblDetail" fileName="UnReturned_Hired_Items" />
                     </h:commandLink>
                 </f:facet>
-                <p:column headerText="#{transactionTypeBean.getTransactionType(65).transactorLabel}" rendered="#{!transBean.fieldName.equals('item_id')}">
+                <p:column headerText="#{menuItemBean.menuItemObj.CUSTOMER_NAME}" rendered="#{!transBean.fieldName.equals('item_id')}">
                     <h:outputText value="#{itm.transactor_names}"/>
                 </p:column>
                 <p:column headerText="Item Description">

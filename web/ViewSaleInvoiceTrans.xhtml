@@ -48,7 +48,7 @@
                         <h:inputText id="itxtTransactionDate" value="#{utilityBean.formatDate(transBean.transObj.transactionDate)}" disabled="true"/>
                         <h:outputLabel  value="#{transactionTypeBean.getTransactionType(2).transactionRefLabel}:"/>
                         <h:inputText styleClass="clsInput" id="itxtTransactionRef" value="#{transBean.transObj.transactionRef}" autocomplete="off" style="width: 170px;" disabled="true"/>
-                        <h:outputLabel  value="#{transactionTypeBean.getTransactionType(2).transactorLabel}:"/>
+                        <h:outputLabel  value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}:"/>
                         <h:inputText styleClass="clsInput" id="itxtTransactor" value="#{transactorBean.getTransactor(transBean.transObj.transactorId).transactorNames}" autocomplete="off" style="width: 170px;" disabled="true"/>
                     </h:panelGrid>
                     <p:dataTable rowIndexVar="rowIndex" id="dtblTransactionItem" value="#{transBean.transItemList}" var="ati" 
@@ -182,7 +182,7 @@
                     </h:panelGrid>
                     <h:panelGrid id="pgrdScheme" style="background-color: yellow;width: 100%">
                         <h:panelGrid id="pgrdScheme2" columns="4" rendered="#{transBean.transObj.transactorId!=transBean.transObj.billTransactorId}">
-                            <h:outputLabel  value="#{transactionTypeBean.getTransactionType(2).billTransactorLabel}:"/>
+                            <h:outputLabel  value="Bill For:"/>
                             <h:inputText styleClass="clsInput" id="itxtBillTransactor" value="#{transactorBean.getTransactor(transBean.transObj.billTransactorId).transactorNames}" autocomplete="off" style="width: 200px;" disabled="true"/>
                             <h:outputLabel  value="Scheme.Name:"/>
                             <h:inputText styleClass="clsInput" id="itxtSchemeTransactor" value="#{transactorBean.getTransactor(transBean.transObj.schemeTransactorId).transactorNames}" autocomplete="off" style="width: 200px;" disabled="true"/>

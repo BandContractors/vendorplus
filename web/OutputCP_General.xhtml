@@ -69,7 +69,7 @@
                     <h:outputLabel style="font-size: 16px;" value="Goods/Services Supplied" rendered="#{generalUserSetting.outputDetailParent.pay.payReasonId==25 or generalUserSetting.outputDetailParent.pay.payReasonId==26}"/>
                     <h:outputLabel style="font-size: 16px;" value="Owner Cash Drawing" rendered="#{generalUserSetting.outputDetailParent.pay.payReasonId==34}"/>
                     <h:outputLabel style="font-size: 16px;" value="Loan Installment" rendered="#{generalUserSetting.outputDetailParent.pay.payReasonId==33}"/>
-                    <h:outputLabel style="font-size: 16px;" value="Cash Advance to Supplier" rendered="#{generalUserSetting.outputDetailParent.pay.payReasonId==91}"/>
+                    <h:outputLabel style="font-size: 16px;" value="Cash Advance to #{menuItemBean.menuItemObj.SUPPLIER_NAME}" rendered="#{generalUserSetting.outputDetailParent.pay.payReasonId==91}"/>
                     <h:outputLabel style="font-size: 16px;" value="Liability Payment" rendered="#{generalUserSetting.outputDetailParent.pay.payReasonId==105}"/>
                     <h:outputLabel style="font-size: 12px;" value="#{payTransBean.getPaidForSummary(generalUserSetting.outputDetailParent.pay.payId)}"/>
                 </h:panelGrid>

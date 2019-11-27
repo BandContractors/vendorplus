@@ -38,10 +38,10 @@
 
             <h:panelGrid styleClass="clsGridMainHeader" columns="3">
                 <h:outputLabel styleClass="clsLabelTop" id="olblPaymentHeader" value="PAYMENT - #{generalUserSetting.getCurrentPayCategory()}"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="Payment From #{transactionTypeBean.getTransactionType(2).transactorLabel} against #{transactionTypeBean.getTransactionType(2).transactionOutputLabel}" rendered="#{generalUserSetting.getCurrentPayCategory().equals('IN')}"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="#{transactionTypeBean.getTransactionType(2).transactorLabel}:Credit" rendered="#{generalUserSetting.getCurrentPayCategory().equals('IN')}"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="Payment To #{transactionTypeBean.getTransactionType(1).transactorLabel} against #{transactionTypeBean.getTransactionType(1).transactionOutputLabel}" rendered="#{generalUserSetting.getCurrentPayCategory().equals('OUT')}"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="#{transactionTypeBean.getTransactionType(1).transactorLabel} Ledger:Debt" rendered="#{generalUserSetting.getCurrentPayCategory().equals('OUT')}"/>
+                <h:outputLabel style="background-color:#00B461;color: white;" value="Payment From #{menuItemBean.menuItemObj.CUSTOMER_NAME} against #{transactionTypeBean.getTransactionType(2).transactionOutputLabel}" rendered="#{generalUserSetting.getCurrentPayCategory().equals('IN')}"/>
+                <h:outputLabel style="background-color:#00B461;color: white;" value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}:Credit" rendered="#{generalUserSetting.getCurrentPayCategory().equals('IN')}"/>
+                <h:outputLabel style="background-color:#00B461;color: white;" value="Payment To #{menuItemBean.menuItemObj.SUPPLIER_NAME} against #{transactionTypeBean.getTransactionType(1).transactionOutputLabel}" rendered="#{generalUserSetting.getCurrentPayCategory().equals('OUT')}"/>
+                <h:outputLabel style="background-color:#00B461;color: white;" value="#{menuItemBean.menuItemObj.SUPPLIER_NAME} Ledger:Debt" rendered="#{generalUserSetting.getCurrentPayCategory().equals('OUT')}"/>
             </h:panelGrid>
             <h:panelGrid styleClass="clsGridMainInput" columns="2" style="background-color: #b3f2b3;width: 100%;">
 
@@ -58,8 +58,8 @@
 
                 <h:panelGrid styleClass="clsGridMainInput" columns="1" id="pnlgSearch">
                     <h:panelGrid styleClass="clsGridMainInput" columns="2" rendered="#{payBean.searchBy.equals('Name')}">
-                        <h:outputLabel  value="#{transactionTypeBean.getTransactionType(2).transactorLabel}:" rendered="#{generalUserSetting.getCurrentPayCategory().equals('IN')}"/>
-                        <h:outputLabel  value="#{transactionTypeBean.getTransactionType(1).transactorLabel}:" rendered="#{generalUserSetting.getCurrentPayCategory().equals('OUT')}"/>
+                        <h:outputLabel  value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}:" rendered="#{generalUserSetting.getCurrentPayCategory().equals('IN')}"/>
+                        <h:outputLabel  value="#{menuItemBean.menuItemObj.SUPPLIER_NAME}:" rendered="#{generalUserSetting.getCurrentPayCategory().equals('OUT')}"/>
                         <p:autoComplete id="autcTransactor" value="#{payBean.selectedBillTransactor}" 
                                         completeMethod="#{transactorBean.getTransactorObjectList}" 
                                         var="trct" 
@@ -73,7 +73,7 @@
                                 #{trct.transactorNames} 
                             </p:column> 
                             <p:column headerText="Type" style="text-align: left" >  
-                                #{trct.transactorType} 
+                                #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)} 
                             </p:column> 
                             <p:column headerText="Contact Person" style="text-align: left">  
                                 #{trct.cpName} 

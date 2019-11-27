@@ -26,7 +26,7 @@
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Supplier">
+                <p:column headerText="#{menuItemBean.menuItemObj.SUPPLIER_NAME}">
                     <h:outputText value="#{transactorBean.getTransactor(transBean.getTrans(rts.transactionId).transactorId).transactorNames}">
                     </h:outputText>
                 </p:column>

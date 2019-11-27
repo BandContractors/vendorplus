@@ -28,7 +28,7 @@
                     return false;"> 
             <div class="ui-fluid">
                 <h:panelGrid id="pnlgFilter1" columns="6">
-                    <p:outputLabel value="Customer/Client:"/>
+                    <p:outputLabel value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}:"/>
                     <p:inputText value="#{transactorBean.getTransactor(site.transactor_id).transactorNames}" rendered="#{site.site_id>0}" readonly="true"/>
                     <p:autoComplete id="autcTransactor" value="#{transactorBean.selectedTransactor}" 
                                     completeMethod="#{transactorBean.getTransactorObjectList}" 
@@ -43,7 +43,7 @@
                             #{trct.transactorNames} 
                         </p:column> 
                         <p:column headerText="Type" style="text-align: left" >  
-                            #{trct.transactorType} 
+                            #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)} 
                         </p:column> 
                         <p:column headerText="Contact Person" style="text-align: left">  
                             #{trct.cpName} 
@@ -81,7 +81,7 @@
                 <p:outputLabel value="#{siteBean.actionMessage}" style="color: green;" rendered="#{siteBean.actionMessageType==1}"/>
                 <p:outputLabel value="#{siteBean.actionMessage}" style="color: red;" rendered="#{siteBean.actionMessageType==2}"/>
             </h:panelGrid>
-            <p:outputLabel value="Search Customer/Client:"/>
+            <p:outputLabel value="Search #{menuItemBean.menuItemObj.CUSTOMER_NAME}:"/>
             <p:autoComplete id="autcTransactor2" value="#{siteBean.searchTransactor}" 
                             completeMethod="#{transactorBean.getTransactorObjectList}" 
                             var="trct" 
@@ -94,7 +94,7 @@
                     #{trct.transactorNames} 
                 </p:column> 
                 <p:column headerText="Type" style="text-align: left" >  
-                    #{trct.transactorType} 
+                    #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)} 
                 </p:column> 
                 <p:column headerText="Contact Person" style="text-align: left">  
                     #{trct.cpName} 

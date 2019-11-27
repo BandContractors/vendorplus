@@ -45,7 +45,7 @@
                     <p:outputLabel value="To #{payBean.dateType}" id="lblDate2"/>
                     <p:outputLabel value="Pay No"/>
                     <p:outputLabel value="#{transactionTypeBean.getTransactionType(1).transactionNumberLabel}"/>
-                    <p:outputLabel value="#{transactionTypeBean.getTransactionType(1).transactorLabel}"/>
+                    <p:outputLabel value="#{menuItemBean.menuItemObj.SUPPLIER_NAME}"/>
                     <p:selectOneMenu id="menuFromStore" value="#{pay.storeId}" >
                         <f:selectItem itemLabel="Select" itemValue="0"/>
                         <f:selectItems value="#{storeBean.stores}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
@@ -72,7 +72,7 @@
                             #{trct.transactorNames} 
                         </p:column> 
                         <p:column headerText="Type" style="text-align: left" >  
-                            #{trct.transactorType} 
+                            #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)} 
                         </p:column> 
                         <p:column headerText="Contact Person" style="text-align: left">  
                             #{trct.cpName} 
@@ -114,7 +114,7 @@
                     <p:selectOneMenu id="menuSummariseBy" value="#{payBean.fieldName}">
                         <f:selectItem itemLabel="Select" itemValue=""/>
                         <f:selectItem itemLabel="Paid By" itemValue="add_user_detail_id"/>
-                        <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(1).transactorLabel}" itemValue="bill_transactor_id"/>
+                        <f:selectItem itemLabel="#{menuItemBean.menuItemObj.SUPPLIER_NAME}" itemValue="bill_transactor_id"/>
                         <f:selectItem itemLabel="ShareHolder/LoanAcc" itemValue="acc_child_account_id2"/>
                         <f:selectItem itemLabel="Pay Date" itemValue="pay_date"/>
                         <f:selectItem itemLabel="Cash Payment Type" itemValue="pay_reason_id"/>
@@ -154,7 +154,7 @@
                         <p:column headerText="Paid By" style="text-align: left;" rendered="#{payBean.fieldName.equals('add_user_detail_id')}">
                             <h:outputText value="#{userDetailBean.getUserDetail(sm.addUserDetailId).userName}" rendered="#{sm.addUserDetailId>0}"/>
                         </p:column>
-                        <p:column headerText="#{transactionTypeBean.getTransactionType(1).billTransactorLabel}" style="text-align: left;" rendered="#{payBean.fieldName.equals('bill_transactor_id')}">
+                        <p:column headerText="#{menuItemBean.menuItemObj.SUPPLIER_NAME}" style="text-align: left;" rendered="#{payBean.fieldName.equals('bill_transactor_id')}">
                             <h:outputText value="#{transactorBean.getTransactor(sm.billTransactorId).transactorNames}"/>
                         </p:column>
                         <p:column headerText="Cash Payment Type" style="text-align: left;" rendered="#{payBean.fieldName.equals('pay_reason_id')}">

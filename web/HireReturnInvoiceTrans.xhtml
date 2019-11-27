@@ -41,7 +41,7 @@
                     <h:outputLabel value="From"/>
                     <h:outputLabel value="#{transactionTypeBean.getTransactionType(68).transactionRefLabel}"/>
                     <h:outputLabel value="Currency"/>
-                    <h:outputLabel value="#{transactionTypeBean.getTransactionType(68).transactorLabel}"/>
+                    <h:outputLabel value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}"/>
                     <h:outputLabel value="#{transactionTypeBean.getTransactionType(68).transactionDateLabel}"/>
                     <h:outputLabel id="olblDebtCreditChild" style="color: coral;font-weight: bold;" value="Receivable (#{accCurrencyBean.localCurrency.currencyCode})"/>
                     <h:outputLabel id="olblDepositChild" style="color: green;font-weight: bold;" value="Deposit (#{transBean.transChild.currencyCode})"/>
@@ -227,7 +227,7 @@
 
                 <h:panelGrid id="pgrdSchemeChild" style="background-color: yellow;width: 100%">
                     <h:panelGrid id="pgrdSchemeChild2" columns="6" rendered="#{transBean.transChild.billOther}">
-                        <h:outputLabel value="#{transactionTypeBean.getTransactionType(68).billTransactorLabel}:"/>
+                        <h:outputLabel value="Bill For:"/>
                         <p:autoComplete id="autcBillTransactorChild" value="#{transactorBean.selectedBillTransactor}" 
                                         completeMethod="#{transactorBean.getTransactorObjectList}" 
                                         var="trct" 
@@ -240,7 +240,7 @@
                                 #{trct.transactorNames} 
                             </p:column> 
                             <p:column headerText="Type" style="text-align: left" >  
-                                #{trct.transactorType} 
+                                #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)} 
                             </p:column> 
                             <p:column headerText="Contact Person" style="text-align: left">  
                                 #{trct.cpName} 

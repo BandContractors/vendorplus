@@ -44,7 +44,7 @@
                         <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{storeBean.getStore(transBean.transObj.storeId).storeName}" style="width: 170px;"/>
                         <h:outputLabel  value="#{transactionTypeBean.getTransactionType(72).transactionDateLabel}:"/>
                         <h:inputText id="itxtTransactionDate" value="#{utilityBean.formatDate(transBean.transObj.transactionDate)}" disabled="true"/>
-                        <h:outputLabel  value="#{transactionTypeBean.getTransactionType(72).transactorLabel}:"/>
+                        <h:outputLabel  value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}:"/>
                         <h:inputText value="#{transactorBean.getTransactor(transBean.transObj.transactorId).transactorNames}" disabled="true"/>
                     </h:panelGrid>
                     <p:dataTable rowIndexVar="rowIndex" id="dtblTransactionItem" value="#{transBean.transItemList}" var="ati" 

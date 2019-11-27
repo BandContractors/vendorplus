@@ -59,8 +59,8 @@
 
                     <p:outputLabel value="Added By"/>
                     <h:outputLabel value="#{transactionTypeBean.getTransactionType(10).transactionUserLabel}"/>
-                    <p:outputLabel value="#{transactionTypeBean.getTransactionType(10).billTransactorLabel}"/>
-                    <p:outputLabel value="#{transactionTypeBean.getTransactionType(10).transactorLabel}"/>                
+                    <p:outputLabel value="Bill For"/>
+                    <p:outputLabel value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}"/>                
                     <h:outputLabel value="SUMMARIZE RESULTS BY:"/>
                     <p:selectOneMenu id="menuTransUser" value="#{trans.transactionUserDetailId}">
                         <f:selectItem itemLabel="Select" itemValue="0"/>
@@ -99,7 +99,7 @@
                             #{trct.transactorNames} 
                         </p:column> 
                         <p:column headerText="Type" style="text-align: left" >  
-                            #{trct.transactorType} 
+                            #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)} 
                         </p:column> 
                         <p:column headerText="Contact Person" style="text-align: left">  
                             #{trct.cpName} 
@@ -111,8 +111,8 @@
                         <f:selectItem itemLabel="Select" itemValue=""/>
                         <f:selectItem itemLabel="Added By" itemValue="add_user_detail_id"/>
                         <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(10).transactionUserLabel}" itemValue="transaction_user_detail_id"/>
-                        <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(10).billTransactorLabel}" itemValue="bill_transactor_id"/>
-                        <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(10).transactorLabel}" itemValue="transactor_id"/>
+                        <f:selectItem itemLabel="Bill For" itemValue="bill_transactor_id"/>
+                        <f:selectItem itemLabel="#{menuItemBean.menuItemObj.CUSTOMER_NAME}" itemValue="transactor_id"/>
                         <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(10).transactionDateLabel}" itemValue="transaction_date"/>
                     </p:selectOneMenu>
 
@@ -145,10 +145,10 @@
                         <p:column headerText="#{transactionTypeBean.getTransactionType(10).transactionUserLabel}" style="text-align: left;" rendered="#{transBean.fieldName.equals('transaction_user_detail_id')}">
                             <h:outputText value="#{userDetailBean.getUserDetail(sm.transactionUserDetailId).userName}"/>
                         </p:column>
-                        <p:column headerText="#{transactionTypeBean.getTransactionType(10).billTransactorLabel}" style="text-align: left;" rendered="#{transBean.fieldName.equals('bill_transactor_id')}">
+                        <p:column headerText="Bill For" style="text-align: left;" rendered="#{transBean.fieldName.equals('bill_transactor_id')}">
                             <h:outputText value="#{transactorBean.getTransactor(sm.billTransactorId).transactorNames}"/>
                         </p:column>
-                        <p:column headerText="#{transactionTypeBean.getTransactionType(10).transactorLabel}" style="text-align: left;" rendered="#{transBean.fieldName.equals('transactor_id')}">
+                        <p:column headerText="#{menuItemBean.menuItemObj.CUSTOMER_NAME}" style="text-align: left;" rendered="#{transBean.fieldName.equals('transactor_id')}">
                             <h:outputText value="#{transactorBean.getTransactor(sm.transactorId).transactorNames}"/>
                         </p:column>
                         <p:column headerText="#{transactionTypeBean.getTransactionType(10).transactionDateLabel}" style="text-align: left;" rendered="#{transBean.fieldName.equals('transaction_date')}">
@@ -199,10 +199,10 @@
                 <p:column headerText="Add Date" rendered="#{transBean.dateType.equals('Add Date')}">
                     <h:outputText value="#{utilityBean.formatDate(itm.addDate)}"/>
                 </p:column>
-                <p:column headerText="#{transactionTypeBean.getTransactionType(10).billTransactorLabel}">
+                <p:column headerText="Bill For">
                     <h:outputText value="#{transactorBean.getTransactor(itm.billTransactorId).transactorNames}"/>
                 </p:column>
-                <p:column headerText="#{transactionTypeBean.getTransactionType(10).transactorLabel}">
+                <p:column headerText="#{menuItemBean.menuItemObj.CUSTOMER_NAME}">
                     <h:outputText value="#{transactorBean.getTransactor(itm.transactorId).transactorNames}"/>
                 </p:column>
                 <p:column headerText="CUR">

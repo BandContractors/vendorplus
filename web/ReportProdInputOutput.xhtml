@@ -82,7 +82,7 @@
                         <p:ajax event="itemSelect" listener="#{transProductionItem.setInputItemId(itemBean.selectedItemX.itemId)}" process="@this"/>
                         <p:ajax event="change" listener="#{transProductionItem.setInputItemId(itemBean.selectedItemX.itemId)}" rendered="#{itemBean.selectedItemX!=null}" process="@this"/>
                     </p:autoComplete>
-                    <h:outputLabel value="#{transactionTypeBean.getTransactionType(70).transactorLabel}:" styleClass="clsLabelReportFilter"/>
+                    <h:outputLabel value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}:" styleClass="clsLabelReportFilter"/>
                     <p:autoComplete id="autcTransactor" value="#{transactorBean.selectedTransactor}" 
                                     completeMethod="#{transactorBean.getTransactorObjectList}" 
                                     var="trct" 
@@ -95,7 +95,7 @@
                             #{trct.transactorNames} 
                         </p:column> 
                         <p:column headerText="Type" style="text-align: left" >  
-                            #{trct.transactorType} 
+                            #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)} 
                         </p:column> 
                         <p:column headerText="Contact Person" style="text-align: left">  
                             #{trct.cpName} 
@@ -121,7 +121,7 @@
                     <tr style="background-color: yellow;font-weight: bold">
                         <td colspan="2">Input (Raw Material)</td>
                         <td colspan="2">Output (Product)</td>
-                        <td colspan="2">Customer</td>
+                        <td colspan="2">#{menuItemBean.menuItemObj.CUSTOMER_NAME}</td>
                         <td>Qty Produced</td>
                         <td>Total Used</td>
                         <td>Qty After Prod</td>

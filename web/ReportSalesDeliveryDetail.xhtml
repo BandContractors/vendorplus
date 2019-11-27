@@ -81,7 +81,7 @@
                 <h:panelGrid columns="2">
                     <p:outputLabel value="Order/Sales No:"/>
                     <p:inputText id="itxtRefNo" value="#{trans.transactionRef}" style="width: 235px;"/>
-                    <p:outputLabel value="#{transactionTypeBean.getTransactionType(12).billTransactorLabel}:"/>
+                    <p:outputLabel value="Bill For:"/>
                     <p:autoComplete id="autcBillTransactor" value="#{transactorBean.selectedBillTransactor}" 
                                     completeMethod="#{transactorBean.getTransactorObjectList}" 
                                     var="trct2" 
@@ -99,7 +99,7 @@
                         <p:ajax event="itemSelect" listener="#{trans.setBillTransactorId(transactorBean.selectedBillTransactor.transactorId)}"/>
                         <p:ajax event="change" listener="#{trans.setBillTransactorId(transactorBean.selectedBillTransactor.transactorId)}" rendered="#{transactorBean.selectedBillTransactor!=null} "/>
                     </p:autoComplete>
-                    <p:outputLabel value="#{transactionTypeBean.getTransactionType(12).transactorLabel}:"/> 
+                    <p:outputLabel value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}:"/> 
                     <p:autoComplete id="autcTransactor" value="#{transactorBean.selectedTransactor}" 
                                     completeMethod="#{transactorBean.getTransactorObjectList}" 
                                     var="trct" 
@@ -112,7 +112,7 @@
                             #{trct.transactorNames} 
                         </p:column> 
                         <p:column headerText="Type" style="text-align: left" >  
-                            #{trct.transactorType} 
+                            #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)} 
                         </p:column> 
                         <p:column headerText="Contact Person" style="text-align: left">  
                             #{trct.cpName} 
@@ -125,8 +125,8 @@
                         <f:selectItem itemLabel="Select" itemValue=""/>
                         <f:selectItem itemLabel="Added By" itemValue="add_user_detail_id"/>
                         <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(12).transactionUserLabel}" itemValue="transaction_user_detail_id"/>
-                        <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(12).billTransactorLabel}" itemValue="bill_transactor_id"/>
-                        <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(12).transactorLabel}" itemValue="transactor_id"/>
+                        <f:selectItem itemLabel="Bill For" itemValue="bill_transactor_id"/>
+                        <f:selectItem itemLabel="#{menuItemBean.menuItemObj.CUSTOMER_NAME}" itemValue="transactor_id"/>
                         <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(12).transactionDateLabel}" itemValue="transaction_date"/>
                     </p:selectOneMenu>
                 </h:panelGrid>
@@ -175,10 +175,10 @@
                 <p:column headerText="Add Date" rendered="#{transBean.dateType.equals('Add Date')}">
                     <h:outputText value="#{utilityBean.formatDate(itm.addDate)}"/>
                 </p:column>
-                <p:column headerText="#{transactionTypeBean.getTransactionType(12).billTransactorLabel}">
+                <p:column headerText="Bill For">
                     <h:outputText value="#{transactorBean.getTransactor(itm.billTransactorId).transactorNames}"/>
                 </p:column>
-                <p:column headerText="#{transactionTypeBean.getTransactionType(12).transactorLabel}">
+                <p:column headerText="#{menuItemBean.menuItemObj.CUSTOMER_NAME}">
                     <h:outputText value="#{transactorBean.getTransactor(itm.transactorId).transactorNames}"/>
                 </p:column>
                 <p:column headerText="Added By">

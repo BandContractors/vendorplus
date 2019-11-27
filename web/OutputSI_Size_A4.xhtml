@@ -51,12 +51,12 @@
                         <h:outputLabel  value="From:"/>
                         <h:inputText styleClass="clsInput" id="itxtvFromStore" disabled="true" value="#{storeBean.getStore(generalUserSetting.outputDetailParent.trans.storeId).storeName}" style="border: none;"/>
 
-                        <h:outputLabel  value="#{generalUserSetting.outputDetailParent.transaction_type.transactorLabel}:"/>
+                        <h:outputLabel  value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}:"/>
                         <h:inputText styleClass="clsInput" id="itxtvCustomerName" disabled="true" value="#{generalUserSetting.outputDetailParent.transactor.transactorNames}" style="border: none;"/>
-                        <h:outputLabel  value="#{generalUserSetting.outputDetailParent.transaction_type.billTransactorLabel}:"/>
+                        <h:outputLabel  value="Bill For:"/>
                         <h:inputText styleClass="clsInput" id="itxtvCustomerName2" disabled="true" value="#{generalUserSetting.outputDetailParent.bill_transactor.transactorNames}" style="border: none;"/>
                         
-                        <h:outputLabel  value="#{generalUserSetting.outputDetailParent.transaction_type.transactorLabel} #:"/>
+                        <h:outputLabel  value="#{menuItemBean.menuItemObj.CUSTOMER_NAME} #:"/>
                         <h:inputText styleClass="clsInput" id="itxtvCustomerNo" disabled="true" value="#{generalUserSetting.outputDetailParent.transactor.transactorRef}" style="border: none;"/>
                         <h:outputLabel  value="Tax Identity:"/>
                         <h:inputText styleClass="clsInput" id="itxtvTaxIdentity" disabled="true" value="#{generalUserSetting.outputDetailParent.transactor.taxIdentity}" style="border: none;"/>

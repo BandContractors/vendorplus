@@ -96,7 +96,7 @@
                         <h:outputLabel value=""/>
                         <h:outputLabel value="CUSTOMER LOYALTY CARD" style="background-color: black;color: white;font-weight: bold;"/>
                     </h:panelGrid>
-                    <p:commandLink value="Print.Customer.Loyalty.Card">
+                    <p:commandLink value="Print.#{menuItemBean.menuItemObj.CUSTOMER_NAME}.Loyalty.Card">
                         <p:printer target="pnlgPointsCardPrint" rendered="false"/>
                     </p:commandLink>
                 </h:panelGrid>
