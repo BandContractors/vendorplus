@@ -540,6 +540,14 @@ public class UtilityBean implements Serializable {
             return aString.substring(0, 1).toUpperCase() + aString.substring(1).toLowerCase();
         }
     }
+    
+    public String formatCapitaliseAllCharacter(String aString) {
+        if (aString.length()==0) {
+            return aString;
+        } else {
+            return aString.substring(0).toUpperCase();
+        }
+    }
 
     //public static void main(String[] args) {
 ////        UtilityBean ub=new UtilityBean();
