@@ -38,7 +38,7 @@
             </h:panelGrid>
             <h:panelGrid id="pnlgFilter" columns="3" styleClass="clsPanelReportFilter">
                 <h:panelGrid columns="2">
-                    <p:outputLabel value="Store/Section:"/>
+                    <p:outputLabel value="#{companySetting.getStoreEquivName()}:"/>
                     <p:selectOneMenu id="menuFromStore" value="#{trans.storeId}" style="width: 200px;">
                         <f:selectItem itemLabel="Select" itemValue="0"/>
                         <f:selectItems value="#{storeBean.stores}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
@@ -128,7 +128,7 @@
                         <f:selectItem itemLabel="Bill For" itemValue="bill_transactor_id"/>
                         <f:selectItem itemLabel="#{menuItemBean.menuItemObj.CUSTOMER_NAME}" itemValue="transactor_id"/>
                         <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(2).transactionDateLabel}" itemValue="transaction_date"/>
-                        <f:selectItem itemLabel="Store/Section" itemValue="store_id"/>
+                        <f:selectItem itemLabel="#{companySetting.getStoreEquivName()}" itemValue="store_id"/>
                     </p:selectOneMenu>
                 </h:panelGrid>
             </h:panelGrid>
@@ -159,7 +159,7 @@
                         <p:column headerText="#{transactionTypeBean.getTransactionType(2).transactionDateLabel}" style="text-align: left;" rendered="#{transBean.fieldName.equals('transaction_date')}">
                             <h:outputText value="#{utilityBean.formatDate(sm.transactionDate)}"/>
                         </p:column>
-                        <p:column headerText="Store/Section" style="text-align: left;" rendered="#{transBean.fieldName.equals('store_id')}">
+                        <p:column headerText="#{companySetting.getStoreEquivName()}" style="text-align: left;" rendered="#{transBean.fieldName.equals('store_id')}">
                             <h:outputText value="#{sm.storeName}" rendered="#{sm.storeId>0}"/>
                         </p:column>
                         <p:column headerText="Currency" style="text-align: left;">

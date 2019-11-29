@@ -38,7 +38,7 @@
             </h:panelGrid>
             <div class="ui-fluid">
                 <h:panelGrid id="pnlgFilter" columns="5" styleClass="clsPanelReportFilter">
-                    <p:outputLabel value="Store/Section"/>
+                    <p:outputLabel value="#{companySetting.getStoreEquivName()}"/>
                     <p:outputLabel value="Date Type"/>
                     <p:outputLabel value="From #{transBean.dateType}" id="lblDate1"/>
                     <p:outputLabel value="To #{transBean.dateType}" id="lblDate2"/>
@@ -115,7 +115,7 @@
                         <f:selectItem itemLabel="#{menuItemBean.menuItemObj.CUSTOMER_NAME}" itemValue="transactor_id"/>
                         <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(11).transactionDateLabel}" itemValue="transaction_date"/>
                         <f:selectItem itemLabel="Delivery Mode" itemValue="delivery_mode"/>
-                        <f:selectItem itemLabel="Store/Section" itemValue="store_id"/>
+                        <f:selectItem itemLabel="#{companySetting.getStoreEquivName()}" itemValue="store_id"/>
                     </p:selectOneMenu>
 
                     <p:commandButton id="cmdbSearch" value="SEARCH (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
@@ -159,7 +159,7 @@
                         <p:column headerText="Delivery Mode" style="text-align: left;" rendered="#{transBean.fieldName.equals('delivery_mode')}">
                             <h:outputText value="#{sm.delivery_mode}"/>
                         </p:column>
-                        <p:column headerText="Store/Section" style="text-align: left;" rendered="#{transBean.fieldName.equals('store_id')}">
+                        <p:column headerText="#{companySetting.getStoreEquivName()}" style="text-align: left;" rendered="#{transBean.fieldName.equals('store_id')}">
                             <h:outputText value="#{sm.storeName}" rendered="#{sm.storeId>0}"/>
                         </p:column>
                         <p:column headerText="Currency" style="text-align: left;">

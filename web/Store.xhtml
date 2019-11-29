@@ -6,7 +6,7 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:p="http://primefaces.org/ui">
     <h:head>
-        <title>Store</title>
+        <title>#{companySetting.getStoreEquivName()}</title>
         <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
         <script  language="javascript">
@@ -26,19 +26,19 @@
         <h:form id="form" styleClass="clsMainFrom">
 
             <h:panelGrid styleClass="clsGridMainHeader" columns="1">
-                <h:outputLabel styleClass="clsLabelTop" id="olblStoreHeader" value="Branch - Store"/>
+                <h:outputLabel styleClass="clsLabelTop" id="olblStoreHeader" value="Branch - #{companySetting.getStoreEquivName()}"/>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainInput" columns="2">
-                <h:outputLabel  value="Store Id:"/>
+                <h:outputLabel  value="#{companySetting.getStoreEquivName()} Id:"/>
                 <h:inputText styleClass="clsInput" id="itxtStoreId" value="#{store.storeId}" disabled="true"/>
-                <h:outputLabel  value="Store Name:"/>
+                <h:outputLabel  value="#{companySetting.getStoreEquivName()} Name:"/>
                 <h:inputText styleClass="clsInput" id="itxtStoreName" value="#{store.storeName}"/>
-                <h:outputLabel  value="Store Code (Max 10 Characters):"/>
+                <h:outputLabel  value="#{companySetting.getStoreEquivName()} Code (Max 10 Characters):"/>
                 <h:inputText styleClass="clsInput" id="itxtStoreCode" value="#{store.store_code}"/> 
             </h:panelGrid>
 
-            <h:panelGrid styleClass="clsGridMainCommands" columns="2">
+            <h:panelGrid styleClass="clsGridMainCommands" columns="1">
                 <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
                     <p:commandButton styleClass="clsButton" id="cmdbSave" value="Save" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
@@ -53,9 +53,6 @@
                         <p:ajax listener="#{storeBean.deleteStoreByObject(store)}" process="@form" update="@form" />
                     </p:commandButton>
                 </h:panelGrid>
-                <h:panelGrid styleClass="clsGridMainCommands2" columns="4">
-                </h:panelGrid>
-
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainMessages" columns="1">
@@ -64,44 +61,40 @@
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainSearch" columns="1">
-                <h:outputLabel id="olblMainSearch" value="Search Store"/>
+                <h:outputLabel id="olblMainSearch" value="Search #{companySetting.getStoreEquivName()}"/>
                 <h:inputText id="itxtMainSearch" value="#{storeBean.searchStoreName}" autocomplete="off">
                     <f:ajax event="keyup" render="dtblStore"/>
                 </h:inputText>
             </h:panelGrid>
 
-            <h:dataTable id="dtblStore" value="#{storeBean.getStoresByName(storeBean.searchStoreName)}" var="s" 
-                         styleClass="cls-table" 
-                         
-                         rowClasses="cls-table-odd-row,cls-table-even-row" 
+            <p:dataTable id="dtblStore" value="#{storeBean.getStoresByName(storeBean.searchStoreName)}" var="s" 
                          > 
-                <h:column>
+                <p:column>
                     <!-- column header -->
-                    <f:facet name="header">ID</f:facet>
+                    <f:facet name="header">#{companySetting.getStoreEquivName()} ID</f:facet>
                     <!-- row record -->
                     #{s.storeId}
-                </h:column>
-                <h:column>
+                </p:column>
+                <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Name</f:facet>
+                    <f:facet name="header">#{companySetting.getStoreEquivName()} Name</f:facet>
                     <!-- row record -->
                     #{s.storeName}
-                </h:column>
-                <h:column>
+                </p:column>
+                <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Code</f:facet>
+                    <f:facet name="header">#{companySetting.getStoreEquivName()} Code</f:facet>
                     <!-- row record -->
                     #{s.store_code}
-                </h:column>
-                <h:column>
+                </p:column>
+                <p:column>
                     <!-- column header -->
                     <f:facet name="header">Action</f:facet>
                     <!-- row record -->
                     <h:commandLink value="Edit" action="#{storeBean.displayStore(s,store)}" />
                     &nbsp;
-                </h:column>
-
-            </h:dataTable>
+                </p:column>
+            </p:dataTable>
 
         </h:form>
     </h:body>

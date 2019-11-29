@@ -36,7 +36,7 @@
             </h:panelGrid>
             <div class="ui-fluid">
                 <h:panelGrid id="pnlgFilter" columns="5" styleClass="clsPanelReportFilter">
-                    <p:outputLabel value="From Store/Section"/>
+                    <p:outputLabel value="From #{companySetting.getStoreEquivName()}"/>
                     <p:outputLabel value="Date Type"/>
                     <p:outputLabel value="From #{transBean.dateType}" id="lblDate1"/>
                     <p:outputLabel value="To #{transBean.dateType}" id="lblDate2"/>
@@ -171,7 +171,7 @@
                         <p:dataExporter type="xml" target="tblDetail" fileName="Item_Trans_Detail" />
                     </h:commandLink>
                 </f:facet>
-                <p:column headerText="From Store">
+                <p:column headerText="From #{companySetting.getStoreEquivName()}">
                     <h:outputLabel value="#{storeBean.getStore(transBean.getTrans(itm.transactionId).storeId).storeName}"/>
                 </p:column>
                 <p:column headerText="Trans Type">

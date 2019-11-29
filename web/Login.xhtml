@@ -61,7 +61,7 @@
                             </p:dialog>
                             <f:ajax listener="#{login.confirmUser()}" execute="itxtUserName itxtPassword" render="menuStore olblActionMessageSuccess olblActionMessageFailure pnlgLoginHeader"/>
                         </p:commandButton>
-                        <h:outputLabel  value="Section/Store"/>
+                        <h:outputLabel  value="#{companySetting.getStoreEquivName()}"/>
                         <h:selectOneMenu styleClass="clsMenu" id="menuStore" value="#{login.loggedInStoreId}" style="width: 220px;">
                             <f:selectItem itemLabel="" itemValue="0"/>
                             <f:selectItems value="#{login.storesList}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>

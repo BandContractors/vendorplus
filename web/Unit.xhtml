@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
     <h:head>
         <title>Unit</title>
         <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
@@ -39,7 +40,7 @@
                 
             </h:panelGrid>
 
-            <h:panelGrid styleClass="clsGridMainCommands" columns="2">
+            <h:panelGrid styleClass="clsGridMainCommands" columns="1">
             <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
                 <h:commandButton styleClass="clsButton" id="cmdbSave" value="Save">
                     <f:ajax listener="#{unitBean.saveUnit(unit)}" execute="@form" render="@form" />
@@ -51,9 +52,6 @@
                     <f:ajax listener="#{unitBean.deleteUnitByObject(unit)}" execute="@form" render="@form" />
                 </h:commandButton>
             </h:panelGrid>
-            <h:panelGrid styleClass="clsGridMainCommands2" columns="4">
-            </h:panelGrid>
-
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainMessages" columns="1">
@@ -68,27 +66,23 @@
                 </h:inputText>
             </h:panelGrid>
 
-            <h:dataTable id="dtblUnit" value="#{unitBean.getUnitsByUnitName(unitBean.searchUnitName)}" var="u" 
-                         styleClass="cls-table" 
-                         headerClass="cls-table-header" 
-                         rowClasses="cls-table-odd-row,cls-table-even-row" 
-                         columnClasses="cls-table-col1,cls-table-col2,cls-table-col3"
+            <p:dataTable id="dtblUnit" value="#{unitBean.getUnitsByUnitName(unitBean.searchUnitName)}" var="u" 
                          > 
-                <h:column>
+                <p:column>
                     <!-- column header -->
                     <f:facet name="header">Unit Name</f:facet>
                     <!-- row record -->
                     #{u.unitName}
-                </h:column>
+                </p:column>
                 
-                <h:column>
+                <p:column>
                     <!-- column header -->
                     <f:facet name="header">Unit Symbol</f:facet>
                     <!-- row record -->
                     #{u.unitSymbol}
-                </h:column>
+                </p:column>
 
-                <h:column>
+                <p:column>
                     <!-- column header -->
                     <f:facet name="header">Action</f:facet>
                     <!-- row record -->
@@ -96,9 +90,9 @@
                         <f:ajax listener="#{unitBean.displayUnit(u,unit)}" execute="@form" render="@form"/>
                     </h:commandLink>
                     &nbsp;
-                </h:column>
+                </p:column>
                 
-            </h:dataTable>
+            </p:dataTable>
 
         </h:form>
     </h:body>

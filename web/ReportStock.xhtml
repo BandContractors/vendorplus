@@ -30,7 +30,7 @@
             </h:panelGrid>
             <h:panelGrid id="pnlgFilter" columns="6" styleClass="clsPanelReportFilter">
                 <p:outputLabel value="Stock Type"/>
-                <p:outputLabel value="Store"/>
+                <p:outputLabel value="#{companySetting.getStoreEquivName()}"/>
                 <p:outputLabel value="Category"/>
                 <p:outputLabel value="From Expiry Date" id="lblDate1"/>
                 <p:outputLabel value="To Expiry Date" id="lblDate2"/>
@@ -152,7 +152,7 @@
                 <p:column headerText="Stock Type">
                     <h:outputLabel value="#{itm.stock_type} "/>
                 </p:column>
-                <p:column headerText="Store">
+                <p:column headerText="#{companySetting.getStoreEquivName()}">
                     <h:outputLabel value="#{itm.storeName} "/>
                 </p:column>
                 <p:column headerText="Item Name">

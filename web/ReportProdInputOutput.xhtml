@@ -41,7 +41,7 @@
             </h:panelGrid>
             <h:panelGrid id="id1" columns="4" styleClass="clsPanelReportFilter">
                 <h:panelGrid columns="2">
-                    <p:outputLabel styleClass="clsLabelReportFilter" id="id2" value="Section/Store:"/>
+                    <p:outputLabel styleClass="clsLabelReportFilter" id="id2" value="#{companySetting.getStoreEquivName()}:"/>
                     <h:selectOneMenu styleClass="clsInputReportFilter" id="menuFromStore" value="#{transProduction.storeId}" >
                         <f:selectItem itemLabel="" itemValue="0"/>
                         <f:selectItems value="#{storeBean.storesList}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>

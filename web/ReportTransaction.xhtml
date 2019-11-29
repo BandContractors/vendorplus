@@ -176,7 +176,7 @@
                 <f:facet name="header">
                     Transaction Summary Report
                 </f:facet>
-                <p:column headerText="Store">
+                <p:column headerText="#{companySetting.getStoreEquivName()}">
                     <h:outputText value="#{storeBean.getStore(rtss.storeId).storeName}">
                     </h:outputText>
                 </p:column>

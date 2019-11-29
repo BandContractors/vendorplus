@@ -69,7 +69,7 @@
                 
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Store</f:facet>
+                    <f:facet name="header">#{companySetting.getStoreEquivName()}</f:facet>
                     <!-- row record -->
                     #{storeBean.getStore(ls.storeId).storeName}
                 </p:column>

@@ -37,7 +37,7 @@
             </h:panelGrid>
             <div class="ui-fluid">
                 <h:panelGrid id="id1" columns="6" styleClass="clsPanelReportFilter">
-                    <p:outputLabel  id="id2" value="Store/Section:"/>
+                    <p:outputLabel  id="id2" value="#{companySetting.getStoreEquivName()}:"/>
                     <p:selectOneMenu id="menuFromStore" value="#{trans.storeId}" >
                         <f:selectItem itemLabel="" itemValue="0"/>
                         <f:selectItems value="#{storeBean.stores}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
@@ -118,7 +118,7 @@
                         <p:dataExporter type="xml" target="tblTransaction" fileName="User_Earn_Report" />
                     </h:commandLink>
                 </f:facet>
-                <p:column headerText="Store/Section">
+                <p:column headerText="#{companySetting.getStoreEquivName()}">
                     <h:outputText value="#{rts.storeName}">
                     </h:outputText>
                 </p:column>

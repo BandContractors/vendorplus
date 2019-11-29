@@ -29,7 +29,7 @@
                 <h:outputLabel styleClass="clsLabelReportFilterTitle" value="Transactors Ledger Report - Detail"/>
             </h:panelGrid>
             <h:panelGrid id="id1" columns="8" styleClass="clsPanelReportFilter">
-                <p:outputLabel styleClass="clsLabelReportFilter" id="id2" value="Store:"/>
+                <p:outputLabel styleClass="clsLabelReportFilter" id="id2" value="#{companySetting.getStoreEquivName()}:"/>
                 <h:selectOneMenu styleClass="clsInputReportFilter" id="menuFromStore" value="#{transactorLedger.storeId}" >
                     <f:selectItem itemLabel="" itemValue="0"/>
                     <f:selectItems value="#{storeBean.stores}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
@@ -179,7 +179,7 @@
                     </h:outputText>
                 </p:column>
 
-                <p:column headerText="Store">
+                <p:column headerText="#{companySetting.getStoreEquivName()}">
                     <h:outputText value="#{rts.storeName}"/>
                 </p:column>
 

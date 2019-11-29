@@ -29,7 +29,7 @@
                 <h:outputLabel styleClass="clsLabelReportFilterTitle" value="Asset Inventory Report"/>
             </h:panelGrid>
             <h:panelGrid id="pnlgFilter" columns="5" styleClass="clsPanelReportFilter">
-                <p:outputLabel value="Store:"/>
+                <p:outputLabel value="#{companySetting.getStoreEquivName()}:"/>
                 <h:selectOneMenu id="menuFromStore" value="#{stock.storeId}" >
                     <f:selectItem itemLabel="" itemValue="0"/>
                     <f:selectItems value="#{storeBean.stores}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
@@ -91,7 +91,7 @@
                         <p:dataExporter type="xml" target="tblDetail" fileName="Asset_Inventory" />
                     </h:commandLink>
                 </f:facet>
-                <p:column headerText="Store">
+                <p:column headerText="#{companySetting.getStoreEquivName()}">
                     <h:outputLabel value="#{itm.storeName} "/>
                 </p:column>
                 <p:column headerText="Description">

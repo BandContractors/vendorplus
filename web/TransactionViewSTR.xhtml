@@ -39,7 +39,7 @@
 
                     <h:panelGrid columns="4" style="width:100%;margin: 0px;">
                         <h:panelGrid style="margin: 0px;text-align:left;width: 300px;" columns="1">
-                            <h:outputLabel value="From Store" style="border-bottom-style: solid;"/>
+                            <h:outputLabel value="From #{companySetting.getStoreEquivName()}" style="border-bottom-style: solid;"/>
                             <h:outputLabel value="#{storeBean.getStore(salesInvoiceBean.getCurrentTransaction().storeId).storeName}"/>
                         </h:panelGrid>
                         <h:panelGrid style="margin: 0px;text-align: left;" columns="1">
@@ -51,7 +51,7 @@
                             <h:outputText styleClass="clsInput" id="itxtvDelDate" value="#{utilityBean.formatDate(salesInvoiceBean.getCurrentTransaction().deliveryDate)}"/>
                         </h:panelGrid>
                         <h:panelGrid style="margin: 0px;text-align: left; float: right;width: 250px;" columns="1">
-                            <h:outputLabel value="To Store" style="border-bottom-style: solid;"/>
+                            <h:outputLabel value="To #{companySetting.getStoreEquivName()}" style="border-bottom-style: solid;"/>
                             <h:outputLabel value="#{storeBean.getStore(salesInvoiceBean.getCurrentTransaction().store2Id).storeName}"/>
                         </h:panelGrid>
                     </h:panelGrid>

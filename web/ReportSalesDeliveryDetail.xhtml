@@ -38,7 +38,7 @@
             </h:panelGrid>
             <h:panelGrid id="pnlgFilter" columns="3" styleClass="clsPanelReportFilter">
                 <h:panelGrid columns="2">
-                    <p:outputLabel value="Store/Section:"/>
+                    <p:outputLabel value="#{companySetting.getStoreEquivName()}:"/>
                     <p:selectOneMenu id="menuFromStore" value="#{trans.storeId}" style="width: 200px;">
                         <f:selectItem itemLabel="Select" itemValue="0"/>
                         <f:selectItems value="#{storeBean.stores}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>

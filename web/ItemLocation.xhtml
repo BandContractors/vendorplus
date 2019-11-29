@@ -30,7 +30,7 @@
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainInput" columns="4">
-                 <h:outputLabel  value="Store:"/>
+                 <h:outputLabel  value="#{companySetting.getStoreEquivName()}:"/>
                 <p:selectOneMenu styleClass="clsMenu" id="menuStore" value="#{location.storeId}">
                     <f:selectItem itemLabel="" itemValue="0"/>
                     <f:selectItems value="#{storeBean.stores}" var="s" itemLabel="#{s.storeName}" itemValue="#{s.storeId}"/>
@@ -92,42 +92,38 @@
                 <h:messages id="msgsMainMessage" style="color: red"/><br/>
             </h:panelGrid>
 
-            <h:dataTable id="dtblItemLocation" value="#{itemLocationBean.getItemLocations(location,itemLocation)}" var="il" 
-                         styleClass="cls-table" 
-                         headerClass="cls-table-header" 
-                         rowClasses="cls-table-odd-row,cls-table-even-row" 
-                         columnClasses="cls-table-col1,cls-table-col2,cls-table-col3"
+            <p:dataTable id="dtblItemLocation" value="#{itemLocationBean.getItemLocations(location,itemLocation)}" var="il" 
                          > 
-                <h:column>
+                <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Store</f:facet>
+                    <f:facet name="header">#{companySetting.getStoreEquivName()}</f:facet>
                     <!-- row record -->
                     #{il.storeName}
-                </h:column>
+                </p:column>
                 
-                <h:column>
+                <p:column>
                     <!-- column header -->
                     <f:facet name="header">Location</f:facet>
                     <!-- row record -->
                     #{il.locationName}
-                </h:column>
+                </p:column>
                 
-                <h:column>
+                <p:column>
                     <!-- column header -->
                     <f:facet name="header">Item</f:facet>
                     <!-- row record -->
                     #{il.description}
-                </h:column>
+                </p:column>
 
-                <h:column>
+                <p:column>
                     <!-- column header -->
                     <f:facet name="header">Action</f:facet>
                     <!-- row record -->
                     <h:commandLink value="Remove Item from Location" action="#{itemLocationBean.deleteItemLocationByObject(il)}" />
                     &nbsp;
-                </h:column>
+                </p:column>
                 
-            </h:dataTable>
+            </p:dataTable>
 
         </h:form>
     </h:body>

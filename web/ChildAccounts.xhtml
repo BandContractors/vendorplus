@@ -53,9 +53,9 @@
                         <f:selectItem itemLabel="Any User" itemValue="0"/>
                         <f:selectItems value="#{userDetailBean.getUserDetails()}" var="ut" itemLabel="#{ut.firstName} #{ut.secondName} #{ut.thirdName}" itemValue="#{ut.userDetailId}"/>
                     </h:selectOneMenu>
-                    <h:outputLabel value="Account for Store:"/>
+                    <h:outputLabel value="Account for #{companySetting.getStoreEquivName()}:"/>
                     <h:selectOneMenu id="menuStore" value="#{accChildAccountBean.accChildAccountObj.storeId}" style="width: 250px;">
-                        <f:selectItem itemLabel="Any Store" itemValue=""/>
+                        <f:selectItem itemLabel="Any #{companySetting.getStoreEquivName()}" itemValue=""/>
                         <f:selectItems value="#{storeBean.stores}" var="st" itemLabel="#{st.storeName}" itemValue="#{st.storeId}"/>
                     </h:selectOneMenu>
                     <h:outputLabel value="Active:"/>
@@ -130,7 +130,7 @@
                 <p:column headerText="User">
                     <h:outputLabel value="#{userDetailBean.getUserDetail(itm.userDetailId).userName}"/>
                 </p:column>
-                <p:column headerText="Store">
+                <p:column headerText="#{companySetting.getStoreEquivName()}">
                     <h:outputLabel value="#{storeBean.getStore(itm.storeId).storeName}"/>
                 </p:column>
                 <p:column headerText="Balance Checker">

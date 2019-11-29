@@ -234,7 +234,7 @@
                 </h:panelGrid>
             </p:sidebar>
             <p:sidebar widgetVar="sbarStore" position="right" baseZIndex="10000">
-                <h1 style="font-weight:bolder">Store (From/To)</h1>
+                <h1 style="font-weight:bolder">#{companySetting.getStoreEquivName()} (From/To)</h1>
                 <h:panelGrid columns="2">
                     <h:panelGrid id="pnlStores" columns="1">
                         <c:forEach var="st" items="#{transBean.storeList}">

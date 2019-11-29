@@ -38,7 +38,7 @@
             </h:panelGrid>
             <div class="ui-fluid">
                 <h:panelGrid id="pnlgFilter" columns="4" styleClass="clsPanelReportFilter">
-                    <p:outputLabel value="From Store/Section"/>
+                    <p:outputLabel value="From #{companySetting.getStoreEquivName()}"/>
                     <p:outputLabel value="Date Type"/>
                     <p:outputLabel value="From #{transBean.dateType}" id="lblDate1"/>
                     <p:outputLabel value="To #{transBean.dateType}" id="lblDate2"/>

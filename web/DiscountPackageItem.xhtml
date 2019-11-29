@@ -33,7 +33,7 @@
 
             <h:panelGrid styleClass="clsGridMainInput" columns="2">
 
-                <h:outputLabel  value="Store:"/>
+                <h:outputLabel  value="#{companySetting.getStoreEquivName()}:"/>
                 <h:selectOneMenu styleClass="clsMenu" id="menuStore" value="#{discountPackageItem.storeId}" >
                     <f:selectItem itemLabel="" itemValue="0"/>
                     <f:selectItems value="#{storeBean.stores}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
@@ -145,7 +145,7 @@
                 </p:column>
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Store</f:facet>
+                    <f:facet name="header">#{companySetting.getStoreEquivName()}</f:facet>
                     <!-- row record -->
                     <h:outputLabel style="color: #{generalSetting.getStyleColorByDaysFromNow('DISCOUNT-EXPIRY-DATE',discountPackageBean.getDiscountPackage(dpi.discountPackageId).endDate)};" value="#{storeBean.getStore(dpi.storeId).storeName}"/>
                 </p:column>

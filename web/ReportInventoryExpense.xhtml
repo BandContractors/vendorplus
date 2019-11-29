@@ -29,7 +29,7 @@
                 <h:outputLabel styleClass="clsLabelReportFilterTitle" value="Expenses Inventory Report"/>
             </h:panelGrid>
             <h:panelGrid id="pnlgFilter" columns="5" styleClass="clsPanelReportFilter">
-                <p:outputLabel value="Store"/>
+                <p:outputLabel value="#{companySetting.getStoreEquivName()}"/>
                 <p:outputLabel value="Category"/>
                 <p:outputLabel value="From Expiry Date" id="lblDate1"/>
                 <p:outputLabel value="To Expiry Date" id="lblDate2"/>
@@ -93,7 +93,7 @@
                         <p:dataExporter type="xml" target="tblDetail" fileName="Expense_Inventory" />
                     </h:commandLink>
                 </f:facet>
-                <p:column headerText="Store">
+                <p:column headerText="#{companySetting.getStoreEquivName()}">
                     <h:outputLabel value="#{itm.storeName} "/>
                 </p:column>
                 <p:column headerText="Description">

@@ -15110,7 +15110,7 @@ public class TransBean implements Serializable {
     }
 
     public String getDisplayStore(int aStoreId) {
-        String outc = "Store";
+        String outc = CompanySetting.getStoreEquivName();
         try {
             if (aStoreId > 0) {
                 Store st = new StoreBean().getStore(aStoreId);

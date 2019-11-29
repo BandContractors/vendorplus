@@ -30,7 +30,7 @@
                 <h:outputLabel styleClass="clsLabelReportFilterTitle" value="Item Location Report"/>
             </h:panelGrid>
             <h:panelGrid id="id1" columns="10" styleClass="clsPanelReportFilter">
-                <h:outputLabel value="Store:"/>
+                <h:outputLabel value="#{companySetting.getStoreEquivName()}:"/>
                 <h:selectOneMenu styleClass="clsInputReportFilter" id="menuStore" value="#{store.storeId}">
                     <f:selectItem itemLabel="" itemValue="0"/>
                     <f:selectItems value="#{storeBean.stores}" var="s" itemLabel="#{s.storeName}" itemValue="#{s.storeId}"/>
@@ -112,7 +112,7 @@
                         <p:dataExporter type="xml" target="tblDetail" fileName="Item_Location" />
                     </h:commandLink>
                 </f:facet>
-                <p:column headerText="Store">
+                <p:column headerText="#{companySetting.getStoreEquivName()}">
                     <h:outputText value="#{il.storeName}">
                     </h:outputText>
                 </p:column>

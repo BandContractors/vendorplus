@@ -39,7 +39,7 @@
                     <f:ajax event="change" listener="#{utilityBean.clearList(groupRightBean.groupRightsForEdit)}" render="dtblGroupRightEdit"/>
                 </h:selectOneMenu>
 
-                <h:outputLabel  value="Select Store:"/>
+                <h:outputLabel  value="Select #{companySetting.getStoreEquivName()}:"/>
                 <h:selectOneMenu styleClass="clsMenu" id="menuStore" value="#{groupRight.storeId}">
                     <f:selectItem itemLabel="" itemValue="0"/>
                     <f:selectItems value="#{storeBean.stores}" var="s" itemLabel="#{s.storeName}" itemValue="#{s.storeId}"/>

@@ -40,7 +40,7 @@
                 <h:selectOneMenu styleClass="clsMenu" id="menuTransactionReason" value="#{trans.transactionReasonId}">
                     <f:selectItems value="#{transactionReasonBean.getTransactionReasons(generalUserSetting.getCurrentTransactionTypeId())}" var="tr" itemLabel="#{tr.transactionReasonName}" itemValue="#{tr.transactionReasonId}"/>
                 </h:selectOneMenu>
-                <h:outputLabel  value="To Store:"/>
+                <h:outputLabel  value="To #{companySetting.getStoreEquivName()}:"/>
                 <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}">
                 </h:inputText>
                 <h:outputLabel  value="Transaction Date:"/>

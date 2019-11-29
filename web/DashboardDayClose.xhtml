@@ -125,7 +125,7 @@
                                 </ui:repeat>
                                 <tr style="background-color: yellow;">
                                     <td colspan="3" align="center" valign="bottom">
-                                        <b>Section Sales</b>
+                                        <b>#{companySetting.getStoreEquivName()} Sales</b>
                                     </td>
                                 </tr>
                                 <ui:repeat var="st" value="#{dashboardBean.dayCloseSalesStore}">
@@ -269,7 +269,7 @@
                                 </ui:repeat>
                                 <tr style="background-color: yellow;">
                                     <td colspan="3" align="center" valign="bottom">
-                                        <b>Section Purchases &amp; Expenses</b>
+                                        <b>#{companySetting.getStoreEquivName()} Purchases &amp; Expenses</b>
                                     </td>
                                 </tr>
                                 <ui:repeat var="stpu" value="#{dashboardBean.dayClosePurchasesStore}">

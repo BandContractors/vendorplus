@@ -35,7 +35,7 @@
                 <h:inputText styleClass="clsInput" id="itxtUserRightId" disabled="true" value="#{userRight.userRightId}">
                 </h:inputText>
                 
-                <h:outputLabel  value="Store Name:"/>
+                <h:outputLabel  value="#{companySetting.getStoreEquivName()} Name:"/>
                 <h:selectOneMenu styleClass="clsMenu" id="menuStoreName" value="#{userRight.storeId}">
                     <f:selectItem itemLabel="" itemValue="0"/>
                     <f:selectItems value="#{storeBean.stores}" var="s" itemLabel="#{s.storeName}" itemValue="#{s.storeId}"/>
@@ -145,7 +145,7 @@
                 
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header">Store Name</f:facet>
+                    <f:facet name="header">#{companySetting.getStoreEquivName()} Name</f:facet>
                     <!-- row record -->
                     #{ur.storeName}
                 </h:column>

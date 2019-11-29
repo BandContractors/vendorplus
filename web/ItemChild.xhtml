@@ -210,7 +210,7 @@
                                  > 
                         <h:column>
                             <!-- column header -->
-                            <f:facet name="header">Store</f:facet>
+                            <f:facet name="header">#{companySetting.getStoreEquivName()}</f:facet>
                             <!-- row record -->
                             #{storeBean.getStore(loc.storeId).storeName}
                         </h:column>
@@ -232,7 +232,7 @@
                                  > 
                         <h:column>
                             <!-- column header -->
-                            <f:facet name="header">Store</f:facet>
+                            <f:facet name="header">#{companySetting.getStoreEquivName()}</f:facet>
                             <!-- row record -->
                             #{storeBean.getStore(stck.storeId).storeName}
                         </h:column>

@@ -125,7 +125,7 @@
                      <f:selectItem itemLabel="AddUser" itemValue="add_user_detail_id"/>
                      <f:selectItem itemLabel="EditUser" itemValue="edit_user_detail_id"/>
                      <f:selectItem itemLabel="BillTransactor" itemValue="bill_transactor_id"/>
-                     <f:selectItem itemLabel="Store" itemValue="store_id"/>
+                     <f:selectItem itemLabel="#{companySetting.getStoreEquivName()}" itemValue="store_id"/>
                      <f:selectItem itemLabel="PayMethod" itemValue="pay_method_id"/>
                 </h:selectOneMenu>
                 
@@ -145,7 +145,7 @@
                         Payment Summary Report
                     </f:facet>
                 
-                <p:column headerText="Store">
+                <p:column headerText="#{companySetting.getStoreEquivName()}">
                     <h:outputText value="#{storeBean.getStore(rtss.storeId).storeName}">
                     </h:outputText>
                 </p:column>
@@ -221,7 +221,7 @@
                         <p:columnToggler datasource="tblReportPay" trigger="toggler" />
                     </f:facet>
                     
-                    <p:column headerText="Store">
+                    <p:column headerText="#{companySetting.getStoreEquivName()}">
                         <h:outputText value="#{rts.storeName}">
                         </h:outputText>
                     </p:column>

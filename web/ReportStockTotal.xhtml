@@ -27,13 +27,13 @@
         
         <h:form id="formReport">
             <h:panelGrid id="id0" columns="1" styleClass="clsPanelReportFilterTitle">
-                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="Store-wise Stock(In and Out) Report"/>
+                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="#{companySetting.getStoreEquivName()}-wise Stock(In and Out) Report"/>
             </h:panelGrid>
             <h:panelGrid id="id1" columns="9" styleClass="clsPanelReportFilter">
                 <h:outputLabel styleClass="clsLabelReportFilter" value="ACTIVE:"/>
                 <h:selectBooleanCheckbox label="Active" value="#{generalUserSetting.reportRetrievalOption}">
                 </h:selectBooleanCheckbox>
-                <p:outputLabel styleClass="clsLabelReportFilter" id="id2" value="Store:"/>
+                <p:outputLabel styleClass="clsLabelReportFilter" id="id2" value="#{companySetting.getStoreEquivName()}:"/>
                 <h:selectOneMenu styleClass="clsInputReportFilter" id="menuFromStore" value="#{reportStock.storeId}" >
                     <f:selectItem itemLabel="" itemValue="0"/>
                     <f:selectItems value="#{storeBean.stores}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
@@ -90,12 +90,12 @@
                          paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}" 
                          rowsPerPageTemplate="10,20,50,100,200,500">
                     <f:facet name="header">
-                        Store-wise Stock In and Out Report
+                        #{companySetting.getStoreEquivName()}-wise Stock In and Out Report
                         <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
                         <p:columnToggler datasource="tblReportStock" trigger="toggler" />
                     </f:facet>
                     
-                    <p:column headerText="Store">
+                    <p:column headerText="#{companySetting.getStoreEquivName()}">
                         <h:outputText value="#{rts.storeName}">
                         </h:outputText>
                     </p:column>
@@ -146,7 +146,7 @@
              </p:dataTable>
             
             <h:panelGrid id="id15" columns="1" style="margin-top: 20px;">
-                <p:panel header="Export Store-wise Stock In and Out Report">
+                <p:panel header="Export #{companySetting.getStoreEquivName()}-wise Stock In and Out Report">
                     <h:commandLink>
                         <p:commandButton icon="ui-icon-circle-arrow-s" value="Excel"/>
                         <p:dataExporter type="xls" target="tblReportStock" fileName="ReportStoreStockInOut" />
@@ -172,10 +172,10 @@
             <p:dataTable tableStyle="width:auto;" id="tblReportStockSummary" var="rtss" value="#{reportStockBean.getActiveReportStockTotalSummary(reportStock,generalUserSetting.reportRetrievalOption)}" 
                          >
                     <f:facet name="header">
-                        Store-wise Stock In and Out Summary Report
+                        #{companySetting.getStoreEquivName()}-wise Stock In and Out Summary Report
                     </f:facet>
                  
-                    <p:column headerText="Store">
+                    <p:column headerText="#{companySetting.getStoreEquivName()}">
                         <h:outputText value="#{rtss.storeName}">
                         </h:outputText>
                     </p:column>
@@ -217,7 +217,7 @@
              </p:dataTable>
             
             <h:panelGrid id="id16" columns="1" style="margin-top: 20px;">
-                <p:panel header="Export Store-wise Stock In and Out Summary Report">
+                <p:panel header="Export #{companySetting.getStoreEquivName()}-wise Stock In and Out Summary Report">
                     <h:commandLink>
                         <p:commandButton icon="ui-icon-circle-arrow-s" value="Excel"/>
                         <p:dataExporter type="xls" target="tblReportStockSummary" fileName="ReportStoreStockInOutSummary" />

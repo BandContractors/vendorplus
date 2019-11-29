@@ -36,7 +36,7 @@
             </h:panelGrid>
             <div class="ui-fluid">
                 <h:panelGrid id="pnlgFilter" columns="6" styleClass="clsPanelReportFilter">
-                    <p:outputLabel value="From Store/Section"/>
+                    <p:outputLabel value="From #{companySetting.getStoreEquivName()}"/>
                     <p:outputLabel value="From Date"/>
                     <p:outputLabel value="To Date"/>
                     <p:outputLabel value="Item Description"/>
@@ -145,7 +145,7 @@
                 <p:column headerText="Date">
                     <h:outputText value="#{utilityBean.formatDateTime(itm.add_date)}"/>
                 </p:column>
-                <p:column headerText="Store">
+                <p:column headerText="#{companySetting.getStoreEquivName()}">
                     <h:outputLabel value="#{itm.store_name}"/>
                 </p:column>
                 <p:column headerText="Transaction Type">

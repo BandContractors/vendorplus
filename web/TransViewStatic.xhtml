@@ -53,9 +53,9 @@
                 <h:outputLabel value="Last.Edited.by"/>
                 <h:inputText styleClass="clsInput" id="itxtEditUser" disabled="true" value="#{userDetailBean.getUserDetail(salesInvoiceBean.getCurrentTransaction().editUserDetailId).firstName} #{userDetailBean.getUserDetail(salesInvoiceBean.getCurrentTransaction().editUserDetailId).secondName}"/>
 
-                <h:outputLabel  value="From.Store"/>
+                <h:outputLabel  value="From.#{companySetting.getStoreEquivName()}"/>
                 <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{storeBean.getStore(salesInvoiceBean.getCurrentTransaction().storeId).storeName}"/>
-                <h:outputLabel  value="To.Store"/>
+                <h:outputLabel  value="To.#{companySetting.getStoreEquivName()}"/>
                 <h:inputText styleClass="clsInput" id="itxtToStore" disabled="true" value="#{storeBean.getStore(salesInvoiceBean.getCurrentTransaction().store2Id).storeName}"/>
                 <h:outputLabel  value="Last.Edited.Date"/>
                 <h:inputText styleClass="clsInput" disabled="true" value="#{utilityBean.formatDate(salesInvoiceBean.getCurrentTransaction().editDate)}"/>

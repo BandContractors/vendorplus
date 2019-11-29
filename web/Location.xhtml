@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
     <h:head>
         <title>Location</title>
         <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
@@ -25,11 +26,11 @@
         <h:form id="form" styleClass="clsMainFrom">
 
             <h:panelGrid styleClass="clsGridMainHeader" columns="1">
-                <h:outputLabel styleClass="clsLabelTop" id="olblstoreHeader" value="Store Locations"/>
+                <h:outputLabel styleClass="clsLabelTop" id="olblstoreHeader" value="#{companySetting.getStoreEquivName()} Locations"/>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainInput" columns="4">
-                <h:outputLabel  value="Store Name:"/>
+                <h:outputLabel  value="#{companySetting.getStoreEquivName()} Name:"/>
                 <h:selectOneMenu styleClass="clsMenu" id="menuStore" value="#{location.storeId}">
                     <f:selectItem itemLabel="" itemValue="0"/>
                     <f:selectItems value="#{storeBean.stores}" var="c" itemLabel="#{c.storeName}" itemValue="#{c.storeId}"/>
@@ -40,7 +41,7 @@
                 </h:inputText>
             </h:panelGrid>
 
-            <h:panelGrid styleClass="clsGridMainCommands" columns="2">
+            <h:panelGrid styleClass="clsGridMainCommands" columns="1">
             <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
                 <h:commandButton styleClass="clsButton" id="cmdbSave" value="Save">
                     <f:actionListener binding="#{locationBean.saveLocation(location)}" />
@@ -54,9 +55,6 @@
                     <f:actionListener binding="#{locationBean.clearLocation(location)}" />
                 </h:commandButton>
             </h:panelGrid>
-            <h:panelGrid styleClass="clsGridMainCommands2" columns="4">
-            </h:panelGrid>
-
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainMessages" columns="1">
@@ -66,41 +64,37 @@
             
             <h:panelGrid styleClass="clsGridMainSearch" columns="1">
                 <h:outputLabel id="olblMainSearch" value="Search Location"/>
-                <h:outputLabel id="olblMainSearchDesc" value="(Type Store/Location Name to search!)"/>
+                <h:outputLabel id="olblMainSearchDesc" value="(Type #{companySetting.getStoreEquivName()}/Location Name to search!)"/>
                 <h:inputText id="itxtMainSearch" value="#{locationBean.searchLocationName}" autocomplete="off">
                     <f:ajax event="keyup" render="dtblLocation" listener="#{locationBean.getLocations()}"/>
                 </h:inputText>
             </h:panelGrid>
 
-            <h:dataTable id="dtblLocation" value="#{locationBean.locations}" var="loc" 
-                         styleClass="cls-table" 
-                         headerClass="cls-table-header" 
-                         rowClasses="cls-table-odd-row,cls-table-even-row" 
-                         columnClasses="cls-table-col1,cls-table-col2,cls-table-col3"
+            <p:dataTable id="dtblLocation" value="#{locationBean.locations}" var="loc" 
                          > 
-                <h:column>
+                <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Store Name</f:facet>
+                    <f:facet name="header">#{companySetting.getStoreEquivName()} Name</f:facet>
                     <!-- row record -->
                     #{storeBean.getStore(loc.storeId).storeName}
-                </h:column>
+                </p:column>
                 
-                <h:column>
+                <p:column>
                     <!-- column header -->
                     <f:facet name="header">Location Name</f:facet>
                     <!-- row record -->
                     #{loc.locationName}
-                </h:column>
+                </p:column>
 
-                <h:column>
+                <p:column>
                     <!-- column header -->
                     <f:facet name="header">Action</f:facet>
                     <!-- row record -->
                     <h:commandLink value="Edit" action="#{locationBean.displayLocation(loc,location)}" />
                     &nbsp;
-                </h:column>
+                </p:column>
                 
-            </h:dataTable>
+            </p:dataTable>
 
         </h:form>
     </h:body>

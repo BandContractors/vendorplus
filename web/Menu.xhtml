@@ -265,11 +265,11 @@
                         <p:separator />
                     </p:submenu>
                     <p:separator />
-                    <p:submenu label="Branch Stores">  
+                    <p:submenu label="Branch #{companySetting.getStoreEquivName()}">  
                         <p:separator />
-                        <p:menuitem value="Stores Details" action="#{navigationBean.redirectToStore()}" /> 
+                        <p:menuitem value="#{companySetting.getStoreEquivName()} Detail" action="#{navigationBean.redirectToStore()}" /> 
                         <p:separator />
-                        <p:menuitem value="Store Item Locations" action="#{navigationBean.redirectToLocation()}" /> 
+                        <p:menuitem value="#{companySetting.getStoreEquivName()} Locations" action="#{navigationBean.redirectToLocation()}" /> 
                         <p:separator />
                     </p:submenu> 
                     <p:separator />

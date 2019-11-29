@@ -36,7 +36,7 @@
             </h:panelGrid>
 
             <h:panelGrid id="pgrdTransViewOptions1" columns="4" styleClass="clsLikeMainFromWidth" style="background-color: orangered;">
-                <h:outputLabel  value="From Store:"/>
+                <h:outputLabel  value="From #{companySetting.getStoreEquivName()}:"/>
                 <h:inputText styleClass="clsInput" id="itxtFromStoreOption" disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}"/>
                 <h:outputLabel  value="Transaction Type:"/>
                 <h:selectOneMenu styleClass="clsMenu" id="menuTransactionType" value="#{transactionType.transactionTypeId}">
@@ -103,9 +103,9 @@
                 <h:outputLabel value="Last.Edited.by"/>
                 <h:inputText styleClass="clsInput" id="itxtEditUser" disabled="true" value="#{userDetailBean.getUserDetail(trans.editUserDetailId).firstName} #{userDetailBean.getUserDetail(trans.editUserDetailId).secondName}"/>
 
-                <h:outputLabel  value="From.Store"/>
+                <h:outputLabel  value="From.#{companySetting.getStoreEquivName()}"/>
                 <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{storeBean.getStore(trans.storeId).storeName}"/>
-                <h:outputLabel  value="To.Store"/>
+                <h:outputLabel  value="To.#{companySetting.getStoreEquivName()}"/>
                 <h:inputText styleClass="clsInput" id="itxtToStore" disabled="true" value="#{storeBean.getStore(trans.store2Id).storeName}"/>
                 <h:outputLabel  value="Last.Edited.Date"/>
                 <h:inputText styleClass="clsInput" disabled="true" value="#{utilityBean.formatDate(trans.editDate)}"/>
