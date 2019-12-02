@@ -1897,7 +1897,7 @@ public class ItemBean implements Serializable {
         }
     }
 
-    public void reportItemStockLowOut(String aItemType, int aCategoryId, int aSubCategoryId, String aCurrency, int aIsGeneral, String aStockType) {
+    public void reportItemStockLowOut(String aItemType, int aCategoryId, int aSubCategoryId, String aCurrency, int aIsGeneral, String aStockType, String aStockStatus) {
         String sql = "SELECT * FROM view_inventory_low_out_vw WHERE is_suspended='No'";
         String sqlsum = "SELECT stock_status,count(*) as qty_total FROM view_inventory_low_out_vw WHERE is_suspended='No'";
         String wheresql = "";
@@ -1928,6 +1928,9 @@ public class ItemBean implements Serializable {
         }
         if (aIsGeneral == 11) {
             wheresql = wheresql + " AND is_general=1";
+        }
+        if (aStockStatus.length() > 0) {
+            wheresql = wheresql + " AND stock_status='" + aStockStatus + "'";
         }
         sql = sql + wheresql + ordersql;
         sqlsum = sqlsum + wheresql + groupbysum + ordersqlsum;

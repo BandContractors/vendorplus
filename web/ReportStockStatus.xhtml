@@ -69,12 +69,20 @@
                         <f:selectItem itemLabel="Yes" itemValue="11"/>
                         <f:selectItem itemLabel="No" itemValue="10"/>
                     </h:selectOneMenu>
+                    <p:outputLabel value="Stock Status"/>
+                    <h:selectOneMenu id="menuStockStatus" value="#{item.stock_status}" style="width: 200px;">
+                        <f:selectItem itemLabel=""/>
+                        <f:selectItem itemLabel="Out of Stock" itemValue="Out of Stock"/>
+                        <f:selectItem itemLabel="Low Stock" itemValue="Low Stock"/>
+                        <f:selectItem itemLabel="Stocked" itemValue="Stocked"/>
+                        <f:selectItem itemLabel="No Reorder Level" itemValue="No Reorder Level"/>
+                    </h:selectOneMenu>
                     <p:outputLabel value=""/>
                     <p:commandButton id="cmdbSearch" value="SEARCH (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
-                        <p:ajax listener="#{itemBean.reportItemStockLowOut(item.itemType,item.categoryId,item.subCategoryId,item.currencyCode,item.isGeneral,item.expense_type)}" process="pnlgFilter" update="pnlgMessage tblDetail tblSummary"/>
+                        <p:ajax listener="#{itemBean.reportItemStockLowOut(item.itemType,item.categoryId,item.subCategoryId,item.currencyCode,item.isGeneral,item.expense_type,item.stock_status)}" process="pnlgFilter" update="pnlgMessage tblDetail tblSummary"/>
                     </p:commandButton>
                 </h:panelGrid>
                 <p:dataTable id="tblSummary" tableStyle="width:auto;" var="itms" value="#{itemBean.itemsSummary}" 

@@ -795,12 +795,12 @@ public class TransBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
         } else if (("TRANSFER".equals(CurrentTransactionType.getTransactionTypeName()) || "TRANSFER REQUEST".equals(CurrentTransactionType.getTransactionTypeName())) && trans.getStore2Id() == 0) {
             this.setActionMessage("");
-            msg = "Select the store/section to which item(s) are requested from / transferred to...";
+            msg = "Select the " + CompanySetting.getStoreEquivName() + " to which item(s) are requested from / transferred to...";
             this.setActionMessage("Transaction NOT saved");
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
         } else if (("TRANSFER".equals(CurrentTransactionType.getTransactionTypeName()) || "TRANSFER REQUEST".equals(CurrentTransactionType.getTransactionTypeName())) && new GeneralUserSetting().getCurrentStore().getStoreId() == trans.getStore2Id()) {
             this.setActionMessage("");
-            msg = "You cannot request/trasfer item(s) to and from the same store/section...";
+            msg = "You cannot request/trasfer item(s) to and from the same " + CompanySetting.getStoreEquivName() + "...";
             this.setActionMessage("Transaction NOT saved");
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
         } else if ("Yes".equals(CurrentTransactionType.getIsTransactionUserMandatory()) && trans.getTransactionUserDetailId() == 0) {
@@ -1463,9 +1463,9 @@ public class TransBean implements Serializable {
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && "Yes".equals(CompanySetting.getIsAllowDebt()) && (trans.getAmountTendered() + trans.getSpendPointsAmount()) < trans.getGrandTotal() && trans.getTransactorId() == 0) {
                 msg = "Amount tendered is LESS THAN grand total, you MUST select a valid Customer for this Debt Sale";
             } else if (("TRANSFER".equals(transtype.getTransactionTypeName()) || "TRANSFER REQUEST".equals(transtype.getTransactionTypeName())) && trans.getStore2Id() == 0) {
-                msg = "Select the store/section to which item(s) are requested from / transferred to...";
+                msg = "Select the " + CompanySetting.getStoreEquivName() + " to which item(s) are requested from / transferred to...";
             } else if (("TRANSFER".equals(transtype.getTransactionTypeName()) || "TRANSFER REQUEST".equals(transtype.getTransactionTypeName())) && store.getStoreId() == trans.getStore2Id()) {
-                msg = "You cannot request/trasfer item(s) to and from the same store/section...";
+                msg = "You cannot request/trasfer item(s) to and from the same " + CompanySetting.getStoreEquivName() + "...";
             } else if ("Yes".equals(transtype.getIsTransactionUserMandatory()) && trans.getTransactionUserDetailId() == 0) {
                 msg = "Select " + transtype.getTransactionUserLabel();
             } else if ("Yes".equals(transtype.getIsTransactionRefMandatory()) && trans.getTransactionRef().equals("")) {
@@ -1529,7 +1529,7 @@ public class TransBean implements Serializable {
             } else if ("SALE ORDER".equals(transtype.getTransactionTypeName()) && trans.getTransactorId() == 0 && trans.getLocation_id() == 0) {
                 msg = "Select Location OR " + transtype.getTransactorLabel();
             } else if ("SALE ORDER".equals(transtype.getTransactionTypeName()) && trans.getStore2Id() == 0) {
-                msg = "Select Store/Section to send the order to...";
+                msg = "Select " + CompanySetting.getStoreEquivName() + " to send the order to...";
             } else if (!new AccLedgerBean().checkerBalancePass(trans.getPayMethod(), trans.getAccChildAccountId(), trans.getCurrencyCode(), trans.getAmountTendered(), transtype.getTransactionTypeId(), transreason.getTransactionReasonId(), 0, 0)) {
                 msg = "Paying account is out of Funds...";
             }

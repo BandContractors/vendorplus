@@ -213,10 +213,13 @@ public class TransItemBean implements Serializable {
                     cs.setLong("in_item_id", transitem.getItemId());
                     cs.setString("in_batchno", transitem.getBatchno());
                     try {
-                        cs.setDate("in_item_expiry_date", new java.sql.Date(transitem.getItemExpryDate().getTime()));
                         cs.setDate("in_item_mnf_date", new java.sql.Date(transitem.getItemMnfDate().getTime()));
                     } catch (NullPointerException npe) {
-                        cs.setDate("in_item_expiry_date", null);
+                        cs.setDate("in_item_mnf_date", null);
+                    }
+                    try {
+                        cs.setDate("in_item_expiry_date", new java.sql.Date(transitem.getItemExpryDate().getTime()));
+                    } catch (NullPointerException npe) {
                         cs.setDate("in_item_mnf_date", null);
                     }
                     cs.setDouble("in_item_qty", transitem.getItemQty());
@@ -739,11 +742,14 @@ public class TransItemBean implements Serializable {
                     cs.setLong("in_item_id", transitem.getItemId());
                     cs.setString("in_batchno", transitem.getBatchno());
                     try {
-                        cs.setDate("in_item_expiry_date", new java.sql.Date(transitem.getItemExpryDate().getTime()));
                         cs.setDate("in_item_mnf_date", new java.sql.Date(transitem.getItemMnfDate().getTime()));
                     } catch (NullPointerException npe) {
-                        cs.setDate("in_item_expiry_date", null);
                         cs.setDate("in_item_mnf_date", null);
+                    }
+                    try {
+                        cs.setDate("in_item_expiry_date", new java.sql.Date(transitem.getItemExpryDate().getTime()));
+                    } catch (NullPointerException npe) {
+                        cs.setDate("in_item_expiry_date", null);
                     }
                     cs.setDouble("in_item_qty", transitem.getItemQty());
                     cs.setDouble("in_unit_price", transitem.getUnitPrice());
@@ -1262,11 +1268,14 @@ public class TransItemBean implements Serializable {
                 cs.setLong("in_item_id", transitem.getItemId());
                 cs.setString("in_batchno", transitem.getBatchno());
                 try {
-                    cs.setDate("in_item_expiry_date", new java.sql.Date(transitem.getItemExpryDate().getTime()));
                     cs.setDate("in_item_mnf_date", new java.sql.Date(transitem.getItemMnfDate().getTime()));
                 } catch (NullPointerException npe) {
-                    cs.setDate("in_item_expiry_date", null);
                     cs.setDate("in_item_mnf_date", null);
+                }
+                try {
+                    cs.setDate("in_item_expiry_date", new java.sql.Date(transitem.getItemExpryDate().getTime()));
+                } catch (NullPointerException npe) {
+                    cs.setDate("in_item_expiry_date", null);
                 }
                 cs.setDouble("in_item_qty", transitem.getItemQty());
                 cs.setDouble("in_unit_price", transitem.getUnitPrice());
@@ -1808,11 +1817,14 @@ public class TransItemBean implements Serializable {
             cs.setLong("in_item_id", transitem.getItemId());
             cs.setString("in_batchno", transitem.getBatchno());
             try {
-                cs.setDate("in_item_expiry_date", new java.sql.Date(transitem.getItemExpryDate().getTime()));
                 cs.setDate("in_item_mnf_date", new java.sql.Date(transitem.getItemMnfDate().getTime()));
             } catch (NullPointerException npe) {
-                cs.setDate("in_item_expiry_date", null);
                 cs.setDate("in_item_mnf_date", null);
+            }
+            try {
+                cs.setDate("in_item_expiry_date", new java.sql.Date(transitem.getItemExpryDate().getTime()));
+            } catch (NullPointerException npe) {
+                cs.setDate("in_item_expiry_date", null);
             }
             cs.setDouble("in_item_qty", transitem.getItemQty());
             cs.setDouble("in_unit_price", 0);
@@ -3054,11 +3066,14 @@ public class TransItemBean implements Serializable {
             }
 
             try {
-                transitem.setItemExpryDate(new Date(aResultSet.getDate("item_expiry_date").getTime()));
                 transitem.setItemMnfDate(new Date(aResultSet.getDate("item_mnf_date").getTime()));
             } catch (NullPointerException npe) {
-                transitem.setItemExpryDate(null);
                 transitem.setItemMnfDate(null);
+            }
+            try {
+                transitem.setItemExpryDate(new Date(aResultSet.getDate("item_expiry_date").getTime()));
+            } catch (NullPointerException npe) {
+                transitem.setItemExpryDate(null);
             }
 
             try {
@@ -3372,11 +3387,15 @@ public class TransItemBean implements Serializable {
             }
 
             try {
-                transitem.setItemExpryDate(new Date(aResultSet.getDate("item_expiry_date").getTime()));
                 transitem.setItemMnfDate(new Date(aResultSet.getDate("item_mnf_date").getTime()));
             } catch (NullPointerException npe) {
-                transitem.setItemExpryDate(null);
                 transitem.setItemMnfDate(null);
+            }
+
+            try {
+                transitem.setItemExpryDate(new Date(aResultSet.getDate("item_expiry_date").getTime()));
+            } catch (NullPointerException npe) {
+                transitem.setItemExpryDate(null);
             }
 
             try {
@@ -8245,7 +8264,7 @@ public class TransItemBean implements Serializable {
         //update totals
         new TransBean().setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems);
     }
-    
+
     public void overridePrice(TransItem aTransItem) {
         aTransItem.setIs_override_price(1);
     }
@@ -8258,7 +8277,7 @@ public class TransItemBean implements Serializable {
             }
             //update totals
             //new TransBean().setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems);
-            this.editTransItemCEC(aTransTypeId, aTransReasonId,"", aTrans, aActiveTransItems, ti);
+            this.editTransItemCEC(aTransTypeId, aTransReasonId, "", aTrans, aActiveTransItems, ti);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -8272,7 +8291,7 @@ public class TransItemBean implements Serializable {
             }
             //update totals
             //new TransBean().setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems);
-            this.editTransItemCEC(aTransTypeId, aTransReasonId,"", aTrans, aActiveTransItems, ti);
+            this.editTransItemCEC(aTransTypeId, aTransReasonId, "", aTrans, aActiveTransItems, ti);
         } catch (Exception e) {
             e.printStackTrace();
         }

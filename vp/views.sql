@@ -440,4 +440,19 @@ CREATE OR REPLACE VIEW view_fact_expenses_items AS
 	from transaction_item ti inner join transaction t on 
 	ti.transaction_id=t.transaction_id and t.transaction_type_id IN(1,19) and t.grand_total>0;
 
-
+CREATE OR REPLACE VIEW view_stock_risk_expiry AS 
+	SELECT 
+	s.*,
+	DATEDIFF(s.item_exp_date,now()) as days_to_expiry,
+	CASE 
+	WHEN DATEDIFF(s.item_exp_date,now())<=0 THEN 'E' 
+	WHEN CAST(SUBSTRING(i.expiry_band,1,4) AS UNSIGNED)>0 AND DATEDIFF(s.item_exp_date,now())<=CAST(SUBSTRING(i.expiry_band,1,4) AS UNSIGNED) THEN 'Unusable' 
+	WHEN CAST(SUBSTRING(i.expiry_band,6,4) AS UNSIGNED)>0 AND DATEDIFF(s.item_exp_date,now())<=CAST(SUBSTRING(i.expiry_band,6,4) AS UNSIGNED) THEN 'High' 
+	WHEN CAST(SUBSTRING(i.expiry_band,11,4) AS UNSIGNED)>0 AND DATEDIFF(s.item_exp_date,now())<=CAST(SUBSTRING(i.expiry_band,11,4) AS UNSIGNED) THEN 'Medium' 
+	WHEN CAST(SUBSTRING(i.expiry_band,16,4) AS UNSIGNED)>0 AND DATEDIFF(s.item_exp_date,now())<=CAST(SUBSTRING(i.expiry_band,16,4) AS UNSIGNED) THEN 'Low' 
+	WHEN CAST(SUBSTRING(i.expiry_band,16,4) AS UNSIGNED)>0 AND DATEDIFF(s.item_exp_date,now())>CAST(SUBSTRING(i.expiry_band,16,4) AS UNSIGNED) THEN 'NoRisk' 
+	ELSE 'NotApplicable' 
+	END 
+	FROM stock s 
+	INNER JOIN item i ON s.item_id=i.item_id;
+-- "0030,0060,0120,0180"
