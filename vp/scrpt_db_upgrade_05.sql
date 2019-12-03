@@ -42,6 +42,14 @@ UPDATE transaction_type SET transactor_label='' AND bill_transactor_label='' WHE
 alter table item add column expiry_band varchar(50);
 update item set expiry_band='0030,0060,0120,0180' WHERE item_id>0 and is_track=1 and is_asset=0;
 
+INSERT INTO transaction_reason (transaction_reason_id, transaction_reason_name, transaction_type_id) VALUES ('114', 'EXPIRY ALERTS', '73');
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) VALUES ('51', 'ALERTS', 'EXPIRY_ALERTS_MODE', '0','0(None),1(Expired,Unusable),2(Expired,Unusable,High),3(Expired,Unusable,High,Medium)');
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) VALUES ('52', 'ALERTS', 'EXPIRY_ALERTS_EMAIL', '0','0(No),1(Yes-Expired,Unusable),2(Yes-Expired,Unusable,High),3(Yes-Expired,Unusable,High,Medium)');
+
+alter table alert_general add column alert_category varchar(50);
+UPDATE alert_general SET alert_category='Stock Alert' WHERE alert_general_id>0 AND (alert_type LIKE '%Stock%' OR alert_type LIKE '%No Reorder%');
+
+
 
 
 

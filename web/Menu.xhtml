@@ -502,13 +502,13 @@
             </p:menubar>
             <p:sidebar widgetVar="sbarAlert" position="right" baseZIndex="10000">
                 <h:panelGrid id="pnlAlertHeader" columns="1" style="width: 100%;">
-                    <p:commandButton value="Unread Stock Alerts (#{generalUserSetting.userUnreadStockAlertsCount})" oncomplete="PF('sbarAlert').hide()" style="height: 40px;width: 100%;background-color:#FF0000;color: #ffffff;border: none;"/>
+                    <p:commandButton value="Unread Alerts (#{generalUserSetting.userUnreadStockAlertsCount})" oncomplete="PF('sbarAlert').hide()" style="height: 40px;width: 100%;background-color:#FF0000;color: #ffffff;border: none;"/>
                 </h:panelGrid>
                 <p:scrollPanel mode="native" style="width:100%;height:90%;border: none;">
                     <h:panelGrid id="pnlAlertList" columns="1">
                         <p:accordionPanel activeIndex="-1">
                             <c:forEach var="sa" items="#{generalUserSetting.getUserUnreadStockAlertsList()}">
-                                <p:tab title="#{sa.subject}" titleStyle="border:none;background-color:#F9A602;">
+                                <p:tab title="#{sa.subject}" titleStyle="border:none;background-color:#{sa.alert_category eq 'Stock Alert' ? '#F9A602' : 'red'};">
                                     <h:panelGrid columns="1" cellpadding="0" style="border: none;">
                                         <h:outputText value="#{sa.message}"/>
                                         <p:commandButton value="Mark as read" icon="fa fa-fw fa-check" style="width: 100%;background-color: #00B259;border: none;">

@@ -32,6 +32,7 @@ public class Alert_general implements Serializable {
     private Date last_update_date;
     private int last_update_by;
     private String status_code;
+    private String alert_category;
 
     /**
      * @return the alert_general_id
@@ -213,6 +214,20 @@ public class Alert_general implements Serializable {
      */
     public void setAlert_date(Date alert_date) {
         this.alert_date = alert_date;
+    }
+
+    /**
+     * @return the alert_category
+     */
+    public String getAlert_category() {
+        return alert_category;
+    }
+
+    /**
+     * @param alert_category the alert_category to set
+     */
+    public void setAlert_category(String alert_category) {
+        this.alert_category = alert_category;
     }
 
 }

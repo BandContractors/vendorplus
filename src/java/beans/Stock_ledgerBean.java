@@ -227,8 +227,10 @@ public class Stock_ledgerBean implements Serializable {
             stockledger.setQty_bal(qtybal);
             //insert
             this.insertStock_ledger(stockledger);
-            //check alert
+            //check alert-stock status
             new Alert_generalBean().checkStockStatusForAlert(stockledger.getItem_id());
+            //check alert-expiry status
+            new Alert_generalBean().checkExpiryStatusForAlert(stockledger.getItem_id(),stockledger.getBatchno(),stockledger.getCode_specific(),stockledger.getDesc_specific());
         } catch (Exception e) {
             System.err.println("callInsertStock_ledger:" + e.getMessage());
         }

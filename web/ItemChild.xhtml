@@ -180,8 +180,11 @@
                     <h:outputLabel value="Unit Weight(#{parameter_listBean.getParameter_listByContextNameMemory('ITEM','DEFAULT_MEASURE_UNIT').parameter_value}):"/>
                     <h:inputText value="#{itemBean.itemObj.unit_weight}" autocomplete="off" style="width: 200px"/>
                     
-                    <h:outputLabel value=""/>
-                    <h:outputLabel value=""/>
+                    <h:outputLabel value="Expiry Band (U,H,M,L):"/>
+                    <p:selectOneMenu id="menuExpiryBand" value="#{itemBean.itemObj.expiry_band}" style="width: 200px" editable="true">
+                        <f:selectItem itemLabel="" itemValue=""/>
+                        <f:selectItem itemLabel="0030,0060,0120,0180" itemValue="0030,0060,0120,0180"/>
+                    </p:selectOneMenu>
                     <h:outputLabel value="Specify Size?"/>
                     <h:selectOneMenu id="menuSpecifySize" value="#{itemBean.itemObj.specify_size}" style="width: 200px">
                         <f:selectItem itemLabel="No" itemValue="0"/>

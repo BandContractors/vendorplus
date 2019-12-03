@@ -173,9 +173,9 @@ public class ItemBean implements Serializable {
         int save_status = 0;
         String sql = null;
         if (aItem.getItemId() == 0) {
-            sql = "{call sp_insert_item(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_insert_item(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         } else if (aItem.getItemId() > 0) {
-            sql = "{call sp_update_item(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_update_item(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         }
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -295,6 +295,11 @@ public class ItemBean implements Serializable {
                 cs.setInt("in_size_to_specific_name", aItem.getSize_to_specific_name());
             } catch (NullPointerException npe) {
                 cs.setInt("in_size_to_specific_name", 0);
+            }
+            try {
+                cs.setString("in_expiry_band", aItem.getExpiry_band());
+            } catch (NullPointerException npe) {
+                cs.setString("in_expiry_band", "");
             }
             cs.executeUpdate();
             save_status = 1;
@@ -476,6 +481,11 @@ public class ItemBean implements Serializable {
                 aItem.setSize_to_specific_name(aResultSet.getInt("size_to_specific_name"));
             } catch (NullPointerException npe) {
                 aItem.setSize_to_specific_name(0);
+            }
+            try {
+                aItem.setExpiry_band(aResultSet.getString("expiry_band"));
+            } catch (NullPointerException npe) {
+                aItem.setExpiry_band("");
             }
         } catch (SQLException se) {
             System.err.println("setItemFromResultset:" + se.getMessage());
@@ -683,6 +693,11 @@ public class ItemBean implements Serializable {
                 aItem.setStock_status(aResultSet.getString("stock_status"));
             } catch (Exception e) {
                 aItem.setStock_status("");
+            }
+            try {
+                aItem.setExpiry_band(aResultSet.getString("expiry_band"));
+            } catch (Exception e) {
+                aItem.setExpiry_band("");
             }
         } catch (SQLException se) {
             System.err.println("setItemFromResultsetReport:" + se.getMessage());
@@ -902,6 +917,7 @@ public class ItemBean implements Serializable {
                 this.ItemObj.setSpecify_size(0);
                 this.ItemObj.setSize_to_specific_name(0);
                 this.ItemObj.setUnitCostPrice(0);
+                this.ItemObj.setExpiry_band("");
                 this.setSearchItemDesc("");
                 this.refreshStockLocation(0);
                 this.refreshItemsList(this.getSearchItemDesc());
@@ -948,6 +964,7 @@ public class ItemBean implements Serializable {
                 aItem.setIs_free(0);
                 aItem.setSpecify_size(0);
                 aItem.setSize_to_specific_name(0);
+                aItem.setExpiry_band("");
                 this.setSearchItemDesc("");
                 this.refreshStockLocation(0);
             }

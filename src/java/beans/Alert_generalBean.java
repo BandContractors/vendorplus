@@ -5,6 +5,7 @@ import entities.Alert_general;
 import entities.CompanySetting;
 import entities.EmailEntity;
 import entities.Item;
+import entities.Stock;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -50,6 +51,11 @@ public class Alert_generalBean implements Serializable {
                 aAlert_general.setAlert_date(new Date(aResultSet.getDate("alert_date").getTime()));
             } catch (NullPointerException npe) {
                 aAlert_general.setAlert_date(null);
+            }
+            try {
+                aAlert_general.setAlert_category(aResultSet.getString("alert_category"));
+            } catch (NullPointerException npe) {
+                aAlert_general.setAlert_category("");
             }
             try {
                 aAlert_general.setAlert_type(aResultSet.getString("alert_type"));
@@ -132,7 +138,7 @@ public class Alert_generalBean implements Serializable {
     public void saveAlert_general(Alert_general aAlert_general) {
         String sql = null;
         if (aAlert_general.getAlert_general_id() == 0) {
-            sql = "INSERT INTO alert_general(alert_type,subject,message,alert_users,read_by,alert_items,add_date,add_by,status_code,alert_date) VALUES (?,?,?,?,?,?,?,?,?,?)";
+            sql = "INSERT INTO alert_general(alert_type,subject,message,alert_users,read_by,alert_items,add_date,add_by,status_code,alert_date,alert_category) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
         } else if (aAlert_general.getAlert_general_id() > 0) {
             sql = "UPDATE alert_general SET status_code=?,read_by=?,last_update_date=?,last_update_by=? WHERE alert_general_id=" + aAlert_general.getAlert_general_id();
         }
@@ -159,6 +165,7 @@ public class Alert_generalBean implements Serializable {
                 } catch (NullPointerException npe) {
                     ps.setDate(10, null);
                 }
+                ps.setString(11, aAlert_general.getAlert_category());
             }
             //update
             if (aAlert_general.getAlert_general_id() > 0) {
@@ -191,6 +198,7 @@ public class Alert_generalBean implements Serializable {
             aAlert_general.setAdd_by(0);
             aAlert_general.setLast_update_by(0);
             aAlert_general.setStatus_code("");
+            aAlert_general.setAlert_category("");
         }
     }
 
@@ -203,7 +211,7 @@ public class Alert_generalBean implements Serializable {
 
     public void checkStockStatusForAlert(long aItem_id) {
         try {
-            //get STOCK_ALERTS_MODE 0(None),1(Out of stock),2(Low stock),3(Both Out and Low)
+            //get EXPIRY_ALERTS_MODE 0(None),1(Out of stock),2(Low stock),3(Both Out and Low)
             String STOCK_ALERTS_MODE = "0";
             try {
                 STOCK_ALERTS_MODE = new Parameter_listBean().getParameter_listByContextNameMemory("ALERTS", "STOCK_ALERTS_MODE").getParameter_value();
@@ -232,6 +240,54 @@ public class Alert_generalBean implements Serializable {
             }
         } catch (Exception e) {
             System.out.println("checkStockStatusForAlert:" + e.getMessage());
+        }
+    }
+
+    public void checkExpiryStatusForAlert(long aItem_id, String aBatchno, String aCodeSpecific, String aDescSpecific) {
+        try {
+            //get EXPIRY_ALERTS_MODE 0(None),1(Expired,Unusable),2(Expired,Unusable,High),3(Expired,Unusable,High,Medium)
+            String EXPIRY_ALERTS_MODE = "0";
+            try {
+                EXPIRY_ALERTS_MODE = new Parameter_listBean().getParameter_listByContextNameMemory("ALERTS", "EXPIRY_ALERTS_MODE").getParameter_value();
+            } catch (Exception e) {
+                //do nothing
+            }
+            if (EXPIRY_ALERTS_MODE.equals("0")) {
+                //do nothing
+            } else {
+                //get item current expiry status
+                Stock stock = new StockBean().getStockCurrentExpiryStatus(aItem_id, aBatchno, aCodeSpecific, aDescSpecific);
+                String expirystatus = "";
+                if (null != stock) {
+                    expirystatus = stock.getStatus();
+                }
+                if (expirystatus.equals("Expired") || expirystatus.equals("Unusable") || expirystatus.equals("High") || expirystatus.equals("Medium")) {
+                    if (EXPIRY_ALERTS_MODE.equals("3")) {
+                        //check if it alert hasnt been taken today
+                        if (this.isTodayAlertFound(aItem_id, expirystatus)) {
+                            //ignore
+                        } else {
+                            this.saveNewExpiryStatusAlert(stock);
+                        }
+                    } else if (EXPIRY_ALERTS_MODE.equals("1") && (expirystatus.equals("Expired") || expirystatus.equals("Unusable"))) {
+                        //check if it alert hasnt been taken today
+                        if (this.isTodayAlertFound(aItem_id, expirystatus)) {
+                            //ignore
+                        } else {
+                            this.saveNewExpiryStatusAlert(stock);
+                        }
+                    } else if (EXPIRY_ALERTS_MODE.equals("2") && (expirystatus.equals("Expired") || expirystatus.equals("Unusable") || expirystatus.equals("High"))) {
+                        //check if it alert hasnt been taken today
+                        if (this.isTodayAlertFound(aItem_id, expirystatus)) {
+                            //ignore
+                        } else {
+                            this.saveNewExpiryStatusAlert(stock);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("checkExpiryStatusForAlert:" + e.getMessage());
         }
     }
 
@@ -278,6 +334,60 @@ public class Alert_generalBean implements Serializable {
             }
         } catch (Exception e) {
             System.out.println("checkStockStatusForEmail:" + e.getMessage());
+        }
+    }
+
+    public void checkExpiryStatusForEmail(Alert_general aAlert_general) {
+        try {
+            //get EXPIRY_ALERTS_EMAIL 0(No),1(Yes-Expired,Unusable),2(Yes-Expired,Unusable,High),3(Yes-Expired,Unusable,High,Medium)
+            String EXPIRY_ALERTS_EMAIL = "0";
+            try {
+                EXPIRY_ALERTS_EMAIL = new Parameter_listBean().getParameter_listByContextNameMemory("ALERTS", "EXPIRY_ALERTS_EMAIL").getParameter_value();
+            } catch (Exception e) {
+                //do nothing
+            }
+            if (EXPIRY_ALERTS_EMAIL.equals("0")) {
+                //do nothing
+            } else {
+                //get alert current expiry status
+                String expirystatus = "";
+                if (null != aAlert_general) {
+                    expirystatus = aAlert_general.getAlert_type();
+                }
+                int sendemail = 0;
+                if (expirystatus.equals("Expired") || expirystatus.equals("Unusable") || expirystatus.equals("High") || expirystatus.equals("Medium")) {
+                    if (EXPIRY_ALERTS_EMAIL.equals("3")) {
+                        sendemail = 1;
+                    } else if (EXPIRY_ALERTS_EMAIL.equals("1") && (expirystatus.equals("Expired") || expirystatus.equals("Unusable"))) {
+                        sendemail = 1;
+                    } else if (EXPIRY_ALERTS_EMAIL.equals("2") && (expirystatus.equals("Expired") || expirystatus.equals("Unusable") || expirystatus.equals("High"))) {
+                        sendemail = 1;
+                    }
+                }
+                if (sendemail == 1) {
+                    EmailEntity emailentity = new EmailEntity();
+                    emailentity.setSubject(aAlert_general.getSubject());
+                    emailentity.setMessage(aAlert_general.getMessage());
+                    String emailids = this.replaceUserIDsWithEmail(aAlert_general.getAlert_users());
+                    emailentity.setToEmail(emailids);
+                    try {
+                        if (emailentity.getToEmail().length() > 0) {
+                            //int sent = new EmailEntityBean().validateSendEmailBackground(emailentity);
+                            new Thread(new Runnable() {
+                                public void run() {
+                                    //CALL METHOD FOR WORK IN BACKGROUND
+                                    int sent = new EmailEntityBean().validateSendEmailBackground(emailentity);
+                                    return;
+                                }
+                            }).start();
+                        }
+                    } catch (Exception e) {
+                        //do nothing
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("checkExpiryStatusForEmail:" + e.getMessage());
         }
     }
 
@@ -330,6 +440,7 @@ public class Alert_generalBean implements Serializable {
         try {
             Alert_general alertgeneral = new Alert_general();
             alertgeneral.setAlert_general_id(0);
+            alertgeneral.setAlert_category("Stock Alert");
             alertgeneral.setAlert_type(aItem.getStock_status());
             alertgeneral.setAlert_date(new CompanySetting().getCURRENT_SERVER_DATE());
             alertgeneral.setAdd_date(new CompanySetting().getCURRENT_SERVER_DATE());
@@ -350,6 +461,51 @@ public class Alert_generalBean implements Serializable {
             this.checkStockStatusForEmail(alertgeneral);
         } catch (Exception e) {
             System.out.println("saveNewStockStatusAlert:" + e.getMessage());
+        }
+    }
+
+    public void saveNewExpiryStatusAlert(Stock aStock) {
+        try {
+            Alert_general alertgeneral = new Alert_general();
+            alertgeneral.setAlert_general_id(0);
+            alertgeneral.setAlert_category("Expiry Alert");
+            if (aStock.getStatus().equals("High") || aStock.getStatus().equals("Medium")) {
+                alertgeneral.setAlert_type(aStock.getStatus() + " Risk of Expiry");
+            } else {
+                alertgeneral.setAlert_type(aStock.getStatus());
+            }
+            alertgeneral.setAlert_date(new CompanySetting().getCURRENT_SERVER_DATE());
+            alertgeneral.setAdd_date(new CompanySetting().getCURRENT_SERVER_DATE());
+            alertgeneral.setAdd_by(UserDetailBean.getSystemUserDetailId());
+            String subject = aStock.getStatus() + ", " + aStock.getDescription();
+            if (subject.length() > 150) {
+                subject = subject.substring(0, (subject.length() - 1));
+            }
+            alertgeneral.setSubject(subject);
+            String ItemFullName = "";
+            if (aStock.getDescription().length() > 0) {
+                ItemFullName = aStock.getDescription();
+            }
+            if (aStock.getBatchno().length() > 0) {
+                ItemFullName = ItemFullName + " BatchNo(" + aStock.getBatchno() + ")";
+            }
+            if (aStock.getCodeSpecific().length() > 0) {
+                ItemFullName = ItemFullName + " SpecificCode(" + aStock.getCodeSpecific() + ")";
+            }
+            if (aStock.getDescSpecific().length() > 0) {
+                ItemFullName = ItemFullName + " SpecificName(" + aStock.getDescSpecific() + ")";
+            }
+            String message = aStock.getStatus() + " for item (" + ItemFullName + ")"
+                    + ", Current Quantity:" + new UtilityBean().formatDoubleToString(aStock.getCurrentqty()) + aStock.getUnitSymbol() + " " + ", Expiry Date:" + new UtilityBean().formatDate(aStock.getItemExpDate());
+            alertgeneral.setMessage(message);
+            alertgeneral.setAlert_users(new UserDetailBean().getUserDetailIDsForFunction("114", "allow_view"));
+            alertgeneral.setRead_by("");
+            alertgeneral.setAlert_items("" + aStock.getItemId() + "");
+            alertgeneral.setStatus_code("");
+            this.saveAlert_general(alertgeneral);
+            this.checkExpiryStatusForEmail(alertgeneral);
+        } catch (Exception e) {
+            System.out.println("saveNewExpiryStatusAlert:" + e.getMessage());
         }
     }
 

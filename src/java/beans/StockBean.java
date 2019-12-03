@@ -2,7 +2,6 @@ package beans;
 
 import connections.DBConnection;
 import entities.AccCurrency;
-import entities.Item;
 import entities.ItemProductionMap;
 import entities.Stock;
 import entities.TransItem;
@@ -393,6 +392,25 @@ public class StockBean implements Serializable {
         } catch (SQLException se) {
             System.err.println(se.getMessage());
         }
+    }
+
+    public Stock getStockCurrentExpiryStatus(long aItem_id, String aBatchno, String aCodeSpecific, String aDescSpecific) {
+        String sql = "SELECT * FROM view_stock_expiry_status_vw WHERE item_id=" + aItem_id + " AND batchno='" + aBatchno + "' AND code_specific='" + aCodeSpecific + "' AND desc_specific='" + aDescSpecific + "'";
+        ResultSet rs = null;
+        Stock stock = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                stock = new Stock();
+                this.setStockFromResultsetReport(stock, rs);
+                this.setStockFromResultsetAppendExpiryStatus(stock, rs);
+            }
+        } catch (Exception e) {
+            System.err.println("getStockCurrentExpiryStatus:" + e.getMessage());
+        }
+        return stock;
     }
 
     public void setStockFromResultsetAppendExpiryStatus(Stock aStock, ResultSet aResultSet) {

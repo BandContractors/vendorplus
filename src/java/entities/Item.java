@@ -62,6 +62,7 @@ public class Item implements Serializable {
     private double qty_total;
     private String stock_status;
     private double stock_status_perc;
+    private String expiry_band;
     
     /**
      * @return the ItemId
@@ -684,6 +685,20 @@ public class Item implements Serializable {
      */
     public void setStock_status_perc(double stock_status_perc) {
         this.stock_status_perc = stock_status_perc;
+    }
+
+    /**
+     * @return the expiry_band
+     */
+    public String getExpiry_band() {
+        return expiry_band;
+    }
+
+    /**
+     * @param expiry_band the expiry_band to set
+     */
+    public void setExpiry_band(String expiry_band) {
+        this.expiry_band = expiry_band;
     }
 
 }
