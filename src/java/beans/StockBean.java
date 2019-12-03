@@ -2,6 +2,7 @@ package beans;
 
 import connections.DBConnection;
 import entities.AccCurrency;
+import entities.Item;
 import entities.ItemProductionMap;
 import entities.Stock;
 import entities.TransItem;
@@ -302,82 +303,82 @@ public class StockBean implements Serializable {
             //for Report
             try {
                 aStock.setItemCode(aResultSet.getString("item_code"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock.setItemCode("");
             }
             try {
                 aStock.setDescription(aResultSet.getString("description"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock.setDescription("");
             }
             try {
                 aStock.setUnitSymbol(aResultSet.getString("unit_symbol"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock.setUnitSymbol("");
             }
             try {
                 aStock.setCurrencyCode(aResultSet.getString("currency_code"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock.setCurrencyCode("");
             }
             try {
                 aStock.setReorderLevel(aResultSet.getInt("reorder_level"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock.setReorderLevel(0);
             }
             try {
                 aStock.setUnitCostPrice(aResultSet.getDouble("unit_cost_price"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock.setUnitCostPrice(0);
             }
             try {
                 aStock.setUnitRetailsalePrice(aResultSet.getDouble("unit_retailsale_price"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock.setUnitRetailsalePrice(0);
             }
             try {
                 aStock.setUnitWholesalePrice(aResultSet.getDouble("unit_wholesale_price"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock.setUnitWholesalePrice(0);
             }
             try {
                 aStock.setStoreName(aResultSet.getString("store_name"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock.setStoreName("");
             }
             try {
                 aStock.setCategoryName(aResultSet.getString("category_name"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock.setCategoryName("");
             }
             try {
                 aStock.setUnitName(aResultSet.getString("unit_name"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock.setUnitName("");
             }
             try {
                 aStock.setSubCategoryName(aResultSet.getString("sub_category_name"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock.setSubCategoryName("");
             }
             try {
                 aStock.setCostValue(aResultSet.getDouble("cost_value"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock.setCostValue(0);
             }
             try {
                 aStock.setRetailsaleValue(aResultSet.getDouble("retailsale_value"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock.setRetailsaleValue(0);
             }
             try {
                 aStock.setWholesaleValue(aResultSet.getDouble("wholesale_value"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock.setWholesaleValue(0);
             }
             try {
                 aStock.setQty_damage(aResultSet.getDouble("qty_damage"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock.setQty_damage(0);
             }
             try {
@@ -388,6 +389,116 @@ public class StockBean implements Serializable {
                 }
             } catch (NullPointerException npe) {
                 aStock.setSpecific_size(1);
+            }
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+        }
+    }
+
+    public void setStockFromResultsetAppendExpiryStatus(Stock aStock, ResultSet aResultSet) {
+        try {
+            try {
+                aStock.setStock_type(aResultSet.getString("stock_type"));
+            } catch (Exception e) {
+                aStock.setStock_type("");
+            }
+            try {
+                aStock.setDays_to_expiry(aResultSet.getInt("days_to_expiry"));
+            } catch (Exception e) {
+                aStock.setDays_to_expiry(0);
+            }
+            try {
+                aStock.setStatus(aResultSet.getString("expiry_status"));
+            } catch (Exception e) {
+                aStock.setStatus("");
+            }
+            try {
+                aStock.setStatus_qty(aResultSet.getDouble("status_qty"));
+            } catch (Exception e) {
+                aStock.setStatus_qty(0);
+            }
+            try {
+                aStock.setStatus_perc(aResultSet.getDouble("status_perc"));
+            } catch (Exception e) {
+                aStock.setStatus_perc(0);
+            }
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+    public void reportStockExpiryStatus(String aItemType, int aCategoryId, int aSubCategoryId, int aIsGeneral, String aStockType, String aExpiryStatus) {
+        String sql = "SELECT * FROM view_stock_expiry_status_vw WHERE 1=1";
+        String sqlsum = "SELECT expiry_status,count(*) as status_qty FROM view_stock_expiry_status_vw WHERE 1=1";
+        String wheresql = "";
+        String ordersql = " ORDER BY stock_type_order,expiry_status,description ASC";
+        String ordersqlsum = " ORDER BY status_qty DESC";
+        String groupbysum = " GROUP BY expiry_status";
+        ResultSet rs = null;
+        ResultSet rs2 = null;
+        this.setStocksList(new ArrayList<>());
+        this.setStocksSummary(new ArrayList<>());
+        if (aStockType.length() > 0) {
+            wheresql = wheresql + " AND stock_type='" + aStockType + "'";
+        }
+        if (aItemType.length() > 0) {
+            wheresql = wheresql + " AND item_type='" + aItemType + "'";
+        }
+        if (aCategoryId > 0) {
+            wheresql = wheresql + " AND category_id=" + aCategoryId;
+        }
+        if (aSubCategoryId > 0) {
+            wheresql = wheresql + " AND sub_category_id=" + aSubCategoryId;
+        }
+        if (aIsGeneral == 10) {
+            wheresql = wheresql + " AND is_general=0";
+        }
+        if (aIsGeneral == 11) {
+            wheresql = wheresql + " AND is_general=1";
+        }
+        if (aExpiryStatus.length() > 0) {
+            wheresql = wheresql + " AND expiry_status='" + aExpiryStatus + "'";
+        }
+        sql = sql + wheresql + ordersql;
+        sqlsum = sqlsum + wheresql + groupbysum + ordersqlsum;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            Stock stock = null;
+            while (rs.next()) {
+                stock = new Stock();
+                this.setStockFromResultsetReport(stock, rs);
+                this.setStockFromResultsetAppendExpiryStatus(stock, rs);
+                this.getStocksList().add(stock);
+            }
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+        }
+
+        //summary
+        double totalitems = this.getStocksList().size();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps2 = conn.prepareStatement(sqlsum);) {
+            rs2 = ps2.executeQuery();
+            Stock stock2 = null;
+            while (rs2.next()) {
+                stock2 = new Stock();
+                try {
+                    stock2.setStatus(rs2.getString("expiry_status"));
+                } catch (NullPointerException npe) {
+                    stock2.setStatus("");
+                }
+                try {
+                    stock2.setStatus_qty(rs2.getDouble("status_qty"));
+                } catch (NullPointerException npe) {
+                    stock2.setStatus_qty(0);
+                }
+                if (totalitems > 0) {
+                    stock2.setStatus_perc(100.0 * stock2.getStatus_qty() / totalitems);
+                }
+                this.getStocksSummary().add(stock2);
             }
         } catch (SQLException se) {
             System.err.println(se.getMessage());

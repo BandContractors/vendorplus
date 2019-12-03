@@ -63,6 +63,11 @@ public class Stock implements Serializable {
     private double qty_out;
     private double specific_size;
     private String stock_type;
+    private String ItemType;
+    private int days_to_expiry;
+    private String status;
+    private double status_qty;
+    private double status_perc;
 
     /**
      * @return the StockId
@@ -650,5 +655,75 @@ public class Stock implements Serializable {
      */
     public void setStock_type(String stock_type) {
         this.stock_type = stock_type;
+    }
+
+    /**
+     * @return the days_to_expiry
+     */
+    public int getDays_to_expiry() {
+        return days_to_expiry;
+    }
+
+    /**
+     * @param days_to_expiry the days_to_expiry to set
+     */
+    public void setDays_to_expiry(int days_to_expiry) {
+        this.days_to_expiry = days_to_expiry;
+    }
+
+    /**
+     * @return the status
+     */
+    public String getStatus() {
+        return status;
+    }
+
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    /**
+     * @return the status_qty
+     */
+    public double getStatus_qty() {
+        return status_qty;
+    }
+
+    /**
+     * @param status_qty the status_qty to set
+     */
+    public void setStatus_qty(double status_qty) {
+        this.status_qty = status_qty;
+    }
+
+    /**
+     * @return the status_perc
+     */
+    public double getStatus_perc() {
+        return status_perc;
+    }
+
+    /**
+     * @param status_perc the status_perc to set
+     */
+    public void setStatus_perc(double status_perc) {
+        this.status_perc = status_perc;
+    }
+
+    /**
+     * @return the ItemType
+     */
+    public String getItemType() {
+        return ItemType;
+    }
+
+    /**
+     * @param ItemType the ItemType to set
+     */
+    public void setItemType(String ItemType) {
+        this.ItemType = ItemType;
     }
 }

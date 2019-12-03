@@ -440,19 +440,37 @@ CREATE OR REPLACE VIEW view_fact_expenses_items AS
 	from transaction_item ti inner join transaction t on 
 	ti.transaction_id=t.transaction_id and t.transaction_type_id IN(1,19) and t.grand_total>0;
 
-CREATE OR REPLACE VIEW view_stock_risk_expiry AS 
+CREATE OR REPLACE VIEW view_stock_expiry_status AS 
 	SELECT 
-	s.*,
+	s.*,i.unit_id,i.category_id,i.sub_category_id,i.is_sale,i.is_asset,i.is_track,i.is_buy,i.expense_type,i.description,i.item_type,
+	ifnull(i.is_general,0) as is_general,i.item_code,i.currency_code,
 	DATEDIFF(s.item_exp_date,now()) as days_to_expiry,
 	CASE 
-	WHEN DATEDIFF(s.item_exp_date,now())<=0 THEN 'E' 
+	WHEN DATEDIFF(s.item_exp_date,now())<=0 THEN 'Expired' 
 	WHEN CAST(SUBSTRING(i.expiry_band,1,4) AS UNSIGNED)>0 AND DATEDIFF(s.item_exp_date,now())<=CAST(SUBSTRING(i.expiry_band,1,4) AS UNSIGNED) THEN 'Unusable' 
 	WHEN CAST(SUBSTRING(i.expiry_band,6,4) AS UNSIGNED)>0 AND DATEDIFF(s.item_exp_date,now())<=CAST(SUBSTRING(i.expiry_band,6,4) AS UNSIGNED) THEN 'High' 
 	WHEN CAST(SUBSTRING(i.expiry_band,11,4) AS UNSIGNED)>0 AND DATEDIFF(s.item_exp_date,now())<=CAST(SUBSTRING(i.expiry_band,11,4) AS UNSIGNED) THEN 'Medium' 
 	WHEN CAST(SUBSTRING(i.expiry_band,16,4) AS UNSIGNED)>0 AND DATEDIFF(s.item_exp_date,now())<=CAST(SUBSTRING(i.expiry_band,16,4) AS UNSIGNED) THEN 'Low' 
 	WHEN CAST(SUBSTRING(i.expiry_band,16,4) AS UNSIGNED)>0 AND DATEDIFF(s.item_exp_date,now())>CAST(SUBSTRING(i.expiry_band,16,4) AS UNSIGNED) THEN 'NoRisk' 
-	ELSE 'NotApplicable' 
-	END 
+	ELSE 'N/A' 
+	END as expiry_status 
 	FROM stock s 
 	INNER JOIN item i ON s.item_id=i.item_id;
--- "0030,0060,0120,0180"
+
+CREATE OR REPLACE VIEW view_stock_expiry_status_vw AS 
+SELECT sv.*,
+	CASE 
+	WHEN sv.is_sale=1 AND sv.is_asset=0 AND sv.is_track=1 THEN 'Goods for Sale' 
+	WHEN sv.is_sale=0 AND sv.is_asset=0 AND sv.is_track=1 AND sv.is_buy=1 THEN sv.expense_type 
+	ELSE '' 
+	END as stock_type,
+	CASE 
+	WHEN sv.is_sale=1 AND sv.is_asset=0 AND sv.is_track=1 THEN 1 
+	WHEN sv.is_sale=0 AND sv.is_asset=0 AND sv.is_track=1 AND sv.is_buy=1 THEN 2 
+	ELSE 3 
+	END as stock_type_order,
+	c.category_name,u.unit_symbol,sc.sub_category_name 
+	FROM view_stock_expiry_status as sv 
+	INNER JOIN category c ON sv.category_id=c.category_id 
+	INNER JOIN unit u ON sv.unit_id=u.unit_id 
+	LEFT JOIN sub_category sc ON sv.sub_category_id=sc.sub_category_id;

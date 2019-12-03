@@ -39,7 +39,8 @@ INSERT INTO parameter_list (parameter_list_id, context, parameter_name, paramete
 INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) VALUES ('50', 'COMPANY_SETTING', 'SUPPLIER_NAME', 'Supplier','E.g. Supplier,Agent, etc.');
 UPDATE transaction_type SET transactor_label='' AND bill_transactor_label='' WHERE transaction_type_id>0;
 
-
+alter table item add column expiry_band varchar(50);
+update item set expiry_band='0030,0060,0120,0180' WHERE item_id>0 and is_track=1 and is_asset=0;
 
 
 
