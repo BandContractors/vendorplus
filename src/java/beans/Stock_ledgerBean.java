@@ -231,7 +231,7 @@ public class Stock_ledgerBean implements Serializable {
             //check alert-stock status
             new Alert_generalBean().checkStockStatusForAlert(stockledger.getItem_id());
             //check alert-expiry status
-            new Alert_generalBean().checkExpiryStatusForAlert(stockledger.getItem_id(),stockledger.getBatchno(),stockledger.getCode_specific(),stockledger.getDesc_specific());
+            new Alert_generalBean().checkExpiryStatusForAlert(stockledger.getItem_id(), stockledger.getBatchno(), stockledger.getCode_specific(), stockledger.getDesc_specific());
         } catch (Exception e) {
             System.err.println("callInsertStock_ledger:" + e.getMessage());
         }
@@ -342,6 +342,11 @@ public class Stock_ledgerBean implements Serializable {
         // Put it back in the Date object  
         this.setDate2(cal2.getTime());
     }
+    
+    public void reportStock_ledger(Stock_ledger aStock_ledger, Stock_ledgerBean aStock_ledgerBean, Item aItem) {
+        this.reportStock_ledgerSummary(aStock_ledger, aStock_ledgerBean, aItem);
+        this.reportStock_ledgerDetail(aStock_ledger, aStock_ledgerBean, aItem);
+    }
 
     public void reportStock_ledgerDetail(Stock_ledger aStock_ledger, Stock_ledgerBean aStock_ledgerBean, Item aItem) {
         aStock_ledgerBean.setActionMessage("");
@@ -410,73 +415,98 @@ public class Stock_ledgerBean implements Serializable {
             System.err.println("reportStock_ledgerDetail:" + e.getMessage());
         }
     }
-    
+
     public void reportStock_ledgerSummary(Stock_ledger aStock_ledger, Stock_ledgerBean aStock_ledgerBean, Item aItem) {
         aStock_ledgerBean.setActionMessage("");
         ResultSet rs = null;
         this.Stock_ledgerSummary = new ArrayList<>();
-        String sql = "SELECT l.*,i.description,un.unit_symbol,tt.transaction_type_name,us.user_name,s.store_name "
-                + "FROM stock_ledger l "
-                + "INNER JOIN item i ON l.item_id=i.item_id "
-                + "INNER JOIN unit un ON i.unit_id=un.unit_id "
-                + "INNER JOIN transaction_type tt ON l.transaction_type_id=tt.transaction_type_id "
-                + "INNER JOIN user_detail us ON l.user_detail_id=us.user_detail_id "
-                + "INNER JOIN store s ON l.store_id=s.store_id "
-                + "WHERE 1=1";
         String wheresql = "";
-        String ordersql = "";
-        if (aStock_ledger.getStore_id() > 0) {
-            wheresql = wheresql + " AND l.store_id=" + aStock_ledger.getStore_id();
-        }
-        if (aStock_ledger.getTransaction_type_id() > 0) {
-            wheresql = wheresql + " AND l.transaction_type_id=" + aStock_ledger.getTransaction_type_id();
-        }
-        if (aStock_ledger.getUser_detail_id() > 0) {
-            wheresql = wheresql + " AND l.user_detail_id=" + aStock_ledger.getUser_detail_id();
-        }
+        String wheredate = "";
         try {
             if (null != aItem && aItem.getItemId() > 0) {
                 wheresql = wheresql + " AND l.item_id=" + aItem.getItemId();
             }
         } catch (NullPointerException npe) {
-
         }
         if (aStock_ledgerBean.getDate1() != null && aStock_ledgerBean.getDate2() != null) {
             wheresql = wheresql + " AND l.add_date BETWEEN '" + new java.sql.Timestamp(aStock_ledgerBean.getDate1().getTime()) + "' AND '" + new java.sql.Timestamp(aStock_ledgerBean.getDate2().getTime()) + "'";
+            wheredate = " AND (l.add_date BETWEEN '" + new java.sql.Timestamp(aStock_ledgerBean.getDate1().getTime()) + "' AND '" + new java.sql.Timestamp(aStock_ledgerBean.getDate2().getTime()) + "')";
         }
-        ordersql = " ORDER BY l.add_date DESC,l.stock_ledger_id DESC";
-        sql = sql + wheresql + ordersql;
+        String sql = "select "
+                + "t.*,"
+                + "i.description,"
+                + "u.unit_symbol,"
+                + "(select case when l1.qty_added>0 then l1.qty_bal-l1.qty_added when l1.qty_subtracted>0 then l1.qty_bal+l1.qty_subtracted else 0 end from stock_ledger l1 where l1.stock_ledger_id=t.min_id) as qty_open,"
+                + "(select l2.qty_bal from stock_ledger l2 where l2.stock_ledger_id=t.max_id) as qty_close "
+                + "from "
+                + "("
+                + "select l.item_id,l.batchno,l.code_specific,l.desc_specific,"
+                + "min(l.stock_ledger_id) as min_id,"
+                + "max(l.stock_ledger_id) as max_id "
+                + "from stock_ledger l  "
+                + "where 1=1 " + wheresql + " "
+                + "group by l.item_id,l.batchno,l.code_specific,l.desc_specific "
+                + ") as t "
+                + "inner join item i on t.item_id=i.item_id "
+                + "inner join unit u on i.unit_id=u.unit_id "
+                + "order by i.description;";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             rs = ps.executeQuery();
             Stock_ledger sl = null;
             Stock_ledgerBean slb = new Stock_ledgerBean();
-            String TransNo = "";
             while (rs.next()) {
                 sl = new Stock_ledger();
-                slb.setStock_ledgerFromResultset(sl, rs);
+                sl.setItem_id(rs.getLong("item_id"));
                 sl.setDescription(rs.getString("description"));
                 sl.setUnit_symbol(rs.getString("unit_symbol"));
-                sl.setTransaction_type_name(rs.getString("transaction_type_name"));
-                sl.setUser_name(rs.getString("user_name"));
-                sl.setStore_name(rs.getString("store_name"));
-                TransNo = "";
-                try {
-                    if (sl.getTransaction_type_id() == 70) {
-                        TransNo = new TransProductionBean().getTransProductionById(sl.getTransaction_id()).getTransaction_number();
-                    } else {
-                        TransNo = new TransBean().getTrans(sl.getTransaction_id()).getTransactionNumber();
-                    }
-                } catch (Exception e) {
-                    //do nothing
-                }
-                sl.setTransaction_number(TransNo);
-                this.Stock_ledgerList.add(sl);
+                sl.setBatchno(rs.getString("batchno"));
+                sl.setCode_specific(rs.getString("code_specific"));
+                sl.setDesc_specific(rs.getString("desc_specific"));
+                sl.setQty_open(rs.getDouble("qty_open"));
+                sl.setQty_close(rs.getDouble("qty_close"));
+                String whereinner = " AND l.item_id=" + sl.getItem_id() + " AND l.batchno='" + sl.getBatchno() + "' AND l.code_specific='" + sl.getCode_specific() + "' AND l.desc_specific='" + sl.getDesc_specific() + "' " + wheredate;
+                sl.setStock_ledgerList(this.getStock_ledgerInner(whereinner));
+                this.Stock_ledgerSummary.add(sl);
             }
         } catch (Exception e) {
-            System.err.println("reportStock_ledgerDetail:" + e.getMessage());
+            System.err.println("reportStock_ledgerSummary:" + e.getMessage());
         }
+    }
+
+    public List<Stock_ledger> getStock_ledgerInner(String aWhereSql) {
+        ResultSet rs = null;
+        List<Stock_ledger> sll = new ArrayList<>();
+        String wheresql = "select "
+                + "sm.*,tt.transaction_type_name from "
+                + "("
+                + "select "
+                + "l.transaction_type_id,"
+                + "sum(l.qty_added) as qty_added,"
+                + "sum(l.qty_subtracted) as qty_subtracted  "
+                + "from stock_ledger l "
+                + "where 1=1 " + aWhereSql + " "
+                + "group by l.transaction_type_id"
+                + ") as sm "
+                + "inner join transaction_type tt on sm.transaction_type_id=tt.transaction_type_id "
+                + "order by tt.transaction_type_name";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(wheresql);) {
+            rs = ps.executeQuery();
+            Stock_ledger sl = null;
+            while (rs.next()) {
+                sl = new Stock_ledger();
+                sl.setTransaction_type_name(rs.getString("transaction_type_name"));
+                sl.setQty_subtracted(rs.getDouble("qty_subtracted"));
+                sl.setQty_added(rs.getDouble("qty_added"));
+                sll.add(sl);
+            }
+        } catch (Exception e) {
+            System.err.println("getStock_ledgerInner:" + e.getMessage());
+        }
+        return sll;
     }
 
     public void initResetStock_ledgerDetail(Stock_ledger aStock_ledger, Stock_ledgerBean aStock_ledgerBean, Item aItem) {

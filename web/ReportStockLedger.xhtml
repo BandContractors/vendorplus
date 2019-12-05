@@ -37,18 +37,11 @@
             <div class="ui-fluid">
                 <h:panelGrid id="pnlgFilter" columns="3" styleClass="clsPanelReportFilter">
                     <h:panelGrid columns="2">
-                        <p:outputLabel value="From #{companySetting.getStoreEquivName()}"/>
-                        <p:selectOneMenu id="menuFromStore" value="#{stock_ledger.store_id}" >
-                            <f:selectItem itemLabel="Select" itemValue="0"/>
-                            <f:selectItems value="#{storeBean.stores}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
-                        </p:selectOneMenu>
-                        <p:outputLabel value="From Date"/>
-                        <p:calendar id="calDate1"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{stock_ledgerBean.date1}" size="12"/>
-                        <p:outputLabel value="To Date"/>
-                        <p:calendar id="calDate2"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{stock_ledgerBean.date2}" size="12"/>
-                    </h:panelGrid>
-                    <h:panelGrid columns="2">
-                        <p:outputLabel value="Item Description"/>
+                        <p:outputLabel value="From Date:"/>
+                        <p:calendar id="calDate1"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{stock_ledgerBean.date1}" size="22"/>
+                        <p:outputLabel value="To Date:"/>
+                        <p:calendar id="calDate2"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{stock_ledgerBean.date2}" size="22"/>
+                        <p:outputLabel value="Item Description:"/>
                         <p:autoComplete id="autcItem" widgetVar="WautcItem" value="#{itemBean.selectedItem}"  
                                         completeMethod="#{itemBean.getItemObjectListActive}" 
                                         var="itm" 
@@ -88,31 +81,30 @@
                                 </h:outputText>
                             </p:column>
                         </p:autoComplete>
-                        <p:outputLabel value="Added By"/>
-                        <p:selectOneMenu id="menuAddUser" value="#{stock_ledger.user_detail_id}">
-                            <f:selectItem itemLabel="Select"/>
-                            <f:selectItems value="#{userDetailBean.getUserDetails()}" var="ua" itemLabel="#{ua.firstName} #{ua.secondName} #{ua.thirdName}" itemValue="#{ua.userDetailId}"/>
+                    </h:panelGrid>
+                    <h:panelGrid columns="2">
+                        <p:outputLabel value="#{companySetting.getStoreEquivName()}:"/>
+                        <p:selectOneMenu id="menuFromStore" value="#{stock_ledger.store_id}" >
+                            <f:selectItem itemLabel="Select" itemValue="0"/>
+                            <f:selectItems value="#{storeBean.stores}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
                         </p:selectOneMenu>
-                        <p:outputLabel value="Transaction Type"/>
+                        <p:outputLabel value="Transaction Type:"/>
                         <p:selectOneMenu id="menuTransactionType" value="#{stock_ledger.transaction_type_id}">
                             <f:selectItem itemLabel="" itemValue="0"/>
                             <f:selectItems value="#{transactionTypeBean.getTransTypesWithItems()}" var="tt" itemLabel="#{tt.transactionTypeName}" itemValue="#{tt.transactionTypeId}"/>
-                        </p:selectOneMenu>                
+                        </p:selectOneMenu>
+                        <p:outputLabel value="Added By:"/>
+                        <p:selectOneMenu id="menuAddUser" value="#{stock_ledger.user_detail_id}">
+                            <f:selectItem itemLabel="Select"/>
+                            <f:selectItems value="#{userDetailBean.getUserDetails()}" var="ua" itemLabel="#{ua.firstName} #{ua.secondName} #{ua.thirdName}" itemValue="#{ua.userDetailId}"/>
+                        </p:selectOneMenu>            
                     </h:panelGrid>
                     <h:panelGrid columns="1">
-                        <!--
-                        <p:commandButton id="cmdbSearchSUmmary" value="SUMMARY" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                        <p:commandButton id="cmdbSearch" value="SEARCH" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                             <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                                 <p:graphicImage name="/images/ajax-loader.gif"/>
                             </p:dialog>
-                            <p:ajax listener="#{stock_ledgerBean.reportStock_ledgerSummary(stock_ledger,stock_ledgerBean,itemBean.selectedItem)}" process="pnlgFilter" update="pnlgMessage tblDetail"/>
-                        </p:commandButton>
-                        -->
-                        <p:commandButton id="cmdbSearchDetail" value="DETAIL" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
-                            <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
-                                <p:graphicImage name="/images/ajax-loader.gif"/>
-                            </p:dialog>
-                            <p:ajax listener="#{stock_ledgerBean.reportStock_ledgerDetail(stock_ledger,stock_ledgerBean,itemBean.selectedItem)}" process="pnlgFilter" update="pnlgMessage tblDetail"/>
+                            <p:ajax listener="#{stock_ledgerBean.reportStock_ledger(stock_ledger,stock_ledgerBean,itemBean.selectedItem)}" process="pnlgFilter" update="pnlgMessage pnlgData"/>
                         </p:commandButton>
                         <p:commandButton id="cmdbReset" value="RESET">
                             <p:ajax listener="#{stock_ledgerBean.resetStock_ledgerDetail(stock_ledger,stock_ledgerBean,itemBean.selectedItem)}" process="pnlgFilter" update="pnlgFilter pnlgMessage tblDetail"/>
@@ -127,75 +119,136 @@
             <h:panelGrid id="pnlgMessage">
                 <p:outputLabel value="#{stock_ledgerBean.actionMessage}" style="color: red;"/>
             </h:panelGrid>
-            <p:dataTable id="tblDetail" tableStyle="width:auto;" var="itm" value="#{stock_ledgerBean.stock_ledgerList}" 
-                         paginator="true" rows="50" 
-                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
-                         rowsPerPageTemplate="50,100,200,400">
-                <f:facet name="header">
-                    #{stock_ledgerBean.stock_ledgerList.size()} Records Found
-                    <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
-                    <p:columnToggler datasource="tblDetail" trigger="toggler" />
-                </f:facet>
-                <f:facet name="{Exporters}">
-                    <h:commandLink>
-                        <p:graphicImage name="images/excel.png" width="24"/>
-                        <p:dataExporter type="xls" target="tblDetail" fileName="Stock_Ledger" />
-                    </h:commandLink>
-                    <h:commandLink>
-                        <p:graphicImage name="images/pdf.png" width="24"/>
-                        <p:dataExporter type="pdf" target="tblDetail" fileName="Stock_Ledger"/>
-                    </h:commandLink>
-                    <h:commandLink>
-                        <p:graphicImage name="images/csv.png" width="24"/>
-                        <p:dataExporter type="csv" target="tblDetail" fileName="Stock_Ledger" />
-                    </h:commandLink>
-                    <h:commandLink>
-                        <p:graphicImage name="images/xml.png" width="24"/>
-                        <p:dataExporter type="xml" target="tblDetail" fileName="Stock_Ledger" />
-                    </h:commandLink>
-                </f:facet>
-                <p:column headerText="Date">
-                    <h:outputText value="#{utilityBean.formatDateTime(itm.add_date)}"/>
-                </p:column>
-                <p:column headerText="#{companySetting.getStoreEquivName()}">
-                    <h:outputLabel value="#{itm.store_name}"/>
-                </p:column>
-                <p:column headerText="Transaction Type">
-                    <h:outputLabel value="#{itm.transaction_type_name} "/>
-                </p:column>
-                <p:column headerText="Transaction No">
-                    <h:outputLabel value="#{itm.transaction_number} "/>
-                </p:column>
-                <p:column headerText="Item Description">
-                    #{itm.description}
-                    #{itm.batchno}
-                    #{itm.code_specific}
-                    #{itm.desc_specific}
-                </p:column>
-                <p:column headerText="Unit">
-                    <h:outputLabel value="#{itm.unit_symbol}"/>
-                </p:column>
-                <p:column headerText="User">
-                    <h:outputLabel value="#{itm.user_name} "/>
-                </p:column>
-                <p:column headerText="Subtract" style="text-align: right;background-color: red;color: white;">
-                    <h:outputText value="#{itm.qty_subtracted}">
-                        <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                    </h:outputText>
-                </p:column>
-                <p:column headerText="Add" style="text-align: right;background-color: #00B461;color: white;">
-                    <h:outputText value="#{itm.qty_added}">
-                        <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                    </h:outputText>
-                </p:column>
-                <p:column headerText="Balance" style="text-align: right;background-color: yellow;">
-                    <h:outputText value="#{itm.qty_bal}">
-                        <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                    </h:outputText>
-                </p:column>
-            </p:dataTable>
+            <h:panelGrid id="pnlgData" columns="1">
+                <p:dataTable id="tblSummary" tableStyle="width:100%;" var="itm" value="#{stock_ledgerBean.stock_ledgerSummary}" 
+                             paginator="true" rows="50" 
+                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
+                             rowsPerPageTemplate="50,100,200,400">
+                    <f:facet name="header">
+                        Stock Movement (Summary) : #{stock_ledgerBean.stock_ledgerSummary.size()} Records Found
+                        <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
+                        <p:columnToggler datasource="tblSummary" trigger="toggler" />
+                    </f:facet>
+                    <f:facet name="{Exporters}">
+                        <h:commandLink>
+                            <p:graphicImage name="images/excel.png" width="24"/>
+                            <p:dataExporter type="xls" target="tblSummary" fileName="Stock_Ledger_Summary" />
+                        </h:commandLink>
+                        <h:commandLink>
+                            <p:graphicImage name="images/pdf.png" width="24"/>
+                            <p:dataExporter type="pdf" target="tblSummary" fileName="Stock_Ledger_Summary"/>
+                        </h:commandLink>
+                        <h:commandLink>
+                            <p:graphicImage name="images/csv.png" width="24"/>
+                            <p:dataExporter type="csv" target="tblSummary" fileName="Stock_Ledger_Summary" />
+                        </h:commandLink>
+                        <h:commandLink>
+                            <p:graphicImage name="images/xml.png" width="24"/>
+                            <p:dataExporter type="xml" target="tblSummary" fileName="Stock_Ledger_Summary" />
+                        </h:commandLink>
+                    </f:facet>
+                    <p:column headerText="Item Description" style="width: 40%;font-size: 13px;">
+                        <h:outputText value="#{itm.description}"/>
+                        <h:outputText value="#{itm.batchno}"/>
+                        <h:outputText value="#{itm.code_specific}"/>
+                        <h:outputText value="#{itm.desc_specific}"/>
+                    </p:column>
+                    <p:column headerText="Unit" style="width: 6%;font-size: 13px;">
+                        <h:outputText value="#{itm.unit_symbol}"/>
+                    </p:column>
+                    <p:column headerText="Open Qty" style="text-align: right;width: 7%;font-size: 13px;">
+                        <h:outputText value="#{itm.qty_open}">
+                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Stock Changes (Added, Subtracted)" style="width: 40%;font-size: 13px;">
+                        <ui:repeat var="lst" value="#{itm.stock_ledgerList}" varStatus="status">
+                            <h:outputText value="#{lst.transaction_type_name}" rendered="#{lst.qty_added>0 or lst.qty_subtracted>0}"/>
+                            <h:outputText value="#{lst.qty_added}" style="background-color: #00B461;color: white;font-size: 13px;" rendered="#{lst.qty_added>0}">
+                                <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                            <h:outputText value="&nbsp;" rendered="#{lst.qty_added>0 and lst.qty_subtracted>0}"/>
+                            <h:outputText value="#{lst.qty_subtracted}" style="background-color: red;color: white;font-size: 13px;" rendered="#{lst.qty_subtracted>0}">
+                                <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                            <h:outputText value="&nbsp;"/>
+                        </ui:repeat>
+                    </p:column>
+                    <p:column headerText="Close Qty" style="text-align: right;width: 7%;font-size: 13px;">
+                        <h:outputText value="#{itm.qty_close}">
+                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
+                <p:dataTable id="tblDetail" tableStyle="100%;" var="itm" value="#{stock_ledgerBean.stock_ledgerList}" 
+                             paginator="true" rows="50" 
+                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
+                             rowsPerPageTemplate="50,100,200,400">
+                    <f:facet name="header">
+                        Stock Movement (Detail) : #{stock_ledgerBean.stock_ledgerList.size()} Records Found
+                        <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
+                        <p:columnToggler datasource="tblDetail" trigger="toggler" />
+                    </f:facet>
+                    <f:facet name="{Exporters}">
+                        <h:commandLink>
+                            <p:graphicImage name="images/excel.png" width="24"/>
+                            <p:dataExporter type="xls" target="tblDetail" fileName="Stock_Ledger" />
+                        </h:commandLink>
+                        <h:commandLink>
+                            <p:graphicImage name="images/pdf.png" width="24"/>
+                            <p:dataExporter type="pdf" target="tblDetail" fileName="Stock_Ledger"/>
+                        </h:commandLink>
+                        <h:commandLink>
+                            <p:graphicImage name="images/csv.png" width="24"/>
+                            <p:dataExporter type="csv" target="tblDetail" fileName="Stock_Ledger" />
+                        </h:commandLink>
+                        <h:commandLink>
+                            <p:graphicImage name="images/xml.png" width="24"/>
+                            <p:dataExporter type="xml" target="tblDetail" fileName="Stock_Ledger" />
+                        </h:commandLink>
+                    </f:facet>
+                    <p:column headerText="Date" style="font-size: 13px;width: 12%;">
+                        <h:outputText value="#{utilityBean.formatDateTime(itm.add_date)}"/>
+                    </p:column>
+                    <p:column headerText="#{companySetting.getStoreEquivName()}" style="font-size: 13px;width: 8%;">
+                        <h:outputText value="#{itm.store_name}"/>
+                    </p:column>
+                    <p:column headerText="Transaction Type" style="font-size: 13px;width: 12%;">
+                        <h:outputText value="#{itm.transaction_type_name} "/>
+                    </p:column>
+                    <p:column headerText="Transaction No" style="font-size: 13px;width: 12%;">
+                        <h:outputText value="#{itm.transaction_number} "/>
+                    </p:column>
+                    <p:column headerText="Item Description" style="font-size: 13px;width: 24%;">
+                        <h:outputText value="#{itm.description}"/>
+                        <h:outputText value="#{itm.batchno}"/>
+                        <h:outputText value="#{itm.code_specific}"/>
+                        <h:outputText value="#{itm.desc_specific}"/>
+                    </p:column>
+                    <p:column headerText="Unit" style="font-size: 13px;width: 5%;">
+                        <h:outputText value="#{itm.unit_symbol}"/>
+                    </p:column>
+                    <p:column headerText="User" style="font-size: 13px;width: 8%;">
+                        <h:outputText value="#{itm.user_name} "/>
+                    </p:column>
+                    <p:column headerText="Subtract" style="text-align: right;background-color: red;color: white;font-size: 13px;width: 7%;">
+                        <h:outputText value="#{itm.qty_subtracted}" rendered="#{itm.qty_subtracted>0}">
+                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Add" style="text-align: right;background-color: #00B461;color: white;font-size: 13px;width: 5%;">
+                        <h:outputText value="#{itm.qty_added}" rendered="#{itm.qty_added>0}">
+                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Balance" style="text-align: right;background-color: yellow;font-size: 13px;width: 7%;">
+                        <h:outputText value="#{itm.qty_bal}">
+                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
+            </h:panelGrid>
         </h:form>
     </h:body>
-
 </html>
 

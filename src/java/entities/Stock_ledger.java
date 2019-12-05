@@ -2,6 +2,7 @@ package entities;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 
@@ -39,6 +40,9 @@ public class Stock_ledger implements Serializable {
     private String user_name;
     private String store_name;
     private String transaction_number;
+    private double qty_open;
+    private double qty_close;
+    private List<Stock_ledger> Stock_ledgerList;
 
     /**
      * @return the stock_ledger_id
@@ -332,5 +336,47 @@ public class Stock_ledger implements Serializable {
      */
     public void setTransaction_number(String transaction_number) {
         this.transaction_number = transaction_number;
+    }
+
+    /**
+     * @return the qty_open
+     */
+    public double getQty_open() {
+        return qty_open;
+    }
+
+    /**
+     * @param qty_open the qty_open to set
+     */
+    public void setQty_open(double qty_open) {
+        this.qty_open = qty_open;
+    }
+
+    /**
+     * @return the qty_close
+     */
+    public double getQty_close() {
+        return qty_close;
+    }
+
+    /**
+     * @param qty_close the qty_close to set
+     */
+    public void setQty_close(double qty_close) {
+        this.qty_close = qty_close;
+    }
+
+    /**
+     * @return the Stock_ledgerList
+     */
+    public List<Stock_ledger> getStock_ledgerList() {
+        return Stock_ledgerList;
+    }
+
+    /**
+     * @param Stock_ledgerList the Stock_ledgerList to set
+     */
+    public void setStock_ledgerList(List<Stock_ledger> Stock_ledgerList) {
+        this.Stock_ledgerList = Stock_ledgerList;
     }
 }
