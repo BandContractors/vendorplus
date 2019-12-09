@@ -490,6 +490,8 @@
                     <p:separator />
                     <p:menuitem value="Top Expenses" action="DashboardExpensesItems?faces-redirect=true" />
                     <p:separator />
+                    <p:menuitem value="Stock Trend" action="DashboardStock?faces-redirect=true" />
+                    <p:separator />
                 </p:submenu>  
                 <p:menuitem id="mniAlert" value="#{generalUserSetting.userUnreadStockAlertsCount}" oncomplete="PF('sbarAlert').show()" icon="fa fa-fw fa-envelope" style="background-color:#FF0000;color: #ffffff;float: right;" rendered="#{generalUserSetting.userUnreadStockAlertsCount>0}"/>
                 <p:submenu label="#{menuItemBean.menuItemObj.CURRENT_USER.userName}" style="background-color:#FF0000;color: #ffffff;float: right;" icon="ui-icon-person">  

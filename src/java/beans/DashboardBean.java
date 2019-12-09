@@ -100,6 +100,9 @@ public class DashboardBean implements Serializable {
     private List<Stock_ledger> DayCloseStockMovementAdded;
     private List<Stock_ledger> DayCloseStockMovementSubtracted;
 
+    private String DayStockByDay;
+    private String AmountStockByDay;
+
     public void initSalesDashboard() {
         try {
             this.CurrentYear = new UtilityBean().getCurrentYear();
@@ -117,6 +120,23 @@ public class DashboardBean implements Serializable {
             this.refreshSalesByDay(this.ClickedYear, this.ClickedMonthNo, "");
         } catch (Exception e) {
             System.err.println("initSalesDashboard:" + e.getMessage());
+        }
+    }
+    
+    public void initStockDashboard() {
+        try {
+            this.CurrentYear = new UtilityBean().getCurrentYear();
+            this.CurrentMonthNo = new UtilityBean().getCurrentMonth();
+            this.SelectedYear = this.CurrentYear;
+            this.SelectedMonthNo = this.CurrentMonthNo;
+            this.ClickedYear = this.CurrentYear;
+            this.ClickedMonthNo = this.CurrentMonthNo;
+            this.SelectedMonthName = new UtilityBean().convertMonthNoToName(this.SelectedMonthNo, 0);
+            this.ClickedMonthName = new UtilityBean().convertMonthNoToName(this.ClickedMonthNo, 0);
+            this.SelectedDisplayYears = 5;
+            this.refreshStockByYear(this.SelectedYear, this.SelectedDisplayYears);
+        } catch (Exception e) {
+            System.err.println("initStockDashboard:" + e.getMessage());
         }
     }
 
@@ -188,6 +208,25 @@ public class DashboardBean implements Serializable {
             this.refreshSalesByDay(this.ClickedYear, this.ClickedMonthNo, "");
         } catch (Exception e) {
             System.err.println("searchSalesDashboard:" + e.getMessage());
+        }
+    }
+
+    public void searchStockDashboard() {
+        try {
+            this.CurrentYear = new UtilityBean().getCurrentYear();
+            this.CurrentMonthNo = new UtilityBean().getCurrentMonth();
+            if (this.SelectedYear == this.CurrentYear) {
+                this.SelectedMonthNo = this.CurrentMonthNo;
+            } else {
+                this.SelectedMonthNo = 12;
+            }
+            this.ClickedYear = this.SelectedYear;
+            this.ClickedMonthNo = this.SelectedMonthNo;
+            this.SelectedMonthName = new UtilityBean().convertMonthNoToName(this.SelectedMonthNo, 0);
+            this.ClickedMonthName = new UtilityBean().convertMonthNoToName(this.ClickedMonthNo, 0);
+            this.refreshStockByYear(this.SelectedYear, this.SelectedDisplayYears);
+        } catch (Exception e) {
+            System.err.println("searchStockDashboard:" + e.getMessage());
         }
     }
 
@@ -272,6 +311,48 @@ public class DashboardBean implements Serializable {
             }
         } catch (Exception e) {
             System.err.println(e.getMessage());
+        }
+    }
+
+    public void refreshStockByYear(int aSelYear, int aSelDisplayYears) {
+        DayStockByDay = "";
+        AmountStockByDay = "";
+        //this.YearsList = new ArrayList<>();
+        String sql = "";
+        sql = "SELECT "
+                + "	c.y,c.m,c.d,c.snapshot_no,"
+                + "	s.currency_code,s.cp_value  "
+                + "FROM "
+                + "("
+                + "	select year(cdc_date) as y,month(cdc_date) as m,day(cdc_date) as d,max(snapshot_no) as snapshot_no from cdc_general "
+                + "	where cdc_function='STOCK' and is_passed=1 and year(cdc_date)=" + aSelYear
+                + "	group by year(cdc_date),month(cdc_date),day(cdc_date) "
+                + "	order by year(cdc_date),month(cdc_date),day(cdc_date) "
+                + ") AS c "
+                + "INNER JOIN "
+                + "("
+                + "	select snapshot_no,currency_code,sum(cp_value) as cp_value from snapshot_stock_value where year(snapshot_date)=" + aSelYear + " group by snapshot_no,currency_code"
+                + ") AS s ON c.snapshot_no=s.snapshot_no";
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                if (DayStockByDay.length() == 0) {
+                    DayStockByDay = "\"" + rs.getString("d") + "/" + rs.getString("m") + "\"";
+                } else {
+                    DayStockByDay = DayStockByDay + ",\"" + rs.getString("d") + "/" + rs.getString("m") + "\"";
+                }
+                //this.YearsList.add(rs.getInt("y"));
+                if (AmountStockByDay.length() == 0) {
+                    AmountStockByDay = "" + new UtilityBean().formatNumber("###", rs.getDouble("cp_value"));
+                } else {
+                    AmountStockByDay = AmountStockByDay + "," + new UtilityBean().formatNumber("###", rs.getDouble("cp_value"));
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("refreshStockByYear:" + e.getMessage());
         }
     }
 
@@ -1596,7 +1677,7 @@ public class DashboardBean implements Serializable {
         // Put it back in the Date object  
         this.setToDate(cal2.getTime());
     }
-    
+
     public void setDateToYesturday() {
         Date CurrentServerDate = new CompanySetting().getCURRENT_SERVER_DATE();
         this.setFromDate(CurrentServerDate);
@@ -2608,6 +2689,34 @@ public class DashboardBean implements Serializable {
      */
     public void setDayCloseStockMovementSubtracted(List<Stock_ledger> DayCloseStockMovementSubtracted) {
         this.DayCloseStockMovementSubtracted = DayCloseStockMovementSubtracted;
+    }
+
+    /**
+     * @return the DayStockByDay
+     */
+    public String getDayStockByDay() {
+        return DayStockByDay;
+    }
+
+    /**
+     * @param DayStockByDay the DayStockByDay to set
+     */
+    public void setDayStockByDay(String DayStockByDay) {
+        this.DayStockByDay = DayStockByDay;
+    }
+
+    /**
+     * @return the AmountStockByDay
+     */
+    public String getAmountStockByDay() {
+        return AmountStockByDay;
+    }
+
+    /**
+     * @param AmountStockByDay the AmountStockByDay to set
+     */
+    public void setAmountStockByDay(String AmountStockByDay) {
+        this.AmountStockByDay = AmountStockByDay;
     }
 
 }
