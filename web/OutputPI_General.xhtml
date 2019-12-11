@@ -51,7 +51,7 @@
                             <h:outputLabel value="#{generalUserSetting.outputDetailParent.transactor.phone}"/>
                         </h:panelGrid>
                         <h:panelGrid style="margin: 0px;text-align: left;" columns="1">
-                            <h:outputLabel value="Invoice Date" style="border-bottom-style: solid;"/>
+                            <h:outputLabel value="#{generalUserSetting.outputDetailParent.transaction_type.transactionDateLabel}" style="border-bottom-style: solid;"/>
                             <h:outputText styleClass="clsInput" id="itxtvOrderDate" value="#{utilityBean.formatDate(generalUserSetting.outputDetailParent.trans.transactionDate)}"/>
                         </h:panelGrid>
                         <h:panelGrid style="margin: 0px;text-align: left;" columns="1">

@@ -1,8 +1,12 @@
 package beans;
 
+import connections.DBConnection;
 import entities.PayTrans;
 import sessions.GeneralUserSetting;
 import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
@@ -175,7 +179,8 @@ public class OutputDetailBean implements Serializable {
             try {
                 if (null != aOutputDetail.getPay()) {
                     if (aOutputDetail.getPay().getPayReasonId() == 21 || aOutputDetail.getPay().getPayReasonId() == 22) {
-                        aOutputDetail.setPay_reason("Goods/Services Ref No:");
+                        //aOutputDetail.setPay_reason("Goods/Services Ref No:");
+                        aOutputDetail.setPay_reason(this.getGoodOrService(aOutputDetail.getPay().getPayId()) + " Ref No:");
                         String RefIdString = "";
                         String RefIdString2 = "";
                         try {
@@ -231,6 +236,42 @@ public class OutputDetailBean implements Serializable {
         } catch (Exception e) {
             System.err.println("refreshOutput:" + e.getMessage());
         }
+    }
+
+    public String getGoodOrService(long aPayId) {
+        String good_or_service = "";
+        int good_found = 0;
+        int service_found = 0;
+        String sql = "SELECT distinct i.item_type FROM transaction_item ti "
+                + "INNER JOIN item i ON ti.item_id=i.item_id "
+                + "WHERE ti.transaction_id IN (select pt.transaction_id from pay_trans pt where pt.pay_id=" + aPayId + ")";
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                if (good_found == 0 && rs.getString("item_type").equals("PRODUCT")) {
+                    good_found = 1;
+                } else if (service_found == 0 && rs.getString("item_type").equals("SERVICE")) {
+                    service_found = 1;
+                } else {
+                    break;
+                }
+            }
+            if (good_found == 1 && service_found == 0) {
+                good_or_service = "Goods Sold";
+            } else if (good_found == 0 && service_found == 1) {
+                good_or_service = "Services Rendered";
+            } else if (good_found == 1 && service_found == 1) {
+                good_or_service = "Goods and Services";
+            } else {
+                good_or_service = "Goods/Services";
+            }
+        } catch (Exception e) {
+            System.err.println("getGoodOrService:" + e.getMessage());
+        }
+        return good_or_service;
     }
 
     public void refreshOutputProduction(String aLevel, String aSource) {
