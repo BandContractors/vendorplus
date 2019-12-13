@@ -474,3 +474,13 @@ SELECT sv.*,
 	INNER JOIN category c ON sv.category_id=c.category_id 
 	INNER JOIN unit u ON sv.unit_id=u.unit_id 
 	LEFT JOIN sub_category sc ON sv.sub_category_id=sc.sub_category_id;
+
+CREATE OR REPLACE VIEW view_snapshot_stock_value AS 
+SELECT 
+	s.*,
+	CASE 
+	WHEN i.is_sale=1 AND i.is_asset=0 AND i.is_track=1 THEN 'Goods for Sale' 
+	WHEN i.is_sale=0 AND i.is_asset=0 AND i.is_track=1 AND i.is_buy=1 THEN i.expense_type 
+	ELSE '' 
+	END as stock_type 
+ FROM snapshot_stock_value s INNER JOIN item i ON s.item_id=i.item_id;

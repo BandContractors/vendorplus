@@ -102,6 +102,8 @@ public class DashboardBean implements Serializable {
 
     private String DayStockByDay;
     private String AmountStockByDay;
+    
+    private String stock_type;
 
     public void initSalesDashboard() {
         try {
@@ -122,7 +124,7 @@ public class DashboardBean implements Serializable {
             System.err.println("initSalesDashboard:" + e.getMessage());
         }
     }
-    
+
     public void initStockDashboard() {
         try {
             this.CurrentYear = new UtilityBean().getCurrentYear();
@@ -134,7 +136,8 @@ public class DashboardBean implements Serializable {
             this.SelectedMonthName = new UtilityBean().convertMonthNoToName(this.SelectedMonthNo, 0);
             this.ClickedMonthName = new UtilityBean().convertMonthNoToName(this.ClickedMonthNo, 0);
             this.SelectedDisplayYears = 5;
-            this.refreshStockByYear(this.SelectedYear, this.SelectedDisplayYears);
+            this.stock_type="";
+            this.refreshStockByYear(this.SelectedYear, this.SelectedDisplayYears,this.stock_type);
         } catch (Exception e) {
             System.err.println("initStockDashboard:" + e.getMessage());
         }
@@ -224,7 +227,7 @@ public class DashboardBean implements Serializable {
             this.ClickedMonthNo = this.SelectedMonthNo;
             this.SelectedMonthName = new UtilityBean().convertMonthNoToName(this.SelectedMonthNo, 0);
             this.ClickedMonthName = new UtilityBean().convertMonthNoToName(this.ClickedMonthNo, 0);
-            this.refreshStockByYear(this.SelectedYear, this.SelectedDisplayYears);
+            this.refreshStockByYear(this.SelectedYear, this.SelectedDisplayYears,this.stock_type);
         } catch (Exception e) {
             System.err.println("searchStockDashboard:" + e.getMessage());
         }
@@ -314,10 +317,13 @@ public class DashboardBean implements Serializable {
         }
     }
 
-    public void refreshStockByYear(int aSelYear, int aSelDisplayYears) {
+    public void refreshStockByYear(int aSelYear, int aSelDisplayYears, String aStock_type) {
         DayStockByDay = "";
         AmountStockByDay = "";
-        //this.YearsList = new ArrayList<>();
+        String StockSql = "";
+        if (aStock_type.length() > 0) {
+            StockSql = " and stock_type='" + aStock_type + "'";
+        }
         String sql = "";
         sql = "SELECT "
                 + "	c.y,c.m,c.d,c.snapshot_no,"
@@ -331,7 +337,7 @@ public class DashboardBean implements Serializable {
                 + ") AS c "
                 + "INNER JOIN "
                 + "("
-                + "	select snapshot_no,currency_code,sum(cp_value) as cp_value from snapshot_stock_value where year(snapshot_date)=" + aSelYear + " group by snapshot_no,currency_code"
+                + "	select snapshot_no,currency_code,sum(cp_value) as cp_value from view_snapshot_stock_value where year(snapshot_date)=" + aSelYear + StockSql + " group by snapshot_no,currency_code"
                 + ") AS s ON c.snapshot_no=s.snapshot_no";
         ResultSet rs = null;
         try (
@@ -2717,6 +2723,20 @@ public class DashboardBean implements Serializable {
      */
     public void setAmountStockByDay(String AmountStockByDay) {
         this.AmountStockByDay = AmountStockByDay;
+    }
+
+    /**
+     * @return the stock_type
+     */
+    public String getStock_type() {
+        return stock_type;
+    }
+
+    /**
+     * @param stock_type the stock_type to set
+     */
+    public void setStock_type(String stock_type) {
+        this.stock_type = stock_type;
     }
 
 }

@@ -74,7 +74,7 @@
                 <h:outputLabel styleClass="clsLabelTransItem" value="Unit"/>
                 <h:outputLabel styleClass="clsLabelTransItem" value="Specific.Item(Batch/Code/Name):"/>
                 <p:autoComplete id="autcItem" widgetVar="WautcItem" value="#{itemBean.selectedItem}"  
-                                completeMethod="#{itemBean.getItemObjectListForTransfer}" 
+                                completeMethod="#{itemBean.getItemObjectListForStockDispose}" 
                                 var="itm" 
                                 itemLabel="#{itm.description}" 
                                 itemValue="#{itm}" 
