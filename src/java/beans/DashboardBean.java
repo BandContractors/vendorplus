@@ -339,6 +339,7 @@ public class DashboardBean implements Serializable {
                 + "("
                 + "	select snapshot_no,currency_code,sum(cp_value) as cp_value from view_snapshot_stock_value where year(snapshot_date)=" + aSelYear + StockSql + " group by snapshot_no,currency_code"
                 + ") AS s ON c.snapshot_no=s.snapshot_no";
+        //System.out.println("Q:" + sql);
         ResultSet rs = null;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -434,6 +435,7 @@ public class DashboardBean implements Serializable {
                 String ItemDesc = "";
                 try {
                     ItemDesc = ib.getItem(rs.getLong("item_id")).getDescription();
+                    ItemDesc=ItemDesc.replace("\"", "'");
                 } catch (Exception e) {
                 }
                 if (ItemsTopSoldItemsByYear.length() == 0) {
@@ -472,6 +474,7 @@ public class DashboardBean implements Serializable {
                 String ItemDesc = "";
                 try {
                     ItemDesc = ib.getItem(rs.getLong("item_id")).getDescription();
+                    ItemDesc=ItemDesc.replace("\"", "'");
                 } catch (Exception e) {
                 }
                 if (ItemsTopExpenseItemsByYear.length() == 0) {
@@ -508,6 +511,7 @@ public class DashboardBean implements Serializable {
                 String CatName = "";
                 try {
                     CatName = cb.getCategory(rs.getInt("category_id")).getCategoryName();
+                    CatName=CatName.replace("\"", "'");
                 } catch (Exception e) {
                 }
                 if (CatItemsTopSoldItemsByYear.length() == 0) {
@@ -548,6 +552,7 @@ public class DashboardBean implements Serializable {
                 String CatName = "";
                 try {
                     CatName = cb.getCategory(rs.getInt("category_id")).getCategoryName();
+                    CatName=CatName.replace("\"", "'");
                 } catch (Exception e) {
                 }
                 if (CatItemsTopExpenseItemsByYear.length() == 0) {

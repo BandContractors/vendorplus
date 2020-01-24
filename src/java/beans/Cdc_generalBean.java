@@ -277,7 +277,8 @@ public class Cdc_generalBean implements Serializable {
             cdcgenInsert.setCdc_start_time(new CompanySetting().getCURRENT_SERVER_DATE());
             cdcgenInsert.setAdd_date(new CompanySetting().getCURRENT_SERVER_DATE());
             cdcgenInsert.setAdd_by(UserDetailBean.getSystemUserDetailId());
-            cdcgenInsert.setAcc_period_id(new AccPeriodBean().getAccPeriodCurrent().getAccPeriodId());
+            //cdcgenInsert.setAcc_period_id(new AccPeriodBean().getAccPeriodCurrent().getAccPeriodId());
+            cdcgenInsert.setAcc_period_id(new AccPeriodBean().getAccPeriod(cdcgenInsert.getCdc_date()).getAccPeriodId());
             this.saveCdc_general(cdcgenInsert);
             //2. insert stock snapshop
             Cdc_general cdcgenSaved = this.getCdc_generalByJobId(cdcid);
