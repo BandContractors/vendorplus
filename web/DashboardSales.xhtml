@@ -33,7 +33,12 @@
             <h:panelGrid id="pnlgHeader" styleClass="clsPanelReportFilterTitle">
                 <h:outputLabel styleClass="clsLabelReportFilterTitle" value="Sales Trend Dashboard"/>
             </h:panelGrid>
-            <h:panelGrid id="pnlgFilter" columns="6" styleClass="clsPanelReportFilter">
+            <h:panelGrid id="pnlgFilter" columns="8" styleClass="clsPanelReportFilter">
+                <p:outputLabel value="#{companySetting.getStoreEquivName()}:"/>
+                <p:selectOneMenu id="menuFromStore" value="#{dashboardBean.store_id}" style="width: 200px;">
+                    <f:selectItem itemLabel="Select" itemValue="0"/>
+                    <f:selectItems value="#{dashboardBean.storeList}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
+                </p:selectOneMenu>
                 <p:outputLabel value="Calendar Year:"/>
                 <p:selectOneMenu id="menuCalendarYear" value="#{dashboardBean.selectedYear}">
                     <f:selectItem itemLabel="#{dashboardBean.currentYear}" itemValue="#{dashboardBean.currentYear}" />

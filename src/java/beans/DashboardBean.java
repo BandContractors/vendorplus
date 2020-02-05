@@ -4,6 +4,7 @@ import connections.DBConnection;
 import entities.CompanySetting;
 import entities.Pay;
 import entities.Stock_ledger;
+import entities.Store;
 import entities.Trans;
 import utilities.UtilityBean;
 import java.io.Serializable;
@@ -94,19 +95,20 @@ public class DashboardBean implements Serializable {
     private double TotalCashPayment;
     private List<Pay> DayCloseCashPaymentType;
     private List<Pay> DayCloseCashPaymentAccount;
-
     private long CountItemsAdded;
     private long CountItemsSubtracted;
     private List<Stock_ledger> DayCloseStockMovementAdded;
     private List<Stock_ledger> DayCloseStockMovementSubtracted;
-
     private String DayStockByDay;
     private String AmountStockByDay;
-    
     private String stock_type;
+    private List<Store> StoreList;
+    private int store_id;
 
     public void initSalesDashboard() {
         try {
+            this.StoreList = new StoreBean().getStores();
+            this.store_id = 0;
             this.CurrentYear = new UtilityBean().getCurrentYear();
             this.CurrentMonthNo = new UtilityBean().getCurrentMonth();
             this.SelectedYear = this.CurrentYear;
@@ -136,8 +138,8 @@ public class DashboardBean implements Serializable {
             this.SelectedMonthName = new UtilityBean().convertMonthNoToName(this.SelectedMonthNo, 0);
             this.ClickedMonthName = new UtilityBean().convertMonthNoToName(this.ClickedMonthNo, 0);
             this.SelectedDisplayYears = 5;
-            this.stock_type="";
-            this.refreshStockByYear(this.SelectedYear, this.SelectedDisplayYears,this.stock_type);
+            this.stock_type = "";
+            this.refreshStockByYear(this.SelectedYear, this.SelectedDisplayYears, this.stock_type);
         } catch (Exception e) {
             System.err.println("initStockDashboard:" + e.getMessage());
         }
@@ -145,6 +147,8 @@ public class DashboardBean implements Serializable {
 
     public void initExpensesDashboard() {
         try {
+            this.StoreList = new StoreBean().getStores();
+            this.store_id = 0;
             this.CurrentYear = new UtilityBean().getCurrentYear();
             this.CurrentMonthNo = new UtilityBean().getCurrentMonth();
             this.SelectedYear = this.CurrentYear;
@@ -164,6 +168,8 @@ public class DashboardBean implements Serializable {
 
     public void initSaleItemsDashboard() {
         try {
+            this.StoreList = new StoreBean().getStores();
+            this.store_id = 0;
             this.CurrentYear = new UtilityBean().getCurrentYear();
             this.CurrentMonthNo = new UtilityBean().getCurrentMonth();
             this.SelectedYear = this.CurrentYear;
@@ -179,6 +185,8 @@ public class DashboardBean implements Serializable {
 
     public void initExpenseItemsDashboard() {
         try {
+            this.StoreList = new StoreBean().getStores();
+            this.store_id = 0;
             this.CurrentYear = new UtilityBean().getCurrentYear();
             this.CurrentMonthNo = new UtilityBean().getCurrentMonth();
             this.SelectedYear = this.CurrentYear;
@@ -227,7 +235,7 @@ public class DashboardBean implements Serializable {
             this.ClickedMonthNo = this.SelectedMonthNo;
             this.SelectedMonthName = new UtilityBean().convertMonthNoToName(this.SelectedMonthNo, 0);
             this.ClickedMonthName = new UtilityBean().convertMonthNoToName(this.ClickedMonthNo, 0);
-            this.refreshStockByYear(this.SelectedYear, this.SelectedDisplayYears,this.stock_type);
+            this.refreshStockByYear(this.SelectedYear, this.SelectedDisplayYears, this.stock_type);
         } catch (Exception e) {
             System.err.println("searchStockDashboard:" + e.getMessage());
         }
@@ -293,7 +301,13 @@ public class DashboardBean implements Serializable {
         AmountSalesByYear = "";
         this.YearsList = new ArrayList<>();
         String sql = "";
-        sql = "SELECT y,sum(amount) as amount FROM view_fact_sales where y<=" + aSelYear + " and y>" + (aSelYear - aSelDisplayYears) + " group by y order by y ASC";
+        if (this.store_id == 0) {
+            sql = "SELECT y,sum(amount) as amount FROM view_fact_sales where y<=" + aSelYear + " and y>" + (aSelYear - aSelDisplayYears) + " group by y order by y ASC";
+        } else {
+            sql = "SELECT f.y,sum(f.amount) as amount FROM view_fact_sales f"
+                    + " INNER JOIN  transaction t on f.transaction_id=t.transaction_id and t.store_id=" + this.store_id
+                    + " where f.y<=" + aSelYear + " and f.y>" + (aSelYear - aSelDisplayYears) + " group by f.y order by f.y ASC";
+        }
         ResultSet rs = null;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -369,7 +383,14 @@ public class DashboardBean implements Serializable {
         AmountSalesByYear = "";
         this.YearsList = new ArrayList<>();
         String sql = "";
-        sql = "SELECT y,sum(amount) as amount FROM view_fact_expenses where y<=" + aSelYear + " and y>" + (aSelYear - aSelDisplayYears) + " group by y order by y ASC";
+
+        if (this.store_id == 0) {
+            sql = "SELECT y,sum(amount) as amount FROM view_fact_expenses where y<=" + aSelYear + " and y>" + (aSelYear - aSelDisplayYears) + " group by y order by y ASC";
+        } else {
+            sql = "SELECT f.y,sum(f.amount) as amount FROM view_fact_expenses f"
+                    + " INNER JOIN  transaction t on f.transaction_id=t.transaction_id and t.store_id=" + this.store_id
+                    + " where f.y<=" + aSelYear + " and f.y>" + (aSelYear - aSelDisplayYears) + " group by f.y order by f.y ASC";
+        }
         ResultSet rs = null;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -424,7 +445,13 @@ public class DashboardBean implements Serializable {
         AmountTopSoldItemsByYear = "";
         QtyTopSoldItemsByYear = "";
         String sql = "";
-        sql = "SELECT item_id,sum(amount) as amount,sum(item_qty) as item_qty FROM view_fact_sales_items where y=" + aSelYear + " group by item_id order by sum(amount) DESC LIMIT " + aSelDisplayItems;
+        if (this.store_id == 0) {
+            sql = "SELECT item_id,sum(amount) as amount,sum(item_qty) as item_qty FROM view_fact_sales_items where y=" + aSelYear + " group by item_id order by sum(amount) DESC LIMIT " + aSelDisplayItems;
+        } else {
+            sql = "SELECT f.item_id,sum(f.amount) as amount,sum(f.item_qty) as item_qty FROM view_fact_sales_items f"
+                    + " INNER JOIN  transaction t on f.transaction_id=t.transaction_id and t.store_id=" + this.store_id
+                    + " where f.y=" + aSelYear + " group by f.item_id order by sum(f.amount) DESC LIMIT " + aSelDisplayItems;
+        }
         ResultSet rs = null;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -435,7 +462,7 @@ public class DashboardBean implements Serializable {
                 String ItemDesc = "";
                 try {
                     ItemDesc = ib.getItem(rs.getLong("item_id")).getDescription();
-                    ItemDesc=ItemDesc.replace("\"", "'");
+                    ItemDesc = ItemDesc.replace("\"", "'");
                 } catch (Exception e) {
                 }
                 if (ItemsTopSoldItemsByYear.length() == 0) {
@@ -463,7 +490,13 @@ public class DashboardBean implements Serializable {
         ItemsTopExpenseItemsByYear = "";
         AmountTopExpenseItemsByYear = "";
         String sql = "";
-        sql = "SELECT item_id,sum(amount) as amount FROM view_fact_expenses_items where y=" + aSelYear + " group by item_id order by sum(amount) DESC LIMIT " + aSelDisplayItems;
+        if (this.store_id == 0) {
+            sql = "SELECT item_id,sum(amount) as amount FROM view_fact_expenses_items where y=" + aSelYear + " group by item_id order by sum(amount) DESC LIMIT " + aSelDisplayItems;
+        } else {
+            sql = "SELECT f.item_id,sum(f.amount) as amount FROM view_fact_expenses_items f"
+                    + " INNER JOIN  transaction t on f.transaction_id=t.transaction_id and t.store_id=" + this.store_id
+                    + " where f.y=" + aSelYear + " group by f.item_id order by sum(f.amount) DESC LIMIT " + aSelDisplayItems;
+        }
         ResultSet rs = null;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -474,7 +507,7 @@ public class DashboardBean implements Serializable {
                 String ItemDesc = "";
                 try {
                     ItemDesc = ib.getItem(rs.getLong("item_id")).getDescription();
-                    ItemDesc=ItemDesc.replace("\"", "'");
+                    ItemDesc = ItemDesc.replace("\"", "'");
                 } catch (Exception e) {
                 }
                 if (ItemsTopExpenseItemsByYear.length() == 0) {
@@ -498,9 +531,16 @@ public class DashboardBean implements Serializable {
         CatAmountTopSoldItemsByYear = "";
         CatQtyTopSoldItemsByYear = "";
         String sql = "";
-        sql = "SELECT i.category_id,sum(v.amount) as amount,sum(v.item_qty) as item_qty FROM view_fact_sales_items v "
-                + "inner join item i on v.item_id=i.item_id "
-                + "where v.y=" + aSelYear + " group by i.category_id order by sum(v.amount) DESC LIMIT " + aSelDisplayItems;
+        if (this.store_id == 0) {
+            sql = "SELECT i.category_id,sum(v.amount) as amount,sum(v.item_qty) as item_qty FROM view_fact_sales_items v "
+                    + "inner join item i on v.item_id=i.item_id "
+                    + "where v.y=" + aSelYear + " group by i.category_id order by sum(v.amount) DESC LIMIT " + aSelDisplayItems;
+        } else {
+            sql = "SELECT i.category_id,sum(v.amount) as amount,sum(v.item_qty) as item_qty FROM view_fact_sales_items v "
+                    + "inner join item i on v.item_id=i.item_id "
+                    + " INNER JOIN  transaction t on v.transaction_id=t.transaction_id and t.store_id=" + this.store_id
+                    + " where v.y=" + aSelYear + " group by i.category_id order by sum(v.amount) DESC LIMIT " + aSelDisplayItems;
+        }
         ResultSet rs = null;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -511,7 +551,7 @@ public class DashboardBean implements Serializable {
                 String CatName = "";
                 try {
                     CatName = cb.getCategory(rs.getInt("category_id")).getCategoryName();
-                    CatName=CatName.replace("\"", "'");
+                    CatName = CatName.replace("\"", "'");
                 } catch (Exception e) {
                 }
                 if (CatItemsTopSoldItemsByYear.length() == 0) {
@@ -539,9 +579,16 @@ public class DashboardBean implements Serializable {
         CatItemsTopExpenseItemsByYear = "";
         CatAmountTopExpenseItemsByYear = "";
         String sql = "";
-        sql = "SELECT i.category_id,sum(v.amount) as amount FROM view_fact_expenses_items v "
-                + "inner join item i on v.item_id=i.item_id "
-                + "where v.y=" + aSelYear + " group by i.category_id order by sum(v.amount) DESC LIMIT " + aSelDisplayItems;
+        if (this.store_id == 0) {
+            sql = "SELECT i.category_id,sum(v.amount) as amount FROM view_fact_expenses_items v "
+                    + "inner join item i on v.item_id=i.item_id "
+                    + "where v.y=" + aSelYear + " group by i.category_id order by sum(v.amount) DESC LIMIT " + aSelDisplayItems;
+        } else {
+            sql = "SELECT i.category_id,sum(v.amount) as amount FROM view_fact_expenses_items v "
+                    + "inner join item i on v.item_id=i.item_id "
+                    + " INNER JOIN  transaction t on v.transaction_id=t.transaction_id and t.store_id=" + this.store_id
+                    + " where v.y=" + aSelYear + " group by i.category_id order by sum(v.amount) DESC LIMIT " + aSelDisplayItems;
+        }
         ResultSet rs = null;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -552,7 +599,7 @@ public class DashboardBean implements Serializable {
                 String CatName = "";
                 try {
                     CatName = cb.getCategory(rs.getInt("category_id")).getCategoryName();
-                    CatName=CatName.replace("\"", "'");
+                    CatName = CatName.replace("\"", "'");
                 } catch (Exception e) {
                 }
                 if (CatItemsTopExpenseItemsByYear.length() == 0) {
@@ -617,7 +664,13 @@ public class DashboardBean implements Serializable {
         AmountSalesByMonth = "";
         this.MonthNoList = new ArrayList<>();
         String sql = "";
-        sql = "SELECT m,sum(amount) as amount FROM view_fact_sales where y=" + aYear + " group by m order by m ASC";
+        if (this.store_id == 0) {
+            sql = "SELECT m,sum(amount) as amount FROM view_fact_sales where y=" + aYear + " group by m order by m ASC";
+        } else {
+            sql = "SELECT f.m,sum(f.amount) as amount FROM view_fact_sales f"
+                    + " INNER JOIN  transaction t on f.transaction_id=t.transaction_id and t.store_id=" + this.store_id
+                    + " where f.y=" + aYear + " group by f.m order by f.m ASC";
+        }
         ResultSet rs = null;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -648,7 +701,13 @@ public class DashboardBean implements Serializable {
         AmountExpensesByMonth = "";
         this.MonthNoList = new ArrayList<>();
         String sql = "";
-        sql = "SELECT m,sum(amount) as amount FROM view_fact_expenses where y=" + aYear + " group by m order by m ASC";
+        if (this.store_id == 0) {
+            sql = "SELECT m,sum(amount) as amount FROM view_fact_expenses where y=" + aYear + " group by m order by m ASC";
+        } else {
+            sql = "SELECT f.m,sum(f.amount) as amount FROM view_fact_expenses f"
+                    + " INNER JOIN  transaction t on f.transaction_id=t.transaction_id and t.store_id=" + this.store_id
+                    + " where f.y=" + aYear + " group by f.m order by f.m ASC";
+        }
         ResultSet rs = null;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -685,7 +744,13 @@ public class DashboardBean implements Serializable {
         DaySalesByDay = "";
         AmountSalesByDay = "";
         String sql = "";
-        sql = "SELECT d,sum(amount) as amount FROM view_fact_sales where y=" + aYear + " and m=" + monthno + " group by d order by d ASC";
+        if (this.store_id == 0) {
+            sql = "SELECT d,sum(amount) as amount FROM view_fact_sales where y=" + aYear + " and m=" + monthno + " group by d order by d ASC";
+        } else {
+            sql = "SELECT f.d,sum(f.amount) as amount FROM view_fact_sales f"
+                    + " INNER JOIN  transaction t on f.transaction_id=t.transaction_id and t.store_id=" + this.store_id
+                    + " where f.y=" + aYear + " and f.m=" + monthno + " group by f.d order by f.d ASC";
+        }
         ResultSet rs = null;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -719,7 +784,13 @@ public class DashboardBean implements Serializable {
         DayExpensesByDay = "";
         AmountExpensesByDay = "";
         String sql = "";
-        sql = "SELECT d,sum(amount) as amount FROM view_fact_expenses where y=" + aYear + " and m=" + monthno + " group by d order by d ASC";
+        if (this.store_id == 0) {
+            sql = "SELECT d,sum(amount) as amount FROM view_fact_expenses where y=" + aYear + " and m=" + monthno + " group by d order by d ASC";
+        } else {
+            sql = "SELECT f.d,sum(f.amount) as amount FROM view_fact_expenses f"
+                    + " INNER JOIN  transaction t on f.transaction_id=t.transaction_id and t.store_id=" + this.store_id
+                    + " where f.y=" + aYear + " and f.m=" + monthno + " group by f.d order by f.d ASC";
+        }
         ResultSet rs = null;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -747,7 +818,13 @@ public class DashboardBean implements Serializable {
         AvgAmountSalesByMonth = "";
         AvgMonthQtyByMonth = "";
         String sql = "";
-        sql = "SELECT m,sum(amount) as amount,count(transaction_id) as n,AVG(c) as c FROM view_fact_sales where y=" + aYear + " group by m order by m ASC";
+        if (this.store_id == 0) {
+            sql = "SELECT m,sum(amount) as amount,count(transaction_id) as n,AVG(c) as c FROM view_fact_sales where y=" + aYear + " group by m order by m ASC";
+        } else {
+            sql = "SELECT f.m,sum(f.amount) as amount,count(f.transaction_id) as n,AVG(f.c) as c FROM view_fact_sales f"
+                    + " INNER JOIN  transaction t on f.transaction_id=t.transaction_id and t.store_id=" + this.store_id
+                    + " where f.y=" + aYear + " group by f.m order by f.m ASC";
+        }
         ResultSet rs = null;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -2742,6 +2819,34 @@ public class DashboardBean implements Serializable {
      */
     public void setStock_type(String stock_type) {
         this.stock_type = stock_type;
+    }
+
+    /**
+     * @return the StoreList
+     */
+    public List<Store> getStoreList() {
+        return StoreList;
+    }
+
+    /**
+     * @param StoreList the StoreList to set
+     */
+    public void setStoreList(List<Store> StoreList) {
+        this.StoreList = StoreList;
+    }
+
+    /**
+     * @return the store_id
+     */
+    public int getStore_id() {
+        return store_id;
+    }
+
+    /**
+     * @param store_id the store_id to set
+     */
+    public void setStore_id(int store_id) {
+        this.store_id = store_id;
     }
 
 }
