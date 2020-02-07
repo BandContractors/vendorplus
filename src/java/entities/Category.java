@@ -13,6 +13,7 @@ public class Category implements Serializable {
     private String CategoryName;
     private int display_quick_order;
     private int list_rank;
+    private int store_quick_order;
 
     /**
      * @return the CategoryId
@@ -68,5 +69,19 @@ public class Category implements Serializable {
      */
     public void setList_rank(int list_rank) {
         this.list_rank = list_rank;
+    }
+
+    /**
+     * @return the store_quick_order
+     */
+    public int getStore_quick_order() {
+        return store_quick_order;
+    }
+
+    /**
+     * @param store_quick_order the store_quick_order to set
+     */
+    public void setStore_quick_order(int store_quick_order) {
+        this.store_quick_order = store_quick_order;
     }
 }

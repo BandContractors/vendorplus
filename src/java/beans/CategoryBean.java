@@ -48,9 +48,9 @@ public class CategoryBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
         } else {
             if (cat.getCategoryId() == 0) {
-                sql = "{call sp_insert_category(?,?,?)}";
+                sql = "{call sp_insert_category(?,?,?,?)}";
             } else if (cat.getCategoryId() > 0) {
-                sql = "{call sp_update_category(?,?,?,?)}";
+                sql = "{call sp_update_category(?,?,?,?,?)}";
             }
 
             try (
@@ -60,6 +60,7 @@ public class CategoryBean implements Serializable {
                     cs.setString(1, cat.getCategoryName());
                     cs.setInt(2, cat.getDisplay_quick_order());
                     cs.setInt(3, cat.getList_rank());
+                    cs.setInt(4, cat.getStore_quick_order());
                     cs.executeUpdate();
                     this.setActionMessage("Saved Successfully");
                     this.clearCategory(cat);
@@ -68,6 +69,7 @@ public class CategoryBean implements Serializable {
                     cs.setString(2, cat.getCategoryName());
                     cs.setInt(3, cat.getDisplay_quick_order());
                     cs.setInt(4, cat.getList_rank());
+                    cs.setInt(5, cat.getStore_quick_order());
                     cs.executeUpdate();
                     this.setActionMessage("Saved Successfully");
                     this.clearCategory(cat);
@@ -100,6 +102,11 @@ public class CategoryBean implements Serializable {
                 aCategory.setList_rank(aResultSet.getInt("list_rank"));
             } catch (NullPointerException npe) {
                 aCategory.setList_rank(0);
+            }
+            try {
+                aCategory.setStore_quick_order(aResultSet.getInt("store_quick_order"));
+            } catch (NullPointerException npe) {
+                aCategory.setStore_quick_order(0);
             }
         } catch (SQLException se) {
             System.err.println("setCategoryFromResultset:" + se.getMessage());
@@ -173,6 +180,7 @@ public class CategoryBean implements Serializable {
         CatTo.setCategoryName(CatFrom.getCategoryName());
         CatTo.setDisplay_quick_order(CatFrom.getDisplay_quick_order());
         CatTo.setList_rank(CatFrom.getList_rank());
+        CatTo.setStore_quick_order(CatFrom.getStore_quick_order());
     }
 
     public void clearCategory(Category Cat) {
@@ -180,6 +188,7 @@ public class CategoryBean implements Serializable {
         Cat.setCategoryName("");
         Cat.setDisplay_quick_order(0);
         Cat.setList_rank(0);
+        Cat.setStore_quick_order(0);
     }
 
     public List<Category> getCategories() {
@@ -212,7 +221,8 @@ public class CategoryBean implements Serializable {
 
     public List<Category> getCategoriesQuickOrder() {
         String sql;
-        sql = "SELECT * FROM category where display_quick_order=1 ORDER BY list_rank DESC,category_name ASC";
+        int CurStoreId = new GeneralUserSetting().getCurrentStore().getStoreId();
+        sql = "SELECT * FROM category where display_quick_order=1 and (store_quick_order=0 or store_quick_order=" + CurStoreId + ") ORDER BY list_rank DESC,category_name ASC";
         ResultSet rs = null;
         Categories = new ArrayList<Category>();
         try (

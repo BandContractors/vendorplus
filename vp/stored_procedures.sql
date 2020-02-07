@@ -153,7 +153,8 @@ CREATE PROCEDURE sp_insert_category
 (
 	IN in_category_name varchar(50),
 	IN in_display_quick_order varchar(50),
-	IN in_list_rank varchar(50)
+	IN in_list_rank varchar(50),
+	IN in_store_quick_order int
 ) 
 BEGIN 
 	SET @new_id=0;
@@ -163,14 +164,16 @@ BEGIN
 		category_id,
 		category_name,
 		display_quick_order,
-		list_rank
+		list_rank,
+		store_quick_order
 	) 
     VALUES
 	(
 		@new_id,
 		in_category_name,
 		in_display_quick_order,
-		in_list_rank
+		in_list_rank,
+		in_store_quick_order
 	); 
 END//
 DELIMITER ;
@@ -182,11 +185,12 @@ CREATE PROCEDURE sp_update_category
 	IN in_category_id int,
 	IN in_category_name varchar(50),
 	IN in_display_quick_order varchar(50),
-	IN in_list_rank varchar(50)
+	IN in_list_rank varchar(50),
+	IN in_store_quick_order int
 ) 
 BEGIN 
 	UPDATE category SET 
-		category_name=in_category_name,display_quick_order=in_display_quick_order,list_rank=in_list_rank 
+		category_name=in_category_name,display_quick_order=in_display_quick_order,list_rank=in_list_rank,store_quick_order=in_store_quick_order 
 	WHERE category_id=in_category_id; 
 END//
 DELIMITER ;

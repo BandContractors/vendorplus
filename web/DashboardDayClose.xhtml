@@ -56,7 +56,12 @@
                         <p:ajax listener="#{dashboardBean.setDateToYesturday()}" process="@this" update="pnlgFilter"/>
                     </p:commandLink>
                 </h:panelGrid>
-                <h:panelGrid id="pnlgFilter" columns="6" styleClass="clsPanelReportFilter" style="-webkit-print-color-adjust: exact;">
+                <h:panelGrid id="pnlgFilter" columns="8" styleClass="clsPanelReportFilter" style="-webkit-print-color-adjust: exact;">
+                    <p:outputLabel value="#{companySetting.getStoreEquivName()}:"/>
+                    <p:selectOneMenu id="menuFromStore" value="#{dashboardBean.store_id}" style="width: 200px;">
+                        <f:selectItem itemLabel="Select" itemValue="0"/>
+                        <f:selectItems value="#{dashboardBean.storeList}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
+                    </p:selectOneMenu>
                     <p:outputLabel value="From Date:"/>
                     <p:calendar pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{dashboardBean.fromDate}" size="8"/>
                     <p:outputLabel id="id11" value="To Date:"/>

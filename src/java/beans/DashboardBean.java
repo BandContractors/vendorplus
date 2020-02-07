@@ -129,6 +129,8 @@ public class DashboardBean implements Serializable {
 
     public void initStockDashboard() {
         try {
+            this.StoreList = new StoreBean().getStores();
+            this.store_id = 0;
             this.CurrentYear = new UtilityBean().getCurrentYear();
             this.CurrentMonthNo = new UtilityBean().getCurrentMonth();
             this.SelectedYear = this.CurrentYear;
@@ -338,6 +340,10 @@ public class DashboardBean implements Serializable {
         if (aStock_type.length() > 0) {
             StockSql = " and stock_type='" + aStock_type + "'";
         }
+        String StoreCondition = "";
+        if (this.store_id > 0) {
+            StoreCondition = " and store_id=" + this.store_id + " ";
+        }
         String sql = "";
         sql = "SELECT "
                 + "	c.y,c.m,c.d,c.snapshot_no,"
@@ -351,9 +357,8 @@ public class DashboardBean implements Serializable {
                 + ") AS c "
                 + "INNER JOIN "
                 + "("
-                + "	select snapshot_no,currency_code,sum(cp_value) as cp_value from view_snapshot_stock_value where year(snapshot_date)=" + aSelYear + StockSql + " group by snapshot_no,currency_code"
+                + "	select snapshot_no,currency_code,sum(cp_value) as cp_value from view_snapshot_stock_value where year(snapshot_date)=" + aSelYear + StoreCondition + StockSql + " group by snapshot_no,currency_code"
                 + ") AS s ON c.snapshot_no=s.snapshot_no";
-        //System.out.println("Q:" + sql);
         ResultSet rs = null;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -864,16 +869,22 @@ public class DashboardBean implements Serializable {
         this.DayCloseSalesCash = new ArrayList<>();
         this.DayCloseSalesCredit = new ArrayList<>();
         this.DayCloseSalesStore = new ArrayList<>();
+        String StoreCondition = "";
+        if (this.store_id > 0) {
+            StoreCondition = " AND t.store_id=" + this.store_id + " ";
+        }
         String sql = "SELECT "
                 + "t.currency_code,sum(t.grand_total) as grand_total,sum(t.cash_discount) as cash_discount,"
                 + "sum(t.grand_total*t.xrate) as grand_total_loc,sum(t.cash_discount*t.xrate) as cash_discount_loc,"
                 + "SUM(IF(t.amount_tendered=0,t.grand_total,0)) as credit_sale,SUM(IF(t.amount_tendered>0,t.grand_total,0)) as cash_sale "
                 + "FROM transaction t WHERE t.transaction_type_id IN(2,65,68) "
+                + StoreCondition
                 + "AND t.transaction_date " + aBtnFrmToDate + " "
                 + "GROUP BY t.currency_code";
         String sql2 = "SELECT "
                 + "t.store_id,t.currency_code,sum(t.grand_total) as grand_total "
                 + "FROM transaction t WHERE t.transaction_type_id IN(2,65,68) "
+                + StoreCondition
                 + "AND t.transaction_date " + aBtnFrmToDate + " "
                 + "GROUP BY t.store_id,t.currency_code "
                 + "ORDER BY t.store_id,t.currency_code ";
@@ -985,21 +996,28 @@ public class DashboardBean implements Serializable {
         this.DayClosePurchasesCredit = new ArrayList<>();
         this.DayClosePurchasesType = new ArrayList<>();
         this.DayClosePurchasesStore = new ArrayList<>();
+        String StoreCondition = "";
+        if (this.store_id > 0) {
+            StoreCondition = " AND t.store_id=" + this.store_id + " ";
+        }
         String sql = "SELECT "
                 + "sum(t.grand_total*t.xrate) as grand_total "
                 + "FROM transaction t "
                 + "WHERE t.transaction_type_id IN(1,19) "
+                + StoreCondition
                 + "AND t.transaction_date " + aBtnFrmToDate;
         String sql2 = "SELECT "
                 + "t.currency_code,"
                 + "SUM(IF(t.amount_tendered=0,t.grand_total,0)) as credit_purchase,SUM(IF(t.amount_tendered>0,t.grand_total,0)) as cash_purchase "
                 + "FROM transaction t WHERE t.transaction_type_id IN(1,19) "
+                + StoreCondition
                 + "AND t.transaction_date " + aBtnFrmToDate + " "
                 + "GROUP BY t.currency_code";
         String sql3 = "SELECT "
                 + "tr.transaction_reason_name,t.currency_code,sum(t.grand_total) as grand_total "
                 + "FROM transaction t inner join transaction_reason tr on t.transaction_reason_id=tr.transaction_reason_id "
                 + "WHERE t.transaction_type_id IN(1,19) "
+                + StoreCondition
                 + "AND t.transaction_date " + aBtnFrmToDate + " "
                 + "GROUP BY tr.transaction_reason_name,t.currency_code "
                 + "ORDER BY tr.transaction_reason_name,t.currency_code";
@@ -1007,6 +1025,7 @@ public class DashboardBean implements Serializable {
                 + "st.store_name,t.currency_code,sum(t.grand_total) as grand_total "
                 + "FROM transaction t inner join store st on t.store_id=st.store_id "
                 + "WHERE t.transaction_type_id IN(1,19) "
+                + StoreCondition
                 + "AND t.transaction_date " + aBtnFrmToDate + " "
                 + "GROUP BY st.store_name,t.currency_code "
                 + "ORDER BY st.store_name,t.currency_code ";
@@ -1222,14 +1241,20 @@ public class DashboardBean implements Serializable {
         double totalreceipt = 0;
         this.DayCloseCashReceiptType = new ArrayList<>();
         this.DayCloseCashReceiptAccount = new ArrayList<>();
+        String StoreCondition = "";
+        if (this.store_id > 0) {
+            StoreCondition = " AND p.store_id=" + this.store_id + " ";
+        }
         String sql = "SELECT "
                 + "sum(p.paid_amount*p.xrate) as paid_amount FROM pay p "
                 + "WHERE p.pay_type_id=14 AND p.pay_method_id!=6 "
+                + StoreCondition
                 + "AND p.pay_date " + aBtnFrmToDate;
         String sql2 = "SELECT "
                 + "tr.transaction_reason_name,p.currency_code,sum(p.paid_amount) as paid_amount "
                 + "FROM pay p inner join transaction_reason tr on p.pay_reason_id=tr.transaction_reason_id "
                 + "WHERE p.pay_type_id=14 AND p.pay_method_id!=6 "
+                + StoreCondition
                 + "AND p.pay_date " + aBtnFrmToDate + " "
                 + "GROUP BY tr.transaction_reason_name,p.currency_code "
                 + "ORDER BY tr.transaction_reason_name,p.currency_code";
@@ -1237,6 +1262,7 @@ public class DashboardBean implements Serializable {
                 + "ca.child_account_name,p.currency_code,sum(p.paid_amount) as paid_amount "
                 + "FROM pay p inner join acc_child_account ca on p.acc_child_account_id=ca.acc_child_account_id "
                 + "WHERE p.pay_type_id=14 AND p.pay_method_id!=6 "
+                + StoreCondition
                 + "AND p.pay_date " + aBtnFrmToDate + " "
                 + "GROUP BY ca.child_account_name,p.currency_code "
                 + "ORDER BY ca.child_account_name,p.currency_code";
@@ -1407,14 +1433,20 @@ public class DashboardBean implements Serializable {
         long totalsubtracted = 0;
         this.DayCloseStockMovementAdded = new ArrayList<>();
         this.DayCloseStockMovementSubtracted = new ArrayList<>();
+        String StoreCondition = "";
+        if (this.store_id > 0) {
+            StoreCondition = " AND sl.store_id=" + this.store_id + " ";
+        }
         String sql = "SELECT "
-                + "count(distinct item_id) as items_added from stock_ledger "
+                + "count(distinct item_id) as items_added from stock_ledger sl "
                 + "WHERE qty_added>0 "
+                + StoreCondition
                 + "AND cast(add_date as date) " + aBtnFrmToDate;
         String sql2 = "SELECT "
                 + "count(distinct item_id) as items_subtracted "
-                + "from stock_ledger "
+                + "from stock_ledger sl "
                 + "WHERE qty_subtracted>0 "
+                + StoreCondition
                 + "AND cast(add_date as date) " + aBtnFrmToDate;
         String sql3 = "SELECT "
                 + "tt.transaction_type_name,"
@@ -1422,6 +1454,7 @@ public class DashboardBean implements Serializable {
                 + "sum(sl.qty_added) as qty_added "
                 + "from stock_ledger sl INNER JOIN transaction_type tt ON tt.transaction_type_id=sl.transaction_type_id "
                 + "WHERE sl.qty_added>0 "
+                + StoreCondition
                 + "AND cast(sl.add_date as date) " + aBtnFrmToDate + " "
                 + "GROUP BY tt.transaction_type_name";
         String sql4 = "SELECT "
@@ -1430,6 +1463,7 @@ public class DashboardBean implements Serializable {
                 + "sum(sl.qty_subtracted) as qty_subtracted "
                 + "from stock_ledger sl INNER JOIN transaction_type tt ON tt.transaction_type_id=sl.transaction_type_id "
                 + "WHERE sl.qty_subtracted>0 "
+                + StoreCondition
                 + "AND cast(sl.add_date as date) " + aBtnFrmToDate + " "
                 + "GROUP BY tt.transaction_type_name";
         //added
@@ -1539,14 +1573,20 @@ public class DashboardBean implements Serializable {
         double totalpayment = 0;
         this.DayCloseCashPaymentType = new ArrayList<>();
         this.DayCloseCashPaymentAccount = new ArrayList<>();
+        String StoreCondition = "";
+        if (this.store_id > 0) {
+            StoreCondition = " AND p.store_id=" + this.store_id + " ";
+        }
         String sql = "SELECT "
                 + "sum(p.paid_amount*p.xrate) as paid_amount FROM pay p "
                 + "WHERE p.pay_type_id=15 AND p.pay_method_id!=7 "
+                + StoreCondition
                 + "AND p.pay_date " + aBtnFrmToDate;
         String sql2 = "SELECT "
                 + "tr.transaction_reason_name,p.currency_code,sum(p.paid_amount) as paid_amount "
                 + "FROM pay p inner join transaction_reason tr on p.pay_reason_id=tr.transaction_reason_id "
                 + "WHERE p.pay_type_id=15 AND p.pay_method_id!=7 "
+                + StoreCondition
                 + "AND p.pay_date " + aBtnFrmToDate + " "
                 + "GROUP BY tr.transaction_reason_name,p.currency_code "
                 + "ORDER BY tr.transaction_reason_name,p.currency_code";
@@ -1554,6 +1594,7 @@ public class DashboardBean implements Serializable {
                 + "ca.child_account_name,p.currency_code,sum(p.paid_amount) as paid_amount "
                 + "FROM pay p inner join acc_child_account ca on p.acc_child_account_id=ca.acc_child_account_id "
                 + "WHERE p.pay_type_id=15 AND p.pay_method_id!=7 "
+                + StoreCondition
                 + "AND p.pay_date " + aBtnFrmToDate + " "
                 + "GROUP BY ca.child_account_name,p.currency_code "
                 + "ORDER BY ca.child_account_name,p.currency_code";
@@ -1736,6 +1777,8 @@ public class DashboardBean implements Serializable {
 
     public void initDayCloseDashboard() {
         try {
+            this.StoreList = new StoreBean().getStores();
+            this.store_id = 0;
             this.setDateToToday();
             this.searchDayCloseDashboard();
         } catch (Exception e) {

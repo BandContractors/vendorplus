@@ -39,6 +39,11 @@
                 </h:selectOneMenu>
                 <h:outputLabel  value="List Rank:"/>
                 <h:inputText styleClass="clsInput" value="#{category.list_rank}" autocomplete="off"/>
+                <h:outputLabel value="Restrict Quick Access to #{companySetting.getStoreEquivName()}:"/>
+                <h:selectOneMenu styleClass="clsMenu" id="menuStore" value="#{category.store_quick_order}">
+                    <f:selectItem itemLabel="None(ShowOnAll)" itemValue="0"/>
+                    <f:selectItems value="#{storeBean.stores}" var="c" itemLabel="#{c.storeName}" itemValue="#{c.storeId}"/>
+                </h:selectOneMenu>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainCommands" columns="1">
@@ -86,6 +91,12 @@
                     <f:facet name="header">List Rank</f:facet>
                     <!-- row record -->
                     #{c.list_rank}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Restrict Quick Access to #{companySetting.getStoreEquivName()} Name</f:facet>
+                    <!-- row record -->
+                    #{c.store_quick_order eq 0 ? 'None' : storeBean.getStore(c.store_quick_order).storeName}
                 </p:column>
                 <p:column>
                     <!-- column header -->
