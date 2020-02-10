@@ -63,6 +63,7 @@ public class Item implements Serializable {
     private String stock_status;
     private double stock_status_perc;
     private String expiry_band;
+    private int override_gen_name;
     
     /**
      * @return the ItemId
@@ -699,6 +700,20 @@ public class Item implements Serializable {
      */
     public void setExpiry_band(String expiry_band) {
         this.expiry_band = expiry_band;
+    }
+
+    /**
+     * @return the override_gen_name
+     */
+    public int getOverride_gen_name() {
+        return override_gen_name;
+    }
+
+    /**
+     * @param override_gen_name the override_gen_name to set
+     */
+    public void setOverride_gen_name(int override_gen_name) {
+        this.override_gen_name = override_gen_name;
     }
 
 }

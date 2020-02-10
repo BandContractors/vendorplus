@@ -5168,6 +5168,7 @@ public class TransItemBean implements Serializable {
                 }
                 aTransItem.setItem_currency_code(item.getCurrencyCode());
                 aTransItem.setIs_general(item.getIsGeneral());
+                aTransItem.setOverride_gen_name(item.getOverride_gen_name());
             }
         } catch (Exception e) {
             System.out.println("updateLookUpsUI:" + e.getMessage());
@@ -9911,6 +9912,11 @@ public class TransItemBean implements Serializable {
                 if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "SHOW_GEN_ITEM_NAME").getParameter_value().equals("1")) {
                     FullItemDesc = item.getDescription();
                 }
+                if (item.getOverride_gen_name() == 1) {
+                    FullItemDesc = item.getDescription();
+                } else if (item.getOverride_gen_name() == 2) {
+                    FullItemDesc = "";
+                }
             }
             //ovveride item desc with alias if set and allowable
             if (item.getAlias_name().length() > 0 && item.getDisplay_alias_name() == 1) {
@@ -10000,6 +10006,15 @@ public class TransItemBean implements Serializable {
                     } else {
                         FullItemDesc = aTransItem.getDescription();
                     }
+                }
+                if (aTransItem.getOverride_gen_name() == 1) {
+                    if (aTransItem.getAlias_name().length() > 0 && aTransItem.getDisplay_alias_name() == 1) {
+                        FullItemDesc = aTransItem.getAlias_name();
+                    } else {
+                        FullItemDesc = aTransItem.getDescription();
+                    }
+                } else if (aTransItem.getOverride_gen_name() == 2) {
+                    FullItemDesc = "";
                 }
             }
         } catch (NullPointerException npe) {

@@ -671,7 +671,8 @@ CREATE PROCEDURE sp_insert_item
 	IN in_is_free int,
 	IN in_specify_size int,
 	IN in_size_to_specific_name int,
-	IN in_expiry_band varchar(50)
+	IN in_expiry_band varchar(50),
+	IN in_override_gen_name int
 ) 
 BEGIN 
 	SET @new_id=0;
@@ -743,7 +744,8 @@ BEGIN
 		is_free,
 		specify_size,
 		size_to_specific_name,
-		expiry_band
+		expiry_band,
+		override_gen_name
 	) 
     VALUES
 	(
@@ -783,7 +785,8 @@ BEGIN
 		in_is_free,
 		in_specify_size,
 		in_size_to_specific_name,
-		in_expiry_band
+		in_expiry_band,
+		in_override_gen_name
 	); 
 END//
 DELIMITER ;
@@ -826,7 +829,8 @@ CREATE PROCEDURE sp_update_item
 	IN in_is_free int,
 	IN in_specify_size int,
 	IN in_size_to_specific_name int,
-	IN in_expiry_band varchar(50)
+	IN in_expiry_band varchar(50),
+	IN in_override_gen_name int
 ) 
 BEGIN 
 	SET @sub_category_id=NULL;
@@ -893,7 +897,8 @@ BEGIN
 		is_free=in_is_free,
 		specify_size=in_specify_size,
 		size_to_specific_name=in_size_to_specific_name,
-		expiry_band=in_expiry_band 
+		expiry_band=in_expiry_band,
+		override_gen_name=in_override_gen_name 
 	WHERE item_id=in_item_id; 
 END//
 DELIMITER ;

@@ -173,9 +173,9 @@ public class ItemBean implements Serializable {
         int save_status = 0;
         String sql = null;
         if (aItem.getItemId() == 0) {
-            sql = "{call sp_insert_item(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_insert_item(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         } else if (aItem.getItemId() > 0) {
-            sql = "{call sp_update_item(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_update_item(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         }
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -300,6 +300,11 @@ public class ItemBean implements Serializable {
                 cs.setString("in_expiry_band", aItem.getExpiry_band());
             } catch (NullPointerException npe) {
                 cs.setString("in_expiry_band", "");
+            }
+            try {
+                cs.setInt("in_override_gen_name", aItem.getOverride_gen_name());
+            } catch (NullPointerException npe) {
+                cs.setInt("in_override_gen_name", 0);
             }
             cs.executeUpdate();
             save_status = 1;
@@ -486,6 +491,11 @@ public class ItemBean implements Serializable {
                 aItem.setExpiry_band(aResultSet.getString("expiry_band"));
             } catch (NullPointerException npe) {
                 aItem.setExpiry_band("");
+            }
+            try {
+                aItem.setOverride_gen_name(aResultSet.getInt("override_gen_name"));
+            } catch (NullPointerException npe) {
+                aItem.setOverride_gen_name(0);
             }
         } catch (SQLException se) {
             System.err.println("setItemFromResultset:" + se.getMessage());
@@ -698,6 +708,11 @@ public class ItemBean implements Serializable {
                 aItem.setExpiry_band(aResultSet.getString("expiry_band"));
             } catch (Exception e) {
                 aItem.setExpiry_band("");
+            }
+            try {
+                aItem.setOverride_gen_name(aResultSet.getInt("override_gen_name"));
+            } catch (NullPointerException npe) {
+                aItem.setOverride_gen_name(0);
             }
         } catch (SQLException se) {
             System.err.println("setItemFromResultsetReport:" + se.getMessage());
@@ -918,6 +933,7 @@ public class ItemBean implements Serializable {
                 this.ItemObj.setSize_to_specific_name(0);
                 this.ItemObj.setUnitCostPrice(0);
                 this.ItemObj.setExpiry_band("");
+                this.ItemObj.setOverride_gen_name(0);
                 this.setSearchItemDesc("");
                 this.refreshStockLocation(0);
                 this.refreshItemsList(this.getSearchItemDesc());
@@ -965,6 +981,7 @@ public class ItemBean implements Serializable {
                 aItem.setSpecify_size(0);
                 aItem.setSize_to_specific_name(0);
                 aItem.setExpiry_band("");
+                aItem.setOverride_gen_name(0);
                 this.setSearchItemDesc("");
                 this.refreshStockLocation(0);
             }
