@@ -371,7 +371,7 @@ BEGIN
 	SELECT * FROM store WHERE store_id IN(
 		SELECT gr.store_id FROM group_right gr WHERE gr.group_detail_id IN(
 			SELECT gu.group_detail_id FROM group_user gu WHERE gu.user_detail_id=in_user_detail_id
-		)
+		) AND (allow_view='Yes' or allow_add='Yes' or allow_edit='Yes' or allow_delete='Yes')
 	); 
 END//
 DELIMITER ;
