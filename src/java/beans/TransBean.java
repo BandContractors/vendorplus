@@ -879,7 +879,7 @@ public class TransBean implements Serializable {
             msg = "TOTAL DEBIT IS NOT EQUAL TO TOTAL CREIDT...!";
             this.setActionMessage("Transaction NOT saved");
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if ("EXPENSE ENTRY".equals(CurrentTransactionType.getTransactionTypeName()) && (trans.getAmountTendered() <= 0 && trans.getGrandTotal() <= 0)) {
+        } else if ("EXPENSE ENTRY".equals(CurrentTransactionType.getTransactionTypeName()) && (trans.getAmountTendered() <= 0 && trans.getGrandTotal() <= 0) && trans.getTransactionId()==0) {
             this.setActionMessage("");
             msg = "Please enter Spent/Paid Amount";
             this.setActionMessage("Transaction NOT saved");
@@ -1498,7 +1498,7 @@ public class TransBean implements Serializable {
                 msg = "Please select the Payment Account";
             } else if ("JOURNAL ENTRY".equals(transtype.getTransactionTypeName()) && trans.getTotalDebit() != trans.getTotalCredit()) {
                 msg = "TOTAL DEBIT IS NOT EQUAL TO TOTAL CREDIT...!";
-            } else if ("EXPENSE ENTRY".equals(transtype.getTransactionTypeName()) && (trans.getAmountTendered() <= 0 && trans.getGrandTotal() <= 0)) {
+            } else if ("EXPENSE ENTRY".equals(transtype.getTransactionTypeName()) && (trans.getAmountTendered() <= 0 && trans.getGrandTotal() <= 0) && trans.getTransactionId()==0) {
                 msg = "Please enter Spent/Paid Amount";
             } else if ("EXPENSE ENTRY".equals(transtype.getTransactionTypeName()) && trans.getAccChildAccountId() == 0) {
                 msg = "Please select the Payment Account";
