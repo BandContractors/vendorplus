@@ -2709,6 +2709,174 @@ public class AccJournalBean implements Serializable {
         }
     }
 
+    public void postJournalCashReceiptOtherRevenue(Pay aPay, int aAccPeriodId, List<PayTrans> aPayTranss) {
+        long JobId = 0;
+        if (aPay != null) {
+            int CashAccountId = 0;
+            String CashAccountCode = "";
+            try {
+                CashAccountCode = new AccChildAccountBean().getParentAccCodeByChildAccId(aPay.getAccChildAccountId());
+            } catch (NullPointerException npe) {
+                CashAccountCode = "";
+            }
+            try {
+                CashAccountId = new AccCoaBean().getAccCoaByCodeOrId(CashAccountCode, 0).getAccCoaId();
+            } catch (NullPointerException npe) {
+                CashAccountId = 0;
+            }
+            int RevenueAccountId = 0;
+            String RevenueAccountCode = "";
+            try {
+                RevenueAccountCode = aPayTranss.get(0).getAccount_code();
+            } catch (Exception e) {
+                RevenueAccountCode = "";
+            }
+            try {
+                RevenueAccountId = new AccCoaBean().getAccCoaByCodeOrId(RevenueAccountCode, 0).getAccCoaId();
+            } catch (NullPointerException npe) {
+                RevenueAccountId = 0;
+            }
+
+            AccJournal accjournal = new AccJournal();
+            //get job Id
+            try {
+                JobId = new UtilityBean().getNewTableColumnSeqNumber("acc_journal", "job_id");
+            } catch (NullPointerException npe) {
+                JobId = 0;
+            }
+            accjournal.setJobId(JobId);
+            accjournal.setAccJournalId(0);
+            accjournal.setJournalDate(aPay.getPayDate());
+            accjournal.setTransactionId(0);
+            accjournal.setTransactionTypeId(0);
+            accjournal.setTransactionReasonId(0);
+            accjournal.setPayId(aPay.getPayId());
+            accjournal.setPayTypeId(aPay.getPayTypeId());
+            accjournal.setPayReasonId(aPay.getPayReasonId());
+            accjournal.setStoreId(aPay.getStoreId());
+            accjournal.setLedgerFolio("");
+            accjournal.setAccPeriodId(aAccPeriodId);
+            accjournal.setCurrencyCode(aPay.getCurrencyCode());
+            accjournal.setXrate(aPay.getXRate());
+            accjournal.setAddBy(aPay.getAddUserDetailId());
+            accjournal.setBillTransactorId(0);
+            double PaidCashAmount = aPay.getPaidAmount();
+            Transactor aBillTransactor = null;
+            try {
+                aBillTransactor = new TransactorBean().getTransactor(aPay.getBillTransactorId());
+            } catch (NullPointerException npe) {
+                aBillTransactor = null;
+            }
+            //Debit Cash
+            if (PaidCashAmount > 0) {
+                accjournal.setAccChildAccountId(aPay.getAccChildAccountId());
+                accjournal.setAccCoaId(CashAccountId);
+                accjournal.setAccountCode(CashAccountCode);
+                accjournal.setDebitAmount(PaidCashAmount);
+                accjournal.setCreditAmount(0);
+                accjournal.setNarration("CASH RECEIVED - OTHER REVENUE");
+                this.saveAccJournal(accjournal);
+            }
+            //Credit Revenue Account
+            if (PaidCashAmount > 0) {
+                if (aBillTransactor != null) {
+                    accjournal.setBillTransactorId(aBillTransactor.getTransactorId());
+                }
+                accjournal.setAccChildAccountId(0);
+                accjournal.setAccCoaId(RevenueAccountId);
+                accjournal.setAccountCode(RevenueAccountCode);
+                accjournal.setDebitAmount(0);
+                accjournal.setCreditAmount(PaidCashAmount);
+                accjournal.setNarration("OTHER REVENUE RECEIVED");
+                this.saveAccJournal(accjournal);
+            }
+        }
+    }
+    
+    public void postJournalCashReceiptOtherRevenueCANCEL(Pay aPay,int aAccPeriodId, List<PayTrans> aPayTranss) {
+        long JobId = 0;
+        if (aPay != null) {
+            int CashAccountId = 0;
+            String CashAccountCode = "";
+            try {
+                CashAccountCode = new AccChildAccountBean().getParentAccCodeByChildAccId(aPay.getAccChildAccountId());
+            } catch (NullPointerException npe) {
+                CashAccountCode = "";
+            }
+            try {
+                CashAccountId = new AccCoaBean().getAccCoaByCodeOrId(CashAccountCode, 0).getAccCoaId();
+            } catch (NullPointerException npe) {
+                CashAccountId = 0;
+            }
+            int RevenueAccountId = 0;
+            String RevenueAccountCode = "";
+            try {
+                RevenueAccountCode = aPayTranss.get(0).getAccount_code();
+            } catch (Exception e) {
+                RevenueAccountCode = "";
+            }
+            try {
+                RevenueAccountId = new AccCoaBean().getAccCoaByCodeOrId(RevenueAccountCode, 0).getAccCoaId();
+            } catch (NullPointerException npe) {
+                RevenueAccountId = 0;
+            }
+
+            AccJournal accjournal = new AccJournal();
+            //get job Id
+            try {
+                JobId = new UtilityBean().getNewTableColumnSeqNumber("acc_journal", "job_id");
+            } catch (NullPointerException npe) {
+                JobId = 0;
+            }
+            accjournal.setJobId(JobId);
+            accjournal.setAccJournalId(0);
+            accjournal.setJournalDate(aPay.getPayDate());
+            accjournal.setTransactionId(0);
+            accjournal.setTransactionTypeId(0);
+            accjournal.setTransactionReasonId(0);
+            accjournal.setPayId(aPay.getPayId());
+            accjournal.setPayTypeId(aPay.getPayTypeId());
+            accjournal.setPayReasonId(aPay.getPayReasonId());
+            accjournal.setStoreId(aPay.getStoreId());
+            accjournal.setLedgerFolio("");
+            accjournal.setAccPeriodId(aAccPeriodId);
+            accjournal.setCurrencyCode(aPay.getCurrencyCode());
+            accjournal.setXrate(aPay.getXRate());
+            accjournal.setAddBy(aPay.getAddUserDetailId());
+            accjournal.setBillTransactorId(0);
+            double PaidCashAmount = aPay.getPaidAmount();
+            Transactor aBillTransactor = null;
+            try {
+                aBillTransactor = new TransactorBean().getTransactor(aPay.getBillTransactorId());
+            } catch (NullPointerException npe) {
+                aBillTransactor = null;
+            }
+            //CANCEL by Credit Cash
+            if (PaidCashAmount > 0) {
+                accjournal.setAccChildAccountId(aPay.getAccChildAccountId());
+                accjournal.setAccCoaId(CashAccountId);
+                accjournal.setAccountCode(CashAccountCode);
+                accjournal.setDebitAmount(0);
+                accjournal.setCreditAmount(PaidCashAmount);
+                accjournal.setNarration("CANCEL-CASH RECEIVED - OTHER REVENUE");
+                this.saveAccJournal(accjournal);
+            }
+            //CANCEL by Dedit Revenue Account
+            if (PaidCashAmount > 0) {
+                if (aBillTransactor != null) {
+                    accjournal.setBillTransactorId(aBillTransactor.getTransactorId());
+                }
+                accjournal.setAccChildAccountId(0);
+                accjournal.setAccCoaId(RevenueAccountId);
+                accjournal.setAccountCode(RevenueAccountCode);
+                accjournal.setDebitAmount(PaidCashAmount);
+                accjournal.setCreditAmount(0);
+                accjournal.setNarration("CANCEL-OTHER REVENUE RECEIVED");
+                this.saveAccJournal(accjournal);
+            }
+        }
+    }
+
     public void postJournalCashPaymentPrepaidExpense(Pay aPay, int aAccPeriodId) {
         long JobId = 0;
         if (aPay != null) {

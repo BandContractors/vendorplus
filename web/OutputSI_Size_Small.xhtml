@@ -23,7 +23,7 @@
                     <h:panelGrid id="IpgrdSalesInvoice" columns="1">
 
                         <h:panelGrid id="IpgrdSalesInvoiceHeader1" style="width: 290px;text-align: center;border-bottom-style: dotted;" columns="1">
-                            <h:outputLabel id="IolblSalesInvoiceCompany" style="font-size: 20px;font-weight: bold;" value="#{companySetting.getLICENSE_CLIENT_NAME()}"/>
+                            <h:outputLabel id="IolblSalesInvoiceCompany" style="font-size: 20px;font-weight: bold;" value="#{companySetting.getLICENSE_CLIENT_NAME()}" rendered="#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','OUTPUT_SHOW_CO_NAME').parameter_value.equals('1')}"/>
                             <p:panel style="width: 290px;text-align: center; border-style: none !important;">
                                 <h:outputLabel id="IolblSalesInvoiceBranch" value="#{companySetting.getBranchCode()} " rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowBranchInvoice(),'Yes')}"/>
                                 <h:outputLabel id="IolblSalesInvoiceStore" value="#{generalUserSetting.outputDetailParent.store.storeName}" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowStoreInvoice(),'Yes')}"/>
@@ -128,7 +128,7 @@
                             <h:outputLabel style="font-size: 16px;" id="IolblSalesInvoiceCashDiscount" value="#{generalUserSetting.outputDetailParent.trans.cashDiscount}" rendered="#{generalUserSetting.outputDetailParent.trans.cashDiscount>0}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
-                            <h:outputLabel style="font-size: 16px; font-weight: bold;" value="GRAND TOTAL:"/>
+                            <h:outputLabel style="font-size: 16px; font-weight: bold;" value="TOTAL:"/>
                             <h:outputLabel style="font-size: 16px; font-weight: bold;" id="IolblSalesInvoiceGrandTotal" value="#{generalUserSetting.outputDetailParent.trans.grandTotal}">
                                 <f:convertNumber pattern="#{accCurrencyBean.getNumberFormatByCurrency(generalUserSetting.outputDetailParent.trans.currencyCode)}" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>

@@ -231,6 +231,25 @@ public class PayBean implements Serializable {
         return PayId;
     }
     
+    public void saveCashReceiptREVENUE(Pay pay, List<PayTrans> aPayTranss, int aPayTypeId, int aPayReasId, PayTrans aPayTrans) {
+        try {
+            if (aPayTrans.getAccount_code().length() <= 0) {
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Select Revenue Account..."));
+            } else {
+                aPayTrans.setTransPaidAmount(pay.getPaidAmount());
+                try {
+                    aPayTranss.clear();
+                } catch (NullPointerException npe) {
+                    aPayTranss = new ArrayList<>();
+                }
+                aPayTranss.add(aPayTrans);
+                this.saveCashReceipt(pay, aPayTranss, aPayTypeId, aPayReasId);
+            }
+        } catch (NullPointerException npe) {
+            npe.printStackTrace();
+        }
+    }
+    
     public void saveCashReceipt(Pay pay, List<PayTrans> aPayTranss, int aPayTypeId, int aPayReasId) {
         String sql = null;
         String sql2 = null;
@@ -314,7 +333,7 @@ public class PayBean implements Serializable {
             
             pay.setPayId(SavedPayId);
             //insert pay transs items
-            if (aPayReasId == 21 || aPayReasId == 22) {
+            if (aPayReasId == 21 || aPayReasId == 22 || aPayReasId == 115) {
                 new PayTransBean().savePayTranss(pay, aPayTranss);
             }
             //Refresh Print output
@@ -329,6 +348,8 @@ public class PayBean implements Serializable {
                 new AccJournalBean().postJournalCashReceiptLoan(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId());
             } else if (aPayReasId == 90) {//CUSTOMER DEPOSIT (Prepaid Income)
                 new AccJournalBean().postJournalCashReceiptPrepaidIncome(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId());
+            }else if (aPayReasId == 115) {//OTHER REVENUE
+                new AccJournalBean().postJournalCashReceiptOtherRevenue(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId(),aPayTranss);
             }
             this.setActionMessage("Saved Successfully");
             this.clearPayPayTranss(pay, aPayTranss);
@@ -1117,7 +1138,7 @@ public class PayBean implements Serializable {
             }
             //copy paytrans
             if (isPayCopySuccess) {
-                if (aPay.getPayReasonId() == 22 || aPay.getPayReasonId() == 25) {
+                if (aPay.getPayReasonId() == 22 || aPay.getPayReasonId() == 25 || aPay.getPayReasonId() == 115) {
                     int i = 0;
                     int n = aPayTransList.size();
                     //now copy item by item
@@ -1157,7 +1178,7 @@ public class PayBean implements Serializable {
             }
             //update paytrans
             if (isPayUpdateSuccess) {
-                if (aPay.getPayReasonId() == 22 || aPay.getPayReasonId() == 25) {
+                if (aPay.getPayReasonId() == 22 || aPay.getPayReasonId() == 25 || aPay.getPayReasonId() == 115) {
                     int i = 0;
                     newPayTransList = new PayTransBean().getPayTranssByPayId(aPay.getPayId());
                     int n = newPayTransList.size();
@@ -1200,6 +1221,9 @@ public class PayBean implements Serializable {
                 }
                 if (aPay.getPayReasonId() == 91) {
                     new AccJournalBean().postJournalCashPaymentPrepaidExpenseCANCEL(aPay, new AccPeriodBean().getAccPeriod(aPay.getPayDate()).getAccPeriodId());
+                }
+                if (aPay.getPayReasonId() == 115) {
+                    new AccJournalBean().postJournalCashReceiptOtherRevenueCANCEL(aPay, new AccPeriodBean().getAccPeriod(aPay.getPayDate()).getAccPeriodId(),aPayTransList);
                 }
                 hasReversed = 1;
             }

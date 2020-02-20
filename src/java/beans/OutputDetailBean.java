@@ -211,6 +211,8 @@ public class OutputDetailBean implements Serializable {
                         aOutputDetail.setPay_reason("Current/Long-Term Loan");
                     } else if (aOutputDetail.getPay().getPayReasonId() == 90) {
                         aOutputDetail.setPay_reason("Customer Deposit/Prepayment");
+                    } else if (aOutputDetail.getPay().getPayReasonId() == 115) {
+                        aOutputDetail.setPay_reason("Other Revenue");
                     }
                 }
                 //for hire return

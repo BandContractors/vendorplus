@@ -17,7 +17,7 @@
                 </p:panel>
                 <h:panelGrid id="vTransactionGrid" style="text-align: center;border-style: none;-webkit-print-color-adjust: exact; width: 100%"> 
                     <h:panelGrid columns="2" style="width: 100%">
-                        <h:outputLabel style="font-family:'Trebuchet MS',Lucida Grande,Lucida Sans Unicode,Lucida Sans,Tahoma,sans-serif; font-size: 18pt;color:red;font-weight: bold; float: left">#{companySetting.getLICENSE_CLIENT_NAME()}</h:outputLabel>
+                        <h:outputLabel style="font-family:'Trebuchet MS',Lucida Grande,Lucida Sans Unicode,Lucida Sans,Tahoma,sans-serif; font-size: 18pt;color:red;font-weight: bold; float: left" rendered="#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','OUTPUT_SHOW_CO_NAME').parameter_value.equals('1')}">#{companySetting.getLICENSE_CLIENT_NAME()}</h:outputLabel>
                         <p:panel style="background: black; height: 30px; width: 200px; float: right">
                             <h:outputLabel style="font-family:'Trebuchet MS',Lucida Grande,Lucida Sans Unicode,Lucida Sans,Tahoma,sans-serif; font-size: 16pt;color:white;font-weight: bold; text-align: center">CASH RECEIPT</h:outputLabel>                     
                         </p:panel>

@@ -20,7 +20,7 @@
             <h:panelGrid id="IpgrdSalesInvoice" columns="1">
 
                 <h:panelGrid id="IpgrdSalesInvoiceHeader1" style="width: 290px;text-align: center;background-color: black;color: white;-webkit-print-color-adjust: exact;" columns="1">
-                    <h:outputLabel id="IolblSalesInvoiceCompany" style="font-size: 20px;font-weight: bold;" value="#{companySetting.getLICENSE_CLIENT_NAME()}"/>
+                    <h:outputLabel id="IolblSalesInvoiceCompany" style="font-size: 20px;font-weight: bold;" value="#{companySetting.getLICENSE_CLIENT_NAME()}" rendered="#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','OUTPUT_SHOW_CO_NAME').parameter_value.equals('1')}"/>
                     <p:panel style="width: 290px;text-align: center; border-style: none !important;">
                         <h:outputLabel id="IolblSalesInvoiceBranch" value="#{companySetting.getBranchCode()} " rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowBranchInvoice(),'Yes')}"/>
                         <h:outputLabel id="IolblSalesInvoiceStore" value="(#{generalUserSetting.outputDetailParent.store.storeName})" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowStoreInvoice(),'Yes')}"/>
@@ -69,6 +69,7 @@
                     <h:outputLabel style="font-size: 16px;" value="Share Capital Contribution" rendered="#{generalUserSetting.outputDetailParent.pay.payReasonId==23}"/>
                     <h:outputLabel style="font-size: 16px;" value="Current/Long-Term Loan" rendered="#{generalUserSetting.outputDetailParent.pay.payReasonId==24}"/>
                     <h:outputLabel style="font-size: 16px;" value="#{menuItemBean.menuItemObj.CUSTOMER_NAME} Deposit (Prepayment)" rendered="#{generalUserSetting.outputDetailParent.pay.payReasonId==90}"/>
+                    <h:outputLabel style="font-size: 16px;" value="Other Revenue Received" rendered="#{generalUserSetting.outputDetailParent.pay.payReasonId==115}"/>
                 </h:panelGrid>
 
                 <h:panelGrid id="IpgrdSalesInvoiceTotals" style="width: 290px; margin: 0px;border-bottom-style: dotted" columns="2">

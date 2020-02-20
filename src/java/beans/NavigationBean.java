@@ -171,6 +171,19 @@ public class NavigationBean implements Serializable {
         httpSession.setAttribute("TRANSACTION_REASON_NAME", "CREDIT SALE");
         return "CashReceiptCS?faces-redirect=true";
     }
+    
+    public String redirectToCashReceiptRevenue() {
+        //update seesion
+        FacesContext context = FacesContext.getCurrentInstance();
+        HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+        HttpSession httpSession = request.getSession(false);
+        httpSession.setAttribute("PAY_CATEGORY", "IN");
+        httpSession.setAttribute("TRANSACTION_TYPE_ID", 14);
+        httpSession.setAttribute("TRANSACTION_TYPE_NAME", "CASH RECEIPT");
+        httpSession.setAttribute("TRANSACTION_REASON_ID", 115);
+        httpSession.setAttribute("TRANSACTION_REASON_NAME", "OTHER REVENUE");
+        return "CashReceiptREVENUE?faces-redirect=true";
+    }
 
     public String redirectToCashReceiptPrepaidIncome() {
         //update seesion

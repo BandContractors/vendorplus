@@ -214,6 +214,8 @@
                     <p:commandButton id="cmdbcancelCRLoan" icon="ui-icon-closethick" oncomplete="PF('dlgCRLoan').show();" actionListener="#{payBean.initPaySession(itm.payId,'Cancel')}" update=":formTransactionCRLoan" rendered="#{itm.payReasonId==24}"/>
                     <p:commandButton id="cmdbViewCRDeposit" icon="ui-icon-search" oncomplete="PF('dlgCRDeposit').show();" actionListener="#{payBean.initPaySession(itm.payId,'View')}" update=":formTransactionCRDeposit" rendered="#{itm.payReasonId==90}"/>
                     <p:commandButton id="cmdbcancelCRDeposit" icon="ui-icon-closethick" oncomplete="PF('dlgCRDeposit').show();" actionListener="#{payBean.initPaySession(itm.payId,'Cancel')}" update=":formTransactionCRDeposit" rendered="#{itm.payReasonId==90}"/>
+                    <p:commandButton id="cmdbViewCROtherRevenue" icon="ui-icon-search" oncomplete="PF('dlgCROtherRevenue').show();" actionListener="#{payBean.initPaySession(itm.payId,'View')}" update=":formTransactionCROtherRevenue" rendered="#{itm.payReasonId==115}"/>
+                    <p:commandButton id="cmdbcancelCROtherRevenue" icon="ui-icon-closethick" oncomplete="PF('dlgCROtherRevenue').show();" actionListener="#{payBean.initPaySession(itm.payId,'Cancel')}" update=":formTransactionCROtherRevenue" rendered="#{itm.payReasonId==115}"/>
                 </p:column>
                 <p:column headerText="Cash Receipt Type">
                     <h:outputLabel value="#{transactionReasonBean.getTransactionReason(itm.payReasonId).transactionReasonName}"/><br/>
@@ -253,6 +255,7 @@
         <ui:include src="ViewCashReceiptCapitalTrans.xhtml"/>
         <ui:include src="ViewCashReceiptLoanTrans.xhtml"/>
         <ui:include src="ViewCashReceiptDepositTrans.xhtml"/>
+        <ui:include src="ViewCashReceiptOtherRevenueTrans.xhtml"/>
     </h:body>
 </html>
 
