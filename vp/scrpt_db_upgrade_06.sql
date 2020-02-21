@@ -4,7 +4,8 @@ alter table category add column store_quick_order int(1) default 0;
 alter table item add column override_gen_name int(1) default 0; -- 0 DoNotOverride, 1 OverrideShowYes, 2 OverrideShowNo
 INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) VALUES (53, 'COMPANY_SETTING', 'OUTPUT_SHOW_CO_NAME', '1','');
 INSERT INTO transaction_reason (transaction_reason_id, transaction_reason_name, transaction_type_id) VALUES (115, 'OTHER REVENUE', 14);
-
+INSERT INTO transaction_type (transaction_type_id, transaction_type_name) VALUES (75, 'CASH ADJUSTMENT');
+INSERT INTO transaction_reason (transaction_reason_id, transaction_reason_name, transaction_type_id) VALUES (116, 'CASH ADJUSTMENT', 75);
 
 
 -- DO NOT RUN  THE ONES BELO---

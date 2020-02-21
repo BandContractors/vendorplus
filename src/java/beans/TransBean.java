@@ -2239,6 +2239,8 @@ public class TransBean implements Serializable {
                         tib.saveTransItemsJournalEntry(trans, aActiveTransItems, trans.getTransactionId());
                     } else if (trans.getTransactionTypeId() == 18) {//Cash Transfer
                         tib.saveTransItemsCashTransfer(trans, aActiveTransItems, trans.getTransactionId());
+                    } else if (trans.getTransactionTypeId() == 75) {//Cash Adjustment
+                        tib.saveTransItemsCashAdjustment(trans, aActiveTransItems, trans.getTransactionId());
                     } else {
                         tib.saveTransItemsCEC(aStoreId, aTransTypeId, aTransReasonId, aSaleType, trans, aActiveTransItems, trans.getTransactionId());
                     }
@@ -2425,9 +2427,13 @@ public class TransBean implements Serializable {
                     if ("JOURNAL ENTRY".equals(transtype.getTransactionTypeName())) {
                         new AccJournalBean().postJournalJournalEntry(trans, aActiveTransItems, new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getAccPeriodId());
                     }
-                    //Save Journal Entry - Journal Entry
+                    //Save Journal Entry - Cash Transfer
                     if ("CASH TRANSFER".equals(transtype.getTransactionTypeName())) {
                         new AccJournalBean().postJournalCashTransfer(trans, aActiveTransItems, new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getAccPeriodId());
+                    }
+                    //Save Journal Entry - Cash Adjustment
+                    if ("CASH ADJUSTMENT".equals(transtype.getTransactionTypeName())) {
+                        new AccJournalBean().postJournalCashAdjustment(trans, aActiveTransItems, new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getAccPeriodId());
                     }
                     //Save Expense Journal Entry
                     if ("EXPENSE ENTRY".equals(transtype.getTransactionTypeName())) {

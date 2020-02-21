@@ -250,9 +250,11 @@
                     <p:separator />
                     <p:menuitem value="Record Journal Entry" action="#{navigationBean.redirectToJournalEntryTrans()}" /> 
                     <p:separator />
-                    <p:submenu label="Banking">   
+                    <p:submenu label="Cash Management">   
                         <p:separator />
-                        <p:menuitem value="Cash Transfer" action="#{navigationBean.redirectToBankTransferCash()}" /> 
+                        <p:menuitem value="Cash Transfer" action="#{navigationBean.redirectToCashTransfer()}" /> 
+                        <p:separator />
+                        <p:menuitem value="Cash Adjustment" action="#{navigationBean.redirectToCashAdjustment()}" /> 
                         <p:separator />
                     </p:submenu> 
                     <p:separator />

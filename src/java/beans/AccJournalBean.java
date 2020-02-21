@@ -1218,6 +1218,109 @@ public class AccJournalBean implements Serializable {
         }
     }
 
+    public void postJournalCashAdjustment(Trans aTrans, List<TransItem> aActiveTransItems, int aAccPeriodId) {
+        long JobId = 0;
+        String LocalCurrencyCode = "";
+        try {
+            AccJournal accjournal = new AccJournal();
+            //get job Id
+            try {
+                JobId = new UtilityBean().getNewTableColumnSeqNumber("acc_journal", "job_id");
+            } catch (NullPointerException npe) {
+                JobId = 0;
+            }
+            try {
+                LocalCurrencyCode = new AccCurrencyBean().getLocalCurrency().getCurrencyCode();
+            } catch (Exception e) {
+
+            }
+            accjournal.setJobId(JobId);
+            accjournal.setAccJournalId(0);
+            accjournal.setJournalDate(aTrans.getTransactionDate());
+            accjournal.setTransactionId(aTrans.getTransactionId());
+            accjournal.setTransactionTypeId(aTrans.getTransactionTypeId());
+            accjournal.setTransactionReasonId(aTrans.getTransactionReasonId());
+            accjournal.setPayId(0);
+            accjournal.setPayTypeId(0);
+            accjournal.setPayReasonId(0);
+            accjournal.setStoreId(aTrans.getStoreId());
+            accjournal.setLedgerFolio("");
+            accjournal.setAccPeriodId(aAccPeriodId);
+            //accjournal.setCurrencyCode(aTrans.getCurrencyCode());
+            //accjournal.setXrate(aTrans.getXrate());
+            accjournal.setAddBy(new GeneralUserSetting().getCurrentUser().getUserDetailId());
+            accjournal.setBillTransactorId(aTrans.getBillTransactorId());
+            //1. post cash transfer entries
+            List<TransItem> ati = aActiveTransItems;
+            int ListItemIndex = 0;
+            int ListItemNo = ati.size();
+            String FromChildAccountCode = "";
+            String FromAccountCode = "";
+            int FromAccountId = 0;
+            int FromChildAccountId = 0;
+            String Narration = "";
+            String FromCurrencyCode = "";
+            double AdjustAmount = 0;
+            double FromXrate = 1;
+            while (ListItemIndex < ListItemNo) {
+                //set general
+                Narration = ati.get(ListItemIndex).getNarration();
+                accjournal.setNarration(Narration);
+                //set from
+                FromChildAccountCode = ati.get(ListItemIndex).getAccountCode();
+                try {
+                    FromChildAccountId = new AccChildAccountBean().getAccChildAccByCode(FromChildAccountCode).getAccChildAccountId();
+                } catch (NullPointerException npe) {
+                    FromChildAccountId = 0;
+                }
+                try {
+                    FromAccountCode = new AccChildAccountBean().getAccChildAccByCode(FromChildAccountCode).getAccCoaAccountCode();
+                } catch (NullPointerException npe) {
+                    FromAccountCode = "";
+                }
+                try {
+                    FromAccountId = new AccCoaBean().getAccCoaByCodeOrId(FromAccountCode, 0).getAccCoaId();
+                } catch (NullPointerException npe) {
+                    FromAccountId = 0;
+                }
+                FromCurrencyCode = ati.get(ListItemIndex).getBatchno();
+                if (FromCurrencyCode.equals(LocalCurrencyCode)) {
+                    FromXrate = 1;
+                } else {
+                    FromXrate = new AccXrateBean().getXrate(FromCurrencyCode, LocalCurrencyCode);
+                }
+                AdjustAmount = ati.get(ListItemIndex).getAmountIncVat();
+
+                //for Add, (debit) account
+                if (Narration.equals("Add")) {
+                    accjournal.setAccCoaId(FromAccountId);
+                    accjournal.setAccountCode(FromAccountCode);
+                    accjournal.setAccChildAccountId(FromChildAccountId);
+                    accjournal.setDebitAmount(AdjustAmount);
+                    accjournal.setCreditAmount(0);
+                    accjournal.setCurrencyCode(FromCurrencyCode);
+                    accjournal.setXrate(FromXrate);
+                    this.saveAccJournal(accjournal);
+                }
+                //for Subtract, (credit) account
+                if (Narration.equals("Subtract")) {
+                    accjournal.setAccCoaId(FromAccountId);
+                    accjournal.setAccountCode(FromAccountCode);
+                    accjournal.setAccChildAccountId(FromChildAccountId);
+                    accjournal.setDebitAmount(0);
+                    accjournal.setCreditAmount(AdjustAmount);
+                    accjournal.setCurrencyCode(FromCurrencyCode);
+                    accjournal.setXrate(FromXrate);
+                    this.saveAccJournal(accjournal);
+                }
+
+                ListItemIndex = ListItemIndex + 1;
+            }
+        } catch (Exception exc) {
+            System.err.println("postJournalCashAdjustment:" + exc.getMessage());
+        }
+    }
+
     public long postJournalPurchaseInvoice(Trans aTrans, List<TransItem> aTransItems, Pay aPay, int aAccPeriodId) {
         long JobId = 0;
         try {
@@ -2792,8 +2895,8 @@ public class AccJournalBean implements Serializable {
             }
         }
     }
-    
-    public void postJournalCashReceiptOtherRevenueCANCEL(Pay aPay,int aAccPeriodId, List<PayTrans> aPayTranss) {
+
+    public void postJournalCashReceiptOtherRevenueCANCEL(Pay aPay, int aAccPeriodId, List<PayTrans> aPayTranss) {
         long JobId = 0;
         if (aPay != null) {
             int CashAccountId = 0;

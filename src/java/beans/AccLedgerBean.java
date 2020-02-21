@@ -717,6 +717,32 @@ public class AccLedgerBean implements Serializable {
         }
     }
 
+    public void refreshNewBalance(TransItem aTransItem) {
+        if (null != aTransItem) {
+            if (aTransItem.getNarration().equals("Add")) {
+                aTransItem.setAmountExcVat(aTransItem.getUnitPrice() + aTransItem.getAmountIncVat());
+            } else if (aTransItem.getNarration().equals("Subtract")) {
+                aTransItem.setAmountExcVat(aTransItem.getUnitPrice() - aTransItem.getAmountIncVat());
+            } else {
+                aTransItem.setAmountExcVat(0);
+            }
+        }
+    }
+
+    public void refreshBalance(TransItem aTransItem) {
+        String FromCurCode = "";
+        String FromAccCode = "";
+        if (null != aTransItem) {
+            FromCurCode = aTransItem.getBatchno();
+            FromAccCode = aTransItem.getAccountCode();
+            try {
+                aTransItem.setUnitPrice(this.getCashAccBalanceByAccCode(FromAccCode, FromCurCode));
+            } catch (Exception e) {
+                aTransItem.setUnitPrice(0);
+            }
+        }
+    }
+
     public void refreshXrate(TransItem aTransItem) {
         String FromCurCode = "";
         String ToCurCode = "";

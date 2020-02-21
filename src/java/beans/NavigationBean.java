@@ -1066,7 +1066,7 @@ public class NavigationBean implements Serializable {
         return "Transactor?faces-redirect=true";
     }
 
-    public String redirectToBankTransferCash() {
+    public String redirectToCashTransfer() {
         //update seesion
         FacesContext context = FacesContext.getCurrentInstance();
         HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
@@ -1076,7 +1076,20 @@ public class NavigationBean implements Serializable {
         httpSession.setAttribute("TRANSACTION_REASON_ID", 41);
         httpSession.setAttribute("TRANSACTION_REASON_NAME", "CASH TRANSFER");
         httpSession.setAttribute("INVOKE_MODE", "PARENT");
-        return "CashTransferCash?faces-redirect=true";
+        return "CashTransfer?faces-redirect=true";
+    }
+    
+    public String redirectToCashAdjustment() {
+        //update seesion
+        FacesContext context = FacesContext.getCurrentInstance();
+        HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+        HttpSession httpSession = request.getSession(false);
+        httpSession.setAttribute("TRANSACTION_TYPE_ID", 75);
+        httpSession.setAttribute("TRANSACTION_TYPE_NAME", "CASH ADJUSTMENT");
+        httpSession.setAttribute("TRANSACTION_REASON_ID", 116);
+        httpSession.setAttribute("TRANSACTION_REASON_NAME", "CASH ADJUSTMENT");
+        httpSession.setAttribute("INVOKE_MODE", "PARENT");
+        return "CashAdjustment?faces-redirect=true";
     }
 
     public String redirectToBankTransferCheque() {
