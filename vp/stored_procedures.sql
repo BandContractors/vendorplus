@@ -1399,8 +1399,8 @@ CREATE PROCEDURE sp_insert_transaction_item
 	IN in_unit_profit_margin double,
 	IN in_earn_perc double,
 	IN in_earn_amount double,
-	IN in_code_specific varchar(50),
-	IN in_desc_specific varchar(100),
+	IN in_code_specific varchar(250),
+	IN in_desc_specific varchar(250),
 	IN in_desc_more varchar(250),
 	IN in_warranty_desc varchar(150),
 	IN in_warranty_expiry_date date,
@@ -1606,8 +1606,8 @@ CREATE PROCEDURE sp_update_transaction_item
 	IN in_unit_profit_margin double,
 	IN in_earn_perc double,
 	IN in_earn_amount double,
-	IN in_code_specific varchar(50),
-	IN in_desc_specific varchar(100),
+	IN in_code_specific varchar(250),
+	IN in_desc_specific varchar(250),
 	IN in_desc_more varchar(250),
 	IN in_warranty_desc varchar(150),
 	IN in_warranty_expiry_date date,
@@ -2902,8 +2902,8 @@ CREATE PROCEDURE sp_search_stock_bms
 		IN in_store_id int,
 		IN in_item_id bigint,
 		IN in_batchno varchar(100),
-		IN in_code_specific varchar(50),
-		IN in_desc_specific varchar(100)
+		IN in_code_specific varchar(250),
+		IN in_desc_specific varchar(250)
 ) 
 BEGIN 
 
@@ -2936,8 +2936,8 @@ CREATE PROCEDURE sp_insert_stock
 		IN in_item_mnf_date date,
 		IN in_item_exp_date date,
 		IN in_unit_cost double,
-		IN in_code_specific varchar(50),
-		IN in_desc_specific varchar(100),
+		IN in_code_specific varchar(250),
+		IN in_desc_specific varchar(250),
 		IN in_desc_more varchar(250),
 		IN in_warranty_desc varchar(150),
 		IN in_warranty_expiry_date date,
@@ -3078,8 +3078,8 @@ CREATE PROCEDURE sp_update_stock
 		IN in_item_mnf_date date,
 		IN in_item_exp_date date,
 		IN in_unit_cost double,
-		IN in_code_specific varchar(50),
-		IN in_desc_specific varchar(100),
+		IN in_code_specific varchar(250),
+		IN in_desc_specific varchar(250),
 		IN in_desc_more varchar(250),
 		IN in_warranty_desc varchar(150),
 		IN in_warranty_expiry_date date,
@@ -3204,8 +3204,8 @@ CREATE PROCEDURE sp_add_stock_bms
 		IN in_store_id int,
 		IN in_item_id bigint,
 		IN in_batchno varchar(100),
-		IN in_code_specific varchar(50),
-		IN in_desc_specific varchar(100),
+		IN in_code_specific varchar(250),
+		IN in_desc_specific varchar(250),
 		IN in_qty double,
 		IN in_unit_cost double
 ) 
@@ -3239,8 +3239,8 @@ CREATE PROCEDURE sp_subtract_stock_bms
 		IN in_store_id int,
 		IN in_item_id bigint,
 		IN in_batchno varchar(100),
-		IN in_code_specific varchar(50),
-		IN in_desc_specific varchar(100),
+		IN in_code_specific varchar(250),
+		IN in_desc_specific varchar(250),
 		IN in_qty double 
 ) 
 BEGIN 
@@ -3265,8 +3265,8 @@ CREATE PROCEDURE sp_update_stock_damage_add
 		IN in_store_id int,
 		IN in_item_id bigint,
 		IN in_batchno varchar(100),
-		IN in_code_specific varchar(50),
-		IN in_desc_specific varchar(100),
+		IN in_code_specific varchar(250),
+		IN in_desc_specific varchar(250),
 		IN in_qty double
 ) 
 BEGIN 
@@ -3296,8 +3296,8 @@ CREATE PROCEDURE sp_update_stock_damage_subtract
 		IN in_store_id int,
 		IN in_item_id bigint,
 		IN in_batchno varchar(100),
-		IN in_code_specific varchar(50),
-		IN in_desc_specific varchar(100),
+		IN in_code_specific varchar(250),
+		IN in_desc_specific varchar(250),
 		IN in_qty double
 ) 
 BEGIN 
@@ -9523,7 +9523,9 @@ CREATE PROCEDURE sp_save_acc_currency
 	IN in_is_deleted int,
 	IN in_user_detail_id int,
 	IN in_decimal_places int,
-	IN in_rounding_mode int
+	IN in_rounding_mode int,
+	IN in_currency_unit varchar(50),
+	IN in_decimal_unit varchar(50)
 ) 
 BEGIN 
 	SET @new_id=0;
@@ -9539,15 +9541,16 @@ BEGIN
 
 	if (in_acc_currency_id=0) then 
 		INSERT INTO acc_currency(currency_name,currency_code,currency_no,is_local_currency,is_active,is_deleted,
-		add_by,add_date,last_edit_by,last_edit_date,decimal_places,rounding_mode) 
+		add_by,add_date,last_edit_by,last_edit_date,decimal_places,rounding_mode,currency_unit,decimal_unit) 
 		VALUES(in_currency_name,in_currency_code,in_currency_no,in_is_local_currency,in_is_active,in_is_deleted,
-		@in_user_detail_id,@cur_sys_datetime,null,null,in_decimal_places,in_rounding_mode);
+		@in_user_detail_id,@cur_sys_datetime,null,null,in_decimal_places,in_rounding_mode,in_currency_unit,in_decimal_unit);
 	end if;
 
 	if (in_acc_currency_id>0) then 
 		UPDATE acc_currency SET currency_name=in_currency_name,currency_code=in_currency_code,currency_no=in_currency_no,
 		is_local_currency=in_is_local_currency,is_active=in_is_active,is_deleted=in_is_deleted,
-		last_edit_by=@in_user_detail_id,last_edit_date=@cur_sys_datetime,decimal_places=in_decimal_places,rounding_mode=in_rounding_mode 
+		last_edit_by=@in_user_detail_id,last_edit_date=@cur_sys_datetime,decimal_places=in_decimal_places,rounding_mode=in_rounding_mode,
+		currency_unit=in_currency_unit,decimal_unit=in_decimal_unit 
 		WHERE acc_currency_id=in_acc_currency_id;
 	end if;
 END//
@@ -9605,8 +9608,8 @@ CREATE PROCEDURE sp_item_unit_cost_price_latest_trans_item_id
 		IN in_store_id int,
 		IN in_item_id bigint,
 		IN in_batchno varchar(100),
-		IN in_code_specific varchar(50),
-		IN in_desc_specific varchar(100)
+		IN in_code_specific varchar(250),
+		IN in_desc_specific varchar(250)
 ) 
 BEGIN 
 		SET @in_code_specific='';
@@ -9634,8 +9637,8 @@ CREATE PROCEDURE sp_item_unit_cost_price_latest_trans_item_id2
 		IN in_store_id int,
 		IN in_item_id bigint,
 		IN in_batchno varchar(100),
-		IN in_code_specific varchar(50),
-		IN in_desc_specific varchar(100)
+		IN in_code_specific varchar(250),
+		IN in_desc_specific varchar(250)
 ) 
 BEGIN 
 		SET @in_batchno='';
@@ -9666,8 +9669,8 @@ CREATE PROCEDURE sp_item_unit_cost_price_latest_production
 		IN in_store_id int,
 		IN in_item_id bigint,
 		IN in_batchno varchar(100),
-		IN in_code_specific varchar(50),
-		IN in_desc_specific varchar(100)
+		IN in_code_specific varchar(250),
+		IN in_desc_specific varchar(250)
 ) 
 BEGIN 
 		SET @in_batchno='';
@@ -9953,8 +9956,8 @@ CREATE PROCEDURE sp_insert_transaction_item_hist
 	IN in_unit_profit_margin double,
 	IN in_earn_perc double,
 	IN in_earn_amount double,
-	IN in_code_specific varchar(50),
-	IN in_desc_specific varchar(100),
+	IN in_code_specific varchar(250),
+	IN in_desc_specific varchar(250),
 	IN in_desc_more varchar(250),
 	IN in_warranty_desc varchar(150),
 	IN in_warranty_expiry_date date,
@@ -10277,8 +10280,8 @@ CREATE PROCEDURE sp_insert_trans_production
 	OUT out_store_id int,
 	IN in_item_expiry_date date,
 	IN in_item_mnf_date date,
-	IN in_code_specific varchar(50),
-	IN in_desc_specific varchar(100),
+	IN in_code_specific varchar(250),
+	IN in_desc_specific varchar(250),
 	IN in_desc_more varchar(250),
 	IN in_transaction_comment varchar(255),
 	IN in_add_user_detail_id int,
@@ -10413,8 +10416,8 @@ CREATE PROCEDURE sp_insert_trans_production_item
 	IN in_input_qty double,
 	IN in_input_unit_cost double,
 	IN in_batchno varchar(100),
-	IN in_code_specific varchar(50),
-	IN in_desc_specific varchar(100),
+	IN in_code_specific varchar(250),
+	IN in_desc_specific varchar(250),
 	IN in_desc_more varchar(250),
 	IN in_input_unit_qty double,
 	IN in_input_qty_bfr_prod double,

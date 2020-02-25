@@ -189,6 +189,9 @@
                             </h:outputLabel>
                         </h:panelGrid>
                     </h:panelGrid>
+                    <h:panelGrid columns="1" style="float:right;text-align: right;" rendered="#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','OUTPUT_SHOW_AMOUNT_IN_WORDS').parameter_value.equals('1')}">
+                        <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 12pt;color:#000000;font-weight: bold;text-decoration: none;float:right;text-align: right;">#{generalUserSetting.outputDetailParent.transAmountInWords}</h:outputLabel>
+                    </h:panelGrid>
                     <h:panelGrid columns="1" style="width: 100%; margin: 0px;text-align: left;" bgcolor="#3B4E87">
                         <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">#{utilityBean.formatCapitaliseAllCharacter(generalUserSetting.outputDetailParent.transaction_type.transactionUserLabel)}</h:outputLabel>
                     </h:panelGrid>

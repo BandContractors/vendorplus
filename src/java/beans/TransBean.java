@@ -53,6 +53,7 @@ import javax.faces.event.ActionEvent;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.primefaces.event.SelectEvent;
+import utilities.ConvertNumToWordBean;
 import utilities.UtilityBean;
 //import org.primefaces.component.commandbutton.CommandButton;
 
@@ -1452,7 +1453,7 @@ public class TransBean implements Serializable {
                 msg = "INCORRECT SERVER DATE or LICENSE HAS EXPIRED !";
             } else if (trans.getTransactorId() == 0 && transtype.getIsTransactorMandatory().equals("Yes")) {
                 msg = "Select a valid Individual/Company you are transacting with...";
-            } else if (aActiveTransItems.size() < 1 & !"UNPACK".equals(transtype.getTransactionTypeName())) {
+            } else if (aActiveTransItems.size() < 1 & !"UNPACK".equals(transtype.getTransactionTypeName()) & trans.getTransactionId()==0) {
                 msg = "No item(s) found for this " + transtype.getTransactionOutputLabel();
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && trans.getPayMethod() == 0 && trans.getTransactionId() == 0) {
                 msg = "Select Payment Method";

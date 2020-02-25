@@ -82,6 +82,10 @@
                         <f:selectItem itemLabel="CEILING" itemValue="2"/>
                         <f:selectItem itemLabel="FLOOR" itemValue="3"/>
                     </h:selectOneMenu>
+                    <h:outputLabel  value="Currency Unit (e.g Dollar):"/>
+                    <h:inputText styleClass="clsInput" id="itxtCurUnit" value="#{accCurrency.currency_unit}" autocomplete="off" style="width: 200px;"/>
+                    <h:outputLabel  value="Decimal Unit (e.g Cent):"/>
+                    <h:inputText styleClass="clsInput" id="itxtDecUnit" value="#{accCurrency.decimal_unit}" autocomplete="off" style="width: 200px;"/>
                 </h:panelGrid>
             </h:panelGrid>
 

@@ -35,6 +35,8 @@ public class AccCurrency implements Serializable {
     private double Selling;
     private int decimal_places;
     private int rounding_mode;
+    private String currency_unit;
+    private String decimal_unit;
 
     /**
      * @return the AccCurrencyId
@@ -244,6 +246,34 @@ public class AccCurrency implements Serializable {
      */
     public void setRounding_mode(int rounding_mode) {
         this.rounding_mode = rounding_mode;
+    }
+
+    /**
+     * @return the currency_unit
+     */
+    public String getCurrency_unit() {
+        return currency_unit;
+    }
+
+    /**
+     * @param currency_unit the currency_unit to set
+     */
+    public void setCurrency_unit(String currency_unit) {
+        this.currency_unit = currency_unit;
+    }
+
+    /**
+     * @return the decimal_unit
+     */
+    public String getDecimal_unit() {
+        return decimal_unit;
+    }
+
+    /**
+     * @param decimal_unit the decimal_unit to set
+     */
+    public void setDecimal_unit(String decimal_unit) {
+        this.decimal_unit = decimal_unit;
     }
 
 }

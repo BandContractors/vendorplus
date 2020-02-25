@@ -134,6 +134,16 @@ public class AccCurrencyBean implements Serializable {
             } catch (NullPointerException npe) {
                 acccurrency.setRounding_mode(4);
             }
+            try {
+                acccurrency.setCurrency_unit(aResultSet.getString("currency_unit"));
+            } catch (Exception e) {
+                acccurrency.setCurrency_unit("");
+            }
+            try {
+                acccurrency.setDecimal_unit(aResultSet.getString("decimal_unit"));
+            } catch (Exception e) {
+                acccurrency.setDecimal_unit("");
+            }
         } catch (SQLException se) {
             System.err.println("setAccCurrencyFromResultset:" + se.getMessage());
         }
@@ -150,7 +160,7 @@ public class AccCurrencyBean implements Serializable {
         } else if (aAccCurrency.getBuying() <= 0 || aAccCurrency.getSelling() <= 0) {
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Exchange rates for buying and selling cannot be 0(zero)..."));
         } else {
-            String sql = "{call sp_save_acc_currency(?,?,?,?,?,?,?,?,?,?)}";
+            String sql = "{call sp_save_acc_currency(?,?,?,?,?,?,?,?,?,?,?,?)}";
             try (
                     Connection conn = DBConnection.getMySQLConnection();
                     CallableStatement cs = conn.prepareCall(sql);) {
@@ -204,6 +214,16 @@ public class AccCurrencyBean implements Serializable {
                         cs.setInt("in_rounding_mode", aAccCurrency.getRounding_mode());
                     } catch (NullPointerException npe) {
                         cs.setInt("in_rounding_mode", 4);
+                    }
+                    try {
+                        cs.setString("in_currency_unit", aAccCurrency.getCurrency_unit());
+                    } catch (Exception e) {
+                        cs.setString("in_currency_unit", "");
+                    }
+                    try {
+                        cs.setString("in_decimal_unit", aAccCurrency.getDecimal_unit());
+                    } catch (Exception e) {
+                        cs.setString("in_decimal_unit", "");
                     }
                     cs.executeUpdate();
                     new AccXrateBean().saveAccXrate(aAccCurrency);//save Xrate
@@ -578,6 +598,8 @@ public class AccCurrencyBean implements Serializable {
             aAccCurrency.setSelling(1);
             aAccCurrency.setDecimal_places(3);
             aAccCurrency.setRounding_mode(4);
+            aAccCurrency.setCurrency_unit("");
+            aAccCurrency.setDecimal_unit("");
         }
     }
 
@@ -597,6 +619,8 @@ public class AccCurrencyBean implements Serializable {
         aTo.setSelling(aFrom.getSelling());
         aTo.setDecimal_places(aFrom.getDecimal_places());
         aTo.setRounding_mode(aFrom.getRounding_mode());
+        aTo.setCurrency_unit(aFrom.getCurrency_unit());
+        aTo.setDecimal_unit(aFrom.getDecimal_unit());
     }
 
     public void setCurrencyFromIso(AccCurrency aAccCurrencyIso, AccCurrency aAccCurrency) {

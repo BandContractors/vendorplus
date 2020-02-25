@@ -1,9 +1,11 @@
 package utilities;
 
+import beans.AccCurrencyBean;
+import entities.AccCurrency;
 import java.io.Serializable;
-import java.sql.Types;
-import static java.sql.Types.BIGINT;
-import java.util.StringTokenizer;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.Locale;
 import javax.faces.bean.*;
 
 @ManagedBean
@@ -56,7 +58,7 @@ public class ConvertNumToWordBean implements Serializable {
         " Trillion"
     };
 
-    private static String convertNumber(long number) {
+    private static String convertNumber(int number) {
         String word = "";
         int index = 0;
         do {
@@ -88,49 +90,121 @@ public class ConvertNumToWordBean implements Serializable {
         return word;
     }
 
-//    public static void main(String[] args) {
-//        System.out.println("1234123456789- " + convertNumber(1234123456789L));
-//        System.out.println("123456789- " + convertNumber(123456789));
-//        System.out.println("37565820- " + convertNumber(37565820));
-//        System.out.println("9341947- " + convertNumber(9341947));
-//        System.out.println("37000- " + convertNumber(37000));
-//        System.out.println("1387- " + convertNumber(1387));
-//        System.out.println("10- " + convertNumber(10));
-//        System.out.println("41- " + convertNumber(41));
-//        double AmountToConvert = 12345672;
-//        String FirstPart = "";
-//        String LastPart = "";
-//        int FirstNumber = 0;
-//        int LastNumber = 0;
-//        String FirstWord = "";
-//        String LastWord = "";
-//        String FinalWord = "";
-//
-//        StringTokenizer token = new StringTokenizer(Double.toString(AmountToConvert), ".");
-//        FirstPart = token.nextToken();
-//        LastPart = token.nextToken();
-//        if (!FirstPart.equals("0")) {
-//            try {
-//                FirstNumber = Integer.parseInt(FirstPart);
-//                FirstWord = convertNumber(FirstNumber);
-//            } catch (Exception e) {
-//                FirstWord = "";
-//            }
-//        }
-//        if (!LastPart.equals("0")) {
-//            try {
-//                LastNumber = Integer.parseInt(LastPart);
-//                LastWord = convertNumber(LastNumber);
-//            } catch (Exception e) {
-//                LastWord = "";
-//            }
-//        }
-//        if (FirstWord.length() > 0) {
-//            FinalWord = FirstWord;
-//        }
-//        if (LastWord.length() > 0) {
-//            FinalWord = FinalWord + " AND " + LastWord + " CENTS";
-//        }
-//        System.out.println(FinalWord);
-//    }
+    public static String formatNumber(Double aNumber) {
+        String format = "";
+        try {
+            String pattern = "###";
+            String language_code = "en";
+            String country_code = "US";
+            Locale locale = new Locale(language_code, country_code);
+            DecimalFormat decimalFormat = (DecimalFormat) NumberFormat.getNumberInstance(locale);
+            decimalFormat.applyPattern(pattern);
+            format = decimalFormat.format(aNumber);
+        } catch (Exception e) {
+        }
+        return format;
+    }
+
+    public String convertNumToWord(double aAmount, String aCurrencyCode) {
+        String words = "";
+        try {
+            String numberAsString = this.formatDoubleToString(aAmount, aCurrencyCode);
+            String NumberStr = "";
+            String DecimalStr = "";
+            int psn = -1;
+            psn = numberAsString.indexOf(".");
+            if (psn > 0) {
+                NumberStr = numberAsString.substring(0, psn);
+                DecimalStr = numberAsString.substring(psn + 1);
+            } else {
+                NumberStr = numberAsString;
+                DecimalStr = "";
+            }
+            int NumberInt = 0;
+            int DecimalInt = 0;
+            if (!NumberStr.equals("0") && !NumberStr.equals("")) {
+                NumberInt = Integer.parseInt(NumberStr);
+            }
+            if (!DecimalStr.equals("0") && !DecimalStr.equals("")) {
+                DecimalInt = Integer.parseInt(DecimalStr);
+            }
+            String NumberWord = "";
+            String DecimalWord = "";
+            if (NumberInt > 0) {
+                NumberWord = convertNumber(NumberInt);
+            }
+            if (DecimalInt > 0) {
+                DecimalWord = convertNumber(DecimalInt);
+            }
+            String CurUnit = "";
+            String DecUnit = "";
+            AccCurrency acccurr = new AccCurrencyBean().getCurrencyFromListMemory(aCurrencyCode);
+            if (acccurr.getCurrency_unit().length() > 0) {
+                CurUnit = acccurr.getCurrency_unit();
+            }
+            if (acccurr.getDecimal_unit().length() > 0) {
+                DecUnit = acccurr.getDecimal_unit();
+            }
+
+            if (NumberWord.length() > 0) {
+                words = NumberWord;
+                if (CurUnit.length() > 0) {
+                    if (NumberInt > 1) {
+                        words = NumberWord + " " + CurUnit + "s";
+                    } else {
+                        words = NumberWord + " " + CurUnit;
+                    }
+                }
+            }
+
+            if (DecimalWord.length() > 0) {
+                //words = words + " and " + DecimalWord;
+                if (DecUnit.length() > 0) {
+                    if (DecimalInt > 1) {
+                        words = words + " and " + DecimalWord + " " + DecUnit + "s";
+                    } else {
+                        words = words + " and " + DecimalWord + " " + DecUnit;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("convertNumToWord:" + e.getMessage());
+        }
+        return words;
+    }
+
+    public String getNumberFormatByCurrency(String aCurrencyCode) {
+        String NumberFormat = "###";
+        String DecimalPlaceSubStr = "";
+        int decimal_places = 0;
+        try {
+            decimal_places = new AccCurrencyBean().getCurrencyFromListMemory(aCurrencyCode).getDecimal_places();
+            for (int i = 1; i <= decimal_places; i++) {
+                DecimalPlaceSubStr = DecimalPlaceSubStr + "0";
+            }
+        } catch (Exception e) {
+        }
+        if (decimal_places > 0) {
+            NumberFormat = "###." + DecimalPlaceSubStr;
+        } else {
+            NumberFormat = "###";
+        }
+        return NumberFormat;
+    }
+
+    public String formatDoubleToString(double aAmount, String aCurrencyCode) {
+        String aString = "";
+        String aPattern = "";
+        aPattern = this.getNumberFormatByCurrency(aCurrencyCode);
+        if (aPattern.length() == 0) {
+            aPattern = "###";
+        }
+        if (aAmount >= 0) {
+            aString = new UtilityBean().formatNumber(aPattern, aAmount) + "";
+        } else if (aAmount < 0) {
+            aString = new UtilityBean().formatNumber(aPattern, aAmount) + "";
+        }
+        return aString;
+    }
+
 }

@@ -180,7 +180,7 @@ public class TransItemBean implements Serializable {
             ListItemIndex = ListItemIndex + 1;
         }
     }
-    
+
     public void saveTransItemsCashAdjustment(Trans aTrans, List<TransItem> aActiveTransItems, long TransactionId) {
         List<TransItem> ati = aActiveTransItems;
         int ListItemIndex = 0;
@@ -1737,7 +1737,7 @@ public class TransItemBean implements Serializable {
             }
         }
     }
-    
+
     public void saveTransItemCashAdjustment(Trans aTrans, TransItem transitem) {
         String sql = null;
         String sql2 = null;
@@ -5359,6 +5359,12 @@ public class TransItemBean implements Serializable {
         try {
             if (aTransTypeId == 71 && NewTransItem.getNarration().length() == 0) {//STOCK ADJUSTMENT
                 status = "please select Adjustment Type...";
+            } else if (NewTransItem.getCodeSpecific().length() > 250) {
+                status = "Code cannot be more than 250 characters...";
+            } else if (NewTransItem.getDescSpecific().length() > 250) {
+                status = "Name cannot be more than 250 characters...";
+            } else if (NewTransItem.getDescMore().length() > 250) {
+                status = "More Description cannot be more than 250 characters...";
             } else {
                 status = this.addTransItemCEC(aStoreId, aTransTypeId, aTransReasonId, aSaleType, aTrans, aActiveTransItems, NewTransItem, aSelectedItem);
             }
@@ -5702,6 +5708,30 @@ public class TransItemBean implements Serializable {
             if (NewTransItem.getItemQty() <= 0) {
                 aStatusBean.setItemAddedStatus("");
                 aStatusBean.setItemNotAddedStatus("ENTER ITEM QUANTITY !");
+                aStatusBean.setShowItemAddedStatus(0);
+                aStatusBean.setShowItemNotAddedStatus(1);
+                StockFail3 = 1;
+            }
+            
+            if (NewTransItem.getCodeSpecific().length() > 250) {
+                aStatusBean.setItemAddedStatus("");
+                aStatusBean.setItemNotAddedStatus("Code cannot be more than 250 characters...");
+                aStatusBean.setShowItemAddedStatus(0);
+                aStatusBean.setShowItemNotAddedStatus(1);
+                StockFail3 = 1;
+            }
+            
+            if (NewTransItem.getDescSpecific().length() > 250) {
+                aStatusBean.setItemAddedStatus("");
+                aStatusBean.setItemNotAddedStatus("Name cannot be more than 250 characters...");
+                aStatusBean.setShowItemAddedStatus(0);
+                aStatusBean.setShowItemNotAddedStatus(1);
+                StockFail3 = 1;
+            }
+            
+            if (NewTransItem.getDescMore().length() > 250) {
+                aStatusBean.setItemAddedStatus("");
+                aStatusBean.setItemNotAddedStatus("More Description cannot be more than 250 characters...");
                 aStatusBean.setShowItemAddedStatus(0);
                 aStatusBean.setShowItemNotAddedStatus(1);
                 StockFail3 = 1;

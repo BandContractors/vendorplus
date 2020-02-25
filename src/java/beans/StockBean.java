@@ -739,14 +739,14 @@ public class StockBean implements Serializable {
                 return null;
             }
         } catch (SQLException se) {
-            System.err.println("getStock:" + se.getMessage());
+            System.err.println("getStock1:" + se.getMessage());
             return null;
         } finally {
             if (rs != null) {
                 try {
                     rs.close();
                 } catch (SQLException ex) {
-                    System.err.println("getStock:" + ex.getMessage());
+                    System.err.println("getStock1:" + ex.getMessage());
                 }
             }
         }
@@ -786,14 +786,14 @@ public class StockBean implements Serializable {
                 return null;
             }
         } catch (SQLException | NullPointerException se) {
-            System.err.println("getStock:" + se.getMessage());
+            System.err.println("getStock2:" + se.getMessage());
             return null;
         } finally {
             if (rs != null) {
                 try {
                     rs.close();
                 } catch (SQLException ex) {
-                    System.err.println("getStock:" + ex.getMessage());
+                    System.err.println("getStock2:" + ex.getMessage());
                 }
             }
         }

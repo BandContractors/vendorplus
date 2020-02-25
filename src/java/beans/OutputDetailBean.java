@@ -14,6 +14,7 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import utilities.ConvertNumToWordBean;
 
 @ManagedBean
 @SessionScoped
@@ -172,6 +173,25 @@ public class OutputDetailBean implements Serializable {
                     aOutputDetail.getTrans().setTotal_weight(new TransItemBean().calcTransTotalWeight(aOutputDetail.getTrans_items()));
                 }
             } catch (Exception e) {
+            }
+            //refresh amoun tin words
+            try {
+                if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "OUTPUT_SHOW_AMOUNT_IN_WORDS").getParameter_value().equals("1")) {
+                    aOutputDetail.setTransAmountInWords(new ConvertNumToWordBean().convertNumToWord(aOutputDetail.getTrans().getGrandTotal(), aOutputDetail.getTrans().getCurrencyCode()));
+                } else {
+                    aOutputDetail.setTransAmountInWords("");
+                }
+            } catch (Exception e) {
+                aOutputDetail.setTransAmountInWords("");
+            }
+            try {
+                if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "OUTPUT_SHOW_AMOUNT_IN_WORDS").getParameter_value().equals("1")) {
+                    aOutputDetail.setPayAmountInWords(new ConvertNumToWordBean().convertNumToWord(aOutputDetail.getPay().getPaidAmount(), aOutputDetail.getPay().getCurrencyCode()));
+                } else {
+                    aOutputDetail.setPayAmountInWords("");
+                }
+            } catch (Exception e) {
+                aOutputDetail.setPayAmountInWords("");
             }
             //refresh pay reason
             aOutputDetail.setPay_reason("");

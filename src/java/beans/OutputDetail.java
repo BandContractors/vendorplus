@@ -48,6 +48,8 @@ public class OutputDetail implements Serializable {
     private String pay_reason2;
     private TransProduction transProduction;
     private List<TransProductionItem> trans_prod_items = new ArrayList<TransProductionItem>();
+    private String TransAmountInWords;
+    private String PayAmountInWords;
     
     
     public OutputDetail() {
@@ -387,6 +389,34 @@ public class OutputDetail implements Serializable {
      */
     public void setTrans_prod_items(List<TransProductionItem> trans_prod_items) {
         this.trans_prod_items = trans_prod_items;
+    }
+
+    /**
+     * @return the TransAmountInWords
+     */
+    public String getTransAmountInWords() {
+        return TransAmountInWords;
+    }
+
+    /**
+     * @param TransAmountInWords the TransAmountInWords to set
+     */
+    public void setTransAmountInWords(String TransAmountInWords) {
+        this.TransAmountInWords = TransAmountInWords;
+    }
+
+    /**
+     * @return the PayAmountInWords
+     */
+    public String getPayAmountInWords() {
+        return PayAmountInWords;
+    }
+
+    /**
+     * @param PayAmountInWords the PayAmountInWords to set
+     */
+    public void setPayAmountInWords(String PayAmountInWords) {
+        this.PayAmountInWords = PayAmountInWords;
     }
 
 }
