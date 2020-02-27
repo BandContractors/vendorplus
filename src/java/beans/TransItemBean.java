@@ -5712,7 +5712,7 @@ public class TransItemBean implements Serializable {
                 aStatusBean.setShowItemNotAddedStatus(1);
                 StockFail3 = 1;
             }
-            
+
             if (NewTransItem.getCodeSpecific().length() > 250) {
                 aStatusBean.setItemAddedStatus("");
                 aStatusBean.setItemNotAddedStatus("Code cannot be more than 250 characters...");
@@ -5720,7 +5720,7 @@ public class TransItemBean implements Serializable {
                 aStatusBean.setShowItemNotAddedStatus(1);
                 StockFail3 = 1;
             }
-            
+
             if (NewTransItem.getDescSpecific().length() > 250) {
                 aStatusBean.setItemAddedStatus("");
                 aStatusBean.setItemNotAddedStatus("Name cannot be more than 250 characters...");
@@ -5728,7 +5728,7 @@ public class TransItemBean implements Serializable {
                 aStatusBean.setShowItemNotAddedStatus(1);
                 StockFail3 = 1;
             }
-            
+
             if (NewTransItem.getDescMore().length() > 250) {
                 aStatusBean.setItemAddedStatus("");
                 aStatusBean.setItemNotAddedStatus("More Description cannot be more than 250 characters...");
@@ -6728,6 +6728,21 @@ public class TransItemBean implements Serializable {
             if (null != aSelectedItem && aSelectedItem.getIsBuy() == 0) {
                 aStatusBean.setItemAddedStatus("");
                 aStatusBean.setItemNotAddedStatus("This item is set up not to be supplied/purchased!");
+                aStatusBean.setShowItemAddedStatus(0);
+                aStatusBean.setShowItemNotAddedStatus(1);
+            } else if (NewTransItem.getCodeSpecific().length() > 250) {
+                aStatusBean.setItemAddedStatus("");
+                aStatusBean.setItemNotAddedStatus("Code cannot be more than 250 characters...");
+                aStatusBean.setShowItemAddedStatus(0);
+                aStatusBean.setShowItemNotAddedStatus(1);
+            } else if (NewTransItem.getDescSpecific().length() > 250) {
+                aStatusBean.setItemAddedStatus("");
+                aStatusBean.setItemNotAddedStatus("Name cannot be more than 250 characters...");
+                aStatusBean.setShowItemAddedStatus(0);
+                aStatusBean.setShowItemNotAddedStatus(1);
+            } else if (NewTransItem.getDescMore().length() > 250) {
+                aStatusBean.setItemAddedStatus("");
+                aStatusBean.setItemNotAddedStatus("More Description cannot be more than 250 characters...");
                 aStatusBean.setShowItemAddedStatus(0);
                 aStatusBean.setShowItemNotAddedStatus(1);
             } else {
@@ -8196,6 +8211,21 @@ public class TransItemBean implements Serializable {
             } else if (NewTransItem.getItemId() == 0) {
                 aStatusBean.setItemAddedStatus("");
                 aStatusBean.setItemNotAddedStatus("SELECT A VALID ITEM...!");
+                aStatusBean.setShowItemAddedStatus(0);
+                aStatusBean.setShowItemNotAddedStatus(1);
+            } else if (NewTransItem.getCodeSpecific().length() > 250) {
+                aStatusBean.setItemAddedStatus("");
+                aStatusBean.setItemNotAddedStatus("Code cannot be more than 250 characters...");
+                aStatusBean.setShowItemAddedStatus(0);
+                aStatusBean.setShowItemNotAddedStatus(1);
+            } else if (NewTransItem.getDescSpecific().length() > 250) {
+                aStatusBean.setItemAddedStatus("");
+                aStatusBean.setItemNotAddedStatus("Name cannot be more than 250 characters...");
+                aStatusBean.setShowItemAddedStatus(0);
+                aStatusBean.setShowItemNotAddedStatus(1);
+            } else if (NewTransItem.getDescMore().length() > 250) {
+                aStatusBean.setItemAddedStatus("");
+                aStatusBean.setItemNotAddedStatus("More Description cannot be more than 250 characters...");
                 aStatusBean.setShowItemAddedStatus(0);
                 aStatusBean.setShowItemNotAddedStatus(1);
             } else {
