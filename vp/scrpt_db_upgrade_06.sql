@@ -11,24 +11,22 @@ ALTER TABLE acc_currency ADD COLUMN currency_unit VARCHAR(50) NULL  AFTER roundi
 INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) VALUES (54, 'COMPANY_SETTING', 'OUTPUT_SHOW_AMOUNT_IN_WORDS', '0','');
 
 ALTER TABLE transaction_item CHANGE COLUMN code_specific code_specific VARCHAR(250) NULL DEFAULT NULL  ,
+CHANGE COLUMN desc_specific desc_specific VARCHAR(250) NULL DEFAULT NULL,
+CHANGE COLUMN desc_more desc_more VARCHAR(250) NULL DEFAULT NULL  ;
+
+ALTER TABLE transaction_item_hist CHANGE COLUMN code_specific code_specific VARCHAR(250) NULL DEFAULT NULL,
 CHANGE COLUMN desc_specific desc_specific VARCHAR(250) NULL DEFAULT NULL  ,
 CHANGE COLUMN desc_more desc_more VARCHAR(250) NULL DEFAULT NULL  ;
 
-ALTER TABLE transaction_item_hist CHANGE COLUMN code_specific code_specific VARCHAR(250) NULL DEFAULT NULL  ,
+ALTER TABLE stock CHANGE COLUMN code_specific code_specific VARCHAR(250) NULL DEFAULT NULL,
 CHANGE COLUMN desc_specific desc_specific VARCHAR(250) NULL DEFAULT NULL  ,
 CHANGE COLUMN desc_more desc_more VARCHAR(250) NULL DEFAULT NULL  ;
 
-ALTER TABLE stock CHANGE COLUMN code_specific code_specific VARCHAR(250) NULL DEFAULT NULL  ,
-CHANGE COLUMN desc_specific desc_specific VARCHAR(250) NULL DEFAULT NULL  ,
-CHANGE COLUMN desc_more desc_more VARCHAR(250) NULL DEFAULT NULL  ;
-
-ALTER TABLE stock_ledger CHANGE COLUMN code_specific code_specific VARCHAR(250) NULL DEFAULT NULL  ,
+ALTER TABLE stock_ledger CHANGE COLUMN code_specific code_specific VARCHAR(250) NULL DEFAULT NULL,
 CHANGE COLUMN desc_specific desc_specific VARCHAR(250) NULL DEFAULT NULL;
 
-ALTER TABLE stock_out CHANGE COLUMN code_specific code_specific VARCHAR(250) NULL DEFAULT NULL  ,
+ALTER TABLE stock_out CHANGE COLUMN code_specific code_specific VARCHAR(250) NULL DEFAULT NULL,
 CHANGE COLUMN desc_specific desc_specific VARCHAR(250) NULL DEFAULT NULL;
-
--- DO NOT RUN  THE ONES BELO---
 
 -- 17th Feb 2020
 alter table discount_package add column store_scope varchar(500) default '';

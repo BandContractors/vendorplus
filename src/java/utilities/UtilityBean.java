@@ -539,36 +539,19 @@ public class UtilityBean implements Serializable {
             return aString.substring(0, 1).toUpperCase() + aString.substring(1).toLowerCase();
         }
     }
-    
+
     public String formatCapitaliseAllCharacter(String aString) {
-        if (aString.length()==0) {
+        if (aString.length() == 0) {
             return aString;
         } else {
             return aString.substring(0).toUpperCase();
         }
     }
 
-    //public static void main(String[] args) {
-////        UtilityBean ub=new UtilityBean();
-////        System.out.println("Enc:" + Security.Encrypt("sales_123"));
-////        System.out.println("Enc:" + Security.Decrypt("B3JHX6Rxo5F6T4A9c8B_k6cDH1FnX4XeA6qsV0ZUR3mwD9e9"));
-////        
-////        List<String> emails = new ArrayList<>();
-////        emails.add("twenceb@gmail.com");
-////        emails.add("twenceb@wingersoft.co.ug");
-////        emails.add("wbenda@pauesa.org");
-////        emails.add("wbenda@rea.or.ug");
-////        EmailEntityBean eb = new EmailEntityBean();
-////        eb.sendEmailBulk("I am the subject", emails, "I am the body here", "TO",2);
-////        
-////        String commaSeparated = "aa@bb.com,cc@k.com";
-////        String[] items = commaSeparated.split(",");
-////        List<String> container = Arrays.asList(items);
-////        System.out.println("0:" + container.get(0));
-////        System.out.println("1:" + container.get(1));
-    ///String Name="BRIAN";
-    //System.out.println(Name.substring(0,1).toUpperCase() + Name.substring(1).toLowerCase());
-    //}
+//    public static void main(String[] args) {
+//        System.out.println(",12".split(",")[0]);
+//    }
+
     /**
      * @return the pattern
      */

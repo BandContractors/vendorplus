@@ -4570,7 +4570,9 @@ CREATE PROCEDURE sp_insert_discount_package
 (
 	IN in_package_name varchar(50),
 	IN in_start_date datetime,
-	IN in_end_date datetime
+	IN in_end_date datetime,
+	IN in_store_scope varchar(500),
+	IN in_transactor_scope varchar(500)
 ) 
 BEGIN 
 	SET @new_id=0;
@@ -4581,14 +4583,18 @@ BEGIN
 		discount_package_id,
 		package_name,
 		start_date,
-		end_date
+		end_date,
+		store_scope,
+		transactor_scope
 	) 
     VALUES
 	(
 		@new_id,
 		in_package_name,
 		in_start_date,
-		in_end_date
+		in_end_date,
+		in_store_scope,
+		in_transactor_scope
 	); 
 END//
 DELIMITER ;
@@ -4600,13 +4606,17 @@ CREATE PROCEDURE sp_update_discount_package
 	IN in_discount_package_id int,
 	IN in_package_name varchar(50),
 	IN in_start_date datetime,
-	IN in_end_date datetime
+	IN in_end_date datetime,
+	IN in_store_scope varchar(500),
+	IN in_transactor_scope varchar(500)
 ) 
 BEGIN 
 	UPDATE discount_package SET 
 		package_name=in_package_name,
 		start_date=in_start_date,
-		end_date=in_end_date 
+		end_date=in_end_date,
+		store_scope=in_store_scope,
+		transactor_scope=in_transactor_scope 
 	WHERE discount_package_id=in_discount_package_id; 
 END//
 DELIMITER ;

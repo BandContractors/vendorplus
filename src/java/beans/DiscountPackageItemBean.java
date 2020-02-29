@@ -309,6 +309,18 @@ public class DiscountPackageItemBean implements Serializable {
         }
     }
 
+    public void deleteDiscountPackageItems(long aDiscountPackageItemId) {
+        String sql = "DELETE FROM discount_package_item WHERE discount_package_id=?";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aDiscountPackageItemId);
+            ps.executeUpdate();
+        } catch (SQLException se) {
+            System.err.println("deleteDiscountPackageItems:" + se.getMessage());
+        }
+    }
+
     public void displayDiscountPackageItem(DiscountPackageItem DiscountPackageItemFrom, DiscountPackageItem DiscountPackageItemTo) {
         DiscountPackageItemTo.setDiscountPackageItemId(DiscountPackageItemFrom.getDiscountPackageItemId());
         DiscountPackageItemTo.setDiscountPackageId(DiscountPackageItemFrom.getDiscountPackageId());
@@ -346,7 +358,7 @@ public class DiscountPackageItemBean implements Serializable {
             this.clearDiscountPackageItem(aDiscountPackageItem, aItem);
         }
     }
-
+    
     public List<DiscountPackageItem> getDiscountPackageItems(int PacId, int StrId, long ItmId) {//1.ByPackage, 2.ByPackageStore,3. ByStoreItem
         String sql = "";
         if (PacId != 0 && StrId == 0 && ItmId == 0) {//1.ByPackage
