@@ -107,14 +107,17 @@ public class DiscountPackageBean implements Serializable {
     public String getTransactorIdsStrFromList(DiscountPackage aDiscountPackage) {
         String TransactorIdsSrt = "";
         try {
-            if (null == aDiscountPackage) {
+            if (null == aDiscountPackage || null==aDiscountPackage.getSelectedTransactors()) {
                 TransactorIdsSrt = "";
             } else {
                 for (int i = 0; i < aDiscountPackage.getSelectedTransactors().size(); i++) {
-                    if (TransactorIdsSrt.length() == 0) {
-                        TransactorIdsSrt = Long.toString(aDiscountPackage.getSelectedTransactors().get(i).getTransactorId());
-                    } else {
-                        TransactorIdsSrt = TransactorIdsSrt + "," + Long.toString(aDiscountPackage.getSelectedTransactors().get(i).getTransactorId());
+                    long id = aDiscountPackage.getSelectedTransactors().get(i).getTransactorId();
+                    if (id > 0) {
+                        if (TransactorIdsSrt.length() == 0) {
+                            TransactorIdsSrt = Long.toString(id);
+                        } else {
+                            TransactorIdsSrt = TransactorIdsSrt + "," + Long.toString(id);
+                        }
                     }
                 }
             }
@@ -138,7 +141,6 @@ public class DiscountPackageBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
             System.out.println("getTransactorListFromIdsStr:" + e.getMessage());
         }
         return lst;
@@ -308,7 +310,7 @@ public class DiscountPackageBean implements Serializable {
             while (rs.next()) {
                 DiscountPackage discountPackage = new DiscountPackage();
                 this.setDiscountPackageFromResultset(discountPackage, rs);
-                discountPackage.setStatusColor(new GeneralSetting().getStyleColorByDaysFromNow("DISCOUNT-EXPIRY-DATE",discountPackage.getEndDate()));
+                discountPackage.setStatusColor(new GeneralSetting().getStyleColorByDaysFromNow("DISCOUNT-EXPIRY-DATE", discountPackage.getEndDate()));
                 this.getDiscountPackages().add(discountPackage);
             }
         } catch (Exception e) {

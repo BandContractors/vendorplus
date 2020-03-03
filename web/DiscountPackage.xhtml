@@ -131,13 +131,173 @@
                         <!-- column header -->
                         <f:facet name="header">Action</f:facet>
                         <!-- row record -->
-                        <p:commandLink value="Edit">
+                        <p:commandLink value="Edit" style="color: #{d.statusColor};">
                             <p:ajax listener="#{discountPackageBean.displayDiscountPackage(d,discountPackage)}" process="dtblDiscountPackage" update="form:pnlgInput"/>
+                        </p:commandLink>
+                        &nbsp;
+                        <p:commandLink value="Items" style="color: #{d.statusColor};">
+                            <p:ajax listener="#{discountPackageItemBean.refreshDiscountPackageItems(d.discountPackageId)}"/>
+                            <p:ajax listener="#{discountPackageItemBean.clearDiscountPackageItem(discountPackageItem)}"/>
+                            <p:ajax listener="#{discountPackageItemBean.setActionMessage('')}"/>
+                            <p:ajax listener="#{discountPackageBean.displayDiscountPackage(d,discountPackage)}" process="dtblDiscountPackage" update="form:pnlgInput form:pnlMessage2 form:pnlSideInput1 form:pnlSideInput2 form:pnlgItemsLabel form:dtblDPItems"  oncomplete="PF('sbarItems').show()"/>
                         </p:commandLink>
                         &nbsp;
                     </p:column>
                 </p:dataTable>
             </h:panelGrid>
+            <p:sidebar widgetVar="sbarItems" position="left" style="width: 500px;">
+                <h:panelGrid id="pnlgItemsLabel" style="background-color:black;color: white;">
+                    <h:outputLabel value="#{discountPackage.packageName}"/>
+                </h:panelGrid>
+                <p:scrollPanel mode="native" style="width:100%;height:90%;border: none;">
+                    <h:panelGrid columns="1" id="pnlSideInput1">
+                        <h:panelGrid columns="1">
+                            <h:outputLabel  value="Categories" style="font-weight: bold;"/>
+                            <p:autoComplete id="autcCategory" multiple="true" value="#{discountPackageItem.selectedCategories}" 
+                                            completeMethod="#{categoryBean.getCategoriesByCategoryName}" 
+                                            var="cat" 
+                                            itemLabel="#{cat.categoryName}" 
+                                            itemValue="#{cat}" 
+                                            converter="CategoryConverter" style="text-align: left;" 
+                                            forceSelection="true" queryDelay="0" 
+                                            >
+                                <p:column headerText="Category" style="text-align: left" >  
+                                    #{cat.categoryName} 
+                                </p:column>
+                            </p:autoComplete>
+                        </h:panelGrid>
+                        <h:panelGrid columns="1">
+                            <h:outputLabel  value="Subcategories" style="font-weight: bold;"/>
+                            <p:autoComplete id="autcSubCategory" multiple="true" value="#{discountPackageItem.selectedSubCategories}" 
+                                            completeMethod="#{subCategoryBean.getSubCategoriesByCatSubcatName}" 
+                                            var="subcat" 
+                                            itemLabel="#{subcat.subCategoryName}" 
+                                            itemValue="#{subcat}" 
+                                            converter="SubCategoryConverter" style="text-align: left;" 
+                                            forceSelection="true" queryDelay="0" 
+                                            >
+                                <p:column headerText="Subcategory" style="text-align: left" >  
+                                    #{subcat.subCategoryName} 
+                                </p:column>
+                                <p:column headerText="Category" style="text-align: left" >  
+                                    #{subcat.categoryName} 
+                                </p:column>
+                            </p:autoComplete>
+                        </h:panelGrid>
+                        <h:panelGrid columns="1">
+                            <h:outputLabel  value="Items" style="font-weight: bold;"/>
+                            <p:autoComplete id="autcItem" multiple="true" widgetVar="WautcItem" value="#{discountPackageItem.selectedItems}"  
+                                            completeMethod="#{itemBean.getItemObjectList}" 
+                                            var="itm" 
+                                            itemLabel="#{itm.description}" 
+                                            itemValue="#{itm}" 
+                                            converter="ItemConverter" style="text-align: left" 
+                                            forceSelection="true" queryDelay="0" 
+                                            >
+                                <p:column headerText="Item Description" style="text-align: left" >  
+                                    #{itm.description} 
+                                </p:column>
+                                <p:column headerText="Retailsale Price" style="text-align: left">  
+                                    <h:outputLabel value="#{itm.unitRetailsalePrice}">
+                                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    </h:outputLabel>
+                                </p:column>
+                                <p:column headerText="Wholesale Price" style="text-align: left">  
+                                    <h:outputLabel value="#{itm.unitWholesalePrice}">
+                                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    </h:outputLabel>
+                                </p:column>
+                                <p:column headerText="Hire Price" style="text-align: left">  
+                                    <h:outputLabel value="#{itm.unit_hire_price}">
+                                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    </h:outputLabel>
+                                </p:column>
+                                <p:column headerText="Currency" style="text-align: left">
+                                    <h:outputText value="#{itm.currencyCode}">
+                                    </h:outputText>
+                                </p:column>
+                            </p:autoComplete>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <h:panelGrid id="pnlSideInput2" columns="2">
+                        <h:outputLabel  value="Quantity"/>
+                        <h:inputText id="itxtQty" styleClass="clsInputTransItem" style="width: 195px" value="#{discountPackageItem.itemQty}" autocomplete="off" disabled="true">
+                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:inputText>
+                        <h:outputLabel  value="Retailsale Discount (%)"/>
+                        <h:inputText id="itxtRetailsaleDiscount" styleClass="clsInputTransItem" style="width: 195px" value="#{discountPackageItem.retailsaleDiscountAmt}" autocomplete="off">
+                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:inputText>
+                        <h:outputLabel  value="Wholesale Discount (%)"/>
+                        <h:inputText id="itxtWholesaleDiscount" styleClass="clsInputTransItem" style="width: 195px" value="#{discountPackageItem.wholesaleDiscountAmt}" autocomplete="off">
+                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:inputText>
+                        <h:outputLabel  value="HirePrice Discount (%)"/>
+                        <h:inputText id="itxtHirePriceDiscount" styleClass="clsInputTransItem" style="width: 195px" value="#{discountPackageItem.hire_price_discount_amt}" autocomplete="off">
+                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:inputText>
+                    </h:panelGrid>
+                    <h:panelGrid columns="4">
+                        <p:commandButton id="cmdbSaveItems" value="Save" style="height: 40px;width: 100px;background-color: black;color: white;">
+                            <p:ajax listener="#{discountPackageItemBean.saveDiscountPackageItem(discountPackageItem,discountPackage)}" process="@form" update="pnlMessage2 pnlSideInput1 pnlSideInput2 dtblDPItems" />
+                        </p:commandButton>
+                        <p:commandButton id="cmdbClearItems" value="Clear" style="height: 40px;width: 100px;background-color: black;color: white;">
+                            <p:ajax listener="#{discountPackageItemBean.clearDiscountPackageItem(discountPackageItem)}" process="@form" update="pnlMessage2 pnlSideInput1 pnlSideInput2"/>
+                        </p:commandButton>
+                        <p:commandButton id="cmdbDeleteItems" value="Delete" style="height: 40px;width: 100px;background-color: black;color: white;">
+                            <p:ajax listener="#{discountPackageItemBean.deleteDiscountPackageItem(discountPackageItem)}" process="@form" update="pnlMessage2 pnlSideInput1 pnlSideInput2 dtblDPItems"/>
+                        </p:commandButton>
+                        <p:commandButton id="cmdCloseItems" value="Close" oncomplete="PF('sbarItems').hide()" style="height: 40px;width: 100px;background-color: black;color: white;"/>
+                    </h:panelGrid>
+                    <h:panelGrid  id="pnlMessage2" columns="1">
+                        <h:outputLabel value="#{discountPackageItemBean.actionMessage}" style="color: red;"/>
+                    </h:panelGrid>
+                    <p:dataTable id="dtblDPItems" value="#{discountPackageItemBean.discountPackageItemsList}" var="di" 
+                                 styleClass="cls-table" 
+                                 > 
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">Qty</f:facet>
+                            <!-- row record -->
+                            <h:outputLabel value="#{di.itemQty}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputLabel>
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">Retail Disc(%)</f:facet>
+                            <!-- row record -->
+                            <h:outputLabel value="#{di.retailsaleDiscountAmt}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputLabel>
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">Wholesale Disc(%)</f:facet>
+                            <!-- row record -->
+                            <h:outputLabel value="#{di.wholesaleDiscountAmt}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputLabel>
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">Hire Disc(%)</f:facet>
+                            <!-- row record -->
+                            <h:outputLabel value="#{di.hire_price_discount_amt}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputLabel>
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header"></f:facet>
+                            <!-- row record -->
+                            <p:commandLink value="Edit">
+                                <p:ajax listener="#{discountPackageItemBean.displayDiscountPackageItem(di,discountPackageItem)}" process="dtblDPItems" update="form:pnlSideInput1 form:pnlSideInput2"/>
+                            </p:commandLink>
+                        </p:column>
+                    </p:dataTable>
+                </p:scrollPanel>
+            </p:sidebar>
         </h:form>
     </h:body>
 </html>

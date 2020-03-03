@@ -2,10 +2,13 @@ package beans;
 
 import sessions.GeneralUserSetting;
 import connections.DBConnection;
+import entities.Category;
+import entities.DiscountPackage;
 import entities.GroupRight;
 import entities.UserDetail;
 import entities.DiscountPackageItem;
 import entities.Item;
+import entities.SubCategory;
 import java.io.Serializable;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -18,7 +21,6 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
-import utilities.CustomValidator;
 
 /*
  * To change this template, choose Tools | Templates
@@ -36,173 +38,205 @@ public class DiscountPackageItemBean implements Serializable {
     private List<DiscountPackageItem> DiscountPackageItems;
     private String ActionMessage = null;
     DiscountPackageItem SelectedDiscountPackageItem = null;
+    private List<DiscountPackageItem> DiscountPackageItemsList;
 
-    public void saveDiscountPackageItem(DiscountPackageItem discountPackageItem) {
-        String sql = null;
-        String sql2 = null;
-        String msg = "";
-
-        sql2 = "SELECT * FROM discount_package_item WHERE store_id=" + discountPackageItem.getStoreId() + " AND item_id=" + discountPackageItem.getItemId() + " AND item_qty=" + discountPackageItem.getItemQty();
-
-        UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
-        List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
-        GroupRightBean grb = new GroupRightBean();
-
-        if (discountPackageItem.getDiscountPackageItemId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Add") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (discountPackageItem.getDiscountPackageItemId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Edit") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (discountPackageItem.getDiscountPackageId() == 0) {
-            msg = "Select discount package...";
-            this.setActionMessage("DiscountPackageItem NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (discountPackageItem.getStoreId() == 0) {
-            msg = "Select store...";
-            this.setActionMessage("DiscountPackageItem NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (discountPackageItem.getItemId() == 0) {
-            msg = "Select item to add to the package...";
-            this.setActionMessage("DiscountPackageItem NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (discountPackageItem.getItemQty() <= 0) {
-            msg = "Specify Quanity please...";
-            this.setActionMessage("DiscountPackageItem NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (discountPackageItem.getWholesaleDiscountAmt() <= 0 && discountPackageItem.getRetailsaleDiscountAmt() <= 0) {
-            msg = "EITHER Retailsale-Discount-Amount OR Wholesale-Discount-Amount is not selected...";
-            this.setActionMessage("DiscountPackageItem NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if ((new CustomValidator().CheckRecords(sql2) > 0 && discountPackageItem.getDiscountPackageItemId() == 0) || (new CustomValidator().CheckRecords(sql2) > 0 && new CustomValidator().CheckRecords(sql2) != 1 && discountPackageItem.getDiscountPackageItemId() > 0)) {
-            msg = "Quantity for this item already exists in the store's discount package...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (discountPackageItem.getRetailsaleDiscountAmt() > new ItemBean().findItem(discountPackageItem.getItemId()).getUnitRetailsalePrice() || discountPackageItem.getWholesaleDiscountAmt() > new ItemBean().findItem(discountPackageItem.getItemId()).getUnitWholesalePrice()) {
-            msg = "Discount amount cannot exceed the set retail/wholesale unit price for the item...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else {
-            if (discountPackageItem.getDiscountPackageItemId() == 0) {
-                sql = "{call sp_insert_discount_package_item(?,?,?,?,?,?,?)}";
-            } else if (discountPackageItem.getDiscountPackageItemId() > 0) {
-                sql = "{call sp_update_discount_package_item(?,?,?,?,?,?,?,?)}";
-            }
-            try (
-                    Connection conn = DBConnection.getMySQLConnection();
-                    CallableStatement cs = conn.prepareCall(sql);) {
-                if (discountPackageItem.getDiscountPackageItemId() == 0) {
-                    cs.setInt("in_discount_package_id", discountPackageItem.getDiscountPackageId());
-                    cs.setInt("in_store_id", discountPackageItem.getStoreId());
-                    cs.setLong("in_item_id", discountPackageItem.getItemId());
-                    cs.setDouble("in_item_qty", discountPackageItem.getItemQty());
-                    cs.setDouble("in_wholesale_discount_amt", discountPackageItem.getWholesaleDiscountAmt());
-                    cs.setDouble("in_retailsale_discount_amt", discountPackageItem.getRetailsaleDiscountAmt());
-                    cs.setDouble("in_hire_price_discount_amt", discountPackageItem.getHire_price_discount_amt());
-                    cs.executeUpdate();
-                    this.clearDiscountPackageItem(discountPackageItem);
-                    this.setActionMessage("Saved Successfully");
-
-                } else if (discountPackageItem.getDiscountPackageItemId() > 0) {
-                    cs.setLong("in_discount_package_item_id", discountPackageItem.getDiscountPackageItemId());
-                    cs.setInt("in_discount_package_id", discountPackageItem.getDiscountPackageId());
-                    cs.setInt("in_store_id", discountPackageItem.getStoreId());
-                    cs.setLong("in_item_id", discountPackageItem.getItemId());
-                    cs.setDouble("in_item_qty", discountPackageItem.getItemQty());
-                    cs.setDouble("in_wholesale_discount_amt", discountPackageItem.getWholesaleDiscountAmt());
-                    cs.setDouble("in_retailsale_discount_amt", discountPackageItem.getRetailsaleDiscountAmt());
-                    cs.setDouble("in_hire_price_discount_amt", discountPackageItem.getHire_price_discount_amt());
-                    cs.executeUpdate();
-                    this.setActionMessage("Saved Successfully");
-                    this.clearDiscountPackageItem(discountPackageItem);
+    public String getCategoryIdsStrFromList(DiscountPackageItem aDiscountPackageItem) {
+        String CategoryIdsSrt = "";
+        try {
+            if (null == aDiscountPackageItem || null == aDiscountPackageItem.getSelectedCategories()) {
+                CategoryIdsSrt = "";
+            } else {
+                for (int i = 0; i < aDiscountPackageItem.getSelectedCategories().size(); i++) {
+                    int id = aDiscountPackageItem.getSelectedCategories().get(i).getCategoryId();
+                    if (id > 0) {
+                        if (CategoryIdsSrt.length() == 0) {
+                            CategoryIdsSrt = Integer.toString(id);
+                        } else {
+                            CategoryIdsSrt = CategoryIdsSrt + "," + Integer.toString(id);
+                        }
+                    }
                 }
-            } catch (SQLException se) {
-                System.err.println("saveDiscountPackageItem:" + se.getMessage());
-                this.setActionMessage("DiscountPackageItem NOT saved");
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("DiscountPackageItem NOT saved!"));
             }
+        } catch (Exception e) {
+            System.out.println("getCategoryIdsStrFromList:" + e.getMessage());
         }
+        return CategoryIdsSrt;
     }
 
-    public void saveDiscountPackageItem(DiscountPackageItem discountPackageItem, Item aItem) {
+    public String getSubCategoryIdsStrFromList(DiscountPackageItem aDiscountPackageItem) {
+        String SubCategoryIdsSrt = "";
+        try {
+            if (null == aDiscountPackageItem || null == aDiscountPackageItem.getSelectedSubCategories()) {
+                SubCategoryIdsSrt = "";
+            } else {
+                for (int i = 0; i < aDiscountPackageItem.getSelectedSubCategories().size(); i++) {
+                    int id = aDiscountPackageItem.getSelectedSubCategories().get(i).getSubCategoryId();
+                    if (id > 0) {
+                        if (SubCategoryIdsSrt.length() == 0) {
+                            SubCategoryIdsSrt = Integer.toString(id);
+                        } else {
+                            SubCategoryIdsSrt = SubCategoryIdsSrt + "," + Integer.toString(id);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("getSubCategoryIdsStrFromList:" + e.getMessage());
+        }
+        return SubCategoryIdsSrt;
+    }
+
+    public String getItemIdsStrFromList(DiscountPackageItem aDiscountPackageItem) {
+        String ItemIdsSrt = "";
+        try {
+            if (null == aDiscountPackageItem || null == aDiscountPackageItem.getSelectedItems()) {
+                ItemIdsSrt = "";
+            } else {
+                for (int i = 0; i < aDiscountPackageItem.getSelectedItems().size(); i++) {
+                    long id = aDiscountPackageItem.getSelectedItems().get(i).getItemId();
+                    if (id > 0) {
+                        if (ItemIdsSrt.length() == 0) {
+                            ItemIdsSrt = Long.toString(id);
+                        } else {
+                            ItemIdsSrt = ItemIdsSrt + "," + Long.toString(id);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("getItemIdsStrFromList:" + e.getMessage());
+        }
+        return ItemIdsSrt;
+    }
+
+    public List<Category> getCategoryListFromIdsStr(DiscountPackageItem aDiscountPackageItem) {
+        List<Category> lst = new ArrayList<>();
+        String[] array = null;
+        try {
+            if (null == aDiscountPackageItem) {
+            } else {
+                if (aDiscountPackageItem.getCategory_scope().length() > 0) {
+                    array = aDiscountPackageItem.getCategory_scope().split(",");
+                    for (int i = 0; i < array.length; i++) {
+                        lst.add(new CategoryBean().getCategory(Integer.parseInt(array[i])));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("getCategoryListFromIdsStr:" + e.getMessage());
+        }
+        return lst;
+    }
+
+    public List<SubCategory> getSubCategoryListFromIdsStr(DiscountPackageItem aDiscountPackageItem) {
+        List<SubCategory> lst = new ArrayList<>();
+        String[] array = null;
+        try {
+            if (null == aDiscountPackageItem) {
+            } else {
+                if (aDiscountPackageItem.getSub_category_scope().length() > 0) {
+                    array = aDiscountPackageItem.getSub_category_scope().split(",");
+                    for (int i = 0; i < array.length; i++) {
+                        lst.add(new SubCategoryBean().getSubCategory(Integer.parseInt(array[i])));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("getSubCategoryListFromIdsStr:" + e.getMessage());
+        }
+        return lst;
+    }
+
+    public List<Item> getItemListFromIdsStr(DiscountPackageItem aDiscountPackageItem) {
+        List<Item> lst = new ArrayList<>();
+        String[] array = null;
+        try {
+            if (null == aDiscountPackageItem) {
+            } else {
+                if (aDiscountPackageItem.getItem_scope().length() > 0) {
+                    array = aDiscountPackageItem.getItem_scope().split(",");
+                    for (int i = 0; i < array.length; i++) {
+                        lst.add(new ItemBean().getItem(Long.parseLong(array[i])));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("getItemListFromIdsStr:" + e.getMessage());
+        }
+        return lst;
+    }
+
+    public void saveDiscountPackageItem(DiscountPackageItem aDiscountPackageItem, DiscountPackage aDiscountPackage) {
         String sql = null;
-        String sql2 = null;
         String msg = "";
-
-        sql2 = "SELECT * FROM discount_package_item WHERE store_id=" + discountPackageItem.getStoreId() + " AND item_id=" + discountPackageItem.getItemId() + " AND item_qty=" + discountPackageItem.getItemQty();
-
-        UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
-        List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
-        GroupRightBean grb = new GroupRightBean();
-
-        if (discountPackageItem.getDiscountPackageItemId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Add") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (discountPackageItem.getDiscountPackageItemId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Edit") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (discountPackageItem.getDiscountPackageId() == 0) {
-            msg = "Select discount package...";
-            this.setActionMessage("DiscountPackageItem NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (discountPackageItem.getStoreId() == 0) {
-            msg = "Select store...";
-            this.setActionMessage("DiscountPackageItem NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (discountPackageItem.getItemId() == 0) {
-            msg = "Select item to add to the package...";
-            this.setActionMessage("DiscountPackageItem NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (discountPackageItem.getItemQty() <= 0) {
+        //update lookups
+        try {
+            aDiscountPackageItem.setDiscountPackageId(aDiscountPackage.getDiscountPackageId());
+            aDiscountPackageItem.setCategory_scope(this.getCategoryIdsStrFromList(aDiscountPackageItem));
+            aDiscountPackageItem.setSub_category_scope(this.getSubCategoryIdsStrFromList(aDiscountPackageItem));
+            aDiscountPackageItem.setItem_scope(this.getItemIdsStrFromList(aDiscountPackageItem));
+        } catch (Exception e) {
+            //
+        }
+        if (aDiscountPackageItem.getDiscountPackageId() == 0) {
+            msg = "Select package...";
+            this.setActionMessage(msg);
+        } else if (aDiscountPackageItem.getCategory_scope().length() == 0 && aDiscountPackageItem.getSub_category_scope().length() == 0 && aDiscountPackageItem.getItem_scope().length() == 0) {
+            msg = "Select package items (category and/or subcategory and/or items)...";
+            this.setActionMessage(msg);
+        } else if (aDiscountPackageItem.getItemQty() <= 0) {
             msg = "Specify Quanity please...";
-            this.setActionMessage("DiscountPackageItem NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (discountPackageItem.getWholesaleDiscountAmt() <= 0 && discountPackageItem.getRetailsaleDiscountAmt() <= 0) {
-            msg = "EITHER Retailsale-Discount-Percent OR Wholesale-Discount-Percent is not selected...";
-            this.setActionMessage("DiscountPackageItem NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if ((new CustomValidator().CheckRecords(sql2) > 0 && discountPackageItem.getDiscountPackageItemId() == 0) || (new CustomValidator().CheckRecords(sql2) > 0 && new CustomValidator().CheckRecords(sql2) != 1 && discountPackageItem.getDiscountPackageItemId() > 0)) {
-            msg = "Quantity for this item already exists in the store's discount package...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (discountPackageItem.getRetailsaleDiscountAmt() > 100 || discountPackageItem.getWholesaleDiscountAmt() > 100) {
+            this.setActionMessage(msg);
+        } else if (aDiscountPackageItem.getWholesaleDiscountAmt() <= 0 && aDiscountPackageItem.getRetailsaleDiscountAmt() <= 0 && aDiscountPackageItem.getHire_price_discount_amt() <= 0) {
+            msg = "Specify percentage discount...";
+            this.setActionMessage(msg);
+        } else if (aDiscountPackageItem.getRetailsaleDiscountAmt() > 100 || aDiscountPackageItem.getWholesaleDiscountAmt() > 100 || aDiscountPackageItem.getHire_price_discount_amt() > 100) {
             msg = "Discount percent cannot exceed 100%...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            this.setActionMessage(msg);
         } else {
-            if (discountPackageItem.getDiscountPackageItemId() == 0) {
-                sql = "{call sp_insert_discount_package_item(?,?,?,?,?,?,?)}";
-            } else if (discountPackageItem.getDiscountPackageItemId() > 0) {
-                sql = "{call sp_update_discount_package_item(?,?,?,?,?,?,?,?)}";
+            if (aDiscountPackageItem.getDiscountPackageItemId() == 0) {
+                sql = "{call sp_insert_discount_package_item(?,?,?,?,?,?,?,?,?,?)}";
+            } else if (aDiscountPackageItem.getDiscountPackageItemId() > 0) {
+                sql = "{call sp_update_discount_package_item(?,?,?,?,?,?,?,?,?,?,?)}";
             }
             try (
                     Connection conn = DBConnection.getMySQLConnection();
                     CallableStatement cs = conn.prepareCall(sql);) {
-                if (discountPackageItem.getDiscountPackageItemId() == 0) {
-                    cs.setInt("in_discount_package_id", discountPackageItem.getDiscountPackageId());
-                    cs.setInt("in_store_id", discountPackageItem.getStoreId());
-                    cs.setLong("in_item_id", discountPackageItem.getItemId());
-                    cs.setDouble("in_item_qty", discountPackageItem.getItemQty());
-                    cs.setDouble("in_wholesale_discount_amt", discountPackageItem.getWholesaleDiscountAmt());
-                    cs.setDouble("in_retailsale_discount_amt", discountPackageItem.getRetailsaleDiscountAmt());
-                    cs.setDouble("in_hire_price_discount_amt", discountPackageItem.getHire_price_discount_amt());
+                if (aDiscountPackageItem.getDiscountPackageItemId() == 0) {
+                    cs.setInt("in_discount_package_id", aDiscountPackageItem.getDiscountPackageId());
+                    cs.setInt("in_store_id", aDiscountPackageItem.getStoreId());
+                    cs.setLong("in_item_id", aDiscountPackageItem.getItemId());
+                    cs.setDouble("in_item_qty", aDiscountPackageItem.getItemQty());
+                    cs.setDouble("in_wholesale_discount_amt", aDiscountPackageItem.getWholesaleDiscountAmt());
+                    cs.setDouble("in_retailsale_discount_amt", aDiscountPackageItem.getRetailsaleDiscountAmt());
+                    cs.setDouble("in_hire_price_discount_amt", aDiscountPackageItem.getHire_price_discount_amt());
+                    cs.setString("in_category_scope", aDiscountPackageItem.getCategory_scope());
+                    cs.setString("in_sub_category_scope", aDiscountPackageItem.getSub_category_scope());
+                    cs.setString("in_item_scope", aDiscountPackageItem.getItem_scope());
                     cs.executeUpdate();
-                    this.clearDiscountPackageItem(discountPackageItem);
+                    this.refreshDiscountPackageItems(aDiscountPackageItem.getDiscountPackageId());
+                    this.clearDiscountPackageItem(aDiscountPackageItem);
                     this.setActionMessage("Saved Successfully");
-                    this.clearDiscountPackageItem(discountPackageItem, aItem);
-                } else if (discountPackageItem.getDiscountPackageItemId() > 0) {
-                    cs.setLong("in_discount_package_item_id", discountPackageItem.getDiscountPackageItemId());
-                    cs.setInt("in_discount_package_id", discountPackageItem.getDiscountPackageId());
-                    cs.setInt("in_store_id", discountPackageItem.getStoreId());
-                    cs.setLong("in_item_id", discountPackageItem.getItemId());
-                    cs.setDouble("in_item_qty", discountPackageItem.getItemQty());
-                    cs.setDouble("in_wholesale_discount_amt", discountPackageItem.getWholesaleDiscountAmt());
-                    cs.setDouble("in_retailsale_discount_amt", discountPackageItem.getRetailsaleDiscountAmt());
-                    cs.setDouble("in_hire_price_discount_amt", discountPackageItem.getHire_price_discount_amt());
+                } else if (aDiscountPackageItem.getDiscountPackageItemId() > 0) {
+                    cs.setLong("in_discount_package_item_id", aDiscountPackageItem.getDiscountPackageItemId());
+                    cs.setInt("in_discount_package_id", aDiscountPackageItem.getDiscountPackageId());
+                    cs.setInt("in_store_id", aDiscountPackageItem.getStoreId());
+                    cs.setLong("in_item_id", aDiscountPackageItem.getItemId());
+                    cs.setDouble("in_item_qty", aDiscountPackageItem.getItemQty());
+                    cs.setDouble("in_wholesale_discount_amt", aDiscountPackageItem.getWholesaleDiscountAmt());
+                    cs.setDouble("in_retailsale_discount_amt", aDiscountPackageItem.getRetailsaleDiscountAmt());
+                    cs.setDouble("in_hire_price_discount_amt", aDiscountPackageItem.getHire_price_discount_amt());
+                    cs.setString("in_category_scope", aDiscountPackageItem.getCategory_scope());
+                    cs.setString("in_sub_category_scope", aDiscountPackageItem.getSub_category_scope());
+                    cs.setString("in_item_scope", aDiscountPackageItem.getItem_scope());
                     cs.executeUpdate();
+                    this.refreshDiscountPackageItems(aDiscountPackageItem.getDiscountPackageId());
+                    this.clearDiscountPackageItem(aDiscountPackageItem);
                     this.setActionMessage("Saved Successfully");
-                    this.clearDiscountPackageItem(discountPackageItem, aItem);
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
                 this.setActionMessage("DiscountPackageItem NOT saved");
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("DiscountPackageItem NOT saved!"));
             }
         }
     }
@@ -249,6 +283,21 @@ public class DiscountPackageItemBean implements Serializable {
             } catch (NullPointerException npe) {
                 aDiscountPackageItem.setHire_price_discount_amt(0);
             }
+            try {
+                aDiscountPackageItem.setCategory_scope(aResultSet.getString("category_scope"));
+            } catch (NullPointerException npe) {
+                aDiscountPackageItem.setCategory_scope("");
+            }
+            try {
+                aDiscountPackageItem.setSub_category_scope(aResultSet.getString("sub_category_scope"));
+            } catch (NullPointerException npe) {
+                aDiscountPackageItem.setSub_category_scope("");
+            }
+            try {
+                aDiscountPackageItem.setItem_scope(aResultSet.getString("item_scope"));
+            } catch (NullPointerException npe) {
+                aDiscountPackageItem.setItem_scope("");
+            }
         } catch (SQLException se) {
             System.err.println("setDiscountPackageItemFromResultset:" + se.getMessage());
         }
@@ -286,13 +335,8 @@ public class DiscountPackageItemBean implements Serializable {
 
     public void deleteDiscountPackageItem(DiscountPackageItem discountPackageItem) {
         String msg;
-        UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
-        List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
-        GroupRightBean grb = new GroupRightBean();
-
-        if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Delete") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+        if (null == discountPackageItem || discountPackageItem.getDiscountPackageItemId() == 0) {
+            //
         } else {
             String sql = "DELETE FROM discount_package_item WHERE discount_package_item_id=?";
             try (
@@ -301,9 +345,10 @@ public class DiscountPackageItemBean implements Serializable {
                 ps.setLong(1, discountPackageItem.getDiscountPackageItemId());
                 ps.executeUpdate();
                 this.setActionMessage("Deleted Successfully!");
+                this.refreshDiscountPackageItems(discountPackageItem.getDiscountPackageId());
                 this.clearDiscountPackageItem(discountPackageItem);
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                System.err.println("deleteDiscountPackageItem:" + e.getMessage());
                 this.setActionMessage("DiscountPackageItem NOT deleted");
             }
         }
@@ -324,41 +369,76 @@ public class DiscountPackageItemBean implements Serializable {
     public void displayDiscountPackageItem(DiscountPackageItem DiscountPackageItemFrom, DiscountPackageItem DiscountPackageItemTo) {
         DiscountPackageItemTo.setDiscountPackageItemId(DiscountPackageItemFrom.getDiscountPackageItemId());
         DiscountPackageItemTo.setDiscountPackageId(DiscountPackageItemFrom.getDiscountPackageId());
-        DiscountPackageItemTo.setStoreId(DiscountPackageItemFrom.getStoreId());
-        DiscountPackageItemTo.setItemId(DiscountPackageItemFrom.getItemId());
+        DiscountPackageItemTo.setStoreId(0);
+        DiscountPackageItemTo.setItemId(0);
         DiscountPackageItemTo.setItemQty(DiscountPackageItemFrom.getItemQty());
         DiscountPackageItemTo.setWholesaleDiscountAmt(DiscountPackageItemFrom.getWholesaleDiscountAmt());
         DiscountPackageItemTo.setRetailsaleDiscountAmt(DiscountPackageItemFrom.getRetailsaleDiscountAmt());
         DiscountPackageItemTo.setHire_price_discount_amt(DiscountPackageItemFrom.getHire_price_discount_amt());
+        DiscountPackageItemTo.setCategory_scope(DiscountPackageItemFrom.getCategory_scope());
+        DiscountPackageItemTo.setSub_category_scope(DiscountPackageItemFrom.getSub_category_scope());
+        DiscountPackageItemTo.setItem_scope(DiscountPackageItemFrom.getItem_scope());
+        DiscountPackageItemTo.setSelectedCategories(this.getCategoryListFromIdsStr(DiscountPackageItemFrom));
+        DiscountPackageItemTo.setSelectedSubCategories(this.getSubCategoryListFromIdsStr(DiscountPackageItemFrom));
+        DiscountPackageItemTo.setSelectedItems(this.getItemListFromIdsStr(DiscountPackageItemFrom));
     }
 
-    public void clearDiscountPackageItem(DiscountPackageItem discountPackageItem) {
-        //discountPackageItem.setDiscountPackageItemId(0);
-        //discountPackageItem.setDiscountPackageId(0);
-        //discountPackageItem.setStoreId(0);
-        discountPackageItem.setItemId(0);
-        //discountPackageItem.setItemQty(1);
-        discountPackageItem.setWholesaleDiscountAmt(0);
-        discountPackageItem.setRetailsaleDiscountAmt(0);
-        discountPackageItem.setHire_price_discount_amt(0);
+    public void clearDiscountPackageItem(DiscountPackageItem aDiscountPackageItem) {
+        if (null != aDiscountPackageItem) {
+            aDiscountPackageItem.setDiscountPackageItemId(0);
+            aDiscountPackageItem.setDiscountPackageId(0);
+            aDiscountPackageItem.setItemId(0);
+            aDiscountPackageItem.setStoreId(0);
+            aDiscountPackageItem.setWholesaleDiscountAmt(0);
+            aDiscountPackageItem.setRetailsaleDiscountAmt(0);
+            aDiscountPackageItem.setHire_price_discount_amt(0);
+            aDiscountPackageItem.setCategory_scope("");
+            aDiscountPackageItem.setSub_category_scope("");
+            aDiscountPackageItem.setItem_scope("");
+            try {
+                aDiscountPackageItem.getSelectedCategories().clear();
+            } catch (Exception e) {
+                //
+            }
+            try {
+                aDiscountPackageItem.getSelectedSubCategories().clear();
+            } catch (Exception e) {
+                //
+            }
+            try {
+                aDiscountPackageItem.getSelectedItems().clear();
+            } catch (Exception e) {
+                //
+            }
+        }
     }
 
-    public void clearDiscountPackageItem(DiscountPackageItem aDiscountPackageItem, Item aItem) {
-        new ItemBean().clearItem(aItem);
-        aDiscountPackageItem.setItemId(0);
-        aDiscountPackageItem.setWholesaleDiscountAmt(0);
-        aDiscountPackageItem.setRetailsaleDiscountAmt(0);
-        aDiscountPackageItem.setHire_price_discount_amt(0);
-    }
-
-    public void initClearDiscountPackageItem(DiscountPackageItem aDiscountPackageItem, Item aItem) {
+    public void initClearDiscountPackageItem(DiscountPackageItem aDiscountPackageItem) {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
         } else {
-            this.clearDiscountPackageItem(aDiscountPackageItem, aItem);
+            this.clearDiscountPackageItem(aDiscountPackageItem);
         }
     }
-    
+
+    public void refreshDiscountPackageItems(int aPackageId) {
+        String sql = "SELECT * FROM discount_package_item WHERE discount_package_id=" + aPackageId;
+        ResultSet rs = null;
+        this.DiscountPackageItemsList = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                DiscountPackageItem discountPackageItem = new DiscountPackageItem();
+                this.setDiscountPackageItemFromResultset(discountPackageItem, rs);
+                this.DiscountPackageItemsList.add(discountPackageItem);
+            }
+        } catch (Exception e) {
+            System.err.println("refreshDiscountPackageItems:" + e.getMessage());
+        }
+    }
+
     public List<DiscountPackageItem> getDiscountPackageItems(int PacId, int StrId, long ItmId) {//1.ByPackage, 2.ByPackageStore,3. ByStoreItem
         String sql = "";
         if (PacId != 0 && StrId == 0 && ItmId == 0) {//1.ByPackage
@@ -472,5 +552,19 @@ public class DiscountPackageItemBean implements Serializable {
      */
     public void setActionMessage(String ActionMessage) {
         this.ActionMessage = ActionMessage;
+    }
+
+    /**
+     * @return the DiscountPackageItemsList
+     */
+    public List<DiscountPackageItem> getDiscountPackageItemsList() {
+        return DiscountPackageItemsList;
+    }
+
+    /**
+     * @param DiscountPackageItemsList the DiscountPackageItemsList to set
+     */
+    public void setDiscountPackageItemsList(List<DiscountPackageItem> DiscountPackageItemsList) {
+        this.DiscountPackageItemsList = DiscountPackageItemsList;
     }
 }

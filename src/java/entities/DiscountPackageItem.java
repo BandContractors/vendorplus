@@ -2,6 +2,7 @@ package entities;
 
 
 import java.io.Serializable;
+import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 
@@ -27,6 +28,12 @@ public class DiscountPackageItem implements Serializable {
     private double WholesaleDiscountAmt;
     private double RetailsaleDiscountAmt;
     private double hire_price_discount_amt;
+    private List<Category> SelectedCategories;
+    private List<SubCategory> SelectedSubCategories;
+    private List<Item> SelectedItems;
+    private String category_scope;
+    private String sub_category_scope;
+    private String item_scope;
 
     /**
      * @return the DiscountPackageItemId
@@ -138,6 +145,90 @@ public class DiscountPackageItem implements Serializable {
      */
     public void setHire_price_discount_amt(double hire_price_discount_amt) {
         this.hire_price_discount_amt = hire_price_discount_amt;
+    }
+
+    /**
+     * @return the SelectedCategories
+     */
+    public List<Category> getSelectedCategories() {
+        return SelectedCategories;
+    }
+
+    /**
+     * @param SelectedCategories the SelectedCategories to set
+     */
+    public void setSelectedCategories(List<Category> SelectedCategories) {
+        this.SelectedCategories = SelectedCategories;
+    }
+
+    /**
+     * @return the SelectedSubCategories
+     */
+    public List<SubCategory> getSelectedSubCategories() {
+        return SelectedSubCategories;
+    }
+
+    /**
+     * @param SelectedSubCategories the SelectedSubCategories to set
+     */
+    public void setSelectedSubCategories(List<SubCategory> SelectedSubCategories) {
+        this.SelectedSubCategories = SelectedSubCategories;
+    }
+
+    /**
+     * @return the SelectedItems
+     */
+    public List<Item> getSelectedItems() {
+        return SelectedItems;
+    }
+
+    /**
+     * @param SelectedItems the SelectedItems to set
+     */
+    public void setSelectedItems(List<Item> SelectedItems) {
+        this.SelectedItems = SelectedItems;
+    }
+
+    /**
+     * @return the category_scope
+     */
+    public String getCategory_scope() {
+        return category_scope;
+    }
+
+    /**
+     * @param category_scope the category_scope to set
+     */
+    public void setCategory_scope(String category_scope) {
+        this.category_scope = category_scope;
+    }
+
+    /**
+     * @return the sub_category_scope
+     */
+    public String getSub_category_scope() {
+        return sub_category_scope;
+    }
+
+    /**
+     * @param sub_category_scope the sub_category_scope to set
+     */
+    public void setSub_category_scope(String sub_category_scope) {
+        this.sub_category_scope = sub_category_scope;
+    }
+
+    /**
+     * @return the item_scope
+     */
+    public String getItem_scope() {
+        return item_scope;
+    }
+
+    /**
+     * @param item_scope the item_scope to set
+     */
+    public void setItem_scope(String item_scope) {
+        this.item_scope = item_scope;
     }
     
 }

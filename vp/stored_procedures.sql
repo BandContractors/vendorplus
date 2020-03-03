@@ -4665,11 +4665,22 @@ CREATE PROCEDURE sp_insert_discount_package_item
 	IN in_item_qty double,
 	IN in_wholesale_discount_amt double,
 	IN in_retailsale_discount_amt double,
-	IN in_hire_price_discount_amt double
+	IN in_hire_price_discount_amt double,
+	IN in_category_scope varchar(500),
+	IN in_sub_category_scope varchar(500),
+	IN in_item_scope varchar(500)
 ) 
 BEGIN 
 	SET @new_id=0;
 	CALL sp_get_new_id("discount_package_item","discount_package_item_id",@new_id);
+	SET @in_item_id=NULL;
+	if (in_item_id!=0) then
+		set @in_item_id=in_item_id;
+	end if;
+	SET @in_store_id=NULL;
+	if (in_store_id!=0) then
+		set @in_store_id=in_store_id;
+	end if;
 
 	INSERT INTO discount_package_item
 	(
@@ -4680,18 +4691,24 @@ BEGIN
 		item_qty,
 		wholesale_discount_amt,
 		retailsale_discount_amt,
-		hire_price_discount_amt
+		hire_price_discount_amt,
+		category_scope,
+		sub_category_scope,
+		item_scope
 	) 
     VALUES
 	(
 		@new_id,
 		in_discount_package_id,
-		in_store_id,
-		in_item_id,
+		@in_store_id,
+		@in_item_id,
 		in_item_qty,
 		in_wholesale_discount_amt,
 		in_retailsale_discount_amt,
-		in_hire_price_discount_amt
+		in_hire_price_discount_amt,
+		in_category_scope,
+		in_sub_category_scope,
+		in_item_scope
 	); 
 END//
 DELIMITER ;
@@ -4707,17 +4724,32 @@ CREATE PROCEDURE sp_update_discount_package_item
 	IN in_item_qty double,
 	IN in_wholesale_discount_amt double,
 	IN in_retailsale_discount_amt double,
-	IN in_hire_price_discount_amt double
+	IN in_hire_price_discount_amt double,
+	IN in_category_scope varchar(500),
+	IN in_sub_category_scope varchar(500),
+	IN in_item_scope varchar(500)
 ) 
 BEGIN 
+	SET @in_item_id=NULL;
+	if (in_item_id!=0) then
+		set @in_item_id=in_item_id;
+	end if;
+	SET @in_store_id=NULL;
+	if (in_store_id!=0) then
+		set @in_store_id=in_store_id;
+	end if;
+
 	UPDATE discount_package_item SET 
 		discount_package_id=in_discount_package_id,
-		store_id=in_store_id,
-		item_id=in_item_id,
+		store_id=@in_store_id,
+		item_id=@in_item_id,
 		item_qty=in_item_qty,
 		wholesale_discount_amt=in_wholesale_discount_amt,
 		retailsale_discount_amt=in_retailsale_discount_amt,
-		hire_price_discount_amt=in_hire_price_discount_amt 
+		hire_price_discount_amt=in_hire_price_discount_amt,
+		category_scope=in_category_scope,
+		sub_category_scope=in_sub_category_scope,
+		item_scope=in_item_scope 
 	WHERE discount_package_item_id=in_discount_package_item_id; 
 END//
 DELIMITER ;

@@ -3,6 +3,7 @@ package beans;
 
 import sessions.GeneralUserSetting;
 import connections.DBConnection;
+import entities.Category;
 import entities.GroupRight;
 import entities.SubCategory;
 import entities.UserDetail;
@@ -38,6 +39,28 @@ public class SubCategoryBean implements Serializable {
     private SubCategory SelectedSubCategory=null;
     private int SelectedSubCategoryId;
     private String SearchSubCategoryName="";
+    
+    public void setSubCategoryFromResultset(SubCategory aSubCategory, ResultSet aResultSet) {
+        try {
+            try {
+                aSubCategory.setSubCategoryId(aResultSet.getInt("sub_category_id"));
+            } catch (NullPointerException npe) {
+                aSubCategory.setSubCategoryId(0);
+            }
+            try {
+                aSubCategory.setCategoryId(aResultSet.getInt("category_id"));
+            } catch (NullPointerException npe) {
+                aSubCategory.setCategoryId(0);
+            }
+            try {
+                aSubCategory.setSubCategoryName(aResultSet.getString("sub_category_name"));
+            } catch (NullPointerException npe) {
+                aSubCategory.setSubCategoryName("");
+            }
+        } catch (SQLException se) {
+            System.err.println("setSubCategoryFromResultset:" + se.getMessage());
+        }
+    }
     
     public void saveSubCategory(SubCategory subcat) {
         String sql = null;
@@ -97,9 +120,7 @@ public class SubCategoryBean implements Serializable {
             rs = ps.executeQuery();
             if (rs.next()) {
                 SubCategory subcat = new SubCategory();
-                subcat.setSubCategoryId(rs.getInt("sub_category_id"));
-                subcat.setCategoryId(rs.getInt("category_id"));
-                subcat.setSubCategoryName(rs.getString("sub_category_name"));
+                this.setSubCategoryFromResultset(subcat, rs);
                 return subcat;
             } else {
                 return null;
@@ -176,10 +197,8 @@ public class SubCategoryBean implements Serializable {
             rs = ps.executeQuery();
             while (rs.next()) {
                 SubCategory subcat = new SubCategory();
-                subcat.setSubCategoryId(rs.getInt("sub_category_id"));
-                subcat.setCategoryId(rs.getInt("category_id"));
+                this.setSubCategoryFromResultset(subcat, rs);
                 subcat.setCategoryName(rs.getString("category_name"));
-                subcat.setSubCategoryName(rs.getString("sub_category_name"));
                 SubCategories.add(subcat);
             }
         } catch (SQLException se) {
@@ -208,10 +227,8 @@ public class SubCategoryBean implements Serializable {
             rs = ps.executeQuery();
             while (rs.next()) {
                 SubCategory subcat = new SubCategory();
-                subcat.setSubCategoryId(rs.getInt("sub_category_id"));
-                subcat.setCategoryId(rs.getInt("category_id"));
+                this.setSubCategoryFromResultset(subcat, rs);
                 subcat.setCategoryName(rs.getString("category_name"));
-                subcat.setSubCategoryName(rs.getString("sub_category_name"));
                 SubCategories.add(subcat);
             }
         } catch (SQLException se) {
@@ -240,9 +257,7 @@ public class SubCategoryBean implements Serializable {
             rs = ps.executeQuery();
             while (rs.next()) {
                 SubCategory subcat = new SubCategory();
-                subcat.setSubCategoryId(rs.getInt("sub_category_id"));
-                subcat.setCategoryId(rs.getInt("category_id"));
-                subcat.setSubCategoryName(rs.getString("sub_category_name"));
+                this.setSubCategoryFromResultset(subcat, rs);
                 SubCategories.add(subcat);
             }
         } catch (SQLException se) {
