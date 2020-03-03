@@ -406,7 +406,11 @@ public class TransactionTypeBean implements Serializable {
             tt.setDefault_currency_code("");
         }
         try {
-            tt.setTrans_number_format(rs.getString("trans_number_format"));
+            if (null == rs.getString("trans_number_format")) {
+                tt.setTrans_number_format("");
+            } else {
+                tt.setTrans_number_format(rs.getString("trans_number_format"));
+            }
         } catch (Exception e) {
             tt.setTrans_number_format("");
         }

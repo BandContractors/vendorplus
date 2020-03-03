@@ -47,5 +47,3 @@ alter table discount_package add column transactor_scope varchar(500) default ''
 alter table discount_package_item add column category_scope varchar(500) default '';
 alter table discount_package_item add column sub_category_scope varchar(500) default '';
 alter table discount_package_item add column item_scope varchar(500) default '';
-
-select concat("'",replace("1,2,3",",","','"),"'");

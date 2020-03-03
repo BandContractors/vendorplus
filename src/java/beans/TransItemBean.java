@@ -9159,7 +9159,7 @@ public class TransItemBean implements Serializable {
             aTransItemToUpdate.setItemId(i.getItemId());
             aTransItemToUpdate.setIsTradeDiscountVatLiable(CompanySetting.getIsTradeDiscountVatLiable());
             if (new GeneralUserSetting().getCurrentTransactionTypeName().equals("SALE ORDER") || new GeneralUserSetting().getCurrentTransactionTypeName().equals("SALE QUOTATION") || new GeneralUserSetting().getCurrentTransactionTypeName().equals("SALE INVOICE") || new GeneralUserSetting().getCurrentTransactionTypeName().equals("HIRE INVOICE") || new GeneralUserSetting().getCurrentTransactionTypeName().equals("HIRE QUOTATION")) {
-                dpi = new DiscountPackageItemBean().getActiveDiscountPackageItem(new GeneralUserSetting().getCurrentStore().getStoreId(), i.getItemId(), 1);
+                dpi = new DiscountPackageItemBean().getActiveDiscountPackageItem(new GeneralUserSetting().getCurrentStore().getStoreId(), i.getItemId(), 1, aTrans.getTransactorId(), i.getCategoryId(), i.getSubCategoryId());
             } else {
                 dpi = null;
             }
@@ -9378,7 +9378,7 @@ public class TransItemBean implements Serializable {
             aTransItemToUpdate.setItemId(aItem.getItemId());
             aTransItemToUpdate.setIsTradeDiscountVatLiable(CompanySetting.getIsTradeDiscountVatLiable());
             if (transtype.getTransactionTypeName().equals("SALE ORDER") || transtype.getTransactionTypeName().equals("SALE QUOTATION") || transtype.getTransactionTypeName().equals("SALE INVOICE") || transtype.getTransactionTypeName().equals("HIRE INVOICE") || transtype.getTransactionTypeName().equals("HIRE QUOTATION") || transtype.getTransactionTypeName().equals("HIRE RETURN INVOICE")) {
-                dpi = new DiscountPackageItemBean().getActiveDiscountPackageItem(store.getStoreId(), aItem.getItemId(), 1);
+                dpi = new DiscountPackageItemBean().getActiveDiscountPackageItem(store.getStoreId(), aItem.getItemId(), 1, aTrans.getTransactorId(), aItem.getCategoryId(), aItem.getSubCategoryId());
             } else {
                 dpi = null;
             }
@@ -9588,7 +9588,7 @@ public class TransItemBean implements Serializable {
             aSelectedTransItem.setItemQty(1);
             aSelectedTransItem.setIsTradeDiscountVatLiable(CompanySetting.getIsTradeDiscountVatLiable());
             if (new GeneralUserSetting().getCurrentTransactionTypeName().equals("SALE INVOICE")) {
-                dpi = new DiscountPackageItemBean().getActiveDiscountPackageItem(new GeneralUserSetting().getCurrentStore().getStoreId(), aSelectedItem.getItemId(), aSelectedTransItem.getItemQty());
+                dpi = new DiscountPackageItemBean().getActiveDiscountPackageItem(new GeneralUserSetting().getCurrentStore().getStoreId(), aSelectedItem.getItemId(), aSelectedTransItem.getItemQty(), aTrans.getTransactorId(), aSelectedItem.getCategoryId(), aSelectedItem.getSubCategoryId());
             } else {
                 dpi = null;
             }
@@ -9826,7 +9826,7 @@ public class TransItemBean implements Serializable {
             aSelectedTransItem.setItemQty(1);
             aSelectedTransItem.setIsTradeDiscountVatLiable(CompanySetting.getIsTradeDiscountVatLiable());
             if (transtype.getTransactionTypeName().equals("SALE INVOICE") || transtype.getTransactionTypeName().equals("SALE ORDER")) {
-                dpi = new DiscountPackageItemBean().getActiveDiscountPackageItem(store.getStoreId(), aSelectedItem.getItemId(), aSelectedTransItem.getItemQty());
+                dpi = new DiscountPackageItemBean().getActiveDiscountPackageItem(store.getStoreId(), aSelectedItem.getItemId(), aSelectedTransItem.getItemQty(), aTrans.getTransactorId(), aSelectedItem.getCategoryId(), aSelectedItem.getSubCategoryId());
             } else {
                 dpi = null;
             }

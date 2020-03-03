@@ -4875,6 +4875,32 @@ BEGIN
 END//
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS sp_search_discount_package_item_active;
+DELIMITER //
+CREATE PROCEDURE sp_search_discount_package_item_active
+(
+	IN in_store_id int,
+	IN in_item_id bigint,
+	IN in_item_qty double,
+	IN in_transactor_id bigint,
+	IN in_category_id int,
+	IN in_sub_category_id int
+) 
+BEGIN 
+		SET @cur_sys_datetime=null;
+		CALL sp_get_current_system_datetime(@cur_sys_datetime);
+		
+		SELECT dpi.* FROM discount_package_item dpi 
+		INNER JOIN discount_package dp ON dpi.discount_package_id=dp.discount_package_id 
+		WHERE 
+		(ifnull(store_scope,'')='' OR find_in_set(in_store_id,dp.store_scope)<>0) AND 
+		(ifnull(transactor_scope,'')='' OR find_in_set(in_transactor_id,dp.transactor_scope)<>0) AND 
+		(find_in_set(in_category_id,dpi.category_scope)<>0 OR find_in_set(in_sub_category_id,dpi.sub_category_scope)<>0 OR find_in_set(in_item_id,dpi.item_scope)<>0) AND 
+		dpi.item_qty=in_item_qty AND 
+		@cur_sys_datetime BETWEEN dp.start_date AND dp.end_date;
+END//
+DELIMITER ;
+
 DROP PROCEDURE IF EXISTS sp_search_company_setting_by_id;
 DELIMITER //
 CREATE PROCEDURE sp_search_company_setting_by_id

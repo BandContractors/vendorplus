@@ -488,50 +488,42 @@ public class DiscountPackageItemBean implements Serializable {
         return DiscountPackageItems;
     }
 
-    public DiscountPackageItem getActiveDiscountPackageItem(int StoreI, long ItemI, double Qty) {
-        String sql = "{call sp_search_discount_package_item_by_store_item_qty_active(?,?,?)}";
+    public DiscountPackageItem getActiveDiscountPackageItem(int aStoreId, long aItemId, double aQty, long aTransactorId, int aCatId, int aSubCatId) {
+        String sql = "{call sp_search_discount_package_item_active(?,?,?,?,?,?)}";
         ResultSet rs = null;
+        DiscountPackageItem dpi = null;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
-            ps.setInt(1, StoreI);
-            ps.setLong(2, ItemI);
-            ps.setDouble(3, Qty);
+            ps.setInt(1, aStoreId);
+            ps.setLong(2, aItemId);
+            ps.setDouble(3, aQty);
+            ps.setLong(4, aTransactorId);
+            ps.setInt(5, aCatId);
+            ps.setInt(6, aSubCatId);
             rs = ps.executeQuery();
             if (rs.next()) {
-                DiscountPackageItem discountPackageItem = new DiscountPackageItem();
-                this.setDiscountPackageItemFromResultset(discountPackageItem, rs);
-                return discountPackageItem;
-            } else {
-                return null;
+                dpi = new DiscountPackageItem();
+                this.setDiscountPackageItemFromResultset(dpi, rs);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-            return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            System.err.println("getActiveDiscountPackageItem:" + e.getMessage());
         }
-
+        return dpi;
     }
-
-    public double getActiveWholesaleDiscount(int StoreI, long ItemI, double Qty) {
-        double DiscountAmount = 0;
-        SelectedDiscountPackageItem = this.getActiveDiscountPackageItem(StoreI, ItemI, Qty);
-        if (SelectedDiscountPackageItem == null) {
-            DiscountAmount = 0;
-            return 0;
-        } else {
-            DiscountAmount = SelectedDiscountPackageItem.getWholesaleDiscountAmt();
-            SelectedDiscountPackageItem = null;
-            return DiscountAmount;
-        }
-    }
+    
+//    public double getActiveWholesaleDiscount(int StoreI, long ItemI, double Qty) {
+//        double DiscountAmount = 0;
+//        SelectedDiscountPackageItem = this.getActiveDiscountPackageItem(StoreI, ItemI, Qty);
+//        if (SelectedDiscountPackageItem == null) {
+//            DiscountAmount = 0;
+//            return 0;
+//        } else {
+//            DiscountAmount = SelectedDiscountPackageItem.getWholesaleDiscountAmt();
+//            SelectedDiscountPackageItem = null;
+//            return DiscountAmount;
+//        }
+//    }
 
     /**
      * @param DiscountPackageItems the DiscountPackageItems to set
