@@ -394,7 +394,12 @@ public class TransBean implements Serializable {
             //do nothing
         }
         try {
-            aTrans.setStore2Id(Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("ORDER", "DEFAULT_ORDER_TO_STORE").getParameter_value()));
+            int storeid = 0;
+            storeid = Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("ORDER", "DEFAULT_ORDER_TO_STORE").getParameter_value());
+            if (storeid > 0 && null == new StoreBean().getStore(storeid)) {
+                storeid = 0;
+            }
+            aTrans.setStore2Id(storeid);
         } catch (NullPointerException npe) {
             aTrans.setStore2Id(0);
         }
@@ -880,7 +885,7 @@ public class TransBean implements Serializable {
             msg = "TOTAL DEBIT IS NOT EQUAL TO TOTAL CREIDT...!";
             this.setActionMessage("Transaction NOT saved");
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if ("EXPENSE ENTRY".equals(CurrentTransactionType.getTransactionTypeName()) && (trans.getAmountTendered() <= 0 && trans.getGrandTotal() <= 0) && trans.getTransactionId()==0) {
+        } else if ("EXPENSE ENTRY".equals(CurrentTransactionType.getTransactionTypeName()) && (trans.getAmountTendered() <= 0 && trans.getGrandTotal() <= 0) && trans.getTransactionId() == 0) {
             this.setActionMessage("");
             msg = "Please enter Spent/Paid Amount";
             this.setActionMessage("Transaction NOT saved");
@@ -1453,7 +1458,7 @@ public class TransBean implements Serializable {
                 msg = "INCORRECT SERVER DATE or LICENSE HAS EXPIRED !";
             } else if (trans.getTransactorId() == 0 && transtype.getIsTransactorMandatory().equals("Yes")) {
                 msg = "Select a valid Individual/Company you are transacting with...";
-            } else if (aActiveTransItems.size() < 1 & !"UNPACK".equals(transtype.getTransactionTypeName()) & trans.getTransactionId()==0) {
+            } else if (aActiveTransItems.size() < 1 & !"UNPACK".equals(transtype.getTransactionTypeName()) & trans.getTransactionId() == 0) {
                 msg = "No item(s) found for this " + transtype.getTransactionOutputLabel();
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && trans.getPayMethod() == 0 && trans.getTransactionId() == 0) {
                 msg = "Select Payment Method";
@@ -1499,7 +1504,7 @@ public class TransBean implements Serializable {
                 msg = "Please select the Payment Account";
             } else if ("JOURNAL ENTRY".equals(transtype.getTransactionTypeName()) && trans.getTotalDebit() != trans.getTotalCredit()) {
                 msg = "TOTAL DEBIT IS NOT EQUAL TO TOTAL CREDIT...!";
-            } else if ("EXPENSE ENTRY".equals(transtype.getTransactionTypeName()) && (trans.getAmountTendered() <= 0 && trans.getGrandTotal() <= 0) && trans.getTransactionId()==0) {
+            } else if ("EXPENSE ENTRY".equals(transtype.getTransactionTypeName()) && (trans.getAmountTendered() <= 0 && trans.getGrandTotal() <= 0) && trans.getTransactionId() == 0) {
                 msg = "Please enter Spent/Paid Amount";
             } else if ("EXPENSE ENTRY".equals(transtype.getTransactionTypeName()) && trans.getAccChildAccountId() == 0) {
                 msg = "Please select the Payment Account";
@@ -1829,7 +1834,7 @@ public class TransBean implements Serializable {
                 this.ActionMessage = "Invalid user...!";
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(this.ActionMessage));
             } else if (trans.getDelivery_mode().length() == 0) {
-                this.ActionMessage = "Specify Delivery Mode (Sit In, Take Out, Delivery)...!";
+                this.ActionMessage = "Specify Delivery Mode...!";
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(this.ActionMessage));
             } else {
                 if (aAction.equals("Send")) {
@@ -1887,7 +1892,7 @@ public class TransBean implements Serializable {
                             this.ActionMessage = "Selected Order is already PAID...";
                             FacesContext.getCurrentInstance().addMessage("Pay", new FacesMessage(this.ActionMessage));
                         } else if (SavedOrderTrans.getStoreId() != new GeneralUserSetting().getCurrentStore().getStoreId()) {
-                            this.ActionMessage = "ORDER STORE AND PAY STORE MUST BE THE SAME...";
+                            this.ActionMessage = "ORDER " + CompanySetting.getStoreEquivName() + " AND PAY " + CompanySetting.getStoreEquivName() + " MUST BE THE SAME...";
                             FacesContext.getCurrentInstance().addMessage("Pay", new FacesMessage(this.ActionMessage));
                         } else {
                             this.getOrderSalesInvoice(SavedOrderTrans.getTransactionId(), ud);
@@ -2132,6 +2137,11 @@ public class TransBean implements Serializable {
             //save invoice status if not 0
             if (InvoiceStatus > 0) {
                 this.updateOrderStatus(OrderTrans.getTransactionId(), "is_invoiced", InvoiceStatus);
+            }
+            if (trans.getAmountTendered() >= trans.getGrandTotal()) {
+                this.updateOrderStatus(OrderTrans.getTransactionId(), "is_paid", 1);
+            } else if (trans.getAmountTendered() > 0 && trans.getAmountTendered() < trans.getGrandTotal()) {
+                this.updateOrderStatus(OrderTrans.getTransactionId(), "is_paid", 2);
             }
         }
     }
@@ -13594,7 +13604,7 @@ public class TransBean implements Serializable {
                 String mg = "INVALID HIRE NUMBER...";
                 FacesContext.getCurrentInstance().addMessage("Return", new FacesMessage(mg));
             } else if (this.RefTrans.getStoreId() != new GeneralUserSetting().getCurrentStore().getStoreId()) {
-                String mg = "RETURN STORE AND HIRE STORE MUST BE THE SAME...";
+                String mg = "RETURN " + CompanySetting.getStoreEquivName() + " AND HIRE " + CompanySetting.getStoreEquivName() + " MUST BE THE SAME...";
                 FacesContext.getCurrentInstance().addMessage("Return", new FacesMessage(mg));
             } else {
                 aReturnTrans.setTransactionRef(this.RefTrans.getTransactionNumber());
@@ -13642,7 +13652,7 @@ public class TransBean implements Serializable {
                 String mg = "INVALID HIRE NUMBER...";
                 FacesContext.getCurrentInstance().addMessage("Return", new FacesMessage(mg));
             } else if (this.RefTrans.getStoreId() != new GeneralUserSetting().getCurrentStore().getStoreId()) {
-                String mg = "RETURN STORE AND HIRE STORE MUST BE THE SAME...";
+                String mg = "RETURN " + CompanySetting.getStoreEquivName() + " AND HIRE " + CompanySetting.getStoreEquivName() + " MUST BE THE SAME...";
                 FacesContext.getCurrentInstance().addMessage("Return", new FacesMessage(mg));
             } else {
                 aReturnTrans.setTransactionRef(this.RefTrans.getTransactionNumber());
@@ -13712,7 +13722,7 @@ public class TransBean implements Serializable {
                 String mg = "INVALID HIRE NUMBER...";
                 FacesContext.getCurrentInstance().addMessage("Return", new FacesMessage(mg));
             } else if (this.RefTrans.getStoreId() != new GeneralUserSetting().getCurrentStore().getStoreId()) {
-                String mg = "FROM DELIVERY STORE AND HIRE STORE MUST BE THE SAME...";
+                String mg = "FROM DELIVERY " + CompanySetting.getStoreEquivName() + " AND HIRE " + CompanySetting.getStoreEquivName() + " MUST BE THE SAME...";
                 FacesContext.getCurrentInstance().addMessage("Return", new FacesMessage(mg));
             } else {
                 aDeliveryTrans.setTransactionRef(this.RefTrans.getTransactionNumber());
@@ -13756,7 +13766,7 @@ public class TransBean implements Serializable {
                 String mg = "INVALID HIRE NUMBER...";
                 FacesContext.getCurrentInstance().addMessage("Return", new FacesMessage(mg));
             } else if (this.RefTrans.getStoreId() != new GeneralUserSetting().getCurrentStore().getStoreId()) {
-                String mg = "FROM DELIVERY STORE AND HIRE STORE MUST BE THE SAME...";
+                String mg = "FROM DELIVERY " + CompanySetting.getStoreEquivName() + " AND HIRE " + CompanySetting.getStoreEquivName() + " MUST BE THE SAME...";
                 FacesContext.getCurrentInstance().addMessage("Return", new FacesMessage(mg));
             } else {
                 aDeliveryTrans.setTransactionRef(this.RefTrans.getTransactionNumber());
@@ -13801,7 +13811,7 @@ public class TransBean implements Serializable {
                 if (null == ReturnedTrans || ReturnedTrans.getTransactionId() == 0) {
                     mg = "INVALID HIRE RETURN NUMBER...";
                 } else if (ReturnedTrans.getStoreId() != new GeneralUserSetting().getCurrentStore().getStoreId()) {
-                    mg = "RETURN STORE AND HIRE STORE MUST BE THE SAME...";
+                    mg = "RETURN " + CompanySetting.getStoreEquivName() + " AND HIRE " + CompanySetting.getStoreEquivName() + " MUST BE THE SAME...";
                 } else {
                     try {
                         this.TransChild.setTransactionDate(new CompanySetting().getCURRENT_SERVER_DATE());
@@ -13874,92 +13884,6 @@ public class TransBean implements Serializable {
         return mg;
     }
 
-    public String getReturnHireInvoice_old(long aReturnNoteId) {
-        String mg = "";
-        TransItemBean tib = new TransItemBean();
-        try {
-            if (aReturnNoteId > 0) {
-                Trans ReturnedTrans = this.getTrans(aReturnNoteId);
-                if (null == this.getTransChild()) {
-                    this.setTransChild(new Trans());
-                }
-                this.clearTrans(this.getTransChild());
-                if (null == ReturnedTrans || ReturnedTrans.getTransactionId() == 0) {
-                    mg = "INVALID HIRE RETURN NUMBER...";
-                } else if (ReturnedTrans.getStoreId() != new GeneralUserSetting().getCurrentStore().getStoreId()) {
-                    mg = "RETURN STORE AND HIRE STORE MUST BE THE SAME...";
-                } else {
-                    try {
-                        this.getTransChild().setTransactionDate(new CompanySetting().getCURRENT_SERVER_DATE());
-                    } catch (NullPointerException npe) {
-                        this.getTransChild().setTransactionDate(new CompanySetting().getCURRENT_SERVER_DATE());
-                    }
-                    this.getTransChild().setTransactionRef(ReturnedTrans.getTransactionNumber());
-                    this.getTransChild().setTransactorId(ReturnedTrans.getTransactorId());
-                    this.getTransChild().setStoreId(ReturnedTrans.getStoreId());
-                    this.getTransChild().setSite_id(ReturnedTrans.getSite_id());
-                    this.getTransChild().setTransactionComment(ReturnedTrans.getTransactionComment());
-                    Trans RefHireTrans = this.getTransByTransNumber(ReturnedTrans.getTransactionRef());
-                    try {
-                        this.getTransChild().setFrom_date(RefHireTrans.getTo_date());
-                    } catch (NullPointerException npe) {
-                        this.getTransChild().setFrom_date(null);
-                    }
-                    try {
-                        this.getTransChild().setCurrencyCode(RefHireTrans.getCurrencyCode());
-                    } catch (NullPointerException npe) {
-                        this.getTransChild().setCurrencyCode("");
-                    }
-                    this.getTransChild().setTo_date(ReturnedTrans.getTransactionDate());
-                    this.getTransChild().setDuration_value(ReturnedTrans.getDuration_value());
-                    this.getTransChild().setDuration_type(ReturnedTrans.getDuration_type());
-                    this.ActiveTransItemsChild.clear();
-                    List<TransItem> ReturnedItems = new TransItemBean().getTransItemsByTransactionId(aReturnNoteId);
-                    TransItem ti = null;
-                    TransItem ti2 = null;
-                    Item i = null;
-                    Item i2 = null;
-                    for (TransItem ReturnedTransItem : ReturnedItems) {
-                        //check for returned GOOD but DELAYED
-                        if (ReturnedTransItem.getItemQty() > 0 && ReturnedTransItem.getDuration_passed() > 0) {
-                            i = new ItemBean().getItem(ReturnedTransItem.getItemId());
-                            ti = new TransItem();
-                            tib.updateModelTransItemCEC(this.getTransChild().getStoreId(), 68, 97, "", this.getTransChild(), ti, i, ReturnedTransItem.getItemQty());
-                            ti.setItemId(ReturnedTransItem.getItemId());
-                            ti.setBatchno(ReturnedTransItem.getBatchno());
-                            ti.setCodeSpecific(ReturnedTransItem.getCodeSpecific());
-                            ti.setDescSpecific(ReturnedTransItem.getDescSpecific());
-                            ti.setDescMore(ReturnedTransItem.getDescMore());
-                            ti.setNarration("DELAYED");
-                            tib.addTransItemCEC(this.getTransChild().getStoreId(), 68, 97, "", this.getTransChild(), this.ActiveTransItemsChild, ti, i);
-                        }
-                        //check for returned DAMAGED/LOST
-                        if (ReturnedTransItem.getQty_damage() > 0) {
-                            i2 = new ItemBean().getItem(ReturnedTransItem.getItemId());
-                            ti2 = new TransItem();
-                            //only for damage; overrite item hire rate by cost rate
-                            double unitcost = new StockBean().getItemUnitCostPrice(this.getTransChild().getStoreId(), i2.getItemId(), ReturnedTransItem.getBatchno(), ReturnedTransItem.getCodeSpecific(), ReturnedTransItem.getDescSpecific());
-                            i2.setUnit_hire_price(unitcost); //only applies on damaged/lost items
-                            tib.updateModelTransItemCEC(this.getTransChild().getStoreId(), 68, 97, "", this.getTransChild(), ti2, i2, ReturnedTransItem.getQty_damage());
-                            ti2.setItemId(ReturnedTransItem.getItemId());
-                            ti2.setBatchno(ReturnedTransItem.getBatchno());
-                            ti2.setCodeSpecific(ReturnedTransItem.getCodeSpecific());
-                            ti2.setDescSpecific(ReturnedTransItem.getDescSpecific());
-                            ti2.setDescMore(ReturnedTransItem.getDescMore());
-                            ti2.setNarration("DAMAGED/LOST");
-                            tib.addTransItemCEC(this.getTransChild().getStoreId(), 68, 97, "", this.getTransChild(), this.ActiveTransItemsChild, ti2, i2);
-                        }
-                    }
-                    //update totals
-                    this.setTransTotalsAndUpdateCEC(68, 97, this.getTransChild(), this.ActiveTransItemsChild);
-                }
-            }
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
-        }
-        return mg;
-    }
-
     public String getOrderSalesInvoice(long aOrderId, UserDetail aUserDetail) {
         String mg = "";
         TransItemBean tib = new TransItemBean();
@@ -13969,7 +13893,7 @@ public class TransBean implements Serializable {
                 if (null == this.TransChild || this.TransChild.getTransactionId() == 0) {
                     mg = "INVALID ORDER NUMBER...";
                 } else if (this.TransChild.getStoreId() != new GeneralUserSetting().getCurrentStore().getStoreId()) {
-                    mg = "ORDER STORE AND INVOICE STORE MUST BE THE SAME...";
+                    mg = "ORDER " + CompanySetting.getStoreEquivName() + " AND INVOICE " + CompanySetting.getStoreEquivName() + " MUST BE THE SAME...";
                 } else {
                     this.TransChild.setTransactionUserDetailId(aUserDetail.getUserDetailId());
                     this.TransChild.setTransactionId(0);
@@ -14006,65 +13930,6 @@ public class TransBean implements Serializable {
             }
         } catch (Exception e) {
             System.err.println("getOrderSalesInvoice:" + e.getMessage());
-        }
-        return mg;
-    }
-
-    public String getReturnHireInvoice_old(long aReturnNoteId, Trans aReturnHireInvoiceTrans, List<TransItem> aReturnHireInvoiceTransItems) {
-        String mg = "";
-        try {
-            if (aReturnNoteId > 0) {
-                Trans ReturnedTrans = this.getTrans(aReturnNoteId);
-                if (null == aReturnHireInvoiceTrans) {
-                    aReturnHireInvoiceTrans = new Trans();
-                }
-                if (null == ReturnedTrans || ReturnedTrans.getTransactionId() == 0) {
-                    mg = "INVALID HIRE RETURN NUMBER...";
-                } else if (ReturnedTrans.getStoreId() != new GeneralUserSetting().getCurrentStore().getStoreId()) {
-                    mg = "RETURN STORE AND HIRE STORE MUST BE THE SAME...";
-                } else {
-                    aReturnHireInvoiceTrans.setTransactionRef(ReturnedTrans.getTransactionNumber());
-                    aReturnHireInvoiceTrans.setTransactorId(ReturnedTrans.getTransactorId());
-                    aReturnHireInvoiceTrans.setStoreId(ReturnedTrans.getStoreId());
-                    aReturnHireInvoiceTrans.setSite_id(ReturnedTrans.getSite_id());
-                    try {
-                        aReturnHireInvoiceTrans.setFrom_date(this.getTransByTransNumber(ReturnedTrans.getTransactionRef()).getTo_date());
-                    } catch (NullPointerException npe) {
-                        aReturnHireInvoiceTrans.setFrom_date(null);
-                    }
-                    aReturnHireInvoiceTrans.setTo_date(ReturnedTrans.getTransactionDate());
-                    aReturnHireInvoiceTrans.setDuration_value(ReturnedTrans.getDuration_value());
-                    aReturnHireInvoiceTrans.setDuration_type(ReturnedTrans.getDuration_type());
-                    aReturnHireInvoiceTransItems.clear();
-                    List<TransItem> ReturnedItems = new TransItemBean().getTransItemsByTransactionId(aReturnNoteId);
-                    TransItem ti = null;
-                    for (TransItem ReturnedItem : ReturnedItems) {
-                        ti = new TransItem();
-                        ti.setItemId(ReturnedItem.getItemId());
-                        ti.setBatchno(ReturnedItem.getBatchno());
-                        ti.setCodeSpecific(ReturnedItem.getCodeSpecific());
-                        ti.setDescSpecific(ReturnedItem.getDescSpecific());
-                        ti.setDescMore(ReturnedItem.getDescMore());
-                        ti.setDuration_value(ReturnedItem.getDuration_passed());
-                        //check for returned GOOD but DELAYED
-                        if (ReturnedItem.getItemQty() > 0 && ReturnedItem.getDuration_passed() > 0) {
-                            ti.setItemQty(ReturnedItem.getItemQty()); //returned GOOD
-                            ti.setNarration("DELAYED");
-                            //Calculate the costs for DELAYED
-                            aReturnHireInvoiceTransItems.add(ti);
-                        }
-                        //check for returned DAMAGED/LOST
-                        if (ReturnedItem.getQty_damage() > 0) {
-                            ti.setItemQty(ReturnedItem.getQty_damage()); //returned DAMAGED/LOST
-                            ti.setNarration("DAMAGED/LOST");
-                            //Calculate the costs for DAMAGED/LOST
-                            aReturnHireInvoiceTransItems.add(ti);
-                        }
-                    }
-                }
-            }
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
         }
         return mg;
     }
@@ -14691,7 +14556,7 @@ public class TransBean implements Serializable {
                         } else if (at.get(selectedindex).getIs_cancel() == 1) {
                             this.ActionMessage = "Selected Order is already CANCELLED...";
                         } else if (at.get(selectedindex).getStoreId() != new GeneralUserSetting().getCurrentStore().getStoreId()) {
-                            this.ActionMessage = "ORDER STORE AND INVOICE STORE MUST BE THE SAME...";
+                            this.ActionMessage = "ORDER " + CompanySetting.getStoreEquivName() + " AND INVOICE " + CompanySetting.getStoreEquivName() + " MUST BE THE SAME...";
                         } else {
                             this.openOrderChildSalesInvoice(at.get(selectedindex).getTransactionId(), ud);
                         }
@@ -14717,7 +14582,7 @@ public class TransBean implements Serializable {
                         } else if (at.get(selectedindex).getIs_paid() == 1) {
                             this.ActionMessage = "Selected Order is already PAID...";
                         } else if (at.get(selectedindex).getStoreId() != new GeneralUserSetting().getCurrentStore().getStoreId()) {
-                            this.ActionMessage = "ORDER STORE AND PAY STORE MUST BE THE SAME...";
+                            this.ActionMessage = "ORDER " + CompanySetting.getStoreEquivName() + " AND PAY " + CompanySetting.getStoreEquivName() + " MUST BE THE SAME...";
                         } else {
                             this.getOrderSalesInvoice(at.get(selectedindex).getTransactionId(), ud);
                             this.TransChild.setTransactionRef(at.get(selectedindex).getTransactionNumber());

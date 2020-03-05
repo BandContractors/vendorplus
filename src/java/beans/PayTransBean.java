@@ -261,6 +261,23 @@ public class PayTransBean implements Serializable {
         return getPayTranss();
     }
 
+    public double getTotalPaidByOrderRef(String aOrderNumber) {
+        String sql = "select ifnull(sum(pt.trans_paid_amount),0) as total_paid from pay_trans pt inner join transaction t on pt.transaction_id=t.transaction_id and t.transaction_ref='" + aOrderNumber + "'";
+        ResultSet rs = null;
+        double totalpay = 0;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                totalpay = rs.getDouble("total_paid");
+            }
+        } catch (Exception e) {
+            System.err.println("getTotalPaidByOrderRef:" + e.getMessage());
+        }
+        return totalpay;
+    }
+
     public void refreshSalePayTranssSummaryByTransactor(long aTransactorId, String aCurrencyCode) {
         String sql = "{call sp_search_sum_sale_pay_trans_by_transactor(?,?)}";
         ResultSet rs = null;

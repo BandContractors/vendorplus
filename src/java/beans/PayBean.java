@@ -250,6 +250,37 @@ public class PayBean implements Serializable {
         }
     }
     
+    public void updateOrderPayStatus(List<PayTrans> aPayTranss) {
+        try {
+            for (int i = 0; i < aPayTranss.size(); i++) {
+                long OrderId = 0;
+                String OrderNumber = "";
+                double OrderAmount = 0;
+                double TotalPaid = 0;
+                OrderNumber = aPayTranss.get(i).getTransactionRef();
+                if (null == OrderNumber || OrderNumber.length() == 0) {
+                    //do nothing
+                } else {
+                    try {
+                        Trans OrderTrans = new TransBean().getTransByTransNumber(OrderNumber);
+                        OrderAmount = OrderTrans.getGrandTotal();
+                        OrderId = OrderTrans.getTransactionId();
+                    } catch (Exception e) {
+                        OrderAmount = 0;
+                    }
+                    TotalPaid = new PayTransBean().getTotalPaidByOrderRef(OrderNumber);
+                    if (TotalPaid >= OrderAmount) {//1
+                        new TransBean().updateOrderStatus(OrderId, "is_paid", 1);
+                    } else if (TotalPaid > 0 && TotalPaid < OrderAmount) {//2
+                        new TransBean().updateOrderStatus(OrderId, "is_paid", 2);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("updateOrderPayStatus:" + e.getMessage());
+        }
+    }
+    
     public void saveCashReceipt(Pay pay, List<PayTrans> aPayTranss, int aPayTypeId, int aPayReasId) {
         String sql = null;
         String sql2 = null;
@@ -348,10 +379,13 @@ public class PayBean implements Serializable {
                 new AccJournalBean().postJournalCashReceiptLoan(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId());
             } else if (aPayReasId == 90) {//CUSTOMER DEPOSIT (Prepaid Income)
                 new AccJournalBean().postJournalCashReceiptPrepaidIncome(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId());
-            }else if (aPayReasId == 115) {//OTHER REVENUE
-                new AccJournalBean().postJournalCashReceiptOtherRevenue(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId(),aPayTranss);
+            } else if (aPayReasId == 115) {//OTHER REVENUE
+                new AccJournalBean().postJournalCashReceiptOtherRevenue(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId(), aPayTranss);
             }
             this.setActionMessage("Saved Successfully");
+            if (aPayReasId == 22) {
+                this.updateOrderPayStatus(aPayTranss);
+            }
             this.clearPayPayTranss(pay, aPayTranss);
             this.PayAll = false;
         }
@@ -1223,7 +1257,7 @@ public class PayBean implements Serializable {
                     new AccJournalBean().postJournalCashPaymentPrepaidExpenseCANCEL(aPay, new AccPeriodBean().getAccPeriod(aPay.getPayDate()).getAccPeriodId());
                 }
                 if (aPay.getPayReasonId() == 115) {
-                    new AccJournalBean().postJournalCashReceiptOtherRevenueCANCEL(aPay, new AccPeriodBean().getAccPeriod(aPay.getPayDate()).getAccPeriodId(),aPayTransList);
+                    new AccJournalBean().postJournalCashReceiptOtherRevenueCANCEL(aPay, new AccPeriodBean().getAccPeriod(aPay.getPayDate()).getAccPeriodId(), aPayTransList);
                 }
                 hasReversed = 1;
             }
