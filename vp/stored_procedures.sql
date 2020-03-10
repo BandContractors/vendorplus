@@ -8136,7 +8136,7 @@ BEGIN
 	(select sum(pt.trans_paid_amount) from pay_trans pt inner join pay p on 
 	pt.pay_id=p.pay_id and p.pay_category='IN' where pt.transaction_id=t.transaction_id) 
 	as sum_trans_paid_amount  from transaction t 
-	where t.transaction_number=in_transaction_number and t.transaction_type_id=2 and t.currency_code=in_currency_code and 
+	where t.transaction_number=in_transaction_number and (t.transaction_type_id=2 or t.transaction_reason_id=117) and t.currency_code=in_currency_code and 
 	t.transaction_date between in_date1 and in_date2; 
  else 
 	select t.transaction_id as transaction_id,t.transaction_number as transaction_number,
@@ -8145,7 +8145,7 @@ BEGIN
 	(select sum(pt.trans_paid_amount) from pay_trans pt inner join pay p on 
 	pt.pay_id=p.pay_id and p.pay_category='IN' where pt.transaction_id=t.transaction_id) 
 	as sum_trans_paid_amount  from transaction t 
-	where t.transaction_number=in_transaction_number and t.transaction_type_id=2 and t.currency_code=in_currency_code;
+	where t.transaction_number=in_transaction_number and (t.transaction_type_id=2 or t.transaction_reason_id=117) and t.currency_code=in_currency_code;
  end if;
 END//
 DELIMITER ;
@@ -8213,25 +8213,25 @@ BEGIN
 	if (in_date1 is not null and in_date2 is not null ) then 
 		select t.transaction_id as transaction_id,t.transaction_number as transaction_number,
 		t.transaction_type_id as transaction_type_id,t.transaction_reason_id as transaction_reason_id,
-		t.grand_total as grand_total,t.transaction_ref as transaction_ref,TP.sum_trans_paid_amount 
-		from transaction t, 		
+		t.grand_total as grand_total,t.transaction_ref as transaction_ref,ifnull(TP.sum_trans_paid_amount,0) as sum_trans_paid_amount 
+		from transaction as t left join 
 		(select pt.transaction_id,sum(pt.trans_paid_amount) as sum_trans_paid_amount from pay_trans pt 
 		inner join pay p on p.pay_id=pt.pay_id and p.pay_category='IN' and p.bill_transactor_id=in_transactor_id 
-		group by pt.transaction_id) as TP 
-		where t.transaction_id=TP.transaction_id and t.bill_transactor_id=in_transactor_id and t.transaction_type_id IN(2,65,68) 
+		group by pt.transaction_id) as TP on t.transaction_id=TP.transaction_id 
+		where t.bill_transactor_id=in_transactor_id and (t.transaction_type_id IN(2,65,68) or t.transaction_reason_id=117) 
 		and t.currency_code=in_currency_code 
-		and  t.grand_total>TP.sum_trans_paid_amount and t.transaction_date between in_date1 and in_date2; 
+		and  t.grand_total>ifnull(TP.sum_trans_paid_amount,0) and t.transaction_date between in_date1 and in_date2; 
 	else 
 		select t.transaction_id as transaction_id,t.transaction_number as transaction_number,
 		t.transaction_type_id as transaction_type_id,t.transaction_reason_id as transaction_reason_id,
-		t.grand_total as grand_total,t.transaction_ref as transaction_ref,TP.sum_trans_paid_amount 
-		from transaction t, 		
+		t.grand_total as grand_total,t.transaction_ref as transaction_ref,ifnull(TP.sum_trans_paid_amount,0) as sum_trans_paid_amount 
+		from transaction as t left join  		
 		(select pt.transaction_id,sum(pt.trans_paid_amount) as sum_trans_paid_amount from pay_trans pt 
 		inner join pay p on p.pay_id=pt.pay_id and p.pay_category='IN' and p.bill_transactor_id=in_transactor_id 
-		group by pt.transaction_id) as TP 
-		where t.transaction_id=TP.transaction_id and t.bill_transactor_id=in_transactor_id and t.transaction_type_id IN(2,65,68) 
+		group by pt.transaction_id) as TP on t.transaction_id=TP.transaction_id 
+		where t.bill_transactor_id=in_transactor_id and (t.transaction_type_id IN(2,65,68) or t.transaction_reason_id=117) 
 		and t.currency_code=in_currency_code 
-		and t.grand_total>TP.sum_trans_paid_amount; 
+		and t.grand_total>ifnull(TP.sum_trans_paid_amount,0); 
 	end if;
 	
 END//
@@ -8306,7 +8306,7 @@ BEGIN
 	t.grand_total as grand_total,t.transaction_ref as transaction_ref,
 	(select sum(pt.trans_paid_amount) from pay_trans pt where pt.transaction_id=t.transaction_id) 
 	as sum_trans_paid_amount  from transaction t 
-	where t.bill_transactor_id=in_transactor_id and t.transaction_type_id=1 and t.currency_code=in_currency_code and 
+	where t.bill_transactor_id=in_transactor_id and (t.transaction_type_id=1 or t.transaction_reason_id=118) and t.currency_code=in_currency_code and 
 	t.transaction_date between in_date1 and in_date2; 
  else 
 	select t.transaction_id as transaction_id,t.transaction_number as transaction_number,
@@ -8314,7 +8314,7 @@ BEGIN
 	t.grand_total as grand_total,t.transaction_ref as transaction_ref,
 	(select sum(pt.trans_paid_amount) from pay_trans pt where pt.transaction_id=t.transaction_id) 
 	as sum_trans_paid_amount  from transaction t 
-	where t.bill_transactor_id=in_transactor_id and t.transaction_type_id=1 and t.currency_code=in_currency_code; 
+	where t.bill_transactor_id=in_transactor_id and (t.transaction_type_id=1 or t.transaction_reason_id=118) and t.currency_code=in_currency_code; 
  end if;
 END//
 DELIMITER ;
@@ -8384,7 +8384,7 @@ BEGIN
 	t.grand_total as grand_total,t.transaction_ref as transaction_ref,
 	(select sum(pt.trans_paid_amount) from pay_trans pt where pt.transaction_id=t.transaction_id) 
 	as sum_trans_paid_amount  from transaction t 
-	where t.transaction_number=in_transaction_number and t.transaction_type_id=1 and t.currency_code=in_currency_code and 
+	where t.transaction_number=in_transaction_number and (t.transaction_type_id=1 or t.transaction_reason_id=118) and t.currency_code=in_currency_code and 
 	t.transaction_date between in_date1 and in_date2; 
   else 
 	select t.transaction_id as transaction_id,t.transaction_number as transaction_number,
@@ -8392,7 +8392,7 @@ BEGIN
 	t.grand_total as grand_total,t.transaction_ref as transaction_ref,
 	(select sum(pt.trans_paid_amount) from pay_trans pt where pt.transaction_id=t.transaction_id) 
 	as sum_trans_paid_amount  from transaction t 
-	where t.transaction_number=in_transaction_number and t.transaction_type_id=1 and t.currency_code=in_currency_code;
+	where t.transaction_number=in_transaction_number and (t.transaction_type_id=1 or t.transaction_reason_id=118) and t.currency_code=in_currency_code;
   end if;
 END//
 DELIMITER ;

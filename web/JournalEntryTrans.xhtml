@@ -79,54 +79,54 @@
                 <h:inputText styleClass="clsInput" id="itxtTransactionRef" value="#{trans.transactionRef}" autocomplete="off" style="width: 100px;"/>
             </h:panelGrid>
             <div class="ui-fluid">
-            <h:panelGrid id="gridTransItem" styleClass="clsGridMainInput" columns="3">
-                <h:outputLabel value="Account"/>
-                <h:outputLabel value="Child.Account"/>
-                <h:outputLabel value=""/>
-                <p:autoComplete id="autcItem" widgetVar="WautcItem" value="#{transItemBean.selectedAccCoa}"  
-                                completeMethod="#{accCoaBean.getAccCoaObjectListAllActive}" 
-                                var="itm" 
-                                itemLabel="#{itm.accountName}" 
-                                itemValue="#{itm}" 
-                                converter="AccCoaConverter" style="text-align: left" 
-                                forceSelection="true" queryDelay="0" 
-                                >
-                    <p:column headerText="Account Name" style="text-align: left" >  
-                        #{itm.accountName} 
-                    </p:column> 
-                    <p:column headerText="Account Code" style="text-align: left" >  
-                        #{itm.accountCode} 
-                    </p:column> 
-                    <p:column headerText="Type" style="text-align: left">  
-                        #{accTypeBean.getAccTypeById(itm.accTypeId).accTypeName}
-                    </p:column> 
-                    <p:column headerText="Group/Category" style="text-align: left"> 
-                        #{accGroupBean.getAccGroupById(itm.accGroupId).accGroupName} / 
-                        #{accCategoryBean.getAccCategoryById(itm.accCategoryId).accCategoryName}
-                    </p:column> 
-                    <p:ajax event="itemSelect" listener="#{transItemBean.updateAccCodeTransItem(transItem,transItemBean.selectedAccCoa)}" process="@this menuCurrency menuChildAcc" update="menuChildAcc"/>
-                    <p:ajax event="change" listener="#{transItemBean.updateAccCodeTransItem(transItem,transItemBean.selectedAccCoa)}" rendered="#{transItemBean.selectedAccCoa!=null}" process="@this menuCurrency menuChildAcc" update="menuChildAcc"/>
-                </p:autoComplete>
-                <h:selectOneMenu styleClass="clsMenu" id="menuChildAcc" value="#{transItem.codeSpecific}">
-                    <f:selectItem itemLabel="" itemValue=""/>
-                    <f:selectItems value="#{accChildAccountBean.getAccChildAccountsByCurrencyParent(trans.currencyCode,transItemBean.selectedAccCoa.accountCode)}" var="ea" itemLabel="#{ea.childAccountName}" itemValue="#{ea.childAccountCode}"/>
-                </h:selectOneMenu>
-                <h:outputLabel value=""/>
-                <h:outputLabel value="Debit.Amount"/>
-                <h:outputLabel value="Credit.Amount"/>
-                <h:outputLabel value="Narration"/>
-                <h:inputText id="itxtDebit" disabled="#{transItem.amountIncVat>0}" value="#{transItem.amountExcVat}" autocomplete="off">
-                    <f:ajax event="change" listener="#{transItem.setAmountIncVat(0)}" execute="itxtDebit itxtCredit" render="itxtDebit itxtCredit"/>
-                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                </h:inputText>
-                <h:inputText id="itxtCredit" disabled="#{transItem.amountExcVat>0}" value="#{transItem.amountIncVat}" autocomplete="off">
-                    <f:ajax event="change" listener="#{transItem.setAmountExcVat(0)}" execute="itxtDebit itxtCredit" render="itxtDebit itxtCredit"/>
-                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                </h:inputText>
-                <h:inputText id="itxtNarration" value="#{transItem.narration}" autocomplete="off"/>
-                <p:focus for="autcItem"/>
-            </h:panelGrid>
-                </div>
+                <h:panelGrid id="gridTransItem" styleClass="clsGridMainInput" columns="3">
+                    <h:outputLabel value="Account"/>
+                    <h:outputLabel value="Child.Account"/>
+                    <h:outputLabel value=""/>
+                    <p:autoComplete id="autcItem" widgetVar="WautcItem" value="#{transItemBean.selectedAccCoa}"  
+                                    completeMethod="#{accCoaBean.getAccCoaObjectListAllActive}" 
+                                    var="itm" 
+                                    itemLabel="#{itm.accountName}" 
+                                    itemValue="#{itm}" 
+                                    converter="AccCoaConverter" style="text-align: left" 
+                                    forceSelection="true" queryDelay="0" 
+                                    >
+                        <p:column headerText="Account Name" style="text-align: left" >  
+                            #{itm.accountName} 
+                        </p:column> 
+                        <p:column headerText="Account Code" style="text-align: left" >  
+                            #{itm.accountCode} 
+                        </p:column> 
+                        <p:column headerText="Type" style="text-align: left">  
+                            #{accTypeBean.getAccTypeById(itm.accTypeId).accTypeName}
+                        </p:column> 
+                        <p:column headerText="Group/Category" style="text-align: left"> 
+                            #{accGroupBean.getAccGroupById(itm.accGroupId).accGroupName} / 
+                            #{accCategoryBean.getAccCategoryById(itm.accCategoryId).accCategoryName}
+                        </p:column> 
+                        <p:ajax event="itemSelect" listener="#{transItemBean.updateAccCodeTransItem(transItem,transItemBean.selectedAccCoa)}" process="@this menuCurrency menuChildAcc" update="menuChildAcc"/>
+                        <p:ajax event="change" listener="#{transItemBean.updateAccCodeTransItem(transItem,transItemBean.selectedAccCoa)}" rendered="#{transItemBean.selectedAccCoa!=null}" process="@this menuCurrency menuChildAcc" update="menuChildAcc"/>
+                    </p:autoComplete>
+                    <h:selectOneMenu styleClass="clsMenu" id="menuChildAcc" value="#{transItem.codeSpecific}">
+                        <f:selectItem itemLabel="" itemValue=""/>
+                        <f:selectItems value="#{accChildAccountBean.getAccChildAccountsByCurrencyParent(trans.currencyCode,transItemBean.selectedAccCoa.accountCode)}" var="ea" itemLabel="#{ea.childAccountName}" itemValue="#{ea.childAccountCode}"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel value=""/>
+                    <h:outputLabel value="Debit.Amount"/>
+                    <h:outputLabel value="Credit.Amount"/>
+                    <h:outputLabel value="Narration"/>
+                    <h:inputText id="itxtDebit" disabled="#{transItem.amountIncVat>0}" value="#{transItem.amountExcVat}" autocomplete="off">
+                        <f:ajax event="change" listener="#{transItem.setAmountIncVat(0)}" execute="itxtDebit itxtCredit" render="itxtDebit itxtCredit"/>
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:inputText>
+                    <h:inputText id="itxtCredit" disabled="#{transItem.amountExcVat>0}" value="#{transItem.amountIncVat}" autocomplete="off">
+                        <f:ajax event="change" listener="#{transItem.setAmountExcVat(0)}" execute="itxtDebit itxtCredit" render="itxtDebit itxtCredit"/>
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:inputText>
+                    <h:inputText id="itxtNarration" value="#{transItem.narration}" autocomplete="off"/>
+                    <p:focus for="autcItem"/>
+                </h:panelGrid>
+            </div>
             <h:panelGrid id="gridItemCommands" styleClass="clsGridMainInput" columns="7">
                 <h:commandButton styleClass="clsButtonMedium" value="Add Item (ALT+A)" accesskey="a" >
                     <f:ajax listener="#{transItemBean.addTransItemJournalEntry(trans,statusBean,transItemBean.activeTransItems,transItem,itemBean.selectedItem,transItemBean.selectedAccCoa)}" execute="@form" render="@form"/>

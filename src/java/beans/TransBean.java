@@ -2146,6 +2146,13 @@ public class TransBean implements Serializable {
         }
     }
 
+    public void saveTransCECcallFromOpenBalance(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa, TransItem aTransItem) {
+        int valid = new TransItemBean().validateOpenBalance(trans, aActiveTransItems, aTransItem, aSelectedAccCoa);
+        if (valid == 1) {
+            this.saveTransCEC(aLevel, aStoreId, aTransTypeId, aTransReasonId, aSaleType, trans, aActiveTransItems, aSelectedTransactor, aSelectedBillTransactor, aTransUserDetail, aSelectedSchemeTransactor, aAuthorisedByUserDetail, aSelectedAccCoa);
+        }
+    }
+
     public void saveTransCECcallFromGDN(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
         long aChoiceId = 99;
         int TransTypeId = 0;
@@ -2246,7 +2253,7 @@ public class TransBean implements Serializable {
                     //save trans items
                     trans.setStoreId(VARCHAR);
                     TransItemBean tib = new TransItemBean();
-                    if (trans.getTransactionTypeId() == 16) {//Journal Entry
+                    if (trans.getTransactionTypeId() == 16 || trans.getTransactionTypeId() == 76) {//Journal Entry, Opening Balance
                         tib.saveTransItemsJournalEntry(trans, aActiveTransItems, trans.getTransactionId());
                     } else if (trans.getTransactionTypeId() == 18) {//Cash Transfer
                         tib.saveTransItemsCashTransfer(trans, aActiveTransItems, trans.getTransactionId());
@@ -2460,6 +2467,10 @@ public class TransBean implements Serializable {
                             savedpay = new PayBean().getPay(savedpayid);
                         }
                         new AccJournalBean().postJournalExpenseEntry(trans, aActiveTransItems, savedpay, new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getAccPeriodId());
+                    }
+                    //Save Opening Balance - Journal Entry
+                    if ("OPENING BALANCE".equals(transtype.getTransactionTypeName())) {
+                        new AccJournalBean().postJournalOpenBalance(trans, aActiveTransItems, new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getAccPeriodId());
                     }
                     //delete if any draft trans was used
                     if (trans.getTransactionHistId() > 0) {
@@ -7922,6 +7933,58 @@ public class TransBean implements Serializable {
             }
         } catch (NullPointerException npe) {
             trans.setCurrencyCode("");
+        }
+    }
+
+    public void initTransOpenBalance(int aTransTypeId, int aTransReasonId, Trans aTrans, TransItem aTransItem) {
+        try {
+            //1. currency
+            TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
+            String DefaultCurrencyCode = "";
+            String TransTypeCurrencyCode = "";
+            String LocalCurrencyCode = "";
+
+            try {
+                LocalCurrencyCode = new AccCurrencyBean().getLocalCurrency().getCurrencyCode();
+                if (null == LocalCurrencyCode) {
+                    LocalCurrencyCode = "";
+                }
+            } catch (NullPointerException npe) {
+                LocalCurrencyCode = "";
+            }
+            try {
+                DefaultCurrencyCode = new GeneralUserSetting().getDEFAULT_CURRENCY_CODE();
+                if (null == DefaultCurrencyCode) {
+                    DefaultCurrencyCode = "";
+                }
+            } catch (NullPointerException npe) {
+                DefaultCurrencyCode = "";
+            }
+            try {
+                TransTypeCurrencyCode = transtype.getDefault_currency_code();
+                if (null == TransTypeCurrencyCode) {
+                    TransTypeCurrencyCode = "";
+                }
+            } catch (NullPointerException npe) {
+                TransTypeCurrencyCode = "";
+            }
+            if (TransTypeCurrencyCode.length() > 0) {
+                aTrans.setCurrencyCode(TransTypeCurrencyCode);
+            } else if (DefaultCurrencyCode.length() > 0) {
+                aTrans.setCurrencyCode(DefaultCurrencyCode);
+            } else {
+                aTrans.setCurrencyCode(LocalCurrencyCode);
+            }
+            //2. account code
+            if (aTransReasonId == 117) {//customer
+                aTransItem.setAccountCode("1-00-010-010");
+                aTransItem.setAccountName("Accounts Receivable Trade");
+            } else if (aTransReasonId == 118) {//supplier
+                aTransItem.setAccountCode("2-00-000-010");
+                aTransItem.setAccountName("Accounts Payable Trade");
+            }
+        } catch (Exception e) {
+            System.out.println("initTransOpenBalance:" + e.getMessage());
         }
     }
 

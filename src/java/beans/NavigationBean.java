@@ -1594,6 +1594,75 @@ public class NavigationBean implements Serializable {
         }
         return "JournalEntryTrans?faces-redirect=true";
     }
+    
+    public String redirectToOpenBalanceCustomer() {
+        //update seesion
+        FacesContext context = FacesContext.getCurrentInstance();
+        HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+        HttpSession httpSession = request.getSession(false);
+        httpSession.setAttribute("TRANSACTION_TYPE_ID", 76);
+        httpSession.setAttribute("TRANSACTION_TYPE_NAME", "OPENING BALANCE");
+        httpSession.setAttribute("TRANSACTION_REASON_ID", 117);
+        httpSession.setAttribute("TRANSACTION_REASON_NAME", "CUSTOMER OPENING BALANCE");
+        TransactionType TempTransType = new TransactionTypeBean().getTransactionType(76);
+        if (TempTransType != null) {
+            httpSession.setAttribute("TRANSACTOR_LABEL", TempTransType.getTransactorLabel());
+            httpSession.setAttribute("TRANSACTION_NUMBER_LABEL", TempTransType.getTransactionNumberLabel());
+            httpSession.setAttribute("TRANSACTION_OUTPUT_LABEL", TempTransType.getTransactionOutputLabel());
+        }
+        return "OpenBalance?faces-redirect=true";
+    }
+    
+    public String redirectToOpenBalanceSupplier() {
+        //update seesion
+        FacesContext context = FacesContext.getCurrentInstance();
+        HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+        HttpSession httpSession = request.getSession(false);
+        httpSession.setAttribute("TRANSACTION_TYPE_ID", 76);
+        httpSession.setAttribute("TRANSACTION_TYPE_NAME", "OPENING BALANCE");
+        httpSession.setAttribute("TRANSACTION_REASON_ID", 118);
+        TransactionType TempTransType = new TransactionTypeBean().getTransactionType(76);
+        if (TempTransType != null) {
+            httpSession.setAttribute("TRANSACTOR_LABEL", TempTransType.getTransactorLabel());
+            httpSession.setAttribute("TRANSACTION_NUMBER_LABEL", TempTransType.getTransactionNumberLabel());
+            httpSession.setAttribute("TRANSACTION_OUTPUT_LABEL", TempTransType.getTransactionOutputLabel());
+        }
+        return "OpenBalance?faces-redirect=true";
+    }
+    
+    public String redirectToOpenBalanceCash() {
+        //update seesion
+        FacesContext context = FacesContext.getCurrentInstance();
+        HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+        HttpSession httpSession = request.getSession(false);
+        httpSession.setAttribute("TRANSACTION_TYPE_ID", 76);
+        httpSession.setAttribute("TRANSACTION_TYPE_NAME", "OPENING BALANCE");
+        httpSession.setAttribute("TRANSACTION_REASON_ID", 119);
+        TransactionType TempTransType = new TransactionTypeBean().getTransactionType(76);
+        if (TempTransType != null) {
+            httpSession.setAttribute("TRANSACTOR_LABEL", TempTransType.getTransactorLabel());
+            httpSession.setAttribute("TRANSACTION_NUMBER_LABEL", TempTransType.getTransactionNumberLabel());
+            httpSession.setAttribute("TRANSACTION_OUTPUT_LABEL", TempTransType.getTransactionOutputLabel());
+        }
+        return "OpenBalance?faces-redirect=true";
+    }
+    
+    public String redirectToOpenBalanceOtherAcc() {
+        //update seesion
+        FacesContext context = FacesContext.getCurrentInstance();
+        HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+        HttpSession httpSession = request.getSession(false);
+        httpSession.setAttribute("TRANSACTION_TYPE_ID", 76);
+        httpSession.setAttribute("TRANSACTION_TYPE_NAME", "OPENING BALANCE");
+        httpSession.setAttribute("TRANSACTION_REASON_ID", 120);
+        TransactionType TempTransType = new TransactionTypeBean().getTransactionType(76);
+        if (TempTransType != null) {
+            httpSession.setAttribute("TRANSACTOR_LABEL", TempTransType.getTransactorLabel());
+            httpSession.setAttribute("TRANSACTION_NUMBER_LABEL", TempTransType.getTransactionNumberLabel());
+            httpSession.setAttribute("TRANSACTION_OUTPUT_LABEL", TempTransType.getTransactionOutputLabel());
+        }
+        return "OpenBalance?faces-redirect=true";
+    }
 
     /**
      * @param NavMsg the NavMsg to set

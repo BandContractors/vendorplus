@@ -47,3 +47,9 @@ alter table discount_package add column transactor_scope varchar(500) default ''
 alter table discount_package_item add column category_scope varchar(500) default '';
 alter table discount_package_item add column sub_category_scope varchar(500) default '';
 alter table discount_package_item add column item_scope varchar(500) default '';
+
+INSERT INTO transaction_type (transaction_type_id, transaction_type_name) VALUES (76, 'OPENING BANANCE');
+INSERT INTO transaction_reason (transaction_reason_id, transaction_reason_name, transaction_type_id) VALUES (117, 'CUSTOMER OPENING BALANCE', 76);
+INSERT INTO transaction_reason (transaction_reason_id, transaction_reason_name, transaction_type_id) VALUES (118, 'SUPPLIER OPENING BALANCE', 76);
+INSERT INTO transaction_reason (transaction_reason_id, transaction_reason_name, transaction_type_id) VALUES (119, 'CASH ACCOUNT OPENING BALANCE', 76);
+INSERT INTO transaction_reason (transaction_reason_id, transaction_reason_name, transaction_type_id) VALUES (120, 'OTHER ACCOUNT OPENING BALANCE', 76);

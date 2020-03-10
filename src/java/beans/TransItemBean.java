@@ -7267,6 +7267,139 @@ public class TransItemBean implements Serializable {
         }
     }
 
+    public int validateOpenBalance(Trans aTrans, List<TransItem> aActiveTransItems, TransItem aTransItem, AccCoa aSelectedAccCoa) {
+        int added = 0;
+        String msg = "";
+        try {
+            TransactionType TransType = new TransactionTypeBean().getTransactionType(new GeneralUserSetting().getCurrentTransactionTypeId());
+            TransactionReason TransReason = new TransactionReasonBean().getTransactionReason(new GeneralUserSetting().getCurrentTransactionReasonId());
+            //customer
+            if (TransReason.getTransactionReasonId() == 117) {
+                if (aTrans.getTransactorId() <= 0) {
+                    msg = "Select Customer";
+                } else if (null == aTrans.getTransactionDate()) {
+                    msg = "Select Opening Date";
+                } else if (aTransItem.getAccountCode().length() == 0) {
+                    msg = "Specify Receivable Account";
+                } else if (aTransItem.getAmount() <= 0) {
+                    msg = "Specify Outstanding Customer Balance";
+                } else {
+                    aTrans.setGrandTotal(aTransItem.getAmount());
+                    msg = "";
+                }
+            }
+            //supplier
+            if (TransReason.getTransactionReasonId() == 118) {
+                if (aTrans.getTransactorId() <= 0) {
+                    msg = "Select Supplier";
+                } else if (null == aTrans.getTransactionDate()) {
+                    msg = "Select Opening Date";
+                } else if (aTransItem.getAccountCode().length() == 0) {
+                    msg = "Specify Payable Account";
+                } else if (aTransItem.getAmount() <= 0) {
+                    msg = "Specify Outstanding Supplier Balance";
+                } else {
+                    aTrans.setGrandTotal(aTransItem.getAmount());
+                    msg = "";
+                }
+            }
+            //cash
+            if (TransReason.getTransactionReasonId() == 119) {
+                if (null == aTrans.getTransactionDate()) {
+                    msg = "Select Opening Date";
+                } else if (aTransItem.getAccountCode().length() <= 0) {
+                    msg = "Specify Cash Account";
+                } else if (aTransItem.getCodeSpecific().length() <= 0) {
+                    msg = "Specify Cash Child Account";
+                } else if (aTransItem.getAmount() <= 0) {
+                    msg = "Specify Cash Account Opening Balance";
+                } else {
+                    aTrans.setGrandTotal(aTransItem.getAmount());
+                    msg = "";
+                }
+            }
+            //other account
+            if (TransReason.getTransactionReasonId() == 120) {
+                if (null == aTrans.getTransactionDate()) {
+                    msg = "Select Opening Date";
+                } else if (null == aSelectedAccCoa || aTransItem.getAccountCode().length() <= 0) {
+                    msg = "Specify Account";
+                } else if (aSelectedAccCoa.getIsChild() == 1 && aTransItem.getCodeSpecific().length() <= 0) {
+                    msg = "Specify Child Account";
+                } else if (aTransItem.getAmountIncVat() <= 0 && aTransItem.getAmountExcVat() <= 0) {
+                    msg = "Specify Account Opening Balance";
+                } else if (aTransItem.getAmountIncVat() > 0 && aTransItem.getAmountExcVat() > 0) {
+                    msg = "Specify Debit or Credit Amount only but not both...";
+                } else {
+                    if (aTransItem.getAmountIncVat() > 0) {
+                        aTrans.setGrandTotal(aTransItem.getAmountIncVat());
+                    } else {
+                        aTrans.setGrandTotal(aTransItem.getAmountExcVat());
+                    }
+                    msg = "";
+                }
+            }
+            if (msg.length() > 0) {
+                FacesContext.getCurrentInstance().addMessage("Opening Balance", new FacesMessage(msg));
+            } else {
+                TransItem ti = new TransItem();
+                ti.setTransactionItemId(0);
+                ti.setTransactionId(0);
+                ti.setItemId(0);
+                ti.setBatchno("");
+                ti.setItemQty(1);
+                ti.setUnitPrice(0);
+                ti.setUnitTradeDiscount(0);
+                ti.setAmount(0);
+                ti.setVatRated("");
+                ti.setVatPerc(CompanySetting.getVatPerc());
+                ti.setUnitVat(0);
+                ti.setUnitPriceExcVat(0);
+                ti.setUnitPriceIncVat(0);
+                ti.setAmountExcVat(aTransItem.getAmountExcVat());
+                ti.setAmountIncVat(aTransItem.getAmountIncVat());
+                ti.setAmount(aTransItem.getAmount());
+                ti.setItemExpryDate(null);
+                ti.setItemMnfDate(null);
+                if (null == aTransItem.getCodeSpecific()) {
+                    ti.setCodeSpecific("");
+                } else {
+                    ti.setCodeSpecific(aTransItem.getCodeSpecific());
+                }
+                ti.setDescSpecific("");
+                ti.setDescMore("");
+                ti.setWarrantyDesc("");
+                ti.setWarrantyExpiryDate(null);
+                if (null == aTransItem.getAccountCode()) {
+                    ti.setAccountCode("");
+                } else {
+                    ti.setAccountCode(aTransItem.getAccountCode());
+                }
+                ti.setPurchaseDate(null);
+                ti.setDepStartDate(null);
+                ti.setDepMethodId(0);
+                ti.setDepRate(0);
+                ti.setAverageMethodId(0);
+                ti.setEffectiveLife(0);
+                ti.setResidualValue(0);
+                ti.setNarration("");
+                ti.setQty_balance(0);
+                ti.setDuration_value(0);
+                ti.setQty_damage(0);
+                ti.setDuration_passed(0);
+                ti.setSpecific_size(1);
+                ti.setUnitCostPrice(0);
+                ti.setUnitProfitMargin(0);
+                //add item
+                aActiveTransItems.add(ti);
+                added = 1;
+            }
+        } catch (Exception e) {
+            System.out.println("validateOpenBalance:" + e.getMessage());
+        }
+        return added;
+    }
+
     public void addTransItemCashTransfer(Trans aTrans, StatusBean aStatusBean, List<TransItem> aActiveTransItems, TransItem NewTransItem, Item aSelectedItem, AccCoa aSelectedAccCoa) {
         String FromCurCode = "";
         String ToCurCode = "";

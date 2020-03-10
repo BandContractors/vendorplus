@@ -240,6 +240,18 @@
                         <p:separator />
                     </p:submenu> 
                     <p:separator />
+                    <p:submenu label="Opening Balance">   
+                        <p:separator />
+                        <p:menuitem value="Customer Balance" action="#{navigationBean.redirectToOpenBalanceCustomer()}" /> 
+                        <p:separator />
+                        <p:menuitem value="Supplier Balance" action="#{navigationBean.redirectToOpenBalanceSupplier()}" /> 
+                        <p:separator />
+                        <p:menuitem value="Cash Account Balance" action="#{navigationBean.redirectToOpenBalanceCash()}" /> 
+                        <p:separator />
+                        <p:menuitem value="Other Account Balance" action="#" /> 
+                        <p:separator />
+                    </p:submenu> 
+                    <p:separator />
                     <p:submenu label="Human Resource">   
                         <p:separator />
                         <p:menuitem value="Employee Details" action="#{navigationBean.redirectToTransactorEmployee()}" /> 
