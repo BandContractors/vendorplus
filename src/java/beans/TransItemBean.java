@@ -1963,6 +1963,26 @@ public class TransItemBean implements Serializable {
         }
     }
 
+    public int updateTransItemCECOpenBalance(TransItem aTransitem) {
+        int success = 0;
+        String sql = "UPDATE transaction_item SET amount_inc_vat=?,amount_exc_vat=?,amount=? WHERE transaction_item_id=?";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setDouble(1, aTransitem.getAmountIncVat());
+            ps.setDouble(2, aTransitem.getAmountExcVat());
+            ps.setDouble(3, aTransitem.getAmount());
+            ps.setLong(4, aTransitem.getTransactionItemId());
+            //save
+            ps.executeUpdate();
+            success = 1;
+        } catch (Exception e) {
+            success = 0;
+            System.err.println("updateTransItemCECOpenBalance:" + e.getMessage());
+        }
+        return success;
+    }
+
     public void saveTransItemAutoUnpack(TransItem transitem) {
         String sql = null;
         String sql2 = null;
@@ -7332,8 +7352,10 @@ public class TransItemBean implements Serializable {
                     msg = "Specify Debit or Credit Amount only but not both...";
                 } else {
                     if (aTransItem.getAmountIncVat() > 0) {
+                        aTransItem.setAmount(aTransItem.getAmountIncVat());
                         aTrans.setGrandTotal(aTransItem.getAmountIncVat());
                     } else {
+                        aTransItem.setAmount(aTransItem.getAmountExcVat());
                         aTrans.setGrandTotal(aTransItem.getAmountExcVat());
                     }
                     msg = "";

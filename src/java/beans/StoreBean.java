@@ -350,6 +350,39 @@ public class StoreBean implements Serializable {
         return Stores;
     }
 
+    public List<Store> getWeekDaysList() {
+        String sql;
+        ResultSet rs = null;
+        List<Store> stores = new ArrayList<Store>();
+        try {
+            for (int d = 1; d <= 7; d++) {
+                Store store = new Store();
+                store.setStoreId(d);
+                if (d == 1) {
+                    store.setStoreName("Mon");
+                } else if (d == 2) {
+                    store.setStoreName("Tue");
+                } else if (d == 3) {
+                    store.setStoreName("Wed");
+                } else if (d == 4) {
+                    store.setStoreName("Thu");
+                } else if (d == 5) {
+                    store.setStoreName("Fri");
+                } else if (d == 6) {
+                    store.setStoreName("Sat");
+                } else if (d == 7) {
+                    store.setStoreName("Sun");
+                } else {
+                    store.setStoreName("");
+                }
+                stores.add(store);
+            }
+        } catch (Exception e) {
+            System.err.println("getWeekDaysList:" + e.getMessage());
+        }
+        return stores;
+    }
+
     /**
      * @return the ActionMessage
      */

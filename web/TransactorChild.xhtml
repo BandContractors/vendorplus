@@ -66,6 +66,11 @@
                         <f:selectItem itemLabel="Individual" itemValue="Individual"/>
                         <f:selectItem itemLabel="Company" itemValue="Company"/>
                     </h:selectOneMenu>
+                    <h:outputLabel  value="Segment:"/>
+                    <h:selectOneMenu styleClass="clsMenu" id="menuTransactorSegment" value="#{transactorBean.transactorObj.transactor_segment_id}" style="width: 206px;">
+                        <f:selectItem itemLabel="" itemValue="0"/>
+                        <f:selectItems value="#{transactor_segmentBean.transactor_segments}" var="s" itemLabel="#{s.segment_name}" itemValue="#{s.transactor_segment_id}"/>
+                    </h:selectOneMenu>
                     <h:outputLabel  value="Reference No:"/>
                     <h:inputText styleClass="clsInput" id="itxtRef" value="#{transactorBean.transactorObj.transactorRef}" autocomplete="off" style="width: 203px;" disabled="#{transactorBean.transactorObj.trans_number_format.length()>0}">
                     </h:inputText>
@@ -109,7 +114,11 @@
                 </h:panelGrid>
                 <h:panelGrid id="pnlCol2" columns="2">
                     <h:outputLabel  value="Sex:"/>
-                    <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.sex}" autocomplete="off" style="width: 203px;"/>
+                    <h:selectOneMenu styleClass="clsMenu" value="#{transactorBean.transactorObj.sex}" style="width: 206px;">
+                        <f:selectItem itemLabel="" itemValue=""/>
+                        <f:selectItem itemLabel="F" itemValue="F"/>
+                        <f:selectItem itemLabel="M" itemValue="M"/>
+                    </h:selectOneMenu>
                     <h:outputLabel  value="Occupation:"/>
                     <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.occupation}" autocomplete="off" style="width: 203px;"/>
                     <h:outputLabel  value="Country:"/>

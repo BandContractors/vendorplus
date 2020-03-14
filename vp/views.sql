@@ -484,3 +484,12 @@ SELECT
 	ELSE '' 
 	END as stock_type 
  FROM snapshot_stock_value s INNER JOIN item i ON s.item_id=i.item_id;
+
+CREATE OR REPLACE VIEW view_opening_balance_manual AS 
+SELECT 
+	'Manual' as entry_type,t.transaction_id,t.transaction_number,t.transaction_type_id,t.transaction_reason_id,
+	t.transactor_id,t.transaction_date,t.add_date,t.transaction_ref,t.add_user_detail_id,t.grand_total,
+	ti.account_code,ti.code_specific as child_account_code,ti.amount_exc_vat,ti.amount_inc_vat,ti.amount,t.currency_code,
+	ifnull((select p.acc_period_id from acc_period p where t.transaction_date between p.start_date and p.end_date),0) as acc_period_id 
+	FROM transaction t INNER JOIN transaction_item ti ON t.transaction_id=ti.transaction_id 
+	WHERE t.transaction_type_id=76;

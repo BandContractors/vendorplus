@@ -18,6 +18,14 @@ public class DiscountPackage implements Serializable {
     private String[] SelectedStores;
     private List<Transactor> SelectedTransactors;
     private String StatusColor;
+    private String segment_scope;
+    private String[] SelectedSegments;
+    private String day_scope;
+    private String[] SelectedDays;
+    private String time_scope_from;
+    private String time_scope_to;
+    private Date FromTime;
+    private Date ToTime;
 
     /**
      * @return the DiscountPackageId
@@ -143,6 +151,118 @@ public class DiscountPackage implements Serializable {
      */
     public void setStatusColor(String StatusColor) {
         this.StatusColor = StatusColor;
+    }
+
+    /**
+     * @return the segment_scope
+     */
+    public String getSegment_scope() {
+        return segment_scope;
+    }
+
+    /**
+     * @param segment_scope the segment_scope to set
+     */
+    public void setSegment_scope(String segment_scope) {
+        this.segment_scope = segment_scope;
+    }
+
+    /**
+     * @return the SelectedSegments
+     */
+    public String[] getSelectedSegments() {
+        return SelectedSegments;
+    }
+
+    /**
+     * @param SelectedSegments the SelectedSegments to set
+     */
+    public void setSelectedSegments(String[] SelectedSegments) {
+        this.SelectedSegments = SelectedSegments;
+    }
+
+    /**
+     * @return the day_scope
+     */
+    public String getDay_scope() {
+        return day_scope;
+    }
+
+    /**
+     * @param day_scope the day_scope to set
+     */
+    public void setDay_scope(String day_scope) {
+        this.day_scope = day_scope;
+    }
+
+    /**
+     * @return the SelectedDays
+     */
+    public String[] getSelectedDays() {
+        return SelectedDays;
+    }
+
+    /**
+     * @param SelectedDays the SelectedDays to set
+     */
+    public void setSelectedDays(String[] SelectedDays) {
+        this.SelectedDays = SelectedDays;
+    }
+
+    /**
+     * @return the time_scope_from
+     */
+    public String getTime_scope_from() {
+        return time_scope_from;
+    }
+
+    /**
+     * @param time_scope_from the time_scope_from to set
+     */
+    public void setTime_scope_from(String time_scope_from) {
+        this.time_scope_from = time_scope_from;
+    }
+
+    /**
+     * @return the time_scope_to
+     */
+    public String getTime_scope_to() {
+        return time_scope_to;
+    }
+
+    /**
+     * @param time_scope_to the time_scope_to to set
+     */
+    public void setTime_scope_to(String time_scope_to) {
+        this.time_scope_to = time_scope_to;
+    }
+
+    /**
+     * @return the FromTime
+     */
+    public Date getFromTime() {
+        return FromTime;
+    }
+
+    /**
+     * @param FromTime the FromTime to set
+     */
+    public void setFromTime(Date FromTime) {
+        this.FromTime = FromTime;
+    }
+
+    /**
+     * @return the ToTime
+     */
+    public Date getToTime() {
+        return ToTime;
+    }
+
+    /**
+     * @param ToTime the ToTime to set
+     */
+    public void setToTime(Date ToTime) {
+        this.ToTime = ToTime;
     }
     
 }

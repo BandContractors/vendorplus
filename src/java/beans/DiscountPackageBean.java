@@ -2,6 +2,7 @@ package beans;
 
 import sessions.GeneralUserSetting;
 import connections.DBConnection;
+import entities.CompanySetting;
 import entities.GroupRight;
 import entities.UserDetail;
 import entities.DiscountPackage;
@@ -13,6 +14,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -20,6 +23,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.*;
 import javax.faces.context.FacesContext;
 import utilities.CustomValidator;
+import utilities.UtilityBean;
 
 @ManagedBean
 @SessionScoped
@@ -63,6 +67,26 @@ public class DiscountPackageBean implements Serializable {
             } catch (NullPointerException npe) {
                 aDiscountPackage.setTransactor_scope("");
             }
+            try {
+                aDiscountPackage.setSegment_scope(aResultSet.getString("segment_scope"));
+            } catch (NullPointerException npe) {
+                aDiscountPackage.setSegment_scope("");
+            }
+            try {
+                aDiscountPackage.setDay_scope(aResultSet.getString("day_scope"));
+            } catch (NullPointerException npe) {
+                aDiscountPackage.setDay_scope("");
+            }
+            try {
+                aDiscountPackage.setTime_scope_from(aResultSet.getString("time_scope_from"));
+            } catch (NullPointerException npe) {
+                aDiscountPackage.setTime_scope_from("");
+            }
+            try {
+                aDiscountPackage.setTime_scope_to(aResultSet.getString("time_scope_to"));
+            } catch (NullPointerException npe) {
+                aDiscountPackage.setTime_scope_to("");
+            }
         } catch (SQLException se) {
             System.err.println("setDiscountPackageFromResultset:" + se.getMessage());
         }
@@ -88,6 +112,46 @@ public class DiscountPackageBean implements Serializable {
         return StoreIdsSrt;
     }
 
+    public String getSegmentIdsStrFromList(DiscountPackage aDiscountPackage) {
+        String SegmentIdsSrt = "";
+        try {
+            if (null == aDiscountPackage) {
+                SegmentIdsSrt = "";
+            } else {
+                for (int i = 0; i < aDiscountPackage.getSelectedSegments().length; i++) {
+                    if (SegmentIdsSrt.length() == 0) {
+                        SegmentIdsSrt = aDiscountPackage.getSelectedSegments()[i];
+                    } else {
+                        SegmentIdsSrt = SegmentIdsSrt + "," + aDiscountPackage.getSelectedSegments()[i];
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("getSegmentIdsStrFromList:" + e.getMessage());
+        }
+        return SegmentIdsSrt;
+    }
+
+    public String getDayIdsStrFromList(DiscountPackage aDiscountPackage) {
+        String DayIdsSrt = "";
+        try {
+            if (null == aDiscountPackage) {
+                DayIdsSrt = "";
+            } else {
+                for (int i = 0; i < aDiscountPackage.getSelectedDays().length; i++) {
+                    if (DayIdsSrt.length() == 0) {
+                        DayIdsSrt = aDiscountPackage.getSelectedDays()[i];
+                    } else {
+                        DayIdsSrt = DayIdsSrt + "," + aDiscountPackage.getSelectedDays()[i];
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("getDayIdsStrFromList:" + e.getMessage());
+        }
+        return DayIdsSrt;
+    }
+
     public String[] getStoreListFromIdsStr(DiscountPackage aDiscountPackage) {
         String[] StoreList = null;
         try {
@@ -104,10 +168,42 @@ public class DiscountPackageBean implements Serializable {
         return StoreList;
     }
 
+    public String[] getSegmentListFromIdsStr(DiscountPackage aDiscountPackage) {
+        String[] SegmentList = null;
+        try {
+            if (null == aDiscountPackage) {
+                //SegmentList
+            } else {
+                if (aDiscountPackage.getSegment_scope().length() > 0) {
+                    SegmentList = aDiscountPackage.getSegment_scope().split(",");
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("getSegmentListFromIdsStr:" + e.getMessage());
+        }
+        return SegmentList;
+    }
+
+    public String[] getDayListFromIdsStr(DiscountPackage aDiscountPackage) {
+        String[] DayList = null;
+        try {
+            if (null == aDiscountPackage) {
+                //DayList
+            } else {
+                if (aDiscountPackage.getDay_scope().length() > 0) {
+                    DayList = aDiscountPackage.getDay_scope().split(",");
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("getDayListFromIdsStr:" + e.getMessage());
+        }
+        return DayList;
+    }
+
     public String getTransactorIdsStrFromList(DiscountPackage aDiscountPackage) {
         String TransactorIdsSrt = "";
         try {
-            if (null == aDiscountPackage || null==aDiscountPackage.getSelectedTransactors()) {
+            if (null == aDiscountPackage || null == aDiscountPackage.getSelectedTransactors()) {
                 TransactorIdsSrt = "";
             } else {
                 for (int i = 0; i < aDiscountPackage.getSelectedTransactors().size(); i++) {
@@ -174,12 +270,25 @@ public class DiscountPackageBean implements Serializable {
         } else {
 
             if (discountPackage.getDiscountPackageId() == 0) {
-                sql = "{call sp_insert_discount_package(?,?,?,?,?)}";
+                sql = "{call sp_insert_discount_package(?,?,?,?,?,?,?,?,?)}";
             } else if (discountPackage.getDiscountPackageId() > 0) {
-                sql = "{call sp_update_discount_package(?,?,?,?,?,?)}";
+                sql = "{call sp_update_discount_package(?,?,?,?,?,?,?,?,?,?)}";
             }
             discountPackage.setStore_scope(this.getStoreIdsStrFromList(discountPackage));
             discountPackage.setTransactor_scope(this.getTransactorIdsStrFromList(discountPackage));
+            discountPackage.setSegment_scope(this.getSegmentIdsStrFromList(discountPackage));
+            discountPackage.setDay_scope(this.getDayIdsStrFromList(discountPackage));
+            Format timeFOrmat = new SimpleDateFormat("HH:mm");
+            if (null == discountPackage.getFromTime()) {
+                discountPackage.setTime_scope_from("");
+            } else {
+                discountPackage.setTime_scope_from(timeFOrmat.format(discountPackage.getFromTime()));
+            }
+            if (null == discountPackage.getToTime()) {
+                discountPackage.setTime_scope_to("");
+            } else {
+                discountPackage.setTime_scope_to(timeFOrmat.format(discountPackage.getToTime()));
+            }
             try (
                     Connection conn = DBConnection.getMySQLConnection();
                     CallableStatement cs = conn.prepareCall(sql);) {
@@ -189,6 +298,10 @@ public class DiscountPackageBean implements Serializable {
                     cs.setTimestamp("in_end_date", new java.sql.Timestamp(discountPackage.getEndDate().getTime()));
                     cs.setString("in_store_scope", discountPackage.getStore_scope());
                     cs.setString("in_transactor_scope", discountPackage.getTransactor_scope());
+                    cs.setString("in_segment_scope", discountPackage.getSegment_scope());
+                    cs.setString("in_day_scope", discountPackage.getDay_scope());
+                    cs.setString("in_time_scope_from", discountPackage.getTime_scope_from());
+                    cs.setString("in_time_scope_to", discountPackage.getTime_scope_to());
                     cs.executeUpdate();
                     this.setActionMessage("Saved Successfully");
                     this.clearDiscountPackage(discountPackage);
@@ -199,6 +312,10 @@ public class DiscountPackageBean implements Serializable {
                     cs.setTimestamp("in_end_date", new java.sql.Timestamp(discountPackage.getEndDate().getTime()));
                     cs.setString("in_store_scope", discountPackage.getStore_scope());
                     cs.setString("in_transactor_scope", discountPackage.getTransactor_scope());
+                    cs.setString("in_segment_scope", discountPackage.getSegment_scope());
+                    cs.setString("in_day_scope", discountPackage.getDay_scope());
+                    cs.setString("in_time_scope_from", discountPackage.getTime_scope_from());
+                    cs.setString("in_time_scope_to", discountPackage.getTime_scope_to());
                     cs.executeUpdate();
                     this.setActionMessage("Updated Successfully");
                     this.clearDiscountPackage(discountPackage);
@@ -277,6 +394,26 @@ public class DiscountPackageBean implements Serializable {
         DiscountPackageTo.setTransactor_scope(DiscountPackageFrom.getTransactor_scope());
         DiscountPackageTo.setSelectedStores(this.getStoreListFromIdsStr(DiscountPackageFrom));
         DiscountPackageTo.setSelectedTransactors(this.getTransactorListFromIdsStr(DiscountPackageFrom));
+        DiscountPackageTo.setSelectedSegments(this.getSegmentListFromIdsStr(DiscountPackageFrom));
+        DiscountPackageTo.setSelectedDays(this.getDayListFromIdsStr(DiscountPackageFrom));
+        DiscountPackageTo.setTime_scope_from(DiscountPackageFrom.getTime_scope_from());
+        DiscountPackageTo.setTime_scope_to(DiscountPackageFrom.getTime_scope_to());
+        Date FromTime = new CompanySetting().getCURRENT_SERVER_DATE();
+        Date ToTime = new CompanySetting().getCURRENT_SERVER_DATE();
+
+        int x1 = new UtilityBean().setTimePartOfDateOnly(FromTime, DiscountPackageFrom.getTime_scope_from());
+        int x2 = new UtilityBean().setTimePartOfDateOnly(ToTime, DiscountPackageFrom.getTime_scope_to());
+        if (x1 == 1) {
+            DiscountPackageTo.setFromTime(FromTime);
+        } else {
+            DiscountPackageTo.setFromTime(null);
+        }
+        if (x2 == 1) {
+            DiscountPackageTo.setToTime(ToTime);
+        } else {
+            DiscountPackageTo.setToTime(null);
+        }
+
     }
 
     public void clearDiscountPackage(DiscountPackage discountPackage) {
@@ -289,6 +426,14 @@ public class DiscountPackageBean implements Serializable {
             discountPackage.setTransactor_scope("");
             discountPackage.setSelectedStores(null);
             discountPackage.setSelectedTransactors(null);
+            discountPackage.setSegment_scope("");
+            discountPackage.setSelectedSegments(null);
+            discountPackage.setDay_scope("");
+            discountPackage.setSelectedDays(null);
+            discountPackage.setTime_scope_from("");
+            discountPackage.setTime_scope_to("");
+            discountPackage.setFromTime(null);
+            discountPackage.setToTime(null);
         }
     }
 

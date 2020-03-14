@@ -53,6 +53,7 @@ public class Transactor implements Serializable {
     private double MonthNetPay;
     private int store_id;
     private String trans_number_format;
+    private int transactor_segment_id;
 
     /**
      * @return the TransactorId
@@ -542,6 +543,20 @@ public class Transactor implements Serializable {
      */
     public void setTrans_number_format(String trans_number_format) {
         this.trans_number_format = trans_number_format;
+    }
+
+    /**
+     * @return the transactor_segment_id
+     */
+    public int getTransactor_segment_id() {
+        return transactor_segment_id;
+    }
+
+    /**
+     * @param transactor_segment_id the transactor_segment_id to set
+     */
+    public void setTransactor_segment_id(int transactor_segment_id) {
+        this.transactor_segment_id = transactor_segment_id;
     }
 
 }

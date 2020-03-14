@@ -1227,6 +1227,145 @@ public class AccJournalBean implements Serializable {
         }
     }
 
+    public void postJournalOpenBalanceCANCEL(Trans aTrans, List<TransItem> aActiveTransItems, int aAccPeriodId) {
+        long JobId = 0;
+        try {
+            AccJournal accjournal = new AccJournal();
+            //get job Id
+            try {
+                JobId = new UtilityBean().getNewTableColumnSeqNumber("acc_journal", "job_id");
+            } catch (NullPointerException npe) {
+                JobId = 0;
+            }
+            accjournal.setJobId(JobId);
+            accjournal.setAccJournalId(0);
+            accjournal.setJournalDate(aTrans.getTransactionDate());
+            accjournal.setTransactionId(aTrans.getTransactionId());
+            accjournal.setTransactionTypeId(aTrans.getTransactionTypeId());
+            accjournal.setTransactionReasonId(aTrans.getTransactionReasonId());
+            accjournal.setPayId(0);
+            accjournal.setPayTypeId(0);
+            accjournal.setPayReasonId(0);
+            accjournal.setStoreId(aTrans.getStoreId());
+            accjournal.setLedgerFolio("");
+            accjournal.setAccPeriodId(aAccPeriodId);
+            accjournal.setCurrencyCode(aTrans.getCurrencyCode());
+            accjournal.setXrate(aTrans.getXrate());
+            accjournal.setAddBy(new GeneralUserSetting().getCurrentUser().getUserDetailId());
+            accjournal.setBillTransactorId(0);
+            //1. REVERSE - post account journal entries
+            List<TransItem> ati = aActiveTransItems;
+            int ListItemIndex = 0;
+            int ListItemNo = ati.size();
+            String ItemAccountCode = "";
+            int ItemAccountId = 0;
+            String ItemChildAccountCode = "";
+            int ItemChildAccountId = 0;
+            double DebitAmount = 0;
+            double CreditAmount = 0;
+            String Narration = "";
+            while (ListItemIndex < ListItemNo) {
+                //customer receivable
+                if (aTrans.getTransactionReasonId() == 117) {
+                    accjournal.setBillTransactorId(aTrans.getBillTransactorId());
+                    ItemAccountCode = ati.get(ListItemIndex).getAccountCode();
+                    DebitAmount = ati.get(ListItemIndex).getAmount();
+                    CreditAmount = 0;
+                    Narration = "REVERSE-Customer Opening Balance";
+                    try {
+                        ItemAccountId = new AccCoaBean().getAccCoaByCodeOrId(ItemAccountCode, 0).getAccCoaId();
+                    } catch (NullPointerException npe) {
+                        ItemAccountId = 0;
+                    }
+                    ItemChildAccountId = 0;
+                    accjournal.setNarration(Narration);
+                    accjournal.setAccCoaId(ItemAccountId);
+                    accjournal.setAccountCode(ItemAccountCode);
+                    accjournal.setAccChildAccountId(ItemChildAccountId);
+                    accjournal.setDebitAmount(CreditAmount);//REVERSE
+                    accjournal.setCreditAmount(DebitAmount);//REVERSE
+                    this.saveAccJournal(accjournal);
+                }
+                //REVERSE-supplier payable
+                if (aTrans.getTransactionReasonId() == 118) {
+                    accjournal.setBillTransactorId(aTrans.getBillTransactorId());
+                    ItemAccountCode = ati.get(ListItemIndex).getAccountCode();
+                    DebitAmount = 0;
+                    CreditAmount = ati.get(ListItemIndex).getAmount();
+                    Narration = "REVERSE-Supplier Opening Balance";
+                    try {
+                        ItemAccountId = new AccCoaBean().getAccCoaByCodeOrId(ItemAccountCode, 0).getAccCoaId();
+                    } catch (NullPointerException npe) {
+                        ItemAccountId = 0;
+                    }
+                    ItemChildAccountId = 0;
+                    accjournal.setNarration(Narration);
+                    accjournal.setAccCoaId(ItemAccountId);
+                    accjournal.setAccountCode(ItemAccountCode);
+                    accjournal.setAccChildAccountId(ItemChildAccountId);
+                    accjournal.setDebitAmount(CreditAmount);//REVERSE
+                    accjournal.setCreditAmount(DebitAmount);//REVERSE
+                    this.saveAccJournal(accjournal);
+                }
+                //REVERSE-cash account balance
+                if (aTrans.getTransactionReasonId() == 119) {
+                    accjournal.setBillTransactorId(0);
+                    ItemAccountCode = ati.get(ListItemIndex).getAccountCode();
+                    ItemChildAccountCode = ati.get(ListItemIndex).getCodeSpecific();
+                    DebitAmount = ati.get(ListItemIndex).getAmount();
+                    CreditAmount = 0;
+                    Narration = "REVERSE-Cash Account Opening Balance";
+                    try {
+                        ItemAccountId = new AccCoaBean().getAccCoaByCodeOrId(ItemAccountCode, 0).getAccCoaId();
+                    } catch (NullPointerException npe) {
+                        ItemAccountId = 0;
+                    }
+                    try {
+                        ItemChildAccountId = new AccChildAccountBean().getAccChildAccByCode(ItemChildAccountCode).getAccChildAccountId();
+                    } catch (NullPointerException npe) {
+                        ItemChildAccountId = 0;
+                    }
+                    accjournal.setNarration(Narration);
+                    accjournal.setAccCoaId(ItemAccountId);
+                    accjournal.setAccountCode(ItemAccountCode);
+                    accjournal.setAccChildAccountId(ItemChildAccountId);
+                    accjournal.setDebitAmount(CreditAmount);//REVERSE
+                    accjournal.setCreditAmount(DebitAmount);//REVERSE
+                    this.saveAccJournal(accjournal);
+                }
+                //REVERSE-other account balance
+                if (aTrans.getTransactionReasonId() == 120) {
+                    accjournal.setBillTransactorId(aTrans.getBillTransactorId());
+                    ItemAccountCode = ati.get(ListItemIndex).getAccountCode();
+                    ItemChildAccountCode = ati.get(ListItemIndex).getCodeSpecific();
+                    DebitAmount = ati.get(ListItemIndex).getAmountExcVat();
+                    CreditAmount = ati.get(ListItemIndex).getAmountIncVat();
+                    Narration = "REVERSE-Account Opening Balance";
+                    try {
+                        ItemAccountId = new AccCoaBean().getAccCoaByCodeOrId(ItemAccountCode, 0).getAccCoaId();
+                    } catch (NullPointerException npe) {
+                        ItemAccountId = 0;
+                    }
+                    try {
+                        ItemChildAccountId = new AccChildAccountBean().getAccChildAccByCode(ItemChildAccountCode).getAccChildAccountId();
+                    } catch (NullPointerException npe) {
+                        ItemChildAccountId = 0;
+                    }
+                    accjournal.setNarration(Narration);
+                    accjournal.setAccCoaId(ItemAccountId);
+                    accjournal.setAccountCode(ItemAccountCode);
+                    accjournal.setAccChildAccountId(ItemChildAccountId);
+                    accjournal.setDebitAmount(CreditAmount);//REVERSE
+                    accjournal.setCreditAmount(DebitAmount);//REVERSE
+                    this.saveAccJournal(accjournal);
+                }
+                ListItemIndex = ListItemIndex + 1;
+            }
+        } catch (Exception exc) {
+            System.err.println("postJournalOpenBalanceCANCEL:" + exc.getMessage());
+        }
+    }
+
     public void postJournalCashTransfer(Trans aTrans, List<TransItem> aActiveTransItems, int aAccPeriodId) {
         long JobId = 0;
         String LocalCurrencyCode = "";

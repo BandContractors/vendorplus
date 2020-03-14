@@ -222,6 +222,8 @@
                     <p:separator />
                     <p:menuitem value="Provider Details" action="#{navigationBean.redirectToTransactorProvider()}" /> 
                     <p:separator />
+                    <p:menuitem value="Segments" action="#{navigationBean.redirectToTransactorSegment()}" /> 
+                    <p:separator />
                     <p:menuitem value="Merge Partner" action="#{navigationBean.redirectToTransactorMerge()}" /> 
                     <p:separator />
                     <p:menuitem value="Bulk Email" action="#{navigationBean.redirectToEmail()}" /> 
@@ -482,6 +484,8 @@
                         <p:menuitem value="Journal Entry" action="#{navigationBean.redirectToReportJournal()}" />
                         <p:separator />
                         <p:menuitem value="Account Balances (Trial.Balance)" action="#{navigationBean.redirectToTrialBalance()}" />
+                        <p:separator />
+                        <p:menuitem value="Opening Balance (Manual)" action="#{navigationBean.redirectToReportOpenBalance()}" />
                         <p:separator />
                         <p:menuitem value="Post-Closing Trial.Balance" action="#{navigationBean.redirectToPostCloseTrialBalance()}" />
                         <p:separator />

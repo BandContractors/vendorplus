@@ -147,6 +147,23 @@ BEGIN
 END//
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS sp_get_transactor_segment;
+DELIMITER //
+CREATE PROCEDURE sp_get_transactor_segment
+(
+	IN in_transactor_id int(11),
+	OUT out_transactor_segment_id int 
+)
+BEGIN 
+	set @segid=out_transactor_segment_id;
+	set @sql_text = CONCAT('SELECT ifnull(transactor_segment_id,0) as transactor_segment_id INTO @segid FROM transactor WHERE transactor_id=',in_transactor_id);
+	PREPARE stmt FROM @sql_text;
+	EXECUTE stmt;
+	DEALLOCATE PREPARE stmt;
+	set out_transactor_segment_id=@segid;
+END//
+DELIMITER ;
+
 DROP PROCEDURE IF EXISTS sp_insert_category;
 DELIMITER //
 CREATE PROCEDURE sp_insert_category
@@ -1124,6 +1141,7 @@ CREATE PROCEDURE sp_insert_transactor
 	IN in_month_gross_pay double,
 	IN in_month_net_pay double,
 	IN in_store_id int,
+	IN in_transactor_segment_id int,
 	OUT out_transactor_id bigint
 ) 
 BEGIN 
@@ -1136,6 +1154,11 @@ BEGIN
 	SET @in_dob=NULL;
 	if (in_dob is not null) then
 		set @in_dob=in_dob;
+	end if;
+
+	SET @in_transactor_segment_id=NULL;
+	if (in_transactor_segment_id!=0) then
+		set @in_transactor_segment_id=in_transactor_segment_id;
 	end if;
 
 	INSERT INTO transactor
@@ -1175,7 +1198,8 @@ BEGIN
 		position,
 		month_gross_pay,
 		month_net_pay,
-		store_id
+		store_id,
+		transactor_segment_id
 	) 
     VALUES
 	(
@@ -1214,7 +1238,8 @@ BEGIN
 		in_position,
 		in_month_gross_pay,
 		in_month_net_pay,
-		in_store_id
+		in_store_id,
+		in_transactor_segment_id
 	); 
 SET out_transactor_id=@new_id;
 END//
@@ -1256,7 +1281,8 @@ CREATE PROCEDURE sp_update_transactor
 	IN in_title varchar(50),
 	IN in_position varchar(50),
 	IN in_month_gross_pay double,
-	In in_month_net_pay double 
+	IN in_month_net_pay double,
+	IN in_transactor_segment_id int
 ) 
 BEGIN 
 
@@ -1266,6 +1292,11 @@ BEGIN
 	SET @in_dob=NULL;
 	if (in_dob is not null) then
 		set @in_dob=in_dob;
+	end if;
+
+	SET @in_transactor_segment_id=NULL;
+	if (in_transactor_segment_id!=0) then
+		set @in_transactor_segment_id=in_transactor_segment_id;
 	end if;
 
 	UPDATE transactor SET 
@@ -1301,7 +1332,8 @@ BEGIN
 		title=in_title,
 		position=in_position,
 		month_gross_pay=in_month_gross_pay,
-		month_net_pay=in_month_net_pay 
+		month_net_pay=in_month_net_pay,
+		transactor_segment_id=in_transactor_segment_id 
 	WHERE transactor_id=in_transactor_id; 
 END//
 DELIMITER ;
@@ -4572,7 +4604,11 @@ CREATE PROCEDURE sp_insert_discount_package
 	IN in_start_date datetime,
 	IN in_end_date datetime,
 	IN in_store_scope varchar(500),
-	IN in_transactor_scope varchar(500)
+	IN in_transactor_scope varchar(500),
+	IN in_segment_scope varchar(500),
+	IN in_day_scope varchar(20),
+	IN in_time_scope_from varchar(10),
+	IN in_time_scope_to varchar(10)
 ) 
 BEGIN 
 	SET @new_id=0;
@@ -4585,7 +4621,11 @@ BEGIN
 		start_date,
 		end_date,
 		store_scope,
-		transactor_scope
+		transactor_scope,
+		segment_scope,
+		day_scope,
+		time_scope_from,
+		time_scope_to
 	) 
     VALUES
 	(
@@ -4594,7 +4634,11 @@ BEGIN
 		in_start_date,
 		in_end_date,
 		in_store_scope,
-		in_transactor_scope
+		in_transactor_scope,
+		in_segment_scope,
+		in_day_scope,
+		in_time_scope_from,
+		in_time_scope_to
 	); 
 END//
 DELIMITER ;
@@ -4608,7 +4652,11 @@ CREATE PROCEDURE sp_update_discount_package
 	IN in_start_date datetime,
 	IN in_end_date datetime,
 	IN in_store_scope varchar(500),
-	IN in_transactor_scope varchar(500)
+	IN in_transactor_scope varchar(500),
+	IN in_segment_scope varchar(500),
+	IN in_day_scope varchar(20),
+	IN in_time_scope_from varchar(10),
+	IN in_time_scope_to varchar(10)
 ) 
 BEGIN 
 	UPDATE discount_package SET 
@@ -4616,7 +4664,11 @@ BEGIN
 		start_date=in_start_date,
 		end_date=in_end_date,
 		store_scope=in_store_scope,
-		transactor_scope=in_transactor_scope 
+		transactor_scope=in_transactor_scope,
+		segment_scope=in_segment_scope,
+		day_scope=in_day_scope,
+		time_scope_from=in_time_scope_from,
+		time_scope_to=in_time_scope_to 
 	WHERE discount_package_id=in_discount_package_id; 
 END//
 DELIMITER ;
@@ -4889,12 +4941,20 @@ CREATE PROCEDURE sp_search_discount_package_item_active
 BEGIN 
 		SET @cur_sys_datetime=null;
 		CALL sp_get_current_system_datetime(@cur_sys_datetime);
-		
+		SET @segid=0;
+		CALL sp_get_transactor_segment(in_transactor_id,@segid);
+		SET @dayno=0;
+		CALL sp_get_day_of_week(DAYNAME(@cur_sys_datetime),@dayno);
+
 		SELECT dpi.* FROM discount_package_item dpi 
 		INNER JOIN discount_package dp ON dpi.discount_package_id=dp.discount_package_id 
 		WHERE 
 		(ifnull(store_scope,'')='' OR find_in_set(in_store_id,dp.store_scope)<>0) AND 
 		(ifnull(transactor_scope,'')='' OR find_in_set(in_transactor_id,dp.transactor_scope)<>0) AND 
+		(ifnull(segment_scope,'')='' OR find_in_set(@segid,dp.segment_scope)<>0) AND 
+		(ifnull(day_scope,'')='' OR find_in_set(@dayno,dp.day_scope)<>0) AND 
+		-- (ifnull(time_scope_from,'')='' OR find_in_set(@dayno,dp.day_scope)<>0) AND 
+		-- (ifnull(time_scope_to,'')='' OR find_in_set(@dayno,dp.day_scope)<>0) AND 
 		(find_in_set(in_category_id,dpi.category_scope)<>0 OR find_in_set(in_sub_category_id,dpi.sub_category_scope)<>0 OR find_in_set(in_item_id,dpi.item_scope)<>0) AND 
 		dpi.item_qty=in_item_qty AND 
 		@cur_sys_datetime BETWEEN dp.start_date AND dp.end_date;
@@ -5853,6 +5913,40 @@ BEGIN
 	PREPARE stmt FROM @sql_text;
 	EXECUTE stmt;
 	DEALLOCATE PREPARE stmt;
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_get_day_of_week;
+DELIMITER //
+CREATE PROCEDURE sp_get_day_of_week
+(
+	IN in_day_of_week varchar(3),
+	OUT out_day_of_week int
+) 
+BEGIN 
+	SET @dayno=0;
+	if (in_day_of_week='Monday') then 
+		SET @dayno=1;
+	end if;
+	if (in_day_of_week='Tuesday') then 
+		SET @dayno=2;
+	end if;
+	if (in_day_of_week='Wednesday') then 
+		SET @dayno=3;
+	end if;
+	if (in_day_of_week='Thursday') then 
+		SET @dayno=4;
+	end if;
+	if (in_day_of_week='Friday') then 
+		SET @dayno=5;
+	end if;
+	if (in_day_of_week='Saturday') then 
+		SET @dayno=6;
+	end if;
+	if (in_day_of_week='Sunday') then 
+		SET @dayno=7;
+	end if;
+	SET out_day_of_week=@dayno;
 END//
 DELIMITER ;
 

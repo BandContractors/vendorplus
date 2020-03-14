@@ -53,3 +53,18 @@ INSERT INTO transaction_reason (transaction_reason_id, transaction_reason_name, 
 INSERT INTO transaction_reason (transaction_reason_id, transaction_reason_name, transaction_type_id) VALUES (118, 'SUPPLIER OPENING BALANCE', 76);
 INSERT INTO transaction_reason (transaction_reason_id, transaction_reason_name, transaction_type_id) VALUES (119, 'CASH ACCOUNT OPENING BALANCE', 76);
 INSERT INTO transaction_reason (transaction_reason_id, transaction_reason_name, transaction_type_id) VALUES (120, 'OTHER ACCOUNT OPENING BALANCE', 76);
+
+CREATE TABLE transactor_segment (
+  transactor_segment_id int(11) NOT NULL AUTO_INCREMENT,
+  segment_name varchar(50) NOT NULL,
+  PRIMARY KEY (transactor_segment_id),
+  UNIQUE KEY segment_name (segment_name)
+);
+ALTER TABLE transactor ADD COLUMN transactor_segment_id INT NULL;
+
+
+alter table discount_package add column segment_scope varchar(500) default '';
+alter table discount_package add column day_scope varchar(20) default '';
+alter table discount_package add column time_scope_from varchar(10) default '';
+alter table discount_package add column time_scope_to varchar(10) default '';
+

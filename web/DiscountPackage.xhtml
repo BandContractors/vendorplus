@@ -32,26 +32,39 @@
                 <h:outputLabel styleClass="clsLabelTop" id="olbldiscountPackageHeader" value="Trade Discount Packages"/>
             </h:panelGrid>
 
-            <h:panelGrid id="pnlgInput" styleClass="clsGridMainInput" columns="3">
+            <h:panelGrid id="pnlgInput" styleClass="clsGridMainInput" columns="4">
                 <h:panelGrid columns="2">
                     <h:outputLabel  value="Package Name:"/>
-                    <h:inputText styleClass="clsInput" id="itxtPackageName" value="#{discountPackage.packageName}" autocomplete="off">  
-                    </h:inputText>
+                    <h:inputText styleClass="clsInput" id="itxtPackageName" value="#{discountPackage.packageName}" autocomplete="off" style="width: 200px;"/>
                     <h:outputLabel  value="Start Date:"/>
-                    <p:calendar styleClass="clsInput" id="calStartDate" pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{discountPackage.startDate}" size="17">
-                    </p:calendar>
+                    <p:calendar styleClass="clsInput" id="calStartDate" pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{discountPackage.startDate}" size="16"/>
                     <h:outputLabel  value="End Date:"/>
-                    <p:calendar styleClass="clsInput" id="calEndDate" pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{discountPackage.endDate}" size="17">
-                    </p:calendar>
+                    <p:calendar styleClass="clsInput" id="calEndDate" pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{discountPackage.endDate}" size="16"/>
+                    <h:outputLabel  value="From Day Time:"/>
+                    <p:calendar styleClass="clsInput" id="calFromTime" pattern="HH:mm" value="#{discountPackage.fromTime}" size="16" timeOnly="true"/>
+                    <h:outputLabel  value="To Day Time:"/>
+                    <p:calendar styleClass="clsInput" id="calToTime" pattern="HH:mm" value="#{discountPackage.toTime}" size="16" timeOnly="true"/>
                 </h:panelGrid>
-                <h:panelGrid columns="1">
-                    <h:outputLabel  value="Restrict Discount To #{companySetting.getStoreEquivName()}(s)" style="font-weight: bold;"/>
-                    <p:selectManyCheckbox id="gridid" value="#{discountPackage.selectedStores}" layout="grid" columns="2">
-                        <f:selectItems  value="#{storeBean.storesAll}" var="st" itemLabel="#{st.storeName}" itemValue="#{st.storeId}" />
+                <h:panelGrid columns="1" style="background-color: yellow;width: 170px;">
+                    <h:outputLabel  value="Only on Day(s)" style="font-weight: bold;"/>
+                    <p:selectManyCheckbox id="grididDays" value="#{discountPackage.selectedDays}" layout="grid" columns="2">
+                        <f:selectItems  value="#{storeBean.weekDaysList}" var="wd" itemLabel="#{wd.storeName}" itemValue="#{wd.storeId}" />
                     </p:selectManyCheckbox>
                 </h:panelGrid>
                 <h:panelGrid columns="1">
-                    <h:outputLabel  value="Restrict Discount To Partner(s)" style="font-weight: bold;"/>
+                    <h:outputLabel  value="Only to #{companySetting.getStoreEquivName()}(s)" style="font-weight: bold;"/>
+                    <p:selectManyCheckbox id="gridid" value="#{discountPackage.selectedStores}" layout="grid" columns="1">
+                        <f:selectItems  value="#{storeBean.storesAll}" var="st" itemLabel="#{st.storeName}" itemValue="#{st.storeId}" />
+                    </p:selectManyCheckbox>
+                </h:panelGrid>
+                <h:panelGrid columns="1" style="background-color: yellow;">
+                    <h:outputLabel  value="Only to Segment(s)" style="font-weight: bold;"/>
+                    <p:selectManyCheckbox id="grididSegment" value="#{discountPackage.selectedSegments}" layout="grid" columns="1">
+                        <f:selectItems  value="#{transactor_segmentBean.transactor_segments}" var="ts" itemLabel="#{ts.segment_name}" itemValue="#{ts.transactor_segment_id}" />
+                    </p:selectManyCheckbox>
+                </h:panelGrid>
+                <h:panelGrid columns="1">
+                    <h:outputLabel  value="Only to Partner(s)" style="font-weight: bold;"/>
                     <p:autoComplete id="autcTransactor" multiple="true" value="#{discountPackage.selectedTransactors}" 
                                     completeMethod="#{transactorBean.getTransactorActiveObjectList}" 
                                     var="trct" 

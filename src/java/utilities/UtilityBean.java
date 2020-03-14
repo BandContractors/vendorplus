@@ -548,10 +548,26 @@ public class UtilityBean implements Serializable {
         }
     }
 
-//    public static void main(String[] args) {
-//        System.out.println(",12".split(",")[0]);
-//    }
+    public int setTimePartOfDateOnly(Date aDate, String aTimePart) {
+        int x = 0;
+        if (null == aDate || aTimePart.length() == 0 || aTimePart.length() != 5) {
+            x = 0;
+        } else {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(aDate);
+            cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(aTimePart.substring(0, 2)));
+            cal.set(Calendar.MINUTE, Integer.parseInt(aTimePart.substring(3)));
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+            // Put it back in the Date object 
+            aDate.setTime(cal.getTime().getTime());
+            x = 1;
+        }
+        return x;
+    }
 
+//    public static void main(String[] args) {
+//    }
     /**
      * @return the pattern
      */

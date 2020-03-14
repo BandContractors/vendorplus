@@ -48,7 +48,7 @@ public class NavigationBean implements Serializable {
     public String redirectToCompanySetting() {
         return "CompanySetting?faces-redirect=true";
     }
-    
+
     public String redirectToTransactorMerge() {
         return "TransactorMerge?faces-redirect=true";
     }
@@ -171,7 +171,7 @@ public class NavigationBean implements Serializable {
         httpSession.setAttribute("TRANSACTION_REASON_NAME", "CREDIT SALE");
         return "CashReceiptCS?faces-redirect=true";
     }
-    
+
     public String redirectToCashReceiptRevenue() {
         //update seesion
         FacesContext context = FacesContext.getCurrentInstance();
@@ -1049,6 +1049,10 @@ public class NavigationBean implements Serializable {
         return "Transactor?faces-redirect=true";
     }
 
+    public String redirectToTransactorSegment() {
+        return "TransactorSegment?faces-redirect=true";
+    }
+
     public String redirectToEmail() {
         return "Email?faces-redirect=true";
     }
@@ -1078,7 +1082,7 @@ public class NavigationBean implements Serializable {
         httpSession.setAttribute("INVOKE_MODE", "PARENT");
         return "CashTransfer?faces-redirect=true";
     }
-    
+
     public String redirectToCashAdjustment() {
         //update seesion
         FacesContext context = FacesContext.getCurrentInstance();
@@ -1164,6 +1168,10 @@ public class NavigationBean implements Serializable {
 
     public String redirectToReportSalesInvoiceDetail() {
         return "ReportSalesInvoiceDetail?faces-redirect=true";
+    }
+
+    public String redirectToReportOpenBalance() {
+        return "ReportOpenBalance?faces-redirect=true";
     }
 
     public String redirectToReportHireInvoiceDetail() {
@@ -1361,19 +1369,19 @@ public class NavigationBean implements Serializable {
     public String redirectToReportInventoryStock() {
         return "ReportInventoryStock?faces-redirect=true";
     }
-    
+
     public String redirectToReportInventoryLedger() {
         return "ReportStockLedger?faces-redirect=true";
     }
-    
+
     public String redirectToReportStock() {
         return "ReportStock?faces-redirect=true";
     }
-    
+
     public String redirectToReportStockStatus() {
         return "ReportStockStatus?faces-redirect=true";
     }
-    
+
     public String redirectToReportExpiryStatus() {
         return "ReportExpiryStatus?faces-redirect=true";
     }
@@ -1541,7 +1549,7 @@ public class NavigationBean implements Serializable {
     }
 
     public void checkLicenseExpired() {
-        if (CompanySetting.getLicenseDaysLeft() <= 0 && CompanySetting.getLicenseType()!=9) {
+        if (CompanySetting.getLicenseDaysLeft() <= 0 && CompanySetting.getLicenseType() != 9) {
             this.setNavMsg("--- LICENSE IS EXPIRED, CONTACT SYSTEM VENDOR ---");
             FacesContext.getCurrentInstance().addMessage("License", new FacesMessage(getNavMsg()));
             FacesContext fc = FacesContext.getCurrentInstance();
@@ -1594,7 +1602,7 @@ public class NavigationBean implements Serializable {
         }
         return "JournalEntryTrans?faces-redirect=true";
     }
-    
+
     public String redirectToOpenBalanceCustomer() {
         //update seesion
         FacesContext context = FacesContext.getCurrentInstance();
@@ -1612,7 +1620,7 @@ public class NavigationBean implements Serializable {
         }
         return "OpenBalance?faces-redirect=true";
     }
-    
+
     public String redirectToOpenBalanceSupplier() {
         //update seesion
         FacesContext context = FacesContext.getCurrentInstance();
@@ -1629,7 +1637,7 @@ public class NavigationBean implements Serializable {
         }
         return "OpenBalance?faces-redirect=true";
     }
-    
+
     public String redirectToOpenBalanceCash() {
         //update seesion
         FacesContext context = FacesContext.getCurrentInstance();
@@ -1646,7 +1654,7 @@ public class NavigationBean implements Serializable {
         }
         return "OpenBalance?faces-redirect=true";
     }
-    
+
     public String redirectToOpenBalanceOtherAcc() {
         //update seesion
         FacesContext context = FacesContext.getCurrentInstance();

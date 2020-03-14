@@ -40,9 +40,9 @@ import utilities.CustomValidator;
 @ManagedBean
 @SessionScoped
 public class TransactorBean implements Serializable {
-
+    
     private static final long serialVersionUID = 1L;
-
+    
     private List<Transactor> Transactors;
     private String ActionMessage = null;
     private String SearchTransactorNames = "";
@@ -56,7 +56,7 @@ public class TransactorBean implements Serializable {
     private Transactor TransactorObj;
     private List<Transactor> TransactorListSimilar = new ArrayList<Transactor>();
     private Transactor ParentTransactor;
-
+    
     public String getDisplayName(MenuItem aMenuItem, Transactor aTransactor) {
         String display_name = "";
         if (aTransactor.getTransactorType().equals("CUSTOMER")) {
@@ -70,7 +70,7 @@ public class TransactorBean implements Serializable {
         }
         return display_name;
     }
-
+    
     public Transactor findTransactor(Long TransactorId) {
         String sql = "{call sp_search_transactor_by_id(?)}";
         ResultSet rs = null;
@@ -97,7 +97,7 @@ public class TransactorBean implements Serializable {
             }
         }
     }
-
+    
     public void initTransactorObj() {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -114,7 +114,7 @@ public class TransactorBean implements Serializable {
             //this.setNewTransctorRef(this.TransactorObj);
         }
     }
-
+    
     public String validateTransactor(Transactor transactor, List<SalaryDeduction> aSalaryDeductions) {
         String sql = null;
         String msg = "";
@@ -130,7 +130,7 @@ public class TransactorBean implements Serializable {
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
-
+        
         if (transactor.getTransactorId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, new NavigationBean().getTransactorReasonStr(new GeneralUserSetting().getTransactorType()), "Add") == 0) {
             msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
         } else if (transactor.getTransactorId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, new NavigationBean().getTransactorReasonStr(new GeneralUserSetting().getTransactorType()), "Edit") == 0) {
@@ -168,13 +168,13 @@ public class TransactorBean implements Serializable {
         }
         return msg;
     }
-
+    
     public void saveTransactor(Transactor transactor, List<SalaryDeduction> aSalaryDeductions) {
         String sql = null;
         String msg = "";
         GroupRightBean grb = new GroupRightBean();
         String ValidationMsg = this.validateTransactor(transactor, aSalaryDeductions);
-
+        
         if (ValidationMsg.length() > 0) {
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ValidationMsg));
         } else {
@@ -210,14 +210,14 @@ public class TransactorBean implements Serializable {
             }
         }
     }
-
+    
     public long insertUpdateTransactor(Transactor transactor) {
         String sql = null;
         long status = 0;
         if (transactor.getTransactorId() == 0) {
-            sql = "{call sp_insert_transactor(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_insert_transactor(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         } else if (transactor.getTransactorId() > 0) {
-            sql = "{call sp_update_transactor(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_update_transactor(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         }
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -294,6 +294,11 @@ public class TransactorBean implements Serializable {
             } catch (NullPointerException npe) {
                 cs.setDouble("in_month_net_pay", 0);
             }
+            try {
+                cs.setInt("in_transactor_segment_id", transactor.getTransactor_segment_id());
+            } catch (NullPointerException npe) {
+                cs.setInt("in_transactor_segment_id", 0);
+            }
             cs.executeUpdate();
             if (transactor.getTransactorId() == 0) {
                 status = cs.getLong("out_transactor_id");
@@ -306,7 +311,7 @@ public class TransactorBean implements Serializable {
         }
         return status;
     }
-
+    
     public Transactor getTransactorFromResultSet(ResultSet rs) {
         try {
             Transactor transactor = new Transactor();
@@ -430,7 +435,7 @@ public class TransactorBean implements Serializable {
             } catch (NullPointerException npe) {
                 transactor.setFirstDate(null);
             }
-
+            
             try {
                 transactor.setFileReference(rs.getString("file_reference"));
             } catch (NullPointerException npe) {
@@ -476,12 +481,17 @@ public class TransactorBean implements Serializable {
             } catch (NullPointerException npe) {
                 transactor.setMonthNetPay(0);
             }
+            try {
+                transactor.setTransactor_segment_id(rs.getInt("transactor_segment_id"));
+            } catch (NullPointerException npe) {
+                transactor.setTransactor_segment_id(0);
+            }
             return transactor;
         } catch (SQLException se) {
             return null;
         }
     }
-
+    
     public void setTransactorFromResultSet(Transactor transactor, ResultSet rs) {
         try {
             //Transactor transactor = new Transactor();
@@ -605,7 +615,7 @@ public class TransactorBean implements Serializable {
             } catch (NullPointerException npe) {
                 transactor.setFirstDate(null);
             }
-
+            
             try {
                 transactor.setFileReference(rs.getString("file_reference"));
             } catch (NullPointerException npe) {
@@ -652,6 +662,11 @@ public class TransactorBean implements Serializable {
                 transactor.setMonthNetPay(0);
             }
             try {
+                transactor.setTransactor_segment_id(rs.getInt("transactor_segment_id"));
+            } catch (NullPointerException npe) {
+                transactor.setTransactor_segment_id(0);
+            }
+            try {
                 transactor.setStore_id(rs.getInt("store_id"));
             } catch (NullPointerException npe) {
                 transactor.setStore_id(0);
@@ -659,7 +674,7 @@ public class TransactorBean implements Serializable {
         } catch (SQLException se) {
         }
     }
-
+    
     public Transactor getTransactor(long TransactorId) {
         String sql = "{call sp_search_transactor_by_id(?)}";
         ResultSet rs = null;
@@ -686,7 +701,7 @@ public class TransactorBean implements Serializable {
             }
         }
     }
-
+    
     public long getCurrentTransactorRefNo() {
         long curno = 0;
         String sql = "select cast(max(transactor_ref)+0 as SIGNED) as current_no from transactor WHERE transactor_ref>0";
@@ -722,7 +737,7 @@ public class TransactorBean implements Serializable {
         }
         return curno;
     }
-
+    
     public long getCountTransactors() {
         long curcount = 0;
         String sql = "select count(*) as current_count from transactor;";
@@ -753,7 +768,7 @@ public class TransactorBean implements Serializable {
         }
         return curcount;
     }
-
+    
     public void setTransactor(Transactor aTransactor, long TransactorId) {
         String sql = "{call sp_search_transactor_by_id(?)}";
         ResultSet rs = null;
@@ -769,7 +784,7 @@ public class TransactorBean implements Serializable {
             System.err.println("setTransactor:" + e.getMessage());
         }
     }
-
+    
     public void deleteTransactorCall(Transactor aTransactor, List<SalaryDeduction> aSalaryDeductions) {
         String msg = "";
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
@@ -801,7 +816,7 @@ public class TransactorBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
         }
     }
-
+    
     public int deleteTransactor(long aTransactorId) {
         int status = 0;
         String sql = "DELETE FROM transactor WHERE transactor_id=?";
@@ -817,7 +832,7 @@ public class TransactorBean implements Serializable {
         }
         return status;
     }
-
+    
     public void mergeTransactorRecordsCall(Trans aTrans, Transactor aTransactor, Transactor aBillTransactor) {
         String msg = "";
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
@@ -852,7 +867,7 @@ public class TransactorBean implements Serializable {
             System.err.println("mergeTransactorRecordsCall:" + e.getMessage());
         }
     }
-
+    
     public void displayTransactor(Transactor TransactorFrom, Transactor TransactorTo) {
         TransactorTo.setTransactorId(TransactorFrom.getTransactorId());
         TransactorTo.setTransactorType(TransactorFrom.getTransactorType());
@@ -887,11 +902,12 @@ public class TransactorBean implements Serializable {
         TransactorTo.setPosition(TransactorFrom.getPosition());
         TransactorTo.setMonthGrossPay(TransactorFrom.getMonthGrossPay());
         TransactorTo.setMonthNetPay(TransactorFrom.getMonthNetPay());
+        TransactorTo.setTransactor_segment_id(TransactorFrom.getTransactor_segment_id());
         TransactorTo.setStore_id(TransactorFrom.getStore_id());
         //new SalaryDeductionBean().setSalaryDeductions(TransactorFrom.getTransactorId(), this.SalaryDeductions);
         this.SalaryDeductions = new SalaryDeductionBean().getSalaryDeductions(TransactorFrom.getTransactorId());
     }
-
+    
     public void clearTransactor(Transactor transactor) {
         if (transactor != null) {
             transactor.setTransactorId(0);
@@ -927,10 +943,11 @@ public class TransactorBean implements Serializable {
             transactor.setPosition("");
             transactor.setMonthGrossPay(0);
             transactor.setMonthNetPay(0);
+            transactor.setTransactor_segment_id(0);
             transactor.setStore_id(0);
         }
     }
-
+    
     public void clearTransactor2(Transactor transactor, List<SalaryDeduction> aSalaryDeductions) {
         if (transactor != null) {
             transactor.setTransactorId(0);
@@ -966,6 +983,7 @@ public class TransactorBean implements Serializable {
             transactor.setPosition("");
             transactor.setMonthGrossPay(0);
             transactor.setMonthNetPay(0);
+            transactor.setTransactor_segment_id(0);
             transactor.setStore_id(0);
             try {
                 aSalaryDeductions.clear();
@@ -981,7 +999,7 @@ public class TransactorBean implements Serializable {
             //this.setNewTransctorRef(transactor);
         }
     }
-
+    
     public void initClearTransactor(Transactor transactor) {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -1020,12 +1038,13 @@ public class TransactorBean implements Serializable {
                 transactor.setPosition("");
                 transactor.setMonthGrossPay(0);
                 transactor.setMonthNetPay(0);
+                transactor.setTransactor_segment_id(0);
                 transactor.setStore_id(0);
                 this.setSearchTransactorNames("");
             }
         }
     }
-
+    
     public void initClearTransactor2(Transactor transactor, List<SalaryDeduction> aSalaryDeductions) {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -1064,6 +1083,7 @@ public class TransactorBean implements Serializable {
                 transactor.setPosition("");
                 transactor.setMonthGrossPay(0);
                 transactor.setMonthNetPay(0);
+                transactor.setTransactor_segment_id(0);
                 transactor.setStore_id(0);
                 try {
                     aSalaryDeductions.clear();
@@ -1073,15 +1093,15 @@ public class TransactorBean implements Serializable {
             }
         }
     }
-
+    
     public void clearSelectedTransactor() {
         this.clearTransactor(this.getSelectedTransactor());
     }
-
+    
     public void clearSelectedBillTransactor() {
         this.clearTransactor(this.getSelectedBillTransactor());
     }
-
+    
     public List<Transactor> getTransactors() {
         String sql;
         sql = "{call sp_search_transactor_by_name(?)}";
@@ -1108,7 +1128,7 @@ public class TransactorBean implements Serializable {
         }
         return Transactors;
     }
-
+    
     public void clearList() {
         try {
             this.TransactorList.clear();
@@ -1116,7 +1136,7 @@ public class TransactorBean implements Serializable {
             //do nothing
         }
     }
-
+    
     public void refreshTransactorsListByNameRefFile(String aName, String aType) {
         String sql;
         sql = "{call sp_search_transactor_by_name_ref_file(?,?)}";
@@ -1137,7 +1157,7 @@ public class TransactorBean implements Serializable {
             }
         }
     }
-
+    
     public void refreshTransactorsListSimilar(String aName, String aType) {
         String sql;
         sql = "{call sp_search_transactor_by_name_ref_file(?,?)}";
@@ -1158,7 +1178,7 @@ public class TransactorBean implements Serializable {
             }
         }
     }
-
+    
     public List<Transactor> getTransactorsByNameType(String aName, String aType) {
         String sql;
         sql = "{call sp_search_transactor_by_name_type(?,?)}";
@@ -1186,7 +1206,7 @@ public class TransactorBean implements Serializable {
         }
         return NewTransactors;
     }
-
+    
     public void setTransactors(List<Transactor> Transactors) {
         this.Transactors = Transactors;
     }
@@ -1283,7 +1303,7 @@ public class TransactorBean implements Serializable {
         }
         return TransactorObjectList;
     }
-
+    
     public List<Transactor> getReportTransactors(Transactor aTransactor, boolean RETRIEVE_REPORT) {
         String sql = "{call sp_report_transactor(?)}";
         ResultSet rs = null;
@@ -1313,7 +1333,7 @@ public class TransactorBean implements Serializable {
         }
         return this.ReportTransactors;
     }
-
+    
     public void reportTransactors(String aTransactorType) {
         String sql = "{call sp_report_transactor(?)}";
         ResultSet rs = null;
@@ -1340,7 +1360,7 @@ public class TransactorBean implements Serializable {
             }
         }
     }
-
+    
     public void addSalaryDeduction() {
         try {
             if (null == this.getSalaryDeductions()) {
@@ -1356,19 +1376,19 @@ public class TransactorBean implements Serializable {
             npe.printStackTrace();
         }
     }
-
+    
     public void removeSalaryDeduction(Transactor aTransactor, SalaryDeduction aSalaryDeduction) {
         if (null == this.getSalaryDeductions()) {
-
+            
         } else {
             this.getSalaryDeductions().remove(aSalaryDeduction);
         }
         this.refreshTotalSalaryDeductions(aTransactor);
     }
-
+    
     public void calcSalaryDeductionPerc(Transactor aTransactor, SalaryDeduction aSalaryDeduction) {
         if (null == aSalaryDeduction) {
-
+            
         } else {
             if (aTransactor.getMonthGrossPay() > 0) {
                 aSalaryDeduction.setPerc((aSalaryDeduction.getAmount() / aTransactor.getMonthGrossPay()) * 100);
@@ -1378,16 +1398,16 @@ public class TransactorBean implements Serializable {
             aTransactor.setMonthNetPay(aTransactor.getMonthGrossPay() - this.getTotalSalaryDeductions());
         }
     }
-
+    
     public void calcSalaryDeductionAmount(Transactor aTransactor, SalaryDeduction aSalaryDeduction) {
         if (null == aSalaryDeduction) {
-
+            
         } else {
             aSalaryDeduction.setAmount((aSalaryDeduction.getPerc() * aTransactor.getMonthGrossPay()) / 100);
         }
         aTransactor.setMonthNetPay(aTransactor.getMonthGrossPay() - this.getTotalSalaryDeductions());
     }
-
+    
     public void setTotalSalaryDeductions(double aAmount) {
         List<SalaryDeduction> sds = this.getSalaryDeductions();
         int ListItemIndex = 0;
@@ -1399,7 +1419,7 @@ public class TransactorBean implements Serializable {
         }
         aAmount = Total;
     }
-
+    
     public double getTotalSalaryDeductions() {
         List<SalaryDeduction> sds = this.getSalaryDeductions();
         int ListItemIndex = 0;
@@ -1411,7 +1431,7 @@ public class TransactorBean implements Serializable {
         }
         return Total;
     }
-
+    
     public void initClearTransactor(Transactor aTransactor, List<Transactor> aTransactorList, List<Transactor> aTransactorListSummary) {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -1436,13 +1456,13 @@ public class TransactorBean implements Serializable {
             }
         }
     }
-
+    
     public void openChildTransactor(String aTransactorType) {
         FacesContext context = FacesContext.getCurrentInstance();
         HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
         HttpSession httpSession = request.getSession(false);
         httpSession.setAttribute("TRANSACTOR_TYPE", aTransactorType);
-
+        
         Map<String, Object> options = new HashMap<String, Object>();
         options.put("modal", true);
         options.put("draggable", false);
@@ -1456,7 +1476,7 @@ public class TransactorBean implements Serializable {
         options.put("dynamic", true);
         org.primefaces.PrimeFaces.current().dialog().openDynamic("TransactorChild", options, null);
     }
-
+    
     public void openChildTransactor(String aTransactorType, long aTransactorId) {
         FacesContext context = FacesContext.getCurrentInstance();
         HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
@@ -1481,7 +1501,7 @@ public class TransactorBean implements Serializable {
         options.put("dynamic", true);
         org.primefaces.PrimeFaces.current().dialog().openDynamic("TransactorChild", options, null);
     }
-
+    
     public long getTransactorRecords(long aTransactorId) {
         String sql = "{call sp_search_records_by_transactor(?)}";
         ResultSet rs = null;
@@ -1499,7 +1519,7 @@ public class TransactorBean implements Serializable {
         }
         return records;
     }
-
+    
     public int mergeTransactorRecords(long aToTransactorId, long aFromTransactorId) {
         int status = 0;
         String sql = "{call sp_merge_records_by_transactor(?,?)}";
@@ -1516,11 +1536,11 @@ public class TransactorBean implements Serializable {
         }
         return status;
     }
-
+    
     public void refreshTotalSalaryDeductions(Transactor aTransactor) {
         aTransactor.setMonthNetPay(aTransactor.getMonthGrossPay() - this.getTotalSalaryDeductions());
     }
-
+    
     public long getReportTransactorsCount() {
         return this.ReportTransactors.size();
     }
