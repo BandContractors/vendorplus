@@ -151,7 +151,7 @@ DROP PROCEDURE IF EXISTS sp_get_transactor_segment;
 DELIMITER //
 CREATE PROCEDURE sp_get_transactor_segment
 (
-	IN in_transactor_id int(11),
+	IN in_transactor_id bigint,
 	OUT out_transactor_segment_id int 
 )
 BEGIN 
@@ -1249,7 +1249,7 @@ DROP PROCEDURE IF EXISTS sp_update_transactor;
 DELIMITER //
 CREATE PROCEDURE sp_update_transactor
 (
-	IN in_transactor_id int,
+	IN in_transactor_id bigint,
 	IN in_transactor_type varchar(20),
 	IN in_transactor_names varchar(100),
 	IN in_phone varchar(100),
@@ -4953,8 +4953,8 @@ BEGIN
 		(ifnull(transactor_scope,'')='' OR find_in_set(in_transactor_id,dp.transactor_scope)<>0) AND 
 		(ifnull(segment_scope,'')='' OR find_in_set(@segid,dp.segment_scope)<>0) AND 
 		(ifnull(day_scope,'')='' OR find_in_set(@dayno,dp.day_scope)<>0) AND 
-		-- (ifnull(time_scope_from,'')='' OR find_in_set(@dayno,dp.day_scope)<>0) AND 
-		-- (ifnull(time_scope_to,'')='' OR find_in_set(@dayno,dp.day_scope)<>0) AND 
+		(ifnull(time_scope_from,'')='' OR HOUR(@cur_sys_datetime)>HOUR(time_scope_from) OR (HOUR(@cur_sys_datetime)=HOUR(time_scope_from) AND MINUTE(@cur_sys_datetime)>=MINUTE(time_scope_from))) AND 
+		(ifnull(time_scope_to,'')='' OR HOUR(@cur_sys_datetime)<HOUR(time_scope_to) OR (HOUR(@cur_sys_datetime)=HOUR(time_scope_to) AND MINUTE(@cur_sys_datetime)<=MINUTE(time_scope_to))) AND 
 		(find_in_set(in_category_id,dpi.category_scope)<>0 OR find_in_set(in_sub_category_id,dpi.sub_category_scope)<>0 OR find_in_set(in_item_id,dpi.item_scope)<>0) AND 
 		dpi.item_qty=in_item_qty AND 
 		@cur_sys_datetime BETWEEN dp.start_date AND dp.end_date;
@@ -5920,7 +5920,7 @@ DROP PROCEDURE IF EXISTS sp_get_day_of_week;
 DELIMITER //
 CREATE PROCEDURE sp_get_day_of_week
 (
-	IN in_day_of_week varchar(3),
+	IN in_day_of_week varchar(50),
 	OUT out_day_of_week int
 ) 
 BEGIN 
