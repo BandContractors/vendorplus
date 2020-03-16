@@ -7,7 +7,7 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     <h:head>
-        <title>#{menuItemBean.menuItemObj.SUPPLIER_NAME} Card Report</title>
+        <title>#{menuItemBean.menuItemObj.SUPPLIER_NAME} Statement</title>
         <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
         <script  language="javascript">
@@ -32,7 +32,7 @@
 
         <h:form id="formReport">
             <h:panelGrid id="id0" columns="1" styleClass="clsPanelReportFilterTitle">
-                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="#{menuItemBean.menuItemObj.SUPPLIER_NAME} Card Report"/>
+                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="#{menuItemBean.menuItemObj.SUPPLIER_NAME} Statement Report"/>
             </h:panelGrid>
             <h:panelGrid id="id1" columns="9" styleClass="clsPanelReportFilter">
                 <p:outputLabel styleClass="clsLabelReportFilter" id="id2" value="From #{companySetting.getStoreEquivName()}:"/>
@@ -73,7 +73,7 @@
             <h:panelGrid id="pnlgActionMessage">
                 <p:outputLabel value="#{transBean.actionMessage}" style="color: red;"/>
             </h:panelGrid>
-            <p:commandButton id="cmdbPrint" value="Print #{menuItemBean.menuItemObj.SUPPLIER_NAME} Card (ALT+P)" icon="ui-icon-print" type="button" accesskey="p">
+            <p:commandButton id="cmdbPrint" value="Print #{menuItemBean.menuItemObj.SUPPLIER_NAME} Statement (ALT+P)" icon="ui-icon-print" type="button" accesskey="p">
                 <p:printer target="pnlTransaction" rendered="false"/>
             </p:commandButton>
             <p:panel id="pnlTransaction" style="border: none;">
