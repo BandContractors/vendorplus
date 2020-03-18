@@ -2152,6 +2152,13 @@ public class TransBean implements Serializable {
         int valid = new TransItemBean().validateOpenBalance(trans, aActiveTransItems, aTransItem, aSelectedAccCoa);
         if (valid == 1) {
             this.saveTransCEC(aLevel, aStoreId, aTransTypeId, aTransReasonId, aSaleType, trans, aActiveTransItems, aSelectedTransactor, aSelectedBillTransactor, aTransUserDetail, aSelectedSchemeTransactor, aAuthorisedByUserDetail, aSelectedAccCoa);
+            if (null == aTransItem) {
+                //do nothing
+            } else {
+                aTransItem.setAmount(0);
+                aTransItem.setAmountExcVat(0);
+                aTransItem.setAmountIncVat(0);
+            }
         }
     }
     

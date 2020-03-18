@@ -4315,19 +4315,27 @@ public class AccJournalBean implements Serializable {
         this.setDate2(cal2.getTime());
     }
 
-    public void initResetAccJournalReport(AccJournal aAccJournal, AccJournalBean aAccJournalBean) {
+    public void initResetAccJournalReport(AccJournal aAccJournal, AccJournalBean aAccJournalBean, Transactor aTransactor) {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
         } else {
-            this.resetAccJournalReport(aAccJournal, aAccJournalBean);
+            this.resetAccJournalReport(aAccJournal, aAccJournalBean, aTransactor);
         }
     }
 
-    public void resetAccJournalReport(AccJournal aAccJournal, AccJournalBean aAccJournalBean) {
+    public void resetAccJournalReport(AccJournal aAccJournal, AccJournalBean aAccJournalBean, Transactor aTransactor) {
         aAccJournalBean.setActionMessage("");
         try {
             this.clearAccJournal(aAccJournal);
         } catch (NullPointerException npe) {
+        }
+        try {
+            if (null == aTransactor) {
+                //do nothing
+            } else {
+                new TransactorBean().clearTransactor(aTransactor);
+            }
+        } catch (Exception e) {
         }
         try {
             aAccJournalBean.setDateType("");

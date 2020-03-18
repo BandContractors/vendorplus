@@ -71,7 +71,10 @@
                                         >
                             <p:column headerText="#{menuItemBean.menuItemObj.SUPPLIER_NAME}" style="text-align: left" >  
                                 #{trct.transactorNames} 
-                            </p:column> 
+                            </p:column>
+                            <p:column headerText="Reference No" style="text-align: left" >  
+                                #{trct.transactorRef} 
+                            </p:column>
                             <p:column headerText="Type" style="text-align: left" >  
                                 #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)} 
                             </p:column> 
@@ -90,12 +93,12 @@
                     </h:panelGrid>
                     <h:panelGrid columns="1">
                         <p:commandButton id="cbtnSearch" value="Search" style="background-color: black;color: white;font-weight: bold;" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" >
-                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
-                            <p:graphicImage name="/images/ajax-loader.gif"/>
-                        </p:dialog>
-                        <p:ajax listener="#{payTransBean.refreshPayTranssByBillTrPayCatTransNo2(trans.transactionNumber2,payBean.selectedBillTransactor.transactorId,generalUserSetting.getCurrentPayCategory(),pay.currencyCode,payBean.date1,payBean.date2)}" process="pnlSearch" update="pnlInput pnlButtons"/>
-                        <p:ajax listener="#{payBean.setPayAll(false)}" process="pnlInput" update="pnlInput"/>
-                    </p:commandButton>
+                            <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                                <p:graphicImage name="/images/ajax-loader.gif"/>
+                            </p:dialog>
+                            <p:ajax listener="#{payTransBean.refreshPayTranssByBillTrPayCatTransNo2(trans.transactionNumber2,payBean.selectedBillTransactor.transactorId,generalUserSetting.getCurrentPayCategory(),pay.currencyCode,payBean.date1,payBean.date2)}" process="pnlSearch" update="pnlInput pnlButtons"/>
+                            <p:ajax listener="#{payBean.setPayAll(false)}" process="pnlInput" update="pnlInput"/>
+                        </p:commandButton>
                     </h:panelGrid>
                 </h:panelGrid>
             </div>

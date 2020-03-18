@@ -21,7 +21,7 @@
         </script> 
     </h:head>
     <f:event listener="#{navigationBean.checkAccessDenied('59', 'View')}" type="preRenderView" />
-    <f:event listener="#{accJournalBean.initResetAccJournalReport(accJournal, accJournalBean)}" type="preRenderView" />
+    <f:event listener="#{accJournalBean.initResetAccJournalReport(accJournal, accJournalBean,transactorBean.selectedTransactor)}" type="preRenderView" />
     <h:body>
         <ui:include src="Menu.xhtml"/>
         <h:form id="formReport">

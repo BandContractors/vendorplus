@@ -22,7 +22,7 @@
     </h:head>
     <f:metadata>
         <f:viewAction action="#{navigationBean.checkAccessDenied('84', 'View')}"/>
-        <f:viewAction action="#{payBean.initResetPayReportDetail(trans,pay,payBean,transactorBean.selectedBillTransactor)}"/>
+        <f:viewAction action="#{payBean.initResetPayReportDetail(trans,pay,payBean,transactorBean.selectedTransactor)}"/>
         <f:viewAction action="#{payMethodBean.refreshPayMethodsPayReport()}"/>
     </f:metadata>
     <h:body>
