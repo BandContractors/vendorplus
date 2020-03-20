@@ -10989,3 +10989,33 @@ BEGIN
 	UPDATE stock_out SET transactor_id=in_to_transactor_id WHERE stock_out_id>0 AND transactor_id=in_from_transactor_id;
 END//
 DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_insert_upgrade_control;
+DELIMITER //
+CREATE PROCEDURE sp_insert_upgrade_control
+(
+	IN in_script_name varchar(50),
+	IN in_line_no int,
+	IN in_upgrade_date timestamp,
+	IN in_version_no varchar(10),
+	IN in_upgrade_detail varchar(250)
+) 
+BEGIN 
+	INSERT INTO upgrade_control
+	(
+		script_name,
+		line_no,
+		upgrade_date,
+		version_no,
+		upgrade_detail
+	) 
+    VALUES
+	(
+		in_script_name,
+		in_line_no,
+		in_upgrade_date,
+		in_version_no,
+		in_upgrade_detail
+	); 
+END//
+DELIMITER ;

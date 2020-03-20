@@ -2,6 +2,7 @@ package beans;
 
 import sessions.GeneralUserSetting;
 import connections.DBConnection;
+import entities.Category;
 import entities.GroupRight;
 import entities.Item;
 import entities.Location;
@@ -53,8 +54,8 @@ public class ItemBean implements Serializable {
     private String SearchItemDesc = "";
     private List<Item> ItemObjectList;
     private String TypedItemCode;
-    List<Item> ReportItems = new ArrayList<Item>();
-    List<Item> ReportItemsSummary = new ArrayList<Item>();
+    List<Item> ReportItems = new ArrayList<>();
+    List<Item> ReportItemsSummary = new ArrayList<>();
     private List<Item> ItemsList;
     private List<Item> ItemsSummary;
     private Item ItemObj;
@@ -63,6 +64,40 @@ public class ItemBean implements Serializable {
     private Item ParentItem;
     private Part file;
     private List<Item> producedItemList;
+    private List<Category> InventoryTypeList;
+    private List<Category> InventoryAccountList;
+
+    public void refreshInventoryType(Item aItem, String aItemPurpose) {
+        try {
+            this.InventoryTypeList = new ArrayList<>();
+            if (aItemPurpose.equals("Asset")) {
+                //list
+                this.InventoryTypeList.clear();
+            } else if (aItemPurpose.equals("Expense")) {
+                //list
+                this.InventoryTypeList.clear();
+                Category cat = null;
+                cat = new Category();
+                cat.setCategoryName("Raw Material");
+                this.InventoryTypeList.add(cat);
+                cat = new Category();
+                cat.setCategoryName("Consumption");
+                this.InventoryTypeList.add(cat);
+            } else {//Stock
+                //list
+                this.InventoryTypeList.clear();
+                Category cat = null;
+                cat = new Category();
+                cat.setCategoryName("Merchandise");
+                this.InventoryTypeList.add(cat);
+                cat = new Category();
+                cat.setCategoryName("Finished Goods");
+                this.InventoryTypeList.add(cat);
+            }
+        } catch (Exception e) {
+            System.out.println("refreshInventoryType:" + e.getMessage());
+        }
+    }
 
     public void updateItemObjName(Part aFile, Item aItem) {
         try {
@@ -2399,5 +2434,33 @@ public class ItemBean implements Serializable {
      */
     public void setProducedItemList(List<Item> producedItemList) {
         this.producedItemList = producedItemList;
+    }
+
+    /**
+     * @return the InventoryTypeList
+     */
+    public List<Category> getInventoryTypeList() {
+        return InventoryTypeList;
+    }
+
+    /**
+     * @param InventoryTypeList the InventoryTypeList to set
+     */
+    public void setInventoryTypeList(List<Category> InventoryTypeList) {
+        this.InventoryTypeList = InventoryTypeList;
+    }
+
+    /**
+     * @return the InventoryAccountList
+     */
+    public List<Category> getInventoryAccountList() {
+        return InventoryAccountList;
+    }
+
+    /**
+     * @param InventoryAccountList the InventoryAccountList to set
+     */
+    public void setInventoryAccountList(List<Category> InventoryAccountList) {
+        this.InventoryAccountList = InventoryAccountList;
     }
 }

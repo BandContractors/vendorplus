@@ -26,6 +26,7 @@
     <f:event listener="#{itemBean.initClearItem(itemBean.itemObj,itemBean.itemsList)}" type="preRenderView" />
     <f:event listener="#{itemBean.initStockLocation()}" type="preRenderView" />
     <f:event listener="#{itemBean.initItemObj()}" type="preRenderView" />
+    <f:event listener="#{itemBean.refreshInventoryType(itemBean.itemObj,generalUserSetting.currentItemPurpose)}" type="preRenderView" />
     <h:body>
         <h:form enctype="multipart/form-data" id="formMain" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
                     return false;">
@@ -113,11 +114,10 @@
                         <f:selectItem itemLabel="" itemValue="0"/>
                         <f:selectItems value="#{subCategoryBean.getSubCategoriesByCategoryId(itemBean.itemObj.categoryId)}" var="s" itemLabel="#{s.subCategoryName}" itemValue="#{s.subCategoryId}"/>
                     </h:selectOneMenu>
-                    <h:outputLabel value="Expense Type:"/>
-                    <h:selectOneMenu id="menuExpenseType" value="#{itemBean.itemObj.expense_type}" style="width: 200px;background-color: #{listOptionBean.getColorByBoolean(generalUserSetting.currentItemPurpose.equals('Expense'))}" disabled="#{!generalUserSetting.currentItemPurpose.equals('Expense')}">
+                    <h:outputLabel value="Inventory Type:"/>
+                    <h:selectOneMenu id="menuExpenseType" value="#{itemBean.itemObj.expense_type}" style="width: 200px;background-color: #{listOptionBean.getColorByBoolean(!generalUserSetting.currentItemPurpose.equals('Asset'))}" disabled="#{generalUserSetting.currentItemPurpose.equals('Asset')}">
                         <f:selectItem itemLabel="" itemValue=""/>
-                        <f:selectItem itemLabel="Raw Material" itemValue="Raw Material"/>
-                        <f:selectItem itemLabel="Consumption" itemValue="Consumption"/>
+                        <f:selectItems value="#{itemBean.inventoryTypeList}" var="it" itemLabel="#{it.categoryName}" itemValue="#{it.categoryName}"/>
                         <f:ajax event="change" render="menuExpenseAccountCode"/>
                     </h:selectOneMenu>                   
                     <h:outputLabel value="Unit:"/>
@@ -128,14 +128,20 @@
                     <h:outputLabel value="Re-order Level:"/>
                     <h:inputText id="itxtReorderLevel" value="#{itemBean.itemObj.reorderLevel}" autocomplete="off" style="width: 200px">
                     </h:inputText>
-                    <h:outputLabel value="Expense Account:"/>
-                    <h:selectOneMenu id="menuExpenseAccountCode" value="#{itemBean.itemObj.expenseAccountCode}" style="width: 200px;background-color: #{listOptionBean.getColorByBoolean(generalUserSetting.currentItemPurpose.equals('Expense'))}" disabled="#{!generalUserSetting.currentItemPurpose.equals('Expense')}">
+                    <h:outputLabel value="Inventory Account:"/>
+                    <h:selectOneMenu id="menuExpenseAccountCode" value="#{itemBean.itemObj.expenseAccountCode}" style="width: 200px;background-color: #{listOptionBean.getColorByBoolean(!generalUserSetting.currentItemPurpose.equals('Asset'))}" disabled="#{generalUserSetting.currentItemPurpose.equals('Asset')}">
                         <f:selectItem itemLabel="" itemValue=""/>
                         <c:if test="#{itemBean.itemObj.expense_type.equals('Consumption')}">
-                            <f:selectItems value="#{accCoaBean.getAccCoaObjectListBeginWith2('5-20','5-30')}" var="ea" itemLabel="#{ea.accountName}" itemValue="#{ea.accountCode}"/>
+                            <f:selectItems value="#{accCoaBean.getAccCoaObjectListBeginWith1('1-00-020-070')}" var="ea" itemLabel="#{ea.accountName}" itemValue="#{ea.accountCode}"/>
                         </c:if>
                         <c:if test="#{itemBean.itemObj.expense_type.equals('Raw Material')}">
-                            <f:selectItems value="#{accCoaBean.getAccCoaObjectListBeginWith1('5-10-000-070')}" var="ea" itemLabel="#{ea.accountName}" itemValue="#{ea.accountCode}"/>
+                            <f:selectItems value="#{accCoaBean.getAccCoaObjectListBeginWith1('1-00-020-020')}" var="ea" itemLabel="#{ea.accountName}" itemValue="#{ea.accountCode}"/>
+                        </c:if>
+                        <c:if test="#{itemBean.itemObj.expense_type.equals('Merchandise')}">
+                            <f:selectItems value="#{accCoaBean.getAccCoaObjectListBeginWith1('1-00-020-010')}" var="ea" itemLabel="#{ea.accountName}" itemValue="#{ea.accountCode}"/>
+                        </c:if>
+                        <c:if test="#{itemBean.itemObj.expense_type.equals('Finished Goods')}">
+                            <f:selectItems value="#{accCoaBean.getAccCoaObjectListBeginWith1('1-00-020-040')}" var="ea" itemLabel="#{ea.accountName}" itemValue="#{ea.accountCode}"/>
                         </c:if>
                     </h:selectOneMenu>
                     <h:outputLabel value="Retailsale Price:"/>
