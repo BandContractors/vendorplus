@@ -83,6 +83,9 @@ public class ItemBean implements Serializable {
                 cat = new Category();
                 cat.setCategoryName("Consumption");
                 this.InventoryTypeList.add(cat);
+                cat = new Category();
+                cat.setCategoryName("Services");
+                this.InventoryTypeList.add(cat);
             } else {//Stock
                 //list
                 this.InventoryTypeList.clear();
@@ -92,6 +95,9 @@ public class ItemBean implements Serializable {
                 this.InventoryTypeList.add(cat);
                 cat = new Category();
                 cat.setCategoryName("Finished Goods");
+                this.InventoryTypeList.add(cat);
+                cat = new Category();
+                cat.setCategoryName("Services");
                 this.InventoryTypeList.add(cat);
             }
         } catch (Exception e) {

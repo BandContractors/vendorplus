@@ -31,7 +31,9 @@
         <h:form enctype="multipart/form-data" id="formMain" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
                     return false;">
             <h:panelGrid id="pnlgHeader" styleClass="clsGridMainHeader" columns="1">
-                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeader" value="#{generalUserSetting.currentItemPurpose} Item Detail"/>
+                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeaderS" value="Items for Sale: Goods (Merchandise, Finished Goods) and Services" rendered="#{generalUserSetting.currentItemPurpose.equals('Stock')}"/>
+                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeaderE" value="Items for Expenditure: Raw Materials, Consumables and Services" rendered="#{generalUserSetting.currentItemPurpose.equals('Expense')}"/>
+                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeaderA" value="Asset Item Detail" rendered="#{generalUserSetting.currentItemPurpose.equals('Asset')}"/>
             </h:panelGrid>
 
             <h:panelGrid id="pnlgBarCode" columns="2">  
@@ -114,7 +116,7 @@
                         <f:selectItem itemLabel="" itemValue="0"/>
                         <f:selectItems value="#{subCategoryBean.getSubCategoriesByCategoryId(itemBean.itemObj.categoryId)}" var="s" itemLabel="#{s.subCategoryName}" itemValue="#{s.subCategoryId}"/>
                     </h:selectOneMenu>
-                    <h:outputLabel value="Inventory Type:"/>
+                    <h:outputLabel value="Account Type:"/>
                     <h:selectOneMenu id="menuExpenseType" value="#{itemBean.itemObj.expense_type}" style="width: 200px;background-color: #{listOptionBean.getColorByBoolean(!generalUserSetting.currentItemPurpose.equals('Asset'))}" disabled="#{generalUserSetting.currentItemPurpose.equals('Asset')}">
                         <f:selectItem itemLabel="" itemValue=""/>
                         <f:selectItems value="#{itemBean.inventoryTypeList}" var="it" itemLabel="#{it.categoryName}" itemValue="#{it.categoryName}"/>
@@ -128,21 +130,10 @@
                     <h:outputLabel value="Re-order Level:"/>
                     <h:inputText id="itxtReorderLevel" value="#{itemBean.itemObj.reorderLevel}" autocomplete="off" style="width: 200px">
                     </h:inputText>
-                    <h:outputLabel value="Inventory Account:"/>
+                    <h:outputLabel value="Account Name:"/>
                     <h:selectOneMenu id="menuExpenseAccountCode" value="#{itemBean.itemObj.expenseAccountCode}" style="width: 200px;background-color: #{listOptionBean.getColorByBoolean(!generalUserSetting.currentItemPurpose.equals('Asset'))}" disabled="#{generalUserSetting.currentItemPurpose.equals('Asset')}">
                         <f:selectItem itemLabel="" itemValue=""/>
-                        <c:if test="#{itemBean.itemObj.expense_type.equals('Consumption')}">
-                            <f:selectItems value="#{accCoaBean.getAccCoaObjectListBeginWith1('1-00-020-070')}" var="ea" itemLabel="#{ea.accountName}" itemValue="#{ea.accountCode}"/>
-                        </c:if>
-                        <c:if test="#{itemBean.itemObj.expense_type.equals('Raw Material')}">
-                            <f:selectItems value="#{accCoaBean.getAccCoaObjectListBeginWith1('1-00-020-020')}" var="ea" itemLabel="#{ea.accountName}" itemValue="#{ea.accountCode}"/>
-                        </c:if>
-                        <c:if test="#{itemBean.itemObj.expense_type.equals('Merchandise')}">
-                            <f:selectItems value="#{accCoaBean.getAccCoaObjectListBeginWith1('1-00-020-010')}" var="ea" itemLabel="#{ea.accountName}" itemValue="#{ea.accountCode}"/>
-                        </c:if>
-                        <c:if test="#{itemBean.itemObj.expense_type.equals('Finished Goods')}">
-                            <f:selectItems value="#{accCoaBean.getAccCoaObjectListBeginWith1('1-00-020-040')}" var="ea" itemLabel="#{ea.accountName}" itemValue="#{ea.accountCode}"/>
-                        </c:if>
+                        <f:selectItems value="#{accCoaBean.getAccCoaObjectListByInventoryType(generalUserSetting.currentItemPurpose,itemBean.itemObj.expense_type)}" var="ea" itemLabel="#{ea.accountName}" itemValue="#{ea.accountCode}"/>
                     </h:selectOneMenu>
                     <h:outputLabel value="Retailsale Price:"/>
                     <h:inputText id="itxtUnitRetailsalePrice" value="#{itemBean.itemObj.unitRetailsalePrice}" autocomplete="off" style="width: 200px"/>
@@ -209,13 +200,6 @@
                         <f:selectItem itemLabel="Override Show No" itemValue="2"/>
                     </h:selectOneMenu>
                 </h:panelGrid>
-                <!--
-                <h:panelGrid columns="2">
-                    <h:outputLabel value="Product Image:"/>
-                    <h:inputFile value="#{itemBean.file}">
-                    </h:inputFile>
-                </h:panelGrid>
-                -->
                 <h:panelGrid id="pnlLocationStock" columns="4" style="width: 980px;">
                     <h:outputLabel value="Located:"/>
                     <h:dataTable id="dtblLocation" value="#{itemBean.locationList}" var="loc" 

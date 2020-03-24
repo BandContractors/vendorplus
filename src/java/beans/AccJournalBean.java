@@ -613,9 +613,9 @@ public class AccJournalBean implements Serializable {
                 accjournal.setNarration("SALES DISCOUNT TO CLIENT");
                 this.saveAccJournal(accjournal);
             }
-            //Sales Revenue
+            //SALES REVENUE
             //1. Sales revues per Sales Account
-            List<TransItem> ati = new TransItemBean().getTransItemsSummaryByAccount(aTrans.getTransactionId());
+            List<TransItem> ati = new TransItemBean().getTransItemsSummaryByItemType(aTrans.getTransactionId());
             //2. post account sales revenue
             int ListItemIndex = 0;
             int ListItemNo = ati.size();
@@ -627,7 +627,11 @@ public class AccJournalBean implements Serializable {
                 if (aBillTransactor != null) {
                     accjournal.setBillTransactorId(aBillTransactor.getTransactorId());
                 }
-                ItemSalesAccountCode = ati.get(ListItemIndex).getAccountCode();
+                if (ati.get(ListItemIndex).getItem_type().equals("PRODUCT")) {//4-10-000-010 - SALES Products
+                    ItemSalesAccountCode = "4-10-000-010";
+                } else if (ati.get(ListItemIndex).getItem_type().equals("SERVICE")) {//4-10-000-020 - SALES Services	
+                    ItemSalesAccountCode = "4-10-000-020";
+                }
                 ItemNetSalesAmount = ati.get(ListItemIndex).getAmountExcVat();
                 try {
                     ItemSalesAccountId = new AccCoaBean().getAccCoaByCodeOrId(ItemSalesAccountCode, 0).getAccCoaId();
@@ -643,6 +647,74 @@ public class AccJournalBean implements Serializable {
                     this.saveAccJournal(accjournal);
                 }
                 ListItemIndex = ListItemIndex + 1;
+            }
+
+            //CREDIT COS - InventoryAcc
+            //1. Cost by InventoryAcc
+            List<TransItem> ati2 = new TransItemBean().getInventoryCostByTrans(aTrans.getTransactionId());
+            //2. Credit inventory account
+            int ListItemIndex2 = 0;
+            int ListItemNo2 = ati2.size();
+            String ItemInventoryAccountCode = "";
+            int ItemInventoryAccountId = 0;
+            double ItemInventoryCostAmount = 0;
+            while (ListItemIndex2 < ListItemNo2) {
+                accjournal.setAccChildAccountId(0);
+                if (aBillTransactor != null) {
+                    accjournal.setBillTransactorId(0);
+                }
+                ItemInventoryAccountCode = ati2.get(ListItemIndex2).getAccountCode();
+                ItemInventoryCostAmount = ati2.get(ListItemIndex2).getUnitCostPrice();
+                try {
+                    ItemInventoryAccountId = new AccCoaBean().getAccCoaByCodeOrId(ItemInventoryAccountCode, 0).getAccCoaId();
+                } catch (NullPointerException npe) {
+                    ItemInventoryAccountId = 0;
+                }
+                if (ItemInventoryAccountId > 0 && ItemInventoryCostAmount > 0) {
+                    accjournal.setAccCoaId(ItemInventoryAccountId);
+                    accjournal.setAccountCode(ItemInventoryAccountCode);
+                    accjournal.setDebitAmount(0);
+                    accjournal.setCreditAmount(ItemInventoryCostAmount);
+                    accjournal.setNarration("INVENTORY COST OF SALE");
+                    this.saveAccJournal(accjournal);
+                }
+                ListItemIndex2 = ListItemIndex2 + 1;
+            }
+
+            //DEBIT COS - COS ACC
+            //1. Cost by ItemType
+            List<TransItem> ati3 = new TransItemBean().getInventoryItemTypeCostByTrans(aTrans.getTransactionId());
+            //2. Debit COS
+            int ListItemIndex3 = 0;
+            int ListItemNo3 = ati3.size();
+            String ItemInventoryItemTypeAccountCode = "";
+            int ItemInventoryItemTypeAccountId = 0;
+            double ItemInventoryItemTypeCostAmount = 0;
+            while (ListItemIndex3 < ListItemNo3) {
+                accjournal.setAccChildAccountId(0);
+                if (aBillTransactor != null) {
+                    accjournal.setBillTransactorId(0);
+                }
+                if (ati3.get(ListItemIndex3).getItem_type().equals("PRODUCT")) {//Cost of Purchase - Products	5-10-000-010
+                    ItemInventoryItemTypeAccountCode = "5-10-000-010";
+                } else if (ati3.get(ListItemIndex3).getItem_type().equals("SERVICE")) {//Cost of Purchase - Services	5-10-000-020	
+                    ItemInventoryItemTypeAccountCode = "5-10-000-020";
+                }
+                ItemInventoryItemTypeCostAmount = ati3.get(ListItemIndex3).getUnitCostPrice();
+                try {
+                    ItemInventoryItemTypeAccountId = new AccCoaBean().getAccCoaByCodeOrId(ItemInventoryItemTypeAccountCode, 0).getAccCoaId();
+                } catch (NullPointerException npe) {
+                    ItemInventoryItemTypeAccountId = 0;
+                }
+                if (ItemInventoryItemTypeAccountId > 0 && ItemInventoryItemTypeCostAmount > 0) {
+                    accjournal.setAccCoaId(ItemInventoryItemTypeAccountId);
+                    accjournal.setAccountCode(ItemInventoryItemTypeAccountCode);
+                    accjournal.setDebitAmount(ItemInventoryItemTypeCostAmount);
+                    accjournal.setCreditAmount(0);
+                    accjournal.setNarration("INVENTORY COST OF SALE");
+                    this.saveAccJournal(accjournal);
+                }
+                ListItemIndex3 = ListItemIndex3 + 1;
             }
         } catch (Exception exc) {
             System.err.println(exc.getMessage());
@@ -1751,17 +1823,6 @@ public class AccJournalBean implements Serializable {
                 accjournal.setCreditAmount(ReceivedCashDiscAmount);
                 accjournal.setNarration("DISCOUNT RECEIVED FROM SUPPLIER");
                 this.saveAccJournal(accjournal);
-                //Debit Payable
-//                accjournal.setAccChildAccountId(0);
-//                if (aBillTransactor != null) {
-//                    accjournal.setBillTransactorId(aBillTransactor.getTransactorId());
-//                }
-//                accjournal.setAccCoaId(APAccountId);
-//                accjournal.setAccountCode(APAccountCode);
-//                accjournal.setDebitAmount(ReceivedCashDiscAmount);
-//                accjournal.setCreditAmount(0);
-//                accjournal.setNarration("DISCOUNT RECEIVED FROM SUPPLIER");
-//                this.saveAccJournal(accjournal);
             }
             //Purchase Invoice Item Accounts
             //1. get account codes with summary of amounts invoiced
@@ -1789,7 +1850,7 @@ public class AccJournalBean implements Serializable {
                     accjournal.setAccountCode(ItemAccountCode);
                     accjournal.setDebitAmount(ItemAmountExcVat);
                     accjournal.setCreditAmount(0);
-                    accjournal.setNarration("COST ACCOUNT AMT");
+                    accjournal.setNarration("COST/INVENTORY AMT");
                     this.saveAccJournal(accjournal);
                 }
                 ListItemIndex = ListItemIndex + 1;
@@ -1799,162 +1860,7 @@ public class AccJournalBean implements Serializable {
         }
         return JobId;
     }
-
-//    public long postJournalPurchaseInvoice_old(Trans aTrans, List<TransItem> aTransItems, Pay aPay, int aAccPeriodId) {
-//        long JobId = 0;
-//        try {
-//            //Cash account money paid from
-//            int CashAccountId = 0;
-//            String CashAccountCode = "";
-//            try {
-//                CashAccountCode = new AccChildAccountBean().getParentAccCodeByChildAccId(aTrans.getAccChildAccountId());
-//                CashAccountId = new AccCoaBean().getAccCoaByCodeOrId(CashAccountCode, 0).getAccCoaId();
-//            } catch (NullPointerException npe) {
-//                CashAccountId = 0;
-//                CashAccountCode = "";
-//            }
-//            int APAccountId = 0;
-//            String APAccountCode = "2-00-000-010";//AP-Trade
-//            try {
-//                APAccountId = new AccCoaBean().getAccCoaByCodeOrId(APAccountCode, 0).getAccCoaId();
-//            } catch (NullPointerException npe) {
-//                APAccountId = 0;
-//            }
-//            int PurchaseVatInputTaxAccountId = 0;
-//            String PurchaseVatInputTaxAccountCode = "1-00-010-060";//AR Sales VAT Tax
-//            try {
-//                PurchaseVatInputTaxAccountId = new AccCoaBean().getAccCoaByCodeOrId(PurchaseVatInputTaxAccountCode, 0).getAccCoaId();
-//            } catch (NullPointerException npe) {
-//                PurchaseVatInputTaxAccountId = 0;
-//            }
-//            int ReceivedDiscAccountId = 0;
-//            String ReceivedDiscAccountCode = "4-10-000-030";//Sales Discount
-//            try {
-//                ReceivedDiscAccountId = new AccCoaBean().getAccCoaByCodeOrId(ReceivedDiscAccountCode, 0).getAccCoaId();
-//            } catch (NullPointerException npe) {
-//                ReceivedDiscAccountId = 0;
-//            }
-//
-//            double GrossPurchaseAmount = 0;
-//            double NetPurchaseAmount = 0;
-//            double PaidCashAmount = 0;
-//            double PayableAmount = 0;
-//            double VatInputTaxAmount = 0;
-//            double ReceivedCashDiscAmount = 0;
-//
-//            PaidCashAmount = aTrans.getAmountTendered();
-//            GrossPurchaseAmount = aTrans.getGrandTotal();
-//            PayableAmount = aTrans.getGrandTotal() - PaidCashAmount;
-//            VatInputTaxAmount = aTrans.getTotalVat();
-//            ReceivedCashDiscAmount = aTrans.getCashDiscount();
-//            NetPurchaseAmount = GrossPurchaseAmount - VatInputTaxAmount;//-CashDiscountAmount;
-//
-//            //get job Id
-//            try {
-//                JobId = new UtilityBean().getNewTableColumnSeqNumber("acc_journal", "job_id");
-//            } catch (NullPointerException npe) {
-//                JobId = 0;
-//            }
-//            AccJournal accjournal = new AccJournal();
-//            accjournal.setAccJournalId(0);
-//            accjournal.setJobId(JobId);
-//            accjournal.setJournalDate(aTrans.getTransactionDate());
-//            accjournal.setTransactionId(aTrans.getTransactionId());
-//            accjournal.setTransactionTypeId(aTrans.getTransactionTypeId());
-//            accjournal.setTransactionReasonId(aTrans.getTransactionReasonId());
-//            accjournal.setPayId(aPay.getPayId());
-//            accjournal.setPayTypeId(aPay.getPayTypeId());
-//            accjournal.setPayReasonId(aPay.getPayReasonId());
-//            accjournal.setStoreId(aTrans.getStoreId());
-//            accjournal.setLedgerFolio("");
-//            accjournal.setAccPeriodId(aAccPeriodId);
-//            accjournal.setCurrencyCode(aPay.getCurrencyCode());
-//            accjournal.setXrate(aTrans.getXrate());
-//            accjournal.setAddBy(new GeneralUserSetting().getCurrentUser().getUserDetailId());
-//            Transactor aBillTransactor = null;
-//            try {
-//                aBillTransactor = new TransactorBean().getTransactor(aTrans.getBillTransactorId());
-//            } catch (NullPointerException npe) {
-//                aBillTransactor = null;
-//            }
-//            //CASH PAID
-//            if (PaidCashAmount > 0) {
-//                //Credit cash account
-//                accjournal.setAccChildAccountId(aPay.getAccChildAccountId());
-//                if (aBillTransactor != null) {
-//                    accjournal.setBillTransactorId(aBillTransactor.getTransactorId());
-//                }
-//                accjournal.setAccCoaId(CashAccountId);
-//                accjournal.setAccountCode(CashAccountCode);
-//                accjournal.setDebitAmount(0);
-//                accjournal.setCreditAmount(PaidCashAmount);
-//                accjournal.setNarration("CASH PAYMENT TO SUPPLIER");
-//                this.saveAccJournal(accjournal);
-//            }
-//            //CREDIT PURCHASE
-//            if (PayableAmount > 0) {
-//                //Credit payable account
-//                accjournal.setAccChildAccountId(0);
-//                if (aBillTransactor != null) {
-//                    accjournal.setBillTransactorId(aBillTransactor.getTransactorId());
-//                }
-//                accjournal.setAccCoaId(APAccountId);
-//                accjournal.setAccountCode(APAccountCode);
-//                accjournal.setDebitAmount(0);
-//                accjournal.setCreditAmount(PayableAmount);
-//                accjournal.setNarration("CREDIT PAYABLE TO SUPPLIER");
-//                this.saveAccJournal(accjournal);
-//            }
-//            //Sales tax (VAT) Receivable
-//            if (VatInputTaxAmount > 0) {
-//                accjournal.setAccChildAccountId(0);
-////                if (aBillTransactor != null) {
-////                    accjournal.setBillTransactorId(aBillTransactor.getTransactorId());
-////                }
-//                accjournal.setBillTransactorId(0);
-//                accjournal.setAccCoaId(PurchaseVatInputTaxAccountId);
-//                accjournal.setAccountCode(PurchaseVatInputTaxAccountCode);
-//                accjournal.setDebitAmount(VatInputTaxAmount);
-//                accjournal.setCreditAmount(0);
-//                accjournal.setNarration("VAT INPUT RECEIVABLE");
-//                this.saveAccJournal(accjournal);
-//            }
-//            //Purchase Invoice Item Accounts
-//            //1. get account codes with summary of amounts invoiced
-//            List<TransItem> ati = new TransItemBean().getTransItemsSummaryByAccount(aTrans.getTransactionId());
-//            //1. post account invoice amounts
-//            int ListItemIndex = 0;
-//            int ListItemNo = ati.size();
-//            String ItemAccountCode = "";
-//            int ItemAccountId = 0;
-//            double ItemAmountExcVat = 0;
-//            while (ListItemIndex < ListItemNo) {
-//                accjournal.setAccChildAccountId(0);
-//                if (aBillTransactor != null) {
-//                    accjournal.setBillTransactorId(aBillTransactor.getTransactorId());
-//                }
-//                ItemAccountCode = ati.get(ListItemIndex).getAccountCode();
-//                ItemAmountExcVat = ati.get(ListItemIndex).getAmountExcVat();
-//                try {
-//                    ItemAccountId = new AccCoaBean().getAccCoaByCodeOrId(ItemAccountCode, 0).getAccCoaId();
-//                } catch (NullPointerException npe) {
-//                    ItemAccountId = 0;
-//                }
-//                if (ItemAccountId > 0 && ItemAmountExcVat > 0) {
-//                    accjournal.setAccCoaId(ItemAccountId);
-//                    accjournal.setAccountCode(ItemAccountCode);
-//                    accjournal.setDebitAmount(ItemAmountExcVat);
-//                    accjournal.setCreditAmount(0);
-//                    accjournal.setNarration("COST ACCOUNT AMT");
-//                    this.saveAccJournal(accjournal);
-//                }
-//                ListItemIndex = ListItemIndex + 1;
-//            }
-//        } catch (Exception exc) {
-//            System.err.println(exc.getMessage());
-//        }
-//        return JobId;
-//    }
+    
     public void postJournalExpenseEntry(Trans aTrans, List<TransItem> aTransItems, Pay aPay, int aAccPeriodId) {
         long JobId = 0;
         try {

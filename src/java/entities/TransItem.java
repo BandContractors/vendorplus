@@ -116,6 +116,7 @@ public class TransItem implements Serializable {
     private double specific_size_qty;
     private int is_override_price;
     private int override_gen_name;
+    private String item_type;
 
     /**
      * @return the TransactionItemId
@@ -1389,6 +1390,20 @@ public class TransItem implements Serializable {
      */
     public void setOverride_gen_name(int override_gen_name) {
         this.override_gen_name = override_gen_name;
+    }
+
+    /**
+     * @return the item_type
+     */
+    public String getItem_type() {
+        return item_type;
+    }
+
+    /**
+     * @param item_type the item_type to set
+     */
+    public void setItem_type(String item_type) {
+        this.item_type = item_type;
     }
 
 }

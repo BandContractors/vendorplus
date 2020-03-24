@@ -319,6 +319,46 @@ public class AccCoaBean implements Serializable {
         return AccCoaObjectList;
     }
 
+    public List<AccCoa> getAccCoaObjectListByInventoryType(String aItemPurpose, String aInventoryType) {
+        String sql;
+        String aWhere = "";
+        String aOrder = " ORDER BY account_name ASC";
+        sql = "SELECT * FROM acc_coa WHERE is_active=1 AND is_deleted=0";
+        ResultSet rs = null;
+        this.AccCoaObjectList = new ArrayList<>();
+        if (aItemPurpose.equals("Stock")) {
+            if (aInventoryType.equals("Merchandise")) {
+                aWhere = " AND account_code='1-00-020-010'";
+            } else if (aInventoryType.equals("Finished Goods")) {
+                aWhere = " AND account_code='1-00-020-040'";
+            } else if (aInventoryType.equals("Services")) {
+                aWhere = " AND (account_code='5-10-000-010' OR account_code='5-10-000-020')";
+            }
+        } else if (aItemPurpose.equals("Expense")) {
+            if (aInventoryType.equals("Raw Material")) {
+                aWhere = " AND account_code='1-00-020-020'";
+            } else if (aInventoryType.equals("Consumption")) {
+                aWhere = " AND account_code='1-00-020-070'";
+            } else if (aInventoryType.equals("Services")) {
+                aWhere = " AND account_code LIKE '5-20%'";
+            }
+        }
+        sql = sql + aWhere + aOrder;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                AccCoa accCoa = new AccCoa();
+                this.setAccCoaFromResultset(accCoa, rs);
+                this.AccCoaObjectList.add(accCoa);
+            }
+        } catch (Exception e) {
+            System.err.println("getAccCoaObjectListByInventoryType:" + e.getMessage());
+        }
+        return AccCoaObjectList;
+    }
+
     public List<AccCoa> getAccCoaObjectListBeginWith2(String aBeginWith1, String aBeginWith2) {
         String sql;
         sql = "{call sp_search_coa_begin_with2(?,?)}";
