@@ -1928,6 +1928,19 @@ BEGIN
 END//
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS sp_search_inventory_cost_by_trans_dispose;
+DELIMITER //
+CREATE PROCEDURE sp_search_inventory_cost_by_trans_dispose
+(
+	IN in_transaction_id bigint 
+) 
+BEGIN 
+		SELECT IFNULL(ti.account_code,'') as account_code,sum(ti.amount_exc_vat) as amount_exc_vat FROM transaction_item ti 
+		WHERE ti.transaction_id=in_transaction_id AND IFNULL(ti.account_code,'')<>'' 
+		GROUP BY IFNULL(ti.account_code,'');
+END//
+DELIMITER ;
+
 
 DROP PROCEDURE IF EXISTS sp_search_transaction_item_by_transaction_number;
 DELIMITER //

@@ -40,7 +40,7 @@
                 <h:selectOneMenu styleClass="clsMenu" id="menuTransactionReason" value="#{trans.transactionReasonId}">
                     <f:selectItem itemValue="#{transBean.transReasonObj.transactionReasonId}" itemLabel="#{transBean.transReasonObj.transactionReasonName}"/>
                 </h:selectOneMenu>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="#{transBean.transTypeObj.transactionOutputLabel} - Operational &amp; Non-Operational Expenses"/>
+                <h:outputLabel style="background-color:#00B461;color: white;" value="#{transBean.transTypeObj.transactionOutputLabel} - Raw Materials, Consumables and Services(Operational &amp; Non)"/>
                 <h:outputLabel style="background-color:#00B461;color: white;" value="Stock:No effect"/>
                 <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:No effect"/>
             </h:panelGrid>
@@ -53,7 +53,7 @@
                 <h:outputLabel  value="#{transBean.transTypeObj.transactionDateLabel}:"/>
                 <h:outputLabel id="olblDebtCredit" style="color: coral;font-weight: bold;" value="Payable (#{generalUserSetting.LOCAL_CURRENCY.currencyCode})"/>
                 <h:outputLabel id="olblDeposit" style="color: green;font-weight: bold;" value="Prepaid (#{trans.currencyCode})"/>
-                
+
                 <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}" style="width: 120px;"/>
                 <h:inputText styleClass="clsInput" id="itxtTransactionRef" value="#{trans.transactionRef}" autocomplete="off" style="width: 120px;"/>
                 <h:selectOneMenu styleClass="clsMenu" id="menuCurrency" value="#{trans.currencyCode}" style="width: 80px;">
@@ -93,12 +93,15 @@
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
             </h:panelGrid>
-            <h:panelGrid id="gridTransItem" styleClass="clsGridMainInput" columns="5">
+            <h:panelGrid id="gridTransItem" styleClass="clsGridMainInput" columns="7">
                 <h:outputLabel styleClass="clsLabelTransItem" value="Item.Description"/>
                 <h:outputLabel styleClass="clsLabelTransItem" value="Unit"/>
-                <h:outputLabel styleClass="clsLabelTransItem" value="Expenses.Account"/>
-                <h:outputLabel styleClass="clsLabelTransItem" value=""/>
-                <h:outputLabel styleClass="clsLabelTransItem" value=""/>
+                <h:outputLabel styleClass="clsLabelTransItem" value="Qty"/>
+                <h:outputLabel styleClass="clsLabelTransItem" value="Unit.Price"/>
+                <h:outputLabel styleClass="clsLabelTransItem" value="Unit.VAT"/>
+                <h:outputLabel styleClass="clsLabelTransItem" value="Unit.Trade.Disc"/>
+                <h:outputLabel styleClass="clsLabelTransItem" value="Amount"/>
+
                 <p:autoComplete id="autcItem" widgetVar="WautcItem" value="#{itemBean.selectedItem}"  
                                 completeMethod="#{itemBean.getItemObjectListForPurchaseExpense}" 
                                 var="itm" 
@@ -126,29 +129,11 @@
                         <h:outputText value="#{itm.currencyCode}">
                         </h:outputText>
                     </p:column>
-                    <p:ajax event="itemSelect" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentSaleType,trans,transItem,itemBean.selectedItem,1.0)}" process="@this" update="itxtUnit pgrdSpecific itxtExpensesAcc menuExpensesAcc"/>
-                    <p:ajax event="change" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentSaleType,trans,transItem,itemBean.selectedItem,1.0)}" rendered="#{itemBean.selectedItem!=null}" process="@this" update="itxtUnit pgrdSpecific itxtExpensesAcc menuExpensesAcc"/>
+                    <p:ajax event="itemSelect" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentSaleType,trans,transItem,itemBean.selectedItem,1.0)}" process="@this" update="itxtUnit pgrdSpecific"/>
+                    <p:ajax event="change" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentSaleType,trans,transItem,itemBean.selectedItem,1.0)}" rendered="#{itemBean.selectedItem!=null}" process="@this" update="itxtUnit pgrdSpecific"/>
                 </p:autoComplete>
-                <h:inputText id="itxtUnit" styleClass="clsInputTransItem" value="#{unitBean.getUnit(itemBean.getItem(transItem.itemId).getUnitId()).unitSymbol}" disabled="true" style="width: 120px;"/>
-                <h:selectOneMenu styleClass="clsMenu" id="menuExpensesAcc" value="#{transItem.accountCode}" style="width: 240px">
-                    <f:selectItem itemLabel="" itemValue=""/>
-                    <c:if test="#{itemBean.selectedItem.expense_type.equals('Consumption')}">
-                        <f:selectItems value="#{accCoaBean.getAccCoaObjectListBeginWith2('5-20','5-30')}" var="ea" itemLabel="#{ea.accountName}" itemValue="#{ea.accountCode}"/>
-                    </c:if>
-                    <c:if test="#{itemBean.selectedItem.expense_type.equals('Raw Material')}">
-                        <f:selectItems value="#{accCoaBean.getAccCoaObjectListBeginWith1('5-10-000-070')}" var="ea" itemLabel="#{ea.accountName}" itemValue="#{ea.accountCode}"/>
-                    </c:if>
-                    <f:ajax event="change" render="itxtExpensesAcc"/>
-                </h:selectOneMenu>
-                <h:outputText id="itxtExpensesAcc" styleClass="clsInputTransItem" value="#{transItem.accountCode}" style="width: 100px"/>
-                <h:outputLabel styleClass="clsLabelTransItem" style="width: 100px" value=""/>
-
-                <h:outputLabel styleClass="clsLabelTransItem" value="Qty"/>
-                <h:outputLabel styleClass="clsLabelTransItem" value="Unit.Price"/>
-                <h:outputLabel styleClass="clsLabelTransItem" value="Unit.VAT"/>
-                <h:outputLabel styleClass="clsLabelTransItem" value="Unit.Trade.Disc"/>
-                <h:outputLabel styleClass="clsLabelTransItem" value="Amount"/>
-                <h:inputText id="itxtQty" styleClass="clsInputTransItem" style="width: 230px" value="#{transItem.itemQty}" autocomplete="off">
+                <h:inputText id="itxtUnit" styleClass="clsInputTransItem" value="#{unitBean.getUnit(itemBean.getItem(transItem.itemId).getUnitId()).unitSymbol}" disabled="true" style="width: 100px;"/>
+                <h:inputText id="itxtQty" styleClass="clsInputTransItem" style="width: 70px" value="#{transItem.itemQty}" autocomplete="off">
                     <f:ajax event="change" listener="#{transItem.setAmount(transItem.itemQty*(transItem.unitPrice + transItem.unitVat - transItem.unitTradeDiscount))}" execute="itxtQty itxtUnitPrice itxtUnitVat itxtUnitTradeDisc" render="itxtAmount"/>
                     <f:ajax event="keyup" listener="#{transItem.setAmount(transItem.itemQty*(transItem.unitPrice + transItem.unitVat - transItem.unitTradeDiscount))}" execute="itxtQty itxtUnitPrice itxtUnitVat itxtUnitTradeDisc" render="itxtAmount"/>
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -158,7 +143,7 @@
                     <f:ajax event="keyup" listener="#{transItem.setAmount(transItem.itemQty*(transItem.unitPrice + transItem.unitVat - transItem.unitTradeDiscount))}" execute="itxtQty itxtUnitPrice itxtUnitVat itxtUnitTradeDisc" render="itxtAmount"/>
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
-                <h:inputText id="itxtUnitVat" styleClass="clsInputTransItem" style="width: 235px" disabled="false" value="#{transItem.unitVat}" autocomplete="off">
+                <h:inputText id="itxtUnitVat" styleClass="clsInputTransItem" style="width: 120px" disabled="false" value="#{transItem.unitVat}" autocomplete="off">
                     <f:ajax event="change" listener="#{transItem.setAmount(transItem.itemQty*(transItem.unitPrice + transItem.unitVat - transItem.unitTradeDiscount))}" execute="itxtQty itxtUnitPrice itxtUnitVat itxtUnitTradeDisc" render="itxtAmount"/>
                     <f:ajax event="keyup" listener="#{transItem.setAmount(transItem.itemQty*(transItem.unitPrice + transItem.unitVat - transItem.unitTradeDiscount))}" execute="itxtQty itxtUnitPrice itxtUnitVat itxtUnitTradeDisc" render="itxtAmount"/>
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -168,7 +153,7 @@
                     <f:ajax event="keyup" listener="#{transItem.setAmount(transItem.itemQty*(transItem.unitPrice + transItem.unitVat - transItem.unitTradeDiscount))}" execute="itxtQty itxtUnitPrice itxtUnitVat itxtUnitTradeDisc" render="itxtAmount"/>
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
-                <h:inputText id="itxtAmount" styleClass="clsInputTransItem" style="width: 100px" disabled="true" value="#{transItem.amount}">
+                <h:inputText id="itxtAmount" styleClass="clsInputTransItem" style="width: 150px" disabled="true" value="#{transItem.amount}">
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
                 <p:focus for="autcItem"/>
@@ -223,7 +208,7 @@
 
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Expense Account</f:facet>
+                    <f:facet name="header">Inventory/Cost Acc</f:facet>
                     <!-- row record -->
                     <p:outputLabel id="lblAccountCodeInner" value="#{ati.accountCode}"/>
                     <p:tooltip id="toolTipTrackAccCode" for="lblAccountCodeInner" value="#{accCoaBean.getAccCoaByCodeOrId(ati.accountCode,0).accountName}" trackMouse="true" />    
@@ -365,7 +350,7 @@
             <p:growl id="growl1"/>
             <!-- INVOICE STARTS HERE -->
             <h:panelGrid id="pnlgOutput">
-            <ui:include src="#{transBean.getPrintFileName('PARENT',transBean.transTypeObj,0)}"/>
+                <ui:include src="#{transBean.getPrintFileName('PARENT',transBean.transTypeObj,0)}"/>
             </h:panelGrid>
             <!-- INVOICE ENDS HERE -->
         </h:form>

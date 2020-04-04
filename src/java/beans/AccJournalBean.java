@@ -1029,7 +1029,7 @@ public class AccJournalBean implements Serializable {
         try {
             //Loss Inv Expense Acc(LIE)
             int LIEAccountId = 0;
-            String LIEAccountCode = "5-10-000-090";
+            String LIEAccountCode = "5-10-000-090";//Loss on inventory write off
             try {
                 LIEAccountId = new AccCoaBean().getAccCoaByCodeOrId(LIEAccountCode, 0).getAccCoaId();
             } catch (NullPointerException npe) {
@@ -1078,15 +1078,33 @@ public class AccJournalBean implements Serializable {
                 accjournal.setNarration("STOCK DISPOSED LOSS");
                 this.saveAccJournal(accjournal);
             }
-            //Credit Invetoru Account
-            if (TotalDisposeAmountt > 0) {
-                //Debit cash account
-                accjournal.setAccCoaId(InventoryAccountId);
-                accjournal.setAccountCode(InventoryAccountCode);
-                accjournal.setDebitAmount(0);
-                accjournal.setCreditAmount(TotalDisposeAmountt);
-                accjournal.setNarration("STOCK DISPOSED LOSS");
-                this.saveAccJournal(accjournal);
+            //Credit Invetory/Cost Account
+            //Cost by Inventory/Cost Acc
+            List<TransItem> ati2 = new TransItemBean().getInventoryCostByTransDispose(aTrans.getTransactionId());
+            int ListItemIndex2 = 0;
+            int ListItemNo2 = ati2.size();
+            String ItemInventoryAccountCode = "";
+            int ItemInventoryAccountId = 0;
+            double ItemInventoryCostAmount = 0;
+            while (ListItemIndex2 < ListItemNo2) {
+                accjournal.setAccChildAccountId(0);
+                accjournal.setBillTransactorId(0);
+                ItemInventoryAccountCode = ati2.get(ListItemIndex2).getAccountCode();
+                ItemInventoryCostAmount = ati2.get(ListItemIndex2).getAmountExcVat();
+                try {
+                    ItemInventoryAccountId = new AccCoaBean().getAccCoaByCodeOrId(ItemInventoryAccountCode, 0).getAccCoaId();
+                } catch (NullPointerException npe) {
+                    ItemInventoryAccountId = 0;
+                }
+                if (ItemInventoryAccountId > 0 && ItemInventoryCostAmount > 0) {
+                    accjournal.setAccCoaId(ItemInventoryAccountId);
+                    accjournal.setAccountCode(ItemInventoryAccountCode);
+                    accjournal.setDebitAmount(0);
+                    accjournal.setCreditAmount(ItemInventoryCostAmount);
+                    accjournal.setNarration("STOCK DISPOSED LOSS");
+                    this.saveAccJournal(accjournal);
+                }
+                ListItemIndex2 = ListItemIndex2 + 1;
             }
         } catch (Exception exc) {
             System.err.println(exc.getMessage());
@@ -1860,7 +1878,7 @@ public class AccJournalBean implements Serializable {
         }
         return JobId;
     }
-    
+
     public void postJournalExpenseEntry(Trans aTrans, List<TransItem> aTransItems, Pay aPay, int aAccPeriodId) {
         long JobId = 0;
         try {
@@ -2009,7 +2027,7 @@ public class AccJournalBean implements Serializable {
                     accjournal.setAccountCode(ItemAccountCode);
                     accjournal.setDebitAmount(ItemAmountExcVat);
                     accjournal.setCreditAmount(0);
-                    accjournal.setNarration("COST ACCOUNT AMT");
+                    accjournal.setNarration("COST/INVENTORY AMT");
                     this.saveAccJournal(accjournal);
                 }
                 ListItemIndex = ListItemIndex + 1;

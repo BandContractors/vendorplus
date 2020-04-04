@@ -37,7 +37,7 @@
                         <h:outputLabel style="background-color:#00B461;color: white;" value="EDIT" rendered="#{transBean.actionType.equals('Edit')}"/>
                         <h:outputLabel style="background-color:#00B461;color: white;" value="#{transactionReasonBean.getTransactionReason(transBean.transObj.transactionReasonId).transactionReasonName} : #{transBean.transObj.transactionNumber}"/>
                         <h:outputLabel style="background-color:#00B461;color: white;" value="Stock↓"/>
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:INV-STORES↓ COS-INV↑"/>
+                        <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:INV-ACC↓ COS-INV↑"/>
                     </h:panelGrid>
                     <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="6">
                         <h:outputLabel  value="From:"/>
@@ -69,6 +69,13 @@
                             <f:facet name="header">Unit</f:facet>
                             <!-- row record -->
                             #{unitBean.getUnit(itemBean.getItem(ati.itemId).getUnitId()).unitSymbol}
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">Inventory/Cost Acc</f:facet>
+                            <!-- row record -->
+                            <p:outputLabel id="lblAccountCodeInner" value="#{ati.accountCode}"/>
+                            <p:tooltip id="toolTipTrackAccCode" for="lblAccountCodeInner" value="#{accCoaBean.getAccCoaByCodeOrId(ati.accountCode,0).accountName}" trackMouse="true" />    
                         </p:column>
                         <p:column>
                             <!-- column header -->

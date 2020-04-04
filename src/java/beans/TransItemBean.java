@@ -4468,6 +4468,29 @@ public class TransItemBean implements Serializable {
         }
         return transitems;
     }
+    
+    public List<TransItem> getInventoryCostByTransDispose(long aTransactionId) {
+        String sql;
+        sql = "{call sp_search_inventory_cost_by_trans_dispose(?)}";
+        ResultSet rs = null;
+        List<TransItem> transitems = new ArrayList<>();
+        TransItem transitem = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aTransactionId);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                transitem = new TransItem();
+                transitem.setAccountCode(rs.getString("account_code"));
+                transitem.setAmountExcVat(rs.getDouble("amount_exc_vat"));
+                transitems.add(transitem);
+            }
+        } catch (Exception e) {
+            System.err.println("getInventoryCostByTransDispose:" + e.getMessage());
+        }
+        return transitems;
+    }
 
     public List<TransItem> getInventoryItemTypeCostByTrans(long aTransactionId) {
         String sql;
@@ -5195,6 +5218,15 @@ public class TransItemBean implements Serializable {
                     }
                 }
             }
+
+            //for dispose; apply unit cost price of the stock/batch
+            if (aSelectedItem.getIsTrack() == 1 && null != st && "DISPOSE STOCK".equals(transtype.getTransactionTypeName())) {
+                NewTransItem.setUnitCostPrice(xrate * st.getUnitCost());
+                NewTransItem.setUnitPrice(NewTransItem.getUnitCostPrice());
+                NewTransItem.setUnitPriceExcVat(NewTransItem.getUnitCostPrice());
+                NewTransItem.setAmountExcVat(NewTransItem.getItemQty() * NewTransItem.getUnitPriceExcVat());
+            }
+
             if (NewTransItem.getItemQty() <= 0) {
                 status = "ENTER ITEM QUANTITY !";
                 StockFail3 = 1;
@@ -5387,11 +5419,6 @@ public class TransItemBean implements Serializable {
                     aActiveTransItems.add(ItemFoundAtIndex, ti);
                     aActiveTransItems.remove(ItemFoundAtIndex + 1);
                 }
-                //TransBean transB = new TransBean();
-                //transB.clearAll(null, aActiveTransItems, NewTransItem, aSelectedItem, null, 1, null);
-                //status = "ITEM ADDED";
-                //update totals
-                //new TransBean().setTransTotalsAndUpdate(aTrans, aActiveTransItems);
             }
         } catch (NullPointerException npe) {
             status = "ERROR OCCURED - ITEM NOT ADDED";
@@ -5447,6 +5474,7 @@ public class TransItemBean implements Serializable {
         aStatusBean.setShowItemAddedStatus(0);
         aStatusBean.setShowItemNotAddedStatus(0);
         try {
+            //check
             if (aTransTypeId == 71 && NewTransItem.getNarration().length() == 0) {//STOCK ADJUSTMENT
                 status = "please select Adjustment Type...";
             } else if (NewTransItem.getCodeSpecific().length() > 250) {
@@ -6501,7 +6529,7 @@ public class TransItemBean implements Serializable {
             ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
 
             //for profit margin
-            if ("SALE INVOICE".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
+            if ("SALE INVOICE".equals(new GeneralUserSetting().getCurrentTransactionTypeName()) || "SALE ORDER".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
                 ti.setUnitCostPrice(st.getUnitCost());
                 ti.setUnitProfitMargin((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) - st.getUnitCost());
             } else {
@@ -9611,75 +9639,9 @@ public class TransItemBean implements Serializable {
                 //dpaItem.setRetailsaleDiscountAmt(dpaItem.getRetailsaleDiscountAmt() * XrateMultiply);
                 //dpaItem.setWholesaleDiscountAmt(dpaItem.getWholesaleDiscountAmt() * XrateMultiply);
             }
+
             //get account code for the cost of inventory
-            try {
-                if (transtype.getTransactionTypeName().equals("SALE INVOICE")) {
-                    if (aItem.getExpenseAccountCode()!=null && aItem.getExpenseAccountCode().length() > 0) {
-                        aTransItemToUpdate.setAccountCode(aItem.getExpenseAccountCode());
-                    } else {
-                        if (aItem.getItemType().equals("PRODUCT")) {//5-10-000-010 - COS Products
-                            aTransItemToUpdate.setAccountCode("5-10-000-010");
-                        } else if (aItem.getItemType().equals("SERVICE")) {//5-10-000-020 - COS Services	
-                            aTransItemToUpdate.setAccountCode("5-10-000-020");
-                        }
-                    }
-                } else if (transtype.getTransactionTypeName().equals("PURCHASE INVOICE") || transtype.getTransactionTypeName().equals("EXPENSE ENTRY")) {
-                    if (new GeneralUserSetting().getCurrentTransactionReasonId() == 1) {//GOOD AND SERVICE
-                        if (aItem.getExpenseAccountCode()!=null && aItem.getExpenseAccountCode().length() > 0) {
-                            aTransItemToUpdate.setAccountCode(aItem.getExpenseAccountCode());
-                        } else {
-                            if (aItem.getItemType().equals("PRODUCT")) {
-                                aTransItemToUpdate.setAccountCode("5-10-000-010");
-                            } else if (aItem.getItemType().equals("SERVICE")) {
-                                aTransItemToUpdate.setAccountCode("5-10-000-020");
-                            }
-                        }
-                    } else if (new GeneralUserSetting().getCurrentTransactionReasonId() == 27 || new GeneralUserSetting().getCurrentTransactionReasonId() == 43) {//EXPENSE,EXPENSE ENTRY
-                        aTransItemToUpdate.setAccountCode(aItem.getExpenseAccountCode());
-                    } else if (new GeneralUserSetting().getCurrentTransactionReasonId() == 29) {//ASSET
-                        aTransItemToUpdate.setAccountCode(aItem.getAssetAccountCode());
-                    }
-                } else if (transtype.getTransactionTypeName().equals("PURCHASE ORDER")) {
-                    if (transreason.getTransactionReasonId() == 12) {//GOOD AND SERVICE
-                        if (aItem.getExpenseAccountCode()!=null && aItem.getExpenseAccountCode().length() > 0) {
-                            aTransItemToUpdate.setAccountCode(aItem.getExpenseAccountCode());
-                        } else {
-                            if (aItem.getItemType().equals("PRODUCT")) {
-                                aTransItemToUpdate.setAccountCode("5-10-000-010");
-                            } else if (aItem.getItemType().equals("SERVICE")) {
-                                aTransItemToUpdate.setAccountCode("5-10-000-020");
-                            }
-                        }
-                    } else if (transreason.getTransactionReasonId() == 30) {//EXPENSE
-                        aTransItemToUpdate.setAccountCode(aItem.getExpenseAccountCode());
-                    } else if (transreason.getTransactionReasonId() == 31) {//ASSET
-                        aTransItemToUpdate.setAccountCode(aItem.getAssetAccountCode());
-                    }
-                } else if (transtype.getTransactionTypeName().equals("ITEM RECEIVED")) {
-                    //aTransItemToUpdate.setAccountCode(aItem.getAssetAccountCode());
-                    if (transreason.getTransactionReasonId() == 13) {//GOOD/PRODUCT
-                        if (aItem.getExpenseAccountCode()!=null && aItem.getExpenseAccountCode().length() > 0) {
-                            aTransItemToUpdate.setAccountCode(aItem.getExpenseAccountCode());
-                        } else {
-                            if (aItem.getItemType().equals("PRODUCT")) {
-                                aTransItemToUpdate.setAccountCode("5-10-000-010");
-                            } else if (aItem.getItemType().equals("SERVICE")) {
-                                aTransItemToUpdate.setAccountCode("5-10-000-020");
-                            }
-                        }
-                    } else if (transreason.getTransactionReasonId() == 32) {//EXPENSE
-                        aTransItemToUpdate.setAccountCode(aItem.getExpenseAccountCode());
-                    } else if (transreason.getTransactionReasonId() == 28) {//ASSET
-                        aTransItemToUpdate.setAccountCode(aItem.getAssetAccountCode());
-                    }
-                } else if (transtype.getTransactionTypeName().equals("HIRE INVOICE") || transtype.getTransactionTypeName().equals("HIRE RETURN INVOICE") || transtype.getTransactionTypeName().equals("HIRE QUOTATION")) {
-                    aTransItemToUpdate.setAccountCode("4-10-000-050");
-                } else {
-                    aTransItemToUpdate.setAccountCode("");
-                }
-            } catch (NullPointerException npe) {
-                aTransItemToUpdate.setAccountCode("");
-            }
+            aTransItemToUpdate.setAccountCode(this.getTransItemInventCostAccount(transtype, transreason, aItem));
 
             if (transtype.getTransactionTypeName().equals("HIRE INVOICE") || transtype.getTransactionTypeName().equals("HIRE QUOTATION") || transtype.getTransactionTypeName().equals("HIRE RETURN INVOICE")) {
                 aTransItemToUpdate.setDuration_value(aTrans.getDuration_value());
@@ -9764,6 +9726,89 @@ public class TransItemBean implements Serializable {
                 aTransItemToUpdate.setAmount(aTransItemToUpdate.getItemQty() * aTransItemToUpdate.getUnitPrice());
             }
         }
+    }
+
+    public String getTransItemInventCostAccount(TransactionType aTransType, TransactionReason aTransReason, Item aItem) {
+        String AccountCode = "";
+        try {
+            if (aTransType.getTransactionTypeName().equals("SALE INVOICE") || aTransType.getTransactionTypeName().equals("SALE ORDER")) {
+                if (aItem.getExpenseAccountCode() != null && aItem.getExpenseAccountCode().length() > 0) {
+                    AccountCode = aItem.getExpenseAccountCode();
+                } else {
+                    if (aItem.getItemType().equals("PRODUCT")) {//5-10-000-010 - COS Products
+                        AccountCode = "5-10-000-010";
+                    } else if (aItem.getItemType().equals("SERVICE")) {//5-10-000-020 - COS Services	
+                        AccountCode = "5-10-000-020";
+                    }
+                }
+            } else if (aTransType.getTransactionTypeName().equals("PURCHASE INVOICE") || aTransType.getTransactionTypeName().equals("EXPENSE ENTRY")) {
+                if (aTransReason.getTransactionReasonId() == 1) {//GOOD AND SERVICE
+                    if (aItem.getExpenseAccountCode() != null && aItem.getExpenseAccountCode().length() > 0) {
+                        AccountCode = aItem.getExpenseAccountCode();
+                    } else {
+                        if (aItem.getItemType().equals("PRODUCT")) {
+                            AccountCode = "5-10-000-010";
+                        } else if (aItem.getItemType().equals("SERVICE")) {
+                            AccountCode = "5-10-000-020";
+                        }
+                    }
+                } else if (aTransReason.getTransactionReasonId() == 27 || aTransReason.getTransactionReasonId() == 43) {//EXPENSE,EXPENSE ENTRY
+                    AccountCode = aItem.getExpenseAccountCode();
+                } else if (aTransReason.getTransactionReasonId() == 29) {//ASSET
+                    AccountCode = aItem.getAssetAccountCode();
+                }
+            } else if (aTransType.getTransactionTypeName().equals("PURCHASE ORDER")) {
+                if (aTransReason.getTransactionReasonId() == 12) {//GOOD AND SERVICE
+                    if (aItem.getExpenseAccountCode() != null && aItem.getExpenseAccountCode().length() > 0) {
+                        AccountCode = aItem.getExpenseAccountCode();
+                    } else {
+                        if (aItem.getItemType().equals("PRODUCT")) {
+                            AccountCode = "5-10-000-010";
+                        } else if (aItem.getItemType().equals("SERVICE")) {
+                            AccountCode = "5-10-000-020";
+                        }
+                    }
+                } else if (aTransReason.getTransactionReasonId() == 30) {//EXPENSE
+                    AccountCode = aItem.getExpenseAccountCode();
+                } else if (aTransReason.getTransactionReasonId() == 31) {//ASSET
+                    AccountCode = aItem.getAssetAccountCode();
+                }
+            } else if (aTransType.getTransactionTypeName().equals("ITEM RECEIVED")) {
+                //aTransItemToUpdate.setAccountCode(aItem.getAssetAccountCode());
+                if (aTransReason.getTransactionReasonId() == 13) {//GOOD/PRODUCT
+                    if (aItem.getExpenseAccountCode() != null && aItem.getExpenseAccountCode().length() > 0) {
+                        AccountCode = aItem.getExpenseAccountCode();
+                    } else {
+                        if (aItem.getItemType().equals("PRODUCT")) {
+                            AccountCode = "5-10-000-010";
+                        } else if (aItem.getItemType().equals("SERVICE")) {
+                            AccountCode = "5-10-000-020";
+                        }
+                    }
+                } else if (aTransReason.getTransactionReasonId() == 32) {//EXPENSE
+                    AccountCode = aItem.getExpenseAccountCode();
+                } else if (aTransReason.getTransactionReasonId() == 28) {//ASSET
+                    AccountCode = aItem.getAssetAccountCode();
+                }
+            } else if (aTransType.getTransactionTypeName().equals("HIRE INVOICE") || aTransType.getTransactionTypeName().equals("HIRE RETURN INVOICE") || aTransType.getTransactionTypeName().equals("HIRE QUOTATION")) {
+                AccountCode = "4-10-000-050";
+            } else if (aTransType.getTransactionTypeName().equals("DISPOSE STOCK")) {
+                if (aItem.getExpenseAccountCode() != null && aItem.getExpenseAccountCode().length() > 0) {
+                    AccountCode = aItem.getExpenseAccountCode();
+                } else {
+                    if (aItem.getItemType().equals("PRODUCT")) {//5-10-000-010 - COS Products
+                        AccountCode = "5-10-000-010";
+                    } else if (aItem.getItemType().equals("SERVICE")) {//5-10-000-020 - COS Services	
+                        AccountCode = "5-10-000-020";
+                    }
+                }
+            } else {
+                AccountCode = "";
+            }
+        } catch (Exception e) {
+            AccountCode = "";
+        }
+        return AccountCode;
     }
 
     public void updateAccCodeTransItem(TransItem aTransItemToUpdate, AccCoa aAccCoa) {
@@ -10039,14 +10084,7 @@ public class TransItemBean implements Serializable {
             aStatusBean.setShowItemNotAddedStatus(1);
             new ItemBean().clearItem(aSelectedItem);
             this.clearTransItem2(aSelectedTransItem);
-        } /*else if (null != aSelectedItem && aSelectedItem.getIsGeneral() == 1) {
-         aStatusBean.setItemAddedStatus("");
-         aStatusBean.setItemNotAddedStatus("A GENERAL ITEM CANNOT BE TRANSACTED BY THIS MODE/WINDOW");
-         aStatusBean.setShowItemAddedStatus(0);
-         aStatusBean.setShowItemNotAddedStatus(1);
-         new ItemBean().clearItem(aSelectedItem);
-         this.clearTransItem2(aSelectedTransItem);
-         } */ else if (aSelectedItem != null) {
+        } else if (aSelectedItem != null) {
             //for where item currency is different from trans currency, we first get the factor to convert to trans currency
             double xrate = 1;
             double XrateMultiply = 1;
@@ -10077,56 +10115,57 @@ public class TransItemBean implements Serializable {
                 //dpi.setWholesaleDiscountAmt(dpi.getWholesaleDiscountAmt() * XrateMultiply);
             }
             //get account code for the item
-            try {
-                if (transtype.getTransactionTypeName().equals("SALE INVOICE") || transtype.getTransactionTypeName().equals("SALE ORDER")) {
-                    if (aSelectedItem.getItemType().equals("PRODUCT")) {//4-10-000-010 - SALES Products
-                        aSelectedTransItem.setAccountCode("4-10-000-010");
-                    } else if (aSelectedItem.getItemType().equals("SERVICE")) {//4-10-000-020 - SALES Services	
-                        aSelectedTransItem.setAccountCode("4-10-000-020");
-                    }
-                } else if (transtype.getTransactionTypeName().equals("PURCHASE INVOICE") || transtype.getTransactionTypeName().equals("EXPENSE ENTRY")) {
-                    if (transreason.getTransactionReasonId() == 1) {//GOOD AND SERVICE
-                        if (aSelectedItem.getItemType().equals("PRODUCT")) {
-                            aSelectedTransItem.setAccountCode("5-10-000-010");
-                        } else if (aSelectedItem.getItemType().equals("SERVICE")) {
-                            aSelectedTransItem.setAccountCode("5-10-000-020");
-                        }
-                    } else if (transreason.getTransactionReasonId() == 27 || transreason.getTransactionReasonId() == 43) {//EXPENSE,EXPENSE ENTRY
-                        aSelectedTransItem.setAccountCode(aSelectedItem.getExpenseAccountCode());
-                    } else if (transreason.getTransactionReasonId() == 29) {//ASSET
-                        aSelectedTransItem.setAccountCode(aSelectedItem.getAssetAccountCode());
-                    }
-                } else if (transtype.getTransactionTypeName().equals("PURCHASE ORDER")) {
-                    if (transreason.getTransactionReasonId() == 12) {//GOOD AND SERVICE
-                        if (aSelectedItem.getItemType().equals("PRODUCT")) {
-                            aSelectedTransItem.setAccountCode("5-10-000-010");
-                        } else if (aSelectedItem.getItemType().equals("SERVICE")) {
-                            aSelectedTransItem.setAccountCode("5-10-000-020");
-                        }
-                    } else if (transreason.getTransactionReasonId() == 30) {//EXPENSE
-                        aSelectedTransItem.setAccountCode(aSelectedItem.getExpenseAccountCode());
-                    } else if (transreason.getTransactionReasonId() == 31) {//ASSET
-                        aSelectedTransItem.setAccountCode(aSelectedItem.getAssetAccountCode());
-                    }
-                } else if (transtype.getTransactionTypeName().equals("ITEM RECEIVED")) {
-                    //aSelectedTransItem.setAccountCode(aSelectedItem.getAssetAccountCode());
-                    if (transreason.getTransactionReasonId() == 13) {//GOOD/PRODUCT
-                        if (aSelectedItem.getItemType().equals("PRODUCT")) {
-                            aSelectedTransItem.setAccountCode("5-10-000-010");
-                        } else if (aSelectedItem.getItemType().equals("SERVICE")) {
-                            aSelectedTransItem.setAccountCode("5-10-000-020");
-                        }
-                    } else if (transreason.getTransactionReasonId() == 32) {//EXPENSE
-                        aSelectedTransItem.setAccountCode(aSelectedItem.getExpenseAccountCode());
-                    } else if (transreason.getTransactionReasonId() == 28) {//ASSET
-                        aSelectedTransItem.setAccountCode(aSelectedItem.getAssetAccountCode());
-                    }
-                } else {
-                    aSelectedTransItem.setAccountCode("");
-                }
-            } catch (NullPointerException npe) {
-                aSelectedTransItem.setAccountCode("");
-            }
+            aSelectedTransItem.setAccountCode(this.getTransItemInventCostAccount(transtype, transreason, aSelectedItem));
+//            try {
+//                if (transtype.getTransactionTypeName().equals("SALE INVOICE") || transtype.getTransactionTypeName().equals("SALE ORDER")) {
+//                    if (aSelectedItem.getItemType().equals("PRODUCT")) {//4-10-000-010 - SALES Products
+//                        aSelectedTransItem.setAccountCode("4-10-000-010");
+//                    } else if (aSelectedItem.getItemType().equals("SERVICE")) {//4-10-000-020 - SALES Services	
+//                        aSelectedTransItem.setAccountCode("4-10-000-020");
+//                    }
+//                } else if (transtype.getTransactionTypeName().equals("PURCHASE INVOICE") || transtype.getTransactionTypeName().equals("EXPENSE ENTRY")) {
+//                    if (transreason.getTransactionReasonId() == 1) {//GOOD AND SERVICE
+//                        if (aSelectedItem.getItemType().equals("PRODUCT")) {
+//                            aSelectedTransItem.setAccountCode("5-10-000-010");
+//                        } else if (aSelectedItem.getItemType().equals("SERVICE")) {
+//                            aSelectedTransItem.setAccountCode("5-10-000-020");
+//                        }
+//                    } else if (transreason.getTransactionReasonId() == 27 || transreason.getTransactionReasonId() == 43) {//EXPENSE,EXPENSE ENTRY
+//                        aSelectedTransItem.setAccountCode(aSelectedItem.getExpenseAccountCode());
+//                    } else if (transreason.getTransactionReasonId() == 29) {//ASSET
+//                        aSelectedTransItem.setAccountCode(aSelectedItem.getAssetAccountCode());
+//                    }
+//                } else if (transtype.getTransactionTypeName().equals("PURCHASE ORDER")) {
+//                    if (transreason.getTransactionReasonId() == 12) {//GOOD AND SERVICE
+//                        if (aSelectedItem.getItemType().equals("PRODUCT")) {
+//                            aSelectedTransItem.setAccountCode("5-10-000-010");
+//                        } else if (aSelectedItem.getItemType().equals("SERVICE")) {
+//                            aSelectedTransItem.setAccountCode("5-10-000-020");
+//                        }
+//                    } else if (transreason.getTransactionReasonId() == 30) {//EXPENSE
+//                        aSelectedTransItem.setAccountCode(aSelectedItem.getExpenseAccountCode());
+//                    } else if (transreason.getTransactionReasonId() == 31) {//ASSET
+//                        aSelectedTransItem.setAccountCode(aSelectedItem.getAssetAccountCode());
+//                    }
+//                } else if (transtype.getTransactionTypeName().equals("ITEM RECEIVED")) {
+//                    //aSelectedTransItem.setAccountCode(aSelectedItem.getAssetAccountCode());
+//                    if (transreason.getTransactionReasonId() == 13) {//GOOD/PRODUCT
+//                        if (aSelectedItem.getItemType().equals("PRODUCT")) {
+//                            aSelectedTransItem.setAccountCode("5-10-000-010");
+//                        } else if (aSelectedItem.getItemType().equals("SERVICE")) {
+//                            aSelectedTransItem.setAccountCode("5-10-000-020");
+//                        }
+//                    } else if (transreason.getTransactionReasonId() == 32) {//EXPENSE
+//                        aSelectedTransItem.setAccountCode(aSelectedItem.getExpenseAccountCode());
+//                    } else if (transreason.getTransactionReasonId() == 28) {//ASSET
+//                        aSelectedTransItem.setAccountCode(aSelectedItem.getAssetAccountCode());
+//                    }
+//                } else {
+//                    aSelectedTransItem.setAccountCode("");
+//                }
+//            } catch (NullPointerException npe) {
+//                aSelectedTransItem.setAccountCode("");
+//            }
 
             if ("EXEMPT SALE INVOICE".equals(aSaleType)) {
                 aSelectedTransItem.setUnitPrice(0);

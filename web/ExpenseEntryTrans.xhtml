@@ -41,7 +41,7 @@
                 <h:selectOneMenu styleClass="clsMenu" id="menuTransactionReason" value="#{trans.transactionReasonId}">
                     <f:selectItem itemValue="#{transBean.transReasonObj.transactionReasonId}" itemLabel="#{transBean.transReasonObj.transactionReasonName}"/>
                 </h:selectOneMenu>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="Record Expenses - Operational &amp; Non-Operational Expenses"/>
+                <h:outputLabel style="background-color:#00B461;color: white;" value="Quickly Record Expenses without Supplier Invoice - Services(Operational &amp; Non-Operational), Raw Materials, and Consumables"/>
                 <h:outputLabel style="background-color:#00B461;color: white;" value="Stock:No effect"/>
                 <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:Cash↓ Expense↑"/>
             </h:panelGrid>
@@ -63,11 +63,9 @@
                 <h:inputText styleClass="clsInput" id="itxtTransactionRef" value="#{trans.transactionRef}" autocomplete="off" style="font-weight: bold;"/>
             </h:panelGrid>
 
-            <h:panelGrid id="gridTransItem" styleClass="clsGridMainInput" columns="7">
+            <h:panelGrid id="gridTransItem" styleClass="clsGridMainInput" columns="5">
                 <h:outputLabel styleClass="clsLabelTransItem" value="Item.Description"/>
                 <h:outputLabel styleClass="clsLabelTransItem" value="Unit"/>
-                <h:outputLabel styleClass="clsLabelTransItem" value="Expense.Account"/>
-                <h:outputLabel styleClass="clsLabelTransItem" value=""/>
                 <h:outputLabel styleClass="clsLabelTransItem" value="Qty"/>
                 <h:outputLabel styleClass="clsLabelTransItem" value="Unit.Price"/>
                 <h:outputLabel styleClass="clsLabelTransItem" value="Amount"/>
@@ -99,21 +97,10 @@
                         <h:outputText value="#{itm.currencyCode}">
                         </h:outputText>
                     </p:column>
-                    <p:ajax event="itemSelect" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,'',trans,transItem,itemBean.selectedItem,1.0)}" process="@this" update="itxtUnit pgrdSpecific itxtExpenseAcc menuExpenseAcc"/>
-                    <p:ajax event="change" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,'',trans,transItem,itemBean.selectedItem,1.0)}" rendered="#{itemBean.selectedItem!=null}" process="@this" update="itxtUnit pgrdSpecific itxtExpenseAcc menuExpenseAcc"/>
+                    <p:ajax event="itemSelect" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,'',trans,transItem,itemBean.selectedItem,1.0)}" process="@this" update="itxtUnit pgrdSpecific"/>
+                    <p:ajax event="change" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,'',trans,transItem,itemBean.selectedItem,1.0)}" rendered="#{itemBean.selectedItem!=null}" process="@this" update="itxtUnit pgrdSpecific"/>
                 </p:autoComplete>
                 <h:inputText id="itxtUnit" styleClass="clsInputTransItem" value="#{unitBean.getUnit(itemBean.getItem(transItem.itemId).getUnitId()).unitSymbol}" disabled="true" style="width: 100px"/>
-                <h:selectOneMenu styleClass="clsMenu" id="menuExpenseAcc" value="#{transItem.accountCode}" style="width: 200px">
-                    <f:selectItem itemLabel="" itemValue=""/>
-                    <c:if test="#{itemBean.selectedItem.expense_type.equals('Consumption')}">
-                        <f:selectItems value="#{accCoaBean.getAccCoaObjectListBeginWith2('5-20','5-30')}" var="ea" itemLabel="#{ea.accountName}" itemValue="#{ea.accountCode}"/>
-                    </c:if>
-                    <c:if test="#{itemBean.selectedItem.expense_type.equals('Raw Material')}">
-                        <f:selectItems value="#{accCoaBean.getAccCoaObjectListBeginWith1('5-10-000-070')}" var="ea" itemLabel="#{ea.accountName}" itemValue="#{ea.accountCode}"/>
-                    </c:if>
-                    <f:ajax event="change" render="itxtExpenseAcc"/>
-                </h:selectOneMenu>
-                <h:outputLabel id="itxtExpenseAcc" styleClass="clsInputTransItem" value="#{transItem.accountCode}"/>               
                 <h:inputText id="itxtQty" styleClass="clsInputTransItem" style="width: 50px" value="#{transItem.itemQty}" autocomplete="off">
                     <f:ajax event="change" listener="#{transItem.setAmount(transItem.itemQty*transItem.unitPrice)}" execute="itxtQty itxtUnitPrice" render="itxtAmount"/>
                     <f:ajax event="keyup" listener="#{transItem.setAmount(transItem.itemQty*transItem.unitPrice)}" execute="itxtQty itxtUnitPrice" render="itxtAmount"/>
@@ -177,7 +164,7 @@
 
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Expense Account</f:facet>
+                    <f:facet name="header">Inventory/Cost Acc</f:facet>
                     <!-- row record -->
                     <p:outputLabel id="lblAccountCodeInner" value="#{ati.accountCode}"/>
                     <p:tooltip id="toolTipTrackAccCode" for="lblAccountCodeInner" value="#{ati.accountName}" trackMouse="true" />    

@@ -35,7 +35,7 @@
                     <h:panelGrid styleClass="clsGridMainHeader" columns="4" style="width: 100%">
                         <h:outputLabel style="background-color:#00B461;color: white;" value="VIEW" rendered="#{transBean.actionType.equals('View')}"/>
                         <h:outputLabel style="background-color:#00B461;color: white;" value="EDIT" rendered="#{transBean.actionType.equals('Edit')}"/>
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{transactionTypeBean.getTransactionType(1).transactionOutputLabel} - Operational &amp; Non-Operational Expenses : #{transBean.transObj.transactionNumber}"/>
+                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{transactionTypeBean.getTransactionType(1).transactionOutputLabel} - Raw Materials, Consumables and Services(Operational &amp; Non) : #{transBean.transObj.transactionNumber}"/>
                         <h:outputLabel style="background-color:#00B461;color: white;" value="Stock:No effect"/>
                         <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:Cash↓ AP↑"/>
                     </h:panelGrid>
@@ -74,7 +74,7 @@
                         </p:column>
                         <p:column>
                             <!-- column header -->
-                            <f:facet name="header">Expense Account</f:facet>
+                            <f:facet name="header">Inventory/Cost Acc</f:facet>
                             <!-- row record -->
                             <p:outputLabel id="lblAccountCodeInner" value="#{ati.accountCode}"/>
                             <p:tooltip id="toolTipTrackAccCode" for="lblAccountCodeInner" value="#{accCoaBean.getAccCoaByCodeOrId(ati.accountCode,0).accountName}" trackMouse="true" />    
