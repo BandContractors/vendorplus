@@ -2481,6 +2481,10 @@ public class TransBean implements Serializable {
                     if ("OPENING BALANCE".equals(transtype.getTransactionTypeName())) {
                         new AccJournalBean().postJournalOpenBalance(trans, aActiveTransItems, new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getAccPeriodId());
                     }
+                    //Save STOCK CONSUMPTION Journal Entry
+                    if ("STOCK CONSUMPTION".equals(transtype.getTransactionTypeName())) {
+                        new AccJournalBean().postJournalStockConsumption(trans, new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getAccPeriodId());
+                    }
                     //delete if any draft trans was used
                     if (trans.getTransactionHistId() > 0) {
                         this.deleteTransFromHist(trans.getTransactionHistId());
@@ -3852,6 +3856,22 @@ public class TransBean implements Serializable {
                 if (hasReversed == 1) {
                     savedtrans.setTransactionDate(new CompanySetting().getCURRENT_SERVER_DATE());
                     new AccJournalBean().postJournalDisposeStock(savedtrans, new AccPeriodBean().getAccPeriod(savedtrans.getTransactionDate()).getAccPeriodId());
+                }
+            }
+            if ("STOCK CONSUMPTION".equals(transtype.getTransactionTypeName())) {
+                savedpay = null;
+                savedtrans = null;
+                hasReversed = 0;
+                List<TransItem> transitems = null;
+                if (newPayId > 0) {
+                    savedpay = new PayBean().getPay(newPayId);
+                }
+                savedtrans = new TransBean().getTrans(aNewTrans.getTransactionId());
+                transitems = new TransItemBean().getTransItemsByTransactionId(aNewTrans.getTransactionId());
+                hasReversed = new AccJournalBean().postJournalReverse(OldTrans, oldPay);
+                if (hasReversed == 1) {
+                    savedtrans.setTransactionDate(new CompanySetting().getCURRENT_SERVER_DATE());
+                    new AccJournalBean().postJournalStockConsumption(savedtrans, new AccPeriodBean().getAccPeriod(savedtrans.getTransactionDate()).getAccPeriodId());
                 }
             }
             if ("EXPENSE ENTRY".equals(transtype.getTransactionTypeName())) {
@@ -10347,7 +10367,7 @@ public class TransBean implements Serializable {
                 ListItemIndex = ListItemIndex + 1;
             }
             GTotal = GTotal - aTrans.getCashDiscount();
-        } else if ("DISPOSE STOCK".equals(transtype.getTransactionTypeName())) {
+        } else if ("DISPOSE STOCK".equals(transtype.getTransactionTypeName()) || "STOCK CONSUMPTION".equals(transtype.getTransactionTypeName())) {
             List<TransItem> ati = aActiveTransItems;
 
             int ListItemIndex = 0;

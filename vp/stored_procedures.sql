@@ -1928,6 +1928,20 @@ BEGIN
 END//
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS sp_search_inventory_item_type_cost_by_trans_consume;
+DELIMITER //
+CREATE PROCEDURE sp_search_inventory_item_type_cost_by_trans_consume
+(
+	IN in_transaction_id bigint 
+) 
+BEGIN 
+		SELECT i.item_type,sum(ti.amount_exc_vat) as amount_exc_vat FROM transaction_item ti 
+		INNER JOIN item i ON ti.item_id=i.item_id 
+		WHERE ti.transaction_id=in_transaction_id AND IFNULL(ti.account_code,'')<>'' AND IFNULL(ti.account_code,'') NOT LIKE '5%'  
+		GROUP BY i.item_type;
+END//
+DELIMITER ;
+
 DROP PROCEDURE IF EXISTS sp_search_inventory_cost_by_trans_dispose;
 DELIMITER //
 CREATE PROCEDURE sp_search_inventory_cost_by_trans_dispose
@@ -1936,7 +1950,20 @@ CREATE PROCEDURE sp_search_inventory_cost_by_trans_dispose
 ) 
 BEGIN 
 		SELECT IFNULL(ti.account_code,'') as account_code,sum(ti.amount_exc_vat) as amount_exc_vat FROM transaction_item ti 
-		WHERE ti.transaction_id=in_transaction_id AND IFNULL(ti.account_code,'')<>'' 
+		WHERE ti.transaction_id=in_transaction_id AND IFNULL(ti.account_code,'')<>'' AND IFNULL(ti.account_code,'') NOT LIKE '5%' 
+		GROUP BY IFNULL(ti.account_code,'');
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_inventory_cost_by_trans_consume;
+DELIMITER //
+CREATE PROCEDURE sp_search_inventory_cost_by_trans_consume
+(
+	IN in_transaction_id bigint 
+) 
+BEGIN 
+		SELECT IFNULL(ti.account_code,'') as account_code,sum(ti.amount_exc_vat) as amount_exc_vat FROM transaction_item ti 
+		WHERE ti.transaction_id=in_transaction_id AND IFNULL(ti.account_code,'')<>'' AND IFNULL(ti.account_code,'') NOT LIKE '5%' 
 		GROUP BY IFNULL(ti.account_code,'');
 END//
 DELIMITER ;

@@ -2917,7 +2917,7 @@ public class TransItemBean implements Serializable {
 
             }
 
-            if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "DISPOSE STOCK".equals(transtype.getTransactionTypeName()) || "GOODS DELIVERY".equals(transtype.getTransactionTypeName())) {
+            if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "DISPOSE STOCK".equals(transtype.getTransactionTypeName()) || "GOODS DELIVERY".equals(transtype.getTransactionTypeName()) || "STOCK CONSUMPTION".equals(transtype.getTransactionTypeName())) {
                 if (aDiffHistNewQty > 0) {
                     //add stock
                     if (Stk != null) {
@@ -4468,7 +4468,7 @@ public class TransItemBean implements Serializable {
         }
         return transitems;
     }
-    
+
     public List<TransItem> getInventoryCostByTransDispose(long aTransactionId) {
         String sql;
         sql = "{call sp_search_inventory_cost_by_trans_dispose(?)}";
@@ -4492,6 +4492,29 @@ public class TransItemBean implements Serializable {
         return transitems;
     }
 
+    public List<TransItem> getInventoryCostByTransConsume(long aTransactionId) {
+        String sql;
+        sql = "{call sp_search_inventory_cost_by_trans_consume(?)}";
+        ResultSet rs = null;
+        List<TransItem> transitems = new ArrayList<>();
+        TransItem transitem = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aTransactionId);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                transitem = new TransItem();
+                transitem.setAccountCode(rs.getString("account_code"));
+                transitem.setAmountExcVat(rs.getDouble("amount_exc_vat"));
+                transitems.add(transitem);
+            }
+        } catch (Exception e) {
+            System.err.println("getInventoryCostByTransConsume:" + e.getMessage());
+        }
+        return transitems;
+    }
+
     public List<TransItem> getInventoryItemTypeCostByTrans(long aTransactionId) {
         String sql;
         sql = "{call sp_search_inventory_item_type_cost_by_trans(?)}";
@@ -4511,6 +4534,29 @@ public class TransItemBean implements Serializable {
             }
         } catch (Exception e) {
             System.err.println("getInventoryItemTypeCostByTrans:" + e.getMessage());
+        }
+        return transitems;
+    }
+
+    public List<TransItem> getInventoryItemTypeCostByTransConsume(long aTransactionId) {
+        String sql;
+        sql = "{call sp_search_inventory_item_type_cost_by_trans_consume(?)}";
+        ResultSet rs = null;
+        List<TransItem> transitems = new ArrayList<>();
+        TransItem transitem = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aTransactionId);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                transitem = new TransItem();
+                transitem.setItem_type(rs.getString("item_type"));
+                transitem.setAmountExcVat(rs.getDouble("amount_exc_vat"));
+                transitems.add(transitem);
+            }
+        } catch (Exception e) {
+            System.err.println("getInventoryItemTypeCostByTransConsume:" + e.getMessage());
         }
         return transitems;
     }
@@ -5219,8 +5265,8 @@ public class TransItemBean implements Serializable {
                 }
             }
 
-            //for dispose; apply unit cost price of the stock/batch
-            if (aSelectedItem.getIsTrack() == 1 && null != st && "DISPOSE STOCK".equals(transtype.getTransactionTypeName())) {
+            //for dispose,consume; apply unit cost price of the stock/batch
+            if (aSelectedItem.getIsTrack() == 1 && null != st && ("DISPOSE STOCK".equals(transtype.getTransactionTypeName()) || "STOCK CONSUMPTION".equals(transtype.getTransactionTypeName()))) {
                 NewTransItem.setUnitCostPrice(xrate * st.getUnitCost());
                 NewTransItem.setUnitPrice(NewTransItem.getUnitCostPrice());
                 NewTransItem.setUnitPriceExcVat(NewTransItem.getUnitCostPrice());
@@ -6230,7 +6276,7 @@ public class TransItemBean implements Serializable {
             ti.setAmountIncVat(0);
             ti.setAmountExcVat(0);
         }
-        if (aTransTypeId == 3) {//DISPOSE STOCK
+        if (aTransTypeId == 3 || aTransTypeId == 72) {//DISPOSE STOCK or STOCK CONSUMPTION
             aTrans.setCashDiscount(0);
             ti.setAmount(ti.getUnitPrice() * ti.getItemQty());
             ti.setAmountIncVat((ti.getUnitPriceIncVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
@@ -9792,7 +9838,7 @@ public class TransItemBean implements Serializable {
                 }
             } else if (aTransType.getTransactionTypeName().equals("HIRE INVOICE") || aTransType.getTransactionTypeName().equals("HIRE RETURN INVOICE") || aTransType.getTransactionTypeName().equals("HIRE QUOTATION")) {
                 AccountCode = "4-10-000-050";
-            } else if (aTransType.getTransactionTypeName().equals("DISPOSE STOCK")) {
+            } else if (aTransType.getTransactionTypeName().equals("DISPOSE STOCK") || aTransType.getTransactionTypeName().equals("STOCK CONSUMPTION")) {
                 if (aItem.getExpenseAccountCode() != null && aItem.getExpenseAccountCode().length() > 0) {
                     AccountCode = aItem.getExpenseAccountCode();
                 } else {

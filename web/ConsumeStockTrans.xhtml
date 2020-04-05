@@ -39,7 +39,7 @@
             <h:panelGrid styleClass="clsGridMainHeader" columns="3">
                 <h:outputLabel styleClass="clsLabelTop" id="olblTransactionHeader" value="STOCK CONSUMPTION"/>
                 <h:outputLabel style="background-color:#00B461;color: white;" value="Stock:↓"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:NONE"/>
+                <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:INV-ACC↓ COS-ACC↑"/>
             </h:panelGrid>
 
             <h:panelGrid id="pnlgHeader" styleClass="clsGridMainInput" columns="6">
@@ -158,7 +158,13 @@
                     <!-- row record -->
                     #{ati.unitSymbol}
                 </p:column>
-
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Inventory/Cost Acc</f:facet>
+                    <!-- row record -->
+                    <p:outputLabel id="lblAccountCodeInner" value="#{ati.accountCode}"/>
+                    <p:tooltip id="toolTipTrackAccCode" for="lblAccountCodeInner" value="#{ati.accountName}" trackMouse="true" />    
+                </p:column>
                 <p:column>
                     <!-- column header -->
                     <f:facet name="header">Batch No</f:facet>
@@ -178,6 +184,22 @@
                     <f:facet name="header">Qty</f:facet>
                     <!-- row record -->
                     <h:outputLabel value="#{ati.itemQty}">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputLabel>
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Unit Cost</f:facet>
+                    <!-- row record -->
+                    <h:outputLabel value="#{ati.unitPriceExcVat}">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputLabel>
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Cost Amount</f:facet>
+                    <!-- row record -->
+                    <h:outputLabel value="#{ati.amountExcVat}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                 </p:column>
@@ -205,9 +227,13 @@
                 </p:column> 
             </p:dataTable>
 
-            <h:panelGrid id="pgrdTermsConditions" styleClass="clsGridMainInput" columns="2">
+            <h:panelGrid id="pgrdTermsConditions" styleClass="clsGridMainInput" columns="3">
+                <h:outputLabel styleClass="clsLabelTransItem" value="Total Cost"/>
                 <h:outputLabel value="Authorised.By"/>
                 <h:outputLabel value="Authorised.Date"/>
+                <h:inputText id="itxtGrandTotal" value="#{trans.grandTotal}" styleClass="clsInputTransItem" style="width: 150px" disabled="true">
+                    <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                </h:inputText>
                 <p:autoComplete id="autcTransactionUser" value="#{transBean.authorisedByUserDetail}" 
                                 completeMethod="#{userDetailBean.getUserDetailObjectListActive}" 
                                 var="ud" 

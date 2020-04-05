@@ -175,7 +175,7 @@
 
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Unit Cost Price</f:facet>
+                    <f:facet name="header">Unit Cost</f:facet>
                     <!-- row record -->
                     <h:outputLabel value="#{ati.unitPriceExcVat}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -220,7 +220,6 @@
                 <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="TOTAL VALUE DISPOSED"/>
                 <h:inputText id="itxtGrandTotal" value="#{trans.grandTotal}" styleClass="clsInputTransItem" style="width: 150px" disabled="true">
                     <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                    <f:ajax event="change" render="itxtChange"/>
                 </h:inputText>
                 <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value=""/>
             </h:panelGrid>

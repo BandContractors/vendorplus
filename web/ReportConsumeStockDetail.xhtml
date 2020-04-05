@@ -129,6 +129,11 @@
                 <p:column headerText="#{menuItemBean.menuItemObj.CUSTOMER_NAME}">
                     <h:outputText value="#{transactorBean.getTransactor(itm.transactorId).transactorNames}"/>
                 </p:column>
+                <p:column headerText="Cost Amount" style="text-align: right;">
+                    <h:outputText value="#{itm.grandTotal}">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputText>
+                </p:column>
                 <p:column headerText="Add Date" rendered="#{transBean.dateType.equals('Add Date')}">
                     <h:outputText value="#{utilityBean.formatDate(itm.addDate)}"/>
                 </p:column>

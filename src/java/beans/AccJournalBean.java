@@ -721,6 +721,110 @@ public class AccJournalBean implements Serializable {
         }
     }
 
+    public void postJournalStockConsumption(Trans aTrans, int aAccPeriodId) {
+        long JobId = 0;
+        try {
+            AccJournal accjournal = new AccJournal();
+            //get job Id
+            try {
+                JobId = new UtilityBean().getNewTableColumnSeqNumber("acc_journal", "job_id");
+            } catch (NullPointerException npe) {
+                JobId = 0;
+            }
+            accjournal.setJobId(JobId);
+            accjournal.setAccJournalId(0);
+            accjournal.setJournalDate(aTrans.getTransactionDate());
+            accjournal.setTransactionId(aTrans.getTransactionId());
+            accjournal.setTransactionTypeId(aTrans.getTransactionTypeId());
+            accjournal.setTransactionReasonId(aTrans.getTransactionReasonId());
+            accjournal.setPayId(0);
+            accjournal.setPayTypeId(0);
+            accjournal.setPayReasonId(0);
+            accjournal.setStoreId(aTrans.getStoreId());
+            accjournal.setLedgerFolio("");
+            accjournal.setAccPeriodId(aAccPeriodId);
+            accjournal.setCurrencyCode(aTrans.getCurrencyCode());
+            accjournal.setXrate(aTrans.getXrate());
+            accjournal.setAddBy(aTrans.getAddUserDetailId());
+            Transactor aBillTransactor = null;
+            try {
+                aBillTransactor = new TransactorBean().getTransactor(aTrans.getBillTransactorId());
+            } catch (NullPointerException npe) {
+                aBillTransactor = null;
+            }
+
+            //CREDIT COS - InventoryAcc
+            //1. Cost by InventoryAcc
+            List<TransItem> ati2 = new TransItemBean().getInventoryCostByTransConsume(aTrans.getTransactionId());
+            //2. Credit inventory account
+            int ListItemIndex2 = 0;
+            int ListItemNo2 = ati2.size();
+            String ItemInventoryAccountCode = "";
+            int ItemInventoryAccountId = 0;
+            double ItemInventoryCostAmount = 0;
+            while (ListItemIndex2 < ListItemNo2) {
+                accjournal.setAccChildAccountId(0);
+                if (aBillTransactor != null) {
+                    accjournal.setBillTransactorId(0);
+                }
+                ItemInventoryAccountCode = ati2.get(ListItemIndex2).getAccountCode();
+                ItemInventoryCostAmount = ati2.get(ListItemIndex2).getAmountExcVat();
+                try {
+                    ItemInventoryAccountId = new AccCoaBean().getAccCoaByCodeOrId(ItemInventoryAccountCode, 0).getAccCoaId();
+                } catch (NullPointerException npe) {
+                    ItemInventoryAccountId = 0;
+                }
+                if (ItemInventoryAccountId > 0 && ItemInventoryCostAmount > 0) {
+                    accjournal.setAccCoaId(ItemInventoryAccountId);
+                    accjournal.setAccountCode(ItemInventoryAccountCode);
+                    accjournal.setDebitAmount(0);
+                    accjournal.setCreditAmount(ItemInventoryCostAmount);
+                    accjournal.setNarration("CONSUMPTION INVENTORY COST");
+                    this.saveAccJournal(accjournal);
+                }
+                ListItemIndex2 = ListItemIndex2 + 1;
+            }
+
+            //DEBIT COS - COS ACC
+            //1. Cost by ItemType
+            List<TransItem> ati3 = new TransItemBean().getInventoryItemTypeCostByTransConsume(aTrans.getTransactionId());
+            //2. Debit COS
+            int ListItemIndex3 = 0;
+            int ListItemNo3 = ati3.size();
+            String ItemInventoryItemTypeAccountCode = "";
+            int ItemInventoryItemTypeAccountId = 0;
+            double ItemInventoryItemTypeCostAmount = 0;
+            while (ListItemIndex3 < ListItemNo3) {
+                accjournal.setAccChildAccountId(0);
+                if (aBillTransactor != null) {
+                    accjournal.setBillTransactorId(0);
+                }
+                if (ati3.get(ListItemIndex3).getItem_type().equals("PRODUCT")) {//Cost of Purchase - Products	5-10-000-010
+                    ItemInventoryItemTypeAccountCode = "5-10-000-010";
+                } else if (ati3.get(ListItemIndex3).getItem_type().equals("SERVICE")) {//Cost of Purchase - Services	5-10-000-020	
+                    ItemInventoryItemTypeAccountCode = "5-10-000-020";
+                }
+                ItemInventoryItemTypeCostAmount = ati3.get(ListItemIndex3).getAmountExcVat();
+                try {
+                    ItemInventoryItemTypeAccountId = new AccCoaBean().getAccCoaByCodeOrId(ItemInventoryItemTypeAccountCode, 0).getAccCoaId();
+                } catch (NullPointerException npe) {
+                    ItemInventoryItemTypeAccountId = 0;
+                }
+                if (ItemInventoryItemTypeAccountId > 0 && ItemInventoryItemTypeCostAmount > 0) {
+                    accjournal.setAccCoaId(ItemInventoryItemTypeAccountId);
+                    accjournal.setAccountCode(ItemInventoryItemTypeAccountCode);
+                    accjournal.setDebitAmount(ItemInventoryItemTypeCostAmount);
+                    accjournal.setCreditAmount(0);
+                    accjournal.setNarration("CONSUMPTION INVENTORY COST");
+                    this.saveAccJournal(accjournal);
+                }
+                ListItemIndex3 = ListItemIndex3 + 1;
+            }
+        } catch (Exception exc) {
+            System.err.println(exc.getMessage());
+        }
+    }
+
     public int postJournalReverse(Trans aTrans, Pay aPay) {
         int x = 0;
         int aTransTypeId = 0;
