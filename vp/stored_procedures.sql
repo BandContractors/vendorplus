@@ -3038,6 +3038,35 @@ BEGIN
 END//
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS sp_search_stock_bms_any_store;
+DELIMITER //
+CREATE PROCEDURE sp_search_stock_bms_any_store
+(
+		IN in_item_id bigint,
+		IN in_batchno varchar(100),
+		IN in_code_specific varchar(250),
+		IN in_desc_specific varchar(250)
+) 
+BEGIN 
+
+		SET @BatchNo='';
+		if (in_batchno is not null) then 
+			SET @BatchNo=in_batchno;
+		end if;
+		SET @in_code_specific='';
+		if (in_code_specific is not null) then 
+			SET @in_code_specific=in_code_specific;
+		end if;
+		SET @in_desc_specific='';
+		if (in_desc_specific is not null) then 
+			SET @in_desc_specific=in_desc_specific;
+		end if;
+		SELECT * FROM stock s 
+		WHERE s.item_id=in_item_id AND s.batchno=@BatchNo 
+		AND s.code_specific=@in_code_specific AND s.desc_specific=@in_desc_specific LIMIT 1;
+END//
+DELIMITER ;
+
 DROP PROCEDURE IF EXISTS sp_insert_stock;
 DELIMITER //
 CREATE PROCEDURE sp_insert_stock
@@ -9902,6 +9931,36 @@ BEGIN
 		SELECT max(transaction_item_id) AS transaction_item_id FROM transaction_item ti,transaction t WHERE ti.transaction_id=t.transaction_id 
 		AND t.transaction_type_id=in_transaction_type_id AND t.transaction_reason_id=in_transaction_reason_id 
 		AND ti.item_id=in_item_id AND ti.unit_cost_price>0 AND concat(' 1=1 ',@in_where);
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_get_item_received_latest_trans_item_id;
+DELIMITER //
+CREATE PROCEDURE sp_get_item_received_latest_trans_item_id
+(
+		IN in_item_id bigint,
+		IN in_batchno varchar(100),
+		IN in_code_specific varchar(250),
+		IN in_desc_specific varchar(250)
+) 
+BEGIN 
+		SET @in_batchno='';
+		if (in_batchno!='' and in_batchno is not null) then 
+			set @in_batchno=concat(" AND batchno='",in_batchno,"'");
+		end if;
+		SET @in_code_specific='';
+		if (in_code_specific!='' and in_code_specific is not null) then 
+			set @in_code_specific=concat(" AND code_specific='",in_code_specific,"'");
+		end if;
+		SET @in_desc_specific='';
+		if (in_desc_specific!='' and in_desc_specific is not null) then 
+			set @in_desc_specific=concat(" AND desc_specific='",in_desc_specific,"'");
+		end if;
+
+		SET @in_where=concat(@in_batchno,@in_code_specific,@in_desc_specific);
+
+		SELECT max(transaction_item_id) AS transaction_item_id FROM transaction_item ti,transaction t WHERE ti.transaction_id=t.transaction_id 
+		AND t.transaction_type_id=9 AND ti.item_id=in_item_id AND ti.unit_cost_price>0 AND concat(' 1=1 ',@in_where);
 END//
 DELIMITER ;
 

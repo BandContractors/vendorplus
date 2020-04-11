@@ -48,14 +48,11 @@
                 <h:outputLabel  value="#{transBean.transTypeObj.transactionDateLabel}:"/>
                 <p:calendar styleClass="clsInput" id="calTransactionDate"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.transactionDate}" size="8"/>
             </h:panelGrid>
-            <h:panelGrid id="gridTransItem" styleClass="clsGridMainInput" columns="6">
+            <h:panelGrid id="gridTransItem" styleClass="clsGridMainInput" columns="4">
                 <h:outputLabel value="Item Description"/>
                 <h:outputLabel value="Unit"/>
                 <h:outputLabel value="Adjustment Type"/>
-                <h:outputLabel value="Batch/Code/Name"/>
-                <h:outputLabel value="Current Qty"/>
-                <h:outputLabel id="lblQty2" value="#{transItem.narration} Qty"/>
-
+                <h:outputLabel value="Available Stock Detail (Batch/Code/Name)"/>
                 <p:autoComplete id="autcItem" widgetVar="WautcItem" value="#{itemBean.selectedItem}"  
                                 completeMethod="#{itemBean.getItemObjectListForStockDispose}" 
                                 var="itm" 
@@ -86,33 +83,56 @@
                     <p:column headerText="Category" style="text-align: left">  
                         #{categoryBean.getCategory(itm.categoryId).categoryName}
                     </p:column>
-                    <p:ajax event="itemSelect" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,transBean.transTypeObj.transactionTypeId,transBean.transReasonObj.transactionReasonId,'',trans,transItem,itemBean.selectedItem,1.0)}" process="@this" update="menuBatchSpecific itxtUnit"/>
-                    <p:ajax event="change" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,transBean.transTypeObj.transactionTypeId,transBean.transReasonObj.transactionReasonId,'',trans,transItem,itemBean.selectedItem,1.0)}" rendered="#{itemBean.selectedItem!=null}" process="@this" update="menuBatchSpecific itxtUnit"/>
+                    <p:ajax event="itemSelect" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,transBean.transTypeObj.transactionTypeId,transBean.transReasonObj.transactionReasonId,'',trans,transItem,itemBean.selectedItem,1.0)}" process="@this" update="menuBatchSpecific itxtUnit pgrdSpecific lblCur itxtUnitCost"/>
+                    <p:ajax event="change" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,transBean.transTypeObj.transactionTypeId,transBean.transReasonObj.transactionReasonId,'',trans,transItem,itemBean.selectedItem,1.0)}" rendered="#{itemBean.selectedItem!=null}" process="@this" update="menuBatchSpecific itxtUnit pgrdSpecific lblCur itxtUnitCost"/>
                     <p:ajax event="itemSelect" listener="#{stockBean.refreshSpecificList(generalUserSetting.currentStore.storeId,transItem.itemId)}" process="@this" update="menuBatchSpecific itxtUnit"/>
                     <p:ajax event="change" listener="#{stockBean.refreshSpecificList(generalUserSetting.currentStore.storeId,transItem.itemId)}" rendered="#{itemBean.selectedItem!=null}" process="@this" update="menuBatchSpecific itxtUnit"/>
-                    <p:ajax event="itemSelect" listener="#{stockBean.setStockCurrentQty(transItem,generalUserSetting.currentStore.storeId,transItem.itemId,transItem.stockId)}" process="@this" update="itxtQtyCurrent"/>
-                    <p:ajax event="change" listener="#{stockBean.setStockCurrentQty(transItem,generalUserSetting.currentStore.storeId,transItem.itemId,transItem.stockId)}" rendered="#{itemBean.selectedItem!=null}" process="@this" update="itxtQtyCurrent"/>
+                    <p:ajax event="itemSelect" listener="#{transItemBean.refreshAdjustUponItemChange(transItem)}" process="@this" update="itxtQtyCurrent itxtUnitCost itxtBatch pgrdSpecific menuBatchSpecific"/>
+                    <p:ajax event="change" listener="#{transItemBean.refreshAdjustUponItemChange(transItem)}" rendered="#{itemBean.selectedItem!=null}" process="@this" update="itxtQtyCurrent itxtUnitCost itxtBatch pgrdSpecific menuBatchSpecific"/>
                 </p:autoComplete>
-                <h:inputText id="itxtUnit" styleClass="clsInputTransItem" value="#{unitBean.getUnit(itemBean.getItem(transItem.itemId).getUnitId()).unitSymbol}" style="width: 50px" disabled="true"/>
+                <h:inputText id="itxtUnit" styleClass="clsInputTransItem" value="#{unitBean.getUnit(itemBean.getItem(transItem.itemId).getUnitId()).unitSymbol}" style="width: 120px" disabled="true"/>
                 <h:selectOneMenu id="menuReason" styleClass="clsMenu" value="#{transItem.narration}" style="width: 180px;">
                     <f:selectItem itemLabel="" itemValue=""/>
                     <f:selectItem itemLabel="Add(Positive)" itemValue="Add"/>
                     <f:selectItem itemLabel="Subtract(Negative)" itemValue="Subtract"/>
                     <f:ajax render="lblQty2"/>
                 </h:selectOneMenu>
-                <h:selectOneMenu id="menuBatchSpecific" styleClass="clsMenu" value="#{transItem.stockId}" style="width: 350px;">
-                    <c:if test="#{stockBean.specificList.size()>1}" >
-                        <f:selectItem itemLabel="Select..."/>
-                    </c:if>
+                <h:selectOneMenu id="menuBatchSpecific" styleClass="clsMenu" value="#{transItem.stockId}" style="width: 400px;">
+                    <f:selectItem itemLabel="Select..." itemValue="0"/>
                     <f:selectItems value="#{stockBean.specificList}" var="ic" itemLabel="#{ic.batchno} #{ic.codeSpecific} #{ic.descSpecific}" itemValue="#{ic.stockId}"/>
-                    <f:ajax event="change" listener="#{stockBean.setStockCurrentQty(transItem,generalUserSetting.currentStore.storeId,transItem.itemId,transItem.stockId)}" execute="gridTransItem" render="itxtQtyCurrent"/>
+                    <f:ajax event="change" listener="#{transItemBean.refreshAdjustUponStockChange(transItem)}" execute="gridTransItem" render="itxtQtyCurrent itxtUnitCost itxtBatch pgrdSpecific"/>
                 </h:selectOneMenu>
-                <h:inputText id="itxtQtyCurrent" styleClass="clsInputTransItem" style="width: 100px" value="#{transItem.qty_total}" disabled="true">
+
+                <h:outputLabel value="Current Qty"/>
+                <h:outputLabel id="lblQty2" value="#{transItem.narration} Qty"/>
+                <h:outputLabel id="lblCur" value="Unit Cost (#{itemBean.selectedItem.currencyCode})"/>
+                <h:outputLabel value="Batch No"/>
+                <h:inputText id="itxtQtyCurrent" styleClass="clsInputTransItem" style="width: 242px" value="#{transItem.qty_total}" disabled="true">
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
-                <h:inputText id="itxtQty" styleClass="clsInputTransItem" style="width: 100px" value="#{transItem.itemQty}" autocomplete="off">
+                <h:inputText id="itxtQty" styleClass="clsInputTransItem" style="width: 120px" value="#{transItem.itemQty}" autocomplete="off">
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
+                <h:inputText id="itxtUnitCost" styleClass="clsInputTransItem" style="width: 180px" value="#{transItem.unitCostPrice}">
+                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                </h:inputText>
+                <h:inputText id="itxtBatch" styleClass="clsInputTransItem" style="width: 400px" value="#{transItem.batchno}">
+                    <f:ajax event="blur" listener="#{transItemBean.refreshAdjustUponSpecificChange(transItem)}" execute="gridTransItem" render="itxtQtyCurrent"/>
+                </h:inputText>
+            </h:panelGrid>
+            <h:panelGrid id="pgrdSpecific">
+                <h:panelGrid id="pgrdSpecific2" columns="3" rendered="#{itemBean.selectedItem.isGeneral==1}">
+                    <h:outputLabel styleClass="clsLabelTransItem" value="Name"/>
+                    <h:outputLabel styleClass="clsLabelTransItem" value="Code"/>
+                    <h:outputLabel styleClass="clsLabelTransItem" value="More.Description"/>
+                    <h:inputTextarea id="itxtDescSppecific" styleClass="clsInput" rows="2" cols="36" value="#{transItem.descSpecific}">
+                        <f:ajax event="blur" listener="#{transItemBean.refreshAdjustUponSpecificChange(transItem)}" execute="gridTransItem" render="itxtQtyCurrent"/>
+                    </h:inputTextarea>
+                    <h:inputTextarea id="itxtCodeSpecific" styleClass="clsInput" rows="2" cols="36" value="#{transItem.codeSpecific}">
+                        <f:ajax event="blur" listener="#{transItemBean.refreshAdjustUponSpecificChange(transItem)}" execute="gridTransItem" render="itxtQtyCurrent"/>
+                    </h:inputTextarea>
+                    <h:inputTextarea styleClass="clsInput" id="itxaDescMore" rows="2" cols="36" value="#{transItem.descMore}"/>
+                </h:panelGrid>
             </h:panelGrid>
             <h:panelGrid id="gridTransItemButtons" styleClass="clsGridMainInput" columns="4">
                 <h:commandButton styleClass="clsButtonMedium" value="Add Item (ALT+A)" accesskey="a" >
@@ -161,6 +181,14 @@
                     <f:facet name="header">Current Qty</f:facet>
                     <!-- row record -->
                     <h:inputText value="#{ati.qty_total}" style="width: 50px;color:#{utilityBean.setColorByValueFromZero(ati.itemQty-ati.qty_total,ati.narration,'red','black')}" disabled="true">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:inputText>
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Unit Cost</f:facet>
+                    <!-- row record -->
+                    <h:inputText value="#{ati.unitCostPrice}" style="width: 50px;color:#{utilityBean.setColorByValueFromZero(ati.itemQty-ati.qty_total,ati.narration,'red','black')}" disabled="true">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
                 </p:column>
