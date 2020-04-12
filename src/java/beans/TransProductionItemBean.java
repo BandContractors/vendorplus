@@ -254,7 +254,7 @@ public class TransProductionItemBean implements Serializable {
                         cs.setDouble("in_input_qty", 0);
                     }
                     try {
-                        cs.setDouble("in_input_unit_cost", 0);
+                        cs.setDouble("in_input_unit_cost", new TransItemBean().getItemLatestUnitCostPrice(aItemProductionMap.getInputItemId(), aItemProductionMap.getBatchno(), aItemProductionMap.getCodeSpecific(), aItemProductionMap.getDescSpecific()));
                     } catch (NullPointerException npe) {
                         cs.setDouble("in_input_unit_cost", 0);
                     }

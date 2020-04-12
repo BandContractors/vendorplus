@@ -9,6 +9,7 @@ import entities.PayTrans;
 import entities.Stock;
 import entities.Trans;
 import entities.TransItem;
+import entities.TransProduction;
 import entities.Transactor;
 import java.io.Serializable;
 import java.sql.CallableStatement;
@@ -816,6 +817,104 @@ public class AccJournalBean implements Serializable {
                     accjournal.setDebitAmount(ItemInventoryItemTypeCostAmount);
                     accjournal.setCreditAmount(0);
                     accjournal.setNarration("CONSUMPTION INVENTORY COST");
+                    this.saveAccJournal(accjournal);
+                }
+                ListItemIndex3 = ListItemIndex3 + 1;
+            }
+        } catch (Exception exc) {
+            System.err.println(exc.getMessage());
+        }
+    }
+
+    public void postJournalProduction(long aTransId) {
+        long JobId = 0;
+        try {
+            TransProduction aTrans = new TransProductionBean().getTransProductionById(aTransId);
+            int aAccPeriodId = new AccPeriodBean().getAccPeriod(aTrans.getTransactionDate()).getAccPeriodId();
+            AccJournal accjournal = new AccJournal();
+            //get job Id
+            try {
+                JobId = new UtilityBean().getNewTableColumnSeqNumber("acc_journal", "job_id");
+            } catch (NullPointerException npe) {
+                JobId = 0;
+            }
+            accjournal.setJobId(JobId);
+            accjournal.setAccJournalId(0);
+            accjournal.setJournalDate(aTrans.getTransactionDate());
+            accjournal.setTransactionId(aTrans.getTransactionId());
+            accjournal.setTransactionTypeId(aTrans.getTransactionTypeId());
+            accjournal.setTransactionReasonId(aTrans.getTransactionReasonId());
+            accjournal.setPayId(0);
+            accjournal.setPayTypeId(0);
+            accjournal.setPayReasonId(0);
+            accjournal.setStoreId(aTrans.getStoreId());
+            accjournal.setLedgerFolio("");
+            accjournal.setAccPeriodId(aAccPeriodId);
+            accjournal.setCurrencyCode(new ItemBean().getItem(aTrans.getOutputItemId()).getCurrencyCode());
+            accjournal.setXrate(1);//aTrans.getXrate()
+            accjournal.setAddBy(aTrans.getAddUserDetailId());
+            Transactor aBillTransactor = null;
+            try {
+                aBillTransactor = new TransactorBean().getTransactor(aTrans.getTransactor_id());
+            } catch (NullPointerException npe) {
+                aBillTransactor = null;
+            }
+
+            //1. CREDIT Input->InventoryAcc
+            List<TransItem> ati2 = new TransItemBean().getInventoryCostByTransInput(aTrans.getTransactionId());
+            int ListItemIndex2 = 0;
+            int ListItemNo2 = ati2.size();
+            String ItemInventoryAccountCode = "";
+            int ItemInventoryAccountId = 0;
+            double ItemInventoryCostAmount = 0;
+            while (ListItemIndex2 < ListItemNo2) {
+                accjournal.setAccChildAccountId(0);
+                if (aBillTransactor != null) {
+                    accjournal.setBillTransactorId(0);
+                }
+                ItemInventoryAccountCode = ati2.get(ListItemIndex2).getAccountCode();
+                ItemInventoryCostAmount = ati2.get(ListItemIndex2).getAmount();
+                try {
+                    ItemInventoryAccountId = new AccCoaBean().getAccCoaByCodeOrId(ItemInventoryAccountCode, 0).getAccCoaId();
+                } catch (NullPointerException npe) {
+                    ItemInventoryAccountId = 0;
+                }
+                if (ItemInventoryAccountId > 0 && ItemInventoryCostAmount > 0) {
+                    accjournal.setAccCoaId(ItemInventoryAccountId);
+                    accjournal.setAccountCode(ItemInventoryAccountCode);
+                    accjournal.setDebitAmount(0);
+                    accjournal.setCreditAmount(ItemInventoryCostAmount);
+                    accjournal.setNarration("PRODUCTION INPUT INVENTORY COST");
+                    this.saveAccJournal(accjournal);
+                }
+                ListItemIndex2 = ListItemIndex2 + 1;
+            }
+
+            //1. DEBIT Output->InventoryAcc
+            List<TransItem> ati3 = new TransItemBean().getInventoryCostByTransOutput(aTrans.getTransactionId());
+            int ListItemIndex3 = 0;
+            int ListItemNo3 = ati3.size();
+            String ItemInventoryItemTypeAccountCode = "";
+            int ItemInventoryItemTypeAccountId = 0;
+            double ItemInventoryItemTypeCostAmount = 0;
+            while (ListItemIndex3 < ListItemNo3) {
+                accjournal.setAccChildAccountId(0);
+                if (aBillTransactor != null) {
+                    accjournal.setBillTransactorId(0);
+                }
+                ItemInventoryItemTypeAccountCode = ati3.get(ListItemIndex3).getAccountCode();
+                ItemInventoryItemTypeCostAmount = ati3.get(ListItemIndex3).getAmount();
+                try {
+                    ItemInventoryItemTypeAccountId = new AccCoaBean().getAccCoaByCodeOrId(ItemInventoryItemTypeAccountCode, 0).getAccCoaId();
+                } catch (NullPointerException npe) {
+                    ItemInventoryItemTypeAccountId = 0;
+                }
+                if (ItemInventoryItemTypeAccountId > 0 && ItemInventoryItemTypeCostAmount > 0) {
+                    accjournal.setAccCoaId(ItemInventoryItemTypeAccountId);
+                    accjournal.setAccountCode(ItemInventoryItemTypeAccountCode);
+                    accjournal.setDebitAmount(ItemInventoryItemTypeCostAmount);
+                    accjournal.setCreditAmount(0);
+                    accjournal.setNarration("PRODUCTION OUTPUT INVENTORY COST");
                     this.saveAccJournal(accjournal);
                 }
                 ListItemIndex3 = ListItemIndex3 + 1;

@@ -705,33 +705,37 @@ public class TransProductionBean implements Serializable {
                 //do nothing
             }
             if (null != itm) {
-                try {
-                    if (itm.getExpense_type().equals("Raw Material")) {
-                        LatestTransItemId = new TransItemBean().getItemUnitCostPriceLatestTransItemId(9, 32, aStoreId, this.getItmCombinationList().get(i).getInputItemId(), "", "", "");
-                    } else if (itm.getExpense_type().equals("Consumption")) {
-                        LatestTransItemId = new TransItemBean().getItemUnitCostPriceLatestTransItemId(9, 32, aStoreId, this.getItmCombinationList().get(i).getInputItemId(), "", "", "");
-                    } else {
-                        LatestTransItemId = new TransItemBean().getItemUnitCostPriceLatestTransItemId(9, 13, aStoreId, this.getItmCombinationList().get(i).getInputItemId(), "", "", "");
-                    }
-                } catch (NullPointerException npe) {
-                    LatestTransItemId = 0;
-                }
-                if (LatestTransItemId > 0) {
-                    try {
-                        ItemUnitCost = new TransItemBean().getTransItem(LatestTransItemId).getUnitCostPrice();
-                    } catch (NullPointerException npe) {
-                    }
-                }
-                if (ItemUnitCost > 0) {
-                    try {
-                        TotalUnitCost = TotalUnitCost + (ItemUnitCost * InputQty);
-                    } catch (NullPointerException npe) {
-                    }
-                } else {
-                    ItemUnitCost = itm.getUnitCostPrice();
-                    TotalUnitCost = TotalUnitCost + (ItemUnitCost * InputQty);
-                }
+                ItemUnitCost = new TransItemBean().getItemLatestUnitCostPrice(itm.getItemId(), this.getItmCombinationList().get(i).getBatchno(), this.getItmCombinationList().get(i).getCodeSpecific(), this.getItmCombinationList().get(i).getDescSpecific());
+                TotalUnitCost = TotalUnitCost + (ItemUnitCost * InputQty);
             }
+//            if (null != itm) {
+//                try {
+//                    if (itm.getExpense_type().equals("Raw Material")) {
+//                        LatestTransItemId = new TransItemBean().getItemUnitCostPriceLatestTransItemId(9, 32, aStoreId, this.getItmCombinationList().get(i).getInputItemId(), "", "", "");
+//                    } else if (itm.getExpense_type().equals("Consumption")) {
+//                        LatestTransItemId = new TransItemBean().getItemUnitCostPriceLatestTransItemId(9, 32, aStoreId, this.getItmCombinationList().get(i).getInputItemId(), "", "", "");
+//                    } else {
+//                        LatestTransItemId = new TransItemBean().getItemUnitCostPriceLatestTransItemId(9, 13, aStoreId, this.getItmCombinationList().get(i).getInputItemId(), "", "", "");
+//                    }
+//                } catch (NullPointerException npe) {
+//                    LatestTransItemId = 0;
+//                }
+//                if (LatestTransItemId > 0) {
+//                    try {
+//                        ItemUnitCost = new TransItemBean().getTransItem(LatestTransItemId).getUnitCostPrice();
+//                    } catch (NullPointerException npe) {
+//                    }
+//                }
+//                if (ItemUnitCost > 0) {
+//                    try {
+//                        TotalUnitCost = TotalUnitCost + (ItemUnitCost * InputQty);
+//                    } catch (NullPointerException npe) {
+//                    }
+//                } else {
+//                    ItemUnitCost = itm.getUnitCostPrice();
+//                    TotalUnitCost = TotalUnitCost + (ItemUnitCost * InputQty);
+//                }
+//            }
         }
         return TotalUnitCost;
     }
@@ -773,6 +777,8 @@ public class TransProductionBean implements Serializable {
             msg = "Check Raw Material Item Qty";
         } else if (this.itemExists(this.getItmCombinationList(), aItemProductionMap.getInputItemId(), aItemProductionMap.getBatchno(), aItemProductionMap.getCodeSpecific(), aItemProductionMap.getDescSpecific()) > -1) {
             msg = "Raw Material Item already exists";
+        } else if (new ItemProductionMapBean().differentCurrencyExists(aTransItem.getItemId(), aItem.getItemId())) {
+            msg = "Both Input and Output items MUST be of the same Currency...";
         } else {
             ItemProductionMap ipm = new ItemProductionMap();
             ipm.setOutputItemId(0);
@@ -1223,7 +1229,10 @@ public class TransProductionBean implements Serializable {
                         new Stock_ledgerBean().callInsertStock_ledger("Add", stock, transItem.getItemQty(), "Add", aTransTypeId, InsertedTransId, new GeneralUserSetting().getCurrentUser().getUserDetailId());
                     }
                     new TransProductionItemBean().saveTransProductionItemsCEC(InsertedTransId, InsertedOutputQty, InsertedStoreId, aTransProducts);
-                    //update stock
+                    //Save PRODUCTION Journal Entry
+
+                    new AccJournalBean().postJournalProduction(InsertedTransId);
+                    //after
                     TransTypeBean = null;
                     StkBean = null;
 

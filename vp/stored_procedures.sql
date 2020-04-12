@@ -1968,6 +1968,34 @@ BEGIN
 END//
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS sp_search_inventory_cost_by_trans_input;
+DELIMITER //
+CREATE PROCEDURE sp_search_inventory_cost_by_trans_input
+(
+	IN in_transaction_id bigint 
+) 
+BEGIN 
+	SELECT IFNULL(i.expense_account_code,'') as account_code,sum(ti.input_qty*ti.input_unit_cost) as input_total_cost FROM trans_production_item ti 
+	INNER JOIN item i ON ti.input_item_id=i.item_id 
+	WHERE ti.transaction_id=in_transaction_id AND IFNULL(i.expense_account_code,'')<>'' 
+	GROUP BY IFNULL(i.expense_account_code,'');
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_inventory_cost_by_trans_output;
+DELIMITER //
+CREATE PROCEDURE sp_search_inventory_cost_by_trans_output
+(
+	IN in_transaction_id bigint 
+) 
+BEGIN 
+	SELECT IFNULL(i.expense_account_code,'') as account_code,sum(t.output_total_cost) as output_total_cost FROM trans_production t 
+	INNER JOIN item i ON t.output_item_id=i.item_id 
+	WHERE t.transaction_id=in_transaction_id AND IFNULL(i.expense_account_code,'')<>'' 
+	GROUP BY IFNULL(i.expense_account_code,'');
+END//
+DELIMITER ;
+
 
 DROP PROCEDURE IF EXISTS sp_search_transaction_item_by_transaction_number;
 DELIMITER //

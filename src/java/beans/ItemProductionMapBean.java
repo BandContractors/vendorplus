@@ -250,6 +250,8 @@ public class ItemProductionMapBean implements Serializable {
             msg = "Check Parent, Child Item and Qty";
         } else if (this.combinationExists(aItemProductionMap.getOutputItemId(), aItemProductionMap.getInputItemId())) {
             msg = "Input item already exists...";
+        } else if (this.differentCurrencyExists(aItemProductionMap.getOutputItemId(), aItemProductionMap.getInputItemId())) {
+            msg = "Both Input and Output items MUST be of the same Currency...";
         } else {
             ItemProductionMap ic = new ItemProductionMap();
             ic.setItemProductionMapId(aItemProductionMap.getItemProductionMapId());
@@ -276,6 +278,27 @@ public class ItemProductionMapBean implements Serializable {
             rs = ps.executeQuery();
             if (rs.next()) {
                 found = true;
+            }
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+        return found;
+    }
+
+    public boolean differentCurrencyExists(long aOutputItemId, long aInputItemId) {
+        boolean found = false;
+        String sql = "select count(distinct currency_code) as n from item where item_id in(" + aOutputItemId + "," + aInputItemId + ")";
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                if (rs.getInt("n") > 1) {
+                    found = true;
+                } else {
+                    found = false;
+                }
             }
         } catch (Exception e) {
             System.err.println(e.getMessage());
