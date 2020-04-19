@@ -38,9 +38,11 @@
 
                 <h:selectOneMenu id="menuStockType" value="#{stock.stock_type}" >
                     <f:selectItem itemLabel="" itemValue=""/>
-                    <f:selectItem itemLabel="Goods for Sale" itemValue="Goods for Sale"/>
+                    <f:selectItem itemLabel="Merchandise" itemValue="Merchandise"/>
+                    <f:selectItem itemLabel="Finished Goods" itemValue="Finished Goods"/>
                     <f:selectItem itemLabel="Raw Material" itemValue="Raw Material"/>
                     <f:selectItem itemLabel="Consumption" itemValue="Consumption"/>
+                    <f:selectItem itemLabel="Services" itemValue="Services"/>
                 </h:selectOneMenu>
                 <h:selectOneMenu id="menuFromStore" value="#{stock.storeId}" >
                     <f:selectItem itemLabel="" itemValue="0"/>

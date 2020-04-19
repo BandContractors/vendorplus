@@ -204,6 +204,10 @@ public class ItemBean implements Serializable {
             msg = "Item Code OR Description already exists!";
         } else if (aItem.getDisplay_alias_name() == 1 && aItem.getAlias_name().length() == 0) {
             msg = "Please specify the Item Alias Name...";
+        } else if (aItem.getIsAsset() == 1 && (aItem.getAssetType().length()==0 || aItem.getAssetAccountCode().length()==0)) {
+            msg = "Please specify the Asset Type and/or Account...";
+        } else if (aItem.getIsAsset() == 0 && (aItem.getExpense_type().length()==0 || aItem.getExpenseAccountCode().length()==0)) {
+            msg = "Please specify the Account Type and/or Name...";
         } else {
             msg = "";
         }

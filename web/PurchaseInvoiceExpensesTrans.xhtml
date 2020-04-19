@@ -42,9 +42,9 @@
                 <h:selectOneMenu styleClass="clsMenu" id="menuTransactionReason" value="#{trans.transactionReasonId}">
                     <f:selectItem itemValue="#{transBean.transReasonObj.transactionReasonId}" itemLabel="#{transBean.transReasonObj.transactionReasonName}"/>
                 </h:selectOneMenu>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="#{transBean.transTypeObj.transactionOutputLabel} - Raw Materials, Consumables and Services(Operational &amp; Non)"/>
+                <h:outputLabel style="background-color:#00B461;color: white;" value="#{transBean.transTypeObj.transactionOutputLabel} - Raw Materials, Consumables and Services(Operational,Non)"/>
                 <h:outputLabel style="background-color:#00B461;color: white;" value="Stock:No effect"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:Cash↓ AP↑"/>
+                <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:Cash↓ AP↑ INV↑"/>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainInput" columns="6" id="pnlHeader">

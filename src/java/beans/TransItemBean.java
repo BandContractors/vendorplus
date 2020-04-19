@@ -4537,7 +4537,7 @@ public class TransItemBean implements Serializable {
         }
         return transitems;
     }
-    
+
     public List<TransItem> getInventoryCostByTransOutput(long aTransactionId) {
         String sql;
         sql = "{call sp_search_inventory_cost_by_trans_output(?)}";
@@ -7323,7 +7323,7 @@ public class TransItemBean implements Serializable {
             aStatusBean.setItemNotAddedStatus("PLEASE ENTER VALID NAME(CUSTOMER/SUPPLIER/PROVIDER/EMPLOYEE)...!");
             aStatusBean.setShowItemAddedStatus(0);
             aStatusBean.setShowItemNotAddedStatus(1);
-        } else if (aSelectedAccCoa.getIsChild() == 1 && NewTransItem.getCodeSpecific().length() < 0) {
+        } else if (aSelectedAccCoa.getIsChild() == 0 && NewTransItem.getCodeSpecific().length() <= 0) {
             aStatusBean.setItemAddedStatus("");
             aStatusBean.setItemNotAddedStatus("PLEASE SPECIFY CHILD ACCOUNT...!");
             aStatusBean.setShowItemAddedStatus(0);
@@ -7539,7 +7539,7 @@ public class TransItemBean implements Serializable {
                     msg = "Select Opening Date";
                 } else if (null == aSelectedAccCoa || aTransItem.getAccountCode().length() <= 0) {
                     msg = "Specify Account";
-                } else if (aSelectedAccCoa.getIsChild() == 1 && aTransItem.getCodeSpecific().length() <= 0) {
+                } else if (aSelectedAccCoa.getIsChild() == 0 && aTransItem.getCodeSpecific().length() <= 0) {
                     msg = "Specify Child Account";
                 } else if (aTransItem.getAmountIncVat() <= 0 && aTransItem.getAmountExcVat() <= 0) {
                     msg = "Specify Account Opening Balance";
@@ -8700,6 +8700,22 @@ public class TransItemBean implements Serializable {
                 } catch (NullPointerException npe) {
                     ti.setSpecific_size(1);
                 }
+                //for profit margin
+                ti.setUnitCostPrice(NewTransItem.getUnitCostPrice());//this left for updating stock's unit cost
+                ti.setUnitProfitMargin(0);
+                //check for Auto Append Batch for new UnitCostPrice
+                if (aTransTypeId == 9 && (aTransReasonId == 13 || aTransReasonId == 32) && new Parameter_listBean().getParameter_listByContextNameMemory("ITEMS_RECEIVED", "AUTO_APPEND_NEW_COST_BATCH").getParameter_value().equals("1")) {
+                    Stock existstock = new StockBean().getStock(new GeneralUserSetting().getCurrentStore().getStoreId(), ti.getItemId(), ti.getBatchno(), ti.getCodeSpecific(), ti.getDescSpecific());
+                    if (null == existstock) {
+                        //do nothing
+                    } else {
+                        if (existstock.getUnitCost() - ti.getUnitCostPrice() == 0) {
+                            //do nothing
+                        } else {
+                            ti.setBatchno(ti.getBatchno() + "_" + new UtilityBean().formatNumber("###.###", ti.getUnitCostPrice()));
+                        }
+                    }
+                }
                 //check if itme+batchno already exists
                 int ItemFoundAtIndex = itemExists(aActiveTransItems, ti.getItemId(), ti.getBatchno(), ti.getCodeSpecific(), ti.getDescSpecific());
                 if (ItemFoundAtIndex == -1) {
@@ -8725,11 +8741,6 @@ public class TransItemBean implements Serializable {
                     aActiveTransItems.add(ItemFoundAtIndex, ti);
                     aActiveTransItems.remove(ItemFoundAtIndex + 1);
                 }
-
-                //for profit margin
-                //ti.setUnitCostPrice(0);
-                ti.setUnitCostPrice(NewTransItem.getUnitCostPrice());//this left for updating stock's unit cost
-                ti.setUnitProfitMargin(0);
 
                 TransBean transB = new TransBean();
                 transB.clearAll(null, aActiveTransItems, NewTransItem, aSelectedItem, null, 1, aSelectedAccCoa);

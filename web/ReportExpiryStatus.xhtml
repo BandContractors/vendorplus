@@ -36,9 +36,11 @@
                     <p:outputLabel value="Stock Type:"/>
                     <h:selectOneMenu id="menuStockType" value="#{item.stock_type}" style="width: 200px;" >
                         <f:selectItem itemLabel="" itemValue=""/>
-                        <f:selectItem itemLabel="Goods for Sale" itemValue="Goods for Sale"/>
+                        <f:selectItem itemLabel="Merchandise" itemValue="Merchandise"/>
+                        <f:selectItem itemLabel="Finished Goods" itemValue="Finished Goods"/>
                         <f:selectItem itemLabel="Raw Material" itemValue="Raw Material"/>
                         <f:selectItem itemLabel="Consumption" itemValue="Consumption"/>
+                        <f:selectItem itemLabel="Services" itemValue="Services"/>
                     </h:selectOneMenu>
                     <p:outputLabel value="Item Type:"/>
                     <h:selectOneMenu id="menuItemType" value="#{item.itemType}" style="width: 200px;">

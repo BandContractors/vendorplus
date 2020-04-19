@@ -2149,11 +2149,12 @@ public class AccLedgerBean implements Serializable {
         TempTotal = TempTotal + aAccBalanceSheet.getAssetCurCash();
         aAccBalanceSheet.setAssetCurRec(this.balanceAccountsStartWith(aAccBalanceSheet.getAccPeriodId(), "1-00-010", "Dr"));
         TempTotal = TempTotal + aAccBalanceSheet.getAssetCurRec();
-        if (accperiod.getIsClosed() == 1) {
-            aAccBalanceSheet.setAssetCurInv(new StockBean().getStockAtHandCostPriceValueSnapshot(aAccBalanceSheet.getAccPeriodId()));
-        } else {
-            aAccBalanceSheet.setAssetCurInv(new StockBean().getStockAtHandCostPriceValue());
-        }
+//        if (accperiod.getIsClosed() == 1) {
+//            aAccBalanceSheet.setAssetCurInv(new StockBean().getStockAtHandCostPriceValueSnapshot(aAccBalanceSheet.getAccPeriodId()));
+//        } else {
+//            aAccBalanceSheet.setAssetCurInv(new StockBean().getStockAtHandCostPriceValue());
+//        }
+        aAccBalanceSheet.setAssetCurInv(this.balanceAccountsStartWith(aAccBalanceSheet.getAccPeriodId(), "1-00-020", "Dr"));
         TempTotal = TempTotal + aAccBalanceSheet.getAssetCurInv();
         aAccBalanceSheet.setAssetCurPreExp(this.balanceAccountsStartWith(aAccBalanceSheet.getAccPeriodId(), "1-00-030", "Dr"));
         TempTotal = TempTotal + aAccBalanceSheet.getAssetCurPreExp();

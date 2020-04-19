@@ -283,48 +283,27 @@ CREATE OR REPLACE VIEW view_inventory_asset AS
 	LEFT JOIN sub_category sc ON i.sub_category_id=sc.sub_category_id;
 
 CREATE OR REPLACE VIEW view_inventory_in AS
-	SELECT 1 as stock_type_order,'Goods for Sale' as stock_type,
+	SELECT (CASE WHEN i.is_sale=1 THEN 1 ELSE 2 END) as stock_type_order,i.expense_type as stock_type,
 	s.*,i.item_code,i.description,i.currency_code,i.reorder_level,i.category_id,i.sub_category_id,
 	s.unit_cost as unit_cost_price,i.unit_retailsale_price,i.unit_wholesale_price,
 	t.store_name,c.category_name,u.unit_name,u.unit_symbol,sc.sub_category_name,
 	0 as cost_value,0 as retailsale_value,0 as wholesale_value 
 	FROM stock s 
-	INNER JOIN item i ON s.item_id=i.item_id AND i.is_sale=1 AND i.is_asset=0 AND i.is_track=1 
-	INNER JOIN store t ON s.store_id=t.store_id 
-	INNER JOIN category c ON i.category_id=c.category_id 
-	INNER JOIN unit u ON i.unit_id=u.unit_id 
-	LEFT JOIN sub_category sc ON i.sub_category_id=sc.sub_category_id 
-UNION ALL 
-	SELECT  2 as stock_type_order,i.expense_type as stock_type,
-	s.*,i.item_code,i.description,i.currency_code,i.reorder_level,i.category_id,i.sub_category_id,
-	s.unit_cost as unit_cost_price,i.unit_retailsale_price,i.unit_wholesale_price,
-	t.store_name,c.category_name,u.unit_name,u.unit_symbol,sc.sub_category_name,
-	0 as cost_value,0 as retailsale_value,0 as wholesale_value 
-	FROM stock s 
-	INNER JOIN item i ON s.item_id=i.item_id AND i.is_sale=0 AND i.is_asset=0 AND i.is_track=1 AND i.is_buy=1 
+	INNER JOIN item i ON s.item_id=i.item_id AND i.is_asset=0 AND i.is_track=1 
 	INNER JOIN store t ON s.store_id=t.store_id 
 	INNER JOIN category c ON i.category_id=c.category_id 
 	INNER JOIN unit u ON i.unit_id=u.unit_id 
 	LEFT JOIN sub_category sc ON i.sub_category_id=sc.sub_category_id;
 
 CREATE OR REPLACE VIEW view_inventory_low_out AS
-	SELECT 1 as stock_type_order,'Goods for Sale' as stock_type,i.*,
+	SELECT (CASE WHEN i.is_sale=1 THEN 1 ELSE 2 END) as stock_type_order,i.expense_type as stock_type,i.*,
 	(select ifnull(sum(s.currentqty),0) from stock s where s.item_id=i.item_id) as qty_total,
 	c.category_name,u.unit_symbol,sc.sub_category_name 
 	FROM item i  
 	INNER JOIN category c ON i.category_id=c.category_id 
 	INNER JOIN unit u ON i.unit_id=u.unit_id 
 	LEFT JOIN sub_category sc ON i.sub_category_id=sc.sub_category_id 
-	WHERE i.is_sale=1 AND i.is_asset=0 AND i.is_track=1
-UNION ALL 
-	SELECT  2 as stock_type_order,i.expense_type as stock_type,i.*,
-	(select ifnull(sum(s.currentqty),0) from stock s where s.item_id=i.item_id) as qty_total,
-	c.category_name,u.unit_symbol,sc.sub_category_name 
-	FROM item i  
-	INNER JOIN category c ON i.category_id=c.category_id 
-	INNER JOIN unit u ON i.unit_id=u.unit_id 
-	LEFT JOIN sub_category sc ON i.sub_category_id=sc.sub_category_id 
-	WHERE i.is_sale=0 AND i.is_asset=0 AND i.is_track=1 AND i.is_buy=1;
+	WHERE i.is_asset=0 AND i.is_track=1;
 
 CREATE OR REPLACE VIEW view_inventory_low_out_vw AS 
 	SELECT v.*,
@@ -459,14 +438,10 @@ CREATE OR REPLACE VIEW view_stock_expiry_status AS
 
 CREATE OR REPLACE VIEW view_stock_expiry_status_vw AS 
 SELECT sv.*,
-	CASE 
-	WHEN sv.is_sale=1 AND sv.is_asset=0 AND sv.is_track=1 THEN 'Goods for Sale' 
-	WHEN sv.is_sale=0 AND sv.is_asset=0 AND sv.is_track=1 AND sv.is_buy=1 THEN sv.expense_type 
-	ELSE '' 
-	END as stock_type,
+	IFNULL(sv.expense_type,'') as stock_type,
 	CASE 
 	WHEN sv.is_sale=1 AND sv.is_asset=0 AND sv.is_track=1 THEN 1 
-	WHEN sv.is_sale=0 AND sv.is_asset=0 AND sv.is_track=1 AND sv.is_buy=1 THEN 2 
+	WHEN sv.is_sale=0 AND sv.is_asset=0 AND sv.is_track=1 THEN 2 
 	ELSE 3 
 	END as stock_type_order,
 	c.category_name,u.unit_symbol,sc.sub_category_name 
@@ -478,12 +453,9 @@ SELECT sv.*,
 CREATE OR REPLACE VIEW view_snapshot_stock_value AS 
 SELECT 
 	s.*,
-	CASE 
-	WHEN i.is_sale=1 AND i.is_asset=0 AND i.is_track=1 THEN 'Goods for Sale' 
-	WHEN i.is_sale=0 AND i.is_asset=0 AND i.is_track=1 AND i.is_buy=1 THEN i.expense_type 
-	ELSE '' 
-	END as stock_type 
- FROM snapshot_stock_value s INNER JOIN item i ON s.item_id=i.item_id;
+	IFNULL(i.expense_type,'') as stock_type 
+	FROM snapshot_stock_value s INNER JOIN item i ON s.item_id=i.item_id 
+	WHERE i.is_asset=0 AND i.is_track=1;
 
 CREATE OR REPLACE VIEW view_opening_balance_manual AS 
 SELECT 

@@ -35,9 +35,9 @@
                     <h:panelGrid styleClass="clsGridMainHeader" columns="4" style="width: 100%">
                         <h:outputLabel style="background-color:#00B461;color: white;" value="VIEW" rendered="#{transBean.actionType.equals('View')}"/>
                         <h:outputLabel style="background-color:#00B461;color: white;" value="EDIT" rendered="#{transBean.actionType.equals('Edit')}"/>
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{transactionTypeBean.getTransactionType(1).transactionOutputLabel} - Raw Materials, Consumables and Services(Operational &amp; Non) : #{transBean.transObj.transactionNumber}"/>
+                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{transactionTypeBean.getTransactionType(1).transactionOutputLabel} - Raw Materials, Consumables and Services(Operational,Non) : #{transBean.transObj.transactionNumber}"/>
                         <h:outputLabel style="background-color:#00B461;color: white;" value="Stock:No effect"/>
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:Cash↓ AP↑"/>
+                        <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:Cash↓ AP↑ INV↑"/>
                     </h:panelGrid>
                     <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="6">
                         <h:outputLabel  value="From:"/>
