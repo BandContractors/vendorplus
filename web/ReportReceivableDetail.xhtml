@@ -34,17 +34,22 @@
                     <p:ajax listener="#{accJournalBean.setDateToYesturday()}" process="@this" update="@form"/>
                 </p:commandLink>
             </h:panelGrid>
-            <h:panelGrid id="pnlgFilter" columns="6" styleClass="clsPanelReportFilter">
-                <p:outputLabel value="Acc. Period"/>
+            <h:panelGrid id="pnlgFilter" columns="7" styleClass="clsPanelReportFilter">
+                <p:outputLabel value="Account Period"/>
+                <p:outputLabel value="#{companySetting.getStoreEquivName()}"/>
                 <p:outputLabel value="Date Type"/>
                 <p:outputLabel value="From #{accJournalBean.dateType}" id="lblDate1"/>
                 <p:outputLabel value="To #{accJournalBean.dateType}" id="lblDate2"/>
                 <h:outputLabel value="Receivable From"/>
                 <p:outputLabel value="Receivable Account"/>
 
-                <h:selectOneMenu id="menuAccPeriod" value="#{accJournal.accPeriodId}" >
+                <h:selectOneMenu id="menuAccPeriod" value="#{accJournal.accPeriodId}" style="width: 120px;" >
                     <f:selectItem itemLabel="All Periods" itemValue=""/>
                     <f:selectItems value="#{accPeriodBean.returnAccPeriodsCurrentFirst()}" var="ap" itemLabel="#{ap.accPeriodName}" itemValue="#{ap.accPeriodId}"/>
+                </h:selectOneMenu>
+                <h:selectOneMenu id="menuStore" value="#{accJournal.storeId}" style="width: 200px;">
+                    <f:selectItem itemLabel="Select" itemValue="0"/>
+                    <f:selectItems value="#{storeBean.stores}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
                 </h:selectOneMenu>
                 <h:selectOneMenu id="menuDateType" value="#{accJournalBean.dateType}" >
                     <f:selectItem itemLabel=""/>
@@ -52,8 +57,8 @@
                     <f:selectItem itemValue="Add Date" itemLabel="Add Date"/>
                     <f:ajax event="change" execute="@this" render="lblDate1 lblDate2"/>
                 </h:selectOneMenu>
-                <p:calendar id="calDate1"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{accJournalBean.date1}" size="12"/>
-                <p:calendar id="calDate2"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{accJournalBean.date2}" size="12"/>
+                <p:calendar id="calDate1"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{accJournalBean.date1}" size="10"/>
+                <p:calendar id="calDate2"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{accJournalBean.date2}" size="10"/>
                 <p:autoComplete id="autcTransactor" value="#{transactorBean.selectedTransactor}" 
                                 completeMethod="#{transactorBean.getTransactorObjectList}" 
                                 var="trct" 
@@ -77,11 +82,11 @@
                     <p:ajax event="itemSelect" listener="#{accJournal.setBillTransactorId(transactorBean.selectedTransactor.transactorId)}"/>
                     <p:ajax event="change" listener="#{accJournal.setBillTransactorId(transactorBean.selectedTransactor.transactorId)}" rendered="#{transactorBean.selectedTransactor!=null}"/>
                 </p:autoComplete>
-                <h:selectOneMenu id="menuAccount" value="#{accJournal.accountCode}">
+                <h:selectOneMenu id="menuAccount" value="#{accJournal.accountCode}" style="width: 200px;">
                     <f:selectItem itemLabel=""/>
                     <f:selectItems value="#{accCoaBean.getAccCoaObjectListBeginWith1('1-00-010')}" var="ac" itemLabel="#{ac.accountName}" itemValue="#{ac.accountCode}"/>
                 </h:selectOneMenu>
-                
+
                 <p:commandButton id="cmdbSearch" value="SEARCH" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                     <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                         <p:graphicImage name="/images/ajax-loader.gif"/>
@@ -140,6 +145,9 @@
                         <p:dataExporter type="xml" target="tblDetail" fileName="Receivable_Detail" />
                     </h:commandLink>
                 </f:facet>
+                <p:column headerText="#{companySetting.getStoreEquivName()}">
+                    <h:outputText value="#{storeBean.getStore(itm.storeId).storeName}"/>
+                </p:column>
                 <p:column headerText="Journal Date" rendered="#{accJournalBean.dateType.equals('Journal Date')}">
                     <h:outputText value="#{utilityBean.formatDate(itm.journalDate)}"/>
                 </p:column>

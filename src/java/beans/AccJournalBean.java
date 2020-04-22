@@ -4112,6 +4112,9 @@ public class AccJournalBean implements Serializable {
         if (aAccJournal.getBillTransactorId() > 0) {
             wheresql = wheresql + " AND bill_transactor_id=" + aAccJournal.getBillTransactorId();
         }
+        if (aAccJournal.getStoreId() > 0) {
+            wheresql = wheresql + " AND store_id=" + aAccJournal.getStoreId();
+        }
         if (aAccJournalBean.getDateType().length() > 0 && aAccJournalBean.getDate1() != null && aAccJournalBean.getDate2() != null) {
             switch (aAccJournalBean.getDateType()) {
                 case "Journal Date":
