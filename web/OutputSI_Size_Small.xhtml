@@ -29,19 +29,17 @@
                                 <h:outputLabel id="IolblSalesInvoiceStore" value="#{generalUserSetting.outputDetailParent.store.storeName}" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowStoreInvoice(),'Yes')}"/>
                             </p:panel>
                         </h:panelGrid>
-
-                        <h:panelGrid style="width: 290px; margin: 0px;" columns="2" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowLogoInvoice(),'Yes') and companySetting.getLogoUrl().length()>1}">
-                            <p:graphicImage value="#{companySetting.getLogoUrl()}" style="float: left;" width="45" height="65" />
+                        <h:panelGrid style="width: 290px;" columns="1" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowLogoInvoice(),'Yes') and companySetting.getLogoUrl().length()>1}">
+                            <p:graphicImage value="#{companySetting.getLogoUrl()}" style="display: block;margin-left: auto;margin-right: auto;"/>
+                        </h:panelGrid>
+                        <h:panelGrid style="width: 290px; margin: 0px;float:left;" columns="2">
                             <h:outputLabel value="#{companySetting.getPhysicalAddress()}"/>
+                            <h:panelGrid id="IpgrdSalesInvoiceHeader3" style="margin: 0px;float: right;" columns="1">
+                                <h:outputLabel id="IolblSalesInvoiceTel" value="Tel:#{companySetting.getPhone()}" rendered="#{companySetting.getPhone().length()>0}"/>
+                                <h:outputLabel id="IolblSalesInvoiceMob" value="Mob:#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','MOBILE_NUMBER').parameter_value}" rendered="#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','MOBILE_NUMBER').parameter_value.length()>0}"/>
+                                <h:outputLabel id="IolblSalesInvoiceTIN" value="TIN:#{companySetting.getTaxIdentity()}" rendered="#{companySetting.getTaxIdentity().length()>0}"/>
+                            </h:panelGrid>
                         </h:panelGrid>
-                        <h:panelGrid style="width: 290px; margin: 0px;" columns="1" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowLogoInvoice(),'No') or companySetting.getLogoUrl().length()==0}">
-                            <h:outputLabel value="#{companySetting.getPhysicalAddress()}"/>
-                        </h:panelGrid>
-                        <h:panelGrid id="IpgrdSalesInvoiceHeader3" style="width: 290px; margin: 0px;" columns="1">
-                            <h:outputLabel id="IolblSalesInvoiceTel" value="Tel:#{companySetting.getPhone()}" rendered="#{companySetting.getPhone().length()>0}"/>
-                            <h:outputLabel id="IolblSalesInvoiceTIN" value="TIN:#{companySetting.getTaxIdentity()}" rendered="#{companySetting.getTaxIdentity().length()>0}"/>
-                        </h:panelGrid>
-
                         <h:panelGrid id="IpgrdSalesInvoiceHeader34" style="width: 290px; margin: 0px;border-bottom-style: dotted;" columns="1">
                             <h:outputLabel id="IolblSalesInvoiceWebsite" value="Website: #{companySetting.getWebsite()}" rendered="#{companySetting.getWebsite().length()>0}"/>
                             <h:outputLabel id="IolblSalesInvoiceEmail" value="Email: #{companySetting.getEmail()}" rendered="#{companySetting.getEmail().length()>0}"/>
@@ -69,7 +67,7 @@
                             <h:outputLabel id="IolblSalesInvoiceCustomer" style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transactor.transactorNames}" rendered="#{generalUserSetting.outputDetailParent.transactor.transactorId>0}"/>
                             <h:outputLabel style="font-size: 12px;" value="Bill For:" rendered="#{generalUserSetting.outputDetailParent.bill_transactor.transactorId!=generalUserSetting.outputDetailParent.transactor.transactorId}"/>
                             <h:outputLabel id="IolblSalesInvoiceBillCustomer" style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.bill_transactor.transactorNames}" rendered="#{generalUserSetting.outputDetailParent.bill_transactor.transactorId!=generalUserSetting.outputDetailParent.transactor.transactorId}"/>
-                            
+
                             <h:outputLabel style="font-size: 12px;" value="Phone:" rendered="#{generalUserSetting.outputDetailParent.transactor.phone.length()>0}"/>
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transactor.phone}" rendered="#{generalUserSetting.outputDetailParent.transactor.phone.length()>0}"/>
                             <h:outputLabel style="font-size: 12px;" value="Address:" rendered="#{generalUserSetting.outputDetailParent.trans.deliveryAddress.length()>0}"/>
@@ -93,16 +91,18 @@
                                     <!-- column header -->
                                     <f:facet name="header">QTY</f:facet>
                                     <!-- row record -->
-                                    <h:outputLabel value="#{ti.itemQty}">
+                                    <h:outputLabel style="font-size: 10px;" value="#{ti.itemQty}">
                                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                                    </h:outputLabel>#{unitBean.getUnit(itemBean.getItem(ti.itemId).unitId).unitSymbol} @ 
-                                    <h:outputLabel style="font-size: 12px;" value="#{ti.unitPriceIncVat}">
+                                    </h:outputLabel> 
+                                    <h:outputLabel style="font-size: 10px;" value="#{unitBean.getUnit(itemBean.getItem(ti.itemId).unitId).unitSymbol}"/>
+                                    <h:outputLabel style="font-size: 10px;" value="@" rendered="#{itemBean.getItem(ti.itemId).hide_unit_price_invoice eq 0}"/>
+                                    <h:outputLabel style="font-size: 10px;" value="#{ti.unitPriceIncVat}" rendered="#{itemBean.getItem(ti.itemId).hide_unit_price_invoice eq 0}">
                                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                     </h:outputLabel>
                                 </h:column>
                                 <h:column>
                                     <!-- column header -->
-                                    <f:facet name="header">AMOUNT(#{generalUserSetting.outputDetailParent.trans.getCurrencyCode()})</f:facet>
+                                    <f:facet name="header">AMOUNT</f:facet>
                                     <!-- row record -->
                                     <h:outputLabel style="font-size: 12px;" value="#{ti.amountIncVat}">
                                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -128,7 +128,7 @@
                             <h:outputLabel style="font-size: 16px;" id="IolblSalesInvoiceCashDiscount" value="#{generalUserSetting.outputDetailParent.trans.cashDiscount}" rendered="#{generalUserSetting.outputDetailParent.trans.cashDiscount>0}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
-                            <h:outputLabel style="font-size: 16px; font-weight: bold;" value="TOTAL:"/>
+                            <h:outputLabel style="font-size: 16px; font-weight: bold;" value="TOTAL (#{generalUserSetting.outputDetailParent.trans.getCurrencyCode()}):"/>
                             <h:outputLabel style="font-size: 16px; font-weight: bold;" id="IolblSalesInvoiceGrandTotal" value="#{generalUserSetting.outputDetailParent.trans.grandTotal}">
                                 <f:convertNumber pattern="#{accCurrencyBean.getNumberFormatByCurrency(generalUserSetting.outputDetailParent.trans.currencyCode)}" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>

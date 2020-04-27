@@ -1150,7 +1150,7 @@ public class TransBean implements Serializable {
                 //save trans items
                 httpSession.setAttribute("CURRENT_TRANSACTION_ID", cs.getLong("out_transaction_id"));
                 trans.setTransactionId(new GeneralUserSetting().getCurrentTransactionId());
-                trans.setStoreId(VARCHAR);
+                //trans.setStoreId(VARCHAR);
                 //new GeneralUserSetting().getCurrentUser().getUserDetailId()
 
                 TransItemBean tib = new TransItemBean();
@@ -2260,7 +2260,7 @@ public class TransBean implements Serializable {
                             break;
                     }
                     //save trans items
-                    trans.setStoreId(VARCHAR);
+                    //trans.setStoreId(VARCHAR);
                     TransItemBean tib = new TransItemBean();
                     if (trans.getTransactionTypeId() == 16 || trans.getTransactionTypeId() == 76) {//Journal Entry, Opening Balance
                         tib.saveTransItemsJournalEntry(trans, aActiveTransItems, trans.getTransactionId());
@@ -2637,7 +2637,7 @@ public class TransBean implements Serializable {
                             break;
                     }
                     //save trans items
-                    trans.setStoreId(VARCHAR);
+                    //trans.setStoreId(VARCHAR);
                     TransItemBean tib = new TransItemBean();
                     if (trans.getTransactionTypeId() == 16 || trans.getTransactionTypeId() == 18) {//Journal Entry, Cash Transfer
                         tib.saveTransItemsJournalEntry(trans, aActiveTransItems, trans.getTransactionId());

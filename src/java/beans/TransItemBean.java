@@ -6626,10 +6626,15 @@ public class TransItemBean implements Serializable {
             ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
 
             //for profit margin
-            if ("SALE INVOICE".equals(new GeneralUserSetting().getCurrentTransactionTypeName()) || "SALE ORDER".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
-                ti.setUnitCostPrice(st.getUnitCost());
-                ti.setUnitProfitMargin((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) - st.getUnitCost());
-            } else {
+            try {
+                if ("SALE INVOICE".equals(new GeneralUserSetting().getCurrentTransactionTypeName()) || "SALE ORDER".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
+                    ti.setUnitCostPrice(st.getUnitCost());
+                    ti.setUnitProfitMargin((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) - st.getUnitCost());
+                } else {
+                    ti.setUnitCostPrice(0);
+                    ti.setUnitProfitMargin(0);
+                }
+            } catch (Exception e) {
                 ti.setUnitCostPrice(0);
                 ti.setUnitProfitMargin(0);
             }

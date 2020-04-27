@@ -17,7 +17,7 @@
             <h:panelGrid id="vTransactionGrid" style="border-style: solid;"> 
                 <h:panelGrid columns="3" style="width:100%;margin: 0px;">
                     <h:panelGrid style="width: 350px; margin: 0px;" columns="2">
-                        <p:graphicImage value="#{companySetting.getLogoUrl()}" style="float: left;" width="45" height="70" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowLogoInvoice(),'Yes')}" />
+                        <p:graphicImage value="#{companySetting.getLogoUrl()}" style="float: left;" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowLogoInvoice(),'Yes')}" />
                         <h:outputLabel value="#{companySetting.getPhysicalAddress()}"/>
                     </h:panelGrid>
                     <h:panelGrid style="width: 350px;text-align: center;" columns="1">

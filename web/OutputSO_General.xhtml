@@ -22,7 +22,7 @@
                 <h:panelGrid id="vTransactionGrid" style="border-style: solid;"> 
                     <h:panelGrid columns="3" style="width:100%;margin: 0px;">
                         <h:panelGrid style="width: 350px; margin: 0px;" columns="2">
-                            <p:graphicImage value="#{companySetting.getLogoUrl()}" style="float: left;" width="45" height="70" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowLogoInvoice(),'Yes')}" />
+                            <p:graphicImage value="#{companySetting.getLogoUrl()}" style="float: left;" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowLogoInvoice(),'Yes')}" />
                             <h:outputLabel value="#{companySetting.getPhysicalAddress()}"/>
                         </h:panelGrid>
                         <h:panelGrid style="width: 350px;text-align: center;" columns="1">
@@ -31,9 +31,9 @@
                             <h:outputLabel style="font-size: 16px;" value="#{generalUserSetting.outputDetailParent.store.storeName}" rendered="#{companySetting.getShowStoreInvoice().equals('Yes')}"/>
                         </h:panelGrid>
                         <h:panelGrid style="margin: 0px;" columns="1">
-                            <h:outputLabel value=" Tel:#{companySetting.getPhone()} "/>
-                            <h:outputLabel value=" TIN:#{companySetting.getTaxIdentity()} "/>
-                            <h:outputLabel value=" Email:#{companySetting.getEmail()} "/>
+                            <h:outputLabel value="Tel:#{companySetting.getPhone()}" rendered="#{companySetting.getPhone().length()>0}"/>
+                            <h:outputLabel value="Mob:#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','MOBILE_NUMBER').parameter_value}" rendered="#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','MOBILE_NUMBER').parameter_value.length()>0}"/>
+                            <h:outputLabel value="TIN:#{companySetting.getTaxIdentity()}" rendered="#{companySetting.getTaxIdentity().length()>0}"/>
                         </h:panelGrid>
                     </h:panelGrid>
 
@@ -107,7 +107,7 @@
                             <!-- column header -->
                             <f:facet name="header">Unit Price</f:facet>
                             <!-- row record -->
-                            <h:outputLabel value="#{ti2.unitPriceExcVat}">
+                            <h:outputLabel value="#{ti2.unitPriceExcVat}" rendered="#{itemBean.getItem(ti2.itemId).hide_unit_price_invoice eq 0}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
                         </p:column>
@@ -116,7 +116,7 @@
                             <!-- column header -->
                             <f:facet name="header">Unit VAT</f:facet>
                             <!-- row record -->
-                            <h:outputLabel value="#{ti2.unitVat}">
+                            <h:outputLabel value="#{ti2.unitVat}" rendered="#{itemBean.getItem(ti2.itemId).hide_unit_price_invoice eq 0}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
                         </p:column>
@@ -148,7 +148,7 @@
                             </div>
                         </h:panelGrid>
                         <h:panelGrid style="margin: 0px;" columns="1">
-                            
+
                         </h:panelGrid>
                         <h:panelGrid style="margin: 0px;text-align: right;float: right" columns="2">
                             <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="Sub.Total"/>

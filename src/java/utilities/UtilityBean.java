@@ -229,6 +229,22 @@ public class UtilityBean implements Serializable {
         }
         return aString;
     }
+    
+    public String formatDoubleToStringHide(double aAmount, int aHideResult) {
+        String aString = "";
+        //DecimalFormat myFormatter = new DecimalFormat("###,###.###;(###,###.###)");
+        //DecimalFormat myFormatter = new DecimalFormat("###,###.###");
+        if (aAmount >= 0) {
+            aString = this.formatNumber("###,###.###", aAmount) + "";
+        } else if (aAmount < 0) {
+            aString = this.formatNumber("###,###.###", aAmount) + "";
+        }
+        if (aHideResult == 0) {
+            return aString;
+        } else {
+            return "";
+        }
+    }
 
     public String formatDoubleToString(double aAmount, String aCurrencyCode) {
         String aString = "";

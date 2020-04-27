@@ -95,13 +95,13 @@
                                     #{transItemBean.getSpecificSizeQtyFromQtyAndSizeStr(ti)}
                                 </td>
                                 <td style="text-align: right;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                    #{utilityBean.formatDoubleToString(ti.unitPriceExcVat)}
+                                    #{utilityBean.formatDoubleToStringHide(ti.unitPriceExcVat,itemBean.getItem(ti.itemId).hide_unit_price_invoice)}
                                 </td>
                                 <td style="text-align: right;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                    #{utilityBean.formatDoubleToString(ti.unitVat)}
+                                    #{utilityBean.formatDoubleToStringHide(ti.unitVat,itemBean.getItem(ti.itemId).hide_unit_price_invoice)}
                                 </td>
                                 <td style="text-align: right;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                    #{utilityBean.formatDoubleToString(ti.unitPriceIncVat)}
+                                    #{utilityBean.formatDoubleToStringHide(ti.unitPriceIncVat,itemBean.getItem(ti.itemId).hide_unit_price_invoice)}
                                 </td>
                                 <td style="text-align: right;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
                                     #{utilityBean.formatDoubleToString(ti.amountIncVat)}

@@ -204,9 +204,9 @@ public class ItemBean implements Serializable {
             msg = "Item Code OR Description already exists!";
         } else if (aItem.getDisplay_alias_name() == 1 && aItem.getAlias_name().length() == 0) {
             msg = "Please specify the Item Alias Name...";
-        } else if (aItem.getIsAsset() == 1 && (aItem.getAssetType().length()==0 || aItem.getAssetAccountCode().length()==0)) {
+        } else if (aItem.getIsAsset() == 1 && (aItem.getAssetType().length() == 0 || aItem.getAssetAccountCode().length() == 0)) {
             msg = "Please specify the Asset Type and/or Account...";
-        } else if (aItem.getIsAsset() == 0 && (aItem.getExpense_type().length()==0 || aItem.getExpenseAccountCode().length()==0)) {
+        } else if (aItem.getIsAsset() == 0 && (aItem.getExpense_type().length() == 0 || aItem.getExpenseAccountCode().length() == 0)) {
             msg = "Please specify the Account Type and/or Name...";
         } else {
             msg = "";
@@ -218,9 +218,9 @@ public class ItemBean implements Serializable {
         int save_status = 0;
         String sql = null;
         if (aItem.getItemId() == 0) {
-            sql = "{call sp_insert_item(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_insert_item(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         } else if (aItem.getItemId() > 0) {
-            sql = "{call sp_update_item(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_update_item(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         }
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -350,6 +350,11 @@ public class ItemBean implements Serializable {
                 cs.setInt("in_override_gen_name", aItem.getOverride_gen_name());
             } catch (NullPointerException npe) {
                 cs.setInt("in_override_gen_name", 0);
+            }
+            try {
+                cs.setInt("in_hide_unit_price_invoice", aItem.getHide_unit_price_invoice());
+            } catch (NullPointerException npe) {
+                cs.setInt("in_display_alias_name", 0);
             }
             cs.executeUpdate();
             save_status = 1;
@@ -541,6 +546,11 @@ public class ItemBean implements Serializable {
                 aItem.setOverride_gen_name(aResultSet.getInt("override_gen_name"));
             } catch (NullPointerException npe) {
                 aItem.setOverride_gen_name(0);
+            }
+            try {
+                aItem.setHide_unit_price_invoice(aResultSet.getInt("hide_unit_price_invoice"));
+            } catch (NullPointerException npe) {
+                aItem.setHide_unit_price_invoice(0);
             }
         } catch (SQLException se) {
             System.err.println("setItemFromResultset:" + se.getMessage());
@@ -758,6 +768,11 @@ public class ItemBean implements Serializable {
                 aItem.setOverride_gen_name(aResultSet.getInt("override_gen_name"));
             } catch (NullPointerException npe) {
                 aItem.setOverride_gen_name(0);
+            }
+            try {
+                aItem.setHide_unit_price_invoice(aResultSet.getInt("hide_unit_price_invoice"));
+            } catch (NullPointerException npe) {
+                aItem.setHide_unit_price_invoice(0);
             }
         } catch (SQLException se) {
             System.err.println("setItemFromResultsetReport:" + se.getMessage());
@@ -979,6 +994,7 @@ public class ItemBean implements Serializable {
                 this.ItemObj.setUnitCostPrice(0);
                 this.ItemObj.setExpiry_band("");
                 this.ItemObj.setOverride_gen_name(0);
+                this.ItemObj.setHide_unit_price_invoice(0);
                 this.setSearchItemDesc("");
                 this.refreshStockLocation(0);
                 this.refreshItemsList(this.getSearchItemDesc());
@@ -1027,6 +1043,7 @@ public class ItemBean implements Serializable {
                 aItem.setSize_to_specific_name(0);
                 aItem.setExpiry_band("");
                 aItem.setOverride_gen_name(0);
+                aItem.setHide_unit_price_invoice(0);
                 this.setSearchItemDesc("");
                 this.refreshStockLocation(0);
             }

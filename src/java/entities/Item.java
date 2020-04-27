@@ -64,6 +64,7 @@ public class Item implements Serializable {
     private double stock_status_perc;
     private String expiry_band;
     private int override_gen_name;
+    private int hide_unit_price_invoice;
     
     /**
      * @return the ItemId
@@ -714,6 +715,20 @@ public class Item implements Serializable {
      */
     public void setOverride_gen_name(int override_gen_name) {
         this.override_gen_name = override_gen_name;
+    }
+
+    /**
+     * @return the hide_unit_price_invoice
+     */
+    public int getHide_unit_price_invoice() {
+        return hide_unit_price_invoice;
+    }
+
+    /**
+     * @param hide_unit_price_invoice the hide_unit_price_invoice to set
+     */
+    public void setHide_unit_price_invoice(int hide_unit_price_invoice) {
+        this.hide_unit_price_invoice = hide_unit_price_invoice;
     }
 
 }

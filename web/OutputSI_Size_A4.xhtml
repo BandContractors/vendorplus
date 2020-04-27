@@ -22,7 +22,7 @@
                 <h:panelGrid id="vTransactionGrid" style="border: solid black;"> 
                     <h:panelGrid columns="3" style="width:100%;margin: 0px;">
                         <h:panelGrid style="width: 350px; margin: 0px;" columns="2" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowLogoInvoice(),'Yes') and companySetting.getLogoUrl().length()>1}">
-                            <p:graphicImage value="#{companySetting.getLogoUrl()}" style="float: left;" width="45" height="65" />
+                            <p:graphicImage value="#{companySetting.getLogoUrl()}" style="float: left;"/>
                             <h:outputLabel value="#{companySetting.getPhysicalAddress()}"/>
                         </h:panelGrid>
                         <h:panelGrid style="width: 350px; margin: 0px;" columns="1" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowLogoInvoice(),'No') or companySetting.getLogoUrl().length()==0}">
@@ -105,7 +105,7 @@
                             <!-- column header -->
                             <f:facet name="header">Unit Price</f:facet>
                             <!-- row record -->
-                            <h:outputLabel value="#{ti2.unitPriceExcVat}">
+                            <h:outputLabel value="#{ti2.unitPriceExcVat}" rendered="#{itemBean.getItem(ti2.itemId).hide_unit_price_invoice eq 0}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
                         </p:column>
@@ -114,7 +114,7 @@
                             <!-- column header -->
                             <f:facet name="header">Unit VAT</f:facet>
                             <!-- row record -->
-                            <h:outputLabel value="#{ti2.unitVat}">
+                            <h:outputLabel value="#{ti2.unitVat}" rendered="#{itemBean.getItem(ti2.itemId).hide_unit_price_invoice eq 0}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
                         </p:column>

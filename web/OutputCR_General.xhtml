@@ -18,29 +18,26 @@
         </p:panel>
         <h:panelGrid id="vTransactionGrid">
             <h:panelGrid id="IpgrdSalesInvoice" columns="1">
-
-                <h:panelGrid id="IpgrdSalesInvoiceHeader1" style="width: 290px;text-align: center;background-color: black;color: white;-webkit-print-color-adjust: exact;" columns="1">
-                    <h:outputLabel id="IolblSalesInvoiceCompany" style="font-size: 20px;font-weight: bold;" value="#{companySetting.getLICENSE_CLIENT_NAME()}" rendered="#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','OUTPUT_SHOW_CO_NAME').parameter_value.equals('1')}"/>
-                    <p:panel style="width: 290px;text-align: center; border-style: none !important;">
-                        <h:outputLabel id="IolblSalesInvoiceBranch" value="#{companySetting.getBranchCode()} " rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowBranchInvoice(),'Yes')}"/>
-                        <h:outputLabel id="IolblSalesInvoiceStore" value="(#{generalUserSetting.outputDetailParent.store.storeName})" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowStoreInvoice(),'Yes')}"/>
-                    </p:panel>
+                <h:panelGrid style="width: 290px;text-align: center;background-color: black;color: white;-webkit-print-color-adjust: exact;" columns="1" rendered="#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','OUTPUT_SHOW_CO_NAME').parameter_value.equals('1')}">
+                    <h:outputLabel style="font-size: 20px;font-weight: bold;" value="#{companySetting.getLICENSE_CLIENT_NAME()}"/>
+                </h:panelGrid>
+                <h:panelGrid style="width: 290px;text-align: center;background-color: black;color: white;-webkit-print-color-adjust: exact;" columns="1" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowBranchInvoice(),'Yes')}">
+                    <h:outputLabel value="#{companySetting.getBranchCode()}"/>
+                </h:panelGrid>
+                <h:panelGrid style="width: 290px;text-align: center;background-color: black;color: white;-webkit-print-color-adjust: exact;" columns="1" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowStoreInvoice(),'Yes')}">
+                    <h:outputLabel value="(#{generalUserSetting.outputDetailParent.store.storeName})"/>
                 </h:panelGrid>
 
-                <h:panelGrid style="width: 290px; margin: 0px;" columns="2" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowLogoInvoice(),'Yes') and companySetting.getLogoUrl().length()>1}">
-                    <h:panelGrid>
-                        <p:graphicImage value="#{companySetting.getLogoUrl()}" width="45" height="65" style="float: left;" />
-                    </h:panelGrid>
-                    <h:panelGrid>
-                        <h:outputLabel style="font-size: 10px;" value="#{companySetting.getPhysicalAddress()}"/>
-                        <h:outputLabel style="font-size: 12px;" value="Tel:#{companySetting.getPhone()}" rendered="#{companySetting.getPhone().length()>0}"/>
-                        <h:outputLabel style="font-size: 12px;" value="TIN:#{companySetting.getTaxIdentity()}" rendered="#{companySetting.getTaxIdentity().length()>0}"/>
-                    </h:panelGrid>
+                <h:panelGrid style="width: 290px;" columns="1" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowLogoInvoice(),'Yes') and companySetting.getLogoUrl().length()>1}">
+                    <p:graphicImage value="#{companySetting.getLogoUrl()}" style="display: block;margin-left: auto;margin-right: auto;"/>
                 </h:panelGrid>
-                <h:panelGrid style="width: 290px; margin: 0px;text-align: center;" columns="1" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowLogoInvoice(),'No') or companySetting.getLogoUrl().length()==0}">
-                    <h:outputLabel style="font-size: 10px;" value="#{companySetting.getPhysicalAddress()}"/>
-                    <h:outputLabel style="font-size: 12px;" value="Tel:#{companySetting.getPhone()}" rendered="#{companySetting.getPhone().length()>0}"/>
-                    <h:outputLabel style="font-size: 12px;" value="TIN:#{companySetting.getTaxIdentity()}" rendered="#{companySetting.getTaxIdentity().length()>0}"/>
+                <h:panelGrid style="width: 290px; margin: 0px;float:left;" columns="2">
+                    <h:outputLabel value="#{companySetting.getPhysicalAddress()}"/>
+                    <h:panelGrid id="IpgrdSalesInvoiceHeader3" style="margin: 0px;float: right;" columns="1">
+                        <h:outputLabel id="IolblSalesInvoiceTel" value="Tel:#{companySetting.getPhone()}" rendered="#{companySetting.getPhone().length()>0}"/>
+                        <h:outputLabel id="IolblSalesInvoiceMob" value="Mob:#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','MOBILE_NUMBER').parameter_value}" rendered="#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','MOBILE_NUMBER').parameter_value.length()>0}"/>
+                        <h:outputLabel id="IolblSalesInvoiceTIN" value="TIN:#{companySetting.getTaxIdentity()}" rendered="#{companySetting.getTaxIdentity().length()>0}"/>
+                    </h:panelGrid>
                 </h:panelGrid>
 
                 <h:panelGrid style="width: 290px; margin: 0px;" columns="1">
