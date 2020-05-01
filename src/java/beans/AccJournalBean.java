@@ -589,15 +589,16 @@ public class AccJournalBean implements Serializable {
                 accjournal.setNarration("CREDIT RECEIVABLE FROM CLIENT");
                 this.saveAccJournal(accjournal);
             }
-            //Sales tax (VAT)
+            //VAT OUTPUT
             if (VatOutputTaxAmount > 0) {
-                accjournal.setAccChildAccountId(aTrans.getAccChildAccountId());
+                //accjournal.setAccChildAccountId(aTrans.getAccChildAccountId());
+                accjournal.setAccChildAccountId(0);
                 accjournal.setBillTransactorId(0);
                 accjournal.setAccCoaId(SalesVatOutputTaxAccountId);
                 accjournal.setAccountCode(SalesVatOutputTaxAccountCode);
                 accjournal.setDebitAmount(0);
                 accjournal.setCreditAmount(VatOutputTaxAmount);
-                accjournal.setNarration("VAT OUTPUT PAYABLE FROM CLIENT");
+                accjournal.setNarration("VAT OUTPUT PAYABLE");
                 this.saveAccJournal(accjournal);
             }
             //SALES DISCOUNT (DISCOUNT ALLOWED) - Cash Discount
@@ -1178,9 +1179,10 @@ public class AccJournalBean implements Serializable {
                 accjournal.setNarration("CREDIT RECEIVABLE FROM CLIENT");
                 this.saveAccJournal(accjournal);
             }
-            //Sales tax (VAT)
+            //VAT OUTPUT
             if (VatOutputTaxAmount > 0) {
-                accjournal.setAccChildAccountId(aTrans.getAccChildAccountId());
+                //accjournal.setAccChildAccountId(aTrans.getAccChildAccountId());
+                accjournal.setAccChildAccountId(0);
                 if (aBillTransactor != null) {
                     accjournal.setBillTransactorId(aBillTransactor.getTransactorId());
                 }
@@ -1188,7 +1190,7 @@ public class AccJournalBean implements Serializable {
                 accjournal.setAccountCode(SalesVatOutputTaxAccountCode);
                 accjournal.setDebitAmount(0);
                 accjournal.setCreditAmount(VatOutputTaxAmount);
-                accjournal.setNarration("VAT OUTPUT PAYABLE FROM CLIENT");
+                accjournal.setNarration("VAT OUTPUT PAYABLE");
                 this.saveAccJournal(accjournal);
             }
             //Sales Revenue
@@ -2020,7 +2022,7 @@ public class AccJournalBean implements Serializable {
                 accjournal.setNarration("CREDIT PAYABLE TO SUPPLIER");
                 this.saveAccJournal(accjournal);
             }
-            //Sales tax (VAT) Receivable
+            //VAT INPUT
             if (VatInputTaxAmount > 0) {
                 accjournal.setAccChildAccountId(0);
                 accjournal.setBillTransactorId(0);
@@ -2191,7 +2193,7 @@ public class AccJournalBean implements Serializable {
                 accjournal.setNarration("CREDIT PAYABLE TO SUPPLIER");
                 this.saveAccJournal(accjournal);
             }
-            //Sales tax (VAT) Receivable
+            //VAT INPUT
             if (VatInputTaxAmount > 0) {
                 accjournal.setAccChildAccountId(0);
                 if (aBillTransactor != null) {

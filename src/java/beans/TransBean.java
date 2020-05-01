@@ -10042,6 +10042,53 @@ public class TransBean implements Serializable {
         aTrans.setTotalProfitMargin(this.getTotalProfitMargin(aActiveTransItems));
     }
 
+    public void setPurchaseTransVatAndUpdate(int aTransTypeId, int aTransReasonId, Trans aTrans, List<TransItem> aActiveTransItems) {
+        //reset all item VATs to 0
+        this.resetPurchaseItemsUnitVAT(aActiveTransItems);
+        //re-calculate SubTotal and Trade Discount
+        aTrans.setSubTotal(this.getSubTotalCEC(aTrans, aActiveTransItems));
+        //set the manual VAT
+        //aTrans.setTotalVat() is already set from the interface
+        //re-calculate the others
+        aTrans.setTotalTradeDiscount(this.getTotalTradeDiscountCEC(aTrans, aActiveTransItems));
+        //Manually calculate Grand Total
+        double GTotal = 0;
+        GTotal = (aTrans.getSubTotal() + aTrans.getTotalVat()) - aTrans.getCashDiscount();
+        GTotal = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), GTotal);
+        aTrans.setGrandTotal(GTotal);
+        //other totals
+        aTrans.setTotalStdVatableAmount(aTrans.getTotalVat());
+        aTrans.setTotalZeroVatableAmount(0);
+        aTrans.setTotalExemptVatableAmount(0);
+        if (aTransTypeId == 19) {//EXPENSE ENTRY
+            aTrans.setAmountTendered(aTrans.getGrandTotal());
+        }
+        aTrans.setPointsAwarded(0);
+        aTrans.setSpendPoints(0);
+        aTrans.setTotalProfitMargin(0);
+        aTrans.setChangeAmount(this.getChangeAmount(aTrans));
+        this.setCashDiscountPerc(aTrans);
+    }
+    
+    public void setPurchaseTransDiscAndUpdate(int aTransTypeId, int aTransReasonId, Trans aTrans, List<TransItem> aActiveTransItems) {
+        double GTotal = 0;
+        GTotal = (aTrans.getSubTotal() + aTrans.getTotalVat()) - aTrans.getCashDiscount();
+        GTotal = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), GTotal);
+        aTrans.setGrandTotal(GTotal);
+        //other totals
+        aTrans.setTotalStdVatableAmount(aTrans.getTotalVat());
+        aTrans.setTotalZeroVatableAmount(0);
+        aTrans.setTotalExemptVatableAmount(0);
+        if (aTransTypeId == 19) {//EXPENSE ENTRY
+            aTrans.setAmountTendered(aTrans.getGrandTotal());
+        }
+        aTrans.setPointsAwarded(0);
+        aTrans.setSpendPoints(0);
+        aTrans.setTotalProfitMargin(0);
+        aTrans.setChangeAmount(this.getChangeAmount(aTrans));
+        this.setCashDiscountPerc(aTrans);
+    }
+
     public void setTransTotalsAndUpdateCEC(int aTransTypeId, int aTransReasonId, Trans aTrans, List<TransItem> aActiveTransItems) {
         aTrans.setSubTotal(this.getSubTotalCEC(aTrans, aActiveTransItems));
         aTrans.setTotalTradeDiscount(this.getTotalTradeDiscountCEC(aTrans, aActiveTransItems));
@@ -10260,6 +10307,21 @@ public class TransBean implements Serializable {
         }
         TVat = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), TVat);
         return TVat;
+    }
+
+    public void resetPurchaseItemsUnitVAT(List<TransItem> aActiveTransItems) {
+        List<TransItem> ati = aActiveTransItems;
+        int ListItemIndex = 0;
+        int ListItemNo = ati.size();
+        while (ListItemIndex < ListItemNo) {
+            ati.get(ListItemIndex).setUnitVat(0);
+            ati.get(ListItemIndex).setUnitPriceExcVat(ati.get(ListItemIndex).getUnitPrice());
+            ati.get(ListItemIndex).setUnitPriceIncVat(ati.get(ListItemIndex).getUnitPrice());
+            ati.get(ListItemIndex).setAmountExcVat(ati.get(ListItemIndex).getItemQty() * (ati.get(ListItemIndex).getUnitPrice() - ati.get(ListItemIndex).getUnitTradeDiscount()));
+            ati.get(ListItemIndex).setAmountIncVat(ati.get(ListItemIndex).getItemQty() * (ati.get(ListItemIndex).getUnitPrice() - ati.get(ListItemIndex).getUnitTradeDiscount()));
+            ati.get(ListItemIndex).setAmount(ati.get(ListItemIndex).getItemQty() * (ati.get(ListItemIndex).getUnitPrice() - ati.get(ListItemIndex).getUnitTradeDiscount()));
+            ListItemIndex = ListItemIndex + 1;
+        }
     }
 
     public double getSubTotal(List<TransItem> aActiveTransItems) {
