@@ -10048,12 +10048,12 @@ public class TransBean implements Serializable {
         //re-calculate SubTotal and Trade Discount
         aTrans.setSubTotal(this.getSubTotalCEC(aTrans, aActiveTransItems));
         //set the manual VAT
-        //aTrans.setTotalVat() is already set from the interface
+        //--aTrans.setTotalVat() is already set from the interface
         //re-calculate the others
         aTrans.setTotalTradeDiscount(this.getTotalTradeDiscountCEC(aTrans, aActiveTransItems));
         //Manually calculate Grand Total
         double GTotal = 0;
-        GTotal = (aTrans.getSubTotal() + aTrans.getTotalVat()) - aTrans.getCashDiscount();
+        GTotal = (aTrans.getSubTotal() + aTrans.getTotalVat()) - (aTrans.getTotalTradeDiscount() + aTrans.getCashDiscount());
         GTotal = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), GTotal);
         aTrans.setGrandTotal(GTotal);
         //other totals
@@ -10069,10 +10069,10 @@ public class TransBean implements Serializable {
         aTrans.setChangeAmount(this.getChangeAmount(aTrans));
         this.setCashDiscountPerc(aTrans);
     }
-    
+
     public void setPurchaseTransDiscAndUpdate(int aTransTypeId, int aTransReasonId, Trans aTrans, List<TransItem> aActiveTransItems) {
         double GTotal = 0;
-        GTotal = (aTrans.getSubTotal() + aTrans.getTotalVat()) - aTrans.getCashDiscount();
+        GTotal = (aTrans.getSubTotal() + aTrans.getTotalVat()) - (aTrans.getTotalTradeDiscount() + aTrans.getCashDiscount());
         GTotal = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), GTotal);
         aTrans.setGrandTotal(GTotal);
         //other totals
@@ -10317,9 +10317,9 @@ public class TransBean implements Serializable {
             ati.get(ListItemIndex).setUnitVat(0);
             ati.get(ListItemIndex).setUnitPriceExcVat(ati.get(ListItemIndex).getUnitPrice());
             ati.get(ListItemIndex).setUnitPriceIncVat(ati.get(ListItemIndex).getUnitPrice());
-            ati.get(ListItemIndex).setAmountExcVat(ati.get(ListItemIndex).getItemQty() * (ati.get(ListItemIndex).getUnitPrice() - ati.get(ListItemIndex).getUnitTradeDiscount()));
-            ati.get(ListItemIndex).setAmountIncVat(ati.get(ListItemIndex).getItemQty() * (ati.get(ListItemIndex).getUnitPrice() - ati.get(ListItemIndex).getUnitTradeDiscount()));
             ati.get(ListItemIndex).setAmount(ati.get(ListItemIndex).getItemQty() * (ati.get(ListItemIndex).getUnitPrice() - ati.get(ListItemIndex).getUnitTradeDiscount()));
+            ati.get(ListItemIndex).setAmountIncVat(ati.get(ListItemIndex).getAmount());
+            ati.get(ListItemIndex).setAmountExcVat(ati.get(ListItemIndex).getItemQty() * (ati.get(ListItemIndex).getUnitPriceExcVat() - ati.get(ListItemIndex).getUnitTradeDiscount()));
             ListItemIndex = ListItemIndex + 1;
         }
     }
@@ -10410,25 +10410,31 @@ public class TransBean implements Serializable {
         } else if ("SALE ORDER".equals(transtype.getTransactionTypeName())) {
             GTotal = (aTrans.getSubTotal() + aTrans.getTotalVat()) - (aTrans.getTotalTradeDiscount() + aTrans.getCashDiscount());
         } else if ("PURCHASE INVOICE".equals(transtype.getTransactionTypeName()) || "EXPENSE ENTRY".equals(transtype.getTransactionTypeName())) {
-            List<TransItem> ati = aActiveTransItems;
-            int ListItemIndex = 0;
-            int ListItemNo = ati.size();
             GTotal = 0;
-            while (ListItemIndex < ListItemNo) {
-                GTotal = GTotal + (ati.get(ListItemIndex).getAmount());
-                ListItemIndex = ListItemIndex + 1;
-            }
-            GTotal = GTotal - aTrans.getCashDiscount();
+            /*
+             List<TransItem> ati = aActiveTransItems;
+             int ListItemIndex = 0;
+             int ListItemNo = ati.size();
+             while (ListItemIndex < ListItemNo) {
+             GTotal = GTotal + (ati.get(ListItemIndex).getAmount());
+             ListItemIndex = ListItemIndex + 1;
+             }
+             GTotal = GTotal - aTrans.getCashDiscount();
+             */
+            GTotal = (aTrans.getSubTotal() + aTrans.getTotalVat()) - (aTrans.getTotalTradeDiscount() + aTrans.getCashDiscount());
         } else if ("PURCHASE ORDER".equals(transtype.getTransactionTypeName())) {
-            List<TransItem> ati = aActiveTransItems;
-            int ListItemIndex = 0;
-            int ListItemNo = ati.size();
             GTotal = 0;
-            while (ListItemIndex < ListItemNo) {
-                GTotal = GTotal + (ati.get(ListItemIndex).getAmount());
-                ListItemIndex = ListItemIndex + 1;
-            }
-            GTotal = GTotal - aTrans.getCashDiscount();
+            /*
+             List<TransItem> ati = aActiveTransItems;
+             int ListItemIndex = 0;
+             int ListItemNo = ati.size();
+             while (ListItemIndex < ListItemNo) {
+             GTotal = GTotal + (ati.get(ListItemIndex).getAmount());
+             ListItemIndex = ListItemIndex + 1;
+             }
+             GTotal = GTotal - aTrans.getCashDiscount();
+             */
+            GTotal = (aTrans.getSubTotal() + aTrans.getTotalVat()) - (aTrans.getTotalTradeDiscount() + aTrans.getCashDiscount());
         } else if ("DISPOSE STOCK".equals(transtype.getTransactionTypeName()) || "STOCK CONSUMPTION".equals(transtype.getTransactionTypeName())) {
             List<TransItem> ati = aActiveTransItems;
 
