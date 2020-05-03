@@ -135,13 +135,13 @@
                         <h:inputText id="itxtTotalTradeDiscount" value="#{transBean.transObj.totalTradeDiscount}" styleClass="clsInputTransItem" style="width: 150px" autocomplete="off" disabled="true"> 
                             <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
-                        <h:inputText id="itxtTotalVat" value="#{transBean.transObj.totalVat}" styleClass="clsInputTransItem" style="width: 150px" disabled="true">
+                        <h:inputText id="itxtTotalVat" value="#{transBean.transObj.totalVat}" styleClass="clsInputTransItem" style="width: 150px" disabled="#{transBean.actionType.equals('View') or generalUserSetting.currentStore.storeId!=transBean.transObj.storeId}">
                             <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:ajax event="blur" listener="#{transBean.setPurchaseTransVatAndUpdate(transBean.transObj.transactionTypeId,transBean.transObj.transactionReasonId,transBean.transObj, transBean.transItemList)}" render="dtblTransactionItem itxtGrandTotal itxtChange pgrdApprove"/>
                         </h:inputText>
                         <h:inputText id="itxtCashDiscount" value="#{transBean.transObj.cashDiscount}" styleClass="clsInputTransItem" style="width: 150px;" autocomplete="off" disabled="#{transBean.actionType.equals('View') or generalUserSetting.currentStore.storeId!=transBean.transObj.storeId}">
                             <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                            <f:ajax event="change" listener="#{transBean.setTransTotalsAndUpdateCEC(transBean.transObj.transactionTypeId,transBean.transObj.transactionReasonId,transBean.transObj, transBean.transItemList)}" render="itxtGrandTotal itxtChange pgrdApprove"/>
-                            <f:ajax event="keyup" listener="#{transBean.setTransTotalsAndUpdateCEC(transBean.transObj.transactionTypeId,transBean.transObj.transactionReasonId,transBean.transObj, transBean.transItemList)}" render="itxtGrandTotal itxtChange pgrdApprove"/>
+                            <f:ajax event="blur" listener="#{transBean.setPurchaseTransDiscAndUpdate(transBean.transObj.transactionTypeId,transBean.transObj.transactionReasonId,transBean.transObj, transBean.transItemList)}" render="itxtGrandTotal itxtChange pgrdApprove"/>
                         </h:inputText>
                         <h:inputText id="itxtGrandTotal" value="#{transBean.transObj.grandTotal}" styleClass="clsInputTransItem" style="width: 180px;background-color: yellow;font-weight: bold;font-size: 20px;" disabled="true">
                             <f:convertNumber pattern="#{accCurrencyBean.getNumberFormatByCurrency(transBean.transObj.currencyCode)}" locale="#{utilityBean.convertLocaleToString()}"/>

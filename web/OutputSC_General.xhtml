@@ -43,9 +43,11 @@
                     </h:panelGrid>
 
                     <h:panelGrid columns="3" style="width:100%;margin: 0px;">
-                        <h:panelGrid style="margin: 0px;text-align:left;width: 300px;" columns="1">
+                        <h:panelGrid style="margin: 0px;text-align:left;width: 300px;" columns="2">
                             <h:outputLabel value="From #{companySetting.getStoreEquivName()}" style="border-bottom-style: solid;"/>
+                            <h:outputLabel value="#{generalUserSetting.outputDetailParent.transaction_type.transactionRefLabel}" style="border-bottom-style: solid;"/>
                             <h:outputLabel value="#{generalUserSetting.outputDetailParent.store.storeName}"/>
+                            <h:outputLabel value="#{generalUserSetting.outputDetailParent.trans.transactionRef}"/>
                         </h:panelGrid>
                         <h:panelGrid columns="1">
                             <h:outputLabel value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}" style="border-bottom-style: solid;"/>
@@ -133,7 +135,7 @@
                         <h:outputLabel styleClass="clsInput" value="#{utilityBean.formatDoubleToString(generalUserSetting.outputDetailParent.trans.grandTotal)}"/>
                         <h:outputLabel styleClass="clsInput" value="#{generalUserSetting.outputDetailParent.authorised_by_user_detail.firstName} #{generalUserSetting.outputDetailParent.authorised_by_user_detail.secondName}"/>
                         <h:outputText styleClass="clsInput" value="#{utilityBean.formatDate(generalUserSetting.outputDetailParent.trans.authoriseDate)}"/>
-                        
+
                         <h:outputLabel styleClass="clsLabelTransItem" style="border-top-style: solid;" value="Total.Cost"/>
                         <h:outputLabel styleClass="clsLabelTransItem" style="border-top-style: solid;" value="Authorised.By"/>
                         <h:outputLabel styleClass="clsLabelTransItem" style="border-top-style: solid;" value="Authorised.Date"/>

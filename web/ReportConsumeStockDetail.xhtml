@@ -129,6 +129,9 @@
                 <p:column headerText="#{menuItemBean.menuItemObj.CUSTOMER_NAME}">
                     <h:outputText value="#{transactorBean.getTransactor(itm.transactorId).transactorNames}"/>
                 </p:column>
+                <p:column headerText="#{transactionTypeBean.getTransactionType(72).transactionRefLabel}">
+                    <h:outputText value="#{itm.transactionRef}"/>
+                </p:column>
                 <p:column headerText="Cost Amount" style="text-align: right;">
                     <h:outputText value="#{itm.grandTotal}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>

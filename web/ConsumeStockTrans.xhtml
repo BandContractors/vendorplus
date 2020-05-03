@@ -42,7 +42,7 @@
                 <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:INV-ACC↓ COS-ACC↑"/>
             </h:panelGrid>
 
-            <h:panelGrid id="pnlgHeader" styleClass="clsGridMainInput" columns="6">
+            <h:panelGrid id="pnlgHeader" styleClass="clsGridMainInput" columns="8">
                 <h:outputLabel  value="From:"/>
                 <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}"/>
                 <h:outputLabel  value="#{transBean.transTypeObj.transactionDateLabel}:"/>
@@ -68,6 +68,8 @@
                     <p:ajax event="itemSelect" listener="#{trans.setTransactorId(transactorBean.selectedTransactor.transactorId)}" />
                     <p:ajax event="change" listener="#{trans.setTransactorId(transactorBean.selectedTransactor.transactorId)}" rendered="#{transactorBean.selectedTransactor!=null}" />
                 </p:autoComplete>
+                <h:outputLabel  value="#{transBean.transTypeObj.transactionRefLabel}:"/>
+                <h:inputText styleClass="clsInput" id="itxtReference" value="#{trans.transactionRef}" style="width: 130px;"/>
             </h:panelGrid>
             <h:panelGrid id="gridTransItem" styleClass="clsGridMainInput" columns="6">
                 <h:outputLabel value="Item Description"/>
