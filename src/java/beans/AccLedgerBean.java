@@ -22,6 +22,8 @@ import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 /*
  * To change this template, choose Tools | Templates
@@ -46,6 +48,8 @@ public class AccLedgerBean implements Serializable {
     private List<AccLedger> AccLedgerReceivablesAccBal;
     private List<AccLedger> AccLedgerPayablesAccBal;
     private double AccountBalance;
+    private List<AccLedger> CategoryList;
+    private String CategoryHeader;
 
     public void setAccLedgerFromResultset(AccLedger accledger, ResultSet aResultSet) {
         try {
@@ -2049,6 +2053,78 @@ public class AccLedgerBean implements Serializable {
         }
     }
 
+    public void refreshViewCategoryBalanceSheet(int aAccPeriodId, String aAccCodeStart, String aDrCrBalance) {
+        this.CategoryList = new ArrayList<>();
+        double balance = 0;
+        double totalDr = 0;
+        double totalCr = 0;
+        ResultSet rs = null;
+        String sql = "SELECT account_code,acc_child_account_id,sum(debit_amount_lc) as debit_amount_lc,sum(credit_amount_lc) as credit_amount_lc "
+                + "FROM view_ledger_union_open_balances WHERE acc_period_id=" + aAccPeriodId + " AND account_code LIKE '" + aAccCodeStart + "%' "
+                + "GROUP BY account_code,acc_child_account_id";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            AccLedger al = null;
+            while (rs.next()) {
+                al = new AccLedger();
+                //account
+                try {
+                    al.setAccountCode(rs.getString("account_code"));
+                } catch (Exception e) {
+                    al.setAccountCode("");
+                }
+                try {
+                    if (al.getAccountCode().length() > 0) {
+                        al.setCategory(new AccCoaBean().getAccCoaByCodeOrId(al.getAccountCode(), 0).getAccountName());
+                    } else {
+                        al.setCategory("");
+                    }
+                } catch (Exception e) {
+                    al.setCategory("");
+                }
+                //child account
+                int childaccid = 0;
+                try {
+                    childaccid = rs.getInt("acc_child_account_id");
+                } catch (Exception e) {
+                    childaccid = 0;
+                }
+                try {
+                    if (childaccid > 0) {
+                        al.setSubcategory(new AccChildAccountBean().getAccChildAccById(childaccid).getChildAccountName());
+                    } else {
+                        al.setSubcategory("");
+                    }
+                } catch (Exception e) {
+                    al.setSubcategory("");
+                }
+                //amount
+                try {
+                    totalDr = rs.getDouble("debit_amount_lc");
+                } catch (NullPointerException npe) {
+                    totalDr = 0;
+                }
+                try {
+                    totalCr = rs.getDouble("credit_amount_lc");
+                } catch (NullPointerException npe) {
+                    totalCr = 0;
+                }
+                if (aDrCrBalance.equals("Dr")) {
+                    balance = totalDr - totalCr;
+                } else if (aDrCrBalance.equals("Cr")) {
+                    balance = totalCr - totalDr;
+                }
+                al.setAmount(balance);
+                //add obj
+                this.CategoryList.add(al);
+            }
+        } catch (Exception e) {
+            System.err.println("refreshViewCategoryBalanceSheet:" + e.getMessage());
+        }
+    }
+
     public double balanceAccountsStartWith(int aAccPeriodId, String aAccCodeStart, String aDrCrBalance) {
         double balance = 0;
         double totalDr = 0;
@@ -2130,6 +2206,11 @@ public class AccLedgerBean implements Serializable {
             System.err.println(se.getMessage());
         }
         return balance;
+    }
+
+    public void initViewCategoryBalanceSheet(int aAccPeriodId, String aAccCodeStart, String aDrCrBalance, String aCategoryHeader) {
+        this.CategoryHeader = aCategoryHeader;
+        this.refreshViewCategoryBalanceSheet(aAccPeriodId, aAccCodeStart, aDrCrBalance);
     }
 
     public void refreshAccBalanceSheet(AccBalanceSheet aAccBalanceSheet) {
@@ -2789,5 +2870,33 @@ public class AccLedgerBean implements Serializable {
      */
     public void setAccountBalance(double AccountBalance) {
         this.AccountBalance = AccountBalance;
+    }
+
+    /**
+     * @return the CategoryList
+     */
+    public List<AccLedger> getCategoryList() {
+        return CategoryList;
+    }
+
+    /**
+     * @param CategoryList the CategoryList to set
+     */
+    public void setCategoryList(List<AccLedger> CategoryList) {
+        this.CategoryList = CategoryList;
+    }
+
+    /**
+     * @return the CategoryHeader
+     */
+    public String getCategoryHeader() {
+        return CategoryHeader;
+    }
+
+    /**
+     * @param CategoryHeader the CategoryHeader to set
+     */
+    public void setCategoryHeader(String CategoryHeader) {
+        this.CategoryHeader = CategoryHeader;
     }
 }

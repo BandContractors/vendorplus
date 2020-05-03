@@ -1,6 +1,5 @@
 package entities;
 
-
 import java.io.Serializable;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
@@ -9,7 +8,6 @@ import javax.faces.bean.SessionScoped;
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author btwesigye
@@ -17,8 +15,9 @@ import javax.faces.bean.SessionScoped;
 @ManagedBean
 @SessionScoped
 public class AccLedger implements Serializable {
+
     private static final long serialVersionUID = 1L;
-    
+
     private long AccLedgerId;
     private int AccPeriodId;
     private long BillTransactorId;
@@ -31,6 +30,11 @@ public class AccLedger implements Serializable {
     private double CreditAmountLc;
     private String TransactorName;
     private String TransactorRef;
+    //start-for balance sheet dialog
+    private String Category;
+    private String Subcategory;
+    private double Amount;
+    //end-for balance sheet dialog
 
     /**
      * @return the AccLedgerId
@@ -199,5 +203,47 @@ public class AccLedger implements Serializable {
     public void setTransactorRef(String TransactorRef) {
         this.TransactorRef = TransactorRef;
     }
-    
+
+    /**
+     * @return the Category
+     */
+    public String getCategory() {
+        return Category;
+    }
+
+    /**
+     * @param Category the Category to set
+     */
+    public void setCategory(String Category) {
+        this.Category = Category;
+    }
+
+    /**
+     * @return the Subcategory
+     */
+    public String getSubcategory() {
+        return Subcategory;
+    }
+
+    /**
+     * @param Subcategory the Subcategory to set
+     */
+    public void setSubcategory(String Subcategory) {
+        this.Subcategory = Subcategory;
+    }
+
+    /**
+     * @return the Amount
+     */
+    public double getAmount() {
+        return Amount;
+    }
+
+    /**
+     * @param Amount the Amount to set
+     */
+    public void setAmount(double Amount) {
+        this.Amount = Amount;
+    }
+
 }
