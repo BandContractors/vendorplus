@@ -70,29 +70,54 @@
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="SALES Products"/>
+                <p:commandLink value="SALES Products" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'SALES Products','revORSaleProduct')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.revORSaleProduct)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="SALES Services"/>
+                <p:commandLink value="SALES Services" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'SALES Services','revORSaleService')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.revORSaleService)}"/>
-                
+
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="SALES Hire"/>
+                <p:commandLink value="SALES Hire" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'SALES Hire','revORSaleHire')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.revORSaleHire)}"/>
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="SALES Discounts (Contra-Revenue Acc)"/>
+                <p:commandLink value="SALES Discounts (Contra-Revenue Acc)" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'SALES Discounts (Contra-Revenue Acc)','revORSaleDisc')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.revORSaleDisc)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="SALES Returns and Allowances (Contra-Revenue Acc)"/>
+                <p:commandLink value="SALES Returns and Allowances (Contra-Revenue Acc)" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'SALES Returns and Allowances (Contra-Revenue Acc)','revORSaleReturn')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.revORSaleReturn)}"/>
 
 
@@ -110,49 +135,89 @@
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Interest Income"/>
+                <p:commandLink value="Interest Income" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Interest Income','revNORInterest')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.revNORInterest)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Dividends"/>
+                <p:commandLink value="Dividends" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Dividends','revNORDividend')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.revNORDividend)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Commissions"/>
+                <p:commandLink value="Commissions" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Commissions','revNORCommission')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.revNORCommission)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Rental Income"/>
+                <p:commandLink value="Rental Income" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Rental Income','revNORRental')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.revNORRental)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Gain On Sale Of Assets"/>
+                <p:commandLink value="Gain On Sale Of Assets" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Gain On Sale Of Assets','revNORGainSaleAsset')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.revNORGainSaleAsset)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Gift-Related Gain"/>
+                <p:commandLink value="Gift-Related Gain" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Gift-Related Gain','revNORGainGift')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.revNORGainGift)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Exchange-Related Gain"/>
+                <p:commandLink value="Exchange-Related Gain" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Exchange-Related Gain','revNORGainExchange')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.revNORGainExchange)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Other Non-Operating Revenue"/>
+                <p:commandLink value="Other Non-Operating Revenue" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Other Non-Operating Revenue','revNOROther')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.revNOROther)}"/>
 
 
@@ -183,55 +248,100 @@
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Cost of Purchase - Products"/>
+                <p:commandLink value="Cost of Purchase - Products" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Cost of Purchase - Products','expCOGSProduct')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expCOGSProduct)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Cost of Purchase - Services"/>
+                <p:commandLink value="Cost of Purchase - Services" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Cost of Purchase - Services','expCOGSService')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expCOGSService)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Cost of Purchase - Freight"/>
+                <p:commandLink value="Cost of Purchase - Freight" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Cost of Purchase - Freight','expCOGSFreight')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expCOGSFreight)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Cost of Purchase - Inventory Adjustments"/>
+                <p:commandLink value="Cost of Purchase - Inventory Adjustments" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Cost of Purchase - Inventory Adjustments','expCOGSInvAdj')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expCOGSInvAdj)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Purchase Returns and Allowances (Contra Account)"/>
+                <p:commandLink value="Purchase Returns and Allowances (Contra Account)" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Purchase Returns and Allowances (Contra Account)','expCOGSReturn')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expCOGSReturn)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Purchase Discounts (Contra Account)"/>
+                <p:commandLink value="Purchase Discounts (Contra Account)" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Purchase Discounts (Contra Account)','expCOGSDisc')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expCOGSDisc)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Cost of Goods Manufactured and Sold"/>
+                <p:commandLink value="Cost of Goods Manufactured and Sold" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Cost of Goods Manufactured and Sold','expCOGSManfSold')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expCOGSManfSold)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Cost of Sales - Loyalties"/>
+                <p:commandLink value="Cost of Sales - Loyalties" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Cost of Sales - Loyalties','expCOGSLoyalty')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expCOGSLoyalty)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Loss on inventory write off"/>
+                <p:commandLink value="Loss on inventory write off" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Loss on inventory write off','expCOGSInvWriteOff')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expCOGSInvWriteOff)}"/>
 
 
@@ -264,211 +374,386 @@
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Advertisement"/>
+                <p:commandLink value="Advertisement" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Advertisement','expOEAdvertise')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEAdvertise)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Audit Expenses"/>
+                <p:commandLink value="Audit Expenses" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Audit Expenses','expOEAudit')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEAudit)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Bad Debts"/>
+                <p:commandLink value="Bad Debts" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Bad Debts','expOEBadDebts')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEBadDebts)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Commission"/>
+                <p:commandLink value="Commission" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Commission','expOECommission')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOECommission)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Computer Expenses"/>
+                <p:commandLink value="Computer Expenses" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Computer Expenses','expOEComputer')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEComputer)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Donations"/>
+                <p:commandLink value="Donations" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Donations','expOEDonations')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEDonations)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Entertainment"/>
+                <p:commandLink value="Entertainment" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Entertainment','expOEEntertainment')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEEntertainment)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Freight and Transport"/>
+                <p:commandLink value="Freight and Transport" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Freight and Transport','expOEFreightTransport')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEFreightTransport)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Gift Expenses"/>
+                <p:commandLink value="Gift Expenses" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Gift Expenses','expOEGift')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEGift)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Hotel, Boarding and Lodging Expenses"/>
+                <p:commandLink value="Hotel, Boarding and Lodging Expenses" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Hotel, Boarding and Lodging Expenses','expOEHotelLodging')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEHotelLodging)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Legal expenses"/>
+                <p:commandLink value="Legal expenses" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Legal expenses','expOELegal')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOELegal)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Utility Expenses"/>
+                <p:commandLink value="Utility Expenses" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Utility Expenses','expOEUtility')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEUtility)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Rent"/>
+                <p:commandLink value="Rent" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Rent','expOERent')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOERent)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Rates"/>
+                <p:commandLink value="Rates" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Rates','expOERates')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOERates)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Repairs and Maintenance"/>
+                <p:commandLink value="Repairs and Maintenance" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Repairs and Maintenance','expOERepairMaint')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOERepairMaint)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Sales Promotion"/>
+                <p:commandLink value="Sales Promotion" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Sales Promotion','expOESalesPromotion')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOESalesPromotion)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Staff Welfare Expenses"/>
+                <p:commandLink value="Staff Welfare Expenses" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Staff Welfare Expenses','expOEStaffWelfare')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEStaffWelfare)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Startup cost/ pre- operating expenses"/>
+                <p:commandLink value="Startup cost/ pre- operating expenses" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Startup cost/ pre- operating expenses','expOEStartupPreOperate')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEStartupPreOperate)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Stationery and printing"/>
+                <p:commandLink value="Stationery and printing" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Stationery and printing','expOEStationeryPrint')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEStationeryPrint)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Subsistence Allowance"/>
+                <p:commandLink value="Subsistence Allowance" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Subsistence Allowance','expOESubsAllowance')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOESubsAllowance)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Telephone Expenses"/>
+                <p:commandLink value="Telephone Expenses" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Telephone Expenses','expOETelephone')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOETelephone)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Training Expenditure"/>
+                <p:commandLink value="Training Expenditure" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Training Expenditure','expOETraining')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOETraining)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Travelling Expenses including foreign travelling"/>
+                <p:commandLink value="Travelling Expenses including foreign travelling" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Travelling Expenses including foreign travelling','expOETravel')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOETravel)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Workshop - Conference Expenses"/>
+                <p:commandLink value="Workshop - Conference Expenses" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Workshop - Conference Expenses','expOEWorkshopConf')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEWorkshopConf)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Internet Expenses"/>
+                <p:commandLink value="Internet Expenses" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Internet Expenses','expOEInternet')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEInternet)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Depriciation"/>
+                <p:commandLink value="Depriciation" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Depriciation','expOEDepriciation')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEDepriciation)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Loss on disposal of assets"/>
+                <p:commandLink value="Loss on disposal of assets" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Loss on disposal of assets','expOELossDisposalAsset')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOELossDisposalAsset)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Management Fees"/>
+                <p:commandLink value="Management Fees" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Management Fees','expOEManagementFees')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEManagementFees)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Scientific Research Expenses"/>
+                <p:commandLink value="Scientific Research Expenses" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Scientific Research Expenses','expOEScientificResearch')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEScientificResearch)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Employment Expenses"/>
+                <p:commandLink value="Employment Expenses" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Employment Expenses','expOEEmployment')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEEmployment)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Financial Expenses"/>
+                <p:commandLink value="Financial Expenses" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Financial Expenses','expOEFinancial')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEFinancial)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Short-Term Insurance Business Expenses"/>
+                <p:commandLink value="Short-Term Insurance Business Expenses" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Short-Term Insurance Business Expenses','expOEShortInsurance')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEShortInsurance)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Income Tax Expense"/>
+                <p:commandLink value="Income Tax Expense" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Income Tax Expense','expOEIncomeTax')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEIncomeTax)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Proposed Dividend"/>
+                <p:commandLink value="Proposed Dividend" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Proposed Dividend','expOEProposedDividend')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEProposedDividend)}"/>
 
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Other Operating Expenses"/>
+                <p:commandLink value="Other Operating Expenses" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Other Operating Expenses','expOEOther')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expOEOther)}"/>
 
 
@@ -486,7 +771,12 @@
 
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:outputLabel value="Non-Operating Expenses"/>
+                <p:commandLink value="Non-Operating Expenses" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryIncomeStatement(accIncomeStatement,accJournalBean.date1,accJournalBean.date2,'Non-Operating Expenses','expNOE')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accIncomeStatement.expNOE)}"/>
 
 
@@ -514,6 +804,7 @@
 
             </p:panelGrid>
         </h:form>
+        <ui:include src="ViewCategoryLedger.xhtml"/>
     </h:body>
 </html>
 

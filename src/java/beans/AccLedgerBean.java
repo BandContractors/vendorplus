@@ -2125,6 +2125,49 @@ public class AccLedgerBean implements Serializable {
         }
     }
 
+    public void refreshViewCategoryIncomeStatement(String aSQL) {
+        this.CategoryList = new ArrayList<>();
+        ResultSet rs = null;
+        String sql = aSQL;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            AccLedger al = null;
+            while (rs.next()) {
+                al = new AccLedger();
+                String cat = "";
+                String subcat = "";
+                double amt = 0;
+                //category
+                try {
+                    cat = rs.getString("category");
+                } catch (Exception e) {
+                    cat = "";
+                }
+                al.setCategory(cat);
+                //subcategory
+                try {
+                    subcat = rs.getString("sub_category");
+                } catch (Exception e) {
+                    subcat = "";
+                }
+                al.setSubcategory(subcat);
+                //amount
+                try {
+                    amt = rs.getDouble("amount");
+                } catch (NullPointerException npe) {
+                    amt = 0;
+                }
+                al.setAmount(amt);
+                //add obj
+                this.CategoryList.add(al);
+            }
+        } catch (Exception e) {
+            System.err.println("refreshViewCategoryIncomeStatement:" + e.getMessage());
+        }
+    }
+
     public double balanceAccountsStartWith(int aAccPeriodId, String aAccCodeStart, String aDrCrBalance) {
         double balance = 0;
         double totalDr = 0;
@@ -2213,6 +2256,250 @@ public class AccLedgerBean implements Serializable {
         this.refreshViewCategoryBalanceSheet(aAccPeriodId, aAccCodeStart, aDrCrBalance);
     }
 
+    public void initViewCategoryIncomeStatement(AccIncomeStatement aAccIncomeStatement, Date aDate1, Date aDate2, String aCategoryHeader, String aCategory) {
+        String sql="";
+        String AccStartWith="";
+        String DrCr="";
+        this.CategoryHeader = aCategoryHeader;
+        //compile sql
+       aCategory= aCategory.substring(0, 1).toUpperCase() + aCategory.substring(1);
+        switch (aCategory) {
+            case "RevORSaleProduct":
+                AccStartWith="4-10-000-010";
+                DrCr="Cr";
+                break;
+            case "RevORSaleService":
+                AccStartWith="4-10-000-020";
+                DrCr="Cr";
+                break;
+            case "RevORSaleHire":
+                AccStartWith="4-10-000-050";
+                DrCr="Cr";
+                break;
+            case "RevORSaleDisc":
+                AccStartWith="4-10-000-030";
+                DrCr="Dr";
+                break;
+            case "RevORSaleReturn":
+                AccStartWith="4-10-000-040";
+                DrCr="Dr";
+                break;
+            case "RevNORInterest":
+                AccStartWith="4-20-000-010";
+                DrCr="Cr";
+                break;
+            case "RevNORDividend":
+                AccStartWith="4-20-000-020";
+                DrCr="Cr";
+                break;
+            case "RevNORCommission":
+                AccStartWith="4-20-000-030";
+                DrCr="Cr";
+                break;
+            case "RevNORRental":
+                AccStartWith="4-20-000-040";
+                DrCr="Cr";
+                break;
+            case "RevNORGainSaleAsset":
+                AccStartWith="4-20-000-050";
+                DrCr="Cr";
+                break;
+            case "RevNORGainGift":
+                AccStartWith="4-20-000-060";
+                DrCr="Cr";
+                break;
+            case "RevNORGainExchange":
+                AccStartWith="4-20-000-070";
+                DrCr="Cr";
+                break;
+            case "RevNOROther":
+                AccStartWith="4-20-000-080";
+                DrCr="Cr";
+                break;
+            case "ExpCOGSProduct":
+                AccStartWith="5-10-000-010";
+                DrCr="Dr";
+                break;
+            case "ExpCOGSService":
+                AccStartWith="5-10-000-020";
+                DrCr="Dr";
+                break;
+            case "ExpCOGSFreight":
+                AccStartWith="5-10-000-030";
+                DrCr="Dr";
+                break;
+            case "ExpCOGSInvAdj":
+                AccStartWith="5-10-000-040";
+                DrCr="Dr";
+                break;
+            case "ExpCOGSReturn":
+                AccStartWith="5-10-000-050";
+                DrCr="Cr";
+                break;
+            case "ExpCOGSDisc":
+                AccStartWith="5-10-000-060";
+                DrCr="Cr";
+                break;
+            case "ExpCOGSManfSold":
+                AccStartWith="5-10-000-070";
+                DrCr="Dr";
+                break;
+            case "ExpCOGSLoyalty":
+                AccStartWith="5-10-000-080";
+                DrCr="Dr";
+                break;
+            case "ExpCOGSInvWriteOff":
+                AccStartWith="5-10-000-090";
+                DrCr="Dr";
+                break;
+            case "ExpOEAdvertise":
+                AccStartWith="5-20-000";
+                DrCr="Dr";
+                break;
+            case "ExpOEAudit":
+                AccStartWith="5-20-010";
+                DrCr="Dr";
+                break;
+            case "ExpOEBadDebts":
+                AccStartWith="5-20-020";
+                DrCr="Dr";
+                break;
+            case "ExpOECommission":
+                AccStartWith="5-20-030";
+                DrCr="Dr";
+                break;
+            case "ExpOEComputer":
+                AccStartWith="5-20-040";
+                DrCr="Dr";
+                break;
+            case "ExpOEDonations":
+                AccStartWith="5-20-050";
+                DrCr="Dr";
+                break;
+            case "ExpOEEntertainment":
+                AccStartWith="5-20-060";
+                DrCr="Dr";
+                break;
+            case "ExpOEFreightTransport":
+                AccStartWith="5-20-070";
+                DrCr="Dr";
+                break;
+            case "ExpOEGift":
+                AccStartWith="5-20-080";
+                DrCr="Dr";
+                break;
+            case "ExpOEHotelLodging":
+                AccStartWith="5-20-090";
+                DrCr="Dr";
+                break;
+            case "ExpOELegal":
+                AccStartWith="5-20-100";
+                DrCr="Dr";
+                break;
+            case "ExpOEUtility":
+                AccStartWith="5-20-110";
+                DrCr="Dr";
+                break;
+            case "ExpOERent":
+                AccStartWith="5-20-120";
+                DrCr="Dr";
+                break;
+            case "ExpOERates":
+                AccStartWith="5-20-130";
+                DrCr="Dr";
+                break;
+            case "ExpOERepairMaint":
+                AccStartWith="5-20-140";
+                DrCr="Dr";
+                break;
+            case "ExpOESalesPromotion":
+                AccStartWith="5-20-150";
+                DrCr="Dr";
+                break;
+            case "ExpOEStaffWelfare":
+                AccStartWith="5-20-160";
+                DrCr="Dr";
+                break;
+            case "ExpOEStartupPreOperate":
+                AccStartWith="5-20-170";
+                DrCr="Dr";
+                break;
+            case "ExpOEStationeryPrint":
+                AccStartWith="5-20-180";
+                DrCr="Dr";
+                break;
+            case "ExpOESubsAllowance":
+                AccStartWith="5-20-190";
+                DrCr="Dr";
+                break;
+            case "ExpOETelephone":
+                AccStartWith="5-20-200";
+                DrCr="Dr";
+                break;
+            case "ExpOETraining":
+                AccStartWith="5-20-210";
+                DrCr="Dr";
+                break;
+            case "ExpOETravel":
+                AccStartWith="5-20-220";
+                DrCr="Dr";
+                break;
+            case "ExpOEWorkshopConf":
+                AccStartWith="5-20-230";
+                DrCr="Dr";
+                break;
+            case "ExpOEInternet":
+                AccStartWith="5-20-240";
+                DrCr="Dr";
+                break;
+            case "ExpOEDepriciation":
+                AccStartWith="5-20-250";
+                DrCr="Dr";
+                break;
+            case "ExpOELossDisposalAsset":
+                AccStartWith="5-20-260";
+                DrCr="Dr";
+                break;
+            case "ExpOEManagementFees":
+                AccStartWith="5-20-270";
+                DrCr="Dr";
+                break;
+            case "ExpOEScientificResearch":
+                AccStartWith="5-20-280";
+                DrCr="Dr";
+                break;
+            case "ExpOEEmployment":
+                AccStartWith="5-20-290";
+                DrCr="Dr";
+                break;
+            case "ExpOEFinancial":
+                AccStartWith="5-20-300";
+                DrCr="Dr";
+                break;
+            case "ExpOEShortInsurance":
+                AccStartWith="5-20-400";
+                DrCr="Dr";
+                break;
+            case "ExpOEIncomeTax":
+                AccStartWith="5-20-410";
+                DrCr="Dr";
+                break;
+            case "ExpOEProposedDividend":
+                AccStartWith="5-20-420";
+                DrCr="Dr";
+                break;
+            case "ExpOEOther":
+                AccStartWith="5-20-430";
+                DrCr="Dr";
+                break;
+            case "ExpNOE":
+                AccStartWith="5-30-000";
+                DrCr="Dr";
+                break;
+        }
+        this.refreshViewCategoryIncomeStatement(sql);
+    }
+
     public void refreshAccBalanceSheet(AccBalanceSheet aAccBalanceSheet) {
         AccPeriod accperiod = null;
         accperiod = new AccPeriodBean().getAccPeriodById(aAccBalanceSheet.getAccPeriodId());
@@ -2222,7 +2509,11 @@ public class AccLedgerBean implements Serializable {
         aAccBalanceSheet.setAssetFixedPPE(this.balanceAccountsStartWith(aAccBalanceSheet.getAccPeriodId(), "1-20-000", "Dr"));
         TempTotal = TempTotal + aAccBalanceSheet.getAssetFixedPPE();
         aAccBalanceSheet.setAssetFixedAccumDep(this.balanceAccountsStartWith(aAccBalanceSheet.getAccPeriodId(), "1-20-010", "Cr"));
-        TempTotal = TempTotal - aAccBalanceSheet.getAssetFixedAccumDep();
+        if (aAccBalanceSheet.getAssetFixedAccumDep() >= 0) {
+            TempTotal = TempTotal - aAccBalanceSheet.getAssetFixedAccumDep();
+        } else {
+            TempTotal = TempTotal + aAccBalanceSheet.getAssetFixedAccumDep();
+        }
         aAccBalanceSheet.setAssetFixedOtherNonCur(this.balanceAccountsStartWith(aAccBalanceSheet.getAccPeriodId(), "1-20-020", "Dr"));
         TempTotal = TempTotal + aAccBalanceSheet.getAssetFixedOtherNonCur();
         //Assets - Current
@@ -2230,11 +2521,6 @@ public class AccLedgerBean implements Serializable {
         TempTotal = TempTotal + aAccBalanceSheet.getAssetCurCash();
         aAccBalanceSheet.setAssetCurRec(this.balanceAccountsStartWith(aAccBalanceSheet.getAccPeriodId(), "1-00-010", "Dr"));
         TempTotal = TempTotal + aAccBalanceSheet.getAssetCurRec();
-//        if (accperiod.getIsClosed() == 1) {
-//            aAccBalanceSheet.setAssetCurInv(new StockBean().getStockAtHandCostPriceValueSnapshot(aAccBalanceSheet.getAccPeriodId()));
-//        } else {
-//            aAccBalanceSheet.setAssetCurInv(new StockBean().getStockAtHandCostPriceValue());
-//        }
         aAccBalanceSheet.setAssetCurInv(this.balanceAccountsStartWith(aAccBalanceSheet.getAccPeriodId(), "1-00-020", "Dr"));
         TempTotal = TempTotal + aAccBalanceSheet.getAssetCurInv();
         aAccBalanceSheet.setAssetCurPreExp(this.balanceAccountsStartWith(aAccBalanceSheet.getAccPeriodId(), "1-00-030", "Dr"));
@@ -2244,11 +2530,6 @@ public class AccLedgerBean implements Serializable {
         //Assets - Total
         aAccBalanceSheet.setAssetTotal(TempTotal);
         TempTotal = 0;
-//        if (aAccBalanceSheet.getLiabTotal() >= 0) {
-//            aAccBalanceSheet.setNetAssets(aAccBalanceSheet.getAssetTotal() - aAccBalanceSheet.getLiabTotal());
-//        } else {
-//            aAccBalanceSheet.setNetAssets(aAccBalanceSheet.getAssetTotal() + aAccBalanceSheet.getLiabTotal());
-//        }
 
         //Liabilities - Long Term
         aAccBalanceSheet.setLiabLongDebt(this.balanceAccountsStartWith(aAccBalanceSheet.getAccPeriodId(), "2-10-000", "Cr"));
@@ -2291,9 +2572,17 @@ public class AccLedgerBean implements Serializable {
         aAccBalanceSheet.setEquityRetEarn(this.balanceAccountsStartWith(aAccBalanceSheet.getAccPeriodId(), "3-10-000-060", "Cr"));
         TempTotal = TempTotal + aAccBalanceSheet.getEquityRetEarn();
         aAccBalanceSheet.setEquityDrawing(this.balanceAccountsStartWith(aAccBalanceSheet.getAccPeriodId(), "3-10-000-070", "Dr"));
-        TempTotal = TempTotal - aAccBalanceSheet.getEquityDrawing();
+        if (aAccBalanceSheet.getEquityDrawing() >= 0) {
+            TempTotal = TempTotal - aAccBalanceSheet.getEquityDrawing();
+        } else {
+            TempTotal = TempTotal + aAccBalanceSheet.getEquityDrawing();
+        }
         aAccBalanceSheet.setEquityDividend(this.balanceAccountsStartWith(aAccBalanceSheet.getAccPeriodId(), "3-10-000-080", "Dr"));
-        TempTotal = TempTotal - aAccBalanceSheet.getEquityDividend();
+        if (aAccBalanceSheet.getEquityDividend() >= 0) {
+            TempTotal = TempTotal - aAccBalanceSheet.getEquityDividend();
+        } else {
+            TempTotal = TempTotal + aAccBalanceSheet.getEquityDividend();
+        }
         //Equitys - Total
         aAccBalanceSheet.setEquityTotal(TempTotal);
         TempTotal = 0;
