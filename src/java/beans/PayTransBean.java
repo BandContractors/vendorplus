@@ -277,6 +277,23 @@ public class PayTransBean implements Serializable {
         }
         return totalpay;
     }
+    
+    public double getTotalPaidByTransId(long aTransId) {
+        String sql = "select ifnull(sum(pt.trans_paid_amount),0) as total_paid from pay_trans pt where pt.transaction_id=" + aTransId;
+        ResultSet rs = null;
+        double totalpay = 0;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                totalpay = rs.getDouble("total_paid");
+            }
+        } catch (Exception e) {
+            System.err.println("getTotalPaidByTransId:" + e.getMessage());
+        }
+        return totalpay;
+    }
 
     public void refreshSalePayTranssSummaryByTransactor(long aTransactorId, String aCurrencyCode) {
         String sql = "{call sp_search_sum_sale_pay_trans_by_transactor(?,?)}";

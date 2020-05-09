@@ -8,6 +8,8 @@ import entities.Item;
 import java.io.Serializable;
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import static java.sql.Types.VARCHAR;
 import java.text.DecimalFormat;
@@ -229,7 +231,7 @@ public class UtilityBean implements Serializable {
         }
         return aString;
     }
-    
+
     public String formatDoubleToStringHide(double aAmount, int aHideResult) {
         String aString = "";
         //DecimalFormat myFormatter = new DecimalFormat("###,###.###;(###,###.###)");
@@ -580,6 +582,26 @@ public class UtilityBean implements Serializable {
             x = 1;
         }
         return x;
+    }
+
+    public long getN(String aSQL) {
+        ResultSet rs = null;
+        long n = 0;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(aSQL);) {
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                try {
+                    n = rs.getLong("n");
+                } catch (Exception e) {
+                    n = 0;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("getN:" + e.getMessage());
+        }
+        return n;
     }
 
 //    public static void main(String[] args) {

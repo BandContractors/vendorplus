@@ -1,6 +1,7 @@
 package entities;
 
 import java.io.Serializable;
+import java.util.Date;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 
@@ -85,6 +86,8 @@ public class AccIncomeStatement implements Serializable {
     private double ExpNOETotal;
     private double ExpOENOETotal;
     private double NetProfit;
+    private Date date1;
+    private Date date2;
 
     /**
      * @return the AccPeriodId
@@ -1036,6 +1039,34 @@ public class AccIncomeStatement implements Serializable {
      */
     public void setRevORSaleHire(double RevORSaleHire) {
         this.RevORSaleHire = RevORSaleHire;
+    }
+
+    /**
+     * @return the date1
+     */
+    public Date getDate1() {
+        return date1;
+    }
+
+    /**
+     * @param date1 the date1 to set
+     */
+    public void setDate1(Date date1) {
+        this.date1 = date1;
+    }
+
+    /**
+     * @return the date2
+     */
+    public Date getDate2() {
+        return date2;
+    }
+
+    /**
+     * @param date2 the date2 to set
+     */
+    public void setDate2(Date date2) {
+        this.date2 = date2;
     }
 
 }

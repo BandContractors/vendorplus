@@ -225,7 +225,7 @@
                 <p:column headerText="Add Date" rendered="#{transBean.dateType.equals('Add Date')}">
                     <h:outputText value="#{utilityBean.formatDate(itm.addDate)}"/>
                 </p:column>
-                <p:column headerText="Bill For">
+                <p:column headerText="Bill For" visible="false">
                     <h:outputText value="#{transactorBean.getTransactor(itm.billTransactorId).transactorNames}"/>
                 </p:column>
                 <p:column headerText="#{menuItemBean.menuItemObj.CUSTOMER_NAME}">
@@ -257,10 +257,15 @@
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="#{transactionTypeBean.getTransactionType(2).transactionUserLabel}">
+                <p:column headerText="Total Paid">
+                    <h:outputText value="#{itm.totalPaid}" styleClass="#{itm.is_paid eq 1 ? 'green':itm.is_paid eq 2 ? 'amber':'red'}" style="width: 60px;color: #ffffff !important;text-align: right !important;">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{transactionTypeBean.getTransactionType(2).transactionUserLabel}" visible="false">
                     <h:outputText value="#{userDetailBean.getUserDetail(itm.transactionUserDetailId).userName}"/>
                 </p:column>
-                <p:column headerText="Added By">
+                <p:column headerText="Added By" visible="false">
                     <h:outputText value="#{userDetailBean.getUserDetail(itm.addUserDetailId).userName}"/>
                 </p:column>
             </p:dataTable>

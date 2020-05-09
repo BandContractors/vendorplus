@@ -47,6 +47,12 @@ public class AccJournal implements Serializable {
     private Date LastEditDate;
     private int LastEditBy;
     private long JobId;
+    //start-for income statement dialog
+    private String transaction_type_name;
+    private String transaction_number;
+    private String account_name;
+    private double amount;
+    //end-for income statement dialog
 
     /**
      * @return the AccJournalId
@@ -424,6 +430,62 @@ public class AccJournal implements Serializable {
      */
     public void setJobId(long JobId) {
         this.JobId = JobId;
+    }
+
+    /**
+     * @return the transaction_type_name
+     */
+    public String getTransaction_type_name() {
+        return transaction_type_name;
+    }
+
+    /**
+     * @param transaction_type_name the transaction_type_name to set
+     */
+    public void setTransaction_type_name(String transaction_type_name) {
+        this.transaction_type_name = transaction_type_name;
+    }
+
+    /**
+     * @return the transaction_number
+     */
+    public String getTransaction_number() {
+        return transaction_number;
+    }
+
+    /**
+     * @param transaction_number the transaction_number to set
+     */
+    public void setTransaction_number(String transaction_number) {
+        this.transaction_number = transaction_number;
+    }
+
+    /**
+     * @return the account_name
+     */
+    public String getAccount_name() {
+        return account_name;
+    }
+
+    /**
+     * @param account_name the account_name to set
+     */
+    public void setAccount_name(String account_name) {
+        this.account_name = account_name;
+    }
+
+    /**
+     * @return the amount
+     */
+    public double getAmount() {
+        return amount;
+    }
+
+    /**
+     * @param amount the amount to set
+     */
+    public void setAmount(double amount) {
+        this.amount = amount;
     }
     
 }

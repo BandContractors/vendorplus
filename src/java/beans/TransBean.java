@@ -11178,6 +11178,7 @@ public class TransBean implements Serializable {
         ResultSet rs = null;
         this.TransList = new ArrayList<>();
         this.TransListSummary = new ArrayList<>();
+        PayTransBean ptb = new PayTransBean();
         String sql = "SELECT * FROM transaction WHERE transaction_type_id IN(2,65,68)";
         String sqlsum = "";
         if (aTransBean.getFieldName().length() > 0) {
@@ -11241,6 +11242,15 @@ public class TransBean implements Serializable {
             while (rs.next()) {
                 trans = new Trans();
                 this.setTransFromResultset(trans, rs);
+                double TotalPaid = ptb.getTotalPaidByTransId(trans.getTransactionId());
+                trans.setTotalPaid(TotalPaid);
+                if (TotalPaid >= trans.getGrandTotal()) {
+                    trans.setIs_paid(1);
+                } else if (TotalPaid > 0 && TotalPaid < trans.getGrandTotal()) {
+                    trans.setIs_paid(2);
+                } else {
+                    trans.setIs_paid(0);
+                }
                 this.TransList.add(trans);
             }
         } catch (SQLException se) {

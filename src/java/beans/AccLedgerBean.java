@@ -22,8 +22,7 @@ import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import utilities.UtilityBean;
 
 /*
  * To change this template, choose Tools | Templates
@@ -50,6 +49,9 @@ public class AccLedgerBean implements Serializable {
     private double AccountBalance;
     private List<AccLedger> CategoryList;
     private String CategoryHeader;
+    private List<AccJournal> JournalList;
+    private long n;
+    private long i;
 
     public void setAccLedgerFromResultset(AccLedger accledger, ResultSet aResultSet) {
         try {
@@ -2125,44 +2127,69 @@ public class AccLedgerBean implements Serializable {
         }
     }
 
-    public void refreshViewCategoryIncomeStatement(String aSQL) {
-        this.CategoryList = new ArrayList<>();
+    public void refreshViewCategoryIncomeStatement(String aSQL, String aDrCr) {
+        this.JournalList = new ArrayList<>();
         ResultSet rs = null;
         String sql = aSQL;
+        long recs = 0;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             rs = ps.executeQuery();
-            AccLedger al = null;
+            AccJournal aj = null;
             while (rs.next()) {
-                al = new AccLedger();
-                String cat = "";
-                String subcat = "";
-                double amt = 0;
-                //category
+                recs = recs + 1;
+                aj = new AccJournal();
                 try {
-                    cat = rs.getString("category");
+                    aj.setTransaction_type_name(rs.getString("transaction_type_name"));
                 } catch (Exception e) {
-                    cat = "";
+                    aj.setTransaction_type_name("");
                 }
-                al.setCategory(cat);
-                //subcategory
                 try {
-                    subcat = rs.getString("sub_category");
+                    aj.setTransactionId(rs.getLong("transaction_id"));
                 } catch (Exception e) {
-                    subcat = "";
+                    aj.setTransactionId(0);
                 }
-                al.setSubcategory(subcat);
-                //amount
                 try {
-                    amt = rs.getDouble("amount");
-                } catch (NullPointerException npe) {
-                    amt = 0;
+                    aj.setTransaction_number(rs.getString("transaction_number"));
+                } catch (Exception e) {
+                    aj.setTransaction_number("");
                 }
-                al.setAmount(amt);
+                try {
+                    aj.setAccount_name(rs.getString("account_name"));
+                } catch (Exception e) {
+                    aj.setAccount_name("");
+                }
+                try {
+                    aj.setCurrencyCode(rs.getString("currency_code"));
+                } catch (Exception e) {
+                    aj.setCurrencyCode("");
+                }
+                try {
+                    aj.setXrate(rs.getDouble("xrate"));
+                } catch (Exception e) {
+                    aj.setXrate(0);
+                }
+                try {
+                    aj.setJournalDate(new Date(rs.getDate("journal_date").getTime()));
+                } catch (Exception e) {
+                    aj.setJournalDate(null);
+                }
+                try {
+                    if (aDrCr.equals("Dr")) {
+                        aj.setAmount(rs.getDouble("debit_amount") - rs.getDouble("credit_amount"));
+                    } else if (aDrCr.equals("Cr")) {
+                        aj.setAmount(rs.getDouble("credit_amount") - rs.getDouble("debit_amount"));
+                    } else {
+                        aj.setAmount(0);
+                    }
+                } catch (Exception e) {
+                    aj.setAmount(0);
+                }
                 //add obj
-                this.CategoryList.add(al);
+                this.JournalList.add(aj);
             }
+            this.i = recs;
         } catch (Exception e) {
             System.err.println("refreshViewCategoryIncomeStatement:" + e.getMessage());
         }
@@ -2256,248 +2283,269 @@ public class AccLedgerBean implements Serializable {
         this.refreshViewCategoryBalanceSheet(aAccPeriodId, aAccCodeStart, aDrCrBalance);
     }
 
-    public void initViewCategoryIncomeStatement(AccIncomeStatement aAccIncomeStatement, Date aDate1, Date aDate2, String aCategoryHeader, String aCategory) {
-        String sql="";
-        String AccStartWith="";
-        String DrCr="";
+    public void initViewCategoryIncomeStatement(AccIncomeStatement aAccIncomeStatement, String aCategoryHeader, String aCategory) {
+        String sql = "SELECT y.transaction_type_name,t.transaction_id,t.transaction_number,a.account_name,j.currency_code,j.journal_date,j.debit_amount,j.credit_amount,j.xrate "
+                + "FROM acc_journal j "
+                + "INNER JOIN transaction t ON j.transaction_id=t.transaction_id "
+                + "INNER JOIN transaction_type y ON j.transaction_type_id=y.transaction_type_id "
+                + "INNER JOIN acc_coa a ON j.acc_coa_id=a.acc_coa_id  "
+                + "WHERE j.acc_period_id=" + aAccIncomeStatement.getAccPeriodId();
+        String sql2 = "SELECT count(*) as n "
+                + "FROM acc_journal j "
+                + "INNER JOIN transaction t ON j.transaction_id=t.transaction_id "
+                + "INNER JOIN transaction_type y ON j.transaction_type_id=y.transaction_type_id "
+                + "INNER JOIN acc_coa a ON j.acc_coa_id=a.acc_coa_id  "
+                + "WHERE j.acc_period_id=" + aAccIncomeStatement.getAccPeriodId();
+        String aWhere = "";
+        String AccStartWith = "";
+        String DrCr = "";
+        String aOrder = " ORDER BY j.journal_date DESC,y.transaction_type_name ASC";
         this.CategoryHeader = aCategoryHeader;
+        //Upper case 1st Character for the category
+        aCategory = aCategory.substring(0, 1).toUpperCase() + aCategory.substring(1);
         //compile sql
-       aCategory= aCategory.substring(0, 1).toUpperCase() + aCategory.substring(1);
+        if (null != aAccIncomeStatement.getDate1() && null != aAccIncomeStatement.getDate2()) {
+            aWhere = aWhere + " AND j.journal_date between '" + new java.sql.Date(aAccIncomeStatement.getDate1().getTime()) + "' and '" + new java.sql.Date(aAccIncomeStatement.getDate2().getTime()) + "'";
+        }
         switch (aCategory) {
             case "RevORSaleProduct":
-                AccStartWith="4-10-000-010";
-                DrCr="Cr";
+                AccStartWith = "4-10-000-010";
+                DrCr = "Cr";
                 break;
             case "RevORSaleService":
-                AccStartWith="4-10-000-020";
-                DrCr="Cr";
+                AccStartWith = "4-10-000-020";
+                DrCr = "Cr";
                 break;
             case "RevORSaleHire":
-                AccStartWith="4-10-000-050";
-                DrCr="Cr";
+                AccStartWith = "4-10-000-050";
+                DrCr = "Cr";
                 break;
             case "RevORSaleDisc":
-                AccStartWith="4-10-000-030";
-                DrCr="Dr";
+                AccStartWith = "4-10-000-030";
+                DrCr = "Dr";
                 break;
             case "RevORSaleReturn":
-                AccStartWith="4-10-000-040";
-                DrCr="Dr";
+                AccStartWith = "4-10-000-040";
+                DrCr = "Dr";
                 break;
             case "RevNORInterest":
-                AccStartWith="4-20-000-010";
-                DrCr="Cr";
+                AccStartWith = "4-20-000-010";
+                DrCr = "Cr";
                 break;
             case "RevNORDividend":
-                AccStartWith="4-20-000-020";
-                DrCr="Cr";
+                AccStartWith = "4-20-000-020";
+                DrCr = "Cr";
                 break;
             case "RevNORCommission":
-                AccStartWith="4-20-000-030";
-                DrCr="Cr";
+                AccStartWith = "4-20-000-030";
+                DrCr = "Cr";
                 break;
             case "RevNORRental":
-                AccStartWith="4-20-000-040";
-                DrCr="Cr";
+                AccStartWith = "4-20-000-040";
+                DrCr = "Cr";
                 break;
             case "RevNORGainSaleAsset":
-                AccStartWith="4-20-000-050";
-                DrCr="Cr";
+                AccStartWith = "4-20-000-050";
+                DrCr = "Cr";
                 break;
             case "RevNORGainGift":
-                AccStartWith="4-20-000-060";
-                DrCr="Cr";
+                AccStartWith = "4-20-000-060";
+                DrCr = "Cr";
                 break;
             case "RevNORGainExchange":
-                AccStartWith="4-20-000-070";
-                DrCr="Cr";
+                AccStartWith = "4-20-000-070";
+                DrCr = "Cr";
                 break;
             case "RevNOROther":
-                AccStartWith="4-20-000-080";
-                DrCr="Cr";
+                AccStartWith = "4-20-000-080";
+                DrCr = "Cr";
                 break;
             case "ExpCOGSProduct":
-                AccStartWith="5-10-000-010";
-                DrCr="Dr";
+                AccStartWith = "5-10-000-010";
+                DrCr = "Dr";
                 break;
             case "ExpCOGSService":
-                AccStartWith="5-10-000-020";
-                DrCr="Dr";
+                AccStartWith = "5-10-000-020";
+                DrCr = "Dr";
                 break;
             case "ExpCOGSFreight":
-                AccStartWith="5-10-000-030";
-                DrCr="Dr";
+                AccStartWith = "5-10-000-030";
+                DrCr = "Dr";
                 break;
             case "ExpCOGSInvAdj":
-                AccStartWith="5-10-000-040";
-                DrCr="Dr";
+                AccStartWith = "5-10-000-040";
+                DrCr = "Dr";
                 break;
             case "ExpCOGSReturn":
-                AccStartWith="5-10-000-050";
-                DrCr="Cr";
+                AccStartWith = "5-10-000-050";
+                DrCr = "Cr";
                 break;
             case "ExpCOGSDisc":
-                AccStartWith="5-10-000-060";
-                DrCr="Cr";
+                AccStartWith = "5-10-000-060";
+                DrCr = "Cr";
                 break;
             case "ExpCOGSManfSold":
-                AccStartWith="5-10-000-070";
-                DrCr="Dr";
+                AccStartWith = "5-10-000-070";
+                DrCr = "Dr";
                 break;
             case "ExpCOGSLoyalty":
-                AccStartWith="5-10-000-080";
-                DrCr="Dr";
+                AccStartWith = "5-10-000-080";
+                DrCr = "Dr";
                 break;
             case "ExpCOGSInvWriteOff":
-                AccStartWith="5-10-000-090";
-                DrCr="Dr";
+                AccStartWith = "5-10-000-090";
+                DrCr = "Dr";
                 break;
             case "ExpOEAdvertise":
-                AccStartWith="5-20-000";
-                DrCr="Dr";
+                AccStartWith = "5-20-000";
+                DrCr = "Dr";
                 break;
             case "ExpOEAudit":
-                AccStartWith="5-20-010";
-                DrCr="Dr";
+                AccStartWith = "5-20-010";
+                DrCr = "Dr";
                 break;
             case "ExpOEBadDebts":
-                AccStartWith="5-20-020";
-                DrCr="Dr";
+                AccStartWith = "5-20-020";
+                DrCr = "Dr";
                 break;
             case "ExpOECommission":
-                AccStartWith="5-20-030";
-                DrCr="Dr";
+                AccStartWith = "5-20-030";
+                DrCr = "Dr";
                 break;
             case "ExpOEComputer":
-                AccStartWith="5-20-040";
-                DrCr="Dr";
+                AccStartWith = "5-20-040";
+                DrCr = "Dr";
                 break;
             case "ExpOEDonations":
-                AccStartWith="5-20-050";
-                DrCr="Dr";
+                AccStartWith = "5-20-050";
+                DrCr = "Dr";
                 break;
             case "ExpOEEntertainment":
-                AccStartWith="5-20-060";
-                DrCr="Dr";
+                AccStartWith = "5-20-060";
+                DrCr = "Dr";
                 break;
             case "ExpOEFreightTransport":
-                AccStartWith="5-20-070";
-                DrCr="Dr";
+                AccStartWith = "5-20-070";
+                DrCr = "Dr";
                 break;
             case "ExpOEGift":
-                AccStartWith="5-20-080";
-                DrCr="Dr";
+                AccStartWith = "5-20-080";
+                DrCr = "Dr";
                 break;
             case "ExpOEHotelLodging":
-                AccStartWith="5-20-090";
-                DrCr="Dr";
+                AccStartWith = "5-20-090";
+                DrCr = "Dr";
                 break;
             case "ExpOELegal":
-                AccStartWith="5-20-100";
-                DrCr="Dr";
+                AccStartWith = "5-20-100";
+                DrCr = "Dr";
                 break;
             case "ExpOEUtility":
-                AccStartWith="5-20-110";
-                DrCr="Dr";
+                AccStartWith = "5-20-110";
+                DrCr = "Dr";
                 break;
             case "ExpOERent":
-                AccStartWith="5-20-120";
-                DrCr="Dr";
+                AccStartWith = "5-20-120";
+                DrCr = "Dr";
                 break;
             case "ExpOERates":
-                AccStartWith="5-20-130";
-                DrCr="Dr";
+                AccStartWith = "5-20-130";
+                DrCr = "Dr";
                 break;
             case "ExpOERepairMaint":
-                AccStartWith="5-20-140";
-                DrCr="Dr";
+                AccStartWith = "5-20-140";
+                DrCr = "Dr";
                 break;
             case "ExpOESalesPromotion":
-                AccStartWith="5-20-150";
-                DrCr="Dr";
+                AccStartWith = "5-20-150";
+                DrCr = "Dr";
                 break;
             case "ExpOEStaffWelfare":
-                AccStartWith="5-20-160";
-                DrCr="Dr";
+                AccStartWith = "5-20-160";
+                DrCr = "Dr";
                 break;
             case "ExpOEStartupPreOperate":
-                AccStartWith="5-20-170";
-                DrCr="Dr";
+                AccStartWith = "5-20-170";
+                DrCr = "Dr";
                 break;
             case "ExpOEStationeryPrint":
-                AccStartWith="5-20-180";
-                DrCr="Dr";
+                AccStartWith = "5-20-180";
+                DrCr = "Dr";
                 break;
             case "ExpOESubsAllowance":
-                AccStartWith="5-20-190";
-                DrCr="Dr";
+                AccStartWith = "5-20-190";
+                DrCr = "Dr";
                 break;
             case "ExpOETelephone":
-                AccStartWith="5-20-200";
-                DrCr="Dr";
+                AccStartWith = "5-20-200";
+                DrCr = "Dr";
                 break;
             case "ExpOETraining":
-                AccStartWith="5-20-210";
-                DrCr="Dr";
+                AccStartWith = "5-20-210";
+                DrCr = "Dr";
                 break;
             case "ExpOETravel":
-                AccStartWith="5-20-220";
-                DrCr="Dr";
+                AccStartWith = "5-20-220";
+                DrCr = "Dr";
                 break;
             case "ExpOEWorkshopConf":
-                AccStartWith="5-20-230";
-                DrCr="Dr";
+                AccStartWith = "5-20-230";
+                DrCr = "Dr";
                 break;
             case "ExpOEInternet":
-                AccStartWith="5-20-240";
-                DrCr="Dr";
+                AccStartWith = "5-20-240";
+                DrCr = "Dr";
                 break;
             case "ExpOEDepriciation":
-                AccStartWith="5-20-250";
-                DrCr="Dr";
+                AccStartWith = "5-20-250";
+                DrCr = "Dr";
                 break;
             case "ExpOELossDisposalAsset":
-                AccStartWith="5-20-260";
-                DrCr="Dr";
+                AccStartWith = "5-20-260";
+                DrCr = "Dr";
                 break;
             case "ExpOEManagementFees":
-                AccStartWith="5-20-270";
-                DrCr="Dr";
+                AccStartWith = "5-20-270";
+                DrCr = "Dr";
                 break;
             case "ExpOEScientificResearch":
-                AccStartWith="5-20-280";
-                DrCr="Dr";
+                AccStartWith = "5-20-280";
+                DrCr = "Dr";
                 break;
             case "ExpOEEmployment":
-                AccStartWith="5-20-290";
-                DrCr="Dr";
+                AccStartWith = "5-20-290";
+                DrCr = "Dr";
                 break;
             case "ExpOEFinancial":
-                AccStartWith="5-20-300";
-                DrCr="Dr";
+                AccStartWith = "5-20-300";
+                DrCr = "Dr";
                 break;
             case "ExpOEShortInsurance":
-                AccStartWith="5-20-400";
-                DrCr="Dr";
+                AccStartWith = "5-20-400";
+                DrCr = "Dr";
                 break;
             case "ExpOEIncomeTax":
-                AccStartWith="5-20-410";
-                DrCr="Dr";
+                AccStartWith = "5-20-410";
+                DrCr = "Dr";
                 break;
             case "ExpOEProposedDividend":
-                AccStartWith="5-20-420";
-                DrCr="Dr";
+                AccStartWith = "5-20-420";
+                DrCr = "Dr";
                 break;
             case "ExpOEOther":
-                AccStartWith="5-20-430";
-                DrCr="Dr";
+                AccStartWith = "5-20-430";
+                DrCr = "Dr";
                 break;
             case "ExpNOE":
-                AccStartWith="5-30-000";
-                DrCr="Dr";
+                AccStartWith = "5-30-000";
+                DrCr = "Dr";
                 break;
         }
-        this.refreshViewCategoryIncomeStatement(sql);
+        aWhere = aWhere + " AND j.account_code LIKE '" + AccStartWith + "%'";
+        sql = sql + aWhere + aOrder + " LIMIT 1000";
+        sql2 = sql2 + aWhere;
+        this.n = new UtilityBean().getN(sql2);
+        this.refreshViewCategoryIncomeStatement(sql, DrCr);
     }
 
     public void refreshAccBalanceSheet(AccBalanceSheet aAccBalanceSheet) {
@@ -2586,171 +2634,6 @@ public class AccLedgerBean implements Serializable {
         //Equitys - Total
         aAccBalanceSheet.setEquityTotal(TempTotal);
         TempTotal = 0;
-    }
-
-    public void refreshAccIncomeStatement(AccIncomeStatement aAccIncomeStatement) {
-        double TempTotal = 0;
-        //Revenue - OR(Sales)
-        aAccIncomeStatement.setRevORSaleProduct(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "4-10-000-010", "Cr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getRevORSaleProduct();
-        aAccIncomeStatement.setRevORSaleService(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "4-10-000-020", "Cr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getRevORSaleService();
-        aAccIncomeStatement.setRevORSaleDisc(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "4-10-000-030", "Dr"));
-        TempTotal = TempTotal - aAccIncomeStatement.getRevORSaleDisc();
-        aAccIncomeStatement.setRevORSaleReturn(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "4-10-000-040", "Dr"));
-        TempTotal = TempTotal - aAccIncomeStatement.getRevORSaleReturn();
-        //Revenue - OR(Sales) - Total
-        aAccIncomeStatement.setRevORSaleTotal(TempTotal);
-        TempTotal = 0;
-        //Revenue - NOR
-        aAccIncomeStatement.setRevNORInterest(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "4-20-000-010", "Cr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getRevNORInterest();
-        aAccIncomeStatement.setRevNORDividend(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "4-20-000-020", "Cr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getRevNORDividend();
-        aAccIncomeStatement.setRevNORCommission(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "4-20-000-030", "Cr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getRevNORCommission();
-        aAccIncomeStatement.setRevNORRental(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "4-20-000-040", "Cr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getRevNORRental();
-        aAccIncomeStatement.setRevNORGainSaleAsset(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "4-20-000-050", "Cr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getRevNORGainSaleAsset();
-        aAccIncomeStatement.setRevNORGainGift(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "4-20-000-060", "Cr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getRevNORGainGift();
-        aAccIncomeStatement.setRevNORGainExchange(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "4-20-000-070", "Cr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getRevNORGainExchange();
-        aAccIncomeStatement.setRevNOROther(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "4-20-000-080", "Cr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getRevNOROther();
-        //Revenue - NOR - Total
-        aAccIncomeStatement.setRevNORTotal(TempTotal);
-        TempTotal = 0;
-        aAccIncomeStatement.setRevTotal(aAccIncomeStatement.getRevORSaleTotal() + aAccIncomeStatement.getRevNORTotal());
-
-        //Expenses - COGS
-        aAccIncomeStatement.setExpCOGSProduct(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-10-000-010", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpCOGSProduct();
-        aAccIncomeStatement.setExpCOGSService(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-10-000-020", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpCOGSService();
-        aAccIncomeStatement.setExpCOGSFreight(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-10-000-030", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpCOGSFreight();
-        aAccIncomeStatement.setExpCOGSInvAdj(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-10-000-040", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpCOGSInvAdj();
-        aAccIncomeStatement.setExpCOGSReturn(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-10-000-050", "Cr"));
-        TempTotal = TempTotal - aAccIncomeStatement.getExpCOGSReturn();
-        aAccIncomeStatement.setExpCOGSDisc(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-10-000-060", "Cr"));
-        TempTotal = TempTotal - aAccIncomeStatement.getExpCOGSDisc();
-        aAccIncomeStatement.setExpCOGSManfSold(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-10-000-070", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpCOGSManfSold();
-        aAccIncomeStatement.setExpCOGSLoyalty(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-10-000-080", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpCOGSLoyalty();
-        aAccIncomeStatement.setExpCOGSInvWriteOff(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-10-000-090", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpCOGSInvWriteOff();
-        //Expense COGS - Total
-        aAccIncomeStatement.setExpCOGSTotal(TempTotal);
-        TempTotal = 0;
-        if (aAccIncomeStatement.getExpCOGSTotal() >= 0) {
-            aAccIncomeStatement.setGrossProfit(aAccIncomeStatement.getRevTotal() - aAccIncomeStatement.getExpCOGSTotal());
-        } else {
-            aAccIncomeStatement.setGrossProfit(aAccIncomeStatement.getRevTotal() + aAccIncomeStatement.getExpCOGSTotal());
-        }
-
-        //Expenses - OE
-        aAccIncomeStatement.setExpOEAdvertise(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-000", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOEAdvertise();
-        aAccIncomeStatement.setExpOEAudit(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-010", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOEAudit();
-        aAccIncomeStatement.setExpOEBadDebts(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-020", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOEBadDebts();
-        aAccIncomeStatement.setExpOECommission(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-030", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOECommission();
-        aAccIncomeStatement.setExpOEComputer(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-040", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOEComputer();
-        aAccIncomeStatement.setExpOEDonations(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-050", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOEDonations();
-        aAccIncomeStatement.setExpOEEntertainment(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-060", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOEEntertainment();
-        aAccIncomeStatement.setExpOEFreightTransport(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-070", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOEFreightTransport();
-        aAccIncomeStatement.setExpOEGift(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-080", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOEGift();
-        aAccIncomeStatement.setExpOEHotelLodging(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-090", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOEHotelLodging();
-        aAccIncomeStatement.setExpOELegal(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-100", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOELegal();
-        aAccIncomeStatement.setExpOEUtility(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-110", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOEUtility();
-        aAccIncomeStatement.setExpOERent(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-120", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOERent();
-        aAccIncomeStatement.setExpOERates(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-130", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOERates();
-        aAccIncomeStatement.setExpOERepairMaint(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-140", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOERepairMaint();
-        aAccIncomeStatement.setExpOESalesPromotion(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-150", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOESalesPromotion();
-        aAccIncomeStatement.setExpOEStaffWelfare(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-160", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOEStaffWelfare();
-        aAccIncomeStatement.setExpOEStartupPreOperate(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-170", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOEStartupPreOperate();
-        aAccIncomeStatement.setExpOEStationeryPrint(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-180", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOEStationeryPrint();
-        aAccIncomeStatement.setExpOESubsAllowance(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-190", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOESubsAllowance();
-        aAccIncomeStatement.setExpOETelephone(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-200", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOETelephone();
-        aAccIncomeStatement.setExpOETraining(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-210", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOETraining();
-        aAccIncomeStatement.setExpOETravel(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-220", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOETravel();
-        aAccIncomeStatement.setExpOEWorkshopConf(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-230", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOEWorkshopConf();
-        aAccIncomeStatement.setExpOEInternet(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-240", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOEInternet();
-        aAccIncomeStatement.setExpOEDepriciation(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-250", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOEDepriciation();
-        aAccIncomeStatement.setExpOELossDisposalAsset(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-260", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOELossDisposalAsset();
-        aAccIncomeStatement.setExpOEManagementFees(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-270", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOEManagementFees();
-        aAccIncomeStatement.setExpOEScientificResearch(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-280", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOEScientificResearch();
-        aAccIncomeStatement.setExpOEEmployment(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-290", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOEEmployment();
-        aAccIncomeStatement.setExpOEFinancial(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-300", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOEFinancial();
-        aAccIncomeStatement.setExpOEShortInsurance(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-400", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOEShortInsurance();
-        aAccIncomeStatement.setExpOEIncomeTax(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-410", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOEIncomeTax();
-        aAccIncomeStatement.setExpOEProposedDividend(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-420", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOEProposedDividend();
-        aAccIncomeStatement.setExpOEOther(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-430", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpOEOther();
-        //Expense OE - Total
-        aAccIncomeStatement.setExpOETotal(TempTotal);
-        TempTotal = 0;
-
-        //Expense NOE
-        aAccIncomeStatement.setExpNOE(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-30-000", "Dr"));
-        TempTotal = TempTotal + aAccIncomeStatement.getExpNOE();
-        //Expense OE - Total
-        aAccIncomeStatement.setExpNOETotal(TempTotal);
-        TempTotal = 0;
-
-        //Expenses Total
-        aAccIncomeStatement.setExpOENOETotal(aAccIncomeStatement.getExpOETotal() + aAccIncomeStatement.getExpNOETotal());
-        //Net Profit
-        //aAccIncomeStatement.setNetProfit(aAccIncomeStatement.getRevTotal() - aAccIncomeStatement.getExpCOGSTotal() - aAccIncomeStatement.getExpOENOETotal());
-        double LessExpCOGSTotal = 0;
-        if (aAccIncomeStatement.getExpCOGSTotal() >= 0) {
-            LessExpCOGSTotal = -1 * aAccIncomeStatement.getExpCOGSTotal();
-        } else {
-            LessExpCOGSTotal = aAccIncomeStatement.getExpCOGSTotal();
-        }
-        double LessExpOENOETotal = 0;
-        if (aAccIncomeStatement.getExpOENOETotal() >= 0) {
-            LessExpOENOETotal = -1 * aAccIncomeStatement.getExpOENOETotal();
-        } else {
-            LessExpOENOETotal = aAccIncomeStatement.getExpOENOETotal();
-        }
-        aAccIncomeStatement.setNetProfit((aAccIncomeStatement.getRevTotal() + LessExpCOGSTotal) + LessExpOENOETotal);
     }
 
     public void refreshAccIncomeStatement(AccIncomeStatement aAccIncomeStatement, Date aDate1, Date aDate2) {
@@ -2920,6 +2803,173 @@ public class AccLedgerBean implements Serializable {
         aAccIncomeStatement.setNetProfit((aAccIncomeStatement.getRevTotal() + LessExpCOGSTotal) + LessExpOENOETotal);
     }
 
+    public void refreshAccIncomeStatement(AccIncomeStatement aAccIncomeStatement) {
+        double TempTotal = 0;
+        //Revenue - OR(Sales)
+        aAccIncomeStatement.setRevORSaleProduct(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "4-10-000-010", "Cr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getRevORSaleProduct();
+        aAccIncomeStatement.setRevORSaleService(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "4-10-000-020", "Cr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getRevORSaleService();
+        aAccIncomeStatement.setRevORSaleHire(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "4-10-000-050", "Cr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getRevORSaleHire();
+        aAccIncomeStatement.setRevORSaleDisc(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "4-10-000-030", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal - aAccIncomeStatement.getRevORSaleDisc();
+        aAccIncomeStatement.setRevORSaleReturn(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "4-10-000-040", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal - aAccIncomeStatement.getRevORSaleReturn();
+        //Revenue - OR(Sales) - Total
+        aAccIncomeStatement.setRevORSaleTotal(TempTotal);
+        TempTotal = 0;
+        //Revenue - NOR
+        aAccIncomeStatement.setRevNORInterest(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "4-20-000-010", "Cr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getRevNORInterest();
+        aAccIncomeStatement.setRevNORDividend(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "4-20-000-020", "Cr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getRevNORDividend();
+        aAccIncomeStatement.setRevNORCommission(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "4-20-000-030", "Cr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getRevNORCommission();
+        aAccIncomeStatement.setRevNORRental(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "4-20-000-040", "Cr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getRevNORRental();
+        aAccIncomeStatement.setRevNORGainSaleAsset(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "4-20-000-050", "Cr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getRevNORGainSaleAsset();
+        aAccIncomeStatement.setRevNORGainGift(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "4-20-000-060", "Cr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getRevNORGainGift();
+        aAccIncomeStatement.setRevNORGainExchange(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "4-20-000-070", "Cr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getRevNORGainExchange();
+        aAccIncomeStatement.setRevNOROther(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "4-20-000-080", "Cr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getRevNOROther();
+        //Revenue - NOR - Total
+        aAccIncomeStatement.setRevNORTotal(TempTotal);
+        TempTotal = 0;
+        aAccIncomeStatement.setRevTotal(aAccIncomeStatement.getRevORSaleTotal() + aAccIncomeStatement.getRevNORTotal());
+
+        //Expenses - COGS
+        aAccIncomeStatement.setExpCOGSProduct(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-10-000-010", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpCOGSProduct();
+        aAccIncomeStatement.setExpCOGSService(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-10-000-020", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpCOGSService();
+        aAccIncomeStatement.setExpCOGSFreight(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-10-000-030", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpCOGSFreight();
+        aAccIncomeStatement.setExpCOGSInvAdj(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-10-000-040", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpCOGSInvAdj();
+        aAccIncomeStatement.setExpCOGSReturn(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-10-000-050", "Cr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal - aAccIncomeStatement.getExpCOGSReturn();
+        aAccIncomeStatement.setExpCOGSDisc(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-10-000-060", "Cr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal - aAccIncomeStatement.getExpCOGSDisc();
+        aAccIncomeStatement.setExpCOGSManfSold(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-10-000-070", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpCOGSManfSold();
+        aAccIncomeStatement.setExpCOGSLoyalty(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-10-000-080", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpCOGSLoyalty();
+        aAccIncomeStatement.setExpCOGSInvWriteOff(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-10-000-090", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpCOGSInvWriteOff();
+        //Expense COGS - Total
+        aAccIncomeStatement.setExpCOGSTotal(TempTotal);
+        TempTotal = 0;
+        if (aAccIncomeStatement.getExpCOGSTotal() >= 0) {
+            aAccIncomeStatement.setGrossProfit(aAccIncomeStatement.getRevTotal() - aAccIncomeStatement.getExpCOGSTotal());
+        } else {
+            aAccIncomeStatement.setGrossProfit(aAccIncomeStatement.getRevTotal() + aAccIncomeStatement.getExpCOGSTotal());
+        }
+
+        //Expenses - OE
+        aAccIncomeStatement.setExpOEAdvertise(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-000", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOEAdvertise();
+        aAccIncomeStatement.setExpOEAudit(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-010", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOEAudit();
+        aAccIncomeStatement.setExpOEBadDebts(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-020", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOEBadDebts();
+        aAccIncomeStatement.setExpOECommission(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-030", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOECommission();
+        aAccIncomeStatement.setExpOEComputer(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-040", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOEComputer();
+        aAccIncomeStatement.setExpOEDonations(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-050", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOEDonations();
+        aAccIncomeStatement.setExpOEEntertainment(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-060", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOEEntertainment();
+        aAccIncomeStatement.setExpOEFreightTransport(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-070", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOEFreightTransport();
+        aAccIncomeStatement.setExpOEGift(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-080", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOEGift();
+        aAccIncomeStatement.setExpOEHotelLodging(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-090", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOEHotelLodging();
+        aAccIncomeStatement.setExpOELegal(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-100", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOELegal();
+        aAccIncomeStatement.setExpOEUtility(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-110", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOEUtility();
+        aAccIncomeStatement.setExpOERent(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-120", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOERent();
+        aAccIncomeStatement.setExpOERates(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-130", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOERates();
+        aAccIncomeStatement.setExpOERepairMaint(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-140", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOERepairMaint();
+        aAccIncomeStatement.setExpOESalesPromotion(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-150", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOESalesPromotion();
+        aAccIncomeStatement.setExpOEStaffWelfare(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-160", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOEStaffWelfare();
+        aAccIncomeStatement.setExpOEStartupPreOperate(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-170", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOEStartupPreOperate();
+        aAccIncomeStatement.setExpOEStationeryPrint(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-180", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOEStationeryPrint();
+        aAccIncomeStatement.setExpOESubsAllowance(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-190", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOESubsAllowance();
+        aAccIncomeStatement.setExpOETelephone(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-200", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOETelephone();
+        aAccIncomeStatement.setExpOETraining(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-210", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOETraining();
+        aAccIncomeStatement.setExpOETravel(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-220", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOETravel();
+        aAccIncomeStatement.setExpOEWorkshopConf(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-230", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOEWorkshopConf();
+        aAccIncomeStatement.setExpOEInternet(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-240", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOEInternet();
+        aAccIncomeStatement.setExpOEDepriciation(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-250", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOEDepriciation();
+        aAccIncomeStatement.setExpOELossDisposalAsset(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-260", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOELossDisposalAsset();
+        aAccIncomeStatement.setExpOEManagementFees(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-270", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOEManagementFees();
+        aAccIncomeStatement.setExpOEScientificResearch(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-280", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOEScientificResearch();
+        aAccIncomeStatement.setExpOEEmployment(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-290", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOEEmployment();
+        aAccIncomeStatement.setExpOEFinancial(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-300", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOEFinancial();
+        aAccIncomeStatement.setExpOEShortInsurance(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-400", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOEShortInsurance();
+        aAccIncomeStatement.setExpOEIncomeTax(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-410", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOEIncomeTax();
+        aAccIncomeStatement.setExpOEProposedDividend(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-420", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOEProposedDividend();
+        aAccIncomeStatement.setExpOEOther(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-20-430", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpOEOther();
+        //Expense OE - Total
+        aAccIncomeStatement.setExpOETotal(TempTotal);
+        TempTotal = 0;
+
+        //Expense NOE
+        aAccIncomeStatement.setExpNOE(this.balanceAccountsStartWith(aAccIncomeStatement.getAccPeriodId(), "5-30-000", "Dr", aAccIncomeStatement.getDate1(), aAccIncomeStatement.getDate2()));
+        TempTotal = TempTotal + aAccIncomeStatement.getExpNOE();
+        //Expense OE - Total
+        aAccIncomeStatement.setExpNOETotal(TempTotal);
+        TempTotal = 0;
+
+        //Expenses Total
+        aAccIncomeStatement.setExpOENOETotal(aAccIncomeStatement.getExpOETotal() + aAccIncomeStatement.getExpNOETotal());
+        //Net Profit
+        //aAccIncomeStatement.setNetProfit(aAccIncomeStatement.getRevTotal() - aAccIncomeStatement.getExpCOGSTotal() - aAccIncomeStatement.getExpOENOETotal());
+        double LessExpCOGSTotal = 0;
+        if (aAccIncomeStatement.getExpCOGSTotal() >= 0) {
+            LessExpCOGSTotal = -1 * aAccIncomeStatement.getExpCOGSTotal();
+        } else {
+            LessExpCOGSTotal = aAccIncomeStatement.getExpCOGSTotal();
+        }
+        double LessExpOENOETotal = 0;
+        if (aAccIncomeStatement.getExpOENOETotal() >= 0) {
+            LessExpOENOETotal = -1 * aAccIncomeStatement.getExpOENOETotal();
+        } else {
+            LessExpOENOETotal = aAccIncomeStatement.getExpOENOETotal();
+        }
+        aAccIncomeStatement.setNetProfit((aAccIncomeStatement.getRevTotal() + LessExpCOGSTotal) + LessExpOENOETotal);
+    }
+
     public void initResetAccLedgerReport(AccLedger aAccLedger, AccLedgerBean aAccLedgerBean) {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -2954,6 +3004,8 @@ public class AccLedgerBean implements Serializable {
             // Skip ajax requests.
         } else {
             aAccIncomeStatement = new AccIncomeStatement();
+            aAccIncomeStatement.setDate1(null);
+            aAccIncomeStatement.setDate2(null);
         }
     }
 
@@ -3187,5 +3239,47 @@ public class AccLedgerBean implements Serializable {
      */
     public void setCategoryHeader(String CategoryHeader) {
         this.CategoryHeader = CategoryHeader;
+    }
+
+    /**
+     * @return the JournalList
+     */
+    public List<AccJournal> getJournalList() {
+        return JournalList;
+    }
+
+    /**
+     * @param JournalList the JournalList to set
+     */
+    public void setJournalList(List<AccJournal> JournalList) {
+        this.JournalList = JournalList;
+    }
+
+    /**
+     * @return the n
+     */
+    public long getN() {
+        return n;
+    }
+
+    /**
+     * @param n the n to set
+     */
+    public void setN(long n) {
+        this.n = n;
+    }
+
+    /**
+     * @return the i
+     */
+    public long getI() {
+        return i;
+    }
+
+    /**
+     * @param i the i to set
+     */
+    public void setI(long i) {
+        this.i = i;
     }
 }
