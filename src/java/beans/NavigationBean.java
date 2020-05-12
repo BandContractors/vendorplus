@@ -1397,6 +1397,10 @@ public class NavigationBean implements Serializable {
     public String redirectToReportItemDetailStock() {
         return "ReportItemDetailStock?faces-redirect=true";
     }
+    
+    public String redirectToReportItemDetail() {
+        return "ReportItemDetail?faces-redirect=true";
+    }
 
     public String redirectToReportItemDetailExpense() {
         return "ReportItemDetailExpense?faces-redirect=true";

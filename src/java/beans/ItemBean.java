@@ -1044,6 +1044,7 @@ public class ItemBean implements Serializable {
                 aItem.setExpiry_band("");
                 aItem.setOverride_gen_name(0);
                 aItem.setHide_unit_price_invoice(0);
+                aItem.setPurpose("");
                 this.setSearchItemDesc("");
                 this.refreshStockLocation(0);
             }
@@ -1856,6 +1857,73 @@ public class ItemBean implements Serializable {
             this.ReportItemsSummary.clear();
         }
         return this.ReportItemsSummary;
+    }
+
+    public void reportItemDetail(String aPurpose, String aItemType, int aCategoryId, int aSubCategoryId, String aCurrency, String aIsSuspended, int aIsGeneral) {
+        String sql = "SELECT * FROM view_item_detail WHERE 1=1";
+        String wheresql = "";
+        String ordersql = "";
+        ResultSet rs = null;
+        this.setItemsList(new ArrayList<>());
+        this.setItemsSummary(new ArrayList<>());
+        AccCoaBean acb = new AccCoaBean();
+        if (aPurpose.length() > 0) {
+            wheresql = wheresql + " AND purpose='" + aPurpose + "'";
+        }
+        if (aItemType.length() > 0) {
+            wheresql = wheresql + " AND item_type='" + aItemType + "'";
+        }
+        if (aCategoryId > 0) {
+            wheresql = wheresql + " AND category_id=" + aCategoryId;
+        }
+        if (aSubCategoryId > 0) {
+            wheresql = wheresql + " AND sub_category_id=" + aSubCategoryId;
+        }
+        if (aCurrency.length() > 0) {
+            wheresql = wheresql + " AND currency_code='" + aCurrency + "'";
+        }
+        if (aIsSuspended.length() > 0) {
+            wheresql = wheresql + " AND is_suspended='" + aIsSuspended + "'";
+        }
+        if (aIsGeneral == 10) {
+            wheresql = wheresql + " AND is_general=0";
+        }
+        if (aIsGeneral == 11) {
+            wheresql = wheresql + " AND is_general=1";
+        }
+        ordersql = " ORDER BY description ASC";
+        sql = sql + wheresql + ordersql;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            Item item = null;
+            while (rs.next()) {
+                item = new Item();
+                this.setItemFromResultsetReport(item, rs);
+                try {
+                    item.setPurpose(rs.getString("purpose"));
+                } catch (Exception e) {
+                    item.setPurpose("");
+                }
+                //merge asset details with non asset
+                if (item.getIsAsset() == 1) {
+                    item.setExpense_type(item.getAssetType());
+                    item.setExpenseAccountCode(item.getAssetAccountCode());
+                }
+                //retrieve account details
+                String accname = "";
+                try {
+                    accname = acb.getAccCoaByCodeOrId(item.getExpenseAccountCode(), 0).getAccountName();
+                } catch (Exception e) {
+                    //do nothing
+                }
+                item.setAccount_name(accname);
+                this.getItemsList().add(item);
+            }
+        } catch (SQLException se) {
+            System.err.println(se.getMessage());
+        }
     }
 
     public void reportItemDetailStock(String aItemType, int aCategoryId, int aSubCategoryId, String aCurrency, String aIsSuspended, int aIsGeneral) {

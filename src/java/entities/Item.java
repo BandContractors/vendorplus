@@ -65,6 +65,8 @@ public class Item implements Serializable {
     private String expiry_band;
     private int override_gen_name;
     private int hide_unit_price_invoice;
+    private String account_name;
+    private String purpose;
     
     /**
      * @return the ItemId
@@ -729,6 +731,34 @@ public class Item implements Serializable {
      */
     public void setHide_unit_price_invoice(int hide_unit_price_invoice) {
         this.hide_unit_price_invoice = hide_unit_price_invoice;
+    }
+
+    /**
+     * @return the account_name
+     */
+    public String getAccount_name() {
+        return account_name;
+    }
+
+    /**
+     * @param account_name the account_name to set
+     */
+    public void setAccount_name(String account_name) {
+        this.account_name = account_name;
+    }
+
+    /**
+     * @return the purpose
+     */
+    public String getPurpose() {
+        return purpose;
+    }
+
+    /**
+     * @param purpose the purpose to set
+     */
+    public void setPurpose(String purpose) {
+        this.purpose = purpose;
     }
 
 }
