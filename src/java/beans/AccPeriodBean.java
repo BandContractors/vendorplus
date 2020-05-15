@@ -2,6 +2,7 @@ package beans;
 
 import connections.DBConnection;
 import entities.AccPeriod;
+import entities.CompanySetting;
 import entities.GroupRight;
 import entities.UserDetail;
 import java.io.Serializable;
@@ -11,6 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.faces.application.FacesMessage;
@@ -18,6 +20,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import sessions.GeneralUserSetting;
+import utilities.UtilityBean;
 
 /*
  * To change this template, choose Tools | Templates
@@ -262,14 +265,14 @@ public class AccPeriodBean implements Serializable {
             }
         }
     }
-    
-    public int updateAccPeriodOrder(int aAccPeriodId,int aOrderNo) {
+
+    public int updateAccPeriodOrder(int aAccPeriodId, int aOrderNo) {
         int saved = 0;
         String sql = "UPDATE acc_period SET order_no=" + aOrderNo + " WHERE acc_period_id=" + aAccPeriodId;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 CallableStatement cs = conn.prepareCall(sql);) {
-            if (aAccPeriodId>0) {
+            if (aAccPeriodId > 0) {
                 cs.executeUpdate();
                 saved = 1;
             }
@@ -282,11 +285,11 @@ public class AccPeriodBean implements Serializable {
     public void closeAccPeriod(AccPeriod aAccPeriod) {
         int x = 0;
         String sql = "{call sp_close_account_period(?)}";
-        
+
         //first take snapshots of stock and xrates
         this.saveSnapshotStockValue(aAccPeriod);
         this.saveSnapshotXrate(aAccPeriod);
-        
+
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 CallableStatement cs = conn.prepareCall(sql);) {
@@ -317,7 +320,7 @@ public class AccPeriodBean implements Serializable {
         int x = 0;
         AccPeriod PrevAccPeriod = null;
         PrevAccPeriod = this.getAccPeriodByOrder(aAccPeriodToOpen.getOrderNo() - 1);
-        if ((null == PrevAccPeriod || PrevAccPeriod.getIsClosed() == 0) && this.getAccPeriodsCurrentFirst().size()>0) {
+        if ((null == PrevAccPeriod || PrevAccPeriod.getIsClosed() == 0) && this.getAccPeriodsCurrentFirst().size() > 0) {
             this.setActionMessage("Accounting Period CANNOT BE OPENED, when the previous Accounting Period is NOT CLOSED!");
         } else {
             aAccPeriodToOpen.setIsOpen(1);
@@ -349,7 +352,7 @@ public class AccPeriodBean implements Serializable {
     }
 
     public void reopenAccPeriod(AccPeriod aAccPeriodToOpen) {
-        
+
     }
 
     public AccPeriod getAccPeriodById(int aAccPeriodId) {
@@ -436,6 +439,24 @@ public class AccPeriodBean implements Serializable {
                     System.err.println(ex.getMessage());
                 }
             }
+        }
+        return accperiod;
+    }
+
+    public AccPeriod getAccPeriodLatest() {
+        String sql = "SELECT * FROM acc_period ORDER BY end_date DESC LIMIT 1";
+        ResultSet rs = null;
+        AccPeriod accperiod = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                accperiod = new AccPeriod();
+                this.setAccPeriodFromResultset(accperiod, rs);
+            }
+        } catch (Exception e) {
+            System.err.println("getAccPeriodLatest:" + e.getMessage());
         }
         return accperiod;
     }
@@ -550,13 +571,13 @@ public class AccPeriodBean implements Serializable {
         }
         return lst;
     }
-    
+
     public void arrangeAccPeriodsOrder() {
         String sql;
         sql = "select * from acc_period order by start_date ASC";
         ResultSet rs = null;
-        int orderno=1;
-        AccPeriod accperiod=null;
+        int orderno = 1;
+        AccPeriod accperiod = null;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -564,8 +585,12 @@ public class AccPeriodBean implements Serializable {
             while (rs.next()) {
                 accperiod = new AccPeriod();
                 this.setAccPeriodFromResultset(accperiod, rs);
-                int x=this.updateAccPeriodOrder(accperiod.getAccPeriodId(), orderno);
-                orderno=orderno+1;
+                if (orderno == rs.getInt("order_no")) {
+                    //do nothing
+                } else {
+                    int x = this.updateAccPeriodOrder(accperiod.getAccPeriodId(), orderno);
+                }
+                orderno = orderno + 1;
             }
         } catch (SQLException se) {
             System.err.println(se.getMessage());
@@ -580,13 +605,114 @@ public class AccPeriodBean implements Serializable {
         }
     }
 
-    public void initClearAccPeriod(AccPeriod aAccPeriod) {
-        if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
-            // Skip ajax requests.
+    public void setNextAccPeriodStartEndDate(AccPeriod NewAccPeriod) {
+        Calendar calLatest = Calendar.getInstance();
+        int AccPrdEndDay = 0;
+        int AccPrdEndMonth = 0;
+        int startYear = 0;
+        int endYear = 0;
+
+        String AccPeriodEndDate = "";
+        Date aDate = null;
+        AccPeriod LatestAccPeriod = this.getAccPeriodLatest();
+        if (null == LatestAccPeriod) {
+            LatestAccPeriod = new AccPeriod();
+        }
+        if (LatestAccPeriod.getAccPeriodId() == 0) {
+            calLatest.setTime(new CompanySetting().getCURRENT_SERVER_DATE());
         } else {
-            if (aAccPeriod != null) {
-                this.clearAccPeriod(aAccPeriod);
+            calLatest.setTime(LatestAccPeriod.getEndDate());
+        }
+        //get company setting's end day and month
+        try {
+            AccPeriodEndDate = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "ACCOUNTING_PERIOD_END_DATE").getParameter_value();
+            if (AccPeriodEndDate.length() == 5) {
+                AccPrdEndDay = Integer.parseInt(AccPeriodEndDate.substring(0, 2));
+                AccPrdEndMonth = Integer.parseInt(AccPeriodEndDate.substring(3));
             }
+        } catch (Exception e) {
+            //
+        }
+
+        //get New AccPeriod start date
+        Calendar calStart = Calendar.getInstance();
+        calStart.set(Calendar.DAY_OF_MONTH, 1);
+        if (AccPrdEndMonth == 12) {
+            calStart.set(Calendar.MONTH, 0);//0 is Jan
+        } else {
+            calStart.set(Calendar.MONTH, AccPrdEndMonth);
+        }
+        if (AccPrdEndMonth == 12) {
+            startYear = calLatest.get(Calendar.YEAR) + 1;
+            calStart.set(Calendar.YEAR, startYear);
+        } else {
+            startYear = calLatest.get(Calendar.YEAR);
+            calStart.set(Calendar.YEAR, startYear);
+        }
+        calStart.set(Calendar.HOUR_OF_DAY, 0);
+        calStart.set(Calendar.MINUTE, 0);
+        calStart.set(Calendar.SECOND, 0);
+        calStart.set(Calendar.MILLISECOND, 0);
+        NewAccPeriod.setStartDate(calStart.getTime());
+
+        //get New AccPeriod end date
+        Calendar calEnd = Calendar.getInstance();
+        calEnd.set(Calendar.DAY_OF_MONTH, AccPrdEndDay);
+        if (AccPrdEndMonth == 12) {
+            calEnd.set(Calendar.MONTH, AccPrdEndMonth - 1);//0 is Jan
+        } else {
+            calEnd.set(Calendar.MONTH, AccPrdEndMonth - 1);
+        }
+        if (AccPrdEndMonth == 12) {
+            endYear = calLatest.get(Calendar.YEAR) + 1;
+            calEnd.set(Calendar.YEAR, endYear);
+        } else {
+            endYear = calLatest.get(Calendar.YEAR) + 1;
+            calEnd.set(Calendar.YEAR, endYear);
+        }
+        calEnd.set(Calendar.HOUR_OF_DAY, 0);
+        calEnd.set(Calendar.MINUTE, 0);
+        calEnd.set(Calendar.SECOND, 0);
+        calEnd.set(Calendar.MILLISECOND, 0);
+        NewAccPeriod.setEndDate(calEnd.getTime());
+
+        //account period year and order
+        if (startYear == endYear) {
+            NewAccPeriod.setAccPeriodName(Integer.toString(startYear));
+        } else {
+            NewAccPeriod.setAccPeriodName(Integer.toString(startYear) + "-" + Integer.toString(endYear));
+        }
+        NewAccPeriod.setOrderNo(LatestAccPeriod.getOrderNo() + 1);
+    }
+
+    public void initAddNewAccPeriod(AccPeriod aAccPeriod) {
+        try {
+            if (null != aAccPeriod) {
+                this.setNextAccPeriodStartEndDate(aAccPeriod);
+                aAccPeriod.setAction_mode(1);//0-dont show; 1-add new; 2-edit
+                aAccPeriod.setAccPeriodId(0);
+                //aAccPeriod.setAccPeriodName("");
+                aAccPeriod.setIsCurrent(0);
+                //aAccPeriod.setStartDate(null);
+                //aAccPeriod.setEndDate(null);
+                aAccPeriod.setIsActive(0);
+                aAccPeriod.setIsDeleted(0);
+                aAccPeriod.setIsOpen(0);
+                aAccPeriod.setIsClosed(0);
+                //aAccPeriod.setOrderNo(0);
+                aAccPeriod.setAddBy(0);
+                aAccPeriod.setLastEditBy(0);
+                aAccPeriod.setAddDate(null);
+                aAccPeriod.setLastEditDate(null);
+            }
+        } catch (Exception e) {
+            System.out.println("initAddNewAccPeriod:" + e.getMessage());
+        }
+    }
+
+    public void initClearAccPeriod(AccPeriod aAccPeriod) {
+        if (null != aAccPeriod) {
+            this.clearAccPeriod(aAccPeriod);
         }
     }
 
@@ -606,10 +732,12 @@ public class AccPeriodBean implements Serializable {
             aAccPeriod.setLastEditBy(0);
             aAccPeriod.setAddDate(null);
             aAccPeriod.setLastEditDate(null);
+            aAccPeriod.setAction_mode(0);
         }
     }
 
     public void copyAccPeriod(AccPeriod aFrom, AccPeriod aTo) {
+        aTo.setAction_mode(2);
         aTo.setAccPeriodId(aFrom.getAccPeriodId());
         aTo.setAccPeriodName(aFrom.getAccPeriodName());
         aTo.setStartDate(aFrom.getStartDate());
@@ -631,12 +759,19 @@ public class AccPeriodBean implements Serializable {
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
+        String sql2 = "SELECT COUNT(*) AS n from acc_journal WHERE acc_period_id=+" + aAccPeriod.getAccPeriodId();
 
+        if (null != aAccPeriod) {
+            aAccPeriod.setAction_mode(0);
+        }
         if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "53", "Delete") == 0) {
             msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+        } else if (new UtilityBean().getN(sql2) > 0) {
+            msg = "SELECTED ACCOUNTING PERIOD CANNOT BE DELETED; IT HAS JOURNAL ENTRIES, CONTACT SYSTEM ADMINISTRATOR...";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
         } else {
-            String sql = "UPDATE acc_period SET is_deleted=1 WHERE acc_period_id=?";
+            String sql = "DELETE FROM acc_period WHERE acc_period_id=?";
             try (
                     Connection conn = DBConnection.getMySQLConnection();
                     PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -650,7 +785,7 @@ public class AccPeriodBean implements Serializable {
             }
         }
     }
-    
+
     public int saveSnapshotStockValue(AccPeriod aAccPeriod) {
         int saved = 0;
         String sql = "{call sp_take_snapshot_stock_value(?)}";
@@ -671,7 +806,7 @@ public class AccPeriodBean implements Serializable {
         }
         return saved;
     }
-    
+
     public int saveSnapshotXrate(AccPeriod aAccPeriod) {
         int saved = 0;
         String sql = "{call sp_take_snapshot_xrate(?)}";

@@ -32,6 +32,7 @@ public class AccPeriod implements Serializable {
     private int AddBy;
     private Date LastEditDate;
     private int LastEditBy;
+    private int action_mode; //0-dont show; 1-add new; 2-edit
 
     /**
      * @return the AccPeriodId
@@ -227,6 +228,20 @@ public class AccPeriod implements Serializable {
      */
     public void setOrderNo(int OrderNo) {
         this.OrderNo = OrderNo;
+    }
+
+    /**
+     * @return the action_mode
+     */
+    public int getAction_mode() {
+        return action_mode;
+    }
+
+    /**
+     * @param action_mode the action_mode to set
+     */
+    public void setAction_mode(int action_mode) {
+        this.action_mode = action_mode;
     }
 
 }
