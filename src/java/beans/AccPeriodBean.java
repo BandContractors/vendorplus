@@ -283,13 +283,10 @@ public class AccPeriodBean implements Serializable {
     }
 
     public void closeAccPeriod(AccPeriod aAccPeriod) {
+        String msg = "";
         int x = 0;
         String sql = "{call sp_close_account_period(?)}";
-
-        //first take snapshots of stock and xrates
-        this.saveSnapshotStockValue(aAccPeriod);
         this.saveSnapshotXrate(aAccPeriod);
-
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 CallableStatement cs = conn.prepareCall(sql);) {
@@ -305,23 +302,43 @@ public class AccPeriodBean implements Serializable {
                         cs.setInt("in_acc_period_id", 0);
                     }
                     cs.executeUpdate();
-                    this.setActionMessage("Accounting Period CLOSED Successfully!");
+                    msg = "Accounting Period CLOSED Successfully!";
+                    this.setActionMessage(msg);
+                    FacesContext.getCurrentInstance().addMessage("Close", new FacesMessage(msg));
                 } else {
-                    this.setActionMessage("Accounting Period NOT CLOSED!");
+                    msg = "Accounting Period NOT CLOSED!";
+                    this.setActionMessage(msg);
+                    FacesContext.getCurrentInstance().addMessage("Close", new FacesMessage(msg));
                 }
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            msg = "An error occured:" + "closeAccPeriod:" + e.getMessage();
+            System.err.println(msg);
+            this.setActionMessage(msg);
+            FacesContext.getCurrentInstance().addMessage("Close", new FacesMessage(msg));
         }
     }
 
     public void openAccPeriod(AccPeriod aAccPeriodToOpen) {
+        String msg = "";
         String sql = "";
         int x = 0;
         AccPeriod PrevAccPeriod = null;
         PrevAccPeriod = this.getAccPeriodByOrder(aAccPeriodToOpen.getOrderNo() - 1);
-        if ((null == PrevAccPeriod || PrevAccPeriod.getIsClosed() == 0) && this.getAccPeriodsCurrentFirst().size() > 0) {
-            this.setActionMessage("Accounting Period CANNOT BE OPENED, when the previous Accounting Period is NOT CLOSED!");
+        if (null == PrevAccPeriod || this.getAccPeriodsCurrentFirst().size() == 1) {
+            aAccPeriodToOpen.setIsOpen(1);
+            aAccPeriodToOpen.setIsCurrent(1);
+            aAccPeriodToOpen.setIsClosed(0);
+            x = this.saveAccPeriod(aAccPeriodToOpen);
+            if (x == 1) {
+                msg = "Accounting Period OPENED Successfully!";
+                this.setActionMessage(msg);
+                FacesContext.getCurrentInstance().addMessage("Open", new FacesMessage(msg));
+            }
+        } else if (null != PrevAccPeriod && PrevAccPeriod.getIsClosed() == 0) {
+            msg = "Accounting Period CANNOT BE OPENED, when the previous Accounting Period is NOT CLOSED!";
+            this.setActionMessage(msg);
+            FacesContext.getCurrentInstance().addMessage("Open", new FacesMessage(msg));
         } else {
             aAccPeriodToOpen.setIsOpen(1);
             aAccPeriodToOpen.setIsCurrent(1);
@@ -343,9 +360,14 @@ public class AccPeriodBean implements Serializable {
                         cs.setInt("in_opened_acc_period_id", 0);
                     }
                     cs.executeUpdate();
-                    this.setActionMessage("Accounting Period OPENED Successfully!");
-                } catch (SQLException se) {
-                    System.err.println(se.getMessage());
+                    msg = "Accounting Period OPENED Successfully!";
+                    this.setActionMessage(msg);
+                    FacesContext.getCurrentInstance().addMessage("Open", new FacesMessage(msg));
+                } catch (Exception e) {
+                    msg = "An error occured:" + "openAccPeriod:" + e.getMessage();
+                    System.err.println(msg);
+                    this.setActionMessage(msg);
+                    FacesContext.getCurrentInstance().addMessage("Close", new FacesMessage(msg));
                 }
             }
         }
@@ -723,7 +745,7 @@ public class AccPeriodBean implements Serializable {
             aAccPeriod.setIsCurrent(0);
             aAccPeriod.setStartDate(null);
             aAccPeriod.setEndDate(null);
-            aAccPeriod.setIsActive(0);
+            aAccPeriod.setIsActive(1);
             aAccPeriod.setIsDeleted(0);
             aAccPeriod.setIsOpen(0);
             aAccPeriod.setIsClosed(0);
