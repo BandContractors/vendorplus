@@ -13483,6 +13483,8 @@ public class TransBean implements Serializable {
         aTransBean.setActionMessage("");
         try {
             this.clearTrans(aTrans);
+            aTrans.setTransactionTypeId(0);
+            aTrans.setTransactionReasonId(0);
         } catch (NullPointerException npe) {
         }
         try {
