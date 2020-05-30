@@ -33,6 +33,7 @@ public class AccPeriod implements Serializable {
     private Date LastEditDate;
     private int LastEditBy;
     private int action_mode; //0-dont show; 1-add new; 2-edit
+    private int is_reopen;
 
     /**
      * @return the AccPeriodId
@@ -242,6 +243,20 @@ public class AccPeriod implements Serializable {
      */
     public void setAction_mode(int action_mode) {
         this.action_mode = action_mode;
+    }
+
+    /**
+     * @return the is_reopen
+     */
+    public int getIs_reopen() {
+        return is_reopen;
+    }
+
+    /**
+     * @param is_reopen the is_reopen to set
+     */
+    public void setIs_reopen(int is_reopen) {
+        this.is_reopen = is_reopen;
     }
 
 }

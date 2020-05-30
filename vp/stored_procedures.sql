@@ -9450,14 +9450,33 @@ BEGIN
 		INSERT INTO acc_ledger_close(acc_period_id,account_code,currency_code,debit_bal,debit_bal_lc,credit_bal,credit_bal_lc) 
 		SELECT bal.acc_period_id,bal.account_code,bal.currency_code,bal.credit_bal,bal.credit_bal_lc,0,0 
 		FROM view_ledger_temp_acc_balances bal WHERE bal.acc_period_id=in_acc_period_id AND bal.credit_bal>0;
-
+		/*
 		INSERT INTO acc_ledger_close(acc_period_id,account_code,currency_code,debit_bal,debit_bal_lc,credit_bal,credit_bal_lc) 
 		SELECT cl.acc_period_id,'3-10-000-060',cl.currency_code,0,0,cl.debit_bal,cl.debit_bal_lc 
 		FROM acc_ledger_close cl WHERE cl.acc_period_id=in_acc_period_id AND cl.debit_bal>0;
-
+		*/
+		INSERT INTO acc_ledger_close(acc_period_id,account_code,currency_code,debit_bal,debit_bal_lc,credit_bal,credit_bal_lc) 
+		SELECT bal.acc_period_id,'3-10-000-060',bal.currency_code,bal.debit_bal,bal.debit_bal_lc,0,0 
+		FROM view_ledger_temp_acc_balances bal WHERE bal.acc_period_id=in_acc_period_id AND bal.debit_bal>0;
+		/*
 		INSERT INTO acc_ledger_close(acc_period_id,account_code,currency_code,debit_bal,debit_bal_lc,credit_bal,credit_bal_lc) 
 		SELECT cl.acc_period_id,'3-10-000-060',cl.currency_code,cl.credit_bal,cl.credit_bal_lc,0,0 
 		FROM acc_ledger_close cl WHERE cl.acc_period_id=in_acc_period_id AND cl.credit_bal>0;
+		*/
+		INSERT INTO acc_ledger_close(acc_period_id,account_code,currency_code,debit_bal,debit_bal_lc,credit_bal,credit_bal_lc) 
+		SELECT bal.acc_period_id,'3-10-000-060',bal.currency_code,0,0,bal.credit_bal,bal.credit_bal_lc 
+		FROM view_ledger_temp_acc_balances bal WHERE bal.acc_period_id=in_acc_period_id AND bal.credit_bal>0;
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_reopen_account_period;
+DELIMITER //
+CREATE PROCEDURE sp_reopen_account_period
+(
+		IN in_acc_period_id int
+) 
+BEGIN 		
+		DELETE FROM acc_ledger_close WHERE acc_ledger_close_id>0 AND acc_period_id=in_acc_period_id;
 END//
 DELIMITER ;
 
@@ -9562,7 +9581,8 @@ CREATE PROCEDURE sp_save_acc_period
 	IN in_is_closed int,
 	IN in_is_active int,
 	IN in_is_deleted int,
-	IN in_user_detail_id int
+	IN in_user_detail_id int,
+	IN in_is_reopen int
 ) 
 BEGIN 
 	SET @new_id=0;
@@ -9578,15 +9598,15 @@ BEGIN
 
 	if (in_acc_period_id=0) then 
 		INSERT INTO acc_period(acc_period_name,start_date,end_date,order_no,is_current,is_open,is_closed,is_active,is_deleted,
-		add_by,add_date,last_edit_by,last_edit_date) 
+		add_by,add_date,last_edit_by,last_edit_date,is_reopen) 
 		VALUES(in_acc_period_name,in_start_date,in_end_date,in_order_no,in_is_current,in_is_open,in_is_closed,in_is_active,in_is_deleted,
-		@in_user_detail_id,@cur_sys_datetime,null,null);
+		@in_user_detail_id,@cur_sys_datetime,null,null,in_is_reopen);
 	end if;
 
 	if (in_acc_period_id>0) then 
 		UPDATE acc_period SET acc_period_name=in_acc_period_name,start_date=in_start_date,end_date=in_end_date,
 		order_no=in_order_no,is_current=in_is_current,is_open=in_is_open,is_closed=in_is_closed,is_active=in_is_active,is_deleted=in_is_deleted,
-		last_edit_by=@in_user_detail_id,last_edit_date=@cur_sys_datetime WHERE acc_period_id=in_acc_period_id;
+		last_edit_by=@in_user_detail_id,last_edit_date=@cur_sys_datetime,is_reopen=in_is_reopen WHERE acc_period_id=in_acc_period_id;
 	end if;
 END//
 DELIMITER ;

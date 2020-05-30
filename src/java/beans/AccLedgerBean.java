@@ -52,6 +52,7 @@ public class AccLedgerBean implements Serializable {
     private List<AccJournal> JournalList;
     private long n;
     private long i;
+    private String OpenBalanceHeader = "";
 
     public void setAccLedgerFromResultset(AccLedger accledger, ResultSet aResultSet) {
         try {
@@ -2035,23 +2036,23 @@ public class AccLedgerBean implements Serializable {
     }
 
     public void reportAccLedgerOpenBal(int aAccPeriodId) {
-        String sql = "SELECT * FROM view_ledger_open_bal al ORDER BY  al.account_code ASC";
+        this.OpenBalanceHeader = "";
+        String sql = "SELECT * FROM view_ledger_open_bal al WHERE al.acc_period_id=" + aAccPeriodId + " ORDER BY  al.account_code ASC";
         ResultSet rs = null;
-        if (aAccPeriodId > 0) {
-            this.AccLedgerListOpenBal = new ArrayList<>();
-            try (
-                    Connection conn = DBConnection.getMySQLConnection();
-                    PreparedStatement ps = conn.prepareStatement(sql);) {
-                rs = ps.executeQuery();
-                AccLedger accledger = null;
-                while (rs.next()) {
-                    accledger = new AccLedger();
-                    this.setAccLedgerFromResultset(accledger, rs);
-                    this.AccLedgerListOpenBal.add(accledger);
-                }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+        this.AccLedgerListOpenBal = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            AccLedger accledger = null;
+            while (rs.next()) {
+                accledger = new AccLedger();
+                this.setAccLedgerFromResultset(accledger, rs);
+                this.AccLedgerListOpenBal.add(accledger);
             }
+            this.OpenBalanceHeader = this.AccLedgerListOpenBal.size() + " Opening Balance Records For " + new AccPeriodBean().getAccPeriodById(aAccPeriodId).getAccPeriodName();
+        } catch (Exception e) {
+            System.err.println("reportAccLedgerOpenBal:" + e.getMessage());
         }
     }
 
@@ -3281,5 +3282,19 @@ public class AccLedgerBean implements Serializable {
      */
     public void setI(long i) {
         this.i = i;
+    }
+
+    /**
+     * @return the OpenBalanceHeader
+     */
+    public String getOpenBalanceHeader() {
+        return OpenBalanceHeader;
+    }
+
+    /**
+     * @param OpenBalanceHeader the OpenBalanceHeader to set
+     */
+    public void setOpenBalanceHeader(String OpenBalanceHeader) {
+        this.OpenBalanceHeader = OpenBalanceHeader;
     }
 }

@@ -81,6 +81,11 @@ public class AccPeriodBean implements Serializable {
                 aAccPeriod.setIsOpen(0);
             }
             try {
+                aAccPeriod.setIs_reopen(aResultSet.getInt("is_reopen"));
+            } catch (NullPointerException npe) {
+                aAccPeriod.setIs_reopen(0);
+            }
+            try {
                 aAccPeriod.setIsClosed(aResultSet.getInt("is_closed"));
             } catch (NullPointerException npe) {
                 aAccPeriod.setIsClosed(0);
@@ -117,7 +122,7 @@ public class AccPeriodBean implements Serializable {
 
     public int saveAccPeriod(AccPeriod aAccPeriod) {
         int saved = 0;
-        String sql = "{call sp_save_acc_period(?,?,?,?,?,?,?,?,?,?,?)}";
+        String sql = "{call sp_save_acc_period(?,?,?,?,?,?,?,?,?,?,?,?)}";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 CallableStatement cs = conn.prepareCall(sql);) {
@@ -177,6 +182,11 @@ public class AccPeriodBean implements Serializable {
                 } catch (NullPointerException npe) {
                     cs.setInt("in_user_detail_id", 0);
                 }
+                try {
+                    cs.setInt("in_is_reopen", aAccPeriod.getIs_reopen());
+                } catch (NullPointerException npe) {
+                    cs.setInt("in_is_reopen", 0);
+                }
                 cs.executeUpdate();
                 saved = 1;
             }
@@ -195,7 +205,7 @@ public class AccPeriodBean implements Serializable {
         } else if (aAccPeriod.getAccPeriodId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "53", "Edit") == 0) {
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR..."));
         } else {
-            String sql = "{call sp_save_acc_period(?,?,?,?,?,?,?,?,?,?,?)}";
+            String sql = "{call sp_save_acc_period(?,?,?,?,?,?,?,?,?,?,?,?)}";
             try (
                     Connection conn = DBConnection.getMySQLConnection();
                     CallableStatement cs = conn.prepareCall(sql);) {
@@ -234,6 +244,11 @@ public class AccPeriodBean implements Serializable {
                         cs.setInt("in_is_open", aAccPeriod.getIsOpen());
                     } catch (NullPointerException npe) {
                         cs.setInt("in_is_open", 0);
+                    }
+                    try {
+                        cs.setInt("in_is_reopen", aAccPeriod.getIs_reopen());
+                    } catch (NullPointerException npe) {
+                        cs.setInt("in_is_reopen", 0);
                     }
                     try {
                         cs.setInt("in_is_closed", aAccPeriod.getIsClosed());
@@ -316,6 +331,43 @@ public class AccPeriodBean implements Serializable {
             System.err.println(msg);
             this.setActionMessage(msg);
             FacesContext.getCurrentInstance().addMessage("Close", new FacesMessage(msg));
+        }
+    }
+
+    public void reOpenAccPeriod(AccPeriod aAccPeriod) {
+        String msg = "";
+        int x = 0;
+        String sql = "{call sp_reopen_account_period(?)}";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                CallableStatement cs = conn.prepareCall(sql);) {
+            if (null != aAccPeriod) {
+                aAccPeriod.setIsOpen(1);
+                aAccPeriod.setIsClosed(0);
+                aAccPeriod.setIs_reopen(1);
+                //aAccPeriod.setIsCurrent(0);
+                x = this.saveAccPeriod(aAccPeriod);
+                if (x == 1) {
+                    try {
+                        cs.setInt("in_acc_period_id", aAccPeriod.getAccPeriodId());
+                    } catch (NullPointerException npe) {
+                        cs.setInt("in_acc_period_id", 0);
+                    }
+                    cs.executeUpdate();
+                    msg = "Accounting Period RE-OPENED Successfully!";
+                    this.setActionMessage(msg);
+                    FacesContext.getCurrentInstance().addMessage("ReOpen", new FacesMessage(msg));
+                } else {
+                    msg = "Accounting Period NOT RE-OPENED!";
+                    this.setActionMessage(msg);
+                    FacesContext.getCurrentInstance().addMessage("ReOpen", new FacesMessage(msg));
+                }
+            }
+        } catch (Exception e) {
+            msg = "An error occured:" + "reOpenAccPeriod:" + e.getMessage();
+            System.err.println(msg);
+            this.setActionMessage(msg);
+            FacesContext.getCurrentInstance().addMessage("ReOpen", new FacesMessage(msg));
         }
     }
 

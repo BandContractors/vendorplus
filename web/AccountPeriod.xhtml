@@ -26,6 +26,7 @@
         <f:viewAction action="#{accPeriodBean.initClearAccPeriod(accPeriod)}"/>
         <f:viewAction action="#{accPeriodBean.setActionMessage('')}"/>
         <f:viewAction action="#{utilityBean.clearList(accLedgerBean.accLedgerListOpenBal)}"/>
+        <f:viewAction action="#{accLedgerBean.setOpenBalanceHeader('')}"/>
     </f:metadata>
     <h:body>
         <ui:include src="Menu.xhtml"/>
@@ -155,13 +156,17 @@
                     <h:commandLink value="Edit">
                         <f:ajax listener="#{accPeriodBean.copyAccPeriod(itm,accPeriod)}" execute="@form" render="frmMain:pnlgInput frmMain:pnlgAddNew frmMain:pgrdMsgs frmMain:growl1 frmMain:dtblAccountPeriod"/>
                     </h:commandLink>
-                    <h:outputText value="&nbsp;&nbsp;" rendered="#{itm.isOpen==0}"/>
-                    <h:commandLink value="Open" rendered="#{itm.isOpen==0}">
+                    <h:outputText value="&nbsp;&nbsp;" rendered="#{itm.isOpen==0 and itm.is_reopen==0}"/>
+                    <h:commandLink value="Open" rendered="#{itm.isOpen==0 and itm.is_reopen==0}">
                         <f:ajax listener="#{accPeriodBean.openAccPeriod(itm)}" execute="@form" render="frmMain:pnlgInput frmMain:pnlgAddNew frmMain:pgrdMsgs frmMain:growl1 frmMain:dtblAccountPeriod"/>
                     </h:commandLink>
-                    <h:outputText value="&nbsp;&nbsp;" rendered="#{itm.isClosed==0}"/>
-                    <h:commandLink value="Close" rendered="#{itm.isClosed==0}">
+                    <h:outputText value="&nbsp;&nbsp;" rendered="#{itm.isClosed==0 and itm.isOpen==1}"/>
+                    <h:commandLink value="Close" rendered="#{itm.isClosed==0 and itm.isOpen==1}">
                         <f:ajax listener="#{accPeriodBean.closeAccPeriod(itm)}" execute="@form" render="frmMain:pnlgInput frmMain:pnlgAddNew frmMain:pgrdMsgs frmMain:growl1 frmMain:dtblAccountPeriod"/>
+                    </h:commandLink>
+                    <h:outputText value="&nbsp;&nbsp;" rendered="#{itm.isClosed==1}"/>
+                    <h:commandLink value="ReOpen" rendered="#{itm.isClosed==1}">
+                        <f:ajax listener="#{accPeriodBean.reOpenAccPeriod(itm)}" execute="@form" render="frmMain:pnlgInput frmMain:pnlgAddNew frmMain:pgrdMsgs frmMain:growl1 frmMain:dtblAccountPeriod"/>
                     </h:commandLink>
                     <h:outputText value="&nbsp;&nbsp;"/>
                     <h:commandLink value="Del">
@@ -179,7 +184,7 @@
                          paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
                          rowsPerPageTemplate="50,100,200,400">
                 <f:facet name="header">
-                    #{accLedgerBean.accLedgerListOpenBal.size()} Opening Balance Records From Previous Account Period                    
+                    #{accLedgerBean.openBalanceHeader}                    
                     <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
                     <p:columnToggler datasource="tblOpenBal" trigger="toggler" />
                 </f:facet>
