@@ -7,6 +7,7 @@ import entities.AccCoa;
 import entities.AccCurrency;
 import entities.AccDepSchedule;
 import entities.AccJournal;
+import entities.AccPeriod;
 import entities.AccType;
 import entities.Category;
 import entities.CompanySetting;
@@ -1317,7 +1318,7 @@ public class TransBean implements Serializable {
                         assetstock = new StockBean().getStock(assetstoreid, assetti.getItemId(), assetti.getBatchno(), assetti.getCodeSpecific(), assetti.getDescSpecific());
                         //Build:1-20-000-020 Land:1-20-000-010 but let us exclude LAND
                         if (null != assetstock && assetstock.getAccountCode().length() > 0 && !assetstock.getAccountCode().equals("1-20-000-010")) {
-                            depschbean.saveAccDepSchedules(depschbean.calcAccDepSchedules(assetstock));
+                            depschbean.insertAccDepSchedules(depschbean.calcAccDepSchedules(assetstock));
                             //post to the ledger the first year's depriciation
                             AccDepSchedule aAccDepSchedule = depschbean.getAccDepScheduleByYear(assetstock.getStockId(), 1);
                             new AccJournalBean().postJournalDepreciateAsset(trans, assetstock, aAccDepSchedule, new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getAccPeriodId(), savedpay, PostJobId);
@@ -2439,10 +2440,35 @@ public class TransBean implements Serializable {
                             assetstock = new StockBean().getStock(assetstoreid, assetti.getItemId(), assetti.getBatchno(), assetti.getCodeSpecific(), assetti.getDescSpecific());
                             //Build:1-20-000-020 Land:1-20-000-010 but let us exclude LAND
                             if (null != assetstock && assetstock.getAccountCode().length() > 0 && !assetstock.getAccountCode().equals("1-20-000-010")) {
-                                depschbean.saveAccDepSchedules(depschbean.calcAccDepSchedules(assetstock));
+                                depschbean.insertAccDepSchedules(depschbean.calcAccDepSchedules(assetstock));
                                 //post to the ledger the first year's depriciation
                                 AccDepSchedule aAccDepSchedule = depschbean.getAccDepScheduleByYear(assetstock.getStockId(), 1);
-                                new AccJournalBean().postJournalDepreciateAsset(trans, assetstock, aAccDepSchedule, new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getAccPeriodId(), savedpay, PostJobId);
+                                AccPeriod accprd4firstpost = null;
+                                AccPeriod accprd4trans = null;
+                                try {
+                                    accprd4firstpost = new AccPeriodBean().getAccPeriod(assetstock.getDepStartDate());
+                                } catch (Exception e) {
+                                    accprd4firstpost = null;
+                                }
+                                try {
+                                    accprd4trans = new AccPeriodBean().getAccPeriod(trans.getTransactionDate());
+                                } catch (Exception e) {
+                                    accprd4trans = null;
+                                }
+                                if (null == accprd4firstpost || null == accprd4trans) {
+                                    //do nothing; means;
+                                    //dep start date is for not yet set acc period OR
+                                    //current date doesnt have correspondiong acc period 
+                                } else {
+                                    if (accprd4firstpost.getAccPeriodId() == accprd4trans.getAccPeriodId()) {
+                                        new AccJournalBean().postJournalDepreciateAsset(trans, assetstock, aAccDepSchedule, accprd4firstpost.getAccPeriodId(), savedpay, PostJobId);
+                                        aAccDepSchedule.setDepForAccPeriodId(accprd4firstpost.getAccPeriodId());
+                                        aAccDepSchedule.setDepFromDate(accprd4firstpost.getStartDate());
+                                        aAccDepSchedule.setDepToDate(accprd4firstpost.getEndDate());
+                                        aAccDepSchedule.setPost_status(1);
+                                        new AccDepScheduleBean().updateAccDepSchedule(aAccDepSchedule);
+                                    }
+                                }
                             }
                         }
                     }
@@ -2812,7 +2838,7 @@ public class TransBean implements Serializable {
                             assetstock = new StockBean().getStock(assetstoreid, assetti.getItemId(), assetti.getBatchno(), assetti.getCodeSpecific(), assetti.getDescSpecific());
                             //Build:1-20-000-020 Land:1-20-000-010 but let us exclude LAND
                             if (null != assetstock && assetstock.getAccountCode().length() > 0 && !assetstock.getAccountCode().equals("1-20-000-010")) {
-                                depschbean.saveAccDepSchedules(depschbean.calcAccDepSchedules(assetstock));
+                                depschbean.insertAccDepSchedules(depschbean.calcAccDepSchedules(assetstock));
                                 //post to the ledger the first year's depriciation
                                 AccDepSchedule aAccDepSchedule = depschbean.getAccDepScheduleByYear(assetstock.getStockId(), 1);
                                 new AccJournalBean().postJournalDepreciateAsset(trans, assetstock, aAccDepSchedule, new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getAccPeriodId(), savedpay, PostJobId);
@@ -3436,7 +3462,7 @@ public class TransBean implements Serializable {
                                 //first delete previous dep schedules
                                 new AccDepScheduleBean().deleteAccDepSchedule(assetstock.getStockId());
                                 //then save new schedules
-                                depschbean.saveAccDepSchedules(depschbean.calcAccDepSchedules(assetstock));
+                                depschbean.insertAccDepSchedules(depschbean.calcAccDepSchedules(assetstock));
                                 //post to the ledger the first year's depriciation
                                 AccDepSchedule aAccDepSchedule = depschbean.getAccDepScheduleByYear(assetstock.getStockId(), 1);
                                 new AccJournalBean().postJournalDepreciateAsset(savedtrans, assetstock, aAccDepSchedule, new AccPeriodBean().getAccPeriod(savedtrans.getTransactionDate()).getAccPeriodId(), savedpay, PostJobId);
@@ -3833,7 +3859,7 @@ public class TransBean implements Serializable {
                                 //first delete previous dep schedules
                                 new AccDepScheduleBean().deleteAccDepSchedule(assetstock.getStockId());
                                 //then save new schedules
-                                depschbean.saveAccDepSchedules(depschbean.calcAccDepSchedules(assetstock));
+                                depschbean.insertAccDepSchedules(depschbean.calcAccDepSchedules(assetstock));
                                 //post to the ledger the first year's depriciation
                                 AccDepSchedule aAccDepSchedule = depschbean.getAccDepScheduleByYear(assetstock.getStockId(), 1);
                                 new AccJournalBean().postJournalDepreciateAsset(savedtrans, assetstock, aAccDepSchedule, new AccPeriodBean().getAccPeriod(savedtrans.getTransactionDate()).getAccPeriodId(), savedpay, PostJobId);

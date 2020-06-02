@@ -396,6 +396,7 @@ public class AccPeriodBean implements Serializable {
             aAccPeriodToOpen.setIsCurrent(1);
             aAccPeriodToOpen.setIsClosed(0);
             x = this.saveAccPeriod(aAccPeriodToOpen);
+            //post open balances
             if (x == 1) {
                 sql = "{call sp_post_ledger_open_balances(?,?)}";
                 try (
@@ -421,6 +422,10 @@ public class AccPeriodBean implements Serializable {
                     this.setActionMessage(msg);
                     FacesContext.getCurrentInstance().addMessage("Close", new FacesMessage(msg));
                 }
+            }
+            //post scheduled depreciation
+            if (x == 1) {
+                new AccDepScheduleBean().postAccDepSchedules(aAccPeriodToOpen, 0);
             }
         }
     }

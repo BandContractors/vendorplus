@@ -75,11 +75,11 @@
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.assetFixedPPE)}"/>
                 <p:outputLabel value=""/>
                 <p:outputLabel value=""/>
-                <p:commandLink value="Accumulated Depreciation" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                <p:commandLink value="Accumulated Depreciation (Contra)" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
                     <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                         <p:graphicImage name="/images/ajax-loader.gif"/>
                     </p:dialog>
-                    <p:ajax listener="#{accLedgerBean.initViewCategoryBalanceSheet(accBalanceSheet.accPeriodId,'1-20-010','Cr','Accumulated Depreciation')}" process="@form" update=":formCAT"/>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryBalanceSheet(accBalanceSheet.accPeriodId,'1-20-010','Cr','Accumulated Depreciation (Contra)')}" process="@form" update=":formCAT"/>
                 </p:commandLink>
                 <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.assetFixedAccumDep)}"/>
                 <p:outputLabel value=""/>

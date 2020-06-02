@@ -6984,6 +6984,11 @@ public class TransItemBean implements Serializable {
                     aStatusBean.setItemNotAddedStatus("SELECT A VALID ITEM ACCOUNT...!");
                     aStatusBean.setShowItemAddedStatus(0);
                     aStatusBean.setShowItemNotAddedStatus(1);
+                } else if (aTransTypeId==1 && aTransReasonId==29 && !aSelectedItem.getCurrencyCode().equals(aTrans.getCurrencyCode())) {
+                    aStatusBean.setItemAddedStatus("");
+                    aStatusBean.setItemNotAddedStatus("Currency for selected item is not same as the transaction currency...!");
+                    aStatusBean.setShowItemAddedStatus(0);
+                    aStatusBean.setShowItemNotAddedStatus(1);
                 } else {
                     status = this.addTransItemPURCHASECEC(aStoreId, aTransTypeId, aTransReasonId, aTrans, aStatusBean, aActiveTransItems, NewTransItem, aSelectedItem, aSelectedAccCoa);
                     if (status.length() > 0) {

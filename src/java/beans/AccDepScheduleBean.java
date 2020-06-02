@@ -2,6 +2,7 @@ package beans;
 
 import connections.DBConnection;
 import entities.AccDepSchedule;
+import entities.AccPeriod;
 import entities.Stock;
 import java.io.Serializable;
 import java.sql.CallableStatement;
@@ -73,7 +74,7 @@ public class AccDepScheduleBean implements Serializable {
         }
     }
 
-    public int saveAccDepSchedule(AccDepSchedule aAccDepSchedule) {
+    public int insertAccDepSchedule(AccDepSchedule aAccDepSchedule) {
         int status = 0;
         String sql = "{call sp_insert_acc_dep_schedule(?,?,?,?,?,?)}";
         try (
@@ -110,13 +111,99 @@ public class AccDepScheduleBean implements Serializable {
         return status;
     }
 
-    public void saveAccDepSchedules(List<AccDepSchedule> aAccDepSchedules) {
+    public int updateAccDepSchedule(AccDepSchedule aAccDepSchedule) {
+        int status = 0;
+        String sql = "{call sp_update_acc_dep_schedule(?,?,?,?,?,?,?,?)}";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                CallableStatement cs = conn.prepareCall(sql);) {
+            cs.setLong("in_acc_dep_schedule_id", aAccDepSchedule.getAccDepScheduleId());
+            cs.setLong("in_stock_id", aAccDepSchedule.getStockId());
+            cs.setInt("in_dep_for_acc_period_id", aAccDepSchedule.getDepForAccPeriodId());
+            try {
+                cs.setDate("in_dep_from_date", new java.sql.Date(aAccDepSchedule.getDepFromDate().getTime()));
+            } catch (NullPointerException npe) {
+                cs.setDate("in_dep_from_date", null);
+            }
+            try {
+                cs.setDate("in_dep_to_date", new java.sql.Date(aAccDepSchedule.getDepToDate().getTime()));
+            } catch (NullPointerException npe) {
+                cs.setDate("in_dep_to_date", null);
+            }
+            try {
+                cs.setInt("in_year_number", aAccDepSchedule.getYearNumber());
+            } catch (NullPointerException npe) {
+                cs.setInt("in_year_number", 0);
+            }
+            try {
+                cs.setDouble("in_dep_amount", aAccDepSchedule.getDepAmount());
+            } catch (NullPointerException npe) {
+                cs.setDouble("in_dep_amount", 0);
+            }
+            cs.setInt("in_post_status", aAccDepSchedule.getPost_status());
+            cs.executeUpdate();
+            status = 1;
+        } catch (SQLException se) {
+            status = 0;
+            System.err.println(se.getMessage());
+        }
+        return status;
+    }
+
+    public void insertAccDepSchedules(List<AccDepSchedule> aAccDepSchedules) {
         List<AccDepSchedule> ati = aAccDepSchedules;
         int ListItemIndex = 0;
         int ListItemNo = ati.size();
         while (ListItemIndex < ListItemNo) {
-            this.saveAccDepSchedule(ati.get(ListItemIndex));
+            this.insertAccDepSchedule(ati.get(ListItemIndex));
             ListItemIndex = ListItemIndex + 1;
+        }
+    }
+
+    public void postAccDepSchedules(AccPeriod aAccPeriod, long aPostJobId) {
+        String sql = "select stock_id,min(year_number) as year_number from acc_dep_schedule where post_status=0 group by stock_id";
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            int curyearno = 0;
+            long curstockid = 0;
+            int prvyearno = 0;
+            //int curaccprd = 0;
+            AccPeriod prvaccprd = null;
+            AccDepSchedule prevDepSched = null;
+            AccDepSchedule curDepSched = null;
+            //below are all un posted depreciation shcedules
+            while (rs.next()) {
+                curyearno = 0;
+                prvyearno = 0;
+                prevDepSched = null;
+                //---
+                //1. get prev acc period
+                curyearno = rs.getInt("year_number");
+                prvyearno = curyearno - 1;
+                if (prvyearno > 0) {
+                    prevDepSched = this.getAccDepScheduleByYear(rs.getLong("stock_id"), prvyearno);
+                    prvaccprd = new AccPeriodBean().getAccPeriodById(prevDepSched.getDepForAccPeriodId());
+                }
+                //2. confirm if this is next acc period and commit
+                if (null != prvaccprd) {
+                    if (aAccPeriod.getOrderNo() == (prvaccprd.getOrderNo() + 1)) {
+                        //depreciate for this year
+                        curstockid = rs.getInt("stock_id");
+                        curDepSched = this.getAccDepScheduleByYear(curstockid, curyearno);
+                        new AccJournalBean().postJournalDepreciateAsset(new StockBean().getStock(curstockid), curDepSched, aAccPeriod.getAccPeriodId(), aPostJobId);
+                        curDepSched.setDepForAccPeriodId(aAccPeriod.getAccPeriodId());
+                        curDepSched.setDepFromDate(aAccPeriod.getStartDate());
+                        curDepSched.setDepToDate(aAccPeriod.getEndDate());
+                        curDepSched.setPost_status(1);
+                        new AccDepScheduleBean().updateAccDepSchedule(curDepSched);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("postAccDepSchedules:" + e.getMessage());
         }
     }
 

@@ -8842,6 +8842,41 @@ BEGIN
 END//
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS sp_update_acc_dep_schedule;
+DELIMITER //
+CREATE PROCEDURE sp_update_acc_dep_schedule
+(
+		IN in_acc_dep_schedule_id bigint,
+		IN in_stock_id bigint,
+		IN in_dep_for_acc_period_id int,
+		IN in_dep_from_date date,
+		IN in_dep_to_date date,
+		IN in_year_number int,
+		IN in_dep_amount double,
+		IN in_post_status int
+) 
+BEGIN 
+		SET @in_dep_from_date=NULL;
+		if (in_dep_from_date is not null) then
+			set @in_dep_from_date=in_dep_from_date;
+		end if;
+		SET @in_dep_to_date=NULL;
+		if (in_dep_to_date is not null) then
+			set @in_dep_to_date=in_dep_to_date;
+		end if;
+		
+		UPDATE acc_dep_schedule SET 
+			dep_for_acc_period_id=in_dep_for_acc_period_id,
+			stock_id=in_stock_id,
+			dep_from_date=@in_dep_from_date,
+			dep_to_date=@in_dep_to_date,
+			year_number=in_year_number,
+			dep_amount=in_dep_amount,
+			post_status=in_post_status 
+		WHERE acc_dep_schedule_id=in_acc_dep_schedule_id; 
+END//
+DELIMITER ;
+
 DROP PROCEDURE IF EXISTS sp_delete_acc_dep_schedule;
 DELIMITER //
 CREATE PROCEDURE sp_delete_acc_dep_schedule
@@ -11210,5 +11245,59 @@ BEGIN
 		in_version_no,
 		in_upgrade_detail
 	); 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_save_transaction_tax_map;
+DELIMITER //
+CREATE PROCEDURE sp_save_transaction_tax_map
+(
+	IN in_transaction_tax_map_id bigint,
+	IN in_transaction_id bigint,
+	IN in_transaction_type_id int,
+	IN in_transaction_reason_id int,
+	IN in_transaction_number varchar(50),
+	IN in_transaction_number_tax varchar(50)
+) 
+BEGIN 
+	SET @cur_sys_datetime=null;
+	CALL sp_get_current_system_datetime(@cur_sys_datetime);
+
+	if (in_transaction_tax_map_id=0) then 
+		INSERT INTO transaction_tax_map(transaction_id,transaction_type_id,transaction_reason_id,
+		transaction_number,transaction_number_tax,add_date) 
+		VALUES(in_transaction_id,in_transaction_type_id,in_transaction_reason_id,in_transaction_number,in_transaction_number_tax,@cur_sys_datetime);
+	end if;
+
+	if (in_transaction_tax_map_id>0) then 
+		UPDATE transaction_tax_map SET transaction_id=in_transaction_id,transaction_type_id=in_transaction_type_id,
+		transaction_reason_id=in_transaction_reason_id,transaction_number=in_transaction_number,transaction_number_tax=in_transaction_number_tax 
+		WHERE transaction_tax_map_id=in_transaction_tax_map_id;
+	end if;
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_item_tax_map;
+DELIMITER //
+CREATE PROCEDURE sp_save_item_tax_map
+(
+	IN in_item_tax_map_id bigint,
+	IN in_item_id bigint,
+	IN in_item_id_tax bigint,
+	IN in_item_code_tax varchar(50)
+) 
+BEGIN 
+	SET @cur_sys_datetime=null;
+	CALL sp_get_current_system_datetime(@cur_sys_datetime);
+
+	if (in_item_tax_map_id=0) then 
+		INSERT INTO item_tax_map(item_id,item_id_tax,item_code_tax,add_date) 
+		VALUES(in_item_id,in_item_id_tax,in_item_code_tax,@cur_sys_datetime);
+	end if;
+
+	if (in_item_tax_map_id>0) then 
+		UPDATE item_tax_map SET item_id=in_item_id,item_id_tax=in_item_id_tax,item_code_tax=in_item_code_tax 
+		WHERE item_tax_map_id=in_item_tax_map_id;
+	end if;
 END//
 DELIMITER ;

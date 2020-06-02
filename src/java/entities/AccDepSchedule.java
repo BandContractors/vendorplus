@@ -27,6 +27,7 @@ public class AccDepSchedule implements Serializable {
     private Date DepToDate;
     private int YearNumber;
     private double DepAmount;
+    private int post_status;
 
     /**
      * @return the AccDepScheduleId
@@ -124,5 +125,19 @@ public class AccDepSchedule implements Serializable {
      */
     public void setStockId(long StockId) {
         this.StockId = StockId;
+    }
+
+    /**
+     * @return the post_status
+     */
+    public int getPost_status() {
+        return post_status;
+    }
+
+    /**
+     * @param post_status the post_status to set
+     */
+    public void setPost_status(int post_status) {
+        this.post_status = post_status;
     }
 }
