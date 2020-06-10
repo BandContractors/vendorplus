@@ -91,6 +91,14 @@
                         <p:dataExporter type="xml" target="tblDetail" fileName="Asset_Inventory" />
                     </h:commandLink>
                 </f:facet>
+                <p:column headerText="Depreciation Schedule">
+                    <p:commandButton value="View/Edit" onclick="PF('statusDialog2').show()" onsuccess="PF('statusDialog2').hide()" oncomplete="PF('dlgDS').show();">
+                        <p:dialog widgetVar="statusDialog2" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                        <p:ajax listener="#{accDepScheduleBean.refreshAccDepSchedules(itm)}" process="@form" update=":formDS"/>
+                    </p:commandButton>
+                </p:column>
                 <p:column headerText="#{companySetting.getStoreEquivName()}">
                     <h:outputLabel value="#{itm.storeName} "/>
                 </p:column>
@@ -134,18 +142,19 @@
                 <p:column headerText="Effective life">
                     <h:outputText value="#{itm.effectiveLife}"/>
                 </p:column>
-                <p:column headerText="Damage/Lost" style="text-align: right;">
+                <p:column headerText="Damage/Lost" style="text-align: right;" rendered="#{menuItemBean.menuItemObj.HIRE_MODULE_ON==1}">
                     <h:outputText value="#{itm.qty_damage}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Qty Out" style="text-align: right;">
+                <p:column headerText="Qty Out" style="text-align: right;" rendered="#{menuItemBean.menuItemObj.HIRE_MODULE_ON==1}">
                     <h:outputText value="#{itm.qty_out}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
             </p:dataTable>
         </h:form>
+        <ui:include src="ViewDepSchedule.xhtml"/>
     </h:body>
 </html>
 

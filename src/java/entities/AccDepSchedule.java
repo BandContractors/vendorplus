@@ -28,6 +28,9 @@ public class AccDepSchedule implements Serializable {
     private int YearNumber;
     private double DepAmount;
     private int post_status;
+    //for output
+    private String acc_period_name;
+    
 
     /**
      * @return the AccDepScheduleId
@@ -139,5 +142,19 @@ public class AccDepSchedule implements Serializable {
      */
     public void setPost_status(int post_status) {
         this.post_status = post_status;
+    }
+
+    /**
+     * @return the acc_period_name
+     */
+    public String getAcc_period_name() {
+        return acc_period_name;
+    }
+
+    /**
+     * @param acc_period_name the acc_period_name to set
+     */
+    public void setAcc_period_name(String acc_period_name) {
+        this.acc_period_name = acc_period_name;
     }
 }

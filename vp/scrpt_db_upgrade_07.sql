@@ -13,32 +13,38 @@ VALUES ('168', '1-00-020-070', 'INV Consumables', '1', '1', '3', '16', '1', '0',
 
 INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
 VALUES (55, 'ITEMS_RECEIVED', 'AUTO_APPEND_NEW_COST_BATCH', '0','Receipt of item with new cost price, append cost price as batch');
+
+-- START - update existing items account type and code
 UPDATE item set expense_type='Services',expense_account_code='5-10-000-020' 
-WHERE is_asset=0 and is_sale=1 and item_type='SERVICE' and is_track=0 and is_hire=0;
+WHERE is_asset=0 and is_sale=1 and item_type='SERVICE' and is_track=0 and ifnull(is_hire,0)=0;
 
 UPDATE item set expense_type='Services',expense_account_code='5-10-000-010' 
-WHERE is_asset=0 and is_sale=1 and item_type='PRODUCT' and is_track=0 and is_hire=0;
+WHERE is_asset=0 and is_sale=1 and item_type='PRODUCT' and is_track=0 and ifnull(is_hire,0)=0;
 
 UPDATE item set expense_type='Merchandise',expense_account_code='1-00-020-010' 
-WHERE is_asset=0 and is_sale=1 and is_buy=1 and item_type='PRODUCT' and is_track=1 and is_hire=0;
+WHERE is_asset=0 and is_sale=1 and is_buy=1 and item_type='PRODUCT' and is_track=1 and ifnull(is_hire,0)=0;
+
+UPDATE item set expense_type='Merchandise',expense_account_code='1-00-020-010' 
+WHERE is_asset=0 and is_sale=1 and is_buy=1 and item_type='SERVICE' and is_track=1 and ifnull(is_hire,0)=0;
 
 UPDATE item set expense_type='Finished Goods',expense_account_code='1-00-020-040' 
-WHERE is_asset=0 and is_sale=1 and is_buy=0 and item_type='PRODUCT' and is_track=1 and is_hire=0;
-
+WHERE is_asset=0 and is_sale=1 and is_buy=0 and item_type='PRODUCT' and is_track=1 and ifnull(is_hire,0)=0;
+-- Choose 1st if business has Raw Materials OR second if business has Consumption items; 
+-- if business has both you need to DISCUSS this with technical team
+/*
 UPDATE item set expense_type='Raw Material',expense_account_code='1-00-020-020' 
-WHERE is_asset=0 and is_sale=0 and is_buy=1 and item_type='PRODUCT' and is_track=1 and is_hire=0;
+WHERE is_asset=0 and is_sale=0 and is_buy=1 and item_type='PRODUCT' and is_track=1 and ifnull(is_hire,0)=0;
+*/
 -- OR
+/*
 UPDATE item set expense_type='Consumption',expense_account_code='1-00-020-070' 
-WHERE is_asset=0 and is_sale=0 and is_buy=1 and item_type='PRODUCT' and is_track=1 and is_hire=0;
+WHERE is_asset=0 and is_sale=0 and is_buy=1 and item_type='PRODUCT' and is_track=1 and ifnull(is_hire,0)=0;
+*/
 
--- select * from item where is_asset=0 and (ifnull(expense_type,'')='' or ifnull(expense_account_code,'')='');
-
-UPDATE item set expense_type='Merchandise',expense_account_code='1-00-020-010' 
-WHERE is_asset=0 and is_sale=1 and is_buy=1 and item_type='SERVICE' and is_track=1 and is_hire=0;
-
--- select * from item where is_asset=0 and (ifnull(expense_type,'')='' or ifnull(expense_account_code,'')='');
+UPDATE item set expense_type='Services' 
+WHERE is_asset=0 and is_sale=0 and is_buy=1 and item_type='SERVICE' and is_track=0 and ifnull(is_hire,0)=0 and expense_account_code LIKE '5-20%';
 
 -- run this; modified at the end of each change batch
-INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_07',42,Now(),'6.0','');
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_07',48,Now(),'6.0','');
 
 

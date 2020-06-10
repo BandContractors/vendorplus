@@ -1321,7 +1321,7 @@ public class TransBean implements Serializable {
                             depschbean.insertAccDepSchedules(depschbean.calcAccDepSchedules(assetstock));
                             //post to the ledger the first year's depriciation
                             AccDepSchedule aAccDepSchedule = depschbean.getAccDepScheduleByYear(assetstock.getStockId(), 1);
-                            new AccJournalBean().postJournalDepreciateAsset(trans, assetstock, aAccDepSchedule, new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getAccPeriodId(), savedpay, PostJobId);
+                            new AccJournalBean().postJournalDepreciateAsset(trans, assetstock, aAccDepSchedule, new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getAccPeriodId(), PostJobId);
                         }
                     }
                 }
@@ -2461,7 +2461,7 @@ public class TransBean implements Serializable {
                                     //current date doesnt have correspondiong acc period 
                                 } else {
                                     if (accprd4firstpost.getAccPeriodId() == accprd4trans.getAccPeriodId()) {
-                                        new AccJournalBean().postJournalDepreciateAsset(trans, assetstock, aAccDepSchedule, accprd4firstpost.getAccPeriodId(), savedpay, PostJobId);
+                                        new AccJournalBean().postJournalDepreciateAsset(trans, assetstock, aAccDepSchedule, accprd4firstpost.getAccPeriodId(), PostJobId);
                                         aAccDepSchedule.setDepForAccPeriodId(accprd4firstpost.getAccPeriodId());
                                         aAccDepSchedule.setDepFromDate(accprd4firstpost.getStartDate());
                                         aAccDepSchedule.setDepToDate(accprd4firstpost.getEndDate());
@@ -2841,7 +2841,7 @@ public class TransBean implements Serializable {
                                 depschbean.insertAccDepSchedules(depschbean.calcAccDepSchedules(assetstock));
                                 //post to the ledger the first year's depriciation
                                 AccDepSchedule aAccDepSchedule = depschbean.getAccDepScheduleByYear(assetstock.getStockId(), 1);
-                                new AccJournalBean().postJournalDepreciateAsset(trans, assetstock, aAccDepSchedule, new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getAccPeriodId(), savedpay, PostJobId);
+                                new AccJournalBean().postJournalDepreciateAsset(trans, assetstock, aAccDepSchedule, new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getAccPeriodId(), PostJobId);
                             }
                         }
                     }
@@ -3465,7 +3465,7 @@ public class TransBean implements Serializable {
                                 depschbean.insertAccDepSchedules(depschbean.calcAccDepSchedules(assetstock));
                                 //post to the ledger the first year's depriciation
                                 AccDepSchedule aAccDepSchedule = depschbean.getAccDepScheduleByYear(assetstock.getStockId(), 1);
-                                new AccJournalBean().postJournalDepreciateAsset(savedtrans, assetstock, aAccDepSchedule, new AccPeriodBean().getAccPeriod(savedtrans.getTransactionDate()).getAccPeriodId(), savedpay, PostJobId);
+                                new AccJournalBean().postJournalDepreciateAsset(savedtrans, assetstock, aAccDepSchedule, new AccPeriodBean().getAccPeriod(savedtrans.getTransactionDate()).getAccPeriodId(), PostJobId);
                             }
                         }
                     }
@@ -3856,13 +3856,58 @@ public class TransBean implements Serializable {
                             assetstock = new StockBean().getStock(assetstoreid, assetti.getItemId(), assetti.getBatchno(), assetti.getCodeSpecific(), assetti.getDescSpecific());
                             //Build:1-20-000-020 Land:1-20-000-010 but let us exclude LAND
                             if (null != assetstock && assetstock.getAccountCode().length() > 0 && !assetstock.getAccountCode().equals("1-20-000-010")) {
-                                //first delete previous dep schedules
-                                new AccDepScheduleBean().deleteAccDepSchedule(assetstock.getStockId());
-                                //then save new schedules
+                                //1. reverse posted 1st year
+                                AccDepSchedule PostedAccDepSchedule = depschbean.getAccDepScheduleByYearPosted(assetstock.getStockId(), 1);
+                                AccPeriod accprd4trans = null;
+                                try {
+                                    accprd4trans = new AccPeriodBean().getAccPeriod(aNewTrans.getTransactionDate());
+                                } catch (Exception e) {
+                                    accprd4trans = null;
+                                }
+                                if (null == PostedAccDepSchedule || null == accprd4trans) {
+                                    //do nothing
+                                } else {
+                                    if (PostedAccDepSchedule.getDepForAccPeriodId() == accprd4trans.getAccPeriodId()) {
+                                        new AccJournalBean().postJournalDepreciateAssetREVERSE(aNewTrans, assetstock, PostedAccDepSchedule, accprd4trans.getAccPeriodId(), PostJobId);
+                                        PostedAccDepSchedule.setPost_status(0);
+                                        new AccDepScheduleBean().updateAccDepSchedule(PostedAccDepSchedule);
+                                    }
+                                }
+
+                                //2. delete all depreciation schedules un posted
+                                new AccDepScheduleBean().deleteAccDepScheduleUnposted(assetstock.getStockId());
+
+                                //3. Post new schedules
                                 depschbean.insertAccDepSchedules(depschbean.calcAccDepSchedules(assetstock));
-                                //post to the ledger the first year's depriciation
+
+                                //4. post to the ledger the first year's depriciation
                                 AccDepSchedule aAccDepSchedule = depschbean.getAccDepScheduleByYear(assetstock.getStockId(), 1);
-                                new AccJournalBean().postJournalDepreciateAsset(savedtrans, assetstock, aAccDepSchedule, new AccPeriodBean().getAccPeriod(savedtrans.getTransactionDate()).getAccPeriodId(), savedpay, PostJobId);
+                                AccPeriod accprd4firstpost = null;
+                                accprd4trans = null;
+                                try {
+                                    accprd4firstpost = new AccPeriodBean().getAccPeriod(assetstock.getDepStartDate());
+                                } catch (Exception e) {
+                                    accprd4firstpost = null;
+                                }
+                                try {
+                                    accprd4trans = new AccPeriodBean().getAccPeriod(aNewTrans.getTransactionDate());
+                                } catch (Exception e) {
+                                    accprd4trans = null;
+                                }
+                                if (null == accprd4firstpost || null == accprd4trans) {
+                                    //do nothing; means;
+                                    //dep start date is for not yet set acc period OR
+                                    //current date doesnt have correspondiong acc period 
+                                } else {
+                                    if (accprd4firstpost.getAccPeriodId() == accprd4trans.getAccPeriodId()) {
+                                        new AccJournalBean().postJournalDepreciateAsset(aNewTrans, assetstock, aAccDepSchedule, accprd4firstpost.getAccPeriodId(), PostJobId);
+                                        aAccDepSchedule.setDepForAccPeriodId(accprd4firstpost.getAccPeriodId());
+                                        aAccDepSchedule.setDepFromDate(accprd4firstpost.getStartDate());
+                                        aAccDepSchedule.setDepToDate(accprd4firstpost.getEndDate());
+                                        aAccDepSchedule.setPost_status(1);
+                                        new AccDepScheduleBean().updateAccDepSchedule(aAccDepSchedule);
+                                    }
+                                }
                             }
                         }
                     }

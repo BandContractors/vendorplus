@@ -3781,7 +3781,7 @@ public class AccJournalBean implements Serializable {
         }
     }
 
-    public void postJournalDepreciateAsset(Trans aTrans, Stock aStock, AccDepSchedule aAccDepSchedule, int aAccPeriodId, Pay aPay, long aParentJobId) {
+    public void postJournalDepreciateAssetTrans(Trans aTrans, Stock aStock, AccDepSchedule aAccDepSchedule, int aAccPeriodId, Pay aPay, long aParentJobId) {
         try {
             //Depreciation Expense Account(profit and loss)
             int DepAccountId = 0;
@@ -3882,7 +3882,7 @@ public class AccJournalBean implements Serializable {
         }
     }
 
-    public void postJournalDepreciateAsset(Stock aStock, AccDepSchedule aAccDepSchedule, int aAccPeriodId, long aParentJobId) {
+    public void postJournalDepreciateAssetOpenAcc(Stock aStock, AccDepSchedule aAccDepSchedule, int aAccPeriodId, long aParentJobId) {
         try {
             //Depreciation Expense Account(profit and loss)
             int DepAccountId = 0;
@@ -3971,6 +3971,188 @@ public class AccJournalBean implements Serializable {
             }
         } catch (Exception e) {
             System.err.println("postJournalDepreciateAsset:" + e.getMessage());
+        }
+    }
+
+    public void postJournalDepreciateAsset(Trans aTrans, Stock aStock, AccDepSchedule aAccDepSchedule, int aAccPeriodId, long aParentJobId) {
+        try {
+            //Depreciation Expense Account(profit and loss)
+            int DepAccountId = 0;
+            String DepAccountCode = "5-20-250-010";
+            try {
+                DepAccountId = new AccCoaBean().getAccCoaByCodeOrId(DepAccountCode, 0).getAccCoaId();
+            } catch (NullPointerException npe) {
+                DepAccountId = 0;
+            }
+            //Accumulated Depreciation Account (balance sheet)
+            int AccumDepAccountId = 0;
+            String AccumDepAccountCode = "";
+            switch (aStock.getAccountCode()) {
+                case "1-20-000-020"://PPE Buildings
+                    AccumDepAccountCode = "1-20-010-010";
+                    break;
+                case "1-20-000-030"://PPE Machinery & Equipment
+                    AccumDepAccountCode = "1-20-010-020";
+                    break;
+                case "1-20-000-040"://PPE Vehicles
+                    AccumDepAccountCode = "1-20-010-030";
+                    break;
+                case "1-20-000-050"://PPE Furniture and Fixtures
+                    AccumDepAccountCode = "1-20-010-040";
+                    break;
+                case "1-20-000-060"://PPE Computer Equipment
+                    AccumDepAccountCode = "1-20-010-050";
+                    break;
+                case "1-20-000-070"://PPE Other Property, Plant & Equipment
+                    AccumDepAccountCode = "1-20-010-060";
+                    break;
+                default:
+                    break;
+            }
+            try {
+                AccumDepAccountId = new AccCoaBean().getAccCoaByCodeOrId(AccumDepAccountCode, 0).getAccCoaId();
+            } catch (NullPointerException npe) {
+                AccumDepAccountId = 0;
+            }
+            //get job Id
+            long JobId = 0;
+            try {
+                if (aParentJobId > 0) {
+                    JobId = aParentJobId;
+                } else {
+                    JobId = new UtilityBean().getNewTableColumnSeqNumber("acc_journal", "job_id");
+                }
+            } catch (NullPointerException npe) {
+                JobId = 0;
+            }
+            AccJournal accjournal = new AccJournal();
+            accjournal.setAccJournalId(0);
+            accjournal.setJobId(JobId);
+            accjournal.setJournalDate(aTrans.getTransactionDate());
+            accjournal.setTransactionId(aTrans.getTransactionId());
+            accjournal.setTransactionTypeId(aTrans.getTransactionTypeId());
+            accjournal.setTransactionReasonId(aTrans.getTransactionReasonId());
+            accjournal.setPayId(0);
+            accjournal.setPayTypeId(0);
+            accjournal.setPayReasonId(0);
+            accjournal.setStoreId(aStock.getStoreId());
+            accjournal.setLedgerFolio("");
+            accjournal.setAccPeriodId(aAccPeriodId);
+            accjournal.setCurrencyCode(new ItemBean().getItem(aStock.getItemId()).getCurrencyCode());
+            accjournal.setXrate(1);
+            accjournal.setAddBy(new GeneralUserSetting().getCurrentUser().getUserDetailId());
+            accjournal.setBillTransactorId(0);
+            //DEBIT DEPRECIATION
+            if (aAccDepSchedule.getDepAmount() > 0) {
+                accjournal.setAccCoaId(DepAccountId);
+                accjournal.setAccountCode(DepAccountCode);
+                accjournal.setDebitAmount(aAccDepSchedule.getDepAmount());
+                accjournal.setCreditAmount(0);
+                accjournal.setNarration("DEPRECIATION COST");
+                this.saveAccJournal(accjournal);
+            }
+            //CREDIT ACCUM DEPRECIATION
+            if (aAccDepSchedule.getDepAmount() > 0) {
+                accjournal.setAccCoaId(AccumDepAccountId);
+                accjournal.setAccountCode(AccumDepAccountCode);
+                accjournal.setDebitAmount(0);
+                accjournal.setCreditAmount(aAccDepSchedule.getDepAmount());
+                accjournal.setNarration("ACCUM DEPRECIATION");
+                this.saveAccJournal(accjournal);
+            }
+        } catch (Exception e) {
+            System.err.println("postJournalDepreciateAsset:" + e.getMessage());
+        }
+    }
+
+    public void postJournalDepreciateAssetREVERSE(Trans aTrans, Stock aStock, AccDepSchedule aAccDepSchedule, int aAccPeriodId, long aParentJobId) {
+        try {
+            //Depreciation Expense Account(profit and loss)
+            int DepAccountId = 0;
+            String DepAccountCode = "5-20-250-010";
+            try {
+                DepAccountId = new AccCoaBean().getAccCoaByCodeOrId(DepAccountCode, 0).getAccCoaId();
+            } catch (NullPointerException npe) {
+                DepAccountId = 0;
+            }
+            //Accumulated Depreciation Account (balance sheet)
+            int AccumDepAccountId = 0;
+            String AccumDepAccountCode = "";
+            switch (aStock.getAccountCode()) {
+                case "1-20-000-020"://PPE Buildings
+                    AccumDepAccountCode = "1-20-010-010";
+                    break;
+                case "1-20-000-030"://PPE Machinery & Equipment
+                    AccumDepAccountCode = "1-20-010-020";
+                    break;
+                case "1-20-000-040"://PPE Vehicles
+                    AccumDepAccountCode = "1-20-010-030";
+                    break;
+                case "1-20-000-050"://PPE Furniture and Fixtures
+                    AccumDepAccountCode = "1-20-010-040";
+                    break;
+                case "1-20-000-060"://PPE Computer Equipment
+                    AccumDepAccountCode = "1-20-010-050";
+                    break;
+                case "1-20-000-070"://PPE Other Property, Plant & Equipment
+                    AccumDepAccountCode = "1-20-010-060";
+                    break;
+                default:
+                    break;
+            }
+            try {
+                AccumDepAccountId = new AccCoaBean().getAccCoaByCodeOrId(AccumDepAccountCode, 0).getAccCoaId();
+            } catch (NullPointerException npe) {
+                AccumDepAccountId = 0;
+            }
+            //get job Id
+            long JobId = 0;
+            try {
+                if (aParentJobId > 0) {
+                    JobId = aParentJobId;
+                } else {
+                    JobId = new UtilityBean().getNewTableColumnSeqNumber("acc_journal", "job_id");
+                }
+            } catch (NullPointerException npe) {
+                JobId = 0;
+            }
+            AccJournal accjournal = new AccJournal();
+            accjournal.setAccJournalId(0);
+            accjournal.setJobId(JobId);
+            accjournal.setJournalDate(aTrans.getTransactionDate());
+            accjournal.setTransactionId(aTrans.getTransactionId());
+            accjournal.setTransactionTypeId(aTrans.getTransactionTypeId());
+            accjournal.setTransactionReasonId(aTrans.getTransactionReasonId());
+            accjournal.setPayId(0);
+            accjournal.setPayTypeId(0);
+            accjournal.setPayReasonId(0);
+            accjournal.setStoreId(aStock.getStoreId());
+            accjournal.setLedgerFolio("");
+            accjournal.setAccPeriodId(aAccPeriodId);
+            accjournal.setCurrencyCode(new ItemBean().getItem(aStock.getItemId()).getCurrencyCode());
+            accjournal.setXrate(1);
+            accjournal.setAddBy(new GeneralUserSetting().getCurrentUser().getUserDetailId());
+            accjournal.setBillTransactorId(0);
+            //REVERSE-DEBIT DEPRECIATION to CR
+            if (aAccDepSchedule.getDepAmount() > 0) {
+                accjournal.setAccCoaId(DepAccountId);
+                accjournal.setAccountCode(DepAccountCode);
+                accjournal.setDebitAmount(0);
+                accjournal.setCreditAmount(aAccDepSchedule.getDepAmount());
+                accjournal.setNarration("REVERSE-DEPRECIATION COST");
+                this.saveAccJournal(accjournal);
+            }
+            //REVERSE-CREDIT ACCUM DEPRECIATION to DR
+            if (aAccDepSchedule.getDepAmount() > 0) {
+                accjournal.setAccCoaId(AccumDepAccountId);
+                accjournal.setAccountCode(AccumDepAccountCode);
+                accjournal.setDebitAmount(aAccDepSchedule.getDepAmount());
+                accjournal.setCreditAmount(0);
+                accjournal.setNarration("REVERSE-ACCUM DEPRECIATION");
+                this.saveAccJournal(accjournal);
+            }
+        } catch (Exception e) {
+            System.err.println("postJournalDepreciateAssetREVERSE:" + e.getMessage());
         }
     }
 

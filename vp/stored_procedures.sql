@@ -8888,6 +8888,17 @@ BEGIN
 END//
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS sp_delete_acc_dep_schedule_unposted;
+DELIMITER //
+CREATE PROCEDURE sp_delete_acc_dep_schedule_unposted
+(
+		IN in_stock_id bigint
+) 
+BEGIN 
+		DELETE FROM acc_dep_schedule WHERE acc_dep_schedule_id>0 AND stock_id=in_stock_id AND ifnull(post_status,0)=0; 
+END//
+DELIMITER ;
+
 DROP PROCEDURE IF EXISTS sp_search_acc_dep_schedule_by_id;
 DELIMITER //
 CREATE PROCEDURE sp_search_acc_dep_schedule_by_id
@@ -8908,6 +8919,18 @@ CREATE PROCEDURE sp_search_acc_dep_schedule_by_year
 ) 
 BEGIN 
 		SELECT * FROM acc_dep_schedule WHERE stock_id=in_stock_id AND year_number=in_year_number;
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_acc_dep_schedule_by_year_posted;
+DELIMITER //
+CREATE PROCEDURE sp_search_acc_dep_schedule_by_year_posted
+(
+	IN in_stock_id bigint,
+	IN in_year_number int
+) 
+BEGIN 
+		SELECT * FROM acc_dep_schedule WHERE stock_id=in_stock_id AND year_number=in_year_number AND ifnull(post_status,0)=1;
 END//
 DELIMITER ;
 
@@ -11277,7 +11300,7 @@ BEGIN
 END//
 DELIMITER ;
 
-DROP PROCEDURE IF EXISTS sp_item_tax_map;
+DROP PROCEDURE IF EXISTS sp_save_item_tax_map;
 DELIMITER //
 CREATE PROCEDURE sp_save_item_tax_map
 (

@@ -3,7 +3,9 @@ package beans;
 import connections.DBConnection;
 import entities.AccDepSchedule;
 import entities.AccPeriod;
+import entities.CompanySetting;
 import entities.Stock;
+import entities.Trans;
 import java.io.Serializable;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -13,8 +15,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
 
 /*
  * To change this template, choose Tools | Templates
@@ -24,13 +28,13 @@ import javax.faces.bean.SessionScoped;
  *
  * @author btwesigye
  */
-@ManagedBean(name = "aAccDepScheduleBean")
+@ManagedBean(name = "accDepScheduleBean")
 @SessionScoped
 public class AccDepScheduleBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
     private List<AccDepSchedule> AccDepScheduleList;
+    private String ItemDescription;
 
     public void setAccDepScheduleFromResultset(AccDepSchedule aAccDepSchedule, ResultSet aResultSet) {
         try {
@@ -68,6 +72,11 @@ public class AccDepScheduleBean implements Serializable {
                 aAccDepSchedule.setDepAmount(aResultSet.getDouble("dep_amount"));
             } catch (NullPointerException npe) {
                 aAccDepSchedule.setDepAmount(0);
+            }
+            try {
+                aAccDepSchedule.setPost_status(aResultSet.getInt("post_status"));
+            } catch (NullPointerException npe) {
+                aAccDepSchedule.setPost_status(0);
             }
         } catch (SQLException se) {
             System.err.println(se.getMessage());
@@ -174,6 +183,12 @@ public class AccDepScheduleBean implements Serializable {
             AccPeriod prvaccprd = null;
             AccDepSchedule prevDepSched = null;
             AccDepSchedule curDepSched = null;
+            //set trans
+            Trans trans = new Trans();
+            trans.setTransactionId(0);
+            trans.setTransactionTypeId(26);//ACCOUNT PERIOD
+            trans.setTransactionReasonId(51);//ACCOUNT PERIOD OPEN
+            trans.setTransactionDate(new CompanySetting().getCURRENT_SERVER_DATE());
             //below are all un posted depreciation shcedules
             while (rs.next()) {
                 curyearno = 0;
@@ -193,7 +208,7 @@ public class AccDepScheduleBean implements Serializable {
                         //depreciate for this year
                         curstockid = rs.getInt("stock_id");
                         curDepSched = this.getAccDepScheduleByYear(curstockid, curyearno);
-                        new AccJournalBean().postJournalDepreciateAsset(new StockBean().getStock(curstockid), curDepSched, aAccPeriod.getAccPeriodId(), aPostJobId);
+                        new AccJournalBean().postJournalDepreciateAsset(trans, new StockBean().getStock(curstockid), curDepSched, aAccPeriod.getAccPeriodId(), aPostJobId);
                         curDepSched.setDepForAccPeriodId(aAccPeriod.getAccPeriodId());
                         curDepSched.setDepFromDate(aAccPeriod.getStartDate());
                         curDepSched.setDepToDate(aAccPeriod.getEndDate());
@@ -216,6 +231,18 @@ public class AccDepScheduleBean implements Serializable {
             cs.executeUpdate();
         } catch (SQLException se) {
             System.err.println("deleteAccDepSchedule:" + se.getMessage());
+        }
+    }
+
+    public void deleteAccDepScheduleUnposted(long aStockId) {
+        String sql = "{call sp_delete_acc_dep_schedule_unposted(?)}";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                CallableStatement cs = conn.prepareCall(sql);) {
+            cs.setLong("in_stock_id", aStockId);
+            cs.executeUpdate();
+        } catch (Exception e) {
+            System.err.println("deleteAccDepScheduleUnposted:" + e.getMessage());
         }
     }
 
@@ -279,6 +306,28 @@ public class AccDepScheduleBean implements Serializable {
         }
     }
 
+    public AccDepSchedule getAccDepScheduleByYearPosted(Long aStockId, int aYearNumber) {
+        String sql = "{call sp_search_acc_dep_schedule_by_year_posted(?,?)}";
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aStockId);
+            ps.setLong(2, aYearNumber);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                AccDepSchedule ads = new AccDepSchedule();
+                this.setAccDepScheduleFromResultset(ads, rs);
+                return ads;
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            System.err.println("getAccDepScheduleByYearPosted:" + e.getMessage());
+            return null;
+        }
+    }
+
     public List<AccDepSchedule> getAccDepSchedulesByStock(Long aStockId) {
         String sql;
         sql = "{call sp_search_acc_dep_schedule_by_stock(?)}";
@@ -310,7 +359,7 @@ public class AccDepScheduleBean implements Serializable {
 
     public List<AccDepSchedule> calcAccDepSchedules(Stock aStock) {
         AccDepSchedule depsch;
-        AccDepScheduleList = new ArrayList<>();
+        setAccDepScheduleList(new ArrayList<>());
         if (null != aStock && aStock.getEffectiveLife() > 0) {
             int depmethodid = aStock.getDepMethodId();
             if (depmethodid == 1) {//SLD
@@ -324,7 +373,7 @@ public class AccDepScheduleBean implements Serializable {
                     depsch.setStockId(aStock.getStockId());
                     depsch.setYearNumber(i);
                     depsch.setDepAmount(nbv / n);
-                    AccDepScheduleList.add(depsch);
+                    getAccDepScheduleList().add(depsch);
                 }
             } else if (depmethodid == 2) {//RBD
                 double rate = 0;
@@ -342,7 +391,7 @@ public class AccDepScheduleBean implements Serializable {
                     } else {
                         depsch.setDepAmount(nbv);
                     }
-                    AccDepScheduleList.add(depsch);
+                    getAccDepScheduleList().add(depsch);
                     nbv = nbv - depsch.getDepAmount();
                 }
             } else if (depmethodid == 3) {//SYD
@@ -359,14 +408,14 @@ public class AccDepScheduleBean implements Serializable {
                     depsch.setStockId(aStock.getStockId());
                     depsch.setYearNumber(i);
                     depsch.setDepAmount(nbv * udy / syd);
-                    AccDepScheduleList.add(depsch);
+                    getAccDepScheduleList().add(depsch);
                     udy = udy - 1;
                 }
             } else {//NONE
 
             }
         }
-        return AccDepScheduleList;
+        return getAccDepScheduleList();
     }
 
     public double calculateDepRate(Stock aStock) {
@@ -385,6 +434,155 @@ public class AccDepScheduleBean implements Serializable {
             }
         }
         return deprate;
+    }
+
+    public void refreshAccDepSchedules(Stock aStock) {
+        String sql = "SELECT * FROM acc_dep_schedule WHERE stock_id=" + aStock.getStockId() + " ORDER BY year_number ASC";
+        this.setAccDepScheduleList(new ArrayList<>());
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            AccDepSchedule ds = null;
+            try {
+                this.ItemDescription = new ItemBean().getItem(aStock.getItemId()).getDescription() + " " + aStock.getDescSpecific() + " " + aStock.getCodeSpecific();
+            } catch (Exception e) {
+                this.ItemDescription = "";
+            }
+            while (rs.next()) {
+                ds = new AccDepSchedule();
+                this.setAccDepScheduleFromResultset(ds, rs);
+                try {
+                    ds.setAcc_period_name(new AccPeriodBean().getAccPeriodById(rs.getInt("dep_for_acc_period_id")).getAccPeriodName());
+                } catch (Exception e) {
+                    ds.setAcc_period_name("");
+                }
+                this.getAccDepScheduleList().add(ds);
+            }
+        } catch (Exception e) {
+            System.err.println("refreshAccDepSchedules:" + e.getMessage());
+        }
+    }
+
+    public void cancelAccDepSchedule(AccDepSchedule aAccDepSchedule) {
+        String msg = "";
+        String sql = "";
+        int x = 0;
+        AccPeriod ap = null;
+        Trans trans = null;
+        Stock stock = null;
+        try {
+            ap = new AccPeriodBean().getAccPeriodById(aAccDepSchedule.getDepForAccPeriodId());
+        } catch (Exception e) {
+            ap = null;
+        }
+        if (null == ap) {
+            msg = "You cannot cancel posted depreciation for this accounting period...";
+            FacesContext.getCurrentInstance().addMessage("Cancel", new FacesMessage(msg));
+        } else if (ap.getIsClosed() == 1) {
+            msg = "You cannot cancel posted depreciation for a closed accounting period...";
+            FacesContext.getCurrentInstance().addMessage("Cancel", new FacesMessage(msg));
+        } else if (aAccDepSchedule.getDepAmount() <= 0) {
+            msg = "You cannot cancel depreciation for 0 amount...";
+            FacesContext.getCurrentInstance().addMessage("Cancel", new FacesMessage(msg));
+        } else if (aAccDepSchedule.getDepForAccPeriodId() <= 0) {
+            msg = "You cannot cancel this depreciation...";
+            FacesContext.getCurrentInstance().addMessage("Cancel", new FacesMessage(msg));
+        } else {
+            trans = new Trans();
+            trans.setTransactionId(0);
+            trans.setTransactionTypeId(16);//JOURNAL ENTRY
+            trans.setTransactionReasonId(35);//JOURNAL ENTRY
+            trans.setTransactionDate(new CompanySetting().getCURRENT_SERVER_DATE());
+            stock = new StockBean().getStock(aAccDepSchedule.getStockId());
+            new AccJournalBean().postJournalDepreciateAssetREVERSE(trans, stock, aAccDepSchedule, aAccDepSchedule.getDepForAccPeriodId(), 0);
+            x = 1;
+            aAccDepSchedule.setPost_status(0);
+            new AccDepScheduleBean().updateAccDepSchedule(aAccDepSchedule);
+        }
+        if (x == 1) {
+            this.refreshAccDepSchedules(stock);
+            msg = "Depreciation record cancelled successfully...";
+            FacesContext.getCurrentInstance().addMessage("Cancel", new FacesMessage(msg));
+        }
+    }
+
+    public void postAccDepSchedule(AccDepSchedule aAccDepSchedule) {
+        String msg = "";
+        String sql = "";
+        int x = 0;
+        AccPeriod ap = null;
+        Trans trans = null;
+        Stock stock = null;
+        try {
+            ap = new AccPeriodBean().getAccPeriodById(aAccDepSchedule.getDepForAccPeriodId());
+        } catch (Exception e) {
+            ap = null;
+        }
+        if (null == ap) {
+            msg = "You cannot post depreciation to this accounting period...";
+            FacesContext.getCurrentInstance().addMessage("Post", new FacesMessage(msg));
+        } else if (ap.getIsClosed() == 1) {
+            msg = "You cannot post depreciation to a closed accounting period...";
+            FacesContext.getCurrentInstance().addMessage("Post", new FacesMessage(msg));
+        } else if (null != ap && ap.getIsOpen() == 0) {
+            msg = "You cannot post depreciation to an accounting period not open...";
+            FacesContext.getCurrentInstance().addMessage("Post", new FacesMessage(msg));
+        } else if (aAccDepSchedule.getDepAmount() <= 0) {
+            msg = "You cannot post depreciation for 0 amount...";
+            FacesContext.getCurrentInstance().addMessage("Post", new FacesMessage(msg));
+        } else if (aAccDepSchedule.getDepForAccPeriodId() <= 0) {
+            msg = "Select a valid accounting period before posting a depreciation...";
+            FacesContext.getCurrentInstance().addMessage("Post", new FacesMessage(msg));
+        } else {
+            trans = new Trans();
+            trans.setTransactionId(0);
+            trans.setTransactionTypeId(16);//JOURNAL ENTRY
+            trans.setTransactionReasonId(35);//JOURNAL ENTRY
+            trans.setTransactionDate(new CompanySetting().getCURRENT_SERVER_DATE());
+            stock = new StockBean().getStock(aAccDepSchedule.getStockId());
+            new AccJournalBean().postJournalDepreciateAsset(trans, stock, aAccDepSchedule, aAccDepSchedule.getDepForAccPeriodId(), 0);
+            x = 1;
+            aAccDepSchedule.setDepForAccPeriodId(ap.getAccPeriodId());
+            aAccDepSchedule.setDepFromDate(ap.getStartDate());
+            aAccDepSchedule.setDepToDate(ap.getEndDate());
+            aAccDepSchedule.setPost_status(1);
+            new AccDepScheduleBean().updateAccDepSchedule(aAccDepSchedule);
+        }
+        if (x == 1) {
+            this.refreshAccDepSchedules(stock);
+            msg = "Depreciation schedule posted successfully...";
+            FacesContext.getCurrentInstance().addMessage("Post", new FacesMessage(msg));
+        }
+    }
+
+    /**
+     * @return the ItemDescription
+     */
+    public String getItemDescription() {
+        return ItemDescription;
+    }
+
+    /**
+     * @param ItemDescription the ItemDescription to set
+     */
+    public void setItemDescription(String ItemDescription) {
+        this.ItemDescription = ItemDescription;
+    }
+
+    /**
+     * @return the AccDepScheduleList
+     */
+    public List<AccDepSchedule> getAccDepScheduleList() {
+        return AccDepScheduleList;
+    }
+
+    /**
+     * @param AccDepScheduleList the AccDepScheduleList to set
+     */
+    public void setAccDepScheduleList(List<AccDepSchedule> AccDepScheduleList) {
+        this.AccDepScheduleList = AccDepScheduleList;
     }
 
 }
