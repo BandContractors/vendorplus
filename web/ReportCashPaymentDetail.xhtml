@@ -37,20 +37,19 @@
                     <p:ajax listener="#{payBean.setDateToYesturday()}" process="@this" update="pnlgFilter1"/>
                 </p:commandLink>
             </h:panelGrid>
-            <div class="ui-fluid">
                 <h:panelGrid id="pnlgFilter1" columns="7" styleClass="clsPanelReportFilter">
                     <p:outputLabel value="#{companySetting.getStoreEquivName()}"/>
                     <p:outputLabel value="Date Type"/>
                     <p:outputLabel value="From #{payBean.dateType}" id="lblDate1"/>
                     <p:outputLabel value="To #{payBean.dateType}" id="lblDate2"/>
                     <p:outputLabel value="Pay No"/>
-                    <p:outputLabel value="#{transactionTypeBean.getTransactionType(1).transactionNumberLabel}"/>
                     <p:outputLabel value="#{menuItemBean.menuItemObj.SUPPLIER_NAME}"/>
-                    <p:selectOneMenu id="menuFromStore" value="#{pay.storeId}" >
+                    <p:outputLabel value="#{transactionTypeBean.getTransactionType(1).transactionNumberLabel}"/>
+                    <p:selectOneMenu id="menuFromStore" value="#{pay.storeId}" style="width: 120px;">
                         <f:selectItem itemLabel="Select" itemValue="0"/>
                         <f:selectItems value="#{storeBean.stores}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
                     </p:selectOneMenu>
-                    <p:selectOneMenu id="menuDateType" value="#{payBean.dateType}">
+                    <p:selectOneMenu id="menuDateType" value="#{payBean.dateType}" style="width: 120px;">
                         <f:selectItem itemLabel="Select" itemValue=""/>
                         <f:selectItem itemValue="Add Date" itemLabel="Add Date"/>
                         <f:selectItem itemValue="Pay Date" itemLabel="Pay Date"/>
@@ -58,8 +57,7 @@
                     </p:selectOneMenu>
                     <p:calendar id="calDate1"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{payBean.date1}" size="12"/>
                     <p:calendar id="calDate2"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{payBean.date2}" size="12"/>
-                    <p:inputText id="itxtPayNo" value="#{pay.pay_number}" style="width: 140px;"/>
-                    <p:inputText id="itxtInvoiceNo" value="#{trans.transactionNumber}" style="width: 140px;"/>
+                    <p:inputText id="itxtPayNo" value="#{pay.pay_number}" style="width: 180px;"/>
                     <p:autoComplete id="autcTransactor" value="#{transactorBean.selectedTransactor}"  
                                     completeMethod="#{transactorBean.getTransactorObjectList}" 
                                     var="trct" 
@@ -83,38 +81,38 @@
                         <p:ajax event="itemSelect" listener="#{pay.setBillTransactorId(transactorBean.selectedTransactor.transactorId)}"/>
                         <p:ajax event="change" listener="#{pay.setBillTransactorId(transactorBean.selectedTransactor.transactorId)}" rendered="#{transactorBean.selectedTransactor!=null}"/>
                     </p:autoComplete>
-                </h:panelGrid>
-                <h:panelGrid id="pnlgFilter2" columns="7" styleClass="clsPanelReportFilter">
+                    <p:inputText id="itxtInvoiceNo" value="#{trans.transactionNumber}" style="width: 150px;"/>
+                    
                     <h:outputLabel value="Pay Method"/>
                     <p:outputLabel value="Added By"/>
                     <h:outputLabel value="Paid By"/>
                     <p:outputLabel value="Cash Payment Type"/>
-                    <p:outputLabel value="ShareHolder/LoanAccount"/>  
-                    <h:outputLabel value="SUMMARIZE RESULTS BY:"/>
+                    <p:outputLabel value="ShareHolder/Loan Acc"/>  
+                    <h:outputLabel value="SUMMARIZE RESULTS BY"/>
                     <h:outputLabel value=""/>
                     
-                    <h:selectOneMenu id="menuPayMethod" value="#{pay.payMethodId}">
+                    <p:selectOneMenu id="menuPayMethod" value="#{pay.payMethodId}" style="width: 120px;">
                         <f:selectItem itemLabel="Select" itemValue="0"/>
                         <f:selectItems value="#{payMethodBean.payMethodsList}" var="pm" itemLabel="#{pm.payMethodName}" itemValue="#{pm.payMethodId}"/>
-                    </h:selectOneMenu>
-                    <p:selectOneMenu id="menuAddUser" value="#{pay.addUserDetailId}">
+                    </p:selectOneMenu>
+                    <p:selectOneMenu id="menuAddUser" value="#{pay.addUserDetailId}" style="width: 120px;">
                         <f:selectItem itemLabel="Select" itemValue="0"/>
                         <f:selectItems value="#{userDetailBean.getUserDetails()}" var="ut" itemLabel="#{ut.firstName} #{ut.secondName} #{ut.thirdName}" itemValue="#{ut.userDetailId}"/>
                     </p:selectOneMenu>
-                    <p:selectOneMenu id="menuTransUser" value="#{pay.addUserDetailId}">
+                    <p:selectOneMenu id="menuTransUser" value="#{pay.addUserDetailId}" style="width: 140px;">
                         <f:selectItem itemLabel="Select"/>
                         <f:selectItems value="#{userDetailBean.getUserDetails()}" var="ua" itemLabel="#{ua.firstName} #{ua.secondName} #{ua.thirdName}" itemValue="#{ua.userDetailId}"/>
                     </p:selectOneMenu>
-                    <p:selectOneMenu id="menuTransType" value="#{pay.payReasonId}" >
+                    <p:selectOneMenu id="menuTransType" value="#{pay.payReasonId}" style="width: 140px;">
                         <f:selectItem itemLabel="Select" itemValue="0"/>
                         <f:selectItems value="#{transactionReasonBean.getTransactionReasonsByTypes('15')}" var="tr" itemLabel="#{tr.transactionReasonName}" itemValue="#{tr.transactionReasonId}"/>
                         <p:ajax event="change" process="@this" update="menuAccount2CapitalLoan"/>
                     </p:selectOneMenu>
-                    <h:selectOneMenu id="menuAccount2CapitalLoan" value="#{pay.accChildAccountId2}">
+                    <p:selectOneMenu id="menuAccount2CapitalLoan" value="#{pay.accChildAccountId2}" style="width: 165px;">
                         <f:selectItem itemValue="" itemLabel=""/>
                         <f:selectItems value="#{accChildAccountBean.getChildAccountsByPayReason('3-10-000-010','2-00-000-050','2-10-000-010',pay.payReasonId)}" var="ca" itemLabel="#{ca.childAccountCode} (#{ca.childAccountName})" itemValue="#{ca.accChildAccountId}"/>
-                    </h:selectOneMenu>
-                    <p:selectOneMenu id="menuSummariseBy" value="#{payBean.fieldName}">
+                    </p:selectOneMenu>
+                    <p:selectOneMenu id="menuSummariseBy" value="#{payBean.fieldName}" style="width: 226px;">
                         <f:selectItem itemLabel="Select" itemValue=""/>
                         <f:selectItem itemLabel="Paid By" itemValue="add_user_detail_id"/>
                         <f:selectItem itemLabel="#{menuItemBean.menuItemObj.SUPPLIER_NAME}" itemValue="bill_transactor_id"/>
@@ -133,15 +131,14 @@
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
-                        <p:ajax listener="#{payBean.reportCashPaymentDetail(trans,pay,payBean)}" process="@this pnlgFilter1 pnlgFilter2" update="pnlgFilter1 pnlgFilter2 pnlgMessage tblDetail"/>
+                        <p:ajax listener="#{payBean.reportCashPaymentDetail(trans,pay,payBean)}" process="@this pnlgFilter1" update="pnlgFilter1 pnlgMessage tblDetail"/>
                     </p:commandButton>
                     <p:commandButton id="cmdbReset" value="RESET (ALT+R)" accesskey="r" style="width: 200px;">
-                        <p:ajax listener="#{payBean.resetPayReportDetail(trans,pay,payBean,transactorBean.selectedBillTransactor)}" process="@this pnlgFilter1 pnlgFilter2" update="pnlgFilter1 pnlgFilter2 pnlgMessage tblDetail"/>
+                        <p:ajax listener="#{payBean.resetPayReportDetail(trans,pay,payBean,transactorBean.selectedBillTransactor)}" process="@this pnlgFilter1" update="pnlgFilter1 pnlgMessage tblDetail"/>
                     </p:commandButton>
                     <h:outputLabel value=""/>
                     <h:outputLabel value=""/>
                 </h:panelGrid>
-            </div>
             <h:panelGrid id="pnlgMessage">
                 <p:outputLabel value="#{payBean.actionMessage}" style="color: red;"/>
             </h:panelGrid>

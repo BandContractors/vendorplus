@@ -253,11 +253,20 @@
                             <h:outputLabel id="olblPointsApprove" style="background-color: black;color: white" value="#{generalUserSetting.getCurrentApprovePointsStatus()}"/>  
                         </h:panelGrid>
                     </h:panelGrid>
-                    <h:panelGrid styleClass="clsGridMainCommands" columns="1" style="width: 100%">
+                    <h:panelGrid styleClass="clsGridMainCommands" columns="2" style="width: 100%">
                         <h:panelGrid styleClass="clsGridMainCommands1" columns="3">
                             <h:commandButton styleClass="clsButtonVeryBig" id="cmdbUpdate" value="UPDATE (ALT+U)" onclick="return confirmUpdate();" accesskey="u" rendered="#{transBean.actionType.equals('Edit') and generalUserSetting.currentStore.storeId==transBean.transObj.storeId}">
                                 <f:ajax listener="#{transBean.updateTransCECcallFromSI('PARENT',transBean.transObj.storeId,transBean.transObj.transactionTypeId,transBean.transObj.transactionReasonId,'',transBean.transObj,transBean.transItemList,transBean.payObj)}" execute="pnlTransaction" render="pnlTransaction"/>
                             </h:commandButton>
+                        </h:panelGrid>
+                        <h:panelGrid columns="1">
+                            <h:outputLabel value="Print.File" style="color: white;"/>
+                            <h:selectOneMenu styleClass="clsMenu" value="#{transBean.overridePrintVersion}">
+                                <f:selectItem itemLabel="" itemValue="0"/>
+                                <f:selectItem itemLabel="Print File 1" itemValue="1"/>
+                                <f:selectItem itemLabel="Print File 2" itemValue="2"/>
+                                <f:ajax event="change" render="pnlgOutput"/>
+                            </h:selectOneMenu>
                         </h:panelGrid>
                     </h:panelGrid>
                     <h:panelGrid styleClass="clsGridMainMessages" columns="1">
@@ -267,7 +276,9 @@
                 </p:panel>
                 <p:growl/>
                 <!-- INVOICE STARTS HERE -->
-                <ui:include src="#{transBean.getPrintFileName('PARENT',transactionTypeBean.getTransactionType(2),0)}"/>
+                <h:panelGrid id="pnlgOutput" style="width: 100%">
+                    <ui:include src="#{transBean.getPrintFileName('PARENT',transactionTypeBean.getTransactionType(2),transBean.overridePrintVersion)}"/>
+                </h:panelGrid>
                 <!-- INVOICE ENDS HERE -->
             </h:form>
         </p:dialog>

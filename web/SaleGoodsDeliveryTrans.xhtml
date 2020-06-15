@@ -254,7 +254,7 @@
             </h:panelGrid>
             <p:growl/>
             <!-- INVOICE STARTS HERE -->
-            <h:panelGrid id="pnlgOutput">
+            <h:panelGrid id="pnlgOutput" style="width: 100%">
                 <ui:include src="#{transBean.getPrintFileName('PARENT',transBean.transTypeObj,transBean.overridePrintVersion)}"/>
             </h:panelGrid>
             <!-- INVOICE ENDS HERE -->

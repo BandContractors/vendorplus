@@ -118,10 +118,10 @@
                     <f:selectItems value="#{transBean.transList}" var="stl" itemLabel="#{stl.transactionNumber}" itemValue="#{stl.transactionNumber}"/>
                     <p:ajax listener="#{transBean.loadOrderForInvoiceTrans(trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor,transBean.authorisedByUserDetail,transItemBean.selectedAccCoa)}" process="@form" update="pnlHeader gridTransItem pgrdOverrideWarranty pgrdSpecific gridItemStatus dtblTransactionItem pgrdTotals pgrdScheme pgrdPayment pgrdMsgs pgrdTransUser pgrdApprove growl1"/>
                 </p:selectOneMenu>
-                <h:inputText disabled="true" style="color: coral;font-weight: bold;width: 160px;" styleClass="clsInput" id="itxtDebtCredit" value="#{accJournalBean.returnBalanceString(trans.balance_receivable)}">
+                <h:inputText disabled="true" style="color: coral;font-weight: bold;width: 155px;" styleClass="clsInput" id="itxtDebtCredit" value="#{accJournalBean.returnBalanceString(trans.balance_receivable)}">
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
-                <h:inputText disabled="true" style="color: green;font-weight: bold;width: 160px;" styleClass="clsInput" id="itxtPrepaidAcc" value="#{accJournalBean.returnBalanceString(trans.deposit_customer)}">
+                <h:inputText disabled="true" style="color: green;font-weight: bold;width: 155px;" styleClass="clsInput" id="itxtPrepaidAcc" value="#{accJournalBean.returnBalanceString(trans.deposit_customer)}">
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
             </h:panelGrid>
@@ -627,7 +627,7 @@
             </h:panelGrid>
             <p:growl id="growl1"/>
             <!-- INVOICE STARTS HERE -->
-            <h:panelGrid id="pnlgOutput">
+            <h:panelGrid id="pnlgOutput" style="width: 100%">
                 <ui:include src="#{transBean.getPrintFileName('PARENT',transBean.transTypeObj,transBean.overridePrintVersion)}"/>
             </h:panelGrid>
             <!-- INVOICE ENDS HERE -->

@@ -52,14 +52,14 @@
                         <h:inputText value="#{payBean.payObj.paidAmount}" disabled="true">
                             <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
-                        
+
                         <h:outputLabel value="Pay Date:"/>
                         <h:inputText value="#{utilityBean.formatDate(payBean.payObj.payDate)}" disabled="true"/>
                         <h:outputLabel value="Add Date:"/>
                         <h:inputText value="#{utilityBean.formatDate(payBean.payObj.addDate)}" disabled="true"/>
                         <h:outputLabel value="Paid By:"/>
                         <h:inputText value="#{userDetailBean.getUserDetail(payBean.payObj.addUserDetailId).userName}" disabled="true"/>
-                        
+
                         <h:outputLabel value="Payment Method:"/>
                         <h:inputText value="#{payMethodBean.getPayMethod(payBean.payObj.payMethodId).payMethodName}" disabled="true"/>
                         <h:outputLabel value="Paid from Account:"/>
@@ -68,13 +68,22 @@
                         <h:inputText value="#{payBean.payObj.payRefNo}" disabled="true"/>
                         <h:outputLabel value="Currency:"/>
                         <h:inputText value="#{payBean.payObj.currencyCode}" disabled="true"/>
-                        
+
                     </h:panelGrid>
-                    <h:panelGrid styleClass="clsGridMainCommands" columns="1" style="width: 100%">
+                    <h:panelGrid styleClass="clsGridMainCommands" columns="2" style="width: 100%">
                         <h:panelGrid styleClass="clsGridMainCommands1" columns="2">
                             <h:commandButton styleClass="clsButtonVeryBig" id="cmdbCancel" value="CANCEL (ALT+C)" onclick="return confirmCancel();" accesskey="c" rendered="#{payBean.actionType.equals('Cancel') and generalUserSetting.currentStore.storeId==payBean.payObj.storeId and payBean.payObj.paidAmount>0}">
                                 <f:ajax listener="#{payBean.cancelPayV2(payBean.payObj,payBean.payTransList)}" execute="pnlTransaction" render="pnlTransaction"/>
                             </h:commandButton>
+                        </h:panelGrid>
+                        <h:panelGrid columns="1">
+                            <h:outputLabel value="Print.File" style="color: white;"/>
+                            <h:selectOneMenu styleClass="clsMenu" value="#{transBean.overridePrintVersion}">
+                                <f:selectItem itemLabel="" itemValue="0"/>
+                                <f:selectItem itemLabel="Print File 1" itemValue="1"/>
+                                <f:selectItem itemLabel="Print File 2" itemValue="2"/>
+                                <f:ajax event="change" render="pnlgOutput"/>
+                            </h:selectOneMenu>
                         </h:panelGrid>
                     </h:panelGrid>
 
@@ -85,7 +94,9 @@
                 </p:panel>
                 <p:growl/>
                 <!-- INVOICE STARTS HERE -->
-                <ui:include src="#{transBean.getPrintFileName('PARENT',transactionTypeBean.getTransactionType(15),0)}"/>
+                <h:panelGrid id="pnlgOutput" style="width: 100%">
+                    <ui:include src="#{transBean.getPrintFileName('PARENT',transactionTypeBean.getTransactionType(15),transBean.overridePrintVersion)}"/>
+                </h:panelGrid>
                 <!-- INVOICE ENDS HERE -->
             </h:form>
         </p:dialog>
