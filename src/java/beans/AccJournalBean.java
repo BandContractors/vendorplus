@@ -4230,14 +4230,22 @@ public class AccJournalBean implements Serializable {
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             rs = ps.executeQuery();
+            TransBean tb = new TransBean();
             AccJournal accjournal = null;
             while (rs.next()) {
                 accjournal = new AccJournal();
                 this.setAccJournalFromResultset(accjournal, rs);
+                try {
+                    if (accjournal.getTransactionId() > 0) {
+                        accjournal.setTransaction_number(tb.getTrans(accjournal.getTransactionId()).getTransactionNumber());
+                    }
+                } catch (Exception e) {
+                    //do nothing
+                }
                 this.AccJournalList.add(accjournal);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            System.err.println("reportAccJournal:" + e.getMessage());
         }
 
         try (

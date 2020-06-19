@@ -147,8 +147,8 @@
                 <p:column headerText="Sub Type">
                     <h:outputLabel value="#{transactionReasonBean.getTransactionReason(itm.payReasonId).transactionReasonName} " rendered="#{null==itm.transactionReasonId or itm.transactionReasonId==0}"/>
                     <h:outputLabel value="#{transactionReasonBean.getTransactionReason(itm.transactionReasonId).transactionReasonName} "/>
-                    <h:outputText value="#{itm.payId}" rendered="#{itm.transactionId==0}"/>
-                    <h:outputText value="#{itm.transactionId}"/>
+                    <h:outputText value="#{itm.payId}" rendered="#{itm.transactionId==0 and itm.payId>0}"/>
+                    <h:outputText value="#{itm.transaction_number}" rendered="#{itm.transactionId>0}"/>
                 </p:column>
                 <p:column headerText="Partner">
                     <h:outputText value="#{transactorBean.getTransactor(itm.billTransactorId).transactorNames} " rendered="#{itm.billTransactorId>0}"/>

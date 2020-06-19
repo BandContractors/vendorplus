@@ -366,8 +366,16 @@ public class AccDepScheduleBean implements Serializable {
                 double rate = 0;
                 double nbv = 0;
                 int n = 0;
-                n = aStock.getEffectiveLife();
-                nbv = aStock.getUnitCost() - aStock.getResidualValue();
+                try {
+                    n = aStock.getEffectiveLife();
+                } catch (Exception e) {
+                    n = 0;
+                }
+                if (n == 0) {
+                    n = 1;
+                }
+                //nbv = aStock.getUnitCost() - aStock.getResidualValue();
+                nbv = aStock.getCurrentqty() * (aStock.getUnitCost() - aStock.getResidualValue());
                 for (int i = 1; i <= n; i++) {
                     depsch = new AccDepSchedule();
                     depsch.setStockId(aStock.getStockId());
@@ -379,9 +387,17 @@ public class AccDepScheduleBean implements Serializable {
                 double rate = 0;
                 double nbv = 0;
                 int n = 0;
-                n = aStock.getEffectiveLife();
+                try {
+                    n = aStock.getEffectiveLife();
+                } catch (Exception e) {
+                    n = 0;
+                }
+                if (n == 0) {
+                    n = 1;
+                }
                 rate = aStock.getDepRate();
-                nbv = aStock.getUnitCost() - aStock.getResidualValue();
+                //nbv = aStock.getUnitCost() - aStock.getResidualValue();
+                nbv = aStock.getCurrentqty() * (aStock.getUnitCost() - aStock.getResidualValue());
                 for (int i = 1; i <= n; i++) {
                     depsch = new AccDepSchedule();
                     depsch.setStockId(aStock.getStockId());
@@ -396,11 +412,19 @@ public class AccDepScheduleBean implements Serializable {
                 }
             } else if (depmethodid == 3) {//SYD
                 double nbv = 0;
-                int n = 0;
                 int syd = 0;
                 int udy = 0;
-                n = aStock.getEffectiveLife();
-                nbv = aStock.getUnitCost() - aStock.getResidualValue();
+                int n = 0;
+                try {
+                    n = aStock.getEffectiveLife();
+                } catch (Exception e) {
+                    n = 0;
+                }
+                if (n == 0) {
+                    n = 1;
+                }
+                //nbv = aStock.getUnitCost() - aStock.getResidualValue();
+                nbv = aStock.getCurrentqty() * (aStock.getUnitCost() - aStock.getResidualValue());
                 udy = n;
                 syd = n * (n + 1) / 2;
                 for (int i = 1; i <= n; i++) {

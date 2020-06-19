@@ -43,6 +43,7 @@
                         <p:column headerText="Acc Period" style="font-size: 13px;">
                             <h:outputText value="#{ds.acc_period_name}"/>
                             <h:selectOneMenu id="menuAccPeriod" value="#{ds.depForAccPeriodId}" rendered="#{ds.depForAccPeriodId==0}" >
+                                <f:selectItem itemLabel="" itemValue="0"/>
                                 <f:selectItems value="#{accPeriodBean.returnAccPeriodsCurrentFirst()}" var="ap" itemLabel="#{ap.accPeriodName}" itemValue="#{ap.accPeriodId}"/>
                             </h:selectOneMenu>
                         </p:column>
