@@ -5,6 +5,7 @@ import entities.Item_tax_map;
 import java.io.Serializable;
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
@@ -49,6 +50,26 @@ public class Item_tax_mapBean implements Serializable {
             }
         } catch (SQLException se) {
             System.err.println("setItem_tax_mapFromResultset:" + se.getMessage());
+        }
+    }
+
+    public Item_tax_map getItem_tax_map(long aItemId) {
+        String sql = "SELECT * FROM item_tax_map WHERE item_id=" + aItemId;
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                Item_tax_map im = new Item_tax_map();
+                this.setItem_tax_mapFromResultset(im, rs);
+                return im;
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            System.err.println("getItem_tax_map:" + e.getMessage());
+            return null;
         }
     }
 

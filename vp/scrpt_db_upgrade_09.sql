@@ -40,3 +40,10 @@ CREATE  TABLE item_unspsc (
   commodity_name VARCHAR(250) NULL,
   add_date TIMESTAMP NULL, 
   PRIMARY KEY (item_unspsc_id) );
+
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (58, 'API', 'API_TAX_URL_OFFLINE', 'http://localhost:8080/efristcs/ws/tcsapp/getInformation','');
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (59, 'API', 'API_TAX_URL_ONLINE', 'https://efristest.ura.go.ug/efrisws/ws/taapp/getInformation','');
+
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_09',49,Now(),'6.0','');
