@@ -132,7 +132,7 @@ public class InvoiceOfflineBean {
             if (goodsDetails.size() > 0) {
                 this.submit_invoice();
             }
-            System.out.println("InvoiceNo:" + InvoiceNo);
+            //System.out.println("InvoiceNo:" + InvoiceNo);
             //update home db
             if (InvoiceNo.length() > 0) {
                 new Transaction_tax_mapBean().saveTransaction_tax_map(aTransId, InvoiceNo);
