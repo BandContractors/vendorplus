@@ -45,5 +45,7 @@ INSERT INTO parameter_list (parameter_list_id, context, parameter_name, paramete
 VALUES (58, 'API', 'API_TAX_URL_OFFLINE', 'http://localhost:8080/efristcs/ws/tcsapp/getInformation','');
 INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
 VALUES (59, 'API', 'API_TAX_URL_ONLINE', 'https://efristest.ura.go.ug/efrisws/ws/taapp/getInformation','');
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (60, 'API', 'API_TAX_THREAD_ON', '0','0=No and 1=Yes');
 
-INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_09',49,Now(),'6.0','');
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_09',51,Now(),'6.0','');

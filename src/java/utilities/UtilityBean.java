@@ -162,6 +162,16 @@ public class UtilityBean implements Serializable {
         return outs;
     }
 
+    public String formatDateTimeServer(Date aDate) {
+        String outs = "";
+        try {
+            Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            outs = formatter.format(aDate);
+        } catch (Exception e) {
+        }
+        return outs;
+    }
+
     public String formatDateTime(Date aDate) {
         String outs = "";
         try {
@@ -254,6 +264,21 @@ public class UtilityBean implements Serializable {
         aPattern = new AccCurrencyBean().getNumberFormatByCurrency(aCurrencyCode);
         if (aPattern.length() == 0) {
             aPattern = "###,###.###";
+        }
+        if (aAmount >= 0) {
+            aString = this.formatNumber(aPattern, aAmount) + "";
+        } else if (aAmount < 0) {
+            aString = this.formatNumber(aPattern, aAmount) + "";
+        }
+        return aString;
+    }
+    
+    public String formatDoubleToStringPlain(double aAmount, String aCurrencyCode) {
+        String aString = "";
+        String aPattern = "";
+        aPattern = new AccCurrencyBean().getNumberFormatByCurrencyPlain(aCurrencyCode);
+        if (aPattern.length() == 0) {
+            aPattern = "###.###";
         }
         if (aAmount >= 0) {
             aString = this.formatNumber(aPattern, aAmount) + "";

@@ -2518,8 +2518,17 @@ public class TransBean implements Serializable {
                     }
                     //TAX API
                     if (aTransTypeId == 2 && trans.getTotalVat() > 0 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {//SALES INVOICE
-                        //new InvoiceOfflineBean().submitTaxInvoiceOffline(new GeneralUserSetting().getCurrentTransactionId());
-                        new InvoiceOfflineBean().submitTaxInvoiceOffline(trans.getTransactionId());
+                        int IsThreadOn = 0;
+                        try {
+                            IsThreadOn = Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_THREAD_ON").getParameter_value());
+                        } catch (Exception e) {
+                            //
+                        }
+                        if (IsThreadOn == 0) {
+                            new InvoiceOfflineBean().submitTaxInvoiceOffline(trans.getTransactionId());
+                        } else if (IsThreadOn == 1) {
+                            new InvoiceOfflineBean().submitTaxInvoiceOfflineThread(trans.getTransactionId());
+                        }
                     }
 
                     //clear
@@ -14967,6 +14976,10 @@ public class TransBean implements Serializable {
                 aTrans.setTransactionUserDetailName(new UserDetailBean().getUserDetail(aTrans.getTransactionUserDetailId()).getUserName());
             } catch (Exception e) {
                 aTrans.setTransactionUserDetailName("");
+            }
+            //get tax invoice number
+            if (aTrans.getTransactionTypeId() == 2 && aTrans.getTotalVat() > 0) {
+                aTrans.setTransaction_number_tax(new Transaction_tax_mapBean().getTaxInvoiceNo(aTrans.getTransactionId(), aTrans.getTransactionTypeId()));
             }
         }
     }

@@ -48,12 +48,16 @@
                         <h:panelGrid id="IpgrdSalesInvoiceHeader4a" style="width: 290px; margin: 0px;" columns="2" rendered="#{utilityBean.isDatesEqual(generalUserSetting.outputDetailParent.trans.transactionDate, generalUserSetting.outputDetailParent.trans.addDate)==1}">
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transaction_type.transactionNumberLabel}:"/>
                             <h:outputLabel style="font-size: 20px;font-weight: bold;" value="#{generalUserSetting.outputDetailParent.trans.transactionNumber}"/>
+                            <h:outputLabel style="font-size: 12px;" value="FDN:" rendered="#{generalUserSetting.outputDetailParent.trans.transaction_number_tax.length() gt 0}"/>
+                            <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.trans.transaction_number_tax}" rendered="#{generalUserSetting.outputDetailParent.trans.transaction_number_tax.length() gt 0}"/>
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transaction_type.transactionDateLabel}:"/>
                             <h:outputLabel style="font-size: 12px;" value="#{utilityBean.formatDateTime(generalUserSetting.outputDetailParent.trans.addDate)}"/>
                         </h:panelGrid>
                         <h:panelGrid id="IpgrdSalesInvoiceHeader4b" style="width: 290px; margin: 0px;" columns="2" rendered="#{utilityBean.isDatesEqual(generalUserSetting.outputDetailParent.trans.transactionDate, generalUserSetting.outputDetailParent.trans.addDate)==0}">
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transaction_type.transactionNumberLabel}:"/>
                             <h:outputLabel style="font-size: 20px;font-weight: bold;" value="#{generalUserSetting.outputDetailParent.trans.transactionNumber}"/>
+                            <h:outputLabel style="font-size: 12px;" value="FDN:" rendered="#{generalUserSetting.outputDetailParent.trans.transaction_number_tax.length() gt 0}"/>
+                            <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.trans.transaction_number_tax}" rendered="#{generalUserSetting.outputDetailParent.trans.transaction_number_tax.length() gt 0}"/>
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transaction_type.transactionDateLabel}:"/>
                             <h:outputLabel style="font-size: 12px;" value="#{utilityBean.formatDate(generalUserSetting.outputDetailParent.trans.transactionDate)}"/>
                             <h:outputLabel style="font-size: 12px;" value="Add Date:"/>

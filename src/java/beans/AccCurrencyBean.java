@@ -733,6 +733,25 @@ public class AccCurrencyBean implements Serializable {
         }
         return NumberFormat;
     }
+    
+    public String getNumberFormatByCurrencyPlain(String aCurrencyCode) {
+        String NumberFormat = "###.###";
+        String DecimalPlaceSubStr = "";
+        int decimal_places = 0;
+        try {
+            decimal_places = this.getCurrencyFromListMemory(aCurrencyCode).getDecimal_places();
+            for (int i = 1; i <= decimal_places; i++) {
+                DecimalPlaceSubStr = DecimalPlaceSubStr + "0";
+            }
+        } catch (Exception e) {
+        }
+        if (decimal_places > 0) {
+            NumberFormat = "###." + DecimalPlaceSubStr;
+        } else {
+            NumberFormat = "###";
+        }
+        return NumberFormat;
+    }
 
     /**
      * @return the IsoCurrencyList

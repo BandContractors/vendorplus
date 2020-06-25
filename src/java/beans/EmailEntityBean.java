@@ -1,6 +1,5 @@
 package beans;
 
-import entities.CompanySetting;
 import entities.Contact_list;
 import entities.EmailEntity;
 import entities.GroupRight;
@@ -8,28 +7,21 @@ import entities.UserDetail;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.NoSuchProviderException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import org.apache.commons.mail.Email;
-import org.apache.commons.mail.SimpleEmail;
 import sessions.GeneralUserSetting;
 import utilities.Security;
 
@@ -238,7 +230,7 @@ public class EmailEntityBean implements Serializable {
         props.put("mail.smtp.port", aEmailEntity.getPort());
         props.put("mail.smtp.ssl.enable", aEmailEntity.isSslFlag());
         // do not change - end
-
+        
         Transport transport = null;
         String emails = "";
         try {

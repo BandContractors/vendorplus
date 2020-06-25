@@ -2,7 +2,6 @@ package beans;
 
 import connections.DBConnection;
 import entities.AccCurrency;
-import entities.Alert_general;
 import entities.CompanySetting;
 import entities.Store;
 import entities.LoginSession;

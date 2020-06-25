@@ -20,7 +20,9 @@ import beans.Item_tax_mapBean;
 import beans.Parameter_listBean;
 import beans.TransBean;
 import beans.TransItemBean;
+import beans.Transaction_tax_mapBean;
 import beans.TransactorBean;
+import beans.UserDetailBean;
 import com.google.gson.Gson;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
@@ -32,6 +34,8 @@ import entities.TransItem;
 import entities.Transactor;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.bean.ManagedBean;
@@ -128,8 +132,30 @@ public class InvoiceOfflineBean {
             if (goodsDetails.size() > 0) {
                 this.submit_invoice();
             }
+            System.out.println("InvoiceNo:" + InvoiceNo);
+            //update home db
+            if (InvoiceNo.length() > 0) {
+                new Transaction_tax_mapBean().saveTransaction_tax_map(aTransId, InvoiceNo);
+            }
         } catch (Exception e) {
             System.err.println("submitTaxInvoiceOffline:" + e.getMessage());
+        }
+    }
+
+    public void submitTaxInvoiceOfflineThread(long aTransId) {
+        try {
+            Runnable task = new Runnable() {
+                @Override
+                public void run() {
+                    submitTaxInvoiceOffline(aTransId);
+                }
+            };
+            //Thread t = new Thread(task, "MY_THREAD");
+            //t.start();
+            Executor e = Executors.newSingleThreadExecutor();
+            e.execute(task);
+        } catch (Exception e) {
+            System.err.println("submitTaxInvoiceOfflineThread:" + e.getMessage());
         }
     }
 
@@ -160,12 +186,22 @@ public class InvoiceOfflineBean {
             sellerDetails.setTin(CompanySetting.getTaxIdentity());
             sellerDetails.setBusinessName(CompanySetting.getLICENSE_CLIENT_NAME());
             sellerDetails.setLegalName(new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "PAYEE_NAME").getParameter_value());
+            sellerDetails.setEmailAddress(CompanySetting.getEmail());
 
             //basicInformation 
             basicInformation.setCurrency(trans.getCurrencyCode());
             basicInformation.setDeviceNo(new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value());
             basicInformation.setInvoiceNo(trans.getTransactionNumber());
-            basicInformation.setIssuedDate(new UtilityBean().formatDateServer(trans.getTransactionDate()));//A
+            basicInformation.setInvoiceType(Integer.toString(1));
+            basicInformation.setInvoiceKind(Integer.toString(1));
+            basicInformation.setDataSource(Integer.toString(103));
+            basicInformation.setIssuedDate(new UtilityBean().formatDateServer(trans.getTransactionDate()));
+            basicInformation.setIssuedDate(new UtilityBean().formatDateTimeServer(trans.getAddDate()));
+            try {
+                basicInformation.setOperator(new UserDetailBean().getUserDetail(trans.getTransactionUserDetailId()).getUserName());
+            } catch (Exception e) {
+                basicInformation.setOperator("System");
+            }
 
             //buyerDetails
             if (transactor.getTransactorId() > 0) {
@@ -175,6 +211,7 @@ public class InvoiceOfflineBean {
                 buyerDetails.setBuyerTin("");
                 buyerDetails.setBuyerLegalName("");
             }
+            buyerDetails.setBuyerType(Integer.toString(1));
             //extend
 
             //goodsDetails
@@ -191,10 +228,12 @@ public class InvoiceOfflineBean {
                     gd.setQty(Double.toString(transitems.get(i).getItemQty()));
                     gd.setUnitOfMeasure(itm.getUnitSymbol());
                     gd.setUnitPrice(Double.toString(transitems.get(i).getUnitPriceIncVat()));
-                    gd.setDiscountTotal(Double.toString(transitems.get(i).getUnitTradeDiscount()));
+                    //gd.setDiscountTotal(Double.toString(transitems.get(i).getUnitTradeDiscount()));
                     gd.setTax(Double.toString(transitems.get(i).getUnitVat()));
                     gd.setTotal(Double.toString(transitems.get(i).getAmountIncVat()));
-                    gd.setTaxRate(Double.toString(transitems.get(i).getVatPerc()));//18%
+                    Double vatPerc = transitems.get(i).getVatPerc();
+                    Double tr = vatPerc / 100;
+                    gd.setTaxRate(Double.toString(tr));
                     gd.setDiscountFlag(Integer.toString(2));//0=Discount amount,1=Discounted goods,2=None
                     gd.setExciseFlag(Integer.toString(2));
                     gd.setDeemedFlag(Integer.toString(2));
@@ -213,33 +252,39 @@ public class InvoiceOfflineBean {
             TaxDetails td = null;
             if (trans.getTotalStdVatableAmount() > 0) {
                 td = new TaxDetails();
-                td.setGrossAmount(Double.toString(trans.getTotalStdVatableAmount()));
+                td.setGrossAmount(Double.toString(trans.getTotalStdVatableAmount() + trans.getTotalVat()));
                 td.setTaxCategory("VAT");
                 td.setTaxRateName("STANDARD");
-                td.setTaxRate(Double.toString(trans.getVatPerc()));
+                Double vatPerc = trans.getVatPerc();
+                Double tr = vatPerc / 100;
+                td.setTaxRate(Double.toString(tr));
                 td.setTaxAmount(Double.toString(trans.getTotalVat()));
+                td.setNetAmount(Double.toString(trans.getTotalStdVatableAmount()));
                 taxDetails.add(td);
             }
-            if (trans.getTotalExemptVatableAmount() > 0) {
-                td = new TaxDetails();
-                td.setGrossAmount(Double.toString(trans.getTotalExemptVatableAmount()));
-                td.setTaxRateName("EXEMPT");
-                td.setTaxRate("");
-                td.setTaxAmount("");
-                taxDetails.add(td);
-            }
-            if (trans.getTotalZeroVatableAmount() > 0) {
-                td = new TaxDetails();
-                td.setGrossAmount(Double.toString(trans.getTotalZeroVatableAmount()));
-                td.setTaxRateName("ZERO");
-                td.setTaxRate("");
-                td.setTaxAmount("");
-                taxDetails.add(td);
-            }
+            /*
+             if (trans.getTotalExemptVatableAmount() > 0) {
+             td = new TaxDetails();
+             td.setGrossAmount(Double.toString(trans.getTotalExemptVatableAmount()));
+             td.setTaxRateName("EXEMPT");
+             td.setTaxRate("0");
+             td.setTaxAmount("0");
+             taxDetails.add(td);
+             }
+             if (trans.getTotalZeroVatableAmount() > 0) {
+             td = new TaxDetails();
+             td.setGrossAmount(Double.toString(trans.getTotalZeroVatableAmount()));
+             td.setTaxRateName("ZERO");
+             td.setTaxRate("0");
+             td.setTaxAmount("0");
+             taxDetails.add(td);
+             }
+             */
 
             //summary
-            summary.setGrossAmount(Double.toString(trans.getGrandTotal()));
-            summary.setTaxAmount(Double.toString(trans.getTotalVat()));
+            summary.setGrossAmount(new UtilityBean().formatDoubleToStringPlain(trans.getGrandTotal(), trans.getCurrencyCode()));
+            summary.setTaxAmount(new UtilityBean().formatDoubleToStringPlain(trans.getTotalVat(), trans.getCurrencyCode()));
+            summary.setNetAmount(new UtilityBean().formatDoubleToStringPlain((trans.getGrandTotal() - trans.getTotalVat()), trans.getCurrencyCode()));
             summary.setItemCount(Integer.toString(goodsDetails.size()));
         } catch (Exception e) {
             System.err.println("prepareInvoice:" + e.getMessage());
@@ -247,6 +292,10 @@ public class InvoiceOfflineBean {
     }
 
     public void submit_invoice() {
+        AntifakeCode = "";
+        InvoiceNo = "";
+        returnCode = "";
+        returnMessage = "";
         try {
             EFRISInvoice eFRISInvoice = new EFRISInvoice(sellerDetails, basicInformation, buyerDetails, summary, extend);
             eFRISInvoice.setPayWay(payWay);
@@ -254,62 +303,58 @@ public class InvoiceOfflineBean {
             eFRISInvoice.setTaxDetails(taxDetails);
             Gson gson = new Gson();
             String json = gson.toJson(eFRISInvoice);
-            System.out.println(json);
-            AntifakeCode = "";
-            InvoiceNo = "";
-            returnCode = "";
-            returnMessage = "";
+            //-System.out.println(json);
+
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
             //WebResource webResource = client.resource("https://efristest.ura.go.ug/efrisws/ws/taapp/getInformation");
             WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_OFFLINE").getParameter_value());
             //String privatekey = new ExtractKeys().PrivateKey(sellerDetails.getTin(), basicInformation.getDeviceNo(), returnCode, returnMessage);
-//            String sub = privatekey.substring(0, 5);
-//            if (sub.equals("ERROR")) {
-//                String[] split = privatekey.split(",");
-//                returnCode = split[1];
-//                returnMessage = split[2];
-//            }
-//            PrivateKey key = ExtractKeys.loadPrivateKey(privatekey);
+            //String sub = privatekey.substring(0, 5);
+            //if (sub.equals("ERROR")) {
+            //      String[] split = privatekey.split(",");
+            //      returnCode = split[1];
+            //     returnMessage = split[2];
+            //}
+            //PrivateKey key = ExtractKeys.loadPrivateKey(privatekey);
             //System.out.println(key.getAlgorithm());
-//            String AESpublickeystring = ExtractKeys.decrypt(new ExtractKeys().AESPublicKey(sellerDetails.getTin(), basicInformation.getDeviceNo()), key);
-//            String encryptedcontent = ExtractKeys.AESencrypt(json, Base64.decodeBase64(AESpublickeystring));
+            // String AESpublickeystring = ExtractKeys.decrypt(new ExtractKeys().AESPublicKey(sellerDetails.getTin(), basicInformation.getDeviceNo()), key);
+            //String encryptedcontent = ExtractKeys.AESencrypt(json, Base64.decodeBase64(AESpublickeystring));
             //PublicKey publickey=ExtractKeys.getKey(AESpublickeystring);
-//            System.out.println(encryptedcontent);
-//            String signedcontent = Base64.encodeBase64String(new ExtractKeys().sign(encryptedcontent, key));
+            //System.out.println(encryptedcontent);
+            //String signedcontent = Base64.encodeBase64String(new ExtractKeys().sign(encryptedcontent, key));
             //String PostData = GeneralUtilities.PostData(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", basicInformation.getDeviceNo(), "T109", sellerDetails.getTin());
 
             String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", basicInformation.getDeviceNo(), "T109", sellerDetails.getTin());
-            System.out.println(PostData);
+            //-System.out.println(PostData);
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             String output = response.getEntity(String.class);
-            System.out.println(output);
+            //-System.out.println(output);
 
             JSONObject parentjsonObject = new JSONObject(output);
             JSONObject dataobject = parentjsonObject.getJSONObject("returnStateInfo");
             returnCode = dataobject.getString("returnCode");
             returnMessage = dataobject.getString("returnMessage");
-            System.out.println("-------------------------------------");
-            System.out.println(returnCode);
-            System.out.println(returnMessage);
-            System.out.println("-------------------------------------");
+            //-System.out.println("-------------------------------------");
+            //-System.out.println(returnCode);
+            //-System.out.println(returnMessage);
+            //-System.out.println("-------------------------------------");
             JSONObject dataobjectcontent = parentjsonObject.getJSONObject("data");
             String content = dataobjectcontent.getString("content");
             //System.out.println(AESpublickeystring);
             //String DecryptedContent = ExtractKeys.AESdecrypt(content, Base64.decodeBase64(AESpublickeystring));
             String DecryptedContent = new String(Base64.decodeBase64(content));
-            //System.out.println(DecryptedContent);
-            System.out.println("-------------------------------------");
+            //-System.out.println(DecryptedContent);
+            //-System.out.println("-------------------------------------");
             JSONObject parentbasicInformationjsonObject = new JSONObject(DecryptedContent);
             JSONObject databasicInformation = parentbasicInformationjsonObject.getJSONObject("basicInformation");
             AntifakeCode = databasicInformation.getString("antifakeCode");
             InvoiceNo = databasicInformation.getString("invoiceNo");
-            System.out.println("AntiFakeCode: " + AntifakeCode);
-            System.out.println("Invoice: " + InvoiceNo);
-            System.out.println("-------------------------------------");
+            //-System.out.println("AntiFakeCode: " + AntifakeCode);
+            //-System.out.println("Invoice: " + InvoiceNo);
+            //-System.out.println("-------------------------------------");
         } catch (Exception ex) {
             Logger.getLogger(InvoiceOfflineBean.class.getName()).log(Level.SEVERE, null, ex);
         }
-
     }
 
     public PayWay getPaymentmode() {

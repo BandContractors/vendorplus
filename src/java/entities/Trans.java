@@ -138,6 +138,7 @@ public class Trans implements Serializable {
     private Category category;
     private int is_delivered;
     private String source_code;
+    private String transaction_number_tax;
     
 
     /**
@@ -1692,6 +1693,20 @@ public class Trans implements Serializable {
      */
     public void setSource_code(String source_code) {
         this.source_code = source_code;
+    }
+
+    /**
+     * @return the transaction_number_tax
+     */
+    public String getTransaction_number_tax() {
+        return transaction_number_tax;
+    }
+
+    /**
+     * @param transaction_number_tax the transaction_number_tax to set
+     */
+    public void setTransaction_number_tax(String transaction_number_tax) {
+        this.transaction_number_tax = transaction_number_tax;
     }
 
 }
