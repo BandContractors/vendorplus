@@ -83,7 +83,7 @@
                     <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                         <p:graphicImage name="/images/ajax-loader.gif"/>
                     </p:dialog>
-                    <p:ajax listener="#{accJournalBean.reportAccJournal(accJournal,accJournalBean)}" process="@form" update="@form"/>
+                    <p:ajax listener="#{accJournalBean.reportAccJournal(accJournal,accJournalBean)}" process="@form" update="pnlgMessage tblDetail"/>
                 </p:commandButton>
             </h:panelGrid>
             <h:panelGrid id="pnlgMessage">

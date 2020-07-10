@@ -1,5 +1,6 @@
 package beans;
 
+import api_tax.efris_bean.StockManage;
 import connections.DBConnection;
 import entities.CompanySetting;
 import entities.Item;
@@ -232,6 +233,16 @@ public class Stock_ledgerBean implements Serializable {
             new Alert_generalBean().checkStockStatusForAlert(stockledger.getItem_id());
             //check alert-expiry status
             new Alert_generalBean().checkExpiryStatusForAlert(stockledger.getItem_id(), stockledger.getBatchno(), stockledger.getCode_specific(), stockledger.getDesc_specific());
+            //URA-STOCK-API
+            if (aTrans_type_id != 2 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
+                if (aAddSubtract.equals("Add")) {
+                    Stock stockadd = new Stock();
+                    stockadd.setItemId(aStock.getItemId());
+                    stockadd.setCurrentqty(aQty);
+                    stockadd.setUnitCost(aStock.getUnitCost());
+                    new StockManage().addStockCallThread(stockadd);
+                }
+            }
         } catch (Exception e) {
             System.err.println("callInsertStock_ledger:" + e.getMessage());
         }
@@ -342,7 +353,7 @@ public class Stock_ledgerBean implements Serializable {
         // Put it back in the Date object  
         this.setDate2(cal2.getTime());
     }
-    
+
     public void reportStock_ledger(Stock_ledger aStock_ledger, Stock_ledgerBean aStock_ledgerBean, Item aItem) {
         this.reportStock_ledgerSummary(aStock_ledger, aStock_ledgerBean, aItem);
         this.reportStock_ledgerDetail(aStock_ledger, aStock_ledgerBean, aItem);
