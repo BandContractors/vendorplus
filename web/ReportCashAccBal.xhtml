@@ -66,11 +66,11 @@
                         <p:dataExporter type="xml" target="tblDetail" fileName="Cash_Accounts_Balances" />
                     </h:commandLink>
                 </f:facet>
-                <p:column headerText="Cash Account Name" style="text-align: left;">
-                    <h:outputText value="#{accCoaBean.getAccCoaByCodeOrId(itm.accountCode, 0).accountName}"/>
+                <p:column headerText="Parent Account" style="text-align: left;">
+                    <h:outputText value="#{itm.parent_account_name}"/>
                 </p:column>
-                <p:column headerText="Child Account Name">
-                    <h:outputText value="#{accChildAccountBean.getAccChildAccById(itm.accChildAccountId).childAccountName}"/>
+                <p:column headerText="Child Account">
+                    <h:outputText value="#{itm.child_account_name}"/>
                 </p:column>
                 <p:column headerText="Currency">
                     <h:outputText value="#{itm.currencyCode}"/>

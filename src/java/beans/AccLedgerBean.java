@@ -2,6 +2,8 @@ package beans;
 
 import connections.DBConnection;
 import entities.AccBalanceSheet;
+import entities.AccChildAccount;
+import entities.AccCoa;
 import entities.AccCurrency;
 import entities.AccIncomeStatement;
 import entities.AccJournal;
@@ -531,8 +533,8 @@ public class AccLedgerBean implements Serializable {
     }
 
     public void reportCashAccBalances() {
-        String sqlsum = "SELECT al.account_code,al.acc_child_account_id,al.currency_code,sum(al.debit_amount) as debit_amount,sum(al.credit_amount) as credit_amount,sum(al.debit_amount_lc) as debit_amount_lc,sum(al.credit_amount_lc) as credit_amount_lc "
-                + "FROM view_ledger_union_open_balances al INNER JOIN acc_coa ac ON al.account_code=ac.account_code WHERE al.account_code LIKE '1-00-000%'";
+        String sqlsum = "SELECT al.acc_child_account_id,al.currency_code,sum(al.debit_amount) as debit_amount,sum(al.credit_amount) as credit_amount,sum(al.debit_amount_lc) as debit_amount_lc,sum(al.credit_amount_lc) as credit_amount_lc "
+                + "FROM view_ledger_union_open_balances al INNER JOIN acc_child_account ac ON al.acc_child_account_id=ac.acc_child_account_id WHERE al.account_code LIKE '1-00-000%'";
         String wheresql = "";
         String ordersql = "";
         ResultSet rs = null;
@@ -544,8 +546,8 @@ public class AccLedgerBean implements Serializable {
             LocCurCode = "";
         }
         wheresql = " AND 1=1";
-        ordersql = " ORDER BY al.account_code ASC";
-        sqlsum = sqlsum + wheresql + " GROUP BY al.account_code,al.acc_child_account_id,al.currency_code " + ordersql;
+        ordersql = " ORDER BY ac.child_account_name ASC";
+        sqlsum = sqlsum + wheresql + " GROUP BY al.acc_child_account_id,al.currency_code " + ordersql;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sqlsum);) {
@@ -553,11 +555,6 @@ public class AccLedgerBean implements Serializable {
             AccLedger accledger = null;
             while (rs.next()) {
                 accledger = new AccLedger();
-                try {
-                    accledger.setAccountCode(rs.getString("account_code"));
-                } catch (NullPointerException npe) {
-                    accledger.setAccountCode("");
-                }
                 try {
                     accledger.setCurrencyCode(rs.getString("currency_code"));
                 } catch (NullPointerException npe) {
@@ -589,6 +586,24 @@ public class AccLedgerBean implements Serializable {
                     accledger.setCreditAmountLc(accledger.getCreditAmount() * new AccXrateBean().getXrateMultiply(accledger.getCurrencyCode(), LocCurCode));
                 } catch (NullPointerException npe) {
                     accledger.setCreditAmountLc(0);
+                }
+                if (accledger.getAccChildAccountId() > 0) {
+                    AccChildAccount acc = null;
+                    try {
+                        acc = new AccChildAccountBean().getAccChildAccById(accledger.getAccChildAccountId());
+                        accledger.setChild_account_name(acc.getChildAccountName());
+                    } catch (Exception e) {
+                        accledger.setChild_account_name("");
+                    }
+                    AccCoa ac = null;
+                    if (null != acc) {
+                        try {
+                            ac = new AccCoaBean().getAccCoaByCodeOrId("", acc.getAccCoaId());
+                            accledger.setParent_account_name(ac.getAccountName());
+                        } catch (Exception e) {
+                            accledger.setParent_account_name("");
+                        }
+                    }
                 }
                 this.getAccLedgerCashAccBal().add(accledger);
             }
@@ -673,6 +688,52 @@ public class AccLedgerBean implements Serializable {
     }
 
     public double getCashAccBalance(int aChildAccId, String aCurrencyCode) {
+        double bal = 0;
+        String sqlsum = "SELECT al.acc_child_account_id,al.currency_code,sum(al.debit_amount) as debit_amount,sum(al.credit_amount) as credit_amount,sum(al.debit_amount_lc) as debit_amount_lc,sum(al.credit_amount_lc) as credit_amount_lc "
+                + "FROM view_ledger_union_open_balances al INNER JOIN acc_child_account ac ON al.acc_child_account_id=ac.acc_child_account_id WHERE al.account_code LIKE '1-00-000%' and al.acc_child_account_id=" + aChildAccId + " and al.currency_code='" + aCurrencyCode + "'";
+        String wheresql = "";
+        String ordersql = "";
+        ResultSet rs = null;
+        wheresql = " AND 1=1";
+        ordersql = " ORDER BY ac.child_account_name ASC";
+        sqlsum = sqlsum + wheresql + " GROUP BY al.acc_child_account_id,al.currency_code " + ordersql;
+        //System.out.println("sqlsum:" + sqlsum);
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sqlsum);) {
+            rs = ps.executeQuery();
+            AccLedger accledger = null;
+            if (rs.next()) {
+                accledger = new AccLedger();
+                try {
+                    accledger.setCurrencyCode(rs.getString("currency_code"));
+                } catch (NullPointerException npe) {
+                    accledger.setCurrencyCode("");
+                }
+                try {
+                    accledger.setAccChildAccountId(rs.getInt("acc_child_account_id"));
+                } catch (NullPointerException npe) {
+                    accledger.setAccChildAccountId(0);
+                }
+                try {
+                    accledger.setDebitAmount(rs.getDouble("debit_amount"));
+                } catch (NullPointerException npe) {
+                    accledger.setDebitAmount(0);
+                }
+                try {
+                    accledger.setCreditAmount(rs.getDouble("credit_amount"));
+                } catch (NullPointerException npe) {
+                    accledger.setCreditAmount(0);
+                }
+                bal = accledger.getDebitAmount() - accledger.getCreditAmount();
+            }
+        } catch (SQLException se) {
+            System.err.println("getCashAccBalance:" + se.getMessage());
+        }
+        return bal;
+    }
+
+    public double getCashAccBalance_Old(int aChildAccId, String aCurrencyCode) {
         double bal = 0;
         String sqlsum = "SELECT al.account_code,al.acc_child_account_id,al.currency_code,sum(al.debit_amount) as debit_amount,sum(al.credit_amount) as credit_amount,sum(al.debit_amount_lc) as debit_amount_lc,sum(al.credit_amount_lc) as credit_amount_lc "
                 + "FROM view_ledger_union_open_balances al INNER JOIN acc_coa ac ON al.account_code=ac.account_code WHERE al.account_code LIKE '1-00-000%' and al.acc_child_account_id=" + aChildAccId + " and al.currency_code='" + aCurrencyCode + "'";

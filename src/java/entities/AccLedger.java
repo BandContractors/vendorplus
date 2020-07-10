@@ -35,6 +35,8 @@ public class AccLedger implements Serializable {
     private String Subcategory;
     private double Amount;
     //end-for balance sheet dialog
+    private String child_account_name;
+    private String parent_account_name;
 
     /**
      * @return the AccLedgerId
@@ -244,6 +246,34 @@ public class AccLedger implements Serializable {
      */
     public void setAmount(double Amount) {
         this.Amount = Amount;
+    }
+
+    /**
+     * @return the child_account_name
+     */
+    public String getChild_account_name() {
+        return child_account_name;
+    }
+
+    /**
+     * @param child_account_name the child_account_name to set
+     */
+    public void setChild_account_name(String child_account_name) {
+        this.child_account_name = child_account_name;
+    }
+
+    /**
+     * @return the parent_account_name
+     */
+    public String getParent_account_name() {
+        return parent_account_name;
+    }
+
+    /**
+     * @param parent_account_name the parent_account_name to set
+     */
+    public void setParent_account_name(String parent_account_name) {
+        this.parent_account_name = parent_account_name;
     }
 
 }
