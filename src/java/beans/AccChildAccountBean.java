@@ -452,7 +452,7 @@ public class AccChildAccountBean implements Serializable {
     
     public List<AccChildAccount> getAccChildAccountsByParentStartWith(String aParentCodeStartWith) {
         String sql;
-        sql = "SELECT * FROM acc_child_account WHERE (acc_coa_account_code LIKE '" + aParentCodeStartWith + "%')  AND is_active=1 AND is_deleted=0";
+        sql = "SELECT * FROM acc_child_account WHERE (acc_coa_account_code LIKE '" + aParentCodeStartWith + "%')  AND is_active=1 AND is_deleted=0 ORDER BY child_account_name ASC";
         ResultSet rs = null;
         List<AccChildAccount> cas = new ArrayList<AccChildAccount>();
         try (

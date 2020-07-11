@@ -27,13 +27,19 @@
     <h:body>
         <ui:include src="Menu.xhtml"/>
         <h:form id="formReport">
-            <h:panelGrid id="pnlgHeader" columns="2" styleClass="clsPanelReportFilterTitle">
+            <h:panelGrid id="pnlgHeader" columns="3" styleClass="clsPanelReportFilterTitle">
                 <h:outputLabel styleClass="clsLabelReportFilterTitle" value="Current Cash Accounts Balances"/>
-                <p:commandButton id="cmdbSearch" value="SHOW REPORT (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                <p:commandButton id="cmdbSearch1" value="ALL ACCOUNTS" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                     <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                         <p:graphicImage name="/images/ajax-loader.gif"/>
                     </p:dialog>
-                    <p:ajax listener="#{accLedgerBean.reportCashAccBalances()}" process="@form" update="@form"/>
+                    <p:ajax listener="#{accLedgerBean.reportCashAccBalances(2)}" process="@form" update="@form"/>
+                </p:commandButton>
+                <p:commandButton id="cmdbSearch2" value="ACTIVE ACCOUNTS" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.reportCashAccBalances(1)}" process="@form" update="@form"/>
                 </p:commandButton>
             </h:panelGrid>
             <h:panelGrid id="pnlgMessage">
@@ -44,7 +50,7 @@
                          paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
                          rowsPerPageTemplate="50,100,200,400">
                 <f:facet name="header">
-                    <h:outputText value="CURRENT TOTAL CASH ACCOUNTS BALANCE (Local Currency) : #{accLedgerBean.calTotalCashAccBalLc(accLedgerBean.accLedgerCashAccBal)} "/>
+                    <h:outputText value="Total Cash Account Balance (Local Currency) : #{accLedgerBean.calTotalCashAccBalLc(accLedgerBean.accLedgerCashAccBal)} "/>
                     <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
                     <p:columnToggler datasource="tblDetail" trigger="toggler" />
                 </f:facet>

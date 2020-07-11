@@ -532,7 +532,7 @@ public class AccLedgerBean implements Serializable {
         }
     }
 
-    public void reportCashAccBalances() {
+    public void reportCashAccBalances(int aActiveFlag) {
         String sqlsum = "SELECT al.acc_child_account_id,al.currency_code,sum(al.debit_amount) as debit_amount,sum(al.credit_amount) as credit_amount,sum(al.debit_amount_lc) as debit_amount_lc,sum(al.credit_amount_lc) as credit_amount_lc "
                 + "FROM view_ledger_union_open_balances al INNER JOIN acc_child_account ac ON al.acc_child_account_id=ac.acc_child_account_id WHERE al.account_code LIKE '1-00-000%'";
         String wheresql = "";
@@ -546,6 +546,14 @@ public class AccLedgerBean implements Serializable {
             LocCurCode = "";
         }
         wheresql = " AND 1=1";
+        
+        if (aActiveFlag == 1) {
+            wheresql = " AND ac.is_active=1";////1 is active ONLY
+        } else if (aActiveFlag == 0) {
+            wheresql = " AND ac.is_active=0";//0 is not active ONLY
+        } else if (aActiveFlag == 2) {
+            //show all
+        }
         ordersql = " ORDER BY ac.child_account_name ASC";
         sqlsum = sqlsum + wheresql + " GROUP BY al.acc_child_account_id,al.currency_code " + ordersql;
         try (
@@ -607,8 +615,8 @@ public class AccLedgerBean implements Serializable {
                 }
                 this.getAccLedgerCashAccBal().add(accledger);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            System.err.println("reportCashAccBalances:" + e.getMessage());
         }
     }
 
