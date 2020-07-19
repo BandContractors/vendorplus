@@ -56,6 +56,7 @@
                     <f:selectItem itemLabel="" itemValue="0"/>
                     <f:selectItems value="#{storeBean.stores}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
                     <p:ajax event="blur" listener="#{transBean.refreshTransListStoreTransferReq(13,trans.store2Id,generalUserSetting.currentStore.storeId,20)}" update="menuTransNumber" />
+                    <p:ajax event="blur" listener="#{utilityBean.clearList(transItemBean.activeTransItems)}" update="dtblTransactionItem" />
                 </h:selectOneMenu>
                 <p:selectOneMenu id="menuTransNumber" value="#{trans.transactionRef}" editable="true" dynamic="true">
                     <f:selectItem itemLabel="Select or Type..." itemValue="0"/>

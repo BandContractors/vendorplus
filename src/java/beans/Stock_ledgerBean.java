@@ -241,6 +241,12 @@ public class Stock_ledgerBean implements Serializable {
                     stockadd.setCurrentqty(aQty);
                     stockadd.setUnitCost(aStock.getUnitCost());
                     new StockManage().addStockCallThread(stockadd);
+                } else if (aAddSubtract.equals("Subtract")) {
+                    Stock stocksub = new Stock();
+                    stocksub.setItemId(aStock.getItemId());
+                    stocksub.setCurrentqty(aQty);
+                    stocksub.setUnitCost(aStock.getUnitCost());
+                    new StockManage().subtractStockCallThread(stocksub);
                 }
             }
         } catch (Exception e) {

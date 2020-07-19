@@ -468,7 +468,7 @@ public class TransBean implements Serializable {
             } else if (null != RetrievedTrans && aRetrieveTransTypeId == RetrievedTrans.getTransactionTypeId() && aRetrieveTransReasId == RetrievedTrans.getTransactionReasonId()) {
                 CurrStoreId = new GeneralUserSetting().getCurrentStore().getStoreId();
                 CurrTransTypeId = new GeneralUserSetting().getCurrentTransactionTypeId();
-                if ((CurrTransTypeId != 4 && CurrStoreId == RetrievedTrans.getStoreId()) || (CurrTransTypeId == 4 && CurrStoreId == RetrievedTrans.getStore2Id())) {
+                if ((CurrTransTypeId != 4 && CurrStoreId == RetrievedTrans.getStoreId()) || (CurrTransTypeId == 4 && CurrStoreId == RetrievedTrans.getStore2Id() && aTrans.getStore2Id() == RetrievedTrans.getStoreId())) {
                     //transactor
                     if (RetrievedTrans.getTransactorId() > 0) {
                         aTrans.setTransactorId(RetrievedTrans.getTransactorId());

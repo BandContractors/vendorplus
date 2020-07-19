@@ -40,6 +40,19 @@ public class StockManage {
         }
     }
 
+    public void subtractStockCall(Stock aStock) {
+        try {
+            if (null != aStock) {
+                String id = this.getItemIdFromTax(Long.toString(aStock.getItemId()));
+                if (id.length() > 0) {
+                    this.subtractStock(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()));
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("addStockCall:" + e.getMessage());
+        }
+    }
+
     public void addStockCallThread(Stock aStock) {
         try {
             Runnable task = new Runnable() {
@@ -52,6 +65,21 @@ public class StockManage {
             e.execute(task);
         } catch (Exception e) {
             System.err.println("addStockCallThread:" + e.getMessage());
+        }
+    }
+
+    public void subtractStockCallThread(Stock aStock) {
+        try {
+            Runnable task = new Runnable() {
+                @Override
+                public void run() {
+                    subtractStockCall(aStock);
+                }
+            };
+            Executor e = Executors.newSingleThreadExecutor();
+            e.execute(task);
+        } catch (Exception e) {
+            System.err.println("subtractStockCallThread:" + e.getMessage());
         }
     }
 
@@ -129,6 +157,37 @@ public class StockManage {
             //System.out.println(DecryptedContent);
         } catch (Exception ex) {
             System.err.println("addStock:" + ex.getMessage());
+        }
+    }
+
+    public void subtractStock(String aId, String aQty, String aUnitPrice) {
+        try {
+            String json = "[\n"
+                    + "	{\n"
+                    //+ "\"commodityGoodsId\": \"" + "350638171648238454" + "\",\n"
+                    + "\"commodityGoodsId\": \"" + aId + "\",\n"
+                    + "\"quantity\": \"" + "-" + aQty + "\",\n"
+                    + "\"unitPrice\": \"" + aUnitPrice + "\"\n"
+                    + "},\n"
+                    + "]";
+
+            com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
+            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_OFFLINE").getParameter_value());
+            String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T131", CompanySetting.getTaxIdentity());
+
+            ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
+            String output = response.getEntity(String.class);
+
+            JSONObject parentjsonObject = new JSONObject(output);
+            JSONObject dataobject = parentjsonObject.getJSONObject("returnStateInfo");
+
+            JSONObject dataobjectcontent = parentjsonObject.getJSONObject("data");
+            String content = dataobjectcontent.getString("content");
+
+            String DecryptedContent = new String(Base64.decodeBase64(content));
+            //System.out.println(DecryptedContent);
+        } catch (Exception ex) {
+            System.err.println("subtractStock:" + ex.getMessage());
         }
     }
 
