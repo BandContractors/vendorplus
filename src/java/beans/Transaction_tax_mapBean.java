@@ -64,6 +64,16 @@ public class Transaction_tax_mapBean implements Serializable {
             } catch (NullPointerException npe) {
                 aTransaction_tax_map.setAdd_date(null);
             }
+            try {
+                aTransaction_tax_map.setIs_updated(aResultSet.getInt("is_updated"));
+            } catch (NullPointerException npe) {
+                aTransaction_tax_map.setIs_updated(0);
+            }
+            try {
+                aTransaction_tax_map.setUpdate_synced(aResultSet.getInt("update_synced"));
+            } catch (NullPointerException npe) {
+                aTransaction_tax_map.setUpdate_synced(0);
+            }
         } catch (SQLException se) {
             System.err.println(se.getMessage());
         }
@@ -71,7 +81,7 @@ public class Transaction_tax_mapBean implements Serializable {
 
     public int saveTransaction_tax_map(Transaction_tax_map aTransaction_tax_map) {
         int saved = 0;
-        String sql = "{call sp_save_transaction_tax_map(?,?,?,?,?,?)}";
+        String sql = "{call sp_save_transaction_tax_map(?,?,?,?,?,?,?,?)}";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 CallableStatement cs = conn.prepareCall(sql);) {
@@ -87,14 +97,14 @@ public class Transaction_tax_mapBean implements Serializable {
                     cs.setLong("in_transaction_id", 0);
                 }
                 try {
-                    cs.setLong("in_transaction_type_id", aTransaction_tax_map.getTransaction_type_id());
+                    cs.setInt("in_transaction_type_id", aTransaction_tax_map.getTransaction_type_id());
                 } catch (NullPointerException npe) {
-                    cs.setLong("in_transaction_type_id", 0);
+                    cs.setInt("in_transaction_type_id", 0);
                 }
                 try {
-                    cs.setLong("in_transaction_reason_id", aTransaction_tax_map.getTransaction_type_id());
+                    cs.setInt("in_transaction_reason_id", aTransaction_tax_map.getTransaction_type_id());
                 } catch (NullPointerException npe) {
-                    cs.setLong("in_transaction_reason_id", 0);
+                    cs.setInt("in_transaction_reason_id", 0);
                 }
                 try {
                     cs.setString("in_transaction_number", aTransaction_tax_map.getTransaction_number());
@@ -105,6 +115,16 @@ public class Transaction_tax_mapBean implements Serializable {
                     cs.setString("in_transaction_number_tax", aTransaction_tax_map.getTransaction_number_tax());
                 } catch (NullPointerException npe) {
                     cs.setString("in_transaction_number_tax", "");
+                }
+                try {
+                    cs.setInt("in_is_updated", aTransaction_tax_map.getIs_updated());
+                } catch (NullPointerException npe) {
+                    cs.setInt("in_is_updated", 0);
+                }
+                try {
+                    cs.setInt("in_update_synced", aTransaction_tax_map.getUpdate_synced());
+                } catch (NullPointerException npe) {
+                    cs.setInt("in_update_synced", 0);
                 }
                 cs.executeUpdate();
                 saved = 1;
@@ -130,10 +150,35 @@ public class Transaction_tax_mapBean implements Serializable {
                 transtaxmap.setTransaction_type_id(trans.getTransactionTypeId());
                 transtaxmap.setTransaction_reason_id(trans.getTransactionReasonId());
                 transtaxmap.setTransaction_number_tax(aTransNoTax);
+                transtaxmap.setIs_updated(0);
+                transtaxmap.setUpdate_synced(0);
                 int x = this.saveTransaction_tax_map(transtaxmap);
             }
         } catch (Exception e) {
             System.err.println("saveTransaction_tax_map2:" + e.getMessage());
+        }
+    }
+
+    public void markTransaction_tax_mapUpdated(Transaction_tax_map aTransaction_tax_map) {
+        try {
+            if (null != aTransaction_tax_map) {
+                aTransaction_tax_map.setIs_updated(1);
+                aTransaction_tax_map.setUpdate_synced(0);
+                int x = this.saveTransaction_tax_map(aTransaction_tax_map);
+            }
+        } catch (Exception e) {
+            System.err.println("markTransaction_tax_mapUpdated:" + e.getMessage());
+        }
+    }
+    
+    public void markTransaction_tax_mapUpdateSynced(Transaction_tax_map aTransaction_tax_map) {
+        try {
+            if (null != aTransaction_tax_map) {
+                aTransaction_tax_map.setUpdate_synced(1);
+                int x = this.saveTransaction_tax_map(aTransaction_tax_map);
+            }
+        } catch (Exception e) {
+            System.err.println("markTransaction_tax_mapUpdated:" + e.getMessage());
         }
     }
 

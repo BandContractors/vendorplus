@@ -31,6 +31,7 @@ import entities.Item;
 import entities.Item_tax_map;
 import entities.Trans;
 import entities.TransItem;
+import entities.Transaction_tax_map;
 import entities.Transactor;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,7 @@ import java.util.logging.Logger;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import org.apache.commons.codec.binary.Base64;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import utilities.UtilityBean;
 
@@ -195,7 +197,7 @@ public class InvoiceOfflineBean {
             basicInformation.setInvoiceType(Integer.toString(1));
             basicInformation.setInvoiceKind(Integer.toString(1));
             basicInformation.setDataSource(Integer.toString(103));
-            basicInformation.setIssuedDate(new UtilityBean().formatDateServer(trans.getTransactionDate()));
+            //basicInformation.setIssuedDate(new UtilityBean().formatDateServer(trans.getTransactionDate()));
             basicInformation.setIssuedDate(new UtilityBean().formatDateTimeServer(trans.getAddDate()));
             try {
                 basicInformation.setOperator(new UserDetailBean().getUserDetail(trans.getTransactionUserDetailId()).getUserName());
@@ -262,25 +264,6 @@ public class InvoiceOfflineBean {
                 td.setNetAmount(Double.toString(trans.getTotalStdVatableAmount()));
                 taxDetails.add(td);
             }
-            /*
-             if (trans.getTotalExemptVatableAmount() > 0) {
-             td = new TaxDetails();
-             td.setGrossAmount(Double.toString(trans.getTotalExemptVatableAmount()));
-             td.setTaxRateName("EXEMPT");
-             td.setTaxRate("0");
-             td.setTaxAmount("0");
-             taxDetails.add(td);
-             }
-             if (trans.getTotalZeroVatableAmount() > 0) {
-             td = new TaxDetails();
-             td.setGrossAmount(Double.toString(trans.getTotalZeroVatableAmount()));
-             td.setTaxRateName("ZERO");
-             td.setTaxRate("0");
-             td.setTaxAmount("0");
-             taxDetails.add(td);
-             }
-             */
-
             //summary
             summary.setGrossAmount(new UtilityBean().formatDoubleToStringPlain(trans.getGrandTotal(), trans.getCurrencyCode()));
             summary.setTaxAmount(new UtilityBean().formatDoubleToStringPlain(trans.getTotalVat(), trans.getCurrencyCode()));
@@ -303,32 +286,15 @@ public class InvoiceOfflineBean {
             eFRISInvoice.setTaxDetails(taxDetails);
             Gson gson = new Gson();
             String json = gson.toJson(eFRISInvoice);
-            //-System.out.println(json);
+            //System.out.println("json:" + json);
 
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
-            //WebResource webResource = client.resource("https://efristest.ura.go.ug/efrisws/ws/taapp/getInformation");
             WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_OFFLINE").getParameter_value());
-            //String privatekey = new ExtractKeys().PrivateKey(sellerDetails.getTin(), basicInformation.getDeviceNo(), returnCode, returnMessage);
-            //String sub = privatekey.substring(0, 5);
-            //if (sub.equals("ERROR")) {
-            //      String[] split = privatekey.split(",");
-            //      returnCode = split[1];
-            //     returnMessage = split[2];
-            //}
-            //PrivateKey key = ExtractKeys.loadPrivateKey(privatekey);
-            //System.out.println(key.getAlgorithm());
-            // String AESpublickeystring = ExtractKeys.decrypt(new ExtractKeys().AESPublicKey(sellerDetails.getTin(), basicInformation.getDeviceNo()), key);
-            //String encryptedcontent = ExtractKeys.AESencrypt(json, Base64.decodeBase64(AESpublickeystring));
-            //PublicKey publickey=ExtractKeys.getKey(AESpublickeystring);
-            //System.out.println(encryptedcontent);
-            //String signedcontent = Base64.encodeBase64String(new ExtractKeys().sign(encryptedcontent, key));
-            //String PostData = GeneralUtilities.PostData(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", basicInformation.getDeviceNo(), "T109", sellerDetails.getTin());
-
             String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", basicInformation.getDeviceNo(), "T109", sellerDetails.getTin());
-            //-System.out.println(PostData);
+            //System.out.println("PostData:" + PostData);
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             String output = response.getEntity(String.class);
-            //-System.out.println(output);
+            //System.out.println("output:" + output);
 
             JSONObject parentjsonObject = new JSONObject(output);
             JSONObject dataobject = parentjsonObject.getJSONObject("returnStateInfo");
@@ -352,9 +318,191 @@ public class InvoiceOfflineBean {
             //-System.out.println("AntiFakeCode: " + AntifakeCode);
             //-System.out.println("Invoice: " + InvoiceNo);
             //-System.out.println("-------------------------------------");
-        } catch (Exception ex) {
-            Logger.getLogger(InvoiceOfflineBean.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception e) {
+            Logger.getLogger(InvoiceOfflineBean.class.getName()).log(Level.SEVERE, null, e);
         }
+    }
+
+    public void submitCreditNoteOfflineThread(long aTransId, int aTransTypeId) {
+        try {
+            Runnable task = new Runnable() {
+                @Override
+                public void run() {
+                    submitCreditNoteOffline(aTransId, aTransTypeId);
+                }
+            };
+            Executor e = Executors.newSingleThreadExecutor();
+            e.execute(task);
+        } catch (Exception e) {
+            System.err.println("submitCreditNoteOfflineThread:" + e.getMessage());
+        }
+    }
+
+    public void submitCreditNoteOffline(long aTransId, int aTransTypeId) {
+        try {
+            Transaction_tax_map ttm = new Transaction_tax_mapBean().getTransaction_tax_map(aTransId, aTransTypeId);
+            if (null != ttm) {
+                String TaxInvoice = ttm.getTransaction_number_tax();
+                String SellerTin = CompanySetting.getTaxIdentity();
+                String DeviceNo = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value();
+                if (TaxInvoice.length() > 0) {
+                    //1. Update is_updated to 1, update_synced=0
+                    new Transaction_tax_mapBean().markTransaction_tax_mapUpdated(ttm);
+                    //2. Submit
+                    String ReturnMessage = this.submit_credit_note(aTransId, TaxInvoice, DeviceNo, SellerTin);
+                    //3. Update update_synced=1 
+                    if (ReturnMessage.equals("SUCCESS")) {
+                        new Transaction_tax_mapBean().markTransaction_tax_mapUpdateSynced(ttm);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("submitCreditNoteOffline:" + e.getMessage());
+        }
+    }
+
+    public String submit_credit_note(long aTransId, String aTaxInvoiceNumber, String aDeviceNo, String aSellerTIN) {
+        String RetMsg = "";
+        try {
+            Trans trans = new Trans();
+            List<TransItem> transitems = new ArrayList<>();
+            try {
+                trans = new TransBean().getTrans(aTransId);
+            } catch (Exception e) {
+                //
+            }
+            try {
+                transitems = new TransItemBean().getTransItemsByTransactionId(aTransId);
+            } catch (Exception e) {
+                //
+            }
+            String json = "{\n"
+                    + "	\"invoiceNo\": \"" + aTaxInvoiceNumber + "\"\n"
+                    + "}";
+            //System.out.println("json1:" + json);
+            com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
+            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_OFFLINE").getParameter_value());
+            String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", aDeviceNo, "T108", aSellerTIN);
+            //System.out.println("PostData1:" + PostData);
+            ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
+            String output = response.getEntity(String.class);
+            //System.out.println("output1:" + output);
+
+            JSONObject parentjsonObject = new JSONObject(output);
+            JSONObject dataobject = parentjsonObject.getJSONObject("returnStateInfo");
+
+            JSONObject dataobjectcontent = parentjsonObject.getJSONObject("data");
+            String content = dataobjectcontent.getString("content");
+
+            String DecryptedContent = new String(Base64.decodeBase64(content));
+
+            JSONObject parentbasicInformationjsonObject = new JSONObject(DecryptedContent);
+            JSONArray jSONArray_GoodsDetials = parentbasicInformationjsonObject.getJSONArray("goodsDetails");
+            JSONArray jSONArray_TaxDetails = parentbasicInformationjsonObject.getJSONArray("taxDetails");
+            JSONObject dataobject_Summary = parentbasicInformationjsonObject.getJSONObject("summary");
+            JSONArray jSONArray_Payway = parentbasicInformationjsonObject.getJSONArray("payWay");
+            JSONObject dataobjectbasicInformation = parentbasicInformationjsonObject.getJSONObject("basicInformation");
+            JSONObject dataobjectsellerDetails = parentbasicInformationjsonObject.getJSONObject("sellerDetails");
+
+            JSONObject jsonObj;
+            for (int i = 0; i < jSONArray_GoodsDetials.length(); i++) {
+                jsonObj = (JSONObject) jSONArray_GoodsDetials.get(i);
+                TransItem ti = this.getTransItemFromList(jsonObj.get("itemCode").toString(), transitems);
+                Double ChangedQty = ti.getItemQty() - Double.parseDouble(jsonObj.get("qty").toString());//can be + or -
+                Double ChangedVatAmt = ti.getAmountIncVat() - Double.parseDouble(jsonObj.get("total").toString());//can be + or -
+                Double ChangedTax = ti.getUnitVat() - Double.parseDouble(jsonObj.get("tax").toString());//can be + or -
+                if (ChangedQty > 0 || ChangedQty < 0) {
+                    jsonObj.put("qty", "" + ChangedQty + "");
+                }
+                if (ChangedVatAmt > 0 || ChangedVatAmt < 0) {
+                    jsonObj.put("total", "" + ChangedVatAmt + "");
+                    jsonObj.put("tax", "" + ChangedVatAmt + "");
+                }
+            }
+            for (int i = 0; i < jSONArray_TaxDetails.length(); i++) {
+                jsonObj = (JSONObject) jSONArray_TaxDetails.get(i);
+                Double ChangedNetAmount = trans.getTotalStdVatableAmount() - Double.parseDouble(jsonObj.get("netAmount").toString());
+                Double ChangedTaxAmount = trans.getTotalVat() - Double.parseDouble(jsonObj.get("taxAmount").toString());
+                Double ChangedGrossAmount = (trans.getTotalStdVatableAmount() + trans.getTotalVat()) - Double.parseDouble(jsonObj.get("grossAmount").toString());
+                if (ChangedNetAmount > 0 || ChangedNetAmount < 0) {
+                    jsonObj.put("netAmount", "" + ChangedNetAmount + "");
+                }
+                if (ChangedTaxAmount > 0 || ChangedTaxAmount < 0) {
+                    jsonObj.put("taxAmount", "" + ChangedTaxAmount + "");
+                }
+                if (ChangedGrossAmount > 0 || ChangedGrossAmount < 0) {
+                    jsonObj.put("grossAmount", "" + ChangedGrossAmount + "");
+                }
+            }
+
+            Double ChangedGrossAmountSum = trans.getGrandTotal() - Double.parseDouble(dataobject_Summary.get("grossAmount").toString());
+            Double ChangedNetAmountSum = (trans.getGrandTotal() - trans.getTotalVat()) - Double.parseDouble(dataobject_Summary.get("netAmount").toString());
+            Double ChangedTaxAmountSum = trans.getTotalVat() - Double.parseDouble(dataobject_Summary.get("taxAmount").toString());
+            if (ChangedGrossAmountSum > 0 || ChangedGrossAmountSum < 0) {
+                dataobject_Summary.put("grossAmount", "" + new UtilityBean().formatDoubleToStringPlain(ChangedGrossAmountSum, trans.getCurrencyCode()) + "");
+            }
+            if (ChangedNetAmountSum > 0 || ChangedNetAmountSum < 0) {
+                dataobject_Summary.put("netAmount", "" + new UtilityBean().formatDoubleToStringPlain(ChangedNetAmountSum, trans.getCurrencyCode()) + "");
+            }
+            if (ChangedTaxAmountSum > 0 || ChangedTaxAmountSum < 0) {
+                dataobject_Summary.put("taxAmount", "" + new UtilityBean().formatDoubleToStringPlain(ChangedTaxAmountSum, trans.getCurrencyCode()) + "");
+            }
+
+            json = "{\n"
+                    + "	\"oriInvoiceId\": \"" + dataobjectbasicInformation.getString("invoiceId") + "\",\n"
+                    + "	\"oriInvoiceNo\": \"" + dataobjectbasicInformation.getString("invoiceNo") + "\",\n"
+                    + "	\"reasonCode\": \"101\",\n"
+                    + "	\"reason\": \"refundreason\",\n"
+                    + "	\"applicationTime\": \"" + new UtilityBean().formatDateTimeServer(trans.getEditDate()) + "\",\n"
+                    + "	\"invoiceApplyCategoryCode\": \"101\",\n"
+                    + "	\"currency\": \"" + dataobjectbasicInformation.getString("currency") + "\",\n"
+                    + "	\"contactName\": \"1\",\n"
+                    + "	\"contactMobileNum\": \"1\",\n"
+                    + "	\"contactEmail\": \"\",\n"
+                    + "	\"source\": \"104\",\n"
+                    + "	\"remark\": \"Remarks\",\n"
+                    + "	\"sellersReferenceNo\": \"" + "" + "\",\n"
+                    + "	\"goodsDetails\": " + jSONArray_GoodsDetials.toString() + ",\n"
+                    + "	\"taxDetails\": " + jSONArray_TaxDetails.toString() + ",\n"
+                    + "	\"summary\":" + dataobject_Summary.toString() + " ,\n"
+                    + "	\"payWay\":" + jSONArray_Payway.toString() + "\n"
+                    + "}";
+            //System.out.println("json2:" + json);
+            PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", aDeviceNo, "T110", aSellerTIN);
+            //System.out.println("PostData2:" + PostData);
+            response = webResource.type("application/json").post(ClientResponse.class, PostData);
+            output = response.getEntity(String.class);
+            //System.out.println("output2:" + output);
+
+            parentjsonObject = new JSONObject(output);
+            dataobject = parentjsonObject.getJSONObject("returnStateInfo");
+
+            dataobjectcontent = parentjsonObject.getJSONObject("data");
+            content = dataobjectcontent.getString("content");
+
+            DecryptedContent = new String(Base64.decodeBase64(content));
+            //System.out.println("DecryptedContent:" + DecryptedContent);
+
+            RetMsg = dataobject.getString("returnMessage");
+            //System.out.println("returnMessage:" + RetMsg);
+        } catch (Exception e) {
+            Logger.getLogger(InvoiceOfflineBean.class.getName()).log(Level.SEVERE, null, e);
+        }
+        return RetMsg;
+    }
+
+    public TransItem getTransItemFromList(String aItemCode, List<TransItem> aTransItems) {
+        TransItem ti = new TransItem();
+        for (int i = 0; i < aTransItems.size(); i++) {
+            if (aItemCode.equals(Long.toString(aTransItems.get(i).getItemId())) && aTransItems.get(i).getItem_no() == 0) {
+                ti.setItemQty(aTransItems.get(i).getItemQty());
+                ti.setAmountIncVat(aTransItems.get(i).getAmountIncVat());
+                ti.setUnitVat(aTransItems.get(i).getUnitVat());
+                aTransItems.get(i).setItem_no(1);
+                break;
+            }
+        }
+        return ti;
     }
 
     public PayWay getPaymentmode() {

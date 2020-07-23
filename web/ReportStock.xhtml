@@ -83,32 +83,32 @@
                             </h:outputText>
                         </p:column>
                         <p:column headerText="Retailsale" style="text-align: right;color:green;">
-                            <h:outputText value="#{sm.retailsaleValue}" rendered="#{sm.stock_type.equals('Goods for Sale')}">
+                            <h:outputText value="#{sm.retailsaleValue}" rendered="#{sm.stock_type.equals('Merchandise') or sm.stock_type.equals('Finished Goods')}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="Margin" style="text-align: right;color: green;">
-                            <h:outputText value="#{sm.retailsaleValue-sm.costValue}" rendered="#{sm.stock_type.equals('Goods for Sale')}">
+                            <h:outputText value="#{sm.retailsaleValue-sm.costValue}" rendered="#{sm.stock_type.equals('Merchandise') or sm.stock_type.equals('Finished Goods')}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="% Margin" style="text-align: right;color: green;">
-                            <h:outputText value="#{(sm.retailsaleValue-sm.costValue)*100/sm.costValue}" rendered="#{sm.stock_type.equals('Goods for Sale')}">
+                            <h:outputText value="#{(sm.retailsaleValue-sm.costValue)*100/sm.costValue}" rendered="#{sm.stock_type.equals('Merchandise') or sm.stock_type.equals('Finished Goods')}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="Wholesale" style="text-align: right;color: coral;">
-                            <h:outputText value="#{sm.wholesaleValue}" rendered="#{sm.stock_type.equals('Goods for Sale')}">
+                            <h:outputText value="#{sm.wholesaleValue}" rendered="#{sm.stock_type.equals('Merchandise') or sm.stock_type.equals('Finished Goods')}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="Margin" style="text-align: right;color: coral;">
-                            <h:outputText value="#{sm.wholesaleValue-sm.costValue}" rendered="#{sm.stock_type.equals('Goods for Sale')}">
+                            <h:outputText value="#{sm.wholesaleValue-sm.costValue}" rendered="#{sm.stock_type.equals('Merchandise') or sm.stock_type.equals('Finished Goods')}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="% Margin" style="text-align: right;color: coral;">
-                            <h:outputText value="#{(sm.wholesaleValue-sm.costValue)*100/sm.costValue}" rendered="#{sm.stock_type.equals('Goods for Sale')}">
+                            <h:outputText value="#{(sm.wholesaleValue-sm.costValue)*100/sm.costValue}" rendered="#{sm.stock_type.equals('Merchandise') or sm.stock_type.equals('Finished Goods')}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>

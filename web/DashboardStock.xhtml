@@ -55,9 +55,11 @@
                 <p:outputLabel value="Stock Type:"/>
                 <h:selectOneMenu id="menuStockType" value="#{dashboardBean.stock_type}" >
                     <f:selectItem itemLabel="" itemValue=""/>
-                    <f:selectItem itemLabel="Goods for Sale" itemValue="Goods for Sale"/>
+                    <f:selectItem itemLabel="Merchandise" itemValue="Merchandise"/>
+                    <f:selectItem itemLabel="Finished Goods" itemValue="Finished Goods"/>
                     <f:selectItem itemLabel="Raw Material" itemValue="Raw Material"/>
                     <f:selectItem itemLabel="Consumption" itemValue="Consumption"/>
+                    <f:selectItem itemLabel="Services" itemValue="Services"/>
                 </h:selectOneMenu>
                 <p:commandButton id="cmdbSearch" value="SEARCH" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                     <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">

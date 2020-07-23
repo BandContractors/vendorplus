@@ -17,6 +17,8 @@ public class Transaction_tax_map implements Serializable {
     private String transaction_number;
     private String transaction_number_tax;
     private Date add_date;
+    private int is_updated;
+    private int update_synced;
 
     /**
      * @return the transaction_tax_map_id
@@ -114,5 +116,33 @@ public class Transaction_tax_map implements Serializable {
      */
     public void setAdd_date(Date add_date) {
         this.add_date = add_date;
+    }
+
+    /**
+     * @return the is_updated
+     */
+    public int getIs_updated() {
+        return is_updated;
+    }
+
+    /**
+     * @param is_updated the is_updated to set
+     */
+    public void setIs_updated(int is_updated) {
+        this.is_updated = is_updated;
+    }
+
+    /**
+     * @return the update_synced
+     */
+    public int getUpdate_synced() {
+        return update_synced;
+    }
+
+    /**
+     * @param update_synced the update_synced to set
+     */
+    public void setUpdate_synced(int update_synced) {
+        this.update_synced = update_synced;
     }
 }

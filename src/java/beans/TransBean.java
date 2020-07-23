@@ -3999,6 +3999,10 @@ public class TransBean implements Serializable {
             new OutputDetailBean().refreshOutput(aLevel, "");
             //Refresh stock alerts
             new UtilityBean().refreshAlerts();
+            //TAX API
+            if (aTransTypeId == 2 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {//SALES INVOICE
+                new InvoiceOfflineBean().submitCreditNoteOfflineThread(aNewTrans.getTransactionId(), aTransTypeId);
+            }
         }
     }
 

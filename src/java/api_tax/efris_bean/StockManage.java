@@ -155,6 +155,7 @@ public class StockManage {
 
             String DecryptedContent = new String(Base64.decodeBase64(content));
             //System.out.println(DecryptedContent);
+            System.out.println("returnMessage--ehh:" + dataobject.getString("returnMessage"));
         } catch (Exception ex) {
             System.err.println("addStock:" + ex.getMessage());
         }

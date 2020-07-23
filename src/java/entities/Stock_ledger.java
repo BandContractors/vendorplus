@@ -43,6 +43,9 @@ public class Stock_ledger implements Serializable {
     private double qty_open;
     private double qty_close;
     private List<Stock_ledger> Stock_ledgerList;
+    private long tax_update_id;
+    private int tax_is_updated;
+    private int tax_update_synced;
 
     /**
      * @return the stock_ledger_id
@@ -378,5 +381,47 @@ public class Stock_ledger implements Serializable {
      */
     public void setStock_ledgerList(List<Stock_ledger> Stock_ledgerList) {
         this.Stock_ledgerList = Stock_ledgerList;
+    }
+
+    /**
+     * @return the tax_is_updated
+     */
+    public int getTax_is_updated() {
+        return tax_is_updated;
+    }
+
+    /**
+     * @param tax_is_updated the tax_is_updated to set
+     */
+    public void setTax_is_updated(int tax_is_updated) {
+        this.tax_is_updated = tax_is_updated;
+    }
+
+    /**
+     * @return the tax_update_synced
+     */
+    public int getTax_update_synced() {
+        return tax_update_synced;
+    }
+
+    /**
+     * @param tax_update_synced the tax_update_synced to set
+     */
+    public void setTax_update_synced(int tax_update_synced) {
+        this.tax_update_synced = tax_update_synced;
+    }
+
+    /**
+     * @return the tax_update_id
+     */
+    public long getTax_update_id() {
+        return tax_update_id;
+    }
+
+    /**
+     * @param tax_update_id the tax_update_id to set
+     */
+    public void setTax_update_id(long tax_update_id) {
+        this.tax_update_id = tax_update_id;
     }
 }
