@@ -4,6 +4,7 @@ import api_tax.efris_bean.StockManage;
 import connections.DBConnection;
 import entities.CompanySetting;
 import entities.Item;
+import entities.Item_tax_map;
 import entities.Stock;
 import entities.Stock_ledger;
 import java.io.Serializable;
@@ -18,6 +19,7 @@ import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
+import utilities.UtilityBean;
 
 /*
  * To change this template, choose Tools | Templates
@@ -116,6 +118,21 @@ public class Stock_ledgerBean implements Serializable {
                 aStock_ledger.setQty_bal(aResultSet.getDouble("qty_bal"));
             } catch (NullPointerException npe) {
                 aStock_ledger.setQty_bal(0);
+            }
+            try {
+                aStock_ledger.setTax_update_id(aResultSet.getLong("tax_update_id"));
+            } catch (NullPointerException npe) {
+                aStock_ledger.setTax_update_id(0);
+            }
+            try {
+                aStock_ledger.setTax_is_updated(aResultSet.getInt("tax_is_updated"));
+            } catch (NullPointerException npe) {
+                aStock_ledger.setTax_is_updated(0);
+            }
+            try {
+                aStock_ledger.setTax_update_synced(aResultSet.getInt("tax_update_synced"));
+            } catch (NullPointerException npe) {
+                aStock_ledger.setTax_update_synced(0);
             }
         } catch (SQLException se) {
             System.err.println(se.getMessage());
@@ -227,6 +244,15 @@ public class Stock_ledgerBean implements Serializable {
                 qtybal = 0;
             }
             stockledger.setQty_bal(qtybal);
+            long update_id = 0;
+            try {
+                update_id = new UtilityBean().getNewTableColumnSeqNumber("stock_ledger", "tax_update_id");
+            } catch (Exception e) {
+                update_id = 0;
+            }
+            stockledger.setTax_update_id(update_id);
+            stockledger.setTax_is_updated(0);
+            stockledger.setTax_update_synced(0);
             //insert
             this.insertStock_ledger(stockledger);
             //check alert-stock status
@@ -235,18 +261,23 @@ public class Stock_ledgerBean implements Serializable {
             new Alert_generalBean().checkExpiryStatusForAlert(stockledger.getItem_id(), stockledger.getBatchno(), stockledger.getCode_specific(), stockledger.getDesc_specific());
             //URA-STOCK-API
             if (aTrans_type_id != 2 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
-                if (aAddSubtract.equals("Add")) {
-                    Stock stockadd = new Stock();
-                    stockadd.setItemId(aStock.getItemId());
-                    stockadd.setCurrentqty(aQty);
-                    stockadd.setUnitCost(aStock.getUnitCost());
-                    new StockManage().addStockCallThread(stockadd);
-                } else if (aAddSubtract.equals("Subtract")) {
-                    Stock stocksub = new Stock();
-                    stocksub.setItemId(aStock.getItemId());
-                    stocksub.setCurrentqty(aQty);
-                    stocksub.setUnitCost(aStock.getUnitCost());
-                    new StockManage().subtractStockCallThread(stocksub);
+                Item_tax_map im = new Item_tax_mapBean().getItem_tax_map(stockledger.getItem_id());
+                if (null == im) {
+                    //do nothing
+                } else {
+                    if (aAddSubtract.equals("Add")) {
+                        Stock stockadd = new Stock();
+                        stockadd.setItemId(aStock.getItemId());
+                        stockadd.setCurrentqty(aQty);
+                        stockadd.setUnitCost(aStock.getUnitCost());
+                        new StockManage().addStockCallThread(stockadd, stockledger.getTax_update_id());
+                    } else if (aAddSubtract.equals("Subtract")) {
+                        Stock stocksub = new Stock();
+                        stocksub.setItemId(aStock.getItemId());
+                        stocksub.setCurrentqty(aQty);
+                        stocksub.setUnitCost(aStock.getUnitCost());
+                        new StockManage().subtractStockCallThread(stocksub, stockledger.getTax_update_id());
+                    }
                 }
             }
         } catch (Exception e) {
@@ -257,8 +288,9 @@ public class Stock_ledgerBean implements Serializable {
     public void insertStock_ledger(Stock_ledger aStock_ledger) {
         String sql = "INSERT INTO stock_ledger"
                 + "(store_id,item_id,batchno,code_specific,desc_specific,specific_size,"
-                + "qty_added,qty_subtracted,transaction_type_id,action_type,transaction_id,user_detail_id,add_date,qty_bal)"
-                + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                + "qty_added,qty_subtracted,transaction_type_id,action_type,transaction_id,user_detail_id,add_date,qty_bal,"
+                + "tax_update_id,tax_is_updated,tax_update_synced)"
+                + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -280,10 +312,27 @@ public class Stock_ledgerBean implements Serializable {
                 ps.setTimestamp(13, null);
             }
             ps.setDouble(14, aStock_ledger.getQty_bal());
+            ps.setLong(15, aStock_ledger.getTax_update_id());
+            ps.setInt(16, aStock_ledger.getTax_is_updated());
+            ps.setInt(17, aStock_ledger.getTax_update_synced());
             ps.executeUpdate();
         } catch (Exception e) {
             System.err.println("insertStock_ledger:" + e.getMessage());
         }
+    }
+
+    public int updateTaxStock_ledger(long aTax_update_id, int aTax_is_updated, int aTax_update_synced) {
+        int update_flag = 0;
+        String sql = "UPDATE stock_ledger SET tax_is_updated=" + aTax_is_updated + ",tax_update_synced=" + aTax_update_synced + " WHERE tax_update_id=" + aTax_update_id;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.executeUpdate();
+            update_flag = 1;
+        } catch (Exception e) {
+            System.err.println("updateTaxStock_ledger:" + e.getMessage());
+        }
+        return update_flag;
     }
 
     public void clearStock_ledger(Stock_ledger aStock_ledger) {
@@ -308,6 +357,9 @@ public class Stock_ledgerBean implements Serializable {
             aStock_ledger.setTransaction_type_name("");
             aStock_ledger.setUser_name("");
             aStock_ledger.setStore_name("");
+            aStock_ledger.setTax_update_id(0);
+            aStock_ledger.setTax_is_updated(0);
+            aStock_ledger.setTax_update_synced(0);
         }
     }
 

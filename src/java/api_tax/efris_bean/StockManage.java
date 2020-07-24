@@ -8,11 +8,13 @@ package api_tax.efris_bean;
 import api_tax.efris.GeneralUtilities;
 import api_tax.efris.innerclasses.ItemTax;
 import beans.Parameter_listBean;
+import beans.Stock_ledgerBean;
 import com.google.gson.Gson;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import entities.CompanySetting;
 import entities.Stock;
+import entities.Stock_ledger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -27,12 +29,19 @@ import org.json.JSONObject;
  */
 public class StockManage {
 
-    public void addStockCall(Stock aStock) {
+    public void addStockCall(Stock aStock, long aTax_update_id) {
         try {
-            if (null != aStock) {
+            if (null != aStock && aTax_update_id > 0) {
+                //1. indicate record4Sync
+                int record4Sync = new Stock_ledgerBean().updateTaxStock_ledger(aTax_update_id, 1, 0);
                 String id = this.getItemIdFromTax(Long.toString(aStock.getItemId()));
-                if (id.length() > 0) {
-                    this.addStock(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()));
+                if (id.length() > 0 && record4Sync == 1) {
+                    //2. update tax db and check if synced yes
+                    String recordSynced = this.addStock(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()));
+                    if (recordSynced.equals("SUCCESS")) {
+                        //3. update local db that synced yes
+                        int x = new Stock_ledgerBean().updateTaxStock_ledger(aTax_update_id, 1, 1);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -40,25 +49,32 @@ public class StockManage {
         }
     }
 
-    public void subtractStockCall(Stock aStock) {
+    public void subtractStockCall(Stock aStock, long aTax_update_id) {
         try {
-            if (null != aStock) {
+            if (null != aStock && aTax_update_id > 0) {
+                //1. indicate record4Sync
+                int record4Sync = new Stock_ledgerBean().updateTaxStock_ledger(aTax_update_id, 1, 0);
                 String id = this.getItemIdFromTax(Long.toString(aStock.getItemId()));
-                if (id.length() > 0) {
-                    this.subtractStock(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()));
+                if (id.length() > 0 && record4Sync == 1) {
+                    //2. update tax db and check if synced yes
+                    String recordSynced = this.subtractStock(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()));
+                    if (recordSynced.equals("SUCCESS")) {
+                        //3. update local db that synced yes
+                        int x = new Stock_ledgerBean().updateTaxStock_ledger(aTax_update_id, 1, 1);
+                    }
                 }
             }
         } catch (Exception e) {
-            System.err.println("addStockCall:" + e.getMessage());
+            System.err.println("subtractStockCall:" + e.getMessage());
         }
     }
 
-    public void addStockCallThread(Stock aStock) {
+    public void addStockCallThread(Stock aStock, long aTax_update_id) {
         try {
             Runnable task = new Runnable() {
                 @Override
                 public void run() {
-                    addStockCall(aStock);
+                    addStockCall(aStock, aTax_update_id);
                 }
             };
             Executor e = Executors.newSingleThreadExecutor();
@@ -68,12 +84,12 @@ public class StockManage {
         }
     }
 
-    public void subtractStockCallThread(Stock aStock) {
+    public void subtractStockCallThread(Stock aStock, long aTax_update_id) {
         try {
             Runnable task = new Runnable() {
                 @Override
                 public void run() {
-                    subtractStockCall(aStock);
+                    subtractStockCall(aStock, aTax_update_id);
                 }
             };
             Executor e = Executors.newSingleThreadExecutor();
@@ -129,7 +145,8 @@ public class StockManage {
         return itemid;
     }
 
-    public void addStock(String aId, String aQty, String aUnitPrice) {
+    public String addStock(String aId, String aQty, String aUnitPrice) {
+        String ReturnMsg = "";
         try {
             String json = "[\n"
                     + "	{\n"
@@ -156,12 +173,15 @@ public class StockManage {
             String DecryptedContent = new String(Base64.decodeBase64(content));
             //System.out.println(DecryptedContent);
             System.out.println("returnMessage--ehh:" + dataobject.getString("returnMessage"));
+            ReturnMsg = dataobject.getString("returnMessage");
         } catch (Exception ex) {
             System.err.println("addStock:" + ex.getMessage());
         }
+        return ReturnMsg;
     }
 
-    public void subtractStock(String aId, String aQty, String aUnitPrice) {
+    public String subtractStock(String aId, String aQty, String aUnitPrice) {
+        String ReturnMsg = "";
         try {
             String json = "[\n"
                     + "	{\n"
@@ -186,10 +206,11 @@ public class StockManage {
             String content = dataobjectcontent.getString("content");
 
             String DecryptedContent = new String(Base64.decodeBase64(content));
-            //System.out.println(DecryptedContent);
+            ReturnMsg = dataobject.getString("returnMessage");
         } catch (Exception ex) {
             System.err.println("subtractStock:" + ex.getMessage());
         }
+        return ReturnMsg;
     }
 
 }
