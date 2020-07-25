@@ -5,6 +5,8 @@ import connections.DBConnection;
 import entities.Category;
 import entities.GroupRight;
 import entities.Item;
+import entities.Item_tax_map;
+import entities.Item_unspsc;
 import entities.Location;
 import entities.Stock;
 import entities.UserDetail;
@@ -43,9 +45,9 @@ import utilities.CustomValidator;
 @ManagedBean
 @SessionScoped
 public class ItemBean implements Serializable {
-
+    
     private static final long serialVersionUID = 1L;
-
+    
     private List<Item> Items;
     private String ActionMessage = null;
     private Item SelectedItem = null;
@@ -66,7 +68,8 @@ public class ItemBean implements Serializable {
     private List<Item> producedItemList;
     private List<Category> InventoryTypeList;
     private List<Category> InventoryAccountList;
-
+    private Item_unspsc Item_unspscObj;
+    
     public void refreshInventoryType(Item aItem, String aItemPurpose) {
         try {
             this.InventoryTypeList = new ArrayList<>();
@@ -104,17 +107,17 @@ public class ItemBean implements Serializable {
             System.out.println("refreshInventoryType:" + e.getMessage());
         }
     }
-
+    
     public void updateItemObjName(Part aFile, Item aItem) {
         try {
             if (aFile.getName().length() > 0) {
                 aItem.setItemImgUrl(aItem.getItemId() + ".png");
             }
         } catch (Exception e) {
-
+            
         }
     }
-
+    
     public void handleFileUpload(Item aItem) {
         try (InputStream input = file.getInputStream()) {
             Files.copy(input, new File(new GeneralUserSetting().getITEM_IMAGE_LOCAL_LOCATION(), Long.toString(aItem.getItemId()) + ".png").toPath());
@@ -122,11 +125,11 @@ public class ItemBean implements Serializable {
             // Show faces message?
         }
     }
-
+    
     public void ItemBarCodeListener(AjaxBehaviorEvent event) {
         System.out.println("OkaY");
     }
-
+    
     public void saveItem() {
         String msg = "";
         msg = this.validateItem(this.ItemObj);
@@ -135,6 +138,7 @@ public class ItemBean implements Serializable {
         } else {
             try {
                 if (this.saveValidatedItem(this.ItemObj) == 1) {
+                    new Item_tax_mapBean().saveItem_tax_mapCall(this.ItemObj.getDescription(), this.ItemObj.getItem_code_tax());
                     this.setActionMessage("Saved Successfully");
                     this.clearItem();
                     this.refreshStockLocation(0);
@@ -149,7 +153,7 @@ public class ItemBean implements Serializable {
             }
         }
     }
-
+    
     public void saveItem(Item aItem) {
         String msg = "";
         msg = this.validateItem(aItem);
@@ -172,7 +176,7 @@ public class ItemBean implements Serializable {
             }
         }
     }
-
+    
     public String validateItem(Item aItem) {
         String msg = "";
         String sql2 = null;
@@ -213,7 +217,7 @@ public class ItemBean implements Serializable {
         }
         return msg;
     }
-
+    
     public int saveValidatedItem(Item aItem) {
         int save_status = 0;
         String sql = null;
@@ -364,7 +368,7 @@ public class ItemBean implements Serializable {
         }
         return save_status;
     }
-
+    
     public void setItemFromResultset(Item aItem, ResultSet aResultSet) {
         try {
             try {
@@ -556,7 +560,7 @@ public class ItemBean implements Serializable {
             System.err.println("setItemFromResultset:" + se.getMessage());
         }
     }
-
+    
     public void setItemFromResultsetReport(Item aItem, ResultSet aResultSet) {
         try {
             try {
@@ -778,7 +782,7 @@ public class ItemBean implements Serializable {
             System.err.println("setItemFromResultsetReport:" + se.getMessage());
         }
     }
-
+    
     public Item getItem(long ItemId) {
         String sql = "{call sp_search_item_by_id(?)}";
         ResultSet rs = null;
@@ -794,21 +798,32 @@ public class ItemBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            System.err.println("getItem:" + e.getMessage());
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
-
     }
-
+    
+    public Item getItemByDesc(String aItemDesc) {
+        String sql = "SELECT * FROM item WHERE description='" + aItemDesc + "'";
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                Item item = new Item();
+                this.setItemFromResultset(item, rs);
+                return item;
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            System.err.println("getItemByDesc:" + e.getMessage());
+            return null;
+        }
+    }
+    
     public void setItem(long aItemId, Item aItem) {
         String sql = "{call sp_search_item_by_id(?)}";
         ResultSet rs = null;
@@ -827,7 +842,7 @@ public class ItemBean implements Serializable {
             System.err.println("setItem:" + e.getMessage());
         }
     }
-
+    
     public Item findItem(long ItemId) {
         String sql = "{call sp_search_item_by_id(?)}";
         ResultSet rs = null;
@@ -843,21 +858,84 @@ public class ItemBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            System.err.println("findItem:" + e.getMessage());
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
-
     }
-
+    
+    public void setItem_unspscFromResultset(Item_unspsc aItem_unspsc, ResultSet aResultSet) {
+        try {
+            try {
+                aItem_unspsc.setItem_unspsc_id(aResultSet.getLong("item_unspsc_id"));
+            } catch (NullPointerException npe) {
+                aItem_unspsc.setItem_unspsc_id(0);
+            }
+            try {
+                aItem_unspsc.setSegment_code(aResultSet.getString("segment_code"));
+            } catch (NullPointerException npe) {
+                aItem_unspsc.setSegment_code("");
+            }
+            try {
+                aItem_unspsc.setSegment_name(aResultSet.getString("segment_name"));
+            } catch (NullPointerException npe) {
+                aItem_unspsc.setSegment_name("");
+            }
+            try {
+                aItem_unspsc.setFamily_code(aResultSet.getString("family_code"));
+            } catch (NullPointerException npe) {
+                aItem_unspsc.setFamily_code("");
+            }
+            try {
+                aItem_unspsc.setFamily_name(aResultSet.getString("family_name"));
+            } catch (NullPointerException npe) {
+                aItem_unspsc.setFamily_name("");
+            }
+            try {
+                aItem_unspsc.setClass_code(aResultSet.getString("class_code"));
+            } catch (NullPointerException npe) {
+                aItem_unspsc.setClass_code("");
+            }
+            try {
+                aItem_unspsc.setClass_name(aResultSet.getString("class_name"));
+            } catch (NullPointerException npe) {
+                aItem_unspsc.setClass_name("");
+            }
+            try {
+                aItem_unspsc.setCommodity_code(aResultSet.getString("commodity_code"));
+            } catch (NullPointerException npe) {
+                aItem_unspsc.setCommodity_code("");
+            }
+            try {
+                aItem_unspsc.setCommodity_name(aResultSet.getString("commodity_name"));
+            } catch (NullPointerException npe) {
+                aItem_unspsc.setCommodity_name("");
+            }
+        } catch (Exception e) {
+            System.err.println("setItem_unspscFromResultset:" + e.getMessage());
+        }
+    }
+    
+    public Item_unspsc findItem_unspsc(long aItem_unspsc_id) {
+        String sql = "SELECT * FROM item_unspsc WHERE item_unspsc_id=" + aItem_unspsc_id;
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                Item_unspsc iu = new Item_unspsc();
+                this.setItem_unspscFromResultset(iu, rs);
+                return iu;
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            System.err.println("findItem_unspsc:" + e.getMessage());
+            return null;
+        }
+    }
+    
     public Item findItemByCode(String ItemCode) {
         String sql = "{call sp_search_item_by_code(?)}";
         ResultSet rs = null;
@@ -886,7 +964,7 @@ public class ItemBean implements Serializable {
             }
         }
     }
-
+    
     public Item findItemByCodeActive(String ItemCode) {
         if (ItemCode.trim().isEmpty()) {
             return null;
@@ -918,13 +996,13 @@ public class ItemBean implements Serializable {
             }
         }
     }
-
+    
     public void deleteItem(Item aItem) {
         String msg;
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
-
+        
         if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Delete") == 0) {
             msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
@@ -943,16 +1021,20 @@ public class ItemBean implements Serializable {
             }
         }
     }
-
+    
     public void displayItem(Item ItemFrom) {
         try {
             this.ItemObj = this.getItem(ItemFrom.getItemId());
             this.refreshStockLocation(ItemFrom.getItemId());
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
+            Item_tax_map itmap = new Item_tax_mapBean().getItem_tax_map(this.ItemObj.getItemId());
+            if (itmap != null) {
+                this.ItemObj.setItem_code_tax(itmap.getItem_code_tax());
+            }
+        } catch (Exception e) {
+            System.out.println("displayItem:" + e.getMessage());
         }
     }
-
+    
     public void clearItem() {
         try {
             if (null == this.ItemObj) {
@@ -995,6 +1077,7 @@ public class ItemBean implements Serializable {
                 this.ItemObj.setExpiry_band("");
                 this.ItemObj.setOverride_gen_name(0);
                 this.ItemObj.setHide_unit_price_invoice(0);
+                this.ItemObj.setItem_code_tax("");
                 this.setSearchItemDesc("");
                 this.refreshStockLocation(0);
                 this.refreshItemsList(this.getSearchItemDesc());
@@ -1003,7 +1086,7 @@ public class ItemBean implements Serializable {
             e.printStackTrace();
         }
     }
-
+    
     public void clearItem(Item aItem) {
         try {
             if (aItem != null) {
@@ -1045,6 +1128,7 @@ public class ItemBean implements Serializable {
                 aItem.setOverride_gen_name(0);
                 aItem.setHide_unit_price_invoice(0);
                 aItem.setPurpose("");
+                aItem.setItem_code_tax("");
                 this.setSearchItemDesc("");
                 this.refreshStockLocation(0);
             }
@@ -1052,7 +1136,7 @@ public class ItemBean implements Serializable {
             e.printStackTrace();
         }
     }
-
+    
     public void initClearItem(Item aItem, List<Item> aItemList) {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -1071,7 +1155,7 @@ public class ItemBean implements Serializable {
             }
         }
     }
-
+    
     public void initClearItemParent() {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -1085,11 +1169,11 @@ public class ItemBean implements Serializable {
             }
         }
     }
-
+    
     public void clearSelectedItem() {
         this.clearItem(this.getSelectedItem());
     }
-
+    
     public List<Item> getItemObjectList(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -1120,7 +1204,7 @@ public class ItemBean implements Serializable {
         }
         return ItemObjectList;
     }
-
+    
     public List<Item> getItemObjectListActive(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -1150,7 +1234,7 @@ public class ItemBean implements Serializable {
         }
         return ItemObjectList;
     }
-
+    
     public void updateLookUpsUI(Item aItem) {
         try {
             //Item item = null;
@@ -1183,7 +1267,7 @@ public class ItemBean implements Serializable {
             System.out.println("updateLookUpsUI-Item:" + e.getMessage());
         }
     }
-
+    
     public List<Item> getItemObjectListForSale(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -1201,20 +1285,32 @@ public class ItemBean implements Serializable {
                 this.updateLookUpsUI(item);
                 this.ItemObjectList.add(item);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            System.err.println("getItemObjectListForSale:" + e.getMessage());
         }
         return ItemObjectList;
     }
-
+    
+    public List<Item_unspsc> getItem_unspscObjectList(String Query) {
+        String sql;
+        sql = "SELECT * FROM item_unspsc WHERE segment_name LIKE '%" + Query + "%' OR family_name LIKE '%" + Query + "%' OR class_name LIKE '%" + Query + "%' OR commodity_name LIKE '%" + Query + "%' ";
+        ResultSet rs = null;
+        List<Item_unspsc> ius = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Item_unspsc iu = new Item_unspsc();
+                this.setItem_unspscFromResultset(iu, rs);
+                ius.add(iu);
+            }
+        } catch (Exception e) {
+            System.err.println("getItem_unspscObjectList:" + e.getMessage());
+        }
+        return ius;
+    }
+    
     public List<Item> getItemObjectListForProduction(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -1245,7 +1341,7 @@ public class ItemBean implements Serializable {
         }
         return ItemObjectList;
     }
-
+    
     public List<Item> getItemObjectListForHire(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -1275,7 +1371,7 @@ public class ItemBean implements Serializable {
         }
         return ItemObjectList;
     }
-
+    
     public List<Item> getItemObjectListForStockDispose(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -1305,7 +1401,7 @@ public class ItemBean implements Serializable {
         }
         return ItemObjectList;
     }
-
+    
     public List<Item> getItemObjectListForConsumption(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -1335,7 +1431,7 @@ public class ItemBean implements Serializable {
         }
         return ItemObjectList;
     }
-
+    
     public List<Item> getItemObjectListForTransfer(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -1365,7 +1461,7 @@ public class ItemBean implements Serializable {
         }
         return ItemObjectList;
     }
-
+    
     public List<Item> getItemObjectListForUnpack(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -1395,7 +1491,7 @@ public class ItemBean implements Serializable {
         }
         return ItemObjectList;
     }
-
+    
     public List<Item> getItemObjectListForPurchase(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -1425,7 +1521,7 @@ public class ItemBean implements Serializable {
         }
         return ItemObjectList;
     }
-
+    
     public List<Item> getItemObjectListForReceiveGoods(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -1455,7 +1551,7 @@ public class ItemBean implements Serializable {
         }
         return ItemObjectList;
     }
-
+    
     public List<Item> getItemObjectListForReceiveExpenses(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -1485,7 +1581,7 @@ public class ItemBean implements Serializable {
         }
         return ItemObjectList;
     }
-
+    
     public List<Item> getItemObjectListForReceiveAssets(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -1515,7 +1611,7 @@ public class ItemBean implements Serializable {
         }
         return ItemObjectList;
     }
-
+    
     public List<Item> getItemObjectListForPurchaseExpense(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -1545,7 +1641,7 @@ public class ItemBean implements Serializable {
         }
         return ItemObjectList;
     }
-
+    
     public List<Item> getItemObjectListForPurchaseGoods(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -1575,7 +1671,7 @@ public class ItemBean implements Serializable {
         }
         return ItemObjectList;
     }
-
+    
     public List<Item> getItemObjectListForAssetFixed(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -1644,7 +1740,7 @@ public class ItemBean implements Serializable {
         }
         return Items;
     }
-
+    
     public List<Item> getItemObjectListForQuickOrder(int aCategoryId, int aSubCategoryId) {
         String sql = "";
         String aWhereSql = "";
@@ -1686,7 +1782,7 @@ public class ItemBean implements Serializable {
         }
         return ItemObjectList;
     }
-
+    
     public void refreshItemsList(String aNameOrCode) {
         this.ItemsList = new ArrayList<>();
         if (aNameOrCode.replace(" ", "").length() <= 0) {
@@ -1739,7 +1835,7 @@ public class ItemBean implements Serializable {
             }
         }
     }
-
+    
     public List<Item> getReportItems(Item aItem, boolean RETRIEVE_REPORT) {
         String sql = "{call sp_report_item(?,?,?)}";
         ResultSet rs = null;
@@ -1802,11 +1898,11 @@ public class ItemBean implements Serializable {
         }
         return this.ReportItems;
     }
-
+    
     public long getReportItemsCount() {
         return this.ReportItems.size();
     }
-
+    
     public List<Item> getReportItemsSummary(Item aItem, boolean RETRIEVE_REPORT) {
         String sql = "{call sp_report_item_summary(?,?,?)}";
         ResultSet rs = null;
@@ -1839,7 +1935,7 @@ public class ItemBean implements Serializable {
                     } catch (NullPointerException npe) {
                         aItem.setCountItems(0);
                     }
-
+                    
                     this.ReportItemsSummary.add(item);
                 }
             } catch (SQLException se) {
@@ -1858,7 +1954,7 @@ public class ItemBean implements Serializable {
         }
         return this.ReportItemsSummary;
     }
-
+    
     public void reportItemDetail(String aPurpose, String aItemType, int aCategoryId, int aSubCategoryId, String aCurrency, String aIsSuspended, int aIsGeneral) {
         String sql = "SELECT * FROM view_item_detail WHERE 1=1";
         String wheresql = "";
@@ -1925,7 +2021,7 @@ public class ItemBean implements Serializable {
             System.err.println(se.getMessage());
         }
     }
-
+    
     public void reportItemDetailStock(String aItemType, int aCategoryId, int aSubCategoryId, String aCurrency, String aIsSuspended, int aIsGeneral) {
         String sql = "SELECT * FROM view_item_detail_stock WHERE 1=1";
         String wheresql = "";
@@ -1970,7 +2066,7 @@ public class ItemBean implements Serializable {
             System.err.println(se.getMessage());
         }
     }
-
+    
     public void reportItemDetailAsset(String aItemType, int aCategoryId, int aSubCategoryId, String aCurrency, String aIsSuspended, int aIsGeneral) {
         String sql = "SELECT * FROM view_item_detail_asset WHERE 1=1";
         String wheresql = "";
@@ -2015,7 +2111,7 @@ public class ItemBean implements Serializable {
             System.err.println(se.getMessage());
         }
     }
-
+    
     public void reportItemDetailExpense(String aItemType, int aCategoryId, int aSubCategoryId, String aCurrency, String aIsSuspended, int aIsGeneral) {
         String sql = "SELECT * FROM view_item_detail_expense WHERE 1=1";
         String wheresql = "";
@@ -2060,7 +2156,7 @@ public class ItemBean implements Serializable {
             System.err.println(se.getMessage());
         }
     }
-
+    
     public void reportItemStockLowOut(String aItemType, int aCategoryId, int aSubCategoryId, String aCurrency, int aIsGeneral, String aStockType, String aStockStatus) {
         String sql = "SELECT * FROM view_inventory_low_out_vw WHERE is_suspended='No'";
         String sqlsum = "SELECT stock_status,count(*) as qty_total FROM view_inventory_low_out_vw WHERE is_suspended='No'";
@@ -2140,7 +2236,7 @@ public class ItemBean implements Serializable {
             System.err.println(se.getMessage());
         }
     }
-
+    
     public Item getItemCurrentStockStatus(long aItem_id) {
         String sql = "SELECT * FROM view_inventory_low_out_vw WHERE item_id=" + aItem_id;
         ResultSet rs = null;
@@ -2158,7 +2254,7 @@ public class ItemBean implements Serializable {
         }
         return item;
     }
-
+    
     public void initItemObj() {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -2172,7 +2268,7 @@ public class ItemBean implements Serializable {
             }
         }
     }
-
+    
     public void initStockLocation() {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -2187,20 +2283,20 @@ public class ItemBean implements Serializable {
             }
         }
     }
-
+    
     public void refreshStockLocation(long aItemId) {
         try {
             this.LocationList.clear();
         } catch (NullPointerException npe) {
             this.LocationList = new ArrayList<>();
         }
-
+        
         try {
             this.StockList.clear();
         } catch (NullPointerException npe) {
             this.StockList = new ArrayList<>();
         }
-
+        
         if (aItemId > 0) {
             try {
                 this.LocationList = new LocationBean().getLocationsByItem(aItemId);
@@ -2212,17 +2308,17 @@ public class ItemBean implements Serializable {
             }
         }
     }
-
+    
     public long getReportItemsSummaryCount() {
         return this.ReportItemsSummary.size();
     }
-
+    
     public void openChildItem(String aItemPurpose) {
         FacesContext context = FacesContext.getCurrentInstance();
         HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
         HttpSession httpSession = request.getSession(false);
         httpSession.setAttribute("ITEM_PURPOSE", aItemPurpose);
-
+        
         Map<String, Object> options = new HashMap<String, Object>();
         options.put("modal", true);
         options.put("draggable", false);
@@ -2236,7 +2332,7 @@ public class ItemBean implements Serializable {
         options.put("dynamic", true);
         org.primefaces.PrimeFaces.current().dialog().openDynamic("ItemChild", options, null);
     }
-
+    
     public void openChildItem(String aItemPurpose, long aItemId) {
         if (new NavigationBean().checkAccessDeniedReturn("8", "View") == 1) {
             FacesContext context = FacesContext.getCurrentInstance();
@@ -2265,7 +2361,7 @@ public class ItemBean implements Serializable {
             org.primefaces.PrimeFaces.current().dialog().openDynamic("ItemChild", options, null);
         }
     }
-
+    
     public List<Item> getProductionItemObjectList(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -2296,7 +2392,7 @@ public class ItemBean implements Serializable {
         }
         return ItemObjectList;
     }
-
+    
     public List<Item> getItemObjectListForRawMaterial(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -2557,5 +2653,19 @@ public class ItemBean implements Serializable {
      */
     public void setInventoryAccountList(List<Category> InventoryAccountList) {
         this.InventoryAccountList = InventoryAccountList;
+    }
+
+    /**
+     * @return the Item_unspscObj
+     */
+    public Item_unspsc getItem_unspscObj() {
+        return Item_unspscObj;
+    }
+
+    /**
+     * @param Item_unspscObj the Item_unspscObj to set
+     */
+    public void setItem_unspscObj(Item_unspsc Item_unspscObj) {
+        this.Item_unspscObj = Item_unspscObj;
     }
 }

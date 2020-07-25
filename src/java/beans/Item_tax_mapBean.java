@@ -1,6 +1,7 @@
 package beans;
 
 import connections.DBConnection;
+import entities.Item;
 import entities.Item_tax_map;
 import java.io.Serializable;
 import java.sql.CallableStatement;
@@ -70,6 +71,48 @@ public class Item_tax_mapBean implements Serializable {
         } catch (Exception e) {
             System.err.println("getItem_tax_map:" + e.getMessage());
             return null;
+        }
+    }
+
+    public void saveItem_tax_mapCall(String aItemDesc, String aItemCodeTax) {
+        try {
+            long ItemId = 0;
+            if (aItemDesc.length() > 0 && aItemCodeTax.length() > 0) {
+                Item itm = new ItemBean().getItemByDesc(aItemDesc);
+                if (itm != null) {
+                    ItemId = itm.getItemId();
+                }
+                if (ItemId > 0) {
+                    //check if already mapped
+                    Item_tax_map itmap = this.getItem_tax_map(ItemId);
+                    Item_tax_map itmap4save = new Item_tax_map();
+                    if (null == itmap) {//insert
+                        itmap4save.setItem_tax_map_id(0);
+                        itmap4save.setItem_id(ItemId);
+                        itmap4save.setItem_id_tax(ItemId);
+                        itmap4save.setItem_code_tax(aItemCodeTax);
+                        int x = this.saveItem_tax_map(itmap4save);
+                        if (x == 1) {//register to URA
+
+                        }
+                    } else {//update
+                        if (itmap.getItem_code_tax().equals(aItemCodeTax)) {
+                            //nothing has changed
+                        } else {
+                            itmap4save.setItem_tax_map_id(itmap.getItem_tax_map_id());
+                            itmap4save.setItem_id(ItemId);
+                            itmap4save.setItem_id_tax(ItemId);
+                            itmap4save.setItem_code_tax(aItemCodeTax);
+                            int x = this.saveItem_tax_map(itmap4save);
+                            if (x == 1) {//register to URA
+
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("saveItem_tax_mapCall:" + e.getMessage());
         }
     }
 

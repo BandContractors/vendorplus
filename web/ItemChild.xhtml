@@ -85,7 +85,7 @@
                         <f:selectItem itemLabel="Other Fixed Asset" itemValue="OTHER"/>
                     </h:selectOneMenu>
                     <h:outputLabel value="Item Code:"/>
-                    <h:inputText id="itxtCode" value="#{itemBean.itemObj.itemCode}" autocomplete="off" style="width: 200px"/>
+                    <h:inputText id="itxtCode" value="#{itemBean.itemObj.itemCode}" autocomplete="off" style="width: 193px"/>
                     <h:outputLabel value="Is General?"/>
                     <h:selectOneMenu id="menuIsGeneral" value="#{itemBean.itemObj.isGeneral}" style="width: 200px">
                         <f:selectItem itemLabel="No" itemValue="0"/>
@@ -97,9 +97,9 @@
                         <f:selectItems value="#{accCoaBean.getAccCoaObjectListBeginWith1('1-20-000')}" var="ac" itemLabel="#{ac.accountName}" itemValue="#{ac.accountCode}"/>
                     </h:selectOneMenu>
                     <h:outputLabel value="Description:"/>
-                    <h:inputText id="itxtDescription" value="#{itemBean.itemObj.description}" autocomplete="off" style="width: 200px"/>
+                    <h:inputText id="itxtDescription" value="#{itemBean.itemObj.description}" autocomplete="off" style="width: 193px"/>
                     <h:outputLabel value="Alias Name:"/>
-                    <h:inputText id="itxtAliasName" value="#{itemBean.itemObj.alias_name}" autocomplete="off" style="width: 200px"/>
+                    <h:inputText id="itxtAliasName" value="#{itemBean.itemObj.alias_name}" autocomplete="off" style="width: 193px"/>
                     <h:outputLabel value="Display Alias?"/>
                     <h:selectOneMenu id="menuDisplayAliasName" value="#{itemBean.itemObj.display_alias_name}" style="width: 200px">
                         <f:selectItem itemLabel="No" itemValue="0"/>
@@ -128,26 +128,25 @@
                         <f:selectItems value="#{unitBean.units}" var="u" itemLabel="#{u.unitName}" itemValue="#{u.unitId}"/>
                     </h:selectOneMenu>
                     <h:outputLabel value="Re-order Level:"/>
-                    <h:inputText id="itxtReorderLevel" value="#{itemBean.itemObj.reorderLevel}" autocomplete="off" style="width: 200px">
-                    </h:inputText>
+                    <h:inputText id="itxtReorderLevel" value="#{itemBean.itemObj.reorderLevel}" autocomplete="off" style="width: 193px"/>
                     <h:outputLabel value="Account Name:"/>
                     <h:selectOneMenu id="menuExpenseAccountCode" value="#{itemBean.itemObj.expenseAccountCode}" style="width: 200px;background-color: #{listOptionBean.getColorByBoolean(!generalUserSetting.currentItemPurpose.equals('Asset'))}" disabled="#{generalUserSetting.currentItemPurpose.equals('Asset')}">
                         <f:selectItem itemLabel="" itemValue=""/>
                         <f:selectItems value="#{accCoaBean.getAccCoaObjectListByInventoryType(generalUserSetting.currentItemPurpose,itemBean.itemObj.expense_type)}" var="ea" itemLabel="#{ea.accountName}" itemValue="#{ea.accountCode}"/>
                     </h:selectOneMenu>
                     <h:outputLabel value="Retailsale Price:"/>
-                    <h:inputText id="itxtUnitRetailsalePrice" value="#{itemBean.itemObj.unitRetailsalePrice}" autocomplete="off" style="width: 200px"/>
+                    <h:inputText id="itxtUnitRetailsalePrice" value="#{itemBean.itemObj.unitRetailsalePrice}" autocomplete="off" style="width: 193px"/>
                     <h:outputLabel value="Unit Cost Price:"/>
-                    <h:inputText id="itxtUnitCostPrice" value="#{itemBean.itemObj.unitCostPrice}" autocomplete="off" style="width: 200px"/>
+                    <h:inputText id="itxtUnitCostPrice" value="#{itemBean.itemObj.unitCostPrice}" autocomplete="off" style="width: 193px"/>
                     <h:outputLabel value="Is Free?"/>
                     <h:selectOneMenu id="menuIsFree" value="#{itemBean.itemObj.is_free}" style="width: 200px">
                         <f:selectItem itemLabel="No" itemValue="0"/>
                         <f:selectItem itemLabel="Yes" itemValue="1"/>
                     </h:selectOneMenu>
                     <h:outputLabel value="Wholesale Price:"/>
-                    <h:inputText id="itxtUnitWholesalePrice" value="#{itemBean.itemObj.unitWholesalePrice}" autocomplete="off" style="width: 200px"/>
+                    <h:inputText id="itxtUnitWholesalePrice" value="#{itemBean.itemObj.unitWholesalePrice}" autocomplete="off" style="width: 193px"/>
                     <h:outputLabel value="Special Price:"/>
-                    <h:inputText id="itxtUnitSpecialsalePrice" value="#{itemBean.itemObj.unit_special_price}" autocomplete="off" style="width: 200px"/>
+                    <h:inputText id="itxtUnitSpecialsalePrice" value="#{itemBean.itemObj.unit_special_price}" autocomplete="off" style="width: 193px"/>
                     <h:outputLabel value="I Hire this Item?"/>
                     <h:selectOneMenu id="menuIsHire" value="#{itemBean.itemObj.is_hire}" style="width: 200px;">
                         <f:selectItem itemLabel=""/>
@@ -162,9 +161,9 @@
                         <f:selectItem itemLabel="Yes" itemValue="1"/>
                     </h:selectOneMenu>
                     <h:outputLabel value="Image Full Name:"/>
-                    <h:inputText id="itxtImageName" value="#{itemBean.itemObj.itemImgUrl}" autocomplete="off" style="width: 200px"/>
+                    <h:inputText id="itxtImageName" value="#{itemBean.itemObj.itemImgUrl}" autocomplete="off" style="width: 193px"/>
                     <h:outputLabel value="Unit HirePrice/#{generalUserSetting.DEFAULT_DURATION_TYPE}:"/>
-                    <h:inputText id="itxtUnitHirePrice" value="#{itemBean.itemObj.unit_hire_price}" autocomplete="off" style="width: 200px" disabled="#{itemBean.itemObj.is_hire==0}"/>
+                    <h:inputText id="itxtUnitHirePrice" value="#{itemBean.itemObj.unit_hire_price}" autocomplete="off" style="width: 193px" disabled="#{itemBean.itemObj.is_hire==0}"/>
                     <h:outputLabel value="I Buy this Item?"/>
                     <h:selectOneMenu id="menuIsBuy" value="#{itemBean.itemObj.isBuy}" style="width: 200px">
                         <f:selectItem itemLabel="Yes" itemValue="1"/>
@@ -175,7 +174,7 @@
                         <f:selectItems value="#{listOptionBean.getItemSaleOptions()}" var="sa" itemLabel="#{sa.strOption2}" itemValue="#{sa.intOption1}"/>
                     </h:selectOneMenu>
                     <h:outputLabel value="Unit Weight(#{parameter_listBean.getParameter_listByContextNameMemory('ITEM','DEFAULT_MEASURE_UNIT').parameter_value}):"/>
-                    <h:inputText value="#{itemBean.itemObj.unit_weight}" autocomplete="off" style="width: 200px"/>
+                    <h:inputText value="#{itemBean.itemObj.unit_weight}" autocomplete="off" style="width: 193px"/>
                     <h:outputLabel value="Expiry Band (U,H,M,L):"/>
                     <p:selectOneMenu id="menuExpiryBand" value="#{itemBean.itemObj.expiry_band}" style="width: 200px" editable="true">
                         <f:selectItem itemLabel="" itemValue=""/>
@@ -191,8 +190,8 @@
                         <f:selectItem itemLabel="No" itemValue="0"/>
                         <f:selectItem itemLabel="Yes" itemValue="1"/>
                     </h:selectOneMenu>
-                    <h:outputLabel value=""/>
-                    <h:outputLabel value=""/>
+                    <h:outputLabel value="UNSPSC:"/>
+                    <h:inputText value="#{itemBean.itemObj.item_code_tax}" autocomplete="off" style="width: 193px"/>
                     <h:outputLabel value="Show General Name?" title="Show General Name?"/>
                     <h:selectOneMenu id="menuOverrideGenName" value="#{itemBean.itemObj.override_gen_name}" style="width: 200px">
                         <f:selectItem itemLabel="Do Not Override" itemValue="0"/>

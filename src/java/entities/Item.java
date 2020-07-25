@@ -67,6 +67,7 @@ public class Item implements Serializable {
     private int hide_unit_price_invoice;
     private String account_name;
     private String purpose;
+    private String item_code_tax;
     
     /**
      * @return the ItemId
@@ -759,6 +760,20 @@ public class Item implements Serializable {
      */
     public void setPurpose(String purpose) {
         this.purpose = purpose;
+    }
+
+    /**
+     * @return the item_code_tax
+     */
+    public String getItem_code_tax() {
+        return item_code_tax;
+    }
+
+    /**
+     * @param item_code_tax the item_code_tax to set
+     */
+    public void setItem_code_tax(String item_code_tax) {
+        this.item_code_tax = item_code_tax;
     }
 
 }

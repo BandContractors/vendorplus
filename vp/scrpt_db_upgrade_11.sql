@@ -6,5 +6,19 @@ ADD COLUMN tax_update_id bigint(20) NULL DEFAULT 0,
 ADD COLUMN tax_is_updated int(1) NULL DEFAULT 0,
 ADD COLUMN tax_update_synced INT(1) NULL DEFAULT 0;
 
+CREATE  TABLE item_unspsc (
+  item_unspsc_id BIGINT(20) NOT NULL AUTO_INCREMENT ,
+  segment_code VARCHAR(50) NULL ,
+  segment_name VARCHAR(255) NULL ,
+  family_code VARCHAR(50) NULL ,
+  family_name VARCHAR(255) NULL ,
+  class_code VARCHAR(50) NULL ,
+  class_name VARCHAR(255) NULL ,
+  commodity_code VARCHAR(50) NULL ,
+  commodity_name VARCHAR(255) NULL ,
+  PRIMARY KEY (item_unspsc_id) );
+
+LOAD DATA INFILE 'C:/item_unspsc.csv' INTO TABLE `item_unspsc` FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\r\n' IGNORE 1 LINES;
+
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
-VALUES('scrpt_db_upgrade_11',7,Now(),'6.0','');
+VALUES('scrpt_db_upgrade_11',23,Now(),'6.0','');
