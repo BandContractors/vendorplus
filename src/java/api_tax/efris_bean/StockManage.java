@@ -7,12 +7,15 @@ package api_tax.efris_bean;
 
 import api_tax.efris.GeneralUtilities;
 import api_tax.efris.innerclasses.ItemTax;
+import beans.ItemBean;
+import beans.Item_tax_mapBean;
 import beans.Parameter_listBean;
 import beans.Stock_ledgerBean;
 import com.google.gson.Gson;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import entities.CompanySetting;
+import entities.Item;
 import entities.Stock;
 import entities.Stock_ledger;
 import java.util.ArrayList;
@@ -209,6 +212,83 @@ public class StockManage {
             ReturnMsg = dataobject.getString("returnMessage");
         } catch (Exception ex) {
             System.err.println("subtractStock:" + ex.getMessage());
+        }
+        return ReturnMsg;
+    }
+
+    public void registerItemCallThread(long aItemId, String aItemCodeTax) {
+        try {
+            Runnable task = new Runnable() {
+                @Override
+                public void run() {
+                    registerItemCall(aItemId, aItemCodeTax);
+                }
+            };
+            Executor e = Executors.newSingleThreadExecutor();
+            e.execute(task);
+        } catch (Exception e) {
+            System.err.println("registerItemCallThread:" + e.getMessage());
+        }
+    }
+
+    public void registerItemCall(long aItemId, String aItemCodeTax) {
+        try {
+            Item item = new ItemBean().getItem(aItemId);
+            if (null != item) {
+                item.setItem_code_tax(aItemCodeTax);
+                String recordSynced = this.registerItem(item);
+                if (recordSynced.equals("SUCCESS")) {
+                    //update local db that synced yes
+                    int x = new Item_tax_mapBean().saveItem_tax_mapSync(aItemId, 1);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("registerItemCall:" + e.getMessage());
+        }
+    }
+
+    public String registerItem(Item aItem) {
+        String ReturnMsg = "";
+        //unit:101;currency:101;
+        try {
+            String json = "[\n"
+                    + "	{\n"
+                    + "	\"goodsName\": \"" + aItem.getDescription() + "\",\n"
+                    + "	\"goodsCode\": \"" + aItem.getItemId() + "\",\n"
+                    + "	\"measureUnit\": \"" + aItem.getUnitSymbol() + "\",\n"
+                    + "	\"unitPrice\": \"" + aItem.getUnitRetailsalePrice() + "\",\n"
+                    + "	\"currency\": \"" + aItem.getCurrencyCode() + "\",\n"
+                    + "	\"commodityCategoryId\": \"" + aItem.getItem_code_tax() + "\",\n"
+                    + "	\"haveExciseTax\": \"102\",\n"
+                    + "	\"description\": \"1\",\n"
+                    + "	\"stockPrewarning\": \"" + aItem.getReorderLevel() + "\",\n"
+                    + "	\"pieceMeasureUnit\": \"\",\n"
+                    + "	\"havePieceUnit\": \"\",\n"
+                    + "	\"pieceUnitPrice\": \"\",\n"
+                    + "	\"packageScaledValue\": \"\",\n"
+                    + "	\"pieceScaledValue\": \"\",\n"
+                    + "	\"exciseDutyCode\": \"\"\n"
+                    + "},\n"
+                    + "]";
+            com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
+            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_OFFLINE").getParameter_value());
+            String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T130", CompanySetting.getTaxIdentity());
+
+            ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
+            String output = response.getEntity(String.class);
+
+            JSONObject parentjsonObject = new JSONObject(output);
+            JSONObject dataobject = parentjsonObject.getJSONObject("returnStateInfo");
+
+            JSONObject dataobjectcontent = parentjsonObject.getJSONObject("data");
+            String content = dataobjectcontent.getString("content");
+
+            String DecryptedContent = new String(Base64.decodeBase64(content));
+            //System.out.println(DecryptedContent);
+            //System.out.println("returnMessage:" + dataobject.getString("returnMessage"));
+            ReturnMsg = dataobject.getString("returnMessage");
+        } catch (Exception ex) {
+            System.err.println("registerItem:" + ex.getMessage());
         }
         return ReturnMsg;
     }

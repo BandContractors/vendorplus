@@ -11310,19 +11310,20 @@ CREATE PROCEDURE sp_save_item_tax_map
 	IN in_item_tax_map_id bigint,
 	IN in_item_id bigint,
 	IN in_item_id_tax bigint,
-	IN in_item_code_tax varchar(50)
+	IN in_item_code_tax varchar(50),
+	IN in_is_synced int
 ) 
 BEGIN 
 	SET @cur_sys_datetime=null;
 	CALL sp_get_current_system_datetime(@cur_sys_datetime);
 
 	if (in_item_tax_map_id=0) then 
-		INSERT INTO item_tax_map(item_id,item_id_tax,item_code_tax,add_date) 
-		VALUES(in_item_id,in_item_id_tax,in_item_code_tax,@cur_sys_datetime);
+		INSERT INTO item_tax_map(item_id,item_id_tax,item_code_tax,add_date,is_synced) 
+		VALUES(in_item_id,in_item_id_tax,in_item_code_tax,@cur_sys_datetime,in_is_synced);
 	end if;
 
 	if (in_item_tax_map_id>0) then 
-		UPDATE item_tax_map SET item_id=in_item_id,item_id_tax=in_item_id_tax,item_code_tax=in_item_code_tax 
+		UPDATE item_tax_map SET item_id=in_item_id,item_id_tax=in_item_id_tax,item_code_tax=in_item_code_tax,is_synced=in_is_synced 
 		WHERE item_tax_map_id=in_item_tax_map_id;
 	end if;
 END//

@@ -20,5 +20,10 @@ CREATE  TABLE item_unspsc (
 
 LOAD DATA INFILE 'C:/item_unspsc.csv' INTO TABLE `item_unspsc` FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\r\n' IGNORE 1 LINES;
 
+ALTER TABLE item_tax_map ADD COLUMN is_synced INT(1) NULL DEFAULT 0;
+
+UPDATE company_setting SET developer_phone='0785485346/0392000708' WHERE company_setting_id=1;
+
+
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
-VALUES('scrpt_db_upgrade_11',23,Now(),'6.0','');
+VALUES('scrpt_db_upgrade_11',28,Now(),'6.0','');

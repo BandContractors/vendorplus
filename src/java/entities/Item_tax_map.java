@@ -15,6 +15,7 @@ public class Item_tax_map implements Serializable {
     private long item_id_tax;
     private String item_code_tax;
     private Date add_date;
+    private int is_synced;
 
     /**
      * @return the item_tax_map_id
@@ -84,6 +85,20 @@ public class Item_tax_map implements Serializable {
      */
     public void setAdd_date(Date add_date) {
         this.add_date = add_date;
+    }
+
+    /**
+     * @return the is_synced
+     */
+    public int getIs_synced() {
+        return is_synced;
+    }
+
+    /**
+     * @param is_synced the is_synced to set
+     */
+    public void setIs_synced(int is_synced) {
+        this.is_synced = is_synced;
     }
 
 }

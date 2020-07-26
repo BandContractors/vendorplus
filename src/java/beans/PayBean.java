@@ -344,6 +344,10 @@ public class PayBean implements Serializable {
             msg = "Date selected does not match any accounting period; please contact system administrator...";
             this.setActionMessage("Transaction NOT saved");
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+        } else if (pay.getPayRefNo().length()>100 || pay.getStatusDesc().length()>100) {
+            msg = "Please check [Reference no] and/or [Status Description]. Text cannot exceed 100 characters...";
+            this.setActionMessage("Payment NOT saved");
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
         } else {
             pay.setAddUserDetailId(new GeneralUserSetting().getCurrentUser().getUserDetailId());
             pay.setEditUserDetailId(new GeneralUserSetting().getCurrentUser().getUserDetailId());//will be made null by the SP
@@ -476,6 +480,10 @@ public class PayBean implements Serializable {
         } else if (!new AccLedgerBean().checkerBalancePass(pay.getPayMethodId(), pay.getAccChildAccountId(), pay.getCurrencyCode(), pay.getPaidAmount(), aPayTypeId, 0, 0, 0)) {
             msg = "Paying account is out of Funds...";
             this.setActionMessage("Transaction NOT saved");
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+        } else if (pay.getPayRefNo().length()>100 || pay.getStatusDesc().length()>100) {
+            msg = "Please check [Reference no] and/or [Status Description]. Text cannot exceed 100 characters...";
+            this.setActionMessage("Payment NOT saved");
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
         } else {
             pay.setAddUserDetailId(new GeneralUserSetting().getCurrentUser().getUserDetailId());

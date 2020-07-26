@@ -1,5 +1,6 @@
 package beans;
 
+import api_tax.efris_bean.StockManage;
 import connections.DBConnection;
 import entities.Item;
 import entities.Item_tax_map;
@@ -9,7 +10,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 
@@ -91,9 +91,10 @@ public class Item_tax_mapBean implements Serializable {
                         itmap4save.setItem_id(ItemId);
                         itmap4save.setItem_id_tax(ItemId);
                         itmap4save.setItem_code_tax(aItemCodeTax);
+                        itmap4save.setIs_synced(0);
                         int x = this.saveItem_tax_map(itmap4save);
-                        if (x == 1) {//register to URA
-
+                        if (x == 1 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {//register to URA
+                            new StockManage().registerItemCallThread(ItemId, aItemCodeTax);
                         }
                     } else {//update
                         if (itmap.getItem_code_tax().equals(aItemCodeTax)) {
@@ -103,9 +104,10 @@ public class Item_tax_mapBean implements Serializable {
                             itmap4save.setItem_id(ItemId);
                             itmap4save.setItem_id_tax(ItemId);
                             itmap4save.setItem_code_tax(aItemCodeTax);
+                            itmap4save.setIs_synced(0);
                             int x = this.saveItem_tax_map(itmap4save);
-                            if (x == 1) {//register to URA
-
+                            if (x == 1 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {//register to URA
+                                new StockManage().registerItemCallThread(ItemId, aItemCodeTax);
                             }
                         }
                     }
@@ -118,7 +120,7 @@ public class Item_tax_mapBean implements Serializable {
 
     public int saveItem_tax_map(Item_tax_map aItem_tax_map) {
         int saved = 0;
-        String sql = "{call sp_save_item_tax_map(?,?,?,?)}";
+        String sql = "{call sp_save_item_tax_map(?,?,?,?,?)}";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 CallableStatement cs = conn.prepareCall(sql);) {
@@ -143,11 +145,32 @@ public class Item_tax_mapBean implements Serializable {
                 } catch (NullPointerException npe) {
                     cs.setString("in_item_code_tax", "");
                 }
+                try {
+                    cs.setInt("in_is_synced", aItem_tax_map.getIs_synced());
+                } catch (NullPointerException npe) {
+                    cs.setInt("in_is_synced", 0);
+                }
                 cs.executeUpdate();
                 saved = 1;
             }
         } catch (SQLException se) {
             System.err.println("saveItem_tax_map:" + se.getMessage());
+        }
+        return saved;
+    }
+
+    public int saveItem_tax_mapSync(long aItemId, int aIs_synced) {
+        int saved = 0;
+        String sql = "UPDATE item_tax_map SET is_synced=" + aIs_synced + " WHERE item_id=" + aItemId;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            if (aItemId > 0) {
+                ps.executeUpdate();
+                saved = 1;
+            }
+        } catch (Exception e) {
+            System.err.println("saveItem_tax_mapSync:" + e.getMessage());
         }
         return saved;
     }
