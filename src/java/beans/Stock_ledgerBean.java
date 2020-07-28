@@ -7,6 +7,7 @@ import entities.Item;
 import entities.Item_tax_map;
 import entities.Stock;
 import entities.Stock_ledger;
+import entities.Transactor;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -270,13 +271,39 @@ public class Stock_ledgerBean implements Serializable {
                         stockadd.setItemId(aStock.getItemId());
                         stockadd.setCurrentqty(aQty);
                         stockadd.setUnitCost(aStock.getUnitCost());
-                        new StockManage().addStockCallThread(stockadd, stockledger.getTax_update_id());
+                        String SupplierTIN = "";
+                        String SupplierName = "";
+                        long SupplierId = 0;
+                        if (aTrans_type_id == 70) {//PRODUCTION
+                            try {
+                                SupplierId = new TransProductionBean().getTransProductionById(aTrans_id).getTransactor_id();
+                            } catch (Exception e) {
+                                SupplierId = 0;
+                            }
+                        } else {
+                            try {
+                                SupplierId = new TransBean().getTrans(aTrans_id).getTransactorId();
+                            } catch (Exception e) {
+                                SupplierId = 0;
+                            }
+                        }
+                        if (SupplierId == 0) {
+                            SupplierTIN = CompanySetting.getTaxIdentity();
+                            SupplierName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "PAYEE_NAME").getParameter_value();
+                        } else {
+                            Transactor tr = new TransactorBean().getTransactor(SupplierId);
+                            SupplierTIN = tr.getTaxIdentity();
+                            SupplierName = tr.getTransactorNames();
+                        }
+                        new StockManage().addStockCallThread(stockadd, stockledger.getTax_update_id(), SupplierTIN, SupplierName);
                     } else if (aAddSubtract.equals("Subtract")) {
                         Stock stocksub = new Stock();
                         stocksub.setItemId(aStock.getItemId());
                         stocksub.setCurrentqty(aQty);
                         stocksub.setUnitCost(aStock.getUnitCost());
-                        new StockManage().subtractStockCallThread(stocksub, stockledger.getTax_update_id());
+                        //get AdjustType
+                        String AdjustType = "105";//Others
+                        new StockManage().subtractStockCallThread(stocksub, stockledger.getTax_update_id(), AdjustType);
                     }
                 }
             }

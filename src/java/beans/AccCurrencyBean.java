@@ -3,6 +3,7 @@ package beans;
 import connections.DBConnection;
 import entities.AccCurrency;
 import entities.AccXrate;
+import entities.Acc_currency_tax_list;
 import entities.GroupRight;
 import entities.UserDetail;
 import java.io.Serializable;
@@ -35,25 +36,13 @@ public class AccCurrencyBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * @return the SavedCurrencyLists
-     */
-    public static List<AccCurrency> getSavedCurrencyLists() {
-        return SavedCurrencyLists;
-    }
-
-    /**
-     * @param aSavedCurrencyLists the SavedCurrencyLists to set
-     */
-    public static void setSavedCurrencyLists(List<AccCurrency> aSavedCurrencyLists) {
-        SavedCurrencyLists = aSavedCurrencyLists;
-    }
     private String ActionMessage = null;
     private List<AccCurrency> IsoCurrencyList;
     private AccCurrency IsoCurrencyObject;
     private int IsoCurrencyId;
     private List<AccCurrency> CurrencyList;
     private static List<AccCurrency> SavedCurrencyLists = new ArrayList<>();
+    private List<Acc_currency_tax_list> Acc_currency_tax_lists;
 
     public void setAccCurrencyFromResultset(AccCurrency acccurrency, ResultSet aResultSet) {
         try {
@@ -71,6 +60,11 @@ public class AccCurrencyBean implements Serializable {
                 acccurrency.setCurrencyCode(aResultSet.getString("currency_code"));
             } catch (NullPointerException npe) {
                 acccurrency.setCurrencyCode("");
+            }
+            try {
+                acccurrency.setCurrency_code_tax(aResultSet.getString("currency_code_tax"));
+            } catch (NullPointerException npe) {
+                acccurrency.setCurrency_code_tax("");
             }
             try {
                 acccurrency.setCurrencyNo(aResultSet.getInt("currency_no"));
@@ -160,7 +154,7 @@ public class AccCurrencyBean implements Serializable {
         } else if (aAccCurrency.getBuying() <= 0 || aAccCurrency.getSelling() <= 0) {
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Exchange rates for buying and selling cannot be 0(zero)..."));
         } else {
-            String sql = "{call sp_save_acc_currency(?,?,?,?,?,?,?,?,?,?,?,?)}";
+            String sql = "{call sp_save_acc_currency(?,?,?,?,?,?,?,?,?,?,?,?,?)}";
             try (
                     Connection conn = DBConnection.getMySQLConnection();
                     CallableStatement cs = conn.prepareCall(sql);) {
@@ -179,6 +173,11 @@ public class AccCurrencyBean implements Serializable {
                         cs.setString("in_currency_code", aAccCurrency.getCurrencyCode());
                     } catch (NullPointerException npe) {
                         cs.setString("in_currency_code", "");
+                    }
+                    try {
+                        cs.setString("in_currency_code_tax", aAccCurrency.getCurrency_code_tax());
+                    } catch (NullPointerException npe) {
+                        cs.setString("in_currency_code_tax", "");
                     }
                     try {
                         cs.setInt("in_currency_no", aAccCurrency.getCurrencyNo());
@@ -586,6 +585,7 @@ public class AccCurrencyBean implements Serializable {
             aAccCurrency.setAccCurrencyId(0);
             aAccCurrency.setCurrencyName("");
             aAccCurrency.setCurrencyCode("");
+            aAccCurrency.setCurrency_code_tax("");
             aAccCurrency.setCurrencyNo(0);
             aAccCurrency.setIsLocalCurrency(0);
             aAccCurrency.setIsActive(0);
@@ -606,6 +606,7 @@ public class AccCurrencyBean implements Serializable {
     public void copyAccCurrency(AccCurrency aFrom, AccCurrency aTo) {
         aTo.setAccCurrencyId(aFrom.getAccCurrencyId());
         aTo.setCurrencyCode(aFrom.getCurrencyCode());
+        aTo.setCurrency_code_tax(aFrom.getCurrency_code_tax());
         aTo.setCurrencyName(aFrom.getCurrencyName());
         aTo.setCurrencyNo(aFrom.getCurrencyNo());
         aTo.setIsLocalCurrency(aFrom.getIsLocalCurrency());
@@ -733,7 +734,7 @@ public class AccCurrencyBean implements Serializable {
         }
         return NumberFormat;
     }
-    
+
     public String getNumberFormatByCurrencyPlain(String aCurrencyCode) {
         String NumberFormat = "###.###";
         String DecimalPlaceSubStr = "";
@@ -751,6 +752,32 @@ public class AccCurrencyBean implements Serializable {
             NumberFormat = "###";
         }
         return NumberFormat;
+    }
+
+    public List<Acc_currency_tax_list> getAcc_currency_tax_lists() {
+        String sql;
+        sql = "SELECT * FROM acc_currency_tax_list ORDER BY currency_name_tax ASC";
+        ResultSet rs = null;
+        List<Acc_currency_tax_list> lst = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Acc_currency_tax_list obj = new Acc_currency_tax_list();
+                obj.setAcc_currency_list_id(rs.getInt("acc_currency_list_id"));
+                obj.setCurrency_code_tax(rs.getString("currency_code_tax"));
+                obj.setCurrency_name_tax(rs.getString("currency_name_tax"));
+                lst.add(obj);
+            }
+        } catch (Exception e) {
+            System.err.println("getAcc_currency_tax_lists:" + e.getMessage());
+        }
+        return lst;
+    }
+
+    public void refreshAcc_currency_tax_lists() {
+        this.setAcc_currency_tax_lists(this.getAcc_currency_tax_lists());
     }
 
     /**
@@ -821,6 +848,27 @@ public class AccCurrencyBean implements Serializable {
      */
     public void setCurrencyList(List<AccCurrency> CurrencyList) {
         this.CurrencyList = CurrencyList;
+    }
+
+    /**
+     * @param Acc_currency_tax_lists the Acc_currency_tax_lists to set
+     */
+    public void setAcc_currency_tax_lists(List<Acc_currency_tax_list> Acc_currency_tax_lists) {
+        this.Acc_currency_tax_lists = Acc_currency_tax_lists;
+    }
+
+    /**
+     * @return the SavedCurrencyLists
+     */
+    public static List<AccCurrency> getSavedCurrencyLists() {
+        return SavedCurrencyLists;
+    }
+
+    /**
+     * @param aSavedCurrencyLists the SavedCurrencyLists to set
+     */
+    public static void setSavedCurrencyLists(List<AccCurrency> aSavedCurrencyLists) {
+        SavedCurrencyLists = aSavedCurrencyLists;
     }
 
 }

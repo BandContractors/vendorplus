@@ -37,6 +37,7 @@ public class AccCurrency implements Serializable {
     private int rounding_mode;
     private String currency_unit;
     private String decimal_unit;
+    private String currency_code_tax;
 
     /**
      * @return the AccCurrencyId
@@ -274,6 +275,20 @@ public class AccCurrency implements Serializable {
      */
     public void setDecimal_unit(String decimal_unit) {
         this.decimal_unit = decimal_unit;
+    }
+
+    /**
+     * @return the currency_code_tax
+     */
+    public String getCurrency_code_tax() {
+        return currency_code_tax;
+    }
+
+    /**
+     * @param currency_code_tax the currency_code_tax to set
+     */
+    public void setCurrency_code_tax(String currency_code_tax) {
+        this.currency_code_tax = currency_code_tax;
     }
 
 }

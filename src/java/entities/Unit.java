@@ -22,6 +22,7 @@ public class Unit implements Serializable {
     private int UnitId;
     private String UnitName;
     private String UnitSymbol;
+    private String unit_symbol_tax;
 
     /**
      * @return the UnitId
@@ -63,6 +64,20 @@ public class Unit implements Serializable {
      */
     public void setUnitSymbol(String UnitSymbol) {
         this.UnitSymbol = UnitSymbol;
+    }
+
+    /**
+     * @return the unit_symbol_tax
+     */
+    public String getUnit_symbol_tax() {
+        return unit_symbol_tax;
+    }
+
+    /**
+     * @param unit_symbol_tax the unit_symbol_tax to set
+     */
+    public void setUnit_symbol_tax(String unit_symbol_tax) {
+        this.unit_symbol_tax = unit_symbol_tax;
     }
 
     

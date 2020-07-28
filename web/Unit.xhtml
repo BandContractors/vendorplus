@@ -20,6 +20,9 @@
             }
         </script> 
     </h:head>
+    <f:metadata>
+        <f:viewAction action="#{unitBean.refreshUnit_tax_lists()}"/>
+    </f:metadata>
     <f:event listener="#{navigationBean.checkAccessDenied('8', 'View')}" type="preRenderView" />
     <h:body>
         <ui:include src="Menu.xhtml"/>
@@ -29,36 +32,40 @@
                 <h:outputLabel styleClass="clsLabelTop" id="olblUnitHeader" value="Item - Unit"/>
             </h:panelGrid>
 
-            <h:panelGrid styleClass="clsGridMainInput" columns="4">
+            <h:panelGrid styleClass="clsGridMainInput" columns="6">
                 <h:outputLabel  value="Unit Name:"/>
-                <h:inputText styleClass="clsInput" id="itxtUnitName" value="#{unit.unitName}" autocomplete="off"> 
+                <h:inputText styleClass="clsInput" id="itxtUnitName" value="#{unit.unitName}" autocomplete="off" style="width: 250px;"> 
                 </h:inputText>
-                
-                 <h:outputLabel  value="Unit Symbol:"/>
-                 <h:inputText styleClass="clsInput" id="itxtUnitSymbol" value="#{unit.unitSymbol}" autocomplete="off">
+
+                <h:outputLabel  value="Unit Symbol:"/>
+                <h:inputText styleClass="clsInput" id="itxtUnitSymbol" value="#{unit.unitSymbol}" autocomplete="off" style="width: 100px;">
                 </h:inputText>
-                
+                <h:outputLabel  value="Tax Code:"/>
+                <h:selectOneMenu id="menuUnitTax" value="#{unit.unit_symbol_tax}" style="width: 300px;">
+                    <f:selectItem itemLabel="" itemValue=""/>
+                    <f:selectItems value="#{unitBean.unit_tax_lists}" var="ut" itemLabel="#{ut.unit_name_tax}" itemValue="#{ut.unit_symbol_tax}"/>
+                </h:selectOneMenu>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainCommands" columns="1">
-            <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
-                <h:commandButton styleClass="clsButton" id="cmdbSave" value="Save">
-                    <f:ajax listener="#{unitBean.saveUnit(unit)}" execute="@form" render="@form" />
-                </h:commandButton>
-                <h:commandButton styleClass="clsButton" id="cmdbClear" value="Clear">
-                    <f:ajax listener="#{unitBean.clearUnit(unit)}" execute="@form" render="@form" />
-                </h:commandButton>
-                <h:commandButton styleClass="clsButton" id="cmdbDelete" value="Delete" onclick="return confirmDelete();">
-                    <f:ajax listener="#{unitBean.deleteUnitByObject(unit)}" execute="@form" render="@form" />
-                </h:commandButton>
-            </h:panelGrid>
+                <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
+                    <h:commandButton styleClass="clsButton" id="cmdbSave" value="Save">
+                        <f:ajax listener="#{unitBean.saveUnit(unit)}" execute="@form" render="@form" />
+                    </h:commandButton>
+                    <h:commandButton styleClass="clsButton" id="cmdbClear" value="Clear">
+                        <f:ajax listener="#{unitBean.clearUnit(unit)}" execute="@form" render="@form" />
+                    </h:commandButton>
+                    <h:commandButton styleClass="clsButton" id="cmdbDelete" value="Delete" onclick="return confirmDelete();">
+                        <f:ajax listener="#{unitBean.deleteUnitByObject(unit)}" execute="@form" render="@form" />
+                    </h:commandButton>
+                </h:panelGrid>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainMessages" columns="1">
                 <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{unitBean.actionMessage}"/>
                 <h:messages id="msgsMainMessage" style="color: red"/><br/>
             </h:panelGrid>
-            
+
             <h:panelGrid styleClass="clsGridMainSearch" columns="1">
                 <h:outputLabel id="olblMainSearch" value="Search Unit"/>
                 <h:inputText id="itxtMainSearch" value="#{unitBean.searchUnitName}" autocomplete="off">
@@ -74,12 +81,19 @@
                     <!-- row record -->
                     #{u.unitName}
                 </p:column>
-                
+
                 <p:column>
                     <!-- column header -->
                     <f:facet name="header">Unit Symbol</f:facet>
                     <!-- row record -->
                     #{u.unitSymbol}
+                </p:column>
+
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Tax Code</f:facet>
+                    <!-- row record -->
+                    #{u.unit_symbol_tax}
                 </p:column>
 
                 <p:column>
@@ -91,7 +105,7 @@
                     </h:commandLink>
                     &nbsp;
                 </p:column>
-                
+
             </p:dataTable>
 
         </h:form>

@@ -1,10 +1,10 @@
 package beans;
 
-
 import sessions.GeneralUserSetting;
 import connections.DBConnection;
 import entities.Unit;
 import entities.GroupRight;
+import entities.Unit_tax_list;
 import entities.UserDetail;
 import java.io.Serializable;
 import java.sql.CallableStatement;
@@ -23,7 +23,6 @@ import javax.faces.context.FacesContext;
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author btwesigye
@@ -31,59 +30,63 @@ import javax.faces.context.FacesContext;
 @ManagedBean
 @SessionScoped
 public class UnitBean implements Serializable {
+    
     private static final long serialVersionUID = 1L;
-
+    
     private List<Unit> Units;
-    private String ActionMessage=null;
-    private Unit SelectedUnit=null;
+    private String ActionMessage = null;
+    private Unit SelectedUnit = null;
     private int SelectedUnitId;
-    private String SearchUnitName="";
+    private String SearchUnitName = "";
+    private List<Unit_tax_list> Unit_tax_lists;
     
     public void saveUnit(Unit unit) {
         String sql = null;
-        String msg=null;
-        UserDetail aCurrentUserDetail=new GeneralUserSetting().getCurrentUser();
-        List<GroupRight> aCurrentGroupRights=new GeneralUserSetting().getCurrentGroupRights();
-        GroupRightBean grb=new GroupRightBean();
-
-     if (unit.getUnitId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail,aCurrentGroupRights,"8", "Add")==0) {
-            msg="YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
+        String msg = null;
+        UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
+        List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
+        GroupRightBean grb = new GroupRightBean();
+        
+        if (unit.getUnitId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Add") == 0) {
+            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-     }else if (unit.getUnitId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail,aCurrentGroupRights,"8", "Edit")==0) {
-            msg="YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
+        } else if (unit.getUnitId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Edit") == 0) {
+            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-     }else if (unit.getUnitName().length()<=0 || unit.getUnitSymbol().length()<=0) {
-            msg="Unit Name and Symbol Cannot be empty...";
+        } else if (unit.getUnitName().length() <= 0 || unit.getUnitSymbol().length() <= 0) {
+            msg = "Unit Name and Symbol Cannot be empty...";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-     }else{
-        if (unit.getUnitId() == 0) {
-            sql = "{call sp_insert_unit(?,?)}";
-        } else if (unit.getUnitId() > 0) {
-            sql = "{call sp_update_unit(?,?,?)}";
-        }
-
-        try (
-                Connection conn = DBConnection.getMySQLConnection();
-                CallableStatement cs = conn.prepareCall(sql);) {
+        } else {
             if (unit.getUnitId() == 0) {
-                cs.setString(1, unit.getUnitName());
-                cs.setString(2, unit.getUnitSymbol());
-                cs.executeUpdate();
-                this.setActionMessage("Saved Successfully");
-                this.clearUnit(unit);
+                sql = "{call sp_insert_unit(?,?,?)}";
             } else if (unit.getUnitId() > 0) {
-                cs.setInt(1, unit.getUnitId());
-                cs.setString(2, unit.getUnitName());
-                cs.setString(3, unit.getUnitSymbol());
-                cs.executeUpdate();
-                this.setActionMessage("Saved Successfully");
-                this.clearUnit(unit);
+                sql = "{call sp_update_unit(?,?,?,?)}";
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-            this.setActionMessage("Unit NOT saved");
+            
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    CallableStatement cs = conn.prepareCall(sql);) {
+                if (unit.getUnitId() == 0) {
+                    cs.setString(1, unit.getUnitName());
+                    cs.setString(2, unit.getUnitSymbol());
+                    cs.setString(3, unit.getUnit_symbol_tax());
+                    cs.executeUpdate();
+                    this.setActionMessage("Saved Successfully");
+                    this.clearUnit(unit);
+                } else if (unit.getUnitId() > 0) {
+                    cs.setInt(1, unit.getUnitId());
+                    cs.setString(2, unit.getUnitName());
+                    cs.setString(3, unit.getUnitSymbol());
+                    cs.setString(4, unit.getUnit_symbol_tax());
+                    cs.executeUpdate();
+                    this.setActionMessage("Saved Successfully");
+                    this.clearUnit(unit);
+                }
+            } catch (SQLException se) {
+                System.err.println(se.getMessage());
+                this.setActionMessage("Unit NOT saved");
+            }
         }
-     } 
         
     }
     
@@ -100,6 +103,7 @@ public class UnitBean implements Serializable {
                 unit.setUnitId(rs.getInt("unit_id"));
                 unit.setUnitName(rs.getString("unit_name"));
                 unit.setUnitSymbol(rs.getString("unit_symbol"));
+                unit.setUnit_symbol_tax(rs.getString("unit_symbol_tax"));
                 return unit;
             } else {
                 return null;
@@ -116,56 +120,58 @@ public class UnitBean implements Serializable {
                 }
             }
         }
-
+        
     }
     
     public void deleteUnit() {
-         this.deleteUnitById(this.SelectedUnitId);
+        this.deleteUnitById(this.SelectedUnitId);
     }
+    
     public void deleteUnitByObject(Unit unit) {
-         this.deleteUnitById(unit.getUnitId());
+        this.deleteUnitById(unit.getUnitId());
     }
-
+    
     public void deleteUnitById(int UnitId) {
         String msg;
-        UserDetail aCurrentUserDetail=new GeneralUserSetting().getCurrentUser();
-        List<GroupRight> aCurrentGroupRights=new GeneralUserSetting().getCurrentGroupRights();
-        GroupRightBean grb=new GroupRightBean();
-
-        if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail,aCurrentGroupRights,"8", "Delete")==0) {
-            msg="YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
+        UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
+        List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
+        GroupRightBean grb = new GroupRightBean();
+        
+        if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Delete") == 0) {
+            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        }else
-        {
-        String sql = "DELETE FROM unit WHERE unit_id=?";
-        try (
-                Connection conn = DBConnection.getMySQLConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);) {
-            ps.setInt(1, UnitId);
-            ps.executeUpdate();
-            this.setActionMessage("Deleted Successfully!");
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-            this.setActionMessage("Unit NOT deleted");
+        } else {
+            String sql = "DELETE FROM unit WHERE unit_id=?";
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                ps.setInt(1, UnitId);
+                ps.executeUpdate();
+                this.setActionMessage("Deleted Successfully!");
+            } catch (SQLException se) {
+                System.err.println(se.getMessage());
+                this.setActionMessage("Unit NOT deleted");
+            }
         }
     }
-    }
-
+    
     public void displayUnit(Unit UnitFrom, Unit UnitTo) {
         UnitTo.setUnitId(UnitFrom.getUnitId());
         UnitTo.setUnitName(UnitFrom.getUnitName());
         UnitTo.setUnitSymbol(UnitFrom.getUnitSymbol());
+        UnitTo.setUnit_symbol_tax(UnitFrom.getUnit_symbol_tax());
     }
-
+    
     public void clearUnit(Unit unit) {
         unit.setUnitId(0);
         unit.setUnitName("");
         unit.setUnitSymbol("");
+        unit.setUnit_symbol_tax("");
     }
     
     public List<Unit> getUnits() {
         String sql;
-        sql="{call sp_search_unit_by_none()}";
+        sql = "{call sp_search_unit_by_none()}";
         ResultSet rs = null;
         Units = new ArrayList<Unit>();
         try (
@@ -177,6 +183,7 @@ public class UnitBean implements Serializable {
                 unit.setUnitId(rs.getInt("unit_id"));
                 unit.setUnitName(rs.getString("unit_name"));
                 unit.setUnitSymbol(rs.getString("unit_symbol"));
+                unit.setUnit_symbol_tax(rs.getString("unit_symbol_tax"));
                 Units.add(unit);
             }
         } catch (SQLException se) {
@@ -199,7 +206,7 @@ public class UnitBean implements Serializable {
      */
     public List<Unit> getUnitsByUnitName(String aUnitName) {
         String sql;
-        sql="{call sp_search_unit_by_name(?)}";
+        sql = "{call sp_search_unit_by_name(?)}";
         ResultSet rs = null;
         Units = new ArrayList<Unit>();
         try (
@@ -212,6 +219,7 @@ public class UnitBean implements Serializable {
                 unit.setUnitId(rs.getInt("unit_id"));
                 unit.setUnitName(rs.getString("unit_name"));
                 unit.setUnitSymbol(rs.getString("unit_symbol"));
+                unit.setUnit_symbol_tax(rs.getString("unit_symbol_tax"));
                 Units.add(unit);
             }
         } catch (SQLException se) {
@@ -226,6 +234,32 @@ public class UnitBean implements Serializable {
             }
         }
         return Units;
+    }
+    
+    public List<Unit_tax_list> getUnit_tax_lists() {
+        String sql;
+        sql = "SELECT * FROM unit_tax_list ORDER BY unit_name_tax ASC";
+        ResultSet rs = null;
+        List<Unit_tax_list> lst = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Unit_tax_list obj = new Unit_tax_list();
+                obj.setUnit_tax_list_id(rs.getInt("unit_tax_list_id"));
+                obj.setUnit_symbol_tax(rs.getString("unit_symbol_tax"));
+                obj.setUnit_name_tax(rs.getString("unit_name_tax"));
+                lst.add(obj);
+            }
+        } catch (Exception e) {
+            System.err.println("getUnit_tax_lists:" + e.getMessage());
+        }
+        return lst;
+    }
+    
+    public void refreshUnit_tax_lists() {
+        this.setUnit_tax_lists(this.getUnit_tax_lists());
     }
 
     /**
@@ -289,6 +323,13 @@ public class UnitBean implements Serializable {
      */
     public void setSearchUnitName(String SearchUnitName) {
         this.SearchUnitName = SearchUnitName;
+    }
+
+    /**
+     * @param Unit_tax_lists the Unit_tax_lists to set
+     */
+    public void setUnit_tax_lists(List<Unit_tax_list> Unit_tax_lists) {
+        this.Unit_tax_lists = Unit_tax_lists;
     }
     
 }

@@ -258,7 +258,8 @@ DELIMITER //
 CREATE PROCEDURE sp_insert_unit
 (
 	IN in_unit_name varchar(50),
-	IN in_unit_symbol varchar(5)
+	IN in_unit_symbol varchar(5),
+	IN in_unit_symbol_tax varchar(50)
 ) 
 BEGIN 
 	SET @new_id=0;
@@ -267,13 +268,15 @@ BEGIN
 	(
 		unit_id,
 		unit_name,
-		unit_symbol
+		unit_symbol,
+		unit_symbol_tax
 	) 
     VALUES
 	(
 		@new_id,
 		in_unit_name,
-		in_unit_symbol
+		in_unit_symbol,
+		in_unit_symbol_tax
 	); 
 END//
 DELIMITER ;
@@ -284,12 +287,14 @@ CREATE PROCEDURE sp_update_unit
 (
 	IN in_unit_id int,
 	IN in_unit_name varchar(50),
-	IN in_unit_symbol varchar(5)
+	IN in_unit_symbol varchar(5),
+	IN in_unit_symbol_tax varchar(50)
 ) 
 BEGIN 
 	UPDATE unit SET 
 		unit_name=in_unit_name,
-		unit_symbol=in_unit_symbol
+		unit_symbol=in_unit_symbol,
+		unit_symbol_tax=in_unit_symbol_tax 
 	WHERE unit_id=in_unit_id; 
 END//
 DELIMITER ;
@@ -9908,7 +9913,8 @@ CREATE PROCEDURE sp_save_acc_currency
 	IN in_decimal_places int,
 	IN in_rounding_mode int,
 	IN in_currency_unit varchar(50),
-	IN in_decimal_unit varchar(50)
+	IN in_decimal_unit varchar(50),
+	IN in_currency_code_tax varchar(50)
 ) 
 BEGIN 
 	SET @new_id=0;
@@ -9924,16 +9930,16 @@ BEGIN
 
 	if (in_acc_currency_id=0) then 
 		INSERT INTO acc_currency(currency_name,currency_code,currency_no,is_local_currency,is_active,is_deleted,
-		add_by,add_date,last_edit_by,last_edit_date,decimal_places,rounding_mode,currency_unit,decimal_unit) 
+		add_by,add_date,last_edit_by,last_edit_date,decimal_places,rounding_mode,currency_unit,decimal_unit,currency_code_tax) 
 		VALUES(in_currency_name,in_currency_code,in_currency_no,in_is_local_currency,in_is_active,in_is_deleted,
-		@in_user_detail_id,@cur_sys_datetime,null,null,in_decimal_places,in_rounding_mode,in_currency_unit,in_decimal_unit);
+		@in_user_detail_id,@cur_sys_datetime,null,null,in_decimal_places,in_rounding_mode,in_currency_unit,in_decimal_unit,in_currency_code_tax);
 	end if;
 
 	if (in_acc_currency_id>0) then 
 		UPDATE acc_currency SET currency_name=in_currency_name,currency_code=in_currency_code,currency_no=in_currency_no,
 		is_local_currency=in_is_local_currency,is_active=in_is_active,is_deleted=in_is_deleted,
 		last_edit_by=@in_user_detail_id,last_edit_date=@cur_sys_datetime,decimal_places=in_decimal_places,rounding_mode=in_rounding_mode,
-		currency_unit=in_currency_unit,decimal_unit=in_decimal_unit 
+		currency_unit=in_currency_unit,decimal_unit=in_decimal_unit,currency_code_tax=in_currency_code_tax 
 		WHERE acc_currency_id=in_acc_currency_id;
 	end if;
 END//
