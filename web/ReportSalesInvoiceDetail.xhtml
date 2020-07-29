@@ -145,7 +145,6 @@
                 <f:facet name="header">
                     <p:dataTable id="tblSummary" var="sm" value="#{transBean.transListSummary}">
                         <p:column headerText="" style="text-align: left;" rendered="#{transBean.fieldName.equals('')}">
-
                         </p:column>
                         <p:column headerText="Added By" style="text-align: left;" rendered="#{transBean.fieldName.equals('add_user_detail_id')}">
                             <h:outputText value="#{userDetailBean.getUserDetail(sm.addUserDetailId).userName}" rendered="#{sm.addUserDetailId>0}"/>
