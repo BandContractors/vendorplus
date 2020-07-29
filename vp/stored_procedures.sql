@@ -2744,7 +2744,7 @@ CREATE PROCEDURE sp_search_item_for_sale
 BEGIN  
 		SELECT * FROM item 
 		WHERE is_suspended='No' AND is_sale=1 AND is_asset=0 AND 
-		(description LIKE concat('%',in_code_desc,'%') OR item_code LIKE concat('%',in_code_desc,'%') OR alias_name LIKE concat('%',in_code_desc,'%')) 
+		(description LIKE concat('%',in_code_desc,'%') OR item_code LIKE concat('%',in_code_desc,'%') OR item_code LIKE concat('%',SUBSTRING(in_code_desc,2),'%') OR item_code LIKE concat('%',SUBSTRING(in_code_desc,3),'%') OR alias_name LIKE concat('%',in_code_desc,'%')) 
 		ORDER BY description ASC LIMIT 10;
 END//
 DELIMITER ;
@@ -2898,7 +2898,7 @@ CREATE PROCEDURE sp_search_item_for_receive_goods
 BEGIN  
 		SELECT * FROM item 
 		WHERE is_suspended='No' AND is_buy=1 AND is_sale=1 AND is_asset=0 AND is_track=1 AND 
-		(description LIKE concat('%',in_code_desc,'%') OR item_code LIKE concat('%',in_code_desc,'%') OR alias_name LIKE concat('%',in_code_desc,'%')) 
+		(description LIKE concat('%',in_code_desc,'%') OR item_code LIKE concat('%',in_code_desc,'%') OR item_code LIKE concat('%',SUBSTRING(in_code_desc,2),'%') OR item_code LIKE concat('%',SUBSTRING(in_code_desc,3),'%') OR alias_name LIKE concat('%',in_code_desc,'%')) 
 		ORDER BY description ASC LIMIT 10;
 END//
 DELIMITER ;
@@ -2952,7 +2952,7 @@ CREATE PROCEDURE sp_search_item_active_by_code
 ) 
 BEGIN 
 		SELECT * FROM view_item 
-		WHERE item_code=in_item_code AND is_suspended='No' 
+		WHERE (item_code=in_item_code OR item_code=SUBSTRING(in_item_code,2) OR item_code=SUBSTRING(in_item_code,3)) AND is_suspended='No' 
 		ORDER BY description ASC;
 END//
 DELIMITER ;
