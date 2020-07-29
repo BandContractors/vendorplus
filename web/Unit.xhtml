@@ -22,6 +22,7 @@
     </h:head>
     <f:metadata>
         <f:viewAction action="#{unitBean.refreshUnit_tax_lists()}"/>
+        <f:viewAction action="#{unitBean.clearUnit(unit,unitBean.unit_tax_listObj)}"/>
     </f:metadata>
     <f:event listener="#{navigationBean.checkAccessDenied('8', 'View')}" type="preRenderView" />
     <h:body>
@@ -41,19 +42,31 @@
                 <h:inputText styleClass="clsInput" id="itxtUnitSymbol" value="#{unit.unitSymbol}" autocomplete="off" style="width: 100px;">
                 </h:inputText>
                 <h:outputLabel  value="Tax Code:"/>
-                <h:selectOneMenu id="menuUnitTax" value="#{unit.unit_symbol_tax}" style="width: 300px;">
-                    <f:selectItem itemLabel="" itemValue=""/>
-                    <f:selectItems value="#{unitBean.unit_tax_lists}" var="ut" itemLabel="#{ut.unit_name_tax}" itemValue="#{ut.unit_symbol_tax}"/>
-                </h:selectOneMenu>
+                <p:autoComplete id="autcUnitTax" widgetVar="WautcItem" value="#{unitBean.unit_tax_listObj}"  
+                                completeMethod="#{unitBean.searchUnit_tax_lists}" 
+                                var="unt" 
+                                itemLabel="#{unt.unit_name_tax}" 
+                                itemValue="#{unt}" 
+                                converter="Unit_tax_listConverter" style="text-align: left" 
+                                forceSelection="true" queryDelay="0" 
+                                onkeypress="if (event.keyCode == 13)
+                                            return false;" >
+                    <p:column headerText="Code" style="text-align: left" >  
+                        #{unt.unit_symbol_tax} 
+                    </p:column>
+                    <p:column headerText="Name" style="text-align: left" >  
+                        #{unt.unit_name_tax} 
+                    </p:column>
+                </p:autoComplete>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainCommands" columns="1">
                 <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
                     <h:commandButton styleClass="clsButton" id="cmdbSave" value="Save">
-                        <f:ajax listener="#{unitBean.saveUnit(unit)}" execute="@form" render="@form" />
+                        <f:ajax listener="#{unitBean.saveUnit(unit,unitBean.unit_tax_listObj)}" execute="@form" render="@form" />
                     </h:commandButton>
                     <h:commandButton styleClass="clsButton" id="cmdbClear" value="Clear">
-                        <f:ajax listener="#{unitBean.clearUnit(unit)}" execute="@form" render="@form" />
+                        <f:ajax listener="#{unitBean.clearUnit(unit,unitBean.unit_tax_listObj)}" execute="@form" render="@form" />
                     </h:commandButton>
                     <h:commandButton styleClass="clsButton" id="cmdbDelete" value="Delete" onclick="return confirmDelete();">
                         <f:ajax listener="#{unitBean.deleteUnitByObject(unit)}" execute="@form" render="@form" />
@@ -101,7 +114,7 @@
                     <f:facet name="header">Action</f:facet>
                     <!-- row record -->
                     <h:commandLink value="Edit">
-                        <f:ajax listener="#{unitBean.displayUnit(u,unit)}" execute="@form" render="@form"/>
+                        <f:ajax listener="#{unitBean.displayUnit(u,unit,unitBean.unit_tax_listObj)}" execute="@form" render="@form"/>
                     </h:commandLink>
                     &nbsp;
                 </p:column>

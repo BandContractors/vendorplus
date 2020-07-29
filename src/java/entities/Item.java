@@ -28,6 +28,7 @@ public class Item implements Serializable {
     private String SubCategoryName;
     private int UnitId;
     private String UnitSymbol;
+    private String Unit_symbol_tax;
     private int ReorderLevel;
     private double UnitCostPrice;
     private double UnitRetailsalePrice;
@@ -38,6 +39,7 @@ public class Item implements Serializable {
     private int CountItems;//for report only
     private String ItemType;
     private String CurrencyCode;
+    private String currency_code_tax;
     private int IsGeneral;
     private String AssetType;
     private int IsBuy;
@@ -774,6 +776,34 @@ public class Item implements Serializable {
      */
     public void setItem_code_tax(String item_code_tax) {
         this.item_code_tax = item_code_tax;
+    }
+
+    /**
+     * @return the Unit_symbol_tax
+     */
+    public String getUnit_symbol_tax() {
+        return Unit_symbol_tax;
+    }
+
+    /**
+     * @param Unit_symbol_tax the Unit_symbol_tax to set
+     */
+    public void setUnit_symbol_tax(String Unit_symbol_tax) {
+        this.Unit_symbol_tax = Unit_symbol_tax;
+    }
+
+    /**
+     * @return the currency_code_tax
+     */
+    public String getCurrency_code_tax() {
+        return currency_code_tax;
+    }
+
+    /**
+     * @param currency_code_tax the currency_code_tax to set
+     */
+    public void setCurrency_code_tax(String currency_code_tax) {
+        this.currency_code_tax = currency_code_tax;
     }
 
 }

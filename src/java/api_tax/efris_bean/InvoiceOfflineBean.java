@@ -22,6 +22,7 @@ import beans.TransBean;
 import beans.TransItemBean;
 import beans.Transaction_tax_mapBean;
 import beans.TransactorBean;
+import beans.UnitBean;
 import beans.UserDetailBean;
 import com.google.gson.Gson;
 import com.sun.jersey.api.client.ClientResponse;
@@ -228,7 +229,17 @@ public class InvoiceOfflineBean {
                     gd.setItem(itm.getDescription());//Hima Cement
                     gd.setItemCode(Long.toString(itm.getItemId()));//147
                     gd.setQty(Double.toString(transitems.get(i).getItemQty()));
-                    gd.setUnitOfMeasure(itm.getUnitSymbol());
+                    //gd.setUnitOfMeasure(itm.getUnitSymbol());
+                    try {
+                        String UnitSymbolTax = new UnitBean().getUnit(itm.getUnitId()).getUnit_symbol_tax();
+                        if (null == UnitSymbolTax) {
+                            gd.setUnitOfMeasure("PCE");
+                        } else {
+                            gd.setUnitOfMeasure(UnitSymbolTax);
+                        }
+                    } catch (Exception e) {
+                        gd.setUnitOfMeasure("PCE");
+                    }
                     gd.setUnitPrice(Double.toString(transitems.get(i).getUnitPriceIncVat()));
                     //gd.setDiscountTotal(Double.toString(transitems.get(i).getUnitTradeDiscount()));
                     gd.setTax(Double.toString(transitems.get(i).getUnitVat()));

@@ -30,23 +30,24 @@ import javax.faces.context.FacesContext;
 @ManagedBean
 @SessionScoped
 public class UnitBean implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     private List<Unit> Units;
     private String ActionMessage = null;
     private Unit SelectedUnit = null;
     private int SelectedUnitId;
     private String SearchUnitName = "";
     private List<Unit_tax_list> Unit_tax_lists;
-    
-    public void saveUnit(Unit unit) {
+    private Unit_tax_list Unit_tax_listObj = new Unit_tax_list();
+
+    public void saveUnit(Unit unit, Unit_tax_list aUnit_tax_listObj) {
         String sql = null;
         String msg = null;
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
-        
+
         if (unit.getUnitId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Add") == 0) {
             msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
@@ -57,12 +58,17 @@ public class UnitBean implements Serializable {
             msg = "Unit Name and Symbol Cannot be empty...";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
         } else {
+            if (null != aUnit_tax_listObj) {
+                unit.setUnit_symbol_tax(aUnit_tax_listObj.getUnit_symbol_tax());
+            } else {
+                unit.setUnit_symbol_tax("");
+            }
             if (unit.getUnitId() == 0) {
                 sql = "{call sp_insert_unit(?,?,?)}";
             } else if (unit.getUnitId() > 0) {
                 sql = "{call sp_update_unit(?,?,?,?)}";
             }
-            
+
             try (
                     Connection conn = DBConnection.getMySQLConnection();
                     CallableStatement cs = conn.prepareCall(sql);) {
@@ -72,7 +78,7 @@ public class UnitBean implements Serializable {
                     cs.setString(3, unit.getUnit_symbol_tax());
                     cs.executeUpdate();
                     this.setActionMessage("Saved Successfully");
-                    this.clearUnit(unit);
+                    this.clearUnit(unit, aUnit_tax_listObj);
                 } else if (unit.getUnitId() > 0) {
                     cs.setInt(1, unit.getUnitId());
                     cs.setString(2, unit.getUnitName());
@@ -80,16 +86,16 @@ public class UnitBean implements Serializable {
                     cs.setString(4, unit.getUnit_symbol_tax());
                     cs.executeUpdate();
                     this.setActionMessage("Saved Successfully");
-                    this.clearUnit(unit);
+                    this.clearUnit(unit, aUnit_tax_listObj);
                 }
             } catch (SQLException se) {
                 System.err.println(se.getMessage());
                 this.setActionMessage("Unit NOT saved");
             }
         }
-        
+
     }
-    
+
     public Unit getUnit(int aUnitId) {
         String sql = "{call sp_search_unit_by_id(?)}";
         ResultSet rs = null;
@@ -120,23 +126,22 @@ public class UnitBean implements Serializable {
                 }
             }
         }
-        
     }
-    
+
     public void deleteUnit() {
         this.deleteUnitById(this.SelectedUnitId);
     }
-    
+
     public void deleteUnitByObject(Unit unit) {
         this.deleteUnitById(unit.getUnitId());
     }
-    
+
     public void deleteUnitById(int UnitId) {
         String msg;
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
-        
+
         if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Delete") == 0) {
             msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
@@ -154,21 +159,48 @@ public class UnitBean implements Serializable {
             }
         }
     }
-    
-    public void displayUnit(Unit UnitFrom, Unit UnitTo) {
-        UnitTo.setUnitId(UnitFrom.getUnitId());
-        UnitTo.setUnitName(UnitFrom.getUnitName());
-        UnitTo.setUnitSymbol(UnitFrom.getUnitSymbol());
-        UnitTo.setUnit_symbol_tax(UnitFrom.getUnit_symbol_tax());
+
+    public void displayUnit(Unit UnitFrom, Unit UnitTo, Unit_tax_list aUnit_tax_listObj) {
+        try {
+            this.clearUnit(UnitTo, aUnit_tax_listObj);
+            UnitTo.setUnitId(UnitFrom.getUnitId());
+            UnitTo.setUnitName(UnitFrom.getUnitName());
+            UnitTo.setUnitSymbol(UnitFrom.getUnitSymbol());
+            UnitTo.setUnit_symbol_tax(UnitFrom.getUnit_symbol_tax());
+        } catch (Exception e) {
+            System.out.println("displayUnit-a:" + e.getMessage());
+        }
+
+        try {
+            if (UnitTo.getUnit_symbol_tax().length() > 0) {
+                this.setUnit_tax_listObj(this.findUnit_tax_list(UnitTo.getUnit_symbol_tax()));
+                //this.Unit_tax_listObj.setUnit_tax_list_id(utl.getUnit_tax_list_id());
+                //this.Unit_tax_listObj.setUnit_symbol_tax(utl.getUnit_symbol_tax());
+                //this.Unit_tax_listObj.setUnit_name_tax(utl.getUnit_name_tax());
+            }
+        } catch (Exception e) {
+            System.out.println("displayUnit-b:" + e.getMessage());
+        }
     }
-    
-    public void clearUnit(Unit unit) {
+
+    public void clearUnit(Unit unit, Unit_tax_list aUnit_tax_listObj) {
         unit.setUnitId(0);
         unit.setUnitName("");
         unit.setUnitSymbol("");
         unit.setUnit_symbol_tax("");
+        if (null != aUnit_tax_listObj) {
+            this.clearUnit_tax_list(aUnit_tax_listObj);
+        }
     }
-    
+
+    public void clearUnit_tax_list(Unit_tax_list aUnit_tax_listObj) {
+        if (null != aUnit_tax_listObj) {
+            aUnit_tax_listObj.setUnit_tax_list_id(0);
+            aUnit_tax_listObj.setUnit_symbol_tax("");
+            aUnit_tax_listObj.setUnit_name_tax("");
+        }
+    }
+
     public List<Unit> getUnits() {
         String sql;
         sql = "{call sp_search_unit_by_none()}";
@@ -235,7 +267,7 @@ public class UnitBean implements Serializable {
         }
         return Units;
     }
-    
+
     public List<Unit_tax_list> getUnit_tax_lists() {
         String sql;
         sql = "SELECT * FROM unit_tax_list ORDER BY unit_name_tax ASC";
@@ -257,7 +289,72 @@ public class UnitBean implements Serializable {
         }
         return lst;
     }
-    
+
+    public Unit_tax_list findUnit_tax_list(int aUnit_tax_list_id) {
+        String sql = "SELECT * FROM unit_tax_list WHERE unit_tax_list_id=" + aUnit_tax_list_id;
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                Unit_tax_list obj = new Unit_tax_list();
+                obj.setUnit_tax_list_id(rs.getInt("unit_tax_list_id"));
+                obj.setUnit_symbol_tax(rs.getString("unit_symbol_tax"));
+                obj.setUnit_name_tax(rs.getString("unit_name_tax"));
+                return obj;
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            System.err.println("findUnit_tax_list:" + e.getMessage());
+            return null;
+        }
+    }
+
+    public Unit_tax_list findUnit_tax_list(String aUnit_code) {
+        String sql = "SELECT * FROM unit_tax_list WHERE unit_symbol_tax='" + aUnit_code + "'";
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                Unit_tax_list obj = new Unit_tax_list();
+                obj.setUnit_tax_list_id(rs.getInt("unit_tax_list_id"));
+                obj.setUnit_symbol_tax(rs.getString("unit_symbol_tax"));
+                obj.setUnit_name_tax(rs.getString("unit_name_tax"));
+                return obj;
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            System.err.println("findUnit_tax_list:" + e.getMessage());
+            return null;
+        }
+    }
+
+    public List<Unit_tax_list> searchUnit_tax_lists(String Query) {
+        String sql = "SELECT * FROM unit_tax_list WHERE unit_name_tax LIKE '%" + Query + "%' OR unit_symbol_tax LIKE '%" + Query + "%' LIMIT 10";
+        ResultSet rs = null;
+        List<Unit_tax_list> lst = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Unit_tax_list obj = new Unit_tax_list();
+                obj.setUnit_tax_list_id(rs.getInt("unit_tax_list_id"));
+                obj.setUnit_symbol_tax(rs.getString("unit_symbol_tax"));
+                obj.setUnit_name_tax(rs.getString("unit_name_tax"));
+                lst.add(obj);
+            }
+        } catch (Exception e) {
+            System.err.println("searchUnit_tax_lists:" + e.getMessage());
+        }
+        return lst;
+    }
+
     public void refreshUnit_tax_lists() {
         this.setUnit_tax_lists(this.getUnit_tax_lists());
     }
@@ -331,5 +428,19 @@ public class UnitBean implements Serializable {
     public void setUnit_tax_lists(List<Unit_tax_list> Unit_tax_lists) {
         this.Unit_tax_lists = Unit_tax_lists;
     }
-    
+
+    /**
+     * @return the Unit_tax_listObj
+     */
+    public Unit_tax_list getUnit_tax_listObj() {
+        return Unit_tax_listObj;
+    }
+
+    /**
+     * @param Unit_tax_listObj the Unit_tax_listObj to set
+     */
+    public void setUnit_tax_listObj(Unit_tax_list Unit_tax_listObj) {
+        this.Unit_tax_listObj = Unit_tax_listObj;
+    }
+
 }

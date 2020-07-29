@@ -7,6 +7,7 @@ package api_tax.efris_bean;
 
 import api_tax.efris.GeneralUtilities;
 import api_tax.efris.innerclasses.ItemTax;
+import beans.AccCurrencyBean;
 import beans.ItemBean;
 import beans.Item_tax_mapBean;
 import beans.Parameter_listBean;
@@ -18,8 +19,6 @@ import com.sun.jersey.api.client.WebResource;
 import entities.CompanySetting;
 import entities.Item;
 import entities.Stock;
-import entities.Stock_ledger;
-import entities.Transactor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -42,7 +41,7 @@ public class StockManage {
                 String id = this.getItemIdFromTax(Long.toString(aStock.getItemId()));
                 if (id.length() > 0 && record4Sync == 1) {
                     //2. update tax db and check if synced yes
-                    String recordSynced = this.addStock(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()),aSupplierTin,aSupplierName);
+                    String recordSynced = this.addStock(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()), aSupplierTin, aSupplierName);
                     if (recordSynced.equals("SUCCESS")) {
                         //3. update local db that synced yes
                         int x = new Stock_ledgerBean().updateTaxStock_ledger(aTax_update_id, 1, 1);
@@ -54,7 +53,7 @@ public class StockManage {
         }
     }
 
-    public void subtractStockCall(Stock aStock, long aTax_update_id,String aAdjustType) {
+    public void subtractStockCall(Stock aStock, long aTax_update_id, String aAdjustType) {
         try {
             if (null != aStock && aTax_update_id > 0) {
                 //1. indicate record4Sync
@@ -62,7 +61,7 @@ public class StockManage {
                 String id = this.getItemIdFromTax(Long.toString(aStock.getItemId()));
                 if (id.length() > 0 && record4Sync == 1) {
                     //2. update tax db and check if synced yes
-                    String recordSynced = this.subtractStock(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()),aAdjustType);
+                    String recordSynced = this.subtractStock(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()), aAdjustType);
                     if (recordSynced.equals("SUCCESS")) {
                         //3. update local db that synced yes
                         int x = new Stock_ledgerBean().updateTaxStock_ledger(aTax_update_id, 1, 1);
@@ -79,7 +78,7 @@ public class StockManage {
             Runnable task = new Runnable() {
                 @Override
                 public void run() {
-                    addStockCall(aStock, aTax_update_id,aSupplierTin,aSupplierName);
+                    addStockCall(aStock, aTax_update_id, aSupplierTin, aSupplierName);
                 }
             };
             Executor e = Executors.newSingleThreadExecutor();
@@ -171,7 +170,7 @@ public class StockManage {
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
             WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_OFFLINE").getParameter_value());
             String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T131", CompanySetting.getTaxIdentity());
-            System.out.println("json:" + json);
+            //System.out.println("json:" + json);
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             String output = response.getEntity(String.class);
 
@@ -182,8 +181,8 @@ public class StockManage {
             String content = dataobjectcontent.getString("content");
 
             String DecryptedContent = new String(Base64.decodeBase64(content));
-            System.out.println("DecryptedContent:" + DecryptedContent);
-            System.out.println("returnMessage--ehh:" + dataobject.getString("returnMessage"));
+            //System.out.println("DecryptedContent:" + DecryptedContent);
+            //System.out.println("returnMessage--ehh:" + dataobject.getString("returnMessage"));
             ReturnMsg = dataobject.getString("returnMessage");
         } catch (Exception ex) {
             System.err.println("addStock:" + ex.getMessage());
@@ -224,6 +223,7 @@ public class StockManage {
 
             String DecryptedContent = new String(Base64.decodeBase64(content));
             ReturnMsg = dataobject.getString("returnMessage");
+            //System.out.println("ReturnMsg:" + ReturnMsg);
         } catch (Exception ex) {
             System.err.println("subtractStock:" + ex.getMessage());
         }
@@ -250,11 +250,33 @@ public class StockManage {
             Item item = new ItemBean().getItem(aItemId);
             if (null != item) {
                 item.setItem_code_tax(aItemCodeTax);
+                //unit
                 try {
-                    item.setUnitSymbol(new UnitBean().getUnit(item.getUnitId()).getUnitSymbol());
+                    String UnitSymbolTax = new UnitBean().getUnit(item.getUnitId()).getUnit_symbol_tax();
+                    if (null == UnitSymbolTax) {
+                        item.setUnit_symbol_tax("PCE");
+                    } else {
+                        item.setUnit_symbol_tax(UnitSymbolTax);
+                    }
                 } catch (Exception e) {
-                    item.setUnitSymbol("");
+                    item.setUnit_symbol_tax("PCE");
                 }
+                //currency
+                try {
+                    String CurCodeTax = new AccCurrencyBean().getCurrency(item.getCurrencyCode()).getCurrency_code_tax();
+                    if (null == CurCodeTax) {
+                        item.setCurrency_code_tax("101");
+                    } else {
+                        item.setCurrency_code_tax(CurCodeTax);
+                    }
+                } catch (Exception e) {
+                    item.setCurrency_code_tax("101");
+                }
+                //reorder level
+                if (item.getReorderLevel() == 0) {
+                    item.setReorderLevel(1);
+                }
+                //register
                 String recordSynced = this.registerItem(item);
                 if (recordSynced.equals("SUCCESS")) {
                     //update local db that synced yes
@@ -268,15 +290,14 @@ public class StockManage {
 
     public String registerItem(Item aItem) {
         String ReturnMsg = "";
-        //unit:101;currency:101;
         try {
             String json = "[\n"
                     + "	{\n"
                     + "	\"goodsName\": \"" + aItem.getDescription() + "\",\n"
                     + "	\"goodsCode\": \"" + aItem.getItemId() + "\",\n"
-                    + "	\"measureUnit\": \"" + aItem.getUnitSymbol() + "\",\n"
+                    + "	\"measureUnit\": \"" + aItem.getUnit_symbol_tax() + "\",\n"
                     + "	\"unitPrice\": \"" + aItem.getUnitRetailsalePrice() + "\",\n"
-                    + "	\"currency\": \"101\",\n"
+                    + "	\"currency\": \"" + aItem.getCurrency_code_tax() + "\",\n"
                     + "	\"commodityCategoryId\": \"" + aItem.getItem_code_tax() + "\",\n"
                     + "	\"haveExciseTax\": \"102\",\n"
                     + "	\"description\": \"1\",\n"
@@ -292,7 +313,7 @@ public class StockManage {
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
             WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_OFFLINE").getParameter_value());
             String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T130", CompanySetting.getTaxIdentity());
-            System.out.println("json:" + json);
+            //System.out.println("json:" + json);
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             String output = response.getEntity(String.class);
 
@@ -303,8 +324,8 @@ public class StockManage {
             String content = dataobjectcontent.getString("content");
 
             String DecryptedContent = new String(Base64.decodeBase64(content));
-            System.out.println("DecryptedContent:" + DecryptedContent);
-            System.out.println("returnMessage:" + dataobject.getString("returnMessage"));
+            //System.out.println("DecryptedContent>:" + DecryptedContent);
+            //System.out.println("returnMessage>:" + dataobject.getString("returnMessage"));
             ReturnMsg = dataobject.getString("returnMessage");
         } catch (Exception ex) {
             System.err.println("registerItem:" + ex.getMessage());
