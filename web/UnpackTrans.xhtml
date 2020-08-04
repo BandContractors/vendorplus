@@ -22,7 +22,7 @@
         </script> 
     </h:head>
     <f:metadata>
-        <f:viewAction action="#{navigationBean.checkAccessDenied(utilityBean.convertIntAsString(7), 'View')}"/>
+        <f:viewAction action="#{navigationBean.checkAccessDenied(utilityBean.convertIntAsString(9), 'View')}"/>
         <f:viewAction action="#{navigationBean.checkLicenseExpired()}"/>
         <f:viewAction action="#{transBean.initClearAllCEC('PARENT',trans,transItemBean.activeTransItems,transItem,itemBean.selectedItem,null,2,null,userDetailBean.selectedUserDetail,null)}" />
         <f:viewAction action="#{stockBean.clearLists()}"/>
@@ -98,7 +98,7 @@
                 <h:outputLabel styleClass="clsLabelTransItem" value="Unit"/>
                 <h:outputLabel styleClass="clsLabelTransItem" value=""/>
                 <h:outputLabel styleClass="clsLabelTransItem" value="Qty.UnPacked"/>
-                <h:selectOneMenu id="menuSmallItem" styleClass="clsMenu" value="#{transItem.itemId2}">
+                <h:selectOneMenu id="menuSmallItem" styleClass="clsMenu" value="#{transItem.itemId2}" style="width: 245px;">
                     <f:selectItem itemLabel="" itemValue="0"/>
                     <f:selectItems value="#{itemMapBean.getItemMapsByBigItemId(transItem.itemId)}" var="im2" itemLabel="#{itemBean.getItem(im2.smallItemId).description}" itemValue="#{im2.smallItemId}"/>
                     <f:ajax event="change" listener="#{transItemBean.calUnpackedQty(transItem)}" execute="@this itxtQty" render="itxtUnit2 itxtQty2"/>
@@ -116,10 +116,10 @@
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
-                        <p:ajax listener="#{transItemBean.addTransItemUNPACK(statusBean,transItemBean.activeTransItems,transItem,trans,itemBean.selectedItem)}" process="@form" update="@form"/>
+                        <p:ajax listener="#{transItemBean.addTransItemUNPACK(statusBean,transItemBean.activeTransItems,transItem,trans,itemBean.selectedItem)}" process="@form" update="gridTransItem gridItemStatus pnlgMessage"/>
                     </p:commandButton>
                     <p:commandButton styleClass="clsButtonBig" id="cmdbClear" value="CLEAR (ALT+C)" accesskey="c">
-                        <p:ajax listener="#{transBean.clearAll(trans,transItemBean.activeTransItems,transItem,itemBean.selectedItem,transactorBean.selectedTransactor,2,null)}" process="@form" update="@form"/>
+                        <p:ajax listener="#{transBean.clearAll(trans,transItemBean.activeTransItems,transItem,itemBean.selectedItem,transactorBean.selectedTransactor,2,null)}" process="@form" update="gridTransItem gridItemStatus pnlgMessage"/>
                     </p:commandButton>
                 </h:panelGrid>
             </h:panelGrid>
@@ -129,7 +129,7 @@
                 <h:outputLabel id="olblItemNotAddedStstus" class="clsFailStatus" value="#{statusBean.itemNotAddedStatus}" rendered="#{statusBean.showItemNotAddedStatus==1}"/>
             </h:panelGrid>
 
-            <h:panelGrid styleClass="clsGridMainMessages" columns="1">
+            <h:panelGrid id="pnlgMessage" styleClass="clsGridMainMessages" columns="1">
                 <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{transBean.actionMessage}"/>
                 <h:messages id="msgsMainMessage" style="color: red"/><br/>
             </h:panelGrid>

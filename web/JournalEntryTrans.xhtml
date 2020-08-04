@@ -41,7 +41,7 @@
                 <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:Accounts↑↓"/>
             </h:panelGrid>
 
-            <h:panelGrid styleClass="clsGridMainInput" columns="10">
+            <h:panelGrid id="pnlgInput1" styleClass="clsGridMainInput" columns="10">
                 <h:outputLabel  value="From:"/>
                 <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}" style="width: 100px;"/>
                 <h:outputLabel  value="Currency:"/>
@@ -212,15 +212,15 @@
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
-                        <f:ajax listener="#{transBean.saveTrans(trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,null,null,null,transBean.authorisedByUserDetail,null)}" execute="@form" render="@form"/>
+                        <p:ajax listener="#{transBean.saveTransCEC('PARENT',generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,'',trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,null,null,null,null,null)}" process="@form" update="pnlgInput1 gridTransItem gridItemStatus dtblTransactionItem pgrdTotals pnlgMessage"/>
                     </p:commandButton>
-                    <p:commandButton styleClass="clsButtonBig" id="cmdbClear" value="CLEAR (ALT+C)" accesskey="c">
-                        <f:ajax listener="#{transBean.clearAll2(trans,transItemBean.activeTransItems,transItem,itemBean.selectedItem,transactorBean.selectedTransactor,2,null,null,null,transBean.authorisedByUserDetail,transItemBean.selectedAccCoa)}" execute="@form" render="@form"/>
+                    <p:commandButton id="cmdbClear" styleClass="clsButtonBig" value="CLEAR (ALT+C)" accesskey="c">
+                        <p:ajax listener="#{transBean.clearAll2(trans,transItemBean.activeTransItems,transItem,itemBean.selectedItem,transactorBean.selectedTransactor,2,null,null,null,null,null)}" process="@form" update="pnlgInput1 gridTransItem gridItemStatus dtblTransactionItem pgrdTotals pnlgMessage"/>
                     </p:commandButton>
                 </h:panelGrid>
             </h:panelGrid>
 
-            <h:panelGrid styleClass="clsGridMainMessages" columns="1">
+            <h:panelGrid id="pnlgMessage" styleClass="clsGridMainMessages" columns="1">
                 <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{transBean.actionMessage}"/>
                 <h:messages id="msgsMainMessage" style="color: red"/><br/>
             </h:panelGrid>

@@ -6866,7 +6866,8 @@ public class TransItemBean implements Serializable {
                     aActiveTransItems.add(ti);
                 }
                 TransBean transB = new TransBean();
-                transB.saveTrans(NewTrans, aActiveTransItems, null, null, null, null, null, null);
+                //transB.saveTrans(NewTrans, aActiveTransItems, null, null, null, null, null, null);
+                transB.saveTransCEC("PARENT", new GeneralUserSetting().getCurrentStore().getStoreId(), new GeneralUserSetting().getCurrentTransactionTypeId(), new GeneralUserSetting().getCurrentTransactionReasonId(), "", NewTrans, aActiveTransItems, null, null, null, null, null, null);
                 transB.clearAll(NewTrans, null, NewTransItem, aItem, null, 1, null);
 
                 aStatusBean.setItemAddedStatus("ITEM ADDED");
@@ -11279,6 +11280,18 @@ public class TransItemBean implements Serializable {
             }
         }
         return TransItemsString;
+    }
+
+    public Double getTransItemsTotalQty(List<TransItem> aTransItems) {
+        Double nQty = 0.0;
+        try {
+            for (int i = 0; i < aTransItems.size(); i++) {
+                nQty = nQty + aTransItems.get(i).getItemQty();
+            }
+        } catch (Exception e) {
+            //
+        }
+        return nQty;
     }
 
     /**
