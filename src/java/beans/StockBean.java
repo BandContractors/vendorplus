@@ -647,9 +647,9 @@ public class StockBean implements Serializable {
             }
             cs.executeUpdate();
             status = 1;
-        } catch (SQLException se) {
+        } catch (Exception e) {
             status = 0;
-            System.err.println(se.getMessage());
+            System.err.println("saveStock:" + e.getMessage());
         }
         return status;
     }

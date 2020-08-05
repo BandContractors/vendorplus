@@ -1228,6 +1228,8 @@ public class TransItemBean implements Serializable {
                                     } catch (NullPointerException npe) {
                                         stock.setItemExpDate(null);
                                     }
+                                    //get account code for stock
+                                    stock.setAccountCode(this.getTransItemInventCostAccount(transtype, transreason, new ItemBean().getItem(stock.getItemId())));
                                     stock.setSpecific_size(transitem.getSpecific_size());
                                     i = new StockBean().saveStock(stock);
                                     new Stock_ledgerBean().callInsertStock_ledger("Add", stock, transitem.getItemQty2(), "Add", aTransTypeId, transitem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
@@ -2195,11 +2197,7 @@ public class TransItemBean implements Serializable {
                     //temp fix -- start
                     Item aItem = new ItemBean().getItem(transitem.getItemId2());
                     AddObj.setDescMore("");
-                    if (aItem.getItemType().equals("PRODUCT")) {
-                        AddObj.setAccountCode("5-10-000-010");
-                    } else if (aItem.getItemType().equals("SERVICE")) {
-                        AddObj.setAccountCode("5-10-000-020");
-                    }
+                    AddObj.setAccountCode(aItem.getExpenseAccountCode());
                     AddObj.setAssetStatusId(1);
                     AddObj.setAssetStatusDesc("");
                     //temp fix -- end
@@ -2217,8 +2215,8 @@ public class TransItemBean implements Serializable {
                 }
             }
             StkBean = null;
-        } catch (SQLException se) {
-            System.err.println("saveTransItemAutoUnpack:" + se.getMessage());
+        } catch (Exception e) {
+            System.err.println("saveTransItemAutoUnpack:" + e.getMessage());
         }
     }
 
@@ -10021,7 +10019,6 @@ public class TransItemBean implements Serializable {
                     AccountCode = aItem.getAssetAccountCode();
                 }
             } else if (aTransType.getTransactionTypeName().equals("ITEM RECEIVED")) {
-                //aTransItemToUpdate.setAccountCode(aItem.getAssetAccountCode());
                 if (aTransReason.getTransactionReasonId() == 13) {//GOOD/PRODUCT
                     if (aItem.getExpenseAccountCode() != null && aItem.getExpenseAccountCode().length() > 0) {
                         AccountCode = aItem.getExpenseAccountCode();
@@ -10039,7 +10036,7 @@ public class TransItemBean implements Serializable {
                 }
             } else if (aTransType.getTransactionTypeName().equals("HIRE INVOICE") || aTransType.getTransactionTypeName().equals("HIRE RETURN INVOICE") || aTransType.getTransactionTypeName().equals("HIRE QUOTATION")) {
                 AccountCode = "4-10-000-050";
-            } else if (aTransType.getTransactionTypeName().equals("DISPOSE STOCK") || aTransType.getTransactionTypeName().equals("STOCK CONSUMPTION")) {
+            } else if (aTransType.getTransactionTypeName().equals("DISPOSE STOCK") || aTransType.getTransactionTypeName().equals("STOCK CONSUMPTION") || aTransType.getTransactionTypeName().equals("UNPACK")) {
                 if (aItem.getExpenseAccountCode() != null && aItem.getExpenseAccountCode().length() > 0) {
                     AccountCode = aItem.getExpenseAccountCode();
                 } else {
