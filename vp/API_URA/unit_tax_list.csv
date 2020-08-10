@@ -1,0 +1,485 @@
+unit_tax_list_id,unit_symbol_tax,unit_name_tax
+1,QTR,Per quarter
+2,KPP,KPP-Kilogram of phosphoric anhydride
+3,KSD,KSD-Kilogram of substance 90 % dry
+4,KSH,KSH-Kilogram of caustic soda
+5,KUR,KUR-Kilogram of uranium
+6,LBR,"LBR-Pound gb, us (0,45359237 kg)"
+7,LBT,"LBT-Troy pound, us (373,242 g)"
+8,LEF,LEF-Leaf
+9,LPA,LPA-Litre of pure alcohol
+10,LTN,"LTN-Long ton gb, us (1,0160469 t)"
+11,LTR,LTR-Litre (1 dm3)
+12,MAL,MAL-Megalitre
+13,MAM,MAM-Megametre
+14,MBF,"MBF-Thousand board feet (2,36 m3)"
+15,MGM,MGM-Milligram
+16,MIL,MIL-Thousand
+17,MTK,MTK-Square metre
+18,MTQ,MTQ-Cubic metre
+19,MTR,MTR-Metre
+20,NAR,NAR-Number of articles
+21,NBB,NBB-Number of bobbins
+22,NIU,NIU-Number of international units
+23,NMB,NMB-Number
+24,NMP,NMP-Number of packs
+25,NPL,NPL-Number of parcels
+26,NPR,NPR-Number of pairs
+27,NPT,NPT-Number of parts
+28,NRL,NRL-Number of rolls
+29,NTT,NTT-Net [register] ton
+30,ONZ,"ONZ-Ounce gb, us (28,349523 g)"
+31,OZA,"OZA-Fluid ounce (29,5735 cm3)"
+32,OZI,"OZI-Fluid ounce (28,4l3 cm3)"
+33,PCE,PCE-Piece
+34,PGL,PGL-Proof gallon
+35,PTD,"PTD-Dry pint (0,55061 dm3)"
+36,PTI,"PTI-Pint (0,568262 dm3)"
+37,PTL,"PTL-Liquid pint (0,473l76 dm3)"
+38,QTD,"QTD-Dry quart (1,101221 dm3)"
+39,QTI,"QTI-Quart (1,136523 dm3)"
+40,QTL,"QTL-Liquid quart (0,946353 dm3)"
+41,QTR,"QTR-Quarter, gb (12,700586 kg)"
+42,SET,SET-Set
+43,SHT,SHT-Shipping ton
+44,STI,"STI-Stone gb (6,350293 kg)"
+45,STN,"STN-Short ton gb, us (0,90718474 t)"
+46,TNE,TNE-Metric ton (1000 kg)
+47,TPR,TPR-Ten pairs
+48,TSD,TSD-Tonne of substance 90 per cent dry
+49,WCD,"WCD-Cord (3,63 m3)"
+50,YDK,YDK-Square yard
+51,YDQ,YDQ-Cubic yard
+52,YRD,"YRD-Yard (0,9144 m)"
+53,APZ,"APZ-Ounce gb, us (31,10348 g)"
+54,ASM,ASM-Alcoholic strength by mass
+55,ASV,ASV-Alcoholic strength by volume
+56,BFT,BFT-Board foot
+57,KGM,KGM-Kilogram
+58,KNI,KNI-Kilogram of nitrogen
+59,KNS,KNS-Kilogram of named substance
+60,KPH,KPH-Kilogram of caustic potash
+61,KPO,KPO-Kilogram of potassium oxide
+62,AGE,AGE-YEAR OF MANUFACTURE
+63,CCP,CCP-ENGINE CAPACITY(c.c)
+64,BHX,BHX-Hundred boxes
+65,BLD,"BLD-Dry barrel (115,627 dm3)"
+66,BLL,"BLL-Barrel (petroleum) (158,987 dm3)"
+67,BUA,"BUA-Bushel (35,2391 dm3)"
+68,BUI,"BUI-Bushel (36,36874 dm3)"
+69,CEN,CEN-Hundred
+70,CGM,CGM-Centigram
+71,CLF,CLF-Hundred leaves
+72,VEH,VEH-Vehicle
+73,CLT,CLT-Centilitre
+74,CMK,CMK-Square centimetre
+75,CMQ,CMQ-Cubic centimetre
+76,CMT,CMT-Centimetre
+77,CNP,CNP-Hundred packs
+78,CNT,"CNT-Cental gb (45,359237 kg)"
+79,CTM,CTM-Metric carat (200 mg = 2.10-4 kg)
+80,CWA,"CWA-Hundredweight us (45,3592 kg)"
+81,CWI,"CWI-Hundredweight gb (50,802345 kg)"
+82,DLT,DLT-Decilitre
+83,DMK,DMK-Square decimetre
+84,DMQ,DMQ-Cubic decimetre
+85,DMT,DMT-Decimetre
+86,DPC,DPC-Dozen pieces
+87,DPR,DPR-Dozen pairs
+88,DRA,"DRA-Dram us (3,887935 g)"
+89,DRI,"DRI-Dram gb (l,771745 g)"
+90,DRL,DRL-Dozen rolls
+91,DRM,"DRM-Drachm gb (3,887935 g)"
+92,DTH,DTH-Hectokilogram
+93,DTN,"DTN-Centner, metric (100 kg)"
+94,DWT,"DWT-Pennyweight gb, us (1,555174 g)"
+95,DZN,DZN-Dozen
+96,DZP,DZP-Dozen packs
+97,FOT,"FOT-Foot (0,3048 m)"
+98,FTK,FTK-Square foot
+99,FTQ,FTQ-Cubic foot
+100,GGR,GGR-Great gross (12 gross)
+101,GIA,"GIA-Gill (11,8294 cm3)"
+102,GII,"GII-Gill (0,142065 dm3)"
+103,GLD,"GLD-Dry gallon (4,404884 dm3)"
+104,GLI,"GLI-Gallon (4,546092 dm3)"
+105,GLL,"GLL-Liquid gallon (3,7854l dm3)"
+106,GRM,GRM-Gram
+107,GRN,"GRN-Grain gb, us (64,798910 mg)"
+108,GRO,GRO-Gross
+109,GRT,GRT-Gross [register] ton
+110,HGM,HGM-Hectogram
+111,HIU,HIU-Hundred international units
+112,HLT,HLT-Hectolitre
+113,HPA,HPA-Hectolitre of pure alcohol
+114,INH,"INH-Inch (25,4 mm)"
+115,INK,INK-Square inch
+116,INQ,INQ-Cubic inch
+117,118,1USD
+118,117,1UGX
+119,115,Per month
+120,114,Per week
+121,116,Per annum
+122,113,Dozen
+123,112,Yard
+124,111,Pair
+125,110,Box
+126,200,Metre
+127,TY,"TY-Tank, cylindrical"
+128,TZ,"TZ-Tubes, in bundle/bunch/truss"
+129,UC,UC-Uncaged
+130,UN,UN-Unit
+131,VA,VA-Vat
+132,VEH,VEH-Vehicle
+133,VG,VG-Bulk
+134,VI,VI-Vial
+135,VK,VK-Vanpack
+136,VL,"VL-Bulk, liquid"
+137,VN,VN-Vehicle
+138,VO,"VO-Bulk,solid,large particles(nodules)"
+139,VP,VP-Vacuum-packed
+140,VQ,"VQ-Bulk,liquefied gas(abnormal temp/pr"
+141,VR,"VR-Bulk, solid, granular particles"
+142,VS,VS-Bulk
+143,VY,"VY-Bulk, solid, fine particles(powder)"
+144,WA,WA-Intermediate bulk container
+145,WB,WB-Wickerbottle
+146,WC,"WC-Intermediate bulk container,steel"
+147,WD,"WD-Intermediate bulk container,alumini"
+148,WF,"WF-Intermediate bulk container,metal"
+149,WG,"WG-Intermediate bulk cont,steel,pressu"
+150,WH,"WH-Inter bulk container,alumin,pressur"
+151,WJ,"WJ-Inter bulk container,metal,pressure"
+152,WK,"WK-Interme bulk container,steel,liquid"
+153,WL,"WL-Inter bulk container,alumin liquid"
+154,WM,"WM-Interm bulk container,metal,liquid"
+155,WN,"WN-Int bulk cont,woven plastic,no coat"
+156,WP,"WP-Inter bulk cont,woven plastic,coate"
+157,WQ,"WQ-Inter bulk cont,woven plastic,liner"
+158,WR,"WR-Inter bulk cont,woven plastic,coate"
+159,WS,"WS-Interm bulk container, plastic film"
+160,WT,"WT-Inter bulk cont,textile no coat/lin"
+161,WU,"WU-Inter bulk cont,natural wood,liner"
+162,WV,"WV-Inter bulk contain, textile, coated"
+163,WW,"WW-Inter bulk conta,textile,with liner"
+164,WX,"WX-Inter bulk cont,textile,coated/line"
+165,WY,"WY-Inter bulk cont,plywood,inner liner"
+166,WZ,"WZ-Interm bulk conta,reconsituted wood"
+167,XA,"XA-Bag,woven plastic,without inner coa"
+168,XB,"XB-Bag,woven plastic, sift proof"
+169,XC,"XC-Bag, woven plastic, water resistant"
+170,XD,"XD-Bag, plastics film"
+171,XF,"XF-Bag, textile,without inner coat/lin"
+172,XG,"XG-Bag, textile, sift proof"
+173,XH,"XH-Bag, textile, water resistant"
+174,XJ,"XJ-Bag, paper, multi-wall"
+175,XK,"XK-Bag,paper,multi-wall,water resistan"
+176,XX,XX-SCT UN-IDENTIFIED
+177,YA,"YA-Composte pack,plast recp steel drum"
+178,YB,"YB-Composte pack,plast recp steel crat"
+179,YC,"YC-Composte pack,plast recp alumi drum"
+180,YD,"YD-Composte pack,plast recp alum crate"
+181,YF,"YF-Composte pack,plast recp wooden box"
+182,YG,"YG-Composte pack,plast recp plywo drum"
+183,YH,"YH-Composte pack,plast recp plywo box"
+184,YJ,"YJ-Composte pack,plast recp fibre drum"
+185,YK,"YK-Composte pack,plast recp fibreb box"
+186,YL,"YL-Composte pack,plast recp plast drum"
+187,YM,"YM-Composte pack,plast recp plastc box"
+188,YN,"YN-Composte pack,glass recp steel drum"
+189,ZY,ZY-Intermediate bulk container
+190,ZZ,ZZ-Mutually defined
+191,YP,"YP-Composte pack,glass recp steel crat"
+192,YQ,"YQ-Composte pack,glass recp alumi drum"
+193,YR,"YR-Composte pack,glass recp alum crate"
+194,YS,"YS-Composte pack,glass recp wooden box"
+195,YT,"YT-Composte pack,glass recp plywo drum"
+196,YV,"YV-Composte pack,glass recp wicker ham"
+197,YW,"YW-Composte pack,glass recp fibre drum"
+198,YX,"YX-Composte pack,glass recp fibreb box"
+199,YY,"YY-Composte pack,glas rec ex plas pack"
+200,YZ,"YZ-Composte pack,glas rec so plas pack"
+201,ZA,"ZA-Interm bulk cont, paper, multi-wall"
+202,ZB,"ZB-Bag, large"
+203,ZC,"ZC-Inter bulk cont,paper,water resista"
+204,ZD,"ZD-Int.bulk.cont,plast,struc equip sol"
+205,ZF,"ZF-Int.bulk.cont,plast,free standing"
+206,ZG,"ZG-Int.bulk.cont,plast,struc equp pres"
+207,ZH,"ZH-Int.bulk.cont,plast,freestand,press"
+208,ZJ,"ZJ-Int.bulk.cont,plast,struc equip liq"
+209,ZK,"ZK-Int.bulk.cont,plast,freestand,liqui"
+210,ZL,"ZL-Int.bulk.cont,comp,rigid plast,soli"
+211,ZM,"ZM-Int.bulk.cont,comp,flexi plast,soli"
+212,ZN,"ZN-Int.bulk.cont,comp,rigid plast,pres"
+213,ZP,"ZP-Int.bulk.cont,comp,flex plast,press"
+214,ZQ,"ZQ-Int.bulk.cont,comp,rigid plast,liqu"
+215,ZR,"ZR-Int.bulk.cont,comp,flex plast,liqui"
+216,ZS,ZS-Intermediate bulk container
+217,ZT,ZT-Intermediate bulk container
+218,ZU,ZU-Intermediate bulk container
+219,ZV,ZV-Intermediate bulk container
+220,ZW,ZW-Intermediate bulk container
+221,ZX,ZX-Intermediate bulk container
+222,AA,AA-Intermediate bulk container
+223,AB,AB-Receptacle
+224,AC,AC-Receptacle
+225,AD,AD-Receptacle
+226,AE,AE-Aerosol
+227,AF,AF-Pallet
+228,AG,AG-Pallet
+229,AH,AH-Pallet
+230,AI,AI-Clamshell
+231,AJ,AJ-Cone
+232,AL,AL-Ball
+233,AM,"AM-Ampoule, non protected"
+234,AP,"AP-Ampoule, protected"
+235,AT,AT-Atomizer
+236,AV,AV-Capsule
+237,BA,BA-Barrel
+238,BB,BB-Bobbin
+239,BC,BC-Bottle crate / bottle rack
+240,BD,BD-Board
+241,BE,BE-Bundle
+242,BF,"BF-Ballon, non-protected"
+243,BG,BG-Bag
+244,BH,BH-Bunch
+245,BI,BI-Bin
+246,BJ,BJ-Bucket
+247,BK,BK-Basket
+248,BL,"BL-Bale, compressed"
+249,BM,BM-Basin 5
+250,BN,"BN-Bale, non compressed"
+251,BO,"BO-Bottle, non protected, cylindrical"
+252,BP,"BP-Ballon, protected"
+253,BQ,"BQ-Bottle, protected cylindrical"
+254,BR,BR-Bar
+255,BS,"BS-Bottle, non protected, bulbous"
+256,BT,BT-Bolt
+257,BU,BU-Butt
+258,BV,"BV-Bottle, protected bulbous"
+259,BW,"BW-Box, for liquids"
+260,BX,BX-Box 21 to
+261,BY,"BY-Board, in bundle/bunch/truss"
+262,BZ,"BZ-Bars, in bundle/bunch/truss"
+263,CA,"CA-Can, rectangular"
+264,CB,"CB-Crate, beer"
+265,CC,CC-Churn
+266,CD,"CD-Can, with handle and spout"
+267,CE,CE-Creel
+268,CF,CF-Coffer
+269,CG,CG-Cage
+270,CH,CH-Chest
+271,CI,CI-Canister
+272,CJ,CJ-Coffin
+273,CK,CK-Cask
+274,CL,CL-Coil
+275,CM,CM-Card
+276,CN,"CN-Container,nes as transport equipmen"
+277,CO,"CO-Carboy, non-protected"
+278,CP,"CP-Carboy, protected"
+279,CQ,CQ-Cartridge
+280,CR,CR-Crate
+281,CS,CS-Case
+282,CT,CT-Carton
+283,CU,CU-Cup
+284,CV,CV-Cover
+285,CW,"CW-Cage, roll"
+286,CX,"CX-Can, cylindrical"
+287,CY,CY-Cylinder
+288,CZ,CZ-Canvas
+289,DA,"DA-Crate, multiple layer, plastic"
+290,DB,"DB-Crate, multiple layer, wooden"
+291,DC,DC-Crate
+292,DG,"DG-Cage,commonwealth handlg equip pool"
+293,DH,"DH-Box,commonwealth handlig equip pool"
+294,DI,"DI-Drum, iron"
+295,DJ,"DJ-Demijohn, non-protected"
+296,DK,"DK-Crate, bulk, cardboard"
+297,DL,"DL-Crate, bulk, plastic"
+298,DM,"DM-Crate, bulk, wooden"
+299,DN,DN-Dispenser
+300,DP,"DP-Demijohn, protected"
+301,DR,DR-Drum
+302,DS,"DS-Tray, one layer no cover,plastic"
+303,DT,"DT-Tray, one layer no cover, wooden"
+304,DU,"DU-Tray, one layer no cover,polystyren"
+305,DV,"DV-Tray, one layer no cover, cardboard"
+306,DW,"DW-Tray,two layers no cover,platic tra"
+307,DX,"DX-Tray, two layers no cover, wooden"
+308,DY,"DY-Tray, two layers no cover,cardboard"
+309,EC,"EC-Bag, plastic"
+310,ED,"ED-Case, with pallet base"
+311,EE,"EE-Case, with pallet base, wooden"
+312,EF,"EF-Case, with pallet base, cardboard"
+313,EG,"EG-Case, with pallet base, plastic"
+314,EH,"EH-Case, with pallet base, metal"
+315,EI,"EI-Case, isothermic"
+316,EN,EN-Envelope
+317,FB,FB-Flexibag
+318,FC,"FC-Crate, friut"
+319,FD,"FD-Crate, framed"
+320,FE,FE-Flexitank
+321,FI,FI-Firkin
+322,FL,FL-Flask
+323,FO,FO-Footlocker
+324,FP,FP-Filmpack
+325,FR,FR-Frame
+326,FT,FT-Foodtainer
+327,FW,FW-Cart
+328,FX,FX-Bag
+329,GB,"GB-Bottle, gas"
+330,GI,GI-Girder
+331,GL,GL-Container
+332,GR,"GR-Receptable, glass"
+333,GU,GU-Tray
+334,GY,GY-Bag
+335,GZ,"GZ-Girders, in bundle/bunch/truss"
+336,HA,"HA-Basket, with handle, plastic"
+337,HB,"HB-Basket, with handle, wooden"
+338,HC,"HC-Basket, with handle, cardboard"
+339,HG,HG-Hogshead
+340,HN,HN-Hanger
+341,HR,HR-Hamper
+342,IA,"IA-Package, display, wooden"
+343,IB,"IB-Package, display, cardboard"
+344,IC,"IC-Package, display, plastic"
+345,ID,"ID-Package, display, metal"
+346,IE,"IE-Package, show"
+347,IF,"IF-Package, flow"
+348,IG,"IG-Package, paper wrapped"
+349,IH,"IH-Drum, plastic"
+350,IK,IK-Package
+351,IL,IL-Tray
+352,IN,IN-Ingot
+353,IZ,"IZ-Ingots, in bundle/bunch/truss"
+354,JB,JB-Bag
+355,JC,"JC-Jerrican, rectangular"
+356,JG,JG-Jug
+357,JR,JR-Jar
+358,JT,JT-Jute bag
+359,JY,"JY-Jerrican, cylindrical"
+360,KG,KG-Keg
+361,KI,KI-Kit
+362,LE,LE-Luggage
+363,LG,LG-Log
+364,LT,LT-Lot
+365,LU,LU-Lug
+366,LV,LV-Liftvan
+367,LZ,"LZ-Logs, in bundle/bunch/truss"
+368,MA,MA-Crate
+369,MB,"MB-Bag, multiply"
+370,MC,"MC-Crate, milk"
+371,ME,ME-Container
+372,MR,"MR-Receptable, metal"
+373,MS,"MS-Sack, multi-wall"
+374,MT,MT-Mat
+375,MW,"MW-Receptable, plastic wrapped"
+376,MX,MX-Matchbox
+377,NA,NA-Not available
+378,NE,NE-Unpacked or unpackaged
+379,NF,NF-Unpacked or unpackaged
+380,NG,NG-Unpacked or unpackaged
+381,NS,NS-Nest
+382,NT,NT-Net
+383,NU,"NU-Net, tube, plastic"
+384,NV,"NV-Net, tube, textile"
+385,OA,OA-Pallet
+386,OB,OB-Pallet
+387,OC,OC-Pallet
+388,OD,OD-Pallet
+389,OE,OE-Pallet
+390,OF,OF-Platform
+391,OK,OK-Block
+392,OT,OT-Octabin
+393,OU,OU-Container
+394,P2,P2-Pan
+395,PA,PA-Packet
+396,PB,"PB-Pallet, box"
+397,PC,PC-Parcel
+398,PD,"PD-Pallet, modular,collars 80cm*100cms"
+399,PE,"PE-Pallet, modular,collars 80cm*120cms"
+400,PF,PF-Pen
+401,PG,PG-Plate
+402,PH,PH-Pitcher
+403,PI,PI-Pipe
+404,PJ,PJ-Punnet
+405,PK,PK-Package
+406,PL,PL-Pail
+407,PN,PN-Plank
+408,PO,PO-Pouch
+409,PP,PP-Piece
+410,PR,"PR-Receptable, plastic"
+411,PT,PT-Pot
+412,PU,PU-Tray
+413,PV,"PV-Pipes, in bundle/bunch/truss"
+414,PX,PX-Pallet
+415,PY,"PY-Plates, in bundle/bunch/truss"
+416,PZ,"PZ-Planks, in bundle/bunch/truss"
+417,QA,"QA-Drum,steel,non-removable head"
+418,QB,"QB-Drum, steel, removable head"
+419,QC,"QC-Drum,aluminium,non-removable head"
+420,QD,"QD-Drum, aluminium, removable head"
+421,QF,"QF-Drum, plastic, non-removable head"
+422,QG,"QG-Drum, plastic, removable head"
+423,QH,"QH-Barrel, wooden, bung type"
+424,QJ,"QJ-Barrel, wooden, removable head"
+425,QK,"QK-Jerrican, steel, non-removable head"
+426,QL,"QL-Jerrican, steel, removable head"
+427,QM,"QM-Jerrican,plastic,non-removable head"
+428,QN,"QN-Jerrican, plastic, removable head"
+429,QP,"QP-Box, wooden, natural wood, ordinary"
+430,QQ,"QQ-Box,natural wood,with sift walls 5"
+431,QR,"QR-Box, plastic, expanded"
+432,QS,"QS-Box, plastic, solid"
+433,RD,RD-Rod
+434,RG,RG-Ring
+435,RJ,"RJ-Rack, clothing hanger"
+436,RK,RK-Rack
+437,RL,RL-Reel
+438,RO,RO-Roll
+439,RT,RT-Rednet
+440,RZ,"RZ-Rods, in bundle/bunch/truss"
+441,SA,SA-Sack
+442,SB,SB-Slab
+443,SC,"SC-Crate, shallow"
+444,SD,SD-Spindle
+445,SE,SE-Sea-chest
+446,SH,SH-Sachet
+447,SI,SI-Skid
+448,SK,"SK-Case, skeleton"
+449,SL,SL-Slipsheet
+450,SM,SM-Sheetmetal
+451,SO,SO-Spool
+452,SP,"SP-Sheet, plastic wrapping"
+453,SS,SS-Case
+454,ST,ST-Sheet
+455,SU,SU-Suitcase
+456,SV,SV-Envelope
+457,SW,SW-Shrinkwrapped
+458,SX,SX-Set
+459,SY,SY-Sleeve
+460,SZ,"SZ-Sheets, in bundle/bunch/truss"
+461,T1,T1-Tablet
+462,TB,TB-Tub
+463,TC,TC-Tea-chest
+464,TD,"TD-Tube, collapsible"
+465,TE,TE-Tyre
+466,TG,TG-Tank container
+467,TI,TI-Tierce
+468,TK,"TK-Tank, rectangular"
+469,TL,TL-Tub
+470,TN,TN-Tin
+471,TO,TO-Tun
+472,TR,TR-Trunk
+473,TS,TS-Truss
+474,TT,TT-Bag
+475,TU,TU-Tube
+476,TV,"TV-Tube, with nozzle"
+477,TW,TW-Pallet
+478,109,g
+479,108,-
+480,104,User per day of access
+481,103,Kg
+482,105,Minute
+483,102,Litre
+484,101,Stick

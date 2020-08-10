@@ -2894,6 +2894,21 @@ public class TransBean implements Serializable {
                     if (trans.getTransactionHistId() > 0) {
                         this.deleteTransFromHist(trans.getTransactionHistId());
                     }
+                    //TAX API
+                    if (aTransTypeId == 2 && trans.getTotalVat() > 0 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {//SALES INVOICE
+                        int IsThreadOn = 0;
+                        try {
+                            IsThreadOn = Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_THREAD_ON").getParameter_value());
+                        } catch (Exception e) {
+                            //
+                        }
+                        if (IsThreadOn == 0) {
+                            new InvoiceOfflineBean().submitTaxInvoiceOffline(trans.getTransactionId());
+                        } else if (IsThreadOn == 1) {
+                            new InvoiceOfflineBean().submitTaxInvoiceOfflineThread(trans.getTransactionId());
+                        }
+                    }
+
                     this.clearAll2(trans, aActiveTransItems, null, null, aSelectedTransactor, 2, aSelectedBillTransactor, aTransUserDetail, aSelectedSchemeTransactor, aAuthorisedByUserDetail, aSelectedAccCoa);
 
                     TransItemBean = null;
