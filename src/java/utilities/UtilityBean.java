@@ -5,7 +5,12 @@ import beans.Alert_generalBean;
 import connections.DBConnection;
 import entities.CompanySetting;
 import entities.Item;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.Serializable;
+import java.net.URISyntaxException;
+import java.security.CodeSource;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -272,7 +277,7 @@ public class UtilityBean implements Serializable {
         }
         return aString;
     }
-    
+
     public String formatDoubleToStringPlain(double aAmount, String aCurrencyCode) {
         String aString = "";
         String aPattern = "";
@@ -630,7 +635,39 @@ public class UtilityBean implements Serializable {
     }
 
 //    public static void main(String[] args) {
+//        new UtilityBean().backupDatabase("kwenu_sm_branch2", "root", "WTLura456", "C:/wamp/bin/mysql/mysql5.6.17/bin", "C:/abc");
 //    }
+    public void backupDatabase(String aDbName, String aDbUser, String aDbPassword, String aMySQLDumpFolderPath, String aSaveFolderPath) {
+        try {
+            String dbName = aDbName;
+            String dbUser = aDbUser;
+            String dbPass = aDbPassword;
+
+            Calendar cal = Calendar.getInstance();
+            //cal.setTime(new CompanySetting().getCURRENT_SERVER_DATE());
+            cal.setTime(new Date());
+            String DatePart = "";
+            DatePart = cal.get(Calendar.YEAR) + "_" + (cal.get(Calendar.MONTH) + 1) + "_" + cal.get(Calendar.DAY_OF_MONTH) + "_" + cal.get(Calendar.HOUR_OF_DAY) + "_" + cal.get(Calendar.MINUTE);
+            String savePath = aSaveFolderPath + "/" + aDbName + "_" + DatePart + ".sql.gz";
+
+            /*NOTE: Used to create a cmd command*/
+            String executeCmd = aMySQLDumpFolderPath + "/mysqldump -u" + dbUser + " -p" + dbPass + " --database " + dbName + " | gzip -r " + savePath;
+
+            /*NOTE: Executing the command here*/
+            Process runtimeProcess = Runtime.getRuntime().exec(executeCmd);
+            int processComplete = runtimeProcess.waitFor();
+
+            /*NOTE: processComplete=0 if correctly executed, will contain other values if not*/
+            if (processComplete == 0) {
+                System.out.println("Backup Complete");
+            } else {
+                System.out.println("Backup Failure");
+            }
+        } catch (IOException | InterruptedException ex) {
+            System.err.println("Error at Backup" + ex.getMessage());
+        }
+    }
+
     /**
      * @return the pattern
      */
@@ -665,4 +702,5 @@ public class UtilityBean implements Serializable {
     public static String getTIME24HOURS_PATTERN() {
         return TIME24HOURS_PATTERN;
     }
+
 }

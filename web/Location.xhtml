@@ -66,7 +66,7 @@
                 <h:outputLabel id="olblMainSearch" value="Search Location"/>
                 <h:outputLabel id="olblMainSearchDesc" value="(Type #{companySetting.getStoreEquivName()}/Location Name to search!)"/>
                 <h:inputText id="itxtMainSearch" value="#{locationBean.searchLocationName}" autocomplete="off">
-                    <f:ajax event="keyup" render="dtblLocation" listener="#{locationBean.getLocations()}"/>
+                    <f:ajax event="keyup" render="dtblLocation" listener="#{locationBean.searchLocations()}"/>
                 </h:inputText>
             </h:panelGrid>
 

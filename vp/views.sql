@@ -478,3 +478,6 @@ SELECT
 	ifnull((select p.acc_period_id from acc_period p where t.transaction_date between p.start_date and p.end_date),0) as acc_period_id 
 	FROM transaction t INNER JOIN transaction_item ti ON t.transaction_id=ti.transaction_id 
 	WHERE t.transaction_type_id=76;
+
+CREATE OR REPLACE VIEW view_pay_trans_with_no_trans_record AS 
+select pt.pay_trans_id from pay_trans pt where pt.transaction_type_id=2 and pt.transaction_number NOT IN (select t.transaction_number from transaction t);

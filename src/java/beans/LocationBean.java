@@ -198,6 +198,32 @@ public class LocationBean implements Serializable {
         return Locations;
     }
 
+    public void searchLocations() {
+        String sql;
+
+        sql = "{call sp_search_location(?,?,?)}";
+        ResultSet rs = null;
+        Locations = new ArrayList<Location>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setInt(1, 0);
+            ps.setString(2, this.SearchLocationName);
+            ps.setInt(3, 0);
+
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Location loc = new Location();
+                loc.setLocationId(rs.getInt("location_id"));
+                loc.setStoreId(rs.getInt("store_id"));
+                loc.setLocationName(rs.getString("location_name"));
+                Locations.add(loc);
+            }
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
     public List<Location> getLocations(int aStoreId) {
         String sql;
 

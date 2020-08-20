@@ -5483,34 +5483,38 @@ public class TransItemBean implements Serializable {
                 if (!"HIRE RETURN INVOICE".equals(transtype.getTransactionTypeName())) {
                     ItemFoundAtIndex = itemExists(aActiveTransItems, ti.getItemId(), ti.getBatchno(), ti.getCodeSpecific(), ti.getDescSpecific());
                 }
-                if (ItemFoundAtIndex == -1) {
-                    //round off amounts basing on currency rules
-                    this.roundTransItemsAmount(aTrans, ti);
-                    //add
-                    if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "LIST_ITEMS_APPEND").getParameter_value().equals("0")) {
-                        this.updateLookUpsUI(ti);
-                        aActiveTransItems.add(0, ti);
-                    } else {
-                        this.updateLookUpsUI(ti);
-                        aActiveTransItems.add(ti);
-                    }
+                if (ti.getAmount() < 0 || ti.getAmountExcVat() < 0 || ti.getAmountExcVat() < 0) {
+                    status = "Discount cannot exceed unit price or you need to review prices set";
                 } else {
-                    ti.setItemQty(ti.getItemQty() + aActiveTransItems.get(ItemFoundAtIndex).getItemQty());
-                    if ("HIRE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE QUOTATION".equals(transtype.getTransactionTypeName())) {
-                        ti.setAmount(ti.getUnitPrice() * ti.getItemQty() * ti.getDuration_value());
-                        ti.setAmountIncVat((ti.getUnitPriceIncVat() - ti.getUnitTradeDiscount()) * ti.getItemQty() * ti.getDuration_value());
-                        ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty() * ti.getDuration_value());
+                    if (ItemFoundAtIndex == -1) {
+                        //round off amounts basing on currency rules
+                        this.roundTransItemsAmount(aTrans, ti);
+                        //add
+                        if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "LIST_ITEMS_APPEND").getParameter_value().equals("0")) {
+                            this.updateLookUpsUI(ti);
+                            aActiveTransItems.add(0, ti);
+                        } else {
+                            this.updateLookUpsUI(ti);
+                            aActiveTransItems.add(ti);
+                        }
                     } else {
-                        ti.setAmount(ti.getUnitPrice() * ti.getItemQty());
-                        ti.setAmountIncVat((ti.getUnitPriceIncVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
-                        ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+                        ti.setItemQty(ti.getItemQty() + aActiveTransItems.get(ItemFoundAtIndex).getItemQty());
+                        if ("HIRE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE QUOTATION".equals(transtype.getTransactionTypeName())) {
+                            ti.setAmount(ti.getUnitPrice() * ti.getItemQty() * ti.getDuration_value());
+                            ti.setAmountIncVat((ti.getUnitPriceIncVat() - ti.getUnitTradeDiscount()) * ti.getItemQty() * ti.getDuration_value());
+                            ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty() * ti.getDuration_value());
+                        } else {
+                            ti.setAmount(ti.getUnitPrice() * ti.getItemQty());
+                            ti.setAmountIncVat((ti.getUnitPriceIncVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+                            ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+                        }
+                        //round off amounts basing on currency rules
+                        this.roundTransItemsAmount(aTrans, ti);
+                        //add
+                        this.updateLookUpsUI(ti);
+                        aActiveTransItems.add(ItemFoundAtIndex, ti);
+                        aActiveTransItems.remove(ItemFoundAtIndex + 1);
                     }
-                    //round off amounts basing on currency rules
-                    this.roundTransItemsAmount(aTrans, ti);
-                    //add
-                    this.updateLookUpsUI(ti);
-                    aActiveTransItems.add(ItemFoundAtIndex, ti);
-                    aActiveTransItems.remove(ItemFoundAtIndex + 1);
                 }
             }
         } catch (NullPointerException npe) {
@@ -5578,6 +5582,8 @@ public class TransItemBean implements Serializable {
                 status = "Name cannot be more than 250 characters...";
             } else if (NewTransItem.getDescMore().length() > 250) {
                 status = "More Description cannot be more than 250 characters...";
+            } else if (NewTransItem.getUnitPrice() < 0 || NewTransItem.getAmount() < 0 || NewTransItem.getUnitPrice2() < 0 || NewTransItem.getUnitTradeDiscount2() < 0) {
+                status = "Prices cannot be be in Negative...";
             } else {
                 status = this.addTransItemCEC(aStoreId, aTransTypeId, aTransReasonId, aSaleType, aTrans, aActiveTransItems, NewTransItem, aSelectedItem);
             }
@@ -5950,6 +5956,14 @@ public class TransItemBean implements Serializable {
                 StockFail3 = 1;
             }
 
+            if (NewTransItem.getUnitPrice() < 0 || NewTransItem.getAmount() < 0 || NewTransItem.getUnitPrice2() < 0 || NewTransItem.getUnitTradeDiscount2() < 0) {
+                aStatusBean.setItemAddedStatus("");
+                aStatusBean.setItemNotAddedStatus("Prices cannot be in Negative...");
+                aStatusBean.setShowItemAddedStatus(0);
+                aStatusBean.setShowItemNotAddedStatus(1);
+                StockFail3 = 1;
+            }
+
             if (StockFail1 == 0 && StockFail2 == 0 && StockFail3 == 0) {
                 TransItem ti = new TransItem();
                 ti.setTransactionItemId(NewTransItem.getTransactionItemId());
@@ -6058,40 +6072,47 @@ public class TransItemBean implements Serializable {
                 }
                 //check if itme+batchno already exists
                 int ItemFoundAtIndex = itemExists(aActiveTransItems, ti.getItemId(), ti.getBatchno(), ti.getCodeSpecific(), ti.getDescSpecific());
-                if (ItemFoundAtIndex == -1) {
-                    //round off amounts basing on currency rules
-                    this.roundTransItemsAmount(aTrans, ti);
-                    //add
-                    if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "LIST_ITEMS_APPEND").getParameter_value().equals("0")) {
-                        this.updateLookUpsUI(ti);
-                        aActiveTransItems.add(0, ti);
-                    } else {
-                        this.updateLookUpsUI(ti);
-                        aActiveTransItems.add(ti);
-                    }
+                if (ti.getAmount() < 0 || ti.getAmountExcVat() < 0 || ti.getAmountExcVat() < 0) {
+                    aStatusBean.setItemAddedStatus("");
+                    aStatusBean.setItemNotAddedStatus("Discount cannot exceed unit price or you need to review prices set");
+                    aStatusBean.setShowItemAddedStatus(0);
+                    aStatusBean.setShowItemNotAddedStatus(1);
                 } else {
-                    ti.setItemQty(ti.getItemQty() + aActiveTransItems.get(ItemFoundAtIndex).getItemQty());
-                    ti.setAmount(ti.getUnitPrice() * ti.getItemQty());
-                    ti.setAmountIncVat((ti.getUnitPriceIncVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
-                    ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
-                    //round off amounts basing on currency rules
-                    this.roundTransItemsAmount(aTrans, ti);
-                    //add
-                    this.updateLookUpsUI(ti);
-                    aActiveTransItems.add(ItemFoundAtIndex, ti);
-                    aActiveTransItems.remove(ItemFoundAtIndex + 1);
+                    if (ItemFoundAtIndex == -1) {
+                        //round off amounts basing on currency rules
+                        this.roundTransItemsAmount(aTrans, ti);
+                        //add
+                        if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "LIST_ITEMS_APPEND").getParameter_value().equals("0")) {
+                            this.updateLookUpsUI(ti);
+                            aActiveTransItems.add(0, ti);
+                        } else {
+                            this.updateLookUpsUI(ti);
+                            aActiveTransItems.add(ti);
+                        }
+                    } else {
+                        ti.setItemQty(ti.getItemQty() + aActiveTransItems.get(ItemFoundAtIndex).getItemQty());
+                        ti.setAmount(ti.getUnitPrice() * ti.getItemQty());
+                        ti.setAmountIncVat((ti.getUnitPriceIncVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+                        ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+                        //round off amounts basing on currency rules
+                        this.roundTransItemsAmount(aTrans, ti);
+                        //add
+                        this.updateLookUpsUI(ti);
+                        aActiveTransItems.add(ItemFoundAtIndex, ti);
+                        aActiveTransItems.remove(ItemFoundAtIndex + 1);
+                    }
+
+                    TransBean transB = new TransBean();
+                    transB.clearAll(null, aActiveTransItems, NewTransItem, aSelectedItem, null, 1, null);
+
+                    aStatusBean.setItemAddedStatus("ITEM ADDED");
+                    aStatusBean.setItemNotAddedStatus("");
+                    aStatusBean.setShowItemAddedStatus(1);
+                    aStatusBean.setShowItemNotAddedStatus(0);
+
+                    //update totals
+                    new TransBean().setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems);
                 }
-
-                TransBean transB = new TransBean();
-                transB.clearAll(null, aActiveTransItems, NewTransItem, aSelectedItem, null, 1, null);
-
-                aStatusBean.setItemAddedStatus("ITEM ADDED");
-                aStatusBean.setItemNotAddedStatus("");
-                aStatusBean.setShowItemAddedStatus(1);
-                aStatusBean.setShowItemNotAddedStatus(0);
-
-                //update totals
-                new TransBean().setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems);
             }
         } catch (NullPointerException npe) {
             System.err.println("addTransItemSalesQuotation:" + npe.getMessage());
@@ -6968,9 +6989,9 @@ public class TransItemBean implements Serializable {
                 aStatusBean.setShowItemAddedStatus(0);
                 aStatusBean.setShowItemNotAddedStatus(1);
             } else {
-                if (NewTransItem.getItemQty() <= 0 || NewTransItem.getUnitPrice() <= 0) {
+                if (NewTransItem.getItemQty() <= 0 || NewTransItem.getUnitPrice() <= 0 || NewTransItem.getUnitVat() < 0 || NewTransItem.getUnitTradeDiscount() < 0) {
                     aStatusBean.setItemAddedStatus("");
-                    aStatusBean.setItemNotAddedStatus("PLEASE ENTER VALID ITEM-QUANTITY OR UNIT-PRICE...!");
+                    aStatusBean.setItemNotAddedStatus("PLEASE ENTER VALID ITEM-QUANTITY OR UNIT-PRICE OR UNIT-VAT OR UNIT-TRADE-DISCOUNT...!");
                     aStatusBean.setShowItemAddedStatus(0);
                     aStatusBean.setShowItemNotAddedStatus(1);
                 } else if (NewTransItem.getItemId() == 0) {
