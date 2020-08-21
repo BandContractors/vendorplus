@@ -139,7 +139,10 @@ public class Trans implements Serializable {
     private int is_delivered;
     private String source_code;
     private String transaction_number_tax;
-    
+    private int tax_synced;
+    private int tax_updated;
+    private int tax_update_synced;
+    private String sync_flag;
 
     /**
      * @return the TransactionId
@@ -1707,6 +1710,62 @@ public class Trans implements Serializable {
      */
     public void setTransaction_number_tax(String transaction_number_tax) {
         this.transaction_number_tax = transaction_number_tax;
+    }
+
+    /**
+     * @return the tax_synced
+     */
+    public int getTax_synced() {
+        return tax_synced;
+    }
+
+    /**
+     * @param tax_synced the tax_synced to set
+     */
+    public void setTax_synced(int tax_synced) {
+        this.tax_synced = tax_synced;
+    }
+
+    /**
+     * @return the tax_updated
+     */
+    public int getTax_updated() {
+        return tax_updated;
+    }
+
+    /**
+     * @param tax_updated the tax_updated to set
+     */
+    public void setTax_updated(int tax_updated) {
+        this.tax_updated = tax_updated;
+    }
+
+    /**
+     * @return the tax_update_synced
+     */
+    public int getTax_update_synced() {
+        return tax_update_synced;
+    }
+
+    /**
+     * @param tax_update_synced the tax_update_synced to set
+     */
+    public void setTax_update_synced(int tax_update_synced) {
+        this.tax_update_synced = tax_update_synced;
+    }
+
+    /**
+     * @return the sync_flag
+     */
+    public String getSync_flag() {
+        return sync_flag;
+    }
+
+    /**
+     * @param sync_flag the sync_flag to set
+     */
+    public void setSync_flag(String sync_flag) {
+        this.sync_flag = sync_flag;
     }
 
 }

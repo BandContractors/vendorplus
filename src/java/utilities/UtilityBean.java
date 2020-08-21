@@ -5,6 +5,7 @@ import beans.Alert_generalBean;
 import connections.DBConnection;
 import entities.CompanySetting;
 import entities.Item;
+import entities.Stock;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -26,6 +27,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.faces.bean.*;
@@ -567,6 +570,21 @@ public class UtilityBean implements Serializable {
             aList.clear();
         } catch (NullPointerException npe) {
             //do nothing
+        }
+    }
+
+    public void refreshAlertsThread() {
+        try {
+            Runnable task = new Runnable() {
+                @Override
+                public void run() {
+                    refreshAlerts();
+                }
+            };
+            Executor e = Executors.newSingleThreadExecutor();
+            e.execute(task);
+        } catch (Exception e) {
+            System.err.println("refreshAlertsThread:" + e.getMessage());
         }
     }
 

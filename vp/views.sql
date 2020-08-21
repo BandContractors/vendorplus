@@ -481,3 +481,15 @@ SELECT
 
 CREATE OR REPLACE VIEW view_pay_trans_with_no_trans_record AS 
 select pt.pay_trans_id from pay_trans pt where pt.transaction_type_id=2 and pt.transaction_number NOT IN (select t.transaction_number from transaction t);
+
+CREATE OR REPLACE VIEW view_transaction_tax_map AS 
+SELECT  
+	t.*,
+	ifnull(t2.transaction_number_tax,'') as transaction_number_tax,
+	case when ifnull(t2.transaction_tax_map_id,0)>0 then 1 else 0 end as tax_synced,
+	ifnull(t2.is_updated,2) as tax_updated,
+	case when ifnull(t2.is_updated,2)=1 then ifnull(t2.update_synced,2) else 2 end as tax_update_synced,
+	case when ifnull(t2.transaction_tax_map_id,0)>0 and (ifnull(t2.is_updated,2)=0 or (ifnull(t2.is_updated,2)=1 and ifnull(t2.update_synced,2)=1)) then 'Synced' else 'Not Synced' end as sync_flag 
+	FROM transaction t 
+	left join transaction_tax_map t2 on t.transaction_id=t2.transaction_id 
+	WHERE t.transaction_type_id IN(2,65,68);
