@@ -4017,7 +4017,17 @@ public class TransBean implements Serializable {
             new UtilityBean().refreshAlertsThread();
             //TAX API
             if (aTransTypeId == 2 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {//SALES INVOICE
-                new InvoiceOfflineBean().submitCreditNoteOfflineThread(aNewTrans.getTransactionId(), aTransTypeId);
+                int IsThreadOn = 0;
+                try {
+                    IsThreadOn = Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_THREAD_ON").getParameter_value());
+                } catch (Exception e) {
+                    //
+                }
+                if (IsThreadOn == 0) {
+                    new InvoiceOfflineBean().submitCreditNoteOffline(aNewTrans.getTransactionId(), aTransTypeId);
+                } else if (IsThreadOn == 1) {
+                    new InvoiceOfflineBean().submitCreditNoteOfflineThread(aNewTrans.getTransactionId(), aTransTypeId);
+                }
             }
         }
     }
@@ -11453,6 +11463,25 @@ public class TransBean implements Serializable {
         }
     }
 
+    public void reSubmitCreditNoteTaxAPI(long aInnerTransId, int aInnerTransTypeId, Trans aTrans, TransBean aTransBean) {
+        try {
+            new InvoiceOfflineBean().submitCreditNoteOffline(aInnerTransId, aInnerTransTypeId);
+            this.reportSalesTaxAPI(aTrans, aTransBean);
+        } catch (Exception e) {
+            System.err.println("reSubmitCreditNoteTaxAPI:" + e.getMessage());
+        }
+    }
+
+    public void reSubmitInvoiceTaxAPI(long aInnerTransId, Trans aTrans, TransBean aTransBean) {
+        try {
+            new InvoiceOfflineBean().submitTaxInvoiceOffline(aInnerTransId);
+            this.reportSalesTaxAPI(aTrans, aTransBean);
+
+        } catch (Exception e) {
+            System.err.println("reSubmitInvoiceTaxAPI:" + e.getMessage());
+        }
+    }
+
     public void reportSalesTaxAPI(Trans aTrans, TransBean aTransBean) {
         if (aTransBean.getDateType().length() == 0) {
             aTransBean.setDateType("Add Date");
@@ -11633,8 +11662,8 @@ public class TransBean implements Serializable {
                 }
                 this.TransListSummary.add(transsum);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            System.err.println("reportSalesTaxAPI:" + e.getMessage());
         }
     }
 
