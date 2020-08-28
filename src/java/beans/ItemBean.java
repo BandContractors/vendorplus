@@ -214,6 +214,8 @@ public class ItemBean implements Serializable {
             msg = "Please specify the Asset Type and/or Account...";
         } else if (aItem.getIsAsset() == 0 && (aItem.getExpense_type().length() == 0 || aItem.getExpenseAccountCode().length() == 0)) {
             msg = "Please specify the Account Type and/or Name...";
+        } else if (aItem.getIsSale() == 1 && aItem.getItem_code_tax().length() == 0 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
+            msg = "Please specify the UN Item(Product/Service) Code...";
         } else {
             msg = "";
         }
@@ -1031,6 +1033,7 @@ public class ItemBean implements Serializable {
             Item_tax_map itmap = new Item_tax_mapBean().getItem_tax_map(this.ItemObj.getItemId());
             if (itmap != null) {
                 this.ItemObj.setItem_code_tax(itmap.getItem_code_tax());
+                this.ItemObj.setIs_synced_tax(itmap.getIs_synced());
             }
         } catch (Exception e) {
             System.out.println("displayItem:" + e.getMessage());

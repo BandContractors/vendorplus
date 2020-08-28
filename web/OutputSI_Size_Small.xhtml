@@ -50,6 +50,8 @@
                             <h:outputLabel style="font-size: 20px;font-weight: bold;" value="#{generalUserSetting.outputDetailParent.trans.transactionNumber}"/>
                             <h:outputLabel style="font-size: 12px;" value="FDN:" rendered="#{generalUserSetting.outputDetailParent.trans.transaction_number_tax.length() gt 0}"/>
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.trans.transaction_number_tax}" rendered="#{generalUserSetting.outputDetailParent.trans.transaction_number_tax.length() gt 0}"/>
+                            <h:outputLabel style="font-size: 12px;" value="Verification Code:" rendered="#{generalUserSetting.outputDetailParent.trans.verification_code_tax.length() gt 0}"/>
+                            <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.trans.verification_code_tax}" rendered="#{generalUserSetting.outputDetailParent.trans.verification_code_tax.length() gt 0}"/>
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transaction_type.transactionDateLabel}:"/>
                             <h:outputLabel style="font-size: 12px;" value="#{utilityBean.formatDateTime(generalUserSetting.outputDetailParent.trans.addDate)}"/>
                         </h:panelGrid>
@@ -58,6 +60,8 @@
                             <h:outputLabel style="font-size: 20px;font-weight: bold;" value="#{generalUserSetting.outputDetailParent.trans.transactionNumber}"/>
                             <h:outputLabel style="font-size: 12px;" value="FDN:" rendered="#{generalUserSetting.outputDetailParent.trans.transaction_number_tax.length() gt 0}"/>
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.trans.transaction_number_tax}" rendered="#{generalUserSetting.outputDetailParent.trans.transaction_number_tax.length() gt 0}"/>
+                            <h:outputLabel style="font-size: 12px;" value="Verification Code:" rendered="#{generalUserSetting.outputDetailParent.trans.verification_code_tax.length() gt 0}"/>
+                            <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.trans.verification_code_tax}" rendered="#{generalUserSetting.outputDetailParent.trans.verification_code_tax.length() gt 0}"/>
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transaction_type.transactionDateLabel}:"/>
                             <h:outputLabel style="font-size: 12px;" value="#{utilityBean.formatDate(generalUserSetting.outputDetailParent.trans.transactionDate)}"/>
                             <h:outputLabel style="font-size: 12px;" value="Add Date:"/>
@@ -213,7 +217,9 @@
                             <h:outputLabel value="Added by: "/>
                             <h:outputLabel value="#{generalUserSetting.outputDetailParent.add_user_detail.firstName} #{generalUserSetting.outputDetailParent.add_user_detail.secondName}"/>
                         </h:panelGrid>
-
+                        <h:panelGrid id="pnlgBarCode" columns="1" style="margin: 0px;border:none;" rendered="#{generalUserSetting.outputDetailParent.trans.qr_code_tax.length() gt 0}">  
+                            <p:barcode id="barCODEqr" value="#{generalUserSetting.outputDetailParent.trans.qr_code_tax}" type="qr" style="width: 176px;height: 128px;"/>
+                        </h:panelGrid>
                         <h:panelGrid id="IpgrdSalesInvoiceFooter2" style="width: 290px; margin: 0px;border-bottom-style: dotted" columns="1" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getIsShowDeveloper(),'Yes')}">
                             <h:outputLabel style="font-size: 10px;" value="System developed by WINGERsoft Technologies Ltd"/>
                             <h:outputLabel style="font-size: 10px;" value="#{companySetting.getDeveloperEmail()} | #{companySetting.getDeveloperPhone()}"/>

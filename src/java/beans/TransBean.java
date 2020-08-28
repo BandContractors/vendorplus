@@ -9,7 +9,6 @@ import entities.AccCurrency;
 import entities.AccDepSchedule;
 import entities.AccJournal;
 import entities.AccPeriod;
-import entities.AccType;
 import entities.Category;
 import entities.CompanySetting;
 import entities.Pay;
@@ -58,7 +57,6 @@ import javax.faces.event.ActionEvent;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.primefaces.event.SelectEvent;
-import utilities.ConvertNumToWordBean;
 import utilities.UtilityBean;
 //import org.primefaces.component.commandbutton.CommandButton;
 
@@ -11465,8 +11463,10 @@ public class TransBean implements Serializable {
 
     public void reSubmitCreditNoteTaxAPI(long aInnerTransId, int aInnerTransTypeId, Trans aTrans, TransBean aTransBean) {
         try {
-            new InvoiceOfflineBean().submitCreditNoteOffline(aInnerTransId, aInnerTransTypeId);
-            this.reportSalesTaxAPI(aTrans, aTransBean);
+            if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
+                new InvoiceOfflineBean().submitCreditNoteOffline(aInnerTransId, aInnerTransTypeId);
+                this.reportSalesTaxAPI(aTrans, aTransBean);
+            }
         } catch (Exception e) {
             System.err.println("reSubmitCreditNoteTaxAPI:" + e.getMessage());
         }
@@ -11474,9 +11474,10 @@ public class TransBean implements Serializable {
 
     public void reSubmitInvoiceTaxAPI(long aInnerTransId, Trans aTrans, TransBean aTransBean) {
         try {
-            new InvoiceOfflineBean().submitTaxInvoiceOffline(aInnerTransId);
-            this.reportSalesTaxAPI(aTrans, aTransBean);
-
+            if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
+                new InvoiceOfflineBean().submitTaxInvoiceOffline(aInnerTransId);
+                this.reportSalesTaxAPI(aTrans, aTransBean);
+            }
         } catch (Exception e) {
             System.err.println("reSubmitInvoiceTaxAPI:" + e.getMessage());
         }
@@ -15213,7 +15214,13 @@ public class TransBean implements Serializable {
             }
             //get tax invoice number
             if (aTrans.getTransactionTypeId() == 2 && aTrans.getTotalVat() > 0) {
-                aTrans.setTransaction_number_tax(new Transaction_tax_mapBean().getTaxInvoiceNo(aTrans.getTransactionId(), aTrans.getTransactionTypeId()));
+                //aTrans.setTransaction_number_tax(new Transaction_tax_mapBean().getTaxInvoiceNo(aTrans.getTransactionId(), aTrans.getTransactionTypeId()));
+                Transaction_tax_map ttm = new Transaction_tax_mapBean().getTransaction_tax_map(aTrans.getTransactionId(), aTrans.getTransactionTypeId());
+                if (null != ttm) {
+                    aTrans.setTransaction_number_tax(ttm.getTransaction_number_tax());
+                    aTrans.setVerification_code_tax(ttm.getVerification_code_tax());
+                    aTrans.setQr_code_tax(ttm.getQr_code_tax());
+                }
             }
         }
     }

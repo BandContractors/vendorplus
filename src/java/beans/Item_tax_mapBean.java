@@ -49,6 +49,11 @@ public class Item_tax_mapBean implements Serializable {
             } catch (NullPointerException npe) {
                 aItem_tax_map.setItem_code_tax("");
             }
+            try {
+                aItem_tax_map.setIs_synced(aResultSet.getInt("is_synced"));
+            } catch (NullPointerException npe) {
+                aItem_tax_map.setIs_synced(0);
+            }
         } catch (SQLException se) {
             System.err.println("setItem_tax_mapFromResultset:" + se.getMessage());
         }
@@ -161,7 +166,7 @@ public class Item_tax_mapBean implements Serializable {
 
     public int saveItem_tax_mapSync(long aItemId, int aIs_synced) {
         int saved = 0;
-        String sql = "UPDATE item_tax_map SET is_synced=" + aIs_synced + " WHERE item_id=" + aItemId;
+        String sql = "UPDATE item_tax_map SET is_synced=" + aIs_synced + " WHERE item_tax_map_id>0 and item_id=" + aItemId;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {

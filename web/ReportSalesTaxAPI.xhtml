@@ -269,7 +269,7 @@
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
-                        <p:ajax listener="#{transBean.reSubmitCreditNoteTaxAPI(itm.transactionId,trans,transBean)}" update="tblDetail"/>
+                        <p:ajax listener="#{transBean.reSubmitCreditNoteTaxAPI(itm.transactionId,itm.transactionTypeId,trans,transBean)}" update="tblDetail"/>
                     </p:commandButton>
                 </p:column>
             </p:dataTable>

@@ -143,6 +143,8 @@ public class Trans implements Serializable {
     private int tax_updated;
     private int tax_update_synced;
     private String sync_flag;
+    private String qr_code_tax;
+    private String verification_code_tax;
 
     /**
      * @return the TransactionId
@@ -1766,6 +1768,34 @@ public class Trans implements Serializable {
      */
     public void setSync_flag(String sync_flag) {
         this.sync_flag = sync_flag;
+    }
+
+    /**
+     * @return the qr_code_tax
+     */
+    public String getQr_code_tax() {
+        return qr_code_tax;
+    }
+
+    /**
+     * @param qr_code_tax the qr_code_tax to set
+     */
+    public void setQr_code_tax(String qr_code_tax) {
+        this.qr_code_tax = qr_code_tax;
+    }
+
+    /**
+     * @return the verification_code_tax
+     */
+    public String getVerification_code_tax() {
+        return verification_code_tax;
+    }
+
+    /**
+     * @param verification_code_tax the verification_code_tax to set
+     */
+    public void setVerification_code_tax(String verification_code_tax) {
+        this.verification_code_tax = verification_code_tax;
     }
 
 }

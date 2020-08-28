@@ -19,6 +19,8 @@ public class Transaction_tax_map implements Serializable {
     private Date add_date;
     private int is_updated;
     private int update_synced;
+    private String qr_code_tax;
+    private String verification_code_tax;
 
     /**
      * @return the transaction_tax_map_id
@@ -144,5 +146,33 @@ public class Transaction_tax_map implements Serializable {
      */
     public void setUpdate_synced(int update_synced) {
         this.update_synced = update_synced;
+    }
+
+    /**
+     * @return the qr_code_tax
+     */
+    public String getQr_code_tax() {
+        return qr_code_tax;
+    }
+
+    /**
+     * @param qr_code_tax the qr_code_tax to set
+     */
+    public void setQr_code_tax(String qr_code_tax) {
+        this.qr_code_tax = qr_code_tax;
+    }
+
+    /**
+     * @return the verification_code_tax
+     */
+    public String getVerification_code_tax() {
+        return verification_code_tax;
+    }
+
+    /**
+     * @param verification_code_tax the verification_code_tax to set
+     */
+    public void setVerification_code_tax(String verification_code_tax) {
+        this.verification_code_tax = verification_code_tax;
     }
 }

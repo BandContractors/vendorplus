@@ -60,6 +60,16 @@ public class Transaction_tax_mapBean implements Serializable {
                 aTransaction_tax_map.setTransaction_number_tax("");
             }
             try {
+                aTransaction_tax_map.setVerification_code_tax(aResultSet.getString("verification_code_tax"));
+            } catch (NullPointerException npe) {
+                aTransaction_tax_map.setVerification_code_tax("");
+            }
+            try {
+                aTransaction_tax_map.setQr_code_tax(aResultSet.getString("qr_code_tax"));
+            } catch (NullPointerException npe) {
+                aTransaction_tax_map.setQr_code_tax("");
+            }
+            try {
                 aTransaction_tax_map.setAdd_date(new Date(aResultSet.getTimestamp("add_date").getTime()));
             } catch (NullPointerException npe) {
                 aTransaction_tax_map.setAdd_date(null);
@@ -81,7 +91,7 @@ public class Transaction_tax_mapBean implements Serializable {
 
     public int saveTransaction_tax_map(Transaction_tax_map aTransaction_tax_map) {
         int saved = 0;
-        String sql = "{call sp_save_transaction_tax_map(?,?,?,?,?,?,?,?)}";
+        String sql = "{call sp_save_transaction_tax_map(?,?,?,?,?,?,?,?,?,?)}";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 CallableStatement cs = conn.prepareCall(sql);) {
@@ -117,6 +127,16 @@ public class Transaction_tax_mapBean implements Serializable {
                     cs.setString("in_transaction_number_tax", "");
                 }
                 try {
+                    cs.setString("in_verification_code_tax", aTransaction_tax_map.getVerification_code_tax());
+                } catch (NullPointerException npe) {
+                    cs.setString("in_verification_code_tax", "");
+                }
+                try {
+                    cs.setString("in_qr_code_tax", aTransaction_tax_map.getQr_code_tax());
+                } catch (NullPointerException npe) {
+                    cs.setString("in_qr_code_tax", "");
+                }
+                try {
                     cs.setInt("in_is_updated", aTransaction_tax_map.getIs_updated());
                 } catch (NullPointerException npe) {
                     cs.setInt("in_is_updated", 0);
@@ -135,7 +155,7 @@ public class Transaction_tax_mapBean implements Serializable {
         return saved;
     }
 
-    public void saveTransaction_tax_map(long aTransId, String aTransNoTax) {
+    public void saveTransaction_tax_map(long aTransId, String aTransNoTax, String aVerCodeTax,String aQrCodeTax) {
         try {
             Trans trans = new Trans();
             Transaction_tax_map transtaxmap = new Transaction_tax_map();
@@ -150,6 +170,8 @@ public class Transaction_tax_mapBean implements Serializable {
                 transtaxmap.setTransaction_type_id(trans.getTransactionTypeId());
                 transtaxmap.setTransaction_reason_id(trans.getTransactionReasonId());
                 transtaxmap.setTransaction_number_tax(aTransNoTax);
+                transtaxmap.setVerification_code_tax(aVerCodeTax);
+                transtaxmap.setQr_code_tax(aQrCodeTax);
                 transtaxmap.setIs_updated(0);
                 transtaxmap.setUpdate_synced(0);
                 int x = this.saveTransaction_tax_map(transtaxmap);
@@ -170,7 +192,7 @@ public class Transaction_tax_mapBean implements Serializable {
             System.err.println("markTransaction_tax_mapUpdated:" + e.getMessage());
         }
     }
-    
+
     public void markTransaction_tax_mapUpdateSynced(Transaction_tax_map aTransaction_tax_map) {
         try {
             if (null != aTransaction_tax_map) {

@@ -191,7 +191,7 @@
                         <f:selectItem itemLabel="Yes" itemValue="1"/>
                     </h:selectOneMenu>
                     <p:commandLink value="UN Item Code" oncomplete="PF('sbarUNSPSC').show()"/>
-                    <h:inputText id="itxtUNSPSC" value="#{itemBean.itemObj.item_code_tax}" autocomplete="off" style="width: 193px"/>
+                    <h:inputText id="itxtUNSPSC" value="#{itemBean.itemObj.item_code_tax}" autocomplete="off" style="width: 193px;color:#{itemBean.itemObj.is_synced_tax eq 1 ? '#238823':'#d2222d'};"/>
                     <h:outputLabel value="Show General Name?" title="Show General Name?"/>
                     <h:selectOneMenu id="menuOverrideGenName" value="#{itemBean.itemObj.override_gen_name}" style="width: 200px">
                         <f:selectItem itemLabel="Do Not Override" itemValue="0"/>

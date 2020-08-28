@@ -1,6 +1,5 @@
 package entities;
 
-
 import java.io.Serializable;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
@@ -9,7 +8,6 @@ import javax.faces.bean.SessionScoped;
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author btwesigye
@@ -24,7 +22,7 @@ public class Item implements Serializable {
     private String Description;
     private int CategoryId;
     private String CategoryName;
-    private Integer SubCategoryId=null;
+    private Integer SubCategoryId = null;
     private String SubCategoryName;
     private int UnitId;
     private String UnitSymbol;
@@ -70,7 +68,8 @@ public class Item implements Serializable {
     private String account_name;
     private String purpose;
     private String item_code_tax;
-    
+    private int is_synced_tax;
+
     /**
      * @return the ItemId
      */
@@ -141,7 +140,6 @@ public class Item implements Serializable {
         this.CategoryName = CategoryName;
     }
 
-    
     /**
      * @return the SubCategoryName
      */
@@ -211,7 +209,6 @@ public class Item implements Serializable {
 //    public void setUnitCostPrice(double UnitCostPrice) {
 //        this.UnitCostPrice = UnitCostPrice;
 //    }
-
     /**
      * @return the UnitRetailsalePrice
      */
@@ -267,7 +264,7 @@ public class Item implements Serializable {
     public void setVatRated(String VatRated) {
         this.VatRated = VatRated;
     }
-    
+
     /**
      * @return the ItemImgUrl
      */
@@ -295,11 +292,12 @@ public class Item implements Serializable {
     public void setSubCategoryId(Integer SubCategoryId) {
         this.SubCategoryId = SubCategoryId;
     }
-    public void updateModelItem(Item i){
-        this.ItemId=i.getItemId();
-        this.UnitId=i.getUnitId();
-        this.UnitSymbol=i.getUnitSymbol();
-        this.UnitRetailsalePrice=i.getUnitRetailsalePrice();
+
+    public void updateModelItem(Item i) {
+        this.ItemId = i.getItemId();
+        this.UnitId = i.getUnitId();
+        this.UnitSymbol = i.getUnitSymbol();
+        this.UnitRetailsalePrice = i.getUnitRetailsalePrice();
     }
 
     /**
@@ -804,6 +802,20 @@ public class Item implements Serializable {
      */
     public void setCurrency_code_tax(String currency_code_tax) {
         this.currency_code_tax = currency_code_tax;
+    }
+
+    /**
+     * @return the is_synced_tax
+     */
+    public int getIs_synced_tax() {
+        return is_synced_tax;
+    }
+
+    /**
+     * @param is_synced_tax the is_synced_tax to set
+     */
+    public void setIs_synced_tax(int is_synced_tax) {
+        this.is_synced_tax = is_synced_tax;
     }
 
 }

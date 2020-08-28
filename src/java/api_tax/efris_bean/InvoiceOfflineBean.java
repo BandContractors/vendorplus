@@ -107,6 +107,8 @@ public class InvoiceOfflineBean {
     private String returnMessage = "";
     private String AntifakeCode = "";
     private String InvoiceNo = "";
+    private String VerificationCode = "";
+    private String QrCode = "";
 
     public void clear_all() {
         sellerDetails = new SellerDetails();
@@ -126,6 +128,8 @@ public class InvoiceOfflineBean {
         returnMessage = "";
         AntifakeCode = "";
         InvoiceNo = "";
+        VerificationCode = "";
+        QrCode = "";
     }
 
     public void submitTaxInvoiceOffline(long aTransId) {
@@ -138,7 +142,7 @@ public class InvoiceOfflineBean {
             //System.out.println("InvoiceNo:" + InvoiceNo);
             //update home db
             if (InvoiceNo.length() > 0) {
-                new Transaction_tax_mapBean().saveTransaction_tax_map(aTransId, InvoiceNo);
+                new Transaction_tax_mapBean().saveTransaction_tax_map(aTransId, InvoiceNo, VerificationCode, QrCode);
             }
         } catch (Exception e) {
             System.err.println("submitTaxInvoiceOffline:" + e.getMessage());
@@ -326,6 +330,11 @@ public class InvoiceOfflineBean {
             JSONObject databasicInformation = parentbasicInformationjsonObject.getJSONObject("basicInformation");
             AntifakeCode = databasicInformation.getString("antifakeCode");
             InvoiceNo = databasicInformation.getString("invoiceNo");
+            VerificationCode = AntifakeCode;
+            //System.out.println("verificationNo:" + VerificationCode);
+            JSONObject summary = parentbasicInformationjsonObject.getJSONObject("summary");
+            QrCode = summary.getString("qrCode");
+            //System.out.println("QrCode:" + QrCode.length() + ":" + QrCode);
             //-System.out.println("AntiFakeCode: " + AntifakeCode);
             //-System.out.println("Invoice: " + InvoiceNo);
             //-System.out.println("-------------------------------------");
@@ -676,6 +685,34 @@ public class InvoiceOfflineBean {
 
     public void setInvoiceNo(String InvoiceNo) {
         this.InvoiceNo = InvoiceNo;
+    }
+
+    /**
+     * @return the VerificationCode
+     */
+    public String getVerificationCode() {
+        return VerificationCode;
+    }
+
+    /**
+     * @param VerificationCode the VerificationCode to set
+     */
+    public void setVerificationCode(String VerificationCode) {
+        this.VerificationCode = VerificationCode;
+    }
+
+    /**
+     * @return the QrCode
+     */
+    public String getQrCode() {
+        return QrCode;
+    }
+
+    /**
+     * @param QrCode the QrCode to set
+     */
+    public void setQrCode(String QrCode) {
+        this.QrCode = QrCode;
     }
 
 }
