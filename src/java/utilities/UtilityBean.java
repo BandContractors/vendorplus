@@ -653,7 +653,8 @@ public class UtilityBean implements Serializable {
     }
 
 //    public static void main(String[] args) {
-//        new UtilityBean().backupDatabase("kwenu_sm_branch2", "root", "WTLura456", "C:/wamp/bin/mysql/mysql5.6.17/bin", "C:/abc");
+//        //new UtilityBean().backupDatabase("kwenu_sm_branch2", "root", "WTLura456", "C:/wamp/bin/mysql/mysql5.6.17/bin", "C:/abc");
+//        System.out.println("123456".substring(0,5));
 //    }
     public void backupDatabase(String aDbName, String aDbUser, String aDbPassword, String aMySQLDumpFolderPath, String aSaveFolderPath) {
         try {

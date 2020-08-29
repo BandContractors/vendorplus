@@ -11287,8 +11287,8 @@ CREATE PROCEDURE sp_save_transaction_tax_map
 	IN in_transaction_reason_id int,
 	IN in_transaction_number varchar(50),
 	IN in_transaction_number_tax varchar(50),
-	IN in_verification_code_tax varchar(500),
-	IN in_qr_code_tax varchar(500),
+	IN in_verification_code_tax varchar(50),
+	IN in_qr_code_tax varchar(1000),
 	IN in_is_updated int,
 	IN in_update_synced int
 ) 

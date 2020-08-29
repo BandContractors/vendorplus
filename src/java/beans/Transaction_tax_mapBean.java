@@ -131,8 +131,12 @@ public class Transaction_tax_mapBean implements Serializable {
                 } catch (NullPointerException npe) {
                     cs.setString("in_verification_code_tax", "");
                 }
+                String Qcode = aTransaction_tax_map.getQr_code_tax();
                 try {
-                    cs.setString("in_qr_code_tax", aTransaction_tax_map.getQr_code_tax());
+                    if (aTransaction_tax_map.getQr_code_tax().length() > 1000) {
+                        Qcode = aTransaction_tax_map.getQr_code_tax().substring(0, 999);
+                    }
+                    cs.setString("in_qr_code_tax", Qcode);
                 } catch (NullPointerException npe) {
                     cs.setString("in_qr_code_tax", "");
                 }
@@ -155,7 +159,7 @@ public class Transaction_tax_mapBean implements Serializable {
         return saved;
     }
 
-    public void saveTransaction_tax_map(long aTransId, String aTransNoTax, String aVerCodeTax,String aQrCodeTax) {
+    public void saveTransaction_tax_map(long aTransId, String aTransNoTax, String aVerCodeTax, String aQrCodeTax) {
         try {
             Trans trans = new Trans();
             Transaction_tax_map transtaxmap = new Transaction_tax_map();
