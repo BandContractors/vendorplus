@@ -4021,10 +4021,31 @@ public class TransBean implements Serializable {
                 } catch (Exception e) {
                     //
                 }
-                if (IsThreadOn == 0) {
-                    new InvoiceOfflineBean().submitCreditNoteOffline(aNewTrans.getTransactionId(), aTransTypeId);
-                } else if (IsThreadOn == 1) {
-                    new InvoiceOfflineBean().submitCreditNoteOfflineThread(aNewTrans.getTransactionId(), aTransTypeId);
+                Transaction_tax_map ttm = new Transaction_tax_mapBean().getTransaction_tax_map(aNewTrans.getTransactionId(), aTransTypeId);
+                if (null == ttm) {
+                    //do nothing, original record for update not found
+                } else {
+                    if (ttm.getIs_updated() == 1) {
+                        new Transaction_tax_mapBean().markTransaction_tax_mapUpdated_more_than_once(ttm);
+                    } else {
+                        if (IsThreadOn == 0) {
+                            if (aNewTrans.getGrandTotal() > OldTrans.getGrandTotal() || aNewTrans.getTotalVat() > OldTrans.getTotalVat()) {//Debit note
+                                //System.out.println("Debit-Note-A");
+                                new InvoiceOfflineBean().submitDebitNoteOffline(aNewTrans.getTransactionId(), aTransTypeId);
+                            } else if (aNewTrans.getGrandTotal() < OldTrans.getGrandTotal() || aNewTrans.getTotalVat() < OldTrans.getTotalVat()) {//Credit note
+                                //System.out.println("Credit-Note-A");
+                                new InvoiceOfflineBean().submitCreditNoteOffline(aNewTrans.getTransactionId(), aTransTypeId);
+                            }
+                        } else if (IsThreadOn == 1) {
+                            if (aNewTrans.getGrandTotal() > OldTrans.getGrandTotal() || aNewTrans.getTotalVat() > OldTrans.getTotalVat()) {//Debit note
+                                //System.out.println("Debit-Note-B");
+                                new InvoiceOfflineBean().submitDebitNoteOfflineThread(aNewTrans.getTransactionId(), aTransTypeId);
+                            } else if (aNewTrans.getGrandTotal() < OldTrans.getGrandTotal() || aNewTrans.getTotalVat() < OldTrans.getTotalVat()) {//Credit note
+                                //System.out.println("Credit-Note-B");
+                                new InvoiceOfflineBean().submitCreditNoteOfflineThread(aNewTrans.getTransactionId(), aTransTypeId);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -11461,14 +11482,24 @@ public class TransBean implements Serializable {
         }
     }
 
-    public void reSubmitCreditNoteTaxAPI(long aInnerTransId, int aInnerTransTypeId, Trans aTrans, TransBean aTransBean) {
+    public void reSubmitDebitOrCreditNoteTaxAPI(long aInnerTransId, int aInnerTransTypeId, Trans aTrans, TransBean aTransBean, String aUpdateType) {
+        //TAX API
         try {
-            if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
-                new InvoiceOfflineBean().submitCreditNoteOffline(aInnerTransId, aInnerTransTypeId);
-                this.reportSalesTaxAPI(aTrans, aTransBean);
+            if (aInnerTransTypeId == 2 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {//SALES INVOICE
+                Transaction_tax_map ttm = new Transaction_tax_mapBean().getTransaction_tax_map(aInnerTransId, aInnerTransTypeId);
+                if (null == ttm) {
+                    //do nothing, original record for update not found
+                } else {
+                    if (aUpdateType.equals("Debit Note")) {//Debit note
+                        new InvoiceOfflineBean().submitDebitNoteOffline(aInnerTransId, aInnerTransTypeId);
+                    } else if (aUpdateType.equals("Credit Note")) {//Credit note
+                        new InvoiceOfflineBean().submitCreditNoteOffline(aInnerTransId, aInnerTransTypeId);
+                    }
+                }
             }
+            this.reportSalesTaxAPI(aTrans, aTransBean);
         } catch (Exception e) {
-            System.err.println("reSubmitCreditNoteTaxAPI:" + e.getMessage());
+            System.err.println("reSubmitDebitOrCreditNoteTaxAPI:" + e.getMessage());
         }
     }
 
@@ -11480,6 +11511,20 @@ public class TransBean implements Serializable {
             }
         } catch (Exception e) {
             System.err.println("reSubmitInvoiceTaxAPI:" + e.getMessage());
+        }
+    }
+
+    public void markManyUpdatesReconsiled(long aInnerTransId, int aInnerTransTypeId, Trans aTrans, TransBean aTransBean) {
+        //TAX API
+        try {
+            if (aInnerTransTypeId == 2 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {//SALES INVOICE
+                Transaction_tax_map ttm = new Transaction_tax_mapBean().getTransaction_tax_map(aInnerTransId, aInnerTransTypeId);
+                ttm.setMore_than_once_update_reconsiled(1);
+                new Transaction_tax_mapBean().saveTransaction_tax_map(ttm);
+            }
+            this.reportSalesTaxAPI(aTrans, aTransBean);
+        } catch (Exception e) {
+            System.err.println("markManyUpdatesReconsiled:" + e.getMessage());
         }
     }
 
@@ -11574,6 +11619,21 @@ public class TransBean implements Serializable {
                     trans.setTax_update_synced(rs.getInt("tax_update_synced"));
                 } catch (Exception npe) {
                     trans.setTax_update_synced(0);
+                }
+                try {
+                    trans.setUpdate_type(rs.getString("update_type"));
+                } catch (Exception npe) {
+                    trans.setUpdate_type("");
+                }
+                try {
+                    trans.setTransaction_number_tax_update(rs.getString("transaction_number_tax_update"));
+                } catch (Exception npe) {
+                    trans.setTransaction_number_tax_update("");
+                }
+                try {
+                    trans.setReconsile_flag(rs.getString("reconsile_flag"));
+                } catch (Exception npe) {
+                    trans.setReconsile_flag("");
                 }
                 this.TransList.add(trans);
             }

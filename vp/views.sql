@@ -489,7 +489,13 @@ SELECT
 	case when ifnull(t2.transaction_tax_map_id,0)>0 then 1 else 0 end as tax_synced,
 	ifnull(t2.is_updated,2) as tax_updated,
 	case when ifnull(t2.is_updated,2)=1 then ifnull(t2.update_synced,2) else 2 end as tax_update_synced,
-	case when ifnull(t2.transaction_tax_map_id,0)>0 and (ifnull(t2.is_updated,2)=0 or (ifnull(t2.is_updated,2)=1 and ifnull(t2.update_synced,2)=1)) then 'Synced' else 'Not Synced' end as sync_flag 
+	case when ifnull(t2.transaction_tax_map_id,0)>0 and (ifnull(t2.is_updated,2)=0 or (ifnull(t2.is_updated,2)=1 and ifnull(t2.update_synced,2)=1)) then 'Synced' else 'Not Synced' end as sync_flag,
+	t2.is_updated_more_than_once,t2.more_than_once_update_reconsiled,t2.transaction_number_tax_update,t2.update_type, 
+	case 
+		when t2.is_updated_more_than_once=1 and t2.more_than_once_update_reconsiled=1 then 'Reconsiled' 
+		when t2.is_updated_more_than_once=1 and t2.more_than_once_update_reconsiled=0 then 'Not Reconsiled' 
+		else '' 
+	end as reconsile_flag 
 	FROM transaction t 
 	left join transaction_tax_map t2 on t.transaction_id=t2.transaction_id 
 	WHERE t.transaction_type_id IN(2,65,68);

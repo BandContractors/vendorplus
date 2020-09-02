@@ -84,6 +84,36 @@ public class Transaction_tax_mapBean implements Serializable {
             } catch (NullPointerException npe) {
                 aTransaction_tax_map.setUpdate_synced(0);
             }
+            try {
+                aTransaction_tax_map.setUpdate_type(aResultSet.getString("update_type"));
+            } catch (NullPointerException npe) {
+                aTransaction_tax_map.setUpdate_type("");
+            }
+            try {
+                aTransaction_tax_map.setTransaction_number_tax_update(aResultSet.getString("transaction_number_tax_update"));
+            } catch (NullPointerException npe) {
+                aTransaction_tax_map.setTransaction_number_tax_update("");
+            }
+            try {
+                aTransaction_tax_map.setVerification_code_tax_update(aResultSet.getString("verification_code_tax_update"));
+            } catch (NullPointerException npe) {
+                aTransaction_tax_map.setVerification_code_tax_update("");
+            }
+            try {
+                aTransaction_tax_map.setQr_code_tax_update(aResultSet.getString("qr_code_tax_update"));
+            } catch (NullPointerException npe) {
+                aTransaction_tax_map.setQr_code_tax_update("");
+            }
+            try {
+                aTransaction_tax_map.setIs_updated_more_than_once(aResultSet.getInt("is_updated_more_than_once"));
+            } catch (NullPointerException npe) {
+                aTransaction_tax_map.setIs_updated_more_than_once(0);
+            }
+            try {
+                aTransaction_tax_map.setMore_than_once_update_reconsiled(aResultSet.getInt("more_than_once_update_reconsiled"));
+            } catch (NullPointerException npe) {
+                aTransaction_tax_map.setMore_than_once_update_reconsiled(0);
+            }
         } catch (SQLException se) {
             System.err.println(se.getMessage());
         }
@@ -91,7 +121,7 @@ public class Transaction_tax_mapBean implements Serializable {
 
     public int saveTransaction_tax_map(Transaction_tax_map aTransaction_tax_map) {
         int saved = 0;
-        String sql = "{call sp_save_transaction_tax_map(?,?,?,?,?,?,?,?,?,?)}";
+        String sql = "{call sp_save_transaction_tax_map(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 CallableStatement cs = conn.prepareCall(sql);) {
@@ -150,6 +180,41 @@ public class Transaction_tax_mapBean implements Serializable {
                 } catch (NullPointerException npe) {
                     cs.setInt("in_update_synced", 0);
                 }
+
+                try {
+                    cs.setString("in_update_type", aTransaction_tax_map.getUpdate_type());
+                } catch (NullPointerException npe) {
+                    cs.setString("in_update_type", "");
+                }
+                try {
+                    cs.setString("in_transaction_number_tax_update", aTransaction_tax_map.getTransaction_number_tax_update());
+                } catch (NullPointerException npe) {
+                    cs.setString("in_transaction_number_tax_update", "");
+                }
+                try {
+                    cs.setString("in_verification_code_tax_update", aTransaction_tax_map.getVerification_code_tax_update());
+                } catch (NullPointerException npe) {
+                    cs.setString("in_verification_code_tax_update", "");
+                }
+                String Qcode_update = aTransaction_tax_map.getQr_code_tax_update();
+                try {
+                    if (aTransaction_tax_map.getQr_code_tax_update().length() > 1000) {
+                        Qcode_update = aTransaction_tax_map.getQr_code_tax_update().substring(0, 999);
+                    }
+                    cs.setString("in_qr_code_tax_update", Qcode_update);
+                } catch (NullPointerException npe) {
+                    cs.setString("in_qr_code_tax_update", "");
+                }
+                try {
+                    cs.setInt("in_is_updated_more_than_once", aTransaction_tax_map.getIs_updated_more_than_once());
+                } catch (NullPointerException npe) {
+                    cs.setInt("in_is_updated_more_than_once", 0);
+                }
+                try {
+                    cs.setInt("in_more_than_once_update_reconsiled", aTransaction_tax_map.getMore_than_once_update_reconsiled());
+                } catch (NullPointerException npe) {
+                    cs.setInt("in_more_than_once_update_reconsiled", 0);
+                }
                 cs.executeUpdate();
                 saved = 1;
             }
@@ -178,6 +243,12 @@ public class Transaction_tax_mapBean implements Serializable {
                 transtaxmap.setQr_code_tax(aQrCodeTax);
                 transtaxmap.setIs_updated(0);
                 transtaxmap.setUpdate_synced(0);
+                transtaxmap.setUpdate_type("");
+                transtaxmap.setTransaction_number_tax_update("");
+                transtaxmap.setVerification_code_tax_update("");
+                transtaxmap.setQr_code_tax_update("");
+                transtaxmap.setIs_updated_more_than_once(0);
+                transtaxmap.setMore_than_once_update_reconsiled(0);
                 int x = this.saveTransaction_tax_map(transtaxmap);
             }
         } catch (Exception e) {
@@ -205,6 +276,29 @@ public class Transaction_tax_mapBean implements Serializable {
             }
         } catch (Exception e) {
             System.err.println("markTransaction_tax_mapUpdated:" + e.getMessage());
+        }
+    }
+
+    public void markTransaction_tax_mapUpdated_more_than_once(Transaction_tax_map aTransaction_tax_map) {
+        try {
+            if (null != aTransaction_tax_map) {
+                aTransaction_tax_map.setIs_updated_more_than_once(1);
+                aTransaction_tax_map.setMore_than_once_update_reconsiled(0);
+                int x = this.saveTransaction_tax_map(aTransaction_tax_map);
+            }
+        } catch (Exception e) {
+            System.err.println("markTransaction_tax_mapUpdated_more_than_once:" + e.getMessage());
+        }
+    }
+
+    public void markTransaction_tax_mapMore_than_once_update_reconsiled(Transaction_tax_map aTransaction_tax_map) {
+        try {
+            if (null != aTransaction_tax_map) {
+                aTransaction_tax_map.setMore_than_once_update_reconsiled(1);
+                int x = this.saveTransaction_tax_map(aTransaction_tax_map);
+            }
+        } catch (Exception e) {
+            System.err.println("markTransaction_tax_mapMore_than_once_update_reconsiled:" + e.getMessage());
         }
     }
 

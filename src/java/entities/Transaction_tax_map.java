@@ -21,6 +21,12 @@ public class Transaction_tax_map implements Serializable {
     private int update_synced;
     private String qr_code_tax;
     private String verification_code_tax;
+    private String update_type;
+    private String transaction_number_tax_update;
+    private String qr_code_tax_update;
+    private String verification_code_tax_update;
+    private int is_updated_more_than_once;
+    private int more_than_once_update_reconsiled;
 
     /**
      * @return the transaction_tax_map_id
@@ -174,5 +180,92 @@ public class Transaction_tax_map implements Serializable {
      */
     public void setVerification_code_tax(String verification_code_tax) {
         this.verification_code_tax = verification_code_tax;
+    }
+
+    /**
+     * @return the update_type
+     */
+    public String getUpdate_type() {
+        return update_type;
+    }
+
+    /**
+     * @param update_type the update_type to set
+     */
+    public void setUpdate_type(String update_type) {
+        this.update_type = update_type;
+    }
+
+    /**
+     * @return the transaction_number_tax_update
+     */
+    public String getTransaction_number_tax_update() {
+        return transaction_number_tax_update;
+    }
+
+    /**
+     * @param transaction_number_tax_update the transaction_number_tax_update to
+     * set
+     */
+    public void setTransaction_number_tax_update(String transaction_number_tax_update) {
+        this.transaction_number_tax_update = transaction_number_tax_update;
+    }
+
+    /**
+     * @return the qr_code_tax_update
+     */
+    public String getQr_code_tax_update() {
+        return qr_code_tax_update;
+    }
+
+    /**
+     * @param qr_code_tax_update the qr_code_tax_update to set
+     */
+    public void setQr_code_tax_update(String qr_code_tax_update) {
+        this.qr_code_tax_update = qr_code_tax_update;
+    }
+
+    /**
+     * @return the verification_code_tax_update
+     */
+    public String getVerification_code_tax_update() {
+        return verification_code_tax_update;
+    }
+
+    /**
+     * @param verification_code_tax_update the verification_code_tax_update to
+     * set
+     */
+    public void setVerification_code_tax_update(String verification_code_tax_update) {
+        this.verification_code_tax_update = verification_code_tax_update;
+    }
+
+    /**
+     * @return the is_updated_more_than_once
+     */
+    public int getIs_updated_more_than_once() {
+        return is_updated_more_than_once;
+    }
+
+    /**
+     * @param is_updated_more_than_once the is_updated_more_than_once to set
+     */
+    public void setIs_updated_more_than_once(int is_updated_more_than_once) {
+        this.is_updated_more_than_once = is_updated_more_than_once;
+    }
+
+    /**
+     * @return the more_than_once_update_reconsiled
+     */
+    public int getMore_than_once_update_reconsiled() {
+        return more_than_once_update_reconsiled;
+    }
+
+    /**
+     * @param more_than_once_update_reconsiled the
+     * more_than_once_update_reconsiled to set
+     */
+    public void setMore_than_once_update_reconsiled(int more_than_once_update_reconsiled) {
+        this.more_than_once_update_reconsiled = more_than_once_update_reconsiled;
     }
 }

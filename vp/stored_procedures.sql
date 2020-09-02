@@ -11290,7 +11290,13 @@ CREATE PROCEDURE sp_save_transaction_tax_map
 	IN in_verification_code_tax varchar(50),
 	IN in_qr_code_tax varchar(1000),
 	IN in_is_updated int,
-	IN in_update_synced int
+	IN in_update_synced int,
+	IN in_update_type varchar(20),
+	IN in_transaction_number_tax_update varchar(50),
+	IN in_verification_code_tax_update varchar(50),
+	IN in_qr_code_tax_update varchar(1000),
+	IN in_is_updated_more_than_once int,
+	IN in_more_than_once_update_reconsiled int
 ) 
 BEGIN 
 	SET @cur_sys_datetime=null;
@@ -11298,16 +11304,20 @@ BEGIN
 
 	if (in_transaction_tax_map_id=0) then 
 		INSERT INTO transaction_tax_map(transaction_id,transaction_type_id,transaction_reason_id,
-		transaction_number,transaction_number_tax,verification_code_tax,qr_code_tax,add_date,is_updated,update_synced) 
+		transaction_number,transaction_number_tax,verification_code_tax,qr_code_tax,add_date,is_updated,update_synced,
+		update_type,transaction_number_tax_update,verification_code_tax_update,qr_code_tax_update,is_updated_more_than_once,more_than_once_update_reconsiled) 
 		VALUES(in_transaction_id,in_transaction_type_id,in_transaction_reason_id,in_transaction_number,in_transaction_number_tax,
-		in_verification_code_tax,in_qr_code_tax,@cur_sys_datetime,in_is_updated,in_update_synced);
+		in_verification_code_tax,in_qr_code_tax,@cur_sys_datetime,in_is_updated,in_update_synced,
+		in_update_type,in_transaction_number_tax_update,in_verification_code_tax_update,in_qr_code_tax_update,in_is_updated_more_than_once,in_more_than_once_update_reconsiled);
 	end if;
 
 	if (in_transaction_tax_map_id>0) then 
 		UPDATE transaction_tax_map SET transaction_id=in_transaction_id,transaction_type_id=in_transaction_type_id,
 		transaction_reason_id=in_transaction_reason_id,transaction_number=in_transaction_number,transaction_number_tax=in_transaction_number_tax,
 		verification_code_tax=in_verification_code_tax,qr_code_tax=in_qr_code_tax,
-		is_updated=in_is_updated,update_synced=in_update_synced 
+		is_updated=in_is_updated,update_synced=in_update_synced,update_type=in_update_type,transaction_number_tax_update=in_transaction_number_tax_update,
+		verification_code_tax_update=in_verification_code_tax_update,qr_code_tax_update=in_qr_code_tax_update,
+		is_updated_more_than_once=in_is_updated_more_than_once,more_than_once_update_reconsiled=in_more_than_once_update_reconsiled 
 		WHERE transaction_tax_map_id=in_transaction_tax_map_id;
 	end if;
 END//

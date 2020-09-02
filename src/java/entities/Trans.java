@@ -145,6 +145,9 @@ public class Trans implements Serializable {
     private String sync_flag;
     private String qr_code_tax;
     private String verification_code_tax;
+    private String reconsile_flag;
+    private String transaction_number_tax_update;
+    private String update_type;
 
     /**
      * @return the TransactionId
@@ -1796,6 +1799,48 @@ public class Trans implements Serializable {
      */
     public void setVerification_code_tax(String verification_code_tax) {
         this.verification_code_tax = verification_code_tax;
+    }
+
+    /**
+     * @return the reconsile_flag
+     */
+    public String getReconsile_flag() {
+        return reconsile_flag;
+    }
+
+    /**
+     * @param reconsile_flag the reconsile_flag to set
+     */
+    public void setReconsile_flag(String reconsile_flag) {
+        this.reconsile_flag = reconsile_flag;
+    }
+
+    /**
+     * @return the transaction_number_tax_update
+     */
+    public String getTransaction_number_tax_update() {
+        return transaction_number_tax_update;
+    }
+
+    /**
+     * @param transaction_number_tax_update the transaction_number_tax_update to set
+     */
+    public void setTransaction_number_tax_update(String transaction_number_tax_update) {
+        this.transaction_number_tax_update = transaction_number_tax_update;
+    }
+
+    /**
+     * @return the update_type
+     */
+    public String getUpdate_type() {
+        return update_type;
+    }
+
+    /**
+     * @param update_type the update_type to set
+     */
+    public void setUpdate_type(String update_type) {
+        this.update_type = update_type;
     }
 
 }

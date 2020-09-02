@@ -269,7 +269,18 @@
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
-                        <p:ajax listener="#{transBean.reSubmitCreditNoteTaxAPI(itm.transactionId,itm.transactionTypeId,trans,transBean)}" update="tblDetail"/>
+                        <p:ajax listener="#{transBean.reSubmitDebitOrCreditNoteTaxAPI(itm.transactionId,itm.transactionTypeId,trans,transBean,itm.update_type)}" update="tblDetail"/>
+                    </p:commandButton>
+                    <h:outputText value=" #{itm.update_type eq 'Debit Note' ? 'DebitNote':itm.update_type eq 'Credit Note' ? 'CreditNote':''}" style="font-size: 10px;"/>
+                    <h:outputText value=" #{itm.transaction_number_tax_update}" style="font-size: 10px;"/>
+                </p:column>
+                <p:column headerText="Many updates reconsiled">
+                    <h:outputText value="#{itm.reconsile_flag eq 'Reconsiled' ? 'Yes':itm.reconsile_flag eq 'Not Reconsiled' ? 'No':''}" styleClass="#{itm.reconsile_flag eq 'Reconsiled' ? 'green':itm.reconsile_flag eq 'Not Reconsiled' ? 'red':''}" style="width: 60px;color: #ffffff !important;text-align: right !important;"/>
+                    <p:commandButton id="cmdbReconsile" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" icon="ui-icon-arrowreturnthick-1-n" style="width: 20px;height: 30px;margin: 5px;"  rendered="#{itm.reconsile_flag eq 'Not Reconsiled'}">
+                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                        <p:ajax listener="#{transBean.markManyUpdatesReconsiled(itm.transactionId,itm.transactionTypeId,trans,transBean)}" update="tblDetail"/>
                     </p:commandButton>
                 </p:column>
             </p:dataTable>
