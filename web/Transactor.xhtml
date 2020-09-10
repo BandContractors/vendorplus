@@ -22,6 +22,8 @@
     <f:metadata>
         <f:viewAction action="#{transactorBean.initTransactorObj()}"/>
         <f:viewAction action="#{utilityBean.clearList(transactorBean.transactorList)}"/>
+        <f:viewAction action="#{iso_country_codeBean.refreshIso_country_codesList()}"/>
+        <f:viewAction action="#{id_typeBean.refreshId_typesList(1,2,2)}"/>
     </f:metadata>
     <f:event listener="#{navigationBean.checkAccessDeniedTransactor(generalUserSetting.transactorType, 'View')}" type="preRenderView" />
     <h:body>

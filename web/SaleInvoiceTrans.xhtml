@@ -240,9 +240,7 @@
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
                     <h:selectOneMenu styleClass="clsMenu" style="width: 150px" id="menuVatRated2" value="#{transItem.vatRated2}">
-                        <f:selectItem itemLabel="STANDARD" itemValue="STANDARD"/>
-                        <f:selectItem itemLabel="ZERO" itemValue="ZERO"/>
-                        <f:selectItem itemLabel="EXEMPT" itemValue="EXEMPT"/>
+                        <f:selectItems value="#{utilityBean.getStringArrayFromCommaSeperatedStr(itemBean.selectedItem.vatRated)}"/>
                     </h:selectOneMenu>
                 </h:panelGrid>
                 <h:panelGrid id="pgrdWarranty2" columns="2" rendered="#{transItem.specifyWarranty}">

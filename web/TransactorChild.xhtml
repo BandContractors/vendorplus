@@ -22,6 +22,8 @@
     <f:metadata>
         <f:viewAction action="#{transactorBean.initTransactorObj()}"/>
         <f:viewAction action="#{utilityBean.clearList(transactorBean.transactorList)}"/>
+        <f:viewAction action="#{iso_country_codeBean.refreshIso_country_codesList()}"/>
+        <f:viewAction action="#{id_typeBean.refreshId_typesList(1,2,2)}"/>
     </f:metadata>
     <h:body>
         <h:form id="form" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
@@ -65,6 +67,7 @@
                         <f:selectItem itemLabel="" />
                         <f:selectItem itemLabel="Individual" itemValue="Individual"/>
                         <f:selectItem itemLabel="Company" itemValue="Company"/>
+                        <f:selectItem itemLabel="Government" itemValue="Government"/>
                     </h:selectOneMenu>
                     <h:outputLabel  value="Segment:"/>
                     <h:selectOneMenu styleClass="clsMenu" id="menuTransactorSegment" value="#{transactorBean.transactorObj.transactor_segment_id}" style="width: 206px;">
@@ -114,7 +117,7 @@
                 </h:panelGrid>
                 <h:panelGrid id="pnlCol2" columns="2">
                     <h:outputLabel  value="Sex:"/>
-                    <h:selectOneMenu styleClass="clsMenu" value="#{transactorBean.transactorObj.sex}" style="width: 206px;">
+                    <h:selectOneMenu styleClass="clsMenu" value="#{transactorBean.transactorObj.sex}" style="width: 210px;">
                         <f:selectItem itemLabel="" itemValue=""/>
                         <f:selectItem itemLabel="F" itemValue="F"/>
                         <f:selectItem itemLabel="M" itemValue="M"/>
@@ -122,10 +125,13 @@
                     <h:outputLabel  value="Occupation:"/>
                     <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.occupation}" autocomplete="off" style="width: 203px;"/>
                     <h:outputLabel  value="Country:"/>
-                    <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.locCountry}" autocomplete="on" style="width: 203px;"/>
-                    <h:outputLabel  value="District:"/>
+                    <h:selectOneMenu styleClass="clsMenu" value="#{transactorBean.transactorObj.locCountry}" style="width: 210px;">
+                        <f:selectItem itemLabel="" itemValue=""/>
+                        <f:selectItems value="#{iso_country_codeBean.iso_country_codeList}" var="ic" itemValue="#{ic.code_3}" itemLabel="#{ic.country_short_name}"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel  value="#{menuItemBean.menuItemObj.LOC_LEVEL_2_LABEL}:"/>
                     <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.locDistrict}" autocomplete="on" style="width: 203px;"/>
-                    <h:outputLabel  value="Town/Village:"/>
+                    <h:outputLabel  value="#{menuItemBean.menuItemObj.LOC_LEVEL_3_LABEL}:"/>
                     <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.locTown}" autocomplete="on" style="width: 203px;"/>
                     <h:outputLabel  value="Physical Address:"/>
                     <h:inputTextarea styleClass="clsInput" id="itxaPhysicalAddress" rows="2" value="#{transactorBean.transactorObj.physicalAddress}" style="width: 202px;"/>
@@ -134,7 +140,10 @@
                     <h:outputLabel  value="File Ref:"/>
                     <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.fileReference}" autocomplete="off" style="width: 203px;"/>
                     <h:outputLabel  value="ID Type:"/>
-                    <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.idType}" autocomplete="off" style="width: 203px;"/>
+                    <h:selectOneMenu id="menuId_type" styleClass="clsMenu" value="#{transactorBean.transactorObj.idType}" style="width: 210px;">
+                        <f:selectItem itemLabel="" itemValue=""/>
+                        <f:selectItems value="#{id_typeBean.id_typeList}" var="it" itemValue="#{it.id_type_code}" itemLabel="#{it.id_type_name}"/>
+                    </h:selectOneMenu>
                     <h:outputLabel  value="ID Number:"/>
                     <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.idNumber}" autocomplete="off" style="width: 203px;"/>
                     <h:outputLabel  value="ID Expiry Date:"/>

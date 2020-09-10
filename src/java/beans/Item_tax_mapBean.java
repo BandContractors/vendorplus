@@ -102,7 +102,7 @@ public class Item_tax_mapBean implements Serializable {
                             new StockManage().registerItemCallThread(ItemId, aItemCodeTax);
                         }
                     } else {//update
-                        if (itmap.getItem_code_tax().equals(aItemCodeTax)) {
+                        if (itmap.getItem_code_tax().equals(aItemCodeTax) && itmap.getIs_synced()==1) {
                             //nothing has changed
                         } else {
                             itmap4save.setItem_tax_map_id(itmap.getItem_tax_map_id());

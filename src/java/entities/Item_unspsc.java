@@ -27,6 +27,11 @@ public class Item_unspsc implements Serializable {
     private String class_name;
     private String commodity_code;
     private String commodity_name;
+    private String excise_duty_product_type;
+    private String vat_rate;
+    private String service_mark;
+    private String zero_rate;
+    private String exempt_rate;
 
     /**
      * @return the item_unspsc_id
@@ -152,5 +157,75 @@ public class Item_unspsc implements Serializable {
      */
     public void setCommodity_name(String commodity_name) {
         this.commodity_name = commodity_name;
+    }
+
+    /**
+     * @return the excise_duty_product_type
+     */
+    public String getExcise_duty_product_type() {
+        return excise_duty_product_type;
+    }
+
+    /**
+     * @param excise_duty_product_type the excise_duty_product_type to set
+     */
+    public void setExcise_duty_product_type(String excise_duty_product_type) {
+        this.excise_duty_product_type = excise_duty_product_type;
+    }
+
+    /**
+     * @return the vat_rate
+     */
+    public String getVat_rate() {
+        return vat_rate;
+    }
+
+    /**
+     * @param vat_rate the vat_rate to set
+     */
+    public void setVat_rate(String vat_rate) {
+        this.vat_rate = vat_rate;
+    }
+
+    /**
+     * @return the service_mark
+     */
+    public String getService_mark() {
+        return service_mark;
+    }
+
+    /**
+     * @param service_mark the service_mark to set
+     */
+    public void setService_mark(String service_mark) {
+        this.service_mark = service_mark;
+    }
+
+    /**
+     * @return the zero_rate
+     */
+    public String getZero_rate() {
+        return zero_rate;
+    }
+
+    /**
+     * @param zero_rate the zero_rate to set
+     */
+    public void setZero_rate(String zero_rate) {
+        this.zero_rate = zero_rate;
+    }
+
+    /**
+     * @return the exempt_rate
+     */
+    public String getExempt_rate() {
+        return exempt_rate;
+    }
+
+    /**
+     * @param exempt_rate the exempt_rate to set
+     */
+    public void setExempt_rate(String exempt_rate) {
+        this.exempt_rate = exempt_rate;
     }
 }

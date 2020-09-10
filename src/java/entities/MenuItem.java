@@ -29,6 +29,8 @@ public class MenuItem implements Serializable {
     private Store CURRENT_STORE;
     private String CUSTOMER_NAME;
     private String SUPPLIER_NAME;
+    private String LOC_LEVEL_2_LABEL;
+    private String LOC_LEVEL_3_LABEL;
 
     /**
      * @return the SYSTEM_NAME
@@ -168,5 +170,33 @@ public class MenuItem implements Serializable {
      */
     public void setSUPPLIER_NAME(String SUPPLIER_NAME) {
         this.SUPPLIER_NAME = SUPPLIER_NAME;
+    }
+
+    /**
+     * @return the LOC_LEVEL_2_LABEL
+     */
+    public String getLOC_LEVEL_2_LABEL() {
+        return LOC_LEVEL_2_LABEL;
+    }
+
+    /**
+     * @param LOC_LEVEL_2_LABEL the LOC_LEVEL_2_LABEL to set
+     */
+    public void setLOC_LEVEL_2_LABEL(String LOC_LEVEL_2_LABEL) {
+        this.LOC_LEVEL_2_LABEL = LOC_LEVEL_2_LABEL;
+    }
+
+    /**
+     * @return the LOC_LEVEL_3_LABEL
+     */
+    public String getLOC_LEVEL_3_LABEL() {
+        return LOC_LEVEL_3_LABEL;
+    }
+
+    /**
+     * @param LOC_LEVEL_3_LABEL the LOC_LEVEL_3_LABEL to set
+     */
+    public void setLOC_LEVEL_3_LABEL(String LOC_LEVEL_3_LABEL) {
+        this.LOC_LEVEL_3_LABEL = LOC_LEVEL_3_LABEL;
     }
 }

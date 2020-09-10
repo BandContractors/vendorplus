@@ -945,6 +945,7 @@ public class TransactorBean implements Serializable {
             transactor.setMonthNetPay(0);
             transactor.setTransactor_segment_id(0);
             transactor.setStore_id(0);
+            transactor.setLocCountry(new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "COUNTRY_CODE").getParameter_value());
         }
     }
 
@@ -997,6 +998,7 @@ public class TransactorBean implements Serializable {
             }
             //init transactor ref no
             //this.setNewTransctorRef(transactor);
+            transactor.setLocCountry(new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "COUNTRY_CODE").getParameter_value());
         }
     }
 

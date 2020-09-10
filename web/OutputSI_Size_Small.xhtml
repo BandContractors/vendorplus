@@ -220,6 +220,9 @@
                         <h:panelGrid id="pnlgBarCode" columns="1" style="margin: 0px;border:none;" rendered="#{generalUserSetting.outputDetailParent.trans.qr_code_tax.length() gt 0}">  
                             <p:barcode id="barCODEqr" value="#{generalUserSetting.outputDetailParent.trans.qr_code_tax}" type="qr" style="width: 176px;height: 128px;"/>
                         </h:panelGrid>
+                        <h:panelGrid style="width: 290px; margin: 0px;border-bottom-style: dotted;text-align: center;" columns="1" rendered="#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','FOOTER_MESSAGE').parameter_value.length() gt 0}">
+                            <h:outputLabel style="font-size: 10px;font-weight: bold;" value="#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','FOOTER_MESSAGE').parameter_value}"/>
+                        </h:panelGrid>
                         <h:panelGrid id="IpgrdSalesInvoiceFooter2" style="width: 290px; margin: 0px;border-bottom-style: dotted" columns="1" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getIsShowDeveloper(),'Yes')}">
                             <h:outputLabel style="font-size: 10px;" value="System developed by WINGERsoft Technologies Ltd"/>
                             <h:outputLabel style="font-size: 10px;" value="#{companySetting.getDeveloperEmail()} | #{companySetting.getDeveloperPhone()}"/>

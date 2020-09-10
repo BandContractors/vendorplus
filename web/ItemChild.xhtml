@@ -68,11 +68,11 @@
                         <f:selectItem itemLabel="SERVICE" itemValue="SERVICE"/>
                     </h:selectOneMenu>
                     <h:outputLabel value="VAT Rated"/>
-                    <h:selectOneMenu id="menuVatRated" value="#{itemBean.itemObj.vatRated}" style="width: 200px">
+                    <p:selectCheckboxMenu id="menuVatRateds" value="#{itemBean.itemObj.selectedVatRateds}" multiple="true" style="width: 200px;">
                         <f:selectItem itemLabel="STANDARD" itemValue="STANDARD"/>
                         <f:selectItem itemLabel="ZERO" itemValue="ZERO"/>
                         <f:selectItem itemLabel="EXEMPT" itemValue="EXEMPT"/>
-                    </h:selectOneMenu>
+                    </p:selectCheckboxMenu>
                     <h:outputLabel value="Asset Type:"/>
                     <h:selectOneMenu id="menuAssetType" value="#{itemBean.itemObj.assetType}" style="width: 200px;background-color: #{listOptionBean.getColorByBoolean(generalUserSetting.currentItemPurpose.equals('Asset'))}" disabled="#{!generalUserSetting.currentItemPurpose.equals('Asset')}">
                         <f:selectItem itemLabel="" itemValue=""/>
@@ -360,36 +360,37 @@
                     <h:outputLabel value="United Nations Standard Products and Services Code (UNSPSC)" style="font-weight: bold;"/>
                 </h:panelGrid>
                 <h:panelGrid columns="1" style="text-align: center;">
-                    <p:scrollPanel mode="native">
-                        <h:panelGrid columns="4">
-                            <h:outputLabel value="Enter text:"/>
-                            <h:inputText id="itxtUNSPSCSearch" value="#{itemBean.searchUNSPSC}"/>
-                            <p:commandButton id="cmdbtnSearchUNSPSC" value="Search" actionListener="#{itemBean.refreshItem_unspscList(itemBean.searchUNSPSC)}" update="formMain:tblUNSPSC"/>
-                            <h:outputLabel value="(Only TOP 10 Search Results to be displayed)"/>
-                        </h:panelGrid>
-                        <p:dataTable id="tblUNSPSC" rowIndexVar="rowIndex" tableStyle="width:auto;" var="unspsc" value="#{itemBean.item_unspscList}">
-                            <p:column headerText="Code" style="text-align: left;font-size: 14px;">
-                                <h:outputText value="#{rowIndex+1}"/>
-                            </p:column>
-                            <p:column headerText="Code" style="text-align: left;font-size: 14px;">
-                                <p:commandLink value="#{unspsc.commodity_code}"  oncomplete="PF('sbarUNSPSC').hide()">
-                                    <f:ajax listener="#{itemBean.itemObj.setItem_code_tax(unspsc.commodity_code)}" render="formMain:itxtUNSPSC"/>
-                                </p:commandLink>
-                            </p:column>
-                            <p:column headerText="Commodity" style="text-align: left;font-size: 14px;">
-                                <h:outputText value="#{unspsc.commodity_name}"/>
-                            </p:column>
-                            <p:column headerText="Class" style="text-align: left;font-size: 14px;">
-                                <h:outputText value="#{unspsc.class_name}"/>
-                            </p:column>
-                            <p:column headerText="Family" style="text-align: left;font-size: 14px;">
-                                <h:outputText value="#{unspsc.family_name}"/>
-                            </p:column>
-                            <p:column headerText="Segment" style="text-align: left;font-size: 14px;">
-                                <h:outputText value="#{unspsc.segment_name}"/>
-                            </p:column>
-                        </p:dataTable>
-                    </p:scrollPanel>
+                    <h:panelGrid columns="4">
+                        <h:outputLabel value="Enter text:"/>
+                        <h:inputText id="itxtUNSPSCSearch" value="#{itemBean.searchUNSPSC}"/>
+                        <p:commandButton id="cmdbtnSearchUNSPSC" value="Search" actionListener="#{itemBean.refreshItem_unspscList(itemBean.searchUNSPSC)}" update="formMain:tblUNSPSC"/>
+                        <h:outputLabel value=""/>
+                    </h:panelGrid>
+                    <p:dataTable id="tblUNSPSC" rowIndexVar="rowIndex" tableStyle="width:auto;" var="unspsc" value="#{itemBean.item_unspscList}" 
+                                 paginator="true" rows="8" 
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}" 
+                                 rowsPerPageTemplate="8,10">
+                        <p:column headerText="Code" style="text-align: left;font-size: 14px;">
+                            <h:outputText value="#{rowIndex+1}"/>
+                        </p:column>
+                        <p:column headerText="Code" style="text-align: left;font-size: 14px;">
+                            <p:commandLink value="#{unspsc.commodity_code}"  oncomplete="PF('sbarUNSPSC').hide()">
+                                <f:ajax listener="#{itemBean.itemObj.setItem_code_tax(unspsc.commodity_code)}" render="formMain:itxtUNSPSC"/>
+                            </p:commandLink>
+                        </p:column>
+                        <p:column headerText="Commodity" style="text-align: left;font-size: 14px;">
+                            <h:outputText value="#{unspsc.commodity_name}"/>
+                        </p:column>
+                        <p:column headerText="Class" style="text-align: left;font-size: 14px;">
+                            <h:outputText value="#{unspsc.class_name}"/>
+                        </p:column>
+                        <p:column headerText="Family" style="text-align: left;font-size: 14px;">
+                            <h:outputText value="#{unspsc.family_name}"/>
+                        </p:column>
+                        <p:column headerText="Segment" style="text-align: left;font-size: 14px;">
+                            <h:outputText value="#{unspsc.segment_name}"/>
+                        </p:column>
+                    </p:dataTable>
                 </h:panelGrid>
             </p:sidebar>
         </h:form>

@@ -3,6 +3,8 @@ package beans;
 import entities.CompanySetting;
 import entities.MenuItem;
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import sessions.GeneralUserSetting;
@@ -87,6 +89,24 @@ public class MenuItemBean implements Serializable {
                 this.MenuItemObj.setSUPPLIER_NAME(ParaValue);
             } catch (Exception e) {
                 this.MenuItemObj.setSUPPLIER_NAME("Supplier");
+            }
+            try {
+                this.MenuItemObj.setLOC_LEVEL_2_LABEL("District");
+                this.MenuItemObj.setLOC_LEVEL_3_LABEL("Town/Village");
+                String ParaValue = pb.getParameter_listByContextNameMemory("LOCATION", "LEVEL_2_3_LABEL").getParameter_value();
+                if (ParaValue.length() > 0) {
+                    String[] Levs = ParaValue.split(",");
+                    List<String> container = Arrays.asList(Levs);
+                    for (int i = 0; i < container.size(); i++) {
+                        if (i == 0 && container.get(i).length() > 0) {
+                            this.MenuItemObj.setLOC_LEVEL_2_LABEL(container.get(i));
+                        } else if (i == 1 && container.get(i).length() > 0) {
+                            this.MenuItemObj.setLOC_LEVEL_3_LABEL(container.get(i));
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                //do nothing
             }
         } catch (Exception e) {
 

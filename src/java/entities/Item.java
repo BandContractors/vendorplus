@@ -33,6 +33,7 @@ public class Item implements Serializable {
     private double UnitWholesalePrice;
     private String IsSuspended;
     private String VatRated;
+    private String[] SelectedVatRateds;
     private String ItemImgUrl;
     private int CountItems;//for report only
     private String ItemType;
@@ -816,6 +817,20 @@ public class Item implements Serializable {
      */
     public void setIs_synced_tax(int is_synced_tax) {
         this.is_synced_tax = is_synced_tax;
+    }
+
+    /**
+     * @return the SelectedVatRateds
+     */
+    public String[] getSelectedVatRateds() {
+        return SelectedVatRateds;
+    }
+
+    /**
+     * @param SelectedVatRateds the SelectedVatRateds to set
+     */
+    public void setSelectedVatRateds(String[] SelectedVatRateds) {
+        this.SelectedVatRateds = SelectedVatRateds;
     }
 
 }

@@ -5,13 +5,8 @@ import beans.Alert_generalBean;
 import connections.DBConnection;
 import entities.CompanySetting;
 import entities.Item;
-import entities.Stock;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.URISyntaxException;
-import java.security.CodeSource;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -685,6 +680,58 @@ public class UtilityBean implements Serializable {
         } catch (IOException | InterruptedException ex) {
             System.err.println("Error at Backup" + ex.getMessage());
         }
+    }
+
+    public String getCommaSeperatedStrFromStringArray(String[] aStringArray) {
+        String CommaSeperatedStr = "";
+        try {
+            if (aStringArray.length == 0) {
+                CommaSeperatedStr = "";
+            } else {
+                for (int i = 0; i < aStringArray.length; i++) {
+                    if (CommaSeperatedStr.length() == 0) {
+                        CommaSeperatedStr = aStringArray[i];
+                    } else {
+                        CommaSeperatedStr = CommaSeperatedStr + "," + aStringArray[i];
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("getCommaSeperatedStrFromStringArray:" + e.getMessage());
+        }
+        return CommaSeperatedStr;
+    }
+
+    public String[] getStringArrayFromCommaSeperatedStr(String aCommaSeperatedStr) {
+        String[] StringArray = null;
+        try {
+            if (null == aCommaSeperatedStr) {
+                //
+            } else {
+                if (aCommaSeperatedStr.length() > 0) {
+                    StringArray = aCommaSeperatedStr.split(",");
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("getStringArrayFromCommaSeperatedStr:" + e.getMessage());
+        }
+        return StringArray;
+    }
+
+    public String getFirstStringFromCommaSeperatedStr(String aCommaSeperatedStr) {
+        String FirstString = "";
+        try {
+            if (null == aCommaSeperatedStr) {
+                //
+            } else {
+                if (aCommaSeperatedStr.length() > 0) {
+                    FirstString = aCommaSeperatedStr.split(",")[0];
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("getFirstStringFromCommaSeperatedStr:" + e.getMessage());
+        }
+        return FirstString;
     }
 
     /**
