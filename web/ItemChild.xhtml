@@ -375,7 +375,7 @@
                         </p:column>
                         <p:column headerText="Code" style="text-align: left;font-size: 14px;">
                             <p:commandLink value="#{unspsc.commodity_code}"  oncomplete="PF('sbarUNSPSC').hide()">
-                                <f:ajax listener="#{itemBean.itemObj.setItem_code_tax(unspsc.commodity_code)}" render="formMain:itxtUNSPSC"/>
+                                <f:ajax listener="#{itemBean.updateItemFromUNSPC(itemBean.itemObj,unspsc)}" render="formMain:itxtUNSPSC formMain:menuVatRateds"/>
                             </p:commandLink>
                         </p:column>
                         <p:column headerText="Commodity" style="text-align: left;font-size: 14px;">
@@ -389,6 +389,10 @@
                         </p:column>
                         <p:column headerText="Segment" style="text-align: left;font-size: 14px;">
                             <h:outputText value="#{unspsc.segment_name}"/>
+                        </p:column>
+                        <p:column headerText="Tax Rates" style="text-align: left;font-size: 14px;">
+                            <h:outputText value="VAT(Standard:#{unspsc.vat_rate},Zero:#{unspsc.zero_rate},Exempt:#{unspsc.exempt_rate}) "/>
+                            <h:outputText value="Excise duty product type:#{unspsc.excise_duty_product_type}"/>
                         </p:column>
                     </p:dataTable>
                 </h:panelGrid>

@@ -62,6 +62,9 @@ ADD COLUMN service_mark VARCHAR(45) NULL  AFTER vat_rate ,
 ADD COLUMN zero_rate VARCHAR(45) NULL  AFTER service_mark ,
 ADD COLUMN exempt_rate VARCHAR(45) NULL  AFTER zero_rate ;
 
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_12',65,Now(),'6.0','');
+
 
 
 
