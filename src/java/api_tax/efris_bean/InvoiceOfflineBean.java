@@ -211,16 +211,46 @@ public class InvoiceOfflineBean {
             }
 
             //buyerDetails
-            if (transactor.getTransactorId() > 0) {
-                buyerDetails.setBuyerTin(transactor.getTaxIdentity());
-                buyerDetails.setBuyerLegalName(transactor.getTransactorNames());
+            String BuyerType = "B2C";
+            if (null == transactor) {
+                //do nothing
             } else {
-                buyerDetails.setBuyerTin("");
-                buyerDetails.setBuyerLegalName("");
+                if (transactor.getTransactorId() > 0) {
+                    if (transactor.getCategory().equals("Company")) {
+                        BuyerType = "B2B";
+                    } else if (transactor.getCategory().equals("Government")) {
+                        BuyerType = "B2G";
+                    } else {
+                        BuyerType = "B2C";
+                    }
+                } else {
+                    BuyerType = "B2C";
+                }
             }
-            buyerDetails.setBuyerType(Integer.toString(1));
-            //extend
+            if (BuyerType.equals("B2B") || BuyerType.equals("B2G")) {
+                buyerDetails.setBuyerType(Integer.toString(1));
+            } else {
+                buyerDetails.setBuyerType(Integer.toString(2));
+            }
+            if (null == transactor) {
+                buyerDetails.setBuyerLegalName("Walk-In Customer");
+            } else {
+                if (transactor.getTransactorId() > 0) {
+                    if (transactor.getTransactorNames().length() > 0) {
+                        buyerDetails.setBuyerLegalName(transactor.getTransactorNames());
+                    }
+                    if (transactor.getTaxIdentity().length() > 0) {
+                        buyerDetails.setBuyerTin(transactor.getTaxIdentity());
+                    }
+                    if (transactor.getIdNumber().length() > 0) {
+                        buyerDetails.setBuyerNinBrn(transactor.getIdNumber());
+                    }
+                } else {
+                    buyerDetails.setBuyerLegalName("Walk-In Customer");
+                }
+            }
 
+            //extend
             //goodsDetails
             Item itm = null;
             Item_tax_map im = null;

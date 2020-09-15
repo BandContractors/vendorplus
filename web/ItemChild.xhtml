@@ -367,11 +367,13 @@
                         <h:outputLabel value=""/>
                     </h:panelGrid>
                     <p:dataTable id="tblUNSPSC" rowIndexVar="rowIndex" tableStyle="width:auto;" var="unspsc" value="#{itemBean.item_unspscList}" 
-                                 paginator="true" rows="8" 
+                                 paginator="true" rows="7" 
                                  paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}" 
-                                 rowsPerPageTemplate="8,10">
+                                 rowsPerPageTemplate="7,10">
                         <p:column headerText="Code" style="text-align: left;font-size: 14px;">
-                            <h:outputText value="#{rowIndex+1}"/>
+                            <h:outputText value="#{rowIndex+1} "/>
+                            <h:outputText value="Service" rendered="#{unspsc.service_mark.equals('Y')}"/>
+                            <h:outputText value="Product" rendered="#{unspsc.service_mark.equals('N')}"/>
                         </p:column>
                         <p:column headerText="Code" style="text-align: left;font-size: 14px;">
                             <p:commandLink value="#{unspsc.commodity_code}"  oncomplete="PF('sbarUNSPSC').hide()">

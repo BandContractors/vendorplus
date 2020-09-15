@@ -554,7 +554,7 @@ public class Alert_generalBean implements Serializable {
                 + "("
                 + "(read_by NOT REGEXP '^" + userid + ",') AND (read_by NOT REGEXP '," + userid + "$') AND  (read_by NOT REGEXP '," + userid + ",') AND read_by!='" + userid + "'"
                 + ")";
-        //System.out.println("SQL-ALERT:" + sql);
+        System.out.println("SQL-ALERT:" + sql);
         ResultSet rs = null;
         List<Alert_general> aList = new ArrayList<>();
         try (
@@ -578,7 +578,8 @@ public class Alert_generalBean implements Serializable {
             FacesContext context = FacesContext.getCurrentInstance();
             HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
             HttpSession httpSession = request.getSession(true);
-            List<Alert_general> agL = this.retrieveUserUnreadStockAlerts();
+            //List<Alert_general> agL = this.retrieveUserUnreadStockAlerts();
+            List<Alert_general> agL=new ArrayList<>();
             httpSession.setAttribute("USER_UNREAD_STOCK_ALERTS_LIST", agL);
             httpSession.setAttribute("USER_UNREAD_STOCK_ALERTS_COUNT", agL.size());
         } catch (NullPointerException | ClassCastException npe) {

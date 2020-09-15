@@ -177,6 +177,12 @@
                 <p:column headerText="Subcategory" visible="false" style="font-size: 12px;">
                     <h:outputText value="#{itm.subCategoryName}"/>
                 </p:column>
+                <p:column headerText="UN Item Code" visible="false" style="font-size: 12px;">
+                    <h:outputText value="#{itm.item_code_tax}"/>
+                </p:column>
+                <p:column headerText="Tax Code Synced" visible="false" style="font-size: 12px;">
+                    <h:outputText value="#{itm.is_synced_tax eq 1 ? 'Y':'N'}"/>
+                </p:column>
             </p:dataTable>
         </h:form>
     </h:body>

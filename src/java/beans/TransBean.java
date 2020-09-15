@@ -2529,7 +2529,10 @@ public class TransBean implements Serializable {
                             new InvoiceOfflineBean().submitTaxInvoiceOfflineThread(trans.getTransactionId());
                         }
                     }
-
+                    //Update Total Paid for Sales/Purchase Invoice
+                    if (aTransTypeId == 2 || aTransTypeId == 1) {
+                        new PayTransBean().updateTransTotalPaid(trans.getTransactionId());
+                    }
                     //clear
                     this.clearAll2(trans, aActiveTransItems, null, null, aSelectedTransactor, 2, aSelectedBillTransactor, aTransUserDetail, aSelectedSchemeTransactor, aAuthorisedByUserDetail, aSelectedAccCoa);
 
@@ -2907,7 +2910,10 @@ public class TransBean implements Serializable {
                             new InvoiceOfflineBean().submitTaxInvoiceOfflineThread(trans.getTransactionId());
                         }
                     }
-
+                    //Update Total Paid for Sales/Purchase Invoice
+                    if (aTransTypeId == 2 || aTransTypeId == 1) {
+                        new PayTransBean().updateTransTotalPaid(trans.getTransactionId());
+                    }
                     this.clearAll2(trans, aActiveTransItems, null, null, aSelectedTransactor, 2, aSelectedBillTransactor, aTransUserDetail, aSelectedSchemeTransactor, aAuthorisedByUserDetail, aSelectedAccCoa);
 
                     TransItemBean = null;
@@ -4047,6 +4053,10 @@ public class TransBean implements Serializable {
                         }
                     }
                 }
+            }
+            //Update Total Paid for Sales/Purchase Invoice
+            if (aTransTypeId == 2 || aTransTypeId == 1) {
+                new PayTransBean().updateTransTotalPaid(aNewTrans.getTransactionId());
             }
         }
     }
@@ -6985,6 +6995,11 @@ public class TransBean implements Serializable {
                 trans.setSource_code(aResultSet.getString("source_code"));
             } catch (NullPointerException npe) {
                 trans.setSource_code("");
+            }
+            try {
+                trans.setTotalPaid(aResultSet.getDouble("total_paid"));
+            } catch (Exception e) {
+                trans.setTotalPaid(0);
             }
             //return trans;
         } catch (SQLException se) {
@@ -11380,7 +11395,8 @@ public class TransBean implements Serializable {
             while (rs.next()) {
                 trans = new Trans();
                 this.setTransFromResultset(trans, rs);
-                double TotalPaid = ptb.getTotalPaidByTransId(trans.getTransactionId());
+                //double TotalPaid = ptb.getTotalPaidByTransId(trans.getTransactionId());
+                double TotalPaid = trans.getTotalPaid();
                 trans.setTotalPaid(TotalPaid);
                 if (TotalPaid >= trans.getGrandTotal()) {
                     trans.setIs_paid(1);

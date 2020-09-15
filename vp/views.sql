@@ -323,11 +323,12 @@ CREATE OR REPLACE VIEW view_item_detail AS
 		WHEN i.is_sale=0 and i.is_asset=0 THEN 'Expenditure' 
 		WHEN i.is_asset=1 THEN 'Asset' 
 		ELSE ''
-	END as purpose 
+	END as purpose,ifnull(im.item_code_tax,'') as item_code_tax,ifnull(im.is_synced,0) as is_synced 
 	FROM item i 
 	INNER JOIN category c ON i.category_id=c.category_id 
 	INNER JOIN unit u ON i.unit_id=u.unit_id 
-	LEFT JOIN sub_category sc ON i.sub_category_id=sc.sub_category_id;
+	LEFT JOIN sub_category sc ON i.sub_category_id=sc.sub_category_id 
+	LEFT JOIN item_tax_map im ON i.item_id=im.item_id;
 
 CREATE OR REPLACE VIEW view_item_detail_stock AS
 	SELECT i.*,c.category_name,sc.sub_category_name,u.unit_symbol 

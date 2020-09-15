@@ -107,7 +107,7 @@
                     <h:panelGrid styleClass="clsGridMainCommands" columns="2" style="width: 100%">
                         <h:panelGrid styleClass="clsGridMainCommands1" columns="2">
                             <h:commandButton styleClass="clsButtonVeryBig" id="cmdbCancel" value="CANCEL (ALT+C)" onclick="return confirmCancel();" accesskey="c" rendered="#{payBean.actionType.equals('Cancel') and generalUserSetting.currentStore.storeId==payBean.payObj.storeId and payBean.payObj.paidAmount>0}">
-                                <f:ajax listener="#{payBean.cancelPayV2(payBean.payObj,payBean.payTransList)}" execute="pnlTransaction" render="pnlTransaction"/>
+                                <f:ajax listener="#{payBean.cancelPayV2(payBean.payObj,payBean.payTransList)}" execute="pnlTransaction" render="pnlTransaction pnlgOutput"/>
                             </h:commandButton>
                         </h:panelGrid>
                         <h:panelGrid columns="1">

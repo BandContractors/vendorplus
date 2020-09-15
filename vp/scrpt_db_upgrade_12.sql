@@ -65,6 +65,10 @@ ADD COLUMN exempt_rate VARCHAR(45) NULL  AFTER zero_rate ;
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_12',65,Now(),'6.0','');
 
+ALTER TABLE transaction ADD COLUMN total_paid DOUBLE NULL DEFAULT '0'  AFTER source_code;
+
+CALL sp_update_total_paid_for_all();
+
 
 
 

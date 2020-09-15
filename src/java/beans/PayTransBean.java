@@ -277,7 +277,7 @@ public class PayTransBean implements Serializable {
         }
         return totalpay;
     }
-    
+
     public double getTotalPaidByTransId(long aTransId) {
         String sql = "select ifnull(sum(pt.trans_paid_amount),0) as total_paid from pay_trans pt where pt.transaction_id=" + aTransId;
         ResultSet rs = null;
@@ -293,6 +293,33 @@ public class PayTransBean implements Serializable {
             System.err.println("getTotalPaidByTransId:" + e.getMessage());
         }
         return totalpay;
+    }
+
+    public void updateTransTotalPaid(long aTransId) {
+        String sql = "UPDATE transaction SET total_paid=(select ifnull(sum(pt.trans_paid_amount),0) from pay_trans pt where pt.transaction_id=" + aTransId + ") WHERE transaction_id>0 AND transaction_id=" + aTransId;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.executeUpdate();
+        } catch (Exception e) {
+            System.err.println("updateTransTotalPaid:" + e.getMessage());
+        }
+    }
+
+    public void updateTranssTotalPaid(List<PayTrans> aPayTranss) {
+        try {
+            if (null == aPayTranss) {
+                //do nothing
+            } else {
+                if (aPayTranss.size() > 0) {
+                    for (int i = 0; i < aPayTranss.size(); i++) {
+                        this.updateTransTotalPaid(aPayTranss.get(i).getTransactionId());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("updateTranssTotalPaid:" + e.getMessage());
+        }
     }
 
     public void refreshSalePayTranssSummaryByTransactor(long aTransactorId, String aCurrencyCode) {

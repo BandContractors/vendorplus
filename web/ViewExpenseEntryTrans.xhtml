@@ -189,7 +189,7 @@
                     <h:panelGrid styleClass="clsGridMainCommands" columns="1" style="width: 100%">
                         <h:panelGrid styleClass="clsGridMainCommands1" columns="2">
                             <h:commandButton styleClass="clsButtonVeryBig" id="cmdbUpdate" value="UPDATE (ALT+U)" onclick="return confirmUpdate();" accesskey="u" rendered="#{transBean.actionType.equals('Edit') and generalUserSetting.currentStore.storeId==transBean.transObj.storeId}">
-                                <f:ajax listener="#{transBean.updateTransCEC('PARENT',transBean.transObj.storeId,transBean.transObj.transactionTypeId,transBean.transObj.transactionReasonId,'',transBean.transObj,transBean.transItemList,transBean.payObj)}" execute="pnlTransaction" render="pnlTransaction"/>
+                                <f:ajax listener="#{transBean.updateTransCEC('PARENT',transBean.transObj.storeId,transBean.transObj.transactionTypeId,transBean.transObj.transactionReasonId,'',transBean.transObj,transBean.transItemList,transBean.payObj)}" execute="pnlTransaction" render="pnlTransaction pnlgOutput"/>
                             </h:commandButton>
                         </h:panelGrid>
                     </h:panelGrid>
@@ -201,7 +201,9 @@
                 </p:panel>
                 <p:growl/>
                 <!-- INVOICE STARTS HERE -->
-                <ui:include src="#{transBean.getPrintFileName('PARENT',transactionTypeBean.getTransactionType(19),0)}"/>
+                <h:panelGrid id="pnlgOutput" style="width: 100%">
+                    <ui:include src="#{transBean.getPrintFileName('PARENT',transactionTypeBean.getTransactionType(19),0)}"/>
+                </h:panelGrid>
                 <!-- INVOICE ENDS HERE -->
             </h:form>
         </p:dialog>

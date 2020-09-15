@@ -344,7 +344,7 @@ public class PayBean implements Serializable {
             msg = "Date selected does not match any accounting period; please contact system administrator...";
             this.setActionMessage("Transaction NOT saved");
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (pay.getPayRefNo().length()>100 || pay.getStatusDesc().length()>100) {
+        } else if (pay.getPayRefNo().length() > 100 || pay.getStatusDesc().length() > 100) {
             msg = "Please check [Reference no] and/or [Status Description]. Text cannot exceed 100 characters...";
             this.setActionMessage("Payment NOT saved");
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
@@ -389,6 +389,10 @@ public class PayBean implements Serializable {
             this.setActionMessage("Saved Successfully");
             if (aPayReasId == 22) {
                 this.updateOrderPayStatus(aPayTranss);
+            }
+            //Update Total Paid for Sales/Purchase Invoice
+            if (aPayReasId == 21 || aPayReasId == 22 || aPayReasId == 115) {
+                new PayTransBean().updateTranssTotalPaid(aPayTranss);
             }
             this.clearPayPayTranss(pay, aPayTranss);
             this.PayAll = false;
@@ -481,7 +485,7 @@ public class PayBean implements Serializable {
             msg = "Paying account is out of Funds...";
             this.setActionMessage("Transaction NOT saved");
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (pay.getPayRefNo().length()>100 || pay.getStatusDesc().length()>100) {
+        } else if (pay.getPayRefNo().length() > 100 || pay.getStatusDesc().length() > 100) {
             msg = "Please check [Reference no] and/or [Status Description]. Text cannot exceed 100 characters...";
             this.setActionMessage("Payment NOT saved");
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
@@ -523,6 +527,10 @@ public class PayBean implements Serializable {
                 new AccJournalBean().postJournalCashPaymentLiability(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId(), aPayTranss);
             }
             this.setActionMessage("Saved Successfully");
+            //Update Total Paid for Sales/Purchase Invoice
+            if (aPayReasId == 25 || aPayReasId == 26 || aPayReasId == 105) {
+                new PayTransBean().updateTranssTotalPaid(aPayTranss);
+            }
             this.clearPayPayTranss(pay, aPayTranss);
             this.PayAll = false;
         }
@@ -1275,6 +1283,8 @@ public class PayBean implements Serializable {
             } else {
                 this.setActionMessage("Transaction NOT Cancelled");
             }
+            //Update Total Paid for Sales/Purchase Invoice
+            new PayTransBean().updateTranssTotalPaid(aPayTransList);
         }
     }
 

@@ -1089,6 +1089,7 @@ public class ItemBean implements Serializable {
                 this.ItemObj.setOverride_gen_name(0);
                 this.ItemObj.setHide_unit_price_invoice(0);
                 this.ItemObj.setItem_code_tax("");
+                this.ItemObj.setIs_synced_tax(0);
                 this.ItemObj.setSelectedVatRateds(null);
                 this.setSearchItemDesc("");
                 this.refreshStockLocation(0);
@@ -1141,6 +1142,7 @@ public class ItemBean implements Serializable {
                 aItem.setHide_unit_price_invoice(0);
                 aItem.setPurpose("");
                 aItem.setItem_code_tax("");
+                aItem.setIs_synced_tax(0);
                 aItem.setSelectedVatRateds(null);
                 this.setSearchItemDesc("");
                 this.refreshStockLocation(0);
@@ -2015,6 +2017,16 @@ public class ItemBean implements Serializable {
                 } catch (Exception e) {
                     item.setPurpose("");
                 }
+                try {
+                    item.setItem_code_tax(rs.getString("item_code_tax"));
+                } catch (Exception e) {
+                    item.setItem_code_tax("");
+                }
+                try {
+                    item.setIs_synced_tax(rs.getInt("is_synced"));
+                } catch (Exception e) {
+                    item.setIs_synced_tax(0);
+                }
                 //merge asset details with non asset
                 if (item.getIsAsset() == 1) {
                     item.setExpense_type(item.getAssetType());
@@ -2461,6 +2473,7 @@ public class ItemBean implements Serializable {
                 itemun.setVat_rate(rs.getString("vat_rate"));
                 itemun.setZero_rate(rs.getString("zero_rate"));
                 itemun.setExempt_rate(rs.getString("exempt_rate"));
+                itemun.setService_mark(rs.getString("service_mark"));
                 this.Item_unspscList.add(itemun);
             }
         } catch (Exception e) {

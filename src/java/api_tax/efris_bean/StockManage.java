@@ -151,6 +151,7 @@ public class StockManage {
 
     public String addStock(String aId, String aQty, String aUnitPrice, String aSupplierTin, String aSupplierName) {
         String ReturnMsg = "";
+        System.out.println("aUnitPrice:" + aUnitPrice);
         try {
             String json = "{\n"
                     + " \"goodsStockIn\": {\n"
@@ -182,8 +183,14 @@ public class StockManage {
 
             String DecryptedContent = new String(Base64.decodeBase64(content));
             //System.out.println("DecryptedContent:" + DecryptedContent);
-            //System.out.println("returnMessage--ehh:" + dataobject.getString("returnMessage"));
-            ReturnMsg = dataobject.getString("returnMessage");
+            //System.out.println("returnMessage:" + dataobject.getString("returnMessage"));
+            if (DecryptedContent.length() == 2) {
+                ReturnMsg = dataobject.getString("returnMessage");
+            } else {
+                System.out.println("DecryptedContent:" + DecryptedContent);
+                System.out.println("returnMessage:" + dataobject.getString("returnMessage"));
+                ReturnMsg = dataobject.getString("returnMessage") + ":DecryptedContent";
+            }
         } catch (Exception ex) {
             System.err.println("addStock:" + ex.getMessage());
         }
@@ -192,6 +199,7 @@ public class StockManage {
 
     public String subtractStock(String aId, String aQty, String aUnitPrice, String aAdjustType) {
         String ReturnMsg = "";
+        System.out.println("aUnitPrice:" + aUnitPrice);
         try {
             String json = "{\n"
                     + " \"goodsStockIn\": {\n"
@@ -203,11 +211,10 @@ public class StockManage {
                     + " },\n"
                     + " \"goodsStockInItem\": [{\n"
                     + " \"commodityGoodsId\": \"" + aId + "\",\n"
-                    + " \"quantity\": \"" + "-" + aQty + "\",\n"
+                    + " \"quantity\": \"" + aQty + "\",\n"
                     + " \"unitPrice\": \"" + aUnitPrice + "\"\n"
                     + " }]\n"
                     + "}";
-
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
             WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_OFFLINE").getParameter_value());
             String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T131", CompanySetting.getTaxIdentity());
@@ -222,8 +229,15 @@ public class StockManage {
             String content = dataobjectcontent.getString("content");
 
             String DecryptedContent = new String(Base64.decodeBase64(content));
-            ReturnMsg = dataobject.getString("returnMessage");
+            //System.out.println("DecryptedContent:" + DecryptedContent);
             //System.out.println("ReturnMsg:" + ReturnMsg);
+            if (DecryptedContent.length() == 2) {
+                ReturnMsg = dataobject.getString("returnMessage");
+            } else {
+                System.out.println("DecryptedContent:" + DecryptedContent);
+                System.out.println("returnMessage:" + dataobject.getString("returnMessage"));
+                ReturnMsg = dataobject.getString("returnMessage") + ":DecryptedContent";
+            }
         } catch (Exception ex) {
             System.err.println("subtractStock:" + ex.getMessage());
         }
@@ -303,7 +317,7 @@ public class StockManage {
                     + "	\"description\": \"1\",\n"
                     + "	\"stockPrewarning\": \"" + aItem.getReorderLevel() + "\",\n"
                     + "	\"pieceMeasureUnit\": \"\",\n"
-                    + "	\"havePieceUnit\": \"\",\n"
+                    + "	\"havePieceUnit\": \"102\",\n"
                     + "	\"pieceUnitPrice\": \"\",\n"
                     + "	\"packageScaledValue\": \"\",\n"
                     + "	\"pieceScaledValue\": \"\",\n"
@@ -313,7 +327,7 @@ public class StockManage {
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
             WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_OFFLINE").getParameter_value());
             String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T130", CompanySetting.getTaxIdentity());
-            //System.out.println("json:" + json);
+            //System.out.println("json>:" + json);
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             String output = response.getEntity(String.class);
 
@@ -324,9 +338,15 @@ public class StockManage {
             String content = dataobjectcontent.getString("content");
 
             String DecryptedContent = new String(Base64.decodeBase64(content));
-            //System.out.println("DecryptedContent>:" + DecryptedContent);
-            //System.out.println("returnMessage>:" + dataobject.getString("returnMessage"));
-            ReturnMsg = dataobject.getString("returnMessage");
+            //System.out.println("DecryptedContent:" + DecryptedContent);
+            //System.out.println("returnMessage:" + dataobject.getString("returnMessage"));
+            if (DecryptedContent.length() == 2) {
+                ReturnMsg = dataobject.getString("returnMessage");
+            } else {
+                System.out.println("DecryptedContent:" + DecryptedContent);
+                System.out.println("returnMessage:" + dataobject.getString("returnMessage"));
+                ReturnMsg = dataobject.getString("returnMessage") + ":DecryptedContent";
+            }
         } catch (Exception ex) {
             System.err.println("registerItem:" + ex.getMessage());
         }
