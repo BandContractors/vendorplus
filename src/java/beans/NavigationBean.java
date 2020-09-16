@@ -1169,7 +1169,7 @@ public class NavigationBean implements Serializable {
     public String redirectToReportSalesInvoiceDetail() {
         return "ReportSalesInvoiceDetail?faces-redirect=true";
     }
-    
+
     public String redirectToReportSalesTaxAPI() {
         return "ReportSalesTaxAPI?faces-redirect=true";
     }
@@ -1401,9 +1401,13 @@ public class NavigationBean implements Serializable {
     public String redirectToReportItemDetailStock() {
         return "ReportItemDetailStock?faces-redirect=true";
     }
-    
+
     public String redirectToReportItemDetail() {
         return "ReportItemDetail?faces-redirect=true";
+    }
+
+    public String redirectToReportAlerts() {
+        return "ReportAlerts?faces-redirect=true";
     }
 
     public String redirectToReportItemDetailExpense() {

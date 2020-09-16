@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
@@ -39,6 +41,7 @@ public class Alert_generalBean implements Serializable {
 
     private List<Alert_general> Alert_generalObjectList;
     private Alert_general Alert_generalObj;
+    private List<Alert_general> AlertList = new ArrayList<>();
 
     public void setAlert_generalFromResultset(Alert_general aAlert_general, ResultSet aResultSet) {
         try {
@@ -209,6 +212,21 @@ public class Alert_generalBean implements Serializable {
         return Alert_generalObjectList;
     }
 
+    public void checkStockStatusForAlertThread(long aItem_id) {
+        try {
+            Runnable task = new Runnable() {
+                @Override
+                public void run() {
+                    checkStockStatusForAlert(aItem_id);
+                }
+            };
+            Executor e = Executors.newSingleThreadExecutor();
+            e.execute(task);
+        } catch (Exception e) {
+            System.err.println("checkStockStatusForAlertThread:" + e.getMessage());
+        }
+    }
+
     public void checkStockStatusForAlert(long aItem_id) {
         try {
             //get EXPIRY_ALERTS_MODE 0(None),1(Out of stock),2(Low stock),3(Both Out and Low)
@@ -240,6 +258,21 @@ public class Alert_generalBean implements Serializable {
             }
         } catch (Exception e) {
             System.out.println("checkStockStatusForAlert:" + e.getMessage());
+        }
+    }
+
+    public void checkExpiryStatusForAlertThread(long aItem_id, String aBatchno, String aCodeSpecific, String aDescSpecific) {
+        try {
+            Runnable task = new Runnable() {
+                @Override
+                public void run() {
+                    checkExpiryStatusForAlert(aItem_id, aBatchno, aCodeSpecific, aDescSpecific);
+                }
+            };
+            Executor e = Executors.newSingleThreadExecutor();
+            e.execute(task);
+        } catch (Exception e) {
+            System.err.println("checkExpiryStatusForAlertThread:" + e.getMessage());
         }
     }
 
@@ -429,6 +462,7 @@ public class Alert_generalBean implements Serializable {
                 aAlertgeneral.setLast_update_by(new GeneralUserSetting().getCurrentUser().getUserDetailId());
                 this.saveAlert_general(aAlertgeneral);
                 this.refreshAlerts();
+                this.refreshAlertList();
                 org.primefaces.PrimeFaces.current().executeScript("doUpdateMenuClick()");
             }
         } catch (Exception e) {
@@ -543,6 +577,34 @@ public class Alert_generalBean implements Serializable {
         return ag;
     }
 
+    public long countUserUnreadStockAlerts() {
+        long n = 0;
+        int userid = new GeneralUserSetting().getCurrentUser().getUserDetailId();
+        //String sql = "select * from alert_general where " + userid + " IN(alert_users) and " + userid + " NOT IN(read_by) order by add_date desc LIMIT 100";
+        String sql = "select count(*) as unread from alert_general where "
+                + "("
+                + "(alert_users REGEXP '^" + userid + ",') OR (alert_users REGEXP '," + userid + "$') OR  (alert_users REGEXP '," + userid + ",') OR alert_users='" + userid + "'"
+                + ") "
+                + "AND "
+                + "("
+                + "(read_by NOT REGEXP '^" + userid + ",') AND (read_by NOT REGEXP '," + userid + "$') AND  (read_by NOT REGEXP '," + userid + ",') AND read_by!='" + userid + "'"
+                + ")";
+        //System.out.println("SQL-ALERT:" + sql);
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            Alert_general ag = null;
+            if (rs.next()) {
+                n = rs.getLong("unread");
+            }
+        } catch (Exception e) {
+            System.err.println("countUserUnreadStockAlerts:" + e.getMessage());
+        }
+        return n;
+    }
+
     public List<Alert_general> retrieveUserUnreadStockAlerts() {
         int userid = new GeneralUserSetting().getCurrentUser().getUserDetailId();
         //String sql = "select * from alert_general where " + userid + " IN(alert_users) and " + userid + " NOT IN(read_by) order by add_date desc LIMIT 100";
@@ -554,7 +616,7 @@ public class Alert_generalBean implements Serializable {
                 + "("
                 + "(read_by NOT REGEXP '^" + userid + ",') AND (read_by NOT REGEXP '," + userid + "$') AND  (read_by NOT REGEXP '," + userid + ",') AND read_by!='" + userid + "'"
                 + ")";
-        System.out.println("SQL-ALERT:" + sql);
+        //System.out.println("SQL-ALERT:" + sql);
         ResultSet rs = null;
         List<Alert_general> aList = new ArrayList<>();
         try (
@@ -573,15 +635,39 @@ public class Alert_generalBean implements Serializable {
         return aList;
     }
 
+    public void refreshAlertList() {
+        int userid = new GeneralUserSetting().getCurrentUser().getUserDetailId();
+        String sql = "select * from alert_general where "
+                + "("
+                + "(alert_users REGEXP '^" + userid + ",') OR (alert_users REGEXP '," + userid + "$') OR  (alert_users REGEXP '," + userid + ",') OR alert_users='" + userid + "'"
+                + ") "
+                + "AND "
+                + "("
+                + "(read_by NOT REGEXP '^" + userid + ",') AND (read_by NOT REGEXP '," + userid + "$') AND  (read_by NOT REGEXP '," + userid + ",') AND read_by!='" + userid + "'"
+                + ") LIMIT 500";
+        ResultSet rs = null;
+        this.AlertList.clear();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            Alert_general ag = null;
+            while (rs.next()) {
+                ag = new Alert_general();
+                this.setAlert_generalFromResultset(ag, rs);
+                this.AlertList.add(ag);
+            }
+        } catch (Exception e) {
+            System.err.println("refreshAlertList:" + e.getMessage());
+        }
+    }
+
     public void refreshAlerts() {
         try {
             FacesContext context = FacesContext.getCurrentInstance();
             HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
             HttpSession httpSession = request.getSession(true);
-            //List<Alert_general> agL = this.retrieveUserUnreadStockAlerts();
-            List<Alert_general> agL=new ArrayList<>();
-            httpSession.setAttribute("USER_UNREAD_STOCK_ALERTS_LIST", agL);
-            httpSession.setAttribute("USER_UNREAD_STOCK_ALERTS_COUNT", agL.size());
+            httpSession.setAttribute("USER_UNREAD_STOCK_ALERTS_COUNT", this.countUserUnreadStockAlerts());
         } catch (NullPointerException | ClassCastException npe) {
             //
         }
@@ -631,5 +717,19 @@ public class Alert_generalBean implements Serializable {
      */
     public void setAlert_generalObj(Alert_general Alert_generalObj) {
         this.Alert_generalObj = Alert_generalObj;
+    }
+
+    /**
+     * @return the AlertList
+     */
+    public List<Alert_general> getAlertList() {
+        return AlertList;
+    }
+
+    /**
+     * @param AlertList the AlertList to set
+     */
+    public void setAlertList(List<Alert_general> AlertList) {
+        this.AlertList = AlertList;
     }
 }

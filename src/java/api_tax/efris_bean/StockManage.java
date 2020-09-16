@@ -151,7 +151,7 @@ public class StockManage {
 
     public String addStock(String aId, String aQty, String aUnitPrice, String aSupplierTin, String aSupplierName) {
         String ReturnMsg = "";
-        System.out.println("aUnitPrice:" + aUnitPrice);
+        //System.out.println("aUnitPrice:" + aUnitPrice);
         try {
             String json = "{\n"
                     + " \"goodsStockIn\": {\n"
@@ -159,6 +159,7 @@ public class StockManage {
                     + " \"supplierTin\": \"" + aSupplierTin + "\",\n"
                     + " \"supplierName\": \"" + aSupplierName + "\",\n"
                     + " \"adjustType\": \"\",\n"
+                    + " \"stockInType\": \"102\",\n"
                     + " \"remarks\": \"Increase inventory\"\n"
                     + " },\n"
                     + " \"goodsStockInItem\": [{\n"
@@ -199,7 +200,7 @@ public class StockManage {
 
     public String subtractStock(String aId, String aQty, String aUnitPrice, String aAdjustType) {
         String ReturnMsg = "";
-        System.out.println("aUnitPrice:" + aUnitPrice);
+        //System.out.println("aUnitPrice:" + aUnitPrice);
         try {
             String json = "{\n"
                     + " \"goodsStockIn\": {\n"

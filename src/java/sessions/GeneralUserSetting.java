@@ -152,7 +152,7 @@ public class GeneralUserSetting implements Serializable {
         }
         return IntResponse;
     }
-    
+
     public int getIsAllowedToBackDate() {
         int IntResponse;
         try {
@@ -607,7 +607,7 @@ public class GeneralUserSetting implements Serializable {
         }
         return DEFAULT_DURATION_TYPE;
     }
-    
+
     public String getDEPLETE_SOLD_STOCK_UPON() {
         String DEPLETE_SOLD_STOCK_UPON = "";
         try {
@@ -732,12 +732,12 @@ public class GeneralUserSetting implements Serializable {
         }
     }
 
-    public int getUserUnreadStockAlertsCount() {
+    public long getUserUnreadStockAlertsCount() {
         try {
             FacesContext context = FacesContext.getCurrentInstance();
             HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
             HttpSession httpSession = request.getSession(false);
-            return (int) httpSession.getAttribute("USER_UNREAD_STOCK_ALERTS_COUNT");
+            return (long) httpSession.getAttribute("USER_UNREAD_STOCK_ALERTS_COUNT");
         } catch (NullPointerException | ClassCastException npe) {
             return 0;
         }

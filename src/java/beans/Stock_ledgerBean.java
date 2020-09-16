@@ -257,9 +257,9 @@ public class Stock_ledgerBean implements Serializable {
             //insert
             this.insertStock_ledger(stockledger);
             //check alert-stock status
-            new Alert_generalBean().checkStockStatusForAlert(stockledger.getItem_id());
+            new Alert_generalBean().checkStockStatusForAlertThread(stockledger.getItem_id());
             //check alert-expiry status
-            new Alert_generalBean().checkExpiryStatusForAlert(stockledger.getItem_id(), stockledger.getBatchno(), stockledger.getCode_specific(), stockledger.getDesc_specific());
+            new Alert_generalBean().checkExpiryStatusForAlertThread(stockledger.getItem_id(), stockledger.getBatchno(), stockledger.getCode_specific(), stockledger.getDesc_specific());
             //URA-STOCK-API
             if (aTrans_type_id != 2 && aTrans_type_id != 4 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
                 Item_tax_map im = new Item_tax_mapBean().getItem_tax_map(stockledger.getItem_id());
