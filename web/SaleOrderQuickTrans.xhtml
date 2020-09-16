@@ -236,8 +236,7 @@
                             <h:outputLabel styleClass="clsLabelTransItem" value="Cash Disc"/>
                             <h:inputText id="itxtCashDiscount" value="#{trans.cashDiscount}" styleClass="clsInputTransItem" style="width: 120px;" autocomplete="off" disabled="#{companySetting.getBoolIsAllowDiscount()}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                                <f:ajax event="change" listener="#{transBean.setTransTotalsAndUpdateCEC(11,16,trans, transItemBean.activeTransItems)}" render="itxtGrandTotal itxtChange itxtTotalVat"/>
-                                <f:ajax event="keyup" listener="#{transBean.setTransTotalsAndUpdateCEC(11,16,trans, transItemBean.activeTransItems)}" render="itxtGrandTotal itxtChange itxtTotalVat"/>
+                                <f:ajax event="blur" listener="#{transBean.setTransTotalsAndUpdateCEC(11,16,trans, transItemBean.activeTransItems)}" render="itxtGrandTotal itxtChange itxtTotalVat"/>
                             </h:inputText>
                             <h:outputLabel styleClass="clsLabelTransItem" value="VAT"/>
                             <h:inputText id="itxtTotalVat" value="#{trans.totalVat}" styleClass="clsInputTransItem" style="width: 120px" disabled="true">

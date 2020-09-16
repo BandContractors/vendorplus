@@ -7574,6 +7574,8 @@ public class TransBean implements Serializable {
                     //do nothing
                 }
             }
+            //Account
+            this.AccChildAccountList = new AccChildAccountBean().getAccChildAccountsForCashReceipt(trans.getCurrencyCode(), trans.getPayMethod(), new GeneralUserSetting().getCurrentStore().getStoreId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
         }
     }
 

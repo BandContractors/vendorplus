@@ -11359,7 +11359,7 @@ BEGIN
 	-- declare cursor for sales and purchase transactions
 	DEClARE curTransactions 
 		CURSOR FOR 
-			SELECT transaction_id FROM transaction WHERE transaction_type_id IN(2,1);
+			SELECT transaction_id FROM transaction WHERE transaction_type_id IN(2,1) AND total_paid=0;
 	-- declare NOT FOUND handler
 	DECLARE CONTINUE HANDLER 
         FOR NOT FOUND SET finished = 1;
