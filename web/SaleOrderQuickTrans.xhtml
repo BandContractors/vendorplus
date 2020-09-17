@@ -43,6 +43,7 @@
         <f:viewAction action="#{transBean.setAutoPrintAfterSave(true)}"/>
         <f:viewAction action="#{transBean.setOutputNumber(0)}"/>
         <f:viewAction action="#{transBean.initUserDetail(generalUserSetting.currentUser.userDetailId)}"/>
+        <f:viewAction action="#{utilityBean.clearList(alert_generalBean.alertList)}"/>
     </f:metadata>
     <f:event listener="#{navigationBean.checkCurrentPage('SALE ORDER','','')}" type="preRenderView" />
     <f:event listener="#{statusBean.initClearStatus()}" type="preRenderView" />

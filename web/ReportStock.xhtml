@@ -21,7 +21,10 @@
         </script> 
     </h:head>
     <f:event listener="#{navigationBean.checkAccessDenied('61', 'View')}" type="preRenderView" />
-    <f:event listener="#{stockBean.initClearStock(stock,stockBean.stocksList,stockBean.stocksSummary)}" type="preRenderView" />
+    <f:metadata>
+        <f:viewAction action="#{utilityBean.clearList(alert_generalBean.alertList)}"/>
+        <f:viewAction action="#{stockBean.initClearStock(stock,stockBean.stocksList,stockBean.stocksSummary)}"/>
+    </f:metadata>
     <h:body>
         <ui:include src="Menu.xhtml"/>
         <h:form id="formReport">

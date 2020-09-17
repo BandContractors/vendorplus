@@ -21,8 +21,10 @@
         </script> 
     </h:head>
     <f:event listener="#{navigationBean.checkAccessDenied('8', 'View')}" type="preRenderView" />
-    <f:event listener="#{itemBean.initClearItem(item,itemBean.itemsList)}" type="preRenderView" />
-    <f:event listener="#{itemBean.initClearItem(item,itemBean.itemsSummary)}" type="preRenderView" />
+    <f:metadata>
+        <f:viewAction action="#{itemBean.initClearItem(item,itemBean.itemsList)}"/>
+        <f:viewAction action="#{itemBean.initClearItem(item,itemBean.itemsSummary)}"/>
+    </f:metadata>
     <h:body>
         <ui:include src="Menu.xhtml"/>
         <h:form id="formReport">
@@ -37,7 +39,7 @@
                 <p:outputLabel value="Currency"/>
                 <p:outputLabel value="General?"/>
                 <p:outputLabel value="Suspended?"/>
-                
+
                 <h:selectOneMenu id="menuPurpose" value="#{item.purpose}" >
                     <f:selectItem itemLabel="" itemValue=""/>
                     <f:selectItem itemLabel="Sale" itemValue="Sale"/>

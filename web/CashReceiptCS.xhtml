@@ -35,6 +35,7 @@
         <f:viewAction action="#{payBean.initClearPayReceipt()}"/>
         <f:viewAction action="#{payBean.initClearPayPayTranss(pay,payBean.selectedBillTransactor,payTransBean.payTranss,payBean,trans)}" />
         <f:viewAction action="#{payBean.initCurrencyCode(14,pay)}"/>
+        <f:viewAction action="#{utilityBean.clearList(alert_generalBean.alertList)}"/>
     </f:metadata>
     <f:event listener="#{navigationBean.checkCurrentPage('CASH RECEIPT','','')}" type="preRenderView" />
     <h:body>

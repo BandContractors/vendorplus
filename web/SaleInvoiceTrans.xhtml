@@ -36,6 +36,7 @@
         <f:viewAction action="#{transBean.refreshAccChildAccountsForCashReceipt(trans.currencyCode, trans.payMethod,generalUserSetting.getCurrentStore().storeId,generalUserSetting.getCurrentUser().userDetailId)}"/>
         <f:viewAction action="#{transBean.refreshTranssDraft(generalUserSetting.currentStore.storeId,generalUserSetting.currentUser.userDetailId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId)}"/>
         <f:viewAction action="#{utilityBean.clearList(transBean.transList)}"/>
+        <f:viewAction action="#{utilityBean.clearList(alert_generalBean.alertList)}"/>
     </f:metadata>
     <f:event listener="#{navigationBean.checkCurrentPage('SALE INVOICE','','')}" type="preRenderView" />
     <f:event listener="#{statusBean.initClearStatus()}" type="preRenderView" />

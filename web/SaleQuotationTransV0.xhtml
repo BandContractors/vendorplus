@@ -30,6 +30,7 @@
         <f:viewAction action="#{transBean.initClearAllCEC('PARENT',trans,transItemBean.activeTransItems,transItem,itemBean.selectedItem,transactorBean.selectedTransactor,2,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor)}" />
         <f:viewAction action="#{transBean.initCurrencyCode(10, trans)}"/>
         <f:viewAction action="#{transBean.initTransType(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId)}"/>
+        <f:viewAction action="#{utilityBean.clearList(alert_generalBean.alertList)}"/>
     </f:metadata>
     <f:event listener="#{navigationBean.checkCurrentPage('SALE QUOTATION','','')}" type="preRenderView" />
     <f:event listener="#{statusBean.initClearStatus()}" type="preRenderView" />

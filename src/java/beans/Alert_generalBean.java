@@ -644,7 +644,7 @@ public class Alert_generalBean implements Serializable {
                 + "AND "
                 + "("
                 + "(read_by NOT REGEXP '^" + userid + ",') AND (read_by NOT REGEXP '," + userid + "$') AND  (read_by NOT REGEXP '," + userid + ",') AND read_by!='" + userid + "'"
-                + ") LIMIT 500";
+                + ") ORDER BY add_date DESC LIMIT 500";
         ResultSet rs = null;
         this.AlertList.clear();
         try (
