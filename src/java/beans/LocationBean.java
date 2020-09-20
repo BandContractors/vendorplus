@@ -229,7 +229,7 @@ public class LocationBean implements Serializable {
 
         sql = "{call sp_search_location(?,?,?)}";
         ResultSet rs = null;
-        Locations = new ArrayList<Location>();
+        Locations = new ArrayList<>();
         Locations.clear();
         if (aStoreId == 0) {
             //do nothing

@@ -58,18 +58,19 @@ public class TransItemBean implements Serializable {
     private TransItem SelectedTransItem = null;
     private int SelectedTransactionItemId;
     private String SearchTransItem = "";
-    private List<TransItem> ActiveTransItems = new ArrayList<TransItem>();
-    List<TransItem> ReportTransItem = new ArrayList<TransItem>();
+    private List<TransItem> ActiveTransItems = new ArrayList<>();
+    List<TransItem> ReportTransItem = new ArrayList<>();
     private String ItemString = "";
     private AccCoa SelectedAccCoa = null;
     private int total_items;
     private List<Integer> total_items_list;
-    private List<TransItem> ActiveTransItemsChild = new ArrayList<TransItem>();
+    private List<TransItem> ActiveTransItemsChild = new ArrayList<>();
     private List<Category> CategoryList;
     private List<SubCategory> SubCategoryList;
     private List<Item> ItemList;
     private String CategoryName;
     private String SubCategoryName;
+    private List<TransItem> TempTransItemsList=new ArrayList<>();
 
     public void specifySize(TransItem aTransItem) {
         if (null != aTransItem) {
@@ -11329,6 +11330,80 @@ public class TransItemBean implements Serializable {
         return nQty;
     }
 
+    public void updateSpecific(TransItem aFrom, TransItem aTo) {
+        if (null == aFrom || null == aTo) {
+            //do nothing
+        } else {
+            aTo.setCodeSpecific(aFrom.getCodeSpecific());
+            aTo.setDescSpecific(aFrom.getDescSpecific());
+        }
+    }
+
+    public void refreshTempTransItemsList4Specific(long aItemId, List<TransItem> aTempTransItemsList) {
+        String sql = "select distinct desc_specific,code_specific FROM ("
+                + "select transaction_item_id,desc_specific,code_specific from transaction_item where item_id=" + aItemId + " and (length(code_specific)>0 || length(desc_specific)>0) "
+                + "ORDER BY transaction_item_id DESC) as aa  LIMIT 50";
+        ResultSet rs = null;
+        if (aItemId > 0) {
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                rs = ps.executeQuery();
+                TransItem ti = null;
+                if (null == aTempTransItemsList) {
+                    aTempTransItemsList = new ArrayList<>();
+                } else {
+                    aTempTransItemsList.clear();
+                }
+                while (rs.next()) {
+                    ti = new TransItem();
+                    ti.setDescSpecific(rs.getString("desc_specific"));
+                    ti.setCodeSpecific(rs.getString("code_specific"));
+                    aTempTransItemsList.add(ti);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.err.println("refreshTempTransItemsList4Specific:" + e.getMessage());
+            }
+        }
+    }
+
+    public void refreshTempTransItemsList4Specific(long aItemId) {
+        try {
+            this.TempTransItemsList.clear();
+        } catch (Exception e) {
+            this.TempTransItemsList = new ArrayList<>();
+        }
+        if (aItemId > 0) {
+            this.TempTransItemsList = this.getTempTransItemsList4Specific(aItemId);
+        }
+    }
+
+    public List<TransItem> getTempTransItemsList4Specific(long aItemId) {
+        List<TransItem> lst = new ArrayList<>();
+        String sql = "select distinct desc_specific,code_specific FROM ("
+                + "select transaction_item_id,desc_specific,code_specific from transaction_item where item_id=" + aItemId + " and (length(code_specific)>0 || length(desc_specific)>0) "
+                + "ORDER BY transaction_item_id DESC) as aa  LIMIT 50";
+        ResultSet rs = null;
+        if (aItemId > 0) {
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                rs = ps.executeQuery();
+                TransItem ti = null;
+                while (rs.next()) {
+                    ti = new TransItem();
+                    ti.setDescSpecific(rs.getString("desc_specific"));
+                    ti.setCodeSpecific(rs.getString("code_specific"));
+                    lst.add(ti);
+                }
+            } catch (Exception e) {
+                System.err.println("getTempTransItemsList4Specific:" + e.getMessage());
+            }
+        }
+        return lst;
+    }
+
     /**
      * @return the SelectedAccCoa
      */
@@ -11467,5 +11542,19 @@ public class TransItemBean implements Serializable {
      */
     public void setSubCategoryName(String SubCategoryName) {
         this.SubCategoryName = SubCategoryName;
+    }
+
+    /**
+     * @return the TempTransItemsList
+     */
+    public List<TransItem> getTempTransItemsList() {
+        return TempTransItemsList;
+    }
+
+    /**
+     * @param TempTransItemsList the TempTransItemsList to set
+     */
+    public void setTempTransItemsList(List<TransItem> TempTransItemsList) {
+        this.TempTransItemsList = TempTransItemsList;
     }
 }

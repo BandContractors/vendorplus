@@ -81,7 +81,7 @@ CREATE OR REPLACE VIEW view_transaction_total_paid AS
 	tr.transactor_names,tr2.transactor_names AS bill_transactor_names,
 	tr3.transactor_names AS scheme_transactor_names,tt.transaction_type_name,
 	tn.transaction_reason_name,
-	(select sum(trans_paid_amount) from pay_trans pt where pt.transaction_id=t.transaction_id) as total_paid 
+	(select sum(trans_paid_amount) from pay_trans pt where pt.transaction_id=t.transaction_id) as total_paid_calc 
 	FROM transaction t 
 	INNER JOIN store s ON t.store_id=s.store_id 
 	INNER JOIN transaction_type tt ON t.transaction_type_id=tt.transaction_type_id 
