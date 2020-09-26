@@ -270,4 +270,33 @@ public class Trans_number_controlBean implements Serializable {
             }
         }
     }
+
+    public int getIsTrans_number_used(int aTransTypeId, String aTransNumber) {
+        int TransNoUsed = 0;
+        String sql = "";
+        ResultSet rs = null;
+        TransactionType TransType = new TransactionTypeBean().getTransactionType(aTransTypeId);
+        if (null == TransType) {
+            //do nothing
+        } else {
+            if (aTransTypeId == 70) {//production
+                sql = "SELECT * FROM trans_production WHERE transaction_number='" + aTransNumber + "'";
+            } else {
+                sql = "SELECT * FROM transaction WHERE transaction_number='" + aTransNumber + "'";
+            }
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                rs = ps.executeQuery();
+                if (rs.next()) {
+                    TransNoUsed = 1;
+                } else {
+                    TransNoUsed = 0;
+                }
+            } catch (Exception e) {
+                System.err.println("getIsTrans_number_used:" + e.getMessage());
+            }
+        }
+        return TransNoUsed;
+    }
 }

@@ -1627,9 +1627,16 @@ public class TransBean implements Serializable {
             }
             try {
                 if (trans.getTransactionNumber().length() == 0) {
-                    trans.setTransactionNumber(new Trans_number_controlBean().getNewTransNumber(transtype));
-                    cs.setString("in_transaction_number", trans.getTransactionNumber());
-                    new Trans_number_controlBean().updateTrans_number_control(transtype);
+                    String NewTransNo = new Trans_number_controlBean().getNewTransNumber(transtype);
+                    int IsNewTransNoUsed = new Trans_number_controlBean().getIsTrans_number_used(transtype.getTransactionTypeId(), NewTransNo);
+                    if (IsNewTransNoUsed == 0) {
+                        trans.setTransactionNumber(NewTransNo);
+                        cs.setString("in_transaction_number", trans.getTransactionNumber());
+                        new Trans_number_controlBean().updateTrans_number_control(transtype);
+                    } else {
+                        trans.setTransactionNumber("");
+                        cs.setString("in_transaction_number", trans.getTransactionNumber());
+                    }
                 } else {
                     cs.setString("in_transaction_number", trans.getTransactionNumber());
                 }
@@ -8962,7 +8969,7 @@ public class TransBean implements Serializable {
                                 trans.setGrandTotal(0);
                             }
                             try {
-                                trans.setTotalPaid(rs.getDouble("total_paid"));
+                                trans.setTotalPaid(rs.getDouble("total_paid2"));
                             } catch (NullPointerException npe) {
                                 trans.setTotalPaid(0);
                             }
@@ -9077,7 +9084,7 @@ public class TransBean implements Serializable {
                                 trans.setGrandTotal(0);
                             }
                             try {
-                                trans.setTotalPaid(rs.getDouble("total_paid"));
+                                trans.setTotalPaid(rs.getDouble("total_paid2"));
                             } catch (NullPointerException npe) {
                                 trans.setTotalPaid(0);
                             }
@@ -9179,7 +9186,7 @@ public class TransBean implements Serializable {
                                 trans.setGrandTotal(0);
                             }
                             try {
-                                trans.setTotalPaid(rs.getDouble("total_paid"));
+                                trans.setTotalPaid(rs.getDouble("total_paid2"));
                             } catch (NullPointerException npe) {
                                 trans.setTotalPaid(0);
                             }
@@ -9252,7 +9259,7 @@ public class TransBean implements Serializable {
                                 trans.setGrandTotal(0);
                             }
                             try {
-                                trans.setTotalPaid(rs.getDouble("total_paid"));
+                                trans.setTotalPaid(rs.getDouble("total_paid2"));
                             } catch (NullPointerException npe) {
                                 trans.setTotalPaid(0);
                             }
