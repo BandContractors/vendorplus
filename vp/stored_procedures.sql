@@ -11348,32 +11348,3 @@ BEGIN
 	end if;
 END//
 DELIMITER ;
-
-DROP PROCEDURE IF EXISTS sp_update_total_paid_for_all;
-DELIMITER //
-CREATE PROCEDURE sp_update_total_paid_for_all() 
-BEGIN 
-	DECLARE finished INTEGER DEFAULT 0;
-	DECLARE transId bigint DEFAULT 0;
-
-	-- declare cursor for sales and purchase transactions
-	DEClARE curTransactions 
-		CURSOR FOR 
-			SELECT transaction_id FROM transaction WHERE transaction_type_id IN(2,1) AND total_paid=0;
-	-- declare NOT FOUND handler
-	DECLARE CONTINUE HANDLER 
-        FOR NOT FOUND SET finished = 1;
-
-	OPEN curTransactions;
-
-	getTrans: LOOP
-		FETCH curTransactions INTO transId;
-		IF finished = 1 THEN 
-			LEAVE getTrans;
-		END IF;
-		-- act on the selected id
-	UPDATE transaction SET total_paid=(select ifnull(sum(pt.trans_paid_amount),0) from pay_trans pt where pt.transaction_id=transId) WHERE transaction_id>0 AND transaction_id=transId;
-	END LOOP getTrans;
-	CLOSE curTransactions;
-END//
-DELIMITER ;
