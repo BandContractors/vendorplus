@@ -295,6 +295,23 @@ public class PayTransBean implements Serializable {
         return totalpay;
     }
 
+    public double getTotalBalByTransId(long aTransId) {
+        String sql = "select t.transaction_id,t.grand_total,ifnull((select sum(pt.trans_paid_amount) from pay_trans pt where pt.transaction_id=t.transaction_id),0) as total_paid_calc from transaction t where t.transaction_id=" + aTransId;
+        ResultSet rs = null;
+        double totalbal = 0;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                totalbal = rs.getDouble("grand_total") - rs.getDouble("total_paid_calc");
+            }
+        } catch (Exception e) {
+            System.err.println("getTotalBalByTransId:" + e.getMessage());
+        }
+        return totalbal;
+    }
+
     public void updateTransTotalPaid(long aTransId) {
         String sql = "UPDATE transaction SET total_paid=(select ifnull(sum(pt.trans_paid_amount),0) from pay_trans pt where pt.transaction_id=" + aTransId + ") WHERE transaction_id>0 AND transaction_id=" + aTransId;
         try (
@@ -742,6 +759,10 @@ public class PayTransBean implements Serializable {
         int ListItemNo = aPayTranss.size();
         while (ListItemIndex < ListItemNo) {
             if (aPayTranss.get(ListItemIndex).getTransPaidAmount() > (aPayTranss.get(ListItemIndex).getGrandTotal() - aPayTranss.get(ListItemIndex).getSumTransPaidAmount())) {
+                RecGreaterBal = aPayTranss.get(ListItemIndex).getTransactionNumber();
+                break;
+            }
+            if (aPayTranss.get(ListItemIndex).getTransPaidAmount() > this.getTotalBalByTransId(aPayTranss.get(ListItemIndex).getTransactionId())) {
                 RecGreaterBal = aPayTranss.get(ListItemIndex).getTransactionNumber();
                 break;
             }
