@@ -208,6 +208,7 @@ public class StockManage {
                     + " \"supplierTin\": \"\",\n"
                     + " \"supplierName\": \"\",\n"
                     + " \"adjustType\": \"" + aAdjustType + "\",\n"
+                    + " \"stockInType\": \"" + 102 + "\",\n"
                     + " \"remarks\": \"Decrease inventory\"\n"
                     + " },\n"
                     + " \"goodsStockInItem\": [{\n"

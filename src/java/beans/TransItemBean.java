@@ -5424,7 +5424,7 @@ public class TransItemBean implements Serializable {
                         ti.setUnitCostPrice(XrateMultiply * aSelectedItem.getUnitCostPrice());
                     }
                     ti.setUnitProfitMargin((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) - ti.getUnitCostPrice());
-                } else if ("STOCK ADJUSTMENT".equals(transtype.getTransactionTypeName())) {
+                } else if ("STOCK ADJUSTMENT".equals(transtype.getTransactionTypeName()) || "DISPOSE STOCK".equals(transtype.getTransactionTypeName()) || "STOCK CONSUMPTION".equals(transtype.getTransactionTypeName())) {
                     //ti.setUnitCostPrice(0);//(this has been already set from UI)
                     ti.setUnitProfitMargin(0);
                 } else {
@@ -9823,7 +9823,7 @@ public class TransItemBean implements Serializable {
                 aTransItemToUpdate.setDuration_value(0);
             }
             //apply recent unit cost
-            if (transtype.getTransactionTypeName().equals("ITEM RECEIVED") || transtype.getTransactionTypeName().equals("PRODUCTION") || transtype.getTransactionTypeName().equals("STOCK ADJUSTMENT")) {
+            if (transtype.getTransactionTypeName().equals("ITEM RECEIVED") || transtype.getTransactionTypeName().equals("PRODUCTION") || transtype.getTransactionTypeName().equals("STOCK ADJUSTMENT") || transtype.getTransactionTypeName().equals("DISPOSE STOCK")) {
                 aTransItemToUpdate.setUnitCostPrice(this.getItemLatestUnitCostPrice(aItem.getItemId(), "", "", ""));
             }
 //            if (transtype.getTransactionTypeName().equals("ITEM RECEIVED") || transtype.getTransactionTypeName().equals("PRODUCTION")) {
