@@ -32,10 +32,10 @@
             <h:panelGrid columns="4">
                 <h:outputLabel  value="Type:"/>
                 <p:selectOneMenu value="#{contact_listBean.contact_listObj.type}" style="width: 165px">
-                    <f:selectItem itemLabel="Company" itemValue="Company"/>
+                    <f:selectItem itemLabel="Business" itemValue="Business"/>
                     <f:selectItem itemLabel="Control" itemValue="Control"/>
                     <f:selectItem itemLabel="Mixed" itemValue="Mixed"/>
-                    <f:selectItem itemLabel="Individual" itemValue="Individual"/>
+                    <f:selectItem itemLabel="Consumer" itemValue="Consumer"/>
                 </p:selectOneMenu>
                 <h:outputLabel  value="Company Name:"/>
                 <p:inputText style="width: 350px" value="#{contact_listBean.contact_listObj.company_name}" autocomplete="off">

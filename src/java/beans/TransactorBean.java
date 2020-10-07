@@ -166,12 +166,12 @@ public class TransactorBean implements Serializable {
             msg = "Transactor Name(s) already exists, please enter different name(s) !";
         } else if (transtype.getTrans_number_format().length() == 0 && ((new CustomValidator().CheckRecords(sql4) > 0 && transactor.getTransactorId() == 0) || (new CustomValidator().CheckRecords(sql5) > 0 && transactor.getTransactorId() > 0))) {
             msg = "Transactor Reference Number already exists!";
-        } else if (TaxBranchNo.length() > 0 && transactor.getCategory().equals("Company") && transactor.getTaxIdentity().length() == 0) {
-            msg = "Specify Tax Identification Number for the Company";
+        } else if (TaxBranchNo.length() > 0 && transactor.getCategory().equals("Business") && transactor.getTaxIdentity().length() == 0) {
+            msg = "Specify Tax Identification Number for the Business";
         } else if (TaxBranchNo.length() > 0 && transactor.getCategory().equals("Government") && transactor.getTaxIdentity().length() == 0) {
             msg = "Specify Tax Identification Number for the Government Entity";
-        } else if (TaxBranchNo.length() > 0 && transactor.getCategory().equals("Individual") && transactor.getTaxIdentity().length() == 0 && transactor.getIdNumber().length() == 0 && transactor.getPhone().length() == 0) {
-            msg = "Specify Phone Number or Identification Number for the Individual";
+        } else if (TaxBranchNo.length() > 0 && transactor.getCategory().equals("Consumer") && transactor.getTaxIdentity().length() == 0 && transactor.getIdNumber().length() == 0 && transactor.getPhone().length() == 0) {
+            msg = "Specify Phone Number or Identification Number for the Consumer";
         }
         return msg;
     }

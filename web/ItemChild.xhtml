@@ -376,7 +376,7 @@
                         </p:column>
                         <p:column headerText="Code" style="text-align: left;font-size: 14px;">
                             <p:commandLink value="#{unspsc.commodity_code}"  oncomplete="PF('sbarUNSPSC').hide()">
-                                <f:ajax listener="#{itemBean.updateItemFromUNSPC(itemBean.itemObj,unspsc)}" render="formMain:itxtUNSPSC formMain:menuVatRateds"/>
+                                <f:ajax listener="#{itemBean.updateItemFromUNSPC(itemBean.itemObj,unspsc)}" render="formMain:itxtUNSPSC formMain:menuVatRateds formMain:menuItemType"/>
                             </p:commandLink>
                         </p:column>
                         <p:column headerText="Commodity" style="text-align: left;font-size: 14px;">

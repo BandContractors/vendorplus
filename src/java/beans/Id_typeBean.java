@@ -101,7 +101,7 @@ public class Id_typeBean implements Serializable {
         return idt;
     }
 
-    public List<Id_type> getId_types(int aActive, int aIndividual, int aCompany) {
+    public List<Id_type> getId_types(int aActive, int aConsumer, int aBusiness) {
         ResultSet rs = null;
         List<Id_type> idts = new ArrayList<>();
         String sql;
@@ -109,11 +109,11 @@ public class Id_typeBean implements Serializable {
         if (aActive == 0 || aActive == 1) {
             sql = sql + " AND is_active=" + aActive;
         }
-        if (aIndividual == 0 || aIndividual == 1) {
-            sql = sql + " AND applies_to_individual=" + aIndividual;
+        if (aConsumer == 0 || aConsumer == 1) {
+            sql = sql + " AND applies_to_individual=" + aConsumer;
         }
-        if (aCompany == 0 || aCompany == 1) {
-            sql = sql + " AND applies_to_company=" + aCompany;
+        if (aBusiness == 0 || aBusiness == 1) {
+            sql = sql + " AND applies_to_company=" + aBusiness;
         }
         sql = sql + " ORDER BY id_type_name ASC";
         try (
@@ -131,7 +131,7 @@ public class Id_typeBean implements Serializable {
         return idts;
     }
 
-    public void refreshId_typesList(int aActive, int aIndividual, int aCompany) {
+    public void refreshId_typesList(int aActive, int aConsumer, int aBusiness) {
         ResultSet rs = null;
         if (null == this.Id_typeList) {
             this.Id_typeList = new ArrayList<>();
@@ -143,11 +143,11 @@ public class Id_typeBean implements Serializable {
         if (aActive == 0 || aActive == 1) {
             sql = sql + " AND is_active=" + aActive;
         }
-        if (aIndividual == 0 || aIndividual == 1) {
-            sql = sql + " AND applies_to_individual=" + aIndividual;
+        if (aConsumer == 0 || aConsumer == 1) {
+            sql = sql + " AND applies_to_individual=" + aConsumer;
         }
-        if (aCompany == 0 || aCompany == 1) {
-            sql = sql + " AND applies_to_company=" + aCompany;
+        if (aBusiness == 0 || aBusiness == 1) {
+            sql = sql + " AND applies_to_company=" + aBusiness;
         }
         sql = sql + " ORDER BY id_type_name ASC";
         try (

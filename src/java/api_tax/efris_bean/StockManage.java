@@ -307,12 +307,18 @@ public class StockManage {
     public String registerItem(Item aItem) {
         String ReturnMsg = "";
         try {
+            String UnitPriceStr = "";
+            if (aItem.getUnitRetailsalePrice() > 0) {
+                UnitPriceStr = " \"unitPrice\": \"" + aItem.getUnitRetailsalePrice() + "\",\n";
+            } else {
+                UnitPriceStr = " \"unitPrice\": \"1\",\n";
+            }
             String json = "[\n"
                     + "	{\n"
                     + "	\"goodsName\": \"" + aItem.getDescription() + "\",\n"
                     + "	\"goodsCode\": \"" + aItem.getItemId() + "\",\n"
                     + "	\"measureUnit\": \"" + aItem.getUnit_symbol_tax() + "\",\n"
-                    + "	\"unitPrice\": \"" + aItem.getUnitRetailsalePrice() + "\",\n"
+                    + UnitPriceStr
                     + "	\"currency\": \"" + aItem.getCurrency_code_tax() + "\",\n"
                     + "	\"commodityCategoryId\": \"" + aItem.getItem_code_tax() + "\",\n"
                     + "	\"haveExciseTax\": \"102\",\n"

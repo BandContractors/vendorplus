@@ -216,7 +216,7 @@ public class InvoiceOfflineBean {
                 //do nothing
             } else {
                 if (transactor.getTransactorId() > 0) {
-                    if (transactor.getCategory().equals("Company")) {
+                    if (transactor.getCategory().equals("Business")) {
                         BuyerType = "B2B";
                     } else if (transactor.getCategory().equals("Government")) {
                         BuyerType = "B2G";

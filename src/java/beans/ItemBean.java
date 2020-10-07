@@ -2491,6 +2491,13 @@ public class ItemBean implements Serializable {
                 //
             } else {
                 aItem.setItem_code_tax(aItem_unspsc.getCommodity_code());
+                //PRODUCT or SERVICE
+                if (aItem_unspsc.getService_mark().equals("Y")) {
+                    aItem.setItemType("SERVICE");
+                } else {
+                    aItem.setItemType("PRODUCT");
+                }
+                //VAT RATE
                 aItem.setSelectedVatRateds(null);
                 if (aItem_unspsc.getVat_rate().length() > 0 && Double.parseDouble(aItem_unspsc.getVat_rate()) > 0) {
                     S = "STANDARD";
@@ -2516,7 +2523,6 @@ public class ItemBean implements Serializable {
                         CommaSeperatedStr = CommaSeperatedStr + "," + E;
                     }
                 }
-
                 if (CommaSeperatedStr.length() > 0) {
                     StringArray = CommaSeperatedStr.split(",");
                     aItem.setSelectedVatRateds(StringArray);

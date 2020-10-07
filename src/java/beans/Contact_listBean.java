@@ -295,7 +295,7 @@ public class Contact_listBean implements Serializable {
         } else if (new CustomValidator().TextSize(aContact_list.getEmail1(), 1, 20).equals("FAIL")) {
             msg = "Email field MUST be specified and cannot exceed 20 characters";
         } else if ((new CustomValidator().CheckRecords(sql2) > 0 && aContact_list.getContact_list_id() == 0) || (new CustomValidator().CheckRecords(sql3) > 0 && aContact_list.getContact_list_id() > 0)) {
-            msg = "Company Name already exists, please enter different name(s) !";
+            msg = "Business Name already exists, please enter different name(s) !";
         }
         return msg;
     }

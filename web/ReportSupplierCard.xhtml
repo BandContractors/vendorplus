@@ -85,7 +85,7 @@
                             <br/>Payable(#{accCurrencyBean.localCurrency.currencyCode}):<h:outputLabel style="color: coral;" value="#{accJournalBean.returnBalanceString(accLedgerBean.getPayableAccBalanceTrade(transactorBean.selectedBillTransactor.transactorId))}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
-                            <br/>Prepaid (#{accCurrencyBean.localCurrency.currencyCode}):<h:outputLabel style="color: green;" value="#{accJournalBean.returnBalanceString(accLedgerBean.getPrepaidExpenseAccBalanceToCur(transactorBean.selectedBillTransactor.transactorId,accCurrencyBean.localCurrency.currencyCode))}">
+                            <br/>Prepaid(#{accCurrencyBean.localCurrency.currencyCode}):<h:outputLabel style="color: green;" value="#{accJournalBean.returnBalanceString(accLedgerBean.getPrepaidExpenseAccBalanceToCur(transactorBean.selectedBillTransactor.transactorId,accCurrencyBean.localCurrency.currencyCode))}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
                         </td>

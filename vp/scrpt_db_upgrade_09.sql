@@ -28,19 +28,6 @@ INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_
 ALTER TABLE acc_dep_schedule ADD COLUMN post_status INT(1) NULL DEFAULT 0;
 UPDATE acc_dep_schedule SET post_status=1 WHERE acc_dep_schedule_id>0 AND year_number=1 AND (post_status=0 OR dep_for_acc_period_id is null OR dep_for_acc_period_id=0);
 
-CREATE  TABLE item_unspsc (
-  item_unspsc_id BIGINT(20) NOT NULL,
-  segment_code VARCHAR(20) NULL,
-  segment_name VARCHAR(250) NULL,
-  family_code VARCHAR(20) NULL,
-  family_name VARCHAR(250) NULL,
-  class_code VARCHAR(20) NULL,
-  class_name VARCHAR(250) NULL,
-  commodity_code VARCHAR(20) NULL,
-  commodity_name VARCHAR(250) NULL,
-  add_date TIMESTAMP NULL, 
-  PRIMARY KEY (item_unspsc_id) );
-
 INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
 VALUES (58, 'API', 'API_TAX_URL_OFFLINE', 'http://localhost:8080/efristcs/ws/tcsapp/getInformation','');
 INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 

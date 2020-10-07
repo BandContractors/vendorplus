@@ -62,11 +62,11 @@
                     <h:selectOneMenu styleClass="clsMenu" id="menuTransactorType" value="#{transactorBean.transactorObj.transactorType}" style="width: 206px;">
                         <f:selectItem itemLabel="#{transactorBean.getDisplayName(menuItemBean.menuItemObj,transactorBean.transactorObj)}" itemValue="#{transactorBean.transactorObj.transactorType}"/>
                     </h:selectOneMenu>
-                    <h:outputLabel  value="Category:"/>
+                    <h:outputLabel  value="Category:" id="lblCategory"/>
                     <h:selectOneMenu styleClass="clsMenu" id="menuTransactorCategory" value="#{transactorBean.transactorObj.category}" style="width: 206px;">
                         <f:selectItem itemLabel="" />
-                        <f:selectItem itemLabel="Individual" itemValue="Individual"/>
-                        <f:selectItem itemLabel="Company" itemValue="Company"/>
+                        <f:selectItem itemLabel="Consumer" itemValue="Consumer"/>
+                        <f:selectItem itemLabel="Business" itemValue="Business"/>
                         <f:selectItem itemLabel="Government" itemValue="Government"/>
                     </h:selectOneMenu>
                     <h:outputLabel  value="Segment:"/>

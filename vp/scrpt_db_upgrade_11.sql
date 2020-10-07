@@ -18,8 +18,6 @@ CREATE  TABLE item_unspsc (
   commodity_name VARCHAR(255) NULL ,
   PRIMARY KEY (item_unspsc_id) );
 
-LOAD DATA INFILE 'C:/item_unspsc.csv' INTO TABLE `item_unspsc` FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\r\n' IGNORE 1 LINES;
-
 ALTER TABLE item_tax_map ADD COLUMN is_synced INT(1) NULL DEFAULT 0;
 
 UPDATE company_setting SET developer_phone='0785485346/0392000708' WHERE company_setting_id=1;
@@ -44,8 +42,6 @@ INSERT INTO acc_currency_tax_list (currency_code_tax, currency_name_tax) VALUES 
 INSERT INTO acc_currency_tax_list (currency_code_tax, currency_name_tax) VALUES ('102', 'USD');
 INSERT INTO acc_currency_tax_list (currency_code_tax, currency_name_tax) VALUES ('103', 'GBP');
 INSERT INTO acc_currency_tax_list (currency_code_tax, currency_name_tax) VALUES ('104', 'EUR');
-
-LOAD DATA INFILE 'C:/unit_tax_list.csv' INTO TABLE `unit_tax_list` FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\r\n' IGNORE 1 LINES;
 
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_11',28,Now(),'6.0','');
