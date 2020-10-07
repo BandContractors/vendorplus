@@ -494,6 +494,12 @@
                         <p:separator />
                     </p:submenu>
                     <p:separator />
+                    <p:submenu label="Risk Reports">  
+                        <p:separator />
+                        <p:menuitem value="Overpaid Transactions" action="#{navigationBean.redirectToReportOverpaidTrans()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
                 </p:submenu>  
                 <p:submenu label="Dashboards" rendered="#{1==1}" icon="ui-icon-document">  
                     <p:separator />

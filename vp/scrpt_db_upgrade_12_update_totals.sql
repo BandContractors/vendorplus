@@ -38,3 +38,6 @@ CALL sp_update_total_paid_for_all();
 DROP TABLE temp_trans_total_paid;
 
 -- end- update total paid
+
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_12_update_totals',42,Now(),'6.0','');

@@ -1543,6 +1543,8 @@ public class TransBean implements Serializable {
                 msg = "Paying account is out of Funds...";
             } else if ("PURCHASE INVOICE".equals(transtype.getTransactionTypeName()) && trans.getAmountTendered() > trans.getGrandTotal()) {
                 msg = "Paid amount CANNOT EXCEED Grand Total";
+            } else if (trans.getTransactionId() > 0 && (trans.getAmountTendered() + trans.getSpendPointsAmount()) > trans.getGrandTotal()) {
+                msg = "Paid amount CANNOT EXCEED the New Grand Total";
             }
         } catch (Exception e) {
             msg = "An error has occured during the validation process";

@@ -6320,9 +6320,6 @@ public class TransItemBean implements Serializable {
         if (ti.getItemQty() < 0) {
             ti.setItemQty(0);
         }
-        if (ti.getItemQty() == 0) {
-            aTrans.setAmountTendered(0);
-        }
         if (aTransTypeId == 2) {//SALE INVOICE
             ti.setAmount(ti.getUnitPrice() * ti.getItemQty());
             ti.setAmountIncVat((ti.getUnitPriceIncVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
