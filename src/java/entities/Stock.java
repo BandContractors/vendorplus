@@ -52,6 +52,7 @@ public class Stock implements Serializable {
     private double UnitCostPrice;
     private double UnitRetailsalePrice;
     private double UnitWholesalePrice;
+    private double UnitSpecialPrice;
     private String StoreName;
     private String CategoryName;
     private String UnitName;
@@ -725,5 +726,19 @@ public class Stock implements Serializable {
      */
     public void setItemType(String ItemType) {
         this.ItemType = ItemType;
+    }
+
+    /**
+     * @return the UnitSpecialPrice
+     */
+    public double getUnitSpecialPrice() {
+        return UnitSpecialPrice;
+    }
+
+    /**
+     * @param UnitSpecialPrice the UnitSpecialPrice to set
+     */
+    public void setUnitSpecialPrice(double UnitSpecialPrice) {
+        this.UnitSpecialPrice = UnitSpecialPrice;
     }
 }

@@ -341,6 +341,11 @@ public class StockBean implements Serializable {
                 aStock.setUnitWholesalePrice(0);
             }
             try {
+                aStock.setUnitWholesalePrice(aResultSet.getDouble("unit_special_price"));
+            } catch (Exception e) {
+                aStock.setUnitSpecialPrice(0);
+            }
+            try {
                 aStock.setStoreName(aResultSet.getString("store_name"));
             } catch (Exception e) {
                 aStock.setStoreName("");
@@ -1856,6 +1861,71 @@ public class StockBean implements Serializable {
             }
         } catch (SQLException se) {
             System.err.println(se.getMessage());
+        }
+    }
+
+    public void reportStockPricingQtyError(int aStoreId, int aCategoryId, int aIsGeneral, String aIsSuspended, String aStockyType) {
+        String sql = "select "
+                + "i.expense_type,s.*,i.description,i.currency_code,i.category_id,i.unit_retailsale_price,i.unit_wholesale_price,i.unit_special_price,"
+                + "i.is_suspended,t.store_name,c.category_name,u.unit_name,u.unit_symbol "
+                + "from stock s inner join item i on s.item_id=i.item_id "
+                + "INNER JOIN store t ON s.store_id=t.store_id "
+                + "INNER JOIN category c ON i.category_id=c.category_id "
+                + "INNER JOIN unit u ON i.unit_id=u.unit_id "
+                + "WHERE i.is_track=1 AND "
+                + "(i.is_sale=1 OR (i.is_sale=0 AND i.is_asset=0 AND i.is_buy=1)) AND "
+                + "("
+                + "	((s.unit_cost>=i.unit_retailsale_price and i.unit_retailsale_price>0) OR (s.unit_cost>=i.unit_wholesale_price and i.unit_wholesale_price>0) OR (s.unit_cost>=i.unit_special_price and i.unit_special_price>0)) OR "
+                + "	(s.currentqty>=s.unit_cost)"
+                + ") AND "
+                + "("
+                + "	ifnull(i.is_general,0)=0 OR "
+                + "	("
+                + "		ifnull(i.is_general,0)=1 AND (i.unit_retailsale_price+i.unit_wholesale_price+i.unit_special_price)>0"
+                + "	)"
+                + ")";
+        String wheresql = "";
+        String ordersql = "";
+        ResultSet rs = null;
+        this.StocksList = new ArrayList<>();
+        this.StocksSummary = new ArrayList<>();
+        if (aStockyType.length() > 0) {
+            wheresql = wheresql + " AND i.expense_type='" + aStockyType + "'";
+        }
+        if (aStoreId > 0) {
+            wheresql = wheresql + " AND s.store_id=" + aStoreId;
+        }
+        if (aCategoryId > 0) {
+            wheresql = wheresql + " AND i.category_id=" + aCategoryId;
+        }
+        if (aIsSuspended.length() > 0) {
+            wheresql = wheresql + " AND i.is_suspended='" + aIsSuspended + "'";
+        }
+        if (aIsGeneral == 10) {
+            wheresql = wheresql + " AND i.is_general=0";
+        }
+        if (aIsGeneral == 11) {
+            wheresql = wheresql + " AND i.is_general=1";
+        }
+        ordersql = " ORDER BY expense_type,description ASC";
+        sql = sql + wheresql + ordersql;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            Stock stock = null;
+            while (rs.next()) {
+                stock = new Stock();
+                this.setStockFromResultsetReport(stock, rs);
+                try {
+                    stock.setStock_type(rs.getString("expense_type"));
+                } catch (NullPointerException npe) {
+                    stock.setStock_type("");
+                }
+                this.StocksList.add(stock);
+            }
+        } catch (Exception e) {
+            System.err.println("reportStockPricingQtyError:" + e.getMessage());
         }
     }
 

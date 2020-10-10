@@ -1173,6 +1173,10 @@ public class NavigationBean implements Serializable {
     public String redirectToReportOverpaidTrans() {
         return "ReportOverpaidTrans?faces-redirect=true";
     }
+    
+    public String redirectToReportStockPriceQtyError() {
+        return "ReportStockPriceQtyError?faces-redirect=true";
+    }
 
     public String redirectToReportSalesTaxAPI() {
         return "ReportSalesTaxAPI?faces-redirect=true";

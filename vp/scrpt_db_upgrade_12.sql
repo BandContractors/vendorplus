@@ -73,6 +73,6 @@ VALUES('scrpt_db_upgrade_12',72,Now(),'6.0','');
 
 INSERT INTO transaction_type (transaction_type_id, transaction_type_name) VALUES (77, 'RISK REPORTS');
 INSERT INTO transaction_reason (transaction_reason_id, transaction_reason_name, transaction_type_id) VALUES (121, 'RISK REPORTS', 77);
-
+UPDATE item SET is_general=0 WHERE item_id>0 AND ifnull(is_general,9)=9;
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_12',77,Now(),'6.0','');
