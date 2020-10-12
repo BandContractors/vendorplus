@@ -77,6 +77,14 @@
                     <h:outputLabel  value="Reference No:"/>
                     <h:inputText styleClass="clsInput" id="itxtRef" value="#{transactorBean.transactorObj.transactorRef}" autocomplete="off" style="width: 203px;" disabled="#{transactorBean.transactorObj.trans_number_format.length()>0}">
                     </h:inputText>
+                    <p:commandLink id="cmdbValidateTIN" value="Tax Identity No(TIN)" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" title="Click here to validate TIN detail">
+                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                        <f:ajax listener="#{transactorBean.updateTaxpayer(transactorBean.transactorObj)}" execute="pnlCol1 pnlCol2" render="pnlCol1 pnlCol2" />
+                    </p:commandLink>
+                    <h:inputText styleClass="clsInput" id="itxtTaxIdentity" value="#{transactorBean.transactorObj.taxIdentity}" autocomplete="off" style="width: 203px;">
+                    </h:inputText>
                     <h:outputLabel  value="Names:"/>
                     <h:inputText styleClass="clsInput" id="itxtTransactorNames" value="#{transactorBean.transactorObj.transactorNames}" autocomplete="off" style="width: 203px;">
                     </h:inputText>
@@ -91,9 +99,6 @@
                     </h:inputText>
                     <h:outputLabel  value="Position:"/>
                     <h:inputText styleClass="clsInput" id="itxtPosition" value="#{transactorBean.transactorObj.position}" autocomplete="off" style="width: 203px;">
-                    </h:inputText>
-                    <h:outputLabel  value="Tax Identity No:"/>
-                    <h:inputText styleClass="clsInput" id="itxtTaxIdentity" value="#{transactorBean.transactorObj.taxIdentity}" autocomplete="off" style="width: 203px;">
                     </h:inputText>
                     <h:outputLabel  value="Website:"/>
                     <h:inputText styleClass="clsInput" id="itxtWebsite" value="#{transactorBean.transactorObj.website}" autocomplete="off" style="width: 203px;">

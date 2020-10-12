@@ -194,6 +194,7 @@ public class InvoiceOfflineBean {
             sellerDetails.setBusinessName(CompanySetting.getLICENSE_CLIENT_NAME());
             sellerDetails.setLegalName(new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "PAYEE_NAME").getParameter_value());
             sellerDetails.setEmailAddress(CompanySetting.getEmail());
+            sellerDetails.setAddress(CompanySetting.getPhysicalAddress());
 
             //basicInformation 
             basicInformation.setCurrency(trans.getCurrencyCode());

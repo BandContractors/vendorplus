@@ -1,5 +1,7 @@
 package beans;
 
+import api_tax.efris.innerclasses.Taxpayer;
+import api_tax.efris_bean.TaxpayerBean;
 import sessions.GeneralUserSetting;
 import connections.DBConnection;
 import entities.GroupRight;
@@ -56,6 +58,36 @@ public class TransactorBean implements Serializable {
     private Transactor TransactorObj;
     private List<Transactor> TransactorListSimilar = new ArrayList<Transactor>();
     private Transactor ParentTransactor;
+
+    public void updateTaxpayer(Transactor aTransactor) {
+        try {
+            if (null == aTransactor) {
+                //do nothing
+            } else if (aTransactor.getTaxIdentity().length() > 0) {
+                if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
+                    //first clear
+                    aTransactor.setTransactorNames("");
+                    aTransactor.setPhysicalAddress("");
+                    aTransactor.setEmail("");
+                    aTransactor.setPhone("");
+                    //get detail
+                    Taxpayer taxpayer = new TaxpayerBean().getTaxpayerDetailFromTax(aTransactor.getTaxIdentity());
+                    if (null == taxpayer) {
+                        //do nothing
+                    } else {
+                        if (taxpayer.getLegalName().length() > 0) {
+                            aTransactor.setTransactorNames(taxpayer.getLegalName());
+                            aTransactor.setPhysicalAddress(taxpayer.getAddress());
+                            aTransactor.setEmail(taxpayer.getContactEmail());
+                            aTransactor.setPhone(taxpayer.getContactNumber());
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("updateTaxpayer:" + e.getMessage());
+        }
+    }
 
     public String getDisplayName(MenuItem aMenuItem, Transactor aTransactor) {
         String display_name = "";
