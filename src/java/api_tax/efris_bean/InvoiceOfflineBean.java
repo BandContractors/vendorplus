@@ -229,9 +229,9 @@ public class InvoiceOfflineBean {
                 }
             }
             if (BuyerType.equals("B2B") || BuyerType.equals("B2G")) {
-                buyerDetails.setBuyerType(Integer.toString(1));
+                buyerDetails.setBuyerType(Integer.toString(0));
             } else {
-                buyerDetails.setBuyerType(Integer.toString(2));
+                buyerDetails.setBuyerType(Integer.toString(1));
             }
             if (null == transactor) {
                 buyerDetails.setBuyerLegalName("Walk-In Customer");

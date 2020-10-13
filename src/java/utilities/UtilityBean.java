@@ -5,6 +5,7 @@ import beans.Alert_generalBean;
 import connections.DBConnection;
 import entities.CompanySetting;
 import entities.Item;
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.CallableStatement;
@@ -648,9 +649,10 @@ public class UtilityBean implements Serializable {
     }
 
 //    public static void main(String[] args) {
-//        //new UtilityBean().backupDatabase("kwenu_sm_branch2", "root", "WTLura456", "C:/wamp/bin/mysql/mysql5.6.17/bin", "C:/abc");
-//        System.out.println("123456".substring(0,5));
+//        //new UtilityBean().backupDatabase("kwenu_sm_branch2", "root", "WTLura456", "C:\\wamp\\bin\\mysql\\mysql5.6.17\\bin", "C:\\abc");
+//        System.out.println(new File("external").getPath());
 //    }
+
     public void backupDatabase(String aDbName, String aDbUser, String aDbPassword, String aMySQLDumpFolderPath, String aSaveFolderPath) {
         try {
             String dbName = aDbName;
@@ -662,11 +664,13 @@ public class UtilityBean implements Serializable {
             cal.setTime(new Date());
             String DatePart = "";
             DatePart = cal.get(Calendar.YEAR) + "_" + (cal.get(Calendar.MONTH) + 1) + "_" + cal.get(Calendar.DAY_OF_MONTH) + "_" + cal.get(Calendar.HOUR_OF_DAY) + "_" + cal.get(Calendar.MINUTE);
-            String savePath = aSaveFolderPath + "/" + aDbName + "_" + DatePart + ".sql.gz";
+            //String savePath = aSaveFolderPath + "/" + aDbName + "_" + DatePart + ".sql.gz";
+            String savePath = aSaveFolderPath + "\\" + aDbName + "_" + DatePart + ".sql.gz";
 
             /*NOTE: Used to create a cmd command*/
-            String executeCmd = aMySQLDumpFolderPath + "/mysqldump -u" + dbUser + " -p" + dbPass + " --database " + dbName + " | gzip -r " + savePath;
-
+            //String executeCmd = aMySQLDumpFolderPath + "/mysqldump -u" + dbUser + " -p" + dbPass + " --database " + dbName + " | gzip -r " + savePath;
+            String executeCmd = aMySQLDumpFolderPath + "\\mysqldump -u" + dbUser + " -p" + dbPass + " --database " + dbName + " | gzip -r >" + savePath;
+            System.out.println("executeCmd:" + executeCmd);
             /*NOTE: Executing the command here*/
             Process runtimeProcess = Runtime.getRuntime().exec(executeCmd);
             int processComplete = runtimeProcess.waitFor();
