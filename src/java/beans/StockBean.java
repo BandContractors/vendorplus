@@ -341,7 +341,7 @@ public class StockBean implements Serializable {
                 aStock.setUnitWholesalePrice(0);
             }
             try {
-                aStock.setUnitWholesalePrice(aResultSet.getDouble("unit_special_price"));
+                aStock.setUnitSpecialPrice(aResultSet.getDouble("unit_special_price"));
             } catch (Exception e) {
                 aStock.setUnitSpecialPrice(0);
             }

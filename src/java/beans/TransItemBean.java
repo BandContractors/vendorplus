@@ -70,7 +70,7 @@ public class TransItemBean implements Serializable {
     private List<Item> ItemList;
     private String CategoryName;
     private String SubCategoryName;
-    private List<TransItem> TempTransItemsList=new ArrayList<>();
+    private List<TransItem> TempTransItemsList = new ArrayList<>();
 
     public void specifySize(TransItem aTransItem) {
         if (null != aTransItem) {
@@ -3856,8 +3856,8 @@ public class TransItemBean implements Serializable {
             } catch (NullPointerException npe) {
                 transitem.setSpecific_size(1);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            System.err.println("setTransItemFromResultSet:" + e.getMessage());
         }
     }
 

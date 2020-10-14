@@ -124,7 +124,7 @@
                     <h:outputText value="#{itm.unitSymbol}"/>
                 </p:column>
                 <p:column headerText="Qty">
-                    <h:outputText value="#{itm.currentqty}"/>
+                    <h:outputText value="#{itm.currentqty}" style="color:#{itm.currentqty ge itm.unitCost ? 'red':'black'}"/>
                 </p:column>
                 <p:column headerText="Unit Cost Price">
                     <h:outputText value="#{itm.unitCost}">
@@ -132,17 +132,17 @@
                     </h:outputText>
                 </p:column>
                 <p:column headerText="Retail Price">
-                    <h:outputText value="#{itm.unitRetailsalePrice}">
+                    <h:outputText value="#{itm.unitRetailsalePrice}" style="color:#{itm.unitCost ge itm.unitRetailsalePrice ? 'red':'black'}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="Wholesale Price">
-                    <h:outputText value="#{itm.unitWholesalePrice}">
+                    <h:outputText value="#{itm.unitWholesalePrice}" style="color:#{itm.unitWholesalePrice gt 0 and itm.unitCost ge itm.unitWholesalePrice ? 'red':'black'}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="Special Price">
-                    <h:outputText value="#{itm.unitSpecialPrice}">
+                    <h:outputText value="#{itm.unitSpecialPrice}" style="color:#{itm.unitSpecialPrice gt 0 and itm.unitCost ge itm.unitSpecialPrice ? 'red':'black'}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>

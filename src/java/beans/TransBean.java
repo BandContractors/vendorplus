@@ -14166,7 +14166,8 @@ public class TransBean implements Serializable {
         aTransBean.setActionMessage("");
         ResultSet rs = null;
         this.TransItemList = new ArrayList<>();
-        String sql = "SELECT ti.* FROM transaction_item ti,transaction t WHERE ti.transaction_id=t.transaction_id";
+        //String sql = "SELECT ti.* FROM transaction_item ti,transaction t WHERE ti.transaction_id=t.transaction_id";
+        String sql = "SELECT ti.* FROM transaction_item ti INNER JOIN transaction t ON ti.transaction_id=t.transaction_id WHERE 1=1";
         String wheresql = "";
         String ordersql = "";
         if (aTrans.getStoreId() > 0) {
