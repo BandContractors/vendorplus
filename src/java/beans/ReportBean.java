@@ -300,6 +300,24 @@ public class ReportBean implements Serializable {
         }
     }
 
+    public List<Trans> getTransHistory(long aTransId) {
+        List<Trans> aList = new ArrayList<>();
+        String sql;
+        sql = "SELECT * FROM transaction_hist WHERE transaction_id=" + aTransId + " ORDER BY hist_add_date DESC";
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                aList.add(new TransBean().getTransHistFromResultset(rs));
+            }
+        } catch (Exception e) {
+            System.err.println("getTransHistory:" + e.getMessage());
+        }
+        return aList;
+    }
+
     /**
      * @return the ActionMessage
      */
@@ -425,5 +443,4 @@ public class ReportBean implements Serializable {
     public void setMenuItemBean(MenuItemBean menuItemBean) {
         this.menuItemBean = menuItemBean;
     }
-
 }

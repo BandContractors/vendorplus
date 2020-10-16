@@ -50,6 +50,8 @@
                         <h:inputText styleClass="clsInput" id="itxtTransactionRef" value="#{transBean.transObj.transactionRef}" autocomplete="off" style="width: 170px;" disabled="true"/>
                         <h:outputLabel  value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}:"/>
                         <h:inputText styleClass="clsInput" id="itxtTransactor" value="#{transactorBean.getTransactor(transBean.transObj.transactorId).transactorNames}" autocomplete="off" style="width: 170px;" disabled="true"/>
+                        <h:outputLabel  value="Last Edit Date:"/>
+                        <h:inputText value="#{utilityBean.formatDateTime(transBean.transObj.editDate)}" disabled="true"/>
                     </h:panelGrid>
                     <p:dataTable rowIndexVar="rowIndex" id="dtblTransactionItem" value="#{transBean.transItemList}" var="ati" 
                                  styleClass="cls-table" tableStyle="width:auto;" 
@@ -269,6 +271,41 @@
                             </h:selectOneMenu>
                         </h:panelGrid>
                     </h:panelGrid>
+
+                    <p:accordionPanel activeIndex="-2">
+                        <p:tab title="Revision History">
+                            <p:dataTable id="tblDetailHist" tableStyle="width:auto;" var="hst" value="#{transBean.transListHist}">
+                                <p:column headerText="#" style="text-align: right;">
+                                    <h:outputText value="#{hst.transactionNumber}"/>
+                                </p:column>
+                                <p:column headerText="History Capture Date">
+                                    <h:outputText value="#{utilityBean.formatDateTime(hst.hist_add_date)}"/>
+                                </p:column>
+                                <p:column headerText="Grand Total" style="text-align: right;">
+                                    <h:outputText value="#{hst.grandTotal}">
+                                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="Amount Tendered" style="text-align: right;">
+                                    <h:outputText value="#{hst.amountTendered}">
+                                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="Balance" style="text-align: right;">
+                                    <h:outputText value="#{hst.changeAmount}">
+                                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="Added By">
+                                    <h:outputText value="#{userDetailBean.getUserDetail(hst.addUserDetailId).userName}"/>
+                                </p:column>
+                                <p:column headerText="Last Edited By">
+                                    <h:outputText value="#{userDetailBean.getUserDetail(hst.editUserDetailId).userName}"/>
+                                </p:column>
+                            </p:dataTable>
+                        </p:tab>
+                    </p:accordionPanel>
+
                     <h:panelGrid styleClass="clsGridMainMessages" columns="1">
                         <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{transBean.actionMessage}"/>
                         <h:messages id="msgsMainMessage" style="color: red"/><br/>

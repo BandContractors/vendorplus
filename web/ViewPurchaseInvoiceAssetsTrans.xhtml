@@ -206,6 +206,35 @@
                             </h:selectOneMenu>
                         </h:panelGrid>
                     </h:panelGrid>
+                    
+                    <p:accordionPanel activeIndex="-2">
+                        <p:tab title="Revision History">
+                            <p:dataTable id="tblDetailHist" tableStyle="width:auto;" var="hst" value="#{transBean.transListHist}">
+                                <p:column headerText="#" style="text-align: right;">
+                                    <h:outputText value="#{hst.transactionNumber}"/>
+                                </p:column>
+                                <p:column headerText="History Capture Date">
+                                    <h:outputText value="#{utilityBean.formatDateTime(hst.hist_add_date)}"/>
+                                </p:column>
+                                <p:column headerText="Grand Total" style="text-align: right;">
+                                    <h:outputText value="#{hst.grandTotal}">
+                                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="Paid Amount" style="text-align: right;">
+                                    <h:outputText value="#{hst.amountTendered}">
+                                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="Added By">
+                                    <h:outputText value="#{userDetailBean.getUserDetail(hst.addUserDetailId).userName}"/>
+                                </p:column>
+                                <p:column headerText="Last Edited By">
+                                    <h:outputText value="#{userDetailBean.getUserDetail(hst.editUserDetailId).userName}"/>
+                                </p:column>
+                            </p:dataTable>
+                        </p:tab>
+                    </p:accordionPanel>
 
                     <h:panelGrid styleClass="clsGridMainMessages" columns="1">
                         <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{transBean.actionMessage}"/>

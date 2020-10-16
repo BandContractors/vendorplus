@@ -137,6 +137,7 @@ public class TransBean implements Serializable {
     private String OrderMode1;
     private String OrderMode2;
     private String OrderMode3;
+    private List<Trans> TransListHist = new ArrayList<>();
 
     public String setBgColorIfEqual(String aA, String aB, int aContext) {
         if (aA.equals(aB)) {
@@ -5916,7 +5917,11 @@ public class TransBean implements Serializable {
             trans.setTransactionId(aResultSet.getLong("transaction_id"));
             trans.setTransactionDate(new Date(aResultSet.getDate("transaction_date").getTime()));
             trans.setStoreId(aResultSet.getInt("store_id"));
-
+            try {
+                trans.setHist_add_date(new Date(aResultSet.getTimestamp("hist_add_date").getTime()));
+            } catch (Exception npe) {
+                trans.setHist_add_date(null);
+            }
             try {
                 trans.setStore2Id(aResultSet.getInt("store2_id"));
             } catch (NullPointerException npe) {
@@ -14060,6 +14065,8 @@ public class TransBean implements Serializable {
         }
         //refresh output
         new OutputDetailBean().refreshOutput("PARENT", "");
+        //refresh history
+        this.TransListHist=new ReportBean().getTransHistory(aTransId);
     }
 
     public void initHireReturnInvoiceSession() {
@@ -16603,6 +16610,20 @@ public class TransBean implements Serializable {
      */
     public void setOrderMode3(String OrderMode3) {
         this.OrderMode3 = OrderMode3;
+    }
+
+    /**
+     * @return the TransListHist
+     */
+    public List<Trans> getTransListHist() {
+        return TransListHist;
+    }
+
+    /**
+     * @param TransListHist the TransListHist to set
+     */
+    public void setTransListHist(List<Trans> TransListHist) {
+        this.TransListHist = TransListHist;
     }
 
 }

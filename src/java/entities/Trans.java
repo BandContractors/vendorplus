@@ -148,6 +148,7 @@ public class Trans implements Serializable {
     private String reconsile_flag;
     private String transaction_number_tax_update;
     private String update_type;
+    private Date hist_add_date;
 
     /**
      * @return the TransactionId
@@ -1841,6 +1842,20 @@ public class Trans implements Serializable {
      */
     public void setUpdate_type(String update_type) {
         this.update_type = update_type;
+    }
+
+    /**
+     * @return the hist_add_date
+     */
+    public Date getHist_add_date() {
+        return hist_add_date;
+    }
+
+    /**
+     * @param hist_add_date the hist_add_date to set
+     */
+    public void setHist_add_date(Date hist_add_date) {
+        this.hist_add_date = hist_add_date;
     }
 
 }
