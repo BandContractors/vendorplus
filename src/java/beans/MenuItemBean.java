@@ -108,6 +108,11 @@ public class MenuItemBean implements Serializable {
             } catch (Exception e) {
                 //do nothing
             }
+            try {
+                this.MenuItemObj.setDEFAULT_FOCUS_CONTROL_ID(pb.getParameter_listByContextNameMemory("COMPANY_SETTING", "DEFAULT_FOCUS_CONTROL_ID").getParameter_value());
+            } catch (NullPointerException npe) {
+                this.MenuItemObj.setDEFAULT_FOCUS_CONTROL_ID("");
+            }
         } catch (Exception e) {
 
         }

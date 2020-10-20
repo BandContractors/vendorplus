@@ -31,6 +31,7 @@ public class MenuItem implements Serializable {
     private String SUPPLIER_NAME;
     private String LOC_LEVEL_2_LABEL;
     private String LOC_LEVEL_3_LABEL;
+    private String DEFAULT_FOCUS_CONTROL_ID;
 
     /**
      * @return the SYSTEM_NAME
@@ -198,5 +199,19 @@ public class MenuItem implements Serializable {
      */
     public void setLOC_LEVEL_3_LABEL(String LOC_LEVEL_3_LABEL) {
         this.LOC_LEVEL_3_LABEL = LOC_LEVEL_3_LABEL;
+    }
+
+    /**
+     * @return the DEFAULT_FOCUS_CONTROL_ID
+     */
+    public String getDEFAULT_FOCUS_CONTROL_ID() {
+        return DEFAULT_FOCUS_CONTROL_ID;
+    }
+
+    /**
+     * @param DEFAULT_FOCUS_CONTROL_ID the DEFAULT_FOCUS_CONTROL_ID to set
+     */
+    public void setDEFAULT_FOCUS_CONTROL_ID(String DEFAULT_FOCUS_CONTROL_ID) {
+        this.DEFAULT_FOCUS_CONTROL_ID = DEFAULT_FOCUS_CONTROL_ID;
     }
 }

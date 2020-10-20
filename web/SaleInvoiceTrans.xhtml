@@ -222,7 +222,7 @@
                 </h:selectBooleanCheckbox>
                 <p:tooltip id="toolTipTrackOP" for="lblOverridePrice" value="Override/Change Unit Price, Discount and VAT Rate" trackMouse="true" />
                 <p:tooltip id="toolTipTrackSW" for="lblWarranty" value="Specify the Warranty applicable to this Item" trackMouse="true" />
-                <p:focus for="itxtItemCode"/>
+                <p:focus for="#{menuItemBean.menuItemObj.DEFAULT_FOCUS_CONTROL_ID}" rendered="#{menuItemBean.menuItemObj.DEFAULT_FOCUS_CONTROL_ID.length()>0}"/>
                 <p:remoteCommand name="barcode" actionListener="#{transItemBean.updateModelTransItemAutoAddCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentSaleType,trans,transItem,statusBean,transItemBean.activeTransItems,transItem,itemBean.selectedItem,'BarCode')}" process="@this itxtItemCode" update="gridTransItem gridItemStatus dtblTransactionItem pgrdTotals pgrdPayment">
                 </p:remoteCommand>
             </h:panelGrid>
