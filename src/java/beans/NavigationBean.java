@@ -1369,9 +1369,13 @@ public class NavigationBean implements Serializable {
     public String redirectToBalanceSheet() {
         return "BalanceSheet?faces-redirect=true";
     }
-
+    
     public String redirectToIncomeStatement() {
         return "IncomeStatement?faces-redirect=true";
+    }
+    
+    public String redirectToCashFlowStatement() {
+        return "CashFlowStatement?faces-redirect=true";
     }
 
     public String redirectToAccountPeriod() {

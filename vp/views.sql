@@ -500,3 +500,64 @@ SELECT
 	FROM transaction t 
 	left join transaction_tax_map t2 on t.transaction_id=t2.transaction_id 
 	WHERE t.transaction_type_id IN(2,65,68);
+
+CREATE OR REPLACE VIEW view_cash_receipt_detail AS 
+SELECT 
+CASE 
+	WHEN p.pay_reason_id=21 THEN 1 
+	WHEN p.pay_reason_id=22 THEN 2 
+	WHEN p.pay_reason_id=90 THEN 3 
+	WHEN p.pay_reason_id=23 THEN 4 
+	WHEN p.pay_reason_id=24 THEN 5 
+	WHEN p.pay_reason_id=115 THEN 6 
+	ELSE 7 
+END as display_order,
+CASE 
+	WHEN p.pay_reason_id=21 THEN 'Cash Sales' 
+	WHEN p.pay_reason_id=22 THEN 'Credit Sales' 
+	WHEN p.pay_reason_id=23 THEN 'Capital Injections' 
+	WHEN p.pay_reason_id=24 THEN 'Loan Injections'
+	WHEN p.pay_reason_id=90 THEN 'Deposits from Customers' 
+	WHEN p.pay_reason_id=115 THEN 'Other Cash Receipts'
+	ELSE 'UnKnown' 
+END as cash_category,
+p.pay_date,YEAR(p.pay_date) as year_cal,MONTH(p.pay_date) as month_cal,(p.xrate*p.paid_amount) as paid_amount 
+FROM pay p  
+WHERE p.pay_type_id=14 AND p.pay_method_id!=6;
+
+CREATE OR REPLACE VIEW view_cash_paid_detail AS 
+	SELECT 
+		CASE 
+			WHEN p.pay_reason_id=91 THEN 2 
+			WHEN p.pay_reason_id=34 THEN 3 
+			WHEN p.pay_reason_id=33 THEN 4 
+			WHEN p.pay_reason_id=105 THEN 8 
+			ELSE 9 
+		END as display_order,
+		CASE 
+			WHEN p.pay_reason_id=34 THEN 'Owner Cash Drawings' 
+			WHEN p.pay_reason_id=33 THEN 'Loan Repayments'
+			WHEN p.pay_reason_id=91 THEN 'Deposits to Suppliers' 
+			WHEN p.pay_reason_id=105 THEN 'Other Cash Payments'
+			ELSE 'NotKnown'  
+		END as cash_category,
+		p.pay_date,YEAR(p.pay_date) as year_cal,MONTH(p.pay_date) as month_cal,(p.xrate*p.paid_amount) as paid_amount 
+	FROM pay p  
+	WHERE p.pay_type_id=15 AND p.pay_method_id!=7 AND p.pay_reason_id IN(34,33,91,105) 
+UNION 
+	SELECT 
+		CASE 
+			WHEN pt.transaction_reason_id=1 THEN 1 
+			WHEN pt.transaction_reason_id=29 THEN 6 
+			WHEN pt.transaction_reason_id=27 OR pt.transaction_reason_id=43 THEN 7  
+			ELSE 9 
+		END as display_order,
+		CASE 
+			WHEN pt.transaction_reason_id=1 THEN 'Purcahse of Goods and Services' 
+			WHEN pt.transaction_reason_id=29 THEN 'Purcahse of Assets' 
+			WHEN pt.transaction_reason_id=27 OR pt.transaction_reason_id=43 THEN 'Operational Expenses' 
+			ELSE 'UnKnown'  
+		END as cash_category,
+		pa.pay_date,YEAR(pa.pay_date) as year_cal,MONTH(pa.pay_date) as month_cal,(pa.xrate*pt.trans_paid_amount) as paid_amount
+	FROM pay_trans pt INNER JOIN pay pa ON pt.pay_id=pa.pay_id 
+	WHERE pa.pay_type_id=15 AND pa.pay_method_id!=7 AND pa.pay_reason_id IN(25,26);

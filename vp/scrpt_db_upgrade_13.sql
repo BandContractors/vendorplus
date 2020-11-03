@@ -3,3 +3,4 @@ VALUES (64, 'COMPANY_SETTING', 'DEFAULT_FOCUS_CONTROL_ID', 'itxtItemCode','Deafu
 
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_13',4,Now(),'6.0','');
+

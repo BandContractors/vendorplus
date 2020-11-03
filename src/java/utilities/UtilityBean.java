@@ -5,7 +5,6 @@ import beans.Alert_generalBean;
 import connections.DBConnection;
 import entities.CompanySetting;
 import entities.Item;
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.CallableStatement;
@@ -552,6 +551,14 @@ public class UtilityBean implements Serializable {
         return current_year;
     }
 
+    public Integer getYearFromDate(Date aDate) {
+        int date_year = 0;
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(aDate);
+        date_year = cal.get(Calendar.YEAR);
+        return date_year;
+    }
+
     public Integer getCurrentMonth() {
         int current_month = 0;
         //current_month = Calendar.getInstance().get(Calendar.MONTH) + 1;
@@ -559,6 +566,14 @@ public class UtilityBean implements Serializable {
         cal.setTime(new CompanySetting().getCURRENT_SERVER_DATE());
         current_month = cal.get(Calendar.MONTH) + 1;
         return current_month;
+    }
+
+    public Integer getMonthFromDate(Date aDate) {
+        int date_month = 0;
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(aDate);
+        date_month = cal.get(Calendar.MONTH) + 1;
+        return date_month;
     }
 
     public void clearList(List<Object> aList) {
@@ -649,8 +664,41 @@ public class UtilityBean implements Serializable {
     }
 
 //    public static void main(String[] args) {
-//        //new UtilityBean().backupDatabase("kwenu_sm_branch2", "root", "WTLura456", "C:\\wamp\\bin\\mysql\\mysql5.6.17\\bin", "C:\\abc");
-//        System.out.println(new File("external").getPath());
+//        int MinM=0,MinY=0,MaxM=0,MaxY=0;
+//        Date fromDate = new Date();
+//        Date toDate = new Date();
+//        Calendar cal1 = new GregorianCalendar();
+//        cal1.set(2019,6,1);//6 is 7
+//        fromDate.setTime(cal1.getTime().getTime());
+//        MinM=cal1.get(Calendar.MONTH)+1;
+//        MinY=cal1.get(Calendar.YEAR);
+//        cal1.set(2020,0,30); //5 is 6
+//        toDate.setTime(cal1.getTime().getTime());
+//        MaxM=cal1.get(Calendar.MONTH)+1;
+//        MaxY=cal1.get(Calendar.YEAR);
+//        System.out.println("From:" + MinM + "/" + MinY + " To:" + MaxM + "/" + MaxY);
+//        int M=0,Y=0;
+//        if(MinY==MaxY){
+//            Y=MinY;
+//            M=MinM;
+//            while(M<=MaxM){
+//                System.out.println(M + "/" + Y);
+//                M=M+1;
+//            }
+//        }else if(MinY<MaxY){
+//            Y=MinY;
+//            M=MinM;
+//            while(M<=12){
+//                System.out.println(M + "/" + Y);
+//                M=M+1;
+//            }
+//            Y=MaxY;
+//            M=1;
+//            while(M<=MaxM){
+//                System.out.println(M + "/" + Y);
+//                M=M+1;
+//            }
+//        }
 //    }
 
     public void backupDatabase(String aDbName, String aDbUser, String aDbPassword, String aMySQLDumpFolderPath, String aSaveFolderPath) {
