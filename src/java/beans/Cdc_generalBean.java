@@ -113,9 +113,13 @@ public class Cdc_generalBean implements Serializable {
         }
     }
 
-    public String getNewCdc_id() {
+    public String getNewCdc_id(String aCdc_function) {
         String cdcid = "";
-
+        if (aCdc_function.equals("STOCK")) {
+            cdcid = "S";
+        } else if (aCdc_function.equals("CASH")) {
+            cdcid = "C";
+        }
         java.util.Calendar calendar = new GregorianCalendar();
         Date aDate = new CompanySetting().getCURRENT_SERVER_DATE();
         calendar.setTime(aDate);
@@ -132,6 +136,9 @@ public class Cdc_generalBean implements Serializable {
         String MN = String.format("%02d", mn);
         int s = calendar.get(java.util.Calendar.SECOND);
         String S = String.format("%02d", s);
+        //int l = calendar.get(java.util.Calendar.MILLISECOND);
+        //String L = String.format("%03d", l);
+        //cdcid = cdcid + Y + M + D + H + MN + S + L;
         cdcid = cdcid + Y + M + D + H + MN + S;
         return cdcid;
     }
@@ -225,8 +232,8 @@ public class Cdc_generalBean implements Serializable {
         return cg;
     }
 
-    public Cdc_general getLatestCdc_general() {
-        String sql = "SELECT c1.* FROM cdc_general c1 WHERE c1.cdc_general_id=(select max(c2.cdc_general_id) from cdc_general c2)";
+    public Cdc_general getLatestCdc_generalSTOCK() {
+        String sql = "SELECT c1.* FROM cdc_general c1 WHERE c1.cdc_general_id=(select max(c2.cdc_general_id) from cdc_general c2 where c2.cdc_function='STOCK')";
         ResultSet rs = null;
         Cdc_general cg = null;
         try (
@@ -238,15 +245,53 @@ public class Cdc_generalBean implements Serializable {
                 this.setCdc_generalFromResultset(cg, rs);
             }
         } catch (Exception e) {
-            System.err.println("getLatestCdc_general:" + e.getMessage());
+            System.err.println("getLatestCdc_generalSTOCK:" + e.getMessage());
         }
         return cg;
     }
 
-    public boolean isTodaySnapshotFound() {
+    public Cdc_general getLatestCdc_generalCASH() {
+        String sql = "SELECT c1.* FROM cdc_general c1 WHERE c1.cdc_general_id=(select max(c2.cdc_general_id) from cdc_general c2 where c2.cdc_function='CASH')";
+        ResultSet rs = null;
+        Cdc_general cg = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                cg = new Cdc_general();
+                this.setCdc_generalFromResultset(cg, rs);
+            }
+        } catch (Exception e) {
+            System.err.println("getLatestCdc_generalCASH:" + e.getMessage());
+        }
+        return cg;
+    }
+
+    public boolean isTodaySnapshotFoundSTOCK() {
         boolean res = false;
         Date today = new CompanySetting().getCURRENT_SERVER_DATE();
-        Cdc_general cdcg = this.getLatestCdc_general();
+        Cdc_general cdcg = this.getLatestCdc_generalSTOCK();
+        if (null == cdcg) {
+            res = false;
+        } else {
+            if (new UtilityBean().isDatesEqual(today, cdcg.getCdc_date()) == 1) {
+                if (cdcg.getIs_passed() == 1) {
+                    res = true;
+                } else {
+                    res = false;
+                }
+            } else {
+                res = false;
+            }
+        }
+        return res;
+    }
+
+    public boolean isTodaySnapshotFoundCASH() {
+        boolean res = false;
+        Date today = new CompanySetting().getCURRENT_SERVER_DATE();
+        Cdc_general cdcg = this.getLatestCdc_generalCASH();
         if (null == cdcg) {
             res = false;
         } else {
@@ -267,7 +312,7 @@ public class Cdc_generalBean implements Serializable {
         try {
             //1. insert cdc_record
             long snapshotno = this.getNewSnapshot_no();
-            String cdcid = this.getNewCdc_id();
+            String cdcid = this.getNewCdc_id("STOCK");
             Cdc_general cdcgenInsert = new Cdc_general();
             cdcgenInsert.setCdc_general_id(0);
             cdcgenInsert.setSnapshot_no(snapshotno);
@@ -277,7 +322,6 @@ public class Cdc_generalBean implements Serializable {
             cdcgenInsert.setCdc_start_time(new CompanySetting().getCURRENT_SERVER_DATE());
             cdcgenInsert.setAdd_date(new CompanySetting().getCURRENT_SERVER_DATE());
             cdcgenInsert.setAdd_by(UserDetailBean.getSystemUserDetailId());
-            //cdcgenInsert.setAcc_period_id(new AccPeriodBean().getAccPeriodCurrent().getAccPeriodId());
             cdcgenInsert.setAcc_period_id(new AccPeriodBean().getAccPeriod(cdcgenInsert.getCdc_date()).getAccPeriodId());
             this.saveCdc_general(cdcgenInsert);
             //2. insert stock snapshop
@@ -303,12 +347,51 @@ public class Cdc_generalBean implements Serializable {
         }
     }
 
+    public void takeNewSnapshot_cash() {
+        try {
+            //1. insert cdc_record
+            long snapshotno = this.getNewSnapshot_no();
+            String cdcid = this.getNewCdc_id("CASH");
+            Cdc_general cdcgenInsert = new Cdc_general();
+            cdcgenInsert.setCdc_general_id(0);
+            cdcgenInsert.setSnapshot_no(snapshotno);
+            cdcgenInsert.setCdc_id(cdcid);
+            cdcgenInsert.setCdc_date(new CompanySetting().getCURRENT_SERVER_DATE());
+            cdcgenInsert.setCdc_function("CASH");
+            cdcgenInsert.setCdc_start_time(new CompanySetting().getCURRENT_SERVER_DATE());
+            cdcgenInsert.setAdd_date(new CompanySetting().getCURRENT_SERVER_DATE());
+            cdcgenInsert.setAdd_by(UserDetailBean.getSystemUserDetailId());
+            cdcgenInsert.setAcc_period_id(new AccPeriodBean().getAccPeriod(cdcgenInsert.getCdc_date()).getAccPeriodId());
+            this.saveCdc_general(cdcgenInsert);
+            //2. insert stock snapshop
+            Cdc_general cdcgenSaved = this.getCdc_generalByJobId(cdcid);
+            if (null != cdcgenSaved) {
+                int saved = new Snapshot_cash_balanceBean().insertSnapshot_cash_balance(cdcgenSaved);
+                long recordsInserted = new Snapshot_cash_balanceBean().getRecordsByCdc_id(cdcid);
+                Cdc_general cdcgenUpdate = new Cdc_general();
+                cdcgenUpdate.setCdc_general_id(cdcgenSaved.getCdc_general_id());
+                cdcgenUpdate.setRecords_affected(recordsInserted);
+                if (recordsInserted > 0) {
+                    cdcgenUpdate.setIs_passed(1);
+                } else {
+                    cdcgenUpdate.setIs_passed(0);
+                }
+                cdcgenUpdate.setCdc_end_time(new CompanySetting().getCURRENT_SERVER_DATE());
+                cdcgenUpdate.setLast_update_date(new CompanySetting().getCURRENT_SERVER_DATE());
+                cdcgenUpdate.setLast_update_by(UserDetailBean.getSystemUserDetailId());
+                this.saveCdc_general(cdcgenUpdate);
+            }
+        } catch (Exception e) {
+            System.out.println("takeNewSnapshot_cash:" + e.getMessage());
+        }
+    }
+
     public void takeNewSnapshot_stockAtLogin() {
         try {
             String DailySnapshotTime = new Parameter_listBean().getParameter_listByContextNameMemory("SNAPSHOT", "DAILY_SNAPSHOT_TIME").getParameter_value();
             if (DailySnapshotTime.equals("1")) {//first login
                 //check if it hasnt been taken
-                if (new Cdc_generalBean().isTodaySnapshotFound()) {
+                if (new Cdc_generalBean().isTodaySnapshotFoundSTOCK()) {
                     //ignore
                 } else {
                     this.takeNewSnapshot_stock();
@@ -316,6 +399,22 @@ public class Cdc_generalBean implements Serializable {
             }
         } catch (Exception e) {
             System.out.println("takeNewSnapshot_stockAtLogin:" + e.getMessage());
+        }
+    }
+
+    public void takeNewSnapshot_cash_balanceAtLogin() {
+        try {
+            String DailySnapshotTime = new Parameter_listBean().getParameter_listByContextNameMemory("SNAPSHOT", "DAILY_SNAPSHOT_TIME").getParameter_value();
+            if (DailySnapshotTime.equals("1")) {//first login
+                //check if it hasnt been taken
+                if (new Cdc_generalBean().isTodaySnapshotFoundCASH()) {
+                    //ignore
+                } else {
+                    this.takeNewSnapshot_cash();
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("takeNewSnapshot_cash_balanceAtLogin:" + e.getMessage());
         }
     }
 

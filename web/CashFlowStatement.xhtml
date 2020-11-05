@@ -20,6 +20,13 @@
                 return alert('Record saved successfully!');
             }
         </script> 
+        <style>
+            .ui-panel .ui-panel-content {
+                border: 0;
+                background: 0;
+                padding: 0;
+            }
+        </style>
     </h:head>
     <f:metadata>
         <f:viewAction action="#{navigationBean.checkAccessDenied('49', 'View')}"/>
@@ -50,93 +57,144 @@
             <h:panelGrid id="pnlgMessage">
                 <p:outputLabel value="#{cashFlowStatementBean.actionMessage}" style="color: red;"/>
             </h:panelGrid>
-            <p:panel id="pnlgDetail" style="border: none;width: 100%">
-                <p:panel style="border: none;width: 100%" rendered="#{cashFlowStatementBean.monthListSelected.size()>0}">
-                    <table id="tblDetail" border="1" cellspacing="0" cellpadding="2" style="border-color: #E5E5E5;width: 100%;">
+            <p:panel id="pnlgDetail" style="border: none;width: 100%;margin: 0px;border-style: none;-webkit-print-color-adjust: exact;">
+                <p:panel style="border: none;width: 100%;margin: 0px;" rendered="#{cashFlowStatementBean.monthListSelected.size()>0}">
+                    <table id="tblDetail" border="1" cellspacing="0" cellpadding="0.5" style="border-color: #E5E5E5;width: 100%;">
                         <tr style="background-color: yellow;font-weight: bold">
-                            <td colspan="2"></td>
-                            <td>#{cashFlowStatementBean.monthListSelected.get(0).monthYearName}</td>
-                            <td>#{cashFlowStatementBean.monthListSelected.get(1).monthYearName}</td>
-                            <td>#{cashFlowStatementBean.monthListSelected.get(2).monthYearName}</td>
-                            <td>#{cashFlowStatementBean.monthListSelected.get(3).monthYearName}</td>
-                            <td>#{cashFlowStatementBean.monthListSelected.get(4).monthYearName}</td>
-                            <td>#{cashFlowStatementBean.monthListSelected.get(5).monthYearName}</td>
-                            <td>#{cashFlowStatementBean.monthListSelected.get(6).monthYearName}</td>
-                            <td>#{cashFlowStatementBean.monthListSelected.get(7).monthYearName}</td>
-                            <td>#{cashFlowStatementBean.monthListSelected.get(8).monthYearName}</td>
-                            <td>#{cashFlowStatementBean.monthListSelected.get(9).monthYearName}</td>
-                            <td>#{cashFlowStatementBean.monthListSelected.get(10).monthYearName}</td>
-                            <td>#{cashFlowStatementBean.monthListSelected.get(11).monthYearName}</td>
+                            <td  style="font-size: 10pt;" align="right" colspan="2"></td>
+                            <td  style="font-size: 10pt;" align="right">#{cashFlowStatementBean.monthListSelected.get(0).monthYearName}</td>
+                            <td  style="font-size: 10pt;" align="right">#{cashFlowStatementBean.monthListSelected.get(1).monthYearName}</td>
+                            <td  style="font-size: 10pt;" align="right">#{cashFlowStatementBean.monthListSelected.get(2).monthYearName}</td>
+                            <td  style="font-size: 10pt;" align="right">#{cashFlowStatementBean.monthListSelected.get(3).monthYearName}</td>
+                            <td  style="font-size: 10pt;" align="right">#{cashFlowStatementBean.monthListSelected.get(4).monthYearName}</td>
+                            <td  style="font-size: 10pt;" align="right">#{cashFlowStatementBean.monthListSelected.get(5).monthYearName}</td>
+                            <td  style="font-size: 10pt;" align="right">#{cashFlowStatementBean.monthListSelected.get(6).monthYearName}</td>
+                            <td  style="font-size: 10pt;" align="right">#{cashFlowStatementBean.monthListSelected.get(7).monthYearName}</td>
+                            <td  style="font-size: 10pt;" align="right">#{cashFlowStatementBean.monthListSelected.get(8).monthYearName}</td>
+                            <td  style="font-size: 10pt;" align="right">#{cashFlowStatementBean.monthListSelected.get(9).monthYearName}</td>
+                            <td  style="font-size: 10pt;" align="right">#{cashFlowStatementBean.monthListSelected.get(10).monthYearName}</td>
+                            <td  style="font-size: 10pt;" align="right">#{cashFlowStatementBean.monthListSelected.get(11).monthYearName}</td>
                         </tr>
                         <tr style="background-color: #E5E5E5">
-                            <td colspan="2" style="color: blue;">
+                            <td colspan="2" style="color: blue;font-size: 10pt;">
+                                Cash at Beginning
+                            </td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                        </tr>
+                        <tr style="background-color: #E5E5E5">
+                            <td colspan="2" style="color: blue;font-size: 10pt;">
                                 Cash Receipts
                             </td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
                         </tr>
                         <ui:repeat var="cr" value="#{cashFlowStatementBean.cashReceiptsList}">
                             <tr>
-                                <td colspan="2">#{cr.cash_category}</td>
-                                <td>#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCR(cr.cash_category, cashFlowStatementBean.monthListSelected.get(0).monthName))}</td>
-                                <td>#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCR(cr.cash_category, cashFlowStatementBean.monthListSelected.get(1).monthName))}</td>
-                                <td>#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCR(cr.cash_category, cashFlowStatementBean.monthListSelected.get(2).monthName))}</td>
-                                <td>#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCR(cr.cash_category, cashFlowStatementBean.monthListSelected.get(3).monthName))}</td>
-                                <td>#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCR(cr.cash_category, cashFlowStatementBean.monthListSelected.get(4).monthName))}</td>
-                                <td>#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCR(cr.cash_category, cashFlowStatementBean.monthListSelected.get(5).monthName))}</td>
-                                <td>#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCR(cr.cash_category, cashFlowStatementBean.monthListSelected.get(6).monthName))}</td>
-                                <td>#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCR(cr.cash_category, cashFlowStatementBean.monthListSelected.get(7).monthName))}</td>
-                                <td>#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCR(cr.cash_category, cashFlowStatementBean.monthListSelected.get(8).monthName))}</td>
-                                <td>#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCR(cr.cash_category, cashFlowStatementBean.monthListSelected.get(9).monthName))}</td>
-                                <td>#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCR(cr.cash_category, cashFlowStatementBean.monthListSelected.get(10).monthName))}</td>
-                                <td>#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCR(cr.cash_category, cashFlowStatementBean.monthListSelected.get(11).monthName))}</td>
+                                <td  style="font-size: 10pt;" align="right" colspan="2">#{cr.cash_category}</td>
+                                <td  style="font-size: 10pt;" align="right">#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCR(cr.cash_category, cashFlowStatementBean.monthListSelected.get(0).monthName))}</td>
+                                <td  style="font-size: 10pt;" align="right">#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCR(cr.cash_category, cashFlowStatementBean.monthListSelected.get(1).monthName))}</td>
+                                <td  style="font-size: 10pt;" align="right">#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCR(cr.cash_category, cashFlowStatementBean.monthListSelected.get(2).monthName))}</td>
+                                <td  style="font-size: 10pt;" align="right">#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCR(cr.cash_category, cashFlowStatementBean.monthListSelected.get(3).monthName))}</td>
+                                <td  style="font-size: 10pt;" align="right">#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCR(cr.cash_category, cashFlowStatementBean.monthListSelected.get(4).monthName))}</td>
+                                <td  style="font-size: 10pt;" align="right">#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCR(cr.cash_category, cashFlowStatementBean.monthListSelected.get(5).monthName))}</td>
+                                <td  style="font-size: 10pt;" align="right">#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCR(cr.cash_category, cashFlowStatementBean.monthListSelected.get(6).monthName))}</td>
+                                <td  style="font-size: 10pt;" align="right">#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCR(cr.cash_category, cashFlowStatementBean.monthListSelected.get(7).monthName))}</td>
+                                <td  style="font-size: 10pt;" align="right">#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCR(cr.cash_category, cashFlowStatementBean.monthListSelected.get(8).monthName))}</td>
+                                <td  style="font-size: 10pt;" align="right">#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCR(cr.cash_category, cashFlowStatementBean.monthListSelected.get(9).monthName))}</td>
+                                <td  style="font-size: 10pt;" align="right">#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCR(cr.cash_category, cashFlowStatementBean.monthListSelected.get(10).monthName))}</td>
+                                <td  style="font-size: 10pt;" align="right">#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCR(cr.cash_category, cashFlowStatementBean.monthListSelected.get(11).monthName))}</td>
                             </tr>
                         </ui:repeat>
 
                         <tr style="background-color: #E5E5E5">
-                            <td colspan="2" style="color: blue;">
+                            <td colspan="2" style="color: blue;font-size: 10pt;">
                                 Cash Payments
                             </td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
                         </tr>
                         <ui:repeat var="cp" value="#{cashFlowStatementBean.cashPaymentsList}">
                             <tr>
-                                <td colspan="2">#{cp.cash_category}</td>
-                                <td>#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCP(cp.cash_category, cashFlowStatementBean.monthListSelected.get(0).monthName))}</td>
-                                <td>#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCP(cp.cash_category, cashFlowStatementBean.monthListSelected.get(1).monthName))}</td>
-                                <td>#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCP(cp.cash_category, cashFlowStatementBean.monthListSelected.get(2).monthName))}</td>
-                                <td>#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCP(cp.cash_category, cashFlowStatementBean.monthListSelected.get(3).monthName))}</td>
-                                <td>#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCP(cp.cash_category, cashFlowStatementBean.monthListSelected.get(4).monthName))}</td>
-                                <td>#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCP(cp.cash_category, cashFlowStatementBean.monthListSelected.get(5).monthName))}</td>
-                                <td>#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCP(cp.cash_category, cashFlowStatementBean.monthListSelected.get(6).monthName))}</td>
-                                <td>#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCP(cp.cash_category, cashFlowStatementBean.monthListSelected.get(7).monthName))}</td>
-                                <td>#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCP(cp.cash_category, cashFlowStatementBean.monthListSelected.get(8).monthName))}</td>
-                                <td>#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCP(cp.cash_category, cashFlowStatementBean.monthListSelected.get(9).monthName))}</td>
-                                <td>#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCP(cp.cash_category, cashFlowStatementBean.monthListSelected.get(10).monthName))}</td>
-                                <td>#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCP(cp.cash_category, cashFlowStatementBean.monthListSelected.get(11).monthName))}</td>
+                                <td  style="font-size: 10pt;" align="right" colspan="2">#{cp.cash_category}</td>
+                                <td  style="font-size: 10pt;" align="right">#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCP(cp.cash_category, cashFlowStatementBean.monthListSelected.get(0).monthName))}</td>
+                                <td  style="font-size: 10pt;" align="right">#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCP(cp.cash_category, cashFlowStatementBean.monthListSelected.get(1).monthName))}</td>
+                                <td  style="font-size: 10pt;" align="right">#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCP(cp.cash_category, cashFlowStatementBean.monthListSelected.get(2).monthName))}</td>
+                                <td  style="font-size: 10pt;" align="right">#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCP(cp.cash_category, cashFlowStatementBean.monthListSelected.get(3).monthName))}</td>
+                                <td  style="font-size: 10pt;" align="right">#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCP(cp.cash_category, cashFlowStatementBean.monthListSelected.get(4).monthName))}</td>
+                                <td  style="font-size: 10pt;" align="right">#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCP(cp.cash_category, cashFlowStatementBean.monthListSelected.get(5).monthName))}</td>
+                                <td  style="font-size: 10pt;" align="right">#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCP(cp.cash_category, cashFlowStatementBean.monthListSelected.get(6).monthName))}</td>
+                                <td  style="font-size: 10pt;" align="right">#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCP(cp.cash_category, cashFlowStatementBean.monthListSelected.get(7).monthName))}</td>
+                                <td  style="font-size: 10pt;" align="right">#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCP(cp.cash_category, cashFlowStatementBean.monthListSelected.get(8).monthName))}</td>
+                                <td  style="font-size: 10pt;" align="right">#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCP(cp.cash_category, cashFlowStatementBean.monthListSelected.get(9).monthName))}</td>
+                                <td  style="font-size: 10pt;" align="right">#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCP(cp.cash_category, cashFlowStatementBean.monthListSelected.get(10).monthName))}</td>
+                                <td  style="font-size: 10pt;" align="right">#{utilityBean.formatDoubleToString(cashFlowStatementBean.getMonthValueFromCP(cp.cash_category, cashFlowStatementBean.monthListSelected.get(11).monthName))}</td>
                             </tr>
                         </ui:repeat>
+                        <tr style="background-color: #E5E5E5">
+                            <td colspan="2" style="color: blue;font-size: 10pt;">
+                                Net Cash Change
+                            </td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                        </tr>
+                        <tr style="background-color: #E5E5E5">
+                            <td colspan="2" style="color: blue;font-size: 10pt;">
+                                Cash at End
+                            </td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                            <td  style="font-size: 10pt;" align="right"></td>
+                        </tr>
                     </table>
                 </p:panel>
             </p:panel>

@@ -664,41 +664,10 @@ public class UtilityBean implements Serializable {
     }
 
 //    public static void main(String[] args) {
-//        int MinM=0,MinY=0,MaxM=0,MaxY=0;
-//        Date fromDate = new Date();
-//        Date toDate = new Date();
-//        Calendar cal1 = new GregorianCalendar();
-//        cal1.set(2019,6,1);//6 is 7
-//        fromDate.setTime(cal1.getTime().getTime());
-//        MinM=cal1.get(Calendar.MONTH)+1;
-//        MinY=cal1.get(Calendar.YEAR);
-//        cal1.set(2020,0,30); //5 is 6
-//        toDate.setTime(cal1.getTime().getTime());
-//        MaxM=cal1.get(Calendar.MONTH)+1;
-//        MaxY=cal1.get(Calendar.YEAR);
-//        System.out.println("From:" + MinM + "/" + MinY + " To:" + MaxM + "/" + MaxY);
-//        int M=0,Y=0;
-//        if(MinY==MaxY){
-//            Y=MinY;
-//            M=MinM;
-//            while(M<=MaxM){
-//                System.out.println(M + "/" + Y);
-//                M=M+1;
-//            }
-//        }else if(MinY<MaxY){
-//            Y=MinY;
-//            M=MinM;
-//            while(M<=12){
-//                System.out.println(M + "/" + Y);
-//                M=M+1;
-//            }
-//            Y=MaxY;
-//            M=1;
-//            while(M<=MaxM){
-//                System.out.println(M + "/" + Y);
-//                M=M+1;
-//            }
-//        }
+//        int l = 12347;
+//        String L = String.format("%03d", l);
+//        System.out.println("l:" + l);
+//        System.out.println("L:" + L);
 //    }
 
     public void backupDatabase(String aDbName, String aDbUser, String aDbPassword, String aMySQLDumpFolderPath, String aSaveFolderPath) {

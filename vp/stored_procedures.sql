@@ -11348,3 +11348,25 @@ BEGIN
 	end if;
 END//
 DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_insert_snapshot_cash_balance;
+DELIMITER //
+CREATE PROCEDURE sp_insert_snapshot_cash_balance
+(
+		IN in_acc_period_id int,
+		IN in_snapshot_no long,
+		IN in_snapshot_date datetime,
+		IN in_cdc_id varchar(20)
+) 
+BEGIN 
+		INSERT INTO snapshot_cash_balance(snapshot_no,snapshot_date,acc_period_id,cdc_id,
+		account_code,acc_child_account_id,currency_code,
+		debit_amount,credit_amount,debit_amount_lc,credit_amount_lc,debit_balance,debit_balance_lc) 
+		SELECT in_snapshot_no,in_snapshot_date,in_acc_period_id,in_cdc_id,
+		al.account_code,al.acc_child_account_id,al.currency_code,sum(al.debit_amount) as debit_amount,
+		sum(al.credit_amount) as credit_amount,sum(al.debit_amount_lc) as debit_amount_lc,sum(al.credit_amount_lc) as credit_amount_lc,
+		(sum(al.debit_amount)-sum(al.credit_amount)) as  debit_balance,(sum(al.debit_amount_lc)-sum(al.credit_amount_lc)) as debit_balance_lc 
+		FROM view_ledger_union_open_balances al INNER JOIN acc_child_account ac ON al.acc_child_account_id=ac.acc_child_account_id 
+		WHERE al.account_code LIKE '1-00-000%';
+END//
+DELIMITER ;

@@ -36,6 +36,8 @@ public class CashFlowStatementBean implements Serializable {
     private List<MonthList> MonthListSelected;
     private String CalendarYear;
     private int AccountPeriodId;
+    private CashFlowStatement CashAtBegin;
+    private CashFlowStatement CashAtEnd;
 
     public void setCashFlowStatementFromResultset(CashFlowStatement aCashFlowStatement, ResultSet rs) {
         try {
@@ -112,11 +114,17 @@ public class CashFlowStatementBean implements Serializable {
     public void reportCashFlowStatement() {
         ResultSet rsCR = null;
         ResultSet rsCP = null;
+        ResultSet rsCB = null;
+        ResultSet rsCE = null;
         this.CashReceiptsList = new ArrayList<>();
         this.CashPaymentsList = new ArrayList<>();
         this.MonthListSelected = new ArrayList<>();
+        this.CashAtBegin = new CashFlowStatement();
+        this.CashAtEnd = new CashFlowStatement();
         String sqlCR = "";
         String sqlCP = "";
+        String sqlCB = "";
+        String sqlCE = "";
         String wheresql = "";
         Date Date1 = null, Date2 = null;
         try {
@@ -126,7 +134,7 @@ public class CashFlowStatementBean implements Serializable {
                 Date2 = accp.getEndDate();
             } else if (this.CalendarYear.length() > 0) {
                 int CalYear = Integer.parseInt(this.CalendarYear);
-                Date1=new Date();
+                Date1 = new Date();
                 Calendar cal = Calendar.getInstance();
                 cal.set(Calendar.YEAR, CalYear);
                 cal.set(Calendar.MONTH, 0);
@@ -137,8 +145,8 @@ public class CashFlowStatementBean implements Serializable {
                 cal.set(Calendar.MILLISECOND, 0);
                 // Put it back in the Date object
                 Date1.setTime(cal.getTime().getTime());
-                
-                Date2=new Date();
+
+                Date2 = new Date();
                 Calendar cal2 = Calendar.getInstance();
                 cal2.set(Calendar.YEAR, CalYear);
                 cal2.set(Calendar.MONTH, 11);
@@ -228,6 +236,48 @@ public class CashFlowStatementBean implements Serializable {
             } catch (Exception e) {
                 System.err.println("reportCashFlowStatement:CP:" + e.getMessage());
             }
+            //Cash at Beginning
+            sqlCB = "SELECT "
+                    + "'' as cash_category,"
+                    + "	GROUP_CONCAT(DISTINCT if(c.m = 1, s.debit_balance_lc, '') SEPARATOR '') AS 'Jan', "
+                    + "	GROUP_CONCAT(DISTINCT if(c.m = 2, s.debit_balance_lc, '') SEPARATOR '') AS 'Feb', "
+                    + "	GROUP_CONCAT(DISTINCT if(c.m = 3, s.debit_balance_lc, '') SEPARATOR '') AS 'Mar', "
+                    + "	GROUP_CONCAT(DISTINCT if(c.m = 4, s.debit_balance_lc, '') SEPARATOR '') AS 'Apr', "
+                    + "	GROUP_CONCAT(DISTINCT if(c.m = 5, s.debit_balance_lc, '') SEPARATOR '') AS 'May', "
+                    + "	GROUP_CONCAT(DISTINCT if(c.m = 6, s.debit_balance_lc, '') SEPARATOR '') AS 'Jun', "
+                    + "	GROUP_CONCAT(DISTINCT if(c.m = 7, s.debit_balance_lc, '') SEPARATOR '') AS 'Jul', "
+                    + "	GROUP_CONCAT(DISTINCT if(c.m = 8, s.debit_balance_lc, '') SEPARATOR '') AS 'Aug', "
+                    + "	GROUP_CONCAT(DISTINCT if(c.m = 9, s.debit_balance_lc, '') SEPARATOR '') AS 'Sep', "
+                    + "	GROUP_CONCAT(DISTINCT if(c.m = 10, s.debit_balance_lc, '') SEPARATOR '') AS 'Oct', "
+                    + "	GROUP_CONCAT(DISTINCT if(c.m = 11, s.debit_balance_lc, '') SEPARATOR '') AS 'Nov', "
+                    + "	GROUP_CONCAT(DISTINCT if(c.m = 12, s.debit_balance_lc, '') SEPARATOR '') AS 'Dec' "
+                    + "FROM "
+                    + "("
+                    + "	select year(cdc_date) as y,month(cdc_date) as m,min(snapshot_no) as snapshot_no from cdc_general "
+                    + "	where cdc_function='CASH' and is_passed=1 and cdc_date between '" + new java.sql.Date(Date1.getTime()) + "' AND '" + new java.sql.Date(Date2.getTime()) + "'"
+                    + "	group by year(cdc_date),month(cdc_date) "
+                    + "	order by year(cdc_date),month(cdc_date) "
+                    + ") AS c "
+                    + "INNER JOIN "
+                    + "("
+                    + "	select snapshot_no,sum(debit_balance_lc) as debit_balance_lc  "
+                    + "	from snapshot_cash_balance where snapshot_date between '" + new java.sql.Date(Date1.getTime()) + "' AND '" + new java.sql.Date(Date2.getTime()) + "'"
+                    + "	group by snapshot_no"
+                    + ") AS s ON c.snapshot_no=s.snapshot_no "
+                    + "GROUP BY c.y,c.m,c.snapshot_no";
+            System.out.println("sqlCB:" + sqlCB);
+            try (
+                    Connection connCB = DBConnection.getMySQLConnection();
+                    PreparedStatement psCB = connCB.prepareStatement(sqlCB);) {
+                rsCB = psCB.executeQuery();
+                if (rsCB.next()) {
+                    this.setCashFlowStatementFromResultset(this.CashAtBegin, rsCB);
+                }
+            } catch (Exception e) {
+                System.err.println("reportCashFlowStatement:CB:" + e.getMessage());
+            }
+            //Cash at End
+
             //MonthList
             int MinM = 0, MinY = 0, MaxM = 0, MaxY = 0;
             Calendar cal1 = new GregorianCalendar();
@@ -479,6 +529,34 @@ public class CashFlowStatementBean implements Serializable {
      */
     public void setAccountPeriodId(int AccountPeriodId) {
         this.AccountPeriodId = AccountPeriodId;
+    }
+
+    /**
+     * @return the CashAtBegin
+     */
+    public CashFlowStatement getCashAtBegin() {
+        return CashAtBegin;
+    }
+
+    /**
+     * @param CashAtBegin the CashAtBegin to set
+     */
+    public void setCashAtBegin(CashFlowStatement CashAtBegin) {
+        this.CashAtBegin = CashAtBegin;
+    }
+
+    /**
+     * @return the CashAtEnd
+     */
+    public CashFlowStatement getCashAtEnd() {
+        return CashAtEnd;
+    }
+
+    /**
+     * @param CashAtEnd the CashAtEnd to set
+     */
+    public void setCashAtEnd(CashFlowStatement CashAtEnd) {
+        this.CashAtEnd = CashAtEnd;
     }
 
 }

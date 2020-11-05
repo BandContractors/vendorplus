@@ -31,17 +31,24 @@ public class TaskManager {
             } catch (Exception e) {
             }
             if (DailySnapshotTime.equals("0")) {//server/tomcat start
-                //check if it hasnt been taken
-                if (new Cdc_generalBean().isTodaySnapshotFound()) {
+                //STOCK-check if it hasnt been taken
+                if (new Cdc_generalBean().isTodaySnapshotFoundSTOCK()) {
                     //ignore
                 } else {
                     new Cdc_generalBean().takeNewSnapshot_stock();
+                }
+                //CASH-check if it hasnt been taken
+                if (new Cdc_generalBean().isTodaySnapshotFoundCASH()) {
+                    //ignore
+                } else {
+                    new Cdc_generalBean().takeNewSnapshot_cash();
                 }
             } else {//specific_time_e.g 00:00 or not set or invalid time format
                 if (new UtilityBean().isTime24Hour(DailySnapshotTime)) {
                     String[] HrMn = DailySnapshotTime.split(":", 2);
                     Date StartTime = new Cdc_generalBean().getStartTime(Integer.parseInt(HrMn[0]), Integer.parseInt(HrMn[1]));
-                    timer.schedule(new PeriodicTaskStockSnapshot(), StartTime, RepeatAfter);
+                    //job for both STOCK and CASH snapshots
+                    timer.schedule(new PeriodicTaskSnapshot(), StartTime, RepeatAfter);
                 } else {
                     //do nothing
                 }
@@ -51,12 +58,13 @@ public class TaskManager {
         }
     }
 
-    private class PeriodicTaskStockSnapshot extends TimerTask {
+    private class PeriodicTaskSnapshot extends TimerTask {
 
         @Override
         public void run() {
             try {
                 new Cdc_generalBean().takeNewSnapshot_stock();
+                new Cdc_generalBean().takeNewSnapshot_cash();
             } catch (Exception e) {
             }
         }
