@@ -38,6 +38,9 @@ public class CashFlowStatementBean implements Serializable {
     private int AccountPeriodId;
     private CashFlowStatement CashAtBegin;
     private CashFlowStatement CashAtEnd;
+    private CashFlowStatement CashReceiptsTotals;
+    private CashFlowStatement CashPaymentsTotals;
+    private CashFlowStatement NetCashChange;
 
     public void setCashFlowStatementFromResultset(CashFlowStatement aCashFlowStatement, ResultSet rs) {
         try {
@@ -121,6 +124,9 @@ public class CashFlowStatementBean implements Serializable {
         this.MonthListSelected = new ArrayList<>();
         this.CashAtBegin = new CashFlowStatement();
         this.CashAtEnd = new CashFlowStatement();
+        this.CashReceiptsTotals = new CashFlowStatement();
+        this.CashPaymentsTotals = new CashFlowStatement();
+        this.NetCashChange = new CashFlowStatement();
         String sqlCR = "";
         String sqlCP = "";
         String sqlCB = "";
@@ -238,7 +244,7 @@ public class CashFlowStatementBean implements Serializable {
             }
             //Cash at Beginning
             sqlCB = "SELECT "
-                    + "'' as cash_category,"
+                    + "'Cash at Beginning' as cash_category,"
                     + "	GROUP_CONCAT(DISTINCT if(c.m = 1, s.debit_balance_lc, '') SEPARATOR '') AS 'Jan', "
                     + "	GROUP_CONCAT(DISTINCT if(c.m = 2, s.debit_balance_lc, '') SEPARATOR '') AS 'Feb', "
                     + "	GROUP_CONCAT(DISTINCT if(c.m = 3, s.debit_balance_lc, '') SEPARATOR '') AS 'Mar', "
@@ -265,7 +271,7 @@ public class CashFlowStatementBean implements Serializable {
                     + "	group by snapshot_no"
                     + ") AS s ON c.snapshot_no=s.snapshot_no "
                     + "GROUP BY c.y,c.m,c.snapshot_no";
-            System.out.println("sqlCB:" + sqlCB);
+            //System.out.println("sqlCB:" + sqlCB);
             try (
                     Connection connCB = DBConnection.getMySQLConnection();
                     PreparedStatement psCB = connCB.prepareStatement(sqlCB);) {
@@ -323,6 +329,114 @@ public class CashFlowStatementBean implements Serializable {
                     M = M + 1;
                 }
             }
+            //Totals-CR
+            this.CashReceiptsTotals.setCash_category("Cash Receipts Total");
+            for (int i = 0; i < this.CashReceiptsList.size(); i++) {
+                this.CashReceiptsTotals.setJan(this.CashReceiptsTotals.getJan() + this.CashReceiptsList.get(i).getJan());
+                this.CashReceiptsTotals.setFeb(this.CashReceiptsTotals.getFeb() + this.CashReceiptsList.get(i).getFeb());
+                this.CashReceiptsTotals.setMar(this.CashReceiptsTotals.getMar() + this.CashReceiptsList.get(i).getMar());
+                this.CashReceiptsTotals.setApr(this.CashReceiptsTotals.getApr() + this.CashReceiptsList.get(i).getApr());
+                this.CashReceiptsTotals.setMay(this.CashReceiptsTotals.getMay() + this.CashReceiptsList.get(i).getMay());
+                this.CashReceiptsTotals.setJun(this.CashReceiptsTotals.getJun() + this.CashReceiptsList.get(i).getJun());
+                this.CashReceiptsTotals.setJul(this.CashReceiptsTotals.getJul() + this.CashReceiptsList.get(i).getJul());
+                this.CashReceiptsTotals.setAug(this.CashReceiptsTotals.getAug() + this.CashReceiptsList.get(i).getAug());
+                this.CashReceiptsTotals.setSep(this.CashReceiptsTotals.getSep() + this.CashReceiptsList.get(i).getSep());
+                this.CashReceiptsTotals.setOct(this.CashReceiptsTotals.getOct() + this.CashReceiptsList.get(i).getOct());
+                this.CashReceiptsTotals.setNov(this.CashReceiptsTotals.getNov() + this.CashReceiptsList.get(i).getNov());
+                this.CashReceiptsTotals.setDec(this.CashReceiptsTotals.getDec() + this.CashReceiptsList.get(i).getDec());
+            }
+            //Totals-CP
+            this.CashPaymentsTotals.setCash_category("Cash Payments Total");
+            for (int i = 0; i < this.CashPaymentsList.size(); i++) {
+                this.CashPaymentsTotals.setJan(this.CashPaymentsTotals.getJan() + this.CashPaymentsList.get(i).getJan());
+                this.CashPaymentsTotals.setFeb(this.CashPaymentsTotals.getFeb() + this.CashPaymentsList.get(i).getFeb());
+                this.CashPaymentsTotals.setMar(this.CashPaymentsTotals.getMar() + this.CashPaymentsList.get(i).getMar());
+                this.CashPaymentsTotals.setApr(this.CashPaymentsTotals.getApr() + this.CashPaymentsList.get(i).getApr());
+                this.CashPaymentsTotals.setMay(this.CashPaymentsTotals.getMay() + this.CashPaymentsList.get(i).getMay());
+                this.CashPaymentsTotals.setJun(this.CashPaymentsTotals.getJun() + this.CashPaymentsList.get(i).getJun());
+                this.CashPaymentsTotals.setJul(this.CashPaymentsTotals.getJul() + this.CashPaymentsList.get(i).getJul());
+                this.CashPaymentsTotals.setAug(this.CashPaymentsTotals.getAug() + this.CashPaymentsList.get(i).getAug());
+                this.CashPaymentsTotals.setSep(this.CashPaymentsTotals.getSep() + this.CashPaymentsList.get(i).getSep());
+                this.CashPaymentsTotals.setOct(this.CashPaymentsTotals.getOct() + this.CashPaymentsList.get(i).getOct());
+                this.CashPaymentsTotals.setNov(this.CashPaymentsTotals.getNov() + this.CashPaymentsList.get(i).getNov());
+                this.CashPaymentsTotals.setDec(this.CashPaymentsTotals.getDec() + this.CashPaymentsList.get(i).getDec());
+            }
+            //Net Cash Change
+            this.NetCashChange.setCash_category("Net Cash Change");
+            if (this.getCashPaymentsTotals().getJan() >= 0) {
+                this.NetCashChange.setJan(this.CashReceiptsTotals.getJan() - this.getCashPaymentsTotals().getJan());
+            } else {
+                this.NetCashChange.setJan(this.CashReceiptsTotals.getJan() + this.getCashPaymentsTotals().getJan());
+            }
+            if (this.getCashPaymentsTotals().getFeb() >= 0) {
+                this.NetCashChange.setFeb(this.CashReceiptsTotals.getFeb() - this.getCashPaymentsTotals().getFeb());
+            } else {
+                this.NetCashChange.setFeb(this.CashReceiptsTotals.getFeb() + this.getCashPaymentsTotals().getFeb());
+            }
+            if (this.getCashPaymentsTotals().getMar() >= 0) {
+                this.NetCashChange.setMar(this.CashReceiptsTotals.getMar() - this.getCashPaymentsTotals().getMar());
+            } else {
+                this.NetCashChange.setMar(this.CashReceiptsTotals.getMar() + this.getCashPaymentsTotals().getMar());
+            }
+            if (this.getCashPaymentsTotals().getApr() >= 0) {
+                this.NetCashChange.setApr(this.CashReceiptsTotals.getApr() - this.getCashPaymentsTotals().getApr());
+            } else {
+                this.NetCashChange.setApr(this.CashReceiptsTotals.getApr() + this.getCashPaymentsTotals().getApr());
+            }
+            if (this.getCashPaymentsTotals().getMay() >= 0) {
+                this.NetCashChange.setMay(this.CashReceiptsTotals.getMay() - this.getCashPaymentsTotals().getMay());
+            } else {
+                this.NetCashChange.setMay(this.CashReceiptsTotals.getMay() + this.getCashPaymentsTotals().getMay());
+            }
+            if (this.getCashPaymentsTotals().getJun() >= 0) {
+                this.NetCashChange.setJun(this.CashReceiptsTotals.getJun() - this.getCashPaymentsTotals().getJun());
+            } else {
+                this.NetCashChange.setJun(this.CashReceiptsTotals.getJun() + this.getCashPaymentsTotals().getJun());
+            }
+            if (this.getCashPaymentsTotals().getJul() >= 0) {
+                this.NetCashChange.setJul(this.CashReceiptsTotals.getJul() - this.getCashPaymentsTotals().getJul());
+            } else {
+                this.NetCashChange.setJul(this.CashReceiptsTotals.getJul() + this.getCashPaymentsTotals().getJul());
+            }
+            if (this.getCashPaymentsTotals().getAug() >= 0) {
+                this.NetCashChange.setAug(this.CashReceiptsTotals.getAug() - this.getCashPaymentsTotals().getAug());
+            } else {
+                this.NetCashChange.setAug(this.CashReceiptsTotals.getAug() + this.getCashPaymentsTotals().getAug());
+            }
+            if (this.getCashPaymentsTotals().getSep() >= 0) {
+                this.NetCashChange.setSep(this.CashReceiptsTotals.getSep() - this.getCashPaymentsTotals().getSep());
+            } else {
+                this.NetCashChange.setSep(this.CashReceiptsTotals.getSep() + this.getCashPaymentsTotals().getSep());
+            }
+            if (this.getCashPaymentsTotals().getOct() >= 0) {
+                this.NetCashChange.setOct(this.CashReceiptsTotals.getOct() - this.getCashPaymentsTotals().getOct());
+            } else {
+                this.NetCashChange.setOct(this.CashReceiptsTotals.getOct() + this.getCashPaymentsTotals().getOct());
+            }
+            if (this.getCashPaymentsTotals().getNov() >= 0) {
+                this.NetCashChange.setNov(this.CashReceiptsTotals.getNov() - this.getCashPaymentsTotals().getNov());
+            } else {
+                this.NetCashChange.setNov(this.CashReceiptsTotals.getNov() + this.getCashPaymentsTotals().getNov());
+            }
+            if (this.getCashPaymentsTotals().getDec() >= 0) {
+                this.NetCashChange.setDec(this.CashReceiptsTotals.getDec() - this.getCashPaymentsTotals().getDec());
+            } else {
+                this.NetCashChange.setDec(this.CashReceiptsTotals.getDec() + this.getCashPaymentsTotals().getDec());
+            }
+            //Cash at End
+            this.CashAtEnd.setCash_category("Cash at End");
+            this.CashAtEnd.setJan(this.CashAtBegin.getJan() + this.getNetCashChange().getJan());
+            this.CashAtEnd.setFeb(this.CashAtBegin.getFeb() + this.getNetCashChange().getFeb());
+            this.CashAtEnd.setMar(this.CashAtBegin.getMar() + this.getNetCashChange().getMar());
+            this.CashAtEnd.setApr(this.CashAtBegin.getApr() + this.getNetCashChange().getApr());
+            this.CashAtEnd.setMay(this.CashAtBegin.getMay() + this.getNetCashChange().getMay());
+            this.CashAtEnd.setJun(this.CashAtBegin.getJun() + this.getNetCashChange().getJun());
+            this.CashAtEnd.setJul(this.CashAtBegin.getJul() + this.getNetCashChange().getJul());
+            this.CashAtEnd.setAug(this.CashAtBegin.getAug() + this.getNetCashChange().getAug());
+            this.CashAtEnd.setSep(this.CashAtBegin.getSep() + this.getNetCashChange().getSep());
+            this.CashAtEnd.setOct(this.CashAtBegin.getOct() + this.getNetCashChange().getOct());
+            this.CashAtEnd.setNov(this.CashAtBegin.getNov() + this.getNetCashChange().getNov());
+            this.CashAtEnd.setDec(this.CashAtBegin.getDec() + this.getNetCashChange().getDec());
         }
     }
 
@@ -418,6 +532,186 @@ public class CashFlowStatementBean implements Serializable {
                         MonthValue = this.CashPaymentsList.get(i).getDec();
                         break;
                     }
+                }
+            }
+        } catch (Exception e) {
+            //do nothing
+        }
+        return MonthValue;
+    }
+
+    public double getMonthValueFromCB(String aMonthName) {
+        double MonthValue = 0.0;
+        try {
+            if (aMonthName.length() > 0) {
+                if (aMonthName.equals("Jan")) {
+                    MonthValue = this.CashAtBegin.getJan();
+                } else if (aMonthName.equals("Feb")) {
+                    MonthValue = this.CashAtBegin.getFeb();
+                } else if (aMonthName.equals("Mar")) {
+                    MonthValue = this.CashAtBegin.getMar();
+                } else if (aMonthName.equals("Apr")) {
+                    MonthValue = this.CashAtBegin.getApr();
+                } else if (aMonthName.equals("May")) {
+                    MonthValue = this.CashAtBegin.getMay();
+                } else if (aMonthName.equals("Jun")) {
+                    MonthValue = this.CashAtBegin.getJun();
+                } else if (aMonthName.equals("Jul")) {
+                    MonthValue = this.CashAtBegin.getJul();
+                } else if (aMonthName.equals("Aug")) {
+                    MonthValue = this.CashAtBegin.getAug();
+                } else if (aMonthName.equals("Sep")) {
+                    MonthValue = this.CashAtBegin.getSep();
+                } else if (aMonthName.equals("Oct")) {
+                    MonthValue = this.CashAtBegin.getOct();
+                } else if (aMonthName.equals("Nov")) {
+                    MonthValue = this.CashAtBegin.getNov();
+                } else if (aMonthName.equals("Dec")) {
+                    MonthValue = this.CashAtBegin.getDec();
+                }
+            }
+        } catch (Exception e) {
+            //do nothing
+        }
+        return MonthValue;
+    }
+
+    public double getMonthValueFromCRT(String aMonthName) {
+        double MonthValue = 0.0;
+        try {
+            if (aMonthName.length() > 0) {
+                if (aMonthName.equals("Jan")) {
+                    MonthValue = this.CashReceiptsTotals.getJan();
+                } else if (aMonthName.equals("Feb")) {
+                    MonthValue = this.CashReceiptsTotals.getFeb();
+                } else if (aMonthName.equals("Mar")) {
+                    MonthValue = this.CashReceiptsTotals.getMar();
+                } else if (aMonthName.equals("Apr")) {
+                    MonthValue = this.CashReceiptsTotals.getApr();
+                } else if (aMonthName.equals("May")) {
+                    MonthValue = this.CashReceiptsTotals.getMay();
+                } else if (aMonthName.equals("Jun")) {
+                    MonthValue = this.CashReceiptsTotals.getJun();
+                } else if (aMonthName.equals("Jul")) {
+                    MonthValue = this.CashReceiptsTotals.getJul();
+                } else if (aMonthName.equals("Aug")) {
+                    MonthValue = this.CashReceiptsTotals.getAug();
+                } else if (aMonthName.equals("Sep")) {
+                    MonthValue = this.CashReceiptsTotals.getSep();
+                } else if (aMonthName.equals("Oct")) {
+                    MonthValue = this.CashReceiptsTotals.getOct();
+                } else if (aMonthName.equals("Nov")) {
+                    MonthValue = this.CashReceiptsTotals.getNov();
+                } else if (aMonthName.equals("Dec")) {
+                    MonthValue = this.CashReceiptsTotals.getDec();
+                }
+            }
+        } catch (Exception e) {
+            //do nothing
+        }
+        return MonthValue;
+    }
+
+    public double getMonthValueFromCPT(String aMonthName) {
+        double MonthValue = 0.0;
+        try {
+            if (aMonthName.length() > 0) {
+                if (aMonthName.equals("Jan")) {
+                    MonthValue = this.CashPaymentsTotals.getJan();
+                } else if (aMonthName.equals("Feb")) {
+                    MonthValue = this.CashPaymentsTotals.getFeb();
+                } else if (aMonthName.equals("Mar")) {
+                    MonthValue = this.CashPaymentsTotals.getMar();
+                } else if (aMonthName.equals("Apr")) {
+                    MonthValue = this.CashPaymentsTotals.getApr();
+                } else if (aMonthName.equals("May")) {
+                    MonthValue = this.CashPaymentsTotals.getMay();
+                } else if (aMonthName.equals("Jun")) {
+                    MonthValue = this.CashPaymentsTotals.getJun();
+                } else if (aMonthName.equals("Jul")) {
+                    MonthValue = this.CashPaymentsTotals.getJul();
+                } else if (aMonthName.equals("Aug")) {
+                    MonthValue = this.CashPaymentsTotals.getAug();
+                } else if (aMonthName.equals("Sep")) {
+                    MonthValue = this.CashPaymentsTotals.getSep();
+                } else if (aMonthName.equals("Oct")) {
+                    MonthValue = this.CashPaymentsTotals.getOct();
+                } else if (aMonthName.equals("Nov")) {
+                    MonthValue = this.CashPaymentsTotals.getNov();
+                } else if (aMonthName.equals("Dec")) {
+                    MonthValue = this.CashPaymentsTotals.getDec();
+                }
+            }
+        } catch (Exception e) {
+            //do nothing
+        }
+        return MonthValue;
+    }
+    
+    public double getMonthValueFromNCC(String aMonthName) {
+        double MonthValue = 0.0;
+        try {
+            if (aMonthName.length() > 0) {
+                if (aMonthName.equals("Jan")) {
+                    MonthValue = this.NetCashChange.getJan();
+                } else if (aMonthName.equals("Feb")) {
+                    MonthValue = this.NetCashChange.getFeb();
+                } else if (aMonthName.equals("Mar")) {
+                    MonthValue = this.NetCashChange.getMar();
+                } else if (aMonthName.equals("Apr")) {
+                    MonthValue = this.NetCashChange.getApr();
+                } else if (aMonthName.equals("May")) {
+                    MonthValue = this.NetCashChange.getMay();
+                } else if (aMonthName.equals("Jun")) {
+                    MonthValue = this.NetCashChange.getJun();
+                } else if (aMonthName.equals("Jul")) {
+                    MonthValue = this.NetCashChange.getJul();
+                } else if (aMonthName.equals("Aug")) {
+                    MonthValue = this.NetCashChange.getAug();
+                } else if (aMonthName.equals("Sep")) {
+                    MonthValue = this.NetCashChange.getSep();
+                } else if (aMonthName.equals("Oct")) {
+                    MonthValue = this.NetCashChange.getOct();
+                } else if (aMonthName.equals("Nov")) {
+                    MonthValue = this.NetCashChange.getNov();
+                } else if (aMonthName.equals("Dec")) {
+                    MonthValue = this.NetCashChange.getDec();
+                }
+            }
+        } catch (Exception e) {
+            //do nothing
+        }
+        return MonthValue;
+    }
+    
+    public double getMonthValueFromCAE(String aMonthName) {
+        double MonthValue = 0.0;
+        try {
+            if (aMonthName.length() > 0) {
+                if (aMonthName.equals("Jan")) {
+                    MonthValue = this.CashAtEnd.getJan();
+                } else if (aMonthName.equals("Feb")) {
+                    MonthValue = this.CashAtEnd.getFeb();
+                } else if (aMonthName.equals("Mar")) {
+                    MonthValue = this.CashAtEnd.getMar();
+                } else if (aMonthName.equals("Apr")) {
+                    MonthValue = this.CashAtEnd.getApr();
+                } else if (aMonthName.equals("May")) {
+                    MonthValue = this.CashAtEnd.getMay();
+                } else if (aMonthName.equals("Jun")) {
+                    MonthValue = this.CashAtEnd.getJun();
+                } else if (aMonthName.equals("Jul")) {
+                    MonthValue = this.CashAtEnd.getJul();
+                } else if (aMonthName.equals("Aug")) {
+                    MonthValue = this.CashAtEnd.getAug();
+                } else if (aMonthName.equals("Sep")) {
+                    MonthValue = this.CashAtEnd.getSep();
+                } else if (aMonthName.equals("Oct")) {
+                    MonthValue = this.CashAtEnd.getOct();
+                } else if (aMonthName.equals("Nov")) {
+                    MonthValue = this.CashAtEnd.getNov();
+                } else if (aMonthName.equals("Dec")) {
+                    MonthValue = this.CashAtEnd.getDec();
                 }
             }
         } catch (Exception e) {
@@ -557,6 +851,48 @@ public class CashFlowStatementBean implements Serializable {
      */
     public void setCashAtEnd(CashFlowStatement CashAtEnd) {
         this.CashAtEnd = CashAtEnd;
+    }
+
+    /**
+     * @return the CashReceiptsTotals
+     */
+    public CashFlowStatement getCashReceiptsTotals() {
+        return CashReceiptsTotals;
+    }
+
+    /**
+     * @param CashReceiptsTotals the CashReceiptsTotals to set
+     */
+    public void setCashReceiptsTotals(CashFlowStatement CashReceiptsTotals) {
+        this.CashReceiptsTotals = CashReceiptsTotals;
+    }
+
+    /**
+     * @return the CashPaymentsTotals
+     */
+    public CashFlowStatement getCashPaymentsTotals() {
+        return CashPaymentsTotals;
+    }
+
+    /**
+     * @param CashPaymentsTotals the CashPaymentsTotals to set
+     */
+    public void setCashPaymentsTotals(CashFlowStatement CashPaymentsTotals) {
+        this.CashPaymentsTotals = CashPaymentsTotals;
+    }
+
+    /**
+     * @return the NetCashChange
+     */
+    public CashFlowStatement getNetCashChange() {
+        return NetCashChange;
+    }
+
+    /**
+     * @param NetCashChange the NetCashChange to set
+     */
+    public void setNetCashChange(CashFlowStatement NetCashChange) {
+        this.NetCashChange = NetCashChange;
     }
 
 }
