@@ -20,6 +20,8 @@
                 return alert('Record saved successfully!');
             }
         </script> 
+        <script type="text/javascript" src="resources/js/Chart.js"></script>
+        <script type="text/javascript" src="resources/js/Chart.min.js"></script>
         <style>
             .ui-panel .ui-panel-content {
                 border: 0;
@@ -74,6 +76,7 @@
                             <td  style="font-size: 10pt;" align="right">#{cashFlowStatementBean.monthListSelected.get(9).monthYearName}</td>
                             <td  style="font-size: 10pt;" align="right">#{cashFlowStatementBean.monthListSelected.get(10).monthYearName}</td>
                             <td  style="font-size: 10pt;" align="right">#{cashFlowStatementBean.monthListSelected.get(11).monthYearName}</td>
+                            <td  style="font-size: 10pt;" align="right">Year Total</td>
                         </tr>
                         <tr style="background-color: #E5E5E5">
                             <td colspan="2" style="color: #007fff;font-size: 10pt;">
@@ -91,6 +94,7 @@
                             <td  style="font-size: 10pt;color: #007fff;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromCB(cashFlowStatementBean.monthListSelected.get(9).monthName))}</td>
                             <td  style="font-size: 10pt;color: #007fff;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromCB(cashFlowStatementBean.monthListSelected.get(10).monthName))}</td>
                             <td  style="font-size: 10pt;color: #007fff;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromCB(cashFlowStatementBean.monthListSelected.get(11).monthName))}</td>
+                            <td  style="font-size: 10pt;color: #007fff;" align="right"></td>
                         </tr>
                         <tr style="background-color: #E5E5E5">
                             <td colspan="2" style="color: #238823;font-size: 10pt;">
@@ -108,6 +112,7 @@
                             <td  style="font-size: 10pt;color: #238823;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromCRT(cashFlowStatementBean.monthListSelected.get(9).monthName))}</td>
                             <td  style="font-size: 10pt;color: #238823;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromCRT(cashFlowStatementBean.monthListSelected.get(10).monthName))}</td>
                             <td  style="font-size: 10pt;color: #238823;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromCRT(cashFlowStatementBean.monthListSelected.get(11).monthName))}</td>
+                            <td  style="font-size: 10pt;color: #238823;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromCRT('Total'))}</td>
                         </tr>
                         <ui:repeat var="cr" value="#{cashFlowStatementBean.cashReceiptsList}">
                             <tr>
@@ -124,6 +129,7 @@
                                 <td  style="font-size: 10pt;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromCR(cr.cash_category, cashFlowStatementBean.monthListSelected.get(9).monthName))}</td>
                                 <td  style="font-size: 10pt;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromCR(cr.cash_category, cashFlowStatementBean.monthListSelected.get(10).monthName))}</td>
                                 <td  style="font-size: 10pt;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromCR(cr.cash_category, cashFlowStatementBean.monthListSelected.get(11).monthName))}</td>
+                                <td  style="font-size: 10pt;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromCR(cr.cash_category, 'Total'))}</td>
                             </tr>
                         </ui:repeat>
 
@@ -143,6 +149,7 @@
                             <td  style="font-size: 10pt;color: #d2222d;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromCPT(cashFlowStatementBean.monthListSelected.get(9).monthName))}</td>
                             <td  style="font-size: 10pt;color: #d2222d;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromCPT(cashFlowStatementBean.monthListSelected.get(10).monthName))}</td>
                             <td  style="font-size: 10pt;color: #d2222d;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromCPT(cashFlowStatementBean.monthListSelected.get(11).monthName))}</td>
+                            <td  style="font-size: 10pt;color: #d2222d;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromCPT('Total'))}</td>
                         </tr>
                         <ui:repeat var="cp" value="#{cashFlowStatementBean.cashPaymentsList}">
                             <tr>
@@ -159,24 +166,26 @@
                                 <td  style="font-size: 10pt;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromCP(cp.cash_category, cashFlowStatementBean.monthListSelected.get(9).monthName))}</td>
                                 <td  style="font-size: 10pt;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromCP(cp.cash_category, cashFlowStatementBean.monthListSelected.get(10).monthName))}</td>
                                 <td  style="font-size: 10pt;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromCP(cp.cash_category, cashFlowStatementBean.monthListSelected.get(11).monthName))}</td>
+                                <td  style="font-size: 10pt;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromCP(cp.cash_category, 'Total'))}</td>
                             </tr>
                         </ui:repeat>
                         <tr style="background-color: #E5E5E5">
-                            <td colspan="2" style="color: #ffbf00;font-size: 10pt;">
+                            <td colspan="2" style="color: orange;font-size: 10pt;">
                                 Net Cash Change
                             </td>
-                            <td  style="font-size: 10pt;color: #ffbf00;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromNCC(cashFlowStatementBean.monthListSelected.get(0).monthName))}</td>
-                            <td  style="font-size: 10pt;color: #ffbf00;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromNCC(cashFlowStatementBean.monthListSelected.get(1).monthName))}</td>
-                            <td  style="font-size: 10pt;color: #ffbf00;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromNCC(cashFlowStatementBean.monthListSelected.get(2).monthName))}</td>
-                            <td  style="font-size: 10pt;color: #ffbf00;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromNCC(cashFlowStatementBean.monthListSelected.get(3).monthName))}</td>
-                            <td  style="font-size: 10pt;color: #ffbf00;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromNCC(cashFlowStatementBean.monthListSelected.get(4).monthName))}</td>
-                            <td  style="font-size: 10pt;color: #ffbf00;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromNCC(cashFlowStatementBean.monthListSelected.get(5).monthName))}</td>
-                            <td  style="font-size: 10pt;color: #ffbf00;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromNCC(cashFlowStatementBean.monthListSelected.get(6).monthName))}</td>
-                            <td  style="font-size: 10pt;color: #ffbf00;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromNCC(cashFlowStatementBean.monthListSelected.get(7).monthName))}</td>
-                            <td  style="font-size: 10pt;color: #ffbf00;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromNCC(cashFlowStatementBean.monthListSelected.get(8).monthName))}</td>
-                            <td  style="font-size: 10pt;color: #ffbf00;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromNCC(cashFlowStatementBean.monthListSelected.get(9).monthName))}</td>
-                            <td  style="font-size: 10pt;color: #ffbf00;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromNCC(cashFlowStatementBean.monthListSelected.get(10).monthName))}</td>
-                            <td  style="font-size: 10pt;color: #ffbf00;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromNCC(cashFlowStatementBean.monthListSelected.get(11).monthName))}</td>
+                            <td  style="font-size: 10pt;color: orange;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromNCC(cashFlowStatementBean.monthListSelected.get(0).monthName))}</td>
+                            <td  style="font-size: 10pt;color: orange;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromNCC(cashFlowStatementBean.monthListSelected.get(1).monthName))}</td>
+                            <td  style="font-size: 10pt;color: orange;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromNCC(cashFlowStatementBean.monthListSelected.get(2).monthName))}</td>
+                            <td  style="font-size: 10pt;color: orange;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromNCC(cashFlowStatementBean.monthListSelected.get(3).monthName))}</td>
+                            <td  style="font-size: 10pt;color: orange;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromNCC(cashFlowStatementBean.monthListSelected.get(4).monthName))}</td>
+                            <td  style="font-size: 10pt;color: orange;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromNCC(cashFlowStatementBean.monthListSelected.get(5).monthName))}</td>
+                            <td  style="font-size: 10pt;color: orange;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromNCC(cashFlowStatementBean.monthListSelected.get(6).monthName))}</td>
+                            <td  style="font-size: 10pt;color: orange;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromNCC(cashFlowStatementBean.monthListSelected.get(7).monthName))}</td>
+                            <td  style="font-size: 10pt;color: orange;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromNCC(cashFlowStatementBean.monthListSelected.get(8).monthName))}</td>
+                            <td  style="font-size: 10pt;color: orange;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromNCC(cashFlowStatementBean.monthListSelected.get(9).monthName))}</td>
+                            <td  style="font-size: 10pt;color: orange;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromNCC(cashFlowStatementBean.monthListSelected.get(10).monthName))}</td>
+                            <td  style="font-size: 10pt;color: orange;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromNCC(cashFlowStatementBean.monthListSelected.get(11).monthName))}</td>
+                            <td  style="font-size: 10pt;color: orange;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromNCC('Total'))}</td>
                         </tr>
                         <tr style="background-color: #E5E5E5">
                             <td colspan="2" style="color: #007fff;font-size: 10pt;">
@@ -194,9 +203,82 @@
                             <td  style="font-size: 10pt;color: #007fff;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromCAE(cashFlowStatementBean.monthListSelected.get(9).monthName))}</td>
                             <td  style="font-size: 10pt;color: #007fff;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromCAE(cashFlowStatementBean.monthListSelected.get(10).monthName))}</td>
                             <td  style="font-size: 10pt;color: #007fff;" align="right">#{accJournalBean.returnBalanceString(cashFlowStatementBean.getMonthValueFromCAE(cashFlowStatementBean.monthListSelected.get(11).monthName))}</td>
+                            <td  style="font-size: 10pt;color: #007fff;" align="right"></td>
                         </tr>
                     </table>
                 </p:panel>
+                <h:panelGrid id="pnlgChart1" rendered="#{cashFlowStatementBean.monthListSelected.size()>0}">
+                    <canvas id="chart1" width="1300" height="300"/>
+                    <script>
+                        var ctx = document.getElementById("chart1");
+                        var chart1 = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: [#{cashFlowStatementBean.yearMonths}],
+                                datasets: [{
+                                        label: 'Cash Receipts',
+                                        data: [#{cashFlowStatementBean.monthAmountCR}],
+                                        backgroundColor: 'green',
+                                        borderColor: 'green',
+                                        borderWidth: 1
+                                    }, {
+                                        label: 'Cash Payments',
+                                        data: [#{cashFlowStatementBean.monthAmountCP}],
+                                        backgroundColor: 'red',
+                                        borderColor: 'red',
+                                        borderWidth: 1
+                                    }, {
+                                        label: 'Net Cash Change',
+                                        data: [#{cashFlowStatementBean.monthAmountNCC}],
+                                        backgroundColor: 'gold',
+                                        borderColor: 'gold',
+                                        borderWidth: 1
+                                    }]
+                            },
+                            options: {
+                                legend: {
+                                    display: true
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Cash Flow Statememt Trend Visualization'
+                                },
+                                tooltips: {
+                                    mode: 'label',
+                                    label: 'mylabel',
+                                    callbacks: {
+                                        label: function (tooltipItem, data) {
+                                            return tooltipItem.yLabel.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                        }}
+                                },
+                                scales: {
+                                    xAxes: [{
+                                            gridLines: {display: false},
+                                            ticks: {
+                                                maxRotation: 0,
+                                                padding: 0,
+                                                callback: function (value, index, values) {
+                                                    return value.split(/\b\s+/);
+                                                }
+                                            }
+                                        }],
+                                    yAxes: [{
+                                            ticks: {
+                                                beginAtZero: true,
+                                                callback: function (value, index, values) {
+                                                    if (parseInt(value) >= 1000) {
+                                                        return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                                    } else {
+                                                        return value;
+                                                    }
+                                                }
+                                            }
+                                        }]
+                                }
+                            }
+                        });
+                    </script>
+                </h:panelGrid>
             </p:panel>
         </h:form>
     </h:body>

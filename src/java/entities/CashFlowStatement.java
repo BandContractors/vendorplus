@@ -32,6 +32,7 @@ public class CashFlowStatement implements Serializable {
     private double Oct;
     private double Nov;
     private double Dec;
+    private double Total;
 
     /**
      * @return the Jan
@@ -213,5 +214,19 @@ public class CashFlowStatement implements Serializable {
      */
     public void setCash_category(String cash_category) {
         this.cash_category = cash_category;
+    }
+
+    /**
+     * @return the Total
+     */
+    public double getTotal() {
+        return Total;
+    }
+
+    /**
+     * @param Total the Total to set
+     */
+    public void setTotal(double Total) {
+        this.Total = Total;
     }
 }
