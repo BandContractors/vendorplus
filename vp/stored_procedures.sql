@@ -11367,6 +11367,6 @@ BEGIN
 		sum(al.credit_amount) as credit_amount,sum(al.debit_amount_lc) as debit_amount_lc,sum(al.credit_amount_lc) as credit_amount_lc,
 		(sum(al.debit_amount)-sum(al.credit_amount)) as  debit_balance,(sum(al.debit_amount_lc)-sum(al.credit_amount_lc)) as debit_balance_lc 
 		FROM view_ledger_union_open_balances al INNER JOIN acc_child_account ac ON al.acc_child_account_id=ac.acc_child_account_id 
-		WHERE al.account_code LIKE '1-00-000%';
+		WHERE al.account_code LIKE '1-00-000%' GROUP BY al.acc_child_account_id,al.currency_code;
 END//
 DELIMITER ;

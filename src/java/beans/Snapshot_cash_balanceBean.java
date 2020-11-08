@@ -35,12 +35,12 @@ public class Snapshot_cash_balanceBean implements Serializable {
     public void setSnapshot_cash_balanceFromResultset(Snapshot_cash_balance aSnapshot_cash_balance, ResultSet aResultSet) {
         try {
             try {
-                aSnapshot_cash_balance.setSnapshot_cash_balance_id(aResultSet.getInt("snapshot_cash_balance_id"));
+                aSnapshot_cash_balance.setSnapshot_cash_balance_id(aResultSet.getLong("snapshot_cash_balance_id"));
             } catch (NullPointerException npe) {
                 aSnapshot_cash_balance.setSnapshot_cash_balance_id(0);
             }
             try {
-                aSnapshot_cash_balance.setSnapshot_no(aResultSet.getInt("snapshot_no"));
+                aSnapshot_cash_balance.setSnapshot_no(aResultSet.getLong("snapshot_no"));
             } catch (NullPointerException npe) {
                 aSnapshot_cash_balance.setSnapshot_no(0);
             }
