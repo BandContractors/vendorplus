@@ -1095,6 +1095,19 @@ public class NavigationBean implements Serializable {
         httpSession.setAttribute("INVOKE_MODE", "PARENT");
         return "CashAdjustment?faces-redirect=true";
     }
+    
+    public String redirectToCashBalancingDaily() {
+        //update seesion
+        FacesContext context = FacesContext.getCurrentInstance();
+        HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+        HttpSession httpSession = request.getSession(false);
+        httpSession.setAttribute("TRANSACTION_TYPE_ID", 78);
+        httpSession.setAttribute("TRANSACTION_TYPE_NAME", "CASH BALANCING");
+        httpSession.setAttribute("TRANSACTION_REASON_ID", 122);
+        httpSession.setAttribute("TRANSACTION_REASON_NAME", "CASH BALANCING DAILY");
+        httpSession.setAttribute("INVOKE_MODE", "PARENT");
+        return "CashBalancingDaily?faces-redirect=true";
+    }
 
     public String redirectToBankTransferCheque() {
         //update seesion

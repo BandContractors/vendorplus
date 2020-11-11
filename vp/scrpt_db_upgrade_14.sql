@@ -22,11 +22,9 @@ VALUES('scrpt_db_upgrade_14',19,Now(),'6.0','');
 CREATE TABLE cash_balancing_daily (
   cash_balancing_daily_id bigint(20) NOT NULL AUTO_INCREMENT,
   balancing_date date NOT NULL,
-  balancing_user int(11) NOT NULL,
-  account_code varchar(20) NOT NULL,
   acc_child_account_id int(11) DEFAULT NULL,
   currency_code varchar(10) NOT NULL,
-  cash_at_begin double NOT NULL,
+  cash_begin double NOT NULL,
   cash_transfer_in double NOT NULL,
   cash_adjustment_pos double NOT NULL,
   cash_receipts double DEFAULT NULL,
@@ -46,3 +44,9 @@ CREATE TABLE cash_balancing_daily (
 
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_14',47,Now(),'6.0','');
+
+INSERT INTO transaction_type (transaction_type_id, transaction_type_name) VALUES (78, 'CASH BALANCING');
+INSERT INTO transaction_reason (transaction_reason_id, transaction_reason_name, transaction_type_id) VALUES (122, 'CASH BALANCING DAILY', 78);
+
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_14',53,Now(),'6.0','');

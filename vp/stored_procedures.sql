@@ -11370,3 +11370,111 @@ BEGIN
 		WHERE al.account_code LIKE '1-00-000%' GROUP BY al.acc_child_account_id,al.currency_code;
 END//
 DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_cash_account_for_balancing;
+DELIMITER //
+CREATE PROCEDURE sp_search_cash_account_for_balancing
+(
+	IN in_balancing_date1 date,
+	IN in_balancing_date2 date
+) 
+BEGIN  
+	SELECT 
+	0 as cash_balancing_daily_id,0 as balancing_user_id,0 as cash_balance,0 as actual_cash_count,0 as cash_over,
+	0 as cash_short,0 as add_user_detail_id,0 as edit_user_detail_id,
+	balancing_date,acc_child_account_id,currency_code,NULL as add_date,NULL as edit_date,
+	GROUP_CONCAT(DISTINCT if(category = 'cash_begin', cash_begin, '') SEPARATOR '') AS 'cash_begin',
+	GROUP_CONCAT(DISTINCT if(category = 'cash_receipts', cash_receipts, '') SEPARATOR '') AS 'cash_receipts',
+	GROUP_CONCAT(DISTINCT if(category = 'cash_payments', cash_payments, '') SEPARATOR '') AS 'cash_payments',
+	GROUP_CONCAT(DISTINCT if(category = 'cash_transfer_in', cash_transfer_in, '') SEPARATOR '') AS 'cash_transfer_in',
+	GROUP_CONCAT(DISTINCT if(category = 'cash_transfer_out', cash_transfer_out, '') SEPARATOR '') AS 'cash_transfer_out',
+	GROUP_CONCAT(DISTINCT if(category = 'cash_adjustment_pos', cash_adjustment_pos, '') SEPARATOR '') AS 'cash_adjustment_pos',
+	GROUP_CONCAT(DISTINCT if(category = 'cash_adjustment_neg', cash_adjustment_neg, '') SEPARATOR '') AS 'cash_adjustment_neg' 
+	FROM 
+	(
+		SELECT 'cash_receipts' as category,pay_date as balancing_date,acc_child_account_id,currency_code,
+		0 as cash_begin,sum(paid_amount) as cash_receipts,0 as cash_payments,0 as cash_transfer_in,0 as cash_transfer_out,0 as cash_adjustment_pos,0 as cash_adjustment_neg 
+		FROM pay WHERE pay_type_id=14 AND pay_method_id!=6 AND pay_date between in_balancing_date1 AND in_balancing_date2 
+		GROUP BY pay_date,acc_child_account_id,currency_code 
+		UNION 
+		SELECT 'cash_payments' as category,pay_date as balancing_date,acc_child_account_id,currency_code,
+		0 as cash_begin,0 as cash_receipts,sum(paid_amount) as cash_payments,0 as cash_transfer_in,0 as cash_transfer_out,0 as cash_adjustment_pos,0 as cash_adjustment_neg 
+		FROM pay WHERE pay_type_id=15 AND pay_method_id!=7 AND pay_date between in_balancing_date1 AND in_balancing_date2 
+		GROUP BY pay_date,acc_child_account_id,currency_code 
+		UNION 
+		select 'cash_transfer_in' as category,journal_date as balancing_date,acc_child_account_id,currency_code,
+		0 as cash_begin,0 as cash_receipts,0 as cash_payments,sum(debit_amount) as cash_transfer_in,0 as cash_transfer_out,0 as cash_adjustment_pos,0 as cash_adjustment_neg  
+		from acc_journal 
+		where transaction_type_id=18 and transaction_reason_id=41 and debit_amount>0 AND journal_date between in_balancing_date1 AND in_balancing_date2  
+		group by journal_date,acc_child_account_id,currency_code 
+		UNION 
+		select 'cash_transfer_out' as category,journal_date as balancing_date,acc_child_account_id,currency_code,
+		0 as cash_begin,0 as cash_receipts,0 as cash_payments,0 as cash_transfer_in,sum(credit_amount) as cash_transfer_out,0 as cash_adjustment_pos,0 as cash_adjustment_neg 
+		from acc_journal 
+		where transaction_type_id=18 and transaction_reason_id=41 and credit_amount>0 AND journal_date between in_balancing_date1 AND in_balancing_date2   
+		group by journal_date,acc_child_account_id,currency_code 
+		UNION 
+		select 'cash_adjustment_pos' as category,journal_date as balancing_date,acc_child_account_id,currency_code,
+		0 as cash_begin,0 as cash_receipts,0 as cash_payments,0 as cash_transfer_in,0 as cash_transfer_out,sum(debit_amount) as cash_adjustment_pos,0 as cash_adjustment_neg 
+		from acc_journal 
+		where transaction_type_id=75 and transaction_reason_id=116 and debit_amount>0 AND journal_date between in_balancing_date1 AND in_balancing_date2   
+		group by journal_date,acc_child_account_id,currency_code 
+		UNION 
+		select 'cash_adjustment_neg' as category,journal_date as balancing_date,acc_child_account_id,currency_code,
+		0 as cash_begin,0 as cash_receipts,0 as cash_payments,0 as cash_transfer_in,0 as cash_transfer_out,0 as cash_adjustment_pos,sum(credit_amount) as cash_adjustment_neg   
+		from acc_journal 
+		where transaction_type_id=75 and transaction_reason_id=116 and credit_amount>0 AND journal_date between in_balancing_date1 AND in_balancing_date2   
+		group by journal_date,acc_child_account_id,currency_code 
+		UNION 
+		select 'cash_begin' as category,cast(snapshot_date as date) as balancing_date,acc_child_account_id,currency_code,
+		debit_balance as cash_begin,0 as cash_receipts,0 as cash_payments,0 as cash_transfer_in,0 as cash_transfer_out,0 as cash_adjustment_pos,0 as cash_adjustment_neg 
+		from snapshot_cash_balance where cast(snapshot_date as date) between in_balancing_date1 AND in_balancing_date2
+	) as d 
+	GROUP BY balancing_date,acc_child_account_id,currency_code 
+	ORDER BY balancing_date DESC,acc_child_account_id,currency_code;
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_save_cash_balancing_daily;
+DELIMITER //
+CREATE PROCEDURE sp_save_cash_balancing_daily
+(
+	IN in_cash_balancing_daily_id bigint(20),
+  	IN in_balancing_date date,
+  	IN in_acc_child_account_id int(11),
+  	IN in_currency_code varchar(10),
+  	IN in_cash_begin double,
+  	IN in_cash_transfer_in double,
+  	IN in_cash_adjustment_pos double,
+  	IN in_cash_receipts double,
+  	IN in_cash_transfer_out double,
+  	IN in_cash_adjustment_neg double,
+  	IN in_cash_payments double,
+  	IN in_cash_balance double,
+  	IN in_actual_cash_count double,
+  	IN in_cash_over double, 
+  	IN in_cash_short double,
+  	IN in_user_detail_id int(11)
+) 
+BEGIN 
+	SET @cur_sys_datetime=null;
+	CALL sp_get_current_system_datetime(@cur_sys_datetime);
+
+	if (in_cash_balancing_daily_id=0) then 
+		INSERT INTO cash_balancing_daily(balancing_date,acc_child_account_id,currency_code,cash_begin,cash_transfer_in,
+		cash_adjustment_pos,cash_receipts,cash_transfer_out,cash_adjustment_neg,cash_payments,cash_balance,actual_cash_count,
+		cash_over,cash_short,add_user_detail_id,add_date) 
+		VALUES(in_balancing_date,in_acc_child_account_id,in_currency_code,in_cash_begin,in_cash_transfer_in,
+		in_cash_adjustment_pos,in_cash_receipts,in_cash_transfer_out,in_cash_adjustment_neg,in_cash_payments,in_cash_balance,in_actual_cash_count,
+		in_cash_over,in_cash_short,in_user_detail_id,@cur_sys_datetime);
+	end if;
+
+	if (in_cash_balancing_daily_id>0) then 
+		UPDATE cash_balancing_daily SET cash_begin=in_cash_begin,cash_transfer_in=in_cash_transfer_in,
+		cash_adjustment_pos=in_cash_adjustment_pos,cash_receipts=in_cash_receipts,cash_transfer_out=in_cash_transfer_out,cash_adjustment_neg=in_cash_adjustment_neg,
+		cash_payments=in_cash_payments,cash_balance=in_cash_balance,actual_cash_count=in_actual_cash_count,
+		cash_over=in_cash_over,cash_short=in_cash_short,edit_user_detail_id=in_user_detail_id,edit_date=@cur_sys_datetime 
+		WHERE cash_balancing_daily_id=in_cash_balancing_daily_id;
+	end if;
+END//
+DELIMITER ;

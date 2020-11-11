@@ -110,7 +110,7 @@
                             <p:ajax listener="#{stock_ledgerBean.reportStock_ledger(stock_ledger,stock_ledgerBean,itemBean.selectedItem)}" process="pnlgFilter" update="pnlgMessage pnlgData"/>
                         </p:commandButton>
                         <p:commandButton id="cmdbReset" value="RESET">
-                            <p:ajax listener="#{stock_ledgerBean.resetStock_ledgerDetail(stock_ledger,stock_ledgerBean,itemBean.selectedItem)}" process="pnlgFilter" update="pnlgFilter pnlgMessage tblDetail"/>
+                            <p:ajax listener="#{stock_ledgerBean.resetStock_ledgerDetail(stock_ledger,stock_ledgerBean,itemBean.selectedItem)}" process="pnlgFilter" update="pnlgFilter pnlgMessage pnlgData"/>
                         </p:commandButton>
                         <h:panelGrid columns="2">
                             <h:outputLabel value=""/>

@@ -20,11 +20,9 @@ public class Cash_balancing_daily implements Serializable {
     private static final long serialVersionUID = 1L;
     private long cash_balancing_daily_id;
     private Date balancing_date;
-    private int balancing_user;
-    private String account_code;
     private int acc_child_account_id;
     private String currency_code;
-    private double cash_at_begin;
+    private double cash_begin;
     private double cash_transfer_in;
     private double cash_adjustment_pos;
     private double cash_receipts;
@@ -39,6 +37,8 @@ public class Cash_balancing_daily implements Serializable {
     private int edit_user_detail_id;
     private Date add_date;
     private Date edit_date;
+    private String AccountName;
+    private String ChildAccountName;
 
     /**
      * @return the cash_balancing_daily_id
@@ -66,34 +66,6 @@ public class Cash_balancing_daily implements Serializable {
      */
     public void setBalancing_date(Date balancing_date) {
         this.balancing_date = balancing_date;
-    }
-
-    /**
-     * @return the balancing_user
-     */
-    public int getBalancing_user() {
-        return balancing_user;
-    }
-
-    /**
-     * @param balancing_user the balancing_user to set
-     */
-    public void setBalancing_user(int balancing_user) {
-        this.balancing_user = balancing_user;
-    }
-
-    /**
-     * @return the account_code
-     */
-    public String getAccount_code() {
-        return account_code;
-    }
-
-    /**
-     * @param account_code the account_code to set
-     */
-    public void setAccount_code(String account_code) {
-        this.account_code = account_code;
     }
 
     /**
@@ -125,17 +97,17 @@ public class Cash_balancing_daily implements Serializable {
     }
 
     /**
-     * @return the cash_at_begin
+     * @return the cash_begin
      */
-    public double getCash_at_begin() {
-        return cash_at_begin;
+    public double getCash_begin() {
+        return cash_begin;
     }
 
     /**
-     * @param cash_at_begin the cash_at_begin to set
+     * @param cash_begin the cash_begin to set
      */
-    public void setCash_at_begin(double cash_at_begin) {
-        this.cash_at_begin = cash_at_begin;
+    public void setCash_begin(double cash_begin) {
+        this.cash_begin = cash_begin;
     }
 
     /**
@@ -332,5 +304,33 @@ public class Cash_balancing_daily implements Serializable {
      */
     public void setEdit_date(Date edit_date) {
         this.edit_date = edit_date;
+    }
+
+    /**
+     * @return the AccountName
+     */
+    public String getAccountName() {
+        return AccountName;
+    }
+
+    /**
+     * @param AccountName the AccountName to set
+     */
+    public void setAccountName(String AccountName) {
+        this.AccountName = AccountName;
+    }
+
+    /**
+     * @return the ChildAccountName
+     */
+    public String getChildAccountName() {
+        return ChildAccountName;
+    }
+
+    /**
+     * @param ChildAccountName the ChildAccountName to set
+     */
+    public void setChildAccountName(String ChildAccountName) {
+        this.ChildAccountName = ChildAccountName;
     }
 }
