@@ -5,6 +5,8 @@ import entities.AccChildAccount;
 import entities.Cdc_general;
 import entities.Cash_balancing_daily;
 import entities.CompanySetting;
+import entities.GroupRight;
+import entities.UserDetail;
 import java.io.Serializable;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -224,6 +226,12 @@ public class Cash_balancing_dailyBean implements Serializable {
                             cbdNew.setAccountName(new AccCoaBean().getAccCoaByCodeOrId(acaNew.getAccCoaAccountCode(), 0).getAccountName());
                             cbdNew.setChildAccountName(new AccChildAccountBean().getAccChildAccById(acaNew.getAccChildAccountId()).getChildAccountName());
                         }
+                        Cash_balancing_daily ExistRecord = this.getCash_balancing_dailyByUnique(cbdNew.getBalancing_date(), cbdNew.getAcc_child_account_id(), cbdNew.getCurrency_code());
+                        if (null != ExistRecord) {
+                            cbdNew.setCash_balancing_daily_id(ExistRecord.getCash_balancing_daily_id());
+                            cbdNew.setActual_cash_count(ExistRecord.getActual_cash_count());
+                            this.calculateCashOverOrShort(cbdNew);
+                        }
                         this.Cash_balancing_dailyListNew.add(cbdNew);
                     }
                 }
@@ -231,26 +239,28 @@ public class Cash_balancing_dailyBean implements Serializable {
                 System.err.println("refreshCash_balancing_dailyList:New:" + e.getMessage());
             }
             //Retrieve Exist
-            sqlExist = "SELECT * FROM cash_balancing_daily WHERE balancing_date BETWEEN '" + new java.sql.Date(this.FromDate.getTime()) + "' AND '" + new java.sql.Date(this.ToDate.getTime()) + "' "
-                    + "ORDER BY balancing_date DESC,acc_child_account_id,currency_code";
-            try (
-                    Connection connExis = DBConnection.getMySQLConnection();
-                    PreparedStatement psExist = connExis.prepareStatement(sqlExist);) {
-                rsExist = psExist.executeQuery();
-                while (rsExist.next()) {
-                    Cash_balancing_daily cbdExist = new Cash_balancing_daily();
-                    this.setCash_balancing_dailyFromResultset(cbdExist, rsExist);
-                    //do some processing
-                    AccChildAccount acaExist = new AccChildAccountBean().getAccChildAccById(cbdExist.getAcc_child_account_id());
-                    if (acaExist != null) {
-                        cbdExist.setAccountName(new AccCoaBean().getAccCoaByCodeOrId(acaExist.getAccCoaAccountCode(), 0).getAccountName());
-                        cbdExist.setChildAccountName(new AccChildAccountBean().getAccChildAccById(acaExist.getAccChildAccountId()).getChildAccountName());
-                    }
-                    this.Cash_balancing_dailyListNew.add(cbdExist);
-                }
-            } catch (Exception e) {
-                System.err.println("refreshCash_balancing_dailyList:Exist:" + e.getMessage());
-            }
+            /*
+             sqlExist = "SELECT * FROM cash_balancing_daily WHERE balancing_date BETWEEN '" + new java.sql.Date(this.FromDate.getTime()) + "' AND '" + new java.sql.Date(this.ToDate.getTime()) + "' "
+             + "ORDER BY balancing_date DESC,acc_child_account_id,currency_code";
+             try (
+             Connection connExis = DBConnection.getMySQLConnection();
+             PreparedStatement psExist = connExis.prepareStatement(sqlExist);) {
+             rsExist = psExist.executeQuery();
+             while (rsExist.next()) {
+             Cash_balancing_daily cbdExist = new Cash_balancing_daily();
+             this.setCash_balancing_dailyFromResultset(cbdExist, rsExist);
+             //do some processing
+             AccChildAccount acaExist = new AccChildAccountBean().getAccChildAccById(cbdExist.getAcc_child_account_id());
+             if (acaExist != null) {
+             cbdExist.setAccountName(new AccCoaBean().getAccCoaByCodeOrId(acaExist.getAccCoaAccountCode(), 0).getAccountName());
+             cbdExist.setChildAccountName(new AccChildAccountBean().getAccChildAccById(acaExist.getAccChildAccountId()).getChildAccountName());
+             }
+             this.Cash_balancing_dailyListExist.add(cbdExist);
+             }
+             } catch (Exception e) {
+             System.err.println("refreshCash_balancing_dailyList:Exist:" + e.getMessage());
+             }
+             */
         }
     }
 
@@ -258,7 +268,9 @@ public class Cash_balancing_dailyBean implements Serializable {
         try {
             aCash_balancing_daily.setCash_over(0);
             aCash_balancing_daily.setCash_short(0);
-            if (aCash_balancing_daily.getCash_balance() > aCash_balancing_daily.getActual_cash_count()) {
+            if (aCash_balancing_daily.getCash_balance() < 0) {
+                aCash_balancing_daily.setCash_over(aCash_balancing_daily.getCash_balance() + aCash_balancing_daily.getActual_cash_count());
+            } else if (aCash_balancing_daily.getCash_balance() > aCash_balancing_daily.getActual_cash_count()) {
                 aCash_balancing_daily.setCash_short(aCash_balancing_daily.getCash_balance() - aCash_balancing_daily.getActual_cash_count());
             } else if (aCash_balancing_daily.getCash_balance() < aCash_balancing_daily.getActual_cash_count()) {
                 aCash_balancing_daily.setCash_over(aCash_balancing_daily.getActual_cash_count() - aCash_balancing_daily.getCash_balance());
@@ -269,22 +281,24 @@ public class Cash_balancing_dailyBean implements Serializable {
     }
 
     public void callSaveCash_balancing_daily(Cash_balancing_daily aCash_balancing_daily) {
-        long ExistId = 0;
-        Cash_balancing_daily ExistCash_balancing_daily = null;
+        String msg = null;
+        UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
+        List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
+        GroupRightBean grb = new GroupRightBean();
         try {
-            ExistCash_balancing_daily = this.getCash_balancing_dailyByUnique(aCash_balancing_daily.getBalancing_date(), aCash_balancing_daily.getAcc_child_account_id(), aCash_balancing_daily.getCurrency_code());
-            if (null != ExistCash_balancing_daily) {
-                ExistId = ExistCash_balancing_daily.getCash_balancing_daily_id();
-            }
-            if (ExistId > 0) {
-                aCash_balancing_daily.setCash_balancing_daily_id(ExistId);
-            }
-            int i = this.saveCash_balancing_daily(aCash_balancing_daily);
-            if (i == 1) {
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Saved Successfully"));
+            if (aCash_balancing_daily.getCash_balancing_daily_id() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "122", "Add") == 0) {
+                msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
+            } else if (aCash_balancing_daily.getCash_balancing_daily_id() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "122", "Edit") == 0) {
+                msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
             } else {
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Record NOT Saved"));
+                int i = this.saveCash_balancing_daily(aCash_balancing_daily);
+                if (i == 1) {
+                    msg = "Saved Successfully";
+                } else {
+                    msg = "Record NOT Saved";
+                }
             }
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
         } catch (Exception e) {
             System.out.println("callSaveCash_balancing_daily:" + e.getMessage());
         }
@@ -299,7 +313,7 @@ public class Cash_balancing_dailyBean implements Serializable {
             if (null != aCash_balancing_daily) {
                 cs.setLong("in_cash_balancing_daily_id", aCash_balancing_daily.getCash_balancing_daily_id());
                 cs.setDate("in_balancing_date", new java.sql.Date(aCash_balancing_daily.getBalancing_date().getTime()));
-                cs.setLong("in_acc_child_account_id", aCash_balancing_daily.getCash_balancing_daily_id());
+                cs.setLong("in_acc_child_account_id", aCash_balancing_daily.getAcc_child_account_id());
                 cs.setString("in_currency_code", aCash_balancing_daily.getCurrency_code());
                 cs.setDouble("in_cash_begin", aCash_balancing_daily.getCash_begin());
                 cs.setDouble("in_cash_transfer_in", aCash_balancing_daily.getCash_transfer_in());

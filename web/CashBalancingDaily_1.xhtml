@@ -60,6 +60,7 @@
             <h:panelGrid id="pnlgMessage">
                 <p:outputLabel value="#{cash_balancing_dailyBean.actionMessage}" style="color: red;"/>
             </h:panelGrid>
+            <p:growl id="growl1"/>
             <h:panelGrid id="pnlgData" columns="1">
                 <p:dataTable id="tblNew" tableStyle="width:100%;" var="itmNew" value="#{cash_balancing_dailyBean.cash_balancing_dailyListNew}"> 
                     <f:facet name="header">
@@ -71,10 +72,10 @@
                     <p:column headerText="Cash Account" style="font-size: 13px;text-align: left;">
                         <h:outputText value="#{itmNew.childAccountName} "/>
                     </p:column>
-                    <p:column headerText="Currency" style="width: 6%;font-size: 13px;">
+                    <p:column headerText="Cur" style="width: 6%;font-size: 13px;">
                         <h:outputText value="#{itmNew.currency_code}"/>
                     </p:column>
-                    <p:column headerText="Cash at Beginning" style="text-align: right;font-size: 13px;">
+                    <p:column headerText="Cash at Begin" style="text-align: right;font-size: 13px;">
                         <h:outputText value="#{itmNew.cash_begin}">
                             <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
@@ -84,7 +85,7 @@
                             <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
-                    <p:column headerText="Positive Adjustment" style="text-align: right;font-size: 13px;background-color: #00B461;">
+                    <p:column headerText="Positive Adjust" style="text-align: right;font-size: 13px;background-color: #00B461;">
                         <h:outputText value="#{itmNew.cash_adjustment_pos}">
                             <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
@@ -99,12 +100,12 @@
                             <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
-                    <p:column headerText="Negative Adjustment" style="text-align: right;font-size: 13px;background-color: red;">
+                    <p:column headerText="Negative Adjust" style="text-align: right;font-size: 13px;background-color: red;">
                         <h:outputText value="#{itmNew.cash_adjustment_neg}">
                             <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
-                    <p:column headerText="Cash Payments" style="text-align: right;font-size: 13px;background-color: red;">
+                    <p:column headerText="Cash Paid Out" style="text-align: right;font-size: 13px;background-color: red;">
                         <h:outputText value="#{itmNew.cash_payments}">
                             <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
@@ -115,8 +116,9 @@
                         </h:outputText>
                     </p:column>
                     <p:column headerText="Actual Cash Count" style="text-align: right;font-size: 13px;">
-                        <h:inputText value="#{itmNew.actual_cash_count}">
+                        <h:inputText value="#{itmNew.actual_cash_count}" style="width: 70px;">
                             <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:ajax event="blur" listener="#{cash_balancing_dailyBean.calculateCashOverOrShort(itmNew)}" execute="tblNew" render="tblNew"/>
                         </h:inputText>
                     </p:column>
                     <p:column headerText="Cash Over" style="text-align: right;font-size: 13px;background-color: #E5E5E5;">
@@ -129,6 +131,11 @@
                             <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
+                    <p:column headerText="" style="width: 30px;">
+                        <p:commandButton id="cmdbSave"  icon="ui-icon-disk">
+                            <p:ajax listener="#{cash_balancing_dailyBean.callSaveCash_balancing_daily(itmNew)}" process="@form" update="formReport:pnlgData formReport:growl1 formReport:pnlgMessage"/>
+                        </p:commandButton>
+                    </p:column>
                 </p:dataTable>
                 <p:dataTable id="tblExist" tableStyle="width:100%;" var="itmExist" value="#{cash_balancing_dailyBean.cash_balancing_dailyListExist}">
                     <f:facet name="header">
@@ -140,10 +147,10 @@
                     <p:column headerText="Cash Account" style="font-size: 13px;text-align: left;">
                         <h:outputText value="#{itmExist.childAccountName} "/>
                     </p:column>
-                    <p:column headerText="Currency" style="width: 6%;font-size: 13px;">
+                    <p:column headerText="Cur" style="width: 6%;font-size: 13px;">
                         <h:outputText value="#{itmExist.currency_code}"/>
                     </p:column>
-                    <p:column headerText="Cash at Beginning" style="text-align: right;font-size: 13px;">
+                    <p:column headerText="Cash at Begin" style="text-align: right;font-size: 13px;">
                         <h:outputText value="#{itmExist.cash_begin}">
                             <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
@@ -153,7 +160,7 @@
                             <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
-                    <p:column headerText="Positive Adjustment" style="text-align: right;font-size: 13px;background-color: #00B461;">
+                    <p:column headerText="Positive Adjust" style="text-align: right;font-size: 13px;background-color: #00B461;">
                         <h:outputText value="#{itmExist.cash_adjustment_pos}">
                             <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
@@ -168,12 +175,12 @@
                             <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
-                    <p:column headerText="Negative Adjustment" style="text-align: right;font-size: 13px;background-color: red;">
+                    <p:column headerText="Negative Adjust" style="text-align: right;font-size: 13px;background-color: red;">
                         <h:outputText value="#{itmExist.cash_adjustment_neg}">
                             <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
-                    <p:column headerText="Cash Payments" style="text-align: right;font-size: 13px;background-color: red;">
+                    <p:column headerText="Cash Paid Out" style="text-align: right;font-size: 13px;background-color: red;">
                         <h:outputText value="#{itmExist.cash_payments}">
                             <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>

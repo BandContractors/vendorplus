@@ -11441,7 +11441,7 @@ CREATE PROCEDURE sp_save_cash_balancing_daily
 (
 	IN in_cash_balancing_daily_id bigint(20),
   	IN in_balancing_date date,
-  	IN in_acc_child_account_id int(11),
+  	IN in_acc_child_account_id int,
   	IN in_currency_code varchar(10),
   	IN in_cash_begin double,
   	IN in_cash_transfer_in double,
@@ -11454,7 +11454,7 @@ CREATE PROCEDURE sp_save_cash_balancing_daily
   	IN in_actual_cash_count double,
   	IN in_cash_over double, 
   	IN in_cash_short double,
-  	IN in_user_detail_id int(11)
+  	IN in_user_detail_id int
 ) 
 BEGIN 
 	SET @cur_sys_datetime=null;
