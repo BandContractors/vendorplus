@@ -38,11 +38,12 @@ public class Cash_balancing_dailyBean implements Serializable {
 
     private String ActionMessage = null;
     private List<Cash_balancing_daily> Cash_balancing_dailyList;
+    private List<Cash_balancing_daily> Cash_balancing_dailySummary;
     private Cash_balancing_daily Cash_balancing_dailyObj;
     private List<Cash_balancing_daily> Cash_balancing_dailyListNew;
-    private List<Cash_balancing_daily> Cash_balancing_dailyListExist;
     private Date FromDate;
     private Date ToDate;
+    private int AccChildAccId;
 
     public void setCash_balancing_dailyFromResultset(Cash_balancing_daily aCash_balancing_daily, ResultSet aResultSet) {
         try {
@@ -192,11 +193,8 @@ public class Cash_balancing_dailyBean implements Serializable {
 
     public void refreshCash_balancing_daily() {
         String sqlNew = "";
-        String sqlExist = "";
         ResultSet rsNew = null;
-        ResultSet rsExist = null;
         this.Cash_balancing_dailyListNew = new ArrayList<>();
-        this.Cash_balancing_dailyListExist = new ArrayList<>();
 
         if (this.FromDate != null && this.ToDate != null) {
             //Retrieve New
@@ -238,29 +236,92 @@ public class Cash_balancing_dailyBean implements Serializable {
             } catch (Exception e) {
                 System.err.println("refreshCash_balancing_dailyList:New:" + e.getMessage());
             }
-            //Retrieve Exist
-            /*
-             sqlExist = "SELECT * FROM cash_balancing_daily WHERE balancing_date BETWEEN '" + new java.sql.Date(this.FromDate.getTime()) + "' AND '" + new java.sql.Date(this.ToDate.getTime()) + "' "
-             + "ORDER BY balancing_date DESC,acc_child_account_id,currency_code";
-             try (
-             Connection connExis = DBConnection.getMySQLConnection();
-             PreparedStatement psExist = connExis.prepareStatement(sqlExist);) {
-             rsExist = psExist.executeQuery();
-             while (rsExist.next()) {
-             Cash_balancing_daily cbdExist = new Cash_balancing_daily();
-             this.setCash_balancing_dailyFromResultset(cbdExist, rsExist);
-             //do some processing
-             AccChildAccount acaExist = new AccChildAccountBean().getAccChildAccById(cbdExist.getAcc_child_account_id());
-             if (acaExist != null) {
-             cbdExist.setAccountName(new AccCoaBean().getAccCoaByCodeOrId(acaExist.getAccCoaAccountCode(), 0).getAccountName());
-             cbdExist.setChildAccountName(new AccChildAccountBean().getAccChildAccById(acaExist.getAccChildAccountId()).getChildAccountName());
-             }
-             this.Cash_balancing_dailyListExist.add(cbdExist);
-             }
-             } catch (Exception e) {
-             System.err.println("refreshCash_balancing_dailyList:Exist:" + e.getMessage());
-             }
-             */
+        }
+    }
+
+    public void refreshReportCash_balancing_daily() {
+        String sqlList = "";
+        String sqlSummary = "";
+        ResultSet rsList = null;
+        ResultSet rsSummary = null;
+        this.Cash_balancing_dailyList = new ArrayList<>();
+        this.Cash_balancing_dailySummary = new ArrayList<>();
+
+        if (this.FromDate != null && this.ToDate != null) {
+            //list
+            if (this.AccChildAccId > 0) {
+                sqlList = "SELECT * FROM cash_balancing_daily WHERE balancing_date BETWEEN '" + new java.sql.Date(this.FromDate.getTime()) + "' AND '" + new java.sql.Date(this.ToDate.getTime()) + "'"
+                        + " AND acc_child_account_id=" + this.AccChildAccId
+                        + " ORDER BY balancing_date DESC,acc_child_account_id,currency_code";
+            } else {
+                sqlList = "SELECT * FROM cash_balancing_daily WHERE balancing_date BETWEEN '" + new java.sql.Date(this.FromDate.getTime()) + "' AND '" + new java.sql.Date(this.ToDate.getTime()) + "'"
+                        + " ORDER BY balancing_date DESC,acc_child_account_id,currency_code";
+            }
+            try (
+                    Connection connList = DBConnection.getMySQLConnection();
+                    PreparedStatement psList = connList.prepareStatement(sqlList);) {
+                rsList = psList.executeQuery();
+                while (rsList.next()) {
+                    Cash_balancing_daily cbdList = new Cash_balancing_daily();
+                    this.setCash_balancing_dailyFromResultset(cbdList, rsList);
+                    //do some processing
+                    AccChildAccount acaList = new AccChildAccountBean().getAccChildAccById(cbdList.getAcc_child_account_id());
+                    if (acaList != null) {
+                        cbdList.setAccountName(new AccCoaBean().getAccCoaByCodeOrId(acaList.getAccCoaAccountCode(), 0).getAccountName());
+                        cbdList.setChildAccountName(new AccChildAccountBean().getAccChildAccById(acaList.getAccChildAccountId()).getChildAccountName());
+                    }
+                    this.Cash_balancing_dailyList.add(cbdList);
+                }
+            } catch (Exception e) {
+                System.err.println("refreshReportCash_balancing_daily:List:" + e.getMessage());
+            }
+
+            //summary
+            if (this.AccChildAccId > 0) {
+                sqlSummary = "SELECT acc_child_account_id,currency_code,sum(cash_over) as cash_over,sum(cash_short) as cash_short FROM cash_balancing_daily WHERE balancing_date BETWEEN '" + new java.sql.Date(this.FromDate.getTime()) + "' AND '" + new java.sql.Date(this.ToDate.getTime()) + "'"
+                        + " AND acc_child_account_id=" + this.AccChildAccId
+                        + " GROUP BY acc_child_account_id,currency_code";
+            } else {
+                sqlSummary = "SELECT acc_child_account_id,currency_code,sum(cash_over) as cash_over,sum(cash_short) as cash_short FROM cash_balancing_daily WHERE balancing_date BETWEEN '" + new java.sql.Date(this.FromDate.getTime()) + "' AND '" + new java.sql.Date(this.ToDate.getTime()) + "'"
+                        + " GROUP BY acc_child_account_id,currency_code";
+            }
+            try (
+                    Connection connSummary = DBConnection.getMySQLConnection();
+                    PreparedStatement psSummary = connSummary.prepareStatement(sqlSummary);) {
+                rsSummary = psSummary.executeQuery();
+                while (rsSummary.next()) {
+                    Cash_balancing_daily cbdSummary = new Cash_balancing_daily();
+                    try {
+                        cbdSummary.setAcc_child_account_id(rsSummary.getInt("acc_child_account_id"));
+                    } catch (Exception e) {
+                        cbdSummary.setAcc_child_account_id(0);
+                    }
+                    try {
+                        cbdSummary.setCurrency_code(rsSummary.getString("currency_code"));
+                    } catch (Exception e) {
+                        cbdSummary.setCurrency_code("");
+                    }
+                    try {
+                        cbdSummary.setCash_over(rsSummary.getDouble("cash_over"));
+                    } catch (Exception e) {
+                        cbdSummary.setCash_over(0);
+                    }
+                    try {
+                        cbdSummary.setCash_short(rsSummary.getDouble("cash_short"));
+                    } catch (Exception e) {
+                        cbdSummary.setCash_short(0);
+                    }
+                    //do some processing
+                    AccChildAccount acaSummary = new AccChildAccountBean().getAccChildAccById(cbdSummary.getAcc_child_account_id());
+                    if (acaSummary != null) {
+                        cbdSummary.setAccountName(new AccCoaBean().getAccCoaByCodeOrId(acaSummary.getAccCoaAccountCode(), 0).getAccountName());
+                        cbdSummary.setChildAccountName(new AccChildAccountBean().getAccChildAccById(acaSummary.getAccChildAccountId()).getChildAccountName());
+                    }
+                    this.Cash_balancing_dailySummary.add(cbdSummary);
+                }
+            } catch (Exception e) {
+                System.err.println("refreshReportCash_balancing_daily:Summary:" + e.getMessage());
+            }
         }
     }
 
@@ -410,6 +471,10 @@ public class Cash_balancing_dailyBean implements Serializable {
 
     public void resetCash_balancing_daily() {
         try {
+            this.setAccChildAccId(0);
+        } catch (Exception e) {
+        }
+        try {
             this.setActionMessage("");
         } catch (Exception e) {
         }
@@ -422,7 +487,11 @@ public class Cash_balancing_dailyBean implements Serializable {
         } catch (Exception e) {
         }
         try {
-            this.Cash_balancing_dailyListExist.clear();
+            this.Cash_balancing_dailyList.clear();
+        } catch (Exception e) {
+        }
+        try {
+            this.Cash_balancing_dailySummary.clear();
         } catch (Exception e) {
         }
     }
@@ -484,21 +553,6 @@ public class Cash_balancing_dailyBean implements Serializable {
     }
 
     /**
-     * @return the Cash_balancing_dailyListExist
-     */
-    public List<Cash_balancing_daily> getCash_balancing_dailyListExist() {
-        return Cash_balancing_dailyListExist;
-    }
-
-    /**
-     * @param Cash_balancing_dailyListExist the Cash_balancing_dailyListExist to
-     * set
-     */
-    public void setCash_balancing_dailyListExist(List<Cash_balancing_daily> Cash_balancing_dailyListExist) {
-        this.Cash_balancing_dailyListExist = Cash_balancing_dailyListExist;
-    }
-
-    /**
      * @return the FromDate
      */
     public Date getFromDate() {
@@ -524,5 +578,33 @@ public class Cash_balancing_dailyBean implements Serializable {
      */
     public void setToDate(Date ToDate) {
         this.ToDate = ToDate;
+    }
+
+    /**
+     * @return the AccChildAccId
+     */
+    public int getAccChildAccId() {
+        return AccChildAccId;
+    }
+
+    /**
+     * @param AccChildAccId the AccChildAccId to set
+     */
+    public void setAccChildAccId(int AccChildAccId) {
+        this.AccChildAccId = AccChildAccId;
+    }
+
+    /**
+     * @return the Cash_balancing_dailySummary
+     */
+    public List<Cash_balancing_daily> getCash_balancing_dailySummary() {
+        return Cash_balancing_dailySummary;
+    }
+
+    /**
+     * @param Cash_balancing_dailySummary the Cash_balancing_dailySummary to set
+     */
+    public void setCash_balancing_dailySummary(List<Cash_balancing_daily> Cash_balancing_dailySummary) {
+        this.Cash_balancing_dailySummary = Cash_balancing_dailySummary;
     }
 }
