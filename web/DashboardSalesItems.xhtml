@@ -32,7 +32,7 @@
             <h:panelGrid id="pnlgHeader" styleClass="clsPanelReportFilterTitle">
                 <h:outputLabel styleClass="clsLabelReportFilterTitle" value="Top Selling Dashboard"/>
             </h:panelGrid>
-            <h:panelGrid id="pnlgFilter" columns="8" styleClass="clsPanelReportFilter">
+            <h:panelGrid id="pnlgFilter" columns="9" styleClass="clsPanelReportFilter">
                 <p:outputLabel value="#{companySetting.getStoreEquivName()}:"/>
                 <p:selectOneMenu id="menuFromStore" value="#{dashboardBean.store_id}" style="width: 200px;">
                     <f:selectItem itemLabel="Select" itemValue="0"/>
@@ -59,200 +59,305 @@
                     <f:selectItem itemValue="15" itemLabel="15"/>
                     <f:selectItem itemValue="20" itemLabel="20"/>
                 </p:selectOneMenu>
-                <p:commandButton id="cmdbSearch" value="SEARCH" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                <p:commandButton id="cmdbSearchYear" value="By YEAR" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                     <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                         <p:graphicImage name="/images/ajax-loader.gif"/>
                     </p:dialog>
-                    <p:ajax listener="#{dashboardBean.searchSaleItemsDashboard()}" process="pnlgFilter" update="growl1 pnlgChart1 pnlgChart2"/>
+                    <p:ajax listener="#{dashboardBean.searchSaleItemsDashboard()}" process="pnlgFilter" update="growl1 pnlgCharts"/>
+                </p:commandButton>
+                <p:commandButton id="cmdbSearchMonth" value="By MONTH" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{dashboardBean.searchTopSoldItemsByMonthDashboard()}" process="pnlgFilter" update="growl1 pnlgCharts"/>
                 </p:commandButton>
                 <p:commandButton id="cmdbReset" value="RESET">
-                    <p:ajax listener="#{dashboardBean.initSaleItemsDashboard()}" process="pnlgFilter" update="pnlgFilter growl1 pnlgChart1 pnlgChart2"/>
+                    <p:ajax listener="#{dashboardBean.initSaleItemsDashboard()}" process="pnlgFilter" update="pnlgFilter growl1 pnlgCharts"/>
                 </p:commandButton>
             </h:panelGrid>
             <p:growl id="growl1"/>
-            <h:panelGrid id="pnlgChart1">
-                <canvas id="chart1" width="1000" height="450"/>
-                <script>
-                    var ctx = document.getElementById("chart1");
-                    var chart1 = new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: [#{dashboardBean.itemsTopSoldItemsByYear}],
-                            datasets: [{
-                                    label: 'Amount',
-                                    yAxisID: 'y-axis-1',
-                                    data: [#{dashboardBean.amountTopSoldItemsByYear}],
-                                    backgroundColor: 'green',
-                                    borderColor: 'green',
-                                    borderWidth: 1
-                                },
-                                {
-                                    label: 'Qty',
-                                    yAxisID: 'y-axis-2',
-                                    data: [#{dashboardBean.qtyTopSoldItemsByYear}],
-                                    backgroundColor: 'gold',
-                                    borderColor: 'gold',
-                                    borderWidth: 1
-                                }]
-                        },
-                        options: {
-                            responsive: true,
-                            legend: {
-                                display: true
-                            },
-                            title: {
-                                display: true,
-                                text: 'Top #{dashboardBean.selectedDisplayItems} items with highest amount of sales in #{dashboardBean.selectedYear}'
-                            },
-                            tooltips: {
-                                mode: 'label',
-                                label: 'mylabel',
-                                callbacks: {
-                                    label: function (tooltipItem, data) {
-                                        return tooltipItem.yLabel.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                    }}
-                            },
-                            scales: {
-                                xAxes: [{
-                                        gridLines: {display: false},
-                                        ticks: {
-                                            maxRotation: 0,
-                                            padding: 0,
-                                            callback: function (value, index, values) {
-                                                return value.split(/\b\s+/);
-                                            }
-                                        }
-                                    }],
-                                yAxes: [{
-                                        type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
-                                        display: true,
-                                        position: 'left',
-                                        id: 'y-axis-1',
-                                        ticks: {
-                                            beginAtZero: true,
-                                            callback: function (value, index, values) {
-                                                if (parseInt(value) >= 1000) {
-                                                    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                                } else {
-                                                    return value;
-                                                }
-                                            }
-                                        }
-                                    }, {
-                                        type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
-                                        display: true,
-                                        position: 'right',
-                                        id: 'y-axis-2',
-                                        ticks: {
-                                            beginAtZero: true,
-                                            callback: function (value, index, values) {
-                                                if (parseInt(value) >= 1000) {
-                                                    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                                } else {
-                                                    return value;
-                                                }
-                                            }
-                                        },
-                                        gridLines: {
-                                            drawOnChartArea: false
-                                        }
+            <h:panelGrid id="pnlgCharts">
+                <h:panelGrid id="pnlgChartYearItem" rendered="#{dashboardBean.viewState==0}">
+                    <canvas id="chart1" width="1000" height="450"/>
+                    <script>
+                        var ctx = document.getElementById("chart1");
+                        var chart1 = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: [#{dashboardBean.itemsTopSoldItemsByYear}],
+                                datasets: [{
+                                        label: 'Amount',
+                                        yAxisID: 'y-axis-1',
+                                        data: [#{dashboardBean.amountTopSoldItemsByYear}],
+                                        backgroundColor: 'green',
+                                        borderColor: 'green',
+                                        borderWidth: 1
+                                    },
+                                    {
+                                        label: 'Qty',
+                                        yAxisID: 'y-axis-2',
+                                        data: [#{dashboardBean.qtyTopSoldItemsByYear}],
+                                        backgroundColor: 'gold',
+                                        borderColor: 'gold',
+                                        borderWidth: 1
                                     }]
-                            }
-                        }
-                    });
-                </script>
-            </h:panelGrid>
-            <h:panelGrid id="pnlgChart2">
-                <canvas id="chart2" width="1000" height="450"/>
-                <script>
-                    var ctx = document.getElementById("chart2");
-                    var chart2 = new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: [#{dashboardBean.catItemsTopSoldItemsByYear}],
-                            datasets: [{
-                                    label: 'Amount',
-                                    yAxisID: 'y-axis-1',
-                                    data: [#{dashboardBean.catAmountTopSoldItemsByYear}],
-                                    backgroundColor: 'green',
-                                    borderColor: 'green',
-                                    borderWidth: 1
+                            },
+                            options: {
+                                responsive: true,
+                                legend: {
+                                    display: true
                                 },
-                                {
-                                    label: 'Qty',
-                                    yAxisID: 'y-axis-2',
-                                    data: [#{dashboardBean.catQtyTopSoldItemsByYear}],
-                                    backgroundColor: 'gold',
-                                    borderColor: 'gold',
-                                    borderWidth: 1
-                                }]
-                        },
-                        options: {
-                            responsive: true,
-                            legend: {
-                                display: true
-                            },
-                            title: {
-                                display: true,
-                                text: 'Top #{dashboardBean.selectedDisplayItems} categories of items with highest amount of sales in #{dashboardBean.selectedYear}'
-                            },
-                            tooltips: {
-                                mode: 'label',
-                                label: 'mylabel',
-                                callbacks: {
-                                    label: function (tooltipItem, data) {
-                                        return tooltipItem.yLabel.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                    }}
-                            },
-                            scales: {
-                                xAxes: [{
-                                        gridLines: {display: false},
-                                        ticks: {
-                                            maxRotation: 0,
-                                            padding: 0,
-                                            callback: function (value, index, values) {
-                                                return value.split(/\b\s+/);
-                                            }
-                                        }
-                                    }],
-                                yAxes: [{
-                                        type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
-                                        display: true,
-                                        position: 'left',
-                                        id: 'y-axis-1',
-                                        ticks: {
-                                            beginAtZero: true,
-                                            callback: function (value, index, values) {
-                                                if (parseInt(value) >= 1000) {
-                                                    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                                } else {
-                                                    return value;
+                                title: {
+                                    display: true,
+                                    text: 'Top #{dashboardBean.selectedDisplayItems} items with highest amount of sales in #{dashboardBean.selectedYear}'
+                                },
+                                tooltips: {
+                                    mode: 'label',
+                                    label: 'mylabel',
+                                    callbacks: {
+                                        label: function (tooltipItem, data) {
+                                            return tooltipItem.yLabel.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                        }}
+                                },
+                                scales: {
+                                    xAxes: [{
+                                            gridLines: {display: false},
+                                            ticks: {
+                                                maxRotation: 0,
+                                                padding: 0,
+                                                callback: function (value, index, values) {
+                                                    return value.split(/\b\s+/);
                                                 }
                                             }
-                                        }
-                                    }, {
-                                        type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
-                                        display: true,
-                                        position: 'right',
-                                        id: 'y-axis-2',
-                                        ticks: {
-                                            beginAtZero: true,
-                                            callback: function (value, index, values) {
-                                                if (parseInt(value) >= 1000) {
-                                                    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                                } else {
-                                                    return value;
+                                        }],
+                                    yAxes: [{
+                                            type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                                            display: true,
+                                            position: 'left',
+                                            id: 'y-axis-1',
+                                            ticks: {
+                                                beginAtZero: true,
+                                                callback: function (value, index, values) {
+                                                    if (parseInt(value) >= 1000) {
+                                                        return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                                    } else {
+                                                        return value;
+                                                    }
                                                 }
                                             }
-                                        },
-                                        gridLines: {
-                                            drawOnChartArea: false
-                                        }
-                                    }]
+                                        }, {
+                                            type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                                            display: true,
+                                            position: 'right',
+                                            id: 'y-axis-2',
+                                            ticks: {
+                                                beginAtZero: true,
+                                                callback: function (value, index, values) {
+                                                    if (parseInt(value) >= 1000) {
+                                                        return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                                    } else {
+                                                        return value;
+                                                    }
+                                                }
+                                            },
+                                            gridLines: {
+                                                drawOnChartArea: false
+                                            }
+                                        }]
+                                }
                             }
-                        }
-                    });
-                </script>
+                        });
+                    </script>
+                </h:panelGrid>
+                <h:panelGrid id="pnlgChartYearCategory" rendered="#{dashboardBean.viewState==0}">
+                    <canvas id="chart2" width="1000" height="450"/>
+                    <script>
+                        var ctx = document.getElementById("chart2");
+                        var chart2 = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: [#{dashboardBean.catItemsTopSoldItemsByYear}],
+                                datasets: [{
+                                        label: 'Amount',
+                                        yAxisID: 'y-axis-1',
+                                        data: [#{dashboardBean.catAmountTopSoldItemsByYear}],
+                                        backgroundColor: 'green',
+                                        borderColor: 'green',
+                                        borderWidth: 1
+                                    },
+                                    {
+                                        label: 'Qty',
+                                        yAxisID: 'y-axis-2',
+                                        data: [#{dashboardBean.catQtyTopSoldItemsByYear}],
+                                        backgroundColor: 'gold',
+                                        borderColor: 'gold',
+                                        borderWidth: 1
+                                    }]
+                            },
+                            options: {
+                                responsive: true,
+                                legend: {
+                                    display: true
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Top #{dashboardBean.selectedDisplayItems} categories of items with highest amount of sales in #{dashboardBean.selectedYear}'
+                                },
+                                tooltips: {
+                                    mode: 'label',
+                                    label: 'mylabel',
+                                    callbacks: {
+                                        label: function (tooltipItem, data) {
+                                            return tooltipItem.yLabel.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                        }}
+                                },
+                                scales: {
+                                    xAxes: [{
+                                            gridLines: {display: false},
+                                            ticks: {
+                                                maxRotation: 0,
+                                                padding: 0,
+                                                callback: function (value, index, values) {
+                                                    return value.split(/\b\s+/);
+                                                }
+                                            }
+                                        }],
+                                    yAxes: [{
+                                            type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                                            display: true,
+                                            position: 'left',
+                                            id: 'y-axis-1',
+                                            ticks: {
+                                                beginAtZero: true,
+                                                callback: function (value, index, values) {
+                                                    if (parseInt(value) >= 1000) {
+                                                        return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                                    } else {
+                                                        return value;
+                                                    }
+                                                }
+                                            }
+                                        }, {
+                                            type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                                            display: true,
+                                            position: 'right',
+                                            id: 'y-axis-2',
+                                            ticks: {
+                                                beginAtZero: true,
+                                                callback: function (value, index, values) {
+                                                    if (parseInt(value) >= 1000) {
+                                                        return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                                    } else {
+                                                        return value;
+                                                    }
+                                                }
+                                            },
+                                            gridLines: {
+                                                drawOnChartArea: false
+                                            }
+                                        }]
+                                }
+                            }
+                        });
+                    </script>
+                </h:panelGrid>
+                <p:dataTable id="tblChartMonthItem" tableStyle="width:auto;" var="mon" value="#{dashboardBean.monthListSelected}" rendered="#{dashboardBean.viewState==1}"> 
+                    <p:column headerText="Month">
+                        <h:outputText value="#{mon.monthYearName} "/>
+                    </p:column>
+                    <p:column headerText="Top #{dashboardBean.selectedDisplayItems} items with highest amount of sales">
+                        <canvas id="#{mon.monthName}" width="1000" height="450"/>
+                        <script>
+                            var #{'ctx'}#{mon.monthNo} = document.getElementById("#{mon.monthName}");
+                            var #{mon.monthName} = new Chart(#{'ctx'}#{mon.monthNo}, {
+                                type: 'bar',
+                                data: {
+                                    labels: [#{dashboardBean.itemsTopSoldItemsByMonth[mon.monthNo-1]}],
+                                    datasets: [{
+                                            label: 'Amount',
+                                            yAxisID: 'y-axis-1',
+                                            data: [#{dashboardBean.amountTopSoldItemsByMonth[mon.monthNo-1]}],
+                                            backgroundColor: 'green',
+                                            borderColor: 'green',
+                                            borderWidth: 1
+                                        },
+                                        {
+                                            label: 'Qty',
+                                            yAxisID: 'y-axis-2',
+                                            data: [#{dashboardBean.qtyTopSoldItemsByMonth[mon.monthNo-1]}],
+                                            backgroundColor: 'gold',
+                                            borderColor: 'gold',
+                                            borderWidth: 1
+                                        }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    legend: {
+                                        display: true
+                                    },
+                                    title: {
+                                        display: false,
+                                        text: '#{mon.monthName} #{dashboardBean.selectedYear}'
+                                                    },
+                                                    tooltips: {
+                                                        mode: 'label',
+                                                        label: 'mylabel',
+                                                        callbacks: {
+                                                            label: function (tooltipItem, data) {
+                                                                return tooltipItem.yLabel.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                                            }}
+                                                    },
+                                                    scales: {
+                                                        xAxes: [{
+                                                                gridLines: {display: false},
+                                                                ticks: {
+                                                                    maxRotation: 0,
+                                                                    padding: 0,
+                                                                    callback: function (value, index, values) {
+                                                                        return value.split(/\b\s+/);
+                                                                    }
+                                                                }
+                                                            }],
+                                                        yAxes: [{
+                                                                type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                                                                display: true,
+                                                                position: 'left',
+                                                                id: 'y-axis-1',
+                                                                ticks: {
+                                                                    beginAtZero: true,
+                                                                    callback: function (value, index, values) {
+                                                                        if (parseInt(value) >= 1000) {
+                                                                            return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                                                        } else {
+                                                                            return value;
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }, {
+                                                                type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                                                                display: true,
+                                                                position: 'right',
+                                                                id: 'y-axis-2',
+                                                                ticks: {
+                                                                    beginAtZero: true,
+                                                                    callback: function (value, index, values) {
+                                                                        if (parseInt(value) >= 1000) {
+                                                                            return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                                                        } else {
+                                                                            return value;
+                                                                        }
+                                                                    }
+                                                                },
+                                                                gridLines: {
+                                                                    drawOnChartArea: false
+                                                                }
+                                                            }]
+                                                    }
+                                                }
+                                            });
+                        </script>
+                    </p:column>
+                </p:dataTable>
             </h:panelGrid>
         </h:form>
     </h:body>

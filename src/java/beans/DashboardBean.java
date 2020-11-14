@@ -2,6 +2,7 @@ package beans;
 
 import connections.DBConnection;
 import entities.CompanySetting;
+import entities.MonthList;
 import entities.Pay;
 import entities.Stock_ledger;
 import entities.Store;
@@ -104,6 +105,11 @@ public class DashboardBean implements Serializable {
     private String stock_type;
     private List<Store> StoreList;
     private int store_id;
+    private String[] ItemsTopSoldItemsByMonth;
+    private String[] AmountTopSoldItemsByMonth;
+    private String[] QtyTopSoldItemsByMonth;
+    private List<MonthList> MonthListSelected;
+    private int ViewState;
 
     public void initSalesDashboard() {
         try {
@@ -169,6 +175,10 @@ public class DashboardBean implements Serializable {
     }
 
     public void initSaleItemsDashboard() {
+        this.ViewState = 0;
+        ItemsTopSoldItemsByMonth = null;
+        AmountTopSoldItemsByMonth = null;
+        QtyTopSoldItemsByMonth = null;
         try {
             this.StoreList = new StoreBean().getStores();
             this.store_id = 0;
@@ -182,6 +192,39 @@ public class DashboardBean implements Serializable {
             this.refreshCategorySaleItemsByYear(this.SelectedYear, this.SelectedDisplayItems);
         } catch (Exception e) {
             System.err.println("initSaleItemsDashboard:" + e.getMessage());
+        }
+    }
+
+    public void initTopSoldItemsByMonthDashboard() {
+        try {
+            this.StoreList = new StoreBean().getStores();
+            this.store_id = 0;
+            this.CurrentYear = new UtilityBean().getCurrentYear();
+            this.CurrentMonthNo = new UtilityBean().getCurrentMonth();
+            this.SelectedYear = this.CurrentYear;
+            this.SelectedMonthNo = this.CurrentMonthNo;
+            this.SelectedMonthName = new UtilityBean().convertMonthNoToName(this.SelectedMonthNo, 0);
+            this.SelectedDisplayItems = 5;
+            this.MonthListSelected = new ArrayList<>();
+            MonthList mon = null;
+            int M = this.SelectedMonthNo;
+            while (M >= 1) {
+                mon = new MonthList();
+                mon.setMonthNo(M);
+                mon.setMonthName(new UtilityBean().convertMonthNoToName(M, 1));
+                mon.setMonthYearName(mon.getMonthName() + "/" + this.SelectedYear);
+                this.MonthListSelected.add(mon);
+                M = M - 1;
+            }
+            ItemsTopSoldItemsByMonth = new String[this.SelectedMonthNo];
+            AmountTopSoldItemsByMonth = new String[this.SelectedMonthNo];
+            QtyTopSoldItemsByMonth = new String[this.SelectedMonthNo];
+            for (int i = 0; i < this.MonthListSelected.size(); i++) {
+                this.refreshTopSoldItemsByMonth(this.MonthListSelected.get(i).getMonthNo(), this.SelectedYear, this.SelectedDisplayItems);
+            }
+            //this.refreshCategorySaleItemsByYear(this.SelectedYear, this.SelectedDisplayItems);
+        } catch (Exception e) {
+            System.err.println("initTopSoldItemsByMonthDashboard:" + e.getMessage());
         }
     }
 
@@ -265,6 +308,10 @@ public class DashboardBean implements Serializable {
     }
 
     public void searchSaleItemsDashboard() {
+        this.ViewState = 0;
+        ItemsTopSoldItemsByMonth = null;
+        AmountTopSoldItemsByMonth = null;
+        QtyTopSoldItemsByMonth = null;
         try {
             this.CurrentYear = new UtilityBean().getCurrentYear();
             this.CurrentMonthNo = new UtilityBean().getCurrentMonth();
@@ -278,6 +325,40 @@ public class DashboardBean implements Serializable {
             this.refreshCategorySaleItemsByYear(this.SelectedYear, this.SelectedDisplayItems);
         } catch (Exception e) {
             System.err.println("searchSaleItemsDashboard:" + e.getMessage());
+        }
+    }
+
+    public void searchTopSoldItemsByMonthDashboard() {
+        this.ViewState = 1;
+        try {
+            this.CurrentYear = new UtilityBean().getCurrentYear();
+            this.CurrentMonthNo = new UtilityBean().getCurrentMonth();
+            if (this.SelectedYear == this.CurrentYear) {
+                this.SelectedMonthNo = this.CurrentMonthNo;
+            } else {
+                this.SelectedMonthNo = 12;
+            }
+            this.SelectedMonthName = new UtilityBean().convertMonthNoToName(this.SelectedMonthNo, 0);
+            this.MonthListSelected = new ArrayList<>();
+            MonthList mon = null;
+            int M = this.SelectedMonthNo;
+            while (M >= 1) {
+                mon = new MonthList();
+                mon.setMonthNo(M);
+                mon.setMonthName(new UtilityBean().convertMonthNoToName(M, 1));
+                mon.setMonthYearName(mon.getMonthName() + "/" + this.SelectedYear);
+                this.MonthListSelected.add(mon);
+                M = M - 1;
+            }
+            ItemsTopSoldItemsByMonth = new String[this.SelectedMonthNo];
+            AmountTopSoldItemsByMonth = new String[this.SelectedMonthNo];
+            QtyTopSoldItemsByMonth = new String[this.SelectedMonthNo];
+            for (int i = 0; i < this.MonthListSelected.size(); i++) {
+                this.refreshTopSoldItemsByMonth(this.MonthListSelected.get(i).getMonthNo(), this.SelectedYear, this.SelectedDisplayItems);
+            }
+            //this.refreshCategorySaleItemsByYear(this.SelectedYear, this.SelectedDisplayItems);
+        } catch (Exception e) {
+            System.err.println("searchTopSoldItemsByMonthDashboard:" + e.getMessage());
         }
     }
 
@@ -484,6 +565,63 @@ public class DashboardBean implements Serializable {
                     QtyTopSoldItemsByYear = "" + new UtilityBean().formatNumber("###", rs.getDouble("item_qty"));
                 } else {
                     QtyTopSoldItemsByYear = QtyTopSoldItemsByYear + "," + new UtilityBean().formatNumber("###", rs.getDouble("item_qty"));
+                }
+            }
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+    public void refreshTopSoldItemsByMonth(int aSelMonth, int aSelYear, int aSelDisplayItems) {
+        try {
+            ItemsTopSoldItemsByMonth[aSelMonth - 1] = "";
+            AmountTopSoldItemsByMonth[aSelMonth - 1] = "";
+            QtyTopSoldItemsByMonth[aSelMonth - 1] = "";
+        } catch (Exception e) {
+            System.err.println("IndexError:" + e.getMessage());
+        }
+        String sql = "";
+        if (this.store_id == 0) {
+            sql = "SELECT item_id,sum(amount) as amount,sum(item_qty) as item_qty "
+                    + "FROM view_fact_sales_items "
+                    + "WHERE y=" + aSelYear + " AND m=" + aSelMonth + " "
+                    + "GROUP BY item_id "
+                    + "ORDER BY sum(amount) DESC LIMIT " + aSelDisplayItems;
+        } else {
+            sql = "SELECT f.item_id,sum(f.amount) as amount,sum(f.item_qty) as item_qty "
+                    + "FROM view_fact_sales_items f "
+                    + "INNER JOIN  transaction t on f.transaction_id=t.transaction_id and t.store_id=" + this.store_id + " "
+                    + "WHERE f.y=" + aSelYear + " AND f.m=" + aSelMonth + " "
+                    + "GROUP BY f.item_id "
+                    + "ORDER BY sum(f.amount) DESC LIMIT " + aSelDisplayItems;
+        }
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            ItemBean ib = new ItemBean();
+            while (rs.next()) {
+                String ItemDesc = "";
+                try {
+                    ItemDesc = ib.getItem(rs.getLong("item_id")).getDescription();
+                    ItemDesc = ItemDesc.replace("\"", "'");
+                } catch (Exception e) {
+                }
+                if (ItemsTopSoldItemsByMonth[aSelMonth - 1].length() == 0) {
+                    ItemsTopSoldItemsByMonth[aSelMonth - 1] = "\"" + ItemDesc + "\"";
+                } else {
+                    ItemsTopSoldItemsByMonth[aSelMonth - 1] = ItemsTopSoldItemsByMonth[aSelMonth - 1] + ",\"" + ItemDesc + "\"";
+                }
+                if (AmountTopSoldItemsByMonth[aSelMonth - 1].length() == 0) {
+                    AmountTopSoldItemsByMonth[aSelMonth - 1] = "" + new UtilityBean().formatNumber("###", rs.getDouble("amount"));
+                } else {
+                    AmountTopSoldItemsByMonth[aSelMonth - 1] = AmountTopSoldItemsByMonth[aSelMonth - 1] + "," + new UtilityBean().formatNumber("###", rs.getDouble("amount"));
+                }
+                if (QtyTopSoldItemsByMonth[aSelMonth - 1].length() == 0) {
+                    QtyTopSoldItemsByMonth[aSelMonth - 1] = "" + new UtilityBean().formatNumber("###", rs.getDouble("item_qty"));
+                } else {
+                    QtyTopSoldItemsByMonth[aSelMonth - 1] = QtyTopSoldItemsByMonth[aSelMonth - 1] + "," + new UtilityBean().formatNumber("###", rs.getDouble("item_qty"));
                 }
             }
         } catch (Exception e) {
@@ -2890,6 +3028,76 @@ public class DashboardBean implements Serializable {
      */
     public void setStore_id(int store_id) {
         this.store_id = store_id;
+    }
+
+    /**
+     * @return the ItemsTopSoldItemsByMonth
+     */
+    public String[] getItemsTopSoldItemsByMonth() {
+        return ItemsTopSoldItemsByMonth;
+    }
+
+    /**
+     * @param ItemsTopSoldItemsByMonth the ItemsTopSoldItemsByMonth to set
+     */
+    public void setItemsTopSoldItemsByMonth(String[] ItemsTopSoldItemsByMonth) {
+        this.ItemsTopSoldItemsByMonth = ItemsTopSoldItemsByMonth;
+    }
+
+    /**
+     * @return the AmountTopSoldItemsByMonth
+     */
+    public String[] getAmountTopSoldItemsByMonth() {
+        return AmountTopSoldItemsByMonth;
+    }
+
+    /**
+     * @param AmountTopSoldItemsByMonth the AmountTopSoldItemsByMonth to set
+     */
+    public void setAmountTopSoldItemsByMonth(String[] AmountTopSoldItemsByMonth) {
+        this.AmountTopSoldItemsByMonth = AmountTopSoldItemsByMonth;
+    }
+
+    /**
+     * @return the QtyTopSoldItemsByMonth
+     */
+    public String[] getQtyTopSoldItemsByMonth() {
+        return QtyTopSoldItemsByMonth;
+    }
+
+    /**
+     * @param QtyTopSoldItemsByMonth the QtyTopSoldItemsByMonth to set
+     */
+    public void setQtyTopSoldItemsByMonth(String[] QtyTopSoldItemsByMonth) {
+        this.QtyTopSoldItemsByMonth = QtyTopSoldItemsByMonth;
+    }
+
+    /**
+     * @return the MonthListSelected
+     */
+    public List<MonthList> getMonthListSelected() {
+        return MonthListSelected;
+    }
+
+    /**
+     * @param MonthListSelected the MonthListSelected to set
+     */
+    public void setMonthListSelected(List<MonthList> MonthListSelected) {
+        this.MonthListSelected = MonthListSelected;
+    }
+
+    /**
+     * @return the ViewState
+     */
+    public int getViewState() {
+        return ViewState;
+    }
+
+    /**
+     * @param ViewState the ViewState to set
+     */
+    public void setViewState(int ViewState) {
+        this.ViewState = ViewState;
     }
 
 }
