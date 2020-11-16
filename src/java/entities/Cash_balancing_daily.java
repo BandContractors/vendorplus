@@ -39,6 +39,7 @@ public class Cash_balancing_daily implements Serializable {
     private Date edit_date;
     private String AccountName;
     private String ChildAccountName;
+    private double net_cash;
 
     /**
      * @return the cash_balancing_daily_id
@@ -332,5 +333,19 @@ public class Cash_balancing_daily implements Serializable {
      */
     public void setChildAccountName(String ChildAccountName) {
         this.ChildAccountName = ChildAccountName;
+    }
+
+    /**
+     * @return the net_cash
+     */
+    public double getNet_cash() {
+        return net_cash;
+    }
+
+    /**
+     * @param net_cash the net_cash to set
+     */
+    public void setNet_cash(double net_cash) {
+        this.net_cash = net_cash;
     }
 }

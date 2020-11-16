@@ -2,7 +2,6 @@ package beans;
 
 import connections.DBConnection;
 import entities.AccChildAccount;
-import entities.Cdc_general;
 import entities.Cash_balancing_daily;
 import entities.CompanySetting;
 import entities.GroupRight;
@@ -141,6 +140,22 @@ public class Cash_balancing_dailyBean implements Serializable {
                 aCash_balancing_daily.setEdit_date(new Date(aResultSet.getTimestamp("edit_date").getTime()));
             } catch (Exception e) {
                 aCash_balancing_daily.setEdit_date(null);
+            }
+            //calculate net cash
+            try {
+                double NetCash = 0;
+                double AddCash = 0;
+                double SubtractCash = 0;
+                AddCash = aCash_balancing_daily.getCash_adjustment_pos() + aCash_balancing_daily.getCash_transfer_in() + aCash_balancing_daily.getCash_receipts();
+                SubtractCash = aCash_balancing_daily.getCash_adjustment_neg() + aCash_balancing_daily.getCash_transfer_out() + aCash_balancing_daily.getCash_payments();
+                if (SubtractCash >= 0) {
+                    NetCash = AddCash - SubtractCash;
+                } else {
+                    NetCash = AddCash + SubtractCash;
+                }
+                aCash_balancing_daily.setNet_cash(NetCash);
+            } catch (Exception e) {
+                aCash_balancing_daily.setNet_cash(0);
             }
         } catch (Exception e) {
             System.err.println("setCash_balancing_dailyFromResultset:" + e.getMessage());
@@ -329,12 +344,25 @@ public class Cash_balancing_dailyBean implements Serializable {
         try {
             aCash_balancing_daily.setCash_over(0);
             aCash_balancing_daily.setCash_short(0);
-            if (aCash_balancing_daily.getCash_balance() < 0) {
-                aCash_balancing_daily.setCash_over(aCash_balancing_daily.getCash_balance() + aCash_balancing_daily.getActual_cash_count());
-            } else if (aCash_balancing_daily.getCash_balance() > aCash_balancing_daily.getActual_cash_count()) {
-                aCash_balancing_daily.setCash_short(aCash_balancing_daily.getCash_balance() - aCash_balancing_daily.getActual_cash_count());
-            } else if (aCash_balancing_daily.getCash_balance() < aCash_balancing_daily.getActual_cash_count()) {
-                aCash_balancing_daily.setCash_over(aCash_balancing_daily.getActual_cash_count() - aCash_balancing_daily.getCash_balance());
+            //calculate net cash
+            double NetCash = 0;
+            double AddCash = 0;
+            double SubtractCash = 0;
+            AddCash = aCash_balancing_daily.getCash_adjustment_pos() + aCash_balancing_daily.getCash_transfer_in() + aCash_balancing_daily.getCash_receipts();
+            SubtractCash = aCash_balancing_daily.getCash_adjustment_neg() + aCash_balancing_daily.getCash_transfer_out() + aCash_balancing_daily.getCash_payments();
+            if (SubtractCash >= 0) {
+                NetCash = AddCash - SubtractCash;
+            } else {
+                NetCash = AddCash + SubtractCash;
+            }
+            aCash_balancing_daily.setNet_cash(NetCash);
+            //calculate cash over or short
+            if (aCash_balancing_daily.getNet_cash() < 0) {
+                aCash_balancing_daily.setCash_over(aCash_balancing_daily.getNet_cash() + aCash_balancing_daily.getActual_cash_count());
+            } else if (aCash_balancing_daily.getNet_cash() > aCash_balancing_daily.getActual_cash_count()) {
+                aCash_balancing_daily.setCash_short(aCash_balancing_daily.getNet_cash() - aCash_balancing_daily.getActual_cash_count());
+            } else if (aCash_balancing_daily.getNet_cash() < aCash_balancing_daily.getActual_cash_count()) {
+                aCash_balancing_daily.setCash_over(aCash_balancing_daily.getActual_cash_count() - aCash_balancing_daily.getNet_cash());
             }
         } catch (Exception e) {
             System.err.println("calculateCashOverOrShort:" + e.getMessage());
@@ -355,6 +383,7 @@ public class Cash_balancing_dailyBean implements Serializable {
                 int i = this.saveCash_balancing_daily(aCash_balancing_daily);
                 if (i == 1) {
                     msg = "Saved Successfully";
+                    this.refreshCash_balancing_daily();
                 } else {
                     msg = "Record NOT Saved";
                 }

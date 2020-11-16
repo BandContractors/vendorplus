@@ -64,10 +64,7 @@
                         <h:outputText value="#{utilityBean.formatDate(itmNew.balancing_date)} "/>
                     </p:column>
                     <p:column headerText="Cash Account" style="font-size: 13px;text-align: left;">
-                        <h:outputText value="#{itmNew.childAccountName}"/>
-                    </p:column>
-                    <p:column headerText="Cur" style="width: 6%;font-size: 13px;">
-                        <h:outputText value="#{itmNew.currency_code}"/>
+                        <h:outputText value="#{itmNew.childAccountName} (#{itmNew.currency_code})"/>
                     </p:column>
                     <p:column headerText="Cash at Begin" style="text-align: right;font-size: 13px;">
                         <h:outputText value="#{itmNew.cash_begin}">
@@ -104,13 +101,13 @@
                             <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
-                    <p:column headerText="Balance" style="text-align: right;font-size: 13px;">
-                        <h:outputText value="#{itmNew.cash_balance}">
+                    <p:column headerText="Day Net Cash" style="text-align: right;font-size: 13px;color: #007fff;">
+                        <h:outputText value="#{itmNew.net_cash}">
                             <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
-                    <p:column headerText="Actual CashCount" style="text-align: right;font-size: 13px;">
-                        <h:inputText value="#{itmNew.actual_cash_count}" style="width: 90px;text-align: right;">
+                    <p:column headerText="Day Actual Cash" style="text-align: right;font-size: 13px;color: #007fff;">
+                        <h:inputText value="#{itmNew.actual_cash_count}" style="width: 75px;text-align: right;margin: 0px;">
                             <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             <f:ajax event="blur" listener="#{cash_balancing_dailyBean.calculateCashOverOrShort(itmNew)}" execute="tblNew" render="tblNew"/>
                         </h:inputText>
@@ -122,6 +119,11 @@
                     </p:column>
                     <p:column headerText="Cash Short" style="text-align: right;font-size: 13px;color: red;">
                         <h:outputText value="#{itmNew.cash_short}">
+                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Cash at End" style="text-align: right;font-size: 13px;">
+                        <h:outputText value="#{itmNew.cash_balance}">
                             <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
