@@ -50,3 +50,25 @@ INSERT INTO transaction_reason (transaction_reason_id, transaction_reason_name, 
 
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_14',53,Now(),'6.0','');
+
+CREATE TABLE stock_take (
+  stock_take_id bigint(20) NOT NULL AUTO_INCREMENT,
+  snapshot_no int(11) NOT NULL,
+  snapshot_date datetime NOT NULL,
+  cdc_id varchar(20) DEFAULT NULL,
+  store_id int(11) DEFAULT NULL,
+  acc_period_id int(11) NOT NULL,
+  item_id bigint(20) NOT NULL,
+  batchno varchar(100) DEFAULT NULL,
+  code_specific varchar(50) DEFAULT NULL,
+  desc_specific varchar(100) DEFAULT NULL,
+  specific_size double DEFAULT '1',
+  qty_system double NOT NULL,
+  qty_physical double NOT NULL,
+  qty_short double NOT NULL,
+  qty_over double NOT NULL,
+  PRIMARY KEY (stock_take_id)
+);
+
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_14',73,Now(),'6.0','');
