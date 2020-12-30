@@ -2200,19 +2200,19 @@ public class TransBean implements Serializable {
     }
 
     public void saveTransCEC(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
-        Date dt1 = null, dt2 = null;
-        long tms = 0;
-        long ms = 0;
-        String TimeStr = "";
+        //Date dt1 = null, dt2 = null;
+        //long tms = 0;
+        //long ms = 0;
+        //String TimeStr = "";
         TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
         TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
         Store store = new StoreBean().getStore(aStoreId);
-        dt1 = new Date();
+        //dt1 = new Date();
         String ValidationMessage = this.validateTransCEC(aStoreId, aTransTypeId, aTransReasonId, aSaleType, trans, aActiveTransItems, aSelectedTransactor, aSelectedBillTransactor);
-        dt2 = new Date();
-        ms = (dt2.getTime() - dt1.getTime());
-        tms = tms + ms;
-        TimeStr = TimeStr + " Val:" + ms;
+        //dt2 = new Date();
+        //ms = (dt2.getTime() - dt1.getTime());
+        //tms = tms + ms;
+        //TimeStr = TimeStr + " Val:" + ms;
         long payid = 0;
         //-------
         String sql = null;
@@ -2250,12 +2250,12 @@ public class TransBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ValidationMessage));
         } else {
             try {
-                dt1 = new Date();
+                //dt1 = new Date();
                 this.insertTransCEC(aStoreId, aTransTypeId, aTransReasonId, aSaleType, trans, aActiveTransItems);
-                dt2 = new Date();
-                ms = (dt2.getTime() - dt1.getTime());
-                tms = tms + ms;
-                TimeStr = TimeStr + " ITrans:" + ms;
+                //dt2 = new Date();
+                //ms = (dt2.getTime() - dt1.getTime());
+                //tms = tms + ms;
+                //TimeStr = TimeStr + " ITrans:" + ms;
                 if (trans.getTransactionId() == 0) {
                     switch (aLevel) {
                         case "PARENT":
@@ -2296,16 +2296,16 @@ public class TransBean implements Serializable {
                     } else if (trans.getTransactionTypeId() == 75) {//Cash Adjustment
                         tib.saveTransItemsCashAdjustment(trans, aActiveTransItems, trans.getTransactionId());
                     } else {
-                        dt1 = new Date();
+                        //dt1 = new Date();
                         tib.saveTransItemsCEC(aStoreId, aTransTypeId, aTransReasonId, aSaleType, trans, aActiveTransItems, trans.getTransactionId());
-                        dt2 = new Date();
-                        ms = (dt2.getTime() - dt1.getTime());
-                        tms = tms + ms;
-                        TimeStr = TimeStr + " SItems:" + ms;
+                        //dt2 = new Date();
+                        //ms = (dt2.getTime() - dt1.getTime());
+                        //tms = tms + ms;
+                        //TimeStr = TimeStr + " SItems:" + ms;
                     }
 
                     //save payment
-                    dt1 = new Date();
+                    //dt1 = new Date();
                     if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "PURCHASE INVOICE".equals(transtype.getTransactionTypeName()) || "EXPENSE ENTRY".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE RETURN INVOICE".equals(transtype.getTransactionTypeName())) {
                         Pay InnerPay = new Pay();
                         InnerPay.setPayDate(trans.getTransactionDate());
@@ -2391,10 +2391,10 @@ public class TransBean implements Serializable {
                         paytrans.setTransactionReasonId(trans.getTransactionReasonId());
                         new PayTransBean().savePayTrans(paytrans);
                     }
-                    dt2 = new Date();
-                    ms = (dt2.getTime() - dt1.getTime());
-                    tms = tms + ms;
-                    TimeStr = TimeStr + " Pay:" + ms;
+                    //dt2 = new Date();
+                    //ms = (dt2.getTime() - dt1.getTime());
+                    //tms = tms + ms;
+                    //TimeStr = TimeStr + " Pay:" + ms;
                     //insert PointsTransaction for both the awarded and spent points to the stage area
                     if (("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) && (trans.getPointsAwarded() != 0 || trans.getSpendPoints() != 0)) {
                         if (trans.getPointsCardId() != 0 && !trans.getCardNumber().equals("")) {
@@ -2425,7 +2425,7 @@ public class TransBean implements Serializable {
                     }
 
                     //Save Sales Journal Entry
-                    dt1 = new Date();
+                    //dt1 = new Date();
                     if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE RETURN INVOICE".equals(transtype.getTransactionTypeName())) {
                         Pay savedpay = null;
                         long savedpayid = 0;
@@ -2552,12 +2552,12 @@ public class TransBean implements Serializable {
                     if (trans.getTransactionHistId() > 0) {
                         this.deleteTransFromHist(trans.getTransactionHistId());
                     }
-                    dt2 = new Date();
-                    ms = (dt2.getTime() - dt1.getTime());
-                    tms = tms + ms;
-                    TimeStr = TimeStr + " SJournal:" + ms;
+                    //dt2 = new Date();
+                    //ms = (dt2.getTime() - dt1.getTime());
+                    //tms = tms + ms;
+                    //TimeStr = TimeStr + " SJournal:" + ms;
                     //TAX API
-                    dt1 = new Date();
+                    //dt1 = new Date();
                     if (aTransTypeId == 2 && trans.getTotalVat() > 0 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {//SALES INVOICE
                         int IsThreadOn = 0;
                         try {
@@ -2571,38 +2571,38 @@ public class TransBean implements Serializable {
                             new InvoiceOfflineBean().submitTaxInvoiceOfflineThread(trans.getTransactionId());
                         }
                     }
-                    dt2 = new Date();
-                    ms = (dt2.getTime() - dt1.getTime());
-                    tms = tms + ms;
-                    TimeStr = TimeStr + " TaxAPI:" + ms;
+                    //dt2 = new Date();
+                    //ms = (dt2.getTime() - dt1.getTime());
+                    //tms = tms + ms;
+                    //TimeStr = TimeStr + " TaxAPI:" + ms;
                     //Update Total Paid for Sales/Purchase Invoice
-                    dt1 = new Date();
+                    //dt1 = new Date();
                     if (aTransTypeId == 2 || aTransTypeId == 1) {
                         new PayTransBean().updateTransTotalPaid(trans.getTransactionId());
                     }
-                    dt2 = new Date();
-                    ms = (dt2.getTime() - dt1.getTime());
-                    tms = tms + ms;
-                    TimeStr = TimeStr + " UPaid:" + ms;
+                    //dt2 = new Date();
+                    //ms = (dt2.getTime() - dt1.getTime());
+                    //tms = tms + ms;
+                    //TimeStr = TimeStr + " UPaid:" + ms;
                     //clear
-                    dt1 = new Date();
+                    //dt1 = new Date();
                     this.clearAll2(trans, aActiveTransItems, null, null, aSelectedTransactor, 2, aSelectedBillTransactor, aTransUserDetail, aSelectedSchemeTransactor, aAuthorisedByUserDetail, aSelectedAccCoa);
-                    dt2 = new Date();
-                    ms = (dt2.getTime() - dt1.getTime());
-                    tms = tms + ms;
-                    TimeStr = TimeStr + " Clear2:" + ms;
+                    //dt2 = new Date();
+                    //ms = (dt2.getTime() - dt1.getTime());
+                    //tms = tms + ms;
+                    //TimeStr = TimeStr + " Clear2:" + ms;
 
                     TransItemBean = null;
                     NewPointsTransactionBean = null;
                     NewPointsTransaction = null;
 
                     //clean stock
-                    dt2 = new Date();
+                    //dt2 = new Date();
                     StockBean.deleteZeroQtyStock();
-                    dt2 = new Date();
-                    ms = (dt2.getTime() - dt1.getTime());
-                    tms = tms + ms;
-                    TimeStr = TimeStr + " deleteZeroStock:" + ms;
+                    //dt2 = new Date();
+                    //ms = (dt2.getTime() - dt1.getTime());
+                    //tms = tms + ms;
+                    //TimeStr = TimeStr + " deleteZeroStock:" + ms;
                     switch (aLevel) {
                         case "PARENT":
                             this.setActionMessage("Saved Successfully ( TransactionId : " + new GeneralUserSetting().getCurrentTransactionId() + " )");
@@ -2613,23 +2613,23 @@ public class TransBean implements Serializable {
                     }
 
                     //Refresh Print output
-                    dt1 = new Date();
+                    //dt1 = new Date();
                     new OutputDetailBean().refreshOutput(aLevel, "");
-                    dt2 = new Date();
-                    ms = (dt2.getTime() - dt1.getTime());
-                    tms = tms + ms;
-                    TimeStr = TimeStr + " ROutput:" + ms;
+                    //dt2 = new Date();
+                    //ms = (dt2.getTime() - dt1.getTime());
+                    //tms = tms + ms;
+                    //TimeStr = TimeStr + " ROutput:" + ms;
                     //refresh draft
-                    dt1 = new Date();
+                    //dt1 = new Date();
                     if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) {
                         this.refreshTranssDraft(aStoreId, new GeneralUserSetting().getCurrentUser().getUserDetailId(), aTransTypeId, aTransReasonId);
                     }
-                    dt2 = new Date();
-                    ms = (dt2.getTime() - dt1.getTime());
-                    tms = tms + ms;
-                    TimeStr = TimeStr + " RDraft:" + ms;
+                    //dt2 = new Date();
+                    //ms = (dt2.getTime() - dt1.getTime());
+                    //tms = tms + ms;
+                    //TimeStr = TimeStr + " RDraft:" + ms;
                     //Auto Printing Invoice
-                    dt1 = new Date();
+                    //dt1 = new Date();
                     if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) {
                         //1. Update Invoice
                         //---SalesInvoiceBean.initSalesInvoiceBean();
@@ -2638,10 +2638,10 @@ public class TransBean implements Serializable {
                             org.primefaces.PrimeFaces.current().executeScript("doPrintHiddenClick()");
                         }
                     }
-                    dt2 = new Date();
-                    ms = (dt2.getTime() - dt1.getTime());
-                    tms = tms + ms;
-                    TimeStr = TimeStr + " APrint:" + ms;
+                    //dt2 = new Date();
+                    //ms = (dt2.getTime() - dt1.getTime());
+                    //tms = tms + ms;
+                    //TimeStr = TimeStr + " APrint:" + ms;
                     //check need for child dialogue
                     if ("HIRE RETURN NOTE".equals(transtype.getTransactionTypeName())) {
                         //find out if there is a return invoice candidate
@@ -2650,12 +2650,12 @@ public class TransBean implements Serializable {
                         }
                     }
                     //Refresh stock alerts
-                    dt1 = new Date();
+                    //dt1 = new Date();
                     new UtilityBean().refreshAlertsThread();
-                    dt2 = new Date();
-                    ms = (dt2.getTime() - dt1.getTime());
-                    tms = tms + ms;
-                    TimeStr = TimeStr + " RAlerts:" + ms;
+                    //dt2 = new Date();
+                    //ms = (dt2.getTime() - dt1.getTime());
+                    //tms = tms + ms;
+                    //TimeStr = TimeStr + " RAlerts:" + ms;
                 }
             } catch (Exception e) {
                 System.err.println(e.getMessage() + Arrays.toString(e.getStackTrace()));
@@ -2670,7 +2670,7 @@ public class TransBean implements Serializable {
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Transaction NOT saved! Double check details, ensure transaction ref numbers have not been captured already"));
             }
         }
-        System.out.println(tms + ", " + TimeStr);
+        //System.out.println(tms + ", " + TimeStr);
     }
 
     public void saveTransCallOrderInvoice(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {

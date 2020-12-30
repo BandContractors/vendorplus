@@ -191,6 +191,14 @@ public class ItemBean implements Serializable {
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
+        double qtybal = 0;
+        try {
+            if (aItem.getItemId() > 0) {
+                qtybal = new StockBean().getStockAtHand(aItem.getItemId());
+            }
+        } catch (Exception e) {
+            qtybal = 0;
+        }
         if (aItem.getItemId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Add") == 0) {
             msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
         } else if (aItem.getItemId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Edit") == 0) {
@@ -221,6 +229,8 @@ public class ItemBean implements Serializable {
             msg = "Please specify the Account Type and/or Name...";
         } else if (aItem.getIsSale() == 1 && aItem.getItem_code_tax().length() == 0 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
             msg = "Please specify the UN Item(Product/Service) Code...";
+        } else if (aItem.getItemId() > 0 && aItem.getItemType().equals("SERVICE") && qtybal > 0) {
+            msg = "Item specified as SERVICE has STOCK, you may adjust stock if you wish to change item type...";
         } else {
             msg = "";
         }
