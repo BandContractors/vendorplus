@@ -11,14 +11,19 @@ import beans.AccCurrencyBean;
 import beans.ItemBean;
 import beans.Item_tax_mapBean;
 import beans.Parameter_listBean;
+import beans.StockBean;
 import beans.Stock_ledgerBean;
+import beans.TransItemBean;
+import beans.TransactorBean;
 import beans.UnitBean;
 import com.google.gson.Gson;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import entities.CompanySetting;
 import entities.Item;
+import entities.Item_tax_map;
 import entities.Stock;
+import entities.Transactor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -32,6 +37,37 @@ import org.json.JSONObject;
  * @author bajuna
  */
 public class StockManage {
+
+    public void callAddStockFromItemReg(Item aItem, Item_tax_map aItem_tax_map) {
+        try {
+            double qtybal = 0;
+            try {
+                qtybal = new StockBean().getStockAtHand(aItem.getItemId());
+            } catch (Exception e) {
+                qtybal = 0;
+            }
+            if (qtybal > 0) {
+                Stock stockadd = new Stock();
+                stockadd.setItemId(aItem.getItemId());
+                stockadd.setCurrentqty(qtybal);
+                stockadd.setUnitCost(new TransItemBean().getItemLatestUnitCostPrice(aItem.getItemId(), "", "", ""));
+                String SupplierTIN = "";
+                String SupplierName = "";
+                long SupplierId = 0;
+                if (SupplierId == 0) {
+                    SupplierTIN = CompanySetting.getTaxIdentity();
+                    SupplierName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "PAYEE_NAME").getParameter_value();
+                } else {
+                    Transactor tr = new TransactorBean().getTransactor(SupplierId);
+                    SupplierTIN = tr.getTaxIdentity();
+                    SupplierName = tr.getTransactorNames();
+                }
+                new StockManage().addStockCallFromItemReg(stockadd, SupplierTIN, SupplierName);
+            }
+        } catch (Exception e) {
+            System.err.println("callAddStockUponItemReg:" + e.getMessage());
+        }
+    }
 
     public void addStockCall(Stock aStock, long aTax_update_id, String aSupplierTin, String aSupplierName) {
         try {
@@ -50,6 +86,24 @@ public class StockManage {
             }
         } catch (Exception e) {
             System.err.println("addStockCall:" + e.getMessage());
+        }
+    }
+
+    public void addStockCallFromItemReg(Stock aStock, String aSupplierTin, String aSupplierName) {
+        try {
+            if (null != aStock) {
+                String id = this.getItemIdFromTax(Long.toString(aStock.getItemId()));
+                if (id.length() > 0) {
+                    //2. update tax db and check if synced yes
+                    String recordSynced = this.addStock(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()), aSupplierTin, aSupplierName);
+                    if (recordSynced.equals("SUCCESS")) {
+                        //3. update local db that synced yes
+                        //int x = new Stock_ledgerBean().updateTaxStock_ledger(aTax_update_id, 1, 1);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("addStockCallFromItemReg:" + e.getMessage());
         }
     }
 
@@ -297,6 +351,9 @@ public class StockManage {
                 if (recordSynced.equals("SUCCESS")) {
                     //update local db that synced yes
                     int x = new Item_tax_mapBean().saveItem_tax_mapSync(aItemId, 1);
+                    //do stock taking
+                    Item_tax_map im = new Item_tax_mapBean().getItem_tax_map(item.getItemId());
+                    this.callAddStockFromItemReg(item, im);
                 }
             }
         } catch (Exception e) {

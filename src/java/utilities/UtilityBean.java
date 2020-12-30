@@ -664,10 +664,25 @@ public class UtilityBean implements Serializable {
     }
 
 //    public static void main(String[] args) {
-//        int l = 12347;
-//        String L = String.format("%03d", l);
-//        System.out.println("l:" + l);
-//        System.out.println("L:" + L);
+//        Date dt1=null;
+//        Date dt2=null;
+//        dt1=new Date();
+//        System.out.println("Print1");
+//        System.out.println("Print1");
+//        System.out.println("Print1");
+//        System.out.println("Print1");
+//        System.out.println("Print1");
+//        System.out.println("Print1");
+//        System.out.println("Print1");
+//        System.out.println("Print1");
+//        System.out.println("Print1");
+//        System.out.println("Print1");
+//        System.out.println("Print1");
+//        System.out.println("Print1");
+//        System.out.println("Print1");
+//        System.out.println("Print1");
+//        dt2=new Date();
+//        System.out.println(dt2.getTime() - dt1.getTime());
 //    }
 
     public void backupDatabase(String aDbName, String aDbUser, String aDbPassword, String aMySQLDumpFolderPath, String aSaveFolderPath) {

@@ -796,6 +796,24 @@ public class StockBean implements Serializable {
         }
     }
 
+    public double getStockAtHand(long aItemId) {
+        double qty_total = 0;
+        String sql = "SELECT * FROM view_inventory_low_out_vw WHERE item_id=?";
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aItemId);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                qty_total = rs.getDouble("qty_total");
+            }
+        } catch (Exception e) {
+            System.err.println("getStockAtHand:" + e.getMessage());
+        }
+        return qty_total;
+    }
+
     public Stock getStockAnyStore(long aItemId, String aBatchNo, String aCodeSpecific, String aDescSpecific) {
         String sql = "{call sp_search_stock_bms_any_store(?,?,?,?)}";
         ResultSet rs = null;

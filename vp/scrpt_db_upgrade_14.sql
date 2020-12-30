@@ -72,3 +72,16 @@ CREATE TABLE stock_take (
 
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_14',73,Now(),'6.0','');
+
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (65, 'COMPANY_SETTING', 'HOTEL_MODULE_ON', '0','0 is OFF and 1 is ON');
+
+INSERT INTO transaction_type (transaction_type_id, transaction_type_name) VALUES (79, 'HOTEL RESERVATION');
+INSERT INTO transaction_type (transaction_type_id, transaction_type_name) VALUES (80, 'HOTEL CHECK IN');
+INSERT INTO transaction_type (transaction_type_id, transaction_type_name) VALUES (81, 'HOTEL CHECK OUT');
+INSERT INTO transaction_reason (transaction_reason_id, transaction_reason_name, transaction_type_id) VALUES (123, 'HOTEL RESERVATION', 79);
+INSERT INTO transaction_reason (transaction_reason_id, transaction_reason_name, transaction_type_id) VALUES (124, 'HOTEL CHECK IN', 80);
+INSERT INTO transaction_reason (transaction_reason_id, transaction_reason_name, transaction_type_id) VALUES (125, 'HOTEL CHECK OUT', 81);
+
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_14',86,Now(),'6.0','');
