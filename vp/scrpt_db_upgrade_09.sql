@@ -28,11 +28,8 @@ INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_
 ALTER TABLE acc_dep_schedule ADD COLUMN post_status INT(1) NULL DEFAULT 0;
 UPDATE acc_dep_schedule SET post_status=1 WHERE acc_dep_schedule_id>0 AND year_number=1 AND (post_status=0 OR dep_for_acc_period_id is null OR dep_for_acc_period_id=0);
 
-INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
-VALUES (58, 'API', 'API_TAX_URL_OFFLINE', 'http://localhost:8080/efristcs/ws/tcsapp/getInformation','');
-INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
-VALUES (59, 'API', 'API_TAX_URL_ONLINE', 'https://efristest.ura.go.ug/efrisws/ws/taapp/getInformation','');
-INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
-VALUES (60, 'API', 'API_TAX_THREAD_ON', '0','0=No and 1=Yes');
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) VALUES (58, 'API', 'API_TAX_URL_OFFLINE', 'http://127.0.0.1:9880/efristcs/ws/tcsapp/getInformation','');
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) VALUES (59, 'API', 'API_TAX_URL_ONLINE', 'https://efrisws.ura.go.ug/ws/taapp/getInformation','');
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) VALUES (60, 'API', 'API_TAX_THREAD_ON', '0','0=No and 1=Yes');
 
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_09',51,Now(),'6.0','');
