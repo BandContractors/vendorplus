@@ -1408,9 +1408,19 @@ public class TransBean implements Serializable {
             String ItemMessage = "";
             try {
                 if (aTransTypeId == 2 && Store2Id > 0) {
-                    ItemMessage = new TransItemBean().getAnyItemTotalQtyGreaterThanCurrentQty(aActiveTransItems, Store2Id, transtype.getTransactionTypeName());
+                    if (trans.getTransactionId() > 0) {//Update
+                        ItemMessage = new TransItemBean().getAnyItemTotalQtyGreaterThanCurrentQty(new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans), Store2Id, transtype.getTransactionTypeName());
+                    } else {//Insert
+                        ItemMessage = new TransItemBean().getAnyItemTotalQtyGreaterThanCurrentQty(aActiveTransItems, Store2Id, transtype.getTransactionTypeName());
+                    }
+                    //ItemMessage = new TransItemBean().getAnyItemTotalQtyGreaterThanCurrentQty(aActiveTransItems, Store2Id, transtype.getTransactionTypeName());
                 } else {
-                    ItemMessage = new TransItemBean().getAnyItemTotalQtyGreaterThanCurrentQty(aActiveTransItems, store.getStoreId(), transtype.getTransactionTypeName());
+                    if (trans.getTransactionId() > 0) {//Update
+                        ItemMessage = new TransItemBean().getAnyItemTotalQtyGreaterThanCurrentQty(new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans), store.getStoreId(), transtype.getTransactionTypeName());
+                    } else {//Insert
+                        ItemMessage = new TransItemBean().getAnyItemTotalQtyGreaterThanCurrentQty(aActiveTransItems, store.getStoreId(), transtype.getTransactionTypeName());
+                    }
+                    //ItemMessage = new TransItemBean().getAnyItemTotalQtyGreaterThanCurrentQty(aActiveTransItems, store.getStoreId(), transtype.getTransactionTypeName());
                 }
             } catch (NullPointerException npe) {
             }
