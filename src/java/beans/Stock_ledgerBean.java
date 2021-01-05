@@ -266,6 +266,9 @@ public class Stock_ledgerBean implements Serializable {
                 if (null == im) {
                     //do nothing
                 } else {
+                    if (aStock.getUnitCost() == 0) {
+                        aStock.setUnitCost(new TransItemBean().getItemLatestUnitCostPrice(aStock.getItemId(), "", "", ""));
+                    }
                     if (aAddSubtract.equals("Add")) {
                         Stock stockadd = new Stock();
                         stockadd.setItemId(aStock.getItemId());

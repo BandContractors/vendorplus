@@ -83,5 +83,6 @@ INSERT INTO transaction_reason (transaction_reason_id, transaction_reason_name, 
 INSERT INTO transaction_reason (transaction_reason_id, transaction_reason_name, transaction_type_id) VALUES (124, 'HOTEL CHECK IN', 80);
 INSERT INTO transaction_reason (transaction_reason_id, transaction_reason_name, transaction_type_id) VALUES (125, 'HOTEL CHECK OUT', 81);
 
+ALTER TABLE item_unspsc ADD COLUMN add_date datetime NOT NULL AFTER exempt_rate;
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
-VALUES('scrpt_db_upgrade_14',86,Now(),'6.0','');
+VALUES('scrpt_db_upgrade_14',87,Now(),'6.0','');

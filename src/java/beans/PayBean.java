@@ -341,7 +341,7 @@ public class PayBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
         } else if (null == new AccPeriodBean().getAccPeriod(pay.getPayDate())) {
             this.setActionMessage("");
-            msg = "Date selected does not match any accounting period; please contact system administrator...";
+            msg = "Date selected does not MATCH any accounting period; Go to Accounts>Account Period, click Add New and Save OR contact system administrator...";
             this.setActionMessage("Transaction NOT saved");
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
         } else if (pay.getPayRefNo().length() > 100 || pay.getStatusDesc().length() > 100) {
@@ -478,7 +478,7 @@ public class PayBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
         } else if (null == new AccPeriodBean().getAccPeriod(pay.getPayDate())) {
             this.setActionMessage("");
-            msg = "Date selected does not match any accounting period; please contact system administrator...";
+            msg = "Date selected does not MATCH any accounting period; Go to Accounts>Account Period, click Add New and Save OR contact system administrator...";
             this.setActionMessage("Transaction NOT saved");
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
         } else if (!new AccLedgerBean().checkerBalancePass(pay.getPayMethodId(), pay.getAccChildAccountId(), pay.getCurrencyCode(), pay.getPaidAmount(), aPayTypeId, 0, 0, 0)) {

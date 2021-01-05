@@ -901,7 +901,7 @@ public class TransBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
         } else if (null == new AccPeriodBean().getAccPeriod(trans.getTransactionDate())) {
             this.setActionMessage("");
-            msg = "Date selected does not MATCH any accounting period; please contact system administrator...";
+            msg = "Date selected does not MATCH any accounting period; Go to Accounts>Account Period, click Add New and Save OR contact system administrator...";
             this.setActionMessage("Transaction NOT saved");
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
         } else if (new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getIsClosed() == 1) {
@@ -1523,7 +1523,7 @@ public class TransBean implements Serializable {
             } else if ("EXPENSE ENTRY".equals(transtype.getTransactionTypeName()) && trans.getAccChildAccountId() == 0) {
                 msg = "Please select the Payment Account";
             } else if (null == new AccPeriodBean().getAccPeriod(trans.getTransactionDate())) {
-                msg = "Date selected does not MATCH any accounting period; please contact system administrator...";
+                msg = "Date selected does not MATCH any accounting period; Go to Accounts>Account Period, click Add New and Save OR contact system administrator...";
             } else if (new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getIsClosed() == 1) {
                 msg = "Date selected is for a CLOSED accounting period; please contact system administrator...";
             } else if ((trans.getPayMethod() == 6 || trans.getPayMethod() == 7) && trans.getAmountTendered() <= 0) {

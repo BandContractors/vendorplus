@@ -242,8 +242,8 @@ public class StockManage {
             if (DecryptedContent.length() == 2) {
                 ReturnMsg = dataobject.getString("returnMessage");
             } else {
-                System.out.println("DecryptedContent:" + DecryptedContent);
-                System.out.println("returnMessage:" + dataobject.getString("returnMessage"));
+                System.out.println("addStock:DecryptedContent:" + DecryptedContent);
+                System.out.println("addStock:returnMessage:" + dataobject.getString("returnMessage"));
                 ReturnMsg = dataobject.getString("returnMessage") + ":DecryptedContent";
             }
         } catch (Exception ex) {
@@ -262,7 +262,7 @@ public class StockManage {
                     + " \"supplierTin\": \"\",\n"
                     + " \"supplierName\": \"\",\n"
                     + " \"adjustType\": \"" + aAdjustType + "\",\n"
-                    + " \"stockInType\": \"" + 102 + "\",\n"
+                    //+ " \"stockInType\": \"" + 102 + "\",\n"
                     + " \"remarks\": \"Decrease inventory\"\n"
                     + " },\n"
                     + " \"goodsStockInItem\": [{\n"
@@ -290,8 +290,8 @@ public class StockManage {
             if (DecryptedContent.length() == 2) {
                 ReturnMsg = dataobject.getString("returnMessage");
             } else {
-                System.out.println("DecryptedContent:" + DecryptedContent);
-                System.out.println("returnMessage:" + dataobject.getString("returnMessage"));
+                System.out.println("subtractStock:DecryptedContent:" + DecryptedContent);
+                System.out.println("subtractStock:returnMessage:" + dataobject.getString("returnMessage"));
                 ReturnMsg = dataobject.getString("returnMessage") + ":DecryptedContent";
             }
         } catch (Exception ex) {
