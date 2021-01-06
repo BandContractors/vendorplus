@@ -86,3 +86,15 @@ INSERT INTO transaction_reason (transaction_reason_id, transaction_reason_name, 
 ALTER TABLE item_unspsc ADD COLUMN add_date datetime NOT NULL AFTER exempt_rate;
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_14',87,Now(),'6.0','');
+
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (66, 'API', 'API_TAX_MODE', 'OFFLINE','OFFLINE or ONLINE');
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (67, 'API', 'API_TAX_KEYSTORE_FILE', 'XXX.p12','The full file location for the keystore file including the extension such as .p12');
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (68, 'API', 'API_TAX_KEYSTORE_PASSWORD', '','(Encrypted password): to change, enter password and click Encrypt before Save');
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (69, 'API', 'API_TAX_KEYSTORE_ALIAS', '','Alias name for the Keystore');
+
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_14',99,Now(),'6.0','');

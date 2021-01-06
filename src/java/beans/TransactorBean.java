@@ -71,7 +71,14 @@ public class TransactorBean implements Serializable {
                     aTransactor.setEmail("");
                     aTransactor.setPhone("");
                     //get detail
-                    Taxpayer taxpayer = new TaxpayerBean().getTaxpayerDetailFromTax(aTransactor.getTaxIdentity());
+                    Taxpayer taxpayer = null;
+                    String APIMode = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_MODE").getParameter_value();
+                    if (APIMode.equals("OFFLINE")) {
+                        taxpayer = new TaxpayerBean().getTaxpayerDetailFromTax_Offline(aTransactor.getTaxIdentity());
+                    } else {
+                        taxpayer = new TaxpayerBean().getTaxpayerDetailFromTax_Online(aTransactor.getTaxIdentity());
+                    }
+                    
                     if (null == taxpayer) {
                         //do nothing
                     } else {

@@ -337,7 +337,7 @@ public class InvoiceOfflineBean {
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
             WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_OFFLINE").getParameter_value());
             String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", basicInformation.getDeviceNo(), "T109", sellerDetails.getTin());
-            //System.out.println("PostData:" + PostData);
+            //System.out.println("PostData_Online:" + PostData_Online);
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             String output = response.getEntity(String.class);
             //System.out.println("output:" + output);
@@ -436,7 +436,7 @@ public class InvoiceOfflineBean {
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
             WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_OFFLINE").getParameter_value());
             String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", aDeviceNo, "T108", aSellerTIN);
-            //System.out.println("PostData1:" + PostData);
+            //System.out.println("PostData1:" + PostData_Online);
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             String output = response.getEntity(String.class);
             //System.out.println("output1:" + output);
@@ -456,8 +456,9 @@ public class InvoiceOfflineBean {
             JSONArray jSONArray_Payway = parentbasicInformationjsonObject.getJSONArray("payWay");
             JSONObject dataobjectbasicInformation = parentbasicInformationjsonObject.getJSONObject("basicInformation");
             JSONObject dataobjectsellerDetails = parentbasicInformationjsonObject.getJSONObject("sellerDetails");
-
+            JSONArray jSONArray_GoodsDetialsNew = new JSONArray();
             JSONObject jsonObj;
+            int itemcount = 0;
             for (int i = 0; i < jSONArray_GoodsDetials.length(); i++) {
                 jsonObj = (JSONObject) jSONArray_GoodsDetials.get(i);
                 TransItem ti = this.getTransItemFromList(jsonObj.get("itemCode").toString(), transitems);
@@ -467,7 +468,12 @@ public class InvoiceOfflineBean {
                 jsonObj.put("qty", "" + ChangedQty + "");
                 jsonObj.put("total", "" + ChangedVatAmt + "");
                 jsonObj.put("tax", "" + ChangedVatAmt + "");
+                if (ChangedQty != 0) {
+                    jSONArray_GoodsDetialsNew.put(jsonObj);
+                    itemcount = itemcount + 1;
+                }
             }
+            //tax details
             for (int i = 0; i < jSONArray_TaxDetails.length(); i++) {
                 jsonObj = (JSONObject) jSONArray_TaxDetails.get(i);
                 Double ChangedNetAmount = trans.getTotalStdVatableAmount() - Double.parseDouble(jsonObj.get("netAmount").toString());
@@ -484,6 +490,7 @@ public class InvoiceOfflineBean {
             dataobject_Summary.put("grossAmount", "" + new UtilityBean().formatDoubleToStringPlain(ChangedGrossAmountSum, trans.getCurrencyCode()) + "");
             dataobject_Summary.put("netAmount", "" + new UtilityBean().formatDoubleToStringPlain(ChangedNetAmountSum, trans.getCurrencyCode()) + "");
             dataobject_Summary.put("taxAmount", "" + new UtilityBean().formatDoubleToStringPlain(ChangedTaxAmountSum, trans.getCurrencyCode()) + "");
+            dataobject_Summary.put("itemCount", "" + itemcount + "");
 
             json = "{\n"
                     + "	\"oriInvoiceId\": \"" + dataobjectbasicInformation.getString("invoiceId") + "\",\n"
@@ -499,17 +506,17 @@ public class InvoiceOfflineBean {
                     + "	\"source\": \"104\",\n"
                     + "	\"remark\": \"Remarks\",\n"
                     + "	\"sellersReferenceNo\": \"" + "" + "\",\n"
-                    + "	\"goodsDetails\": " + jSONArray_GoodsDetials.toString() + ",\n"
+                    + "	\"goodsDetails\": " + jSONArray_GoodsDetialsNew.toString() + ",\n"
                     + "	\"taxDetails\": " + jSONArray_TaxDetails.toString() + ",\n"
                     + "	\"summary\":" + dataobject_Summary.toString() + " ,\n"
                     + "	\"payWay\":" + jSONArray_Payway.toString() + "\n"
                     + "}";
             //System.out.println("json2:" + json);
             PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", aDeviceNo, "T110", aSellerTIN);
-            //System.out.println("PostData2:" + PostData);
+            //System.out.println("PostData2:" + PostData_Online);
             response = webResource.type("application/json").post(ClientResponse.class, PostData);
             output = response.getEntity(String.class);
-            //System.out.println("output2:" + output);
+            //System.out.println("output:" + output);
 
             parentjsonObject = new JSONObject(output);
             dataobject = parentjsonObject.getJSONObject("returnStateInfo");
@@ -598,7 +605,7 @@ public class InvoiceOfflineBean {
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
             WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_OFFLINE").getParameter_value());
             String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", aDeviceNo, "T108", aSellerTIN);
-            //System.out.println("PostData1:" + PostData);
+            //System.out.println("PostData1:" + PostData_Online);
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             String output = response.getEntity(String.class);
             //System.out.println("output1:" + output);
@@ -660,7 +667,7 @@ public class InvoiceOfflineBean {
                     TransItem prevTI = this.getTransItemFromList(Long.toString(transitems.get(i).getItemId()), prevTIs);
                     Double ChangedQty = transitems.get(i).getItemQty() - prevTI.getItemQty();//can be + or -
                     Double ChangedVatAmt = transitems.get(i).getAmountIncVat() - prevTI.getAmountIncVat();//can be + or -
-                    if (ChangedQty > 0 || ChangedVatAmt > 0) {
+                    if (ChangedQty != 0) {//if (ChangedQty > 0 || ChangedVatAmt > 0) {
                         GoodsDetails gd = new GoodsDetails();
                         gd.setItem(itm.getDescription());//Hima Cement
                         gd.setItemCode(Long.toString(itm.getItemId()));//147
@@ -744,7 +751,7 @@ public class InvoiceOfflineBean {
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
             WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_OFFLINE").getParameter_value());
             String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", basicInformation.getDeviceNo(), "T109", sellerDetails.getTin());
-            //System.out.println("PostData:" + PostData);
+            //System.out.println("PostData_Online:" + PostData_Online);
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             String output = response.getEntity(String.class);
             //System.out.println("output:" + output);
@@ -761,7 +768,7 @@ public class InvoiceOfflineBean {
             String content = dataobjectcontent.getString("content");
             //System.out.println(AESpublickeystring);
             String DecryptedContent = new String(Base64.decodeBase64(content));
-            //-System.out.println(DecryptedContent);
+            //System.out.println(DecryptedContent);
             //-System.out.println("-------------------------------------");
             JSONObject parentbasicInformationjsonObject = new JSONObject(DecryptedContent);
             JSONObject databasicInformation = parentbasicInformationjsonObject.getJSONObject("basicInformation");
@@ -798,7 +805,8 @@ public class InvoiceOfflineBean {
         TransItem ti = null;
         for (int i = 0; i < ajSONArray.length(); i++) {
             ti = new TransItem();
-            ti.setItem_no(Integer.parseInt(ajSONArray.getJSONObject(i).get("orderNumber").toString()));
+            //ti.setItem_no(Integer.parseInt(ajSONArray.getJSONObject(i).get("orderNumber").toString()));
+            ti.setItem_no(0);
             ti.setItemId(Long.parseLong(ajSONArray.getJSONObject(i).get("itemCode").toString()));
             ti.setItemQty(Double.parseDouble(ajSONArray.getJSONObject(i).get("qty").toString()));
             ti.setAmountIncVat(Double.parseDouble(ajSONArray.getJSONObject(i).get("total").toString()));

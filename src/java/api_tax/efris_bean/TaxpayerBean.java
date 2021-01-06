@@ -12,8 +12,11 @@ import com.google.gson.Gson;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import entities.CompanySetting;
+import java.security.PrivateKey;
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONObject;
+import utilities.Security;
+import utilities.SecurityPKI;
 
 /**
  *
@@ -21,7 +24,7 @@ import org.json.JSONObject;
  */
 public class TaxpayerBean {
 
-    public Taxpayer getTaxpayerDetailFromTax(String aTIN) {
+    public Taxpayer getTaxpayerDetailFromTax_Offline(String aTIN) {
         Taxpayer tp = null;
         try {
             String json = "{\n"
@@ -52,12 +55,12 @@ public class TaxpayerBean {
         } catch (Exception e) {
             tp = null;
             //e.printStackTrace();
-            System.err.println("getTaxpayerDetailFromTax:" + e.getMessage());
+            System.err.println("getTaxpayerDetailFromTax_Offline:" + e.getMessage());
         }
         return tp;
     }
-    
-    public Taxpayer getTaxpayerDetailFromTaxOnline(String aTIN) {
+
+    public Taxpayer getTaxpayerDetailFromTax_Online(String aTIN) {
         Taxpayer tp = null;
         try {
             String json = "{\n"
@@ -66,19 +69,36 @@ public class TaxpayerBean {
                     + "}";
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
             WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_ONLINE").getParameter_value());
-            String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T119", CompanySetting.getTaxIdentity());
+
+            /**
+             * Read Private Key
+             */
+            PrivateKey key = new SecurityPKI().getPrivate(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_FILE").getParameter_value(), Security.Decrypt(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_PASSWORD").getParameter_value()), new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_ALIAS").getParameter_value());
+            String AESpublickeystring = SecurityPKI.decrypt(new SecurityPKI().AESPublicKey(CompanySetting.getTaxIdentity(), new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value()), key);
+            /**
+             * Encrypt Content
+             */
+            String encryptedcontent = SecurityPKI.AESencrypt(json, Base64.decodeBase64(AESpublickeystring));
+            String signedcontent = Base64.encodeBase64String(new SecurityPKI().sign(encryptedcontent, key));
+            /**
+             * Post Data
+             */
+            String PostData = GeneralUtilities.PostData_Online(encryptedcontent, "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T119", CompanySetting.getTaxIdentity());
 
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             String output = response.getEntity(String.class);
-            //System.out.println(output);
+            System.out.println(output);
 
             JSONObject parentjsonObject = new JSONObject(output);
             JSONObject dataobject = parentjsonObject.getJSONObject("returnStateInfo");
 
             JSONObject dataobjectcontent = parentjsonObject.getJSONObject("data");
             String content = dataobjectcontent.getString("content");
-
-            String DecryptedContent = new String(Base64.decodeBase64(content));
+            /**
+             * Decrypt Response
+             */
+            String DecryptedContent = SecurityPKI.AESdecrypt(content, Base64.decodeBase64(AESpublickeystring));
+            //String DecryptedContent = new String(Base64.decodeBase64(content));
 
             JSONObject parentbasicInformationjsonObject = new JSONObject(DecryptedContent);
             JSONObject obj = parentbasicInformationjsonObject.getJSONObject("taxpayer");
@@ -87,8 +107,8 @@ public class TaxpayerBean {
             tp = g.fromJson(obj.toString(), Taxpayer.class);
         } catch (Exception e) {
             tp = null;
-            //e.printStackTrace();
-            System.err.println("getTaxpayerDetailFromTax:" + e.getMessage());
+            e.printStackTrace();
+            System.err.println("getTaxpayerDetailFromTax_Online:" + e.getMessage());
         }
         return tp;
     }

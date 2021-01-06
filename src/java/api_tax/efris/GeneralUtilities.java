@@ -14,7 +14,7 @@ import java.util.Date;
  */
 public class GeneralUtilities {
     
-    public static String PostData(String content, String signature, String appId, String brn, String dataExchangeId, String deviceMAC, String deviceNo, String interfaceCode, String tin) {
+    public static String PostData_Online(String content, String signature, String appId, String brn, String dataExchangeId, String deviceMAC, String deviceNo, String interfaceCode, String tin) {
         String PostData = "{\n"
                 + "    \"data\": {\n"
                 + "        \"content\": \"" + content + "\",\n"

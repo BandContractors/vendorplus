@@ -143,7 +143,7 @@ public class InvoiceBean {
             //PublicKey publickey=ExtractKeys.getKey(AESpublickeystring);
             System.out.println(encryptedcontent);
             String signedcontent = Base64.encodeBase64String(new ExtractKeys().sign(encryptedcontent, key));
-            String PostData = GeneralUtilities.PostData(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", basicInformation.getDeviceNo(), "T109", sellerDetails.getTin());
+            String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", basicInformation.getDeviceNo(), "T109", sellerDetails.getTin());
             System.out.println(PostData);
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             String output = response.getEntity(String.class);
