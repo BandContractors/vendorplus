@@ -98,3 +98,9 @@ VALUES (69, 'API', 'API_TAX_KEYSTORE_ALIAS', '','Alias name for the Keystore');
 
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_14',99,Now(),'6.0','');
+
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (70, 'API', 'API_TAX_AES_PUBLIC_KEY', '','Stores AESpublickeystring variable for others to use, is picked once every day');
+
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_14',105,Now(),'6.0','');

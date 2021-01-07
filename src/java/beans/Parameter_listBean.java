@@ -220,6 +220,22 @@ public class Parameter_listBean implements Serializable {
         return pl;
     }
 
+    public void saveParameter_listByIdMemory(int aParameter_list_id, String aParameter_value) {
+        int ListItemIndex = 0;
+        try {
+            int ListItemNo = SavedParameterLists.size();
+            while (ListItemIndex < ListItemNo) {
+                if (aParameter_list_id == SavedParameterLists.get(ListItemIndex).getParameter_list_id()) {
+                    SavedParameterLists.get(ListItemIndex).setParameter_value(aParameter_value);
+                    break;
+                }
+                ListItemIndex = ListItemIndex + 1;
+            }
+        } catch (Exception e) {
+            System.err.println("setParameter_listByIdMemory:" + e.getMessage());
+        }
+    }
+
     public List<Parameter_list> getParameter_listsByContext(String aContext) {
         String sql;
         sql = "SELECT * FROM parameter_list WHERE context='" + aContext + "'";
@@ -262,16 +278,8 @@ public class Parameter_listBean implements Serializable {
                 this.setParameter_listFromResultset(pl, rs);
                 SavedParameterLists.add(pl);
             }
-        } catch (SQLException se) {
-            System.err.println("refreshSavedParameterLists:" + se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println("refreshSavedParameterLists:" + ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            System.err.println("refreshSavedParameterLists:" + e.getMessage());
         }
     }
 

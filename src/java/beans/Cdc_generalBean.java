@@ -3,6 +3,7 @@ package beans;
 import connections.DBConnection;
 import entities.Cdc_general;
 import entities.CompanySetting;
+import entities.Parameter_list;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -16,6 +17,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
+import utilities.SecurityPKI;
 import utilities.UtilityBean;
 
 /*
@@ -119,6 +121,8 @@ public class Cdc_generalBean implements Serializable {
             cdcid = "S";
         } else if (aCdc_function.equals("CASH")) {
             cdcid = "C";
+        } else if (aCdc_function.equals("AESPK")) {
+            cdcid = "K";
         }
         java.util.Calendar calendar = new GregorianCalendar();
         Date aDate = new CompanySetting().getCURRENT_SERVER_DATE();
@@ -249,6 +253,24 @@ public class Cdc_generalBean implements Serializable {
         }
         return cg;
     }
+    
+    public Cdc_general getLatestCdc_generalAESPK() {
+        String sql = "SELECT c1.* FROM cdc_general c1 WHERE c1.cdc_general_id=(select max(c2.cdc_general_id) from cdc_general c2 where c2.cdc_function='AESPK')";
+        ResultSet rs = null;
+        Cdc_general cg = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                cg = new Cdc_general();
+                this.setCdc_generalFromResultset(cg, rs);
+            }
+        } catch (Exception e) {
+            System.err.println("getLatestCdc_generalAESPK:" + e.getMessage());
+        }
+        return cg;
+    }
 
     public Cdc_general getLatestCdc_generalCASH() {
         String sql = "SELECT c1.* FROM cdc_general c1 WHERE c1.cdc_general_id=(select max(c2.cdc_general_id) from cdc_general c2 where c2.cdc_function='CASH')";
@@ -272,6 +294,26 @@ public class Cdc_generalBean implements Serializable {
         boolean res = false;
         Date today = new CompanySetting().getCURRENT_SERVER_DATE();
         Cdc_general cdcg = this.getLatestCdc_generalSTOCK();
+        if (null == cdcg) {
+            res = false;
+        } else {
+            if (new UtilityBean().isDatesEqual(today, cdcg.getCdc_date()) == 1) {
+                if (cdcg.getIs_passed() == 1) {
+                    res = true;
+                } else {
+                    res = false;
+                }
+            } else {
+                res = false;
+            }
+        }
+        return res;
+    }
+    
+    public boolean isTodaySnapshotFoundAESPK() {
+        boolean res = false;
+        Date today = new CompanySetting().getCURRENT_SERVER_DATE();
+        Cdc_general cdcg = this.getLatestCdc_generalAESPK();
         if (null == cdcg) {
             res = false;
         } else {
@@ -347,6 +389,45 @@ public class Cdc_generalBean implements Serializable {
         }
     }
 
+    public void takeNewSnapshot_AesPublicKey() {
+        try {
+            //1. insert cdc_record
+            long snapshotno = this.getNewSnapshot_no();
+            String cdcid = this.getNewCdc_id("AESPK");
+            Cdc_general cdcgenInsert = new Cdc_general();
+            cdcgenInsert.setCdc_general_id(0);
+            cdcgenInsert.setSnapshot_no(snapshotno);
+            cdcgenInsert.setCdc_id(cdcid);
+            cdcgenInsert.setCdc_date(new CompanySetting().getCURRENT_SERVER_DATE());
+            cdcgenInsert.setCdc_function("AESPK");
+            cdcgenInsert.setCdc_start_time(new CompanySetting().getCURRENT_SERVER_DATE());
+            cdcgenInsert.setAdd_date(new CompanySetting().getCURRENT_SERVER_DATE());
+            cdcgenInsert.setAdd_by(UserDetailBean.getSystemUserDetailId());
+            cdcgenInsert.setAcc_period_id(new AccPeriodBean().getAccPeriod(cdcgenInsert.getCdc_date()).getAccPeriodId());
+            this.saveCdc_general(cdcgenInsert);
+            //2. insert new AESPK
+            Cdc_general cdcgenSaved = this.getCdc_generalByJobId(cdcid);
+            if (null != cdcgenSaved) {
+                int saved = new SecurityPKI().saveNewAesPublicKey();
+                long recordsInserted = 1;
+                Cdc_general cdcgenUpdate = new Cdc_general();
+                cdcgenUpdate.setCdc_general_id(cdcgenSaved.getCdc_general_id());
+                cdcgenUpdate.setRecords_affected(recordsInserted);
+                if (recordsInserted > 0) {
+                    cdcgenUpdate.setIs_passed(1);
+                } else {
+                    cdcgenUpdate.setIs_passed(0);
+                }
+                cdcgenUpdate.setCdc_end_time(new CompanySetting().getCURRENT_SERVER_DATE());
+                cdcgenUpdate.setLast_update_date(new CompanySetting().getCURRENT_SERVER_DATE());
+                cdcgenUpdate.setLast_update_by(UserDetailBean.getSystemUserDetailId());
+                this.saveCdc_general(cdcgenUpdate);
+            }
+        } catch (Exception e) {
+            System.out.println("takeNewSnapshot_AesPublicKey:" + e.getMessage());
+        }
+    }
+
     public void takeNewSnapshot_cash() {
         try {
             //1. insert cdc_record
@@ -399,6 +480,19 @@ public class Cdc_generalBean implements Serializable {
             }
         } catch (Exception e) {
             System.out.println("takeNewSnapshot_stockAtLogin:" + e.getMessage());
+        }
+    }
+
+    public void takeNewSnapshot_AesPublicKeyAtLogin() {
+        try {
+            //check if it hasnt been taken
+            if (new Cdc_generalBean().isTodaySnapshotFoundAESPK()) {
+                //ignore
+            } else {
+                this.takeNewSnapshot_AesPublicKey();
+            }
+        } catch (Exception e) {
+            System.out.println("takeNewSnapshot_AesPublicKeyAtLogin:" + e.getMessage());
         }
     }
 

@@ -1,6 +1,6 @@
 package beans;
 
-import api_tax.efris_bean.InvoiceOfflineBean;
+import api_tax.efris_bean.InvoiceBean;
 import sessions.GeneralUserSetting;
 import connections.DBConnection;
 import entities.AccChildAccount;
@@ -2576,9 +2576,9 @@ public class TransBean implements Serializable {
                             //
                         }
                         if (IsThreadOn == 0) {
-                            new InvoiceOfflineBean().submitTaxInvoiceOffline(trans.getTransactionId());
+                            new InvoiceBean().submitTaxInvoice(trans.getTransactionId());
                         } else if (IsThreadOn == 1) {
-                            new InvoiceOfflineBean().submitTaxInvoiceOfflineThread(trans.getTransactionId());
+                            new InvoiceBean().submitTaxInvoiceThread(trans.getTransactionId());
                         }
                     }
                     //dt2 = new Date();
@@ -2996,9 +2996,9 @@ public class TransBean implements Serializable {
                             //
                         }
                         if (IsThreadOn == 0) {
-                            new InvoiceOfflineBean().submitTaxInvoiceOffline(trans.getTransactionId());
+                            new InvoiceBean().submitTaxInvoice(trans.getTransactionId());
                         } else if (IsThreadOn == 1) {
-                            new InvoiceOfflineBean().submitTaxInvoiceOfflineThread(trans.getTransactionId());
+                            new InvoiceBean().submitTaxInvoiceThread(trans.getTransactionId());
                         }
                     }
                     //Update Total Paid for Sales/Purchase Invoice
@@ -4128,18 +4128,18 @@ public class TransBean implements Serializable {
                         if (IsThreadOn == 0) {
                             if (aNewTrans.getGrandTotal() > OldTrans.getGrandTotal() || aNewTrans.getTotalVat() > OldTrans.getTotalVat()) {//Debit note
                                 //System.out.println("Debit-Note-A");
-                                new InvoiceOfflineBean().submitDebitNoteOffline(aNewTrans.getTransactionId(), aTransTypeId);
+                                new InvoiceBean().submitDebitNote(aNewTrans.getTransactionId(), aTransTypeId);
                             } else if (aNewTrans.getGrandTotal() < OldTrans.getGrandTotal() || aNewTrans.getTotalVat() < OldTrans.getTotalVat()) {//Credit note
                                 //System.out.println("Credit-Note-A");
-                                new InvoiceOfflineBean().submitCreditNoteOffline(aNewTrans.getTransactionId(), aTransTypeId);
+                                new InvoiceBean().submitCreditNote(aNewTrans.getTransactionId(), aTransTypeId);
                             }
                         } else if (IsThreadOn == 1) {
                             if (aNewTrans.getGrandTotal() > OldTrans.getGrandTotal() || aNewTrans.getTotalVat() > OldTrans.getTotalVat()) {//Debit note
                                 //System.out.println("Debit-Note-B");
-                                new InvoiceOfflineBean().submitDebitNoteOfflineThread(aNewTrans.getTransactionId(), aTransTypeId);
+                                new InvoiceBean().submitDebitNoteThread(aNewTrans.getTransactionId(), aTransTypeId);
                             } else if (aNewTrans.getGrandTotal() < OldTrans.getGrandTotal() || aNewTrans.getTotalVat() < OldTrans.getTotalVat()) {//Credit note
                                 //System.out.println("Credit-Note-B");
-                                new InvoiceOfflineBean().submitCreditNoteOfflineThread(aNewTrans.getTransactionId(), aTransTypeId);
+                                new InvoiceBean().submitCreditNoteThread(aNewTrans.getTransactionId(), aTransTypeId);
                             }
                         }
                     }
@@ -11604,9 +11604,9 @@ public class TransBean implements Serializable {
                     //do nothing, original record for update not found
                 } else {
                     if (aUpdateType.equals("Debit Note")) {//Debit note
-                        new InvoiceOfflineBean().submitDebitNoteOffline(aInnerTransId, aInnerTransTypeId);
+                        new InvoiceBean().submitDebitNote(aInnerTransId, aInnerTransTypeId);
                     } else if (aUpdateType.equals("Credit Note")) {//Credit note
-                        new InvoiceOfflineBean().submitCreditNoteOffline(aInnerTransId, aInnerTransTypeId);
+                        new InvoiceBean().submitCreditNote(aInnerTransId, aInnerTransTypeId);
                     }
                 }
             }
@@ -11619,7 +11619,7 @@ public class TransBean implements Serializable {
     public void reSubmitInvoiceTaxAPI(long aInnerTransId, Trans aTrans, TransBean aTransBean) {
         try {
             if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
-                new InvoiceOfflineBean().submitTaxInvoiceOffline(aInnerTransId);
+                new InvoiceBean().submitTaxInvoice(aInnerTransId);
                 this.reportSalesTaxAPI(aTrans, aTransBean);
             }
         } catch (Exception e) {

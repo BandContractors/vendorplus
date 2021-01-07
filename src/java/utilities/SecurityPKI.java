@@ -6,6 +6,8 @@ import java.io.Serializable;
 import javax.faces.bean.*;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import entities.CompanySetting;
+import entities.Parameter_list;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -207,5 +209,34 @@ public class SecurityPKI implements Serializable {
             System.out.println("Error while decrypting: " + e.toString());
         }
         return null;
+    }
+
+    public String getNewAesPublicKey() {
+        String AesPublicKey = "";
+        try {
+            PrivateKey key = this.getPrivate(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_FILE").getParameter_value(), Security.Decrypt(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_PASSWORD").getParameter_value()), new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_ALIAS").getParameter_value());
+            AesPublicKey = SecurityPKI.decrypt(this.AESPublicKey(CompanySetting.getTaxIdentity(), new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value()), key);
+        } catch (Exception e) {
+            System.out.println("getNewAesPublicKey:" + e.getMessage());
+        }
+        return AesPublicKey;
+    }
+    
+    public int saveNewAesPublicKey() {
+        int saved = 0;
+        try {
+            String AesPublicKey = "";
+            AesPublicKey = this.getNewAesPublicKey();
+            if (AesPublicKey.length() > 0) {
+                Parameter_list pl = new Parameter_listBean().getParameter_listById(70);
+                pl.setParameter_value(AesPublicKey);
+                new Parameter_listBean().saveParameter_list(pl);
+                new Parameter_listBean().saveParameter_listByIdMemory(70, AesPublicKey);
+                saved = 1;
+            }
+        } catch (Exception e) {
+            System.out.println("saveNewAesPublicKey:" + e.getMessage());
+        }
+        return saved;
     }
 }

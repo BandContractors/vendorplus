@@ -12,9 +12,9 @@ import com.google.gson.Gson;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import entities.CompanySetting;
+import org.json.JSONObject;
 import java.security.PrivateKey;
 import org.apache.commons.codec.binary.Base64;
-import org.json.JSONObject;
 import utilities.Security;
 import utilities.SecurityPKI;
 
@@ -24,7 +24,7 @@ import utilities.SecurityPKI;
  */
 public class TaxpayerBean {
 
-    public Taxpayer getTaxpayerDetailFromTax_Offline(String aTIN) {
+    public Taxpayer getTaxpayerDetailFromTaxOffline(String aTIN) {
         Taxpayer tp = null;
         try {
             String json = "{\n"
@@ -55,12 +55,12 @@ public class TaxpayerBean {
         } catch (Exception e) {
             tp = null;
             //e.printStackTrace();
-            System.err.println("getTaxpayerDetailFromTax_Offline:" + e.getMessage());
+            System.err.println("getTaxpayerDetailFromTaxOffline:" + e.getMessage());
         }
         return tp;
     }
 
-    public Taxpayer getTaxpayerDetailFromTax_Online(String aTIN) {
+    public Taxpayer getTaxpayerDetailFromTaxOnline(String aTIN) {
         Taxpayer tp = null;
         try {
             String json = "{\n"
@@ -69,12 +69,12 @@ public class TaxpayerBean {
                     + "}";
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
             WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_ONLINE").getParameter_value());
-
             /**
              * Read Private Key
              */
             PrivateKey key = new SecurityPKI().getPrivate(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_FILE").getParameter_value(), Security.Decrypt(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_PASSWORD").getParameter_value()), new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_ALIAS").getParameter_value());
-            String AESpublickeystring = SecurityPKI.decrypt(new SecurityPKI().AESPublicKey(CompanySetting.getTaxIdentity(), new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value()), key);
+            //String AESpublickeystring = SecurityPKI.decrypt(new SecurityPKI().AESPublicKey(CompanySetting.getTaxIdentity(), new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value()), key);
+            String AESpublickeystring = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_AES_PUBLIC_KEY").getParameter_value();
             /**
              * Encrypt Content
              */
@@ -83,11 +83,11 @@ public class TaxpayerBean {
             /**
              * Post Data
              */
-            String PostData = GeneralUtilities.PostData_Online(encryptedcontent, "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T119", CompanySetting.getTaxIdentity());
-
+            String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T119", CompanySetting.getTaxIdentity());
+            //System.out.println(PostData);
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             String output = response.getEntity(String.class);
-            System.out.println(output);
+            //System.out.println(output);
 
             JSONObject parentjsonObject = new JSONObject(output);
             JSONObject dataobject = parentjsonObject.getJSONObject("returnStateInfo");
@@ -107,8 +107,8 @@ public class TaxpayerBean {
             tp = g.fromJson(obj.toString(), Taxpayer.class);
         } catch (Exception e) {
             tp = null;
-            e.printStackTrace();
-            System.err.println("getTaxpayerDetailFromTax_Online:" + e.getMessage());
+            //e.printStackTrace();
+            System.err.println("getTaxpayerDetailFromTaxOnline:" + e.getMessage());
         }
         return tp;
     }

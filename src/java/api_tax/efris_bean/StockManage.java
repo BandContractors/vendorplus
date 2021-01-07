@@ -24,6 +24,7 @@ import entities.Item;
 import entities.Item_tax_map;
 import entities.Stock;
 import entities.Transactor;
+import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -31,6 +32,8 @@ import java.util.concurrent.Executors;
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import utilities.Security;
+import utilities.SecurityPKI;
 
 /**
  *
@@ -74,10 +77,21 @@ public class StockManage {
             if (null != aStock && aTax_update_id > 0) {
                 //1. indicate record4Sync
                 int record4Sync = new Stock_ledgerBean().updateTaxStock_ledger(aTax_update_id, 1, 0);
-                String id = this.getItemIdFromTax(Long.toString(aStock.getItemId()));
+                String id = "";
+                String APIMode = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_MODE").getParameter_value();
+                if (APIMode.equals("OFFLINE")) {
+                    id = this.getItemIdFromTaxOffline(Long.toString(aStock.getItemId()));
+                } else {
+                    id = this.getItemIdFromTaxOnline(Long.toString(aStock.getItemId()));
+                }
                 if (id.length() > 0 && record4Sync == 1) {
                     //2. update tax db and check if synced yes
-                    String recordSynced = this.addStock(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()), aSupplierTin, aSupplierName);
+                    String recordSynced = "";
+                    if (APIMode.equals("OFFLINE")) {
+                        recordSynced = this.addStockOffline(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()), aSupplierTin, aSupplierName);
+                    } else {
+                        recordSynced = this.addStockOnline(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()), aSupplierTin, aSupplierName);
+                    }
                     if (recordSynced.equals("SUCCESS")) {
                         //3. update local db that synced yes
                         int x = new Stock_ledgerBean().updateTaxStock_ledger(aTax_update_id, 1, 1);
@@ -92,10 +106,21 @@ public class StockManage {
     public void addStockCallFromItemReg(Stock aStock, String aSupplierTin, String aSupplierName) {
         try {
             if (null != aStock) {
-                String id = this.getItemIdFromTax(Long.toString(aStock.getItemId()));
+                String id = "";
+                String APIMode = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_MODE").getParameter_value();
+                if (APIMode.equals("OFFLINE")) {
+                    id = this.getItemIdFromTaxOffline(Long.toString(aStock.getItemId()));
+                } else {
+                    id = this.getItemIdFromTaxOnline(Long.toString(aStock.getItemId()));
+                }
                 if (id.length() > 0) {
                     //2. update tax db and check if synced yes
-                    String recordSynced = this.addStock(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()), aSupplierTin, aSupplierName);
+                    String recordSynced = "";
+                    if (APIMode.equals("OFFLINE")) {
+                        recordSynced = this.addStockOffline(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()), aSupplierTin, aSupplierName);
+                    } else {
+                        recordSynced = this.addStockOnline(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()), aSupplierTin, aSupplierName);
+                    }
                     if (recordSynced.equals("SUCCESS")) {
                         //3. update local db that synced yes
                         //int x = new Stock_ledgerBean().updateTaxStock_ledger(aTax_update_id, 1, 1);
@@ -112,10 +137,21 @@ public class StockManage {
             if (null != aStock && aTax_update_id > 0) {
                 //1. indicate record4Sync
                 int record4Sync = new Stock_ledgerBean().updateTaxStock_ledger(aTax_update_id, 1, 0);
-                String id = this.getItemIdFromTax(Long.toString(aStock.getItemId()));
+                String APIMode = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_MODE").getParameter_value();
+                String id = "";
+                if (APIMode.equals("OFFLINE")) {
+                    id = this.getItemIdFromTaxOffline(Long.toString(aStock.getItemId()));
+                } else {
+                    id = this.getItemIdFromTaxOnline(Long.toString(aStock.getItemId()));
+                }
                 if (id.length() > 0 && record4Sync == 1) {
                     //2. update tax db and check if synced yes
-                    String recordSynced = this.subtractStock(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()), aAdjustType);
+                    String recordSynced = "";
+                    if (APIMode.equals("OFFLINE")) {
+                        recordSynced = this.subtractStockOffline(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()), aAdjustType);
+                    } else {
+                        recordSynced = this.subtractStockOnline(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()), aAdjustType);
+                    }
                     if (recordSynced.equals("SUCCESS")) {
                         //3. update local db that synced yes
                         int x = new Stock_ledgerBean().updateTaxStock_ledger(aTax_update_id, 1, 1);
@@ -157,7 +193,7 @@ public class StockManage {
         }
     }
 
-    public String getItemIdFromTax(String aGoodsCode) {
+    public String getItemIdFromTaxOffline(String aGoodsCode) {
         String itemid = "";
         try {
             /**
@@ -198,12 +234,74 @@ public class StockManage {
             }
             itemid = itemslist.get(0).getId();
         } catch (Exception ex) {
-            System.err.println("getItemIdFromTax:" + ex.getMessage());
+            System.err.println("getItemIdFromTaxOffline:" + ex.getMessage());
         }
         return itemid;
     }
 
-    public String addStock(String aId, String aQty, String aUnitPrice, String aSupplierTin, String aSupplierName) {
+    public String getItemIdFromTaxOnline(String aGoodsCode) {
+        String itemid = "";
+        try {
+            /**
+             * Goods inquiry
+             */
+            //"	\"goodsCode\": \"147\",\n"
+            String json = "{\n"
+                    + "	\"goodsCode\": \"" + aGoodsCode + "\",\n"
+                    + "	\"goodsName \": \"\",\n"
+                    + "	\"commodityCategoryName\": \"\",\n"
+                    + "	\"pageNo\": \"1\",\n"
+                    + "	\"pageSize\": \"10\"\n"
+                    + "}";
+            com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
+            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_ONLINE").getParameter_value());
+            /**
+             * Read Private Key
+             */
+            PrivateKey key = new SecurityPKI().getPrivate(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_FILE").getParameter_value(), Security.Decrypt(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_PASSWORD").getParameter_value()), new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_ALIAS").getParameter_value());
+            //String AESpublickeystring = SecurityPKI.decrypt(new SecurityPKI().AESPublicKey(CompanySetting.getTaxIdentity(), new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value()), key);
+            String AESpublickeystring = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_AES_PUBLIC_KEY").getParameter_value();
+            /**
+             * Encrypt Content
+             */
+            String encryptedcontent = SecurityPKI.AESencrypt(json, Base64.decodeBase64(AESpublickeystring));
+            String signedcontent = Base64.encodeBase64String(new SecurityPKI().sign(encryptedcontent, key));
+            /**
+             * Post Data
+             */
+            String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T127", CompanySetting.getTaxIdentity());
+
+            ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
+            String output = response.getEntity(String.class);
+            //System.out.println(output);
+
+            JSONObject parentjsonObject = new JSONObject(output);
+            JSONObject dataobject = parentjsonObject.getJSONObject("returnStateInfo");
+
+            JSONObject dataobjectcontent = parentjsonObject.getJSONObject("data");
+            String content = dataobjectcontent.getString("content");
+            /**
+             * Decrypt Response
+             */
+            String DecryptedContent = SecurityPKI.AESdecrypt(content, Base64.decodeBase64(AESpublickeystring));
+
+            JSONObject parentbasicInformationjsonObject = new JSONObject(DecryptedContent);
+            JSONArray jSONArray = parentbasicInformationjsonObject.getJSONArray("records");
+            List<ItemTax> itemslist = new ArrayList<>();
+            for (int i = 0, size = jSONArray.length(); i < size; i++) {
+                JSONObject objectInArray = jSONArray.getJSONObject(i);
+                Gson g = new Gson();
+                ItemTax item = g.fromJson(objectInArray.toString(), ItemTax.class);
+                itemslist.add(item);
+            }
+            itemid = itemslist.get(0).getId();
+        } catch (Exception ex) {
+            System.err.println("getItemIdFromTaxOnline:" + ex.getMessage());
+        }
+        return itemid;
+    }
+
+    public String addStockOffline(String aId, String aQty, String aUnitPrice, String aSupplierTin, String aSupplierName) {
         String ReturnMsg = "";
         //System.out.println("aUnitPrice:" + aUnitPrice);
         try {
@@ -242,17 +340,82 @@ public class StockManage {
             if (DecryptedContent.length() == 2) {
                 ReturnMsg = dataobject.getString("returnMessage");
             } else {
-                System.out.println("addStock:DecryptedContent:" + DecryptedContent);
-                System.out.println("addStock:returnMessage:" + dataobject.getString("returnMessage"));
+                System.out.println("addStockOffline:DecryptedContent:" + DecryptedContent);
+                System.out.println("addStockOffline:returnMessage:" + dataobject.getString("returnMessage"));
                 ReturnMsg = dataobject.getString("returnMessage") + ":DecryptedContent";
             }
         } catch (Exception ex) {
-            System.err.println("addStock:" + ex.getMessage());
+            System.err.println("addStockOffline:" + ex.getMessage());
         }
         return ReturnMsg;
     }
 
-    public String subtractStock(String aId, String aQty, String aUnitPrice, String aAdjustType) {
+    public String addStockOnline(String aId, String aQty, String aUnitPrice, String aSupplierTin, String aSupplierName) {
+        String ReturnMsg = "";
+        //System.out.println("aUnitPrice:" + aUnitPrice);
+        try {
+            String json = "{\n"
+                    + " \"goodsStockIn\": {\n"
+                    + " \"operationType\": \"101\",\n"
+                    + " \"supplierTin\": \"" + aSupplierTin + "\",\n"
+                    + " \"supplierName\": \"" + aSupplierName + "\",\n"
+                    + " \"adjustType\": \"\",\n"
+                    + " \"stockInType\": \"102\",\n"
+                    + " \"remarks\": \"Increase inventory\"\n"
+                    + " },\n"
+                    + " \"goodsStockInItem\": [{\n"
+                    + " \"commodityGoodsId\": \"" + aId + "\",\n"
+                    + " \"quantity\": \"" + aQty + "\",\n"
+                    + " \"unitPrice\": \"" + aUnitPrice + "\"\n"
+                    + " }]\n"
+                    + "}";
+
+            com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
+            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_ONLINE").getParameter_value());
+            /**
+             * Read Private Key
+             */
+            PrivateKey key = new SecurityPKI().getPrivate(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_FILE").getParameter_value(), Security.Decrypt(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_PASSWORD").getParameter_value()), new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_ALIAS").getParameter_value());
+            //String AESpublickeystring = SecurityPKI.decrypt(new SecurityPKI().AESPublicKey(CompanySetting.getTaxIdentity(), new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value()), key);
+            String AESpublickeystring = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_AES_PUBLIC_KEY").getParameter_value();
+            /**
+             * Encrypt Content
+             */
+            String encryptedcontent = SecurityPKI.AESencrypt(json, Base64.decodeBase64(AESpublickeystring));
+            String signedcontent = Base64.encodeBase64String(new SecurityPKI().sign(encryptedcontent, key));
+            /**
+             * Post Data
+             */
+            String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T131", CompanySetting.getTaxIdentity());
+            //System.out.println("json:" + json);
+            ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
+            String output = response.getEntity(String.class);
+
+            JSONObject parentjsonObject = new JSONObject(output);
+            JSONObject dataobject = parentjsonObject.getJSONObject("returnStateInfo");
+
+            JSONObject dataobjectcontent = parentjsonObject.getJSONObject("data");
+            String content = dataobjectcontent.getString("content");
+            /**
+             * Decrypt Response
+             */
+            String DecryptedContent = SecurityPKI.AESdecrypt(content, Base64.decodeBase64(AESpublickeystring));
+            //System.out.println("DecryptedContent:" + DecryptedContent);
+            //System.out.println("returnMessage:" + dataobject.getString("returnMessage"));
+            if (DecryptedContent.length() == 2) {
+                ReturnMsg = dataobject.getString("returnMessage");
+            } else {
+                System.out.println("addStockOnline:DecryptedContent:" + DecryptedContent);
+                System.out.println("addStockOnline:returnMessage:" + dataobject.getString("returnMessage"));
+                ReturnMsg = dataobject.getString("returnMessage") + ":DecryptedContent";
+            }
+        } catch (Exception ex) {
+            System.err.println("addStockOnline:" + ex.getMessage());
+        }
+        return ReturnMsg;
+    }
+
+    public String subtractStockOffline(String aId, String aQty, String aUnitPrice, String aAdjustType) {
         String ReturnMsg = "";
         //System.out.println("aUnitPrice:" + aUnitPrice);
         try {
@@ -295,7 +458,71 @@ public class StockManage {
                 ReturnMsg = dataobject.getString("returnMessage") + ":DecryptedContent";
             }
         } catch (Exception ex) {
-            System.err.println("subtractStock:" + ex.getMessage());
+            System.err.println("subtractStockOffline:" + ex.getMessage());
+        }
+        return ReturnMsg;
+    }
+
+    public String subtractStockOnline(String aId, String aQty, String aUnitPrice, String aAdjustType) {
+        String ReturnMsg = "";
+        //System.out.println("aUnitPrice:" + aUnitPrice);
+        try {
+            String json = "{\n"
+                    + " \"goodsStockIn\": {\n"
+                    + " \"operationType\": \"102\",\n"
+                    + " \"supplierTin\": \"\",\n"
+                    + " \"supplierName\": \"\",\n"
+                    + " \"adjustType\": \"" + aAdjustType + "\",\n"
+                    //+ " \"stockInType\": \"" + 102 + "\",\n"
+                    + " \"remarks\": \"Decrease inventory\"\n"
+                    + " },\n"
+                    + " \"goodsStockInItem\": [{\n"
+                    + " \"commodityGoodsId\": \"" + aId + "\",\n"
+                    + " \"quantity\": \"" + aQty + "\",\n"
+                    + " \"unitPrice\": \"" + aUnitPrice + "\"\n"
+                    + " }]\n"
+                    + "}";
+            com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
+            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_ONLINE").getParameter_value());
+            /**
+             * Read Private Key
+             */
+            PrivateKey key = new SecurityPKI().getPrivate(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_FILE").getParameter_value(), Security.Decrypt(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_PASSWORD").getParameter_value()), new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_ALIAS").getParameter_value());
+            //String AESpublickeystring = SecurityPKI.decrypt(new SecurityPKI().AESPublicKey(CompanySetting.getTaxIdentity(), new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value()), key);
+            String AESpublickeystring = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_AES_PUBLIC_KEY").getParameter_value();
+            /**
+             * Encrypt Content
+             */
+            String encryptedcontent = SecurityPKI.AESencrypt(json, Base64.decodeBase64(AESpublickeystring));
+            String signedcontent = Base64.encodeBase64String(new SecurityPKI().sign(encryptedcontent, key));
+            /**
+             * Post Data
+             */
+            String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T131", CompanySetting.getTaxIdentity());
+
+            ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
+            String output = response.getEntity(String.class);
+
+            JSONObject parentjsonObject = new JSONObject(output);
+            JSONObject dataobject = parentjsonObject.getJSONObject("returnStateInfo");
+
+            JSONObject dataobjectcontent = parentjsonObject.getJSONObject("data");
+            String content = dataobjectcontent.getString("content");
+            /**
+             * Decrypt Response
+             */
+            String DecryptedContent = SecurityPKI.AESdecrypt(content, Base64.decodeBase64(AESpublickeystring));
+            //System.out.println("DecryptedContent:" + DecryptedContent);
+            //System.out.println("ReturnMsg:" + ReturnMsg);
+            if (DecryptedContent.length() == 2) {
+                ReturnMsg = dataobject.getString("returnMessage");
+            } else {
+                System.out.println("subtractStockOnline:DecryptedContent:" + DecryptedContent);
+                System.out.println("subtractStockOnline:returnMessage:" + dataobject.getString("returnMessage"));
+                ReturnMsg = dataobject.getString("returnMessage") + ":DecryptedContent";
+            }
+        } catch (Exception ex) {
+            System.err.println("subtractStockOnline:" + ex.getMessage());
         }
         return ReturnMsg;
     }
@@ -347,7 +574,13 @@ public class StockManage {
                     item.setReorderLevel(1);
                 }
                 //register
-                String recordSynced = this.registerItem(item);
+                String recordSynced = "";
+                String APIMode = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_MODE").getParameter_value();
+                if (APIMode.equals("OFFLINE")) {
+                    recordSynced = this.registerItemOffline(item);
+                } else {
+                    recordSynced = this.registerItemOnline(item);
+                }
                 if (recordSynced.equals("SUCCESS")) {
                     //update local db that synced yes
                     int x = new Item_tax_mapBean().saveItem_tax_mapSync(aItemId, 1);
@@ -361,7 +594,7 @@ public class StockManage {
         }
     }
 
-    public String registerItem(Item aItem) {
+    public String registerItemOffline(Item aItem) {
         String ReturnMsg = "";
         try {
             String UnitPriceStr = "";
@@ -413,7 +646,80 @@ public class StockManage {
                 ReturnMsg = dataobject.getString("returnMessage") + ":DecryptedContent";
             }
         } catch (Exception ex) {
-            System.err.println("registerItem:" + ex.getMessage());
+            System.err.println("registerItemOffline:" + ex.getMessage());
+        }
+        return ReturnMsg;
+    }
+
+    public String registerItemOnline(Item aItem) {
+        String ReturnMsg = "";
+        try {
+            String UnitPriceStr = "";
+            if (aItem.getUnitRetailsalePrice() > 0) {
+                UnitPriceStr = " \"unitPrice\": \"" + aItem.getUnitRetailsalePrice() + "\",\n";
+            } else {
+                UnitPriceStr = " \"unitPrice\": \"1\",\n";
+            }
+            String json = "[\n"
+                    + "	{\n"
+                    + "	\"goodsName\": \"" + aItem.getDescription() + "\",\n"
+                    + "	\"goodsCode\": \"" + aItem.getItemId() + "\",\n"
+                    + "	\"measureUnit\": \"" + aItem.getUnit_symbol_tax() + "\",\n"
+                    + UnitPriceStr
+                    + "	\"currency\": \"" + aItem.getCurrency_code_tax() + "\",\n"
+                    + "	\"commodityCategoryId\": \"" + aItem.getItem_code_tax() + "\",\n"
+                    + "	\"haveExciseTax\": \"102\",\n"
+                    + "	\"description\": \"1\",\n"
+                    + "	\"stockPrewarning\": \"" + aItem.getReorderLevel() + "\",\n"
+                    + "	\"pieceMeasureUnit\": \"\",\n"
+                    + "	\"havePieceUnit\": \"102\",\n"
+                    + "	\"pieceUnitPrice\": \"\",\n"
+                    + "	\"packageScaledValue\": \"\",\n"
+                    + "	\"pieceScaledValue\": \"\",\n"
+                    + "	\"exciseDutyCode\": \"\"\n"
+                    + "},\n"
+                    + "]";
+            com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
+            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_ONLINE").getParameter_value());
+            /**
+             * Read Private Key
+             */
+            PrivateKey key = new SecurityPKI().getPrivate(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_FILE").getParameter_value(), Security.Decrypt(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_PASSWORD").getParameter_value()), new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_ALIAS").getParameter_value());
+            //String AESpublickeystring = SecurityPKI.decrypt(new SecurityPKI().AESPublicKey(CompanySetting.getTaxIdentity(), new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value()), key);
+            String AESpublickeystring = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_AES_PUBLIC_KEY").getParameter_value();
+            /**
+             * Encrypt Content
+             */
+            String encryptedcontent = SecurityPKI.AESencrypt(json, Base64.decodeBase64(AESpublickeystring));
+            String signedcontent = Base64.encodeBase64String(new SecurityPKI().sign(encryptedcontent, key));
+            /**
+             * Post Data
+             */
+            String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T130", CompanySetting.getTaxIdentity());
+            //System.out.println("json>:" + json);
+            ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
+            String output = response.getEntity(String.class);
+
+            JSONObject parentjsonObject = new JSONObject(output);
+            JSONObject dataobject = parentjsonObject.getJSONObject("returnStateInfo");
+
+            JSONObject dataobjectcontent = parentjsonObject.getJSONObject("data");
+            String content = dataobjectcontent.getString("content");
+            /**
+             * Decrypt Response
+             */
+            String DecryptedContent = SecurityPKI.AESdecrypt(content, Base64.decodeBase64(AESpublickeystring));
+            //System.out.println("DecryptedContent:" + DecryptedContent);
+            //System.out.println("returnMessage:" + dataobject.getString("returnMessage"));
+            if (DecryptedContent.length() == 2) {
+                ReturnMsg = dataobject.getString("returnMessage");
+            } else {
+                System.out.println("DecryptedContent:" + DecryptedContent);
+                System.out.println("returnMessage:" + dataobject.getString("returnMessage"));
+                ReturnMsg = dataobject.getString("returnMessage") + ":DecryptedContent";
+            }
+        } catch (Exception ex) {
+            System.err.println("registerItemOnline:" + ex.getMessage());
         }
         return ReturnMsg;
     }

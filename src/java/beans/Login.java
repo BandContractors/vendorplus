@@ -261,6 +261,10 @@ public class Login implements Serializable {
                     new Cdc_generalBean().takeNewSnapshot_cash_balanceAtLogin();
                     //Refresh stock and expiry alerts
                     new Alert_generalBean().refreshAlerts();
+                    //API-TAX - take AES public key snapshot
+                    if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0 && new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_MODE").getParameter_value().equals("ONLINE")) {
+                        new Cdc_generalBean().takeNewSnapshot_AesPublicKeyAtLogin();
+                    }
                     //Navigate to the Menu or Home page
                     FacesContext fc = FacesContext.getCurrentInstance();
                     ConfigurableNavigationHandler nav = (ConfigurableNavigationHandler) fc.getApplication().getNavigationHandler();
