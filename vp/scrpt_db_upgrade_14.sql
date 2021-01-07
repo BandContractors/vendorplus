@@ -90,7 +90,7 @@ VALUES('scrpt_db_upgrade_14',87,Now(),'6.0','');
 INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
 VALUES (66, 'API', 'API_TAX_MODE', 'OFFLINE','OFFLINE or ONLINE');
 INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
-VALUES (67, 'API', 'API_TAX_KEYSTORE_FILE', 'XXX.p12','The full file location for the keystore file including the extension such as .p12');
+VALUES (67, 'API', 'API_TAX_KEYSTORE_FILE', '','The full file location for the keystore file including the extension such as d:/key_file_name.p12.p12, /home/key_file_name.p12');
 INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
 VALUES (68, 'API', 'API_TAX_KEYSTORE_PASSWORD', '','(Encrypted password): to change, enter password and click Encrypt before Save');
 INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
