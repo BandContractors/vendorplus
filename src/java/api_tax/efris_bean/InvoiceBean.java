@@ -206,10 +206,11 @@ public class InvoiceBean {
             //basicInformation 
             basicInformation.setCurrency(trans.getCurrencyCode());
             basicInformation.setDeviceNo(new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value());
-            basicInformation.setInvoiceNo(trans.getTransactionNumber());
-            basicInformation.setInvoiceType(Integer.toString(1));
-            basicInformation.setInvoiceKind(Integer.toString(1));
-            basicInformation.setDataSource(Integer.toString(103));
+            //basicInformation.setInvoiceNo(trans.getTransactionNumber());
+            //Leave empty if raising an invoice/receipt. For debit notes, populate the invoiceId that was returned against the original invoice/receipt.
+            basicInformation.setInvoiceType(Integer.toString(1));//1:invoice 4: debit note
+            basicInformation.setInvoiceKind(Integer.toString(1));//1:invoice 2: receipt
+            basicInformation.setDataSource(Integer.toString(103));//101:EFD 102:Windows Client APP 103:WebService API 104:Mis 105:Webportal 106:Offline Mode Enabler
             //basicInformation.setIssuedDate(new UtilityBean().formatDateServer(trans.getTransactionDate()));
             basicInformation.setIssuedDate(new UtilityBean().formatDateTimeServer(trans.getAddDate()));
             try {
@@ -219,7 +220,7 @@ public class InvoiceBean {
             }
 
             //buyerDetails
-            String BuyerType = "B2C";
+            String BuyerType = "B2C";//0: B2B or B2G 1: B2C
             if (null == transactor) {
                 //do nothing
             } else {
@@ -249,6 +250,10 @@ public class InvoiceBean {
                     }
                     if (transactor.getTaxIdentity().length() > 0) {
                         buyerDetails.setBuyerTin(transactor.getTaxIdentity());
+                    }
+                    if (transactor.getPhone().length() > 0) {
+                        buyerDetails.setBuyerMobilePhone(transactor.getPhone());
+                        buyerDetails.setBuyerLinePhone(transactor.getPhone());
                     }
                     if (transactor.getIdNumber().length() > 0) {
                         buyerDetails.setBuyerNinBrn(transactor.getIdNumber());
@@ -322,6 +327,7 @@ public class InvoiceBean {
             summary.setTaxAmount(new UtilityBean().formatDoubleToStringPlain(trans.getTotalVat(), trans.getCurrencyCode()));
             summary.setNetAmount(new UtilityBean().formatDoubleToStringPlain((trans.getGrandTotal() - trans.getTotalVat()), trans.getCurrencyCode()));
             summary.setItemCount(Integer.toString(goodsDetails.size()));
+            summary.setModeCode("0");
         } catch (Exception e) {
             System.err.println("prepareInvoice:" + e.getMessage());
         }
@@ -444,6 +450,8 @@ public class InvoiceBean {
             //-System.out.println("Invoice: " + InvoiceNo);
             //-System.out.println("-------------------------------------");
         } catch (Exception e) {
+            System.out.println("returnCode:" + returnCode);
+            System.out.println("returnMessage:" + returnMessage);
             Logger.getLogger(InvoiceBean.class.getName()).log(Level.SEVERE, null, e);
         }
     }
@@ -872,10 +880,10 @@ public class InvoiceBean {
             basicInformation.setOriInvoiceId(dataobjectbasicInformation.getString("invoiceId"));
             basicInformation.setCurrency(trans.getCurrencyCode());//dataobjectbasicInformation.get("currency").toString()
             basicInformation.setDeviceNo(aDeviceNo);
-            basicInformation.setInvoiceNo(trans.getTransactionNumber());//dataobjectbasicInformation.get("invoiceNo").toString()
-            basicInformation.setInvoiceType(Integer.toString(4));
-            basicInformation.setInvoiceKind(Integer.toString(1));
-            basicInformation.setDataSource(Integer.toString(103));
+            //basicInformation.setInvoiceNo(trans.getTransactionNumber()); //Leave empty if raising an invoice/receipt. For debit notes, populate the invoiceId that was returned against the original invoice/receipt.
+            basicInformation.setInvoiceType(Integer.toString(4));//1:invoice 4: debit note
+            basicInformation.setInvoiceKind(Integer.toString(1));//1:invoice 2: receipt
+            basicInformation.setDataSource(Integer.toString(103));//101:EFD 102:Windows Client APP 103:WebService API
             basicInformation.setIssuedDate(new UtilityBean().formatDateTimeServer(trans.getEditDate()));
             try {
                 basicInformation.setOperator(new UserDetailBean().getUserDetail(trans.getTransactionUserDetailId()).getUserName());
@@ -884,9 +892,32 @@ public class InvoiceBean {
             }
 
             //buyerDetails
-            buyerDetails.setBuyerTin(dataobjectbuyerDetails.get("buyerTin").toString());//transactor.getTaxIdentity()
-            buyerDetails.setBuyerLegalName(dataobjectbuyerDetails.get("buyerLegalName").toString());//transactor.getTransactorNames()
-            buyerDetails.setBuyerType(Integer.toString(1));
+            try {
+                buyerDetails.setBuyerTin(dataobjectbuyerDetails.get("buyerTin").toString());
+            } catch (Exception e) {
+                //do nothing
+            }
+            try {
+                buyerDetails.setBuyerLegalName(dataobjectbuyerDetails.get("buyerLegalName").toString());
+            } catch (Exception e) {
+                //do nothing
+            }
+            buyerDetails.setBuyerType(dataobjectbuyerDetails.get("buyerType").toString());
+            try {
+                buyerDetails.setBuyerMobilePhone(dataobjectbuyerDetails.get("buyerMobilePhone").toString());
+            } catch (Exception e) {
+                //do nothing
+            }
+            try {
+                buyerDetails.setBuyerLinePhone(dataobjectbuyerDetails.get("buyerLinePhone").toString());
+            } catch (Exception e) {
+                //do nothing
+            }
+            try {
+                buyerDetails.setBuyerNinBrn(dataobjectbuyerDetails.get("buyerNinBrn").toString());
+            } catch (Exception e) {
+                //do nothing
+            }
             //extend
 
             //goodsDetails
@@ -964,8 +995,9 @@ public class InvoiceBean {
             summary.setTaxAmount(new UtilityBean().formatDoubleToStringPlain(ChangedTAmount, trans.getCurrencyCode()));
             summary.setNetAmount(new UtilityBean().formatDoubleToStringPlain(ChangedNAmount, trans.getCurrencyCode()));
             summary.setItemCount(Integer.toString(goodsDetails.size()));
+            summary.setModeCode("0");
         } catch (Exception e) {
-            System.err.println("prepareDebit_note:" + e.getMessage());
+            System.err.println("prepareDebit_note_offline:" + e.getMessage());
         }
     }
 
@@ -1040,10 +1072,10 @@ public class InvoiceBean {
             basicInformation.setOriInvoiceId(dataobjectbasicInformation.getString("invoiceId"));
             basicInformation.setCurrency(trans.getCurrencyCode());//dataobjectbasicInformation.get("currency").toString()
             basicInformation.setDeviceNo(aDeviceNo);
-            basicInformation.setInvoiceNo(trans.getTransactionNumber());//dataobjectbasicInformation.get("invoiceNo").toString()
-            basicInformation.setInvoiceType(Integer.toString(4));
-            basicInformation.setInvoiceKind(Integer.toString(1));
-            basicInformation.setDataSource(Integer.toString(103));
+            //basicInformation.setInvoiceNo(trans.getTransactionNumber()); //Leave empty if raising an invoice/receipt. For debit notes, populate the invoiceId that was returned against the original invoice/receipt.
+            basicInformation.setInvoiceType(Integer.toString(4));//1:invoice 4: debit note
+            basicInformation.setInvoiceKind(Integer.toString(1));//1:invoice 2: receipt
+            basicInformation.setDataSource(Integer.toString(103));//101:EFD 102:Windows Client APP 103:WebService API
             basicInformation.setIssuedDate(new UtilityBean().formatDateTimeServer(trans.getEditDate()));
             try {
                 basicInformation.setOperator(new UserDetailBean().getUserDetail(trans.getTransactionUserDetailId()).getUserName());
@@ -1052,9 +1084,32 @@ public class InvoiceBean {
             }
 
             //buyerDetails
-            buyerDetails.setBuyerTin(dataobjectbuyerDetails.get("buyerTin").toString());//transactor.getTaxIdentity()
-            buyerDetails.setBuyerLegalName(dataobjectbuyerDetails.get("buyerLegalName").toString());//transactor.getTransactorNames()
-            buyerDetails.setBuyerType(Integer.toString(1));
+            try {
+                buyerDetails.setBuyerTin(dataobjectbuyerDetails.get("buyerTin").toString());
+            } catch (Exception e) {
+                //do nothing
+            }
+            try {
+                buyerDetails.setBuyerLegalName(dataobjectbuyerDetails.get("buyerLegalName").toString());
+            } catch (Exception e) {
+                //do nothing
+            }
+            buyerDetails.setBuyerType(dataobjectbuyerDetails.get("buyerType").toString());
+            try {
+                buyerDetails.setBuyerMobilePhone(dataobjectbuyerDetails.get("buyerMobilePhone").toString());
+            } catch (Exception e) {
+                //do nothing
+            }
+            try {
+                buyerDetails.setBuyerLinePhone(dataobjectbuyerDetails.get("buyerLinePhone").toString());
+            } catch (Exception e) {
+                //do nothing
+            }
+            try {
+                buyerDetails.setBuyerNinBrn(dataobjectbuyerDetails.get("buyerNinBrn").toString());
+            } catch (Exception e) {
+                //do nothing
+            }
             //extend
 
             //goodsDetails
@@ -1132,8 +1187,9 @@ public class InvoiceBean {
             summary.setTaxAmount(new UtilityBean().formatDoubleToStringPlain(ChangedTAmount, trans.getCurrencyCode()));
             summary.setNetAmount(new UtilityBean().formatDoubleToStringPlain(ChangedNAmount, trans.getCurrencyCode()));
             summary.setItemCount(Integer.toString(goodsDetails.size()));
+            summary.setModeCode("0");
         } catch (Exception e) {
-            System.err.println("prepareDebit_note:" + e.getMessage());
+            System.err.println("prepareDebit_note_online:" + e.getMessage());
         }
     }
 

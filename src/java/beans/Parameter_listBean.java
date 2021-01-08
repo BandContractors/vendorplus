@@ -285,7 +285,7 @@ public class Parameter_listBean implements Serializable {
 
     public List<Parameter_list> getParameterListAll() {
         String sql;
-        sql = "SELECT * FROM parameter_list ORDER BY context ASC";
+        sql = "SELECT * FROM parameter_list ORDER BY context ASC,parameter_name ASC";
         ResultSet rs = null;
         List<Parameter_list> pls = new ArrayList<Parameter_list>();
         try (
@@ -297,16 +297,8 @@ public class Parameter_listBean implements Serializable {
                 this.setParameter_listFromResultset(aParameter_list, rs);
                 pls.add(aParameter_list);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
         }
         return pls;
     }
