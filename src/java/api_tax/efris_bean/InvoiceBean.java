@@ -46,6 +46,7 @@ import javax.faces.bean.SessionScoped;
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import utilities.GzipUtils;
 import utilities.UtilityBean;
 import utilities.Security;
 import utilities.SecurityPKI;
@@ -364,9 +365,20 @@ public class InvoiceBean {
             //-System.out.println("-------------------------------------");
             JSONObject dataobjectcontent = parentjsonObject.getJSONObject("data");
             String content = dataobjectcontent.getString("content");
-            //System.out.println(AESpublickeystring);
-            //String DecryptedContent = ExtractKeys.AESdecrypt(content, Base64.decodeBase64(AESpublickeystring));
-            String DecryptedContent = new String(Base64.decodeBase64(content));
+            JSONObject dataDescription = dataobjectcontent.getJSONObject("dataDescription");
+            String zipCode = "0";
+            String DecryptedContent = "";
+            try {
+                zipCode = dataDescription.getString("zipCode");
+            } catch (Exception e) {
+                //do nothing
+            }
+            if (zipCode.equals("0")) {
+                DecryptedContent = new String(Base64.decodeBase64(content));
+            } else {
+                byte[] str = GzipUtils.decompress(Base64.decodeBase64(content));
+                DecryptedContent = new String(str);
+            }
             //-System.out.println(DecryptedContent);
             //-System.out.println("-------------------------------------");
             JSONObject parentbasicInformationjsonObject = new JSONObject(DecryptedContent);
@@ -434,7 +446,22 @@ public class InvoiceBean {
             /**
              * Decrypt Response
              */
-            String DecryptedContent = SecurityPKI.AESdecrypt(content, Base64.decodeBase64(AESpublickeystring));
+            //String DecryptedContent = SecurityPKI.AESdecrypt(content, Base64.decodeBase64(AESpublickeystring));
+            JSONObject dataDescription = dataobjectcontent.getJSONObject("dataDescription");
+            String zipCode = "0";
+            String DecryptedContent = "";
+            try {
+                zipCode = dataDescription.getString("zipCode");
+            } catch (Exception e) {
+                //do nothing
+            }
+            if (zipCode.equals("0")) {
+                DecryptedContent = SecurityPKI.AESdecrypt(content, Base64.decodeBase64(AESpublickeystring));
+            } else {
+                byte[] str = GzipUtils.decompress(Base64.decodeBase64(content));
+                DecryptedContent = SecurityPKI.AESdecrypt2(str, Base64.decodeBase64(AESpublickeystring));
+            }
+
             //-System.out.println(DecryptedContent);
             //-System.out.println("-------------------------------------");
             JSONObject parentbasicInformationjsonObject = new JSONObject(DecryptedContent);
@@ -535,7 +562,20 @@ public class InvoiceBean {
             JSONObject dataobjectcontent = parentjsonObject.getJSONObject("data");
             String content = dataobjectcontent.getString("content");
 
-            String DecryptedContent = new String(Base64.decodeBase64(content));
+            JSONObject dataDescription = dataobjectcontent.getJSONObject("dataDescription");
+            String zipCode = "0";
+            String DecryptedContent = "";
+            try {
+                zipCode = dataDescription.getString("zipCode");
+            } catch (Exception e) {
+                //do nothing
+            }
+            if (zipCode.equals("0")) {
+                DecryptedContent = new String(Base64.decodeBase64(content));
+            } else {
+                byte[] str = GzipUtils.decompress(Base64.decodeBase64(content));
+                DecryptedContent = new String(str);
+            }
 
             JSONObject parentbasicInformationjsonObject = new JSONObject(DecryptedContent);
             JSONArray jSONArray_GoodsDetials = parentbasicInformationjsonObject.getJSONArray("goodsDetails");
@@ -612,8 +652,20 @@ public class InvoiceBean {
             dataobjectcontent = parentjsonObject.getJSONObject("data");
             content = dataobjectcontent.getString("content");
 
-            DecryptedContent = new String(Base64.decodeBase64(content));
-            //System.out.println("DecryptedContent:" + DecryptedContent);
+            dataDescription = dataobjectcontent.getJSONObject("dataDescription");
+            zipCode = "0";
+            DecryptedContent = "";
+            try {
+                zipCode = dataDescription.getString("zipCode");
+            } catch (Exception e) {
+                //do nothing
+            }
+            if (zipCode.equals("0")) {
+                DecryptedContent = new String(Base64.decodeBase64(content));
+            } else {
+                byte[] str = GzipUtils.decompress(Base64.decodeBase64(content));
+                DecryptedContent = new String(str);
+            }
 
             RetMsg = dataobject.getString("returnMessage");
             //System.out.println("returnMessage:" + RetMsg);
@@ -671,7 +723,20 @@ public class InvoiceBean {
             /**
              * Decrypt Response
              */
-            String DecryptedContent = SecurityPKI.AESdecrypt(content, Base64.decodeBase64(AESpublickeystring));
+            JSONObject dataDescription = dataobjectcontent.getJSONObject("dataDescription");
+            String zipCode = "0";
+            String DecryptedContent = "";
+            try {
+                zipCode = dataDescription.getString("zipCode");
+            } catch (Exception e) {
+                //do nothing
+            }
+            if (zipCode.equals("0")) {
+                DecryptedContent = SecurityPKI.AESdecrypt(content, Base64.decodeBase64(AESpublickeystring));
+            } else {
+                byte[] str = GzipUtils.decompress(Base64.decodeBase64(content));
+                DecryptedContent = SecurityPKI.AESdecrypt2(str, Base64.decodeBase64(AESpublickeystring));
+            }
 
             JSONObject parentbasicInformationjsonObject = new JSONObject(DecryptedContent);
             JSONArray jSONArray_GoodsDetials = parentbasicInformationjsonObject.getJSONArray("goodsDetails");
@@ -758,8 +823,20 @@ public class InvoiceBean {
             /**
              * Decrypt Response
              */
-            DecryptedContent = SecurityPKI.AESdecrypt(content, Base64.decodeBase64(AESpublickeystring));
-            //System.out.println("DecryptedContent:" + DecryptedContent);
+            dataDescription = dataobjectcontent.getJSONObject("dataDescription");
+            zipCode = "0";
+            DecryptedContent = "";
+            try {
+                zipCode = dataDescription.getString("zipCode");
+            } catch (Exception e) {
+                //do nothing
+            }
+            if (zipCode.equals("0")) {
+                DecryptedContent = SecurityPKI.AESdecrypt(content, Base64.decodeBase64(AESpublickeystring));
+            } else {
+                byte[] str = GzipUtils.decompress(Base64.decodeBase64(content));
+                DecryptedContent = SecurityPKI.AESdecrypt2(str, Base64.decodeBase64(AESpublickeystring));
+            }
 
             RetMsg = dataobject.getString("returnMessage");
             //System.out.println("returnMessage:" + RetMsg);
@@ -859,7 +936,20 @@ public class InvoiceBean {
             JSONObject dataobjectcontent = parentjsonObject.getJSONObject("data");
             String content = dataobjectcontent.getString("content");
 
-            String DecryptedContent = new String(Base64.decodeBase64(content));
+            JSONObject dataDescription = dataobjectcontent.getJSONObject("dataDescription");
+            String zipCode = "0";
+            String DecryptedContent = "";
+            try {
+                zipCode = dataDescription.getString("zipCode");
+            } catch (Exception e) {
+                //do nothing
+            }
+            if (zipCode.equals("0")) {
+                DecryptedContent = new String(Base64.decodeBase64(content));
+            } else {
+                byte[] str = GzipUtils.decompress(Base64.decodeBase64(content));
+                DecryptedContent = new String(str);
+            }
 
             JSONObject parentbasicInformationjsonObject = new JSONObject(DecryptedContent);
             JSONArray jSONArray_GoodsDetials = parentbasicInformationjsonObject.getJSONArray("goodsDetails");
@@ -1051,7 +1141,20 @@ public class InvoiceBean {
             /**
              * Decrypt Response
              */
-            String DecryptedContent = SecurityPKI.AESdecrypt(content, Base64.decodeBase64(AESpublickeystring));
+            JSONObject dataDescription = dataobjectcontent.getJSONObject("dataDescription");
+            String zipCode = "0";
+            String DecryptedContent = "";
+            try {
+                zipCode = dataDescription.getString("zipCode");
+            } catch (Exception e) {
+                //do nothing
+            }
+            if (zipCode.equals("0")) {
+                DecryptedContent = SecurityPKI.AESdecrypt(content, Base64.decodeBase64(AESpublickeystring));
+            } else {
+                byte[] str = GzipUtils.decompress(Base64.decodeBase64(content));
+                DecryptedContent = SecurityPKI.AESdecrypt2(str, Base64.decodeBase64(AESpublickeystring));
+            }
 
             JSONObject parentbasicInformationjsonObject = new JSONObject(DecryptedContent);
             JSONArray jSONArray_GoodsDetials = parentbasicInformationjsonObject.getJSONArray("goodsDetails");
@@ -1225,8 +1328,22 @@ public class InvoiceBean {
             //-System.out.println("-------------------------------------");
             JSONObject dataobjectcontent = parentjsonObject.getJSONObject("data");
             String content = dataobjectcontent.getString("content");
-            //System.out.println(AESpublickeystring);
-            String DecryptedContent = new String(Base64.decodeBase64(content));
+
+            JSONObject dataDescription = dataobjectcontent.getJSONObject("dataDescription");
+            String zipCode = "0";
+            String DecryptedContent = "";
+            try {
+                zipCode = dataDescription.getString("zipCode");
+            } catch (Exception e) {
+                //do nothing
+            }
+            if (zipCode.equals("0")) {
+                DecryptedContent = new String(Base64.decodeBase64(content));
+            } else {
+                byte[] str = GzipUtils.decompress(Base64.decodeBase64(content));
+                DecryptedContent = new String(str);
+            }
+
             //System.out.println(DecryptedContent);
             //-System.out.println("-------------------------------------");
             JSONObject parentbasicInformationjsonObject = new JSONObject(DecryptedContent);
@@ -1294,7 +1411,21 @@ public class InvoiceBean {
             /**
              * Decrypt Response
              */
-            String DecryptedContent = SecurityPKI.AESdecrypt(content, Base64.decodeBase64(AESpublickeystring));
+            JSONObject dataDescription = dataobjectcontent.getJSONObject("dataDescription");
+            String zipCode = "0";
+            String DecryptedContent = "";
+            try {
+                zipCode = dataDescription.getString("zipCode");
+            } catch (Exception e) {
+                //do nothing
+            }
+            if (zipCode.equals("0")) {
+                DecryptedContent = SecurityPKI.AESdecrypt(content, Base64.decodeBase64(AESpublickeystring));
+            } else {
+                byte[] str = GzipUtils.decompress(Base64.decodeBase64(content));
+                DecryptedContent = SecurityPKI.AESdecrypt2(str, Base64.decodeBase64(AESpublickeystring));
+            }
+
             //System.out.println(DecryptedContent);
             //-System.out.println("-------------------------------------");
             JSONObject parentbasicInformationjsonObject = new JSONObject(DecryptedContent);
