@@ -38,10 +38,5 @@ CREATE  TABLE acc_currency_tax_list (
   currency_name_tax VARCHAR(255) NULL ,
   PRIMARY KEY (acc_currency_list_id) );
 
-INSERT INTO acc_currency_tax_list (currency_code_tax, currency_name_tax) VALUES ('101', 'UGX');
-INSERT INTO acc_currency_tax_list (currency_code_tax, currency_name_tax) VALUES ('102', 'USD');
-INSERT INTO acc_currency_tax_list (currency_code_tax, currency_name_tax) VALUES ('103', 'GBP');
-INSERT INTO acc_currency_tax_list (currency_code_tax, currency_name_tax) VALUES ('104', 'EUR');
-
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_11',28,Now(),'6.0','');

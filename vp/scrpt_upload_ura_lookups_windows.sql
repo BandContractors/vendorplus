@@ -6,3 +6,7 @@ LOAD DATA INFILE 'C:/wamp64/tmp/unit_tax_list.csv' INTO TABLE `unit_tax_list` FI
 LOAD DATA INFILE 'C:/wamp64/tmp/item_unspsc.csv' INTO TABLE `item_unspsc` FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\r\n' IGNORE 1 LINES;
 LOAD DATA INFILE 'C:/wamp64/tmp/iso_country_code.csv' INTO TABLE `iso_country_code` FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\r\n' IGNORE 1 LINES;
 
+INSERT INTO acc_currency_tax_list (currency_code_tax, currency_name_tax) VALUES ('101', 'UGX');
+INSERT INTO acc_currency_tax_list (currency_code_tax, currency_name_tax) VALUES ('102', 'USD');
+INSERT INTO acc_currency_tax_list (currency_code_tax, currency_name_tax) VALUES ('103', 'GBP');
+INSERT INTO acc_currency_tax_list (currency_code_tax, currency_name_tax) VALUES ('104', 'EUR');
