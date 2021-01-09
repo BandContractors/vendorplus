@@ -168,15 +168,12 @@ public class SecurityPKI implements Serializable {
         return null;
     }
 
-    public static String AESdecrypt2(byte[] bytearrayToDecrypt, byte[] secret) {
+    public static String AESdecrypt2(byte[] strToDecrypt, byte[] secret) {
         try {
-            //setKey(secret);
-            SecretKey originalKey = new SecretKeySpec(secret, 0, 16, "AES");
-
+            SecretKeySpec originalKey = new SecretKeySpec(secret, "AES");
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
-
             cipher.init(Cipher.DECRYPT_MODE, originalKey);
-            return new String(cipher.doFinal(bytearrayToDecrypt));
+            return new String(cipher.doFinal(strToDecrypt));
         } catch (Exception e) {
             System.out.println("Error while decrypting(AESdecrypt2): " + e.toString());
         }
