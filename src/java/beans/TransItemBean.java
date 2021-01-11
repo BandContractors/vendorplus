@@ -5573,6 +5573,16 @@ public class TransItemBean implements Serializable {
         aTransItem.setAmountExcVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getAmountExcVat()));
     }
 
+    public void roundTransItemsAmount_prev(Trans aTrans, TransItem aTransItem) {
+        aTransItem.setUnitVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getUnitVat()));
+        aTransItem.setUnitPriceExcVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getUnitPriceExcVat()));
+        aTransItem.setUnitPriceIncVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getUnitPriceIncVat()));
+        aTransItem.setUnitProfitMargin(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getUnitProfitMargin()));
+        aTransItem.setAmount(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getAmount()));
+        aTransItem.setAmountIncVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getAmountIncVat()));
+        aTransItem.setAmountExcVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getAmountExcVat()));
+    }
+
     public void addTransItemCallCEC(int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aTrans, StatusBean aStatusBean, List<TransItem> aActiveTransItems, TransItem NewTransItem, Item aSelectedItem) {
         String status = "";
         aStatusBean.setItemAddedStatus("");
@@ -5617,7 +5627,7 @@ public class TransItemBean implements Serializable {
                 new TransItemBean().refreshCurrentStock(aActiveTransItems);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             System.err.println("addTransItemCallCEC:" + e.getMessage());
         }
     }

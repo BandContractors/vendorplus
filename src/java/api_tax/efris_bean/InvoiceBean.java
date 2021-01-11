@@ -328,7 +328,7 @@ public class InvoiceBean {
             summary.setTaxAmount(new UtilityBean().formatDoubleToStringPlain(trans.getTotalVat(), trans.getCurrencyCode()));
             summary.setNetAmount(new UtilityBean().formatDoubleToStringPlain((trans.getGrandTotal() - trans.getTotalVat()), trans.getCurrencyCode()));
             summary.setItemCount(Integer.toString(goodsDetails.size()));
-            summary.setModeCode("0");
+            summary.setModeCode("1");
         } catch (Exception e) {
             System.err.println("prepareInvoice:" + e.getMessage());
         }
@@ -346,14 +346,14 @@ public class InvoiceBean {
             eFRISInvoice.setTaxDetails(taxDetails);
             Gson gson = new Gson();
             String json = gson.toJson(eFRISInvoice);
-            //System.out.println("json:" + json);
+            System.out.println("json:" + json);
 
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
             WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_OFFLINE").getParameter_value());
             String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", basicInformation.getDeviceNo(), "T109", sellerDetails.getTin());
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             String output = response.getEntity(String.class);
-            //System.out.println("output:" + output);
+            System.out.println("output:" + output);
 
             JSONObject parentjsonObject = new JSONObject(output);
             JSONObject dataobject = parentjsonObject.getJSONObject("returnStateInfo");
@@ -391,7 +391,7 @@ public class InvoiceBean {
             QrCode = summary.getString("qrCode");
             //System.out.println("QrCode:" + QrCode.length() + ":" + QrCode);
             //-System.out.println("AntiFakeCode: " + AntifakeCode);
-            //-System.out.println("Invoice: " + InvoiceNo);
+            System.out.println("Invoice: " + InvoiceNo);
             //-System.out.println("-------------------------------------");
         } catch (Exception e) {
             Logger.getLogger(InvoiceBean.class.getName()).log(Level.SEVERE, null, e);
@@ -410,7 +410,7 @@ public class InvoiceBean {
             eFRISInvoice.setTaxDetails(taxDetails);
             Gson gson = new Gson();
             String json = gson.toJson(eFRISInvoice);
-            //System.out.println("json:" + json);
+            System.out.println("json:" + json);
 
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
             WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_ONLINE").getParameter_value());
@@ -431,7 +431,7 @@ public class InvoiceBean {
             String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", basicInformation.getDeviceNo(), "T109", sellerDetails.getTin());
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             String output = response.getEntity(String.class);
-            //System.out.println("output:" + output);
+            System.out.println("output:" + output);
 
             JSONObject parentjsonObject = new JSONObject(output);
             JSONObject dataobject = parentjsonObject.getJSONObject("returnStateInfo");
@@ -474,7 +474,7 @@ public class InvoiceBean {
             QrCode = summary.getString("qrCode");
             //System.out.println("QrCode:" + QrCode.length() + ":" + QrCode);
             //-System.out.println("AntiFakeCode: " + AntifakeCode);
-            //-System.out.println("Invoice: " + InvoiceNo);
+            System.out.println("Invoice: " + InvoiceNo);
             //-System.out.println("-------------------------------------");
         } catch (Exception e) {
             System.out.println("returnCode:" + returnCode);
@@ -1085,7 +1085,7 @@ public class InvoiceBean {
             summary.setTaxAmount(new UtilityBean().formatDoubleToStringPlain(ChangedTAmount, trans.getCurrencyCode()));
             summary.setNetAmount(new UtilityBean().formatDoubleToStringPlain(ChangedNAmount, trans.getCurrencyCode()));
             summary.setItemCount(Integer.toString(goodsDetails.size()));
-            summary.setModeCode("0");
+            summary.setModeCode("1");
         } catch (Exception e) {
             System.err.println("prepareDebit_note_offline:" + e.getMessage());
         }
@@ -1290,7 +1290,7 @@ public class InvoiceBean {
             summary.setTaxAmount(new UtilityBean().formatDoubleToStringPlain(ChangedTAmount, trans.getCurrencyCode()));
             summary.setNetAmount(new UtilityBean().formatDoubleToStringPlain(ChangedNAmount, trans.getCurrencyCode()));
             summary.setItemCount(Integer.toString(goodsDetails.size()));
-            summary.setModeCode("0");
+            summary.setModeCode("1");
         } catch (Exception e) {
             System.err.println("prepareDebit_note_online:" + e.getMessage());
         }
