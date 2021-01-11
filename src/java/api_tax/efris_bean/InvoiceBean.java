@@ -15,6 +15,7 @@ import api_tax.efris.innerclasses.PayWay;
 import api_tax.efris.innerclasses.SellerDetails;
 import api_tax.efris.innerclasses.Summary;
 import api_tax.efris.innerclasses.TaxDetails;
+import beans.AccCurrencyBean;
 import beans.ItemBean;
 import beans.Item_tax_mapBean;
 import beans.Parameter_listBean;
@@ -175,6 +176,186 @@ public class InvoiceBean {
     }
 
     public void prepareInvoice(long aTransId) {
+        try {
+            Trans trans = new Trans();
+            List<TransItem> transitems = new ArrayList<>();
+            Transactor transactor = new Transactor();
+            try {
+                trans = new TransBean().getTrans(aTransId);
+            } catch (Exception e) {
+                //
+            }
+            try {
+                transitems = new TransItemBean().getTransItemsByTransactionId(aTransId);
+            } catch (Exception e) {
+                //
+            }
+            try {
+                if (trans.getBillTransactorId() > 0) {
+                    transactor = new TransactorBean().getTransactor(trans.getBillTransactorId());
+                }
+            } catch (Exception e) {
+                //
+            }
+
+            //sellerDetails
+            sellerDetails.setTin(CompanySetting.getTaxIdentity());
+            sellerDetails.setBusinessName(CompanySetting.getLICENSE_CLIENT_NAME());
+            sellerDetails.setLegalName(new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "PAYEE_NAME").getParameter_value());
+            sellerDetails.setEmailAddress(CompanySetting.getEmail());
+            sellerDetails.setAddress(CompanySetting.getPhysicalAddress());
+
+            //basicInformation 
+            basicInformation.setCurrency(trans.getCurrencyCode());
+            basicInformation.setDeviceNo(new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value());
+            //basicInformation.setInvoiceNo(trans.getTransactionNumber());
+            //Leave empty if raising an invoice/receipt. For debit notes, populate the invoiceId that was returned against the original invoice/receipt.
+            basicInformation.setInvoiceType(Integer.toString(1));//1:invoice 4: debit note
+            basicInformation.setInvoiceKind(Integer.toString(1));//1:invoice 2: receipt
+            basicInformation.setDataSource(Integer.toString(103));//101:EFD 102:Windows Client APP 103:WebService API 104:Mis 105:Webportal 106:Offline Mode Enabler
+            //basicInformation.setIssuedDate(new UtilityBean().formatDateServer(trans.getTransactionDate()));
+            basicInformation.setIssuedDate(new UtilityBean().formatDateTimeServer(trans.getAddDate()));
+            try {
+                basicInformation.setOperator(new UserDetailBean().getUserDetail(trans.getTransactionUserDetailId()).getUserName());
+            } catch (Exception e) {
+                basicInformation.setOperator("System");
+            }
+
+            //buyerDetails
+            String BuyerType = "B2C";//0: B2B or B2G 1: B2C
+            if (null == transactor) {
+                //do nothing
+            } else {
+                if (transactor.getTransactorId() > 0) {
+                    if (transactor.getCategory().equals("Business")) {
+                        BuyerType = "B2B";
+                    } else if (transactor.getCategory().equals("Government")) {
+                        BuyerType = "B2G";
+                    } else {
+                        BuyerType = "B2C";
+                    }
+                } else {
+                    BuyerType = "B2C";
+                }
+            }
+            if (BuyerType.equals("B2B") || BuyerType.equals("B2G")) {
+                buyerDetails.setBuyerType(Integer.toString(0));
+            } else {
+                buyerDetails.setBuyerType(Integer.toString(1));
+            }
+            if (null == transactor) {
+                buyerDetails.setBuyerLegalName("Walk-In Customer");
+            } else {
+                if (transactor.getTransactorId() > 0) {
+                    if (transactor.getTransactorNames().length() > 0) {
+                        buyerDetails.setBuyerLegalName(transactor.getTransactorNames());
+                    }
+                    if (transactor.getTaxIdentity().length() > 0) {
+                        buyerDetails.setBuyerTin(transactor.getTaxIdentity());
+                    }
+                    if (transactor.getPhone().length() > 0) {
+                        buyerDetails.setBuyerMobilePhone(transactor.getPhone());
+                        buyerDetails.setBuyerLinePhone(transactor.getPhone());
+                    }
+                    if (transactor.getIdNumber().length() > 0) {
+                        buyerDetails.setBuyerNinBrn(transactor.getIdNumber());
+                    }
+                } else {
+                    buyerDetails.setBuyerLegalName("Walk-In Customer");
+                }
+            }
+
+            //extend
+            //goodsDetails
+            Item itm = null;
+            Item_tax_map im = null;
+            int OrderNo = 0;
+            Double TotalVat = 0.0;
+            Double TotalAmountIncVat = 0.0;
+            Double TotalAmountExcVat = 0.0;
+            for (int i = 0; i < transitems.size(); i++) {
+                itm = new ItemBean().getItem(transitems.get(i).getItemId());
+                im = new Item_tax_mapBean().getItem_tax_map(transitems.get(i).getItemId());
+                if (null != itm && null != im) {
+                    GoodsDetails gd = new GoodsDetails();
+                    gd.setItem(itm.getDescription());//Hima Cement
+                    gd.setItemCode(Long.toString(itm.getItemId()));//147
+                    gd.setQty(Double.toString(transitems.get(i).getItemQty()));
+                    try {
+                        String UnitSymbolTax = new UnitBean().getUnit(itm.getUnitId()).getUnit_symbol_tax();
+                        if (null == UnitSymbolTax) {
+                            gd.setUnitOfMeasure("PCE");
+                        } else {
+                            gd.setUnitOfMeasure(UnitSymbolTax);
+                        }
+                    } catch (Exception e) {
+                        gd.setUnitOfMeasure("PCE");
+                    }
+                    //gd.setUnitPrice(Double.toString(transitems.get(i).getUnitPriceIncVat()));
+                    //gd.setTax(Double.toString(transitems.get(i).getUnitVat()));
+                    gd.setTotal(Double.toString(transitems.get(i).getAmountIncVat()));
+                    Double vatPerc = transitems.get(i).getVatPerc();
+                    Double tr = vatPerc / 100;
+                    gd.setTaxRate(Double.toString(tr));
+                    //start - new calc
+                    Double Qty = transitems.get(i).getItemQty();
+                    Double AmountIncVat = transitems.get(i).getAmountIncVat();
+                    Double UnitPriceIncVat = AmountIncVat / Qty;
+                    Double UnitPriceExcVat = UnitPriceIncVat / (1 + tr);
+                    Double UnitVat = UnitPriceIncVat - UnitPriceExcVat;
+                    Double AmountExcVat = UnitPriceExcVat * Qty;
+                    TotalVat = TotalVat + (Qty * UnitVat);
+                    TotalAmountIncVat = TotalAmountIncVat + AmountIncVat;
+                    TotalAmountExcVat = TotalAmountExcVat + AmountExcVat;
+                    UnitPriceIncVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceIncVat);
+                    UnitPriceExcVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceExcVat);
+                    UnitVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitVat);
+                    gd.setUnitPrice(Double.toString(UnitPriceIncVat));
+                    gd.setTax(Double.toString(UnitVat * Qty));
+                    //end - new calc
+                    gd.setDiscountFlag(Integer.toString(2));//0=Discount amount,1=Discounted goods,2=None
+                    gd.setExciseFlag(Integer.toString(2));
+                    gd.setDeemedFlag(Integer.toString(2));
+                    gd.setOrderNumber(Integer.toString(OrderNo));
+                    gd.setCategoryId("");
+                    gd.setCategoryName("");
+                    gd.setGoodsCategoryId(im.getItem_code_tax());//code for Cement
+                    gd.setGoodsCategoryName("");
+                    //exciseRate;exciseRule;exciseTax;pack;stick;exciseUnit;exciseCurrency;exciseRateName;
+                    goodsDetails.add(gd);
+                    OrderNo = OrderNo + 1;
+                }
+            }
+
+            //taxDetails
+            TotalVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), TotalVat);
+            TotalAmountIncVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), TotalAmountIncVat);
+            TotalAmountExcVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), TotalAmountExcVat);
+            TaxDetails td = null;
+            if (TotalVat > 0) {
+                td = new TaxDetails();
+                td.setGrossAmount(Double.toString(TotalAmountIncVat));
+                td.setTaxCategory("VAT");
+                td.setTaxRateName("STANDARD");
+                Double vatPerc = trans.getVatPerc();
+                Double tr = vatPerc / 100;
+                td.setTaxRate(Double.toString(tr));
+                td.setTaxAmount(Double.toString(TotalVat));
+                td.setNetAmount(Double.toString(TotalAmountExcVat));
+                taxDetails.add(td);
+            }
+            //summary
+            summary.setGrossAmount(Double.toString(TotalAmountIncVat));
+            summary.setTaxAmount(Double.toString(TotalVat));
+            summary.setNetAmount(Double.toString(TotalAmountExcVat));
+            summary.setItemCount(Integer.toString(goodsDetails.size()));
+            summary.setModeCode("1");
+        } catch (Exception e) {
+            System.err.println("prepareInvoice:" + e.getMessage());
+        }
+    }
+
+    public void prepareInvoice_Prev(long aTransId) {
         try {
             Trans trans = new Trans();
             List<TransItem> transitems = new ArrayList<>();
@@ -587,37 +768,61 @@ public class InvoiceBean {
             JSONArray jSONArray_GoodsDetialsNew = new JSONArray();
             JSONObject jsonObj;
             int itemcount = 0;
+            Double TotalVat = 0.0;
+            Double TotalAmountIncVat = 0.0;
+            Double TotalAmountExcVat = 0.0;
             for (int i = 0; i < jSONArray_GoodsDetials.length(); i++) {
                 jsonObj = (JSONObject) jSONArray_GoodsDetials.get(i);
                 TransItem ti = this.getTransItemFromList(jsonObj.get("itemCode").toString(), transitems);
-                Double ChangedQty = ti.getItemQty() - Double.parseDouble(jsonObj.get("qty").toString());//can be + or -
-                Double ChangedVatAmt = ti.getAmountIncVat() - Double.parseDouble(jsonObj.get("total").toString());//can be + or -
-                Double ChangedTax = ti.getUnitVat() - Double.parseDouble(jsonObj.get("tax").toString());//can be + or -
-                jsonObj.put("qty", "" + ChangedQty + "");
-                jsonObj.put("total", "" + ChangedVatAmt + "");
-                jsonObj.put("tax", "" + ChangedVatAmt + "");
+                Double ChangedQty = Double.parseDouble(jsonObj.get("qty").toString()) - ti.getItemQty();
+                Double ChangedAmt = Double.parseDouble(jsonObj.get("total").toString()) - ti.getAmountIncVat();
+                Double vatPerc = ti.getVatPerc();
+                Double tr = vatPerc / 100;
+                //gd.setTaxRate(Double.toString(tr));
+                //start - new calc
+                Double Qty = ChangedQty;
+                Double AmountIncVat = ChangedAmt;//transitems.get(i).getAmountIncVat();
+                Double UnitPriceIncVat = AmountIncVat / Qty;
+                Double UnitPriceExcVat = UnitPriceIncVat / (1 + tr);
+                Double UnitVat = UnitPriceIncVat - UnitPriceExcVat;
+                Double AmountExcVat = UnitPriceExcVat * Qty;
+                TotalVat = TotalVat + (Qty * UnitVat);
+                TotalAmountIncVat = TotalAmountIncVat + AmountIncVat;
+                TotalAmountExcVat = TotalAmountExcVat + AmountExcVat;
+                UnitPriceIncVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceIncVat);
+                UnitPriceExcVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceExcVat);
+                UnitVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitVat);
+                //gd.setUnitPrice(Double.toString(UnitPriceIncVat));
+                //gd.setTax(Double.toString(UnitVat));
+                //end - new calc
+                jsonObj.put("qty", "" + (-1 * ChangedQty) + "");
+                jsonObj.put("total", "" + (-1 * ChangedAmt) + "");
+                jsonObj.put("tax", "" + (-1 * UnitVat) + "");
                 if (ChangedQty != 0) {
                     jSONArray_GoodsDetialsNew.put(jsonObj);
                     itemcount = itemcount + 1;
                 }
             }
             //tax details
+            TotalVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), TotalVat);
+            TotalAmountIncVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), TotalAmountIncVat);
+            TotalAmountExcVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), TotalAmountExcVat);
             for (int i = 0; i < jSONArray_TaxDetails.length(); i++) {
                 jsonObj = (JSONObject) jSONArray_TaxDetails.get(i);
-                Double ChangedNetAmount = trans.getTotalStdVatableAmount() - Double.parseDouble(jsonObj.get("netAmount").toString());
-                Double ChangedTaxAmount = trans.getTotalVat() - Double.parseDouble(jsonObj.get("taxAmount").toString());
-                Double ChangedGrossAmount = (trans.getTotalStdVatableAmount() + trans.getTotalVat()) - Double.parseDouble(jsonObj.get("grossAmount").toString());
-                jsonObj.put("netAmount", "" + ChangedNetAmount + "");
-                jsonObj.put("taxAmount", "" + ChangedTaxAmount + "");
-                jsonObj.put("grossAmount", "" + ChangedGrossAmount + "");
+                Double ChangedNetAmount = TotalAmountExcVat;// trans.getTotalStdVatableAmount() - Double.parseDouble(jsonObj.get("netAmount").toString());
+                Double ChangedTaxAmount = TotalVat;// trans.getTotalVat() - Double.parseDouble(jsonObj.get("taxAmount").toString());
+                Double ChangedGrossAmount = TotalAmountIncVat;// (trans.getTotalStdVatableAmount() + trans.getTotalVat()) - Double.parseDouble(jsonObj.get("grossAmount").toString());
+                jsonObj.put("netAmount", "" + (-1 * ChangedNetAmount) + "");
+                jsonObj.put("taxAmount", "" + (-1 * ChangedTaxAmount) + "");
+                jsonObj.put("grossAmount", "" + (-1 * ChangedGrossAmount) + "");
             }
 
-            Double ChangedGrossAmountSum = trans.getGrandTotal() - Double.parseDouble(dataobject_Summary.get("grossAmount").toString());
-            Double ChangedNetAmountSum = (trans.getGrandTotal() - trans.getTotalVat()) - Double.parseDouble(dataobject_Summary.get("netAmount").toString());
-            Double ChangedTaxAmountSum = trans.getTotalVat() - Double.parseDouble(dataobject_Summary.get("taxAmount").toString());
-            dataobject_Summary.put("grossAmount", "" + new UtilityBean().formatDoubleToStringPlain(ChangedGrossAmountSum, trans.getCurrencyCode()) + "");
-            dataobject_Summary.put("netAmount", "" + new UtilityBean().formatDoubleToStringPlain(ChangedNetAmountSum, trans.getCurrencyCode()) + "");
-            dataobject_Summary.put("taxAmount", "" + new UtilityBean().formatDoubleToStringPlain(ChangedTaxAmountSum, trans.getCurrencyCode()) + "");
+            Double ChangedGrossAmountSum = TotalAmountIncVat;// trans.getGrandTotal() - Double.parseDouble(dataobject_Summary.get("grossAmount").toString());
+            Double ChangedNetAmountSum = TotalAmountExcVat;// (trans.getGrandTotal() - trans.getTotalVat()) - Double.parseDouble(dataobject_Summary.get("netAmount").toString());
+            Double ChangedTaxAmountSum = TotalVat;// trans.getTotalVat() - Double.parseDouble(dataobject_Summary.get("taxAmount").toString());
+            dataobject_Summary.put("grossAmount", "" + Double.toString(-1 * ChangedGrossAmountSum) + "");
+            dataobject_Summary.put("netAmount", "" + Double.toString(-1 * ChangedNetAmountSum) + "");
+            dataobject_Summary.put("taxAmount", "" + Double.toString(-1 * ChangedTaxAmountSum) + "");
             dataobject_Summary.put("itemCount", "" + itemcount + "");
 
             json = "{\n"
@@ -748,37 +953,61 @@ public class InvoiceBean {
             JSONArray jSONArray_GoodsDetialsNew = new JSONArray();
             JSONObject jsonObj;
             int itemcount = 0;
+            Double TotalVat = 0.0;
+            Double TotalAmountIncVat = 0.0;
+            Double TotalAmountExcVat = 0.0;
             for (int i = 0; i < jSONArray_GoodsDetials.length(); i++) {
                 jsonObj = (JSONObject) jSONArray_GoodsDetials.get(i);
                 TransItem ti = this.getTransItemFromList(jsonObj.get("itemCode").toString(), transitems);
-                Double ChangedQty = ti.getItemQty() - Double.parseDouble(jsonObj.get("qty").toString());//can be + or -
-                Double ChangedVatAmt = ti.getAmountIncVat() - Double.parseDouble(jsonObj.get("total").toString());//can be + or -
-                Double ChangedTax = ti.getUnitVat() - Double.parseDouble(jsonObj.get("tax").toString());//can be + or -
-                jsonObj.put("qty", "" + ChangedQty + "");
-                jsonObj.put("total", "" + ChangedVatAmt + "");
-                jsonObj.put("tax", "" + ChangedVatAmt + "");
+                Double ChangedQty = Double.parseDouble(jsonObj.get("qty").toString()) - ti.getItemQty();
+                Double ChangedAmt = Double.parseDouble(jsonObj.get("total").toString()) - ti.getAmountIncVat();
+                Double vatPerc = ti.getVatPerc();
+                Double tr = vatPerc / 100;
+                //gd.setTaxRate(Double.toString(tr));
+                //start - new calc
+                Double Qty = ChangedQty;
+                Double AmountIncVat = ChangedAmt;//transitems.get(i).getAmountIncVat();
+                Double UnitPriceIncVat = AmountIncVat / Qty;
+                Double UnitPriceExcVat = UnitPriceIncVat / (1 + tr);
+                Double UnitVat = UnitPriceIncVat - UnitPriceExcVat;
+                Double AmountExcVat = UnitPriceExcVat * Qty;
+                TotalVat = TotalVat + (Qty * UnitVat);
+                TotalAmountIncVat = TotalAmountIncVat + AmountIncVat;
+                TotalAmountExcVat = TotalAmountExcVat + AmountExcVat;
+                UnitPriceIncVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceIncVat);
+                UnitPriceExcVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceExcVat);
+                UnitVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitVat);
+                //gd.setUnitPrice(Double.toString(UnitPriceIncVat));
+                //gd.setTax(Double.toString(UnitVat));
+                //end - new calc
+                jsonObj.put("qty", "" + (-1 * ChangedQty) + "");
+                jsonObj.put("total", "" + (-1 * ChangedAmt) + "");
+                jsonObj.put("tax", "" + (-1 * UnitVat) + "");
                 if (ChangedQty != 0) {
                     jSONArray_GoodsDetialsNew.put(jsonObj);
                     itemcount = itemcount + 1;
                 }
             }
             //tax details
+            TotalVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), TotalVat);
+            TotalAmountIncVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), TotalAmountIncVat);
+            TotalAmountExcVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), TotalAmountExcVat);
             for (int i = 0; i < jSONArray_TaxDetails.length(); i++) {
                 jsonObj = (JSONObject) jSONArray_TaxDetails.get(i);
-                Double ChangedNetAmount = trans.getTotalStdVatableAmount() - Double.parseDouble(jsonObj.get("netAmount").toString());
-                Double ChangedTaxAmount = trans.getTotalVat() - Double.parseDouble(jsonObj.get("taxAmount").toString());
-                Double ChangedGrossAmount = (trans.getTotalStdVatableAmount() + trans.getTotalVat()) - Double.parseDouble(jsonObj.get("grossAmount").toString());
-                jsonObj.put("netAmount", "" + ChangedNetAmount + "");
-                jsonObj.put("taxAmount", "" + ChangedTaxAmount + "");
-                jsonObj.put("grossAmount", "" + ChangedGrossAmount + "");
+                Double ChangedNetAmount = TotalAmountExcVat;// trans.getTotalStdVatableAmount() - Double.parseDouble(jsonObj.get("netAmount").toString());
+                Double ChangedTaxAmount = TotalVat;// trans.getTotalVat() - Double.parseDouble(jsonObj.get("taxAmount").toString());
+                Double ChangedGrossAmount = TotalAmountIncVat;// (trans.getTotalStdVatableAmount() + trans.getTotalVat()) - Double.parseDouble(jsonObj.get("grossAmount").toString());
+                jsonObj.put("netAmount", "" + (-1 * ChangedNetAmount) + "");
+                jsonObj.put("taxAmount", "" + (-1 * ChangedTaxAmount) + "");
+                jsonObj.put("grossAmount", "" + (-1 * ChangedGrossAmount) + "");
             }
 
-            Double ChangedGrossAmountSum = trans.getGrandTotal() - Double.parseDouble(dataobject_Summary.get("grossAmount").toString());
-            Double ChangedNetAmountSum = (trans.getGrandTotal() - trans.getTotalVat()) - Double.parseDouble(dataobject_Summary.get("netAmount").toString());
-            Double ChangedTaxAmountSum = trans.getTotalVat() - Double.parseDouble(dataobject_Summary.get("taxAmount").toString());
-            dataobject_Summary.put("grossAmount", "" + new UtilityBean().formatDoubleToStringPlain(ChangedGrossAmountSum, trans.getCurrencyCode()) + "");
-            dataobject_Summary.put("netAmount", "" + new UtilityBean().formatDoubleToStringPlain(ChangedNetAmountSum, trans.getCurrencyCode()) + "");
-            dataobject_Summary.put("taxAmount", "" + new UtilityBean().formatDoubleToStringPlain(ChangedTaxAmountSum, trans.getCurrencyCode()) + "");
+            Double ChangedGrossAmountSum = TotalAmountIncVat;// trans.getGrandTotal() - Double.parseDouble(dataobject_Summary.get("grossAmount").toString());
+            Double ChangedNetAmountSum = TotalAmountExcVat;// (trans.getGrandTotal() - trans.getTotalVat()) - Double.parseDouble(dataobject_Summary.get("netAmount").toString());
+            Double ChangedTaxAmountSum = TotalVat;// trans.getTotalVat() - Double.parseDouble(dataobject_Summary.get("taxAmount").toString());
+            dataobject_Summary.put("grossAmount", "" + Double.toString(-1 * ChangedGrossAmountSum) + "");
+            dataobject_Summary.put("netAmount", "" + Double.toString(-1 * ChangedNetAmountSum) + "");
+            dataobject_Summary.put("taxAmount", "" + Double.toString(-1 * ChangedTaxAmountSum) + "");
             dataobject_Summary.put("itemCount", "" + itemcount + "");
 
             json = "{\n"
@@ -857,11 +1086,7 @@ public class InvoiceBean {
                 if (TaxInvoice.length() > 0) {
                     //0. Preparations
                     String APIMode = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_MODE").getParameter_value();
-                    if (APIMode.equals("OFFLINE")) {
-                        this.prepareDebit_note_offline(aTransId, TaxInvoice, DeviceNo, SellerTin);
-                    } else {
-                        this.prepareDebit_note_online(aTransId, TaxInvoice, DeviceNo, SellerTin);
-                    }
+                    this.prepareDebit_note(aTransId, TaxInvoice, DeviceNo, SellerTin);
                     //1. Update is_updated to 1, update_synced=0
                     ttm.setUpdate_type("Debit Note");
                     new Transaction_tax_mapBean().markTransaction_tax_mapUpdated(ttm);
@@ -902,22 +1127,9 @@ public class InvoiceBean {
         }
     }
 
-    public void prepareDebit_note_offline(long aTransId, String aTaxInvoiceNumber, String aDeviceNo, String aSellerTIN) {
+    public String getTaxInvoiceDetailOffline(String aTaxInvoiceNumber, String aDeviceNo, String aSellerTIN) {
+        String DecryptedContent = "";
         try {
-            Trans trans = new Trans();
-            List<TransItem> transitems = new ArrayList<>();
-            Transactor transactor = new Transactor();
-            try {
-                trans = new TransBean().getTrans(aTransId);
-            } catch (Exception e) {
-                //
-            }
-            try {
-                transitems = new TransItemBean().getTransItemsByTransactionId(aTransId);
-            } catch (Exception e) {
-                //
-            }
-
             String json = "{\n"
                     + "	\"invoiceNo\": \"" + aTaxInvoiceNumber + "\"\n"
                     + "}";
@@ -938,7 +1150,7 @@ public class InvoiceBean {
 
             JSONObject dataDescription = dataobjectcontent.getJSONObject("dataDescription");
             String zipCode = "0";
-            String DecryptedContent = "";
+
             try {
                 zipCode = dataDescription.getString("zipCode");
             } catch (Exception e) {
@@ -950,163 +1162,15 @@ public class InvoiceBean {
                 byte[] str = GzipUtils.decompress(Base64.decodeBase64(content));
                 DecryptedContent = new String(str);
             }
-
-            JSONObject parentbasicInformationjsonObject = new JSONObject(DecryptedContent);
-            JSONArray jSONArray_GoodsDetials = parentbasicInformationjsonObject.getJSONArray("goodsDetails");
-            JSONArray jSONArray_TaxDetails = parentbasicInformationjsonObject.getJSONArray("taxDetails");
-            JSONObject dataobject_Summary = parentbasicInformationjsonObject.getJSONObject("summary");
-            JSONArray jSONArray_Payway = parentbasicInformationjsonObject.getJSONArray("payWay");
-            JSONObject dataobjectbasicInformation = parentbasicInformationjsonObject.getJSONObject("basicInformation");
-            JSONObject dataobjectsellerDetails = parentbasicInformationjsonObject.getJSONObject("sellerDetails");
-            JSONObject dataobjectbuyerDetails = parentbasicInformationjsonObject.getJSONObject("buyerDetails");
-
-            //sellerDetails
-            sellerDetails.setTin(CompanySetting.getTaxIdentity());//dataobjectsellerDetails.get("tin").toString()
-            sellerDetails.setBusinessName(CompanySetting.getLICENSE_CLIENT_NAME());//dataobjectsellerDetails.get("businessName").toString()
-            sellerDetails.setLegalName(new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "PAYEE_NAME").getParameter_value());//dataobjectsellerDetails.get("legalName").toString()
-            sellerDetails.setEmailAddress(CompanySetting.getEmail());//dataobjectsellerDetails.get("emailAddress").toString()
-
-            //basicInformation
-            basicInformation.setOriInvoiceId(dataobjectbasicInformation.getString("invoiceId"));
-            basicInformation.setCurrency(trans.getCurrencyCode());//dataobjectbasicInformation.get("currency").toString()
-            basicInformation.setDeviceNo(aDeviceNo);
-            //basicInformation.setInvoiceNo(trans.getTransactionNumber()); //Leave empty if raising an invoice/receipt. For debit notes, populate the invoiceId that was returned against the original invoice/receipt.
-            basicInformation.setInvoiceType(Integer.toString(4));//1:invoice 4: debit note
-            basicInformation.setInvoiceKind(Integer.toString(1));//1:invoice 2: receipt
-            basicInformation.setDataSource(Integer.toString(103));//101:EFD 102:Windows Client APP 103:WebService API
-            basicInformation.setIssuedDate(new UtilityBean().formatDateTimeServer(trans.getEditDate()));
-            try {
-                basicInformation.setOperator(new UserDetailBean().getUserDetail(trans.getTransactionUserDetailId()).getUserName());
-            } catch (Exception e) {
-                basicInformation.setOperator("System");
-            }
-
-            //buyerDetails
-            try {
-                buyerDetails.setBuyerTin(dataobjectbuyerDetails.get("buyerTin").toString());
-            } catch (Exception e) {
-                //do nothing
-            }
-            try {
-                buyerDetails.setBuyerLegalName(dataobjectbuyerDetails.get("buyerLegalName").toString());
-            } catch (Exception e) {
-                //do nothing
-            }
-            buyerDetails.setBuyerType(dataobjectbuyerDetails.get("buyerType").toString());
-            try {
-                buyerDetails.setBuyerMobilePhone(dataobjectbuyerDetails.get("buyerMobilePhone").toString());
-            } catch (Exception e) {
-                //do nothing
-            }
-            try {
-                buyerDetails.setBuyerLinePhone(dataobjectbuyerDetails.get("buyerLinePhone").toString());
-            } catch (Exception e) {
-                //do nothing
-            }
-            try {
-                buyerDetails.setBuyerNinBrn(dataobjectbuyerDetails.get("buyerNinBrn").toString());
-            } catch (Exception e) {
-                //do nothing
-            }
-            //extend
-
-            //goodsDetails
-            Item itm = null;
-            Item_tax_map im = null;
-            int OrderNo = 0;
-            List<TransItem> prevTIs = this.convertJsonGoodsArrayToList(jSONArray_GoodsDetials);
-            for (int i = 0; i < transitems.size(); i++) {
-                itm = new ItemBean().getItem(transitems.get(i).getItemId());
-                im = new Item_tax_mapBean().getItem_tax_map(transitems.get(i).getItemId());
-                if (null != itm && null != im) {
-                    //check if item has changed
-                    TransItem prevTI = this.getTransItemFromList(Long.toString(transitems.get(i).getItemId()), prevTIs);
-                    Double ChangedQty = transitems.get(i).getItemQty() - prevTI.getItemQty();//can be + or -
-                    Double ChangedVatAmt = transitems.get(i).getAmountIncVat() - prevTI.getAmountIncVat();//can be + or -
-                    if (ChangedQty != 0) {//if (ChangedQty > 0 || ChangedVatAmt > 0) {
-                        GoodsDetails gd = new GoodsDetails();
-                        gd.setItem(itm.getDescription());//Hima Cement
-                        gd.setItemCode(Long.toString(itm.getItemId()));//147
-                        gd.setQty(Double.toString(ChangedQty));//transitems.get(i).getItemQty()
-                        try {
-                            String UnitSymbolTax = new UnitBean().getUnit(itm.getUnitId()).getUnit_symbol_tax();
-                            if (null == UnitSymbolTax) {
-                                gd.setUnitOfMeasure("PCE");
-                            } else {
-                                gd.setUnitOfMeasure(UnitSymbolTax);
-                            }
-                        } catch (Exception e) {
-                            gd.setUnitOfMeasure("PCE");
-                        }
-                        gd.setUnitPrice(Double.toString(transitems.get(i).getUnitPriceIncVat()));
-                        gd.setTax(Double.toString(transitems.get(i).getUnitVat()));
-                        gd.setTotal(Double.toString(ChangedVatAmt));//transitems.get(i).getAmountIncVat()
-                        Double vatPerc = transitems.get(i).getVatPerc();
-                        Double tr = vatPerc / 100;
-                        gd.setTaxRate(Double.toString(tr));
-                        gd.setDiscountFlag(Integer.toString(2));//0=Discount amount,1=Discounted goods,2=None
-                        gd.setExciseFlag(Integer.toString(2));
-                        gd.setDeemedFlag(Integer.toString(2));
-                        gd.setOrderNumber(Integer.toString(OrderNo));
-                        gd.setCategoryId("");
-                        gd.setCategoryName("");
-                        gd.setGoodsCategoryId(im.getItem_code_tax());//code for Cement
-                        gd.setGoodsCategoryName("");
-                        //exciseRate;exciseRule;exciseTax;pack;stick;exciseUnit;exciseCurrency;exciseRateName;
-                        goodsDetails.add(gd);
-                        OrderNo = OrderNo + 1;
-                    }
-                }
-            }
-
-            //taxDetails
-            TaxDetails td = null;
-            List<TaxDetails> prevTDs = this.convertJsonTaxDetailsArrayToList(jSONArray_TaxDetails);
-            if (trans.getTotalStdVatableAmount() > 0) {
-                td = new TaxDetails();
-                Double ChangedGrossAmount = (trans.getTotalStdVatableAmount() + trans.getTotalVat()) - Double.parseDouble(prevTDs.get(0).getGrossAmount());
-                Double ChangedNetAmount = trans.getTotalStdVatableAmount() - Double.parseDouble(prevTDs.get(0).getNetAmount());
-                Double ChangedTaxAmount = trans.getTotalVat() - Double.parseDouble(prevTDs.get(0).getTaxAmount());
-                td.setGrossAmount(Double.toString(ChangedGrossAmount));
-                td.setTaxCategory("VAT");
-                td.setTaxRateName("STANDARD");
-                Double vatPerc = trans.getVatPerc();
-                Double tr = vatPerc / 100;
-                td.setTaxRate(Double.toString(tr));
-                td.setTaxAmount(Double.toString(ChangedTaxAmount));
-                td.setNetAmount(Double.toString(ChangedNetAmount));
-                taxDetails.add(td);
-            }
-            //summary
-            Double ChangedGAmount = trans.getGrandTotal() - Double.parseDouble(dataobject_Summary.get("grossAmount").toString());
-            Double ChangedNAmount = (trans.getGrandTotal() - trans.getTotalVat()) - Double.parseDouble(dataobject_Summary.get("netAmount").toString());
-            Double ChangedTAmount = trans.getTotalVat() - Double.parseDouble(dataobject_Summary.get("taxAmount").toString());
-            summary.setGrossAmount(new UtilityBean().formatDoubleToStringPlain(ChangedGAmount, trans.getCurrencyCode()));
-            summary.setTaxAmount(new UtilityBean().formatDoubleToStringPlain(ChangedTAmount, trans.getCurrencyCode()));
-            summary.setNetAmount(new UtilityBean().formatDoubleToStringPlain(ChangedNAmount, trans.getCurrencyCode()));
-            summary.setItemCount(Integer.toString(goodsDetails.size()));
-            summary.setModeCode("1");
         } catch (Exception e) {
-            System.err.println("prepareDebit_note_offline:" + e.getMessage());
+            System.out.println("getTaxInvoiceDetailOffline:" + e.getMessage());
         }
+        return DecryptedContent;
     }
 
-    public void prepareDebit_note_online(long aTransId, String aTaxInvoiceNumber, String aDeviceNo, String aSellerTIN) {
+    public String getTaxInvoiceDetailOnline(String aTaxInvoiceNumber, String aDeviceNo, String aSellerTIN) {
+        String DecryptedContent = "";
         try {
-            Trans trans = new Trans();
-            List<TransItem> transitems = new ArrayList<>();
-            Transactor transactor = new Transactor();
-            try {
-                trans = new TransBean().getTrans(aTransId);
-            } catch (Exception e) {
-                //
-            }
-            try {
-                transitems = new TransItemBean().getTransItemsByTransactionId(aTransId);
-            } catch (Exception e) {
-                //
-            }
-
             String json = "{\n"
                     + "	\"invoiceNo\": \"" + aTaxInvoiceNumber + "\"\n"
                     + "}";
@@ -1143,7 +1207,6 @@ public class InvoiceBean {
              */
             JSONObject dataDescription = dataobjectcontent.getJSONObject("dataDescription");
             String zipCode = "0";
-            String DecryptedContent = "";
             try {
                 zipCode = dataDescription.getString("zipCode");
             } catch (Exception e) {
@@ -1155,7 +1218,34 @@ public class InvoiceBean {
                 byte[] str = GzipUtils.decompress(Base64.decodeBase64(content));
                 DecryptedContent = SecurityPKI.AESdecrypt2(str, Base64.decodeBase64(AESpublickeystring));
             }
+        } catch (Exception e) {
+            System.out.println("getTaxInvoiceDetailOffline:" + e.getMessage());
+        }
+        return DecryptedContent;
+    }
 
+    public void prepareDebit_note(long aTransId, String aTaxInvoiceNumber, String aDeviceNo, String aSellerTIN) {
+        try {
+            Trans trans = new Trans();
+            List<TransItem> transitems = new ArrayList<>();
+            Transactor transactor = new Transactor();
+            try {
+                trans = new TransBean().getTrans(aTransId);
+            } catch (Exception e) {
+                //
+            }
+            try {
+                transitems = new TransItemBean().getTransItemsByTransactionId(aTransId);
+            } catch (Exception e) {
+                //
+            }
+            String DecryptedContent = "";
+            String APIMode = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_MODE").getParameter_value();
+            if (APIMode.equals("OFFLINE")) {
+                DecryptedContent = this.getTaxInvoiceDetailOffline(aTaxInvoiceNumber, aDeviceNo, aSellerTIN);
+            } else {
+                DecryptedContent = this.getTaxInvoiceDetailOnline(aTaxInvoiceNumber, aDeviceNo, aSellerTIN);
+            }
             JSONObject parentbasicInformationjsonObject = new JSONObject(DecryptedContent);
             JSONArray jSONArray_GoodsDetials = parentbasicInformationjsonObject.getJSONArray("goodsDetails");
             JSONArray jSONArray_TaxDetails = parentbasicInformationjsonObject.getJSONArray("taxDetails");
@@ -1219,6 +1309,9 @@ public class InvoiceBean {
             Item itm = null;
             Item_tax_map im = null;
             int OrderNo = 0;
+            Double TotalVat = 0.0;
+            Double TotalAmountIncVat = 0.0;
+            Double TotalAmountExcVat = 0.0;
             List<TransItem> prevTIs = this.convertJsonGoodsArrayToList(jSONArray_GoodsDetials);
             for (int i = 0; i < transitems.size(); i++) {
                 itm = new ItemBean().getItem(transitems.get(i).getItemId());
@@ -1227,7 +1320,7 @@ public class InvoiceBean {
                     //check if item has changed
                     TransItem prevTI = this.getTransItemFromList(Long.toString(transitems.get(i).getItemId()), prevTIs);
                     Double ChangedQty = transitems.get(i).getItemQty() - prevTI.getItemQty();//can be + or -
-                    Double ChangedVatAmt = transitems.get(i).getAmountIncVat() - prevTI.getAmountIncVat();//can be + or -
+                    Double ChangedAmt = transitems.get(i).getAmountIncVat() - prevTI.getAmountIncVat();//can be + or -
                     if (ChangedQty != 0) {//if (ChangedQty > 0 || ChangedVatAmt > 0) {
                         GoodsDetails gd = new GoodsDetails();
                         gd.setItem(itm.getDescription());//Hima Cement
@@ -1243,12 +1336,28 @@ public class InvoiceBean {
                         } catch (Exception e) {
                             gd.setUnitOfMeasure("PCE");
                         }
-                        gd.setUnitPrice(Double.toString(transitems.get(i).getUnitPriceIncVat()));
-                        gd.setTax(Double.toString(transitems.get(i).getUnitVat()));
-                        gd.setTotal(Double.toString(ChangedVatAmt));//transitems.get(i).getAmountIncVat()
+                        //gd.setUnitPrice(Double.toString(transitems.get(i).getUnitPriceIncVat()));
+                        //gd.setTax(Double.toString(transitems.get(i).getUnitVat()));
+                        gd.setTotal(Double.toString(ChangedAmt));//transitems.get(i).getAmountIncVat()
                         Double vatPerc = transitems.get(i).getVatPerc();
                         Double tr = vatPerc / 100;
                         gd.setTaxRate(Double.toString(tr));
+                        //start - new calc
+                        Double Qty = ChangedQty;
+                        Double AmountIncVat = ChangedAmt;//transitems.get(i).getAmountIncVat();
+                        Double UnitPriceIncVat = AmountIncVat / Qty;
+                        Double UnitPriceExcVat = UnitPriceIncVat / (1 + tr);
+                        Double UnitVat = UnitPriceIncVat - UnitPriceExcVat;
+                        Double AmountExcVat = UnitPriceExcVat * Qty;
+                        TotalVat = TotalVat + (Qty * UnitVat);
+                        TotalAmountIncVat = TotalAmountIncVat + AmountIncVat;
+                        TotalAmountExcVat = TotalAmountExcVat + AmountExcVat;
+                        UnitPriceIncVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceIncVat);
+                        UnitPriceExcVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceExcVat);
+                        UnitVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitVat);
+                        gd.setUnitPrice(Double.toString(UnitPriceIncVat));
+                        gd.setTax(Double.toString(UnitVat));
+                        //end - new calc
                         gd.setDiscountFlag(Integer.toString(2));//0=Discount amount,1=Discounted goods,2=None
                         gd.setExciseFlag(Integer.toString(2));
                         gd.setDeemedFlag(Integer.toString(2));
@@ -1266,12 +1375,15 @@ public class InvoiceBean {
 
             //taxDetails
             TaxDetails td = null;
+            TotalVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), TotalVat);
+            TotalAmountIncVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), TotalAmountIncVat);
+            TotalAmountExcVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), TotalAmountExcVat);
             List<TaxDetails> prevTDs = this.convertJsonTaxDetailsArrayToList(jSONArray_TaxDetails);
-            if (trans.getTotalStdVatableAmount() > 0) {
+            if (TotalVat > 0) {
                 td = new TaxDetails();
-                Double ChangedGrossAmount = (trans.getTotalStdVatableAmount() + trans.getTotalVat()) - Double.parseDouble(prevTDs.get(0).getGrossAmount());
-                Double ChangedNetAmount = trans.getTotalStdVatableAmount() - Double.parseDouble(prevTDs.get(0).getNetAmount());
-                Double ChangedTaxAmount = trans.getTotalVat() - Double.parseDouble(prevTDs.get(0).getTaxAmount());
+                Double ChangedGrossAmount = TotalAmountIncVat;// - Double.parseDouble(prevTDs.get(0).getGrossAmount());
+                Double ChangedNetAmount = TotalAmountExcVat;// - Double.parseDouble(prevTDs.get(0).getNetAmount());
+                Double ChangedTaxAmount = TotalVat;// - Double.parseDouble(prevTDs.get(0).getTaxAmount());
                 td.setGrossAmount(Double.toString(ChangedGrossAmount));
                 td.setTaxCategory("VAT");
                 td.setTaxRateName("STANDARD");
@@ -1283,16 +1395,16 @@ public class InvoiceBean {
                 taxDetails.add(td);
             }
             //summary
-            Double ChangedGAmount = trans.getGrandTotal() - Double.parseDouble(dataobject_Summary.get("grossAmount").toString());
-            Double ChangedNAmount = (trans.getGrandTotal() - trans.getTotalVat()) - Double.parseDouble(dataobject_Summary.get("netAmount").toString());
-            Double ChangedTAmount = trans.getTotalVat() - Double.parseDouble(dataobject_Summary.get("taxAmount").toString());
-            summary.setGrossAmount(new UtilityBean().formatDoubleToStringPlain(ChangedGAmount, trans.getCurrencyCode()));
-            summary.setTaxAmount(new UtilityBean().formatDoubleToStringPlain(ChangedTAmount, trans.getCurrencyCode()));
-            summary.setNetAmount(new UtilityBean().formatDoubleToStringPlain(ChangedNAmount, trans.getCurrencyCode()));
+            Double ChangedGAmount = TotalAmountIncVat;// - Double.parseDouble(dataobject_Summary.get("grossAmount").toString());
+            Double ChangedNAmount = TotalAmountExcVat;//(trans.getGrandTotal() - trans.getTotalVat()) - Double.parseDouble(dataobject_Summary.get("netAmount").toString());
+            Double ChangedTAmount = TotalVat;// trans.getTotalVat() - Double.parseDouble(dataobject_Summary.get("taxAmount").toString());
+            summary.setGrossAmount(Double.toString(ChangedGAmount));
+            summary.setTaxAmount(Double.toString(ChangedTAmount));
+            summary.setNetAmount(Double.toString(ChangedNAmount));
             summary.setItemCount(Integer.toString(goodsDetails.size()));
             summary.setModeCode("1");
         } catch (Exception e) {
-            System.err.println("prepareDebit_note_online:" + e.getMessage());
+            System.err.println("prepareDebit_note_offline:" + e.getMessage());
         }
     }
 

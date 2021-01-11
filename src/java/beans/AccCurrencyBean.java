@@ -674,11 +674,9 @@ public class AccCurrencyBean implements Serializable {
      * Rounds off to at least 2 decimal places If currency rounds off to less 2
      * decimal places, values will be rounded off to 2 decimal places otherwise
      * decimal places rounding takes precedence
-     *
-     * @param publicKey
-     * @return
-     * @throws IOException
-     * @throws GeneralSecurityException
+     * @param aCurrencyCode
+     * @param aMount
+     * @return RoundedAmount
      */
     public double roundAmountMinTwoDps(String aCurrencyCode, double aMount) {
         double RoundedAmount = 0;
