@@ -304,14 +304,16 @@ public class InvoiceBean {
                     Double UnitPriceExcVat = UnitPriceIncVat / (1 + tr);
                     Double UnitVat = UnitPriceIncVat - UnitPriceExcVat;
                     Double AmountExcVat = UnitPriceExcVat * Qty;
+                    Double UnitVatTimesQty = UnitVat * Qty;
                     TotalVat = TotalVat + (Qty * UnitVat);
                     TotalAmountIncVat = TotalAmountIncVat + AmountIncVat;
                     TotalAmountExcVat = TotalAmountExcVat + AmountExcVat;
                     UnitPriceIncVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceIncVat);
                     UnitPriceExcVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceExcVat);
                     UnitVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitVat);
+                    UnitVatTimesQty = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitVatTimesQty);
                     gd.setUnitPrice(Double.toString(UnitPriceIncVat));
-                    gd.setTax(Double.toString(UnitVat * Qty));
+                    gd.setTax(Double.toString(UnitVatTimesQty));
                     //end - new calc
                     gd.setDiscountFlag(Integer.toString(2));//0=Discount amount,1=Discounted goods,2=None
                     gd.setExciseFlag(Integer.toString(2));
@@ -786,18 +788,20 @@ public class InvoiceBean {
                 Double UnitPriceExcVat = UnitPriceIncVat / (1 + tr);
                 Double UnitVat = UnitPriceIncVat - UnitPriceExcVat;
                 Double AmountExcVat = UnitPriceExcVat * Qty;
+                Double UnitVatTimesQty = Qty * UnitVat;
                 TotalVat = TotalVat + (Qty * UnitVat);
                 TotalAmountIncVat = TotalAmountIncVat + AmountIncVat;
                 TotalAmountExcVat = TotalAmountExcVat + AmountExcVat;
                 UnitPriceIncVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceIncVat);
                 UnitPriceExcVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceExcVat);
                 UnitVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitVat);
+                UnitVatTimesQty = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitVatTimesQty);
                 //gd.setUnitPrice(Double.toString(UnitPriceIncVat));
                 //gd.setTax(Double.toString(UnitVat));
                 //end - new calc
-                jsonObj.put("qty", "" + (-1 * ChangedQty) + "");
-                jsonObj.put("total", "" + (-1 * ChangedAmt) + "");
-                jsonObj.put("tax", "" + (-1 * UnitVat) + "");
+                jsonObj.put("qty", "" + (-1 * Qty) + "");
+                jsonObj.put("total", "" + (-1 * AmountIncVat) + "");
+                jsonObj.put("tax", "" + (-1 * UnitVatTimesQty) + "");
                 if (ChangedQty != 0) {
                     jSONArray_GoodsDetialsNew.put(jsonObj);
                     itemcount = itemcount + 1;
@@ -971,18 +975,20 @@ public class InvoiceBean {
                 Double UnitPriceExcVat = UnitPriceIncVat / (1 + tr);
                 Double UnitVat = UnitPriceIncVat - UnitPriceExcVat;
                 Double AmountExcVat = UnitPriceExcVat * Qty;
+                Double UnitVatTimesQty = Qty * UnitVat;
                 TotalVat = TotalVat + (Qty * UnitVat);
                 TotalAmountIncVat = TotalAmountIncVat + AmountIncVat;
                 TotalAmountExcVat = TotalAmountExcVat + AmountExcVat;
                 UnitPriceIncVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceIncVat);
                 UnitPriceExcVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceExcVat);
                 UnitVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitVat);
+                UnitVatTimesQty = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitVatTimesQty);
                 //gd.setUnitPrice(Double.toString(UnitPriceIncVat));
                 //gd.setTax(Double.toString(UnitVat));
                 //end - new calc
-                jsonObj.put("qty", "" + (-1 * ChangedQty) + "");
-                jsonObj.put("total", "" + (-1 * ChangedAmt) + "");
-                jsonObj.put("tax", "" + (-1 * UnitVat) + "");
+                jsonObj.put("qty", "" + (-1 * Qty) + "");
+                jsonObj.put("total", "" + (-1 * AmountIncVat) + "");
+                jsonObj.put("tax", "" + (-1 * UnitVatTimesQty) + "");
                 if (ChangedQty != 0) {
                     jSONArray_GoodsDetialsNew.put(jsonObj);
                     itemcount = itemcount + 1;
@@ -1029,7 +1035,7 @@ public class InvoiceBean {
                     + "	\"summary\":" + dataobject_Summary.toString() + " ,\n"
                     + "	\"payWay\":" + jSONArray_Payway.toString() + "\n"
                     + "}";
-            //System.out.println("json2:" + json);
+            System.out.println("json2:" + json);
             /**
              * Encrypt Content
              */
@@ -1042,7 +1048,7 @@ public class InvoiceBean {
             //System.out.println("PostData2:" + PostData_Online);
             response = webResource.type("application/json").post(ClientResponse.class, PostData);
             output = response.getEntity(String.class);
-            //System.out.println("output:" + output);
+            System.out.println("output:" + output);
 
             parentjsonObject = new JSONObject(output);
             dataobject = parentjsonObject.getJSONObject("returnStateInfo");
@@ -1349,14 +1355,16 @@ public class InvoiceBean {
                         Double UnitPriceExcVat = UnitPriceIncVat / (1 + tr);
                         Double UnitVat = UnitPriceIncVat - UnitPriceExcVat;
                         Double AmountExcVat = UnitPriceExcVat * Qty;
+                        Double UnitVatTimesQty = Qty * UnitVat;
                         TotalVat = TotalVat + (Qty * UnitVat);
                         TotalAmountIncVat = TotalAmountIncVat + AmountIncVat;
                         TotalAmountExcVat = TotalAmountExcVat + AmountExcVat;
                         UnitPriceIncVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceIncVat);
                         UnitPriceExcVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceExcVat);
                         UnitVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitVat);
+                        UnitVatTimesQty = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitVatTimesQty);
                         gd.setUnitPrice(Double.toString(UnitPriceIncVat));
-                        gd.setTax(Double.toString(UnitVat));
+                        gd.setTax(Double.toString(UnitVatTimesQty));
                         //end - new calc
                         gd.setDiscountFlag(Integer.toString(2));//0=Discount amount,1=Discounted goods,2=None
                         gd.setExciseFlag(Integer.toString(2));
@@ -1486,7 +1494,7 @@ public class InvoiceBean {
             eFRISInvoice.setTaxDetails(taxDetails);
             Gson gson = new Gson();
             String json = gson.toJson(eFRISInvoice);
-            //System.out.println("json:" + json);
+            System.out.println("json:" + json);
 
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
             WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_ONLINE").getParameter_value());
@@ -1505,10 +1513,10 @@ public class InvoiceBean {
              * Post Data
              */
             String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", basicInformation.getDeviceNo(), "T109", sellerDetails.getTin());
-            //System.out.println("PostData_Online:" + PostData_Online);
+            System.out.println("PostData:" + PostData);
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             String output = response.getEntity(String.class);
-            //System.out.println("output:" + output);
+            System.out.println("output:" + output);
 
             JSONObject parentjsonObject = new JSONObject(output);
             JSONObject dataobject = parentjsonObject.getJSONObject("returnStateInfo");
@@ -1563,6 +1571,7 @@ public class InvoiceBean {
                 ti.setItemQty(aTransItems.get(i).getItemQty());
                 ti.setAmountIncVat(aTransItems.get(i).getAmountIncVat());
                 ti.setUnitVat(aTransItems.get(i).getUnitVat());
+                ti.setVatPerc(aTransItems.get(i).getVatPerc());
                 aTransItems.get(i).setItem_no(1);
                 break;
             }
