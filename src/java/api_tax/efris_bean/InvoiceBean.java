@@ -778,31 +778,31 @@ public class InvoiceBean {
                 TransItem ti = this.getTransItemFromList(jsonObj.get("itemCode").toString(), transitems);
                 Double ChangedQty = Double.parseDouble(jsonObj.get("qty").toString()) - ti.getItemQty();
                 Double ChangedAmt = Double.parseDouble(jsonObj.get("total").toString()) - ti.getAmountIncVat();
-                Double vatPerc = ti.getVatPerc();
-                Double tr = vatPerc / 100;
-                //gd.setTaxRate(Double.toString(tr));
-                //start - new calc
-                Double Qty = ChangedQty;
-                Double AmountIncVat = ChangedAmt;//transitems.get(i).getAmountIncVat();
-                Double UnitPriceIncVat = AmountIncVat / Qty;
-                Double UnitPriceExcVat = UnitPriceIncVat / (1 + tr);
-                Double UnitVat = UnitPriceIncVat - UnitPriceExcVat;
-                Double AmountExcVat = UnitPriceExcVat * Qty;
-                Double UnitVatTimesQty = Qty * UnitVat;
-                TotalVat = TotalVat + (Qty * UnitVat);
-                TotalAmountIncVat = TotalAmountIncVat + AmountIncVat;
-                TotalAmountExcVat = TotalAmountExcVat + AmountExcVat;
-                UnitPriceIncVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceIncVat);
-                UnitPriceExcVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceExcVat);
-                UnitVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitVat);
-                UnitVatTimesQty = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitVatTimesQty);
-                //gd.setUnitPrice(Double.toString(UnitPriceIncVat));
-                //gd.setTax(Double.toString(UnitVat));
-                //end - new calc
-                jsonObj.put("qty", "" + (-1 * Qty) + "");
-                jsonObj.put("total", "" + (-1 * AmountIncVat) + "");
-                jsonObj.put("tax", "" + (-1 * UnitVatTimesQty) + "");
                 if (ChangedQty != 0) {
+                    Double vatPerc = ti.getVatPerc();
+                    Double tr = vatPerc / 100;
+                    //gd.setTaxRate(Double.toString(tr));
+                    //start - new calc
+                    Double Qty = ChangedQty;
+                    Double AmountIncVat = ChangedAmt;//transitems.get(i).getAmountIncVat();
+                    Double UnitPriceIncVat = AmountIncVat / Qty;
+                    Double UnitPriceExcVat = UnitPriceIncVat / (1 + tr);
+                    Double UnitVat = UnitPriceIncVat - UnitPriceExcVat;
+                    Double AmountExcVat = UnitPriceExcVat * Qty;
+                    Double UnitVatTimesQty = Qty * UnitVat;
+                    TotalVat = TotalVat + (Qty * UnitVat);
+                    TotalAmountIncVat = TotalAmountIncVat + AmountIncVat;
+                    TotalAmountExcVat = TotalAmountExcVat + AmountExcVat;
+                    UnitPriceIncVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceIncVat);
+                    UnitPriceExcVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceExcVat);
+                    UnitVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitVat);
+                    UnitVatTimesQty = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitVatTimesQty);
+                    //gd.setUnitPrice(Double.toString(UnitPriceIncVat));
+                    //gd.setTax(Double.toString(UnitVat));
+                    //end - new calc
+                    jsonObj.put("qty", "" + (-1 * Qty) + "");
+                    jsonObj.put("total", "" + (-1 * AmountIncVat) + "");
+                    jsonObj.put("tax", "" + (-1 * UnitVatTimesQty) + "");
                     jSONArray_GoodsDetialsNew.put(jsonObj);
                     itemcount = itemcount + 1;
                 }
@@ -965,31 +965,32 @@ public class InvoiceBean {
                 TransItem ti = this.getTransItemFromList(jsonObj.get("itemCode").toString(), transitems);
                 Double ChangedQty = Double.parseDouble(jsonObj.get("qty").toString()) - ti.getItemQty();
                 Double ChangedAmt = Double.parseDouble(jsonObj.get("total").toString()) - ti.getAmountIncVat();
-                Double vatPerc = ti.getVatPerc();
-                Double tr = vatPerc / 100;
-                //gd.setTaxRate(Double.toString(tr));
-                //start - new calc
-                Double Qty = ChangedQty;
-                Double AmountIncVat = ChangedAmt;//transitems.get(i).getAmountIncVat();
-                Double UnitPriceIncVat = AmountIncVat / Qty;
-                Double UnitPriceExcVat = UnitPriceIncVat / (1 + tr);
-                Double UnitVat = UnitPriceIncVat - UnitPriceExcVat;
-                Double AmountExcVat = UnitPriceExcVat * Qty;
-                Double UnitVatTimesQty = Qty * UnitVat;
-                TotalVat = TotalVat + (Qty * UnitVat);
-                TotalAmountIncVat = TotalAmountIncVat + AmountIncVat;
-                TotalAmountExcVat = TotalAmountExcVat + AmountExcVat;
-                UnitPriceIncVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceIncVat);
-                UnitPriceExcVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceExcVat);
-                UnitVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitVat);
-                UnitVatTimesQty = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitVatTimesQty);
-                //gd.setUnitPrice(Double.toString(UnitPriceIncVat));
-                //gd.setTax(Double.toString(UnitVat));
-                //end - new calc
-                jsonObj.put("qty", "" + (-1 * Qty) + "");
-                jsonObj.put("total", "" + (-1 * AmountIncVat) + "");
-                jsonObj.put("tax", "" + (-1 * UnitVatTimesQty) + "");
                 if (ChangedQty != 0) {
+                    Double vatPerc = ti.getVatPerc();
+                    Double tr = vatPerc / 100;
+                    //gd.setTaxRate(Double.toString(tr));
+                    //start - new calc
+                    Double Qty = ChangedQty;
+                    Double AmountIncVat = ChangedAmt;//transitems.get(i).getAmountIncVat();
+                    Double UnitPriceIncVat = AmountIncVat / Qty;
+                    Double UnitPriceExcVat = UnitPriceIncVat / (1 + tr);
+                    Double UnitVat = UnitPriceIncVat - UnitPriceExcVat;
+                    Double AmountExcVat = UnitPriceExcVat * Qty;
+                    Double UnitVatTimesQty = Qty * UnitVat;
+                    TotalVat = TotalVat + (Qty * UnitVat);
+                    TotalAmountIncVat = TotalAmountIncVat + AmountIncVat;
+                    TotalAmountExcVat = TotalAmountExcVat + AmountExcVat;
+                    UnitPriceIncVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceIncVat);
+                    UnitPriceExcVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceExcVat);
+                    UnitVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitVat);
+                    UnitVatTimesQty = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitVatTimesQty);
+                    //gd.setUnitPrice(Double.toString(UnitPriceIncVat));
+                    //gd.setTax(Double.toString(UnitVat));
+                    //end - new calc
+                    jsonObj.put("qty", "" + (-1 * Qty) + "");
+                    jsonObj.put("total", "" + (-1 * AmountIncVat) + "");
+                    jsonObj.put("tax", "" + (-1 * UnitVatTimesQty) + "");
+
                     jSONArray_GoodsDetialsNew.put(jsonObj);
                     itemcount = itemcount + 1;
                 }
