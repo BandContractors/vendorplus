@@ -17,16 +17,11 @@ public class Transaction_tax_map implements Serializable {
     private String transaction_number;
     private String transaction_number_tax;
     private Date add_date;
-    private int is_updated;
-    private int update_synced;
     private String qr_code_tax;
     private String verification_code_tax;
-    private String update_type;
-    private String transaction_number_tax_update;
-    private String qr_code_tax_update;
-    private String verification_code_tax_update;
     private int is_updated_more_than_once;
     private int more_than_once_update_reconsiled;
+    private String reference_number_tax;
 
     /**
      * @return the transaction_tax_map_id
@@ -127,34 +122,6 @@ public class Transaction_tax_map implements Serializable {
     }
 
     /**
-     * @return the is_updated
-     */
-    public int getIs_updated() {
-        return is_updated;
-    }
-
-    /**
-     * @param is_updated the is_updated to set
-     */
-    public void setIs_updated(int is_updated) {
-        this.is_updated = is_updated;
-    }
-
-    /**
-     * @return the update_synced
-     */
-    public int getUpdate_synced() {
-        return update_synced;
-    }
-
-    /**
-     * @param update_synced the update_synced to set
-     */
-    public void setUpdate_synced(int update_synced) {
-        this.update_synced = update_synced;
-    }
-
-    /**
      * @return the qr_code_tax
      */
     public String getQr_code_tax() {
@@ -180,64 +147,6 @@ public class Transaction_tax_map implements Serializable {
      */
     public void setVerification_code_tax(String verification_code_tax) {
         this.verification_code_tax = verification_code_tax;
-    }
-
-    /**
-     * @return the update_type
-     */
-    public String getUpdate_type() {
-        return update_type;
-    }
-
-    /**
-     * @param update_type the update_type to set
-     */
-    public void setUpdate_type(String update_type) {
-        this.update_type = update_type;
-    }
-
-    /**
-     * @return the transaction_number_tax_update
-     */
-    public String getTransaction_number_tax_update() {
-        return transaction_number_tax_update;
-    }
-
-    /**
-     * @param transaction_number_tax_update the transaction_number_tax_update to
-     * set
-     */
-    public void setTransaction_number_tax_update(String transaction_number_tax_update) {
-        this.transaction_number_tax_update = transaction_number_tax_update;
-    }
-
-    /**
-     * @return the qr_code_tax_update
-     */
-    public String getQr_code_tax_update() {
-        return qr_code_tax_update;
-    }
-
-    /**
-     * @param qr_code_tax_update the qr_code_tax_update to set
-     */
-    public void setQr_code_tax_update(String qr_code_tax_update) {
-        this.qr_code_tax_update = qr_code_tax_update;
-    }
-
-    /**
-     * @return the verification_code_tax_update
-     */
-    public String getVerification_code_tax_update() {
-        return verification_code_tax_update;
-    }
-
-    /**
-     * @param verification_code_tax_update the verification_code_tax_update to
-     * set
-     */
-    public void setVerification_code_tax_update(String verification_code_tax_update) {
-        this.verification_code_tax_update = verification_code_tax_update;
     }
 
     /**
@@ -267,5 +176,19 @@ public class Transaction_tax_map implements Serializable {
      */
     public void setMore_than_once_update_reconsiled(int more_than_once_update_reconsiled) {
         this.more_than_once_update_reconsiled = more_than_once_update_reconsiled;
+    }
+
+    /**
+     * @return the reference_number_tax
+     */
+    public String getReference_number_tax() {
+        return reference_number_tax;
+    }
+
+    /**
+     * @param reference_number_tax the reference_number_tax to set
+     */
+    public void setReference_number_tax(String reference_number_tax) {
+        this.reference_number_tax = reference_number_tax;
     }
 }

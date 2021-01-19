@@ -211,6 +211,10 @@
                 <p:column headerText="View" exportable="false">
                     <p:commandButton id="cmdbView" icon="ui-icon-search" oncomplete="PF('dlgSalesInvoice').show();" actionListener="#{transBean.initSalesInvoiceSession(itm.transactionId,'View')}" update=":formTransaction"/>
                 </p:column>
+                <p:column headerText="Note" exportable="false">
+                    <p:commandButton id="cmdbCreditNote" value="Cr" oncomplete="PF('dlgCreditNote').show();" actionListener="#{transBean.initCreditDebitNoteSession(itm.transaction_id_cr_dr,itm.cr_dr_flag)}" update=":formTransactionCredit" rendered="#{itm.cr_dr_flag eq 'Credit Note'}"/>
+                    <p:commandButton id="cmdbDebitNote" value="Dr" oncomplete="PF('dlgDebitNote').show();" actionListener="#{transBean.initCreditDebitNoteSession(itm.transaction_id_cr_dr,itm.cr_dr_flag)}" update=":formTransactionDebit" rendered="#{itm.cr_dr_flag eq 'Debit Note'}"/>
+                </p:column>
                 <p:column headerText="Sales Type">
                     <h:outputLabel value="#{transactionReasonBean.getTransactionReason(itm.transactionReasonId).transactionReasonName} "/>
                     <h:outputLabel value="#{itm.transactionNumber}"/>
@@ -260,20 +264,6 @@
                         <p:ajax listener="#{transBean.reSubmitInvoiceTaxAPI(itm.transactionId,trans,transBean)}" update="tblDetail"/>
                     </p:commandButton>
                 </p:column>
-                <p:column headerText="Tax Updated">
-                    <h:outputText value="#{itm.tax_updated eq 1 ? 'Yes':itm.tax_updated eq 0 ? 'No':''}" styleClass="#{itm.tax_updated eq 1 ? 'green':itm.tax_updated eq 0 ? 'red':''}" style="width: 60px;color: #ffffff !important;text-align: right !important;"/>
-                </p:column>
-                <p:column headerText="Tax Update Synced">
-                    <h:outputText value="#{itm.tax_update_synced eq 1 ? 'Yes':itm.tax_update_synced eq 0 ? 'No':''}" styleClass="#{itm.tax_update_synced eq 1 ? 'green':itm.tax_update_synced eq 0 ? 'red':''}" style="width: 60px;color: #ffffff !important;text-align: right !important;"/>
-                    <p:commandButton id="cmdbUpdate" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" icon="ui-icon-arrowreturnthick-1-n" style="width: 20px;height: 30px;margin: 5px;"  rendered="#{itm.tax_update_synced eq 0}">
-                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
-                            <p:graphicImage name="/images/ajax-loader.gif"/>
-                        </p:dialog>
-                        <p:ajax listener="#{transBean.reSubmitDebitOrCreditNoteTaxAPI(itm.transactionId,itm.transactionTypeId,trans,transBean,itm.update_type)}" update="tblDetail"/>
-                    </p:commandButton>
-                    <h:outputText value=" #{itm.update_type eq 'Debit Note' ? 'DebitNote':itm.update_type eq 'Credit Note' ? 'CreditNote':''}" style="font-size: 10px;"/>
-                    <h:outputText value=" #{itm.transaction_number_tax_update}" style="font-size: 10px;"/>
-                </p:column>
                 <p:column headerText="Many updates reconsiled">
                     <h:outputText value="#{itm.reconsile_flag eq 'Reconsiled' ? 'Yes':itm.reconsile_flag eq 'Not Reconsiled' ? 'No':''}" styleClass="#{itm.reconsile_flag eq 'Reconsiled' ? 'green':itm.reconsile_flag eq 'Not Reconsiled' ? 'red':''}" style="width: 60px;color: #ffffff !important;text-align: right !important;"/>
                     <p:commandButton id="cmdbReconsile" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" icon="ui-icon-arrowreturnthick-1-n" style="width: 20px;height: 30px;margin: 5px;"  rendered="#{itm.reconsile_flag eq 'Not Reconsiled'}">
@@ -286,6 +276,8 @@
             </p:dataTable>
         </h:form>
         <ui:include src="ViewSaleInvoiceTrans.xhtml"/>
+        <ui:include src="ViewCreditNoteTrans.xhtml"/>
+        <ui:include src="ViewDebitNoteTrans.xhtml"/>
     </h:body>
 
 </html>

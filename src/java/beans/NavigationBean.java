@@ -1095,7 +1095,7 @@ public class NavigationBean implements Serializable {
         httpSession.setAttribute("INVOKE_MODE", "PARENT");
         return "CashAdjustment?faces-redirect=true";
     }
-    
+
     public String redirectToCashBalancingDaily() {
         //update seesion
         FacesContext context = FacesContext.getCurrentInstance();
@@ -1182,11 +1182,11 @@ public class NavigationBean implements Serializable {
     public String redirectToReportSalesInvoiceDetail() {
         return "ReportSalesInvoiceDetail?faces-redirect=true";
     }
-    
+
     public String redirectToReportOverpaidTrans() {
         return "ReportOverpaidTrans?faces-redirect=true";
     }
-    
+
     public String redirectToReportStockPriceQtyError() {
         return "ReportStockPriceQtyError?faces-redirect=true";
     }
@@ -1266,7 +1266,7 @@ public class NavigationBean implements Serializable {
     public String redirectToReportCashPaymentDetail() {
         return "ReportCashPaymentDetail?faces-redirect=true";
     }
-    
+
     public String redirectToReportReportCashBalancingDaily() {
         return "ReportCashBalancingDaily?faces-redirect=true";
     }
@@ -1386,11 +1386,11 @@ public class NavigationBean implements Serializable {
     public String redirectToBalanceSheet() {
         return "BalanceSheet?faces-redirect=true";
     }
-    
+
     public String redirectToIncomeStatement() {
         return "IncomeStatement?faces-redirect=true";
     }
-    
+
     public String redirectToCashFlowStatement() {
         return "CashFlowStatement?faces-redirect=true";
     }

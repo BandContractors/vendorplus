@@ -260,6 +260,111 @@ public class OutputDetailBean implements Serializable {
         }
     }
 
+    public void refreshOutputCrDr(String aLevel, String aSource) {
+        try {
+            TransBean tb = new TransBean();
+            OutputDetail aOutputDetail = new OutputDetail();
+            switch (aLevel) {
+                case "PARENT":
+                    try {
+                        aOutputDetail.setTrans(new CreditDebitNoteBean().getTrans_cr_dr_note(new GeneralUserSetting().getCurrentTransactionId()));
+                    } catch (Exception e) {
+                    }
+                    break;
+                case "CHILD":
+                    try {
+                        aOutputDetail.setTrans(new CreditDebitNoteBean().getTrans_cr_dr_note(new GeneralUserSetting().getCurrentTransactionIdChild()));
+                    } catch (Exception e) {
+                    }
+                    break;
+            }
+            tb.updateLookup(aOutputDetail.getTrans());
+            try {
+                aOutputDetail.setAdd_user_detail(new UserDetailBean().getUserDetail(aOutputDetail.getTrans().getAddUserDetailId()));
+            } catch (Exception e) {
+            }
+            try {
+                aOutputDetail.setEdit_user_detail(new UserDetailBean().getUserDetail(aOutputDetail.getTrans().getEditUserDetailId()));
+            } catch (Exception e) {
+            }
+            try {
+                aOutputDetail.setTrans_user_detail(new UserDetailBean().getUserDetail(aOutputDetail.getTrans().getTransactionUserDetailId()));
+            } catch (Exception e) {
+            }
+            try {
+                aOutputDetail.setAuthorised_by_user_detail(new UserDetailBean().getUserDetail(aOutputDetail.getTrans().getAuthorisedByUserDetailId()));
+            } catch (Exception e) {
+            }
+            try {
+                aOutputDetail.setTransactor(new TransactorBean().getTransactor(aOutputDetail.getTrans().getTransactorId()));
+            } catch (Exception e) {
+            }
+            try {
+                aOutputDetail.setBill_transactor(new TransactorBean().getTransactor(aOutputDetail.getTrans().getBillTransactorId()));
+            } catch (Exception e) {
+            }
+            try {
+                aOutputDetail.setTrans_items(new CreditDebitNoteBean().getTransItemsByTransactionId_cr_dr_note(aOutputDetail.getTrans().getTransactionId()));
+            } catch (Exception e) {
+            }
+            try {
+                aOutputDetail.setStore(new StoreBean().getStore(aOutputDetail.getTrans().getStoreId()));
+            } catch (Exception e) {
+            }
+            try {
+                aOutputDetail.setTransaction_type(new TransactionTypeBean().getTransactionType(aOutputDetail.getTrans().getTransactionTypeId()));
+            } catch (Exception e) {
+            }
+            try {
+                aOutputDetail.setTransaction_reason(new TransactionReasonBean().getTransactionReason(aOutputDetail.getTrans().getTransactionReasonId()));
+            } catch (Exception e) {
+            }
+            try {
+                aOutputDetail.setTotal_items(aOutputDetail.getTrans_items().size());
+                //aOutputDetail.setTotal_items_list(new ArrayList<>());
+                List<Integer> itmlist = new ArrayList<>();
+                for (int x = 1; x <= (15 - aOutputDetail.getTotal_items()); x++) {
+                    itmlist.add(x);
+                }
+                aOutputDetail.setTotal_items_list(itmlist);
+            } catch (Exception e) {
+                //e.printStackTrace();
+            }
+            //refresh amount in words
+            try {
+                if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "OUTPUT_SHOW_AMOUNT_IN_WORDS").getParameter_value().equals("1")) {
+                    aOutputDetail.setTransAmountInWords(new ConvertNumToWordBean().convertNumToWord(aOutputDetail.getTrans().getGrandTotal(), aOutputDetail.getTrans().getCurrencyCode()));
+                } else {
+                    aOutputDetail.setTransAmountInWords("");
+                }
+            } catch (Exception e) {
+                aOutputDetail.setTransAmountInWords("");
+            }
+            try {
+                if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "OUTPUT_SHOW_AMOUNT_IN_WORDS").getParameter_value().equals("1")) {
+                    aOutputDetail.setPayAmountInWords(new ConvertNumToWordBean().convertNumToWord(aOutputDetail.getPay().getPaidAmount(), aOutputDetail.getPay().getCurrencyCode()));
+                } else {
+                    aOutputDetail.setPayAmountInWords("");
+                }
+            } catch (Exception e) {
+                aOutputDetail.setPayAmountInWords("");
+            }
+            FacesContext context = FacesContext.getCurrentInstance();
+            HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+            HttpSession httpSession = request.getSession(false);
+            switch (aLevel) {
+                case "PARENT":
+                    httpSession.setAttribute("OUTPUT_DETAIL_PARENT", aOutputDetail);
+                    break;
+                case "CHILD":
+                    httpSession.setAttribute("OUTPUT_DETAIL_CHILD", aOutputDetail);
+                    break;
+            }
+        } catch (Exception e) {
+            System.err.println("refreshOutputCrDr:" + e.getMessage());
+        }
+    }
+
     public String getGoodOrService(long aPayId) {
         String good_or_service = "";
         int good_found = 0;

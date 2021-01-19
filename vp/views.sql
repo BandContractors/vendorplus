@@ -587,3 +587,9 @@ UNION
 	INNER JOIN pay_trans pt ON p.pay_id=pt.pay_id 
 	INNER JOIN acc_coa ac ON pt.account_code=ac.account_code 
 	WHERE p.pay_type_id=15 AND p.pay_method_id!=7 AND p.pay_reason_id IN(105) ;
+    
+CREATE OR REPLACE VIEW view_transaction_cr_dr AS 
+SELECT t.*,ifnull(t2.transaction_id,0) as transaction_id_cr_dr,ifnull(t2.transaction_comment,"") as dr_cr_flag 
+FROM transaction t 
+LEFT JOIN transaction_cr_dr_note t2 on t.transaction_number=t2.transaction_ref 
+WHERE t.transaction_type_id IN(2,65,68);

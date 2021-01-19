@@ -75,19 +75,19 @@ public class Trans implements Serializable {
     private boolean OtherDates;
     //for profit margin
     private double TotalProfitMargin;
-    
+
     private int TransactionUserDetailId;
     private String TransactionUserDetailName;
     private long BillTransactorId;
     private String BillTransactorName;
     private boolean BillOther;
     private boolean DisplayLoyalty;
-    
+
     private long SchemeTransactorId;
     private String SchemeTransactorName;
     private String PrincSchemeMember;
     private String SchemeCardNumber;
-    
+
     private String TransactionNumber;
     private String TransactionNumber2;
     private String TransactionNumber3;
@@ -146,9 +146,11 @@ public class Trans implements Serializable {
     private String qr_code_tax;
     private String verification_code_tax;
     private String reconsile_flag;
-    private String transaction_number_tax_update;
     private String update_type;
     private Date hist_add_date;
+    private String reference_number_tax;
+    private long transaction_id_cr_dr;
+    private String cr_dr_flag;
 
     /**
      * @return the TransactionId
@@ -1817,20 +1819,6 @@ public class Trans implements Serializable {
     }
 
     /**
-     * @return the transaction_number_tax_update
-     */
-    public String getTransaction_number_tax_update() {
-        return transaction_number_tax_update;
-    }
-
-    /**
-     * @param transaction_number_tax_update the transaction_number_tax_update to set
-     */
-    public void setTransaction_number_tax_update(String transaction_number_tax_update) {
-        this.transaction_number_tax_update = transaction_number_tax_update;
-    }
-
-    /**
      * @return the update_type
      */
     public String getUpdate_type() {
@@ -1856,6 +1844,48 @@ public class Trans implements Serializable {
      */
     public void setHist_add_date(Date hist_add_date) {
         this.hist_add_date = hist_add_date;
+    }
+
+    /**
+     * @return the reference_number_tax
+     */
+    public String getReference_number_tax() {
+        return reference_number_tax;
+    }
+
+    /**
+     * @param reference_number_tax the reference_number_tax to set
+     */
+    public void setReference_number_tax(String reference_number_tax) {
+        this.reference_number_tax = reference_number_tax;
+    }
+
+    /**
+     * @return the transaction_id_cr_dr
+     */
+    public long getTransaction_id_cr_dr() {
+        return transaction_id_cr_dr;
+    }
+
+    /**
+     * @param transaction_id_cr_dr the transaction_id_cr_dr to set
+     */
+    public void setTransaction_id_cr_dr(long transaction_id_cr_dr) {
+        this.transaction_id_cr_dr = transaction_id_cr_dr;
+    }
+
+    /**
+     * @return the cr_dr_flag
+     */
+    public String getCr_dr_flag() {
+        return cr_dr_flag;
+    }
+
+    /**
+     * @param cr_dr_flag the cr_dr_flag to set
+     */
+    public void setCr_dr_flag(String cr_dr_flag) {
+        this.cr_dr_flag = cr_dr_flag;
     }
 
 }

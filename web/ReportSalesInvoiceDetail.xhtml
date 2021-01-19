@@ -211,9 +211,15 @@
                         <p:dataExporter type="xml" target="tblDetail" fileName="Sales_Invoice_Detail" />
                     </h:commandLink>
                 </f:facet>
-                <p:column headerText="View/Edit" exportable="false">
+                <p:column headerText="View" exportable="false">
                     <p:commandButton id="cmdbView" icon="ui-icon-search" oncomplete="PF('dlgSalesInvoice').show();" actionListener="#{transBean.initSalesInvoiceSession(itm.transactionId,'View')}" update=":formTransaction"/>
+                </p:column>
+                <p:column headerText="Edit" exportable="false">
                     <p:commandButton id="cmdbEdit" icon="ui-icon-pencil" oncomplete="PF('dlgSalesInvoice').show();" actionListener="#{transBean.initSalesInvoiceSession(itm.transactionId,'Edit')}" update=":formTransaction"/>
+                </p:column>
+                <p:column headerText="Note" exportable="false">
+                    <p:commandButton id="cmdbCreditNote" value="Cr" oncomplete="PF('dlgCreditNote').show();" actionListener="#{transBean.initCreditDebitNoteSession(itm.transaction_id_cr_dr,itm.cr_dr_flag)}" update=":formTransactionCredit" rendered="#{itm.cr_dr_flag eq 'Credit Note'}"/>
+                    <p:commandButton id="cmdbDebitNote" value="Dr" oncomplete="PF('dlgDebitNote').show();" actionListener="#{transBean.initCreditDebitNoteSession(itm.transaction_id_cr_dr,itm.cr_dr_flag)}" update=":formTransactionDebit" rendered="#{itm.cr_dr_flag eq 'Debit Note'}"/>
                 </p:column>
                 <p:column headerText="Sales Type">
                     <h:outputLabel value="#{transactionReasonBean.getTransactionReason(itm.transactionReasonId).transactionReasonName} "/>
@@ -271,6 +277,8 @@
             </p:dataTable>
         </h:form>
         <ui:include src="ViewSaleInvoiceTrans.xhtml"/>
+        <ui:include src="ViewCreditNoteTrans.xhtml"/>
+        <ui:include src="ViewDebitNoteTrans.xhtml"/>
     </h:body>
 
 </html>

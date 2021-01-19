@@ -156,7 +156,8 @@ public class TransItemBean implements Serializable {
                 ListItemIndex = ListItemIndex + 1;
             }
         } catch (NullPointerException npe) {
-            npe.printStackTrace();
+            System.err.println("saveTransItemsCEC:" + npe.getMessage());
+            //npe.printStackTrace();
         }
     }
 
@@ -9031,14 +9032,13 @@ public class TransItemBean implements Serializable {
         }
     }
 
-    public int itemExists(List<TransItem> aActiveTransItems, Long ItemIdent, String BatchNumb, String aCodeSpec, String aDescSpec) {
+    public int itemExists(List<TransItem> aActiveTransItems, Long aItemId, String aBatchNo, String aCodeSpec, String aDescSpec) {
         List<TransItem> ati = aActiveTransItems;
         int ItemFoundAtIndex = -1;
         int ListItemIndex = 0;
         int ListItemNo = ati.size();
-        double SubT = 0;
         while (ListItemIndex < ListItemNo) {
-            if (ati.get(ListItemIndex).getItemId() == ItemIdent && BatchNumb.equals(ati.get(ListItemIndex).getBatchno()) && aCodeSpec.equals(ati.get(ListItemIndex).getCodeSpecific()) && aDescSpec.equals(ati.get(ListItemIndex).getDescSpecific())) {
+            if (ati.get(ListItemIndex).getItemId() == aItemId && aBatchNo.equals(ati.get(ListItemIndex).getBatchno()) && aCodeSpec.equals(ati.get(ListItemIndex).getCodeSpecific()) && aDescSpec.equals(ati.get(ListItemIndex).getDescSpecific())) {
                 ItemFoundAtIndex = ListItemIndex;
                 break;
             } else {
@@ -9047,6 +9047,23 @@ public class TransItemBean implements Serializable {
             ListItemIndex = ListItemIndex + 1;
         }
         return ItemFoundAtIndex;
+    }
+
+    public TransItem itemExistsObj(List<TransItem> aActiveTransItems, Long aItemId, String aBatchNo, String aCodeSpec, String aDescSpec) {
+        List<TransItem> ati = aActiveTransItems;
+        TransItem ItemFound = null;
+        int ListItemIndex = 0;
+        int ListItemNo = ati.size();
+        while (ListItemIndex < ListItemNo) {
+            if (ati.get(ListItemIndex).getItemId() == aItemId && aBatchNo.equals(ati.get(ListItemIndex).getBatchno()) && aCodeSpec.equals(ati.get(ListItemIndex).getCodeSpecific()) && aDescSpec.equals(ati.get(ListItemIndex).getDescSpecific())) {
+                ItemFound = ati.get(ListItemIndex);
+                break;
+            } else {
+                ItemFound = null;
+            }
+            ListItemIndex = ListItemIndex + 1;
+        }
+        return ItemFound;
     }
 
     public int itemExistsJournalEntry(List<TransItem> aActiveTransItems, String aAccountCode, String aChildAccountCode) {
@@ -9393,6 +9410,8 @@ public class TransItemBean implements Serializable {
             ToObj.setIs_general(0);
             ToObj.setSpecific_size_qty(FromObj.getSpecific_size_qty());
             ToObj.setSpecific_size(FromObj.getSpecific_size_qty());
+            ToObj.setVatPerc(FromObj.getVatPerc());
+            ToObj.setVatRated(FromObj.getVatRated());
         }
     }
 

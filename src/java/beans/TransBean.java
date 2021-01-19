@@ -1798,7 +1798,7 @@ public class TransBean implements Serializable {
             trans.setTransactionId(InsertedTransId);
         } catch (Exception e) {
             System.err.println("--:insertTransCEC:--" + e.getMessage());
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 
@@ -4093,6 +4093,15 @@ public class TransBean implements Serializable {
             if ("OPENING BALANCE".equals(transtype.getTransactionTypeName())) {
                 new AccJournalBean().postJournalOpenBalanceCANCEL(OldTrans, OldTransItems, new AccPeriodBean().getAccPeriod(OldTrans.getTransactionDate()).getAccPeriodId());
             }
+            //start-insert credit/debit note
+            long SavedCrDrNoteTransId = 0;
+            int ExistCountDrCrNotes = new CreditDebitNoteBean().getCountDebitAndCreditNotes(OldTrans.getTransactionNumber());
+            if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE RETURN INVOICE".equals(transtype.getTransactionTypeName())) {
+                if (ExistCountDrCrNotes == 0) {
+                    SavedCrDrNoteTransId = new CreditDebitNoteBean().saveCreditDebitNote(OldTrans, aNewTrans, OldTransItems, aNewTransItems);
+                }
+            }
+            //ens-insert credit/debit note
             TransItemBean = null;
             //clean stock
             StockBean.deleteZeroQtyStock();
@@ -4118,28 +4127,24 @@ public class TransBean implements Serializable {
                 } catch (Exception e) {
                     //
                 }
-                Transaction_tax_map ttm = new Transaction_tax_mapBean().getTransaction_tax_map(aNewTrans.getTransactionId(), aTransTypeId);
-                if (null == ttm) {
-                    //do nothing, original record for update not found
+                Transaction_tax_map PrevSyncedTaxInvoice = new Transaction_tax_mapBean().getTransaction_tax_map(OldTrans.getTransactionId(), aTransTypeId);
+                if (null == PrevSyncedTaxInvoice) {
+                    //do nothing, original record was not synced/found, that canno tbe updated
                 } else {
-                    if (ttm.getIs_updated() == 1) {
-                        new Transaction_tax_mapBean().markTransaction_tax_mapUpdated_more_than_once(ttm);
+                    if (ExistCountDrCrNotes >= 1) {
+                        new Transaction_tax_mapBean().markTransaction_tax_mapUpdated_more_than_once(PrevSyncedTaxInvoice);
                     } else {
                         if (IsThreadOn == 0) {
                             if (aNewTrans.getGrandTotal() > OldTrans.getGrandTotal() || aNewTrans.getTotalVat() > OldTrans.getTotalVat()) {//Debit note
-                                //System.out.println("Debit-Note-A");
-                                new InvoiceBean().submitDebitNote(aNewTrans.getTransactionId(), aTransTypeId);
+                                new InvoiceBean().submitDebitNote(SavedCrDrNoteTransId, 83);
                             } else if (aNewTrans.getGrandTotal() < OldTrans.getGrandTotal() || aNewTrans.getTotalVat() < OldTrans.getTotalVat()) {//Credit note
-                                //System.out.println("Credit-Note-A");
-                                new InvoiceBean().submitCreditNote(aNewTrans.getTransactionId(), aTransTypeId);
+                                new InvoiceBean().submitCreditNote(SavedCrDrNoteTransId, 82);
                             }
                         } else if (IsThreadOn == 1) {
                             if (aNewTrans.getGrandTotal() > OldTrans.getGrandTotal() || aNewTrans.getTotalVat() > OldTrans.getTotalVat()) {//Debit note
-                                //System.out.println("Debit-Note-B");
-                                new InvoiceBean().submitDebitNoteThread(aNewTrans.getTransactionId(), aTransTypeId);
+                                new InvoiceBean().submitDebitNoteThread(SavedCrDrNoteTransId, 83);
                             } else if (aNewTrans.getGrandTotal() < OldTrans.getGrandTotal() || aNewTrans.getTotalVat() < OldTrans.getTotalVat()) {//Credit note
-                                //System.out.println("Credit-Note-B");
-                                new InvoiceBean().submitCreditNoteThread(aNewTrans.getTransactionId(), aTransTypeId);
+                                new InvoiceBean().submitCreditNoteThread(SavedCrDrNoteTransId, 82);
                             }
                         }
                     }
@@ -5231,17 +5236,9 @@ public class TransBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println("getTrans:" + se.getMessage());
+        } catch (Exception e) {
+            System.err.println("getTrans:" + e.getMessage());
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
     }
 
@@ -11429,7 +11426,8 @@ public class TransBean implements Serializable {
         this.TransList = new ArrayList<>();
         this.TransListSummary = new ArrayList<>();
         PayTransBean ptb = new PayTransBean();
-        String sql = "SELECT * FROM transaction WHERE transaction_type_id IN(2,65,68)";
+        //String sql = "SELECT * FROM transaction WHERE transaction_type_id IN(2,65,68)";
+        String sql = "SELECT * FROM view_transaction_cr_dr WHERE 1=1";
         String sqlsum = "";
         if (aTransBean.getFieldName().length() > 0) {
             sqlsum = "SELECT " + aTransBean.getFieldName() + ",currency_code,sum(grand_total) as grand_total,sum(total_profit_margin) as total_profit_margin,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount FROM transaction WHERE transaction_type_id IN(2,65,68)";
@@ -11502,6 +11500,8 @@ public class TransBean implements Serializable {
                 } else {
                     trans.setIs_paid(0);
                 }
+                trans.setTransaction_id_cr_dr(rs.getLong("transaction_id_cr_dr"));
+                trans.setCr_dr_flag(rs.getString("dr_cr_flag"));
                 this.TransList.add(trans);
             }
         } catch (SQLException se) {
@@ -11738,11 +11738,11 @@ public class TransBean implements Serializable {
                 } catch (Exception npe) {
                     trans.setUpdate_type("");
                 }
-                try {
-                    trans.setTransaction_number_tax_update(rs.getString("transaction_number_tax_update"));
-                } catch (Exception npe) {
-                    trans.setTransaction_number_tax_update("");
-                }
+//                try {
+//                    trans.setTransaction_number_tax_update(rs.getString("transaction_number_tax_update"));
+//                } catch (Exception npe) {
+//                    trans.setTransaction_number_tax_update("");
+//                }
                 try {
                     trans.setReconsile_flag(rs.getString("reconsile_flag"));
                 } catch (Exception npe) {
@@ -14148,6 +14148,24 @@ public class TransBean implements Serializable {
         this.TransListHist = new ReportBean().getTransHistory(aTransId);
     }
 
+    public void initCreditDebitNoteSession(long aTransId, String aAction) {
+        //first set current selection in session
+        FacesContext context = FacesContext.getCurrentInstance();
+        HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+        HttpSession httpSession = request.getSession(true);
+        httpSession.setAttribute("CURRENT_TRANSACTION_ID", aTransId);
+        httpSession.setAttribute("CURRENT_TRANSACTION_ACTION", aAction);
+        httpSession.setAttribute("CURRENT_PAY_ID", 0);
+        this.ActionType = aAction;
+        //this.TransObj = new TransBean().getTrans(aTransId);
+        this.TransObj = new CreditDebitNoteBean().getTrans_cr_dr_note(aTransId);
+        //this.TransItemList = new TransItemBean().getTransItemsByTransactionId(aTransId);
+        this.TransItemList = new CreditDebitNoteBean().getTransItemsByTransactionId_cr_dr_note(aTransId);
+        this.PayObj = null;
+        //refresh output
+        new OutputDetailBean().refreshOutputCrDr("PARENT", "");
+    }
+
     public void initHireReturnInvoiceSession() {
         System.out.println("INITED-initHireReturnInvoiceSession");
         //first set current selection in session
@@ -15389,10 +15407,11 @@ public class TransBean implements Serializable {
                 aTrans.setTransactionUserDetailName("");
             }
             //get tax invoice number
-            if (aTrans.getTransactionTypeId() == 2 && aTrans.getTotalVat() > 0) {
-                //aTrans.setTransaction_number_tax(new Transaction_tax_mapBean().getTaxInvoiceNo(aTrans.getTransactionId(), aTrans.getTransactionTypeId()));
+            String DeviceNo = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value();
+            if (DeviceNo.length() > 0 && ((aTrans.getTransactionTypeId() == 2 && aTrans.getTotalVat() > 0) || aTrans.getTransactionTypeId() == 82 || aTrans.getTransactionTypeId() == 83)) {
                 Transaction_tax_map ttm = new Transaction_tax_mapBean().getTransaction_tax_map(aTrans.getTransactionId(), aTrans.getTransactionTypeId());
                 if (null != ttm) {
+                    aTrans.setReference_number_tax(ttm.getReference_number_tax());
                     aTrans.setTransaction_number_tax(ttm.getTransaction_number_tax());
                     aTrans.setVerification_code_tax(ttm.getVerification_code_tax());
                     aTrans.setQr_code_tax(ttm.getQr_code_tax());
