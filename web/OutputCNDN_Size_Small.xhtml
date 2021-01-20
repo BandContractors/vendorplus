@@ -43,40 +43,50 @@
                             <h:outputLabel id="IolblSalesInvoiceWebsite" value="Website: #{companySetting.getWebsite()}" rendered="#{companySetting.getWebsite().length()>0}"/>
                             <h:outputLabel id="IolblSalesInvoiceEmail" value="Email: #{companySetting.getEmail()}" rendered="#{companySetting.getEmail().length()>0}"/>
                         </h:panelGrid>
-                        <h:panelGrid columns="1" style="width: 290px; margin: 0px;background-color: #000000;text-align: center;-webkit-print-color-adjust: exact;">
+                        <h:panelGrid columns="1" style="width: 290px; margin: 0px;background-color: gray;text-align: center;-webkit-print-color-adjust: exact;">
                             <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 18pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">#{generalUserSetting.outputDetailParent.transaction_type.transactionOutputLabel}</h:outputLabel>
                         </h:panelGrid>
-                        <h:panelGrid id="IpgrdSalesInvoiceHeader4a" style="width: 290px; margin: 0px;" columns="2" rendered="#{utilityBean.isDatesEqual(generalUserSetting.outputDetailParent.trans.transactionDate, generalUserSetting.outputDetailParent.trans.addDate)==1}">
+                        <h:panelGrid style="width: 290px; margin: 0px;" columns="2" rendered="#{utilityBean.isDatesEqual(generalUserSetting.outputDetailParent.trans.transactionDate, generalUserSetting.outputDetailParent.trans.addDate)==1}">
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transaction_type.transactionNumberLabel}:"/>
                             <h:outputLabel style="font-size: 20px;font-weight: bold;" value="#{generalUserSetting.outputDetailParent.trans.transactionNumber}"/>
-                            <h:outputLabel style="font-size: 12px;" value="FDN:" rendered="#{generalUserSetting.outputDetailParent.trans.transaction_number_tax.length() gt 0}"/>
-                            <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.trans.transaction_number_tax}" rendered="#{generalUserSetting.outputDetailParent.trans.transaction_number_tax.length() gt 0}"/>
-                            <h:outputLabel style="font-size: 12px;" value="Verification Code:" rendered="#{generalUserSetting.outputDetailParent.trans.verification_code_tax.length() gt 0}"/>
-                            <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.trans.verification_code_tax}" rendered="#{generalUserSetting.outputDetailParent.trans.verification_code_tax.length() gt 0}"/>
+                            <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transaction_type.transactionRefLabel}:" rendered="#{generalUserSetting.outputDetailParent.trans.transactionRef.length()>0}"/>
+                            <h:outputLabel style="font-size: 12px;font-weight: bold;" value="#{generalUserSetting.outputDetailParent.trans.transactionRef}" rendered="#{generalUserSetting.outputDetailParent.trans.transactionRef.length()>0}"/>
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transaction_type.transactionDateLabel}:"/>
                             <h:outputLabel style="font-size: 12px;" value="#{utilityBean.formatDateTime(generalUserSetting.outputDetailParent.trans.addDate)}"/>
                         </h:panelGrid>
-                        <h:panelGrid id="IpgrdSalesInvoiceHeader4b" style="width: 290px; margin: 0px;" columns="2" rendered="#{utilityBean.isDatesEqual(generalUserSetting.outputDetailParent.trans.transactionDate, generalUserSetting.outputDetailParent.trans.addDate)==0}">
+                        <h:panelGrid style="width: 290px; margin: 0px;" columns="2" rendered="#{utilityBean.isDatesEqual(generalUserSetting.outputDetailParent.trans.transactionDate, generalUserSetting.outputDetailParent.trans.addDate)==0}">
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transaction_type.transactionNumberLabel}:"/>
                             <h:outputLabel style="font-size: 20px;font-weight: bold;" value="#{generalUserSetting.outputDetailParent.trans.transactionNumber}"/>
-                            <h:outputLabel style="font-size: 12px;" value="FDN:" rendered="#{generalUserSetting.outputDetailParent.trans.transaction_number_tax.length() gt 0}"/>
-                            <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.trans.transaction_number_tax}" rendered="#{generalUserSetting.outputDetailParent.trans.transaction_number_tax.length() gt 0}"/>
-                            <h:outputLabel style="font-size: 12px;" value="Verification Code:" rendered="#{generalUserSetting.outputDetailParent.trans.verification_code_tax.length() gt 0}"/>
-                            <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.trans.verification_code_tax}" rendered="#{generalUserSetting.outputDetailParent.trans.verification_code_tax.length() gt 0}"/>
+                            <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transaction_type.transactionRefLabel}:" rendered="#{generalUserSetting.outputDetailParent.trans.transactionRef.length()>0}"/>
+                            <h:outputLabel style="font-size: 12px;font-weight: bold;" value="#{generalUserSetting.outputDetailParent.trans.transactionRef}" rendered="#{generalUserSetting.outputDetailParent.trans.transactionRef.length()>0}"/>
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transaction_type.transactionDateLabel}:"/>
                             <h:outputLabel style="font-size: 12px;" value="#{utilityBean.formatDate(generalUserSetting.outputDetailParent.trans.transactionDate)}"/>
                             <h:outputLabel style="font-size: 12px;" value="Add Date:"/>
                             <h:outputLabel style="font-size: 12px;" value="#{utilityBean.formatDateTime(generalUserSetting.outputDetailParent.trans.addDate)}"/>
                         </h:panelGrid>
-
-                        <h:panelGrid id="IpgrdSalesInvoiceHeader5" style="width: 290px; margin: 0px;" columns="2">
-                            <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transaction_type.transactionRefLabel}:" rendered="#{generalUserSetting.outputDetailParent.trans.transactionRef.length()>0}"/>
-                            <h:outputLabel style="font-size: 14px;font-weight: bold;" value="#{generalUserSetting.outputDetailParent.trans.transactionRef}" rendered="#{generalUserSetting.outputDetailParent.trans.transactionRef.length()>0}"/>
-                            <h:outputLabel style="font-size: 12px;" value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}:" rendered="#{generalUserSetting.outputDetailParent.transactor.transactorId>0}"/>
-                            <h:outputLabel id="IolblSalesInvoiceCustomer" style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transactor.transactorNames}" rendered="#{generalUserSetting.outputDetailParent.transactor.transactorId>0}"/>
-                            <h:outputLabel style="font-size: 12px;" value="Bill For:" rendered="#{generalUserSetting.outputDetailParent.bill_transactor.transactorId!=generalUserSetting.outputDetailParent.transactor.transactorId}"/>
-                            <h:outputLabel id="IolblSalesInvoiceBillCustomer" style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.bill_transactor.transactorNames}" rendered="#{generalUserSetting.outputDetailParent.bill_transactor.transactorId!=generalUserSetting.outputDetailParent.transactor.transactorId}"/>
-
+                        <h:panelGrid style="width: 290px; margin: 0px;background-color: ghostwhite;" columns="2">
+                            <h:outputLabel style="font-size: 12px;" value="Reference No:" rendered="#{generalUserSetting.outputDetailParent.trans.reference_number_tax.length() gt 0}"/>
+                            <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.trans.reference_number_tax}" rendered="#{generalUserSetting.outputDetailParent.trans.reference_number_tax.length() gt 0}"/>
+                            <h:outputLabel style="font-size: 12px;" value="FDN:" rendered="#{generalUserSetting.outputDetailParent.trans.transaction_number_tax.length() gt 0}"/>
+                            <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.trans.transaction_number_tax}" rendered="#{generalUserSetting.outputDetailParent.trans.transaction_number_tax.length() gt 0}"/>
+                            <h:outputLabel style="font-size: 12px;" value="Verification Code:" rendered="#{generalUserSetting.outputDetailParent.trans.verification_code_tax.length() gt 0}"/>
+                            <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.trans.verification_code_tax}" rendered="#{generalUserSetting.outputDetailParent.trans.verification_code_tax.length() gt 0}"/>
+                        </h:panelGrid>
+                        
+                        <h:panelGrid style="width: 290px; margin: 0px;" columns="2" rendered="#{generalUserSetting.outputDetailParent.bill_transactor.transactorId!=generalUserSetting.outputDetailParent.transactor.transactorId}">
+                            <h:outputLabel style="font-size: 12px;" value="Bill For:"/>
+                            <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.bill_transactor.transactorNames}"/>
+                            <h:outputLabel style="font-size: 12px;" value="Tax Id No:" rendered="#{generalUserSetting.outputDetailParent.bill_transactor.taxIdentity.length()>0}"/>
+                            <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.bill_transactor.taxIdentity}" rendered="#{generalUserSetting.outputDetailParent.bill_transactor.taxIdentity.length()>0}"/>
+                            <h:outputLabel style="font-size: 12px;" value="Phone:" rendered="#{generalUserSetting.outputDetailParent.bill_transactor.phone.length()>0}"/>
+                            <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.bill_transactor.phone}" rendered="#{generalUserSetting.outputDetailParent.bill_transactor.phone.length()>0}"/>
+                        </h:panelGrid>
+                        
+                        <h:panelGrid style="width: 290px; margin: 0px;" columns="2" rendered="#{generalUserSetting.outputDetailParent.transactor.transactorId>0}">
+                            <h:outputLabel style="font-size: 12px;" value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}:"/>
+                            <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transactor.transactorNames}"/>
+                            <h:outputLabel style="font-size: 12px;" value="Tax Id No:" rendered="#{generalUserSetting.outputDetailParent.transactor.taxIdentity.length()>0}"/>
+                            <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transactor.taxIdentity}" rendered="#{generalUserSetting.outputDetailParent.transactor.taxIdentity.length()>0}"/>
                             <h:outputLabel style="font-size: 12px;" value="Phone:" rendered="#{generalUserSetting.outputDetailParent.transactor.phone.length()>0}"/>
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transactor.phone}" rendered="#{generalUserSetting.outputDetailParent.transactor.phone.length()>0}"/>
                             <h:outputLabel style="font-size: 12px;" value="Address:" rendered="#{generalUserSetting.outputDetailParent.trans.deliveryAddress.length()>0}"/>

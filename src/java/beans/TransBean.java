@@ -11616,10 +11616,16 @@ public class TransBean implements Serializable {
         }
     }
 
-    public void reSubmitInvoiceTaxAPI(long aInnerTransId, Trans aTrans, TransBean aTransBean) {
+    public void reSubmitInvoiceTaxAPI(long aInnerTransId, long aTransTypeId, Trans aTrans, TransBean aTransBean) {
         try {
             if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
-                new InvoiceBean().submitTaxInvoice(aInnerTransId);
+                if (aTransTypeId == 2) {//Invoice
+                    new InvoiceBean().submitTaxInvoice(aInnerTransId);
+                } else if (aTransTypeId == 82) {//Credit Note
+                    new InvoiceBean().submitCreditNote(aInnerTransId, 82);
+                } else if (aTransTypeId == 83) {//Debit Note
+                    new InvoiceBean().submitDebitNote(aInnerTransId, 83);
+                }
                 this.reportSalesTaxAPI(aTrans, aTransBean);
             }
         } catch (Exception e) {
@@ -11628,12 +11634,10 @@ public class TransBean implements Serializable {
     }
 
     public void markManyUpdatesReconsiled(long aInnerTransId, int aInnerTransTypeId, Trans aTrans, TransBean aTransBean) {
-        //TAX API
         try {
             if (aInnerTransTypeId == 2 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {//SALES INVOICE
                 Transaction_tax_map ttm = new Transaction_tax_mapBean().getTransaction_tax_map(aInnerTransId, aInnerTransTypeId);
-                ttm.setMore_than_once_update_reconsiled(1);
-                new Transaction_tax_mapBean().saveTransaction_tax_map(ttm);
+                new Transaction_tax_mapBean().markTransaction_tax_mapMore_than_once_update_reconsiled(ttm);
             }
             this.reportSalesTaxAPI(aTrans, aTransBean);
         } catch (Exception e) {
@@ -11650,12 +11654,12 @@ public class TransBean implements Serializable {
         this.TransList = new ArrayList<>();
         this.TransListSummary = new ArrayList<>();
         PayTransBean ptb = new PayTransBean();
-        String sql = "SELECT * FROM view_transaction_tax_map WHERE transaction_type_id IN(2,65,68)";
+        String sql = "SELECT * FROM view_transaction_tax_map WHERE transaction_type_id IN(2,65,68,82,83)";
         String sqlsum = "";
         if (aTransBean.getFieldName().length() > 0) {
-            sqlsum = "SELECT " + aTransBean.getFieldName() + ",sync_flag,currency_code,sum(grand_total) as grand_total,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount FROM view_transaction_tax_map WHERE transaction_type_id IN(2,65,68)";
+            sqlsum = "SELECT " + aTransBean.getFieldName() + ",sync_flag,currency_code,sum(grand_total) as grand_total,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount FROM view_transaction_tax_map WHERE transaction_type_id IN(2,65,68,82,83)";
         } else {
-            sqlsum = "SELECT sync_flag,currency_code,sum(grand_total) as grand_total,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount FROM view_transaction_tax_map WHERE transaction_type_id IN(2,65,68)";
+            sqlsum = "SELECT sync_flag,currency_code,sum(grand_total) as grand_total,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount FROM view_transaction_tax_map WHERE transaction_type_id IN(2,65,68,82,83)";
         }
         String wheresql = "";
         String ordersql = "";
@@ -11697,7 +11701,7 @@ public class TransBean implements Serializable {
                     break;
             }
         }
-        ordersql = " ORDER BY add_date DESC,transaction_id DESC";
+        ordersql = " ORDER BY add_date DESC";
         if (aTransBean.getFieldName().length() > 0) {
             ordersqlsum = " ORDER BY " + aTransBean.getFieldName() + ",sync_flag,currency_code";
         } else {
@@ -11714,6 +11718,11 @@ public class TransBean implements Serializable {
                 trans = new Trans();
                 this.setTransFromResultset(trans, rs);
                 try {
+                    trans.setReference_number_tax(rs.getString("reference_number_tax"));
+                } catch (Exception npe) {
+                    trans.setReference_number_tax("");
+                }
+                try {
                     trans.setTransaction_number_tax(rs.getString("transaction_number_tax"));
                 } catch (Exception npe) {
                     trans.setTransaction_number_tax("");
@@ -11723,26 +11732,6 @@ public class TransBean implements Serializable {
                 } catch (Exception npe) {
                     trans.setTax_synced(0);
                 }
-                try {
-                    trans.setTax_updated(rs.getInt("tax_updated"));
-                } catch (Exception npe) {
-                    trans.setTax_updated(0);
-                }
-                try {
-                    trans.setTax_update_synced(rs.getInt("tax_update_synced"));
-                } catch (Exception npe) {
-                    trans.setTax_update_synced(0);
-                }
-                try {
-                    trans.setUpdate_type(rs.getString("update_type"));
-                } catch (Exception npe) {
-                    trans.setUpdate_type("");
-                }
-//                try {
-//                    trans.setTransaction_number_tax_update(rs.getString("transaction_number_tax_update"));
-//                } catch (Exception npe) {
-//                    trans.setTransaction_number_tax_update("");
-//                }
                 try {
                     trans.setReconsile_flag(rs.getString("reconsile_flag"));
                 } catch (Exception npe) {

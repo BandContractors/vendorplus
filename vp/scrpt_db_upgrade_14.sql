@@ -107,10 +107,10 @@ VALUES('scrpt_db_upgrade_14',105,Now(),'6.0','');
 
 INSERT INTO transaction_type (transaction_type_id, transaction_type_name,transaction_output_label,transaction_number_label,transaction_type_code,trans_number_format,
 transaction_date_label,transaction_ref_label,print_file_name1,print_file_name2,default_print_file) 
-VALUES (82, 'CREDIT NOTE','CREDIT NOTE','Credit Note No','CN','CYMDX','Credit Date','Tax Invoice No','OutputCNDN_Size_Small','OutputCNDN_Size_A4',1);
+VALUES (82, 'CREDIT NOTE','CREDIT NOTE','Credit Note No','CN','CYMDX','Credit Date','Orig. Invoice No','OutputCNDN_Size_Small','OutputCNDN_Size_A4',1);
 INSERT INTO transaction_type (transaction_type_id, transaction_type_name,transaction_output_label,transaction_number_label,transaction_type_code,trans_number_format,
 transaction_date_label,transaction_ref_label,print_file_name1,print_file_name2,default_print_file) 
-VALUES (83, 'DEBIT NOTE','DEBIT NOTE','Debit Note No','DN','CYMDX','Debit Date','Tax Invoice No','OutputCNDN_Size_Small','OutputCNDN_Size_A4',1);
+VALUES (83, 'DEBIT NOTE','DEBIT NOTE','Debit Note No','DN','CYMDX','Debit Date','Orig. Invoice No','OutputCNDN_Size_Small','OutputCNDN_Size_A4',1);
 INSERT INTO transaction_reason (transaction_reason_id, transaction_reason_name, transaction_type_id) VALUES (126, 'CREDIT NOTE', 82);
 INSERT INTO transaction_reason (transaction_reason_id, transaction_reason_name, transaction_type_id) VALUES (127, 'DEBIT NOTE', 83);
 
