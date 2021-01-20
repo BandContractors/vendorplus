@@ -11291,7 +11291,8 @@ CREATE PROCEDURE sp_save_transaction_tax_map
 	IN in_verification_code_tax varchar(50),
 	IN in_qr_code_tax varchar(1000),
 	IN in_is_updated_more_than_once int,
-	IN in_more_than_once_update_reconsiled int
+	IN in_more_than_once_update_reconsiled int,
+	IN in_fdn_ref varchar(50)
 ) 
 BEGIN 
 	SET @cur_sys_datetime=null;
@@ -11299,16 +11300,16 @@ BEGIN
 
 	if (in_transaction_tax_map_id=0) then 
 		INSERT INTO transaction_tax_map(transaction_id,transaction_type_id,transaction_reason_id,
-		transaction_number,transaction_number_tax,verification_code_tax,qr_code_tax,add_date,is_updated_more_than_once,more_than_once_update_reconsiled,reference_number_tax) 
+		transaction_number,transaction_number_tax,verification_code_tax,qr_code_tax,add_date,is_updated_more_than_once,more_than_once_update_reconsiled,reference_number_tax,fdn_ref) 
 		VALUES(in_transaction_id,in_transaction_type_id,in_transaction_reason_id,in_transaction_number,in_transaction_number_tax,
-		in_verification_code_tax,in_qr_code_tax,@cur_sys_datetime,in_is_updated_more_than_once,in_more_than_once_update_reconsiled,in_reference_number_tax);
+		in_verification_code_tax,in_qr_code_tax,@cur_sys_datetime,in_is_updated_more_than_once,in_more_than_once_update_reconsiled,in_reference_number_tax,in_fdn_ref);
 	end if;
 
 	if (in_transaction_tax_map_id>0) then 
 		UPDATE transaction_tax_map SET transaction_id=in_transaction_id,transaction_type_id=in_transaction_type_id,
 		transaction_reason_id=in_transaction_reason_id,transaction_number=in_transaction_number,transaction_number_tax=in_transaction_number_tax,
 		verification_code_tax=in_verification_code_tax,qr_code_tax=in_qr_code_tax,is_updated_more_than_once=in_is_updated_more_than_once,
-        more_than_once_update_reconsiled=in_more_than_once_update_reconsiled,reference_number_tax=in_reference_number_tax 
+        more_than_once_update_reconsiled=in_more_than_once_update_reconsiled,reference_number_tax=in_reference_number_tax,fdn_ref=in_fdn_ref  
 		WHERE transaction_tax_map_id=in_transaction_tax_map_id;
 	end if;
 END//

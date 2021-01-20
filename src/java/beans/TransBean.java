@@ -15404,6 +15404,7 @@ public class TransBean implements Serializable {
                     aTrans.setTransaction_number_tax(ttm.getTransaction_number_tax());
                     aTrans.setVerification_code_tax(ttm.getVerification_code_tax());
                     aTrans.setQr_code_tax(ttm.getQr_code_tax());
+                    aTrans.setFdn_ref(ttm.getFdn_ref());
                 }
             }
         }

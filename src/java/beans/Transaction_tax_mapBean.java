@@ -89,6 +89,11 @@ public class Transaction_tax_mapBean implements Serializable {
             } catch (NullPointerException npe) {
                 aTransaction_tax_map.setMore_than_once_update_reconsiled(0);
             }
+            try {
+                aTransaction_tax_map.setFdn_ref(aResultSet.getString("fdn_ref"));
+            } catch (NullPointerException npe) {
+                aTransaction_tax_map.setFdn_ref("");
+            }
         } catch (SQLException se) {
             System.err.println(se.getMessage());
         }
@@ -96,7 +101,7 @@ public class Transaction_tax_mapBean implements Serializable {
 
     public int saveTransaction_tax_map(Transaction_tax_map aTransaction_tax_map) {
         int saved = 0;
-        String sql = "{call sp_save_transaction_tax_map(?,?,?,?,?,?,?,?,?,?,?)}";
+        String sql = "{call sp_save_transaction_tax_map(?,?,?,?,?,?,?,?,?,?,?,?)}";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 CallableStatement cs = conn.prepareCall(sql);) {
@@ -160,6 +165,15 @@ public class Transaction_tax_mapBean implements Serializable {
                 } catch (NullPointerException npe) {
                     cs.setInt("in_more_than_once_update_reconsiled", 0);
                 }
+                try {
+                    if (null == aTransaction_tax_map.getFdn_ref()) {
+                        cs.setString("in_fdn_ref", "");
+                    } else {
+                        cs.setString("in_fdn_ref", aTransaction_tax_map.getFdn_ref());
+                    }
+                } catch (NullPointerException npe) {
+                    cs.setString("in_fdn_ref", "");
+                }
                 cs.executeUpdate();
                 saved = 1;
             }
@@ -189,6 +203,7 @@ public class Transaction_tax_mapBean implements Serializable {
                 transtaxmap.setReference_number_tax("");
                 transtaxmap.setIs_updated_more_than_once(0);
                 transtaxmap.setMore_than_once_update_reconsiled(0);
+                transtaxmap.setFdn_ref("");
                 int x = this.saveTransaction_tax_map(transtaxmap);
             }
         } catch (Exception e) {
@@ -200,6 +215,13 @@ public class Transaction_tax_mapBean implements Serializable {
         try {
             Transaction_tax_map transtaxmap = new Transaction_tax_map();
             if (null != aCrDrNoteTrans) {
+                //first get ref fdn
+                String RefFDN = "";
+                try {
+                    RefFDN = this.getTransaction_tax_map(aCrDrNoteTrans.getTransactionRef(), 2).getTransaction_number_tax();
+                } catch (Exception e) {
+                    //do nothing
+                }
                 transtaxmap.setTransaction_id(aCrDrNoteTrans.getTransactionId());
                 transtaxmap.setTransaction_number(aCrDrNoteTrans.getTransactionNumber());
                 transtaxmap.setTransaction_type_id(aCrDrNoteTrans.getTransactionTypeId());
@@ -210,6 +232,7 @@ public class Transaction_tax_mapBean implements Serializable {
                 transtaxmap.setQr_code_tax(aQrCodeTax);
                 transtaxmap.setIs_updated_more_than_once(0);
                 transtaxmap.setMore_than_once_update_reconsiled(0);
+                transtaxmap.setFdn_ref(RefFDN);
                 int x = this.saveTransaction_tax_map(transtaxmap);
             }
         } catch (Exception e) {
@@ -248,7 +271,7 @@ public class Transaction_tax_mapBean implements Serializable {
             System.err.println("markTransaction_tax_mapUpdated_more_than_once:" + e.getMessage());
         }
     }
-    
+
     public void markTransaction_tax_mapMore_than_once_update_reconsiled(Transaction_tax_map aTransaction_tax_map) {
         String sql = "UPDATE transaction_tax_map SET more_than_once_update_reconsiled=? "
                 + "WHERE transaction_tax_map_id=" + aTransaction_tax_map.getTransaction_tax_map_id();

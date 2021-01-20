@@ -22,6 +22,7 @@ public class Transaction_tax_map implements Serializable {
     private int is_updated_more_than_once;
     private int more_than_once_update_reconsiled;
     private String reference_number_tax;
+    private String fdn_ref;
 
     /**
      * @return the transaction_tax_map_id
@@ -190,5 +191,19 @@ public class Transaction_tax_map implements Serializable {
      */
     public void setReference_number_tax(String reference_number_tax) {
         this.reference_number_tax = reference_number_tax;
+    }
+
+    /**
+     * @return the fdn_ref
+     */
+    public String getFdn_ref() {
+        return fdn_ref;
+    }
+
+    /**
+     * @param fdn_ref the fdn_ref to set
+     */
+    public void setFdn_ref(String fdn_ref) {
+        this.fdn_ref = fdn_ref;
     }
 }

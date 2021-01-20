@@ -151,6 +151,7 @@ public class Trans implements Serializable {
     private String reference_number_tax;
     private long transaction_id_cr_dr;
     private String cr_dr_flag;
+    private String fdn_ref;
 
     /**
      * @return the TransactionId
@@ -1886,6 +1887,20 @@ public class Trans implements Serializable {
      */
     public void setCr_dr_flag(String cr_dr_flag) {
         this.cr_dr_flag = cr_dr_flag;
+    }
+
+    /**
+     * @return the fdn_ref
+     */
+    public String getFdn_ref() {
+        return fdn_ref;
+    }
+
+    /**
+     * @param fdn_ref the fdn_ref to set
+     */
+    public void setFdn_ref(String fdn_ref) {
+        this.fdn_ref = fdn_ref;
     }
 
 }
