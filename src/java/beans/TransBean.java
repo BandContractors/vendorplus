@@ -11646,6 +11646,21 @@ public class TransBean implements Serializable {
         }
     }
 
+    public void reGetCreditNoteApprovalStatusTaxAPI(String aReferenceNoTax, long aTransTypeId, Trans aTrans, TransBean aTransBean) {
+        try {
+            if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
+                if (aTransTypeId == 82) {//Credit Note
+                    String SellerTin = CompanySetting.getTaxIdentity();
+                    String DeviceNo = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value();
+                    new InvoiceBean().updateCreditNote(aReferenceNoTax, DeviceNo, SellerTin);
+                }
+                this.reportSalesTaxAPI(aTrans, aTransBean);
+            }
+        } catch (Exception e) {
+            System.err.println("reGetCreditNoteApprovalStatusTaxAPI:" + e.getMessage());
+        }
+    }
+
     public void markManyUpdatesReconsiled(long aInnerTransId, int aInnerTransTypeId, Trans aTrans, TransBean aTransBean) {
         try {
             if (aInnerTransTypeId == 2 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {//SALES INVOICE
