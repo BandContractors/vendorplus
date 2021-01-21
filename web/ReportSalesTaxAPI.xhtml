@@ -56,7 +56,7 @@
                     <p:calendar id="calDate2"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{transBean.date2}" size="18"/>
                 </h:panelGrid>
                 <h:panelGrid columns="2">
-                    <p:outputLabel value="#{transactionTypeBean.getTransactionType(2).transactionNumberLabel}:"/>
+                    <p:outputLabel value="Trans No (This System):"/>
                     <p:inputText id="itxtInvoiceNo" value="#{trans.transactionNumber}" style="width: 215px;"/>
                     <p:outputLabel value="Added By:"/>
                     <p:selectOneMenu id="menuAddUser" value="#{trans.addUserDetailId}" style="width: 200px;">
@@ -72,14 +72,14 @@
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
-                        <p:ajax listener="#{transBean.reportSalesTaxAPI(trans,transBean)}" process="pnlgFilter" update="menuDateType pnlgFilter pnlgMessage tblDetail"/>
+                        <p:ajax listener="#{transBean.reportSalesTaxAPI(trans,transBean)}" process="pnlgFilter" update="menuDateType pnlgFilter pnlgMessage growl1 tblDetail"/>
                     </p:commandButton>
                     <p:commandButton id="cmdbReset" value="RESET (ALT+R)" accesskey="r" style="width: 225px;">
-                        <p:ajax listener="#{transBean.resetSalesInvoiceDetail(trans,transBean,transactorBean.selectedBillTransactor,transactorBean.selectedTransactor)}" process="pnlgFilter" update="pnlgFilter pnlgMessage tblDetail"/>
+                        <p:ajax listener="#{transBean.resetSalesInvoiceDetail(trans,transBean,transactorBean.selectedBillTransactor,transactorBean.selectedTransactor)}" process="pnlgFilter" update="pnlgFilter pnlgMessage growl1 tblDetail"/>
                     </p:commandButton>
                 </h:panelGrid>
                 <h:panelGrid columns="2">
-                    <p:outputLabel value="#{transactionTypeBean.getTransactionType(2).transactionRefLabel}:"/>
+                    <p:outputLabel value="Trans No (Tax System):"/>
                     <p:inputText id="itxtRefNo" value="#{trans.transactionRef}" style="width: 235px;"/>
                     <p:outputLabel value="Bill For:"/>
                     <p:autoComplete id="autcBillTransactor" value="#{transactorBean.selectedBillTransactor}" 
@@ -138,6 +138,7 @@
             <h:panelGrid id="pnlgMessage">
                 <p:outputLabel value="#{transBean.actionMessage}" style="color: red;"/>
             </h:panelGrid>
+            <p:growl id="growl1"/>
             <p:dataTable id="tblDetail" tableStyle="width:auto;" var="itm" value="#{transBean.transList}" 
                          paginator="true" rows="50" 
                          paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 

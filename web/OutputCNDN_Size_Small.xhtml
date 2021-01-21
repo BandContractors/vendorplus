@@ -65,6 +65,8 @@
                             <h:outputLabel style="font-size: 12px;" value="#{utilityBean.formatDateTime(generalUserSetting.outputDetailParent.trans.addDate)}"/>
                         </h:panelGrid>
                         <h:panelGrid style="width: 290px; margin: 0px;background-color: ghostwhite;" columns="2">
+                            <h:outputLabel style="font-size: 12px;" value="" rendered="#{generalUserSetting.outputDetailParent.trans.reference_number_tax.length() gt 0 and generalUserSetting.outputDetailParent.trans.transaction_number_tax.length() eq 0}"/>
+                            <h:outputLabel style="font-size: 12px;color: red;font-weight: bold;" value="NOT APPROVED!" rendered="#{generalUserSetting.outputDetailParent.trans.reference_number_tax.length() gt 0 and generalUserSetting.outputDetailParent.trans.transaction_number_tax.length() eq 0}"/>
                             <h:outputLabel style="font-size: 12px;" value="Reference No:" rendered="#{generalUserSetting.outputDetailParent.trans.reference_number_tax.length() gt 0}"/>
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.trans.reference_number_tax}" rendered="#{generalUserSetting.outputDetailParent.trans.reference_number_tax.length() gt 0}"/>
                             <h:outputLabel style="font-size: 12px;" value="Credit Note No:" rendered="#{generalUserSetting.outputDetailParent.trans.transaction_number_tax.length() gt 0 and generalUserSetting.outputDetailParent.trans.transactionTypeId eq 82}"/>
@@ -72,7 +74,7 @@
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.trans.transaction_number_tax}" rendered="#{generalUserSetting.outputDetailParent.trans.transaction_number_tax.length() gt 0}"/>
                             <h:outputLabel style="font-size: 12px;" value="Verification Code:" rendered="#{generalUserSetting.outputDetailParent.trans.verification_code_tax.length() gt 0}"/>
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.trans.verification_code_tax}" rendered="#{generalUserSetting.outputDetailParent.trans.verification_code_tax.length() gt 0}"/>
-                            <h:outputLabel style="font-size: 12px;" value="FDN:" rendered="#{generalUserSetting.outputDetailParent.trans.fdn_ref.length() gt 0}"/>
+                            <h:outputLabel style="font-size: 12px;" value="Orig. FDN:" rendered="#{generalUserSetting.outputDetailParent.trans.fdn_ref.length() gt 0}"/>
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.trans.fdn_ref}" rendered="#{generalUserSetting.outputDetailParent.trans.fdn_ref.length() gt 0}"/>
                         </h:panelGrid>
                         

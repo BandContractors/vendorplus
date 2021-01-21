@@ -1111,7 +1111,7 @@ public class InvoiceBean {
                     gd.setQty(Double.toString(ChangedQty));
                     gd.setUnitOfMeasure(jsonObj.get("unitOfMeasure").toString());
                     gd.setTotal(Double.toString(ChangedAmt));
-                    Double vatPerc = transitems.get(i).getVatPerc();
+                    Double vatPerc = ti.getVatPerc();
                     Double tr = vatPerc / 100;
                     gd.setTaxRate(Double.toString(tr));
                     //start - new calc

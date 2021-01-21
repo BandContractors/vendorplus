@@ -11418,180 +11418,193 @@ public class TransBean implements Serializable {
     }
 
     public void reportSalesInvoiceDetail(Trans aTrans, TransBean aTransBean) {
+        String msg = "";
+        aTransBean.setActionMessage("");
+        try {
+            if ((aTransBean.getDate1() != null && aTransBean.getDate2() != null) || aTrans.getTransactionNumber().length() > 0 || aTrans.getTransactionRef().length() > 0) {
+                //okay no problem
+            } else {
+                msg = "EITHER select date range OR specify Invoice/Reference Number";
+            }
+        } catch (Exception e) {
+            //do nothing
+        }
         if (aTransBean.getDateType().length() == 0) {
             aTransBean.setDateType("Add Date");
         }
-        aTransBean.setActionMessage("");
         ResultSet rs = null;
         this.TransList = new ArrayList<>();
         this.TransListSummary = new ArrayList<>();
-        PayTransBean ptb = new PayTransBean();
-        //String sql = "SELECT * FROM transaction WHERE transaction_type_id IN(2,65,68)";
-        String sql = "SELECT * FROM view_transaction_cr_dr WHERE 1=1";
-        String sqlsum = "";
-        if (aTransBean.getFieldName().length() > 0) {
-            sqlsum = "SELECT " + aTransBean.getFieldName() + ",currency_code,sum(grand_total) as grand_total,sum(total_profit_margin) as total_profit_margin,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount FROM transaction WHERE transaction_type_id IN(2,65,68)";
+        if (msg.length() > 0) {
+            aTransBean.setActionMessage(msg);
+            FacesContext.getCurrentInstance().addMessage("Report", new FacesMessage(msg));
         } else {
-            sqlsum = "SELECT currency_code,sum(grand_total) as grand_total,sum(total_profit_margin) as total_profit_margin,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount FROM transaction WHERE transaction_type_id IN(2,65,68)";
-        }
-        String wheresql = "";
-        String ordersql = "";
-        String ordersqlsum = "";
-        String groupbysql = "";
-        if (aTransBean.getFieldName().length() > 0) {
-            groupbysql = " GROUP BY " + aTransBean.getFieldName() + ",currency_code";
-        } else {
-            groupbysql = " GROUP BY currency_code";
-        }
-        if (aTrans.getStoreId() > 0) {
-            wheresql = wheresql + " AND store_id=" + aTrans.getStoreId();
-        }
-        if (aTrans.getTransactionNumber().length() > 0) {
-            wheresql = wheresql + " AND transaction_number='" + aTrans.getTransactionNumber() + "'";
-        }
-        if (aTrans.getTransactionRef().length() > 0) {
-            wheresql = wheresql + " AND transaction_ref='" + aTrans.getTransactionRef() + "'";
-        }
-        if (aTrans.getAddUserDetailId() > 0) {
-            wheresql = wheresql + " AND add_user_detail_id=" + aTrans.getAddUserDetailId();
-        }
-        if (aTrans.getTransactionUserDetailId() > 0) {
-            wheresql = wheresql + " AND transaction_user_detail_id=" + aTrans.getTransactionUserDetailId();
-        }
-        if (aTrans.getBillTransactorId() > 0) {
-            wheresql = wheresql + " AND bill_transactor_id=" + aTrans.getBillTransactorId();
-        }
-        if (aTrans.getTransactorId() > 0) {
-            wheresql = wheresql + " AND transactor_id=" + aTrans.getTransactorId();
-        }
-        if (aTransBean.getDateType().length() > 0 && aTransBean.getDate1() != null && aTransBean.getDate2() != null) {
-            switch (aTransBean.getDateType()) {
-                case "Invoice Date":
-                    wheresql = wheresql + " AND transaction_date BETWEEN '" + new java.sql.Date(aTransBean.getDate1().getTime()) + "' AND '" + new java.sql.Date(aTransBean.getDate2().getTime()) + "'";
-                    break;
-                case "Add Date":
-                    wheresql = wheresql + " AND add_date BETWEEN '" + new java.sql.Timestamp(aTransBean.getDate1().getTime()) + "' AND '" + new java.sql.Timestamp(aTransBean.getDate2().getTime()) + "'";
-                    break;
+            String sql = "SELECT * FROM view_transaction_cr_dr WHERE 1=1";
+            String sqlsum = "";
+            if (aTransBean.getFieldName().length() > 0) {
+                sqlsum = "SELECT " + aTransBean.getFieldName() + ",currency_code,sum(grand_total) as grand_total,sum(total_profit_margin) as total_profit_margin,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount FROM transaction WHERE transaction_type_id IN(2,65,68)";
+            } else {
+                sqlsum = "SELECT currency_code,sum(grand_total) as grand_total,sum(total_profit_margin) as total_profit_margin,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount FROM transaction WHERE transaction_type_id IN(2,65,68)";
             }
-        }
-        ordersql = " ORDER BY add_date DESC,transaction_id DESC";
-        if (aTransBean.getFieldName().length() > 0) {
-            ordersqlsum = " ORDER BY " + aTransBean.getFieldName() + ",currency_code";
-        } else {
-            ordersqlsum = " ORDER BY currency_code";
-        }
-        sql = sql + wheresql + ordersql;
-        sqlsum = sqlsum + wheresql + groupbysql + ordersqlsum;
-        try (
-                Connection conn = DBConnection.getMySQLConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);) {
-            rs = ps.executeQuery();
-            Trans trans = null;
-            while (rs.next()) {
-                trans = new Trans();
-                this.setTransFromResultset(trans, rs);
-                //double TotalPaid = ptb.getTotalPaidByTransId(trans.getTransactionId());
-                double TotalPaid = trans.getTotalPaid();
-                trans.setTotalPaid(TotalPaid);
-                if (TotalPaid >= trans.getGrandTotal()) {
-                    trans.setIs_paid(1);
-                } else if (TotalPaid > 0 && TotalPaid < trans.getGrandTotal()) {
-                    trans.setIs_paid(2);
-                } else {
-                    trans.setIs_paid(0);
+            String wheresql = "";
+            String ordersql = "";
+            String ordersqlsum = "";
+            String groupbysql = "";
+            if (aTransBean.getFieldName().length() > 0) {
+                groupbysql = " GROUP BY " + aTransBean.getFieldName() + ",currency_code";
+            } else {
+                groupbysql = " GROUP BY currency_code";
+            }
+            if (aTrans.getStoreId() > 0) {
+                wheresql = wheresql + " AND store_id=" + aTrans.getStoreId();
+            }
+            if (aTrans.getTransactionNumber().length() > 0) {
+                wheresql = wheresql + " AND transaction_number='" + aTrans.getTransactionNumber() + "'";
+            }
+            if (aTrans.getTransactionRef().length() > 0) {
+                wheresql = wheresql + " AND transaction_ref='" + aTrans.getTransactionRef() + "'";
+            }
+            if (aTrans.getAddUserDetailId() > 0) {
+                wheresql = wheresql + " AND add_user_detail_id=" + aTrans.getAddUserDetailId();
+            }
+            if (aTrans.getTransactionUserDetailId() > 0) {
+                wheresql = wheresql + " AND transaction_user_detail_id=" + aTrans.getTransactionUserDetailId();
+            }
+            if (aTrans.getBillTransactorId() > 0) {
+                wheresql = wheresql + " AND bill_transactor_id=" + aTrans.getBillTransactorId();
+            }
+            if (aTrans.getTransactorId() > 0) {
+                wheresql = wheresql + " AND transactor_id=" + aTrans.getTransactorId();
+            }
+            if (aTransBean.getDateType().length() > 0 && aTransBean.getDate1() != null && aTransBean.getDate2() != null) {
+                switch (aTransBean.getDateType()) {
+                    case "Invoice Date":
+                        wheresql = wheresql + " AND transaction_date BETWEEN '" + new java.sql.Date(aTransBean.getDate1().getTime()) + "' AND '" + new java.sql.Date(aTransBean.getDate2().getTime()) + "'";
+                        break;
+                    case "Add Date":
+                        wheresql = wheresql + " AND add_date BETWEEN '" + new java.sql.Timestamp(aTransBean.getDate1().getTime()) + "' AND '" + new java.sql.Timestamp(aTransBean.getDate2().getTime()) + "'";
+                        break;
                 }
-                trans.setTransaction_id_cr_dr(rs.getLong("transaction_id_cr_dr"));
-                trans.setCr_dr_flag(rs.getString("dr_cr_flag"));
-                this.TransList.add(trans);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        }
-
-        try (
-                Connection conn = DBConnection.getMySQLConnection();
-                PreparedStatement ps = conn.prepareStatement(sqlsum);) {
-            rs = ps.executeQuery();
-            Trans transsum = null;
-            while (rs.next()) {
-                transsum = new Trans();
-                if (aTransBean.getFieldName().length() > 0) {
-                    switch (aTransBean.getFieldName()) {
-                        case "add_user_detail_id":
-                            try {
-                                transsum.setAddUserDetailId(rs.getInt("add_user_detail_id"));
-                            } catch (NullPointerException npe) {
-                                transsum.setAddUserDetailId(0);
-                            }
-                            break;
-                        case "transaction_user_detail_id":
-                            try {
-                                transsum.setTransactionUserDetailId(rs.getInt("transaction_user_detail_id"));
-                            } catch (NullPointerException npe) {
-                                transsum.setTransactionUserDetailId(0);
-                            }
-                            break;
-                        case "bill_transactor_id":
-                            try {
-                                transsum.setBillTransactorId(rs.getLong("bill_transactor_id"));
-                            } catch (NullPointerException npe) {
-                                transsum.setBillTransactorId(0);
-                            }
-                            break;
-                        case "transactor_id":
-                            try {
-                                transsum.setTransactorId(rs.getLong("transactor_id"));
-                            } catch (NullPointerException npe) {
-                                transsum.setTransactorId(0);
-                            }
-                            break;
-                        case "transaction_date":
-                            try {
-                                transsum.setTransactionDate(new Date(rs.getDate("transaction_date").getTime()));
-                            } catch (NullPointerException | SQLException npe) {
-                                transsum.setTransactionDate(null);
-                            }
-                            break;
-                        case "store_id":
-                            try {
-                                transsum.setStoreId(rs.getInt("store_id"));
-                                Store st = new StoreBean().getStore(transsum.getStoreId());
-                                transsum.setStoreName(st.getStoreName());
-                            } catch (NullPointerException npe) {
-                                transsum.setStoreName("");
-                            }
-                            break;
+            ordersql = " ORDER BY add_date DESC,transaction_id DESC";
+            if (aTransBean.getFieldName().length() > 0) {
+                ordersqlsum = " ORDER BY " + aTransBean.getFieldName() + ",currency_code";
+            } else {
+                ordersqlsum = " ORDER BY currency_code";
+            }
+            sql = sql + wheresql + ordersql;
+            sqlsum = sqlsum + wheresql + groupbysql + ordersqlsum;
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                rs = ps.executeQuery();
+                Trans trans = null;
+                while (rs.next()) {
+                    trans = new Trans();
+                    this.setTransFromResultset(trans, rs);
+                    //double TotalPaid = ptb.getTotalPaidByTransId(trans.getTransactionId());
+                    double TotalPaid = trans.getTotalPaid();
+                    trans.setTotalPaid(TotalPaid);
+                    if (TotalPaid >= trans.getGrandTotal()) {
+                        trans.setIs_paid(1);
+                    } else if (TotalPaid > 0 && TotalPaid < trans.getGrandTotal()) {
+                        trans.setIs_paid(2);
+                    } else {
+                        trans.setIs_paid(0);
                     }
+                    trans.setTransaction_id_cr_dr(rs.getLong("transaction_id_cr_dr"));
+                    trans.setCr_dr_flag(rs.getString("dr_cr_flag"));
+                    this.TransList.add(trans);
                 }
-                try {
-                    transsum.setCurrencyCode(rs.getString("currency_code"));
-                } catch (NullPointerException npe) {
-                    transsum.setCurrencyCode("");
-                }
-                try {
-                    transsum.setGrandTotal(rs.getDouble("grand_total"));
-                } catch (NullPointerException npe) {
-                    transsum.setGrandTotal(0);
-                }
-                try {
-                    transsum.setTotalProfitMargin(rs.getDouble("total_profit_margin"));
-                } catch (NullPointerException npe) {
-                    transsum.setTotalProfitMargin(0);
-                }
-                try {
-                    transsum.setTotalVat(rs.getDouble("total_vat"));
-                } catch (NullPointerException npe) {
-                    transsum.setTotalVat(0);
-                }
-                try {
-                    transsum.setCashDiscount(rs.getDouble("cash_discount"));
-                } catch (NullPointerException npe) {
-                    transsum.setCashDiscount(0);
-                }
-                this.TransListSummary.add(transsum);
+            } catch (SQLException se) {
+                System.err.println(se.getMessage());
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sqlsum);) {
+                rs = ps.executeQuery();
+                Trans transsum = null;
+                while (rs.next()) {
+                    transsum = new Trans();
+                    if (aTransBean.getFieldName().length() > 0) {
+                        switch (aTransBean.getFieldName()) {
+                            case "add_user_detail_id":
+                                try {
+                                    transsum.setAddUserDetailId(rs.getInt("add_user_detail_id"));
+                                } catch (NullPointerException npe) {
+                                    transsum.setAddUserDetailId(0);
+                                }
+                                break;
+                            case "transaction_user_detail_id":
+                                try {
+                                    transsum.setTransactionUserDetailId(rs.getInt("transaction_user_detail_id"));
+                                } catch (NullPointerException npe) {
+                                    transsum.setTransactionUserDetailId(0);
+                                }
+                                break;
+                            case "bill_transactor_id":
+                                try {
+                                    transsum.setBillTransactorId(rs.getLong("bill_transactor_id"));
+                                } catch (NullPointerException npe) {
+                                    transsum.setBillTransactorId(0);
+                                }
+                                break;
+                            case "transactor_id":
+                                try {
+                                    transsum.setTransactorId(rs.getLong("transactor_id"));
+                                } catch (NullPointerException npe) {
+                                    transsum.setTransactorId(0);
+                                }
+                                break;
+                            case "transaction_date":
+                                try {
+                                    transsum.setTransactionDate(new Date(rs.getDate("transaction_date").getTime()));
+                                } catch (NullPointerException | SQLException npe) {
+                                    transsum.setTransactionDate(null);
+                                }
+                                break;
+                            case "store_id":
+                                try {
+                                    transsum.setStoreId(rs.getInt("store_id"));
+                                    Store st = new StoreBean().getStore(transsum.getStoreId());
+                                    transsum.setStoreName(st.getStoreName());
+                                } catch (NullPointerException npe) {
+                                    transsum.setStoreName("");
+                                }
+                                break;
+                        }
+                    }
+                    try {
+                        transsum.setCurrencyCode(rs.getString("currency_code"));
+                    } catch (NullPointerException npe) {
+                        transsum.setCurrencyCode("");
+                    }
+                    try {
+                        transsum.setGrandTotal(rs.getDouble("grand_total"));
+                    } catch (NullPointerException npe) {
+                        transsum.setGrandTotal(0);
+                    }
+                    try {
+                        transsum.setTotalProfitMargin(rs.getDouble("total_profit_margin"));
+                    } catch (NullPointerException npe) {
+                        transsum.setTotalProfitMargin(0);
+                    }
+                    try {
+                        transsum.setTotalVat(rs.getDouble("total_vat"));
+                    } catch (NullPointerException npe) {
+                        transsum.setTotalVat(0);
+                    }
+                    try {
+                        transsum.setCashDiscount(rs.getDouble("cash_discount"));
+                    } catch (NullPointerException npe) {
+                        transsum.setCashDiscount(0);
+                    }
+                    this.TransListSummary.add(transsum);
+                }
+            } catch (SQLException se) {
+                System.err.println(se.getMessage());
+            }
         }
     }
 
@@ -11646,187 +11659,235 @@ public class TransBean implements Serializable {
     }
 
     public void reportSalesTaxAPI(Trans aTrans, TransBean aTransBean) {
+        String msg = "";
+        aTransBean.setActionMessage("");
+        try {
+            if ((aTransBean.getDate1() != null && aTransBean.getDate2() != null) || aTrans.getTransactionNumber().length() > 0 || aTrans.getTransactionRef().length() > 0) {
+                //okay no problem
+            } else {
+                msg = "EITHER select date range OR specify Transaction Number from This/Tax System";
+            }
+        } catch (Exception e) {
+            //do nothing
+        }
         if (aTransBean.getDateType().length() == 0) {
             aTransBean.setDateType("Add Date");
         }
-        aTransBean.setActionMessage("");
         ResultSet rs = null;
         this.TransList = new ArrayList<>();
         this.TransListSummary = new ArrayList<>();
-        PayTransBean ptb = new PayTransBean();
-        String sql = "SELECT * FROM view_transaction_tax_map WHERE transaction_type_id IN(2,65,68,82,83)";
-        String sqlsum = "";
-        if (aTransBean.getFieldName().length() > 0) {
-            sqlsum = "SELECT " + aTransBean.getFieldName() + ",sync_flag,currency_code,sum(grand_total) as grand_total,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount FROM view_transaction_tax_map WHERE transaction_type_id IN(2,65,68,82,83)";
+        if (msg.length() > 0) {
+            aTransBean.setActionMessage(msg);
+            FacesContext.getCurrentInstance().addMessage("Report", new FacesMessage(msg));
         } else {
-            sqlsum = "SELECT sync_flag,currency_code,sum(grand_total) as grand_total,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount FROM view_transaction_tax_map WHERE transaction_type_id IN(2,65,68,82,83)";
-        }
-        String wheresql = "";
-        String ordersql = "";
-        String ordersqlsum = "";
-        String groupbysql = "";
-        if (aTransBean.getFieldName().length() > 0) {
-            groupbysql = " GROUP BY " + aTransBean.getFieldName() + ",sync_flag,currency_code";
-        } else {
-            groupbysql = " GROUP BY sync_flag,currency_code";
-        }
-        if (aTrans.getStoreId() > 0) {
-            wheresql = wheresql + " AND store_id=" + aTrans.getStoreId();
-        }
-        if (aTrans.getTransactionNumber().length() > 0) {
-            wheresql = wheresql + " AND transaction_number='" + aTrans.getTransactionNumber() + "'";
-        }
-        if (aTrans.getTransactionRef().length() > 0) {
-            wheresql = wheresql + " AND transaction_ref='" + aTrans.getTransactionRef() + "'";
-        }
-        if (aTrans.getAddUserDetailId() > 0) {
-            wheresql = wheresql + " AND add_user_detail_id=" + aTrans.getAddUserDetailId();
-        }
-        if (aTrans.getTransactionUserDetailId() > 0) {
-            wheresql = wheresql + " AND transaction_user_detail_id=" + aTrans.getTransactionUserDetailId();
-        }
-        if (aTrans.getBillTransactorId() > 0) {
-            wheresql = wheresql + " AND bill_transactor_id=" + aTrans.getBillTransactorId();
-        }
-        if (aTrans.getTransactorId() > 0) {
-            wheresql = wheresql + " AND transactor_id=" + aTrans.getTransactorId();
-        }
-        if (aTransBean.getDateType().length() > 0 && aTransBean.getDate1() != null && aTransBean.getDate2() != null) {
-            switch (aTransBean.getDateType()) {
-                case "Invoice Date":
-                    wheresql = wheresql + " AND transaction_date BETWEEN '" + new java.sql.Date(aTransBean.getDate1().getTime()) + "' AND '" + new java.sql.Date(aTransBean.getDate2().getTime()) + "'";
-                    break;
-                case "Add Date":
-                    wheresql = wheresql + " AND add_date BETWEEN '" + new java.sql.Timestamp(aTransBean.getDate1().getTime()) + "' AND '" + new java.sql.Timestamp(aTransBean.getDate2().getTime()) + "'";
-                    break;
+            //1. detail
+            String WhereAppend = "";
+            String OrderAppend = "";
+            if (aTrans.getStoreId() > 0) {
+                WhereAppend = WhereAppend + " AND t.store_id=" + aTrans.getStoreId();
             }
-        }
-        ordersql = " ORDER BY add_date DESC";
-        if (aTransBean.getFieldName().length() > 0) {
-            ordersqlsum = " ORDER BY " + aTransBean.getFieldName() + ",sync_flag,currency_code";
-        } else {
-            ordersqlsum = " ORDER BY sync_flag,currency_code";
-        }
-        sql = sql + wheresql + ordersql;
-        sqlsum = sqlsum + wheresql + groupbysql + ordersqlsum;
-        try (
-                Connection conn = DBConnection.getMySQLConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);) {
-            rs = ps.executeQuery();
-            Trans trans = null;
-            while (rs.next()) {
-                trans = new Trans();
-                this.setTransFromResultset(trans, rs);
-                try {
-                    trans.setReference_number_tax(rs.getString("reference_number_tax"));
-                } catch (Exception npe) {
-                    trans.setReference_number_tax("");
-                }
-                try {
-                    trans.setTransaction_number_tax(rs.getString("transaction_number_tax"));
-                } catch (Exception npe) {
-                    trans.setTransaction_number_tax("");
-                }
-                try {
-                    trans.setTax_synced(rs.getInt("tax_synced"));
-                } catch (Exception npe) {
-                    trans.setTax_synced(0);
-                }
-                try {
-                    trans.setReconsile_flag(rs.getString("reconsile_flag"));
-                } catch (Exception npe) {
-                    trans.setReconsile_flag("");
-                }
-                this.TransList.add(trans);
+            if (aTrans.getTransactionNumber().length() > 0) {
+                WhereAppend = WhereAppend + " AND t.transaction_number='" + aTrans.getTransactionNumber() + "'";
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        }
-
-        try (
-                Connection conn = DBConnection.getMySQLConnection();
-                PreparedStatement ps = conn.prepareStatement(sqlsum);) {
-            rs = ps.executeQuery();
-            Trans transsum = null;
-            while (rs.next()) {
-                transsum = new Trans();
-                if (aTransBean.getFieldName().length() > 0) {
-                    switch (aTransBean.getFieldName()) {
-                        case "add_user_detail_id":
-                            try {
-                                transsum.setAddUserDetailId(rs.getInt("add_user_detail_id"));
-                            } catch (NullPointerException npe) {
-                                transsum.setAddUserDetailId(0);
-                            }
-                            break;
-                        case "transaction_user_detail_id":
-                            try {
-                                transsum.setTransactionUserDetailId(rs.getInt("transaction_user_detail_id"));
-                            } catch (NullPointerException npe) {
-                                transsum.setTransactionUserDetailId(0);
-                            }
-                            break;
-                        case "bill_transactor_id":
-                            try {
-                                transsum.setBillTransactorId(rs.getLong("bill_transactor_id"));
-                            } catch (NullPointerException npe) {
-                                transsum.setBillTransactorId(0);
-                            }
-                            break;
-                        case "transactor_id":
-                            try {
-                                transsum.setTransactorId(rs.getLong("transactor_id"));
-                            } catch (NullPointerException npe) {
-                                transsum.setTransactorId(0);
-                            }
-                            break;
-                        case "transaction_date":
-                            try {
-                                transsum.setTransactionDate(new Date(rs.getDate("transaction_date").getTime()));
-                            } catch (NullPointerException | SQLException npe) {
-                                transsum.setTransactionDate(null);
-                            }
-                            break;
-                        case "store_id":
-                            try {
-                                transsum.setStoreId(rs.getInt("store_id"));
-                                Store st = new StoreBean().getStore(transsum.getStoreId());
-                                transsum.setStoreName(st.getStoreName());
-                            } catch (NullPointerException npe) {
-                                transsum.setStoreName("");
-                            }
-                            break;
+            if (aTrans.getTransactionRef().length() > 0) {
+                //WhereAppend = WhereAppend + " AND t.transaction_ref='" + aTrans.getTransactionRef() + "'";
+                WhereAppend = WhereAppend + " AND t2.transaction_number_tax='" + aTrans.getTransactionRef() + "'";
+            }
+            if (aTrans.getAddUserDetailId() > 0) {
+                WhereAppend = WhereAppend + " AND t.add_user_detail_id=" + aTrans.getAddUserDetailId();
+            }
+            if (aTrans.getTransactionUserDetailId() > 0) {
+                WhereAppend = WhereAppend + " AND t.transaction_user_detail_id=" + aTrans.getTransactionUserDetailId();
+            }
+            if (aTrans.getBillTransactorId() > 0) {
+                WhereAppend = WhereAppend + " AND t.bill_transactor_id=" + aTrans.getBillTransactorId();
+            }
+            if (aTrans.getTransactorId() > 0) {
+                WhereAppend = WhereAppend + " AND t.transactor_id=" + aTrans.getTransactorId();
+            }
+            if (aTransBean.getDateType().length() > 0 && aTransBean.getDate1() != null && aTransBean.getDate2() != null) {
+                switch (aTransBean.getDateType()) {
+                    case "Invoice Date":
+                        WhereAppend = WhereAppend + " AND t.transaction_date BETWEEN '" + new java.sql.Date(aTransBean.getDate1().getTime()) + "' AND '" + new java.sql.Date(aTransBean.getDate2().getTime()) + "'";
+                        break;
+                    case "Add Date":
+                        WhereAppend = WhereAppend + " AND t.add_date BETWEEN '" + new java.sql.Timestamp(aTransBean.getDate1().getTime()) + "' AND '" + new java.sql.Timestamp(aTransBean.getDate2().getTime()) + "'";
+                        break;
+                }
+            }
+            String sql = "SELECT  "
+                    + "		t.*,"
+                    + "		ifnull(t2.reference_number_tax,'') as reference_number_tax,ifnull(t2.transaction_number_tax,'') as transaction_number_tax,"
+                    + "		ifnull(t2.verification_code_tax,'') as verification_code_tax,ifnull(t2.qr_code_tax,'') as qr_code_tax,"
+                    + "		case when ifnull(t2.transaction_tax_map_id,0)>0 then 1 else 0 end as tax_synced,"
+                    + "		case when ifnull(t2.transaction_tax_map_id,0)>0 then 'Synced' else 'Not Synced' end as sync_flag,"
+                    + "		t2.is_updated_more_than_once,t2.more_than_once_update_reconsiled, "
+                    + "		case "
+                    + "			when t2.is_updated_more_than_once=1 and t2.more_than_once_update_reconsiled=1 then 'Reconsiled' "
+                    + "			when t2.is_updated_more_than_once=1 and t2.more_than_once_update_reconsiled=0 then 'Not Reconsiled' "
+                    + "			else '' "
+                    + "		end as reconsile_flag "
+                    + "		FROM transaction t "
+                    + "		left join transaction_tax_map t2 on t.transaction_id=t2.transaction_id and t.transaction_type_id=t2.transaction_type_id "
+                    + "		WHERE t.transaction_type_id IN(2,65,68) " + WhereAppend
+                    + " UNION "
+                    + " SELECT  "
+                    + "	t.*,"
+                    + "	ifnull(t2.reference_number_tax,'') as reference_number_tax,ifnull(t2.transaction_number_tax,'') as transaction_number_tax,"
+                    + "    ifnull(t2.verification_code_tax,'') as verification_code_tax,ifnull(t2.qr_code_tax,'') as qr_code_tax,"
+                    + "	case when ifnull(t2.transaction_tax_map_id,0)>0 then 1 else 0 end as tax_synced,"
+                    + "    case when ifnull(t2.transaction_tax_map_id,0)>0 then 'Synced' else 'Not Synced' end as sync_flag,"
+                    + "	t2.is_updated_more_than_once,t2.more_than_once_update_reconsiled, "
+                    + "	case "
+                    + "		when t2.is_updated_more_than_once=1 and t2.more_than_once_update_reconsiled=1 then 'Reconsiled' "
+                    + "		when t2.is_updated_more_than_once=1 and t2.more_than_once_update_reconsiled=0 then 'Not Reconsiled' "
+                    + "		else '' "
+                    + "	end as reconsile_flag "
+                    + "	FROM transaction_cr_dr_note t "
+                    + "	left join transaction_tax_map t2 on t.transaction_id=t2.transaction_id and t.transaction_type_id=t2.transaction_type_id "
+                    + "	WHERE t.transaction_type_id IN(82,83) " + WhereAppend;
+            OrderAppend = " ORDER BY add_date DESC";
+            sql = "SELECT * FROM (" + sql + ") as a " + OrderAppend;
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                rs = ps.executeQuery();
+                Trans trans = null;
+                while (rs.next()) {
+                    trans = new Trans();
+                    this.setTransFromResultset(trans, rs);
+                    try {
+                        trans.setReference_number_tax(rs.getString("reference_number_tax"));
+                    } catch (Exception npe) {
+                        trans.setReference_number_tax("");
                     }
+                    try {
+                        trans.setTransaction_number_tax(rs.getString("transaction_number_tax"));
+                    } catch (Exception npe) {
+                        trans.setTransaction_number_tax("");
+                    }
+                    try {
+                        trans.setTax_synced(rs.getInt("tax_synced"));
+                    } catch (Exception npe) {
+                        trans.setTax_synced(0);
+                    }
+                    try {
+                        trans.setReconsile_flag(rs.getString("reconsile_flag"));
+                    } catch (Exception npe) {
+                        trans.setReconsile_flag("");
+                    }
+                    this.TransList.add(trans);
                 }
-                try {
-                    transsum.setSync_flag(rs.getString("sync_flag"));
-                } catch (NullPointerException npe) {
-                    transsum.setSync_flag("");
-                }
-                try {
-                    transsum.setCurrencyCode(rs.getString("currency_code"));
-                } catch (NullPointerException npe) {
-                    transsum.setCurrencyCode("");
-                }
-                try {
-                    transsum.setGrandTotal(rs.getDouble("grand_total"));
-                } catch (NullPointerException npe) {
-                    transsum.setGrandTotal(0);
-                }
-                try {
-                    transsum.setTotalVat(rs.getDouble("total_vat"));
-                } catch (NullPointerException npe) {
-                    transsum.setTotalVat(0);
-                }
-                try {
-                    transsum.setCashDiscount(rs.getDouble("cash_discount"));
-                } catch (NullPointerException npe) {
-                    transsum.setCashDiscount(0);
-                }
-                this.TransListSummary.add(transsum);
+            } catch (Exception e) {
+                System.err.println("reportSalesTaxAPI-1:" + e.getMessage());
             }
-        } catch (Exception e) {
-            System.err.println("reportSalesTaxAPI:" + e.getMessage());
+
+            //2. summary
+            String sqlsum = "";
+            if (aTransBean.getFieldName().length() > 0) {
+                sqlsum = "SELECT " + aTransBean.getFieldName() + ",sync_flag,currency_code,sum(grand_total) as grand_total,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount FROM (" + sql + ") as b ";
+            } else {
+                sqlsum = "SELECT sync_flag,currency_code,sum(grand_total) as grand_total,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount FROM (" + sql + ") as b ";
+            }
+
+            String OrderAppendSum = "";
+            String GroupAppendSum = "";
+            if (aTransBean.getFieldName().length() > 0) {
+                GroupAppendSum = " GROUP BY " + aTransBean.getFieldName() + ",sync_flag,currency_code";
+            } else {
+                GroupAppendSum = " GROUP BY sync_flag,currency_code";
+            }
+            if (aTransBean.getFieldName().length() > 0) {
+                OrderAppendSum = " ORDER BY " + aTransBean.getFieldName() + ",sync_flag,currency_code";
+            } else {
+                OrderAppendSum = " ORDER BY sync_flag,currency_code";
+            }
+            sqlsum = sqlsum + GroupAppendSum + OrderAppendSum;
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sqlsum);) {
+                rs = ps.executeQuery();
+                Trans transsum = null;
+                while (rs.next()) {
+                    transsum = new Trans();
+                    if (aTransBean.getFieldName().length() > 0) {
+                        switch (aTransBean.getFieldName()) {
+                            case "add_user_detail_id":
+                                try {
+                                    transsum.setAddUserDetailId(rs.getInt("add_user_detail_id"));
+                                } catch (NullPointerException npe) {
+                                    transsum.setAddUserDetailId(0);
+                                }
+                                break;
+                            case "transaction_user_detail_id":
+                                try {
+                                    transsum.setTransactionUserDetailId(rs.getInt("transaction_user_detail_id"));
+                                } catch (NullPointerException npe) {
+                                    transsum.setTransactionUserDetailId(0);
+                                }
+                                break;
+                            case "bill_transactor_id":
+                                try {
+                                    transsum.setBillTransactorId(rs.getLong("bill_transactor_id"));
+                                } catch (NullPointerException npe) {
+                                    transsum.setBillTransactorId(0);
+                                }
+                                break;
+                            case "transactor_id":
+                                try {
+                                    transsum.setTransactorId(rs.getLong("transactor_id"));
+                                } catch (NullPointerException npe) {
+                                    transsum.setTransactorId(0);
+                                }
+                                break;
+                            case "transaction_date":
+                                try {
+                                    transsum.setTransactionDate(new Date(rs.getDate("transaction_date").getTime()));
+                                } catch (NullPointerException | SQLException npe) {
+                                    transsum.setTransactionDate(null);
+                                }
+                                break;
+                            case "store_id":
+                                try {
+                                    transsum.setStoreId(rs.getInt("store_id"));
+                                    Store st = new StoreBean().getStore(transsum.getStoreId());
+                                    transsum.setStoreName(st.getStoreName());
+                                } catch (NullPointerException npe) {
+                                    transsum.setStoreName("");
+                                }
+                                break;
+                        }
+                    }
+                    try {
+                        transsum.setSync_flag(rs.getString("sync_flag"));
+                    } catch (NullPointerException npe) {
+                        transsum.setSync_flag("");
+                    }
+                    try {
+                        transsum.setCurrencyCode(rs.getString("currency_code"));
+                    } catch (NullPointerException npe) {
+                        transsum.setCurrencyCode("");
+                    }
+                    try {
+                        transsum.setGrandTotal(rs.getDouble("grand_total"));
+                    } catch (NullPointerException npe) {
+                        transsum.setGrandTotal(0);
+                    }
+                    try {
+                        transsum.setTotalVat(rs.getDouble("total_vat"));
+                    } catch (NullPointerException npe) {
+                        transsum.setTotalVat(0);
+                    }
+                    try {
+                        transsum.setCashDiscount(rs.getDouble("cash_discount"));
+                    } catch (NullPointerException npe) {
+                        transsum.setCashDiscount(0);
+                    }
+                    this.TransListSummary.add(transsum);
+                }
+            } catch (Exception e) {
+                System.err.println("reportSalesTaxAPI-2:" + e.getMessage());
+            }
         }
     }
 
@@ -12570,10 +12631,10 @@ public class TransBean implements Serializable {
             wheresql = wheresql + " AND transaction_user_detail_id=" + aTrans.getTransactionUserDetailId();
         }
 //        if (aTrans.getBillTransactorId() > 0) {
-//            wheresql = wheresql + " AND bill_transactor_id=" + aTrans.getBillTransactorId();
+//            WhereAppend = WhereAppend + " AND bill_transactor_id=" + aTrans.getBillTransactorId();
 //        }
 //        if (aTrans.getTransactorId() > 0) {
-//            wheresql = wheresql + " AND transactor_id=" + aTrans.getTransactorId();
+//            WhereAppend = WhereAppend + " AND transactor_id=" + aTrans.getTransactorId();
 //        }
         if (aTransBean.getDateType().length() > 0 && aTransBean.getDate1() != null && aTransBean.getDate2() != null) {
             switch (aTransBean.getDateType()) {
@@ -12966,7 +13027,7 @@ public class TransBean implements Serializable {
             wheresql = wheresql + " AND transaction_user_detail_id=" + aTrans.getTransactionUserDetailId();
         }
 //        if (aTrans.getBillTransactorId() > 0) {
-//            wheresql = wheresql + " AND bill_transactor_id=" + aTrans.getBillTransactorId();
+//            WhereAppend = WhereAppend + " AND bill_transactor_id=" + aTrans.getBillTransactorId();
 //        }
         if (aTrans.getTransactorId() > 0) {
             wheresql = wheresql + " AND transactor_id=" + aTrans.getTransactorId();
@@ -13106,10 +13167,10 @@ public class TransBean implements Serializable {
             wheresql = wheresql + " AND transaction_user_detail_id=" + aTrans.getTransactionUserDetailId();
         }
 //        if (aTrans.getBillTransactorId() > 0) {
-//            wheresql = wheresql + " AND bill_transactor_id=" + aTrans.getBillTransactorId();
+//            WhereAppend = WhereAppend + " AND bill_transactor_id=" + aTrans.getBillTransactorId();
 //        }
 //        if (aTrans.getTransactorId() > 0) {
-//            wheresql = wheresql + " AND transactor_id=" + aTrans.getTransactorId();
+//            WhereAppend = WhereAppend + " AND transactor_id=" + aTrans.getTransactorId();
 //        }
         if (aTransBean.getDateType().length() > 0 && aTransBean.getDate1() != null && aTransBean.getDate2() != null) {
             switch (aTransBean.getDateType()) {
@@ -13241,10 +13302,10 @@ public class TransBean implements Serializable {
             wheresql = wheresql + " AND transaction_user_detail_id=" + aTrans.getTransactionUserDetailId();
         }
 //        if (aTrans.getBillTransactorId() > 0) {
-//            wheresql = wheresql + " AND bill_transactor_id=" + aTrans.getBillTransactorId();
+//            WhereAppend = WhereAppend + " AND bill_transactor_id=" + aTrans.getBillTransactorId();
 //        }
 //        if (aTrans.getTransactorId() > 0) {
-//            wheresql = wheresql + " AND transactor_id=" + aTrans.getTransactorId();
+//            WhereAppend = WhereAppend + " AND transactor_id=" + aTrans.getTransactorId();
 //        }
         if (aTransBean.getDateType().length() > 0 && aTransBean.getDate1() != null && aTransBean.getDate2() != null) {
             switch (aTransBean.getDateType()) {
@@ -13373,7 +13434,7 @@ public class TransBean implements Serializable {
             wheresql = wheresql + " AND transaction_user_detail_id=" + aTrans.getTransactionUserDetailId();
         }
 //        if (aTrans.getBillTransactorId() > 0) {
-//            wheresql = wheresql + " AND bill_transactor_id=" + aTrans.getBillTransactorId();
+//            WhereAppend = WhereAppend + " AND bill_transactor_id=" + aTrans.getBillTransactorId();
 //        }
         if (aTrans.getTransactorId() > 0) {
             wheresql = wheresql + " AND transactor_id=" + aTrans.getTransactorId();
@@ -15280,7 +15341,7 @@ public class TransBean implements Serializable {
         if (aTrans.getLocation_id() > 0) {
             wheresql = wheresql + " AND location_id=" + aTrans.getLocation_id();
         }
-        //wheresql = wheresql + " AND transaction_date BETWEEN '" + new java.sql.Date(aTransBean.getDate1().getTime()) + "' AND '" + new java.sql.Date(aTransBean.getDate2().getTime()) + "'";
+        //wheresql = WhereAppend + " AND transaction_date BETWEEN '" + new java.sql.Date(aTransBean.getDate1().getTime()) + "' AND '" + new java.sql.Date(aTransBean.getDate2().getTime()) + "'";
         ordersql = " ORDER BY add_date DESC,transaction_id DESC";
         sql = sql + wheresql + ordersql;
         //System.out.println("SQL:" + sql);
@@ -15346,7 +15407,7 @@ public class TransBean implements Serializable {
         } catch (Exception e) {
 
         }
-        //wheresql = wheresql + " AND transaction_date BETWEEN '" + new java.sql.Date(aTransBean.getDate1().getTime()) + "' AND '" + new java.sql.Date(aTransBean.getDate2().getTime()) + "'";
+        //wheresql = WhereAppend + " AND transaction_date BETWEEN '" + new java.sql.Date(aTransBean.getDate1().getTime()) + "' AND '" + new java.sql.Date(aTransBean.getDate2().getTime()) + "'";
         ordersql = " ORDER BY add_date DESC,transaction_id DESC";
         sql = sql + wheresql + ordersql;
         //System.out.println("SQL:" + sql);
