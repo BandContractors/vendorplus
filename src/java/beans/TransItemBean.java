@@ -9238,6 +9238,34 @@ public class TransItemBean implements Serializable {
         return this.getItemString();
     }
 
+    public int getAnyItemMixAddSubtractQty(List<TransItem> aActiveTransItems, String aTransactionType) {
+        int MixFound = 0;
+        try {
+            if ((aTransactionType.equals("SALE INVOICE") && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "DEPLETE_SOLD_STOCK_UPON").getParameter_value().equals("0")) || (aTransactionType.equals("GOODS DELIVERY") && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "DEPLETE_SOLD_STOCK_UPON").getParameter_value().equals("1"))) {
+                List<TransItem> ati = aActiveTransItems;
+                int ListItemIndex = 0;
+                int ListItemNo = ati.size();
+                int Adds = 0;
+                int Subs = 0;
+                while (ListItemIndex < ListItemNo) {
+                    if (ati.get(ListItemIndex).getItemQty() > 0) {
+                        Adds = Adds + 1;
+                    } else if (ati.get(ListItemIndex).getItemQty() < 0) {
+                        Subs = Subs + 1;
+                    }
+                    ListItemIndex = ListItemIndex + 1;
+                }
+                if (Adds > 0 && Subs > 0) {
+                    MixFound = 1;
+                }
+            }
+        } catch (Exception e) {
+            MixFound = 0;
+            System.err.println("getAnyItemMixAddSubtractQty:" + e.getMessage());
+        }
+        return MixFound;
+    }
+
     public String getAnyItemReturnTotalGreaterThanBalance(List<TransItem> aActiveTransItems, String aTransactionType) {
         List<TransItem> ati = aActiveTransItems;
         int ListItemIndex = 0;
@@ -10783,6 +10811,7 @@ public class TransItemBean implements Serializable {
         TransItem CurTransItem = null;
         TransItem PrevTransItem = null;
         //TransItem CurLessPrevTransItem = null;
+        UtilityBean ub = new UtilityBean();
         while (ListItemIndexCur < ListItemNoCur) {
             //CurLessPrevTransItem = new TransItem();
             CurQty = 0;
@@ -10795,13 +10824,14 @@ public class TransItemBean implements Serializable {
                 PrevTransItem = new TransItem();
                 //PrevTransItem = PrevTransItemList.get(ListItemIndexPrev);
                 this.copyObjectTransItem(PrevTransItemList.get(ListItemIndexPrev), PrevTransItem);
-                if (CurTransItem.getItemId() == PrevTransItem.getItemId() && CurTransItem.getBatchno().equals(PrevTransItem.getBatchno()) && CurTransItem.getCodeSpecific() == null ? PrevTransItem.getCodeSpecific() == null : CurTransItem.getCodeSpecific().equals(PrevTransItem.getCodeSpecific()) && CurTransItem.getDescSpecific() == null ? PrevTransItem.getDescSpecific() == null : CurTransItem.getDescSpecific().equals(PrevTransItem.getDescSpecific())) {
+                //if (CurTransItem.getItemId() == PrevTransItem.getItemId() && CurTransItem.getBatchno().equals(PrevTransItem.getBatchno()) && CurTransItem.getCodeSpecific() == null ? PrevTransItem.getCodeSpecific() == null : CurTransItem.getCodeSpecific().equals(PrevTransItem.getCodeSpecific()) && CurTransItem.getDescSpecific() == null ? PrevTransItem.getDescSpecific() == null : CurTransItem.getDescSpecific().equals(PrevTransItem.getDescSpecific())) {
+                if (CurTransItem.getItemId() == PrevTransItem.getItemId() && ub.getEmptyIfNull(CurTransItem.getBatchno()).equals(ub.getEmptyIfNull(PrevTransItem.getBatchno())) && ub.getEmptyIfNull(CurTransItem.getCodeSpecific()).equals(PrevTransItem.getCodeSpecific()) && ub.getEmptyIfNull(CurTransItem.getDescSpecific()).equals(ub.getEmptyIfNull(PrevTransItem.getDescSpecific()))) {
                     PrevQty = PrevTransItem.getItemQty();
                     break;
                 }
                 ListItemIndexPrev = ListItemIndexPrev + 1;
             }
-            if ((CurQty - PrevQty) > 0) {
+            if ((CurQty - PrevQty) != 0) {
                 CurTransItem.setItemQty(CurQty - PrevQty);
                 CurLessPrevTransItemList.add(CurTransItem);
             }

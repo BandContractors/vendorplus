@@ -143,5 +143,9 @@ ALTER TABLE transaction_tax_map ADD COLUMN fdn_ref VARCHAR(50) NULL DEFAULT '';
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_14',143,Now(),'6.0','');
 
+UPDATE parameter_list SET parameter_value='6.0' WHERE parameter_list_id=8;
+ALTER TABLE transaction_tax_map ADD COLUMN fdn_ref VARCHAR(50) NULL DEFAULT '';
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_14',147,Now(),'6.0','');
 
 

@@ -664,26 +664,19 @@ public class UtilityBean implements Serializable {
     }
 
 //    public static void main(String[] args) {
-//        Date dt1=null;
-//        Date dt2=null;
-//        dt1=new Date();
-//        System.out.println("Print1");
-//        System.out.println("Print1");
-//        System.out.println("Print1");
-//        System.out.println("Print1");
-//        System.out.println("Print1");
-//        System.out.println("Print1");
-//        System.out.println("Print1");
-//        System.out.println("Print1");
-//        System.out.println("Print1");
-//        System.out.println("Print1");
-//        System.out.println("Print1");
-//        System.out.println("Print1");
-//        System.out.println("Print1");
-//        System.out.println("Print1");
-//        dt2=new Date();
-//        System.out.println(dt2.getTime() - dt1.getTime());
+//        String a = "c";
+//        String b = "c";
+//        boolean x = new UtilityBean().getEmptyIfNull(a).equals(new UtilityBean().getEmptyIfNull(b));
+//        System.out.println("x:" + x);
 //    }
+
+    public String getEmptyIfNull(String aStringValue) {
+        if (aStringValue == null) {
+            return "";
+        } else {
+            return aStringValue;
+        }
+    }
 
     public void backupDatabase(String aDbName, String aDbUser, String aDbPassword, String aMySQLDumpFolderPath, String aSaveFolderPath) {
         try {

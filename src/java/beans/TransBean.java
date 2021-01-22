@@ -1556,6 +1556,8 @@ public class TransBean implements Serializable {
                 msg = "Paid amount CANNOT EXCEED Grand Total";
             } else if (trans.getTransactionId() > 0 && (trans.getAmountTendered() + trans.getSpendPointsAmount()) > trans.getGrandTotal()) {
                 msg = "Paid amount CANNOT EXCEED the New Grand Total";
+            } else if (trans.getTransactionId()>0 && new TransItemBean().getAnyItemMixAddSubtractQty(new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans), transtype.getTransactionTypeName()) == 1) {
+                msg = "You CANNOT Add(Debit Note) and Subtract(Credit Note) different items in the same UPDATE";
             }
         } catch (Exception e) {
             msg = "An error has occured during the validation process";
