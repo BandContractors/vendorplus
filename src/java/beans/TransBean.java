@@ -1556,7 +1556,7 @@ public class TransBean implements Serializable {
                 msg = "Paid amount CANNOT EXCEED Grand Total";
             } else if (trans.getTransactionId() > 0 && (trans.getAmountTendered() + trans.getSpendPointsAmount()) > trans.getGrandTotal()) {
                 msg = "Paid amount CANNOT EXCEED the New Grand Total";
-            } else if (trans.getTransactionId()>0 && new TransItemBean().getAnyItemMixAddSubtractQty(new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans), transtype.getTransactionTypeName()) == 1) {
+            } else if (trans.getTransactionId() > 0 && new TransItemBean().getAnyItemMixAddSubtractQty(new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans), transtype.getTransactionTypeName()) == 1) {
                 msg = "You CANNOT Add(Debit Note) and Subtract(Credit Note) different items in the same UPDATE";
             }
         } catch (Exception e) {
@@ -2570,7 +2570,7 @@ public class TransBean implements Serializable {
                     //TimeStr = TimeStr + " SJournal:" + ms;
                     //TAX API
                     //dt1 = new Date();
-                    if (aTransTypeId == 2 && trans.getTotalVat() > 0 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {//SALES INVOICE
+                    if (aTransTypeId == 2 && trans.getTotalVat() > 0 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0 && new Item_tax_mapBean().countItemsNotMappedSynced(aActiveTransItems) == 0) {//SALES INVOICE
                         int IsThreadOn = 0;
                         try {
                             IsThreadOn = Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_THREAD_ON").getParameter_value());
@@ -2990,7 +2990,7 @@ public class TransBean implements Serializable {
                         this.deleteTransFromHist(trans.getTransactionHistId());
                     }
                     //TAX API
-                    if (aTransTypeId == 2 && trans.getTotalVat() > 0 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {//SALES INVOICE
+                    if (aTransTypeId == 2 && trans.getTotalVat() > 0 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0 && new Item_tax_mapBean().countItemsNotMappedSynced(aActiveTransItems)==0) {//SALES INVOICE
                         int IsThreadOn = 0;
                         try {
                             IsThreadOn = Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_THREAD_ON").getParameter_value());
@@ -4131,7 +4131,7 @@ public class TransBean implements Serializable {
                 }
                 Transaction_tax_map PrevSyncedTaxInvoice = new Transaction_tax_mapBean().getTransaction_tax_map(OldTrans.getTransactionId(), aTransTypeId);
                 if (null == PrevSyncedTaxInvoice) {
-                    //do nothing, original record was not synced/found, that canno tbe updated
+                    //do nothing, original record was not synced/found, that cannot tbe updated
                 } else {
                     if (ExistCountDrCrNotes >= 1) {
                         new Transaction_tax_mapBean().markTransaction_tax_mapUpdated_more_than_once(PrevSyncedTaxInvoice);

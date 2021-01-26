@@ -41,7 +41,7 @@ import utilities.SecurityPKI;
  */
 public class StockManage {
 
-    public void callAddStockFromItemReg(Item aItem, Item_tax_map aItem_tax_map) {
+    public void callAddStockFromItemReg(Item aItem) {//, Item_tax_map aItem_tax_map
         try {
             double qtybal = 0;
             try {
@@ -585,8 +585,8 @@ public class StockManage {
                     //update local db that synced yes
                     int x = new Item_tax_mapBean().saveItem_tax_mapSync(aItemId, 1);
                     //do stock taking
-                    Item_tax_map im = new Item_tax_mapBean().getItem_tax_map(item.getItemId());
-                    this.callAddStockFromItemReg(item, im);
+                    //Item_tax_map im = new Item_tax_mapBean().getItem_tax_mapSynced(item.getItemId());
+                    this.callAddStockFromItemReg(item);//this.callAddStockFromItemReg(item, im);
                 }
             }
         } catch (Exception e) {

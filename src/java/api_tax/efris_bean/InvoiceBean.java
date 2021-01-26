@@ -280,7 +280,7 @@ public class InvoiceBean {
             Double TotalAmountExcVat = 0.0;
             for (int i = 0; i < transitems.size(); i++) {
                 itm = new ItemBean().getItem(transitems.get(i).getItemId());
-                im = new Item_tax_mapBean().getItem_tax_map(transitems.get(i).getItemId());
+                im = new Item_tax_mapBean().getItem_tax_mapSynced(transitems.get(i).getItemId());
                 if (null != itm && null != im) {
                     GoodsDetails gd = new GoodsDetails();
                     gd.setItem(itm.getDescription());//Hima Cement

@@ -4,12 +4,14 @@ import api_tax.efris_bean.StockManage;
 import connections.DBConnection;
 import entities.Item;
 import entities.Item_tax_map;
+import entities.TransItem;
 import java.io.Serializable;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 
@@ -79,6 +81,58 @@ public class Item_tax_mapBean implements Serializable {
         }
     }
 
+    public Item_tax_map getItem_tax_mapSynced(long aItemId) {
+        String sql = "SELECT * FROM item_tax_map WHERE item_id=" + aItemId + " AND is_synced=1";
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                Item_tax_map im = new Item_tax_map();
+                this.setItem_tax_mapFromResultset(im, rs);
+                return im;
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            System.err.println("getItem_tax_mapSynced:" + e.getMessage());
+            return null;
+        }
+    }
+
+    public int countItemsMappedSynced(List<TransItem> aTransItems) {
+        int ItemsMappedSynced = 0;
+        String ComaSepIdStr = new utilities.UtilityBean().getCommaSeperatedItemIds(aTransItems);
+        String sql = "SELECT count(*) as n FROM item_tax_map WHERE item_id IN(" + ComaSepIdStr + ") AND is_synced=1";
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                ItemsMappedSynced = rs.getInt("n");
+            }
+        } catch (Exception e) {
+            System.err.println("countItemsMappedAndSynced:" + e.getMessage());
+        }
+        return ItemsMappedSynced;
+    }
+
+    public int countItemsNotMappedSynced(List<TransItem> aTransItems) {
+        int ItemsNotMappedSynced = 0;
+        try {
+            for (int i = 0; i < aTransItems.size(); i++) {
+                if (null == this.getItem_tax_mapSynced(aTransItems.get(i).getItemId())) {
+                    ItemsNotMappedSynced = ItemsNotMappedSynced + 1;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("countItemsNotMappedSynced:" + e.getMessage());
+        }
+        return ItemsNotMappedSynced;
+    }
+
     public void saveItem_tax_mapCall(String aItemDesc, String aItemCodeTax) {
         try {
             long ItemId = 0;
@@ -102,7 +156,7 @@ public class Item_tax_mapBean implements Serializable {
                             new StockManage().registerItemCallThread(ItemId, aItemCodeTax);
                         }
                     } else {//update
-                        if (itmap.getItem_code_tax().equals(aItemCodeTax) && itmap.getIs_synced()==1) {
+                        if (itmap.getItem_code_tax().equals(aItemCodeTax) && itmap.getIs_synced() == 1) {
                             //nothing has changed
                         } else {
                             itmap4save.setItem_tax_map_id(itmap.getItem_tax_map_id());

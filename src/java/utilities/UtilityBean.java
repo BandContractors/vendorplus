@@ -5,6 +5,7 @@ import beans.Alert_generalBean;
 import connections.DBConnection;
 import entities.CompanySetting;
 import entities.Item;
+import entities.TransItem;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.CallableStatement;
@@ -669,7 +670,6 @@ public class UtilityBean implements Serializable {
 //        boolean x = new UtilityBean().getEmptyIfNull(a).equals(new UtilityBean().getEmptyIfNull(b));
 //        System.out.println("x:" + x);
 //    }
-
     public String getEmptyIfNull(String aStringValue) {
         if (aStringValue == null) {
             return "";
@@ -709,6 +709,26 @@ public class UtilityBean implements Serializable {
         } catch (IOException | InterruptedException ex) {
             System.err.println("Error at Backup" + ex.getMessage());
         }
+    }
+
+    public String getCommaSeperatedItemIds(List<TransItem> aTransItems) {
+        String CommaSeperatedStr = "";
+        try {
+            if (aTransItems.isEmpty()) {
+                CommaSeperatedStr = "";
+            } else {
+                for (int i = 0; i < aTransItems.size(); i++) {
+                    if (CommaSeperatedStr.length() == 0) {
+                        CommaSeperatedStr = Long.toString(aTransItems.get(i).getItemId());
+                    } else {
+                        CommaSeperatedStr = CommaSeperatedStr + "," + Long.toString(aTransItems.get(i).getItemId());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("getCommaSeperatedItemIdStr:" + e.getMessage());
+        }
+        return CommaSeperatedStr;
     }
 
     public String getCommaSeperatedStrFromStringArray(String[] aStringArray) {
