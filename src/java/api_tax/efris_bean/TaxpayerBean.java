@@ -12,9 +12,12 @@ import com.google.gson.Gson;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import entities.CompanySetting;
+import java.io.Serializable;
 import org.json.JSONObject;
 import java.security.PrivateKey;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import utilities.Security;
 import utilities.SecurityPKI;
 
@@ -22,7 +25,10 @@ import utilities.SecurityPKI;
  *
  * @author bajuna
  */
-public class TaxpayerBean {
+public class TaxpayerBean implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+    static Logger LOGGER = Logger.getLogger(TaxpayerBean.class.getName());
 
     public Taxpayer getTaxpayerDetailFromTaxOffline(String aTIN) {
         Taxpayer tp = null;
@@ -55,7 +61,8 @@ public class TaxpayerBean {
         } catch (Exception e) {
             tp = null;
             //e.printStackTrace();
-            System.err.println("getTaxpayerDetailFromTaxOffline:" + e.getMessage());
+            //System.err.println("getTaxpayerDetailFromTaxOffline:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return tp;
     }
@@ -108,7 +115,8 @@ public class TaxpayerBean {
         } catch (Exception e) {
             tp = null;
             //e.printStackTrace();
-            System.err.println("getTaxpayerDetailFromTaxOnline:" + e.getMessage());
+            //System.err.println("getTaxpayerDetailFromTaxOnline:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return tp;
     }

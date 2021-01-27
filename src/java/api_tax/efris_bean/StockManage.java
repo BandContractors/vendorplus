@@ -7,6 +7,7 @@ package api_tax.efris_bean;
 
 import api_tax.efris.GeneralUtilities;
 import api_tax.efris.innerclasses.ItemTax;
+import static api_tax.efris_bean.InvoiceBean.LOGGER;
 import beans.AccCurrencyBean;
 import beans.ItemBean;
 import beans.Item_tax_mapBean;
@@ -21,15 +22,17 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import entities.CompanySetting;
 import entities.Item;
-import entities.Item_tax_map;
 import entities.Stock;
 import entities.Transactor;
+import java.io.Serializable;
 import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import utilities.Security;
@@ -39,7 +42,10 @@ import utilities.SecurityPKI;
  *
  * @author bajuna
  */
-public class StockManage {
+public class StockManage implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+    static Logger LOGGER = Logger.getLogger(StockManage.class.getName());
 
     public void callAddStockFromItemReg(Item aItem) {//, Item_tax_map aItem_tax_map
         try {
@@ -68,7 +74,8 @@ public class StockManage {
                 new StockManage().addStockCallFromItemReg(stockadd, SupplierTIN, SupplierName);
             }
         } catch (Exception e) {
-            System.err.println("callAddStockUponItemReg:" + e.getMessage());
+            //System.err.println("callAddStockUponItemReg:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -99,7 +106,8 @@ public class StockManage {
                 }
             }
         } catch (Exception e) {
-            System.err.println("addStockCall:" + e.getMessage());
+            //System.err.println("addStockCall:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -128,7 +136,8 @@ public class StockManage {
                 }
             }
         } catch (Exception e) {
-            System.err.println("addStockCallFromItemReg:" + e.getMessage());
+            //System.err.println("addStockCallFromItemReg:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -159,7 +168,8 @@ public class StockManage {
                 }
             }
         } catch (Exception e) {
-            System.err.println("subtractStockCall:" + e.getMessage());
+            //System.err.println("subtractStockCall:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -174,7 +184,8 @@ public class StockManage {
             Executor e = Executors.newSingleThreadExecutor();
             e.execute(task);
         } catch (Exception e) {
-            System.err.println("addStockCallThread:" + e.getMessage());
+            //System.err.println("addStockCallThread:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -189,7 +200,8 @@ public class StockManage {
             Executor e = Executors.newSingleThreadExecutor();
             e.execute(task);
         } catch (Exception e) {
-            System.err.println("subtractStockCallThread:" + e.getMessage());
+            //System.err.println("subtractStockCallThread:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -233,8 +245,9 @@ public class StockManage {
                 itemslist.add(item);
             }
             itemid = itemslist.get(0).getId();
-        } catch (Exception ex) {
-            System.err.println("getItemIdFromTaxOffline:" + ex.getMessage());
+        } catch (Exception e) {
+            //System.err.println("getItemIdFromTaxOffline:" + ex.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return itemid;
     }
@@ -295,8 +308,9 @@ public class StockManage {
                 itemslist.add(item);
             }
             itemid = itemslist.get(0).getId();
-        } catch (Exception ex) {
-            System.err.println("getItemIdFromTaxOnline:" + ex.getMessage());
+        } catch (Exception e) {
+            //System.err.println("getItemIdFromTaxOnline:" + ex.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return itemid;
     }
@@ -344,8 +358,9 @@ public class StockManage {
                 System.out.println("addStockOffline:returnMessage:" + dataobject.getString("returnMessage"));
                 ReturnMsg = dataobject.getString("returnMessage") + ":DecryptedContent";
             }
-        } catch (Exception ex) {
-            System.err.println("addStockOffline:" + ex.getMessage());
+        } catch (Exception e) {
+            //System.err.println("addStockOffline:" + ex.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return ReturnMsg;
     }
@@ -409,8 +424,9 @@ public class StockManage {
                 System.out.println("addStockOnline:returnMessage:" + dataobject.getString("returnMessage"));
                 ReturnMsg = dataobject.getString("returnMessage") + ":DecryptedContent";
             }
-        } catch (Exception ex) {
-            System.err.println("addStockOnline:" + ex.getMessage());
+        } catch (Exception e) {
+            //System.err.println("addStockOnline:" + ex.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return ReturnMsg;
     }
@@ -457,8 +473,9 @@ public class StockManage {
                 System.out.println("subtractStock:returnMessage:" + dataobject.getString("returnMessage"));
                 ReturnMsg = dataobject.getString("returnMessage") + ":DecryptedContent";
             }
-        } catch (Exception ex) {
-            System.err.println("subtractStockOffline:" + ex.getMessage());
+        } catch (Exception e) {
+            //System.err.println("subtractStockOffline:" + ex.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return ReturnMsg;
     }
@@ -517,12 +534,13 @@ public class StockManage {
             if (DecryptedContent.length() == 2) {
                 ReturnMsg = dataobject.getString("returnMessage");
             } else {
-                System.out.println("subtractStockOnline:DecryptedContent:" + DecryptedContent);
-                System.out.println("subtractStockOnline:returnMessage:" + dataobject.getString("returnMessage"));
+                //System.out.println("subtractStockOnline:DecryptedContent:" + DecryptedContent);
+                //System.out.println("subtractStockOnline:returnMessage:" + dataobject.getString("returnMessage"));
                 ReturnMsg = dataobject.getString("returnMessage") + ":DecryptedContent";
             }
-        } catch (Exception ex) {
-            System.err.println("subtractStockOnline:" + ex.getMessage());
+        } catch (Exception e) {
+            //System.err.println("subtractStockOnline:" + ex.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return ReturnMsg;
     }
@@ -538,7 +556,8 @@ public class StockManage {
             Executor e = Executors.newSingleThreadExecutor();
             e.execute(task);
         } catch (Exception e) {
-            System.err.println("registerItemCallThread:" + e.getMessage());
+            //System.err.println("registerItemCallThread:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -590,7 +609,8 @@ public class StockManage {
                 }
             }
         } catch (Exception e) {
-            System.err.println("registerItemCall:" + e.getMessage());
+            //System.err.println("registerItemCall:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -641,12 +661,13 @@ public class StockManage {
             if (DecryptedContent.length() == 2) {
                 ReturnMsg = dataobject.getString("returnMessage");
             } else {
-                System.out.println("DecryptedContent:" + DecryptedContent);
-                System.out.println("returnMessage:" + dataobject.getString("returnMessage"));
+                //System.out.println("DecryptedContent:" + DecryptedContent);
+                //System.out.println("returnMessage:" + dataobject.getString("returnMessage"));
                 ReturnMsg = dataobject.getString("returnMessage") + ":DecryptedContent";
             }
-        } catch (Exception ex) {
-            System.err.println("registerItemOffline:" + ex.getMessage());
+        } catch (Exception e) {
+            //System.err.println("registerItemOffline:" + ex.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return ReturnMsg;
     }
@@ -718,8 +739,9 @@ public class StockManage {
                 System.out.println("returnMessage:" + dataobject.getString("returnMessage"));
                 ReturnMsg = dataobject.getString("returnMessage") + ":DecryptedContent";
             }
-        } catch (Exception ex) {
-            System.err.println("registerItemOnline:" + ex.getMessage());
+        } catch (Exception e) {
+            //System.err.println("registerItemOnline:" + ex.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return ReturnMsg;
     }

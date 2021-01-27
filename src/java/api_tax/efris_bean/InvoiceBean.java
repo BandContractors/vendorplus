@@ -38,16 +38,17 @@ import entities.Trans;
 import entities.TransItem;
 import entities.Transaction_tax_map;
 import entities.Transactor;
+import java.io.Serializable;
 import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import utilities.GzipUtils;
@@ -61,7 +62,10 @@ import utilities.SecurityPKI;
  */
 @ManagedBean
 @SessionScoped
-public class InvoiceBean {
+public class InvoiceBean implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+    static Logger LOGGER = Logger.getLogger(UtilityBean.class.getName());
 
     public void init() {
         if (sellerDetails == null) {
@@ -159,7 +163,8 @@ public class InvoiceBean {
                 new Transaction_tax_mapBean().saveTransaction_tax_map(aTransId, InvoiceNo, VerificationCode, QrCode);
             }
         } catch (Exception e) {
-            System.err.println("submitTaxInvoice:" + e.getMessage());
+            //System.err.println("submitTaxInvoice:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -176,7 +181,8 @@ public class InvoiceBean {
             Executor e = Executors.newSingleThreadExecutor();
             e.execute(task);
         } catch (Exception e) {
-            System.err.println("submitTaxInvoiceOfflineThread:" + e.getMessage());
+            //System.err.println("submitTaxInvoiceOfflineThread:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -358,7 +364,8 @@ public class InvoiceBean {
             summary.setItemCount(Integer.toString(goodsDetails.size()));
             summary.setModeCode("1");
         } catch (Exception e) {
-            System.err.println("prepareInvoice:" + e.getMessage());
+            //System.err.println("prepareInvoice:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -422,7 +429,8 @@ public class InvoiceBean {
             //System.out.println("Invoice: " + InvoiceNo);
             //-System.out.println("-------------------------------------");
         } catch (Exception e) {
-            Logger.getLogger(InvoiceBean.class.getName()).log(Level.SEVERE, null, e);
+            //Logger.getLogger(InvoiceBean.class.getName()).log(Level.SEVERE, null, e);
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -502,12 +510,13 @@ public class InvoiceBean {
             QrCode = summary.getString("qrCode");
             //System.out.println("QrCode:" + QrCode.length() + ":" + QrCode);
             //-System.out.println("AntiFakeCode: " + AntifakeCode);
-            System.out.println("Invoice: " + InvoiceNo);
+            //System.out.println("Invoice: " + InvoiceNo);
             //-System.out.println("-------------------------------------");
         } catch (Exception e) {
-            System.out.println("returnCode:" + returnCode);
-            System.out.println("returnMessage:" + returnMessage);
-            Logger.getLogger(InvoiceBean.class.getName()).log(Level.SEVERE, null, e);
+            //System.out.println("returnCode:" + returnCode);
+            //System.out.println("returnMessage:" + returnMessage);
+            //Logger.getLogger(InvoiceBean.class.getName()).log(Level.SEVERE, null, e);
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -522,7 +531,8 @@ public class InvoiceBean {
             Executor e = Executors.newSingleThreadExecutor();
             e.execute(task);
         } catch (Exception e) {
-            System.err.println("submitCreditNoteThread:" + e.getMessage());
+            //System.err.println("submitCreditNoteThread:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -552,7 +562,8 @@ public class InvoiceBean {
                 }
             }
         } catch (Exception e) {
-            System.err.println("submitCreditNote:" + e.getMessage());
+            //System.err.println("submitCreditNote:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -585,7 +596,8 @@ public class InvoiceBean {
                 }
             }
         } catch (Exception e) {
-            System.out.println("updateCreditNote:" + e.getMessage());
+            //System.out.println("updateCreditNote:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -685,7 +697,8 @@ public class InvoiceBean {
             RetMsg = dataobject.getString("returnMessage");
             //System.out.println("returnMessage:" + RetMsg);
         } catch (Exception e) {
-            Logger.getLogger(InvoiceBean.class.getName()).log(Level.SEVERE, null, e);
+            //Logger.getLogger(InvoiceBean.class.getName()).log(Level.SEVERE, null, e);
+            LOGGER.log(Level.ERROR, e);
         }
         return RetMsg;
     }
@@ -803,7 +816,8 @@ public class InvoiceBean {
             RetMsg = dataobject.getString("returnMessage");
             //System.out.println("returnMessage:" + RetMsg);
         } catch (Exception e) {
-            Logger.getLogger(InvoiceBean.class.getName()).log(Level.SEVERE, null, e);
+            //Logger.getLogger(InvoiceBean.class.getName()).log(Level.SEVERE, null, e);
+            LOGGER.log(Level.ERROR, e);
         }
         return RetMsg;
     }
@@ -871,7 +885,8 @@ public class InvoiceBean {
             dataobject_Summary.put("taxAmount", "" + Double.toString(-1 * ChangedTaxAmountSum) + "");
             dataobject_Summary.put("itemCount", "" + itemcount + "");
         } catch (Exception e) {
-            Logger.getLogger(InvoiceBean.class.getName()).log(Level.SEVERE, null, e);
+            //Logger.getLogger(InvoiceBean.class.getName()).log(Level.SEVERE, null, e);
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -902,7 +917,8 @@ public class InvoiceBean {
                 }
             }
         } catch (Exception e) {
-            System.err.println("submitDebitNote:" + e.getMessage());
+            //System.err.println("submitDebitNote:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -917,7 +933,8 @@ public class InvoiceBean {
             Executor e = Executors.newSingleThreadExecutor();
             e.execute(task);
         } catch (Exception e) {
-            System.err.println("submitDebitNoteThread:" + e.getMessage());
+            //System.err.println("submitDebitNoteThread:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -954,7 +971,8 @@ public class InvoiceBean {
                 DecryptedContent = new String(str);
             }
         } catch (Exception e) {
-            System.out.println("getTaxInvoiceDetailOffline:" + e.getMessage());
+            //System.out.println("getTaxInvoiceDetailOffline:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return DecryptedContent;
     }
@@ -1007,7 +1025,8 @@ public class InvoiceBean {
                 DecryptedContent = SecurityPKI.AESdecrypt2(str, Base64.decodeBase64(AESpublickeystring));
             }
         } catch (Exception e) {
-            System.out.println("getTaxInvoiceDetailOffline:" + e.getMessage());
+            //System.out.println("getTaxInvoiceDetailOffline:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return DecryptedContent;
     }
@@ -1176,7 +1195,8 @@ public class InvoiceBean {
             summary.setItemCount(Integer.toString(goodsDetails.size()));
             summary.setModeCode("1");
         } catch (Exception e) {
-            System.err.println("prepareDebit_note_offline:" + e.getMessage());
+            //System.err.println("prepareDebit_note_offline:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -1250,7 +1270,8 @@ public class InvoiceBean {
                 QrCode = "";
             }
         } catch (Exception e) {
-            Logger.getLogger(InvoiceBean.class.getName()).log(Level.SEVERE, null, e);
+            //Logger.getLogger(InvoiceBean.class.getName()).log(Level.SEVERE, null, e);
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -1342,7 +1363,8 @@ public class InvoiceBean {
                 QrCode = "";
             }
         } catch (Exception e) {
-            Logger.getLogger(InvoiceBean.class.getName()).log(Level.SEVERE, null, e);
+            //Logger.getLogger(InvoiceBean.class.getName()).log(Level.SEVERE, null, e);
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -1448,7 +1470,8 @@ public class InvoiceBean {
                 InvoiceNo = itemslist.get(0).getInvoiceNo();
             }
         } catch (Exception e) {
-            System.out.println("getApprovalStatusOffline:" + e.getMessage());
+            //System.out.println("getApprovalStatusOffline:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return InvoiceNo;
     }
@@ -1525,7 +1548,8 @@ public class InvoiceBean {
                 InvoiceNo = itemslist.get(0).getInvoiceNo();
             }
         } catch (Exception e) {
-            System.out.println("getApprovalStatusOnline:" + e.getMessage());
+            //System.out.println("getApprovalStatusOnline:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return InvoiceNo;
     }
@@ -1544,7 +1568,8 @@ public class InvoiceBean {
             InvoiceDtl.setInvoiceNo(invNo);
             InvoiceDtl.setQrCode(qCode);
         } catch (Exception e) {
-            System.out.println("getInvoiceDetail:" + e.getMessage());
+            //System.out.println("getInvoiceDetail:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return InvoiceDtl;
     }

@@ -28,6 +28,8 @@ import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.faces.bean.*;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import sessions.GeneralUserSetting;
 
 @ManagedBean
@@ -39,6 +41,7 @@ public class UtilityBean implements Serializable {
     private Pattern pattern;
     private Matcher matcher;
     private static final String TIME24HOURS_PATTERN = "([01]?[0-9]|2[0-3]):[0-5][0-9]";
+    static Logger LOGGER = Logger.getLogger(UtilityBean.class.getName());
 
     public boolean isTime24Hour(String time) {
         pattern = Pattern.compile(TIME24HOURS_PATTERN);
@@ -665,11 +668,19 @@ public class UtilityBean implements Serializable {
     }
 
 //    public static void main(String[] args) {
-//        String a = "c";
-//        String b = "c";
-//        boolean x = new UtilityBean().getEmptyIfNull(a).equals(new UtilityBean().getEmptyIfNull(b));
-//        System.out.println("x:" + x);
+//        try {
+//            int d = 0;
+//            int n = 5;
+//            int r = 0;
+//            r = n / d;
+//        } catch (Exception e) {
+//            LOGGER.log(Level.ERROR, e);
+//            LOGGER.log(Level.ERROR, "Okay-Noted");
+//            //LOGGER.debug(e);
+//            //System.out.println(e);
+//        }
 //    }
+
     public String getEmptyIfNull(String aStringValue) {
         if (aStringValue == null) {
             return "";
