@@ -675,9 +675,8 @@ public class UtilityBean implements Serializable {
 //            r = n / d;
 //        } catch (Exception e) {
 //            LOGGER.log(Level.ERROR, e);
-//            LOGGER.log(Level.ERROR, "Okay-Noted");
-//            //LOGGER.debug(e);
-//            //System.out.println(e);
+//            LOGGER.debug(e);
+//            System.out.println(e);
 //        }
 //    }
 
