@@ -7,7 +7,6 @@ package api_tax.efris_bean;
 
 import api_tax.efris.GeneralUtilities;
 import api_tax.efris.innerclasses.ItemTax;
-import static api_tax.efris_bean.InvoiceBean.LOGGER;
 import beans.AccCurrencyBean;
 import beans.ItemBean;
 import beans.Item_tax_mapBean;
@@ -207,6 +206,7 @@ public class StockManage implements Serializable {
 
     public String getItemIdFromTaxOffline(String aGoodsCode) {
         String itemid = "";
+        String output = "";
         try {
             /**
              * Goods inquiry
@@ -224,7 +224,7 @@ public class StockManage implements Serializable {
             String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T127", CompanySetting.getTaxIdentity());
 
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
-            String output = response.getEntity(String.class);
+            output = response.getEntity(String.class);
             //System.out.println(output);
 
             JSONObject parentjsonObject = new JSONObject(output);
@@ -247,6 +247,7 @@ public class StockManage implements Serializable {
             itemid = itemslist.get(0).getId();
         } catch (Exception e) {
             //System.err.println("getItemIdFromTaxOffline:" + ex.getMessage());
+            LOGGER.log(Level.INFO, output);
             LOGGER.log(Level.ERROR, e);
         }
         return itemid;
@@ -254,6 +255,7 @@ public class StockManage implements Serializable {
 
     public String getItemIdFromTaxOnline(String aGoodsCode) {
         String itemid = "";
+        String output = "";
         try {
             /**
              * Goods inquiry
@@ -285,7 +287,7 @@ public class StockManage implements Serializable {
             String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T127", CompanySetting.getTaxIdentity());
 
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
-            String output = response.getEntity(String.class);
+            output = response.getEntity(String.class);
             //System.out.println(output);
 
             JSONObject parentjsonObject = new JSONObject(output);
@@ -310,6 +312,7 @@ public class StockManage implements Serializable {
             itemid = itemslist.get(0).getId();
         } catch (Exception e) {
             //System.err.println("getItemIdFromTaxOnline:" + ex.getMessage());
+            LOGGER.log(Level.INFO, output);
             LOGGER.log(Level.ERROR, e);
         }
         return itemid;
@@ -317,6 +320,7 @@ public class StockManage implements Serializable {
 
     public String addStockOffline(String aId, String aQty, String aUnitPrice, String aSupplierTin, String aSupplierName) {
         String ReturnMsg = "";
+        String output = "";
         //System.out.println("aUnitPrice:" + aUnitPrice);
         try {
             String json = "{\n"
@@ -340,7 +344,7 @@ public class StockManage implements Serializable {
             String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T131", CompanySetting.getTaxIdentity());
             //System.out.println("json:" + json);
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
-            String output = response.getEntity(String.class);
+            output = response.getEntity(String.class);
 
             JSONObject parentjsonObject = new JSONObject(output);
             JSONObject dataobject = parentjsonObject.getJSONObject("returnStateInfo");
@@ -354,12 +358,14 @@ public class StockManage implements Serializable {
             if (DecryptedContent.length() == 2) {
                 ReturnMsg = dataobject.getString("returnMessage");
             } else {
-                System.out.println("addStockOffline:DecryptedContent:" + DecryptedContent);
-                System.out.println("addStockOffline:returnMessage:" + dataobject.getString("returnMessage"));
+                //System.out.println("addStockOffline:DecryptedContent:" + DecryptedContent);
+                //System.out.println("addStockOffline:returnMessage:" + dataobject.getString("returnMessage"));
                 ReturnMsg = dataobject.getString("returnMessage") + ":DecryptedContent";
+                LOGGER.log(Level.INFO, ReturnMsg);
             }
         } catch (Exception e) {
             //System.err.println("addStockOffline:" + ex.getMessage());
+            LOGGER.log(Level.INFO, output);
             LOGGER.log(Level.ERROR, e);
         }
         return ReturnMsg;
@@ -367,6 +373,7 @@ public class StockManage implements Serializable {
 
     public String addStockOnline(String aId, String aQty, String aUnitPrice, String aSupplierTin, String aSupplierName) {
         String ReturnMsg = "";
+        String output = "";
         //System.out.println("aUnitPrice:" + aUnitPrice);
         try {
             String json = "{\n"
@@ -404,7 +411,7 @@ public class StockManage implements Serializable {
             String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T131", CompanySetting.getTaxIdentity());
             //System.out.println("json:" + json);
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
-            String output = response.getEntity(String.class);
+            output = response.getEntity(String.class);
 
             JSONObject parentjsonObject = new JSONObject(output);
             JSONObject dataobject = parentjsonObject.getJSONObject("returnStateInfo");
@@ -420,12 +427,14 @@ public class StockManage implements Serializable {
             if (DecryptedContent.length() == 2) {
                 ReturnMsg = dataobject.getString("returnMessage");
             } else {
-                System.out.println("addStockOnline:DecryptedContent:" + DecryptedContent);
-                System.out.println("addStockOnline:returnMessage:" + dataobject.getString("returnMessage"));
+                //System.out.println("addStockOnline:DecryptedContent:" + DecryptedContent);
+                //System.out.println("addStockOnline:returnMessage:" + dataobject.getString("returnMessage"));
                 ReturnMsg = dataobject.getString("returnMessage") + ":DecryptedContent";
+                LOGGER.log(Level.INFO, ReturnMsg);
             }
         } catch (Exception e) {
             //System.err.println("addStockOnline:" + ex.getMessage());
+            LOGGER.log(Level.INFO, output);
             LOGGER.log(Level.ERROR, e);
         }
         return ReturnMsg;
@@ -433,6 +442,7 @@ public class StockManage implements Serializable {
 
     public String subtractStockOffline(String aId, String aQty, String aUnitPrice, String aAdjustType) {
         String ReturnMsg = "";
+        String output = "";
         //System.out.println("aUnitPrice:" + aUnitPrice);
         try {
             String json = "{\n"
@@ -455,7 +465,7 @@ public class StockManage implements Serializable {
             String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T131", CompanySetting.getTaxIdentity());
 
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
-            String output = response.getEntity(String.class);
+            output = response.getEntity(String.class);
 
             JSONObject parentjsonObject = new JSONObject(output);
             JSONObject dataobject = parentjsonObject.getJSONObject("returnStateInfo");
@@ -469,12 +479,14 @@ public class StockManage implements Serializable {
             if (DecryptedContent.length() == 2) {
                 ReturnMsg = dataobject.getString("returnMessage");
             } else {
-                System.out.println("subtractStock:DecryptedContent:" + DecryptedContent);
-                System.out.println("subtractStock:returnMessage:" + dataobject.getString("returnMessage"));
+                //System.out.println("subtractStock:DecryptedContent:" + DecryptedContent);
+                //System.out.println("subtractStock:returnMessage:" + dataobject.getString("returnMessage"));
                 ReturnMsg = dataobject.getString("returnMessage") + ":DecryptedContent";
+                LOGGER.log(Level.INFO, ReturnMsg);
             }
         } catch (Exception e) {
             //System.err.println("subtractStockOffline:" + ex.getMessage());
+            LOGGER.log(Level.INFO, output);
             LOGGER.log(Level.ERROR, e);
         }
         return ReturnMsg;
@@ -482,6 +494,7 @@ public class StockManage implements Serializable {
 
     public String subtractStockOnline(String aId, String aQty, String aUnitPrice, String aAdjustType) {
         String ReturnMsg = "";
+        String output = "";
         //System.out.println("aUnitPrice:" + aUnitPrice);
         try {
             String json = "{\n"
@@ -518,7 +531,7 @@ public class StockManage implements Serializable {
             String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T131", CompanySetting.getTaxIdentity());
 
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
-            String output = response.getEntity(String.class);
+            output = response.getEntity(String.class);
 
             JSONObject parentjsonObject = new JSONObject(output);
             JSONObject dataobject = parentjsonObject.getJSONObject("returnStateInfo");
@@ -537,9 +550,11 @@ public class StockManage implements Serializable {
                 //System.out.println("subtractStockOnline:DecryptedContent:" + DecryptedContent);
                 //System.out.println("subtractStockOnline:returnMessage:" + dataobject.getString("returnMessage"));
                 ReturnMsg = dataobject.getString("returnMessage") + ":DecryptedContent";
+                LOGGER.log(Level.INFO, ReturnMsg);
             }
         } catch (Exception e) {
             //System.err.println("subtractStockOnline:" + ex.getMessage());
+            LOGGER.log(Level.INFO, output);
             LOGGER.log(Level.ERROR, e);
         }
         return ReturnMsg;
@@ -616,6 +631,7 @@ public class StockManage implements Serializable {
 
     public String registerItemOffline(Item aItem) {
         String ReturnMsg = "";
+        String output = "";
         try {
             String UnitPriceStr = "";
             if (aItem.getUnitRetailsalePrice() > 0) {
@@ -647,7 +663,7 @@ public class StockManage implements Serializable {
             String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T130", CompanySetting.getTaxIdentity());
             //System.out.println("json>:" + json);
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
-            String output = response.getEntity(String.class);
+            output = response.getEntity(String.class);
 
             JSONObject parentjsonObject = new JSONObject(output);
             JSONObject dataobject = parentjsonObject.getJSONObject("returnStateInfo");
@@ -664,9 +680,11 @@ public class StockManage implements Serializable {
                 //System.out.println("DecryptedContent:" + DecryptedContent);
                 //System.out.println("returnMessage:" + dataobject.getString("returnMessage"));
                 ReturnMsg = dataobject.getString("returnMessage") + ":DecryptedContent";
+                LOGGER.log(Level.INFO, ReturnMsg);
             }
         } catch (Exception e) {
             //System.err.println("registerItemOffline:" + ex.getMessage());
+            LOGGER.log(Level.INFO, output);
             LOGGER.log(Level.ERROR, e);
         }
         return ReturnMsg;
@@ -674,6 +692,7 @@ public class StockManage implements Serializable {
 
     public String registerItemOnline(Item aItem) {
         String ReturnMsg = "";
+        String output = "";
         try {
             String UnitPriceStr = "";
             if (aItem.getUnitRetailsalePrice() > 0) {
@@ -719,7 +738,7 @@ public class StockManage implements Serializable {
             String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T130", CompanySetting.getTaxIdentity());
             //System.out.println("json>:" + json);
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
-            String output = response.getEntity(String.class);
+            output = response.getEntity(String.class);
 
             JSONObject parentjsonObject = new JSONObject(output);
             JSONObject dataobject = parentjsonObject.getJSONObject("returnStateInfo");
@@ -735,12 +754,14 @@ public class StockManage implements Serializable {
             if (DecryptedContent.length() == 2) {
                 ReturnMsg = dataobject.getString("returnMessage");
             } else {
-                System.out.println("DecryptedContent:" + DecryptedContent);
-                System.out.println("returnMessage:" + dataobject.getString("returnMessage"));
+                //System.out.println("DecryptedContent:" + DecryptedContent);
+                //System.out.println("returnMessage:" + dataobject.getString("returnMessage"));
                 ReturnMsg = dataobject.getString("returnMessage") + ":DecryptedContent";
+                LOGGER.log(Level.INFO, ReturnMsg);
             }
         } catch (Exception e) {
             //System.err.println("registerItemOnline:" + ex.getMessage());
+            LOGGER.log(Level.INFO, output);
             LOGGER.log(Level.ERROR, e);
         }
         return ReturnMsg;

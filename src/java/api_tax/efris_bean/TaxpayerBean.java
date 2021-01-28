@@ -69,6 +69,7 @@ public class TaxpayerBean implements Serializable {
 
     public Taxpayer getTaxpayerDetailFromTaxOnline(String aTIN) {
         Taxpayer tp = null;
+        String output = "";
         try {
             String json = "{\n"
                     + "	\"tin\":\"" + aTIN + "\",\n"
@@ -93,7 +94,7 @@ public class TaxpayerBean implements Serializable {
             String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T119", CompanySetting.getTaxIdentity());
             //System.out.println(PostData);
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
-            String output = response.getEntity(String.class);
+            output = response.getEntity(String.class);
             //System.out.println(output);
 
             JSONObject parentjsonObject = new JSONObject(output);
@@ -114,8 +115,7 @@ public class TaxpayerBean implements Serializable {
             tp = g.fromJson(obj.toString(), Taxpayer.class);
         } catch (Exception e) {
             tp = null;
-            //e.printStackTrace();
-            //System.err.println("getTaxpayerDetailFromTaxOnline:" + e.getMessage());
+            LOGGER.log(Level.INFO, output);
             LOGGER.log(Level.ERROR, e);
         }
         return tp;

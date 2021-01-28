@@ -374,6 +374,7 @@ public class InvoiceBean implements Serializable {
         InvoiceNo = "";
         returnCode = "";
         returnMessage = "";
+        String output = "";
         try {
             EFRISInvoice eFRISInvoice = new EFRISInvoice(sellerDetails, basicInformation, buyerDetails, summary, extend);
             eFRISInvoice.setPayWay(payWay);
@@ -387,7 +388,7 @@ public class InvoiceBean implements Serializable {
             WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_OFFLINE").getParameter_value());
             String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", basicInformation.getDeviceNo(), "T109", sellerDetails.getTin());
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
-            String output = response.getEntity(String.class);
+            output = response.getEntity(String.class);
             //System.out.println("output:" + output);
 
             JSONObject parentjsonObject = new JSONObject(output);
@@ -430,6 +431,7 @@ public class InvoiceBean implements Serializable {
             //-System.out.println("-------------------------------------");
         } catch (Exception e) {
             //Logger.getLogger(InvoiceBean.class.getName()).log(Level.SEVERE, null, e);
+            LOGGER.log(Level.INFO, output);
             LOGGER.log(Level.ERROR, e);
         }
     }
@@ -439,6 +441,7 @@ public class InvoiceBean implements Serializable {
         InvoiceNo = "";
         returnCode = "";
         returnMessage = "";
+        String output = "";
         try {
             EFRISInvoice eFRISInvoice = new EFRISInvoice(sellerDetails, basicInformation, buyerDetails, summary, extend);
             eFRISInvoice.setPayWay(payWay);
@@ -466,7 +469,7 @@ public class InvoiceBean implements Serializable {
              */
             String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", basicInformation.getDeviceNo(), "T109", sellerDetails.getTin());
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
-            String output = response.getEntity(String.class);
+            output = response.getEntity(String.class);
             //System.out.println("output:" + output);
 
             JSONObject parentjsonObject = new JSONObject(output);
@@ -516,6 +519,7 @@ public class InvoiceBean implements Serializable {
             //System.out.println("returnCode:" + returnCode);
             //System.out.println("returnMessage:" + returnMessage);
             //Logger.getLogger(InvoiceBean.class.getName()).log(Level.SEVERE, null, e);
+            LOGGER.log(Level.INFO, output);
             LOGGER.log(Level.ERROR, e);
         }
     }
@@ -603,6 +607,7 @@ public class InvoiceBean implements Serializable {
 
     public String submit_credit_note_offline(long aTransId, String aTaxInvoiceNumber, String aDeviceNo, String aSellerTIN) {
         String RetMsg = "";
+        String output = "";
         try {
             Trans trans = new Trans();
             List<TransItem> transitems = new ArrayList<>();
@@ -621,7 +626,7 @@ public class InvoiceBean implements Serializable {
             WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_OFFLINE").getParameter_value());
             String PostData;
             ClientResponse response;
-            String output;
+            //String output;
             JSONObject parentjsonObject;
             JSONObject dataobject;
             JSONObject dataobjectcontent;
@@ -698,6 +703,7 @@ public class InvoiceBean implements Serializable {
             //System.out.println("returnMessage:" + RetMsg);
         } catch (Exception e) {
             //Logger.getLogger(InvoiceBean.class.getName()).log(Level.SEVERE, null, e);
+            LOGGER.log(Level.INFO, output);
             LOGGER.log(Level.ERROR, e);
         }
         return RetMsg;
@@ -705,6 +711,7 @@ public class InvoiceBean implements Serializable {
 
     public String submit_credit_note_online(long aTransId, String aTaxInvoiceNumber, String aDeviceNo, String aSellerTIN) {
         String RetMsg = "";
+        String output = "";
         try {
             Trans trans = new Trans();
             List<TransItem> transitems = new ArrayList<>();
@@ -723,7 +730,7 @@ public class InvoiceBean implements Serializable {
             WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_ONLINE").getParameter_value());
             String PostData;
             ClientResponse response;
-            String output;
+            //String output;
             JSONObject parentjsonObject;
             JSONObject dataobject;
             JSONObject dataobjectcontent;
@@ -817,6 +824,7 @@ public class InvoiceBean implements Serializable {
             //System.out.println("returnMessage:" + RetMsg);
         } catch (Exception e) {
             //Logger.getLogger(InvoiceBean.class.getName()).log(Level.SEVERE, null, e);
+            LOGGER.log(Level.INFO, output);
             LOGGER.log(Level.ERROR, e);
         }
         return RetMsg;
@@ -940,6 +948,7 @@ public class InvoiceBean implements Serializable {
 
     public String getTaxInvoiceDecryptedContentOffline(String aTaxInvoiceNumber, String aDeviceNo, String aSellerTIN) {
         String DecryptedContent = "";
+        String output = "";
         try {
             String json = "{\n"
                     + "	\"invoiceNo\": \"" + aTaxInvoiceNumber + "\"\n"
@@ -948,7 +957,7 @@ public class InvoiceBean implements Serializable {
             WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_OFFLINE").getParameter_value());
             String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", aDeviceNo, "T108", aSellerTIN);
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
-            String output = response.getEntity(String.class);
+            output = response.getEntity(String.class);
 
             JSONObject parentjsonObject = new JSONObject(output);
             JSONObject dataobject = parentjsonObject.getJSONObject("returnStateInfo");
@@ -972,6 +981,7 @@ public class InvoiceBean implements Serializable {
             }
         } catch (Exception e) {
             //System.out.println("getTaxInvoiceDetailOffline:" + e.getMessage());
+            LOGGER.log(Level.INFO, output);
             LOGGER.log(Level.ERROR, e);
         }
         return DecryptedContent;
@@ -979,6 +989,7 @@ public class InvoiceBean implements Serializable {
 
     public String getTaxInvoiceDecryptedContentOnline(String aTaxInvoiceNumber, String aDeviceNo, String aSellerTIN) {
         String DecryptedContent = "";
+        String output = "";
         try {
             String json = "{\n"
                     + "	\"invoiceNo\": \"" + aTaxInvoiceNumber + "\"\n"
@@ -1001,7 +1012,7 @@ public class InvoiceBean implements Serializable {
              */
             String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", aDeviceNo, "T108", aSellerTIN);
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
-            String output = response.getEntity(String.class);
+            output = response.getEntity(String.class);
 
             JSONObject parentjsonObject = new JSONObject(output);
             JSONObject dataobject = parentjsonObject.getJSONObject("returnStateInfo");
@@ -1026,6 +1037,7 @@ public class InvoiceBean implements Serializable {
             }
         } catch (Exception e) {
             //System.out.println("getTaxInvoiceDetailOffline:" + e.getMessage());
+            LOGGER.log(Level.INFO, output);
             LOGGER.log(Level.ERROR, e);
         }
         return DecryptedContent;
@@ -1201,6 +1213,7 @@ public class InvoiceBean implements Serializable {
     }
 
     public void submit_debit_note_offline() {
+        String output = "";
         try {
             EFRISInvoice eFRISInvoice = new EFRISInvoice(sellerDetails, basicInformation, buyerDetails, summary, extend);
             eFRISInvoice.setPayWay(payWay);
@@ -1215,7 +1228,7 @@ public class InvoiceBean implements Serializable {
             String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", basicInformation.getDeviceNo(), "T109", sellerDetails.getTin());
             //System.out.println("PostData_Online:" + PostData_Online);
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
-            String output = response.getEntity(String.class);
+            output = response.getEntity(String.class);
             //System.out.println("output:" + output);
 
             JSONObject parentjsonObject = new JSONObject(output);
@@ -1271,11 +1284,13 @@ public class InvoiceBean implements Serializable {
             }
         } catch (Exception e) {
             //Logger.getLogger(InvoiceBean.class.getName()).log(Level.SEVERE, null, e);
+            LOGGER.log(Level.INFO, output);
             LOGGER.log(Level.ERROR, e);
         }
     }
 
     public void submit_debit_note_online() {
+        String output = "";
         try {
             EFRISInvoice eFRISInvoice = new EFRISInvoice(sellerDetails, basicInformation, buyerDetails, summary, extend);
             eFRISInvoice.setPayWay(payWay);
@@ -1304,7 +1319,7 @@ public class InvoiceBean implements Serializable {
             String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", basicInformation.getDeviceNo(), "T109", sellerDetails.getTin());
             //System.out.println("PostData:" + PostData);
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
-            String output = response.getEntity(String.class);
+            output = response.getEntity(String.class);
             //System.out.println("output:" + output);
 
             JSONObject parentjsonObject = new JSONObject(output);
@@ -1364,6 +1379,7 @@ public class InvoiceBean implements Serializable {
             }
         } catch (Exception e) {
             //Logger.getLogger(InvoiceBean.class.getName()).log(Level.SEVERE, null, e);
+            LOGGER.log(Level.INFO, output);
             LOGGER.log(Level.ERROR, e);
         }
     }
@@ -1415,6 +1431,7 @@ public class InvoiceBean implements Serializable {
     public String getApprovalStatusOffline(String aReferenceNo, String aDeviceNo, String aSellerTIN) {
         String InvoiceNo = "";
         String DecryptedContent = "";
+        String output = "";
         try {
             String json = "{\n"
                     + " \"referenceNo\": \"" + aReferenceNo + "\",\n"
@@ -1433,7 +1450,7 @@ public class InvoiceBean implements Serializable {
             WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_OFFLINE").getParameter_value());
             String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", aDeviceNo, "T111", aSellerTIN);
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
-            String output = response.getEntity(String.class);
+            output = response.getEntity(String.class);
 
             JSONObject parentjsonObject = new JSONObject(output);
             JSONObject dataobject = parentjsonObject.getJSONObject("returnStateInfo");
@@ -1471,6 +1488,7 @@ public class InvoiceBean implements Serializable {
             }
         } catch (Exception e) {
             //System.out.println("getApprovalStatusOffline:" + e.getMessage());
+            LOGGER.log(Level.INFO, output);
             LOGGER.log(Level.ERROR, e);
         }
         return InvoiceNo;
@@ -1479,6 +1497,7 @@ public class InvoiceBean implements Serializable {
     public String getApprovalStatusOnline(String aReferenceNo, String aDeviceNo, String aSellerTIN) {
         String InvoiceNo = "";
         String DecryptedContent = "";
+        String output = "";
         try {
             String json = "{\n"
                     + " \"referenceNo\": \"" + aReferenceNo + "\",\n"
@@ -1510,7 +1529,7 @@ public class InvoiceBean implements Serializable {
              */
             String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", aDeviceNo, "T111", aSellerTIN);
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
-            String output = response.getEntity(String.class);
+            output = response.getEntity(String.class);
 
             JSONObject parentjsonObject = new JSONObject(output);
             JSONObject dataobject = parentjsonObject.getJSONObject("returnStateInfo");
@@ -1549,6 +1568,7 @@ public class InvoiceBean implements Serializable {
             }
         } catch (Exception e) {
             //System.out.println("getApprovalStatusOnline:" + e.getMessage());
+            LOGGER.log(Level.INFO, output);
             LOGGER.log(Level.ERROR, e);
         }
         return InvoiceNo;
