@@ -463,6 +463,55 @@ public class DashboardBean implements Serializable {
         }
     }
 
+    public void refreshStockByYear_Old(int aSelYear, int aSelDisplayYears, String aStock_type) {
+        DayStockByDay = "";
+        AmountStockByDay = "";
+        String StockSql = "";
+        if (aStock_type.length() > 0) {
+            StockSql = " and stock_type='" + aStock_type + "'";
+        }
+        String StoreCondition = "";
+        if (this.store_id > 0) {
+            StoreCondition = " and store_id=" + this.store_id + " ";
+        }
+        String sql = "";
+        sql = "SELECT "
+                + "	c.y,c.m,c.d,c.snapshot_no,"
+                + "	s.currency_code,s.cp_value  "
+                + "FROM "
+                + "("
+                + "	select year(cdc_date) as y,month(cdc_date) as m,day(cdc_date) as d,max(snapshot_no) as snapshot_no from cdc_general "
+                + "	where cdc_function='STOCK' and is_passed=1 and year(cdc_date)=" + aSelYear
+                + "	group by year(cdc_date),month(cdc_date),day(cdc_date) "
+                + "	order by year(cdc_date),month(cdc_date),day(cdc_date) "
+                + ") AS c "
+                + "INNER JOIN "
+                + "("
+                + "	select snapshot_no,currency_code,sum(cp_value) as cp_value from view_snapshot_stock_value where year(snapshot_date)=" + aSelYear + StoreCondition + StockSql + " group by snapshot_no,currency_code"
+                + ") AS s ON c.snapshot_no=s.snapshot_no";
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                if (DayStockByDay.length() == 0) {
+                    DayStockByDay = "\"" + rs.getString("d") + "/" + rs.getString("m") + "\"";
+                } else {
+                    DayStockByDay = DayStockByDay + ",\"" + rs.getString("d") + "/" + rs.getString("m") + "\"";
+                }
+                //this.YearsList.add(rs.getInt("y"));
+                if (AmountStockByDay.length() == 0) {
+                    AmountStockByDay = "" + new UtilityBean().formatNumber("###", rs.getDouble("cp_value"));
+                } else {
+                    AmountStockByDay = AmountStockByDay + "," + new UtilityBean().formatNumber("###", rs.getDouble("cp_value"));
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("refreshStockByYear:" + e.getMessage());
+        }
+    }
+
     public void refreshExpensesByYear(int aSelYear, int aSelDisplayYears) {
         YearsExpensesByYear = "";
         AmountExpensesByYear = "";

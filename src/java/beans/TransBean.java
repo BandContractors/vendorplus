@@ -58,7 +58,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.primefaces.event.SelectEvent;
 import utilities.UtilityBean;
-//import org.primefaces.component.commandbutton.CommandButton;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 /*
  * To change this template, choose Tools | Templates
@@ -73,6 +74,7 @@ import utilities.UtilityBean;
 public class TransBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    static Logger LOGGER = Logger.getLogger(TransBean.class.getName());
     private List<Trans> Transs;
     private List<Trans> TranssDraft;
     private String ActionMessage = null;
@@ -81,15 +83,15 @@ public class TransBean implements Serializable {
     private long SelectedTransactionId2;
     private String SearchTrans = "";
     private String TypedTransactorName;
-    List<Trans> ReportTrans = new ArrayList<Trans>();
-    List<TransSummary> ReportTransSummary = new ArrayList<TransSummary>();
+    List<Trans> ReportTrans = new ArrayList<>();
+    List<TransSummary> ReportTransSummary = new ArrayList<>();
     private boolean AutoPrintAfterSave;
     Map<String, Object> options;
     private String SRCInvoice;
     private double ReportGrandTotal;
     private UserDetail AuthorisedByUserDetail;
     private UserDetail TransUserDetail;
-    private List<Trans> TransactorTranss = new ArrayList<Trans>();
+    private List<Trans> TransactorTranss = new ArrayList<>();
     private int OverridePrintVersion;
     private String DateType;
     private Date Date1;
@@ -113,7 +115,7 @@ public class TransBean implements Serializable {
     private String SearchTransNo;
     private Trans RefTrans;
     private Trans TransChild = new Trans();
-    private List<TransItem> ActiveTransItemsChild = new ArrayList<TransItem>();
+    private List<TransItem> ActiveTransItemsChild = new ArrayList<>();
     private String ActionMessageChild;
     private Pay PayChild;
     private boolean gen_flag;
@@ -337,6 +339,7 @@ public class TransBean implements Serializable {
             }
             this.LocationList = new LocationBean().getLocations(aStoreId);
         } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -349,6 +352,7 @@ public class TransBean implements Serializable {
             }
             this.StoreList = new StoreBean().getStores();
         } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -361,6 +365,7 @@ public class TransBean implements Serializable {
             }
             this.UserDetailList = new UserDetailBean().getUserDetailsNotLocked();
         } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -395,7 +400,7 @@ public class TransBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            //do nothing
+            LOGGER.log(Level.ERROR, e);
         }
         try {
             int storeid = 0;
@@ -518,8 +523,8 @@ public class TransBean implements Serializable {
                 aTransItems.clear();
                 FacesContext.getCurrentInstance().addMessage("Retrieve PO", new FacesMessage("Either Currency or Transaction-Type of the Order does NOT match with selected currency..."));
             }
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -580,8 +585,8 @@ public class TransBean implements Serializable {
                 aTransItems.clear();
                 FacesContext.getCurrentInstance().addMessage("Retrieve PO", new FacesMessage("Either Currency or Transaction-Type of the Order does NOT match with selected currency..."));
             }
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -620,8 +625,8 @@ public class TransBean implements Serializable {
                     aTransItems.clear();
                     FacesContext.getCurrentInstance().addMessage("Retrieved", new FacesMessage("Transaction-Type or Client or Transaction Number does NOT match with selected..."));
                 }
-            } catch (NullPointerException npe) {
-                npe.printStackTrace();
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
     }
@@ -678,716 +683,8 @@ public class TransBean implements Serializable {
                 //aTrans.setTransactionRef("");
                 aTransItems.clear();
             }
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
-        }
-    }
-
-    public void saveTrans_Del(Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
-        String sql = null;
-        String sql2 = null;
-        String msg = "";
-
-        TransactionType CurrentTransactionType = new TransactionTypeBean().getTransactionType(new GeneralUserSetting().getCurrentTransactionTypeId());
-
-        TransItemBean TransItemBean = new TransItemBean();
-        PointsTransactionBean NewPointsTransactionBean = new PointsTransactionBean();
-        PointsTransaction NewPointsTransaction = new PointsTransaction();
-
-        //first clear current trans and pay ids in session
-        FacesContext context = FacesContext.getCurrentInstance();
-        HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
-        HttpSession httpSession = request.getSession(true);
-        httpSession.setAttribute("CURRENT_TRANSACTION_ID", 0);
-        httpSession.setAttribute("CURRENT_PAY_ID", 0);
-
-        String ItemMessage = "";
-        ItemMessage = new TransItemBean().getAnyItemTotalQtyGreaterThanCurrentQty(aActiveTransItems, new GeneralUserSetting().getCurrentStore().getStoreId(), CurrentTransactionType.getTransactionTypeName());
-        String ItemMessage2 = "";
-        ItemMessage2 = new TransItemBean().getAnyItemReturnTotalGreaterThanBalance(aActiveTransItems, CurrentTransactionType.getTransactionTypeName());
-        String ItemMessage3 = "";
-        ItemMessage3 = new TransItemBean().getAnyItemDeliveryTotalGreaterThanBalance(aActiveTransItems, CurrentTransactionType.getTransactionTypeName());
-
-        UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
-        List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
-        GroupRightBean grb = new GroupRightBean();
-
-        if (null == CurrentTransactionType) {
-            this.setActionMessage("");
-            msg = "-.-.-. INVALID TRANSACTION -.-.-.";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-            //} else if (trans.getTransactionId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, grb.getFunctionByTransType(CurrentTransactionType.getTransactionTypeName(), new GeneralUserSetting().getCurrentSaleType()), "Add") == 0) {
-        } else if (trans.getTransactionId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, new GeneralUserSetting().getCurrentTransactionReasonIdStr(), "Add") == 0) {
-            this.setActionMessage("");
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (!ItemMessage.equals("")) {
-            this.setActionMessage("");
-            msg = "INSUFFICIENT STOCK FOR ITEM(" + ItemMessage + ")...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (!ItemMessage2.equals("") && "HIRE RETURN NOTE".equals(CurrentTransactionType.getTransactionTypeName())) {
-            this.setActionMessage("");
-            msg = "TOTAL RETURNED IS GREATER THAN BALANCE FOR ITEM(" + ItemMessage2 + ")...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (!ItemMessage3.equals("") && "HIRE DELIVERY NOTE".equals(CurrentTransactionType.getTransactionTypeName())) {
-            this.setActionMessage("");
-            msg = "TOTAL DELIVERED IS GREATER THAN BALANCE UNDELIVERED FOR ITEM(" + ItemMessage2 + ")...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if ("SALE INVOICE".equals(CurrentTransactionType.getTransactionTypeName()) && "COST-PRICE SALE INVOICE".equals(new GeneralUserSetting().getCurrentSaleType()) && trans.getTransactorId() == 0) {
-            this.setActionMessage("");
-            msg = "PLEASE SELECT " + CurrentTransactionType.getBillTransactorLabel();
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if ("SALE INVOICE".equals(CurrentTransactionType.getTransactionTypeName()) && "No".equals(CompanySetting.getIsCashDiscountVatLiable()) && trans.getCashDiscount() > (trans.getSubTotal() - trans.getTotalTradeDiscount() + trans.getTotalVat())) {
-            this.setActionMessage("");
-            msg = "Cash Discount is Invalid, it cannot exceed grand total, please check company settings... ";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if ("SALE INVOICE".equals(CurrentTransactionType.getTransactionTypeName()) && "Yes".equals(CompanySetting.getIsCashDiscountVatLiable()) && trans.getCashDiscount() > (trans.getSubTotal() - trans.getTotalTradeDiscount())) {
-            this.setActionMessage("");
-            msg = "Cash Discount is set as a liability, it cannot extend to VAT or exceed grand total, please check company settings... ";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if ("SALE INVOICE".equals(CurrentTransactionType.getTransactionTypeName()) && trans.getCashDiscount() < 0 || trans.getAmountTendered() < 0 || trans.getSpendPointsAmount() < 0 || trans.getGrandTotal() < 0) {
-            this.setActionMessage("");
-            msg = "Either [Cash Discount] or [Amount Tendered] or [Points Spent Amount] is INVALID, please check... ";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if ("PURCHASE INVOICE".equals(CurrentTransactionType.getTransactionTypeName()) && trans.getCashDiscount() < 0) {
-            this.setActionMessage("");
-            msg = "[Cash Discount] is INVALID, please check... ";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if ("SALE INVOICE".equals(CurrentTransactionType.getTransactionTypeName()) && trans.getCashDiscount() > 0 && new GeneralUserSetting().getIsApproveDiscountNeeded() == 1 && !"APPROVED".equals(new GeneralUserSetting().getCurrentApproveDiscountStatus())) {
-            this.setActionMessage("");
-            msg = "YOU ARE NOT ALLOWED TO ISSUE CASH DISCOUNT, SEEK APPROVAL...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if ("SALE INVOICE".equals(CurrentTransactionType.getTransactionTypeName()) && trans.getSpendPointsAmount() > 0 && new GeneralUserSetting().getIsApprovePointsNeeded() == 1 && !"APPROVED".equals(new GeneralUserSetting().getCurrentApprovePointsStatus())) {
-            this.setActionMessage("");
-            msg = "YOU ARE NOT ALLOWED TO SPEND POINTS, SEEK APPROVAL...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (trans.getTransactionDate() == null) {
-            this.setActionMessage("");
-            msg = "Select " + CurrentTransactionType.getTransactionDateLabel();
-            this.setActionMessage("Transaction NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-            if ("UNPACK".equals(CurrentTransactionType.getTransactionTypeName())) {
-                aActiveTransItems.clear();
-            }
-        } else if ((new GeneralUserSetting().getDaysFromDateToLicenseExpiryDate(trans.getTransactionDate()) <= 0 || new GeneralUserSetting().getDaysFromDateToLicenseExpiryDate(new CompanySetting().getCURRENT_SERVER_DATE()) <= 0) && CompanySetting.getLicenseType() != 9) {
-            this.setActionMessage("");
-            msg = "INCORRECT SERVER DATE or LICENSE HAS EXPIRED !";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (trans.getTransactorId() == 0 && CurrentTransactionType.getIsTransactorMandatory().equals("Yes")) {
-            this.setActionMessage("");
-            msg = "Select " + CurrentTransactionType.getTransactorLabel();
-            this.setActionMessage("Transaction NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (aActiveTransItems.size() < 1 & !"UNPACK".equals(CurrentTransactionType.getTransactionTypeName())) {
-            this.setActionMessage("");
-            msg = "No item(s) found for this " + CurrentTransactionType.getTransactionOutputLabel();
-            this.setActionMessage("Transaction NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if ("SALE INVOICE".equals(CurrentTransactionType.getTransactionTypeName()) && trans.getPayMethod() == 0) {
-            this.setActionMessage("");
-            msg = "Select Payment Method";
-            this.setActionMessage("Transaction NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if ("SALE INVOICE".equals(CurrentTransactionType.getTransactionTypeName()) && "No".equals(CompanySetting.getIsAllowDebt()) && (trans.getAmountTendered() + trans.getSpendPointsAmount()) < trans.getGrandTotal()) {
-            this.setActionMessage("");
-            msg = "Amount tendered is LESS THAN grand total";
-            this.setActionMessage("Transaction NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if ("SALE INVOICE".equals(CurrentTransactionType.getTransactionTypeName()) && trans.getSpendPointsAmount() > trans.getBalancePointsAmount()) {
-            this.setActionMessage("");
-            msg = "Amount entered for spending POINTS exceeds the available balance on points available for this customer; please edit accordingly";
-            this.setActionMessage("Transaction NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if ("SALE INVOICE".equals(CurrentTransactionType.getTransactionTypeName()) && "Yes".equals(CompanySetting.getIsAllowDebt()) && (trans.getAmountTendered() + trans.getSpendPointsAmount()) < trans.getGrandTotal() && trans.getTransactorId() == 0) {
-            this.setActionMessage("");
-            msg = "Amount tendered is LESS THAN grand total, you MUST select a valid Customer for this Debt Sale";
-            this.setActionMessage("Transaction NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (("TRANSFER".equals(CurrentTransactionType.getTransactionTypeName()) || "TRANSFER REQUEST".equals(CurrentTransactionType.getTransactionTypeName())) && trans.getStore2Id() == 0) {
-            this.setActionMessage("");
-            msg = "Select the " + CompanySetting.getStoreEquivName() + " to which item(s) are requested from / transferred to...";
-            this.setActionMessage("Transaction NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (("TRANSFER".equals(CurrentTransactionType.getTransactionTypeName()) || "TRANSFER REQUEST".equals(CurrentTransactionType.getTransactionTypeName())) && new GeneralUserSetting().getCurrentStore().getStoreId() == trans.getStore2Id()) {
-            this.setActionMessage("");
-            msg = "You cannot request/trasfer item(s) to and from the same " + CompanySetting.getStoreEquivName() + "...";
-            this.setActionMessage("Transaction NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if ("Yes".equals(CurrentTransactionType.getIsTransactionUserMandatory()) && trans.getTransactionUserDetailId() == 0) {
-            this.setActionMessage("");
-            msg = "Select " + CurrentTransactionType.getTransactionUserLabel();
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if ("Yes".equals(CurrentTransactionType.getIsTransactionRefMandatory()) && trans.getTransactionRef().equals("")) {
-            this.setActionMessage("");
-            msg = "Select " + CurrentTransactionType.getTransactionRefLabel();
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if ("Yes".equals(CurrentTransactionType.getIsTransactionRefMandatory()) && trans.getTransactionRef().equals("")) {
-            this.setActionMessage("");
-            msg = "Select " + CurrentTransactionType.getTransactionRefLabel();
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if ("SALE INVOICE".equals(CurrentTransactionType.getTransactionTypeName()) && trans.isBillOther() && trans.getBillTransactorId() == 0) {
-            this.setActionMessage("");
-            msg = "Select " + CurrentTransactionType.getBillTransactorLabel();
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (trans.getAuthorisedByUserDetailId() == 0 && CurrentTransactionType.getIsAuthoriseUserMandatory().equals("Yes")) {
-            this.setActionMessage("");
-            msg = "Select Authorise User";
-            this.setActionMessage("Transaction NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (trans.getAuthoriseDate() == null && CurrentTransactionType.getIsAuthoriseDateMandatory().equals("Yes")) {
-            this.setActionMessage("");
-            msg = "Select Authorise Date";
-            this.setActionMessage("Transaction NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (trans.getDeliveryAddress().length() == 0 && CurrentTransactionType.getIsDeliveryAddressMandatory().equals("Yes")) {
-            this.setActionMessage("");
-            msg = "Specify Delivery Address";
-            this.setActionMessage("Transaction NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (trans.getDeliveryDate() == null && CurrentTransactionType.getIsDeliveryDateMandatory().equals("Yes")) {
-            this.setActionMessage("");
-            msg = "Select Delivery Date";
-            this.setActionMessage("Transaction NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (trans.getPayDueDate() == null && CurrentTransactionType.getIsPayDueDateMandatory().equals("Yes")) {
-            this.setActionMessage("");
-            msg = "Select Pay Due Date";
-            this.setActionMessage("Transaction NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (trans.getExpiryDate() == null && CurrentTransactionType.getIsExpiryDateMandatory().equals("Yes")) {
-            this.setActionMessage("");
-            msg = "Select Expiry Date for this " + CurrentTransactionType.getTransactionOutputLabel();
-            this.setActionMessage("Transaction NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (aSelectedTransactor != null && aSelectedTransactor.getIsSuspended().equals("Yes")) {
-            this.setActionMessage("");
-            msg = aSelectedTransactor.getTransactorNames() + " IS SUSPENDED [ " + aSelectedTransactor.getSuspendedReason() + " ]";
-            this.setActionMessage("Transaction NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (aSelectedBillTransactor != null && aSelectedBillTransactor.getIsSuspended().equals("Yes")) {
-            this.setActionMessage("");
-            msg = aSelectedBillTransactor.getTransactorNames() + " IS SUSPENDED [ " + aSelectedBillTransactor.getSuspendedReason() + " ]";
-            this.setActionMessage("Transaction NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if ("SALE INVOICE".equals(CurrentTransactionType.getTransactionTypeName()) && trans.getGrandTotal() > 0 && trans.getAccChildAccountId() == 0) {
-            this.setActionMessage("");
-            msg = "Select Payment Receipt Account...";
-            this.setActionMessage("Transaction NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if ("PURCHASE INVOICE".equals(CurrentTransactionType.getTransactionTypeName()) && trans.getAmountTendered() < trans.getGrandTotal() && trans.getTransactorId() == 0) {
-            this.setActionMessage("");
-            msg = "Please select " + CurrentTransactionType.getTransactorLabel();
-            this.setActionMessage("Transaction NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if ("PURCHASE INVOICE".equals(CurrentTransactionType.getTransactionTypeName()) && trans.getAmountTendered() >= 0 && trans.getAccChildAccountId() == 0) {
-            this.setActionMessage("");
-            msg = "Please select the Payment Account";
-            this.setActionMessage("Transaction NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if ("JOURNAL ENTRY".equals(CurrentTransactionType.getTransactionTypeName()) && trans.getTotalDebit() != trans.getTotalCredit()) {
-            this.setActionMessage("");
-            msg = "TOTAL DEBIT IS NOT EQUAL TO TOTAL CREIDT...!";
-            this.setActionMessage("Transaction NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if ("EXPENSE ENTRY".equals(CurrentTransactionType.getTransactionTypeName()) && (trans.getAmountTendered() <= 0 && trans.getGrandTotal() <= 0) && trans.getTransactionId() == 0) {
-            this.setActionMessage("");
-            msg = "Please enter Spent/Paid Amount";
-            this.setActionMessage("Transaction NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if ("EXPENSE ENTRY".equals(CurrentTransactionType.getTransactionTypeName()) && trans.getAccChildAccountId() == 0) {
-            this.setActionMessage("");
-            msg = "Please select the Payment Account";
-            this.setActionMessage("Transaction NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (null == new AccPeriodBean().getAccPeriod(trans.getTransactionDate())) {
-            this.setActionMessage("");
-            msg = "Date selected does not MATCH any accounting period; Go to Accounts>Account Period, click Add New and Save OR contact system administrator...";
-            this.setActionMessage("Transaction NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getIsClosed() == 1) {
-            this.setActionMessage("");
-            msg = "Date selected is for a CLOSED accounting period; please contact system administrator...";
-            this.setActionMessage("Transaction NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if ((trans.getPayMethod() == 6 || trans.getPayMethod() == 7) && trans.getAmountTendered() <= 0) {
-            this.setActionMessage("");
-            msg = "The amount tendered is not accepted for the selected payment method...";
-            this.setActionMessage("Transaction NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (trans.getPayMethod() == 6 && trans.getAmountTendered() > new AccLedgerBean().getPrepaidIncomeAccBalanceTrade(new TransBean().getBillClientId(trans.getTransactorId(), trans.getBillTransactorId()), trans.getCurrencyCode())) {
-            this.setActionMessage("");
-            msg = "Insufficient funds on the Client/Customer Deposit account...";
-            this.setActionMessage("Transaction NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (trans.getPayMethod() == 7 && trans.getAmountTendered() > new AccLedgerBean().getPrepaidExpenseAccBalanceTrade(new TransBean().getBillClientId(trans.getTransactorId(), trans.getBillTransactorId()), trans.getCurrencyCode())) {
-            this.setActionMessage("");
-            msg = "Insufficient funds on the Supplier Advance Expense account...";
-            this.setActionMessage("Transaction NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if ("HIRE INVOICE".equals(CurrentTransactionType.getTransactionTypeName()) && (trans.getFrom_date() == null || trans.getTo_date() == null)) {
-            this.setActionMessage("");
-            msg = "Specify the following: From Date, To Date";
-            this.setActionMessage("Transaction NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else {
-            sql = "{call sp_insert_transaction(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
-            try (
-                    Connection conn = DBConnection.getMySQLConnection();
-                    CallableStatement cs = conn.prepareCall(sql);) {
-                cs.setDate("in_transaction_date", new java.sql.Date(trans.getTransactionDate().getTime()));
-                cs.setInt("in_store_id", new GeneralUserSetting().getCurrentStore().getStoreId());
-                trans.setStoreId(new GeneralUserSetting().getCurrentStore().getStoreId());
-                cs.setInt("in_store2_id", trans.getStore2Id());
-                cs.setLong("in_transactor_id", trans.getTransactorId());
-                trans.setTransactionTypeId(new GeneralUserSetting().getCurrentTransactionTypeId());
-                cs.setInt("in_transaction_type_id", trans.getTransactionTypeId());
-                if (trans.getTransactionTypeId() == 3 || trans.getTransactionTypeId() == 4 || trans.getTransactionTypeId() == 13 || trans.getTransactionTypeId() == 7 || trans.getTransactionTypeId() == 16 || trans.getTransactionTypeId() == 19) {//DISPOSE STOCK, TRANFER & TRANS REQ & UNPACK & JOURNAL ENTRY & EXPENSE ENTRY
-                    trans.setTransactionReasonId(new GeneralUserSetting().getCurrentTransactionReasonId());
-                }
-                cs.setInt("in_transaction_reason_id", trans.getTransactionReasonId());
-                cs.setDouble("in_cash_discount", trans.getCashDiscount());
-                cs.setDouble("in_total_vat", trans.getTotalVat());
-                cs.setString("in_transaction_comment", trans.getTransactionComment());
-                cs.setInt("in_add_user_detail_id", new GeneralUserSetting().getCurrentUser().getUserDetailId());
-                trans.setAddUserDetailId(new GeneralUserSetting().getCurrentUser().getUserDetailId());
-                cs.setTimestamp("in_add_date", new java.sql.Timestamp(new java.util.Date().getTime()));
-                cs.setInt("in_edit_user_detail_id", new GeneralUserSetting().getCurrentUser().getUserDetailId());//will be made null by the SP
-                cs.setTimestamp("in_edit_date", new java.sql.Timestamp(new java.util.Date().getTime()));//will be made null by the SP
-                cs.setString("in_transaction_ref", trans.getTransactionRef());
-                cs.registerOutParameter("out_transaction_id", VARCHAR);
-                cs.setDouble("in_sub_total", trans.getSubTotal());
-                cs.setDouble("in_grand_total", trans.getGrandTotal());
-                cs.setDouble("in_total_trade_discount", trans.getTotalTradeDiscount());
-                cs.setDouble("in_points_awarded", trans.getPointsAwarded());
-                cs.setString("in_card_number", trans.getCardNumber());
-                cs.setDouble("in_total_std_vatable_amount", trans.getTotalStdVatableAmount());
-                cs.setDouble("in_total_zero_vatable_amount", trans.getTotalZeroVatableAmount());
-                cs.setDouble("in_total_exempt_vatable_amount", trans.getTotalExemptVatableAmount());
-                cs.setDouble("in_vat_perc", CompanySetting.getVatPerc());
-                cs.setDouble("in_amount_tendered", trans.getAmountTendered());
-                cs.setDouble("in_change_amount", trans.getChangeAmount());
-                cs.setString("in_is_cash_discount_vat_liable", CompanySetting.getIsCashDiscountVatLiable());
-                //for profit margin
-                cs.setDouble("in_total_profit_margin", trans.getTotalProfitMargin());
-                try {
-                    if (trans.getTransactionUserDetailId() == 0) {
-                        trans.setTransactionUserDetailId(new GeneralUserSetting().getCurrentUser().getUserDetailId());
-                    }
-                } catch (NullPointerException npe) {
-                    trans.setTransactionUserDetailId(new GeneralUserSetting().getCurrentUser().getUserDetailId());
-                }
-                cs.setInt("in_transaction_user_detail_id", trans.getTransactionUserDetailId());
-                try {
-                    if (trans.getBillTransactorId() == 0) {
-                        trans.setBillTransactorId(trans.getTransactorId());
-                    }
-                } catch (NullPointerException npe) {
-                    trans.setBillTransactorId(trans.getTransactorId());
-                }
-                cs.setLong("in_bill_transactor_id", trans.getBillTransactorId());
-                try {
-                    cs.setLong("in_scheme_transactor_id", trans.getSchemeTransactorId());
-                } catch (NullPointerException npe) {
-                    cs.setLong("in_scheme_transactor_id", 0);
-                }
-                try {
-                    cs.setString("in_princ_scheme_member", trans.getPrincSchemeMember());
-                } catch (NullPointerException npe) {
-                    cs.setString("in_princ_scheme_member", "");
-                }
-                try {
-                    cs.setString("in_scheme_card_number", trans.getSchemeCardNumber());
-                } catch (NullPointerException npe) {
-                    cs.setString("in_scheme_card_number", "");
-                }
-                try {
-                    cs.setString("in_transaction_number", trans.getTransactionNumber());
-                } catch (NullPointerException npe) {
-                    cs.setString("in_transaction_number", "");
-                }
-                try {
-                    cs.setDate("in_delivery_date", new java.sql.Date(trans.getDeliveryDate().getTime()));
-                } catch (NullPointerException npe) {
-                    cs.setDate("in_delivery_date", null);
-                }
-                try {
-                    cs.setString("in_delivery_address", trans.getDeliveryAddress());
-                } catch (NullPointerException npe) {
-                    cs.setString("in_delivery_address", "");
-                }
-                try {
-                    cs.setString("in_pay_terms", trans.getPayTerms());
-                } catch (NullPointerException npe) {
-                    cs.setString("in_pay_terms", "");
-                }
-                try {
-                    cs.setString("in_terms_conditions", trans.getTermsConditions());
-                } catch (NullPointerException npe) {
-                    cs.setString("in_terms_conditions", "");
-                }
-                try {
-                    cs.setInt("in_authorised_by_user_detail_id", trans.getAuthorisedByUserDetailId());
-                } catch (NullPointerException npe) {
-                    cs.setInt("in_authorised_by_user_detail_id", 0);
-                }
-                try {
-                    cs.setDate("in_authorise_date", new java.sql.Date(trans.getAuthoriseDate().getTime()));
-                } catch (NullPointerException npe) {
-                    cs.setDate("in_authorise_date", null);
-                }
-                try {
-                    cs.setDate("in_pay_due_date", new java.sql.Date(trans.getPayDueDate().getTime()));
-                } catch (NullPointerException npe) {
-                    cs.setDate("in_pay_due_date", null);
-                }
-                try {
-                    cs.setDate("in_expiry_date", new java.sql.Date(trans.getExpiryDate().getTime()));
-                } catch (NullPointerException npe) {
-                    cs.setDate("in_expiry_date", null);
-                }
-                try {
-                    cs.setInt("in_acc_child_account_id", trans.getAccChildAccountId());
-                } catch (NullPointerException npe) {
-                    cs.setInt("in_acc_child_account_id", 0);
-                }
-                try {
-                    cs.setString("in_currency_code", trans.getCurrencyCode());
-                } catch (NullPointerException npe) {
-                    cs.setString("in_currency_code", "");
-                }
-                try {
-                    AccCurrency LocalCurrency = null;
-                    LocalCurrency = new AccCurrencyBean().getLocalCurrency();
-                    trans.setXrate(new AccXrateBean().getXrate(trans.getCurrencyCode(), LocalCurrency.getCurrencyCode()));
-                } catch (NullPointerException npe) {
-                    trans.setXrate(1);
-                }
-                cs.setDouble("in_xrate", trans.getXrate());
-                try {
-                    cs.setDate("in_from_date", new java.sql.Date(trans.getFrom_date().getTime()));
-                } catch (NullPointerException npe) {
-                    cs.setDate("in_from_date", null);
-                }
-                try {
-                    cs.setDate("in_to_date", new java.sql.Date(trans.getTo_date().getTime()));
-                } catch (NullPointerException npe) {
-                    cs.setDate("in_to_date", null);
-                }
-                try {
-                    cs.setString("in_duration_type", trans.getDuration_type());
-                } catch (NullPointerException npe) {
-                    cs.setString("in_duration_type", "");
-                }
-                try {
-                    cs.setLong("in_site_id", trans.getSite_id());
-                } catch (NullPointerException npe) {
-                    cs.setLong("in_site_id", 0);
-                }
-                try {
-                    cs.setString("in_transactor_rep", trans.getTransactor_rep());
-                } catch (NullPointerException npe) {
-                    cs.setString("in_transactor_rep", "");
-                }
-                try {
-                    cs.setString("in_transactor_vehicle", trans.getTransactor_vehicle());
-                } catch (NullPointerException npe) {
-                    cs.setString("in_transactor_vehicle", "");
-                }
-                try {
-                    cs.setString("in_transactor_driver", trans.getTransactor_driver());
-                } catch (NullPointerException npe) {
-                    cs.setString("in_transactor_driver", "");
-                }
-                try {
-                    cs.setDouble("in_duration_value", trans.getDuration_value());
-                } catch (NullPointerException npe) {
-                    cs.setDouble("in_duration_value", 0);
-                }
-                //bought in after order module
-                try {
-                    cs.setLong("in_location_id", trans.getLocation_id());
-                } catch (NullPointerException npe) {
-                    cs.setLong("in_location_id", 0);
-                }
-                if (null == trans.getStatus_code()) {
-                    cs.setString("in_status_code", "");
-                } else {
-                    cs.setString("in_status_code", trans.getStatus_code());
-                }
-                if (null == trans.getStatus_date()) {
-                    cs.setTimestamp("in_status_date", null);
-                } else {
-                    cs.setTimestamp("in_status_date", new java.sql.Timestamp(trans.getStatus_date().getTime()));
-                }
-                if (null == trans.getDelivery_mode()) {
-                    cs.setString("in_delivery_mode", "");
-                } else {
-                    cs.setString("in_delivery_mode", trans.getDelivery_mode());
-                }
-                try {
-                    cs.setInt("in_is_processed", trans.getIs_processed());
-                } catch (NullPointerException npe) {
-                    cs.setInt("in_is_processed", 0);
-                }
-                try {
-                    cs.setInt("in_is_paid", trans.getIs_paid());
-                } catch (NullPointerException npe) {
-                    cs.setInt("in_is_paid", 0);
-                }
-                try {
-                    cs.setInt("in_is_cancel", trans.getIs_cancel());
-                } catch (NullPointerException npe) {
-                    cs.setInt("in_is_cancel", 0);
-                }
-                //save
-                cs.executeUpdate();
-
-                //set store2 for transfer in session!
-                if ("TRANSFER".equals(CurrentTransactionType.getTransactionTypeName())) {
-                    httpSession.setAttribute("CURRENT_STORE2_ID", trans.getStore2Id());
-                } else {
-                    httpSession.setAttribute("CURRENT_STORE2_ID", 0);
-                }
-
-                //save trans items
-                httpSession.setAttribute("CURRENT_TRANSACTION_ID", cs.getLong("out_transaction_id"));
-                trans.setTransactionId(new GeneralUserSetting().getCurrentTransactionId());
-                //trans.setStoreId(VARCHAR);
-                //new GeneralUserSetting().getCurrentUser().getUserDetailId()
-
-                TransItemBean tib = new TransItemBean();
-                if (trans.getTransactionTypeId() == 16 || trans.getTransactionTypeId() == 18) {//Journal Entry, Cash Transfer
-                    tib.saveTransItemsJournalEntry(trans, aActiveTransItems, new GeneralUserSetting().getCurrentTransactionId());
-                } else {
-                    tib.saveTransItems(trans, aActiveTransItems, new GeneralUserSetting().getCurrentTransactionId());
-                }
-
-                //save payment
-                if ("SALE INVOICE".equals(CurrentTransactionType.getTransactionTypeName()) || "PURCHASE INVOICE".equals(CurrentTransactionType.getTransactionTypeName()) || "EXPENSE ENTRY".equals(CurrentTransactionType.getTransactionTypeName()) || "HIRE INVOICE".equals(CurrentTransactionType.getTransactionTypeName())) {
-                    Pay InnerPay = new Pay();
-                    InnerPay.setPayDate(trans.getTransactionDate());
-                    double paidamountt = 0;
-                    if ((trans.getChangeAmount() > 0)) {
-                        paidamountt = trans.getGrandTotal() - trans.getSpendPointsAmount();
-                    } else {
-                        paidamountt = trans.getAmountTendered();
-                    }
-                    InnerPay.setPaidAmount(paidamountt);
-                    InnerPay.setPayMethodId(trans.getPayMethod());
-                    InnerPay.setAddUserDetailId(new GeneralUserSetting().getCurrentUser().getUserDetailId());
-                    InnerPay.setEditUserDetailId(new GeneralUserSetting().getCurrentUser().getUserDetailId());
-                    InnerPay.setAddDate(new java.util.Date());
-                    InnerPay.setEditDate(new java.util.Date());
-                    InnerPay.setPointsSpent(trans.getSpendPoints());
-                    InnerPay.setPointsSpentAmount(trans.getSpendPointsAmount());
-                    InnerPay.setPayRefNo("");
-                    if ("SALE INVOICE".equals(CurrentTransactionType.getTransactionTypeName()) || "HIRE INVOICE".equals(CurrentTransactionType.getTransactionTypeName())) {
-                        InnerPay.setPayCategory("IN");
-                        InnerPay.setPayTypeId(14);//CASH RECEIPT
-                        if (paidamountt > 0) {//SOME PAYMENT, thus CASH or PREPAID
-                            if (trans.getPayMethod() == 6) {//PREPAID INCOME
-                                InnerPay.setPayReasonId(90);
-                            } else {//CASH
-                                InnerPay.setPayReasonId(21);
-                            }
-                        } else {//Otherwise full/part credit sale
-                            InnerPay.setPayReasonId(22);
-                        }
-                    } else if ("PURCHASE INVOICE".equals(CurrentTransactionType.getTransactionTypeName()) || "EXPENSE ENTRY".equals(CurrentTransactionType.getTransactionTypeName())) {
-                        InnerPay.setPayCategory("OUT");
-                        InnerPay.setPayTypeId(15);//CASH PAYMENT
-                        if (paidamountt >= 0) {//SOME PAYMENT, thus CASH or PREPAID
-                            if (trans.getPayMethod() == 7) {//PREPAID INCOME
-                                InnerPay.setPayReasonId(91);
-                            } else {//CASH
-                                InnerPay.setPayReasonId(26);
-                            }
-                        } else {//Otherwise full/part credit purchase
-                            InnerPay.setPayReasonId(25);
-                        }
-                    }
-                    InnerPay.setBillTransactorId(trans.getBillTransactorId());
-                    InnerPay.setStoreId(new GeneralUserSetting().getCurrentStore().getStoreId());
-                    try {
-                        InnerPay.setAccChildAccountId(trans.getAccChildAccountId());
-                    } catch (NullPointerException npe) {
-                        InnerPay.setAccChildAccountId(0);
-                    }
-                    InnerPay.setCurrencyCode(trans.getCurrencyCode());
-                    InnerPay.setXRate(trans.getXrate());
-                    InnerPay.setStatus(1);
-                    InnerPay.setStatusDesc("");
-                    //define output
-                    InnerPay.setDeletePayId(0);
-                    long payid = 0;
-                    try {
-                        payid = new PayBean().payInsertUpdate(InnerPay);
-                    } catch (NullPointerException npe) {
-                        payid = 0;
-                    }
-                    httpSession.setAttribute("CURRENT_PAY_ID", payid);
-
-                    //insert PayTrans
-                    PayTrans paytrans = new PayTrans();
-                    paytrans.setPayId(payid);
-                    paytrans.setTransactionId(new GeneralUserSetting().getCurrentTransactionId());
-                    paytrans.setTransPaidAmount(paidamountt);
-                    if (trans.getTransactionNumber().length() > 0) {
-                        paytrans.setTransactionNumber(trans.getTransactionNumber());
-                    } else {
-                        paytrans.setTransactionNumber(Long.toString(new GeneralUserSetting().getCurrentTransactionId()));
-                    }
-                    paytrans.setTransactionTypeId(trans.getTransactionTypeId());
-                    paytrans.setTransactionReasonId(trans.getTransactionReasonId());
-                    new PayTransBean().savePayTrans(paytrans);
-                }
-                //insert PointsTransaction for both the awarded and spent points to the stage area
-                if (("SALE INVOICE".equals(CurrentTransactionType.getTransactionTypeName()) || "HIRE INVOICE".equals(CurrentTransactionType.getTransactionTypeName())) && (trans.getPointsAwarded() != 0 || trans.getSpendPoints() != 0)) {
-                    if (trans.getPointsCardId() != 0 && !trans.getCardNumber().equals("")) {
-                        //1. insert PointsTransaction for both the awarded and spent points to the stage area
-                        NewPointsTransaction.setPointsCardId(trans.getPointsCardId());
-                        NewPointsTransaction.setTransactionDate(new java.sql.Date(trans.getTransactionDate().getTime()));
-                        NewPointsTransaction.setPointsAwarded(trans.getPointsAwarded());
-                        NewPointsTransaction.setPointsSpent(trans.getSpendPoints());
-                        NewPointsTransaction.setTransactionId(new GeneralUserSetting().getCurrentTransactionId());
-                        NewPointsTransaction.setTransBranchId(CompanySetting.getBranchId());
-                        NewPointsTransaction.setPointsSpentAmount(trans.getSpendPoints() * CompanySetting.getSpendAmountPerPoint());
-                        NewPointsTransactionBean.addPointsTransactionToStage(NewPointsTransaction);
-                    }
-                }
-                //Move all, if any PointsTransactions in the stage area to the live server
-                //The move function after deletes all if any in the stage area, so only the stage area will have those records not committed due to failure to connect to the server
-                //Transs will be moved if connectivity to the InterBranch DB is ON
-                if (new DBConnection().isINTER_BRANCH_MySQLConnectionAvailable().equals("ON")) {
-                    NewPointsTransactionBean.movePointsTransactionsFromStageToLive();
-                }
-
-                //insert approvals
-                if (("SALE INVOICE".equals(CurrentTransactionType.getTransactionTypeName()) || "HIRE INVOICE".equals(CurrentTransactionType.getTransactionTypeName())) && trans.getCashDiscount() > 0 && new GeneralUserSetting().getIsApproveDiscountNeeded() == 1 && "APPROVED".equals(new GeneralUserSetting().getCurrentApproveDiscountStatus())) {
-                    this.insertApproveTrans(new GeneralUserSetting().getCurrentTransactionId(), "DISCOUNT", new GeneralUserSetting().getCurrentApproveUserId());
-                }
-                if (("SALE INVOICE".equals(CurrentTransactionType.getTransactionTypeName()) || "HIRE INVOICE".equals(CurrentTransactionType.getTransactionTypeName())) && trans.getSpendPointsAmount() > 0 && new GeneralUserSetting().getIsApprovePointsNeeded() == 1 && "APPROVED".equals(new GeneralUserSetting().getCurrentApprovePointsStatus())) {
-                    this.insertApproveTrans(new GeneralUserSetting().getCurrentTransactionId(), "SPEND POINT", new GeneralUserSetting().getCurrentApproveUserId());
-                }
-
-                //Save Sales Journal Entry
-                if ("SALE INVOICE".equals(CurrentTransactionType.getTransactionTypeName()) || "HIRE INVOICE".equals(CurrentTransactionType.getTransactionTypeName())) {
-                    Pay savedpay = null;
-                    long savedpayid = 0;
-                    try {
-                        savedpayid = new GeneralUserSetting().getCurrentPayId();
-                    } catch (NullPointerException npe) {
-                        savedpayid = 0;
-                    }
-                    if (savedpayid > 0) {
-                        savedpay = new PayBean().getPay(savedpayid);
-                    }
-                    new AccJournalBean().postJournalSaleInvoice(trans, aActiveTransItems, savedpay, new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getAccPeriodId());
-                }
-                //Save Purchase Invoice Journal Entry
-                long PostJobId = 0;
-                if ("PURCHASE INVOICE".equals(CurrentTransactionType.getTransactionTypeName())) {
-                    Pay savedpay = null;
-                    long savedpayid = 0;
-                    try {
-                        savedpayid = new GeneralUserSetting().getCurrentPayId();
-                    } catch (NullPointerException npe) {
-                        savedpayid = 0;
-                    }
-                    if (savedpayid > 0) {
-                        savedpay = new PayBean().getPay(savedpayid);
-                    }
-                    PostJobId = new AccJournalBean().postJournalPurchaseInvoice(trans, aActiveTransItems, savedpay, new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getAccPeriodId());
-                }
-                //Save Asset Depreciation Schedule
-                if ("PURCHASE INVOICE".equals(CurrentTransactionType.getTransactionTypeName()) && new GeneralUserSetting().getCurrentTransactionReasonId() == 29) {
-                    //pay just for reference
-                    Pay savedpay = new Pay();
-                    long savedpayid = 0;
-                    try {
-                        savedpayid = new GeneralUserSetting().getCurrentPayId();
-                    } catch (NullPointerException npe) {
-                        savedpayid = 0;
-                    }
-                    if (savedpayid > 0) {
-                        savedpay = new PayBean().getPay(savedpayid);
-                    }
-                    Stock assetstock = null;
-                    AccDepScheduleBean depschbean = new AccDepScheduleBean();
-                    int assetstoreid = new GeneralUserSetting().getCurrentStore().getStoreId();
-                    for (TransItem assetti : aActiveTransItems) {
-                        assetstock = new StockBean().getStock(assetstoreid, assetti.getItemId(), assetti.getBatchno(), assetti.getCodeSpecific(), assetti.getDescSpecific());
-                        //Build:1-20-000-020 Land:1-20-000-010 but let us exclude LAND
-                        if (null != assetstock && assetstock.getAccountCode().length() > 0 && !assetstock.getAccountCode().equals("1-20-000-010")) {
-                            depschbean.insertAccDepSchedules(depschbean.calcAccDepSchedules(assetstock));
-                            //post to the ledger the first year's depriciation
-                            AccDepSchedule aAccDepSchedule = depschbean.getAccDepScheduleByYear(assetstock.getStockId(), 1);
-                            new AccJournalBean().postJournalDepreciateAsset(trans, assetstock, aAccDepSchedule, new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getAccPeriodId(), PostJobId);
-                        }
-                    }
-                }
-                //Save Dispose Stock Journal Entry
-                if ("DISPOSE STOCK".equals(CurrentTransactionType.getTransactionTypeName())) {
-                    new AccJournalBean().postJournalDisposeStock(trans, new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getAccPeriodId());
-                }
-                //Save Journal Entry - Journal Entry
-                if ("JOURNAL ENTRY".equals(CurrentTransactionType.getTransactionTypeName())) {
-                    new AccJournalBean().postJournalJournalEntry(trans, aActiveTransItems, new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getAccPeriodId());
-                }
-                //Save Journal Entry - Journal Entry
-                if ("CASH TRANSFER".equals(CurrentTransactionType.getTransactionTypeName())) {
-                    new AccJournalBean().postJournalCashTransfer(trans, aActiveTransItems, new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getAccPeriodId());
-                }
-                //Save Expense Journal Entry
-                if ("EXPENSE ENTRY".equals(CurrentTransactionType.getTransactionTypeName())) {
-                    Pay savedpay = null;
-                    long savedpayid = 0;
-                    try {
-                        savedpayid = new GeneralUserSetting().getCurrentPayId();
-                    } catch (NullPointerException npe) {
-                        savedpayid = 0;
-                    }
-                    if (savedpayid > 0) {
-                        savedpay = new PayBean().getPay(savedpayid);
-                    }
-                    new AccJournalBean().postJournalExpenseEntry(trans, aActiveTransItems, savedpay, new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getAccPeriodId());
-                }
-                //delete if any draft trans was used
-                if (trans.getTransactionHistId() > 0) {
-                    this.deleteTransFromHist(trans.getTransactionHistId());
-                }
-                this.clearAll2(trans, aActiveTransItems, null, null, aSelectedTransactor, 2, aSelectedBillTransactor, aTransUserDetail, aSelectedSchemeTransactor, aAuthorisedByUserDetail, aSelectedAccCoa);
-
-                TransItemBean = null;
-                NewPointsTransactionBean = null;
-                NewPointsTransaction = null;
-
-                //clean stock
-                StockBean.deleteZeroQtyStock();
-
-                this.setActionMessage("Saved Successfully ( TransactionId : " + new GeneralUserSetting().getCurrentTransactionId() + " )");
-
-                //Invoice
-                //1. Update Invoice
-                //2. Auto Printing Invoice
-                if ("SALE INVOICE".equals(CurrentTransactionType.getTransactionTypeName()) || "HIRE INVOICE".equals(CurrentTransactionType.getTransactionTypeName())) {
-                    //1. Update Invoice
-                    //---SalesInvoiceBean.initSalesInvoiceBean();
-                    //2. Auto Printing Invoice
-                    if (this.AutoPrintAfterSave) {
-                        org.primefaces.PrimeFaces.current().executeScript("doPrintHiddenClick()");
-                    }
-                }
-                if ("HIRE RETURN NOTE".equals(CurrentTransactionType.getTransactionTypeName())) {
-                    this.openChildReturnHireInvoice(new GeneralUserSetting().getCurrentTransactionId());
-                }
-                //Refresh stock alerts
-                new UtilityBean().refreshAlertsThread();
-            } catch (SQLException se) {
-                System.err.println(se.getMessage() + Arrays.toString(se.getStackTrace()));
-                this.setActionMessage("Transaction NOT saved");
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Transaction NOT saved! Double check details, ensure transaction ref numbers have not been captured already"));
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -1562,7 +859,7 @@ public class TransBean implements Serializable {
         } catch (Exception e) {
             msg = "An error has occured during the validation process";
             System.err.println("--:validateTransCEC:--" + e.getMessage());
-            e.printStackTrace();
+            LOGGER.log(Level.ERROR, e);
         }
         return msg;
     }
@@ -1799,8 +1096,7 @@ public class TransBean implements Serializable {
             InsertedTransId = cs.getLong("out_transaction_id");
             trans.setTransactionId(InsertedTransId);
         } catch (Exception e) {
-            System.err.println("--:insertTransCEC:--" + e.getMessage());
-            //e.printStackTrace();
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -1996,7 +1292,7 @@ public class TransBean implements Serializable {
                 }
             } catch (Exception e) {
                 System.err.println("getOrderInvoiceQtyBalance:" + e.getMessage());
-                e.printStackTrace();
+                LOGGER.log(Level.ERROR, e);
             }
         }
         return InvoiceQtyBalance;
@@ -2068,8 +1364,7 @@ public class TransBean implements Serializable {
                     InvoiceStatus = 1;
                 }
             } catch (Exception e) {
-                System.err.println("getOrderInvoiceStatus:" + e.getMessage());
-                e.printStackTrace();
+                LOGGER.log(Level.ERROR, e);
             }
         }
         return InvoiceStatus;
@@ -2143,8 +1438,7 @@ public class TransBean implements Serializable {
                     DeliveryStatus = 1;
                 }
             } catch (Exception e) {
-                System.err.println("getOrderDeliveryStatus:" + e.getMessage());
-                e.printStackTrace();
+                LOGGER.log(Level.ERROR, e);
             }
         }
         return DeliveryStatus;
@@ -2670,7 +1964,7 @@ public class TransBean implements Serializable {
                     //TimeStr = TimeStr + " RAlerts:" + ms;
                 }
             } catch (Exception e) {
-                System.err.println(e.getMessage() + Arrays.toString(e.getStackTrace()));
+                LOGGER.log(Level.ERROR, e);
                 switch (aLevel) {
                     case "PARENT":
                         this.setActionMessage("Transaction NOT saved");
@@ -2682,7 +1976,6 @@ public class TransBean implements Serializable {
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Transaction NOT saved! Double check details, ensure transaction ref numbers have not been captured already"));
             }
         }
-        //System.out.println(tms + ", " + TimeStr);
     }
 
     public void saveTransCallOrderInvoice(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
@@ -2990,7 +2283,7 @@ public class TransBean implements Serializable {
                         this.deleteTransFromHist(trans.getTransactionHistId());
                     }
                     //TAX API
-                    if (aTransTypeId == 2 && trans.getTotalVat() > 0 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0 && new Item_tax_mapBean().countItemsNotMappedSynced(aActiveTransItems)==0) {//SALES INVOICE
+                    if (aTransTypeId == 2 && trans.getTotalVat() > 0 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0 && new Item_tax_mapBean().countItemsNotMappedSynced(aActiveTransItems) == 0) {//SALES INVOICE
                         int IsThreadOn = 0;
                         try {
                             IsThreadOn = Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_THREAD_ON").getParameter_value());
@@ -3052,7 +2345,7 @@ public class TransBean implements Serializable {
                     new UtilityBean().refreshAlertsThread();
                 }
             } catch (Exception e) {
-                System.err.println(e.getMessage() + Arrays.toString(e.getStackTrace()));
+                LOGGER.log(Level.ERROR, e);
                 switch (aLevel) {
                     case "PARENT":
                         this.setActionMessage("Transaction NOT saved");
@@ -3092,8 +2385,8 @@ public class TransBean implements Serializable {
             } else {
                 OneOrZero = 0;
             }
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return OneOrZero;
     }
@@ -3225,7 +2518,7 @@ public class TransBean implements Serializable {
             options.put("dynamic", true);
             org.primefaces.PrimeFaces.current().dialog().openDynamic(filename, options, null);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -3329,8 +2622,8 @@ public class TransBean implements Serializable {
                 aTransItem.setTransactionId(cs.getLong("out_transaction_id"));
                 TransItemBean tib = new TransItemBean();
                 tib.saveTransItemAutoUnpack(aTransItem);
-            } catch (SQLException se) {
-                System.err.println("autoUnpackItem:" + se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
     }
@@ -3358,8 +2651,8 @@ public class TransBean implements Serializable {
             } else {
                 this.setActionMessage("THIS TRANSACTION IS INVALID!");
             }
-        } catch (NullPointerException npe) {
-            System.err.println(npe.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -3421,9 +2714,9 @@ public class TransBean implements Serializable {
                 cs.executeUpdate();
                 TransHistId = cs.getLong("out_transaction_hist_id");
                 isTransCopySuccess = true;
-            } catch (SQLException se) {
+            } catch (Exception e) {
                 isTransCopySuccess = false;
-                System.err.println("CopyTrans:" + se.getMessage());
+                LOGGER.log(Level.ERROR, e);
             }
             //Copy TransItem
             if (isTransCopySuccess) {
@@ -3444,9 +2737,9 @@ public class TransBean implements Serializable {
                         i = i + 1;
                     }
                     isTransItemCopySuccess = true;
-                } catch (SQLException se) {
+                } catch (Exception e) {
                     isTransItemCopySuccess = false;
-                    System.err.println("CopyTransItem:" + se.getMessage());
+                    LOGGER.log(Level.ERROR, e);
                 }
             }
 
@@ -3475,9 +2768,9 @@ public class TransBean implements Serializable {
                         cs.executeUpdate();
                         PayHistId = cs.getLong("out_pay_hist_id");
                         isPayCopySuccess = true;
-                    } catch (SQLException se) {
+                    } catch (Exception e) {
                         isPayCopySuccess = false;
-                        System.err.println("CopyPay:" + se.getMessage());
+                        LOGGER.log(Level.ERROR, e);
                     }
                     //copy pay trans
                     if (isPayCopySuccess) {
@@ -3498,9 +2791,9 @@ public class TransBean implements Serializable {
                                 i = i + 1;
                             }
                             isPayTransCopySuccess = true;
-                        } catch (SQLException se) {
+                        } catch (Exception e) {
                             isPayTransCopySuccess = false;
-                            System.err.println("CopyPayTrans:" + se.getMessage());
+                            LOGGER.log(Level.ERROR, e);
                         }
                     }
                     if (isTransCopySuccess && isTransItemCopySuccess && isTransItemReverseSuccess && isTransUpdateSuccess && isPayCopySuccess && isPayTransCopySuccess) {
@@ -3795,9 +3088,9 @@ public class TransBean implements Serializable {
                 cs.executeUpdate();
                 TransHistId = cs.getLong("out_transaction_hist_id");
                 isTransCopySuccess = true;
-            } catch (SQLException se) {
+            } catch (Exception e) {
                 isTransCopySuccess = false;
-                System.err.println("CopyTrans:" + se.getMessage());
+                LOGGER.log(Level.ERROR, e);
             }
             //Copy TransItem
             if (isTransCopySuccess) {
@@ -3818,9 +3111,9 @@ public class TransBean implements Serializable {
                         i = i + 1;
                     }
                     isTransItemCopySuccess = true;
-                } catch (SQLException se) {
+                } catch (Exception e) {
                     isTransItemCopySuccess = false;
-                    System.err.println("CopyTransItem:" + se.getMessage());
+                    LOGGER.log(Level.ERROR, e);
                 }
             }
 
@@ -3864,13 +3157,13 @@ public class TransBean implements Serializable {
                         cs.executeUpdate();
                         PayHistId = cs.getLong("out_pay_hist_id");
                         isPayCopySuccess = true;
-                    } catch (SQLException se) {
+                    } catch (Exception e) {
                         isPayCopySuccess = false;
-                        System.err.println("CopyPay:" + se.getMessage());
+                        LOGGER.log(Level.ERROR, e);
                     }
                     //copy pay trans
                     if (isPayCopySuccess) {
-                        List<PayTrans> PayTranssToCopy = new ArrayList<PayTrans>();
+                        List<PayTrans> PayTranssToCopy = new ArrayList<>();
                         PayTranssToCopy = new PayTransBean().getPayTranssByPayId(newPay.getPayId());
                         int i = 0;
                         int n = PayTranssToCopy.size();
@@ -3887,9 +3180,9 @@ public class TransBean implements Serializable {
                                 i = i + 1;
                             }
                             isPayTransCopySuccess = true;
-                        } catch (SQLException se) {
+                        } catch (Exception e) {
                             isPayTransCopySuccess = false;
-                            System.err.println("CopyPayTrans:" + se.getMessage());
+                            LOGGER.log(Level.ERROR, e);
                         }
                     }
                     if (isTransCopySuccess && isTransItemCopySuccess && isTransItemReverseSuccess && isTransUpdateSuccess && isPayCopySuccess && isPayTransCopySuccess) {
@@ -4174,15 +3467,8 @@ public class TransBean implements Serializable {
                     rcds = 0;
                 }
             }
-        } catch (SQLException se) {
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return rcds;
     }
@@ -4202,15 +3488,8 @@ public class TransBean implements Serializable {
                     rcds = 0;
                 }
             }
-        } catch (SQLException se) {
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return rcds;
     }
@@ -4235,15 +3514,8 @@ public class TransBean implements Serializable {
                     rcds = 0;
                 }
             }
-        } catch (SQLException se) {
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return rcds;
     }
@@ -4260,8 +3532,8 @@ public class TransBean implements Serializable {
             } else {
                 return 0;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return 0;
         }
     }
@@ -4278,8 +3550,8 @@ public class TransBean implements Serializable {
             } else {
                 return 0;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return 0;
         }
     }
@@ -4296,8 +3568,8 @@ public class TransBean implements Serializable {
             } else {
                 return 0;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return 0;
         }
     }
@@ -4313,14 +3585,13 @@ public class TransBean implements Serializable {
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareCall(sql);) {
             if (aTransId > 0) {
-                System.out.println("Updated:" + sql);
                 ps.executeUpdate();
                 return 1;
             } else {
                 return 0;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return 0;
         }
     }
@@ -4337,55 +3608,55 @@ public class TransBean implements Serializable {
             } else {
                 return 0;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return 0;
         }
     }
 
     public void convertTransToJournalAllstart() {
         String StartDate = new CompanySetting().getCURRENT_SERVER_DATE().toString();
-        System.out.println("Started:" + StartDate);
+        //System.out.println("Started:" + StartDate);
         this.ActionMessage = this.convertTransToJournalAll();
         String EndDate = new CompanySetting().getCURRENT_SERVER_DATE().toString();
         this.ActionMessage = this.ActionMessage + "Started:" + StartDate + " Ended:" + EndDate;
-        System.out.println("Ended:" + EndDate);
+        //System.out.println("Ended:" + EndDate);
     }
 
     public void convertTransToJournalAllstart2() {
         String StartDate = new CompanySetting().getCURRENT_SERVER_DATE().toString();
-        System.out.println("Started:" + StartDate);
+        //System.out.println("Started:" + StartDate);
         this.ActionMessage = this.convertTransToJournalAll2();
         String EndDate = new CompanySetting().getCURRENT_SERVER_DATE().toString();
         this.ActionMessage = this.ActionMessage + "Started:" + StartDate + " Ended:" + EndDate;
-        System.out.println("Ended:" + EndDate);
+        //System.out.println("Ended:" + EndDate);
     }
 
     public void convertPayToJournalAllstart() {
         String StartDate = new CompanySetting().getCURRENT_SERVER_DATE().toString();
-        System.out.println("Started:" + StartDate);
+        //System.out.println("Started:" + StartDate);
         this.ActionMessage = this.convertPayToJournalAll();
         String EndDate = new CompanySetting().getCURRENT_SERVER_DATE().toString();
         this.ActionMessage = this.ActionMessage + "Started:" + StartDate + " Ended:" + EndDate;
-        System.out.println("Ended:" + EndDate);
+        //System.out.println("Ended:" + EndDate);
     }
 
     public void convertOverPayAllstart(String aMode) {
         String StartDate = new CompanySetting().getCURRENT_SERVER_DATE().toString();
-        System.out.println("Started:" + StartDate);
+        //System.out.println("Started:" + StartDate);
         this.ActionMessage = this.convertOverPayAll(aMode);
         String EndDate = new CompanySetting().getCURRENT_SERVER_DATE().toString();
         this.ActionMessage = this.ActionMessage + "Started:" + StartDate + " Ended:" + EndDate;
-        System.out.println("Ended:" + EndDate);
+        //System.out.println("Ended:" + EndDate);
     }
 
     public void convertPayToJournalAllstart2() {
         String StartDate = new CompanySetting().getCURRENT_SERVER_DATE().toString();
-        System.out.println("Started:" + StartDate);
+        //System.out.println("Started:" + StartDate);
         this.ActionMessage = this.convertPayToJournalAll2();
         String EndDate = new CompanySetting().getCURRENT_SERVER_DATE().toString();
         this.ActionMessage = this.ActionMessage + "Started:" + StartDate + " Ended:" + EndDate;
-        System.out.println("Ended:" + EndDate);
+        //System.out.println("Ended:" + EndDate);
     }
 
     public String convertTransToJournalAll() {
@@ -4414,10 +3685,10 @@ public class TransBean implements Serializable {
                     i = i + 1;
                 }
                 rs.close();
-            } catch (SQLException se) {
-                //
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
-            System.out.println(convert_pass + "/" + TotalRecords + " Converted" + " Loop:" + loop + "/" + Loops);
+            //System.out.println(convert_pass + "/" + TotalRecords + " Converted" + " Loop:" + loop + "/" + Loops);
             loop = loop + 1;
         }
         return convert_pass + "/" + TotalRecords + " Converted" + " Loops:" + Loops;
@@ -4451,10 +3722,10 @@ public class TransBean implements Serializable {
                     i = i + 1;
                 }
                 rs.close();
-            } catch (SQLException se) {
-                //
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
-            System.out.println(convert_pass + "/" + TotalRecords + " Converted" + " Loop:" + loop + "/" + Loops);
+            //System.out.println(convert_pass + "/" + TotalRecords + " Converted" + " Loop:" + loop + "/" + Loops);
             loop = loop + 1;
         }
         return convert_pass + "/" + TotalRecords + " Converted" + " Loops:" + Loops;
@@ -4487,8 +3758,8 @@ public class TransBean implements Serializable {
                     i = i + 1;
                 }
                 rs.close();
-            } catch (SQLException se) {
-                //
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
             //System.out.println(convert_pass + "/" + TotalRecords + " Converted" + " Loop:" + loop + "/" + Loops);
             loop = loop + 1;
@@ -4536,7 +3807,8 @@ public class TransBean implements Serializable {
                         i = i + 1;
                     }
                     rs.close();
-                } catch (SQLException se) {
+                } catch (Exception e) {
+                    LOGGER.log(Level.ERROR, e);
                 }
                 loop = loop + 1;
             }
@@ -4571,19 +3843,18 @@ public class TransBean implements Serializable {
                             } else if (null == pay_made) {
                                 this.updateOverPayTransConvertStatusPARTFail(cTrans.getTransactionId());
                             }
-                        } catch (NullPointerException npe) {
-                            System.err.println("Error:Null");
+                        } catch (Exception e) {
+                            LOGGER.log(Level.ERROR, e);
                         }
                         convert_pass = convert_pass + 1;
                         cTrans = null;
                         i = i + 1;
                     }
                     rs.close();
-                } catch (SQLException se) {
+                } catch (Exception e) {
                     //
                 }
                 if (loop == Loops) {
-                    System.out.println("Loops-Reset");
                     TotalRecords = this.getCountOverPayRecords(aMode);
                     Loops = (int) TotalRecords;
                     loop = 1;
@@ -4624,8 +3895,8 @@ public class TransBean implements Serializable {
                     i = i + 1;
                 }
                 rs.close();
-            } catch (SQLException se) {
-                //
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
             //System.out.println(convert_pass + "/" + TotalRecords + " Converted" + " Loop:" + loop + "/" + Loops);
             loop = loop + 1;
@@ -4697,7 +3968,7 @@ public class TransBean implements Serializable {
                 pay_id = new PayBean().getOverPayIdReadyForTransFULL(aTrans.getBillTransactorId(), "OUT", aTrans.getGrandTotal());
             }
             if (pay_id > 0) {
-                System.out.print("," + pay_id);
+                //System.out.print("," + pay_id);
                 PayTrans paytrans = new PayTrans();
                 paytrans.setPayTransId(0);
                 paytrans.setPayId(pay_id);
@@ -4732,7 +4003,7 @@ public class TransBean implements Serializable {
             }
             try {
                 if (null != pay && pay.getPayId() > 0) {
-                    System.out.println("," + pay.getPayId() + ":" + pay.getPaidAmount());
+                    //System.out.println("," + pay.getPayId() + ":" + pay.getPaidAmount());
                     PayTrans paytrans = new PayTrans();
                     paytrans.setPayTransId(0);
                     paytrans.setPayId(pay.getPayId());
@@ -4746,7 +4017,8 @@ public class TransBean implements Serializable {
                 } else {
                     pay = null;
                 }
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         } catch (Exception e) {
             pay = null;
@@ -4957,8 +4229,8 @@ public class TransBean implements Serializable {
                     } else {
                         this.setActionMessage("DRAFT not saved");
                     }
-                } catch (SQLException se) {
-                    System.out.println("saveDraftTrans:" + se.getMessage());
+                } catch (Exception e) {
+                    LOGGER.log(Level.ERROR, e);
                 }
             }
         } catch (NullPointerException npe) {
@@ -5010,7 +4282,7 @@ public class TransBean implements Serializable {
                 this.setActionMessage("No draft sale record loaded");
             }
         } catch (Exception e) {
-            System.out.println("loadDraftTrans:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -5069,7 +4341,7 @@ public class TransBean implements Serializable {
                 //this.setActionMessage("No sale order record loaded");
             }
         } catch (Exception e) {
-            System.out.println("loadOrderTrans:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -5161,7 +4433,7 @@ public class TransBean implements Serializable {
                 //this.setActionMessage("No sale order record loaded");
             }
         } catch (Exception e) {
-            System.out.println("loadOrderTrans:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -5179,7 +4451,7 @@ public class TransBean implements Serializable {
                 this.setActionMessage("No draft sale record loaded");
             }
         } catch (Exception e) {
-            System.out.println("deleteDraftTrans:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -5213,18 +4485,11 @@ public class TransBean implements Serializable {
             } else {
                 this.setActionMessage("THIS TRANSACTION IS INVALID!");
             }
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
-//    public void callPrintButton() {
-//        FacesContext facesContext = FacesContext.getCurrentInstance();
-//        UIViewRoot root = facesContext.getViewRoot();
-//        CommandButton button = (CommandButton) root.findComponent("cmdbPrint");
-//        ActionEvent actionEvent = new ActionEvent(button);
-//        actionEvent.queue();
-//    }
     public Trans getTrans(long aTransactionId) {
         String sql = "{call sp_search_transaction_by_id(?)}";
         ResultSet rs = null;
@@ -5239,7 +4504,7 @@ public class TransBean implements Serializable {
                 return null;
             }
         } catch (Exception e) {
-            System.err.println("getTrans:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
             return null;
         }
     }
@@ -5257,17 +4522,9 @@ public class TransBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
     }
 
@@ -5287,8 +4544,8 @@ public class TransBean implements Serializable {
             if (rs.next()) {
                 this.setTransFromResultset(aTrans, rs);
             }
-        } catch (SQLException se) {
-            System.err.println("setTransFromOrder:" + se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -5308,8 +4565,8 @@ public class TransBean implements Serializable {
             if (rs.next()) {
                 this.setTransFromResultset(aTrans, rs);
             }
-        } catch (SQLException se) {
-            System.err.println("setTransFromOrder:" + se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -5324,16 +4581,8 @@ public class TransBean implements Serializable {
             if (rs.next()) {
                 this.setTransHistFromResultset(aTrans, rs);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -5347,7 +4596,7 @@ public class TransBean implements Serializable {
                 ps.executeUpdate();
                 this.refreshTranssDraft(new GeneralUserSetting().getCurrentStore().getStoreId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), new GeneralUserSetting().getCurrentTransactionTypeId(), new GeneralUserSetting().getCurrentTransactionReasonId());
             } catch (Exception e) {
-                System.err.println("deleteTransFromHist:" + e.getMessage());
+                LOGGER.log(Level.ERROR, e);
             }
         }
     }
@@ -5365,17 +4614,9 @@ public class TransBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
     }
 
@@ -5393,17 +4634,9 @@ public class TransBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
     }
 
@@ -5421,17 +4654,9 @@ public class TransBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
     }
 
@@ -5516,17 +4741,9 @@ public class TransBean implements Serializable {
                     aTrans = null;
                     new NavigationBean().defineTransactionTypes(0, "", "", "");
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
                 aTrans = null;
-            } finally {
-                if (rs != null) {
-                    try {
-                        rs.close();
-                    } catch (SQLException ex) {
-                        System.err.println(ex.getMessage());
-                    }
-                }
             }
             //trans items
             if (aTrans != null) {
@@ -5588,17 +4805,9 @@ public class TransBean implements Serializable {
                 aTrans = null;
                 new NavigationBean().defineTransactionTypes(0, "", "", "");
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             aTrans = null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
         //trans items
         if (aTrans != null) {
@@ -5982,8 +5191,8 @@ public class TransBean implements Serializable {
             }
             return trans;
 
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
         }
     }
@@ -6361,8 +5570,8 @@ public class TransBean implements Serializable {
             }
             return trans;
 
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
         }
     }
@@ -6734,8 +5943,8 @@ public class TransBean implements Serializable {
             } catch (NullPointerException npe) {
                 trans.setSource_code("");
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -7096,9 +6305,8 @@ public class TransBean implements Serializable {
                 trans.setTotalPaid(0);
             }
             //return trans;
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-            ///return null;
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -7401,9 +6609,8 @@ public class TransBean implements Serializable {
                 trans.setIs_cancel(0);
             }
             //return trans;
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-            ///return null;
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -7468,8 +6675,8 @@ public class TransBean implements Serializable {
 
             return transSummary;
 
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
         }
 
@@ -7490,7 +6697,7 @@ public class TransBean implements Serializable {
             success = 1;
         } catch (Exception e) {
             success = 0;
-            System.err.println("updateTransCECOpenBalance:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return success;
     }
@@ -7504,8 +6711,8 @@ public class TransBean implements Serializable {
             ps.executeUpdate();
             this.setActionMessage("Deleted Successfully!");
             this.clearTrans(trans);
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             this.setActionMessage("Trans NOT deleted");
         }
     }
@@ -7519,9 +6726,9 @@ public class TransBean implements Serializable {
             ps.setLong(1, aTransId);
             ps.executeUpdate();
             deleted = 1;
-        } catch (SQLException se) {
+        } catch (Exception e) {
             deleted = 0;
-            System.err.println("deleteTransCEC:" + se.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return deleted;
     }
@@ -8341,7 +7548,7 @@ public class TransBean implements Serializable {
                 aTransItem.setAccountName("Accounts Payable Trade");
             }
         } catch (Exception e) {
-            System.out.println("initTransOpenBalance:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -8350,7 +7557,7 @@ public class TransBean implements Serializable {
             this.TransTypeObj = new TransactionTypeBean().getTransactionType(aTransTypeId);
             this.TransReasonObj = new TransactionReasonBean().getTransactionReason(aTransReasonId);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -8359,7 +7566,7 @@ public class TransBean implements Serializable {
             this.TransTypeRefObj = new TransactionTypeBean().getTransactionType(aTransTypeId);
             this.TransReasonRefObj = new TransactionReasonBean().getTransactionReason(aTransReasonId);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -8441,16 +7648,8 @@ public class TransBean implements Serializable {
                     trans.setSchemeCardNumber("");
                 }
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return Transs;
     }
@@ -8468,16 +7667,8 @@ public class TransBean implements Serializable {
             while (rs.next()) {
                 Transs.add(this.getTransFromResultset(rs));
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return Transs;
     }
@@ -8502,16 +7693,8 @@ public class TransBean implements Serializable {
             while (rs.next()) {
                 this.TranssDraft.add(this.getTransHistFromResultset(rs));
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -8531,14 +7714,14 @@ public class TransBean implements Serializable {
             while (rs.next()) {
                 tds.add(this.getTransHistFromResultset(rs));
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         } finally {
             if (rs != null) {
                 try {
                     rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
+                } catch (Exception e) {
+                    LOGGER.log(Level.ERROR, e);
                 }
             }
         }
@@ -8659,16 +7842,8 @@ public class TransBean implements Serializable {
             while (rs.next()) {
                 Transs.add(this.getTransFromResultset(rs));
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return Transs;
     }
@@ -8687,16 +7862,8 @@ public class TransBean implements Serializable {
             while (rs.next()) {
                 Transs.add(this.getTransFromResultset(rs));
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return Transs;
     }
@@ -8722,14 +7889,14 @@ public class TransBean implements Serializable {
             while (rs.next()) {
                 Transs.add(this.getTransFromResultset(rs));
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         } finally {
             if (rs != null) {
                 try {
                     rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
+                } catch (Exception e) {
+                    LOGGER.log(Level.ERROR, e);
                 }
             }
         }
@@ -8752,16 +7919,8 @@ public class TransBean implements Serializable {
                 while (rs.next()) {
                     Transs.add(this.getTransFromResultset(rs));
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
-            } finally {
-                if (rs != null) {
-                    try {
-                        rs.close();
-                    } catch (SQLException ex) {
-                        System.err.println(ex.getMessage());
-                    }
-                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         } else {
             Transs.clear();
@@ -8877,16 +8036,8 @@ public class TransBean implements Serializable {
                         this.ReportTrans.add(this.getTransFromResultset(rs));
                     }
                     this.ActionMessage = ((""));
-                } catch (SQLException se) {
-                    System.err.println(se.getMessage());
-                } finally {
-                    if (rs != null) {
-                        try {
-                            rs.close();
-                        } catch (SQLException ex) {
-                            System.err.println(ex.getMessage());
-                        }
-                    }
+                } catch (Exception e) {
+                    LOGGER.log(Level.ERROR, e);
                 }
             }
         }
@@ -8931,16 +8082,8 @@ public class TransBean implements Serializable {
                         this.ReportTrans.add(this.getTransFromResultset(rs));
                     }
                     this.ActionMessage = ((""));
-                } catch (SQLException se) {
-                    System.err.println(se.getMessage());
-                } finally {
-                    if (rs != null) {
-                        try {
-                            rs.close();
-                        } catch (SQLException ex) {
-                            System.err.println(ex.getMessage());
-                        }
-                    }
+                } catch (Exception e) {
+                    LOGGER.log(Level.ERROR, e);
                 }
             }
         }
@@ -8971,7 +8114,7 @@ public class TransBean implements Serializable {
                 ListItemIndex = ListItemIndex + 1;
             }
         } catch (Exception e) {
-            System.err.println("calcCustomerCardGrandTotals:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -8998,7 +8141,7 @@ public class TransBean implements Serializable {
                 ListItemIndex = ListItemIndex + 1;
             }
         } catch (Exception e) {
-            System.err.println("calcSupllierCardGrandTotals:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -9090,13 +8233,8 @@ public class TransBean implements Serializable {
                             } catch (NullPointerException | SQLException npe) {
                                 trans.setTransactorName("");
                             }
-//                            try {
-//                                trans.setTransactionComment(rs.getString("pay_nos"));
-//                            } catch (NullPointerException | SQLException npe) {
-//                                trans.setTransactionComment("");
-//                            }
-                        } catch (SQLException se) {
-                            System.err.println("getReportCustomerCardInner:" + se.getMessage());
+                        } catch (Exception e) {
+                            LOGGER.log(Level.ERROR, e);
                         }
                         this.CustomerCardTranss.add(trans);
                     }
@@ -9104,16 +8242,8 @@ public class TransBean implements Serializable {
                     //refresh totals
                     this.refreshReportCustomerCardTotals(aTrans);
                     this.calcCustomerCardGrandTotals(this.CustomerCardTotals);
-                } catch (SQLException se) {
-                    System.err.println("CustomerCardTranss:" + se.getMessage());
-                } finally {
-                    if (rs != null) {
-                        try {
-                            rs.close();
-                        } catch (SQLException ex) {
-                            System.err.println(ex.getMessage());
-                        }
-                    }
+                } catch (Exception e) {
+                    LOGGER.log(Level.ERROR, e);
                 }
             }
         }
@@ -9205,8 +8335,8 @@ public class TransBean implements Serializable {
                             } catch (NullPointerException | SQLException npe) {
                                 trans.setTransactorName("");
                             }
-                        } catch (SQLException se) {
-                            System.err.println("getReportSupplierCardInner:" + se.getMessage());
+                        } catch (Exception e) {
+                            System.err.println("getReportSupplierCardInner:" + e.getMessage());
                         }
                         this.getSupplierCardTranss().add(trans);
                     }
@@ -9215,16 +8345,8 @@ public class TransBean implements Serializable {
                     this.refreshReportSupplierCardTotals(aTrans);
                     //this.calcSupplierCardGrandTotals(this.getSupplierCardTotals());
                     this.calcSupllierCardGrandTotals(this.getSupplierCardTotals());
-                } catch (SQLException se) {
-                    System.err.println("refreshReportSupplierCard:" + se.getMessage());
-                } finally {
-                    if (rs != null) {
-                        try {
-                            rs.close();
-                        } catch (SQLException ex) {
-                            System.err.println(ex.getMessage());
-                        }
-                    }
+                } catch (Exception e) {
+                    LOGGER.log(Level.ERROR, e);
                 }
             }
         }
@@ -9282,22 +8404,14 @@ public class TransBean implements Serializable {
                             } catch (NullPointerException | SQLException npe) {
                                 trans.setCurrencyCode("");
                             }
-                        } catch (SQLException se) {
-                            System.err.println("getReportCustomerCardTotalsInner:" + se.getMessage());
+                        } catch (Exception e) {
+                            LOGGER.log(Level.ERROR, e);
                         }
                         this.CustomerCardTotals.add(trans);
                     }
                     this.ActionMessage = ("");
-                } catch (SQLException se) {
-                    System.err.println("CustomerCardTotals:" + se.getMessage());
-                } finally {
-                    if (rs != null) {
-                        try {
-                            rs.close();
-                        } catch (SQLException ex) {
-                            System.err.println(ex.getMessage());
-                        }
-                    }
+                } catch (Exception e) {
+                    LOGGER.log(Level.ERROR, e);
                 }
             }
         }
@@ -9355,22 +8469,14 @@ public class TransBean implements Serializable {
                             } catch (NullPointerException | SQLException npe) {
                                 trans.setCurrencyCode("");
                             }
-                        } catch (SQLException se) {
-                            System.err.println("getReportSupplierCardTotalsInner:" + se.getMessage());
+                        } catch (Exception e) {
+                            LOGGER.log(Level.ERROR, e);
                         }
                         this.getSupplierCardTotals().add(trans);
                     }
                     this.ActionMessage = ("");
-                } catch (SQLException se) {
-                    System.err.println("SupplierCardTotals:" + se.getMessage());
-                } finally {
-                    if (rs != null) {
-                        try {
-                            rs.close();
-                        } catch (SQLException ex) {
-                            System.err.println(ex.getMessage());
-                        }
-                    }
+                } catch (Exception e) {
+                    LOGGER.log(Level.ERROR, e);
                 }
             }
         }
@@ -9418,16 +8524,8 @@ public class TransBean implements Serializable {
                     while (rs.next()) {
                         gTotal = gTotal + (rs.getDouble("sum_grand_total") * new AccXrateBean().getXrateMultiply(rs.getString("currency_code"), LocCurCode));
                     }
-                } catch (SQLException se) {
-                    System.err.println(se.getMessage());
-                } finally {
-                    if (rs != null) {
-                        try {
-                            rs.close();
-                        } catch (SQLException ex) {
-                            System.err.println(ex.getMessage());
-                        }
-                    }
+                } catch (Exception e) {
+                    LOGGER.log(Level.ERROR, e);
                 }
             }
         }
@@ -9554,16 +8652,8 @@ public class TransBean implements Serializable {
                         this.ReportTransSummary.add(this.getTransSummaryFromResultset(rs));
                     }
                     this.ActionMessage = ((""));
-                } catch (SQLException se) {
-                    System.err.println(se.getMessage());
-                } finally {
-                    if (rs != null) {
-                        try {
-                            rs.close();
-                        } catch (SQLException ex) {
-                            System.err.println(ex.getMessage());
-                        }
-                    }
+                } catch (Exception e) {
+                    LOGGER.log(Level.ERROR, e);
                 }
             }
         }
@@ -9633,16 +8723,8 @@ public class TransBean implements Serializable {
                         this.ReportTransSummary.add(ts);
                     }
                     this.ActionMessage = ((""));
-                } catch (SQLException se) {
-                    System.err.println(se.getMessage());
-                } finally {
-                    if (rs != null) {
-                        try {
-                            rs.close();
-                        } catch (SQLException ex) {
-                            System.err.println(ex.getMessage());
-                        }
-                    }
+                } catch (Exception e) {
+                    LOGGER.log(Level.ERROR, e);
                 }
             }
         }
@@ -9881,8 +8963,8 @@ public class TransBean implements Serializable {
             cs.setString("in_function_name", aFunctionName);
             cs.setInt("in_user_detail_id", aUserDetailId);
             cs.executeUpdate();
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -9936,7 +9018,8 @@ public class TransBean implements Serializable {
                 httpSession.setAttribute("CURRENT_PRINT_OUT_JSF_FILE", this.getPrintoutJsfFile(aTransactionTypeId, aOverride));
                 org.primefaces.PrimeFaces.current().dialog().openDynamic(new GeneralUserSetting().getCurrentPrintoutJsfFile(), options, null);
             }
-        } catch (NullPointerException npe) {
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -9998,7 +9081,8 @@ public class TransBean implements Serializable {
                 //org.primefaces.PrimeFaces.current().dialog().openDynamic("TransactionView.xhtml", options, null);
                 org.primefaces.PrimeFaces.current().dialog().openDynamic("TransViewStatic.xhtml", options, null);
             }
-        } catch (NullPointerException npe) {
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -10025,14 +9109,10 @@ public class TransBean implements Serializable {
                 options.put("contentWidth", 1000);
                 options.put("contentHeight", 500);
                 options.put("scrollable", true);
-//                if (CompanySetting.getSalesReceiptVersion() == 1) {
-//                    org.primefaces.PrimeFaces.current().dialog().openDynamic("SaleTransInvoice.xhtml", options, null);
-//                } else if (CompanySetting.getSalesReceiptVersion() == 2) {
-//                    org.primefaces.PrimeFaces.current().dialog().openDynamic("SaleTransInvoice2.xhtml", null, null);
-//                }
                 org.primefaces.PrimeFaces.current().dialog().openDynamic(this.getSRCInvoice(), options, null);
             }
-        } catch (NullPointerException npe) {
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -10046,11 +9126,6 @@ public class TransBean implements Serializable {
         try {
             if (aTransactionId != 0) {
                 httpSession.setAttribute("CURRENT_TRANSACTION_ID", aTransactionId);
-//                try {
-//                    httpSession.setAttribute("CURRENT_PAY_ID", PayBean.getTransactionFirstPay(aTransactionId).getPayId());
-//                } catch (NullPointerException npe) {
-//                    httpSession.setAttribute("CURRENT_PAY_ID", 0);
-//                }
                 //open the view in a dialog
                 Map<String, Object> options = new HashMap<String, Object>();
                 options.put("modal", true);
@@ -10061,7 +9136,8 @@ public class TransBean implements Serializable {
                 options.put("scrollable", true);
                 org.primefaces.PrimeFaces.current().dialog().openDynamic("SaleInvoiceTransView.xhtml", options, null);
             }
-        } catch (NullPointerException npe) {
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -10201,8 +9277,8 @@ public class TransBean implements Serializable {
         //ActionEvent actionEvent = new ActionEvent(root.findComponent("TransFormSales:cmdbPrint"));
         ActionEvent actionEvent = new ActionEvent(root.findComponent("TransFormSales:cmdbPrint"));
         actionEvent.queue();
-        System.out.println("AvtionEvent To String=" + actionEvent.toString());
-        System.out.println("Component Id==" + root.findComponent(":TransFormSales:cmdbPrint").getId());
+        //System.out.println("AvtionEvent To String=" + actionEvent.toString());
+        //System.out.println("Component Id==" + root.findComponent(":TransFormSales:cmdbPrint").getId());
 
     }
 
@@ -10223,15 +9299,15 @@ public class TransBean implements Serializable {
             } else {
                 return false;//not deleted
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return true;//deleted
         } finally {
             if (rs != null) {
                 try {
                     rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
+                } catch (Exception e) {
+                    LOGGER.log(Level.ERROR, e);
                 }
             }
         }
@@ -10375,10 +9451,6 @@ public class TransBean implements Serializable {
         this.setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems);
     }
 
-    public void ab(Double a, Double b) {
-        System.out.println("A:" + a + " ,b:" + b);
-    }
-
     public void setCashDiscountFromGrandTotalCEC(int aTransTypeId, int aTransReasonId, Trans aTrans, List<TransItem> aActiveTransItems, double aGrandTotal2) {
         double VatPerc = CompanySetting.getVatPerc();
         double DiscountAmount = 0;
@@ -10411,7 +9483,7 @@ public class TransBean implements Serializable {
                 aTrans.setCash_dicsount_perc(0);
             }
         } catch (Exception e) {
-
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -10430,7 +9502,7 @@ public class TransBean implements Serializable {
                 cdr = 1.0;
             }
         } catch (Exception e) {
-
+            LOGGER.log(Level.ERROR, e);
         }
         return cdr;
     }
@@ -10448,7 +9520,7 @@ public class TransBean implements Serializable {
                 aTrans.setCash_dicsount_perc(0);
             }
         } catch (Exception e) {
-
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -10817,8 +9889,8 @@ public class TransBean implements Serializable {
             } else {
                 this.clearTransPointsDetails(aTrans);
             }
-        } catch (NullPointerException npe) {
-            System.out.println("updatePointsCard:" + npe.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -11221,35 +10293,6 @@ public class TransBean implements Serializable {
         return the_file;
     }
 
-//    public String getPrintFileName(String aLevel, TransactionType aTransactionType) {
-//        String the_file = "Output_0";
-//        try {
-//            switch (aLevel) {
-//                case "PARENT":
-//                    if (new GeneralUserSetting().getOutputDetailParent().getTrans().getTransactionTypeId() == aTransactionType.getTransactionTypeId()) {
-//                        if (aTransactionType.getDefault_print_file() == 1) {
-//                            the_file = aTransactionType.getPrint_file_name1();
-//                        } else if (aTransactionType.getDefault_print_file() == 2) {
-//                            the_file = aTransactionType.getPrint_file_name2();
-//                        }
-//                    }
-//                    break;
-//                case "CHILD":
-//                    if (new GeneralUserSetting().getOutputDetailChild().getTrans().getTransactionTypeId() == aTransactionType.getTransactionTypeId()) {
-//                        if (aTransactionType.getDefault_print_file() == 1) {
-//                            the_file = aTransactionType.getPrint_file_name1();
-//                        } else if (aTransactionType.getDefault_print_file() == 2) {
-//                            the_file = aTransactionType.getPrint_file_name2();
-//                        }
-//                    }
-//                    break;
-//            }
-//
-//        } catch (NullPointerException npe) {
-//            //do nothing
-//        }
-//        return the_file + ".xhtml";
-//    }
     public String getPrintFileName(String aLevel, TransactionType aTransactionType, int aPrintFileNo) {
         String the_file = "Output_0";
         int OutTransTypeId = 0;
@@ -11364,8 +10407,8 @@ public class TransBean implements Serializable {
                     break;
             }
 
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return the_file + ".xhtml";
     }
@@ -11518,8 +10561,8 @@ public class TransBean implements Serializable {
                     trans.setCr_dr_flag(rs.getString("dr_cr_flag"));
                     this.TransList.add(trans);
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
 
             try (
@@ -11604,8 +10647,8 @@ public class TransBean implements Serializable {
                     }
                     this.TransListSummary.add(transsum);
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
     }
@@ -11627,7 +10670,7 @@ public class TransBean implements Serializable {
             }
             this.reportSalesTaxAPI(aTrans, aTransBean);
         } catch (Exception e) {
-            System.err.println("reSubmitDebitOrCreditNoteTaxAPI:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -11644,7 +10687,7 @@ public class TransBean implements Serializable {
                 this.reportSalesTaxAPI(aTrans, aTransBean);
             }
         } catch (Exception e) {
-            System.err.println("reSubmitInvoiceTaxAPI:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -11659,7 +10702,7 @@ public class TransBean implements Serializable {
                 this.reportSalesTaxAPI(aTrans, aTransBean);
             }
         } catch (Exception e) {
-            System.err.println("reGetCreditNoteApprovalStatusTaxAPI:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -11671,7 +10714,7 @@ public class TransBean implements Serializable {
             }
             this.reportSalesTaxAPI(aTrans, aTransBean);
         } catch (Exception e) {
-            System.err.println("markManyUpdatesReconsiled:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -11796,7 +10839,7 @@ public class TransBean implements Serializable {
                     this.TransList.add(trans);
                 }
             } catch (Exception e) {
-                System.err.println("reportSalesTaxAPI-1:" + e.getMessage());
+                LOGGER.log(Level.ERROR, e);
             }
 
             //2. summary
@@ -11903,7 +10946,7 @@ public class TransBean implements Serializable {
                     this.TransListSummary.add(transsum);
                 }
             } catch (Exception e) {
-                System.err.println("reportSalesTaxAPI-2:" + e.getMessage());
+                LOGGER.log(Level.ERROR, e);
             }
         }
     }
@@ -12045,8 +11088,8 @@ public class TransBean implements Serializable {
                 }
                 this.TransList.add(trans);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -12120,8 +11163,8 @@ public class TransBean implements Serializable {
                 this.setTransFromResultset(trans, rs);
                 this.TransList.add(trans);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
 
         try (
@@ -12197,8 +11240,8 @@ public class TransBean implements Serializable {
                 }
                 this.TransListSummary.add(transsum);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -12342,8 +11385,8 @@ public class TransBean implements Serializable {
                 }
                 this.Stock_outList.add(so);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -12417,8 +11460,8 @@ public class TransBean implements Serializable {
                 this.setTransFromResultset(trans, rs);
                 this.TransList.add(trans);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
 
         try (
@@ -12494,8 +11537,8 @@ public class TransBean implements Serializable {
                 }
                 this.TransListSummary.add(transsum);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -12550,8 +11593,8 @@ public class TransBean implements Serializable {
                 this.setTransFromResultset(trans, rs);
                 this.TransList.add(trans);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -12606,8 +11649,8 @@ public class TransBean implements Serializable {
                 this.setTransFromResultset(trans, rs);
                 this.TransList.add(trans);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -12681,8 +11724,8 @@ public class TransBean implements Serializable {
                 this.setTransFromResultset(trans, rs);
                 this.TransList.add(trans);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
 
         try (
@@ -12748,8 +11791,8 @@ public class TransBean implements Serializable {
 //                }
                 this.TransListSummary.add(transsum);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -12797,8 +11840,8 @@ public class TransBean implements Serializable {
                 this.setTransFromResultset(trans, rs);
                 this.TransList.add(trans);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -12846,8 +11889,8 @@ public class TransBean implements Serializable {
                 this.setTransFromResultset(trans, rs);
                 this.TransList.add(trans);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -12921,8 +11964,8 @@ public class TransBean implements Serializable {
                 this.setTransFromResultset(trans, rs);
                 this.TransList.add(trans);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
 
         try (
@@ -13002,8 +12045,8 @@ public class TransBean implements Serializable {
                 }
                 this.TransListSummary.add(transsum);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -13077,8 +12120,8 @@ public class TransBean implements Serializable {
                 this.setTransFromResultset(trans, rs);
                 this.TransList.add(trans);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
 
         try (
@@ -13139,8 +12182,8 @@ public class TransBean implements Serializable {
                 }
                 this.TransListSummary.add(transsum);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -13217,8 +12260,8 @@ public class TransBean implements Serializable {
                 this.setTransFromResultset(trans, rs);
                 this.TransList.add(trans);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
 
         try (
@@ -13274,8 +12317,8 @@ public class TransBean implements Serializable {
                 }
                 this.TransListSummary.add(transsum);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -13352,8 +12395,8 @@ public class TransBean implements Serializable {
                 this.setTransFromResultset(trans, rs);
                 this.TransList.add(trans);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
 
         try (
@@ -13409,8 +12452,8 @@ public class TransBean implements Serializable {
                 }
                 this.TransListSummary.add(transsum);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -13484,8 +12527,8 @@ public class TransBean implements Serializable {
                 this.setTransFromResultset(trans, rs);
                 this.TransList.add(trans);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
 
         try (
@@ -13546,8 +12589,8 @@ public class TransBean implements Serializable {
                 }
                 this.TransListSummary.add(transsum);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -13621,8 +12664,8 @@ public class TransBean implements Serializable {
                 this.setTransFromResultset(trans, rs);
                 this.TransList.add(trans);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
 
         try (
@@ -13683,8 +12726,8 @@ public class TransBean implements Serializable {
                 }
                 this.TransListSummary.add(transsum);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -13758,8 +12801,8 @@ public class TransBean implements Serializable {
                 this.setTransFromResultset(trans, rs);
                 this.TransList.add(trans);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
 
         try (
@@ -13836,8 +12879,8 @@ public class TransBean implements Serializable {
                 }
                 this.TransListSummary.add(transsum);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -13894,8 +12937,8 @@ public class TransBean implements Serializable {
                 this.setTransFromResultset(trans, rs);
                 this.TransList.add(trans);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -13970,8 +13013,8 @@ public class TransBean implements Serializable {
                     this.setTransFromResultset(trans, rs);
                     this.TransList.add(trans);
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
 
             try (
@@ -14037,8 +13080,8 @@ public class TransBean implements Serializable {
                     }
                     this.TransListSummary.add(transsum);
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
     }
@@ -14291,12 +13334,12 @@ public class TransBean implements Serializable {
     public void initSalesInvoiceDetail(Trans t, List<TransItem> aActiveTransItems, TransItem ti, Item aSelectedItem, Transactor aSelectedTransactor, int ClearNo, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor) {//Clear No: 0-do not clear, 1 - clear trans item only, 2 - clear all  
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
-            System.out.println("---In Faces---");
+            //System.out.println("---In Faces---");
         } else {
-            System.out.println("---NOT In Faces---");
-            System.out.println("---" + new GeneralUserSetting().getCurrentTransactionId());
+            //System.out.println("---NOT In Faces---");
+            //System.out.println("---" + new GeneralUserSetting().getCurrentTransactionId());
             t = new TransBean().getTrans(new GeneralUserSetting().getCurrentTransactionId());
-            System.out.println("---" + t.getTransactionId());
+            //System.out.println("---" + t.getTransactionId());
         }
     }
 
@@ -14323,9 +13366,9 @@ public class TransBean implements Serializable {
             cs.setDouble("in_total_profit_margin", aNewTrans.getTotalProfitMargin());
             cs.executeUpdate();
             isTransUpdateSuccess = true;
-        } catch (SQLException se) {
+        } catch (Exception e) {
             isTransUpdateSuccess = false;
-            System.err.println("UpdateTrans:" + se.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return isTransUpdateSuccess;
     }
@@ -14393,8 +13436,8 @@ public class TransBean implements Serializable {
                 tib.setTransItemFromResultSet(transitem, rs);
                 this.TransItemList.add(transitem);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -14482,7 +13525,7 @@ public class TransBean implements Serializable {
                 trans_id = rs.getLong("transaction_id");
             }
         } catch (Exception e) {
-            System.err.println("getMostRecentTransId:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return trans_id;
     }
@@ -14506,16 +13549,8 @@ public class TransBean implements Serializable {
             while (rs.next()) {
                 TempTranss.add(this.getTransFromResultset(rs));
             }
-        } catch (SQLException se) {
-            System.err.println("getTranss:" + se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println("getTranss:" + ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return TempTranss;
     }
@@ -14539,16 +13574,8 @@ public class TransBean implements Serializable {
             while (rs.next()) {
                 TempTranss.add(this.getTransFromResultset(rs));
             }
-        } catch (SQLException se) {
-            System.err.println("getTranss:" + se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println("getTranss:" + ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return TempTranss;
     }
@@ -14581,16 +13608,8 @@ public class TransBean implements Serializable {
             while (rs.next()) {
                 TempTranss.add(this.getTransFromResultset(rs));
             }
-        } catch (SQLException se) {
-            System.err.println("getTranssStoreTransferReq:" + se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println("getTranssStoreTransferReq:" + ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return TempTranss;
     }
@@ -14705,7 +13724,7 @@ public class TransBean implements Serializable {
                 aTransItems.get(i).setQty_taken(hire_ti.getItemQty());
             }
         } catch (Exception e) {
-            System.err.println("setHireReturnTotalsAndBalances:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -14883,8 +13902,8 @@ public class TransBean implements Serializable {
                     this.setTransTotalsAndUpdateCEC(68, 97, this.TransChild, this.ActiveTransItemsChild);
                 }
             }
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return mg;
     }
@@ -14934,7 +13953,7 @@ public class TransBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println("getOrderSalesInvoice:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return mg;
     }
@@ -14963,7 +13982,7 @@ public class TransBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println("getHireTotalReturned:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return tempti;
     }
@@ -14987,7 +14006,7 @@ public class TransBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println("getHireTotalDelivered:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return tempti;
     }
@@ -15015,7 +14034,7 @@ public class TransBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println("getRefTransItemsTotal:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return tempti;
     }
@@ -15043,7 +14062,7 @@ public class TransBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println("getRefTransItemsTotal:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return tempti;
     }
@@ -15377,8 +14396,8 @@ public class TransBean implements Serializable {
             }
             //refresh summary total
             this.refreshOrderGrandTotal(this.TransList);
-        } catch (SQLException se) {
-            System.err.println("refreshTransListQuickOrderManage:" + se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -15441,8 +14460,8 @@ public class TransBean implements Serializable {
                 trans.setTransItemsString(tib.getTransItemsString(trans.getTransactionId(), 0));
                 this.TransList.add(trans);
             }
-        } catch (SQLException se) {
-            System.err.println("refreshTransListQuickOrderDashboard:" + se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -15910,7 +14929,7 @@ public class TransBean implements Serializable {
                 ps.executeUpdate();
             } catch (Exception e) {
                 msg = "ERROR occured, order not PROCESSED...";
-                System.err.println(e.getMessage());
+                LOGGER.log(Level.ERROR, e);
             }
         }
         return msg;
@@ -15923,7 +14942,7 @@ public class TransBean implements Serializable {
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             ps.executeUpdate();
         } catch (Exception e) {
-            System.err.println("updateOrderIsInvoiced:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -15934,7 +14953,7 @@ public class TransBean implements Serializable {
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             ps.executeUpdate();
         } catch (Exception e) {
-            System.err.println("updateOrderIsInvoicedPaid:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -15952,7 +14971,7 @@ public class TransBean implements Serializable {
                 ps.executeUpdate();
             } catch (Exception e) {
                 msg = "ERROR occured, order not CANCELLED...";
-                System.err.println(e.getMessage());
+                LOGGER.log(Level.ERROR, e);
             }
         }
         return msg;
@@ -15966,7 +14985,7 @@ public class TransBean implements Serializable {
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             ps.executeUpdate();
         } catch (Exception e) {
-            System.err.println("updateOrderStatus:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -15980,7 +14999,7 @@ public class TransBean implements Serializable {
             passed = 1;
         } catch (Exception e) {
             passed = 0;
-            System.err.println("deleteTranssByIDs:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return passed;
     }

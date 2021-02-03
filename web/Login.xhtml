@@ -43,7 +43,7 @@
                     <h:outputLabel value="#{companySetting.getBranchCode()}"/>
                 </h:panelGrid>
                 <h:panelGrid columns="1" bgcolor="yellow" style="text-align: center;">
-                    <h:panelGrid columns="2">
+                    <h:panelGrid id="pnlgInput" columns="2">
                         <h:outputLabel value="User Name"/>
                         <h:inputText id="itxtUserName" value="#{login.loggedInUserName}" autocomplete="off" style="width: 220px;"> 
                             <f:ajax event="change" listener="#{login.setLoggedInUserDetail(null)}" render="menuStore pnlgLoginHeader"/>
@@ -68,20 +68,20 @@
                         </h:selectOneMenu>
                     </h:panelGrid>
                     <h:panelGrid columns="1">
-                        <p:commandButton style="color: white;width: 350px;height:50px;font-size: 20px;background-color:#00B461;" id="cmdbLogin" value="LOGIN (ALT+L)" accesskey="l" rendered="true" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                        <p:commandButton style="color: white;width: 350px;height:50px;font-size: 20px;background-color:#00B461;" id="cmdbLogin" value="LOGIN (ALT+L)" accesskey="l" rendered="true" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                             <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                                 <p:graphicImage name="/images/ajax-loader.gif"/>
                             </p:dialog>
-                            <f:ajax listener="#{login.userLogin(1)}" execute="menuStore itxtUserName itxtPassword" render="olblActionMessageSuccess olblActionMessageFailure pnlgLoginHeader"/>
+                            <p:ajax listener="#{login.userLogin(1)}" process="pnlgInput @this" update="pnlgLoginHeader pnlgMessage"/>
                         </p:commandButton>
                     </h:panelGrid>
                 </h:panelGrid>
                 <h:panelGrid>
-                    <p:commandButton id="cmdbLogin2" value="GoTo Inter-Branch (ALT+I)" accesskey="i" rendered="true" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                    <p:commandButton id="cmdbLogin2" value="GoTo Inter-Branch (ALT+I)" accesskey="i" rendered="true" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
-                        <p:ajax listener="#{login.userLogin(2)}" process="menuStore itxtUserName itxtPassword" update="olblActionMessageSuccess olblActionMessageFailure pnlgLoginHeader"/>
+                        <p:ajax listener="#{login.userLogin(2)}" process="menuStore itxtUserName itxtPassword @this" update="olblActionMessageSuccess olblActionMessageFailure pnlgLoginHeader"/>
                     </p:commandButton>
                     <h:panelGrid rendered="#{60 gt login.LICENSE_DAYS_LEFT and login.LICENSE_TYPE ne 9 and login.LICENSE_TYPE ne 0}">
                         <p:spacer/>
@@ -97,7 +97,7 @@
                     </h:panelGrid>
                 </h:panelGrid>
             </h:panelGrid>
-            <h:panelGrid  style="text-align: center;width: 100%">
+            <h:panelGrid id="pnlgMessage"  style="text-align: center;width: 100%">
                 <h:outputLabel styleClass="clsActionMessage" id="olblActionMessageSuccess" style="color:green" value="#{login.actionMessageSuccess}"/>
                 <h:outputLabel styleClass="clsActionMessage" id="olblActionMessageFailure" style="color: red" value="#{login.actionMessageFailure}"/>
                 <h:outputLabel id="outlNavMsg" value="#{navigationBean.navMsg}" style="color: red"/>

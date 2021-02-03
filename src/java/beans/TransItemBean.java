@@ -31,13 +31,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import utilities.UtilityBean;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -52,7 +52,7 @@ import utilities.UtilityBean;
 public class TransItemBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    static Logger LOGGER = Logger.getLogger(TransBean.class.getName());
     private List<TransItem> TransItems;
     private String ActionMessage = null;
     private TransItem SelectedTransItem = null;
@@ -155,9 +155,8 @@ public class TransItemBean implements Serializable {
                 }
                 ListItemIndex = ListItemIndex + 1;
             }
-        } catch (NullPointerException npe) {
-            System.err.println("saveTransItemsCEC:" + npe.getMessage());
-            //npe.printStackTrace();
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -713,8 +712,8 @@ public class TransItemBean implements Serializable {
                 } else if (transitem.getTransactionItemId() > 0) {
                     //do nothing; this is for edit
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
                 this.setActionMessage("TransItem NOT saved");
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("TransItem NOT saved!"));
             }
@@ -1253,8 +1252,8 @@ public class TransItemBean implements Serializable {
                 } else if (transitem.getTransactionItemId() > 0) {
                     //do nothing; this is for edit
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
                 this.setActionMessage("TransItem NOT saved");
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("TransItem NOT saved!"));
             }
@@ -1434,8 +1433,8 @@ public class TransItemBean implements Serializable {
                 }
                 //save
                 cs.executeUpdate();
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
                 this.setActionMessage("DRAFT not saved");
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Draft not saved!"));
             }
@@ -1588,8 +1587,8 @@ public class TransItemBean implements Serializable {
                 } else if (transitem.getTransactionItemId() > 0) {
                     //do nothing; this is for edit
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
                 this.setActionMessage("TransItem NOT saved");
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("TransItem NOT saved!"));
             }
@@ -1742,8 +1741,8 @@ public class TransItemBean implements Serializable {
                 } else if (transitem.getTransactionItemId() > 0) {
                     //do nothing; this is for edit
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
                 this.setActionMessage("TransItem NOT saved");
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("TransItem NOT saved!"));
             }
@@ -1896,8 +1895,8 @@ public class TransItemBean implements Serializable {
                 } else if (transitem.getTransactionItemId() > 0) {
                     //do nothing; this is for edit
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
                 this.setActionMessage("TransItem NOT saved");
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("TransItem NOT saved!"));
             }
@@ -1930,10 +1929,9 @@ public class TransItemBean implements Serializable {
             //save
             cs.executeUpdate();
             success = 1;
-        } catch (SQLException se) {
+        } catch (Exception e) {
             success = 0;
-            System.err.println("UpdateTransaction:" + se.getMessage());
-
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -1968,10 +1966,9 @@ public class TransItemBean implements Serializable {
             //save
             cs.executeUpdate();
             success = 1;
-        } catch (SQLException se) {
+        } catch (Exception e) {
             success = 0;
-            System.err.println("UpdateTransaction:" + se.getMessage());
-
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -1990,7 +1987,7 @@ public class TransItemBean implements Serializable {
             success = 1;
         } catch (Exception e) {
             success = 0;
-            System.err.println("updateTransItemCECOpenBalance:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return success;
     }
@@ -2226,7 +2223,7 @@ public class TransItemBean implements Serializable {
             }
             StkBean = null;
         } catch (Exception e) {
-            System.err.println("saveTransItemAutoUnpack:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -2264,7 +2261,7 @@ public class TransItemBean implements Serializable {
             }
             return true;
         } catch (Exception e) {
-            System.err.println("UpdateTransItems:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
             return false;
         }
     }
@@ -2306,7 +2303,7 @@ public class TransItemBean implements Serializable {
             }
             return true;
         } catch (Exception e) {
-            System.err.println("UpdateTransItems:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
             return false;
         }
     }
@@ -2356,7 +2353,7 @@ public class TransItemBean implements Serializable {
             }
             return true;
         } catch (Exception e) {
-            System.err.println("UpdateTransItemsCEC:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
             return false;
         }
     }
@@ -2388,8 +2385,8 @@ public class TransItemBean implements Serializable {
                             cs2.setString("in_batchno", transitem.getBatchno());
                             cs2.setDouble("in_qty", aDiffHistNewQty);
                             cs2.executeUpdate();
-                        } catch (SQLException ex) {
-                            Logger.getLogger(TransItemBean.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.ERROR, e);
                         }
                     } else {
                         //insert
@@ -2417,8 +2414,8 @@ public class TransItemBean implements Serializable {
                             cs2.setString("in_batchno", transitem.getBatchno());
                             cs2.setDouble("in_qty", aDiffHistNewQty);
                             cs2.executeUpdate();
-                        } catch (SQLException ex) {
-                            Logger.getLogger(TransItemBean.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.ERROR, e);
                         }
                     } else {
                         //insert
@@ -2438,8 +2435,8 @@ public class TransItemBean implements Serializable {
                                 cs2.setDate("in_item_mnf_date", null);
                             }
                             cs2.executeUpdate();
-                        } catch (SQLException ex) {
-                            Logger.getLogger(TransItemBean.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.ERROR, e);
                         }
                     }
                 }
@@ -2460,8 +2457,8 @@ public class TransItemBean implements Serializable {
                             cs2.setString("in_batchno", transitem.getBatchno());
                             cs2.setDouble("in_qty", aDiffHistNewQty);
                             cs2.executeUpdate();
-                        } catch (SQLException ex) {
-                            Logger.getLogger(TransItemBean.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.ERROR, e);
                         }
                     } else {
                         //insert
@@ -2481,8 +2478,8 @@ public class TransItemBean implements Serializable {
                                 cs2.setDate("in_item_mnf_date", null);
                             }
                             cs2.executeUpdate();
-                        } catch (SQLException ex) {
-                            Logger.getLogger(TransItemBean.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.ERROR, e);
                         }
                     }
                 } else if (aDiffHistNewQty < 0) {
@@ -2500,8 +2497,8 @@ public class TransItemBean implements Serializable {
                             cs2.setString("in_batchno", transitem.getBatchno());
                             cs2.setDouble("in_qty", aDiffHistNewQty);
                             cs2.executeUpdate();
-                        } catch (SQLException ex) {
-                            Logger.getLogger(TransItemBean.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.ERROR, e);
                         }
                     } else {
                         //insert
@@ -2521,8 +2518,8 @@ public class TransItemBean implements Serializable {
                                 cs2.setDate("in_item_mnf_date", null);
                             }
                             cs2.executeUpdate();
-                        } catch (SQLException ex) {
-                            Logger.getLogger(TransItemBean.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (Exception e) {
+                            LOGGER.log(Level.ERROR, e);
                         }
                     }
                 }
@@ -3191,17 +3188,9 @@ public class TransItemBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
     }
 
@@ -3537,8 +3526,8 @@ public class TransItemBean implements Serializable {
                 transitem.setSpecific_size(1);
             }
             return transitem;
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
         }
 
@@ -3858,7 +3847,7 @@ public class TransItemBean implements Serializable {
                 transitem.setSpecific_size(1);
             }
         } catch (Exception e) {
-            System.err.println("setTransItemFromResultSet:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -4000,16 +3989,8 @@ public class TransItemBean implements Serializable {
                         this.ReportTransItem.add(this.getTransItemFromResultSet(rs));
                     }
                     this.ActionMessage = ((""));
-                } catch (SQLException se) {
-                    System.err.println(se.getMessage());
-                } finally {
-                    if (rs != null) {
-                        try {
-                            rs.close();
-                        } catch (SQLException ex) {
-                            System.err.println(ex.getMessage());
-                        }
-                    }
+                } catch (Exception e) {
+                    LOGGER.log(Level.ERROR, e);
                 }
             }
         }
@@ -4069,16 +4050,8 @@ public class TransItemBean implements Serializable {
                         this.ReportTransItem.add(this.getTransItemFromResultSet(rs));
                     }
                     this.ActionMessage = ((""));
-                } catch (SQLException se) {
-                    System.err.println(se.getMessage());
-                } finally {
-                    if (rs != null) {
-                        try {
-                            rs.close();
-                        } catch (SQLException ex) {
-                            System.err.println(ex.getMessage());
-                        }
-                    }
+                } catch (Exception e) {
+                    LOGGER.log(Level.ERROR, e);
                 }
             }
         }
@@ -4106,16 +4079,8 @@ public class TransItemBean implements Serializable {
                     this.ReportTransItem.add(this.getTransItemFromResultSetBillReport(rs));
                 }
                 this.ActionMessage = ((""));
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
-            } finally {
-                if (rs != null) {
-                    try {
-                        rs.close();
-                    } catch (SQLException ex) {
-                        System.err.println(ex.getMessage());
-                    }
-                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
         return this.ReportTransItem;
@@ -4139,7 +4104,8 @@ public class TransItemBean implements Serializable {
                     org.primefaces.PrimeFaces.current().dialog().openDynamic("ReportPurchasePriceHistoryPI.xhtml", options, null);
                 }
             }
-        } catch (NullPointerException npe) {
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -4165,16 +4131,8 @@ public class TransItemBean implements Serializable {
                     tis.add(this.getTransItemFromResultSet(rs));
                 }
                 this.ActionMessage = ((""));
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
-            } finally {
-                if (rs != null) {
-                    try {
-                        rs.close();
-                    } catch (SQLException ex) {
-                        System.err.println(ex.getMessage());
-                    }
-                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
         return tis;
@@ -4198,16 +4156,8 @@ public class TransItemBean implements Serializable {
                     this.ReportTransItem.add(this.getTransItemFromResultSet(rs));
                 }
                 this.ActionMessage = ((""));
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
-            } finally {
-                if (rs != null) {
-                    try {
-                        rs.close();
-                    } catch (SQLException ex) {
-                        System.err.println(ex.getMessage());
-                    }
-                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
         return this.ReportTransItem;
@@ -4250,16 +4200,8 @@ public class TransItemBean implements Serializable {
                     this.ReportTransItem.add(this.getTransItemFromResultSet(rs));
                 }
                 this.ActionMessage = ((""));
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
-            } finally {
-                if (rs != null) {
-                    try {
-                        rs.close();
-                    } catch (SQLException ex) {
-                        System.err.println(ex.getMessage());
-                    }
-                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
         return this.ReportTransItem;
@@ -4278,8 +4220,8 @@ public class TransItemBean implements Serializable {
             ps.executeUpdate();
             this.setActionMessage("Deleted Successfully!");
             //this.clearTransItem(transitem);
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             this.setActionMessage("TransItem NOT deleted");
         }
     }
@@ -4328,16 +4270,8 @@ public class TransItemBean implements Serializable {
                 this.updateLookUpsUI(ti);
                 getTransItems().add(ti);
             }
-        } catch (SQLException se) {
-            System.err.println("getTransItemsByTransactionId:" + se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return getTransItems();
     }
@@ -4355,16 +4289,8 @@ public class TransItemBean implements Serializable {
             while (rs.next()) {
                 getTransItems().add(this.getTransItemFromResultSet(rs));
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return getTransItems();
     }
@@ -4385,16 +4311,8 @@ public class TransItemBean implements Serializable {
                 this.updateLookUpsUI(ti);
                 aTransItems.add(ti);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -4416,16 +4334,8 @@ public class TransItemBean implements Serializable {
                 transitem.setAmountIncVat(rs.getDouble("amount_inc_vat"));
                 transitems.add(transitem);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return transitems;
     }
@@ -4449,7 +4359,7 @@ public class TransItemBean implements Serializable {
                 transitems.add(transitem);
             }
         } catch (Exception e) {
-            System.err.println("getTransItemsSummaryByItemType:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return transitems;
     }
@@ -4472,7 +4382,7 @@ public class TransItemBean implements Serializable {
                 transitems.add(transitem);
             }
         } catch (Exception e) {
-            System.err.println("getInventoryCostByTrans:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return transitems;
     }
@@ -4495,7 +4405,7 @@ public class TransItemBean implements Serializable {
                 transitems.add(transitem);
             }
         } catch (Exception e) {
-            System.err.println("getInventoryCostByTransDispose:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return transitems;
     }
@@ -4518,7 +4428,7 @@ public class TransItemBean implements Serializable {
                 transitems.add(transitem);
             }
         } catch (Exception e) {
-            System.err.println("getInventoryCostByTransConsume:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return transitems;
     }
@@ -4541,7 +4451,7 @@ public class TransItemBean implements Serializable {
                 transitems.add(transitem);
             }
         } catch (Exception e) {
-            System.err.println("getInventoryCostByTransInput:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return transitems;
     }
@@ -4564,7 +4474,7 @@ public class TransItemBean implements Serializable {
                 transitems.add(transitem);
             }
         } catch (Exception e) {
-            System.err.println("getInventoryCostByTransOutput:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return transitems;
     }
@@ -4587,7 +4497,7 @@ public class TransItemBean implements Serializable {
                 transitems.add(transitem);
             }
         } catch (Exception e) {
-            System.err.println("getInventoryItemTypeCostByTrans:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return transitems;
     }
@@ -4610,7 +4520,7 @@ public class TransItemBean implements Serializable {
                 transitems.add(transitem);
             }
         } catch (Exception e) {
-            System.err.println("getInventoryItemTypeCostByTransConsume:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return transitems;
     }
@@ -4654,16 +4564,8 @@ public class TransItemBean implements Serializable {
                 this.updateLookUpsUI(ti);
                 aTransItems.add(ti);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -4681,16 +4583,8 @@ public class TransItemBean implements Serializable {
             while (rs.next()) {
                 aTransItems.add(this.getTransItemFromResultSet(rs));
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -4718,16 +4612,8 @@ public class TransItemBean implements Serializable {
             for (int x = 1; x <= (15 - this.total_items); x++) {
                 total_items_list.add(x);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return getTransItems();
     }
@@ -4751,7 +4637,7 @@ public class TransItemBean implements Serializable {
                 tis.add(ti);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.ERROR, e);
         }
         return tis;
     }
@@ -4769,16 +4655,8 @@ public class TransItemBean implements Serializable {
             while (rs.next()) {
                 getTransItems().add(this.getTransItemFromResultSet(rs));
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return getTransItems();
     }
@@ -4797,16 +4675,8 @@ public class TransItemBean implements Serializable {
             while (rs.next()) {
                 hTransItems.add(this.getTransItemFromResultSet(rs));
             }
-        } catch (SQLException se) {
-            System.err.println("setTransItemsHistoryByIDs:" + se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -4823,16 +4693,8 @@ public class TransItemBean implements Serializable {
             while (rs.next()) {
                 aTransItems.add(this.getTransItemFromResultSet(rs));
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -4849,16 +4711,8 @@ public class TransItemBean implements Serializable {
             while (rs.next()) {
                 aTransItems.add(this.getTransItemFromResultSet(rs));
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -5170,9 +5024,8 @@ public class TransItemBean implements Serializable {
                 //update totals
                 new TransBean().setTransTotalsAndUpdate(aTrans, aActiveTransItems);
             }
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
-            System.err.println("addTransItem:" + npe.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -5527,10 +5380,9 @@ public class TransItemBean implements Serializable {
                     }
                 }
             }
-        } catch (NullPointerException npe) {
+        } catch (Exception e) {
             status = "ERROR OCCURED - ITEM NOT ADDED";
-            System.err.println("addTransItemCEC:" + npe.getMessage());
-            npe.printStackTrace();
+            LOGGER.log(Level.ERROR, e);
         }
         return status;
     }
@@ -5560,7 +5412,7 @@ public class TransItemBean implements Serializable {
                 aTransItem.setOverride_gen_name(item.getOverride_gen_name());
             }
         } catch (Exception e) {
-            System.out.println("updateLookUpsUI:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -5628,8 +5480,7 @@ public class TransItemBean implements Serializable {
                 new TransItemBean().refreshCurrentStock(aActiveTransItems);
             }
         } catch (Exception e) {
-            //e.printStackTrace();
-            System.err.println("addTransItemCallCEC:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -5639,7 +5490,7 @@ public class TransItemBean implements Serializable {
             //update totals
             new TransBean().setTransTotalsAndUpdate(aTrans, aActiveTransItems);
         } catch (Exception e) {
-            System.err.println("clearTransItems:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -5812,8 +5663,8 @@ public class TransItemBean implements Serializable {
                 //update totals
                 new TransBean().setTransTotalsAndUpdate(aTrans, aActiveTransItems);
             }
-        } catch (NullPointerException npe) {
-            System.err.println("addTransItemSalesQuotation:" + npe.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -6134,8 +5985,8 @@ public class TransItemBean implements Serializable {
                     new TransBean().setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems);
                 }
             }
-        } catch (NullPointerException npe) {
-            System.err.println("addTransItemSalesQuotation:" + npe.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -6258,8 +6109,8 @@ public class TransItemBean implements Serializable {
                 //update totals
                 //new TransBean().setTransTotalsAndUpdate(aTrans, aActiveTransItems);
             }
-        } catch (NullPointerException npe) {
-            System.err.println("addTransItemTransferRequest:" + npe.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -6798,9 +6649,8 @@ public class TransItemBean implements Serializable {
 
             //update totals
             new TransBean().setTransTotalsAndUpdate(aTrans, aActiveTransItems);
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
-            System.err.println("addTransItemAutoAdd:" + npe.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -6973,7 +6823,7 @@ public class TransItemBean implements Serializable {
                 return 0;
             }
         } catch (Exception e) {
-            System.err.println("autoUnpackItem:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
             return 0;
         }
     }
@@ -7060,8 +6910,7 @@ public class TransItemBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("addTransItemPURCHASECallCEC:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -7207,8 +7056,7 @@ public class TransItemBean implements Serializable {
             //new TransBean().setTransTotalsAndUpdate(aTrans, aActiveTransItems);
         } catch (Exception e) {
             status = "ERROR OCCURED - ITEM NOT ADDED";
-            e.printStackTrace();
-            System.err.println("addTransItemPURCHASECEC:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return status;
     }
@@ -7675,7 +7523,7 @@ public class TransItemBean implements Serializable {
                 added = 1;
             }
         } catch (Exception e) {
-            System.out.println("validateOpenBalance:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return added;
     }
@@ -9178,7 +9026,7 @@ public class TransItemBean implements Serializable {
             //new TransBean().setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems);
             this.editTransItemCEC(aTransTypeId, aTransReasonId, "", aTrans, aActiveTransItems, ti);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -9261,7 +9109,7 @@ public class TransItemBean implements Serializable {
             }
         } catch (Exception e) {
             MixFound = 0;
-            System.err.println("getAnyItemMixAddSubtractQty:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return MixFound;
     }
@@ -9591,7 +9439,7 @@ public class TransItemBean implements Serializable {
         aStatusBean.setShowItemNotAddedStatus(0);
 
         StockBean sb = new StockBean();
-        List<Stock> batches = new ArrayList<Stock>();
+        List<Stock> batches = new ArrayList<>();
         DiscountPackageItem dpi = null;
 
         if (i == null) {
@@ -10703,7 +10551,7 @@ public class TransItemBean implements Serializable {
                 aTransItem.setDescSpecific("");
             }
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -10738,7 +10586,7 @@ public class TransItemBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -10753,7 +10601,7 @@ public class TransItemBean implements Serializable {
                 aTransItem.setQty_damage_total(stock.getCurrentqty());
             }
         } catch (Exception e) {
-            System.err.println("updateTransItemTransferSpecific:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -10782,7 +10630,7 @@ public class TransItemBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println("refreshCurrentStock:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -10862,9 +10710,9 @@ public class TransItemBean implements Serializable {
                     transitemid = 0;
                 }
             }
-        } catch (SQLException ex) {
+        } catch (Exception e) {
             transitemid = 0;
-            System.out.println("getItemUnitCostPriceLatestTransItemId:" + ex.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return transitemid;
     }
@@ -10891,9 +10739,9 @@ public class TransItemBean implements Serializable {
                     transitemid = 0;
                 }
             }
-        } catch (SQLException ex) {
+        } catch (Exception e) {
             transitemid = 0;
-            System.out.println("getItemUnitCostPriceLatestTransItemId2:" + ex.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return transitemid;
     }
@@ -10919,7 +10767,7 @@ public class TransItemBean implements Serializable {
             }
         } catch (Exception e) {
             transitemid = 0;
-            System.out.println("getItemReceivedLatestTransItemId:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return transitemid;
     }
@@ -10937,17 +10785,9 @@ public class TransItemBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
     }
 
@@ -10955,7 +10795,7 @@ public class TransItemBean implements Serializable {
         try {
             aTrans.setTotal_weight(this.calcTransTotalWeight(aActiveTransItems));
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -10975,8 +10815,8 @@ public class TransItemBean implements Serializable {
                 totalweight = totalweight + (ati.get(ListItemIndex).getItemQty() * ItemUnitWeight);
                 ListItemIndex = ListItemIndex + 1;
             }
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return totalweight;
     }
@@ -11316,7 +11156,7 @@ public class TransItemBean implements Serializable {
             passed = 1;
         } catch (Exception e) {
             passed = 0;
-            System.err.println("overrideItemsByTransItemsId:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return passed;
     }
@@ -11337,7 +11177,7 @@ public class TransItemBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println("getSelectedTranssIDsExcFirst:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return TransItemsIDsExcFirst;
     }
@@ -11368,7 +11208,7 @@ public class TransItemBean implements Serializable {
                     }
                 }
             } catch (Exception e) {
-                System.err.println("getTransItemsString:" + e.getMessage());
+                LOGGER.log(Level.ERROR, e);
             }
         }
         return TransItemsString;
@@ -11418,8 +11258,7 @@ public class TransItemBean implements Serializable {
                     aTempTransItemsList.add(ti);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
-                System.err.println("refreshTempTransItemsList4Specific:" + e.getMessage());
+                LOGGER.log(Level.ERROR, e);
             }
         }
     }
@@ -11454,7 +11293,7 @@ public class TransItemBean implements Serializable {
                     lst.add(ti);
                 }
             } catch (Exception e) {
-                System.err.println("getTempTransItemsList4Specific:" + e.getMessage());
+                LOGGER.log(Level.ERROR, e);
             }
         }
         return lst;
