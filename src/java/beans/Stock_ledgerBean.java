@@ -21,6 +21,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import utilities.UtilityBean;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 /*
  * To change this template, choose Tools | Templates
@@ -35,7 +37,7 @@ import utilities.UtilityBean;
 public class Stock_ledgerBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    static Logger LOGGER = Logger.getLogger(Stock_ledgerBean.class.getName());
     private String ActionMessage = null;
     private List<Stock_ledger> Stock_ledgerList;
     private Stock_ledger Stock_ledgerObj;
@@ -135,8 +137,8 @@ public class Stock_ledgerBean implements Serializable {
             } catch (NullPointerException npe) {
                 aStock_ledger.setTax_update_synced(0);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -152,8 +154,8 @@ public class Stock_ledgerBean implements Serializable {
                 sl = new Stock_ledger();
                 this.setStock_ledgerFromResultset(sl, rs);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return sl;
     }
@@ -311,7 +313,7 @@ public class Stock_ledgerBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println("callInsertStock_ledger:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -347,7 +349,7 @@ public class Stock_ledgerBean implements Serializable {
             ps.setInt(17, aStock_ledger.getTax_update_synced());
             ps.executeUpdate();
         } catch (Exception e) {
-            System.err.println("insertStock_ledger:" + e.getMessage());
+           LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -360,7 +362,7 @@ public class Stock_ledgerBean implements Serializable {
             ps.executeUpdate();
             update_flag = 1;
         } catch (Exception e) {
-            System.err.println("updateTaxStock_ledger:" + e.getMessage());
+           LOGGER.log(Level.ERROR, e);
         }
         return update_flag;
     }
@@ -511,7 +513,7 @@ public class Stock_ledgerBean implements Serializable {
                 this.Stock_ledgerList.add(sl);
             }
         } catch (Exception e) {
-            System.err.println("reportStock_ledgerDetail:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -570,7 +572,7 @@ public class Stock_ledgerBean implements Serializable {
                 this.Stock_ledgerSummary.add(sl);
             }
         } catch (Exception e) {
-            System.err.println("reportStock_ledgerSummary:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -603,7 +605,7 @@ public class Stock_ledgerBean implements Serializable {
                 sll.add(sl);
             }
         } catch (Exception e) {
-            System.err.println("getStock_ledgerInner:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return sll;
     }

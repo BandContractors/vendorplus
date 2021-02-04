@@ -32,6 +32,7 @@ import java.util.concurrent.Executors;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import utilities.Security;

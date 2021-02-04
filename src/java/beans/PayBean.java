@@ -31,6 +31,8 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 /*
  * To change this template, choose Tools | Templates
@@ -45,6 +47,7 @@ import javax.servlet.http.HttpSession;
 public class PayBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    static Logger LOGGER = Logger.getLogger(PayBean.class.getName());
 
     private List<Pay> Pays;
     private String ActionMessage = null;
@@ -224,9 +227,9 @@ public class PayBean implements Serializable {
             } else if (pay.getPayId() > 0) {
                 PayId = pay.getPayId();
             }
-        } catch (SQLException se) {
-            se.printStackTrace();
+        } catch (Exception e) {
             PayId = 0;
+            LOGGER.log(Level.ERROR, e);
         }
         return PayId;
     }
@@ -245,8 +248,8 @@ public class PayBean implements Serializable {
                 aPayTranss.add(aPayTrans);
                 this.saveCashReceipt(pay, aPayTranss, aPayTypeId, aPayReasId);
             }
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -277,7 +280,7 @@ public class PayBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.out.println("updateOrderPayStatus:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -413,8 +416,8 @@ public class PayBean implements Serializable {
                 aPayTranss.add(aPayTrans);
                 this.saveCashPayment(pay, aPayTranss, aPayTypeId, aPayReasId);
             }
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -573,8 +576,8 @@ public class PayBean implements Serializable {
             cs.setString("in_pay_number", pay.getPay_number());
             cs.executeUpdate();
             return true;
-        } catch (SQLException se) {
-            System.err.println("UpdatePay: " + se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return false;
         }
     }
@@ -592,17 +595,9 @@ public class PayBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
     }
 
@@ -626,7 +621,7 @@ public class PayBean implements Serializable {
                 AccName = new AccCoaBean().getAccCoaByCodeOrId(AccCode, 0).getAccountName();
             }
         } catch (Exception e) {
-            System.err.println("getPaidLiabilityAccount:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return AccName;
     }
@@ -763,8 +758,8 @@ public class PayBean implements Serializable {
             } catch (NullPointerException npe) {
                 pay.setPay_number("");
             }
-        } catch (SQLException se) {
-            se.printStackTrace();
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -903,7 +898,7 @@ public class PayBean implements Serializable {
                 pay.setPay_number("");
             }
             return pay;
-        } catch (SQLException se) {
+        } catch (Exception e) {
             return null;
         }
     }
@@ -1043,7 +1038,7 @@ public class PayBean implements Serializable {
                 pay.setPay_number("");
             }
             return pay;
-        } catch (SQLException se) {
+        } catch (Exception e) {
             return null;
         }
     }
@@ -1061,19 +1056,10 @@ public class PayBean implements Serializable {
             } else {
                 this.clearPay(pay);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             this.clearPay(pay);
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
-
     }
 
     public int getCountPayByDeletePayId(long aDeletePayId) {
@@ -1089,19 +1075,10 @@ public class PayBean implements Serializable {
             } else {
                 return 0;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return 0;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
-
     }
 
     public boolean isAllowCancelPay(Pay aPay) {
@@ -1130,8 +1107,8 @@ public class PayBean implements Serializable {
                 ps.executeUpdate();
                 this.setActionMessage("Deleted Successfully!");
                 this.clearPay(pay);
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
                 this.setActionMessage("Pay NOT deleted");
             }
         }
@@ -1182,9 +1159,9 @@ public class PayBean implements Serializable {
                 cs.executeUpdate();
                 PayHistId = cs.getLong("out_pay_hist_id");
                 isPayCopySuccess = true;
-            } catch (SQLException se) {
+            } catch (Exception e) {
                 isPayCopySuccess = false;
-                System.err.println("CopyPay:" + se.getMessage());
+                LOGGER.log(Level.ERROR, e);
             }
             //copy paytrans
             if (isPayCopySuccess) {
@@ -1204,9 +1181,9 @@ public class PayBean implements Serializable {
                             i = i + 1;
                         }
                         isPayTransCopySuccess = true;
-                    } catch (SQLException se) {
+                    } catch (Exception e) {
                         isPayTransCopySuccess = false;
-                        System.err.println("CopyPayTrans:" + se.getMessage());
+                        LOGGER.log(Level.ERROR, e);
                     }
                 } else {
                     isPayTransCopySuccess = true;
@@ -1369,7 +1346,6 @@ public class PayBean implements Serializable {
                 pay.setPay_number("");
                 new TransactorBean().clearTransactor(transactor);
             } catch (Exception e) {
-
             }
         }
     }
@@ -1384,7 +1360,6 @@ public class PayBean implements Serializable {
                 HttpSession httpSession = request.getSession(true);
                 httpSession.setAttribute("CURRENT_PAY_ID", 0);
             } catch (Exception e) {
-
             }
         }
     }
@@ -1627,16 +1602,8 @@ public class PayBean implements Serializable {
             while (rs.next()) {
                 Pays.add(this.getPayFromResultset(rs));
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return Pays;
     }
@@ -1653,16 +1620,8 @@ public class PayBean implements Serializable {
             while (rs.next()) {
                 Pays.add(this.getPayFromResultset(rs));
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return Pays;
     }
@@ -1680,16 +1639,8 @@ public class PayBean implements Serializable {
             while (rs.next()) {
                 Pays.add(this.getPayFromResultset(rs));
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return Pays;
     }
@@ -1707,16 +1658,8 @@ public class PayBean implements Serializable {
             while (rs.next()) {
                 Pays.add(this.getPayFromResultset(rs));
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return Pays;
     }
@@ -1734,16 +1677,8 @@ public class PayBean implements Serializable {
             while (rs.next()) {
                 Pays.add(this.getPayFromResultset(rs));
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return Pays;
     }
@@ -1761,16 +1696,8 @@ public class PayBean implements Serializable {
                 pay = new Pay();
                 pay = PayBean.getPayFromResultset2(rs);
             }
-        } catch (SQLException se) {
-            System.err.println("getTransactionFirstPay:se:" + se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return pay;
     }
@@ -1788,16 +1715,8 @@ public class PayBean implements Serializable {
                 pay = new Pay();
                 pay = PayBean.getPayFromResultset2(rs);
             }
-        } catch (SQLException se) {
-            System.err.println("getTransactionFirstPayByTransNo:se:" + se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return pay;
     }
@@ -1814,16 +1733,8 @@ public class PayBean implements Serializable {
             while (rs.next()) {
                 Pays.add(this.getPayFromResultset(rs));
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return Pays;
     }
@@ -1899,16 +1810,8 @@ public class PayBean implements Serializable {
             while (rs.next()) {
                 Pays.add(this.getPayFromResultset(rs));
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return Pays;
     }
@@ -1932,16 +1835,8 @@ public class PayBean implements Serializable {
             while (rs.next()) {
                 Pays.add(this.getPayFromResultset(rs));
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return Pays;
     }
@@ -1959,16 +1854,8 @@ public class PayBean implements Serializable {
             while (rs.next()) {
                 Pays.add(this.getPayFromResultset(rs));
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return Pays;
     }
@@ -2002,16 +1889,8 @@ public class PayBean implements Serializable {
                     break;
                 }
             }
-        } catch (SQLException se) {
-            System.err.println("getOverPayIdReadyForTrans:" + se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println("getOverPayIdReadyForTrans:" + ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return payid;
     }
@@ -2061,16 +1940,8 @@ public class PayBean implements Serializable {
                     break;
                 }
             }
-        } catch (SQLException se) {
-            System.err.println("(obj)getOverPayIdReadyForTrans:" + se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println("(obj)getOverPayIdReadyForTrans:" + ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return returnpay;
     }
@@ -2111,7 +1982,7 @@ public class PayBean implements Serializable {
             //: org.primefaces.context.RequestContext.getCurrentInstance().openDialog(out_file_name, options, null);
             org.primefaces.PrimeFaces.current().dialog().openDynamic(out_file_name, options, null);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -2398,8 +2269,8 @@ public class PayBean implements Serializable {
                 this.updateLookupPay(pay);
                 this.PayList.add(pay);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
 
         try (
@@ -2472,8 +2343,8 @@ public class PayBean implements Serializable {
                 }
                 this.PayListSummary.add(paysum);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -2554,8 +2425,8 @@ public class PayBean implements Serializable {
                 this.updateLookupPay(pay);
                 this.PayList.add(pay);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
 
         try (
@@ -2628,8 +2499,8 @@ public class PayBean implements Serializable {
                 }
                 this.PayListSummary.add(paysum);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -2670,7 +2541,7 @@ public class PayBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println("getPaysByTransactionStr:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return PayNumbers;
     }

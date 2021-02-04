@@ -28,8 +28,8 @@ import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.faces.bean.*;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Level;
+//import org.apache.log4j.Logger;
 import sessions.GeneralUserSetting;
 
 @ManagedBean
@@ -37,11 +37,10 @@ import sessions.GeneralUserSetting;
 public class UtilityBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    //static Logger LOGGER = Logger.getLogger(UtilityBean.class.getName());
     private Pattern pattern;
     private Matcher matcher;
     private static final String TIME24HOURS_PATTERN = "([01]?[0-9]|2[0-3]):[0-5][0-9]";
-    static Logger LOGGER = Logger.getLogger(UtilityBean.class.getName());
 
     public boolean isTime24Hour(String time) {
         pattern = Pattern.compile(TIME24HOURS_PATTERN);

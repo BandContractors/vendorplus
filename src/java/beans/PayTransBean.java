@@ -13,11 +13,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 /*
  * To change this template, choose Tools | Templates
@@ -32,6 +32,7 @@ import javax.faces.context.FacesContext;
 public class PayTransBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    static Logger LOGGER = Logger.getLogger(PayTransBean.class.getName());
 
     private List<PayTrans> PayTranss;
     private String ActionMessage = null;
@@ -80,8 +81,8 @@ public class PayTransBean implements Serializable {
                     cs.setString("in_account_code", "");
                 }
                 cs.executeUpdate();
-            } catch (SQLException ex) {
-                Logger.getLogger(PayTransBean.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
     }
@@ -99,19 +100,10 @@ public class PayTransBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
-
     }
 
     public PayTrans getPayTransFromResultset(ResultSet rs) {
@@ -172,8 +164,8 @@ public class PayTransBean implements Serializable {
             } catch (NullPointerException | SQLException npe) {
                 paytrans.setAccount_code("");
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return paytrans;
     }
@@ -204,7 +196,6 @@ public class PayTransBean implements Serializable {
                 paytrans.setAccount_code("");
                 new TransactorBean().clearTransactor(transactor);
             } catch (Exception e) {
-
             }
         }
     }
@@ -221,16 +212,8 @@ public class PayTransBean implements Serializable {
             while (rs.next()) {
                 getPayTranss().add(this.getPayTransFromResultset(rs));
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return getPayTranss();
     }
@@ -247,16 +230,8 @@ public class PayTransBean implements Serializable {
             while (rs.next()) {
                 getPayTranss().add(this.getPayTransFromResultset(rs));
             }
-        } catch (SQLException se) {
-            System.err.println("getPayTranssByPayId:se:" + se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return getPayTranss();
     }
@@ -273,7 +248,7 @@ public class PayTransBean implements Serializable {
                 totalpay = rs.getDouble("total_paid");
             }
         } catch (Exception e) {
-            System.err.println("getTotalPaidByOrderRef:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return totalpay;
     }
@@ -290,7 +265,7 @@ public class PayTransBean implements Serializable {
                 totalpay = rs.getDouble("total_paid");
             }
         } catch (Exception e) {
-            System.err.println("getTotalPaidByTransId:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return totalpay;
     }
@@ -307,7 +282,7 @@ public class PayTransBean implements Serializable {
                 totalbal = rs.getDouble("grand_total") - rs.getDouble("total_paid_calc");
             }
         } catch (Exception e) {
-            System.err.println("getTotalBalByTransId:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return totalbal;
     }
@@ -319,7 +294,7 @@ public class PayTransBean implements Serializable {
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             ps.executeUpdate();
         } catch (Exception e) {
-            System.err.println("updateTransTotalPaid:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -335,7 +310,7 @@ public class PayTransBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println("updateTranssTotalPaid:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -356,16 +331,8 @@ public class PayTransBean implements Serializable {
                     PayTranss.add(pt);
                 }
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -396,16 +363,8 @@ public class PayTransBean implements Serializable {
                     PayTranss.add(pt);
                 }
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -434,16 +393,8 @@ public class PayTransBean implements Serializable {
                 pt = this.getPayTransFromResultset(rs);
                 PayTranss.add(pt);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -464,16 +415,8 @@ public class PayTransBean implements Serializable {
                     PayTranss.add(pt);
                 }
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -504,16 +447,8 @@ public class PayTransBean implements Serializable {
                     PayTranss.add(pt);
                 }
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -534,16 +469,8 @@ public class PayTransBean implements Serializable {
                     PayTranss.add(pt);
                 }
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -574,16 +501,8 @@ public class PayTransBean implements Serializable {
                     PayTranss.add(pt);
                 }
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -604,16 +523,8 @@ public class PayTransBean implements Serializable {
                     PayTranss.add(pt);
                 }
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -644,16 +555,8 @@ public class PayTransBean implements Serializable {
                     PayTranss.add(pt);
                 }
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -738,7 +641,7 @@ public class PayTransBean implements Serializable {
                 aPay.setPaidAmount(0);
             }
         } catch (Exception e) {
-            System.err.println("clearPayTranss:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 

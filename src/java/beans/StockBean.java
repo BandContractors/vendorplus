@@ -10,21 +10,20 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
-
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+
 /**
  *
  * @author btwesigye
@@ -34,6 +33,7 @@ import javax.faces.context.FacesContext;
 public class StockBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    static Logger LOGGER = Logger.getLogger(StockBean.class.getName());
 
     private List<Stock> Stocks;
     private String ActionMessage = null;
@@ -176,8 +176,8 @@ public class StockBean implements Serializable {
             } catch (NullPointerException npe) {
                 aStock.setSpecific_size(1);
             }
-        } catch (SQLException se) {
-            System.err.println("setStockFromResultset:" + se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -394,8 +394,8 @@ public class StockBean implements Serializable {
             } catch (NullPointerException npe) {
                 aStock.setSpecific_size(1);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -413,7 +413,7 @@ public class StockBean implements Serializable {
                 this.setStockFromResultsetAppendExpiryStatus(stock, rs);
             }
         } catch (Exception e) {
-            System.err.println("getStockCurrentExpiryStatus:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return stock;
     }
@@ -446,7 +446,7 @@ public class StockBean implements Serializable {
                 aStock.setStatus_perc(0);
             }
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -495,8 +495,8 @@ public class StockBean implements Serializable {
                 this.setStockFromResultsetAppendExpiryStatus(stock, rs);
                 this.getStocksList().add(stock);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
 
         //summary
@@ -523,8 +523,8 @@ public class StockBean implements Serializable {
                 }
                 this.getStocksSummary().add(stock2);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -654,7 +654,7 @@ public class StockBean implements Serializable {
             status = 1;
         } catch (Exception e) {
             status = 0;
-            System.err.println("saveStock:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return status;
     }
@@ -674,8 +674,8 @@ public class StockBean implements Serializable {
             cs.setDouble("in_unit_cost", aStock.getUnitCost());
             cs.executeUpdate();
             status = 1;
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             status = 0;
         }
         return status;
@@ -695,9 +695,9 @@ public class StockBean implements Serializable {
             cs.setDouble("in_qty", aQty);
             cs.executeUpdate();
             status = 1;
-        } catch (SQLException ex) {
+        } catch (Exception e) {
             status = 0;
-            Logger.getLogger(StockBean.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.ERROR, e);
         }
         return status;
     }
@@ -721,8 +721,8 @@ public class StockBean implements Serializable {
             cs.setDouble("in_qty", aQty);
             cs.executeUpdate();
             status = 1;
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             status = 0;
         }
         return status;
@@ -743,19 +743,10 @@ public class StockBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println("getStock1:" + se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println("getStock1:" + ex.getMessage());
-                }
-            }
         }
-
     }
 
     public Stock getStock(int aStoreId, long aItemId, String aBatchNo, String aCodeSpecific, String aDescSpecific) {
@@ -791,7 +782,7 @@ public class StockBean implements Serializable {
                 return null;
             }
         } catch (Exception e) {
-            System.err.println("getStock2:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
             return null;
         }
     }
@@ -809,7 +800,7 @@ public class StockBean implements Serializable {
                 qty_total = rs.getDouble("qty_total");
             }
         } catch (Exception e) {
-            System.err.println("getStockAtHand:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return qty_total;
     }
@@ -845,7 +836,7 @@ public class StockBean implements Serializable {
                 return null;
             }
         } catch (Exception e) {
-            System.err.println("getStock3:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
             return null;
         }
     }
@@ -976,17 +967,9 @@ public class StockBean implements Serializable {
             } else {
                 return UnitCostPrice;
             }
-        } catch (SQLException | NullPointerException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return 0;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
     }
 
@@ -1003,16 +986,8 @@ public class StockBean implements Serializable {
             ps.executeUpdate();
             //clean stock
             StockBean.deleteZeroQtyStock();
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -1029,16 +1004,8 @@ public class StockBean implements Serializable {
             ps.executeUpdate();
             //clean stock
             StockBean.deleteZeroQtyStock();
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -1058,8 +1025,8 @@ public class StockBean implements Serializable {
             ps.setLong(1, StockId);
             ps.executeUpdate();
             this.setActionMessage("Deleted Successfully!");
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             this.setActionMessage("Stock NOT deleted");
         }
     }
@@ -1103,16 +1070,8 @@ public class StockBean implements Serializable {
                 this.setStockFromResultset(stock, rs);
                 Stocks.add(stock);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return Stocks;
     }
@@ -1137,7 +1096,7 @@ public class StockBean implements Serializable {
                     Stocks.add(stock);
                 }
             } catch (Exception e) {
-                System.err.println("getStocks:" + e.getMessage());
+                LOGGER.log(Level.ERROR, e);
             }
         }
         return Stocks;
@@ -1167,7 +1126,7 @@ public class StockBean implements Serializable {
                     aStockList.add(stock);
                 }
             } catch (Exception e) {
-                System.err.println(e.getMessage());
+                LOGGER.log(Level.ERROR, e);
             }
         }
     }
@@ -1196,7 +1155,7 @@ public class StockBean implements Serializable {
                     this.BatchList.add(stock);
                 }
             } catch (Exception e) {
-                System.err.println(e.getMessage());
+                LOGGER.log(Level.ERROR, e);
             }
         }
     }
@@ -1247,16 +1206,8 @@ public class StockBean implements Serializable {
                 } catch (Exception e) {
 
                 }
-            } catch (SQLException se) {
-                System.err.println("refreshSpecificList:" + se.getMessage());
-            } finally {
-                if (rs != null) {
-                    try {
-                        rs.close();
-                    } catch (SQLException ex) {
-                        System.err.println("refreshSpecificList:" + ex.getMessage());
-                    }
-                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
     }
@@ -1295,16 +1246,8 @@ public class StockBean implements Serializable {
                     this.setStockFromResultset(stock, rs);
                     Stocks.add(stock);
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
-            } finally {
-                if (rs != null) {
-                    try {
-                        rs.close();
-                    } catch (SQLException ex) {
-                        System.err.println(ex.getMessage());
-                    }
-                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
         return Stocks;
@@ -1335,16 +1278,8 @@ public class StockBean implements Serializable {
                     this.setStockFromResultset(stock, rs);
                     this.SpecificList.add(stock);
                 }
-            } catch (SQLException se) {
-                System.err.println("refreshSpecificList:" + se.getMessage());
-            } finally {
-                if (rs != null) {
-                    try {
-                        rs.close();
-                    } catch (SQLException ex) {
-                        System.err.println("refreshSpecificList:" + ex.getMessage());
-                    }
-                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
     }
@@ -1373,16 +1308,8 @@ public class StockBean implements Serializable {
                     this.setStockFromResultset(stock, rs);
                     this.SpecificList.add(stock);
                 }
-            } catch (SQLException se) {
-                System.err.println("refreshSpecificList2:" + se.getMessage());
-            } finally {
-                if (rs != null) {
-                    try {
-                        rs.close();
-                    } catch (SQLException ex) {
-                        System.err.println("refreshSpecificList2:" + ex.getMessage());
-                    }
-                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
     }
@@ -1402,16 +1329,8 @@ public class StockBean implements Serializable {
                 this.setStockFromResultset(stock, rs);
                 Stocks.add(stock);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         //GeneralSetting.setLIST_ITEMS_COUNT(Stocks.size());
         return Stocks;
@@ -1432,16 +1351,8 @@ public class StockBean implements Serializable {
                 this.setStockFromResultset(stock, rs);
                 Stocks.add(stock);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return Stocks;
     }
@@ -1490,16 +1401,8 @@ public class StockBean implements Serializable {
                 amt_lc = amt * XrateMultiply;
                 CpValue = CpValue + amt_lc;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return CpValue;
     }
@@ -1520,16 +1423,8 @@ public class StockBean implements Serializable {
                     SnapshotMaxNo = 0;
                 }
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return SnapshotMaxNo;
     }
@@ -1580,16 +1475,8 @@ public class StockBean implements Serializable {
                 amt_lc = amt * XrateMultiply;
                 CpValue = CpValue + amt_lc;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return CpValue;
     }
@@ -1630,8 +1517,8 @@ public class StockBean implements Serializable {
                 this.setStockFromResultsetReport(stock, rs);
                 this.StocksList.add(stock);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
 
         try (
@@ -1663,8 +1550,8 @@ public class StockBean implements Serializable {
                 }
                 this.StocksSummary.add(stocksum);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -1701,8 +1588,8 @@ public class StockBean implements Serializable {
                 this.setStockFromResultsetReport(stock, rs);
                 this.StocksList.add(stock);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
 
         try (
@@ -1724,8 +1611,8 @@ public class StockBean implements Serializable {
                 }
                 this.StocksSummary.add(stocksum);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -1765,8 +1652,8 @@ public class StockBean implements Serializable {
                 }
                 this.StocksList.add(stock);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
 
         try (
@@ -1788,8 +1675,8 @@ public class StockBean implements Serializable {
                 }
                 this.StocksSummary.add(stocksum);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -1836,8 +1723,8 @@ public class StockBean implements Serializable {
                 }
                 this.StocksList.add(stock);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
 
         try (
@@ -1877,8 +1764,8 @@ public class StockBean implements Serializable {
                 }
                 this.StocksSummary.add(stocksum);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -1943,7 +1830,7 @@ public class StockBean implements Serializable {
                 this.StocksList.add(stock);
             }
         } catch (Exception e) {
-            System.err.println("reportStockPricingQtyError:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -2021,8 +1908,8 @@ public class StockBean implements Serializable {
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             ps.executeUpdate();
-        } catch (SQLException se) {
-            System.err.println("deleteZeroQtyStock:" + se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 

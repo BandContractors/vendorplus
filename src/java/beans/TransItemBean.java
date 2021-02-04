@@ -52,7 +52,7 @@ import org.apache.log4j.Logger;
 public class TransItemBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    static Logger LOGGER = Logger.getLogger(TransBean.class.getName());
+    static Logger LOGGER = Logger.getLogger(TransItemBean.class.getName());
     private List<TransItem> TransItems;
     private String ActionMessage = null;
     private TransItem SelectedTransItem = null;

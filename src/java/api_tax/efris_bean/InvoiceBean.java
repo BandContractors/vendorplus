@@ -65,7 +65,7 @@ import utilities.SecurityPKI;
 public class InvoiceBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    static Logger LOGGER = Logger.getLogger(UtilityBean.class.getName());
+    static Logger LOGGER = Logger.getLogger(InvoiceBean.class.getName());
 
     public void init() {
         if (sellerDetails == null) {
