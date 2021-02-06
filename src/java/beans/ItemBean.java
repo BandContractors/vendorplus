@@ -34,11 +34,13 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 import utilities.CustomValidator;
 import utilities.UtilityBean;
-
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+
 /**
  *
  * @author btwesigye
@@ -48,6 +50,7 @@ import utilities.UtilityBean;
 public class ItemBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    static Logger LOGGER = Logger.getLogger(ItemBean.class.getName());
 
     private List<Item> Items;
     private String ActionMessage = null;
@@ -107,7 +110,7 @@ public class ItemBean implements Serializable {
                 this.InventoryTypeList.add(cat);
             }
         } catch (Exception e) {
-            System.out.println("refreshInventoryType:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -117,7 +120,6 @@ public class ItemBean implements Serializable {
                 aItem.setItemImgUrl(aItem.getItemId() + ".png");
             }
         } catch (Exception e) {
-
         }
     }
 
@@ -130,7 +132,7 @@ public class ItemBean implements Serializable {
     }
 
     public void ItemBarCodeListener(AjaxBehaviorEvent event) {
-        System.out.println("OkaY");
+        //System.out.println("OkaY");
     }
 
     public void saveItem() {
@@ -151,8 +153,8 @@ public class ItemBean implements Serializable {
                     this.setActionMessage("Item NOT saved");
                     FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Item NOT saved!"));
                 }
-            } catch (Exception se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
                 this.setActionMessage("Item NOT saved");
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Item NOT saved!"));
             }
@@ -176,8 +178,8 @@ public class ItemBean implements Serializable {
                     this.setActionMessage("Item NOT saved");
                     FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Item NOT saved!"));
                 }
-            } catch (Exception se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
                 this.setActionMessage("Item NOT saved");
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Item NOT saved!"));
             }
@@ -381,9 +383,9 @@ public class ItemBean implements Serializable {
             }
             cs.executeUpdate();
             save_status = 1;
-        } catch (SQLException se) {
+        } catch (Exception e) {
             save_status = 0;
-            System.err.println(se.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return save_status;
     }
@@ -575,8 +577,8 @@ public class ItemBean implements Serializable {
             } catch (NullPointerException npe) {
                 aItem.setHide_unit_price_invoice(0);
             }
-        } catch (SQLException se) {
-            System.err.println("setItemFromResultset:" + se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -797,8 +799,8 @@ public class ItemBean implements Serializable {
             } catch (NullPointerException npe) {
                 aItem.setHide_unit_price_invoice(0);
             }
-        } catch (SQLException se) {
-            System.err.println("setItemFromResultsetReport:" + se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -818,7 +820,7 @@ public class ItemBean implements Serializable {
                 return null;
             }
         } catch (Exception e) {
-            System.err.println("getItem:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
             return null;
         }
     }
@@ -838,7 +840,7 @@ public class ItemBean implements Serializable {
                 return null;
             }
         } catch (Exception e) {
-            System.err.println("getItemByDesc:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
             return null;
         }
     }
@@ -858,7 +860,7 @@ public class ItemBean implements Serializable {
                 this.setItemFromResultset(aItem, rs);
             }
         } catch (Exception e) {
-            System.err.println("setItem:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -878,7 +880,7 @@ public class ItemBean implements Serializable {
                 return null;
             }
         } catch (Exception e) {
-            System.err.println("findItem:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
             return null;
         }
     }
@@ -931,7 +933,7 @@ public class ItemBean implements Serializable {
                 aItem_unspsc.setCommodity_name("");
             }
         } catch (Exception e) {
-            System.err.println("setItem_unspscFromResultset:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -950,7 +952,7 @@ public class ItemBean implements Serializable {
                 return null;
             }
         } catch (Exception e) {
-            System.err.println("findItem_unspsc:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
             return null;
         }
     }
@@ -970,17 +972,9 @@ public class ItemBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
     }
 
@@ -1002,17 +996,9 @@ public class ItemBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
     }
 
@@ -1034,8 +1020,8 @@ public class ItemBean implements Serializable {
                 ps.executeUpdate();
                 this.setActionMessage("Deleted Successfully!");
                 this.clearItem(aItem);
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
                 this.setActionMessage("Item NOT deleted");
             }
         }
@@ -1052,7 +1038,7 @@ public class ItemBean implements Serializable {
                 this.ItemObj.setIs_synced_tax(itmap.getIs_synced());
             }
         } catch (Exception e) {
-            System.out.println("displayItem:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -1106,7 +1092,7 @@ public class ItemBean implements Serializable {
                 this.refreshItemsList(this.getSearchItemDesc());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -1158,7 +1144,7 @@ public class ItemBean implements Serializable {
                 this.refreshStockLocation(0);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -1216,16 +1202,8 @@ public class ItemBean implements Serializable {
                 this.updateLookUpsUI(item);
                 this.ItemObjectList.add(item);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return ItemObjectList;
     }
@@ -1246,16 +1224,8 @@ public class ItemBean implements Serializable {
                 this.setItemFromResultset(item, rs);
                 this.ItemObjectList.add(item);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return ItemObjectList;
     }
@@ -1289,7 +1259,7 @@ public class ItemBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.out.println("updateLookUpsUI-Item:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -1311,7 +1281,7 @@ public class ItemBean implements Serializable {
                 this.ItemObjectList.add(item);
             }
         } catch (Exception e) {
-            System.err.println("getItemObjectListForSale:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return ItemObjectList;
     }
@@ -1331,7 +1301,7 @@ public class ItemBean implements Serializable {
                 ius.add(iu);
             }
         } catch (Exception e) {
-            System.err.println("getItem_unspscObjectList:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return ius;
     }
@@ -1353,16 +1323,8 @@ public class ItemBean implements Serializable {
                 this.updateLookUpsUI(item);
                 this.ItemObjectList.add(item);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return ItemObjectList;
     }
@@ -1383,16 +1345,8 @@ public class ItemBean implements Serializable {
                 this.setItemFromResultset(item, rs);
                 this.ItemObjectList.add(item);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return ItemObjectList;
     }
@@ -1413,16 +1367,8 @@ public class ItemBean implements Serializable {
                 this.setItemFromResultset(item, rs);
                 this.ItemObjectList.add(item);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return ItemObjectList;
     }
@@ -1443,16 +1389,8 @@ public class ItemBean implements Serializable {
                 this.setItemFromResultset(item, rs);
                 this.ItemObjectList.add(item);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return ItemObjectList;
     }
@@ -1473,16 +1411,8 @@ public class ItemBean implements Serializable {
                 this.setItemFromResultset(item, rs);
                 this.ItemObjectList.add(item);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return ItemObjectList;
     }
@@ -1503,16 +1433,8 @@ public class ItemBean implements Serializable {
                 this.setItemFromResultset(item, rs);
                 this.ItemObjectList.add(item);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return ItemObjectList;
     }
@@ -1533,16 +1455,8 @@ public class ItemBean implements Serializable {
                 this.setItemFromResultset(item, rs);
                 this.ItemObjectList.add(item);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return ItemObjectList;
     }
@@ -1563,16 +1477,8 @@ public class ItemBean implements Serializable {
                 this.setItemFromResultset(item, rs);
                 this.ItemObjectList.add(item);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return ItemObjectList;
     }
@@ -1593,16 +1499,8 @@ public class ItemBean implements Serializable {
                 this.setItemFromResultset(item, rs);
                 this.ItemObjectList.add(item);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return ItemObjectList;
     }
@@ -1623,16 +1521,8 @@ public class ItemBean implements Serializable {
                 this.setItemFromResultset(item, rs);
                 this.ItemObjectList.add(item);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return ItemObjectList;
     }
@@ -1653,16 +1543,8 @@ public class ItemBean implements Serializable {
                 this.setItemFromResultset(item, rs);
                 this.ItemObjectList.add(item);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return ItemObjectList;
     }
@@ -1683,16 +1565,8 @@ public class ItemBean implements Serializable {
                 this.setItemFromResultset(item, rs);
                 this.ItemObjectList.add(item);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return ItemObjectList;
     }
@@ -1713,16 +1587,8 @@ public class ItemBean implements Serializable {
                 this.setItemFromResultset(item, rs);
                 this.ItemObjectList.add(item);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return ItemObjectList;
     }
@@ -1752,16 +1618,8 @@ public class ItemBean implements Serializable {
                 this.setItemFromResultset(item, rs);
                 Items.add(item);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return Items;
     }
@@ -1794,16 +1652,8 @@ public class ItemBean implements Serializable {
                 this.updateLookUpsUI(item);
                 this.ItemObjectList.add(item);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return ItemObjectList;
     }
@@ -1847,16 +1697,8 @@ public class ItemBean implements Serializable {
                     this.setItemFromResultset(item, rs);
                     this.ItemsList.add(item);
                 }
-            } catch (SQLException se) {
-                System.err.println("refreshItemsList:" + se.getMessage());
-            } finally {
-                if (rs != null) {
-                    try {
-                        rs.close();
-                    } catch (SQLException ex) {
-                        System.err.println(ex.getMessage());
-                    }
-                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
     }
@@ -1907,16 +1749,8 @@ public class ItemBean implements Serializable {
                     aItem.setItemType(rs.getString("item_type"));
                     this.ReportItems.add(item);
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
-            } finally {
-                if (rs != null) {
-                    try {
-                        rs.close();
-                    } catch (SQLException ex) {
-                        System.err.println(ex.getMessage());
-                    }
-                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         } else {
             this.ReportItems.clear();
@@ -1963,16 +1797,8 @@ public class ItemBean implements Serializable {
 
                     this.ReportItemsSummary.add(item);
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
-            } finally {
-                if (rs != null) {
-                    try {
-                        rs.close();
-                    } catch (SQLException ex) {
-                        System.err.println(ex.getMessage());
-                    }
-                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         } else {
             this.ReportItemsSummary.clear();
@@ -2052,8 +1878,8 @@ public class ItemBean implements Serializable {
                 item.setAccount_name(accname);
                 this.getItemsList().add(item);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -2097,8 +1923,8 @@ public class ItemBean implements Serializable {
                 this.setItemFromResultsetReport(item, rs);
                 this.getItemsList().add(item);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -2142,8 +1968,8 @@ public class ItemBean implements Serializable {
                 this.setItemFromResultsetReport(item, rs);
                 this.getItemsList().add(item);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -2187,8 +2013,8 @@ public class ItemBean implements Serializable {
                 this.setItemFromResultsetReport(item, rs);
                 this.getItemsList().add(item);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -2239,8 +2065,8 @@ public class ItemBean implements Serializable {
                 this.setItemFromResultsetReport(item, rs);
                 this.getItemsList().add(item);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
 
         //summary
@@ -2267,8 +2093,8 @@ public class ItemBean implements Serializable {
                 }
                 this.getItemsSummary().add(item2);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -2285,7 +2111,7 @@ public class ItemBean implements Serializable {
                 this.setItemFromResultsetReport(item, rs);
             }
         } catch (Exception e) {
-            System.err.println("getItemCurrentStockStatus:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return item;
     }
@@ -2414,16 +2240,8 @@ public class ItemBean implements Serializable {
                 this.updateLookUpsUI(item);
                 this.ItemObjectList.add(item);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return ItemObjectList;
     }
@@ -2445,16 +2263,8 @@ public class ItemBean implements Serializable {
                 this.updateLookUpsUI(item);
                 this.ItemObjectList.add(item);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return ItemObjectList;
     }
@@ -2487,7 +2297,7 @@ public class ItemBean implements Serializable {
                 this.Item_unspscList.add(itemun);
             }
         } catch (Exception e) {
-            System.err.println("refreshItem_unspscList:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -2539,7 +2349,7 @@ public class ItemBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.out.println("updateItemFromUNSPC:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 

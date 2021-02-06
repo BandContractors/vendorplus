@@ -1,2 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context antiJARLocking="true" path="/SM"/>
+<Context path="/SM">
+  <Resource auth="Container" driverClassName="com.mysql.jdbc.Driver" initialSize="5" logAbandoned="false" maxActive="100" maxIdle="30" maxWait="10000" minEvictableIdleTimeMillis="60000" minIdle="5" name="jdbc/BranchPool" password="WTLura456" poolPreparedStatements="true" removeAbandoned="true" removeAbandonedTimeout="300" testOnBorrow="true" testOnReturn="false" testWhileIdle="true" timeBetweenEvictionRunsMillis="30000" type="javax.sql.DataSource" url="jdbc:mysql://127.0.0.1:3306/daytoday_sm_branch?autoReconnect=true" username="root" validationQuery="SELECT 1" validationQueryTimeout="5"/>
+  <Resource auth="Container" driverClassName="com.mysql.jdbc.Driver" initialSize="5" logAbandoned="false" maxActive="100" maxIdle="30" maxWait="10000" minEvictableIdleTimeMillis="60000" minIdle="5" name="jdbc/InterBranchPool" password="WTLura456" poolPreparedStatements="true" removeAbandoned="true" removeAbandonedTimeout="300" testOnBorrow="true" testOnReturn="false" testWhileIdle="true" timeBetweenEvictionRunsMillis="30000" type="javax.sql.DataSource" url="jdbc:mysql://127.0.0.1:3306/wingerso_sm_inter_branch?autoReconnect=true" username="root" validationQuery="SELECT 1" validationQueryTimeout="5"/>
+</Context>

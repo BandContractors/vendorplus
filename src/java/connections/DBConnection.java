@@ -12,17 +12,22 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
 import utilities.Security;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 @ManagedBean
 @SessionScoped
 public class DBConnection implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    static Logger LOGGER = Logger.getLogger(DBConnection.class.getName());
 
     private static String MySQL_JDBC_DRIVER = "com.mysql.jdbc.Driver";
     private static String MySQL_DB_HOST_IP_OR_NAME = "";
@@ -80,13 +85,13 @@ public class DBConnection implements Serializable {
         Properties properties = new Properties();
         try {
             properties.load(in);
-        } catch (IOException ex) {
-            Logger.getLogger(DBConnection.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException e) {
+            LOGGER.log(Level.ERROR, e);
         }
         try {
             in.close();
-        } catch (IOException ex) {
-            Logger.getLogger(DBConnection.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException e) {
+            LOGGER.log(Level.ERROR, e);
         }
 
         DBConnection.PASSWORDS_ARE_ENCRYPTED = properties.getProperty("passwords_are_encrypted", "passwords_are_encrypted");
@@ -178,11 +183,11 @@ public class DBConnection implements Serializable {
                 CompanySetting.RefreshStaticCompanySettings();
             }
         } catch (IOException e) {
-            System.err.println(e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
-    public static Connection getMySQLConnection() {
+    public static Connection getMySQLConnection_Orig() {
         try {
             Class.forName(MySQL_JDBC_DRIVER);
             DBConnection.MySQL_DB_URL = "jdbc:mysql://" + DBConnection.MySQL_DB_HOST_IP_OR_NAME + "/" + DBConnection.MySQL_DB_NAME;
@@ -192,12 +197,37 @@ public class DBConnection implements Serializable {
         return MySQL_Conn;
     }
 
-    public static Connection getINTER_BRANCH_MySQLConnection() {
+    public static Connection getMySQLConnection() {
+        try {
+            Context initContext = new InitialContext();
+            Context envContext = (Context) initContext.lookup("java:/comp/env");
+            DataSource ds = (DataSource) envContext.lookup("jdbc/BranchPool");
+            MySQL_Conn = ds.getConnection();
+        } catch (NamingException | SQLException e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return MySQL_Conn;
+    }
+
+    public static Connection getINTER_BRANCH_MySQLConnection_Orig() {
         try {
             Class.forName(INTER_BRANCH_MySQL_JDBC_DRIVER);
             DBConnection.INTER_BRANCH_MySQL_DB_URL = "jdbc:mysql://" + DBConnection.INTER_BRANCH_MySQL_DB_HOST_IP_OR_NAME + "/" + DBConnection.INTER_BRANCH_MySQL_DB_NAME;
             INTER_BRANCH_MySQL_Conn = DriverManager.getConnection(INTER_BRANCH_MySQL_DB_URL, INTER_BRANCH_MySQL_USER, INTER_BRANCH_MySQL_PASSWORD);
         } catch (ClassNotFoundException | SQLException e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return INTER_BRANCH_MySQL_Conn;
+    }
+
+    public static Connection getINTER_BRANCH_MySQLConnection() {
+        try {
+            Context initContext = new InitialContext();
+            Context envContext = (Context) initContext.lookup("java:/comp/env");
+            DataSource ds = (DataSource) envContext.lookup("jdbc/InterBranchPool");
+            INTER_BRANCH_MySQL_Conn = ds.getConnection();
+        } catch (NamingException | SQLException e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return INTER_BRANCH_MySQL_Conn;
     }
