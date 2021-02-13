@@ -32,16 +32,16 @@
             <h:panelGrid styleClass="clsGridMainInput" columns="2">
                 <h:outputLabel  value="LICENSE-CLIENT-ID:"/>
                 <h:inputText styleClass="clsInput" value="#{companySetting.getLICENSE_CLIENT_ID()}" disabled="true"/>
-                
+
                 <h:outputLabel  value="LICENSE-CLIENT-NAMES:"/>
                 <h:inputText styleClass="clsInput" value="#{companySetting.getLICENSE_CLIENT_NAME()}" disabled="true"/>
-                
+
                 <h:outputLabel  value="PACKAGE-NAME:"/>
                 <h:inputText styleClass="clsInput" value="#{companySetting.getPACKAGE_NAME()}" disabled="true"/>
-                
+
                 <h:outputLabel  value="PACKAGE-DETAILS:"/>
                 <h:outputLabel value="#{companySetting.displayPackageUsers(companySetting.getPackageUsers(companySetting.getPACKAGE_NAME()))}"/> 
-                
+
                 <h:outputLabel  value="LICENSE-EXPIRY-DATE:"/>
                 <h:inputText value="#{utilityBean.formatDate(companySetting.getLICENSE_EXPIRY_DATE())}" disabled="true" rendered="#{companySetting.getLicenseType() ne 9 and companySetting.getLicenseType() ne 0}"/>
                 <h:inputText value="N/A" disabled="true" rendered="#{companySetting.getLicenseType() eq 9}"/>
@@ -57,7 +57,7 @@
                 <h:outputLabel value=""/>
                 <h:outputLabel value=""/>
             </h:panelGrid>  
-            
+
             <h:outputLabel  value="-----------------------------Active and Old(within 12 hrs) User Sessions---"/>
             <p:dataTable id="dtblLoginSession" value="#{loginSessionBean.getLoginSessions()}" var="ls">
                 <p:column>
@@ -66,50 +66,53 @@
                     <!-- row record -->
                     #{userDetailBean.getUserDetail(ls.userDetailId).userName}
                 </p:column>
-                
+
                 <p:column>
                     <!-- column header -->
                     <f:facet name="header">#{companySetting.getStoreEquivName()}</f:facet>
                     <!-- row record -->
                     #{storeBean.getStore(ls.storeId).storeName}
                 </p:column>
-                
+
                 <p:column>
                     <!-- column header -->
                     <f:facet name="header">Session Creation Date</f:facet>
                     <!-- row record -->
                     <h:outputLabel value="#{utilityBean.formatDateTime(ls.addDate)}"/>
                 </p:column>
-                
+
                 <p:column>
                     <!-- column header -->
                     <f:facet name="header">Session Id</f:facet>
                     <!-- row record -->
                     #{ls.sessionId}
                 </p:column>
-                
+
                 <p:column>
                     <!-- column header -->
                     <f:facet name="header">Remote IP</f:facet>
                     <!-- row record -->
                     #{ls.remoteIp}
                 </p:column>
-                
+
                 <p:column>
                     <!-- column header -->
                     <f:facet name="header">Remote Host</f:facet>
                     <!-- row record -->
                     #{ls.remoteHost}
                 </p:column>
-                
+
                 <p:column>
                     <!-- column header -->
                     <f:facet name="header">Remote User</f:facet>
                     <!-- row record -->
                     #{ls.remoteUser}
                 </p:column>
-                
+
             </p:dataTable>
+            <p:commandButton id="cmdbClear" value="JdbcConnPoolPrint">
+                <p:ajax listener="#{utilityBean.printJdbcConnPool()}" process="@form" update="@form" />
+            </p:commandButton>
         </h:form>
     </h:body>
 </html>

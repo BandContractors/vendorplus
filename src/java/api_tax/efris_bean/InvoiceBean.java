@@ -215,6 +215,7 @@ public class InvoiceBean implements Serializable {
             sellerDetails.setLegalName(new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "PAYEE_NAME").getParameter_value());
             sellerDetails.setEmailAddress(CompanySetting.getEmail());
             sellerDetails.setAddress(CompanySetting.getPhysicalAddress());
+            sellerDetails.setReferenceNo(trans.getTransactionNumber());
 
             //basicInformation 
             basicInformation.setCurrency(trans.getCurrencyCode());
@@ -1079,6 +1080,7 @@ public class InvoiceBean implements Serializable {
             sellerDetails.setBusinessName(CompanySetting.getLICENSE_CLIENT_NAME());//dataobjectsellerDetails.get("businessName").toString()
             sellerDetails.setLegalName(new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "PAYEE_NAME").getParameter_value());//dataobjectsellerDetails.get("legalName").toString()
             sellerDetails.setEmailAddress(CompanySetting.getEmail());//dataobjectsellerDetails.get("emailAddress").toString()
+            sellerDetails.setReferenceNo(trans.getTransactionNumber());
 
             //basicInformation
             basicInformation.setOriInvoiceId(dataobjectbasicInformation.getString("invoiceId"));

@@ -8,6 +8,7 @@ import entities.Item;
 import entities.TransItem;
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.management.ManagementFactory;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -23,11 +24,22 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.faces.bean.*;
+import javax.management.AttributeNotFoundException;
+import javax.management.InstanceNotFoundException;
+import javax.management.IntrospectionException;
+import javax.management.MBeanAttributeInfo;
+import javax.management.MBeanException;
+import javax.management.MBeanInfo;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+import javax.management.ReflectionException;
+import org.apache.tomcat.dbcp.dbcp2.BasicDataSource;
 //import org.apache.log4j.Level;
 //import org.apache.log4j.Logger;
 import sessions.GeneralUserSetting;
@@ -678,7 +690,6 @@ public class UtilityBean implements Serializable {
 //            System.out.println(e);
 //        }
 //    }
-
     public String getEmptyIfNull(String aStringValue) {
         if (aStringValue == null) {
             return "";
@@ -790,6 +801,30 @@ public class UtilityBean implements Serializable {
             System.out.println("getFirstStringFromCommaSeperatedStr:" + e.getMessage());
         }
         return FirstString;
+    }
+
+    public void printJdbcConnPool() {
+        System.out.println("Entered!");
+        try {
+            MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+            Set<ObjectName> objectNames = server.queryNames(null, null);
+            for (ObjectName name : objectNames) {
+                MBeanInfo info = server.getMBeanInfo(name);
+                //System.out.println("CN:" + info.getClassName());
+                if (info.getClassName().equals("org.apache.tomcat.jdbc.pool.jmx.ConnectionPool")) {
+                    System.out.println("Gotten!");
+                    for (MBeanAttributeInfo mf : info.getAttributes()) {
+                        Object attributeValue = server.getAttribute(name, mf.getName());
+                        if (attributeValue != null) {
+                            System.out.println("" + mf.getName() + " : " + attributeValue.toString());
+                        }
+                    }
+                    break;
+                }
+            }
+        } catch (InstanceNotFoundException | IntrospectionException | ReflectionException | MBeanException | AttributeNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
