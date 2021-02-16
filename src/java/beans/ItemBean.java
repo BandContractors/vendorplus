@@ -145,7 +145,7 @@ public class ItemBean implements Serializable {
         } else {
             try {
                 if (this.saveValidatedItem(this.ItemObj) == 1) {
-                    new Item_tax_mapBean().saveItem_tax_mapCall(this.ItemObj.getDescription(), this.ItemObj.getItem_code_tax());
+                    new Item_tax_mapBean().saveItem_tax_mapCall(this.ItemObj.getDescription(), this.ItemObj.getItem_code_tax(), "");
                     this.setActionMessage("Saved Successfully");
                     this.clearItem();
                     this.refreshStockLocation(0);

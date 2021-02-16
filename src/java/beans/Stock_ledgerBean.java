@@ -12,7 +12,6 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -300,7 +299,13 @@ public class Stock_ledgerBean implements Serializable {
                             SupplierTIN = tr.getTaxIdentity();
                             SupplierName = tr.getTransactorNames();
                         }
-                        new StockManage().addStockCallThread(stockadd, stockledger.getTax_update_id(), SupplierTIN, SupplierName);
+                        String ItemIdTax = "";
+                        try {
+                            ItemIdTax = new Item_tax_mapBean().getItem_tax_map(stockadd.getItemId()).getItem_id_tax();
+                        } catch (Exception e) {
+                            ItemIdTax = "";
+                        }
+                        new StockManage().addStockCallThread(stockadd, ItemIdTax, stockledger.getTax_update_id(), SupplierTIN, SupplierName);
                     } else if (aAddSubtract.equals("Subtract")) {
                         Stock stocksub = new Stock();
                         stocksub.setItemId(aStock.getItemId());
@@ -308,7 +313,13 @@ public class Stock_ledgerBean implements Serializable {
                         stocksub.setUnitCost(aStock.getUnitCost());
                         //get AdjustType
                         String AdjustType = "105";//Others
-                        new StockManage().subtractStockCallThread(stocksub, stockledger.getTax_update_id(), AdjustType);
+                        String ItemIdTax = "";
+                        try {
+                            ItemIdTax = new Item_tax_mapBean().getItem_tax_map(stocksub.getItemId()).getItem_id_tax();
+                        } catch (Exception e) {
+                            ItemIdTax = "";
+                        }
+                        new StockManage().subtractStockCallThread(stocksub, ItemIdTax, stockledger.getTax_update_id(), AdjustType);
                     }
                 }
             }
@@ -349,7 +360,7 @@ public class Stock_ledgerBean implements Serializable {
             ps.setInt(17, aStock_ledger.getTax_update_synced());
             ps.executeUpdate();
         } catch (Exception e) {
-           LOGGER.log(Level.ERROR, e);
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -362,7 +373,7 @@ public class Stock_ledgerBean implements Serializable {
             ps.executeUpdate();
             update_flag = 1;
         } catch (Exception e) {
-           LOGGER.log(Level.ERROR, e);
+            LOGGER.log(Level.ERROR, e);
         }
         return update_flag;
     }

@@ -11321,7 +11321,7 @@ CREATE PROCEDURE sp_save_item_tax_map
 (
 	IN in_item_tax_map_id bigint,
 	IN in_item_id bigint,
-	IN in_item_id_tax bigint,
+	IN in_item_id_tax varchar(50),
 	IN in_item_code_tax varchar(50),
 	IN in_is_synced int
 ) 

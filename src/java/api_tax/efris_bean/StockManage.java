@@ -32,7 +32,6 @@ import java.util.concurrent.Executors;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import utilities.Security;
@@ -47,7 +46,7 @@ public class StockManage implements Serializable {
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = Logger.getLogger(StockManage.class.getName());
 
-    public void callAddStockFromItemReg(Item aItem) {//, Item_tax_map aItem_tax_map
+    public void callAddStockFromItemReg(Item aItem, String aItemIdTax) {//, Item_tax_map aItem_tax_map
         try {
             double qtybal = 0;
             try {
@@ -71,7 +70,7 @@ public class StockManage implements Serializable {
                     SupplierTIN = tr.getTaxIdentity();
                     SupplierName = tr.getTransactorNames();
                 }
-                new StockManage().addStockCallFromItemReg(stockadd, SupplierTIN, SupplierName);
+                new StockManage().addStockCallFromItemReg(stockadd, aItemIdTax, SupplierTIN, SupplierName);
             }
         } catch (Exception e) {
             //System.err.println("callAddStockUponItemReg:" + e.getMessage());
@@ -79,7 +78,7 @@ public class StockManage implements Serializable {
         }
     }
 
-    public void addStockCall(Stock aStock, long aTax_update_id, String aSupplierTin, String aSupplierName) {
+    public void addStockCall(Stock aStock, String aItemIdTax, long aTax_update_id, String aSupplierTin, String aSupplierName) {
         try {
             if (null != aStock && aTax_update_id > 0) {
                 //1. indicate record4Sync
@@ -87,9 +86,9 @@ public class StockManage implements Serializable {
                 String id = "";
                 String APIMode = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_MODE").getParameter_value();
                 if (APIMode.equals("OFFLINE")) {
-                    id = this.getItemIdFromTaxOffline(Long.toString(aStock.getItemId()));
+                    id = this.getItemIdFromTaxOffline(aItemIdTax);
                 } else {
-                    id = this.getItemIdFromTaxOnline(Long.toString(aStock.getItemId()));
+                    id = this.getItemIdFromTaxOnline(aItemIdTax);
                 }
                 if (id.length() > 0 && record4Sync == 1) {
                     //2. update tax db and check if synced yes
@@ -106,20 +105,19 @@ public class StockManage implements Serializable {
                 }
             }
         } catch (Exception e) {
-            //System.err.println("addStockCall:" + e.getMessage());
             LOGGER.log(Level.ERROR, e);
         }
     }
 
-    public void addStockCallFromItemReg(Stock aStock, String aSupplierTin, String aSupplierName) {
+    public void addStockCallFromItemReg(Stock aStock, String aItemIdTax, String aSupplierTin, String aSupplierName) {
         try {
             if (null != aStock) {
                 String id = "";
                 String APIMode = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_MODE").getParameter_value();
                 if (APIMode.equals("OFFLINE")) {
-                    id = this.getItemIdFromTaxOffline(Long.toString(aStock.getItemId()));
+                    id = this.getItemIdFromTaxOffline(aItemIdTax);
                 } else {
-                    id = this.getItemIdFromTaxOnline(Long.toString(aStock.getItemId()));
+                    id = this.getItemIdFromTaxOnline(aItemIdTax);
                 }
                 if (id.length() > 0) {
                     //2. update tax db and check if synced yes
@@ -141,7 +139,7 @@ public class StockManage implements Serializable {
         }
     }
 
-    public void subtractStockCall(Stock aStock, long aTax_update_id, String aAdjustType) {
+    public void subtractStockCall(Stock aStock, String aItemIdTax, long aTax_update_id, String aAdjustType) {
         try {
             if (null != aStock && aTax_update_id > 0) {
                 //1. indicate record4Sync
@@ -149,9 +147,9 @@ public class StockManage implements Serializable {
                 String APIMode = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_MODE").getParameter_value();
                 String id = "";
                 if (APIMode.equals("OFFLINE")) {
-                    id = this.getItemIdFromTaxOffline(Long.toString(aStock.getItemId()));
+                    id = this.getItemIdFromTaxOffline(aItemIdTax);
                 } else {
-                    id = this.getItemIdFromTaxOnline(Long.toString(aStock.getItemId()));
+                    id = this.getItemIdFromTaxOnline(aItemIdTax);
                 }
                 if (id.length() > 0 && record4Sync == 1) {
                     //2. update tax db and check if synced yes
@@ -173,12 +171,12 @@ public class StockManage implements Serializable {
         }
     }
 
-    public void addStockCallThread(Stock aStock, long aTax_update_id, String aSupplierTin, String aSupplierName) {
+    public void addStockCallThread(Stock aStock, String aItemIdTax, long aTax_update_id, String aSupplierTin, String aSupplierName) {
         try {
             Runnable task = new Runnable() {
                 @Override
                 public void run() {
-                    addStockCall(aStock, aTax_update_id, aSupplierTin, aSupplierName);
+                    addStockCall(aStock, aItemIdTax, aTax_update_id, aSupplierTin, aSupplierName);
                 }
             };
             Executor e = Executors.newSingleThreadExecutor();
@@ -189,12 +187,12 @@ public class StockManage implements Serializable {
         }
     }
 
-    public void subtractStockCallThread(Stock aStock, long aTax_update_id, String aAdjustType) {
+    public void subtractStockCallThread(Stock aStock, String aItemIdTax, long aTax_update_id, String aAdjustType) {
         try {
             Runnable task = new Runnable() {
                 @Override
                 public void run() {
-                    subtractStockCall(aStock, aTax_update_id, aAdjustType);
+                    subtractStockCall(aStock, aItemIdTax, aTax_update_id, aAdjustType);
                 }
             };
             Executor e = Executors.newSingleThreadExecutor();
@@ -247,7 +245,6 @@ public class StockManage implements Serializable {
             }
             itemid = itemslist.get(0).getId();
         } catch (Exception e) {
-            //System.err.println("getItemIdFromTaxOffline:" + ex.getMessage());
             LOGGER.log(Level.INFO, output);
             LOGGER.log(Level.ERROR, e);
         }
@@ -312,7 +309,6 @@ public class StockManage implements Serializable {
             }
             itemid = itemslist.get(0).getId();
         } catch (Exception e) {
-            //System.err.println("getItemIdFromTaxOnline:" + ex.getMessage());
             LOGGER.log(Level.INFO, output);
             LOGGER.log(Level.ERROR, e);
         }
@@ -561,23 +557,22 @@ public class StockManage implements Serializable {
         return ReturnMsg;
     }
 
-    public void registerItemCallThread(long aItemId, String aItemCodeTax) {
+    public void registerItemCallThread(long aItemId, String aItemIdTax, String aItemCodeTax) {
         try {
             Runnable task = new Runnable() {
                 @Override
                 public void run() {
-                    registerItemCall(aItemId, aItemCodeTax);
+                    registerItemCall(aItemId, aItemIdTax, aItemCodeTax);
                 }
             };
             Executor e = Executors.newSingleThreadExecutor();
             e.execute(task);
         } catch (Exception e) {
-            //System.err.println("registerItemCallThread:" + e.getMessage());
             LOGGER.log(Level.ERROR, e);
         }
     }
 
-    public void registerItemCall(long aItemId, String aItemCodeTax) {
+    public void registerItemCall(long aItemId, String aItemIdTax, String aItemCodeTax) {
         try {
             Item item = new ItemBean().getItem(aItemId);
             if (null != item) {
@@ -612,25 +607,24 @@ public class StockManage implements Serializable {
                 String recordSynced = "";
                 String APIMode = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_MODE").getParameter_value();
                 if (APIMode.equals("OFFLINE")) {
-                    recordSynced = this.registerItemOffline(item);
+                    recordSynced = this.registerItemOffline(item, aItemIdTax);
                 } else {
-                    recordSynced = this.registerItemOnline(item);
+                    recordSynced = this.registerItemOnline(item, aItemIdTax);
                 }
                 if (recordSynced.equals("SUCCESS")) {
                     //update local db that synced yes
                     int x = new Item_tax_mapBean().saveItem_tax_mapSync(aItemId, 1);
                     //do stock taking
                     //Item_tax_map im = new Item_tax_mapBean().getItem_tax_mapSynced(item.getItemId());
-                    this.callAddStockFromItemReg(item);//this.callAddStockFromItemReg(item, im);
+                    this.callAddStockFromItemReg(item, aItemIdTax);//this.callAddStockFromItemReg(item, im);
                 }
             }
         } catch (Exception e) {
-            //System.err.println("registerItemCall:" + e.getMessage());
             LOGGER.log(Level.ERROR, e);
         }
     }
 
-    public String registerItemOffline(Item aItem) {
+    public String registerItemOffline(Item aItem, String aItemIdTax) {
         String ReturnMsg = "";
         String output = "";
         try {
@@ -643,7 +637,7 @@ public class StockManage implements Serializable {
             String json = "[\n"
                     + "	{\n"
                     + "	\"goodsName\": \"" + aItem.getDescription() + "\",\n"
-                    + "	\"goodsCode\": \"" + aItem.getItemId() + "\",\n"
+                    + "	\"goodsCode\": \"" + aItemIdTax + "\",\n"
                     + "	\"measureUnit\": \"" + aItem.getUnit_symbol_tax() + "\",\n"
                     + UnitPriceStr
                     + "	\"currency\": \"" + aItem.getCurrency_code_tax() + "\",\n"
@@ -684,14 +678,13 @@ public class StockManage implements Serializable {
                 LOGGER.log(Level.INFO, ReturnMsg);
             }
         } catch (Exception e) {
-            //System.err.println("registerItemOffline:" + ex.getMessage());
             LOGGER.log(Level.INFO, output);
             LOGGER.log(Level.ERROR, e);
         }
         return ReturnMsg;
     }
 
-    public String registerItemOnline(Item aItem) {
+    public String registerItemOnline(Item aItem, String aItemIdTax) {
         String ReturnMsg = "";
         String output = "";
         try {
@@ -704,7 +697,7 @@ public class StockManage implements Serializable {
             String json = "[\n"
                     + "	{\n"
                     + "	\"goodsName\": \"" + aItem.getDescription() + "\",\n"
-                    + "	\"goodsCode\": \"" + aItem.getItemId() + "\",\n"
+                    + "	\"goodsCode\": \"" + aItemIdTax + "\",\n"
                     + "	\"measureUnit\": \"" + aItem.getUnit_symbol_tax() + "\",\n"
                     + UnitPriceStr
                     + "	\"currency\": \"" + aItem.getCurrency_code_tax() + "\",\n"
@@ -761,7 +754,6 @@ public class StockManage implements Serializable {
                 LOGGER.log(Level.INFO, ReturnMsg);
             }
         } catch (Exception e) {
-            //System.err.println("registerItemOnline:" + ex.getMessage());
             LOGGER.log(Level.INFO, output);
             LOGGER.log(Level.ERROR, e);
         }

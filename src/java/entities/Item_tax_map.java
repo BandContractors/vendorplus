@@ -12,7 +12,7 @@ public class Item_tax_map implements Serializable {
     private static final long serialVersionUID = 1L;
     private long item_tax_map_id;
     private long item_id;
-    private long item_id_tax;
+    private String item_id_tax;
     private String item_code_tax;
     private Date add_date;
     private int is_synced;
@@ -43,20 +43,6 @@ public class Item_tax_map implements Serializable {
      */
     public void setItem_id(long item_id) {
         this.item_id = item_id;
-    }
-
-    /**
-     * @return the item_id_tax
-     */
-    public long getItem_id_tax() {
-        return item_id_tax;
-    }
-
-    /**
-     * @param item_id_tax the item_id_tax to set
-     */
-    public void setItem_id_tax(long item_id_tax) {
-        this.item_id_tax = item_id_tax;
     }
 
     /**
@@ -99,6 +85,20 @@ public class Item_tax_map implements Serializable {
      */
     public void setIs_synced(int is_synced) {
         this.is_synced = is_synced;
+    }
+
+    /**
+     * @return the item_id_tax
+     */
+    public String getItem_id_tax() {
+        return item_id_tax;
+    }
+
+    /**
+     * @param item_id_tax the item_id_tax to set
+     */
+    public void setItem_id_tax(String item_id_tax) {
+        this.item_id_tax = item_id_tax;
     }
 
 }

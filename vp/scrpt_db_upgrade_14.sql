@@ -148,4 +148,9 @@ ALTER TABLE transaction_tax_map ADD COLUMN fdn_ref VARCHAR(50) NULL DEFAULT '';
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_14',147,Now(),'6.0','');
 
+ALTER TABLE item_tax_map 
+CHANGE COLUMN item_id_tax item_id_tax VARCHAR(50) NULL DEFAULT NULL ;
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_14',153,Now(),'6.0','');
+
 

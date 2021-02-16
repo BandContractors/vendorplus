@@ -355,48 +355,74 @@
                 </p:column>
             </p:dataTable>
             <p:sidebar widgetVar="sbarUNSPSC" position="bottom" baseZIndex="10000" style="height: 600px;">
-                <h:panelGrid columns="1">
-                    <h:outputLabel value="United Nations Standard Products and Services Code (UNSPSC)" style="font-weight: bold;"/>
-                </h:panelGrid>
-                <h:panelGrid columns="1" style="text-align: center;">
-                    <h:panelGrid columns="4">
-                        <h:outputLabel value="Enter text:"/>
-                        <h:inputText id="itxtUNSPSCSearch" value="#{itemBean.searchUNSPSC}"/>
-                        <p:commandButton id="cmdbtnSearchUNSPSC" value="Search" actionListener="#{itemBean.refreshItem_unspscList(itemBean.searchUNSPSC)}" update="formMain:tblUNSPSC"/>
-                        <h:outputLabel value=""/>
-                    </h:panelGrid>
-                    <p:dataTable id="tblUNSPSC" rowIndexVar="rowIndex" tableStyle="width:auto;" var="unspsc" value="#{itemBean.item_unspscList}" 
-                                 paginator="true" rows="7" 
-                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}" 
-                                 rowsPerPageTemplate="7,10">
-                        <p:column headerText="Code" style="text-align: left;font-size: 14px;">
-                            <h:outputText value="#{rowIndex+1} "/>
-                            <h:outputText value="Service" rendered="#{unspsc.service_mark.equals('Y')}"/>
-                            <h:outputText value="Product" rendered="#{unspsc.service_mark.equals('N')}"/>
-                        </p:column>
-                        <p:column headerText="Code" style="text-align: left;font-size: 14px;">
-                            <p:commandLink value="#{unspsc.commodity_code}"  oncomplete="PF('sbarUNSPSC').hide()">
-                                <f:ajax listener="#{itemBean.updateItemFromUNSPC(itemBean.itemObj,unspsc)}" render="formMain:itxtUNSPSC formMain:menuVatRateds formMain:menuItemType"/>
-                            </p:commandLink>
-                        </p:column>
-                        <p:column headerText="Commodity" style="text-align: left;font-size: 14px;">
-                            <h:outputText value="#{unspsc.commodity_name}"/>
-                        </p:column>
-                        <p:column headerText="Class" style="text-align: left;font-size: 14px;">
-                            <h:outputText value="#{unspsc.class_name}"/>
-                        </p:column>
-                        <p:column headerText="Family" style="text-align: left;font-size: 14px;">
-                            <h:outputText value="#{unspsc.family_name}"/>
-                        </p:column>
-                        <p:column headerText="Segment" style="text-align: left;font-size: 14px;">
-                            <h:outputText value="#{unspsc.segment_name}"/>
-                        </p:column>
-                        <p:column headerText="Tax Rates" style="text-align: left;font-size: 14px;">
-                            <h:outputText value="VAT(Standard:#{unspsc.vat_rate},Zero:#{unspsc.zero_rate},Exempt:#{unspsc.exempt_rate}) "/>
-                            <h:outputText value="Excise duty product type:#{unspsc.excise_duty_product_type}"/>
-                        </p:column>
-                    </p:dataTable>
-                </h:panelGrid>
+                <p:tabView id="tabvUNSPC">
+                    <p:tab title="Search">
+                        <h:panelGrid columns="1">
+                            <h:outputLabel value="United Nations Standard Products and Services Code (UNSPSC)" style="font-weight: bold;"/>
+                        </h:panelGrid>
+                        <h:panelGrid columns="1" style="text-align: center;">
+                            <h:panelGrid columns="4">
+                                <h:outputLabel value="Enter text:"/>
+                                <h:inputText id="itxtUNSPSCSearch" value="#{itemBean.searchUNSPSC}"/>
+                                <p:commandButton id="cmdbtnSearchUNSPSC" value="Search" actionListener="#{itemBean.refreshItem_unspscList(itemBean.searchUNSPSC)}" update="formMain:tabvUNSPC:tblUNSPSC"/>
+                                <h:outputLabel value=""/>
+                            </h:panelGrid>
+                            <p:dataTable id="tblUNSPSC" rowIndexVar="rowIndex" tableStyle="width:auto;" var="unspsc" value="#{itemBean.item_unspscList}" 
+                                         paginator="true" rows="5" 
+                                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}" 
+                                         rowsPerPageTemplate="5,10">
+                                <p:column headerText="Code" style="text-align: left;font-size: 14px;">
+                                    <h:outputText value="#{rowIndex+1} "/>
+                                    <h:outputText value="Service" rendered="#{unspsc.service_mark.equals('Y')}"/>
+                                    <h:outputText value="Product" rendered="#{unspsc.service_mark.equals('N')}"/>
+                                </p:column>
+                                <p:column headerText="Code" style="text-align: left;font-size: 14px;">
+                                    <p:commandLink value="#{unspsc.commodity_code}"  oncomplete="PF('sbarUNSPSC').hide()">
+                                        <f:ajax listener="#{itemBean.updateItemFromUNSPC(itemBean.itemObj,unspsc)}" render="formMain:itxtUNSPSC formMain:menuVatRateds formMain:menuItemType"/>
+                                    </p:commandLink>
+                                </p:column>
+                                <p:column headerText="Commodity" style="text-align: left;font-size: 14px;">
+                                    <h:outputText value="#{unspsc.commodity_name}"/>
+                                </p:column>
+                                <p:column headerText="Class" style="text-align: left;font-size: 14px;">
+                                    <h:outputText value="#{unspsc.class_name}"/>
+                                </p:column>
+                                <p:column headerText="Family" style="text-align: left;font-size: 14px;">
+                                    <h:outputText value="#{unspsc.family_name}"/>
+                                </p:column>
+                                <p:column headerText="Segment" style="text-align: left;font-size: 14px;">
+                                    <h:outputText value="#{unspsc.segment_name}"/>
+                                </p:column>
+                                <p:column headerText="Tax Rates" style="text-align: left;font-size: 14px;">
+                                    <h:outputText value="VAT(Standard:#{unspsc.vat_rate},Zero:#{unspsc.zero_rate},Exempt:#{unspsc.exempt_rate}) "/>
+                                    <h:outputText value="Excise duty product type:#{unspsc.excise_duty_product_type}"/>
+                                </p:column>
+                            </p:dataTable>
+                        </h:panelGrid>
+                    </p:tab>
+                    <p:tab title="Manage">
+                        <h:panelGrid columns="1">
+                            <h:outputLabel value="#{itemBean.itemObj.description}" style="font-weight: bold;"/>
+                        </h:panelGrid>
+                        <h:panelGrid columns="6">
+                            <h:outputLabel value="My Code:"/>
+                            <h:inputText value="#{itemBean.itemObj.itemCode}"/>
+                            <h:outputLabel value="UN Item Code:"/>
+                            <h:inputText value="#{itemBean.itemObj.item_code_tax}"/>
+                            <h:outputLabel value="Synced"/>
+                            <h:selectOneMenu value="#{itemBean.itemObj.isSuspended}" style="width: 70px">
+                                <f:selectItem itemLabel="No" itemValue="0"/>
+                                <f:selectItem itemLabel="Yes" itemValue="1"/>
+                            </h:selectOneMenu>
+                        </h:panelGrid>
+                        <h:panelGrid columns="2">
+                            <p:commandButton value="Save Only" actionListener="#" update="formMain:tabvUNSPC:tblUNSPSC"/>
+                            <p:commandButton value="Save and Sync" actionListener="#" update="formMain:tabvUNSPC:tblUNSPSC"/>
+                            <p:commandButton value="Close" actionListener="#" update="formMain:tabvUNSPC:tblUNSPSC"/>
+                        </h:panelGrid>
+                    </p:tab>
+                </p:tabView>
+
             </p:sidebar>
         </h:form>
     </h:body>

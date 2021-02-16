@@ -291,7 +291,7 @@ public class InvoiceBean implements Serializable {
                 if (null != itm && null != im) {
                     GoodsDetails gd = new GoodsDetails();
                     gd.setItem(itm.getDescription());//Hima Cement
-                    gd.setItemCode(Long.toString(itm.getItemId()));//147
+                    gd.setItemCode(im.getItem_id_tax());//147
                     gd.setQty(Double.toString(transitems.get(i).getItemQty()));
                     try {
                         String UnitSymbolTax = new UnitBean().getUnit(itm.getUnitId()).getUnit_symbol_tax();
@@ -1140,7 +1140,7 @@ public class InvoiceBean implements Serializable {
                 if (ChangedQty > 0) {
                     GoodsDetails gd = new GoodsDetails();
                     gd.setItem(jsonObj.get("item").toString());//Desciption:Hima Cement
-                    gd.setItemCode(jsonObj.get("itemCode").toString());//ItemId:147
+                    gd.setItemCode(jsonObj.get("itemCode").toString());//ItemIdTax:147
                     gd.setQty(Double.toString(ChangedQty));
                     gd.setUnitOfMeasure(jsonObj.get("unitOfMeasure").toString());
                     gd.setTotal(Double.toString(ChangedAmt));
@@ -1389,7 +1389,12 @@ public class InvoiceBean implements Serializable {
     public TransItem getTransItemFromList(String aItemCode, List<TransItem> aTransItems) {
         TransItem ti = new TransItem();
         for (int i = 0; i < aTransItems.size(); i++) {
-            if (aItemCode.equals(Long.toString(aTransItems.get(i).getItemId())) && aTransItems.get(i).getItem_no() == 0) {
+            long ItemId = 0;
+            try {
+                ItemId = new Item_tax_mapBean().getItem_tax_mapByIdTax(aItemCode).getItem_id();
+            } catch (Exception e) {
+            }
+            if (ItemId == aTransItems.get(i).getItemId() && aTransItems.get(i).getItem_no() == 0) {
                 ti.setItemQty(aTransItems.get(i).getItemQty());
                 ti.setAmountIncVat(aTransItems.get(i).getAmountIncVat());
                 ti.setUnitVat(aTransItems.get(i).getUnitVat());
@@ -1401,14 +1406,15 @@ public class InvoiceBean implements Serializable {
         return ti;
     }
 
-    public List<TransItem> convertJsonGoodsArrayToList(JSONArray ajSONArray) {
+    public List<TransItem> convertJsonGoodsArrayToList_Del(JSONArray ajSONArray) {
         List<TransItem> tis = new ArrayList<>();
         TransItem ti = null;
         for (int i = 0; i < ajSONArray.length(); i++) {
             ti = new TransItem();
             //ti.setItem_no(Integer.parseInt(ajSONArray.getJSONObject(i).get("orderNumber").toString()));
             ti.setItem_no(0);
-            ti.setItemId(Long.parseLong(ajSONArray.getJSONObject(i).get("itemCode").toString()));
+            //needs to be set from code
+            //ti.setItemId(Long.parseLong(ajSONArray.getJSONObject(i).get("itemCode").toString()));
             ti.setItemQty(Double.parseDouble(ajSONArray.getJSONObject(i).get("qty").toString()));
             ti.setAmountIncVat(Double.parseDouble(ajSONArray.getJSONObject(i).get("total").toString()));
             ti.setUnitVat(Double.parseDouble(ajSONArray.getJSONObject(i).get("tax").toString()));
