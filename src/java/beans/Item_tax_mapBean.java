@@ -217,6 +217,10 @@ public class Item_tax_mapBean implements Serializable {
         }
     }
 
+    public void saveItem_tax_mapManual(Item_tax_map aItem_tax_map) {
+        int x = this.saveItem_tax_map(aItem_tax_map);
+    }
+
     public int saveItem_tax_map(Item_tax_map aItem_tax_map) {
         int saved = 0;
         String sql = "{call sp_save_item_tax_map(?,?,?,?,?)}";

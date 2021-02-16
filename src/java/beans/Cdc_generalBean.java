@@ -3,7 +3,6 @@ package beans;
 import connections.DBConnection;
 import entities.Cdc_general;
 import entities.CompanySetting;
-import entities.Parameter_list;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -19,6 +18,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import utilities.SecurityPKI;
 import utilities.UtilityBean;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 /*
  * To change this template, choose Tools | Templates
@@ -33,7 +34,8 @@ import utilities.UtilityBean;
 public class Cdc_generalBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    static Logger LOGGER = Logger.getLogger(Cdc_generalBean.class.getName());
+    
     private String ActionMessage = null;
     private List<Cdc_general> Cdc_generalObjectList;
     private Cdc_general Cdc_generalObj;
@@ -110,8 +112,8 @@ public class Cdc_generalBean implements Serializable {
             } catch (NullPointerException npe) {
                 aCdc_general.setAcc_period_id(0);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -195,7 +197,7 @@ public class Cdc_generalBean implements Serializable {
             }
             NewNo = NewNo + 1;
         } catch (Exception e) {
-            System.err.println("getNewSnapshot_no:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return NewNo;
     }
@@ -212,8 +214,8 @@ public class Cdc_generalBean implements Serializable {
                 coa = new Cdc_general();
                 this.setCdc_generalFromResultset(coa, rs);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return coa;
     }
@@ -231,7 +233,7 @@ public class Cdc_generalBean implements Serializable {
                 this.setCdc_generalFromResultset(cg, rs);
             }
         } catch (Exception e) {
-            System.err.println("getCdc_generalByJobId:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return cg;
     }
@@ -249,7 +251,7 @@ public class Cdc_generalBean implements Serializable {
                 this.setCdc_generalFromResultset(cg, rs);
             }
         } catch (Exception e) {
-            System.err.println("getLatestCdc_generalSTOCK:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return cg;
     }
@@ -267,7 +269,7 @@ public class Cdc_generalBean implements Serializable {
                 this.setCdc_generalFromResultset(cg, rs);
             }
         } catch (Exception e) {
-            System.err.println("getLatestCdc_generalAESPK:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return cg;
     }
@@ -285,7 +287,7 @@ public class Cdc_generalBean implements Serializable {
                 this.setCdc_generalFromResultset(cg, rs);
             }
         } catch (Exception e) {
-            System.err.println("getLatestCdc_generalCASH:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return cg;
     }
@@ -385,7 +387,7 @@ public class Cdc_generalBean implements Serializable {
                 this.saveCdc_general(cdcgenUpdate);
             }
         } catch (Exception e) {
-            System.out.println("takeNewSnapshot_stock:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 

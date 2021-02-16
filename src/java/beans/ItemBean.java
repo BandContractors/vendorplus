@@ -36,6 +36,7 @@ import utilities.CustomValidator;
 import utilities.UtilityBean;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.primefaces.event.TabChangeEvent;
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -75,6 +76,7 @@ public class ItemBean implements Serializable {
     private Item_unspsc Item_unspscObj;
     private List<Item_unspsc> Item_unspscList;
     private String SearchUNSPSC = "";
+    private Item_tax_map Item_tax_mapObj;
 
     public void refreshInventoryType(Item aItem, String aItemPurpose) {
         try {
@@ -1036,6 +1038,36 @@ public class ItemBean implements Serializable {
             if (itmap != null) {
                 this.ItemObj.setItem_code_tax(itmap.getItem_code_tax());
                 this.ItemObj.setIs_synced_tax(itmap.getIs_synced());
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void onUNSPSCTabChange(TabChangeEvent event) {
+        if (event.getTab().getTitle().equals("Manage")) {
+            this.displayUNSPSC();
+        }
+    }
+
+    public void displayUNSPSC() {
+        try {
+            //forst clear
+            this.Item_tax_mapObj.setItem_tax_map_id(0);
+            this.Item_tax_mapObj.setDescription("");
+            this.Item_tax_mapObj.setItem_id(0);
+            this.Item_tax_mapObj.setItem_id_tax("");
+            this.Item_tax_mapObj.setItem_code_tax("");
+            this.Item_tax_mapObj.setIs_synced(0);
+            //set
+            this.Item_tax_mapObj.setDescription(this.ItemObj.getDescription());
+            Item_tax_map im = new Item_tax_mapBean().getItem_tax_map(this.ItemObj.getItemId());
+            if (im != null) {
+                this.Item_tax_mapObj.setItem_tax_map_id(im.getItem_tax_map_id());
+                this.Item_tax_mapObj.setItem_id(im.getItem_id());
+                this.Item_tax_mapObj.setItem_id_tax(im.getItem_id_tax());
+                this.Item_tax_mapObj.setItem_code_tax(im.getItem_code_tax());
+                this.Item_tax_mapObj.setIs_synced(im.getIs_synced());
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -2130,6 +2162,16 @@ public class ItemBean implements Serializable {
         }
     }
 
+    public void initItem_tax_mapObj() {
+        if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
+            // Skip ajax requests.
+        } else {
+            if (null == this.Item_tax_mapObj) {
+                this.Item_tax_mapObj = new Item_tax_map();
+            }
+        }
+    }
+
     public void initStockLocation() {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -2624,5 +2666,19 @@ public class ItemBean implements Serializable {
      */
     public void setSearchUNSPSC(String SearchUNSPSC) {
         this.SearchUNSPSC = SearchUNSPSC;
+    }
+
+    /**
+     * @return the Item_tax_mapObj
+     */
+    public Item_tax_map getItem_tax_mapObj() {
+        return Item_tax_mapObj;
+    }
+
+    /**
+     * @param Item_tax_mapObj the Item_tax_mapObj to set
+     */
+    public void setItem_tax_mapObj(Item_tax_map Item_tax_mapObj) {
+        this.Item_tax_mapObj = Item_tax_mapObj;
     }
 }
