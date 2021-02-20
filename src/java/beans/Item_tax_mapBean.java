@@ -12,8 +12,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.List;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
@@ -124,6 +126,26 @@ public class Item_tax_mapBean implements Serializable {
         }
     }
 
+    public Item_tax_map getItem_tax_mapSyncedByName(String aItemName) {
+        String sql = "SELECT * FROM item_tax_map WHERE is_synced=1 AND item_id=(select item_id from item where description='" + aItemName + "')";
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                Item_tax_map im = new Item_tax_map();
+                this.setItem_tax_mapFromResultset(im, rs);
+                return im;
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+            return null;
+        }
+    }
+
     public int countItemsMappedSynced(List<TransItem> aTransItems) {
         int ItemsMappedSynced = 0;
         String ComaSepIdStr = new utilities.UtilityBean().getCommaSeperatedItemIds(aTransItems);
@@ -187,7 +209,7 @@ public class Item_tax_mapBean implements Serializable {
                         itmap4save.setIs_synced(0);
                         int x = this.saveItem_tax_map(itmap4save);
                         if (x == 1 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {//register to URA
-                            new StockManage().registerItemCallThread(ItemId, itmap4save.getItem_id_tax(), aItemCodeTax);
+                            new StockManage().registerItemCall(ItemId, itmap4save.getItem_id_tax(), aItemCodeTax);
                         }
                     } else {//update
                         if (itmap.getItem_code_tax().equals(aItemCodeTax) && itmap.getIs_synced() == 1) {
@@ -206,7 +228,7 @@ public class Item_tax_mapBean implements Serializable {
                             itmap4save.setIs_synced(0);
                             int x = this.saveItem_tax_map(itmap4save);
                             if (x == 1 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {//register to URA
-                                new StockManage().registerItemCallThread(ItemId, itmap4save.getItem_id_tax(), aItemCodeTax);
+                                new StockManage().registerItemCall(ItemId, itmap4save.getItem_id_tax(), aItemCodeTax);
                             }
                         }
                     }
@@ -217,8 +239,24 @@ public class Item_tax_mapBean implements Serializable {
         }
     }
 
-    public void saveItem_tax_mapManual(Item_tax_map aItem_tax_map) {
-        int x = this.saveItem_tax_map(aItem_tax_map);
+    public void saveItem_tax_mapLocal(Item_tax_map aItem_tax_map) {
+        int x = 0;
+        if (null == aItem_tax_map) {
+            x = 0;
+        } else if (aItem_tax_map.getItem_id() == 0) {
+            x = 0;
+        } else if (aItem_tax_map.getItem_id_tax().length() == 0) {
+            x = 0;
+        } else if (aItem_tax_map.getItem_code_tax().length() == 0) {
+            x = 0;
+        } else {
+            x = this.saveItem_tax_map(aItem_tax_map);
+        }
+        if (x == 1) {
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Success : Local Configuration!"));
+        } else {
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Failure : Local Configuration!"));
+        }
     }
 
     public int saveItem_tax_map(Item_tax_map aItem_tax_map) {

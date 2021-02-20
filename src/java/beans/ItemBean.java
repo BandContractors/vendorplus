@@ -1,5 +1,7 @@
 package beans;
 
+import api_tax.efris.innerclasses.ItemTax;
+import api_tax.efris_bean.StockManage;
 import sessions.GeneralUserSetting;
 import connections.DBConnection;
 import entities.Category;
@@ -9,6 +11,7 @@ import entities.Item_tax_map;
 import entities.Item_unspsc;
 import entities.Location;
 import entities.Stock;
+import entities.Unit;
 import entities.UserDetail;
 import java.io.File;
 import java.io.IOException;
@@ -77,6 +80,7 @@ public class ItemBean implements Serializable {
     private List<Item_unspsc> Item_unspscList;
     private String SearchUNSPSC = "";
     private Item_tax_map Item_tax_mapObj;
+    private ItemTax ItemTaxObj;
 
     public void refreshInventoryType(Item aItem, String aItemPurpose) {
         try {
@@ -148,7 +152,21 @@ public class ItemBean implements Serializable {
             try {
                 if (this.saveValidatedItem(this.ItemObj) == 1) {
                     new Item_tax_mapBean().saveItem_tax_mapCall(this.ItemObj.getDescription(), this.ItemObj.getItem_code_tax(), "");
-                    this.setActionMessage("Saved Successfully");
+                    //check sync status
+                    String SyncStatus = "";
+                    if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
+                        if (null == new Item_tax_mapBean().getItem_tax_mapSyncedByName(this.ItemObj.getDescription())) {
+                            SyncStatus = "Synced:No";
+                        } else {
+                            SyncStatus = "Synced:Yes";
+                        }
+                    }
+                    //display Message
+                    if (SyncStatus.length() == 0) {
+                        this.setActionMessage("Saved Successfully");
+                    } else {
+                        this.setActionMessage("Saved Successfully" + ", " + SyncStatus);
+                    }
                     this.clearItem();
                     this.refreshStockLocation(0);
                 } else {
@@ -1052,22 +1070,50 @@ public class ItemBean implements Serializable {
 
     public void displayUNSPSC() {
         try {
-            //forst clear
+            //clear TaxMap
             this.Item_tax_mapObj.setItem_tax_map_id(0);
             this.Item_tax_mapObj.setDescription("");
             this.Item_tax_mapObj.setItem_id(0);
             this.Item_tax_mapObj.setItem_id_tax("");
             this.Item_tax_mapObj.setItem_code_tax("");
             this.Item_tax_mapObj.setIs_synced(0);
-            //set
-            this.Item_tax_mapObj.setDescription(this.ItemObj.getDescription());
-            Item_tax_map im = new Item_tax_mapBean().getItem_tax_map(this.ItemObj.getItemId());
-            if (im != null) {
-                this.Item_tax_mapObj.setItem_tax_map_id(im.getItem_tax_map_id());
-                this.Item_tax_mapObj.setItem_id(im.getItem_id());
-                this.Item_tax_mapObj.setItem_id_tax(im.getItem_id_tax());
-                this.Item_tax_mapObj.setItem_code_tax(im.getItem_code_tax());
-                this.Item_tax_mapObj.setIs_synced(im.getIs_synced());
+            this.Item_tax_mapObj.setUnit_code_tax("");
+            //clear ItemTax
+            this.ItemTaxObj.setGoodsCode("");
+            this.ItemTaxObj.setGoodsName("");
+            this.ItemTaxObj.setCommodityCategoryCode("");
+            this.ItemTaxObj.setMeasureUnit("");
+            if (this.ItemObj.getItemId() > 0 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
+                //set TaxMap
+                this.Item_tax_mapObj.setDescription(this.ItemObj.getDescription());
+                Item_tax_map im = new Item_tax_mapBean().getItem_tax_map(this.ItemObj.getItemId());
+                if (im != null) {
+                    this.Item_tax_mapObj.setItem_tax_map_id(im.getItem_tax_map_id());
+                    this.Item_tax_mapObj.setItem_id(im.getItem_id());
+                    this.Item_tax_mapObj.setItem_id_tax(im.getItem_id_tax());
+                    this.Item_tax_mapObj.setItem_code_tax(im.getItem_code_tax());
+                    this.Item_tax_mapObj.setIs_synced(im.getIs_synced());
+                }
+                Unit un = new UnitBean().getUnit(this.ItemObj.getUnitId());
+                if (un != null) {
+                    this.Item_tax_mapObj.setUnit_code_tax(un.getUnit_symbol_tax());
+                }
+                //set ItemTax
+                if (this.Item_tax_mapObj.getItem_id_tax().length() > 0) {
+                    String APIMode = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_MODE").getParameter_value();
+                    ItemTax it = null;
+                    if (APIMode.equals("OFFLINE")) {
+                        it = new StockManage().getItemFromTaxOffline(this.Item_tax_mapObj.getItem_id_tax());
+                    } else {
+                        it = new StockManage().getItemFromTaxOnline(this.Item_tax_mapObj.getItem_id_tax());
+                    }
+                    if (it != null) {
+                        this.ItemTaxObj.setGoodsCode(it.getGoodsCode());
+                        this.ItemTaxObj.setGoodsName(it.getGoodsName());
+                        this.ItemTaxObj.setCommodityCategoryCode(it.getCommodityCategoryCode());
+                        this.ItemTaxObj.setMeasureUnit(it.getMeasureUnit());
+                    }
+                }
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -2172,6 +2218,16 @@ public class ItemBean implements Serializable {
         }
     }
 
+    public void initItemTaxObj() {
+        if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
+            // Skip ajax requests.
+        } else {
+            if (null == this.ItemTaxObj) {
+                this.ItemTaxObj = new ItemTax();
+            }
+        }
+    }
+
     public void initStockLocation() {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -2680,5 +2736,19 @@ public class ItemBean implements Serializable {
      */
     public void setItem_tax_mapObj(Item_tax_map Item_tax_mapObj) {
         this.Item_tax_mapObj = Item_tax_mapObj;
+    }
+
+    /**
+     * @return the ItemTaxObj
+     */
+    public ItemTax getItemTaxObj() {
+        return ItemTaxObj;
+    }
+
+    /**
+     * @param ItemTaxObj the ItemTaxObj to set
+     */
+    public void setItemTaxObj(ItemTax ItemTaxObj) {
+        this.ItemTaxObj = ItemTaxObj;
     }
 }

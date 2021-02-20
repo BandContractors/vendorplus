@@ -26,6 +26,7 @@
     <f:event listener="#{itemBean.initStockLocation()}" type="preRenderView" />
     <f:event listener="#{itemBean.initItemObj()}" type="preRenderView" />
     <f:event listener="#{itemBean.initItem_tax_mapObj()}" type="preRenderView" />
+    <f:event listener="#{itemBean.initItemTaxObj()}" type="preRenderView" />
     <f:event listener="#{itemBean.refreshInventoryType(itemBean.itemObj,generalUserSetting.currentItemPurpose)}" type="preRenderView" />
     <h:body>
         <h:form enctype="multipart/form-data" id="formMain" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
@@ -190,7 +191,7 @@
                         <f:selectItem itemLabel="No" itemValue="0"/>
                         <f:selectItem itemLabel="Yes" itemValue="1"/>
                     </h:selectOneMenu>
-                    <p:commandLink value="UN Item Code" oncomplete="PF('sbarUNSPSC').show()"/>
+                    <p:commandLink value="UNSPC Code" action="#{itemBean.displayUNSPSC()}" oncomplete="PF('sbarUNSPSC').show()" update="formMain:tabvUNSPC:pnlgManage"/>
                     <h:inputText id="itxtUNSPSC" value="#{itemBean.itemObj.item_code_tax}" autocomplete="off" style="width: 193px;color:#{itemBean.itemObj.is_synced_tax eq 1 ? '#238823':'#d2222d'};"/>
                     <h:outputLabel value="Show General Name?" title="Show General Name?"/>
                     <h:selectOneMenu id="menuOverrideGenName" value="#{itemBean.itemObj.override_gen_name}" style="width: 200px">
@@ -357,7 +358,6 @@
             </p:dataTable>
             <p:sidebar widgetVar="sbarUNSPSC" position="bottom" baseZIndex="10000" style="height: 600px;">
                 <p:tabView id="tabvUNSPC">
-                    <p:ajax event="tabChange" listener="#{itemBean.onUNSPSCTabChange}" update="formMain:tabvUNSPC:pnlgManage1 formMain:tabvUNSPC:pnlgManage2"/>
                     <p:tab title="Search">
                         <h:panelGrid columns="1">
                             <h:outputLabel value="United Nations Standard Products and Services Code (UNSPSC)" style="font-weight: bold;"/>
@@ -403,23 +403,37 @@
                         </h:panelGrid>
                     </p:tab>
                     <p:tab title="Manage">
-                        <h:panelGrid id="pnlgManage1" columns="1">
-                            <h:outputLabel value="#{itemBean.item_tax_mapObj.description}" style="font-weight: bold;"/>
+                        <h:panelGrid id="pnlgManage" columns="2">
+                            <h:panelGrid columns="1">
+                                <h:inputText value="Local Configuration for ID:#{itemBean.item_tax_mapObj.item_id_tax}" disabled="true" style="width: 280px;background-color: black;color: white;"/>
+                                <h:outputLabel value="Item Description:"/>
+                                <h:inputText value="#{itemBean.item_tax_mapObj.description}" disabled="true" style="width: 280px;color:#{itemBean.item_tax_mapObj.description eq itemBean.itemTaxObj.goodsName ? '#238823':'#d2222d'};"/>
+                                <h:outputLabel value="Unit Code:"/>
+                                <h:inputText value="#{itemBean.item_tax_mapObj.unit_code_tax}" disabled="true" style="width: 280px;color:#{itemBean.item_tax_mapObj.unit_code_tax eq itemBean.itemTaxObj.measureUnit ? '#238823':'#d2222d'};"/>
+                                <h:outputLabel value="My Item Code:"/>
+                                <h:inputText value="#{itemBean.item_tax_mapObj.item_id_tax}" style="width: 280px;color:#{itemBean.item_tax_mapObj.item_id_tax eq itemBean.itemTaxObj.goodsCode ? '#238823':'#d2222d'};"/>
+                                <h:outputLabel value="UNSPC Code:"/>
+                                <h:inputText value="#{itemBean.item_tax_mapObj.item_code_tax}" style="width: 280px;color:#{itemBean.item_tax_mapObj.item_code_tax eq itemBean.itemTaxObj.commodityCategoryCode ? '#238823':'#d2222d'};"/>
+                                <h:outputLabel value="Synced"/>
+                                <h:selectOneMenu value="#{itemBean.item_tax_mapObj.is_synced}" style="width: 280px">
+                                    <f:selectItem itemLabel="No" itemValue="0"/>
+                                    <f:selectItem itemLabel="Yes" itemValue="1"/>
+                                </h:selectOneMenu>
+                                <p:commandButton value="Update Local Configuration" actionListener="#{item_tax_mapBean.saveItem_tax_mapLocal(itemBean.item_tax_mapObj)}" style="width: 280px" update="growl2"/>
+                            </h:panelGrid>
+                            <h:panelGrid columns="1">
+                                <h:inputText value="Tax Configuration for ID:#{itemBean.item_tax_mapObj.item_id_tax}" disabled="true" style="width: 280px;background-color: black;color: white;"/>
+                                <h:outputLabel value="Goods Name:"/>
+                                <h:inputText value="#{itemBean.itemTaxObj.goodsName}" disabled="true" style="width: 280px"/>
+                                <h:outputLabel value="Unit Code:"/>
+                                <h:inputText value="#{itemBean.itemTaxObj.measureUnit}" disabled="true" style="width: 280px"/>
+                                <h:outputLabel value="Goods Code:"/>
+                                <h:inputText value="#{itemBean.itemTaxObj.goodsCode}" disabled="true" style="width: 280px"/>
+                                <h:outputLabel value="Category Code:"/>
+                                <h:inputText value="#{itemBean.itemTaxObj.commodityCategoryCode}" disabled="true" style="width: 280px"/>
+                            </h:panelGrid>
                         </h:panelGrid>
-                        <h:panelGrid id="pnlgManage2" columns="6">
-                            <h:outputLabel value="My Code:"/>
-                            <h:inputText value="#{itemBean.item_tax_mapObj.item_id_tax}"/>
-                            <h:outputLabel value="UN Item Code:"/>
-                            <h:inputText value="#{itemBean.item_tax_mapObj.item_code_tax}"/>
-                            <h:outputLabel value="Synced"/>
-                            <h:selectOneMenu value="#{itemBean.item_tax_mapObj.is_synced}" style="width: 70px">
-                                <f:selectItem itemLabel="No" itemValue="0"/>
-                                <f:selectItem itemLabel="Yes" itemValue="1"/>
-                            </h:selectOneMenu>
-                        </h:panelGrid>
-                        <h:panelGrid columns="2">
-                            <p:commandButton value="Update Local Database" actionListener="#{item_tax_mapBean.saveItem_tax_mapManual(itemBean.item_tax_mapObj)}"/>
-                        </h:panelGrid>
+                        <p:growl id="growl2"/>
                     </p:tab>
                 </p:tabView>
 

@@ -165,6 +165,9 @@
                         <p:column headerText="#{companySetting.getStoreEquivName()}" style="text-align: left;" rendered="#{transBean.fieldName.equals('store_id')}">
                             <h:outputText value="#{sm.storeName}" rendered="#{sm.storeId>0}"/>
                         </p:column>
+                        <p:column headerText="Trans." style="text-align: left;">
+                            <h:outputText value="#{sm.transactionTypeName}"/>
+                        </p:column>
                         <p:column headerText="Status" style="text-align: left;">
                             <h:outputText value="#{sm.sync_flag}"/>
                         </p:column>

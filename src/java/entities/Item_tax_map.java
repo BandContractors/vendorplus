@@ -17,6 +17,7 @@ public class Item_tax_map implements Serializable {
     private Date add_date;
     private int is_synced;
     private String description;
+    private String unit_code_tax;
 
     /**
      * @return the item_tax_map_id
@@ -114,6 +115,20 @@ public class Item_tax_map implements Serializable {
      */
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    /**
+     * @return the unit_code_tax
+     */
+    public String getUnit_code_tax() {
+        return unit_code_tax;
+    }
+
+    /**
+     * @param unit_code_tax the unit_code_tax to set
+     */
+    public void setUnit_code_tax(String unit_code_tax) {
+        this.unit_code_tax = unit_code_tax;
     }
 
 }

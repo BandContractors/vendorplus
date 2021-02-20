@@ -10845,22 +10845,22 @@ public class TransBean implements Serializable {
             //2. summary
             String sqlsum = "";
             if (aTransBean.getFieldName().length() > 0) {
-                sqlsum = "SELECT " + aTransBean.getFieldName() + ",sync_flag,currency_code,sum(grand_total) as grand_total,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount FROM (" + sql + ") as b ";
+                sqlsum = "SELECT " + aTransBean.getFieldName() + ",transaction_type_id,sync_flag,currency_code,sum(grand_total) as grand_total,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount FROM (" + sql + ") as b ";
             } else {
-                sqlsum = "SELECT sync_flag,currency_code,sum(grand_total) as grand_total,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount FROM (" + sql + ") as b ";
+                sqlsum = "SELECT transaction_type_id,sync_flag,currency_code,sum(grand_total) as grand_total,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount FROM (" + sql + ") as b ";
             }
 
             String OrderAppendSum = "";
             String GroupAppendSum = "";
             if (aTransBean.getFieldName().length() > 0) {
-                GroupAppendSum = " GROUP BY " + aTransBean.getFieldName() + ",sync_flag,currency_code";
+                GroupAppendSum = " GROUP BY " + aTransBean.getFieldName() + ",transaction_type_id,sync_flag,currency_code";
             } else {
-                GroupAppendSum = " GROUP BY sync_flag,currency_code";
+                GroupAppendSum = " GROUP BY transaction_type_id,sync_flag,currency_code";
             }
             if (aTransBean.getFieldName().length() > 0) {
-                OrderAppendSum = " ORDER BY " + aTransBean.getFieldName() + ",sync_flag,currency_code";
+                OrderAppendSum = " ORDER BY " + aTransBean.getFieldName() + ",transaction_type_id,sync_flag,currency_code";
             } else {
-                OrderAppendSum = " ORDER BY sync_flag,currency_code";
+                OrderAppendSum = " ORDER BY transaction_type_id,sync_flag,currency_code";
             }
             sqlsum = sqlsum + GroupAppendSum + OrderAppendSum;
             try (
@@ -10917,6 +10917,11 @@ public class TransBean implements Serializable {
                                 }
                                 break;
                         }
+                    }
+                    try {
+                        transsum.setTransactionTypeName(new TransactionTypeBean().getTransactionType(rs.getInt("transaction_type_id")).getTransactionTypeName());
+                    } catch (NullPointerException npe) {
+                        transsum.setTransactionTypeName("");
                     }
                     try {
                         transsum.setSync_flag(rs.getString("sync_flag"));
