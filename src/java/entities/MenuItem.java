@@ -1,8 +1,6 @@
 package entities;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 
@@ -32,6 +30,8 @@ public class MenuItem implements Serializable {
     private String LOC_LEVEL_2_LABEL;
     private String LOC_LEVEL_3_LABEL;
     private String DEFAULT_FOCUS_CONTROL_ID;
+    private int ENABLE_AUTO_COMPLETE_ITEM_SEARCH;
+    
 
     /**
      * @return the SYSTEM_NAME
@@ -213,5 +213,19 @@ public class MenuItem implements Serializable {
      */
     public void setDEFAULT_FOCUS_CONTROL_ID(String DEFAULT_FOCUS_CONTROL_ID) {
         this.DEFAULT_FOCUS_CONTROL_ID = DEFAULT_FOCUS_CONTROL_ID;
+    }
+
+    /**
+     * @return the ENABLE_AUTO_COMPLETE_ITEM_SEARCH
+     */
+    public int getENABLE_AUTO_COMPLETE_ITEM_SEARCH() {
+        return ENABLE_AUTO_COMPLETE_ITEM_SEARCH;
+    }
+
+    /**
+     * @param ENABLE_AUTO_COMPLETE_ITEM_SEARCH the ENABLE_AUTO_COMPLETE_ITEM_SEARCH to set
+     */
+    public void setENABLE_AUTO_COMPLETE_ITEM_SEARCH(int ENABLE_AUTO_COMPLETE_ITEM_SEARCH) {
+        this.ENABLE_AUTO_COMPLETE_ITEM_SEARCH = ENABLE_AUTO_COMPLETE_ITEM_SEARCH;
     }
 }

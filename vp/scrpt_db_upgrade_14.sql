@@ -153,4 +153,9 @@ CHANGE COLUMN item_id_tax item_id_tax VARCHAR(50) NULL DEFAULT NULL ;
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_14',153,Now(),'6.0','');
 
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (71, 'COMPANY_SETTING', 'ENABLE_AUTO_COMPLETE_ITEM_SEARCH', '1','possible values: 1 or 0: Enables(1) or disables(0) auto complete on items search where manual search is available.');
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_14',158,Now(),'6.0','');
+
 

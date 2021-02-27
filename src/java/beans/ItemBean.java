@@ -22,7 +22,6 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -1268,7 +1267,7 @@ public class ItemBean implements Serializable {
         String sql;
         sql = "{call sp_search_item_by_code_desc(?)}";
         ResultSet rs = null;
-        this.ItemObjectList = new ArrayList<Item>();
+        this.setItemObjectList(new ArrayList<Item>());
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -1278,12 +1277,12 @@ public class ItemBean implements Serializable {
                 Item item = new Item();
                 this.setItemFromResultset(item, rs);
                 this.updateLookUpsUI(item);
-                this.ItemObjectList.add(item);
+                this.getItemObjectList().add(item);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-        return ItemObjectList;
+        return getItemObjectList();
     }
 
     public List<Item> getItemObjectListActive(String Query) {
@@ -1291,7 +1290,7 @@ public class ItemBean implements Serializable {
         String sql;
         sql = "{call sp_search_item_active_by_code_desc(?)}";
         ResultSet rs = null;
-        this.ItemObjectList = new ArrayList<Item>();
+        this.setItemObjectList(new ArrayList<Item>());
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -1300,12 +1299,12 @@ public class ItemBean implements Serializable {
             while (rs.next()) {
                 Item item = new Item();
                 this.setItemFromResultset(item, rs);
-                this.ItemObjectList.add(item);
+                this.getItemObjectList().add(item);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-        return ItemObjectList;
+        return getItemObjectList();
     }
 
     public void updateLookUpsUI(Item aItem) {
@@ -1346,7 +1345,7 @@ public class ItemBean implements Serializable {
         String sql;
         sql = "{call sp_search_item_for_sale(?)}";
         ResultSet rs = null;
-        this.ItemObjectList = new ArrayList<Item>();
+        this.setItemObjectList(new ArrayList<>());
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -1356,12 +1355,12 @@ public class ItemBean implements Serializable {
                 Item item = new Item();
                 this.setItemFromResultset(item, rs);
                 this.updateLookUpsUI(item);
-                this.ItemObjectList.add(item);
+                this.getItemObjectList().add(item);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-        return ItemObjectList;
+        return getItemObjectList();
     }
 
     public List<Item_unspsc> getItem_unspscObjectList(String Query) {
@@ -1389,7 +1388,7 @@ public class ItemBean implements Serializable {
         String sql;
         sql = "{call sp_search_item_for_production(?)}";
         ResultSet rs = null;
-        this.ItemObjectList = new ArrayList<Item>();
+        this.setItemObjectList(new ArrayList<Item>());
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -1399,12 +1398,12 @@ public class ItemBean implements Serializable {
                 Item item = new Item();
                 this.setItemFromResultset(item, rs);
                 this.updateLookUpsUI(item);
-                this.ItemObjectList.add(item);
+                this.getItemObjectList().add(item);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-        return ItemObjectList;
+        return getItemObjectList();
     }
 
     public List<Item> getItemObjectListForHire(String Query) {
@@ -1412,7 +1411,7 @@ public class ItemBean implements Serializable {
         String sql;
         sql = "{call sp_search_item_for_hire(?)}";
         ResultSet rs = null;
-        this.ItemObjectList = new ArrayList<Item>();
+        this.setItemObjectList(new ArrayList<Item>());
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -1421,12 +1420,12 @@ public class ItemBean implements Serializable {
             while (rs.next()) {
                 Item item = new Item();
                 this.setItemFromResultset(item, rs);
-                this.ItemObjectList.add(item);
+                this.getItemObjectList().add(item);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-        return ItemObjectList;
+        return getItemObjectList();
     }
 
     public List<Item> getItemObjectListForStockDispose(String Query) {
@@ -1434,7 +1433,7 @@ public class ItemBean implements Serializable {
         String sql;
         sql = "{call sp_search_item_for_stock_dispose(?)}";
         ResultSet rs = null;
-        this.ItemObjectList = new ArrayList<Item>();
+        this.setItemObjectList(new ArrayList<Item>());
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -1443,12 +1442,12 @@ public class ItemBean implements Serializable {
             while (rs.next()) {
                 Item item = new Item();
                 this.setItemFromResultset(item, rs);
-                this.ItemObjectList.add(item);
+                this.getItemObjectList().add(item);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-        return ItemObjectList;
+        return getItemObjectList();
     }
 
     public List<Item> getItemObjectListForConsumption(String Query) {
@@ -1456,7 +1455,7 @@ public class ItemBean implements Serializable {
         String sql;
         sql = "{call sp_search_item_for_consumption(?)}";
         ResultSet rs = null;
-        this.ItemObjectList = new ArrayList<Item>();
+        this.setItemObjectList(new ArrayList<Item>());
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -1465,12 +1464,12 @@ public class ItemBean implements Serializable {
             while (rs.next()) {
                 Item item = new Item();
                 this.setItemFromResultset(item, rs);
-                this.ItemObjectList.add(item);
+                this.getItemObjectList().add(item);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-        return ItemObjectList;
+        return getItemObjectList();
     }
 
     public List<Item> getItemObjectListForTransfer(String Query) {
@@ -1478,7 +1477,7 @@ public class ItemBean implements Serializable {
         String sql;
         sql = "{call sp_search_item_for_transfer(?)}";
         ResultSet rs = null;
-        this.ItemObjectList = new ArrayList<Item>();
+        this.setItemObjectList(new ArrayList<Item>());
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -1487,12 +1486,12 @@ public class ItemBean implements Serializable {
             while (rs.next()) {
                 Item item = new Item();
                 this.setItemFromResultset(item, rs);
-                this.ItemObjectList.add(item);
+                this.getItemObjectList().add(item);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-        return ItemObjectList;
+        return getItemObjectList();
     }
 
     public List<Item> getItemObjectListForUnpack(String Query) {
@@ -1500,7 +1499,7 @@ public class ItemBean implements Serializable {
         String sql;
         sql = "{call sp_search_item_for_unpack(?)}";
         ResultSet rs = null;
-        this.ItemObjectList = new ArrayList<Item>();
+        this.setItemObjectList(new ArrayList<Item>());
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -1509,12 +1508,12 @@ public class ItemBean implements Serializable {
             while (rs.next()) {
                 Item item = new Item();
                 this.setItemFromResultset(item, rs);
-                this.ItemObjectList.add(item);
+                this.getItemObjectList().add(item);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-        return ItemObjectList;
+        return getItemObjectList();
     }
 
     public List<Item> getItemObjectListForPurchase(String Query) {
@@ -1522,7 +1521,7 @@ public class ItemBean implements Serializable {
         String sql;
         sql = "{call sp_search_item_for_purchase(?)}";
         ResultSet rs = null;
-        this.ItemObjectList = new ArrayList<Item>();
+        this.setItemObjectList(new ArrayList<Item>());
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -1531,12 +1530,12 @@ public class ItemBean implements Serializable {
             while (rs.next()) {
                 Item item = new Item();
                 this.setItemFromResultset(item, rs);
-                this.ItemObjectList.add(item);
+                this.getItemObjectList().add(item);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-        return ItemObjectList;
+        return getItemObjectList();
     }
 
     public List<Item> getItemObjectListForReceiveGoods(String Query) {
@@ -1544,7 +1543,7 @@ public class ItemBean implements Serializable {
         String sql;
         sql = "{call sp_search_item_for_receive_goods(?)}";
         ResultSet rs = null;
-        this.ItemObjectList = new ArrayList<>();
+        this.setItemObjectList(new ArrayList<>());
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -1553,12 +1552,12 @@ public class ItemBean implements Serializable {
             while (rs.next()) {
                 Item item = new Item();
                 this.setItemFromResultset(item, rs);
-                this.ItemObjectList.add(item);
+                this.getItemObjectList().add(item);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-        return ItemObjectList;
+        return getItemObjectList();
     }
 
     public List<Item> getItemObjectListForReceiveExpenses(String Query) {
@@ -1566,7 +1565,7 @@ public class ItemBean implements Serializable {
         String sql;
         sql = "{call sp_search_item_for_receive_expenses(?)}";
         ResultSet rs = null;
-        this.ItemObjectList = new ArrayList<>();
+        this.setItemObjectList(new ArrayList<>());
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -1575,12 +1574,12 @@ public class ItemBean implements Serializable {
             while (rs.next()) {
                 Item item = new Item();
                 this.setItemFromResultset(item, rs);
-                this.ItemObjectList.add(item);
+                this.getItemObjectList().add(item);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-        return ItemObjectList;
+        return getItemObjectList();
     }
 
     public List<Item> getItemObjectListForReceiveAssets(String Query) {
@@ -1588,7 +1587,7 @@ public class ItemBean implements Serializable {
         String sql;
         sql = "{call sp_search_item_for_receive_assets(?)}";
         ResultSet rs = null;
-        this.ItemObjectList = new ArrayList<>();
+        this.setItemObjectList(new ArrayList<>());
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -1597,12 +1596,12 @@ public class ItemBean implements Serializable {
             while (rs.next()) {
                 Item item = new Item();
                 this.setItemFromResultset(item, rs);
-                this.ItemObjectList.add(item);
+                this.getItemObjectList().add(item);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-        return ItemObjectList;
+        return getItemObjectList();
     }
 
     public List<Item> getItemObjectListForPurchaseExpense(String Query) {
@@ -1610,7 +1609,7 @@ public class ItemBean implements Serializable {
         String sql;
         sql = "{call sp_search_item_for_purchase_expense(?)}";
         ResultSet rs = null;
-        this.ItemObjectList = new ArrayList<Item>();
+        this.setItemObjectList(new ArrayList<Item>());
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -1619,12 +1618,12 @@ public class ItemBean implements Serializable {
             while (rs.next()) {
                 Item item = new Item();
                 this.setItemFromResultset(item, rs);
-                this.ItemObjectList.add(item);
+                this.getItemObjectList().add(item);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-        return ItemObjectList;
+        return getItemObjectList();
     }
 
     public List<Item> getItemObjectListForPurchaseGoods(String Query) {
@@ -1632,7 +1631,7 @@ public class ItemBean implements Serializable {
         String sql;
         sql = "{call sp_search_item_for_purchase_goods(?)}";
         ResultSet rs = null;
-        this.ItemObjectList = new ArrayList<Item>();
+        this.setItemObjectList(new ArrayList<Item>());
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -1641,12 +1640,12 @@ public class ItemBean implements Serializable {
             while (rs.next()) {
                 Item item = new Item();
                 this.setItemFromResultset(item, rs);
-                this.ItemObjectList.add(item);
+                this.getItemObjectList().add(item);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-        return ItemObjectList;
+        return getItemObjectList();
     }
 
     public List<Item> getItemObjectListForAssetFixed(String Query) {
@@ -1654,7 +1653,7 @@ public class ItemBean implements Serializable {
         String sql;
         sql = "{call sp_search_item_for_asset_fixed(?)}";
         ResultSet rs = null;
-        this.ItemObjectList = new ArrayList<Item>();
+        this.setItemObjectList(new ArrayList<Item>());
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -1663,12 +1662,12 @@ public class ItemBean implements Serializable {
             while (rs.next()) {
                 Item item = new Item();
                 this.setItemFromResultset(item, rs);
-                this.ItemObjectList.add(item);
+                this.getItemObjectList().add(item);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-        return ItemObjectList;
+        return getItemObjectList();
     }
 
     /**
@@ -1718,7 +1717,7 @@ public class ItemBean implements Serializable {
                 + " ORDER BY description ASC";
         //System.out.println("SQL:" + sql);
         ResultSet rs = null;
-        this.ItemObjectList = new ArrayList<>();
+        this.setItemObjectList(new ArrayList<>());
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -1728,12 +1727,12 @@ public class ItemBean implements Serializable {
                 Item item = new Item();
                 this.setItemFromResultset(item, rs);
                 this.updateLookUpsUI(item);
-                this.ItemObjectList.add(item);
+                this.getItemObjectList().add(item);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-        return ItemObjectList;
+        return getItemObjectList();
     }
 
     public void refreshItemsList(String aNameOrCode) {
@@ -2326,7 +2325,7 @@ public class ItemBean implements Serializable {
         String sql;
         sql = "{call sp_search_item_for_production(?)}";
         ResultSet rs = null;
-        this.ItemObjectList = new ArrayList<Item>();
+        this.setItemObjectList(new ArrayList<Item>());
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -2336,12 +2335,12 @@ public class ItemBean implements Serializable {
                 Item item = new Item();
                 this.setItemFromResultset(item, rs);
                 this.updateLookUpsUI(item);
-                this.ItemObjectList.add(item);
+                this.getItemObjectList().add(item);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-        return ItemObjectList;
+        return getItemObjectList();
     }
 
     public List<Item> getItemObjectListForRawMaterial(String Query) {
@@ -2349,7 +2348,7 @@ public class ItemBean implements Serializable {
         String sql;
         sql = "{call sp_search_item_for_raw_material(?)}";
         ResultSet rs = null;
-        this.ItemObjectList = new ArrayList<Item>();
+        this.setItemObjectList(new ArrayList<Item>());
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -2359,12 +2358,12 @@ public class ItemBean implements Serializable {
                 Item item = new Item();
                 this.setItemFromResultset(item, rs);
                 this.updateLookUpsUI(item);
-                this.ItemObjectList.add(item);
+                this.getItemObjectList().add(item);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-        return ItemObjectList;
+        return getItemObjectList();
     }
 
     public void refreshItem_unspscList(String Query) {
@@ -2394,6 +2393,44 @@ public class ItemBean implements Serializable {
                 itemun.setService_mark(rs.getString("service_mark"));
                 this.Item_unspscList.add(itemun);
             }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void refreshItemSearchList(String Query) {
+        String sql = "{call sp_search_item_for_sale_limit100(?)}";
+        ResultSet rs = null;
+        this.setItemObjectList(new ArrayList<>());
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setString(1, Query);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Item item = new Item();
+                this.setItemFromResultset(item, rs);
+                this.updateLookUpsUI(item);
+                this.getItemObjectList().add(item);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void resetAtItemSearchList() {
+        try {
+            this.SearchItemDesc = "";
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        try {
+            this.SelectedItem = null;
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        try {
+            this.ItemObjectList.clear();
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -2750,5 +2787,12 @@ public class ItemBean implements Serializable {
      */
     public void setItemTaxObj(ItemTax ItemTaxObj) {
         this.ItemTaxObj = ItemTaxObj;
+    }
+
+    /**
+     * @return the ItemObjectList
+     */
+    public List<Item> getItemObjectList() {
+        return ItemObjectList;
     }
 }

@@ -113,6 +113,11 @@ public class MenuItemBean implements Serializable {
             } catch (NullPointerException npe) {
                 this.MenuItemObj.setDEFAULT_FOCUS_CONTROL_ID("");
             }
+            try {
+                this.MenuItemObj.setENABLE_AUTO_COMPLETE_ITEM_SEARCH(Integer.parseInt(pb.getParameter_listByContextNameMemory("COMPANY_SETTING", "ENABLE_AUTO_COMPLETE_ITEM_SEARCH").getParameter_value()));
+            } catch (NullPointerException npe) {
+                this.MenuItemObj.setENABLE_AUTO_COMPLETE_ITEM_SEARCH(1);
+            }
         } catch (Exception e) {
 
         }

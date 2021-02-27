@@ -2749,6 +2749,20 @@ BEGIN
 END//
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS sp_search_item_for_sale_limit100;
+DELIMITER //
+CREATE PROCEDURE sp_search_item_for_sale_limit100
+(
+	IN in_code_desc varchar(100)
+) 
+BEGIN  
+		SELECT * FROM item 
+		WHERE is_suspended='No' AND is_sale=1 AND is_asset=0 AND 
+		(description LIKE concat('%',in_code_desc,'%') OR item_code LIKE concat('%',in_code_desc,'%') OR item_code LIKE concat('%',SUBSTRING(in_code_desc,2),'%') OR item_code LIKE concat('%',SUBSTRING(in_code_desc,3),'%') OR alias_name LIKE concat('%',in_code_desc,'%')) 
+		ORDER BY description ASC LIMIT 100;
+END//
+DELIMITER ;
+
 DROP PROCEDURE IF EXISTS sp_search_item_for_hire;
 DELIMITER //
 CREATE PROCEDURE sp_search_item_for_hire

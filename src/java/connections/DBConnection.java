@@ -276,22 +276,22 @@ public class DBConnection implements Serializable {
 
     public String isMySQLConnectionAvailable() {
         try {
-            Class.forName(MySQL_JDBC_DRIVER);
-            DBConnection.MySQL_DB_URL = "jdbc:mysql://" + DBConnection.MySQL_DB_HOST_IP_OR_NAME + "/" + DBConnection.MySQL_DB_NAME;
-            DriverManager.getConnection(MySQL_DB_URL, MySQL_USER, MySQL_PASSWORD);
+            //Class.forName(MySQL_JDBC_DRIVER);
+            //DBConnection.MySQL_DB_URL = "jdbc:mysql://" + DBConnection.MySQL_DB_HOST_IP_OR_NAME + "/" + DBConnection.MySQL_DB_NAME;
+            //DriverManager.getConnection(MySQL_DB_URL, MySQL_USER, MySQL_PASSWORD);
             return "ON";
-        } catch (ClassNotFoundException | SQLException e) {
+        } catch (Exception e) {
             return "OFF";
         }
     }
 
     public String isINTER_BRANCH_MySQLConnectionAvailable() {
         try {
-            Class.forName(INTER_BRANCH_MySQL_JDBC_DRIVER);
-            DBConnection.INTER_BRANCH_MySQL_DB_URL = "jdbc:mysql://" + DBConnection.INTER_BRANCH_MySQL_DB_HOST_IP_OR_NAME + "/" + DBConnection.INTER_BRANCH_MySQL_DB_NAME;
-            DriverManager.getConnection(INTER_BRANCH_MySQL_DB_URL, INTER_BRANCH_MySQL_USER, INTER_BRANCH_MySQL_PASSWORD);
+            //Class.forName(INTER_BRANCH_MySQL_JDBC_DRIVER);
+            //DBConnection.INTER_BRANCH_MySQL_DB_URL = "jdbc:mysql://" + DBConnection.INTER_BRANCH_MySQL_DB_HOST_IP_OR_NAME + "/" + DBConnection.INTER_BRANCH_MySQL_DB_NAME;
+            //DriverManager.getConnection(INTER_BRANCH_MySQL_DB_URL, INTER_BRANCH_MySQL_USER, INTER_BRANCH_MySQL_PASSWORD);
             return "ON";
-        } catch (ClassNotFoundException | SQLException e) {
+        } catch (Exception e) {
             return "OFF";
         }
     }

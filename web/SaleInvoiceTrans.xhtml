@@ -126,9 +126,10 @@
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
             </h:panelGrid>
-            <h:panelGrid id="gridTransItem" styleClass="clsGridMainInput" columns="9">
+            <h:panelGrid id="gridTransItem" styleClass="clsGridMainInput" columns="10">
                 <h:outputLabel styleClass="clsLabelTransItem" style="width: 100px" value="ItemCode"/>
                 <p:commandLink actionListener="#{itemBean.openChildItem('Stock',transItem.itemId)}" value="ItemDescription"/>
+                <h:outputLabel value=""/>
                 <h:outputLabel styleClass="clsLabelTransItem" style="width: 50px" value="Unit"/>
                 <h:outputLabel styleClass="clsLabelTransItem" style="width: 80px" value="Batch"/>
                 <h:outputLabel styleClass="clsLabelTransItem" style="width: 50px" value="Qty"/>
@@ -142,8 +143,7 @@
                             return false;
                         }" >
                 </h:inputText>
-
-                <p:autoComplete id="autcItem" widgetVar="WautcItem" value="#{itemBean.selectedItem}"  
+                <p:autoComplete disabled="#{menuItemBean.menuItemObj.ENABLE_AUTO_COMPLETE_ITEM_SEARCH eq 0}" id="autcItem" widgetVar="WautcItem" value="#{itemBean.selectedItem}"  
                                 completeMethod="#{itemBean.getItemObjectListForSale}" 
                                 var="itm" 
                                 itemLabel="#{itm.description}" 
@@ -194,6 +194,7 @@
                     <p:ajax event="itemSelect" listener="#{stockBean.refreshBatchList(generalUserSetting.getCurrentStore().getStoreId(),transItem.itemId)}" process="@this menuCurrency menuBatchno" update="menuBatchno,itxtUnit,itxtUnitPrice,itxtQty,itxtAmount,gridItemStatus,pgrdOverrideWarranty,pgrdSpecific"/>
                     <p:ajax event="change" listener="#{stockBean.refreshBatchList(generalUserSetting.getCurrentStore().getStoreId(),transItem.itemId)}" rendered="#{itemBean.selectedItem!=null}" process="@this menuCurrency menuBatchno" update="menuBatchno,itxtUnit,itxtUnitPrice,itxtQty,itxtAmount,gridItemStatus,pgrdOverrideWarranty,pgrdSpecific"/>
                 </p:autoComplete>
+                <p:commandButton value="" icon="ui-icon-search" oncomplete="PF('sbarItemSearch').show()" actionListener="#{itemBean.resetAtItemSearchList()}" style="width: 40px;height: 30px;" update="TransactionFormSales:pnlgItemSearch"/>
 
                 <h:inputText id="itxtUnit" styleClass="clsInputTransItem" value="#{unitBean.getUnit(itemBean.getItem(transItem.itemId).getUnitId()).unitSymbol}" style="width: 50px" disabled="true"/>
                 <p:selectOneMenu id="menuBatchno" styleClass="clsMenu" value="#{transItem.batchno}">
@@ -265,9 +266,9 @@
                     <h:outputLabel styleClass="clsLabelTransItem" style="width: 200px" value="Name"/>
                     <h:outputLabel styleClass="clsLabelTransItem" style="width: 250px" value="Code"/>
                     <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="More Description"/>
-                    <h:inputTextarea id="itxtDescSppecific" styleClass="clsInput"  rows="2" cols="36" value="#{transItem.descSpecific}"/>
-                    <h:inputTextarea id="itxtCodeSpecific" styleClass="clsInput"  rows="2" cols="36" value="#{transItem.codeSpecific}"/>
-                    <h:inputTextarea id="itxaDescMore" styleClass="clsInput"  rows="2" cols="36" value="#{transItem.descMore}"/>
+                    <h:inputTextarea id="itxtDescSppecific" styleClass="clsInput"  rows="2" cols="34" value="#{transItem.descSpecific}"/>
+                    <h:inputTextarea id="itxtCodeSpecific" styleClass="clsInput"  rows="2" cols="34" value="#{transItem.codeSpecific}"/>
+                    <h:inputTextarea id="itxaDescMore" styleClass="clsInput"  rows="2" cols="34" value="#{transItem.descMore}"/>
                 </h:panelGrid>
             </h:panelGrid>
             <h:panelGrid id="pgrdItemCommands" columns="2">
@@ -616,11 +617,69 @@
                     </h:panelGrid>
                 </h:panelGrid>
             </h:panelGrid>
-
             <h:panelGrid id="pgrdMsgs" styleClass="clsGridMainMessages" columns="1">
                 <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{transBean.actionMessage}"/>
                 <h:messages id="msgsMainMessage" style="color: red"/><br/>
             </h:panelGrid>
+            <p:sidebar widgetVar="sbarItemSearch" position="bottom" baseZIndex="10000" style="height: 600px;">
+                <h:panelGrid id="pnlgItemSearch" columns="1" style="text-align: center;">
+                    <h:panelGrid columns="4">
+                        <h:outputLabel value="Enter text:"/>
+                        <h:inputText id="itxtItemSearch" value="#{itemBean.searchItemDesc}"/>
+                        <p:commandButton id="cmdbtnSearchTransItem" value="Search" actionListener="#{itemBean.refreshItemSearchList(itemBean.searchItemDesc)}" update="TransactionFormSales:tblSbarItemSearch"/>
+                        <h:outputLabel value=""/>
+                    </h:panelGrid>
+                    <p:dataTable id="tblSbarItemSearch" rowIndexVar="rowIndex" tableStyle="width:auto;" var="itm" value="#{itemBean.itemObjectList}" 
+                                 paginator="true" rows="10" 
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}" 
+                                 rowsPerPageTemplate="10,20">
+                        <p:column headerText="#" style="text-align: left;">
+                            <h:outputText value="#{rowIndex+1} "/>
+                        </p:column>
+                        <p:column headerText="Item Description" style="text-align: left;">
+                            <p:commandLink value="#{itm.description}"  oncomplete="PF('sbarItemSearch').hide()">
+                                <f:ajax listener="#{itemBean.setSelectedItem(itm)}" render="TransactionFormSales:gridTransItem"/>
+                                <p:ajax listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentSaleType,trans,transItem,itemBean.selectedItem,1.0)}" process="@this TransactionFormSales:menuCurrency" update="TransactionFormSales:menuBatchno,TransactionFormSales:itxtUnit,TransactionFormSales:itxtUnitPrice,TransactionFormSales:itxtQty,TransactionFormSales:itxtAmount,TransactionFormSales:gridItemStatus,TransactionFormSales:pgrdOverrideWarranty,TransactionFormSales:pgrdSpecific"/>
+                                <p:ajax listener="#{stockBean.refreshBatchList(generalUserSetting.getCurrentStore().getStoreId(),transItem.itemId)}" process="@this TransactionFormSales:menuCurrency TransactionFormSales:menuBatchno" update="TransactionFormSales:menuBatchno,TransactionFormSales:itxtUnit,TransactionFormSales:itxtUnitPrice,TransactionFormSales:itxtQty,TransactionFormSales:itxtAmount,TransactionFormSales:gridItemStatus,TransactionFormSales:pgrdOverrideWarranty,TransactionFormSales:pgrdSpecific"/>
+                            </p:commandLink>
+                        </p:column>
+                        <p:column headerText="Alias" style="text-align: left" >  
+                            #{itm.alias_name} 
+                        </p:column>
+                        <p:column headerText="Item Code" style="text-align: left" >  
+                            #{itm.itemCode} 
+                        </p:column>
+                        <p:column headerText="Unit" style="text-align: left">  
+                            #{itm.unitSymbol}
+                        </p:column> 
+                        <p:column headerText="Category" style="text-align: left">  
+                            #{itm.categoryName}
+                        </p:column>
+                        <p:column headerText="Retailsale Price" style="text-align: left">  
+                            <h:outputText value="#{itm.unitRetailsalePrice}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Wholesale Price" style="text-align: left" rendered="#{generalUserSetting.currentTransactionReasonId==2 or generalUserSetting.currentTransactionReasonId==10}">
+                            <h:outputText value="#{itm.unitWholesalePrice}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Special Price" style="text-align: left" rendered="#{generalUserSetting.currentTransactionReasonId==103}">
+                            <h:outputText value="#{itm.unit_special_price}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Currency" style="text-align: left">
+                            <h:outputText value="#{itm.currencyCode}">
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Location" style="text-align: left">  
+                            #{itm.locationName}
+                        </p:column>
+                    </p:dataTable>
+                </h:panelGrid>
+            </p:sidebar>
             <p:growl id="growl1"/>
             <!-- INVOICE STARTS HERE -->
             <h:panelGrid id="pnlgOutput" style="width: 100%">
