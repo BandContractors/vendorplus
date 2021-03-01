@@ -7522,7 +7522,7 @@ BEGIN
 		(select sum(pt.trans_paid_amount) from pay_trans pt where pt.transaction_id=t.transaction_id) as total_paid2 
 		FROM transaction t  
 		INNER JOIN user_detail ud ON t.add_user_detail_id=ud.user_detail_id 
-		LEFT JOIN transactor tr ON t.transactor_id=tr.transactor_id WHERE (t.transaction_type_id IN(2,65,68) OR t.transaction_reason_id IN(117)) ',@TransDate,@FromStore,@BillTransactor,' ORDER BY t.transaction_id DESC');
+		INNER JOIN transactor tr ON t.transactor_id=tr.transactor_id WHERE (t.transaction_type_id IN(2,65,68) OR t.transaction_reason_id IN(117)) ',@TransDate,@FromStore,@BillTransactor,' ORDER BY t.transaction_id DESC');
 	PREPARE stmt FROM @sql_text;
 	EXECUTE stmt;
 	DEALLOCATE PREPARE stmt;
@@ -7556,7 +7556,7 @@ BEGIN
 	SET @sql_text=concat('SELECT t.*,ud.user_name,tr.transactor_names,
 		(select sum(pt.trans_paid_amount) from pay_trans pt where pt.transaction_id=t.transaction_id) as total_paid2 FROM transaction t  
 		INNER JOIN user_detail ud ON t.add_user_detail_id=ud.user_detail_id 
-		LEFT JOIN transactor tr ON t.transactor_id=tr.transactor_id WHERE (t.transaction_type_id=1 OR t.transaction_reason_id IN(118)) ',@TransDate,@FromStore,@BillTransactor,' ORDER BY t.transaction_id DESC');
+		INNER JOIN transactor tr ON t.transactor_id=tr.transactor_id WHERE (t.transaction_type_id=1 OR t.transaction_reason_id IN(118)) ',@TransDate,@FromStore,@BillTransactor,' ORDER BY t.transaction_id DESC');
 	PREPARE stmt FROM @sql_text;
 	EXECUTE stmt;
 	DEALLOCATE PREPARE stmt;
@@ -7590,8 +7590,8 @@ BEGIN
 	SET @sql_inner=concat('SELECT t.*,ud.user_name,tr.transactor_names,
 		(select sum(pt.trans_paid_amount) from pay_trans pt where pt.transaction_id=t.transaction_id) as total_paid2 FROM transaction t  
 		INNER JOIN user_detail ud ON t.add_user_detail_id=ud.user_detail_id 
-		LEFT JOIN transactor tr ON t.transactor_id=tr.transactor_id WHERE (t.transaction_type_id=2 OR t.transaction_reason_id IN(117)) ',@TransDate,@FromStore,@BillTransactor,' ORDER BY t.transaction_id DESC');
-	SET @sql_text=concat('select CC.currency_code,sum(CC.grand_total) as grand_total,sum(cc.total_paid2) as total_paid2 from (',
+		INNER JOIN transactor tr ON t.transactor_id=tr.transactor_id WHERE (t.transaction_type_id=2 OR t.transaction_reason_id IN(117)) ',@TransDate,@FromStore,@BillTransactor,' ORDER BY t.transaction_id DESC');
+	SET @sql_text=concat('select CC.currency_code,sum(CC.grand_total) as grand_total,sum(CC.total_paid2) as total_paid2 from (',
 		@sql_inner,') as CC group by CC.currency_code');
 	PREPARE stmt FROM @sql_text;
 	EXECUTE stmt;
@@ -7626,8 +7626,8 @@ BEGIN
 	SET @sql_inner=concat('SELECT t.*,ud.user_name,tr.transactor_names,
 		(select sum(pt.trans_paid_amount) from pay_trans pt where pt.transaction_id=t.transaction_id) as total_paid2 FROM transaction t  
 		INNER JOIN user_detail ud ON t.add_user_detail_id=ud.user_detail_id 
-		LEFT JOIN transactor tr ON t.transactor_id=tr.transactor_id WHERE (t.transaction_type_id=1 OR t.transaction_reason_id IN(118)) ',@TransDate,@FromStore,@BillTransactor,' ORDER BY t.transaction_id DESC');
-	SET @sql_text=concat('select CC.currency_code,sum(CC.grand_total) as grand_total,sum(cc.total_paid2) as total_paid2 from (',
+		INNER JOIN transactor tr ON t.transactor_id=tr.transactor_id WHERE (t.transaction_type_id=1 OR t.transaction_reason_id IN(118)) ',@TransDate,@FromStore,@BillTransactor,' ORDER BY t.transaction_id DESC');
+	SET @sql_text=concat('select CC.currency_code,sum(CC.grand_total) as grand_total,sum(CC.total_paid2) as total_paid2 from (',
 		@sql_inner,') as CC group by CC.currency_code');
 	PREPARE stmt FROM @sql_text;
 	EXECUTE stmt;

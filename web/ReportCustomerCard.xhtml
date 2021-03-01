@@ -75,7 +75,7 @@
                 <p:printer target="pnlTransaction" rendered="false"/>
             </p:commandButton>
             <p:panel id="pnlTransaction" style="border: none;">
-                <h:panelGrid columns="2" style="border-style: none;-webkit-print-color-adjust: exact;width: 100%; margin: 0px;"> 
+                <h:panelGrid columns="3" style="border-style: none;-webkit-print-color-adjust: exact;width: 100%; margin: 0px;"> 
                     <h:panelGrid>
                         <h:panelGrid columns="1">
                             <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 18pt;color:red;font-weight: bold;text-decoration: none;">#{companySetting.getLICENSE_CLIENT_NAME()}</h:outputLabel>
@@ -96,6 +96,18 @@
                         </h:panelGrid>
                     </h:panelGrid>
                     <h:panelGrid>
+                        <h:panelGrid columns="1">
+                            <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 12pt;color:#000000;font-weight: normal;text-decoration: none;">Amount Due (#{accCurrencyBean.localCurrency.currencyCode})</h:outputLabel>
+                            <h:outputLabel style="color: coral;font-weight: bold;font-size: 18pt;" value="#{accJournalBean.returnBalanceString(accLedgerBean.getReceivableAccBalanceTrade(transactorBean.selectedBillTransactor.transactorId))}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputLabel>
+                            <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 12pt;color:#000000;font-weight: normal;text-decoration: none;">Deposit (#{accCurrencyBean.localCurrency.currencyCode})</h:outputLabel>
+                            <h:outputLabel style="color: green;font-weight: bold;font-size: 18pt;" value="#{accJournalBean.returnBalanceString(accLedgerBean.getPrepaidIncomeAccBalanceToCur(transactorBean.selectedBillTransactor.transactorId,accCurrencyBean.localCurrency.currencyCode))}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputLabel>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <h:panelGrid style="float: right;">
                         <h:panelGrid columns="1" style="background-color: #000000">
                             <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 18pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">#{utilityBean.formatCapitaliseAllCharacter(menuItemBean.menuItemObj.CUSTOMER_NAME)} STATEMENT</h:outputLabel>
                         </h:panelGrid>
@@ -113,17 +125,8 @@
 
                 <table id="tblTransaction" border="1" cellspacing="0" cellpadding="2" style="-webkit-print-color-adjust: exact;width: 100%;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
                     <tr style="background-color: yellow;font-weight: bold">
-                        <td colspan="2" align="center" style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                            <br/>Amount Due(#{accCurrencyBean.localCurrency.currencyCode}):<h:outputLabel style="color: coral;" value="#{accJournalBean.returnBalanceString(accLedgerBean.getReceivableAccBalanceTrade(transactorBean.selectedBillTransactor.transactorId))}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                            </h:outputLabel>
-                            <br/>Deposit (#{accCurrencyBean.localCurrency.currencyCode}):<h:outputLabel style="color: green;" value="#{accJournalBean.returnBalanceString(accLedgerBean.getPrepaidIncomeAccBalanceToCur(transactorBean.selectedBillTransactor.transactorId,accCurrencyBean.localCurrency.currencyCode))}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                            </h:outputLabel>
-                        </td>
-                        <td colspan="2" align="right" style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                        <td colspan="4" align="center" style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
                             Transactions for period
-                            <br/>
                             <h:outputText value="#{utilityBean.formatDate(trans.transactionDate)}"/> to 
                             <h:outputText value="#{utilityBean.formatDate(trans.transactionDate2)}"/>
                         </td>
