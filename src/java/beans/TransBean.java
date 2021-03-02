@@ -140,6 +140,7 @@ public class TransBean implements Serializable {
     private String OrderMode2;
     private String OrderMode3;
     private List<Trans> TransListHist = new ArrayList<>();
+    private List<TransItem> TransItemSummary;
 
     public String setBgColorIfEqual(String aA, String aB, int aContext) {
         if (aA.equals(aB)) {
@@ -13168,7 +13169,7 @@ public class TransBean implements Serializable {
         }
     }
 
-    public void resetTransItemDetail(Trans aTrans, TransBean aTransBean, Item aItem, Transactor aBillTransactor) {
+    public void resetTransItemDetail(Trans aTrans, TransBean aTransBean, Item aItem, Transactor aBillTransactor, int aCategoryId) {
         aTransBean.setActionMessage("");
         try {
             this.clearTrans(aTrans);
@@ -13188,7 +13189,8 @@ public class TransBean implements Serializable {
             aTransBean.setDate2(null);
             aTransBean.setFieldName("");
             aTransBean.TransItemList.clear();
-            //aTransBean.TransListSummary.clear();
+            aTransBean.TransItemSummary.clear();
+            aCategoryId = 0;
 
         } catch (NullPointerException npe) {
         }
@@ -13232,11 +13234,11 @@ public class TransBean implements Serializable {
         }
     }
 
-    public void initResetTransItemDetail(Trans aTrans, TransBean aTransBean, Item aItem, Transactor aBillTransactor) {
+    public void initResetTransItemDetail(Trans aTrans, TransBean aTransBean, Item aItem, Transactor aBillTransactor, int aCategoryId) {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
         } else {
-            this.resetTransItemDetail(aTrans, aTransBean, aItem, aBillTransactor);
+            this.resetTransItemDetail(aTrans, aTransBean, aItem, aBillTransactor, aCategoryId);
         }
     }
 
@@ -13378,71 +13380,187 @@ public class TransBean implements Serializable {
         return isTransUpdateSuccess;
     }
 
-    public void reportTransItemDetail(Trans aTrans, TransBean aTransBean, Item aItem, Transactor aTransactor) {
+    public void reportTransItemDetail(Trans aTrans, TransBean aTransBean, Item aItem, Transactor aTransactor, int aCategoryId) {
+        String msg = "";
+        aTransBean.setActionMessage("");
+        try {
+            if (aTransBean.getDate1() != null && aTransBean.getDate2() != null) {
+                //okay no problem
+            } else {
+                msg = "Kindly select a date range...";
+            }
+        } catch (Exception e) {
+            //do nothing
+        }
         if (aTransBean.getDateType().length() == 0) {
             aTransBean.setDateType("Add Date");
         }
-        aTransBean.setActionMessage("");
-        ResultSet rs = null;
-        this.TransItemList = new ArrayList<>();
-        //String sql = "SELECT ti.* FROM transaction_item ti,transaction t WHERE ti.transaction_id=t.transaction_id";
-        String sql = "SELECT ti.* FROM transaction_item ti INNER JOIN transaction t ON ti.transaction_id=t.transaction_id WHERE 1=1";
-        String wheresql = "";
-        String ordersql = "";
-        if (aTrans.getStoreId() > 0) {
-            wheresql = wheresql + " AND t.store_id=" + aTrans.getStoreId();
-        }
-        if (aTrans.getTransactionNumber().length() > 0) {
-            wheresql = wheresql + " AND t.transaction_number='" + aTrans.getTransactionNumber() + "'";
-        }
-        if (aTrans.getTransactionTypeId() > 0) {
-            wheresql = wheresql + " AND t.transaction_type_id=" + aTrans.getTransactionTypeId();
-        }
-        if (aTrans.getAddUserDetailId() > 0) {
-            wheresql = wheresql + " AND t.add_user_detail_id=" + aTrans.getAddUserDetailId();
-        }
-        if (aTrans.getTransactionUserDetailId() > 0) {
-            wheresql = wheresql + " AND t.transaction_user_detail_id=" + aTrans.getTransactionUserDetailId();
-        }
-        try {
-            if (null != aTransactor && aTransactor.getTransactorId() > 0) {
-                wheresql = wheresql + " AND (t.bill_transactor_id=" + aTransactor.getTransactorId() + " OR t.transactor_id=" + aTransactor.getTransactorId() + ")";
+        if (msg.length() > 0) {
+            aTransBean.setActionMessage(msg);
+            FacesContext.getCurrentInstance().addMessage("Report", new FacesMessage(msg));
+        } else {
+            ResultSet rs = null;
+            ResultSet rssum = null;
+            this.TransItemList = new ArrayList<>();
+            String sql = "SELECT ti.*,t.transaction_number,t.transaction_type_id,t.store_id,i.description,i.unit_id,i.category_id,t.add_date,t.add_user_detail_id FROM transaction_item ti "
+                    + "INNER JOIN transaction t ON ti.transaction_id=t.transaction_id "
+                    + "INNER JOIN item i ON ti.item_id=i.item_id WHERE 1=1";
+            String wheresql = "";
+            String ordersql = "";
+            if (aCategoryId > 0) {
+                wheresql = wheresql + " AND i.category_id=" + aCategoryId;
             }
-        } catch (NullPointerException npe) {
+            if (aTrans.getStoreId() > 0) {
+                wheresql = wheresql + " AND t.store_id=" + aTrans.getStoreId();
+            }
+            if (aTrans.getTransactionNumber().length() > 0) {
+                wheresql = wheresql + " AND t.transaction_number='" + aTrans.getTransactionNumber() + "'";
+            }
+            if (aTrans.getTransactionTypeId() > 0) {
+                wheresql = wheresql + " AND t.transaction_type_id=" + aTrans.getTransactionTypeId();
+            }
+            if (aTrans.getAddUserDetailId() > 0) {
+                wheresql = wheresql + " AND t.add_user_detail_id=" + aTrans.getAddUserDetailId();
+            }
+            if (aTrans.getTransactionUserDetailId() > 0) {
+                wheresql = wheresql + " AND t.transaction_user_detail_id=" + aTrans.getTransactionUserDetailId();
+            }
+            try {
+                if (null != aTransactor && aTransactor.getTransactorId() > 0) {
+                    wheresql = wheresql + " AND t.transactor_id=" + aTransactor.getTransactorId();
+                }
+            } catch (NullPointerException npe) {
 
-        }
-        try {
-            if (null != aItem && aItem.getItemId() > 0) {
-                wheresql = wheresql + " AND ti.item_id=" + aItem.getItemId();
             }
-        } catch (NullPointerException npe) {
+            try {
+                if (null != aItem && aItem.getItemId() > 0) {
+                    wheresql = wheresql + " AND ti.item_id=" + aItem.getItemId();
+                }
+            } catch (NullPointerException npe) {
 
-        }
-        if (aTransBean.getDateType().length() > 0 && aTransBean.getDate1() != null && aTransBean.getDate2() != null) {
-            switch (aTransBean.getDateType()) {
-                case "Trans Date":
-                    wheresql = wheresql + " AND t.transaction_date BETWEEN '" + new java.sql.Date(aTransBean.getDate1().getTime()) + "' AND '" + new java.sql.Date(aTransBean.getDate2().getTime()) + "'";
-                    break;
-                case "Add Date":
-                    wheresql = wheresql + " AND t.add_date BETWEEN '" + new java.sql.Timestamp(aTransBean.getDate1().getTime()) + "' AND '" + new java.sql.Timestamp(aTransBean.getDate2().getTime()) + "'";
-                    break;
             }
-        }
-        ordersql = " ORDER BY t.add_date DESC,t.transaction_id DESC";
-        sql = sql + wheresql + ordersql;
-        try (
-                Connection conn = DBConnection.getMySQLConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);) {
-            rs = ps.executeQuery();
-            TransItem transitem = null;
-            TransItemBean tib = new TransItemBean();
-            while (rs.next()) {
-                transitem = new TransItem();
-                tib.setTransItemFromResultSet(transitem, rs);
-                this.TransItemList.add(transitem);
+            if (aTransBean.getDateType().length() > 0 && aTransBean.getDate1() != null && aTransBean.getDate2() != null) {
+                switch (aTransBean.getDateType()) {
+                    case "Trans Date":
+                        wheresql = wheresql + " AND t.transaction_date BETWEEN '" + new java.sql.Date(aTransBean.getDate1().getTime()) + "' AND '" + new java.sql.Date(aTransBean.getDate2().getTime()) + "'";
+                        break;
+                    case "Add Date":
+                        wheresql = wheresql + " AND t.add_date BETWEEN '" + new java.sql.Timestamp(aTransBean.getDate1().getTime()) + "' AND '" + new java.sql.Timestamp(aTransBean.getDate2().getTime()) + "'";
+                        break;
+                }
             }
-        } catch (Exception e) {
-            LOGGER.log(Level.ERROR, e);
+            ordersql = " ORDER BY t.add_date DESC,t.transaction_id DESC";
+            sql = sql + wheresql + ordersql;
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                rs = ps.executeQuery();
+                TransItem transitem = null;
+                TransItemBean tib = new TransItemBean();
+                while (rs.next()) {
+                    transitem = new TransItem();
+                    tib.setTransItemFromResultSet(transitem, rs);
+                    try {
+                        transitem.setStoreName(new StoreBean().getStore(rs.getInt("store_id")).getStoreName());
+                    } catch (Exception e) {
+                        transitem.setStoreName("");
+                    }
+                    try {
+                        transitem.setTransactionTypeName(new TransactionTypeBean().getTransactionType(rs.getInt("transaction_type_id")).getTransactionTypeName());
+                    } catch (Exception e) {
+                        transitem.setTransactionTypeName("");
+                    }
+                    Trans t = new Trans();
+                    try {
+                        t = this.getTrans(rs.getLong("transaction_id"));
+                    } catch (Exception e) {
+                        //do nothing
+                    }
+                    try {
+                        transitem.setTransactorNames(new TransactorBean().getTransactor(t.getTransactorId()).getTransactorNames());
+                    } catch (Exception e) {
+                        transitem.setTransactorNames("");
+                    }
+                    try {
+                        transitem.setDescription(rs.getString("description"));
+                    } catch (Exception e) {
+                        transitem.setDescription("");
+                    }
+                    try {
+                        transitem.setUnitSymbol(new UnitBean().getUnit(rs.getInt("unit_id")).getUnitSymbol());
+                    } catch (Exception e) {
+                        transitem.setUnitSymbol("");
+                    }
+                    try {
+                        transitem.setCurrency_code(t.getCurrencyCode());
+                    } catch (Exception e) {
+                        transitem.setCurrency_code("");
+                    }
+                    try {
+                        transitem.setAddUserDetailName(new UserDetailBean().getUserDetail(t.getAddUserDetailId()).getUserName());
+                    } catch (Exception e) {
+                        transitem.setStoreName("");
+                    }
+                    try {
+                        transitem.setTransaction_number(t.getTransactionNumber());
+                    } catch (Exception e) {
+                        transitem.setTransaction_number("");
+                    }
+                    try {
+                        transitem.setAddDate(new Date(rs.getTimestamp("add_date").getTime()));
+                    } catch (Exception e) {
+                        transitem.setAddDate(null);
+                    }
+                    this.TransItemList.add(transitem);
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
+            }
+
+            //summary
+            this.TransItemSummary = new ArrayList<>();
+            String sqlsum = "";
+            sqlsum = "SELECT category_id,t.transaction_type_id,t.currency_code,sum(amount_inc_vat) as amount_inc_vat FROM transaction_item ti "
+                    + "INNER JOIN transaction t ON ti.transaction_id=t.transaction_id "
+                    + "INNER JOIN item i ON ti.item_id=i.item_id WHERE 1=1";
+            String ordersqlsum = "";
+            String groupbysql = "";
+            groupbysql = " GROUP BY category_id,transaction_type_id,currency_code";
+            ordersqlsum = " ORDER BY category_id,transaction_type_id,currency_code";
+            sqlsum = sqlsum + wheresql + groupbysql + ordersqlsum;
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sqlsum);) {
+                rssum = ps.executeQuery();
+                TransItem transitemsum = null;
+                while (rssum.next()) {
+                    transitemsum = new TransItem();
+                    try {
+                        transitemsum.setCategoryName(new CategoryBean().getCategory(rssum.getInt("category_id")).getCategoryName());
+
+                    } catch (Exception e) {
+                        transitemsum.setCategoryName("");
+                    }
+                    try {
+                        transitemsum.setCurrency_code(rssum.getString("currency_code"));
+                    } catch (Exception e) {
+                        transitemsum.setCurrency_code("");
+                    }
+                    try {
+                        transitemsum.setAmountIncVat(rssum.getDouble("amount_inc_vat"));
+                    } catch (NullPointerException npe) {
+                        transitemsum.setAmountIncVat(0);
+                    }
+                    try {
+                        transitemsum.setTransactionTypeName(new TransactionTypeBean().getTransactionType(rssum.getInt("transaction_type_id")).getTransactionTypeName());
+                    } catch (NullPointerException npe) {
+                        transitemsum.setTransactionTypeName("");
+                    }
+                    this.TransItemSummary.add(transitemsum);
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
+            }
         }
     }
 
@@ -15814,6 +15932,20 @@ public class TransBean implements Serializable {
      */
     public void setTransListHist(List<Trans> TransListHist) {
         this.TransListHist = TransListHist;
+    }
+
+    /**
+     * @return the TransItemSummary
+     */
+    public List<TransItem> getTransItemSummary() {
+        return TransItemSummary;
+    }
+
+    /**
+     * @param TransItemSummary the TransItemSummary to set
+     */
+    public void setTransItemSummary(List<TransItem> TransItemSummary) {
+        this.TransItemSummary = TransItemSummary;
     }
 
 }

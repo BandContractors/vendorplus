@@ -117,6 +117,9 @@ public class TransItem implements Serializable {
     private int is_override_price;
     private int override_gen_name;
     private String item_type;
+    private String currency_code;
+    private String transaction_number; 
+    
 
     /**
      * @return the TransactionItemId
@@ -1404,6 +1407,34 @@ public class TransItem implements Serializable {
      */
     public void setItem_type(String item_type) {
         this.item_type = item_type;
+    }
+
+    /**
+     * @return the currency_code
+     */
+    public String getCurrency_code() {
+        return currency_code;
+    }
+
+    /**
+     * @param currency_code the currency_code to set
+     */
+    public void setCurrency_code(String currency_code) {
+        this.currency_code = currency_code;
+    }
+
+    /**
+     * @return the transaction_number
+     */
+    public String getTransaction_number() {
+        return transaction_number;
+    }
+
+    /**
+     * @param transaction_number the transaction_number to set
+     */
+    public void setTransaction_number(String transaction_number) {
+        this.transaction_number = transaction_number;
     }
 
 }
