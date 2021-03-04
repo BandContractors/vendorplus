@@ -1865,7 +1865,7 @@ public class TransBean implements Serializable {
                     //TimeStr = TimeStr + " SJournal:" + ms;
                     //TAX API
                     //dt1 = new Date();
-                    if (aTransTypeId == 2 && trans.getTotalVat() > 0 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0 && new Item_tax_mapBean().countItemsNotMappedSynced(aActiveTransItems) == 0) {//SALES INVOICE
+                    if (aTransTypeId == 2 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0 && new Item_tax_mapBean().countItemsNotMappedSynced(aActiveTransItems) == 0) {//SALES INVOICE
                         int IsThreadOn = 0;
                         try {
                             IsThreadOn = Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_THREAD_ON").getParameter_value());
@@ -2284,7 +2284,7 @@ public class TransBean implements Serializable {
                         this.deleteTransFromHist(trans.getTransactionHistId());
                     }
                     //TAX API
-                    if (aTransTypeId == 2 && trans.getTotalVat() > 0 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0 && new Item_tax_mapBean().countItemsNotMappedSynced(aActiveTransItems) == 0) {//SALES INVOICE
+                    if (aTransTypeId == 2 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0 && new Item_tax_mapBean().countItemsNotMappedSynced(aActiveTransItems) == 0) {//SALES INVOICE
                         int IsThreadOn = 0;
                         try {
                             IsThreadOn = Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_THREAD_ON").getParameter_value());
@@ -14617,7 +14617,7 @@ public class TransBean implements Serializable {
             }
             //get tax invoice number
             String DeviceNo = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value();
-            if (DeviceNo.length() > 0 && ((aTrans.getTransactionTypeId() == 2 && aTrans.getTotalVat() > 0) || aTrans.getTransactionTypeId() == 82 || aTrans.getTransactionTypeId() == 83)) {
+            if (DeviceNo.length() > 0 && (aTrans.getTransactionTypeId() == 2 || aTrans.getTransactionTypeId() == 82 || aTrans.getTransactionTypeId() == 83)) {
                 Transaction_tax_map ttm = new Transaction_tax_mapBean().getTransaction_tax_map(aTrans.getTransactionId(), aTrans.getTransactionTypeId());
                 if (null != ttm) {
                     aTrans.setReference_number_tax(ttm.getReference_number_tax());

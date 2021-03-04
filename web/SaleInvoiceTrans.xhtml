@@ -625,9 +625,14 @@
                 <h:panelGrid id="pnlgItemSearch" columns="1" style="text-align: center;">
                     <h:panelGrid columns="4">
                         <h:outputLabel value="Enter text:"/>
-                        <h:inputText id="itxtItemSearch" value="#{itemBean.searchItemDesc}"/>
+                        <h:inputText id="itxtItemSearch" value="#{itemBean.searchItemDesc}" autocomplete="off" onkeypress="if (event.keyCode == 13) {
+                                    rcmdItemSearch();
+                                    return false;
+                                }"/>
                         <p:commandButton id="cmdbtnSearchTransItem" value="Search" actionListener="#{itemBean.refreshItemSearchList(itemBean.searchItemDesc)}" update="TransactionFormSales:tblSbarItemSearch"/>
                         <h:outputLabel value=""/>
+                        <p:focus for="itxtItemSearch"/>
+                        <p:remoteCommand name="rcmdItemSearch" actionListener="#{itemBean.refreshItemSearchList(itemBean.searchItemDesc)}" update="TransactionFormSales:tblSbarItemSearch"/>
                     </h:panelGrid>
                     <p:dataTable id="tblSbarItemSearch" rowIndexVar="rowIndex" tableStyle="width:auto;" var="itm" value="#{itemBean.itemObjectList}" 
                                  paginator="true" rows="10" 
