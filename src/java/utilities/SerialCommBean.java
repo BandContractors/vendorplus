@@ -48,7 +48,7 @@ public class SerialCommBean implements Serializable, SerialPortEventListener {
                 this.initListener();
                 //this.serialPort.writeString("Added 21,000");
                 //this.serialPort.writeString("             ");
-                this.serialPort.writeString(" Total 100,000");
+                this.serialPort.writeString(aLine1Str);
                 this.serialPort.closePort();
                 System.out.println("-C-");
             }
