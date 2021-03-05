@@ -18,16 +18,45 @@ public class SerialCommBean implements Serializable, SerialPortEventListener {
 //    public static void main(String[] args) {
 //        try {
 //            SerialCommBean scb = new SerialCommBean();
-//            scb.setSerialPort();
-//            scb.serialPort.openPort();
-//            scb.serialPort.setParams(SerialPort.BAUDRATE_9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
-//            scb.serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN | SerialPort.FLOWCONTROL_RTSCTS_OUT);
-//            scb.initListener();
-//            scb.serialPort.writeString("IweWence");
+//            String PortName = "COM5";
+//            if (scb.isPortFound(PortName) == 1) {
+//                scb.setSerialPort(PortName);
+//                scb.serialPort.openPort();
+//                scb.serialPort.setParams(SerialPort.BAUDRATE_9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+//                scb.serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN | SerialPort.FLOWCONTROL_RTSCTS_OUT);
+//                scb.initListener();
+//                //scb.serialPort.writeString("Added 21,000");
+//                //scb.serialPort.writeString("             ");
+//                scb.serialPort.writeString(" Total 100,000");
+//                scb.serialPort.closePort();
+//            }
 //        } catch (Exception e) {
 //            System.out.println(e);
 //        }
 //    }
+
+    public void writeToDisplay(String aPortName, String aLine1Str, String aLine2Str) {
+        try {
+            System.out.println("-A-");
+            String PortName = aPortName;
+            if (this.isPortFound(PortName) == 1) {
+                System.out.println("-b-");
+                this.setSerialPort(PortName);
+                this.serialPort.openPort();
+                this.serialPort.setParams(SerialPort.BAUDRATE_9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+                this.serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN | SerialPort.FLOWCONTROL_RTSCTS_OUT);
+                this.initListener();
+                //this.serialPort.writeString("Added 21,000");
+                //this.serialPort.writeString("             ");
+                this.serialPort.writeString(" Total 100,000");
+                this.serialPort.closePort();
+                System.out.println("-C-");
+            }
+        } catch (Exception e) {
+            System.out.println("-D-");
+            System.out.println(e);
+        }
+    }
 
     //starts the event listener that knows whenever data is available to be read
     //pre style="font-size: 11px;": an open serial port
@@ -40,18 +69,27 @@ public class SerialCommBean implements Serializable, SerialPortEventListener {
         }
     }
 
-    public void setSerialPort() {
+    public void setSerialPort(String aPortName) {
+        serialPort = new SerialPort(aPortName);//can be like COM3
+    }
+
+    public int isPortFound(String aPortName) {
+        int portfound = 0;
         //1. getting serial ports list into the array
         String[] portNames = SerialPortList.getPortNames();
         if (portNames.length == 0) {
-            System.out.println("There are no serial-ports.");
+            portfound = 0;
+        } else {
+            for (int i = 0; i < portNames.length; i++) {
+                if (aPortName.equals(portNames[i])) {
+                    portfound = 1;
+                    break;
+                }
+            }
         }
-        for (int i = 0; i < portNames.length; i++) {
-            System.out.println(portNames[i]);
-        }
-        serialPort = new SerialPort(portNames[0]);//can be like COM3
+        return portfound;
     }
-    
+
     @Override
     public void serialEvent(SerialPortEvent event) {
         if (event.isRXCHAR() && event.getEventValue() > 0) {
