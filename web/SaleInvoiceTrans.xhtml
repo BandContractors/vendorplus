@@ -606,9 +606,6 @@
                         </p:dialog>
                         <p:ajax listener="#{transBean.saveDraftTrans(trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor,transBean.authorisedByUserDetail,transItemBean.selectedAccCoa)}" process="@form" update="pnlDraft pnlHeader gridTransItem pgrdOverrideWarranty pgrdSpecific gridItemStatus dtblTransactionItem pgrdTotals pgrdScheme pgrdPayment pgrdMsgs pgrdTransUser pgrdApprove"/>
                     </p:commandButton>
-                    <p:commandButton value="DISPLAY">
-                        <p:ajax listener="#{serialCommBean.writeToDisplay('COM5','TOTAL 595,789','')}" process="@this" update="@this"/>
-                    </p:commandButton>
                     <h:panelGrid columns="1">
                         <h:outputLabel value="Print.File" style="color: white;"/>
                         <h:selectOneMenu styleClass="clsMenu" value="#{transBean.overridePrintVersion}">
