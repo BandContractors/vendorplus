@@ -14,27 +14,7 @@ public class SerialCommBean implements Serializable, SerialPortEventListener {
 
     private static final long serialVersionUID = 1L;
     SerialPort serialPort = null;
-
-//    public static void main(String[] args) {
-//        try {
-//            SerialCommBean scb = new SerialCommBean();
-//            String PortName = "COM5";
-//            if (scb.isPortFound(PortName) == 1) {
-//                scb.setSerialPort(PortName);
-//                scb.serialPort.openPort();
-//                scb.serialPort.setParams(SerialPort.BAUDRATE_9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
-//                scb.serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN | SerialPort.FLOWCONTROL_RTSCTS_OUT);
-//                scb.initListener();
-//                //scb.serialPort.writeString("Added 21,000");
-//                //scb.serialPort.writeString("             ");
-//                scb.serialPort.writeString(" Total 100,000");
-//                scb.serialPort.closePort();
-//            }
-//        } catch (Exception e) {
-//            System.out.println(e);
-//        }
-//    }
-
+    
     public void writeToDisplay(String aPortName, String aLine1Str, String aLine2Str) {
         try {
             System.out.println("-A-");

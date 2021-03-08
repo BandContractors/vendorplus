@@ -2,6 +2,7 @@ package utilities;
 
 import beans.AccCurrencyBean;
 import beans.Alert_generalBean;
+import beans.Parameter_listBean;
 import connections.DBConnection;
 import entities.CompanySetting;
 import entities.Item;
@@ -9,6 +10,9 @@ import entities.TransItem;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.management.ManagementFactory;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -27,6 +31,8 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.faces.bean.*;
@@ -39,7 +45,6 @@ import javax.management.MBeanInfo;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
-import org.apache.tomcat.dbcp.dbcp2.BasicDataSource;
 //import org.apache.log4j.Level;
 //import org.apache.log4j.Logger;
 import sessions.GeneralUserSetting;
@@ -827,6 +832,37 @@ public class UtilityBean implements Serializable {
         }
     }
 
+    public void invokeLocalCustomerDisplay(String aLine1, String aLine2) {
+        try {
+            Runnable task = new Runnable() {
+                @Override
+                public void run() {
+                    invokeLocalCustomerDisplayNoThread(aLine1, aLine2);
+                }
+            };
+            Executor e = Executors.newSingleThreadExecutor();
+            e.execute(task);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void invokeLocalCustomerDisplayNoThread(String aLine1, String aLine2) {
+        try {
+            String PortName = "COM8";//new Parameter_listBean().getParameter_listByContextNameMemory("CUSTOMER_DISPLAY", "COM_PORT_NAME").getParameter_value();
+            if (PortName.length() > 0) {
+                String wsURL = "http://WenceSurfaceTab:8080/SMclient/CustomerDisplay?port=" + PortName + "&line1=" + aLine1 + "&line2=" + aLine2;
+                URL url = new URL(wsURL);
+                url.openStream();
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+//    public static void main(String[] args) {
+//        new UtilityBean().invokeLocalCustomerDisplay("60,000","56");
+//    }
     /**
      * @return the pattern
      */

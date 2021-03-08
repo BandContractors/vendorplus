@@ -9366,6 +9366,12 @@ public class TransBean implements Serializable {
         aTrans.setPointsAwarded(this.getPointsAwarded(aTrans));
         aTrans.setSpendPoints(this.getSpendPoints(aTrans));
         aTrans.setTotalProfitMargin(this.getTotalProfitMargin(aActiveTransItems));
+        //Customer Display
+        if (new GeneralUserSetting().getCurrentTransactionTypeId() == 2 || new GeneralUserSetting().getCurrentTransactionTypeId() == 11) {
+            UtilityBean ub = new UtilityBean();
+            //ub.invokeLocalCustomerDisplay(ub.formatDoubleToString(aTrans.getGrandTotal()), "");
+            //org.primefaces.PrimeFaces.current().executeScript("customerDisplay(" + ub.formatDoubleToString(aTrans.getGrandTotal()) + "," + "x" + ")");
+        }
     }
 
     public void setPurchaseTransVatAndUpdate(int aTransTypeId, int aTransReasonId, Trans aTrans, List<TransItem> aActiveTransItems) {
@@ -9431,6 +9437,12 @@ public class TransBean implements Serializable {
         aTrans.setSpendPoints(this.getSpendPointsCEC(aTransTypeId, aTransReasonId, aTrans));
         aTrans.setTotalProfitMargin(this.getTotalProfitMargin(aActiveTransItems));
         this.setCashDiscountPerc(aTrans);
+        //Customer Display
+        if (aTransTypeId==2 || aTransTypeId == 11) {
+            UtilityBean ub = new UtilityBean();
+            //ub.invokeLocalCustomerDisplay(ub.formatDoubleToString(aTrans.getGrandTotal()), "");
+            //org.primefaces.PrimeFaces.current().executeScript("customerDisplay(" + ub.formatDoubleToString(aTrans.getGrandTotal()) + "," + "x" + ")");
+        }
     }
 
     public void setCashDiscountPercAndUpdateCEC(int aTransTypeId, int aTransReasonId, Trans aTrans, List<TransItem> aActiveTransItems) {
@@ -9541,6 +9553,12 @@ public class TransBean implements Serializable {
         aTrans.setPointsAwarded(this.getPointsAwarded(aTrans));
         aTrans.setSpendPoints(this.getSpendPoints(aTrans));
         aTrans.setTotalProfitMargin(this.getTotalProfitMargin(aActiveTransItems));
+        //Customer Display
+        if (new GeneralUserSetting().getCurrentTransactionTypeId() == 2 || new GeneralUserSetting().getCurrentTransactionTypeId() == 11) {
+            UtilityBean ub = new UtilityBean();
+            //ub.invokeLocalCustomerDisplay(ub.formatDoubleToString(aTrans.getGrandTotal()), "");
+            //org.primefaces.PrimeFaces.current().executeScript("customerDisplay(" + ub.formatDoubleToString(aTrans.getGrandTotal()) + "," + "x" + ")");
+        }
     }
 
     public void setTransTotalsAndUpdateJournalEntry(Trans aTrans, List<TransItem> aActiveTransItems) {

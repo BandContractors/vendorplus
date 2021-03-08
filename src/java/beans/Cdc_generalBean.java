@@ -35,7 +35,7 @@ public class Cdc_generalBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = Logger.getLogger(Cdc_generalBean.class.getName());
-    
+
     private String ActionMessage = null;
     private List<Cdc_general> Cdc_generalObjectList;
     private Cdc_general Cdc_generalObj;
@@ -255,7 +255,7 @@ public class Cdc_generalBean implements Serializable {
         }
         return cg;
     }
-    
+
     public Cdc_general getLatestCdc_generalAESPK() {
         String sql = "SELECT c1.* FROM cdc_general c1 WHERE c1.cdc_general_id=(select max(c2.cdc_general_id) from cdc_general c2 where c2.cdc_function='AESPK')";
         ResultSet rs = null;
@@ -311,7 +311,7 @@ public class Cdc_generalBean implements Serializable {
         }
         return res;
     }
-    
+
     public boolean isTodaySnapshotFoundAESPK() {
         boolean res = false;
         Date today = new CompanySetting().getCURRENT_SERVER_DATE();
@@ -489,7 +489,11 @@ public class Cdc_generalBean implements Serializable {
         try {
             //check if it hasnt been taken
             if (new Cdc_generalBean().isTodaySnapshotFoundAESPK()) {
-                //ignore
+                if (new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_AES_PUBLIC_KEY").getParameter_value().length() == 0) {
+                    this.takeNewSnapshot_AesPublicKey();
+                } else {
+                    //ignore 
+                }
             } else {
                 this.takeNewSnapshot_AesPublicKey();
             }

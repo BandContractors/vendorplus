@@ -625,10 +625,11 @@
                 <h:panelGrid id="pnlgItemSearch" columns="1" style="text-align: center;">
                     <h:panelGrid columns="4">
                         <h:outputLabel value="Enter text:"/>
-                        <h:inputText id="itxtItemSearch" value="#{itemBean.searchItemDesc}" autocomplete="off" onkeypress="if (event.keyCode == 13) {
-                                    rcmdItemSearch();
-                                    return false;
-                                }"/>
+                        <h:inputText id="itxtItemSearch" value="#{itemBean.searchItemDesc}" autocomplete="off" 
+                                     onkeypress="if (event.keyCode == 13) {
+                                                 rcmdItemSearch();
+                                                 return false;
+                                             }"/>
                         <p:commandButton id="cmdbtnSearchTransItem" value="Search" actionListener="#{itemBean.refreshItemSearchList(itemBean.searchItemDesc)}" update="TransactionFormSales:tblSbarItemSearch"/>
                         <h:outputLabel value=""/>
                         <p:focus for="itxtItemSearch"/>
@@ -642,11 +643,11 @@
                             <h:outputText value="#{rowIndex+1} "/>
                         </p:column>
                         <p:column headerText="Item Description" style="text-align: left;">
-                            <p:commandLink value="#{itm.description}"  oncomplete="PF('sbarItemSearch').hide()">
-                                <f:ajax listener="#{itemBean.setSelectedItem(itm)}" render="TransactionFormSales:gridTransItem"/>
+                            <p:commandButton value="#{itm.description}"  oncomplete="PF('sbarItemSearch').hide()" style="text-align: left;">
+                                <p:ajax listener="#{itemBean.setSelectedItem(itm)}" update="TransactionFormSales:gridTransItem"/>
                                 <p:ajax listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentSaleType,trans,transItem,itemBean.selectedItem,1.0)}" process="@this TransactionFormSales:menuCurrency" update="TransactionFormSales:menuBatchno,TransactionFormSales:itxtUnit,TransactionFormSales:itxtUnitPrice,TransactionFormSales:itxtQty,TransactionFormSales:itxtAmount,TransactionFormSales:gridItemStatus,TransactionFormSales:pgrdOverrideWarranty,TransactionFormSales:pgrdSpecific"/>
                                 <p:ajax listener="#{stockBean.refreshBatchList(generalUserSetting.getCurrentStore().getStoreId(),transItem.itemId)}" process="@this TransactionFormSales:menuCurrency TransactionFormSales:menuBatchno" update="TransactionFormSales:menuBatchno,TransactionFormSales:itxtUnit,TransactionFormSales:itxtUnitPrice,TransactionFormSales:itxtQty,TransactionFormSales:itxtAmount,TransactionFormSales:gridItemStatus,TransactionFormSales:pgrdOverrideWarranty,TransactionFormSales:pgrdSpecific"/>
-                            </p:commandLink>
+                            </p:commandButton>
                         </p:column>
                         <p:column headerText="Alias" style="text-align: left" >  
                             #{itm.alias_name} 

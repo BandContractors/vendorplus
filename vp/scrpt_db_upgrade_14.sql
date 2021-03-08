@@ -158,4 +158,9 @@ VALUES (71, 'COMPANY_SETTING', 'ENABLE_AUTO_COMPLETE_ITEM_SEARCH', '1','possible
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_14',158,Now(),'6.0','');
 
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (72, 'CUSTOMER_DISPLAY', 'COM_PORT_NAME', '','Port name for the customer display in form of COM8,etc.');
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_14',162,Now(),'6.0','');
+
 

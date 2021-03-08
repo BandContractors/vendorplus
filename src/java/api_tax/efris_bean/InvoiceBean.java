@@ -694,8 +694,9 @@ public class InvoiceBean implements Serializable {
             JSONObject dataobjectbasicInformation = parentbasicInformationjsonObject.getJSONObject("basicInformation");
             JSONObject dataobjectsellerDetails = parentbasicInformationjsonObject.getJSONObject("sellerDetails");
             JSONArray jSONArray_GoodsDetialsNew = new JSONArray();
+            JSONArray jSONArray_TaxDetailsNew = new JSONArray();
             //prepare current note to submit
-            this.prepare_credit_note(trans, transitems, jSONArray_GoodsDetials, jSONArray_GoodsDetialsNew, jSONArray_TaxDetails, dataobject_Summary);
+            this.prepare_credit_note(trans, transitems, jSONArray_GoodsDetials, jSONArray_GoodsDetialsNew, jSONArray_TaxDetails,jSONArray_TaxDetailsNew, dataobject_Summary);
             //prepare jason
             json = "{\n"
                     + "	\"oriInvoiceId\": \"" + dataobjectbasicInformation.getString("invoiceId") + "\",\n"
@@ -712,7 +713,7 @@ public class InvoiceBean implements Serializable {
                     + "	\"remark\": \"Remarks\",\n"
                     + "	\"sellersReferenceNo\": \"" + "" + "\",\n"
                     + "	\"goodsDetails\": " + jSONArray_GoodsDetialsNew.toString() + ",\n"
-                    + "	\"taxDetails\": " + jSONArray_TaxDetails.toString() + ",\n"
+                    + "	\"taxDetails\": " + jSONArray_TaxDetailsNew.toString() + ",\n"
                     + "	\"summary\":" + dataobject_Summary.toString() + " ,\n"
                     + "	\"payWay\":" + jSONArray_Payway.toString() + "\n"
                     + "}";
@@ -798,8 +799,9 @@ public class InvoiceBean implements Serializable {
             JSONObject dataobjectbasicInformation = parentbasicInformationjsonObject.getJSONObject("basicInformation");
             JSONObject dataobjectsellerDetails = parentbasicInformationjsonObject.getJSONObject("sellerDetails");
             JSONArray jSONArray_GoodsDetialsNew = new JSONArray();
+            JSONArray jSONArray_TaxDetailsNew = new JSONArray();
             //prepare current note to submit
-            this.prepare_credit_note(trans, transitems, jSONArray_GoodsDetials, jSONArray_GoodsDetialsNew, jSONArray_TaxDetails, dataobject_Summary);
+            this.prepare_credit_note(trans, transitems, jSONArray_GoodsDetials, jSONArray_GoodsDetialsNew, jSONArray_TaxDetails,jSONArray_TaxDetailsNew, dataobject_Summary);
             //prepare jason
             json = "{\n"
                     + "	\"oriInvoiceId\": \"" + dataobjectbasicInformation.getString("invoiceId") + "\",\n"
@@ -816,7 +818,7 @@ public class InvoiceBean implements Serializable {
                     + "	\"remark\": \"Remarks\",\n"
                     + "	\"sellersReferenceNo\": \"" + "" + "\",\n"
                     + "	\"goodsDetails\": " + jSONArray_GoodsDetialsNew.toString() + ",\n"
-                    + "	\"taxDetails\": " + jSONArray_TaxDetails.toString() + ",\n"
+                    + "	\"taxDetails\": " + jSONArray_TaxDetailsNew.toString() + ",\n"
                     + "	\"summary\":" + dataobject_Summary.toString() + " ,\n"
                     + "	\"payWay\":" + jSONArray_Payway.toString() + "\n"
                     + "}";
@@ -880,7 +882,7 @@ public class InvoiceBean implements Serializable {
         return RetMsg;
     }
 
-    public void prepare_credit_note(Trans aTrans, List<TransItem> aTransItems, JSONArray jSONArray_GoodsDetials, JSONArray jSONArray_GoodsDetialsNew, JSONArray jSONArray_TaxDetails, JSONObject dataobject_Summary) {
+    public void prepare_credit_note(Trans aTrans, List<TransItem> aTransItems, JSONArray jSONArray_GoodsDetials, JSONArray jSONArray_GoodsDetialsNew, JSONArray jSONArray_TaxDetails, JSONArray jSONArray_TaxDetailsNew, JSONObject dataobject_Summary) {
         try {
             JSONObject jsonObj;
             int itemcount = 0;
@@ -953,14 +955,17 @@ public class InvoiceBean implements Serializable {
                     jsonObj.put("netAmount", "" + (-1 * ChangedNetAmount) + "");
                     jsonObj.put("taxAmount", "" + (-1 * ChangedTaxAmount) + "");
                     jsonObj.put("grossAmount", "" + (-1 * ChangedGrossAmount) + "");
+                    jSONArray_TaxDetailsNew.put(jsonObj);
                 } else if (TotalAmountExempt > 0 && jsonObj.get("taxCategory").toString().equals("Exempt")) {
                     jsonObj.put("netAmount", "" + (-1 * TotalAmountExempt) + "");
                     jsonObj.put("taxAmount", "0");
                     jsonObj.put("grossAmount", "" + (-1 * TotalAmountExempt) + "");
+                    jSONArray_TaxDetailsNew.put(jsonObj);
                 } else if (TotalAmountZero > 0 && jsonObj.get("taxCategory").toString().equals("Zero")) {
                     jsonObj.put("netAmount", "" + (-1 * TotalAmountZero) + "");
                     jsonObj.put("taxAmount", "0");
                     jsonObj.put("grossAmount", "" + (-1 * TotalAmountZero) + "");
+                    jSONArray_TaxDetailsNew.put(jsonObj);
                 }
             }
             Double ChangedGrossAmountSum = TotalAmountIncVat;

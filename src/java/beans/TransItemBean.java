@@ -5470,6 +5470,7 @@ public class TransItemBean implements Serializable {
                 transB.clearAll(null, aActiveTransItems, NewTransItem, aSelectedItem, null, 1, null);
                 //update totals
                 transB.setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems);
+                //update display status
                 aStatusBean.setItemAddedStatus("ITEM ADDED");
                 aStatusBean.setItemNotAddedStatus("");
                 aStatusBean.setShowItemAddedStatus(1);

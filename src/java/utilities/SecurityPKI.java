@@ -229,6 +229,7 @@ public class SecurityPKI implements Serializable {
             PrivateKey key = this.getPrivate(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_FILE").getParameter_value(), Security.Decrypt(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_PASSWORD").getParameter_value()), new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_ALIAS").getParameter_value());
             AesPublicKey = SecurityPKI.decrypt(this.AESPublicKey(CompanySetting.getTaxIdentity(), new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value()), key);
         } catch (Exception e) {
+            AesPublicKey = "";
             System.out.println("getNewAesPublicKey:" + e.getMessage());
         }
         return AesPublicKey;
