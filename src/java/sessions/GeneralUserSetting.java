@@ -743,4 +743,15 @@ public class GeneralUserSetting implements Serializable {
         }
     }
 
+    public String getClientComputerName() {
+        try {
+            FacesContext context = FacesContext.getCurrentInstance();
+            HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+            HttpSession httpSession = request.getSession(false);
+            return (String) httpSession.getAttribute("CLIENT_COMPUTER_NAME");
+        } catch (NullPointerException | ClassCastException npe) {
+            return "";
+        }
+    }
+
 }

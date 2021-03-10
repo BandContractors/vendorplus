@@ -163,4 +163,12 @@ VALUES (72, 'CUSTOMER_DISPLAY', 'COM_PORT_NAME', '','Port name for the customer 
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_14',162,Now(),'6.0','');
 
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (73, 'CUSTOMER_DISPLAY', 'MAX_CHARACTERS_PER_LINE', '','The maximum number of characters per line supported by the display device.');
+
+DROP INDEX u_transitem_trans_item_batch1 ON transaction_item_hist;
+
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_14',171,Now(),'6.0','');
+
 

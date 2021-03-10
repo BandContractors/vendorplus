@@ -4272,11 +4272,17 @@ public class TransBean implements Serializable {
                     }
                 } catch (NullPointerException npe) {
                 }
-                try {
-                    //if (trans.getAccChildAccountId() > 0) {
-                    //    new AccCoaBean().setAccCoaByCodeOrId(aSelectedAccCoa, "", trans.getAccChildAccountId());
-                    //}
-                } catch (NullPointerException npe) {
+                //Customer Display
+                String PortName = new Parameter_listBean().getParameter_listByContextNameMemory("CUSTOMER_DISPLAY", "COM_PORT_NAME").getParameter_value();
+                String ClientPcName = new GeneralUserSetting().getClientComputerName();
+                String SizeStr = new Parameter_listBean().getParameter_listByContextNameMemory("CUSTOMER_DISPLAY", "MAX_CHARACTERS_PER_LINE").getParameter_value();
+                int Size = 0;
+                if (SizeStr.length() > 0) {
+                    Size = Integer.parseInt(SizeStr);
+                }
+                if (PortName.length() > 0 && ClientPcName.length() > 0 && Size > 0 && (new GeneralUserSetting().getCurrentTransactionTypeId() == 2 || new GeneralUserSetting().getCurrentTransactionTypeId() == 11)) {
+                    UtilityBean ub = new UtilityBean();
+                    ub.invokeLocalCustomerDisplay(ClientPcName, PortName, Size, ub.formatDoubleToString(trans.getGrandTotal()), "");
                 }
             } else {
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Select a valid draft sale record..."));
@@ -6878,6 +6884,8 @@ public class TransBean implements Serializable {
             }
             //Account
             this.AccChildAccountList = new AccChildAccountBean().getAccChildAccountsForCashReceipt(trans.getCurrencyCode(), trans.getPayMethod(), new GeneralUserSetting().getCurrentStore().getStoreId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
+            //Customer Display
+            new UtilityBean().clearCustomerDisplay();
         }
     }
 
@@ -9367,10 +9375,16 @@ public class TransBean implements Serializable {
         aTrans.setSpendPoints(this.getSpendPoints(aTrans));
         aTrans.setTotalProfitMargin(this.getTotalProfitMargin(aActiveTransItems));
         //Customer Display
-        if (new GeneralUserSetting().getCurrentTransactionTypeId() == 2 || new GeneralUserSetting().getCurrentTransactionTypeId() == 11) {
+        String PortName = new Parameter_listBean().getParameter_listByContextNameMemory("CUSTOMER_DISPLAY", "COM_PORT_NAME").getParameter_value();
+        String ClientPcName = new GeneralUserSetting().getClientComputerName();
+        String SizeStr = new Parameter_listBean().getParameter_listByContextNameMemory("CUSTOMER_DISPLAY", "MAX_CHARACTERS_PER_LINE").getParameter_value();
+        int Size = 0;
+        if (SizeStr.length() > 0) {
+            Size = Integer.parseInt(SizeStr);
+        }
+        if (PortName.length() > 0 && ClientPcName.length() > 0 && Size > 0 && (new GeneralUserSetting().getCurrentTransactionTypeId() == 2 || new GeneralUserSetting().getCurrentTransactionTypeId() == 11)) {
             UtilityBean ub = new UtilityBean();
-            //ub.invokeLocalCustomerDisplay(ub.formatDoubleToString(aTrans.getGrandTotal()), "");
-            //org.primefaces.PrimeFaces.current().executeScript("customerDisplay(" + ub.formatDoubleToString(aTrans.getGrandTotal()) + "," + "x" + ")");
+            ub.invokeLocalCustomerDisplay(ClientPcName, PortName, Size, ub.formatDoubleToString(aTrans.getGrandTotal()), "");
         }
     }
 
@@ -9438,10 +9452,16 @@ public class TransBean implements Serializable {
         aTrans.setTotalProfitMargin(this.getTotalProfitMargin(aActiveTransItems));
         this.setCashDiscountPerc(aTrans);
         //Customer Display
-        if (aTransTypeId==2 || aTransTypeId == 11) {
+        String PortName = new Parameter_listBean().getParameter_listByContextNameMemory("CUSTOMER_DISPLAY", "COM_PORT_NAME").getParameter_value();
+        String ClientPcName = new GeneralUserSetting().getClientComputerName();
+        String SizeStr = new Parameter_listBean().getParameter_listByContextNameMemory("CUSTOMER_DISPLAY", "MAX_CHARACTERS_PER_LINE").getParameter_value();
+        int Size = 0;
+        if (SizeStr.length() > 0) {
+            Size = Integer.parseInt(SizeStr);
+        }
+        if (PortName.length() > 0 && ClientPcName.length() > 0 && Size > 0 && (aTransTypeId == 2 || aTransTypeId == 11)) {
             UtilityBean ub = new UtilityBean();
-            //ub.invokeLocalCustomerDisplay(ub.formatDoubleToString(aTrans.getGrandTotal()), "");
-            //org.primefaces.PrimeFaces.current().executeScript("customerDisplay(" + ub.formatDoubleToString(aTrans.getGrandTotal()) + "," + "x" + ")");
+            ub.invokeLocalCustomerDisplay(ClientPcName, PortName, Size, ub.formatDoubleToString(aTrans.getGrandTotal()), "");
         }
     }
 
@@ -9554,10 +9574,16 @@ public class TransBean implements Serializable {
         aTrans.setSpendPoints(this.getSpendPoints(aTrans));
         aTrans.setTotalProfitMargin(this.getTotalProfitMargin(aActiveTransItems));
         //Customer Display
-        if (new GeneralUserSetting().getCurrentTransactionTypeId() == 2 || new GeneralUserSetting().getCurrentTransactionTypeId() == 11) {
+        String PortName = new Parameter_listBean().getParameter_listByContextNameMemory("CUSTOMER_DISPLAY", "COM_PORT_NAME").getParameter_value();
+        String ClientPcName = new GeneralUserSetting().getClientComputerName();
+        String SizeStr = new Parameter_listBean().getParameter_listByContextNameMemory("CUSTOMER_DISPLAY", "MAX_CHARACTERS_PER_LINE").getParameter_value();
+        int Size = 0;
+        if (SizeStr.length() > 0) {
+            Size = Integer.parseInt(SizeStr);
+        }
+        if (PortName.length() > 0 && ClientPcName.length() > 0 && Size > 0 && (new GeneralUserSetting().getCurrentTransactionTypeId() == 2 || new GeneralUserSetting().getCurrentTransactionTypeId() == 11)) {
             UtilityBean ub = new UtilityBean();
-            //ub.invokeLocalCustomerDisplay(ub.formatDoubleToString(aTrans.getGrandTotal()), "");
-            //org.primefaces.PrimeFaces.current().executeScript("customerDisplay(" + ub.formatDoubleToString(aTrans.getGrandTotal()) + "," + "x" + ")");
+            ub.invokeLocalCustomerDisplay(ClientPcName, PortName, Size, ub.formatDoubleToString(aTrans.getGrandTotal()), "");
         }
     }
 

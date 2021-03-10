@@ -16,6 +16,8 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import sessions.GeneralUserSetting;
+import utilities.UtilityBean;
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -209,7 +211,16 @@ public class Login implements Serializable {
                     } catch (NullPointerException | ClassCastException npe) {
                     }
                     httpSession.setAttribute("LOCAL_CURRENCY", LOCAL_CURRENCY);
-
+                    //set computer name session
+                    try {
+                        String clientipaddress = new UtilityBean().getClientIp(request);
+                        String clientcomputername = new UtilityBean().getClientComputerName(clientipaddress);
+                        if (clientcomputername.startsWith("0")) {
+                            clientcomputername = "localhost";
+                        }
+                        httpSession.setAttribute("CLIENT_COMPUTER_NAME", clientcomputername);
+                    } catch (Exception e) {
+                    }
                     //first delete all un-logged out sessions of this user that are older than 12 hours
                     new LoginSessionBean().deleteOldUnloggedOutSessions();
 

@@ -10,14 +10,12 @@ import entities.TransItem;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.management.ManagementFactory;
-import java.net.MalformedURLException;
+import java.net.InetAddress;
 import java.net.URL;
-import java.net.URLConnection;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import static java.sql.Types.VARCHAR;
 import java.text.DecimalFormat;
 import java.text.Format;
@@ -31,11 +29,10 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.faces.bean.*;
+import javax.faces.context.FacesContext;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.IntrospectionException;
@@ -45,8 +42,9 @@ import javax.management.MBeanInfo;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
-//import org.apache.log4j.Level;
-//import org.apache.log4j.Logger;
+import javax.servlet.http.HttpServletRequest;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import sessions.GeneralUserSetting;
 
 @ManagedBean
@@ -54,10 +52,12 @@ import sessions.GeneralUserSetting;
 public class UtilityBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    //static Logger LOGGER = Logger.getLogger(UtilityBean.class.getName());
+    static Logger LOGGER = Logger.getLogger(UtilityBean.class.getName());
     private Pattern pattern;
     private Matcher matcher;
     private static final String TIME24HOURS_PATTERN = "([01]?[0-9]|2[0-3]):[0-5][0-9]";
+    private String HOST_NAME;
+    private String IP;
 
     public boolean isTime24Hour(String time) {
         pattern = Pattern.compile(TIME24HOURS_PATTERN);
@@ -112,9 +112,9 @@ public class UtilityBean implements Serializable {
             cs.registerOutParameter("out_new_id", VARCHAR);
             cs.executeUpdate();
             NewId = cs.getLong(3);
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
             NewId = 0;
+            LOGGER.log(Level.ERROR, e);
         }
         return NewId;
     }
@@ -230,7 +230,7 @@ public class UtilityBean implements Serializable {
             //System.out.println("FFFF:" + aFromDate.toString());
             //System.out.println("TTTT:" + ToDate.toString());
             //System.out.println("TTSQL:" + new java.sql.Timestamp(ToDate.getTime()).toString());
-        } catch (SQLException sqe) {
+        } catch (Exception e) {
             ToDate = null;
         }
         return ToDate;
@@ -615,7 +615,7 @@ public class UtilityBean implements Serializable {
             Executor e = Executors.newSingleThreadExecutor();
             e.execute(task);
         } catch (Exception e) {
-            System.err.println("refreshAlertsThread:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -625,7 +625,7 @@ public class UtilityBean implements Serializable {
             new Alert_generalBean().refreshAlerts();
             org.primefaces.PrimeFaces.current().executeScript("doUpdateMenuSideBarClick()");
         } catch (Exception e) {
-            System.err.println("refreshStockAlerts:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -678,7 +678,7 @@ public class UtilityBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println("getN:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return n;
     }
@@ -751,7 +751,7 @@ public class UtilityBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.out.println("getCommaSeperatedItemIdStr:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return CommaSeperatedStr;
     }
@@ -771,7 +771,7 @@ public class UtilityBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.out.println("getCommaSeperatedStrFromStringArray:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return CommaSeperatedStr;
     }
@@ -787,7 +787,7 @@ public class UtilityBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.out.println("getStringArrayFromCommaSeperatedStr:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return StringArray;
     }
@@ -803,7 +803,7 @@ public class UtilityBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.out.println("getFirstStringFromCommaSeperatedStr:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return FirstString;
     }
@@ -832,37 +832,79 @@ public class UtilityBean implements Serializable {
         }
     }
 
-    public void invokeLocalCustomerDisplay(String aLine1, String aLine2) {
+    public void clearCustomerDisplay() {
+        //Customer Display
+        String PortName = new Parameter_listBean().getParameter_listByContextNameMemory("CUSTOMER_DISPLAY", "COM_PORT_NAME").getParameter_value();
+        String ClientPcName = new GeneralUserSetting().getClientComputerName();
+        String SizeStr = new Parameter_listBean().getParameter_listByContextNameMemory("CUSTOMER_DISPLAY", "MAX_CHARACTERS_PER_LINE").getParameter_value();
+        int Size = 0;
+        if (SizeStr.length() > 0) {
+            Size = Integer.parseInt(SizeStr);
+        }
+        if (PortName.length() > 0 && ClientPcName.length() > 0 && Size>0) {
+            UtilityBean ub = new UtilityBean();
+            ub.invokeLocalCustomerDisplay(ClientPcName, PortName, Size, "", "");
+        }
+    }
+
+    public void invokeLocalCustomerDisplay(String aClientPcName, String aPortName, int aSize, String aLine1, String aLine2) {
         try {
             Runnable task = new Runnable() {
                 @Override
                 public void run() {
-                    invokeLocalCustomerDisplayNoThread(aLine1, aLine2);
+                    invokeLocalCustomerDisplayNoThread(aClientPcName, aPortName, aSize, aLine1, aLine2);
                 }
             };
             Executor e = Executors.newSingleThreadExecutor();
             e.execute(task);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
-    public void invokeLocalCustomerDisplayNoThread(String aLine1, String aLine2) {
+    public void invokeLocalCustomerDisplayNoThread(String aClientPcName, String aPortName, int aSize, String aLine1, String aLine2) {
         try {
-            String PortName = "COM8";//new Parameter_listBean().getParameter_listByContextNameMemory("CUSTOMER_DISPLAY", "COM_PORT_NAME").getParameter_value();
-            if (PortName.length() > 0) {
-                String wsURL = "http://WenceSurfaceTab:8080/SMclient/CustomerDisplay?port=" + PortName + "&line1=" + aLine1 + "&line2=" + aLine2;
+            if (aPortName.length() > 0 && aClientPcName.length() > 0) {
+                String wsURL = "http://" + aClientPcName + ":8080/SMclient/CustomerDisplay?port=" + aPortName + "&size=" + aSize + "&line1=" + aLine1 + "&line2=" + aLine2;
                 URL url = new URL(wsURL);
                 url.openStream();
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
-//    public static void main(String[] args) {
-//        new UtilityBean().invokeLocalCustomerDisplay("60,000","56");
-//    }
+    public String getClientIp(HttpServletRequest request) {
+        String remoteAddr = "";
+        try {
+            if (request != null) {
+                remoteAddr = request.getHeader("X-FORWARDED-FOR");
+                if (remoteAddr == null || "".equals(remoteAddr)) {
+                    remoteAddr = request.getRemoteAddr();
+                }
+            }
+            setIP(remoteAddr);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return remoteAddr;
+    }
+
+    public String getClientComputerName(String remoteAddr) {
+        String computerName = "";
+        try {
+            InetAddress inetAddress = InetAddress.getByName(remoteAddr);
+            computerName = inetAddress.getHostName();
+            if (computerName.equalsIgnoreCase("localhost")) {
+                computerName = java.net.InetAddress.getLocalHost().getCanonicalHostName();
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        setHOST_NAME(computerName);
+        return computerName;
+    }
+
     /**
      * @return the pattern
      */
@@ -896,6 +938,34 @@ public class UtilityBean implements Serializable {
      */
     public static String getTIME24HOURS_PATTERN() {
         return TIME24HOURS_PATTERN;
+    }
+
+    /**
+     * @return the HOST_NAME
+     */
+    public String getHOST_NAME() {
+        return HOST_NAME;
+    }
+
+    /**
+     * @param HOST_NAME the HOST_NAME to set
+     */
+    public void setHOST_NAME(String HOST_NAME) {
+        this.HOST_NAME = HOST_NAME;
+    }
+
+    /**
+     * @return the IP
+     */
+    public String getIP() {
+        return IP;
+    }
+
+    /**
+     * @param IP the IP to set
+     */
+    public void setIP(String IP) {
+        this.IP = IP;
     }
 
 }
