@@ -7,7 +7,6 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -168,17 +167,7 @@ public class Cdc_generalBean implements Serializable {
             return null;
         }
     }
-
-//    public static void main(String[] args){
-//        try {
-//            DBConnection.readConnectionConfigurations("configurations.ConfigFile");
-//            new Parameter_listBean().refreshSavedParameterLists();
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//        Cdc_generalBean gb=new Cdc_generalBean();
-//        gb.getStartTime(11,59);
-//    }
+    
     public long getNewSnapshot_no() {
         String sql;
         sql = "SELECT max(snapshot_no) as snapshot_no FROM cdc_general";
@@ -426,7 +415,7 @@ public class Cdc_generalBean implements Serializable {
                 this.saveCdc_general(cdcgenUpdate);
             }
         } catch (Exception e) {
-            System.out.println("takeNewSnapshot_AesPublicKey:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -465,7 +454,7 @@ public class Cdc_generalBean implements Serializable {
                 this.saveCdc_general(cdcgenUpdate);
             }
         } catch (Exception e) {
-            System.out.println("takeNewSnapshot_cash:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -481,7 +470,7 @@ public class Cdc_generalBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.out.println("takeNewSnapshot_stockAtLogin:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -498,7 +487,7 @@ public class Cdc_generalBean implements Serializable {
                 this.takeNewSnapshot_AesPublicKey();
             }
         } catch (Exception e) {
-            System.out.println("takeNewSnapshot_AesPublicKeyAtLogin:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -514,7 +503,7 @@ public class Cdc_generalBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.out.println("takeNewSnapshot_cash_balanceAtLogin:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -570,7 +559,7 @@ public class Cdc_generalBean implements Serializable {
             }
             ps.executeUpdate();
         } catch (Exception e) {
-            System.err.println("saveCdc_general:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 

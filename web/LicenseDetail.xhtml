@@ -108,11 +108,7 @@
                     <!-- row record -->
                     #{ls.remoteUser}
                 </p:column>
-
             </p:dataTable>
-            <p:commandButton id="cmdbClear" value="JdbcConnPoolPrint">
-                <p:ajax listener="#{utilityBean.printJdbcConnPool()}" process="@form" update="@form" />
-            </p:commandButton>
         </h:form>
     </h:body>
 </html>

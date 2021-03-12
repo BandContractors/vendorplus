@@ -188,6 +188,8 @@ public class InvoiceBean implements Serializable {
 
     public void prepareInvoice(long aTransId) {
         try {
+            AccCurrencyBean acb = new AccCurrencyBean();
+            UtilityBean ub = new UtilityBean();
             Trans trans = new Trans();
             List<TransItem> transitems = new ArrayList<>();
             Transactor transactor = new Transactor();
@@ -284,7 +286,6 @@ public class InvoiceBean implements Serializable {
             int OrderNo = 0;
             Double TotalVat = 0.0;
             Double TotalAmountIncVat = 0.0;
-            Double TotalAmountExcVat = 0.0;
             Double TotalAmountExempt = 0.0;
             Double TotalAmountZero = 0.0;
             for (int i = 0; i < transitems.size(); i++) {
@@ -295,7 +296,7 @@ public class InvoiceBean implements Serializable {
                     GoodsDetails gd = new GoodsDetails();
                     gd.setItem(itm.getDescription());//Hima Cement
                     gd.setItemCode(im.getItem_id_tax());//147
-                    gd.setQty(Double.toString(transitems.get(i).getItemQty()));
+                    gd.setQty(ub.formatDoubleToString(transitems.get(i).getItemQty()));
                     try {
                         String UnitSymbolTax = new UnitBean().getUnit(itm.getUnitId()).getUnit_symbol_tax();
                         if (null == UnitSymbolTax) {
@@ -306,11 +307,10 @@ public class InvoiceBean implements Serializable {
                     } catch (Exception e) {
                         gd.setUnitOfMeasure("PCE");
                     }
-                    gd.setTotal(Double.toString(transitems.get(i).getAmountIncVat()));
                     Double vatPerc = transitems.get(i).getVatPerc();
                     Double tr = vatPerc / 100;
                     if (VatRated.equals("STANDARD")) {
-                        gd.setTaxRate(Double.toString(tr));
+                        gd.setTaxRate(ub.formatDoubleToString(tr));
                     } else if (VatRated.equals("EXEMPT")) {
                         gd.setTaxRate("-");
                     } else if (VatRated.equals("ZERO")) {
@@ -320,32 +320,27 @@ public class InvoiceBean implements Serializable {
                     }
                     //start - new calc
                     Double Qty = transitems.get(i).getItemQty();
-                    Double AmountIncVat = transitems.get(i).getAmountIncVat();
-                    Double UnitPriceIncVat = AmountIncVat / Qty;
-                    Double UnitPriceExcVat = UnitPriceIncVat / (1 + tr);
-                    Double UnitVat = UnitPriceIncVat - UnitPriceExcVat;
-                    Double AmountExcVat = UnitPriceExcVat * Qty;
-                    Double UnitVatTimesQty = UnitVat * Qty;
+                    //formulae UnitPriceIncVat=AmountIncVat/Qty
+                    Double UnitPriceIncVat = transitems.get(i).getAmountIncVat() / Qty;
+                    Double UnitPriceIncVatRd = acb.roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceIncVat);
+                    Double AmountIncVat = UnitPriceIncVatRd * Qty;
+                    Double AmountIncVatRd = acb.roundAmountMinTwoDps(trans.getCurrencyCode(), AmountIncVat);
+                    //formulae 
+                    Double UnitPriceExcVat = UnitPriceIncVatRd / (1 + tr);
+                    Double UnitVat = UnitPriceIncVatRd - UnitPriceExcVat;
+                    Double TaxAmount = UnitVat * Qty;
+                    Double TaxAmountRd = acb.roundAmountMinTwoDps(trans.getCurrencyCode(), TaxAmount);
+                    //assign
+                    gd.setTotal(ub.formatDoubleToString(AmountIncVatRd));
+                    gd.setUnitPrice(ub.formatDoubleToString(UnitPriceIncVatRd));
+                    gd.setTax(ub.formatDoubleToString(TaxAmountRd));
                     if (VatRated.equals("STANDARD")) {
-                        TotalVat = TotalVat + (Qty * UnitVat);
-                        TotalAmountIncVat = TotalAmountIncVat + AmountIncVat;
-                        TotalAmountExcVat = TotalAmountExcVat + AmountExcVat;
-                        UnitPriceIncVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceIncVat);
-                        UnitPriceExcVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceExcVat);
-                        UnitVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitVat);
-                        UnitVatTimesQty = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitVatTimesQty);
-                        gd.setUnitPrice(Double.toString(UnitPriceIncVat));
-                        gd.setTax(Double.toString(UnitVatTimesQty));
+                        TotalVat = TotalVat + TaxAmountRd;
+                        TotalAmountIncVat = TotalAmountIncVat + AmountIncVatRd;
                     } else if (VatRated.equals("EXEMPT")) {
-                        TotalAmountExempt = TotalAmountExempt + AmountIncVat;
-                        UnitPriceIncVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceIncVat);
-                        gd.setUnitPrice(Double.toString(UnitPriceIncVat));
-                        gd.setTax("0");
+                        TotalAmountExempt = TotalAmountExempt + AmountIncVatRd;
                     } else if (VatRated.equals("ZERO")) {
-                        TotalAmountZero = TotalAmountZero + AmountIncVat;
-                        UnitPriceIncVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceIncVat);
-                        gd.setUnitPrice(Double.toString(UnitPriceIncVat));
-                        gd.setTax("0");
+                        TotalAmountZero = TotalAmountZero + AmountIncVatRd;
                     }
                     //end - new calc
                     gd.setDiscountFlag(Integer.toString(2));//0=Discount amount,1=Discounted goods,2=None
@@ -357,11 +352,17 @@ public class InvoiceBean implements Serializable {
                     gd.setGoodsCategoryId(im.getItem_code_tax());//code for Cement
                     gd.setGoodsCategoryName("");
                     //exciseRate;exciseRule;exciseTax;pack;stick;exciseUnit;exciseCurrency;exciseRateName;
+                    //System.out.println("UnitPriceIncVatRd:" + UnitPriceIncVatRd + ",AmountIncVatRd:" + AmountIncVatRd + ",TaxAmountRd:" + TaxAmountRd);
+                    //System.out.println("String:" + ub.formatDoubleToString(UnitPriceIncVatRd));
+                    //System.out.println("String:" + new UtilityBean().formatDoubleToString(UnitPriceIncVatRd));
                     goodsDetails.add(gd);
                     OrderNo = OrderNo + 1;
                 }
             }
-
+            Double TotalVatR = acb.roundAmountMinTwoDps(trans.getCurrencyCode(), TotalVat);
+            Double TotalAmountIncVatR = acb.roundAmountMinTwoDps(trans.getCurrencyCode(), TotalAmountIncVat);
+            Double TotalAmountExemptR = acb.roundAmountMinTwoDps(trans.getCurrencyCode(), TotalAmountExempt);
+            Double TotalAmountZeroR = acb.roundAmountMinTwoDps(trans.getCurrencyCode(), TotalAmountZero);
             /*
              TaxDetails
              Tax Category: Excise Duty, Standard, Deemed, Zero, Exempt
@@ -370,48 +371,46 @@ public class InvoiceBean implements Serializable {
             TaxDetails td = null;
             //Standard
             if (TotalVat > 0) {
-                TotalVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), TotalVat);
-                TotalAmountIncVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), TotalAmountIncVat);
-                TotalAmountExcVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), TotalAmountExcVat);
                 td = new TaxDetails();
-                td.setGrossAmount(Double.toString(TotalAmountIncVat));
+                td.setGrossAmount(ub.formatDoubleToString(TotalAmountIncVatR));
                 td.setTaxCategory("Standard");
                 td.setTaxRateName("VAT-Standard");//free entry
                 Double vatPerc = trans.getVatPerc();
                 Double tr = vatPerc / 100;
-                td.setTaxRate(Double.toString(tr));
-                td.setTaxAmount(Double.toString(TotalVat));
-                td.setNetAmount(Double.toString(TotalAmountExcVat));
+                td.setTaxRate(ub.formatDoubleToString(tr));
+                td.setTaxAmount(ub.formatDoubleToString(TotalVatR));
+                Double NetAmountR = acb.roundAmountMinTwoDps(trans.getCurrencyCode(), TotalAmountIncVatR - TotalVatR);
+                td.setNetAmount(ub.formatDoubleToString(NetAmountR));
                 taxDetails.add(td);
             }
             //Exempt
             if (TotalAmountExempt > 0) {
-                TotalAmountExempt = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), TotalAmountExempt);
                 td = new TaxDetails();
-                td.setGrossAmount(Double.toString(TotalAmountExempt));
+                td.setGrossAmount(ub.formatDoubleToString(TotalAmountExemptR));
                 td.setTaxCategory("Exempt");
                 td.setTaxRateName("VAT-Exempt");//free entry
                 td.setTaxRate("-");
                 td.setTaxAmount("0");
-                td.setNetAmount(Double.toString(TotalAmountExempt));
+                td.setNetAmount(ub.formatDoubleToString(TotalAmountExemptR));
                 taxDetails.add(td);
             }
             //Zero
             if (TotalAmountZero > 0) {
-                TotalAmountZero = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), TotalAmountZero);
                 td = new TaxDetails();
-                td.setGrossAmount(Double.toString(TotalAmountZero));
+                td.setGrossAmount(ub.formatDoubleToString(TotalAmountZeroR));
                 td.setTaxCategory("Zero");
                 td.setTaxRateName("VAT-Zero");//free entry
                 td.setTaxRate("0");
                 td.setTaxAmount("0");
-                td.setNetAmount(Double.toString(TotalAmountZero));
+                td.setNetAmount(ub.formatDoubleToString(TotalAmountZeroR));
                 taxDetails.add(td);
             }
             //summary
-            summary.setGrossAmount(Double.toString(TotalAmountIncVat + TotalAmountExempt + TotalAmountZero));
-            summary.setTaxAmount(Double.toString(TotalVat));
-            summary.setNetAmount(Double.toString(TotalAmountExcVat + TotalAmountExempt + TotalAmountZero));
+            Double GrossAmountSummaryR = TotalAmountIncVatR + TotalAmountExemptR + TotalAmountZeroR;
+            summary.setGrossAmount(ub.formatDoubleToString(acb.roundAmountMinTwoDps(trans.getCurrencyCode(), GrossAmountSummaryR)));
+            summary.setTaxAmount(ub.formatDoubleToString(acb.roundAmountMinTwoDps(trans.getCurrencyCode(), TotalVatR)));
+            Double NetAmountSummary = GrossAmountSummaryR - TotalVatR;
+            summary.setNetAmount(ub.formatDoubleToString(acb.roundAmountMinTwoDps(trans.getCurrencyCode(), NetAmountSummary)));
             summary.setItemCount(Integer.toString(goodsDetails.size()));
             summary.setModeCode("1");
         } catch (Exception e) {
@@ -696,7 +695,7 @@ public class InvoiceBean implements Serializable {
             JSONArray jSONArray_GoodsDetialsNew = new JSONArray();
             JSONArray jSONArray_TaxDetailsNew = new JSONArray();
             //prepare current note to submit
-            this.prepare_credit_note(trans, transitems, jSONArray_GoodsDetials, jSONArray_GoodsDetialsNew, jSONArray_TaxDetails,jSONArray_TaxDetailsNew, dataobject_Summary);
+            this.prepare_credit_note(trans, transitems, jSONArray_GoodsDetials, jSONArray_GoodsDetialsNew, jSONArray_TaxDetails, jSONArray_TaxDetailsNew, dataobject_Summary);
             //prepare jason
             json = "{\n"
                     + "	\"oriInvoiceId\": \"" + dataobjectbasicInformation.getString("invoiceId") + "\",\n"
@@ -801,7 +800,7 @@ public class InvoiceBean implements Serializable {
             JSONArray jSONArray_GoodsDetialsNew = new JSONArray();
             JSONArray jSONArray_TaxDetailsNew = new JSONArray();
             //prepare current note to submit
-            this.prepare_credit_note(trans, transitems, jSONArray_GoodsDetials, jSONArray_GoodsDetialsNew, jSONArray_TaxDetails,jSONArray_TaxDetailsNew, dataobject_Summary);
+            this.prepare_credit_note(trans, transitems, jSONArray_GoodsDetials, jSONArray_GoodsDetialsNew, jSONArray_TaxDetails, jSONArray_TaxDetailsNew, dataobject_Summary);
             //prepare jason
             json = "{\n"
                     + "	\"oriInvoiceId\": \"" + dataobjectbasicInformation.getString("invoiceId") + "\",\n"
@@ -884,11 +883,12 @@ public class InvoiceBean implements Serializable {
 
     public void prepare_credit_note(Trans aTrans, List<TransItem> aTransItems, JSONArray jSONArray_GoodsDetials, JSONArray jSONArray_GoodsDetialsNew, JSONArray jSONArray_TaxDetails, JSONArray jSONArray_TaxDetailsNew, JSONObject dataobject_Summary) {
         try {
+            AccCurrencyBean acb = new AccCurrencyBean();
+            UtilityBean ub = new UtilityBean();
             JSONObject jsonObj;
             int itemcount = 0;
             Double TotalVat = 0.0;
             Double TotalAmountIncVat = 0.0;
-            Double TotalAmountExcVat = 0.0;
             Double TotalAmountExempt = 0.0;
             Double TotalAmountZero = 0.0;
             for (int i = 0; i < jSONArray_GoodsDetials.length(); i++) {
@@ -905,34 +905,36 @@ public class InvoiceBean implements Serializable {
                     ChangedAmt = (-1 * ChangedAmt);
                     //start - new calc
                     Double Qty = ChangedQty;
-                    Double AmountIncVat = ChangedAmt;
-                    Double UnitPriceIncVat = AmountIncVat / Qty;
-                    Double UnitPriceExcVat = UnitPriceIncVat / (1 + tr);
-                    Double UnitVat = UnitPriceIncVat - UnitPriceExcVat;
-                    Double AmountExcVat = UnitPriceExcVat * Qty;
-                    Double UnitVatTimesQty = Qty * UnitVat;
+                    //formulae UnitPriceIncVat=AmountIncVat/Qty
+                    Double UnitPriceIncVat = ChangedAmt / Qty;
+                    Double UnitPriceIncVatRd = acb.roundAmountMinTwoDps(aTrans.getCurrencyCode(), UnitPriceIncVat);
+                    Double AmountIncVat = UnitPriceIncVatRd * Qty;
+                    Double AmountIncVatRd = acb.roundAmountMinTwoDps(aTrans.getCurrencyCode(), AmountIncVat);
+                    //formulae 
+                    Double UnitPriceExcVat = UnitPriceIncVatRd / (1 + tr);
+                    Double UnitVat = UnitPriceIncVatRd - UnitPriceExcVat;
+                    Double TaxAmount = UnitVat * Qty;
+                    Double TaxAmountRd = acb.roundAmountMinTwoDps(aTrans.getCurrencyCode(), TaxAmount);
+
+                    //assign
+                    //gd.setUnitPrice(ub.formatDoubleToString(UnitPriceIncVatRd));
                     if (VatRated.equals("STANDARD")) {
-                        TotalVat = TotalVat + (Qty * UnitVat);
-                        TotalAmountIncVat = TotalAmountIncVat + AmountIncVat;
-                        TotalAmountExcVat = TotalAmountExcVat + AmountExcVat;
-                        UnitPriceIncVat = new AccCurrencyBean().roundAmountMinTwoDps(aTrans.getCurrencyCode(), UnitPriceIncVat);
-                        UnitPriceExcVat = new AccCurrencyBean().roundAmountMinTwoDps(aTrans.getCurrencyCode(), UnitPriceExcVat);
-                        UnitVat = new AccCurrencyBean().roundAmountMinTwoDps(aTrans.getCurrencyCode(), UnitVat);
-                        UnitVatTimesQty = new AccCurrencyBean().roundAmountMinTwoDps(aTrans.getCurrencyCode(), UnitVatTimesQty);
+                        TotalVat = TotalVat + TaxAmountRd;
+                        TotalAmountIncVat = TotalAmountIncVat + AmountIncVatRd;
                         //put the negative back at crediting
                         jsonObj.put("qty", "" + (-1 * Qty) + "");
-                        jsonObj.put("total", "" + (-1 * AmountIncVat) + "");
-                        jsonObj.put("tax", "" + (-1 * UnitVatTimesQty) + "");
+                        jsonObj.put("total", "" + ub.formatDoubleToString(-1 * AmountIncVatRd) + "");
+                        jsonObj.put("tax", "" + ub.formatDoubleToString(-1 * TaxAmountRd) + "");
                     } else if (VatRated.equals("EXEMPT")) {
-                        TotalAmountExempt = TotalAmountExempt + AmountIncVat;
+                        TotalAmountExempt = TotalAmountExempt + AmountIncVatRd;
                         //put the negative back at crediting
                         jsonObj.put("qty", "" + (-1 * Qty) + "");
-                        jsonObj.put("total", "" + (-1 * AmountIncVat) + "");
+                        jsonObj.put("total", "" + ub.formatDoubleToString(-1 * AmountIncVatRd) + "");
                         jsonObj.put("tax", "0");
                     } else if (VatRated.equals("ZERO")) {
-                        TotalAmountZero = TotalAmountZero + AmountIncVat;
+                        TotalAmountZero = TotalAmountZero + AmountIncVatRd;
                         jsonObj.put("qty", "" + (-1 * Qty) + "");
-                        jsonObj.put("total", "" + (-1 * AmountIncVat) + "");
+                        jsonObj.put("total", "" + ub.formatDoubleToString(-1 * AmountIncVatRd) + "");
                         jsonObj.put("tax", "0");
                     }
                     //end - new calc
@@ -940,40 +942,36 @@ public class InvoiceBean implements Serializable {
                     itemcount = itemcount + 1;
                 }
             }
+            Double TotalVatR = acb.roundAmountMinTwoDps(aTrans.getCurrencyCode(), TotalVat);
+            Double TotalAmountIncVatR = acb.roundAmountMinTwoDps(aTrans.getCurrencyCode(), TotalAmountIncVat);
+            Double TotalAmountExemptR = acb.roundAmountMinTwoDps(aTrans.getCurrencyCode(), TotalAmountExempt);
+            Double TotalAmountZeroR = acb.roundAmountMinTwoDps(aTrans.getCurrencyCode(), TotalAmountZero);
             //tax details
-            TotalVat = new AccCurrencyBean().roundAmountMinTwoDps(aTrans.getCurrencyCode(), TotalVat);
-            TotalAmountIncVat = new AccCurrencyBean().roundAmountMinTwoDps(aTrans.getCurrencyCode(), TotalAmountIncVat);
-            TotalAmountExcVat = new AccCurrencyBean().roundAmountMinTwoDps(aTrans.getCurrencyCode(), TotalAmountExcVat);
-            TotalAmountExempt = new AccCurrencyBean().roundAmountMinTwoDps(aTrans.getCurrencyCode(), TotalAmountExempt);
-            TotalAmountZero = new AccCurrencyBean().roundAmountMinTwoDps(aTrans.getCurrencyCode(), TotalAmountZero);
             for (int i = 0; i < jSONArray_TaxDetails.length(); i++) {
                 jsonObj = (JSONObject) jSONArray_TaxDetails.get(i);
                 if (TotalVat > 0 && (jsonObj.get("taxCategory").toString().equals("Standard") || Double.parseDouble(jsonObj.get("taxAmount").toString()) > 0)) {
-                    Double ChangedNetAmount = TotalAmountExcVat;
-                    Double ChangedTaxAmount = TotalVat;
-                    Double ChangedGrossAmount = TotalAmountIncVat;
-                    jsonObj.put("netAmount", "" + (-1 * ChangedNetAmount) + "");
-                    jsonObj.put("taxAmount", "" + (-1 * ChangedTaxAmount) + "");
-                    jsonObj.put("grossAmount", "" + (-1 * ChangedGrossAmount) + "");
+                    Double NetAmountR = acb.roundAmountMinTwoDps(aTrans.getCurrencyCode(), TotalAmountIncVatR - TotalVatR);
+                    jsonObj.put("netAmount", "" + ub.formatDoubleToString(-1 * NetAmountR) + "");
+                    jsonObj.put("taxAmount", "" + ub.formatDoubleToString(-1 * TotalVatR) + "");
+                    jsonObj.put("grossAmount", "" + ub.formatDoubleToString(-1 * TotalAmountIncVatR) + "");
                     jSONArray_TaxDetailsNew.put(jsonObj);
                 } else if (TotalAmountExempt > 0 && jsonObj.get("taxCategory").toString().equals("Exempt")) {
-                    jsonObj.put("netAmount", "" + (-1 * TotalAmountExempt) + "");
+                    jsonObj.put("netAmount", "" + ub.formatDoubleToString(-1 * TotalAmountExemptR) + "");
                     jsonObj.put("taxAmount", "0");
-                    jsonObj.put("grossAmount", "" + (-1 * TotalAmountExempt) + "");
+                    jsonObj.put("grossAmount", "" + ub.formatDoubleToString(-1 * TotalAmountExemptR) + "");
                     jSONArray_TaxDetailsNew.put(jsonObj);
                 } else if (TotalAmountZero > 0 && jsonObj.get("taxCategory").toString().equals("Zero")) {
-                    jsonObj.put("netAmount", "" + (-1 * TotalAmountZero) + "");
+                    jsonObj.put("netAmount", "" + ub.formatDoubleToString(-1 * TotalAmountZeroR) + "");
                     jsonObj.put("taxAmount", "0");
-                    jsonObj.put("grossAmount", "" + (-1 * TotalAmountZero) + "");
+                    jsonObj.put("grossAmount", "" + ub.formatDoubleToString(-1 * TotalAmountZeroR) + "");
                     jSONArray_TaxDetailsNew.put(jsonObj);
                 }
             }
-            Double ChangedGrossAmountSum = TotalAmountIncVat;
-            Double ChangedNetAmountSum = TotalAmountExcVat;
-            Double ChangedTaxAmountSum = TotalVat;
-            dataobject_Summary.put("grossAmount", "" + Double.toString(-1 * (ChangedGrossAmountSum + TotalAmountExempt + TotalAmountZero)) + "");
-            dataobject_Summary.put("netAmount", "" + Double.toString(-1 * (ChangedNetAmountSum + TotalAmountExempt + TotalAmountZero)) + "");
-            dataobject_Summary.put("taxAmount", "" + Double.toString(-1 * ChangedTaxAmountSum) + "");
+            Double GrossAmountSummaryR = TotalAmountIncVatR + TotalAmountExemptR + TotalAmountZeroR;
+            Double NetAmountSummary = GrossAmountSummaryR - TotalVatR;
+            dataobject_Summary.put("grossAmount", "" + ub.formatDoubleToString(-1 * GrossAmountSummaryR) + "");
+            dataobject_Summary.put("netAmount", "" + ub.formatDoubleToString(-1 * NetAmountSummary) + "");
+            dataobject_Summary.put("taxAmount", "" + ub.formatDoubleToString(-1 * TotalVatR) + "");
             dataobject_Summary.put("itemCount", "" + itemcount + "");
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -1130,6 +1128,8 @@ public class InvoiceBean implements Serializable {
             Trans trans = new Trans();
             List<TransItem> transitems = new ArrayList<>();
             Transactor transactor = new Transactor();
+            AccCurrencyBean acb = new AccCurrencyBean();
+            UtilityBean ub = new UtilityBean();
             try {
                 trans = new CreditDebitNoteBean().getTrans_cr_dr_note(aTransId);
             } catch (Exception e) {
@@ -1206,12 +1206,10 @@ public class InvoiceBean implements Serializable {
                 //do nothing
             }
             //extend
-
             //goodsDetails
             int OrderNo = 0;
             Double TotalVat = 0.0;
             Double TotalAmountIncVat = 0.0;
-            Double TotalAmountExcVat = 0.0;
             Double TotalAmountExempt = 0.0;
             Double TotalAmountZero = 0.0;
             JSONObject jsonObj;
@@ -1225,13 +1223,13 @@ public class InvoiceBean implements Serializable {
                     GoodsDetails gd = new GoodsDetails();
                     gd.setItem(jsonObj.get("item").toString());//Desciption:Hima Cement
                     gd.setItemCode(jsonObj.get("itemCode").toString());//ItemIdTax:147
-                    gd.setQty(Double.toString(ChangedQty));
+                    gd.setQty(ub.formatDoubleToString(ChangedQty));
                     gd.setUnitOfMeasure(jsonObj.get("unitOfMeasure").toString());
-                    gd.setTotal(Double.toString(ChangedAmt));
+                    //gd.setTotal(ub.formatDoubleToString(ChangedAmt));
                     Double vatPerc = ti.getVatPerc();
                     Double tr = vatPerc / 100;
                     if (VatRated.equals("STANDARD")) {
-                        gd.setTaxRate(Double.toString(tr));
+                        gd.setTaxRate(ub.formatDoubleToString(tr));
                     } else if (VatRated.equals("EXEMPT")) {
                         gd.setTaxRate("-");
                     } else if (VatRated.equals("ZERO")) {
@@ -1241,32 +1239,27 @@ public class InvoiceBean implements Serializable {
                     }
                     //start - new calc
                     Double Qty = ChangedQty;
-                    Double AmountIncVat = ChangedAmt;//transitems.get(i).getAmountIncVat();
-                    Double UnitPriceIncVat = AmountIncVat / Qty;
-                    Double UnitPriceExcVat = UnitPriceIncVat / (1 + tr);
-                    Double UnitVat = UnitPriceIncVat - UnitPriceExcVat;
-                    Double AmountExcVat = UnitPriceExcVat * Qty;
-                    Double UnitVatTimesQty = Qty * UnitVat;
+                    //formulae UnitPriceIncVat=AmountIncVat/Qty
+                    Double UnitPriceIncVat = ChangedAmt / Qty;
+                    Double UnitPriceIncVatRd = acb.roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceIncVat);
+                    Double AmountIncVat = UnitPriceIncVatRd * Qty;
+                    Double AmountIncVatRd = acb.roundAmountMinTwoDps(trans.getCurrencyCode(), AmountIncVat);
+                    //formulae 
+                    Double UnitPriceExcVat = UnitPriceIncVatRd / (1 + tr);
+                    Double UnitVat = UnitPriceIncVatRd - UnitPriceExcVat;
+                    Double TaxAmount = UnitVat * Qty;
+                    Double TaxAmountRd = acb.roundAmountMinTwoDps(trans.getCurrencyCode(), TaxAmount);
+                    //assign
+                    gd.setTotal(ub.formatDoubleToString(AmountIncVatRd));
+                    gd.setUnitPrice(ub.formatDoubleToString(UnitPriceIncVatRd));
+                    gd.setTax(ub.formatDoubleToString(TaxAmountRd));
                     if (VatRated.equals("STANDARD")) {
-                        TotalVat = TotalVat + (Qty * UnitVat);
-                        TotalAmountIncVat = TotalAmountIncVat + AmountIncVat;
-                        TotalAmountExcVat = TotalAmountExcVat + AmountExcVat;
-                        UnitPriceIncVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceIncVat);
-                        UnitPriceExcVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceExcVat);
-                        UnitVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitVat);
-                        UnitVatTimesQty = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitVatTimesQty);
-                        gd.setUnitPrice(Double.toString(UnitPriceIncVat));
-                        gd.setTax(Double.toString(UnitVatTimesQty));
+                        TotalVat = TotalVat + TaxAmountRd;
+                        TotalAmountIncVat = TotalAmountIncVat + AmountIncVatRd;
                     } else if (VatRated.equals("EXEMPT")) {
-                        TotalAmountExempt = TotalAmountExempt + AmountIncVat;
-                        UnitPriceIncVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceIncVat);
-                        gd.setUnitPrice(Double.toString(UnitPriceIncVat));
-                        gd.setTax("0");
+                        TotalAmountExempt = TotalAmountExempt + AmountIncVatRd;
                     } else if (VatRated.equals("ZERO")) {
-                        TotalAmountZero = TotalAmountZero + AmountIncVat;
-                        UnitPriceIncVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceIncVat);
-                        gd.setUnitPrice(Double.toString(UnitPriceIncVat));
-                        gd.setTax("0");
+                        TotalAmountZero = TotalAmountZero + AmountIncVatRd;
                     }
                     //end - new calc
                     gd.setDiscountFlag(Integer.toString(2));//0=Discount amount,1=Discounted goods,2=None
@@ -1278,63 +1271,65 @@ public class InvoiceBean implements Serializable {
                     gd.setGoodsCategoryId(jsonObj.get("goodsCategoryId").toString());//UNSPC for Cement
                     gd.setGoodsCategoryName("");
                     //exciseRate;exciseRule;exciseTax;pack;stick;exciseUnit;exciseCurrency;exciseRateName;
+                    //System.out.println("UnitPriceIncVatRd:" + UnitPriceIncVatRd + ",AmountIncVatRd:" + AmountIncVatRd + ",TaxAmountRd:" + TaxAmountRd);
+                    //System.out.println("String:" + ub.formatDoubleToString(UnitPriceIncVatRd));
+                    //System.out.println("String:" + new UtilityBean().formatDoubleToString(UnitPriceIncVatRd));
                     goodsDetails.add(gd);
                     OrderNo = OrderNo + 1;
                 }
             }
-
-            //taxDetails
+            Double TotalVatR = acb.roundAmountMinTwoDps(trans.getCurrencyCode(), TotalVat);
+            Double TotalAmountIncVatR = acb.roundAmountMinTwoDps(trans.getCurrencyCode(), TotalAmountIncVat);
+            Double TotalAmountExemptR = acb.roundAmountMinTwoDps(trans.getCurrencyCode(), TotalAmountExempt);
+            Double TotalAmountZeroR = acb.roundAmountMinTwoDps(trans.getCurrencyCode(), TotalAmountZero);
+            /*
+             TaxDetails
+             Tax Category: Excise Duty, Standard, Deemed, Zero, Exempt
+             A– Standard (18%). B-Zero (0%). C- Exempt (-). D-Deemed (18%). E-Excise Duty (as per excise duty rates).
+             */
             TaxDetails td = null;
             //Standard
             if (TotalVat > 0) {
-                TotalVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), TotalVat);
-                TotalAmountIncVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), TotalAmountIncVat);
-                TotalAmountExcVat = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), TotalAmountExcVat);
                 td = new TaxDetails();
-                Double ChangedGrossAmount = TotalAmountIncVat;
-                Double ChangedNetAmount = TotalAmountExcVat;
-                Double ChangedTaxAmount = TotalVat;
-                td.setGrossAmount(Double.toString(ChangedGrossAmount));
+                td.setGrossAmount(ub.formatDoubleToString(TotalAmountIncVatR));
                 td.setTaxCategory("Standard");
-                td.setTaxRateName("VAT-Standard");
+                td.setTaxRateName("VAT-Standard");//free entry
                 Double vatPerc = trans.getVatPerc();
                 Double tr = vatPerc / 100;
-                td.setTaxRate(Double.toString(tr));
-                td.setTaxAmount(Double.toString(ChangedTaxAmount));
-                td.setNetAmount(Double.toString(ChangedNetAmount));
+                td.setTaxRate(ub.formatDoubleToString(tr));
+                td.setTaxAmount(ub.formatDoubleToString(TotalVatR));
+                Double NetAmountR = acb.roundAmountMinTwoDps(trans.getCurrencyCode(), TotalAmountIncVatR - TotalVatR);
+                td.setNetAmount(ub.formatDoubleToString(NetAmountR));
                 taxDetails.add(td);
             }
             //Exempt
             if (TotalAmountExempt > 0) {
-                TotalAmountExempt = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), TotalAmountExempt);
                 td = new TaxDetails();
-                td.setGrossAmount(Double.toString(TotalAmountExempt));
+                td.setGrossAmount(ub.formatDoubleToString(TotalAmountExemptR));
                 td.setTaxCategory("Exempt");
                 td.setTaxRateName("VAT-Exempt");//free entry
                 td.setTaxRate("-");
                 td.setTaxAmount("0");
-                td.setNetAmount(Double.toString(TotalAmountExempt));
+                td.setNetAmount(ub.formatDoubleToString(TotalAmountExemptR));
                 taxDetails.add(td);
             }
             //Zero
             if (TotalAmountZero > 0) {
-                TotalAmountZero = new AccCurrencyBean().roundAmountMinTwoDps(trans.getCurrencyCode(), TotalAmountZero);
                 td = new TaxDetails();
-                td.setGrossAmount(Double.toString(TotalAmountZero));
+                td.setGrossAmount(ub.formatDoubleToString(TotalAmountZeroR));
                 td.setTaxCategory("Zero");
                 td.setTaxRateName("VAT-Zero");//free entry
                 td.setTaxRate("0");
                 td.setTaxAmount("0");
-                td.setNetAmount(Double.toString(TotalAmountZero));
+                td.setNetAmount(ub.formatDoubleToString(TotalAmountZeroR));
                 taxDetails.add(td);
             }
             //summary
-            Double ChangedGAmount = TotalAmountIncVat;
-            Double ChangedNAmount = TotalAmountExcVat;
-            Double ChangedTAmount = TotalVat;
-            summary.setGrossAmount(Double.toString(ChangedGAmount + TotalAmountExempt + TotalAmountZero));
-            summary.setTaxAmount(Double.toString(ChangedTAmount));
-            summary.setNetAmount(Double.toString(ChangedNAmount + TotalAmountExempt + TotalAmountZero));
+            Double GrossAmountSummaryR = TotalAmountIncVatR + TotalAmountExemptR + TotalAmountZeroR;
+            summary.setGrossAmount(ub.formatDoubleToString(acb.roundAmountMinTwoDps(trans.getCurrencyCode(), GrossAmountSummaryR)));
+            summary.setTaxAmount(ub.formatDoubleToString(acb.roundAmountMinTwoDps(trans.getCurrencyCode(), TotalVatR)));
+            Double NetAmountSummary = GrossAmountSummaryR - TotalVatR;
+            summary.setNetAmount(ub.formatDoubleToString(acb.roundAmountMinTwoDps(trans.getCurrencyCode(), NetAmountSummary)));
             summary.setItemCount(Integer.toString(goodsDetails.size()));
             summary.setModeCode("1");
         } catch (Exception e) {

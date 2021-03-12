@@ -260,7 +260,7 @@
                 <p:column headerText="Synced">
                     <h:outputText value="#{itm.tax_synced eq 1 ? 'Yes':itm.tax_synced eq 0 ? 'No':''}" styleClass="#{itm.tax_synced eq 1 ? 'green':itm.tax_synced eq 0 ? 'red':''}" style="width: 60px;color: #ffffff !important;text-align: right !important;"/>
                 </p:column>
-                <p:column headerText="Re-Sync" exportable="false" visible="false">
+                <p:column headerText="Re-Sync" exportable="false" visible="true">
                     <p:commandButton id="cmdbSync" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" icon="ui-icon-arrowreturnthick-1-n" style="width: 20px;height: 30px;margin: 5px;"  rendered="#{itm.tax_synced eq 0}">
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>

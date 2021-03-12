@@ -15,13 +15,15 @@ import java.util.Date;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import utilities.Security;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 @ManagedBean
 @SessionScoped
 public class CompanySetting implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    static Logger LOGGER = Logger.getLogger(CompanySetting.class.getName());
     private static int CompanySettingId;
 
     //license information
@@ -309,16 +311,8 @@ public class CompanySetting implements Serializable {
             } else {
 
             }
-        } catch (SQLException | NullPointerException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -374,16 +368,8 @@ public class CompanySetting implements Serializable {
             } else {
 
             }
-        } catch (SQLException | NullPointerException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -439,18 +425,9 @@ public class CompanySetting implements Serializable {
             } else {
 
             }
-        } catch (SQLException | NullPointerException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
-
     }
 
     /**
@@ -1478,7 +1455,7 @@ public class CompanySetting implements Serializable {
             //System.out.print(diffSeconds + " seconds.");
 
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return diffDays;
     }
@@ -1506,7 +1483,7 @@ public class CompanySetting implements Serializable {
             diffDays = diff / (24 * 60 * 60 * 1000);
             diffDays = diffDays;
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return diffDays;
     }

@@ -14,6 +14,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import utilities.Security;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 /*
  * To change this template, choose Tools | Templates
@@ -28,7 +30,8 @@ import utilities.Security;
 public class Parameter_listBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    static Logger LOGGER = Logger.getLogger(Parameter_listBean.class.getName());
+    
     private String ActionMessage = null;
     private List<Parameter_list> Parameter_lists = new ArrayList<>();
     private Parameter_list Parameter_listObject = new Parameter_list();
@@ -66,8 +69,8 @@ public class Parameter_listBean implements Serializable {
             } catch (NullPointerException npe) {
                 aParameter_list.setStore_id(0);
             }
-        } catch (SQLException se) {
-            System.err.println("setParameter_listFromResultset:" + se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -120,10 +123,10 @@ public class Parameter_listBean implements Serializable {
                 this.setActionMessage("Saved Successfully");
                 this.clearParameter_list(aParameter_list);
             }
-        } catch (SQLException se) {
+        } catch (Exception e) {
             status = 0;
             this.setActionMessage("Not Saved");
-            System.err.println(se.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return status;
     }
@@ -141,16 +144,8 @@ public class Parameter_listBean implements Serializable {
                 pl = new Parameter_list();
                 this.setParameter_listFromResultset(pl, rs);
             }
-        } catch (SQLException se) {
-            System.err.println("getParameter_list:" + se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println("getParameter_listById:" + ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return pl;
     }
@@ -187,16 +182,8 @@ public class Parameter_listBean implements Serializable {
                 pl = new Parameter_list();
                 this.setParameter_listFromResultset(pl, rs);
             }
-        } catch (SQLException se) {
-            System.err.println("getParameter_listByConextName:" + se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println("getParameter_listByConextName:" + ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return pl;
     }
@@ -215,7 +202,7 @@ public class Parameter_listBean implements Serializable {
                 ListItemIndex = ListItemIndex + 1;
             }
         } catch (Exception e) {
-
+            LOGGER.log(Level.ERROR, e);
         }
         return pl;
     }
@@ -232,7 +219,7 @@ public class Parameter_listBean implements Serializable {
                 ListItemIndex = ListItemIndex + 1;
             }
         } catch (Exception e) {
-            System.err.println("setParameter_listByIdMemory:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -250,16 +237,8 @@ public class Parameter_listBean implements Serializable {
                 this.setParameter_listFromResultset(pl, rs);
                 pls.add(pl);
             }
-        } catch (SQLException se) {
-            System.err.println("getParameter_listsByContext:" + se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println("getParameter_listsByContext:" + ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return pls;
     }
@@ -279,7 +258,7 @@ public class Parameter_listBean implements Serializable {
                 SavedParameterLists.add(pl);
             }
         } catch (Exception e) {
-            System.err.println("refreshSavedParameterLists:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -298,7 +277,7 @@ public class Parameter_listBean implements Serializable {
                 pls.add(aParameter_list);
             }
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return pls;
     }
@@ -312,7 +291,7 @@ public class Parameter_listBean implements Serializable {
             Parameter_listTo.setDescription(Parameter_listFrom.getDescription());
             Parameter_listTo.setStore_id(Parameter_listFrom.getStore_id());
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -332,7 +311,6 @@ public class Parameter_listBean implements Serializable {
             aParameter_list.setParameter_value("");
             aParameter_list.setDescription("");
             aParameter_list.setStore_id(0);
-
         }
     }
 
@@ -349,7 +327,6 @@ public class Parameter_listBean implements Serializable {
                 encryptedValue = Security.Encrypt(aParameterValue);
             }
         } catch (Exception e) {
-
         }
         return encryptedValue;
     }

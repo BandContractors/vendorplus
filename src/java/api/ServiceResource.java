@@ -10,7 +10,6 @@ import beans.Parameter_listBean;
 import connections.DBConnection;
 import entities.CompanySetting;
 import entities.MenuItem;
-import java.io.FileNotFoundException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.core.Context;
@@ -53,8 +52,8 @@ public class ServiceResource {
             new Parameter_listBean().refreshSavedParameterLists();
             x=new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "MOBILE_NUMBER").getParameter_value();
             y=CompanySetting.getCompanyName();
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(ServiceResource.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception e) {
+            Logger.getLogger(ServiceResource.class.getName()).log(Level.SEVERE, null, e);
         }
         MenuItem mi=new MenuItemBean().getMenuItemObj();
         return "<h1>" + y + "</h1> </br>" + x;

@@ -8,11 +8,13 @@ import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import sessions.GeneralUserSetting;
-
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+
 /**
  *
  * @author btwesigye
@@ -22,7 +24,7 @@ import sessions.GeneralUserSetting;
 public class MenuItemBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    static Logger LOGGER = Logger.getLogger(MenuItemBean.class.getName());
     private MenuItem MenuItemObj;
 
     public void refreshMenuItemObj() {
@@ -106,7 +108,7 @@ public class MenuItemBean implements Serializable {
                     }
                 }
             } catch (Exception e) {
-                //do nothing
+                LOGGER.log(Level.ERROR, e);
             }
             try {
                 this.MenuItemObj.setDEFAULT_FOCUS_CONTROL_ID(pb.getParameter_listByContextNameMemory("COMPANY_SETTING", "DEFAULT_FOCUS_CONTROL_ID").getParameter_value());
@@ -119,7 +121,7 @@ public class MenuItemBean implements Serializable {
                 this.MenuItemObj.setENABLE_AUTO_COMPLETE_ITEM_SEARCH(1);
             }
         } catch (Exception e) {
-
+            LOGGER.log(Level.ERROR, e);
         }
     }
 

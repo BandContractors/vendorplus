@@ -11,7 +11,6 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -21,6 +20,8 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import org.apache.commons.math3.util.Precision;
 import sessions.GeneralUserSetting;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 /*
  * To change this template, choose Tools | Templates
@@ -35,7 +36,7 @@ import sessions.GeneralUserSetting;
 public class AccCurrencyBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    static Logger LOGGER = Logger.getLogger(AccCurrencyBean.class.getName());
     private String ActionMessage = null;
     private List<AccCurrency> IsoCurrencyList;
     private AccCurrency IsoCurrencyObject;
@@ -138,8 +139,8 @@ public class AccCurrencyBean implements Serializable {
             } catch (Exception e) {
                 acccurrency.setDecimal_unit("");
             }
-        } catch (SQLException se) {
-            System.err.println("setAccCurrencyFromResultset:" + se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -230,8 +231,8 @@ public class AccCurrencyBean implements Serializable {
                     this.setActionMessage("Saved Successfully!");
                     this.clearAccCurrency(aAccCurrency);
                 }
-            } catch (SQLException se) {
-                System.err.println("saveAccCurrency:" + se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
     }
@@ -249,16 +250,8 @@ public class AccCurrencyBean implements Serializable {
                 ac = new AccCurrency();
                 this.setAccCurrencyFromResultset(ac, rs);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println("getCurrency-ID:" + ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return ac;
     }
@@ -276,16 +269,8 @@ public class AccCurrencyBean implements Serializable {
                 ac = new AccCurrency();
                 this.setAccCurrencyFromResultset(ac, rs);
             }
-        } catch (SQLException se) {
-            System.err.println("getCurrency-Code:" + se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println("getCurrency-Code:" + ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return ac;
     }
@@ -308,9 +293,9 @@ public class AccCurrencyBean implements Serializable {
                 ps.executeUpdate();
                 this.setActionMessage("Deleted Successfully!");
                 this.clearAccCurrency(aAccCurrency);
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
                 this.setActionMessage("Currency not deleted");
+                LOGGER.log(Level.ERROR, e);
             }
         }
     }
@@ -329,16 +314,8 @@ public class AccCurrencyBean implements Serializable {
                 this.setAccCurrencyFromResultset(ac, rs);
                 acs.add(ac);
             }
-        } catch (SQLException se) {
-            System.err.println("getAccCurrenciesActive:" + se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println("getAccCurrenciesActive:" + ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return acs;
     }
@@ -368,7 +345,7 @@ public class AccCurrencyBean implements Serializable {
                 acs.add(ac);
             }
         } catch (Exception e) {
-            System.err.println("getAccCurrenciesActiveByAccount:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return acs;
     }
@@ -396,16 +373,8 @@ public class AccCurrencyBean implements Serializable {
                 this.setAccCurrencyFromResultset(ac, rs);
                 this.CurrencyList.add(ac);
             }
-        } catch (SQLException se) {
-            System.err.println("refreshCurrencyListActive:" + se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println("refreshCurrencyListActive:" + ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -424,16 +393,8 @@ public class AccCurrencyBean implements Serializable {
                 this.setAccCurrencyFromResultset(ac, rs);
                 acs.add(ac);
             }
-        } catch (SQLException se) {
-            System.err.println("getAccCurrenciesActiveByDefaultCur:" + se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println("getAccCurrenciesActiveByDefaultCur:" + ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return acs;
     }
@@ -452,16 +413,8 @@ public class AccCurrencyBean implements Serializable {
                 this.setAccCurrencyFromResultset(ac, rs);
                 acs.add(ac);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return acs;
     }
@@ -480,16 +433,8 @@ public class AccCurrencyBean implements Serializable {
                 this.setAccCurrencyFromResultset(ac, rs);
                 acs.add(ac);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return acs;
     }
@@ -507,16 +452,8 @@ public class AccCurrencyBean implements Serializable {
                 ac = new AccCurrency();
                 this.setAccCurrencyFromResultset(ac, rs);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return ac;
     }
@@ -557,16 +494,8 @@ public class AccCurrencyBean implements Serializable {
                 }
                 this.IsoCurrencyList.add(ac);
             }
-        } catch (SQLException se) {
-            System.err.println("refreshIsoCurrencies:" + se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println("refreshIsoCurrencies:" + ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -674,6 +603,7 @@ public class AccCurrencyBean implements Serializable {
      * Rounds off to at least 2 decimal places If currency rounds off to less 2
      * decimal places, values will be rounded off to 2 decimal places otherwise
      * decimal places rounding takes precedence
+     *
      * @param aCurrencyCode
      * @param aMount
      * @return RoundedAmount
@@ -707,16 +637,8 @@ public class AccCurrencyBean implements Serializable {
                 this.setAccCurrencyFromResultset(cur, rs);
                 SavedCurrencyLists.add(cur);
             }
-        } catch (SQLException se) {
-            System.err.println("refreshSavedCurrencyLists:" + se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println("refreshSavedCurrencyLists:" + ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -734,7 +656,7 @@ public class AccCurrencyBean implements Serializable {
                 ListItemIndex = ListItemIndex + 1;
             }
         } catch (Exception e) {
-
+            LOGGER.log(Level.ERROR, e);
         }
         return cur;
     }
@@ -794,7 +716,7 @@ public class AccCurrencyBean implements Serializable {
                 lst.add(obj);
             }
         } catch (Exception e) {
-            System.err.println("getAcc_currency_tax_lists:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return lst;
     }

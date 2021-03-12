@@ -16,8 +16,9 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import sessions.GeneralUserSetting;
 import utilities.UtilityBean;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -32,7 +33,7 @@ import utilities.UtilityBean;
 public class Login implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    static Logger LOGGER = Logger.getLogger(Login.class.getName());
     private String ActionMessageSuccess = null;
     private String ActionMessageFailure = null;
     private UserDetail LoggedInUserDetail = null;

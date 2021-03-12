@@ -7,16 +7,17 @@ package api;
 
 import beans.Cdc_generalBean;
 import beans.Parameter_listBean;
-import java.io.FileNotFoundException;
+import connections.DBConnection;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import connections.DBConnection;
 import java.util.Date;
 import utilities.UtilityBean;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 public class TaskManager {
 
+    static Logger LOGGER = Logger.getLogger(TaskManager.class.getName());
     private Timer timer = new Timer();
 
     public void startTask() {
@@ -53,8 +54,8 @@ public class TaskManager {
                     //do nothing
                 }
             }
-        } catch (FileNotFoundException e) {
-            System.out.println("startTask:" + e.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
