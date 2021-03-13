@@ -24,6 +24,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import sessions.GeneralUserSetting;
 import utilities.UtilityBean;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 /*
  * To change this template, choose Tools | Templates
@@ -38,7 +40,7 @@ import utilities.UtilityBean;
 public class Alert_generalBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    static Logger LOGGER = Logger.getLogger(Alert_generalBean.class.getName());
     private List<Alert_general> Alert_generalObjectList;
     private Alert_general Alert_generalObj;
     private List<Alert_general> AlertList = new ArrayList<>();
@@ -115,8 +117,8 @@ public class Alert_generalBean implements Serializable {
             } catch (NullPointerException npe) {
                 aAlert_general.setStatus_code("");
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -132,8 +134,8 @@ public class Alert_generalBean implements Serializable {
                 ag = new Alert_general();
                 this.setAlert_generalFromResultset(ag, rs);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return ag;
     }
@@ -183,7 +185,7 @@ public class Alert_generalBean implements Serializable {
             }
             ps.executeUpdate();
         } catch (Exception e) {
-            System.err.println("saveAlert_general:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -223,7 +225,7 @@ public class Alert_generalBean implements Serializable {
             Executor e = Executors.newSingleThreadExecutor();
             e.execute(task);
         } catch (Exception e) {
-            System.err.println("checkStockStatusForAlertThread:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -257,7 +259,7 @@ public class Alert_generalBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.out.println("checkStockStatusForAlert:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -272,7 +274,7 @@ public class Alert_generalBean implements Serializable {
             Executor e = Executors.newSingleThreadExecutor();
             e.execute(task);
         } catch (Exception e) {
-            System.err.println("checkExpiryStatusForAlertThread:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -320,7 +322,7 @@ public class Alert_generalBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.out.println("checkExpiryStatusForAlert:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -366,7 +368,7 @@ public class Alert_generalBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.out.println("checkStockStatusForEmail:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -420,7 +422,7 @@ public class Alert_generalBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.out.println("checkExpiryStatusForEmail:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -466,7 +468,7 @@ public class Alert_generalBean implements Serializable {
                 org.primefaces.PrimeFaces.current().executeScript("doUpdateMenuClick()");
             }
         } catch (Exception e) {
-            System.out.println("updateReadStockStatusAlert:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -494,7 +496,7 @@ public class Alert_generalBean implements Serializable {
             this.saveAlert_general(alertgeneral);
             this.checkStockStatusForEmail(alertgeneral);
         } catch (Exception e) {
-            System.out.println("saveNewStockStatusAlert:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -539,7 +541,7 @@ public class Alert_generalBean implements Serializable {
             this.saveAlert_general(alertgeneral);
             this.checkExpiryStatusForEmail(alertgeneral);
         } catch (Exception e) {
-            System.out.println("saveNewExpiryStatusAlert:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -572,7 +574,7 @@ public class Alert_generalBean implements Serializable {
                 this.setAlert_generalFromResultset(ag, rs);
             }
         } catch (Exception e) {
-            System.err.println("getLatestAlert_general:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return ag;
     }
@@ -589,7 +591,6 @@ public class Alert_generalBean implements Serializable {
                 + "("
                 + "(read_by NOT REGEXP '^" + userid + ",') AND (read_by NOT REGEXP '," + userid + "$') AND  (read_by NOT REGEXP '," + userid + ",') AND read_by!='" + userid + "'"
                 + ")";
-        //System.out.println("SQL-ALERT:" + sql);
         ResultSet rs = null;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -600,7 +601,7 @@ public class Alert_generalBean implements Serializable {
                 n = rs.getLong("unread");
             }
         } catch (Exception e) {
-            System.err.println("countUserUnreadStockAlerts:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return n;
     }
@@ -616,7 +617,6 @@ public class Alert_generalBean implements Serializable {
                 + "("
                 + "(read_by NOT REGEXP '^" + userid + ",') AND (read_by NOT REGEXP '," + userid + "$') AND  (read_by NOT REGEXP '," + userid + ",') AND read_by!='" + userid + "'"
                 + ")";
-        //System.out.println("SQL-ALERT:" + sql);
         ResultSet rs = null;
         List<Alert_general> aList = new ArrayList<>();
         try (
@@ -630,7 +630,7 @@ public class Alert_generalBean implements Serializable {
                 aList.add(ag);
             }
         } catch (Exception e) {
-            System.err.println("retrieveUserUnreadStockAlerts:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return aList;
     }
@@ -658,7 +658,7 @@ public class Alert_generalBean implements Serializable {
                 this.AlertList.add(ag);
             }
         } catch (Exception e) {
-            System.err.println("refreshAlertList:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -694,7 +694,7 @@ public class Alert_generalBean implements Serializable {
             }
             aUserUnreadAlertsCount = aUserUnreadStockAlertsList.size();
         } catch (Exception e) {
-            System.err.println("refreshUserUnreadStockAlerts:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 

@@ -684,17 +684,15 @@ public class UtilityBean implements Serializable {
     }
 
 //    public static void main(String[] args) {
-//        try {
-//            int d = 0;
-//            int n = 5;
-//            int r = 0;
-//            r = n / d;
-//        } catch (Exception e) {
-//            LOGGER.log(Level.ERROR, e);
-//            LOGGER.debug(e);
-//            System.out.println(e);
-//        }
+//        UtilityBean ub = new UtilityBean();
+//        double a = 1000000;
+//        double b = 10000000;
+//        System.out.println("a:" + a + ",b=" + b);
+//        System.out.println("aDtoS:" + Double.toString(a) + ",bDtoS=" + Double.toString(b));
+//        System.out.println("aFDtoS:" + ub.formatDoubleToString(a) + ",bFDtoS=" + ub.formatDoubleToString(b));
+//        System.out.println("aFN:" + ub.formatNumber(a) + ",bFN=" + ub.formatNumber(b));
 //    }
+
     public String getEmptyIfNull(String aStringValue) {
         if (aStringValue == null) {
             return "";
@@ -841,7 +839,7 @@ public class UtilityBean implements Serializable {
         if (SizeStr.length() > 0) {
             Size = Integer.parseInt(SizeStr);
         }
-        if (PortName.length() > 0 && ClientPcName.length() > 0 && Size>0) {
+        if (PortName.length() > 0 && ClientPcName.length() > 0 && Size > 0) {
             UtilityBean ub = new UtilityBean();
             ub.invokeLocalCustomerDisplay(ClientPcName, PortName, Size, "", "");
         }

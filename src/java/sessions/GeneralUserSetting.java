@@ -21,6 +21,8 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -31,7 +33,7 @@ import javax.servlet.http.HttpSession;
 public class GeneralUserSetting implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    static Logger LOGGER = Logger.getLogger(GeneralUserSetting.class.getName());
     private boolean ReportRetrievalOption;
 
     /**

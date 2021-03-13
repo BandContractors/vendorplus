@@ -296,7 +296,7 @@ public class InvoiceBean implements Serializable {
                     GoodsDetails gd = new GoodsDetails();
                     gd.setItem(itm.getDescription());//Hima Cement
                     gd.setItemCode(im.getItem_id_tax());//147
-                    gd.setQty(ub.formatDoubleToString(transitems.get(i).getItemQty()));
+                    gd.setQty(Double.toString(transitems.get(i).getItemQty()));
                     try {
                         String UnitSymbolTax = new UnitBean().getUnit(itm.getUnitId()).getUnit_symbol_tax();
                         if (null == UnitSymbolTax) {
@@ -310,7 +310,7 @@ public class InvoiceBean implements Serializable {
                     Double vatPerc = transitems.get(i).getVatPerc();
                     Double tr = vatPerc / 100;
                     if (VatRated.equals("STANDARD")) {
-                        gd.setTaxRate(ub.formatDoubleToString(tr));
+                        gd.setTaxRate(Double.toString(tr));
                     } else if (VatRated.equals("EXEMPT")) {
                         gd.setTaxRate("-");
                     } else if (VatRated.equals("ZERO")) {
@@ -331,9 +331,9 @@ public class InvoiceBean implements Serializable {
                     Double TaxAmount = UnitVat * Qty;
                     Double TaxAmountRd = acb.roundAmountMinTwoDps(trans.getCurrencyCode(), TaxAmount);
                     //assign
-                    gd.setTotal(ub.formatDoubleToString(AmountIncVatRd));
-                    gd.setUnitPrice(ub.formatDoubleToString(UnitPriceIncVatRd));
-                    gd.setTax(ub.formatDoubleToString(TaxAmountRd));
+                    gd.setTotal(Double.toString(AmountIncVatRd));
+                    gd.setUnitPrice(Double.toString(UnitPriceIncVatRd));
+                    gd.setTax(Double.toString(TaxAmountRd));
                     if (VatRated.equals("STANDARD")) {
                         TotalVat = TotalVat + TaxAmountRd;
                         TotalAmountIncVat = TotalAmountIncVat + AmountIncVatRd;
@@ -353,7 +353,7 @@ public class InvoiceBean implements Serializable {
                     gd.setGoodsCategoryName("");
                     //exciseRate;exciseRule;exciseTax;pack;stick;exciseUnit;exciseCurrency;exciseRateName;
                     //System.out.println("UnitPriceIncVatRd:" + UnitPriceIncVatRd + ",AmountIncVatRd:" + AmountIncVatRd + ",TaxAmountRd:" + TaxAmountRd);
-                    //System.out.println("String:" + ub.formatDoubleToString(UnitPriceIncVatRd));
+                    //System.out.println("String:" + Double.toString(UnitPriceIncVatRd));
                     //System.out.println("String:" + new UtilityBean().formatDoubleToString(UnitPriceIncVatRd));
                     goodsDetails.add(gd);
                     OrderNo = OrderNo + 1;
@@ -372,45 +372,45 @@ public class InvoiceBean implements Serializable {
             //Standard
             if (TotalVat > 0) {
                 td = new TaxDetails();
-                td.setGrossAmount(ub.formatDoubleToString(TotalAmountIncVatR));
+                td.setGrossAmount(Double.toString(TotalAmountIncVatR));
                 td.setTaxCategory("Standard");
                 td.setTaxRateName("VAT-Standard");//free entry
                 Double vatPerc = trans.getVatPerc();
                 Double tr = vatPerc / 100;
-                td.setTaxRate(ub.formatDoubleToString(tr));
-                td.setTaxAmount(ub.formatDoubleToString(TotalVatR));
+                td.setTaxRate(Double.toString(tr));
+                td.setTaxAmount(Double.toString(TotalVatR));
                 Double NetAmountR = acb.roundAmountMinTwoDps(trans.getCurrencyCode(), TotalAmountIncVatR - TotalVatR);
-                td.setNetAmount(ub.formatDoubleToString(NetAmountR));
+                td.setNetAmount(Double.toString(NetAmountR));
                 taxDetails.add(td);
             }
             //Exempt
             if (TotalAmountExempt > 0) {
                 td = new TaxDetails();
-                td.setGrossAmount(ub.formatDoubleToString(TotalAmountExemptR));
+                td.setGrossAmount(Double.toString(TotalAmountExemptR));
                 td.setTaxCategory("Exempt");
                 td.setTaxRateName("VAT-Exempt");//free entry
                 td.setTaxRate("-");
                 td.setTaxAmount("0");
-                td.setNetAmount(ub.formatDoubleToString(TotalAmountExemptR));
+                td.setNetAmount(Double.toString(TotalAmountExemptR));
                 taxDetails.add(td);
             }
             //Zero
             if (TotalAmountZero > 0) {
                 td = new TaxDetails();
-                td.setGrossAmount(ub.formatDoubleToString(TotalAmountZeroR));
+                td.setGrossAmount(Double.toString(TotalAmountZeroR));
                 td.setTaxCategory("Zero");
                 td.setTaxRateName("VAT-Zero");//free entry
                 td.setTaxRate("0");
                 td.setTaxAmount("0");
-                td.setNetAmount(ub.formatDoubleToString(TotalAmountZeroR));
+                td.setNetAmount(Double.toString(TotalAmountZeroR));
                 taxDetails.add(td);
             }
             //summary
             Double GrossAmountSummaryR = TotalAmountIncVatR + TotalAmountExemptR + TotalAmountZeroR;
-            summary.setGrossAmount(ub.formatDoubleToString(acb.roundAmountMinTwoDps(trans.getCurrencyCode(), GrossAmountSummaryR)));
-            summary.setTaxAmount(ub.formatDoubleToString(acb.roundAmountMinTwoDps(trans.getCurrencyCode(), TotalVatR)));
+            summary.setGrossAmount(Double.toString(acb.roundAmountMinTwoDps(trans.getCurrencyCode(), GrossAmountSummaryR)));
+            summary.setTaxAmount(Double.toString(acb.roundAmountMinTwoDps(trans.getCurrencyCode(), TotalVatR)));
             Double NetAmountSummary = GrossAmountSummaryR - TotalVatR;
-            summary.setNetAmount(ub.formatDoubleToString(acb.roundAmountMinTwoDps(trans.getCurrencyCode(), NetAmountSummary)));
+            summary.setNetAmount(Double.toString(acb.roundAmountMinTwoDps(trans.getCurrencyCode(), NetAmountSummary)));
             summary.setItemCount(Integer.toString(goodsDetails.size()));
             summary.setModeCode("1");
         } catch (Exception e) {
@@ -917,24 +917,24 @@ public class InvoiceBean implements Serializable {
                     Double TaxAmountRd = acb.roundAmountMinTwoDps(aTrans.getCurrencyCode(), TaxAmount);
 
                     //assign
-                    //gd.setUnitPrice(ub.formatDoubleToString(UnitPriceIncVatRd));
+                    //gd.setUnitPrice(Double.toString(UnitPriceIncVatRd));
                     if (VatRated.equals("STANDARD")) {
                         TotalVat = TotalVat + TaxAmountRd;
                         TotalAmountIncVat = TotalAmountIncVat + AmountIncVatRd;
                         //put the negative back at crediting
                         jsonObj.put("qty", "" + (-1 * Qty) + "");
-                        jsonObj.put("total", "" + ub.formatDoubleToString(-1 * AmountIncVatRd) + "");
-                        jsonObj.put("tax", "" + ub.formatDoubleToString(-1 * TaxAmountRd) + "");
+                        jsonObj.put("total", "" + Double.toString(-1 * AmountIncVatRd) + "");
+                        jsonObj.put("tax", "" + Double.toString(-1 * TaxAmountRd) + "");
                     } else if (VatRated.equals("EXEMPT")) {
                         TotalAmountExempt = TotalAmountExempt + AmountIncVatRd;
                         //put the negative back at crediting
                         jsonObj.put("qty", "" + (-1 * Qty) + "");
-                        jsonObj.put("total", "" + ub.formatDoubleToString(-1 * AmountIncVatRd) + "");
+                        jsonObj.put("total", "" + Double.toString(-1 * AmountIncVatRd) + "");
                         jsonObj.put("tax", "0");
                     } else if (VatRated.equals("ZERO")) {
                         TotalAmountZero = TotalAmountZero + AmountIncVatRd;
                         jsonObj.put("qty", "" + (-1 * Qty) + "");
-                        jsonObj.put("total", "" + ub.formatDoubleToString(-1 * AmountIncVatRd) + "");
+                        jsonObj.put("total", "" + Double.toString(-1 * AmountIncVatRd) + "");
                         jsonObj.put("tax", "0");
                     }
                     //end - new calc
@@ -951,27 +951,27 @@ public class InvoiceBean implements Serializable {
                 jsonObj = (JSONObject) jSONArray_TaxDetails.get(i);
                 if (TotalVat > 0 && (jsonObj.get("taxCategory").toString().equals("Standard") || Double.parseDouble(jsonObj.get("taxAmount").toString()) > 0)) {
                     Double NetAmountR = acb.roundAmountMinTwoDps(aTrans.getCurrencyCode(), TotalAmountIncVatR - TotalVatR);
-                    jsonObj.put("netAmount", "" + ub.formatDoubleToString(-1 * NetAmountR) + "");
-                    jsonObj.put("taxAmount", "" + ub.formatDoubleToString(-1 * TotalVatR) + "");
-                    jsonObj.put("grossAmount", "" + ub.formatDoubleToString(-1 * TotalAmountIncVatR) + "");
+                    jsonObj.put("netAmount", "" + Double.toString(-1 * NetAmountR) + "");
+                    jsonObj.put("taxAmount", "" + Double.toString(-1 * TotalVatR) + "");
+                    jsonObj.put("grossAmount", "" + Double.toString(-1 * TotalAmountIncVatR) + "");
                     jSONArray_TaxDetailsNew.put(jsonObj);
                 } else if (TotalAmountExempt > 0 && jsonObj.get("taxCategory").toString().equals("Exempt")) {
-                    jsonObj.put("netAmount", "" + ub.formatDoubleToString(-1 * TotalAmountExemptR) + "");
+                    jsonObj.put("netAmount", "" + Double.toString(-1 * TotalAmountExemptR) + "");
                     jsonObj.put("taxAmount", "0");
-                    jsonObj.put("grossAmount", "" + ub.formatDoubleToString(-1 * TotalAmountExemptR) + "");
+                    jsonObj.put("grossAmount", "" + Double.toString(-1 * TotalAmountExemptR) + "");
                     jSONArray_TaxDetailsNew.put(jsonObj);
                 } else if (TotalAmountZero > 0 && jsonObj.get("taxCategory").toString().equals("Zero")) {
-                    jsonObj.put("netAmount", "" + ub.formatDoubleToString(-1 * TotalAmountZeroR) + "");
+                    jsonObj.put("netAmount", "" + Double.toString(-1 * TotalAmountZeroR) + "");
                     jsonObj.put("taxAmount", "0");
-                    jsonObj.put("grossAmount", "" + ub.formatDoubleToString(-1 * TotalAmountZeroR) + "");
+                    jsonObj.put("grossAmount", "" + Double.toString(-1 * TotalAmountZeroR) + "");
                     jSONArray_TaxDetailsNew.put(jsonObj);
                 }
             }
             Double GrossAmountSummaryR = TotalAmountIncVatR + TotalAmountExemptR + TotalAmountZeroR;
             Double NetAmountSummary = GrossAmountSummaryR - TotalVatR;
-            dataobject_Summary.put("grossAmount", "" + ub.formatDoubleToString(-1 * GrossAmountSummaryR) + "");
-            dataobject_Summary.put("netAmount", "" + ub.formatDoubleToString(-1 * NetAmountSummary) + "");
-            dataobject_Summary.put("taxAmount", "" + ub.formatDoubleToString(-1 * TotalVatR) + "");
+            dataobject_Summary.put("grossAmount", "" + Double.toString(-1 * GrossAmountSummaryR) + "");
+            dataobject_Summary.put("netAmount", "" + Double.toString(-1 * NetAmountSummary) + "");
+            dataobject_Summary.put("taxAmount", "" + Double.toString(-1 * TotalVatR) + "");
             dataobject_Summary.put("itemCount", "" + itemcount + "");
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -1223,13 +1223,13 @@ public class InvoiceBean implements Serializable {
                     GoodsDetails gd = new GoodsDetails();
                     gd.setItem(jsonObj.get("item").toString());//Desciption:Hima Cement
                     gd.setItemCode(jsonObj.get("itemCode").toString());//ItemIdTax:147
-                    gd.setQty(ub.formatDoubleToString(ChangedQty));
+                    gd.setQty(Double.toString(ChangedQty));
                     gd.setUnitOfMeasure(jsonObj.get("unitOfMeasure").toString());
-                    //gd.setTotal(ub.formatDoubleToString(ChangedAmt));
+                    //gd.setTotal(Double.toString(ChangedAmt));
                     Double vatPerc = ti.getVatPerc();
                     Double tr = vatPerc / 100;
                     if (VatRated.equals("STANDARD")) {
-                        gd.setTaxRate(ub.formatDoubleToString(tr));
+                        gd.setTaxRate(Double.toString(tr));
                     } else if (VatRated.equals("EXEMPT")) {
                         gd.setTaxRate("-");
                     } else if (VatRated.equals("ZERO")) {
@@ -1250,9 +1250,9 @@ public class InvoiceBean implements Serializable {
                     Double TaxAmount = UnitVat * Qty;
                     Double TaxAmountRd = acb.roundAmountMinTwoDps(trans.getCurrencyCode(), TaxAmount);
                     //assign
-                    gd.setTotal(ub.formatDoubleToString(AmountIncVatRd));
-                    gd.setUnitPrice(ub.formatDoubleToString(UnitPriceIncVatRd));
-                    gd.setTax(ub.formatDoubleToString(TaxAmountRd));
+                    gd.setTotal(Double.toString(AmountIncVatRd));
+                    gd.setUnitPrice(Double.toString(UnitPriceIncVatRd));
+                    gd.setTax(Double.toString(TaxAmountRd));
                     if (VatRated.equals("STANDARD")) {
                         TotalVat = TotalVat + TaxAmountRd;
                         TotalAmountIncVat = TotalAmountIncVat + AmountIncVatRd;
@@ -1272,7 +1272,7 @@ public class InvoiceBean implements Serializable {
                     gd.setGoodsCategoryName("");
                     //exciseRate;exciseRule;exciseTax;pack;stick;exciseUnit;exciseCurrency;exciseRateName;
                     //System.out.println("UnitPriceIncVatRd:" + UnitPriceIncVatRd + ",AmountIncVatRd:" + AmountIncVatRd + ",TaxAmountRd:" + TaxAmountRd);
-                    //System.out.println("String:" + ub.formatDoubleToString(UnitPriceIncVatRd));
+                    //System.out.println("String:" + Double.toString(UnitPriceIncVatRd));
                     //System.out.println("String:" + new UtilityBean().formatDoubleToString(UnitPriceIncVatRd));
                     goodsDetails.add(gd);
                     OrderNo = OrderNo + 1;
@@ -1291,45 +1291,45 @@ public class InvoiceBean implements Serializable {
             //Standard
             if (TotalVat > 0) {
                 td = new TaxDetails();
-                td.setGrossAmount(ub.formatDoubleToString(TotalAmountIncVatR));
+                td.setGrossAmount(Double.toString(TotalAmountIncVatR));
                 td.setTaxCategory("Standard");
                 td.setTaxRateName("VAT-Standard");//free entry
                 Double vatPerc = trans.getVatPerc();
                 Double tr = vatPerc / 100;
-                td.setTaxRate(ub.formatDoubleToString(tr));
-                td.setTaxAmount(ub.formatDoubleToString(TotalVatR));
+                td.setTaxRate(Double.toString(tr));
+                td.setTaxAmount(Double.toString(TotalVatR));
                 Double NetAmountR = acb.roundAmountMinTwoDps(trans.getCurrencyCode(), TotalAmountIncVatR - TotalVatR);
-                td.setNetAmount(ub.formatDoubleToString(NetAmountR));
+                td.setNetAmount(Double.toString(NetAmountR));
                 taxDetails.add(td);
             }
             //Exempt
             if (TotalAmountExempt > 0) {
                 td = new TaxDetails();
-                td.setGrossAmount(ub.formatDoubleToString(TotalAmountExemptR));
+                td.setGrossAmount(Double.toString(TotalAmountExemptR));
                 td.setTaxCategory("Exempt");
                 td.setTaxRateName("VAT-Exempt");//free entry
                 td.setTaxRate("-");
                 td.setTaxAmount("0");
-                td.setNetAmount(ub.formatDoubleToString(TotalAmountExemptR));
+                td.setNetAmount(Double.toString(TotalAmountExemptR));
                 taxDetails.add(td);
             }
             //Zero
             if (TotalAmountZero > 0) {
                 td = new TaxDetails();
-                td.setGrossAmount(ub.formatDoubleToString(TotalAmountZeroR));
+                td.setGrossAmount(Double.toString(TotalAmountZeroR));
                 td.setTaxCategory("Zero");
                 td.setTaxRateName("VAT-Zero");//free entry
                 td.setTaxRate("0");
                 td.setTaxAmount("0");
-                td.setNetAmount(ub.formatDoubleToString(TotalAmountZeroR));
+                td.setNetAmount(Double.toString(TotalAmountZeroR));
                 taxDetails.add(td);
             }
             //summary
             Double GrossAmountSummaryR = TotalAmountIncVatR + TotalAmountExemptR + TotalAmountZeroR;
-            summary.setGrossAmount(ub.formatDoubleToString(acb.roundAmountMinTwoDps(trans.getCurrencyCode(), GrossAmountSummaryR)));
-            summary.setTaxAmount(ub.formatDoubleToString(acb.roundAmountMinTwoDps(trans.getCurrencyCode(), TotalVatR)));
+            summary.setGrossAmount(Double.toString(acb.roundAmountMinTwoDps(trans.getCurrencyCode(), GrossAmountSummaryR)));
+            summary.setTaxAmount(Double.toString(acb.roundAmountMinTwoDps(trans.getCurrencyCode(), TotalVatR)));
             Double NetAmountSummary = GrossAmountSummaryR - TotalVatR;
-            summary.setNetAmount(ub.formatDoubleToString(acb.roundAmountMinTwoDps(trans.getCurrencyCode(), NetAmountSummary)));
+            summary.setNetAmount(Double.toString(acb.roundAmountMinTwoDps(trans.getCurrencyCode(), NetAmountSummary)));
             summary.setItemCount(Integer.toString(goodsDetails.size()));
             summary.setModeCode("1");
         } catch (Exception e) {
