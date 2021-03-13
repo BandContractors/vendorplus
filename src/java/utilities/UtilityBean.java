@@ -32,7 +32,6 @@ import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.faces.bean.*;
-import javax.faces.context.FacesContext;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.IntrospectionException;
@@ -308,6 +307,20 @@ public class UtilityBean implements Serializable {
         } else if (aAmount < 0) {
             aString = this.formatNumber(aPattern, aAmount) + "";
         }
+        return aString;
+    }
+
+    public String formatDoublePlain2DP(double aAmount) {
+        String aString = "";
+        String aPattern = "##0.00";
+        aString = this.formatNumber(aPattern, aAmount) + "";
+        return aString;
+    }
+    
+    public String formatDoublePlain1DP4(double aAmount) {
+        String aString = "";
+        String aPattern = "0.0000";
+        aString = this.formatNumber(aPattern, aAmount) + "";
         return aString;
     }
 
@@ -685,12 +698,14 @@ public class UtilityBean implements Serializable {
 
 //    public static void main(String[] args) {
 //        UtilityBean ub = new UtilityBean();
-//        double a = 1000000;
+//        double a = 0.18;
 //        double b = 10000000;
 //        System.out.println("a:" + a + ",b=" + b);
-//        System.out.println("aDtoS:" + Double.toString(a) + ",bDtoS=" + Double.toString(b));
+//        //System.out.println("aDtoS:" + Double.toString(a) + ",bDtoS=" + Double.toString(b));
 //        System.out.println("aFDtoS:" + ub.formatDoubleToString(a) + ",bFDtoS=" + ub.formatDoubleToString(b));
 //        System.out.println("aFN:" + ub.formatNumber(a) + ",bFN=" + ub.formatNumber(b));
+//        System.out.println("aPF:" + ub.formatDoublePlain2DP(a) + ",bPF=" + ub.formatDoublePlain2DP(b));
+//        System.out.println("a14:" + ub.formatDoublePlain1DP4(a) + ",b14=" + ub.formatDoublePlain1DP4(b));
 //    }
 
     public String getEmptyIfNull(String aStringValue) {
