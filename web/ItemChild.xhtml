@@ -136,18 +136,26 @@
                         <f:selectItems value="#{accCoaBean.getAccCoaObjectListByInventoryType(generalUserSetting.currentItemPurpose,itemBean.itemObj.expense_type)}" var="ea" itemLabel="#{ea.accountName}" itemValue="#{ea.accountCode}"/>
                     </h:selectOneMenu>
                     <h:outputLabel value="Retailsale Price:"/>
-                    <h:inputText id="itxtUnitRetailsalePrice" value="#{itemBean.itemObj.unitRetailsalePrice}" autocomplete="off" style="width: 193px"/>
+                    <h:inputText id="itxtUnitRetailsalePrice" value="#{itemBean.itemObj.unitRetailsalePrice}" autocomplete="off" style="width: 193px">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:inputText>
                     <h:outputLabel value="Unit Cost Price:"/>
-                    <h:inputText id="itxtUnitCostPrice" value="#{itemBean.itemObj.unitCostPrice}" autocomplete="off" style="width: 193px"/>
+                    <h:inputText id="itxtUnitCostPrice" value="#{itemBean.itemObj.unitCostPrice}" autocomplete="off" style="width: 193px">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:inputText>
                     <h:outputLabel value="Is Free?"/>
                     <h:selectOneMenu id="menuIsFree" value="#{itemBean.itemObj.is_free}" style="width: 200px">
                         <f:selectItem itemLabel="No" itemValue="0"/>
                         <f:selectItem itemLabel="Yes" itemValue="1"/>
                     </h:selectOneMenu>
                     <h:outputLabel value="Wholesale Price:"/>
-                    <h:inputText id="itxtUnitWholesalePrice" value="#{itemBean.itemObj.unitWholesalePrice}" autocomplete="off" style="width: 193px"/>
+                    <h:inputText id="itxtUnitWholesalePrice" value="#{itemBean.itemObj.unitWholesalePrice}" autocomplete="off" style="width: 193px">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:inputText>
                     <h:outputLabel value="Special Price:"/>
-                    <h:inputText id="itxtUnitSpecialsalePrice" value="#{itemBean.itemObj.unit_special_price}" autocomplete="off" style="width: 193px"/>
+                    <h:inputText id="itxtUnitSpecialsalePrice" value="#{itemBean.itemObj.unit_special_price}" autocomplete="off" style="width: 193px">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:inputText>
                     <h:outputLabel value="I Hire this Item?"/>
                     <h:selectOneMenu id="menuIsHire" value="#{itemBean.itemObj.is_hire}" style="width: 200px;">
                         <f:selectItem itemLabel=""/>
@@ -164,7 +172,9 @@
                     <h:outputLabel value="Image Full Name:"/>
                     <h:inputText id="itxtImageName" value="#{itemBean.itemObj.itemImgUrl}" autocomplete="off" style="width: 193px"/>
                     <h:outputLabel value="Unit HirePrice/#{generalUserSetting.DEFAULT_DURATION_TYPE}:"/>
-                    <h:inputText id="itxtUnitHirePrice" value="#{itemBean.itemObj.unit_hire_price}" autocomplete="off" style="width: 193px" disabled="#{itemBean.itemObj.is_hire==0}"/>
+                    <h:inputText id="itxtUnitHirePrice" value="#{itemBean.itemObj.unit_hire_price}" autocomplete="off" style="width: 193px" disabled="#{itemBean.itemObj.is_hire==0}">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:inputText>
                     <h:outputLabel value="I Buy this Item?"/>
                     <h:selectOneMenu id="menuIsBuy" value="#{itemBean.itemObj.isBuy}" style="width: 200px">
                         <f:selectItem itemLabel="Yes" itemValue="1"/>
@@ -175,7 +185,9 @@
                         <f:selectItems value="#{listOptionBean.getItemSaleOptions()}" var="sa" itemLabel="#{sa.strOption2}" itemValue="#{sa.intOption1}"/>
                     </h:selectOneMenu>
                     <h:outputLabel value="Unit Weight(#{parameter_listBean.getParameter_listByContextNameMemory('ITEM','DEFAULT_MEASURE_UNIT').parameter_value}):"/>
-                    <h:inputText value="#{itemBean.itemObj.unit_weight}" autocomplete="off" style="width: 193px"/>
+                    <h:inputText value="#{itemBean.itemObj.unit_weight}" autocomplete="off" style="width: 193px">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:inputText>
                     <h:outputLabel value="Expiry Band (U,H,M,L):"/>
                     <p:selectOneMenu id="menuExpiryBand" value="#{itemBean.itemObj.expiry_band}" style="width: 200px" editable="true">
                         <f:selectItem itemLabel="" itemValue=""/>
