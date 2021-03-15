@@ -7,6 +7,7 @@ import connections.DBConnection;
 import entities.CompanySetting;
 import entities.Item;
 import entities.TransItem;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.management.ManagementFactory;
@@ -316,7 +317,7 @@ public class UtilityBean implements Serializable {
         aString = this.formatNumber(aPattern, aAmount) + "";
         return aString;
     }
-    
+
     public String formatDoublePlain1DP4(double aAmount) {
         String aString = "";
         String aPattern = "0.0000";
@@ -707,7 +708,6 @@ public class UtilityBean implements Serializable {
 //        System.out.println("aPF:" + ub.formatDoublePlain2DP(a) + ",bPF=" + ub.formatDoublePlain2DP(b));
 //        System.out.println("a14:" + ub.formatDoublePlain1DP4(a) + ",b14=" + ub.formatDoublePlain1DP4(b));
 //    }
-
     public String getEmptyIfNull(String aStringValue) {
         if (aStringValue == null) {
             return "";
@@ -882,6 +882,8 @@ public class UtilityBean implements Serializable {
                 URL url = new URL(wsURL);
                 url.openStream();
             }
+        } catch (FileNotFoundException e) {
+            //do nothing, these do not have the local API deployed
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
