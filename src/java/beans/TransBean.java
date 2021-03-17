@@ -1446,6 +1446,8 @@ public class TransBean implements Serializable {
     }
 
     public void saveTransCECcallFromSI(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
+        //for safety reasons, double check the balance
+        trans.setChangeAmount(this.getChangeAmount(trans));
         //get some details
         String OrderTransNo = trans.getTransactionRef();
         //save
