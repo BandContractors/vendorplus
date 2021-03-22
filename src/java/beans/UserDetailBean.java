@@ -21,6 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import utilities.CustomValidator;
 import utilities.Security;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 /*
  * To change this template, choose Tools | Templates
@@ -35,7 +37,7 @@ import utilities.Security;
 public class UserDetailBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    static Logger LOGGER = Logger.getLogger(UserDetailBean.class.getName());
     private List<UserDetail> UserDetails;
     private List<UserDetail> UserDetailObjectList;
     private String ActionMessage = null;
@@ -56,11 +58,19 @@ public class UserDetailBean implements Serializable {
             aUserDetail.setIsUserGenAdmin(aResultSet.getString("is_user_gen_admin"));
             aUserDetail.setUserCategoryId(aResultSet.getInt("user_category_id"));
             aUserDetail.setUserImgUrl(aResultSet.getString("user_img_url"));
-            aUserDetail.setEmail_address(aResultSet.getString("email_address"));
-            aUserDetail.setPhone_no(aResultSet.getString("phone_no"));
+            if (null == aResultSet.getString("email_address")) {
+                aUserDetail.setEmail_address("");
+            } else {
+                aUserDetail.setEmail_address(aResultSet.getString("email_address"));
+            }
+            if (null == aResultSet.getString("phone_no")) {
+                aUserDetail.setPhone_no("");
+            } else {
+                aUserDetail.setPhone_no(aResultSet.getString("phone_no"));
+            }
             aUserDetail.setTrans_code(Security.Decrypt(aResultSet.getString("trans_code")));
-        } catch (SQLException se) {
-            System.err.println("setUserDetailFromResultset:" + se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -79,17 +89,9 @@ public class UserDetailBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
     }
 
@@ -216,8 +218,8 @@ public class UserDetailBean implements Serializable {
                     this.setActionMessage("Saved Successfully");
                     this.clearUserDetail(userdetail);
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
                 this.setActionMessage("UserDetail NOT saved");
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("UserDetail NOT saved!"));
             }
@@ -239,19 +241,10 @@ public class UserDetailBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
-
     }
 
     public UserDetail getUserDetailWithTransCode(String aTransCode) {
@@ -272,7 +265,7 @@ public class UserDetailBean implements Serializable {
                         break;
                     }
                 }
-            } catch (SQLException se) {
+            } catch (Exception e) {
                 userdetail = null;
             }
         }
@@ -291,16 +284,8 @@ public class UserDetailBean implements Serializable {
                 this.setUserDetailFromResultset(userdetail, rs);
             } else {
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -319,17 +304,9 @@ public class UserDetailBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
     }
 
@@ -346,17 +323,9 @@ public class UserDetailBean implements Serializable {
             } else {
                 return 0;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return 0;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
     }
 
@@ -372,19 +341,10 @@ public class UserDetailBean implements Serializable {
             } else {
                 return 0;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return 1000000;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
-
     }
 
     public boolean isLicensePackageViolated(UserDetail aUserDetail, long PackageUsers) {
@@ -432,8 +392,8 @@ public class UserDetailBean implements Serializable {
                 ps.executeUpdate();
                 this.setActionMessage("Deleted Successfully!");
                 this.clearUserDetail(userdetail);
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
                 this.setActionMessage("UserDetail NOT deleted");
             }
         }
@@ -456,7 +416,7 @@ public class UserDetailBean implements Serializable {
             UserDetailTo.setPhone_no(UserDetailFrom.getPhone_no());
             UserDetailTo.setTrans_code(UserDetailFrom.getTrans_code());
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -505,16 +465,8 @@ public class UserDetailBean implements Serializable {
                 this.setUserDetailFromResultset(userdetail, rs);
                 UserDetails.add(userdetail);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return UserDetails;
     }
@@ -533,16 +485,8 @@ public class UserDetailBean implements Serializable {
                 this.setUserDetailFromResultset(userdetail, rs);
                 UserDetails.add(userdetail);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return UserDetails;
     }
@@ -561,16 +505,8 @@ public class UserDetailBean implements Serializable {
                 this.setUserDetailFromResultset(userdetail, rs);
                 UserDetails.add(userdetail);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return UserDetails;
     }
@@ -650,7 +586,7 @@ public class UserDetailBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println("getUserEmailAddressesForFunction:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return EmailAddresses;
     }
@@ -673,7 +609,7 @@ public class UserDetailBean implements Serializable {
             while (rs.next()) {
                 UserDetail userdetail = new UserDetail();
                 this.setUserDetailFromResultset(userdetail, rs);
-                if (userdetail.getEmail_address().length() > 0) {
+                if (userdetail.getUserDetailId() > 0) {
                     if (UserIDs.length() == 0) {
                         UserIDs = "" + userdetail.getUserDetailId() + "";
                     } else {
@@ -682,7 +618,7 @@ public class UserDetailBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println("getUserDetailIDsForFunction:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return UserIDs;
     }
@@ -707,7 +643,7 @@ public class UserDetailBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println("getUserEmailAddressesForIDs:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return EmailAddresses;
     }
@@ -793,16 +729,8 @@ public class UserDetailBean implements Serializable {
                 this.setUserDetailFromResultset(userdetail, rs);
                 UserDetailObjectList.add(userdetail);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return UserDetailObjectList;
     }
@@ -823,7 +751,7 @@ public class UserDetailBean implements Serializable {
                 UserDetailObjectList.add(userdetail);
             }
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return UserDetailObjectList;
     }

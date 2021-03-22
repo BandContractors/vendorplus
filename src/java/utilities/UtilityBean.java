@@ -637,7 +637,9 @@ public class UtilityBean implements Serializable {
         //Refresh stock alerts
         try {
             new Alert_generalBean().refreshAlerts();
-            org.primefaces.PrimeFaces.current().executeScript("doUpdateMenuSideBarClick()");
+            org.primefaces.PrimeFaces.current().executeScript("doUpdateMenuClick()");
+        } catch (NullPointerException npe) {
+            //do nothing
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }

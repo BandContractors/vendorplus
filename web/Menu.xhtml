@@ -2,9 +2,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:p="http://primefaces.org/ui"
-      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
+      xmlns:p="http://primefaces.org/ui">
     <h:head>
         <title>#{menuItemBean.menuItemObj.SYSTEM_NAME}</title>
         <style>
@@ -19,9 +17,6 @@
             function doUpdateMenuClick() {
                 remoteBtnUpdateMenu();
             }
-            function doUpdateMenuSideBarClick() {
-                remoteBtnUpdateMenuSideBar();
-            }
         </script>
     </h:head>
     <h:body>
@@ -31,7 +26,6 @@
                 <p:outputLabel style="float: right"  value="#{menuItemBean.menuItemObj.LICENSE_CLIENT_NAME}  (#{companySetting.getBranchCode()} - #{menuItemBean.menuItemObj.CURRENT_STORE.storeName})"/>
             </h:panelGrid>
             <p:remoteCommand name="remoteBtnUpdateMenu" process="@this" update="mnubMain"/>
-            <p:remoteCommand name="remoteBtnUpdateMenuSideBar" process="@this" update="mnubMain"/>
             <p:menubar id="mnubMain">  
                 <p:menuitem value="Home" action="#{navigationBean.redirectToHome()}" icon="ui-icon-home" />
                 <p:submenu label="Transaction" rendered="#{menuItemBean.menuItemObj.LOGIN_TYPE==1}" icon="ui-icon-plus"> 

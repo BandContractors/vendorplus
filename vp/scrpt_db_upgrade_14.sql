@@ -171,4 +171,9 @@ DROP INDEX u_transitem_trans_item_batch1 ON transaction_item_hist;
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_14',171,Now(),'6.0','');
 
+UPDATE parameter_list SET parameter_value='' WHERE parameter_list_id IN(32,27,31,30);
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_14',175,Now(),'6.0','');
+
+
 

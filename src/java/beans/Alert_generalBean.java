@@ -10,7 +10,6 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -582,7 +581,6 @@ public class Alert_generalBean implements Serializable {
     public long countUserUnreadStockAlerts() {
         long n = 0;
         int userid = new GeneralUserSetting().getCurrentUser().getUserDetailId();
-        //String sql = "select * from alert_general where " + userid + " IN(alert_users) and " + userid + " NOT IN(read_by) order by add_date desc LIMIT 100";
         String sql = "select count(*) as unread from alert_general where "
                 + "("
                 + "(alert_users REGEXP '^" + userid + ",') OR (alert_users REGEXP '," + userid + "$') OR  (alert_users REGEXP '," + userid + ",') OR alert_users='" + userid + "'"
@@ -596,7 +594,6 @@ public class Alert_generalBean implements Serializable {
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             rs = ps.executeQuery();
-            Alert_general ag = null;
             if (rs.next()) {
                 n = rs.getLong("unread");
             }
