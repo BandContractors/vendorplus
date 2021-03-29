@@ -287,6 +287,7 @@
 
             <p:dataTable rowIndexVar="rowIndex" id="dtblTransactionItem" value="#{transItemBean.activeTransItems}" var="ati" 
                          styleClass="cls-table" tableStyle="width:auto;" 
+                         rowStyleClass="#{ati.is_tax_synced eq 0 ? 'red' : null}"
                          >  
                 <p:column>
                     <!-- column header -->

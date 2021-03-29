@@ -5410,6 +5410,15 @@ public class TransItemBean implements Serializable {
                 aTransItem.setItem_currency_code(item.getCurrencyCode());
                 aTransItem.setIs_general(item.getIsGeneral());
                 aTransItem.setOverride_gen_name(item.getOverride_gen_name());
+                if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
+                    if (null == new Item_tax_mapBean().getItem_tax_mapSynced(aTransItem.getItemId())) {
+                        aTransItem.setIs_tax_synced(0);
+                    } else {
+                        aTransItem.setIs_tax_synced(1);
+                    }
+                } else {
+                    aTransItem.setIs_tax_synced(1);
+                }
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);

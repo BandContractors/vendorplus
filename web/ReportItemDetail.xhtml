@@ -31,7 +31,7 @@
             <h:panelGrid id="pnlgHeader" columns="1" styleClass="clsPanelReportFilterTitle">
                 <h:outputLabel styleClass="clsLabelReportFilterTitle" value="Report Listing Item Details"/>
             </h:panelGrid>
-            <h:panelGrid id="pnlgFilter" columns="7" styleClass="clsPanelReportFilter">
+            <h:panelGrid id="pnlgFilter" columns="8" styleClass="clsPanelReportFilter">
                 <p:outputLabel value="Item Purpose"/>
                 <p:outputLabel value="Item Type"/>
                 <p:outputLabel value="Category"/>
@@ -39,6 +39,7 @@
                 <p:outputLabel value="Currency"/>
                 <p:outputLabel value="General?"/>
                 <p:outputLabel value="Suspended?"/>
+                <p:outputLabel value="Tax Mapped?"/>
 
                 <h:selectOneMenu id="menuPurpose" value="#{item.purpose}" >
                     <f:selectItem itemLabel="" itemValue=""/>
@@ -75,13 +76,18 @@
                     <f:selectItem itemLabel="Yes" itemValue="Yes"/>
                     <f:selectItem itemLabel="No" itemValue="No"/>
                 </h:selectOneMenu>
+                <h:selectOneMenu id="menuIsSyncedTax" value="#{item.is_synced_tax}">
+                    <f:selectItem itemLabel="" itemValue=""/>
+                    <f:selectItem itemLabel="Yes" itemValue="11"/>
+                    <f:selectItem itemLabel="No" itemValue="10"/>
+                </h:selectOneMenu>
 
                 <p:outputLabel value=""/>
                 <p:commandButton id="cmdbSearch" value="SEARCH (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                     <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                         <p:graphicImage name="/images/ajax-loader.gif"/>
                     </p:dialog>
-                    <p:ajax listener="#{itemBean.reportItemDetail(item.purpose,item.itemType,item.categoryId,item.subCategoryId,item.currencyCode,item.isSuspended,item.isGeneral)}" process="pnlgFilter" update="pnlgMessage tblDetail"/>
+                    <p:ajax listener="#{itemBean.reportItemDetail(item.purpose,item.itemType,item.categoryId,item.subCategoryId,item.currencyCode,item.isSuspended,item.isGeneral,item.is_synced_tax)}" process="pnlgFilter" update="pnlgMessage tblDetail"/>
                 </p:commandButton>
             </h:panelGrid>
             <h:panelGrid id="pnlgMessage">

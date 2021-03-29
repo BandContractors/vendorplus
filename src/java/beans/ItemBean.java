@@ -1883,7 +1883,7 @@ public class ItemBean implements Serializable {
         return this.ReportItemsSummary;
     }
 
-    public void reportItemDetail(String aPurpose, String aItemType, int aCategoryId, int aSubCategoryId, String aCurrency, String aIsSuspended, int aIsGeneral) {
+    public void reportItemDetail(String aPurpose, String aItemType, int aCategoryId, int aSubCategoryId, String aCurrency, String aIsSuspended, int aIsGeneral, int aIsTaxMapped) {
         String sql = "SELECT * FROM view_item_detail WHERE 1=1";
         String wheresql = "";
         String ordersql = "";
@@ -1914,6 +1914,14 @@ public class ItemBean implements Serializable {
         }
         if (aIsGeneral == 11) {
             wheresql = wheresql + " AND is_general=1";
+        }
+        if (aIsTaxMapped == 10 || aIsTaxMapped == 11) {
+            if (aIsTaxMapped == 10) {
+                wheresql = wheresql + " AND is_synced=0";
+            }
+            if (aIsTaxMapped == 11) {
+                wheresql = wheresql + " AND is_synced=1";
+            }
         }
         ordersql = " ORDER BY description ASC";
         sql = sql + wheresql + ordersql;

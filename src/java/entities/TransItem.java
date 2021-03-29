@@ -119,8 +119,7 @@ public class TransItem implements Serializable {
     private String item_type;
     private String currency_code;
     private String transaction_number; 
-    
-
+    private int is_tax_synced=1;
     /**
      * @return the TransactionItemId
      */
@@ -1435,6 +1434,20 @@ public class TransItem implements Serializable {
      */
     public void setTransaction_number(String transaction_number) {
         this.transaction_number = transaction_number;
+    }
+
+    /**
+     * @return the is_tax_synced
+     */
+    public int getIs_tax_synced() {
+        return is_tax_synced;
+    }
+
+    /**
+     * @param is_tax_synced the is_tax_synced to set
+     */
+    public void setIs_tax_synced(int is_tax_synced) {
+        this.is_tax_synced = is_tax_synced;
     }
 
 }

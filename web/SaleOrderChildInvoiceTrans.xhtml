@@ -97,6 +97,7 @@
             <h:panelGrid id="pnlItemsChild" columns="1">
                 <p:dataTable rowIndexVar="rowIndex" id="dtblTransactionItemChild" value="#{transBean.activeTransItemsChild}" var="ati" 
                              styleClass="cls-table" tableStyle="width:auto;" 
+                             rowStyleClass="#{ati.is_tax_synced eq 0 ? 'red' : null}"
                              >  
                     <p:column style="width: 20px;">
                         <!-- column header -->
