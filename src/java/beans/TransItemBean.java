@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import utilities.UtilityBean;
@@ -1021,7 +1022,13 @@ public class TransItemBean implements Serializable {
                                     i2 = new StockBean().updateStockDamage(stock2, transitem.getQty_damage(), "Add");
                                 }
                             }
-                            if ("ITEM RECEIVED".equals(transtype.getTransactionTypeName()) || (transtype.getTransactionTypeId() == 1 && transreason.getTransactionReasonId() == 29) || ("STOCK ADJUSTMENT".equals(transtype.getTransactionTypeName()) && transitem.getNarration().equals("Add"))) {
+                            int PurInvoMode = 0;
+                            try {
+                                PurInvoMode = Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "PURCHASE_INVOICE_MODE").getParameter_value());
+                            } catch (Exception e) {
+                                // do nothing
+                            }
+                            if ("ITEM RECEIVED".equals(transtype.getTransactionTypeName()) || (transtype.getTransactionTypeId() == 1 && transreason.getTransactionReasonId() == 29) || ("STOCK ADJUSTMENT".equals(transtype.getTransactionTypeName()) && transitem.getNarration().equals("Add")) || (transtype.getTransactionTypeId() == 1 && PurInvoMode == 1)) {
                                 double UnitCostPrice = 0;
                                 if (StkBean.getStock(store.getStoreId(), transitem.getItemId(), transitem.getBatchno(), transitem.getCodeSpecific(), transitem.getDescSpecific()) != null) {
                                     //update/add
@@ -1033,9 +1040,9 @@ public class TransItemBean implements Serializable {
                                     stock.setCodeSpecific(transitem.getCodeSpecific());
                                     stock.setDescSpecific(transitem.getDescSpecific());
                                     UnitCostPrice = 0;
-                                    //the asset interface uses unit_price for cost price
-                                    if (transreason.getTransactionReasonId() == 29) {
-                                        UnitCostPrice = transitem.getUnitPrice();
+                                    //the purchase interface (asset,goods,expenses) uses unit_price for cost price
+                                    if (transtype.getTransactionTypeId() == 1) {
+                                        UnitCostPrice = (transitem.getUnitPrice() + transitem.getUnitVat()) - transitem.getUnitTradeDiscount();
                                     } else {
                                         UnitCostPrice = transitem.getUnitCostPrice();
                                     }
@@ -1057,8 +1064,9 @@ public class TransItemBean implements Serializable {
                                     stock.setItemMnfDate(transitem.getItemMnfDate());
                                     stock.setItemExpDate(transitem.getItemExpryDate());
                                     UnitCostPrice = 0;
-                                    if (transreason.getTransactionReasonId() == 29) {
-                                        UnitCostPrice = transitem.getUnitPrice();
+                                    //the purchase interface (asset,goods,expenses) uses unit_price for cost price
+                                    if (transtype.getTransactionTypeId() == 1) {
+                                        UnitCostPrice = (transitem.getUnitPrice() + transitem.getUnitVat()) - transitem.getUnitTradeDiscount();
                                     } else {
                                         UnitCostPrice = transitem.getUnitCostPrice();
                                     }
@@ -1253,6 +1261,7 @@ public class TransItemBean implements Serializable {
                     //do nothing; this is for edit
                 }
             } catch (Exception e) {
+                e.printStackTrace();
                 LOGGER.log(Level.ERROR, e);
                 this.setActionMessage("TransItem NOT saved");
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("TransItem NOT saved!"));
@@ -2786,14 +2795,19 @@ public class TransItemBean implements Serializable {
         TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
         TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
         Store store = new StoreBean().getStore(aStoreId);
-
+        int PurInvoMode = 0;
+        try {
+            PurInvoMode = Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "PURCHASE_INVOICE_MODE").getParameter_value());
+        } catch (Exception e) {
+            // do nothing
+        }
         if (aTransItem.getTransactionItemId() == 0 || new ItemBean().getItem(aTransItem.getItemId()).getIsTrack() == 0 || ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && !new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "DEPLETE_SOLD_STOCK_UPON").getParameter_value().equals("0")) || ("GOODS DELIVERY".equals(transtype.getTransactionTypeName()) && !new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "DEPLETE_SOLD_STOCK_UPON").getParameter_value().equals("1"))) {
             //do nothing
         } else {
             //1. reverse stock
             Stk = StkBean.getStock(store.getStoreId(), aTransItem.getItemId(), aTransItem.getBatchno(), aTransItem.getCodeSpecific(), aTransItem.getDescSpecific());
             //for additive transactions, if diff is +ve, subtract; if diff is -ve Add
-            if ("ITEM RECEIVED".equals(transtype.getTransactionTypeName()) || (transtype.getTransactionTypeId() == 1 && transreason.getTransactionReasonId() == 29)) {
+            if ("ITEM RECEIVED".equals(transtype.getTransactionTypeName()) || (transtype.getTransactionTypeId() == 1 && transreason.getTransactionReasonId() == 29) || (transtype.getTransactionTypeId() == 1 && PurInvoMode == 1)) {
                 if (aDiffHistNewQty > 0) {
                     //subtract stock
                     if (Stk != null) {
@@ -6844,6 +6858,12 @@ public class TransItemBean implements Serializable {
         aStatusBean.setItemNotAddedStatus("");
         aStatusBean.setShowItemAddedStatus(0);
         aStatusBean.setShowItemNotAddedStatus(0);
+        int PurInvoMode = 0;
+        try {
+            PurInvoMode = Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "PURCHASE_INVOICE_MODE").getParameter_value());
+        } catch (Exception e) {
+            // do nothing
+        }
         try {
             if (null != aSelectedItem && aSelectedItem.getIsBuy() == 0) {
                 aStatusBean.setItemAddedStatus("");
@@ -6863,6 +6883,11 @@ public class TransItemBean implements Serializable {
             } else if (NewTransItem.getDescMore().length() > 250) {
                 aStatusBean.setItemAddedStatus("");
                 aStatusBean.setItemNotAddedStatus("More Description cannot be more than 250 characters...");
+                aStatusBean.setShowItemAddedStatus(0);
+                aStatusBean.setShowItemNotAddedStatus(1);
+            } else if (aTransTypeId == 1 && aTransReasonId == 1 && PurInvoMode == 1 && (((NewTransItem.getUnitPrice() + NewTransItem.getUnitVat() - NewTransItem.getUnitTradeDiscount()) >= aSelectedItem.getUnitRetailsalePrice()) || ((NewTransItem.getUnitPrice() + NewTransItem.getUnitVat() - NewTransItem.getUnitTradeDiscount()) >= aSelectedItem.getUnitWholesalePrice()))) {
+                aStatusBean.setItemAddedStatus("");
+                aStatusBean.setItemNotAddedStatus("UnitCost cannot be greater than the Selling Retail/Wholesale price ...");
                 aStatusBean.setShowItemAddedStatus(0);
                 aStatusBean.setShowItemNotAddedStatus(1);
             } else {
@@ -6929,6 +6954,12 @@ public class TransItemBean implements Serializable {
         TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
         TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
         Store store = new StoreBean().getStore(aStoreId);
+        int PurInvoMode = 0;
+        try {
+            PurInvoMode = Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "PURCHASE_INVOICE_MODE").getParameter_value());
+        } catch (Exception e) {
+            // do nothing
+        }
         try {
             TransItem ti = new TransItem();
             ti.setTransactionItemId(NewTransItem.getTransactionItemId());
@@ -7030,6 +7061,20 @@ public class TransItemBean implements Serializable {
                 }
             } catch (NullPointerException npe) {
                 ti.setSpecific_size(1);
+            }
+            //check for Auto Append Batch for new UnitCostPrice
+            if (PurInvoMode == 1 && aTransTypeId == 1 && (aTransReasonId == 1 || aTransReasonId == 27) && new Parameter_listBean().getParameter_listByContextNameMemory("ITEMS_RECEIVED", "AUTO_APPEND_NEW_COST_BATCH").getParameter_value().equals("1")) {
+                Stock existstock = new StockBean().getStock(new GeneralUserSetting().getCurrentStore().getStoreId(), ti.getItemId(), ti.getBatchno(), ti.getCodeSpecific(), ti.getDescSpecific());
+                if (null == existstock) {
+                    //do nothing
+                } else {
+                    Double ActualUnitPrice = (ti.getUnitPrice() + ti.getUnitVat()) - ti.getUnitTradeDiscount();
+                    if (existstock.getUnitCost() - ActualUnitPrice == 0) {
+                        //do nothing
+                    } else {
+                        ti.setBatchno(ti.getBatchno() + "_" + new UtilityBean().formatNumber("###.###", ActualUnitPrice));
+                    }
+                }
             }
             //check if itme+batchno already exists
             int ItemFoundAtIndex = itemExists(aActiveTransItems, ti.getItemId(), ti.getBatchno(), ti.getCodeSpecific(), ti.getDescSpecific());

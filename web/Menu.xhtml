@@ -41,8 +41,8 @@
                             <p:menuitem value="Assets" action="#{navigationBean.redirectToPurchaseOrderAssets()}" />
                             <p:separator />
                         </p:submenu>
-                        <p:separator />
-                        <p:submenu label="Item Received">
+                        <p:separator  rendered="#{menuItemBean.menuItemObj.PURCHASE_INVOICE_MODE eq 0}"/>
+                        <p:submenu label="Item Received"  rendered="#{menuItemBean.menuItemObj.PURCHASE_INVOICE_MODE eq 0}">
                             <p:separator />
                             <p:menuitem value="Goods and Services" action="#{navigationBean.redirectToItemReceivedGoods()}" />
                             <p:separator />

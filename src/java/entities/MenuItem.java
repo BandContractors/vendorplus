@@ -31,6 +31,7 @@ public class MenuItem implements Serializable {
     private String LOC_LEVEL_3_LABEL;
     private String DEFAULT_FOCUS_CONTROL_ID;
     private int ENABLE_AUTO_COMPLETE_ITEM_SEARCH;
+    private int PURCHASE_INVOICE_MODE;
     
 
     /**
@@ -227,5 +228,19 @@ public class MenuItem implements Serializable {
      */
     public void setENABLE_AUTO_COMPLETE_ITEM_SEARCH(int ENABLE_AUTO_COMPLETE_ITEM_SEARCH) {
         this.ENABLE_AUTO_COMPLETE_ITEM_SEARCH = ENABLE_AUTO_COMPLETE_ITEM_SEARCH;
+    }
+
+    /**
+     * @return the PURCHASE_INVOICE_MODE
+     */
+    public int getPURCHASE_INVOICE_MODE() {
+        return PURCHASE_INVOICE_MODE;
+    }
+
+    /**
+     * @param PURCHASE_INVOICE_MODE the PURCHASE_INVOICE_MODE to set
+     */
+    public void setPURCHASE_INVOICE_MODE(int PURCHASE_INVOICE_MODE) {
+        this.PURCHASE_INVOICE_MODE = PURCHASE_INVOICE_MODE;
     }
 }

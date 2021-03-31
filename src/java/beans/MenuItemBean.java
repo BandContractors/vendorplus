@@ -120,6 +120,11 @@ public class MenuItemBean implements Serializable {
             } catch (NullPointerException npe) {
                 this.MenuItemObj.setENABLE_AUTO_COMPLETE_ITEM_SEARCH(1);
             }
+            try {
+                this.MenuItemObj.setPURCHASE_INVOICE_MODE(Integer.parseInt(pb.getParameter_listByContextNameMemory("COMPANY_SETTING", "PURCHASE_INVOICE_MODE").getParameter_value()));
+            } catch (NullPointerException npe) {
+                this.MenuItemObj.setPURCHASE_INVOICE_MODE(0);
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }

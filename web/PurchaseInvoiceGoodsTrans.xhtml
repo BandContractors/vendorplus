@@ -43,7 +43,7 @@
                     <f:selectItem itemValue="#{transBean.transReasonObj.transactionReasonId}" itemLabel="#{transBean.transReasonObj.transactionReasonName}"/>
                 </h:selectOneMenu>
                 <h:outputLabel style="background-color:#00B461;color: white;" value="#{transBean.transTypeObj.transactionOutputLabel} - Goods and Services (For Sale)"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="Stock:No effect"/>
+                <h:outputLabel style="background-color:#00B461;color: white;" value="Stock:#{menuItemBean.menuItemObj.PURCHASE_INVOICE_MODE eq 1 ? '↑':'No effect. '}"/>
                 <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:Cash↓ AP↑ INV↑"/>
             </h:panelGrid>
 
@@ -154,12 +154,12 @@
                     <p:ajax event="itemSelect" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,'',trans,transItem,itemBean.selectedItem,1.0)}" process="@this" update="itxtUnit pgrdSpecific"/>
                     <p:ajax event="change" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,'',trans,transItem,itemBean.selectedItem,1.0)}" rendered="#{itemBean.selectedItem!=null}" process="@this" update="itxtUnit pgrdSpecific"/>
                 </p:autoComplete>
-                <h:inputText id="itxtUnit" styleClass="clsInputTransItem" value="#{unitBean.getUnit(itemBean.getItem(transItem.itemId).getUnitId()).unitSymbol}" disabled="true" style="width: 100px"/>
-                <h:inputText id="itxtQty" styleClass="clsInputTransItem" style="width: 70px" value="#{transItem.itemQty}" autocomplete="off">
+                <h:inputText id="itxtUnit" styleClass="clsInputTransItem" value="#{unitBean.getUnit(itemBean.getItem(transItem.itemId).getUnitId()).unitSymbol}" disabled="true" style="width: 115px"/>
+                <h:inputText id="itxtQty" styleClass="clsInputTransItem" style="width: 115px" value="#{transItem.itemQty}" autocomplete="off">
                     <f:ajax event="blur" listener="#{transItem.setAmount(transItem.itemQty*(transItem.unitPrice + transItem.unitVat - transItem.unitTradeDiscount))}" execute="itxtQty itxtUnitPrice itxtUnitVat itxtUnitTradeDisc" render="itxtAmount"/>
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
-                <h:inputText id="itxtUnitPrice" styleClass="clsInputTransItem" style="width: 120px" disabled="false" value="#{transItem.unitPrice}" autocomplete="off">
+                <h:inputText id="itxtUnitPrice" styleClass="clsInputTransItem" style="width: 130px" disabled="false" value="#{transItem.unitPrice}" autocomplete="off">
                     <f:ajax event="blur" listener="#{transItem.setAmount(transItem.itemQty*(transItem.unitPrice + transItem.unitVat - transItem.unitTradeDiscount))}" execute="itxtQty itxtUnitPrice itxtUnitVat itxtUnitTradeDisc" render="itxtAmount"/>
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
@@ -174,6 +174,21 @@
                 <h:inputText id="itxtAmount" styleClass="clsInputTransItem" style="width: 150px" disabled="true" value="#{transItem.amount}">
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
+                
+                <h:outputLabel value="Batch"/>
+                <h:outputLabel value="Mnf.Date"/>
+                <h:outputLabel value="Exp.Date"/>
+                <h:outputLabel value=""/>
+                <h:outputLabel value=""/>
+                <h:outputLabel value=""/>
+                <h:outputLabel value=""/>
+                
+                <h:inputText id="itxtBatchno" value="#{transItem.batchno}" style="width: 230px;"/>
+                <p:calendar id="calMnfDate" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{transItem.itemMnfDate}" size="8" pattern="#{companySetting.getDateFormat()}">
+                </p:calendar>
+                <p:calendar id="calExpDate" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{transItem.itemExpryDate}" size="8" pattern="#{companySetting.getDateFormat()}">
+                </p:calendar>
+                
                 <p:focus for="autcItem"/>
             </h:panelGrid>
             <h:panelGrid id="pgrdSpecific">
@@ -183,7 +198,7 @@
                     <h:outputLabel styleClass="clsLabelTransItem" value="More.Description"/>
                     <h:inputTextarea id="itxtDescSppecific" styleClass="clsInput" rows="2" cols="36" value="#{transItem.descSpecific}"/>
                     <h:inputTextarea id="itxtCodeSpecific" styleClass="clsInput" rows="2" cols="36" value="#{transItem.codeSpecific}"/>
-                    <h:inputTextarea styleClass="clsInput" id="itxaDescMore" rows="2" cols="36" value="#{transItem.descMore}"/>
+                    <h:inputTextarea styleClass="clsInput" id="itxaDescMore" rows="2" cols="34" value="#{transItem.descMore}"/>
                 </h:panelGrid>
             </h:panelGrid>
             <h:panelGrid id="gridItemCommands" styleClass="clsGridMainInput" columns="7">
@@ -223,6 +238,15 @@
                     <f:facet name="header">Unit</f:facet>
                     <!-- row record -->
                     #{ati.unitSymbol}
+                </p:column>
+                
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Batch No</f:facet>
+                    <!-- row record -->
+                    <h:inputText value="#{ati.batchno}" style="width: 120px;">
+                        <f:ajax event="change" execute="dtblTransactionItem" render="dtblTransactionItem"/>
+                    </h:inputText>
                 </p:column>
 
                 <p:column>
