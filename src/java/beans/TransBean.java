@@ -824,11 +824,11 @@ public class TransBean implements Serializable {
                 msg = "Date selected does not MATCH any accounting period; Go to Accounts>Account Period, click Add New and Save OR contact system administrator...";
             } else if (new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getIsClosed() == 1) {
                 msg = "Date selected is for a CLOSED accounting period; please contact system administrator...";
-            } else if ((trans.getPayMethod() == 6 || trans.getPayMethod() == 7) && trans.getAmountTendered() <= 0) {
+            } else if (trans.getTransactionId() == 0 && (trans.getPayMethod() == 6 || trans.getPayMethod() == 7) && trans.getAmountTendered() <= 0) {
                 msg = "The amount tendered is not accepted for the selected payment method...";
-            } else if (trans.getPayMethod() == 6 && trans.getAmountTendered() > new AccLedgerBean().getPrepaidIncomeAccBalanceTrade(new TransBean().getBillClientId(trans.getTransactorId(), trans.getBillTransactorId()), trans.getCurrencyCode())) {
+            } else if (trans.getTransactionId() == 0 && trans.getPayMethod() == 6 && trans.getAmountTendered() > new AccLedgerBean().getPrepaidIncomeAccBalanceTrade(new TransBean().getBillClientId(trans.getTransactorId(), trans.getBillTransactorId()), trans.getCurrencyCode())) {
                 msg = "Insufficient funds on the Client/Customer Deposit account...";
-            } else if (trans.getPayMethod() == 7 && trans.getAmountTendered() > new AccLedgerBean().getPrepaidExpenseAccBalanceTrade(new TransBean().getBillClientId(trans.getTransactorId(), trans.getBillTransactorId()), trans.getCurrencyCode())) {
+            } else if (trans.getTransactionId() == 0 && trans.getPayMethod() == 7 && trans.getAmountTendered() > new AccLedgerBean().getPrepaidExpenseAccBalanceTrade(new TransBean().getBillClientId(trans.getTransactorId(), trans.getBillTransactorId()), trans.getCurrencyCode())) {
                 msg = "Insufficient funds on the Supplier Advance Expense account...";
             } else if ("HIRE INVOICE".equals(transtype.getTransactionTypeName()) && (trans.getFrom_date() == null || trans.getTo_date() == null)) {
                 msg = "Specify the following: From Date, To Date";
@@ -848,7 +848,7 @@ public class TransBean implements Serializable {
                 msg = "Select Location OR " + transtype.getTransactorLabel();
             } else if ("SALE ORDER".equals(transtype.getTransactionTypeName()) && trans.getStore2Id() == 0) {
                 msg = "Select " + CompanySetting.getStoreEquivName() + " to send the order to...";
-            } else if (!new AccLedgerBean().checkerBalancePass(trans.getPayMethod(), trans.getAccChildAccountId(), trans.getCurrencyCode(), trans.getAmountTendered(), transtype.getTransactionTypeId(), transreason.getTransactionReasonId(), 0, 0)) {
+            } else if (trans.getTransactionId() == 0 && !new AccLedgerBean().checkerBalancePass(trans.getPayMethod(), trans.getAccChildAccountId(), trans.getCurrencyCode(), trans.getAmountTendered(), transtype.getTransactionTypeId(), transreason.getTransactionReasonId(), 0, 0)) {
                 msg = "Paying account is out of Funds...";
             } else if ("PURCHASE INVOICE".equals(transtype.getTransactionTypeName()) && trans.getAmountTendered() > trans.getGrandTotal()) {
                 msg = "Paid amount CANNOT EXCEED Grand Total";

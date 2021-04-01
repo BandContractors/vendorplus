@@ -1618,6 +1618,7 @@ public class ItemBean implements Serializable {
             while (rs.next()) {
                 Item item = new Item();
                 this.setItemFromResultset(item, rs);
+                this.updateLookUpsUI(item);
                 this.getItemObjectList().add(item);
             }
         } catch (Exception e) {
@@ -1640,6 +1641,7 @@ public class ItemBean implements Serializable {
             while (rs.next()) {
                 Item item = new Item();
                 this.setItemFromResultset(item, rs);
+                this.updateLookUpsUI(item);
                 this.getItemObjectList().add(item);
             }
         } catch (Exception e) {

@@ -142,12 +142,22 @@
                         #{itm.itemCode} 
                     </p:column> 
                     <p:column headerText="Unit" style="text-align: left">  
-                        #{unitBean.getUnit(itm.unitId).unitSymbol}
+                        #{itm.unitSymbol}
                     </p:column> 
                     <p:column headerText="Category" style="text-align: left">  
-                        #{categoryBean.getCategory(itm.categoryId).categoryName}
+                        #{itm.categoryName}
                     </p:column>
-                    <p:column headerText="Currency" style="text-align: left">
+                    <p:column headerText="Retailsale Price" style="text-align: left">  
+                        <h:outputText value="#{itm.unitRetailsalePrice}">
+                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Wholesale Price" style="text-align: left">
+                        <h:outputText value="#{itm.unitWholesalePrice}">
+                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Cur" style="text-align: left">
                         <h:outputText value="#{itm.currencyCode}">
                         </h:outputText>
                     </p:column>

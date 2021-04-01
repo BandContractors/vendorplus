@@ -395,8 +395,8 @@
                         <p:menuitem value="Purchase &amp; Expense" action="#{navigationBean.redirectToReportPurchaseInvoiceDetail()}" />
                         <p:separator />
                         <p:menuitem value="Purchase Orders" action="#{navigationBean.redirectToReportPurchaseOrderDetail()}" />
-                        <p:separator />
-                        <p:menuitem value="Items Received" action="#{navigationBean.redirectToReportPurchaseItemReceivedDetail()}" />
+                        <p:separator rendered="#{menuItemBean.menuItemObj.PURCHASE_INVOICE_MODE eq 0}"/>
+                        <p:menuitem value="Items Received" action="#{navigationBean.redirectToReportPurchaseItemReceivedDetail()}" rendered="#{menuItemBean.menuItemObj.PURCHASE_INVOICE_MODE eq 0}"/>
                         <p:separator />
                     </p:submenu>
                     <p:separator rendered="#{menuItemBean.menuItemObj.HIRE_MODULE_ON==1}"/>
