@@ -1196,7 +1196,8 @@ public class TransProductionBean implements Serializable {
                         stock.setUnitCost(UnitCostPrice);
                         i = new StockBean().addStock(stock, transItem.getItemQty());
                         stock.setSpecific_size(transItem.getSpecific_size());
-                        new Stock_ledgerBean().callInsertStock_ledger("Add", stock, transItem.getItemQty(), "Add", aTransTypeId, InsertedTransId, new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                        String TableName=new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
+                        new Stock_ledgerBean().callInsertStock_ledger(TableName,"Add", stock, transItem.getItemQty(), "Add", aTransTypeId, InsertedTransId, new GeneralUserSetting().getCurrentUser().getUserDetailId());
                     } else {
                         //insert
                         Stock stock = new Stock();
@@ -1226,7 +1227,8 @@ public class TransProductionBean implements Serializable {
                             stock.setSpecific_size(1);
                         }
                         i = new StockBean().saveStock(stock);
-                        new Stock_ledgerBean().callInsertStock_ledger("Add", stock, transItem.getItemQty(), "Add", aTransTypeId, InsertedTransId, new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                        String TableName=new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
+                        new Stock_ledgerBean().callInsertStock_ledger(TableName,"Add", stock, transItem.getItemQty(), "Add", aTransTypeId, InsertedTransId, new GeneralUserSetting().getCurrentUser().getUserDetailId());
                     }
                     new TransProductionItemBean().saveTransProductionItemsCEC(InsertedTransId, InsertedOutputQty, InsertedStoreId, aTransProducts);
                     //Save PRODUCTION Journal Entry

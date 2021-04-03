@@ -296,8 +296,8 @@ public class TransProductionItemBean implements Serializable {
                     //i = new StockBean().subtractStock(stock, calInputQty);
                     i = new StockBean().subtractStock(stock, aItemProductionMap.getInputQtyTotal());
                     stock.setSpecific_size(1);
-                    //new Stock_ledgerBean().callInsertStock_ledger("Subtract", stock, calInputQty, "Add", 70, aTransProductionID, new GeneralUserSetting().getCurrentUser().getUserDetailId());
-                    new Stock_ledgerBean().callInsertStock_ledger("Subtract", stock, aItemProductionMap.getInputQtyTotal(), "Add", 70, aTransProductionID, new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                    String TableName=new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
+                    new Stock_ledgerBean().callInsertStock_ledger(TableName,"Subtract", stock, aItemProductionMap.getInputQtyTotal(), "Add", 70, aTransProductionID, new GeneralUserSetting().getCurrentUser().getUserDetailId());
                     try {
                         FromUnitCost = new StockBean().getStock(stock.getStoreId(), stock.getItemId(), stock.getBatchno(), stock.getCodeSpecific(), stock.getDescSpecific()).getUnitCost();
                     } catch (NullPointerException npe) {

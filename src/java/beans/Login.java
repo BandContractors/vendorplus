@@ -110,6 +110,9 @@ public class Login implements Serializable {
 
     public void userLogin(int aLoginType) {
         if (new DBConnection().isMySQLConnectionAvailable().equals("ON")) {
+            //check stock ledger table
+            new Stock_ledgerBean().checkTodayMonthlyStockLedgerTable();
+            //continue
             UserDetailBean udb = new UserDetailBean();
             this.setLoggedInUserDetail(udb.getUserDetailByUserName(this.LoggedInUserName));
             if (this.LoggedInUserDetail != null && this.LoggedInPassword.equals(this.LoggedInUserDetail.getUserPassword()) && "No".equals(this.LoggedInUserDetail.getIsUserLocked())) {

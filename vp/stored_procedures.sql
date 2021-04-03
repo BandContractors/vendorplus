@@ -10072,7 +10072,8 @@ CREATE PROCEDURE sp_get_item_received_latest_trans_item_id
 		IN in_item_id bigint,
 		IN in_batchno varchar(100),
 		IN in_code_specific varchar(250),
-		IN in_desc_specific varchar(250)
+		IN in_desc_specific varchar(250),
+		IN in_transaction_type_id int
 ) 
 BEGIN 
 		SET @in_batchno='';
@@ -10091,7 +10092,7 @@ BEGIN
 		SET @in_where=concat(@in_batchno,@in_code_specific,@in_desc_specific);
 
 		SELECT max(transaction_item_id) AS transaction_item_id FROM transaction_item ti,transaction t WHERE ti.transaction_id=t.transaction_id 
-		AND t.transaction_type_id=9 AND ti.item_id=in_item_id AND ti.unit_cost_price>0 AND concat(' 1=1 ',@in_where);
+		AND t.transaction_type_id=in_transaction_type_id AND ti.item_id=in_item_id AND ti.unit_cost_price>0 AND concat(' 1=1 ',@in_where);
 END//
 DELIMITER ;
 
@@ -12282,5 +12283,64 @@ CREATE PROCEDURE sp_search_transaction_item_by_transaction_id_cr_dr_note
 BEGIN 
 		SELECT * FROM transaction_item_cr_dr_note ti 
 		WHERE ti.transaction_id=in_transaction_id ORDER BY ti.transaction_item_id ASC;
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_create_stock_ledger_monthly_tables;
+DELIMITER //
+CREATE PROCEDURE sp_create_stock_ledger_monthly_tables()
+BEGIN 
+	DECLARE finished INTEGER DEFAULT 0;
+	DECLARE TableName varchar(30) DEFAULT "";
+	-- declare cursor for distinct year and month
+	DEClARE curTableName CURSOR FOR select CONCAT('stock_ledger_',year(add_date),'_',LPAD(month(add_date), 2, 0)) from stock_ledger group by year(add_date),month(add_date);
+	-- declare NOT FOUND handler
+	DECLARE CONTINUE HANDLER FOR NOT FOUND SET finished = 1;
+	OPEN curTableName;
+	getTableName: LOOP
+		FETCH curTableName INTO TableName;
+		IF finished = 1 THEN 
+			LEAVE getTableName;
+		END IF;
+		-- create table
+		set @sql_text = CONCAT("CREATE TABLE ",TableName," AS select * from stock_ledger where year(add_date)=SUBSTRING('",TableName,"',14, 4) and LPAD(month(add_date), 2, 0)=SUBSTRING('",TableName,"',19, 2)");
+		-- select @sql_text;
+        PREPARE stmt FROM @sql_text;
+		EXECUTE stmt;
+		DEALLOCATE PREPARE stmt;
+		-- add primary key
+		set @sql_text2 = CONCAT("ALTER TABLE ",TableName," ADD PRIMARY KEY (stock_ledger_id)");
+        PREPARE stmt2 FROM @sql_text2;
+		EXECUTE stmt2;
+		DEALLOCATE PREPARE stmt2;
+	END LOOP getTableName;
+	CLOSE curTableName;
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_get_today_monthly_stock_ledger_table;
+DELIMITER //
+CREATE PROCEDURE sp_get_today_monthly_stock_ledger_table()
+BEGIN 
+	SET @cur_sys_datetime=null;
+	CALL sp_get_current_system_datetime(@cur_sys_datetime);
+	SELECT CONCAT('stock_ledger_',year(@cur_sys_datetime),'_',LPAD(month(@cur_sys_datetime), 2, 0)) as TableName;
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_create_today_monthly_stock_ledger_table;
+DELIMITER //
+CREATE PROCEDURE sp_create_today_monthly_stock_ledger_table(IN in_TableName varchar(30))
+BEGIN 
+		-- create table
+		set @sql_text = CONCAT("CREATE TABLE ",in_TableName," AS select * from stock_ledger where 1=2");
+        PREPARE stmt FROM @sql_text;
+		EXECUTE stmt;
+		DEALLOCATE PREPARE stmt;
+		-- add primary key
+		set @sql_text2 = CONCAT("ALTER TABLE ",in_TableName," ADD PRIMARY KEY (stock_ledger_id)");
+        PREPARE stmt2 FROM @sql_text2;
+		EXECUTE stmt2;
+		DEALLOCATE PREPARE stmt2;
 END//
 DELIMITER ;

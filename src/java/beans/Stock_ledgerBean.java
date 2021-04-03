@@ -5,17 +5,22 @@ import connections.DBConnection;
 import entities.CompanySetting;
 import entities.Item;
 import entities.Item_tax_map;
+import entities.Parameter_list;
 import entities.Stock;
 import entities.Stock_ledger;
 import entities.Transactor;
 import java.io.Serializable;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.text.DecimalFormat;
+import java.text.Format;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
@@ -141,8 +146,8 @@ public class Stock_ledgerBean implements Serializable {
         }
     }
 
-    public Stock_ledger getStock_ledger(long aStock_ledger_id) {
-        String sql = "SELECT * FROM stock_ledger WHERE stock_ledger_id=" + aStock_ledger_id;
+    public Stock_ledger getStock_ledger(String aTableName, long aStock_ledger_id) {
+        String sql = "SELECT * FROM " + aTableName + " WHERE stock_ledger_id=" + aStock_ledger_id;
         ResultSet rs = null;
         Stock_ledger sl = null;
         try (
@@ -159,7 +164,7 @@ public class Stock_ledgerBean implements Serializable {
         return sl;
     }
 
-    public void callInsertStock_ledger(String aAddSubtract, Stock aStock, double aQty, String aAction_type, int aTrans_type_id, long aTrans_id, int aUser_detail_id) {
+    public void callInsertStock_ledger(String aTableName, String aAddSubtract, Stock aStock, double aQty, String aAction_type, int aTrans_type_id, long aTrans_id, int aUser_detail_id) {
         try {
             Stock_ledger stockledger = new Stock_ledger();
             try {
@@ -248,7 +253,7 @@ public class Stock_ledgerBean implements Serializable {
             stockledger.setQty_bal(qtybal);
             long update_id = 0;
             try {
-                update_id = new UtilityBean().getNewTableColumnSeqNumber("stock_ledger", "tax_update_id");
+                update_id = new UtilityBean().getNewTableColumnSeqNumber(aTableName, "tax_update_id");
             } catch (Exception e) {
                 update_id = 0;
             }
@@ -256,7 +261,7 @@ public class Stock_ledgerBean implements Serializable {
             stockledger.setTax_is_updated(0);
             stockledger.setTax_update_synced(0);
             //insert
-            this.insertStock_ledger(stockledger);
+            this.insertStock_ledger(aTableName, stockledger);
             //check alert-stock status
             new Alert_generalBean().checkStockStatusForAlertThread(stockledger.getItem_id());
             //check alert-expiry status
@@ -328,8 +333,8 @@ public class Stock_ledgerBean implements Serializable {
         }
     }
 
-    public void insertStock_ledger(Stock_ledger aStock_ledger) {
-        String sql = "INSERT INTO stock_ledger"
+    public void insertStock_ledger(String aTableName, Stock_ledger aStock_ledger) {
+        String sql = "INSERT INTO " + aTableName
                 + "(store_id,item_id,batchno,code_specific,desc_specific,specific_size,"
                 + "qty_added,qty_subtracted,transaction_type_id,action_type,transaction_id,user_detail_id,add_date,qty_bal,"
                 + "tax_update_id,tax_is_updated,tax_update_synced)"
@@ -364,9 +369,9 @@ public class Stock_ledgerBean implements Serializable {
         }
     }
 
-    public int updateTaxStock_ledger(long aTax_update_id, int aTax_is_updated, int aTax_update_synced) {
+    public int updateTaxStock_ledger(String aTableName, long aTax_update_id, int aTax_is_updated, int aTax_update_synced) {
         int update_flag = 0;
-        String sql = "UPDATE stock_ledger SET tax_is_updated=" + aTax_is_updated + ",tax_update_synced=" + aTax_update_synced + " WHERE tax_update_id=" + aTax_update_id;
+        String sql = "UPDATE " + aTableName + " SET tax_is_updated=" + aTax_is_updated + ",tax_update_synced=" + aTax_update_synced + " WHERE tax_update_id=" + aTax_update_id;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -456,16 +461,40 @@ public class Stock_ledgerBean implements Serializable {
     }
 
     public void reportStock_ledger(Stock_ledger aStock_ledger, Stock_ledgerBean aStock_ledgerBean, Item aItem) {
-        this.reportStock_ledgerSummary(aStock_ledger, aStock_ledgerBean, aItem);
-        this.reportStock_ledgerDetail(aStock_ledger, aStock_ledgerBean, aItem);
+        String msg = "";
+        aStock_ledgerBean.setActionMessage("");
+        int Month1 = 0;
+        int Month2 = 0;
+        int Year1 = 0;
+        int Year2 = 0;
+        try {
+            Month1 = new UtilityBean().getMonthFromDate(aStock_ledgerBean.getDate1());
+            Month2 = new UtilityBean().getMonthFromDate(aStock_ledgerBean.getDate2());
+            Year1 = new UtilityBean().getYearFromDate(aStock_ledgerBean.getDate1());
+            Year2 = new UtilityBean().getYearFromDate(aStock_ledgerBean.getDate2());
+        } catch (Exception e) {
+        }
+        if (Month1 == 0 || Month2 == 0 || Month1 != Month2 || Year1 == 0 || Year2 == 0 || Year1 != Year2) {
+            msg = "[From Date] and [To Date] must be within same month";
+        } else {
+            if (msg.length() > 0) {
+                aStock_ledgerBean.setActionMessage(msg);
+                FacesContext.getCurrentInstance().addMessage("Report", new FacesMessage(msg));
+            } else {
+                String TableName = this.getStockLedgerTableName(Year1, Month1);
+                this.reportStock_ledgerSummary(TableName, aStock_ledger, aStock_ledgerBean, aItem);
+                this.reportStock_ledgerDetail(TableName, aStock_ledger, aStock_ledgerBean, aItem);
+            }
+        }
     }
+//yeah
 
-    public void reportStock_ledgerDetail(Stock_ledger aStock_ledger, Stock_ledgerBean aStock_ledgerBean, Item aItem) {
+    public void reportStock_ledgerDetail(String aTableName, Stock_ledger aStock_ledger, Stock_ledgerBean aStock_ledgerBean, Item aItem) {
         aStock_ledgerBean.setActionMessage("");
         ResultSet rs = null;
         this.Stock_ledgerList = new ArrayList<>();
         String sql = "SELECT l.*,i.description,un.unit_symbol,tt.transaction_type_name,us.user_name,s.store_name "
-                + "FROM stock_ledger l "
+                + "FROM " + aTableName + " l "
                 + "INNER JOIN item i ON l.item_id=i.item_id "
                 + "INNER JOIN unit un ON i.unit_id=un.unit_id "
                 + "INNER JOIN transaction_type tt ON l.transaction_type_id=tt.transaction_type_id "
@@ -528,7 +557,7 @@ public class Stock_ledgerBean implements Serializable {
         }
     }
 
-    public void reportStock_ledgerSummary(Stock_ledger aStock_ledger, Stock_ledgerBean aStock_ledgerBean, Item aItem) {
+    public void reportStock_ledgerSummary(String aTableName, Stock_ledger aStock_ledger, Stock_ledgerBean aStock_ledgerBean, Item aItem) {
         aStock_ledgerBean.setActionMessage("");
         ResultSet rs = null;
         this.Stock_ledgerSummary = new ArrayList<>();
@@ -548,14 +577,14 @@ public class Stock_ledgerBean implements Serializable {
                 + "t.*,"
                 + "i.description,"
                 + "u.unit_symbol,"
-                + "(select case when l1.qty_added>0 then l1.qty_bal-l1.qty_added when l1.qty_subtracted>0 then l1.qty_bal+l1.qty_subtracted else 0 end from stock_ledger l1 where l1.stock_ledger_id=t.min_id) as qty_open,"
-                + "(select l2.qty_bal from stock_ledger l2 where l2.stock_ledger_id=t.max_id) as qty_close "
+                + "(select case when l1.qty_added>0 then l1.qty_bal-l1.qty_added when l1.qty_subtracted>0 then l1.qty_bal+l1.qty_subtracted else 0 end from " + aTableName + " l1 where l1.stock_ledger_id=t.min_id) as qty_open,"
+                + "(select l2.qty_bal from " + aTableName + " l2 where l2.stock_ledger_id=t.max_id) as qty_close "
                 + "from "
                 + "("
                 + "select l.item_id,l.batchno,l.code_specific,l.desc_specific,"
                 + "min(l.stock_ledger_id) as min_id,"
                 + "max(l.stock_ledger_id) as max_id "
-                + "from stock_ledger l  "
+                + "from " + aTableName + " l  "
                 + "where 1=1 " + wheresql + " "
                 + "group by l.item_id,l.batchno,l.code_specific,l.desc_specific "
                 + ") as t "
@@ -579,7 +608,7 @@ public class Stock_ledgerBean implements Serializable {
                 sl.setQty_open(rs.getDouble("qty_open"));
                 sl.setQty_close(rs.getDouble("qty_close"));
                 String whereinner = " AND l.item_id=" + sl.getItem_id() + " AND l.batchno='" + sl.getBatchno() + "' AND l.code_specific='" + sl.getCode_specific() + "' AND l.desc_specific='" + sl.getDesc_specific() + "' " + wheredate;
-                sl.setStock_ledgerList(this.getStock_ledgerInner(whereinner));
+                sl.setStock_ledgerList(this.getStock_ledgerInner(aTableName, whereinner));
                 this.Stock_ledgerSummary.add(sl);
             }
         } catch (Exception e) {
@@ -587,7 +616,7 @@ public class Stock_ledgerBean implements Serializable {
         }
     }
 
-    public List<Stock_ledger> getStock_ledgerInner(String aWhereSql) {
+    public List<Stock_ledger> getStock_ledgerInner(String aTableName, String aWhereSql) {
         ResultSet rs = null;
         List<Stock_ledger> sll = new ArrayList<>();
         String wheresql = "select "
@@ -597,7 +626,7 @@ public class Stock_ledgerBean implements Serializable {
                 + "l.transaction_type_id,"
                 + "sum(l.qty_added) as qty_added,"
                 + "sum(l.qty_subtracted) as qty_subtracted  "
-                + "from stock_ledger l "
+                + "from " + aTableName + " l "
                 + "where 1=1 " + aWhereSql + " "
                 + "group by l.transaction_type_id"
                 + ") as sm "
@@ -647,6 +676,82 @@ public class Stock_ledgerBean implements Serializable {
             aStock_ledgerBean.Stock_ledgerSummary.clear();
         } catch (NullPointerException npe) {
         }
+    }
+
+    public String getTodayMonthlyStockLedgerTable() {
+        String sql = "{call sp_get_today_monthly_stock_ledger_table()}";
+        String TableName = "";
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                CallableStatement cs = conn.prepareCall(sql);) {
+            rs = cs.executeQuery();
+            if (rs.next()) {
+                TableName = rs.getString("TableName");
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return TableName;
+    }
+
+    public int createTodayMonthlyStockLedgerTable(String aTableName) {
+        String sql = "{call sp_create_today_monthly_stock_ledger_table(?)}";
+        int status = 0;
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                CallableStatement cs = conn.prepareCall(sql);) {
+            cs.setString("in_TableName", aTableName);
+            cs.executeUpdate();
+            status = 1;
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return status;
+    }
+
+    /* check stock ledger table
+     1. at login, get today's monthly table
+     2. check 
+     >if exists, do nothing (means parameter list has current)
+     >if not exist, a) create one, b) update parameter list c) refresh
+     */
+    public void checkTodayMonthlyStockLedgerTable() {
+        try {
+            Parameter_list pl = new Parameter_listBean().getParameter_listById(75);
+            if (pl == null) {
+                //do nothing, parameterList not updated
+            } else {
+                String TodayMonthTableName = this.getTodayMonthlyStockLedgerTable();
+                String ExistMonthTableName = "";
+                try {
+                    ExistMonthTableName = pl.getParameter_value();
+                } catch (NullPointerException | ClassCastException npe) {
+                }
+                if (TodayMonthTableName.equals(ExistMonthTableName)) {
+                    //do nothing
+                } else {
+                    if (new Stock_ledgerBean().createTodayMonthlyStockLedgerTable(TodayMonthTableName) == 1) {
+                        pl.setParameter_value(TodayMonthTableName);
+                        new Parameter_listBean().saveParameter_list(pl);
+                        new Parameter_listBean().saveParameter_listByIdMemory(75, TodayMonthTableName);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public String getStockLedgerTableName(int aYearNo, int aMonthNo) {
+        String TableName = "";
+        String monthstr = "";
+        DecimalFormat decimalFormat = new DecimalFormat();
+        decimalFormat.applyPattern("00");
+        monthstr = decimalFormat.format(aMonthNo);
+        TableName = "stock_ledger_" + aYearNo + "_" + monthstr;
+        return TableName;
     }
 
     /**

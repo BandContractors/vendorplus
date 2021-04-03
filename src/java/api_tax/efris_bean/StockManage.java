@@ -82,7 +82,8 @@ public class StockManage implements Serializable {
         try {
             if (null != aStock && aTax_update_id > 0) {
                 //1. indicate record4Sync
-                int record4Sync = new Stock_ledgerBean().updateTaxStock_ledger(aTax_update_id, 1, 0);
+                String TableName=new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
+                int record4Sync = new Stock_ledgerBean().updateTaxStock_ledger(TableName,aTax_update_id, 1, 0);
                 String id = "";
                 String APIMode = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_MODE").getParameter_value();
                 if (APIMode.equals("OFFLINE")) {
@@ -100,7 +101,7 @@ public class StockManage implements Serializable {
                     }
                     if (recordSynced.equals("SUCCESS")) {
                         //3. update local db that synced yes
-                        int x = new Stock_ledgerBean().updateTaxStock_ledger(aTax_update_id, 1, 1);
+                        int x = new Stock_ledgerBean().updateTaxStock_ledger(TableName,aTax_update_id, 1, 1);
                     }
                 }
             }
@@ -143,7 +144,8 @@ public class StockManage implements Serializable {
         try {
             if (null != aStock && aTax_update_id > 0) {
                 //1. indicate record4Sync
-                int record4Sync = new Stock_ledgerBean().updateTaxStock_ledger(aTax_update_id, 1, 0);
+                String TableName=new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
+                int record4Sync = new Stock_ledgerBean().updateTaxStock_ledger(TableName,aTax_update_id, 1, 0);
                 String APIMode = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_MODE").getParameter_value();
                 String id = "";
                 if (APIMode.equals("OFFLINE")) {
@@ -161,7 +163,7 @@ public class StockManage implements Serializable {
                     }
                     if (recordSynced.equals("SUCCESS")) {
                         //3. update local db that synced yes
-                        int x = new Stock_ledgerBean().updateTaxStock_ledger(aTax_update_id, 1, 1);
+                        int x = new Stock_ledgerBean().updateTaxStock_ledger(TableName,aTax_update_id, 1, 1);
                     }
                 }
             }

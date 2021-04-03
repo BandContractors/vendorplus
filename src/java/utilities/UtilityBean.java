@@ -587,9 +587,12 @@ public class UtilityBean implements Serializable {
 
     public Integer getYearFromDate(Date aDate) {
         int date_year = 0;
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(aDate);
-        date_year = cal.get(Calendar.YEAR);
+        try {
+            Calendar cal = new GregorianCalendar();
+            cal.setTime(aDate);
+            date_year = cal.get(Calendar.YEAR);
+        } catch (Exception e) {
+        }
         return date_year;
     }
 
@@ -604,9 +607,12 @@ public class UtilityBean implements Serializable {
 
     public Integer getMonthFromDate(Date aDate) {
         int date_month = 0;
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(aDate);
-        date_month = cal.get(Calendar.MONTH) + 1;
+        try {
+            Calendar cal = new GregorianCalendar();
+            cal.setTime(aDate);
+            date_month = cal.get(Calendar.MONTH) + 1;
+        } catch (Exception e) {
+        }
         return date_month;
     }
 
@@ -700,16 +706,11 @@ public class UtilityBean implements Serializable {
     }
 
 //    public static void main(String[] args) {
-//        UtilityBean ub = new UtilityBean();
-//        double a = 0.18;
-//        double b = 10000000;
-//        System.out.println("a:" + a + ",b=" + b);
-//        //System.out.println("aDtoS:" + Double.toString(a) + ",bDtoS=" + Double.toString(b));
-//        System.out.println("aFDtoS:" + ub.formatDoubleToString(a) + ",bFDtoS=" + ub.formatDoubleToString(b));
-//        System.out.println("aFN:" + ub.formatNumber(a) + ",bFN=" + ub.formatNumber(b));
-//        System.out.println("aPF:" + ub.formatDoublePlain2DP(a) + ",bPF=" + ub.formatDoublePlain2DP(b));
-//        System.out.println("a14:" + ub.formatDoublePlain1DP4(a) + ",b14=" + ub.formatDoublePlain1DP4(b));
+//        DecimalFormat decimalFormat = new DecimalFormat();
+//            decimalFormat.applyPattern("00");
+//            System.out.println("DF:"+ decimalFormat.format(10));
 //    }
+    
     public String getEmptyIfNull(String aStringValue) {
         if (aStringValue == null) {
             return "";
