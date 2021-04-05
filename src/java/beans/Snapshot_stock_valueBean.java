@@ -13,6 +13,8 @@ import java.util.Date;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 /*
  * To change this template, choose Tools | Templates
@@ -27,7 +29,7 @@ import javax.faces.bean.SessionScoped;
 public class Snapshot_stock_valueBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    static Logger LOGGER = Logger.getLogger(Snapshot_stock_valueBean.class.getName());
     private String ActionMessage = null;
     private List<Snapshot_stock_value> Snapshot_stock_valueList;
     private Snapshot_stock_value Snapshot_stock_valueObj;
@@ -124,8 +126,8 @@ public class Snapshot_stock_valueBean implements Serializable {
             } catch (NullPointerException npe) {
                 aSnapshot_stock_value.setStore_id(0);
             }
-        } catch (SQLException se) {
-            System.err.println("setSnapshot_stock_valueFromResultset:" + se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -144,8 +146,8 @@ public class Snapshot_stock_valueBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println("getSnapshot_stock_value:" + se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
         }
     }
@@ -167,7 +169,7 @@ public class Snapshot_stock_valueBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println("getRecordsByCdc_id:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return n;
     }
@@ -192,8 +194,8 @@ public class Snapshot_stock_valueBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException | NullPointerException se) {
-            System.err.println("getSnapshot_stock_value:" + se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
         }
     }
@@ -213,7 +215,7 @@ public class Snapshot_stock_valueBean implements Serializable {
                 saved = 1;
             }
         } catch (Exception e) {
-            System.err.println("insertSnapshot_stock_value:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return saved;
     }
@@ -237,6 +239,60 @@ public class Snapshot_stock_valueBean implements Serializable {
         aSnapshot_stock_value.setQty_damage(0);
         aSnapshot_stock_value.setCdc_id("");
         aSnapshot_stock_value.setStore_id(0);
+    }
+
+    public void takeNewSnapshot_stock_value_day_sum(int aY, int aM, int aD, long aSnaphotNo) {
+        //delete any existing summary snapshot
+        int deleted = this.deleteSnapshot_stock_value_day_sum(aY, aM, aD);
+        //take dialy summary
+        String sql = "INSERT INTO snapshot_stock_value_day_sum(y, m, d,snapshot_no,currency_code,cp_value,wp_value,rp_value,store_id,stock_type) "
+                + "select year(s.snapshot_date) as y,month(s.snapshot_date) as m,day(s.snapshot_date) as d,s.snapshot_no,s.currency_code,"
+                + "s.store_id,IFNULL(i.expense_type,'') as stock_type,"
+                + "sum(s.cp_value) as cp_value,sum(s.wp_value) as wp_value,sum(s.rp_value) as rp_value from snapshot_stock_value s "
+                + "INNER JOIN item i ON s.item_id=i.item_id AND i.is_asset=0 AND i.is_track=1 "
+                + "WHERE s.snapshot_no=? "
+                + "group by year(s.snapshot_date),month(s.snapshot_date),day(s.snapshot_date),s.snapshot_no,s.currency_code,"
+                + "s.store_id,IFNULL(i.expense_type,'');";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aSnaphotNo);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public int deleteSnapshot_stock_value_day_sum(int aY, int aM, int aD) {
+        String sql = "DELETE FROM snapshot_stock_value_day_sum WHERE snapshot_stock_value_day_sum_id>0 and y=? and m=? and d=?";
+        int success = 0;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setInt(1, aY);
+            ps.setInt(2, aM);
+            ps.setInt(3, aD);
+            ps.executeUpdate();
+            success = 1;
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return success;
+    }
+
+    public int deleteSnapshot_stock_value_BelowLastMonth(Date aCurrentDate) {
+        int saved = 0;
+        String sql = "{call sp_delete_snapshot_stock_value_below_last_month(?)}";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                CallableStatement cs = conn.prepareCall(sql);) {
+            cs.setDate("in_current_date", new java.sql.Date(aCurrentDate.getTime()));
+            cs.executeUpdate();
+            saved = 1;
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return saved;
     }
 
     /**

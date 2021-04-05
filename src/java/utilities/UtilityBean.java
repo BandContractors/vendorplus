@@ -616,6 +616,17 @@ public class UtilityBean implements Serializable {
         return date_month;
     }
 
+    public Integer getDayFromDate(Date aDate) {
+        int day_month = 0;
+        try {
+            Calendar cal = new GregorianCalendar();
+            cal.setTime(aDate);
+            day_month = cal.get(Calendar.DAY_OF_MONTH);
+        } catch (Exception e) {
+        }
+        return day_month;
+    }
+
     public void clearList(List<Object> aList) {
         try {
             aList.clear();
@@ -710,7 +721,6 @@ public class UtilityBean implements Serializable {
 //            decimalFormat.applyPattern("00");
 //            System.out.println("DF:"+ decimalFormat.format(10));
 //    }
-    
     public String getEmptyIfNull(String aStringValue) {
         if (aStringValue == null) {
             return "";

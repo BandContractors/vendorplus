@@ -608,3 +608,17 @@ SELECT t.*,ifnull(t2.transaction_id,0) as transaction_id_cr_dr,ifnull(t2.transac
 FROM transaction t 
 LEFT JOIN transaction_cr_dr_note t2 on t.transaction_number=t2.transaction_ref 
 WHERE t.transaction_type_id IN(2,65,68);
+
+CREATE OR REPLACE VIEW view_snapshot_stock_value_max_month AS 
+select year(cdc_date) as y,month(cdc_date) as m,max(snapshot_no) as snapshot_no from cdc_general 
+	where cdc_function='STOCK' and is_passed=1  
+	group by year(cdc_date),month(cdc_date) 
+	order by year(cdc_date),month(cdc_date);
+    
+CREATE OR REPLACE VIEW view_snapshot_stock_value_max_day AS 
+select year(cdc_date) as y,month(cdc_date) as m,day(cdc_date) as d,max(snapshot_no) as snapshot_no from cdc_general 
+	where cdc_function='STOCK' and is_passed=1  
+	group by year(cdc_date),month(cdc_date),day(cdc_date) 
+	order by year(cdc_date),month(cdc_date),day(cdc_date);
+
+

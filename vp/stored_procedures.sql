@@ -12344,3 +12344,21 @@ BEGIN
 		DEALLOCATE PREPARE stmt2;
 END//
 DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_delete_snapshot_stock_value_below_last_month;
+DELIMITER //
+CREATE PROCEDURE sp_delete_snapshot_stock_value_below_last_month(IN in_current_date date)
+BEGIN 
+    SET @cur_month=month(in_current_date);
+    SET @start_date='';
+    if (@cur_month=1) then
+		set @start_date=CONCAT(year(in_current_date)-1,'-','12-01 00:00');
+	else
+		set @start_date=CONCAT(year(in_current_date),'-',month(in_current_date)-1,'-01 00:00');
+	end if;
+    DELETE FROM snapshot_stock_value WHERE snapshot_stock_value_id>1 and snapshot_date<@start_date and 
+    snapshot_no NOT IN (
+		select sn from (select y,m,max(snapshot_no) as sn from snapshot_stock_value_day_sum group by y,m) as t2
+	);
+END//
+DELIMITER ;

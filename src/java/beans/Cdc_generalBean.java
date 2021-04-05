@@ -167,7 +167,7 @@ public class Cdc_generalBean implements Serializable {
             return null;
         }
     }
-    
+
     public long getNewSnapshot_no() {
         String sql;
         sql = "SELECT max(snapshot_no) as snapshot_no FROM cdc_general";
@@ -341,6 +341,25 @@ public class Cdc_generalBean implements Serializable {
         return res;
     }
 
+    public int getCountCdc_generalSTOCK(int aY, int aM) {
+        String sql = "SELECT count(*) as n FROM cdc_general WHERE cdc_function='STOCK' AND year(cdc_date)=? AND month(cdc_date)=?";
+        ResultSet rs = null;
+        int n = 0;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setInt(1, aY);
+            ps.setInt(2, aM);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                n = rs.getInt("n");
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return n;
+    }
+
     public void takeNewSnapshot_stock() {
         try {
             //1. insert cdc_record
@@ -357,7 +376,7 @@ public class Cdc_generalBean implements Serializable {
             cdcgenInsert.setAdd_by(UserDetailBean.getSystemUserDetailId());
             cdcgenInsert.setAcc_period_id(new AccPeriodBean().getAccPeriod(cdcgenInsert.getCdc_date()).getAccPeriodId());
             this.saveCdc_general(cdcgenInsert);
-            //2. insert stock snapshop
+            //2. insert stock snapshot
             Cdc_general cdcgenSaved = this.getCdc_generalByJobId(cdcid);
             if (null != cdcgenSaved) {
                 int saved = new Snapshot_stock_valueBean().insertSnapshot_stock_value(cdcgenSaved);
@@ -374,6 +393,16 @@ public class Cdc_generalBean implements Serializable {
                 cdcgenUpdate.setLast_update_date(new CompanySetting().getCURRENT_SERVER_DATE());
                 cdcgenUpdate.setLast_update_by(UserDetailBean.getSystemUserDetailId());
                 this.saveCdc_general(cdcgenUpdate);
+                //take summary
+                if (recordsInserted > 0) {
+                    UtilityBean ub = new UtilityBean();
+                    int y = ub.getYearFromDate(cdcgenInsert.getCdc_date()), m = ub.getMonthFromDate(cdcgenInsert.getCdc_date()), d = ub.getDayFromDate(cdcgenInsert.getCdc_date());
+                    new Snapshot_stock_valueBean().takeNewSnapshot_stock_value_day_sum(y, m, d, snapshotno);
+                    //delete records below/older-than LAST MONTH if this is the first snapshot in the month
+                    if (d == 1 || this.getCountCdc_generalSTOCK(y, m) == 1) {
+                        new Snapshot_stock_valueBean().deleteSnapshot_stock_value_BelowLastMonth(cdcgenInsert.getCdc_date());
+                    }
+                }
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
