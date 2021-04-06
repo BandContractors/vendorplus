@@ -142,11 +142,11 @@
                 <h:outputLabel value="Transaction Type Code"/>
                 <h:inputText value="#{transactionTypeBean.transactionTypeForEdit.transaction_type_code}"/>
                 <h:outputLabel value="Default Currency Code"/>
-                <h:selectOneMenu value="#{transactionTypeBean.transactionTypeForEdit.default_currency_code}" style="width: 200px">
+                <h:selectOneMenu value="#{transactionTypeBean.transactionTypeForEdit.default_currency_code}" style="width: 220px">
                     <f:selectItem itemLabel="" itemValue=""/>
                     <f:selectItems value="#{accCurrencyBean.currencyList}" var="ac" itemLabel="#{ac.currencyCode}" itemValue="#{ac.currencyCode}"/>
                 </h:selectOneMenu>
-                <h:outputLabel value="Transaction Number Format(S,C,Y,M,D,X/W/Z)"/>
+                <h:outputLabel value="Transaction Number Format (S,U,C,Y,M,D,X/W/Z)"/>
                 <h:inputText value="#{transactionTypeBean.transactionTypeForEdit.trans_number_format}"/>
                 <h:outputLabel value="Output Footer Message"/>
                 <h:inputText value="#{transactionTypeBean.transactionTypeForEdit.output_footer_message}"/>

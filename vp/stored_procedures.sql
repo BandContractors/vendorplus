@@ -12342,6 +12342,11 @@ BEGIN
         PREPARE stmt2 FROM @sql_text2;
 		EXECUTE stmt2;
 		DEALLOCATE PREPARE stmt2;
+        -- add auto increment
+		set @sql_text3 = CONCAT("ALTER TABLE ",in_TableName," CHANGE COLUMN stock_ledger_id stock_ledger_id BIGINT(20) NOT NULL AUTO_INCREMENT");
+        PREPARE stmt3 FROM @sql_text3;
+		EXECUTE stmt3;
+		DEALLOCATE PREPARE stmt3;
 END//
 DELIMITER ;
 

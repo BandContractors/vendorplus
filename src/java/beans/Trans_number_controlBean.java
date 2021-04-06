@@ -188,6 +188,23 @@ public class Trans_number_controlBean implements Serializable {
             X = String.format("%07d", NewNo);
         }
 
+        //U for userid
+        int UserId = new GeneralUserSetting().getCurrentUser().getUserDetailId();
+        String U = "";
+        if (UserId <= 99) {
+            U = String.format("%02d", UserId);
+        } else if (UserId <= 999) {
+            U = String.format("%03d", UserId);
+        } else if (UserId <= 9999) {
+            U = String.format("%04d", UserId);
+        } else if (UserId <= 99999) {
+            U = String.format("%05d", UserId);
+        } else if (UserId <= 999999) {
+            U = String.format("%06d", UserId);
+        } else {
+            U = String.format("%07d", UserId);
+        }
+
         String C = aTransType.getTransaction_type_code();
         if (null == C) {
             C = "";
@@ -210,6 +227,8 @@ public class Trans_number_controlBean implements Serializable {
                 transno = transno + X;
             } else if (TransNumberFormat.charAt(i) == 'S') {
                 transno = transno + S;
+            } else if (TransNumberFormat.charAt(i) == 'U') {
+                transno = transno + U;
             }
         }
         return transno;
