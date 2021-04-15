@@ -210,7 +210,7 @@ public class PayBean implements Serializable {
             try {
                 if (pay.getPay_number().length() == 0) {
                     TransactionType transtype = new TransactionTypeBean().getTransactionType(pay.getPayTypeId());
-                    pay.setPay_number(new Trans_number_controlBean().getNewTransNumber(transtype));
+                    pay.setPay_number(new Trans_number_controlBean().getNewTransNumber(transtype, pay.getAddUserDetailId(), pay.getStoreId()));
                     cs.setString("in_pay_number", pay.getPay_number());
                     new Trans_number_controlBean().updateTrans_number_control(transtype);
                 } else {

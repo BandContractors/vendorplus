@@ -1,6 +1,7 @@
 package beans;
 
 import connections.DBConnection;
+import entities.Pay;
 import entities.PayTrans;
 import sessions.GeneralUserSetting;
 import java.io.Serializable;
@@ -38,6 +39,7 @@ public class OutputDetailBean implements Serializable {
                     try {
                         aOutputDetail.setPay(new PayBean().getPay(new GeneralUserSetting().getCurrentPayId()));
                     } catch (Exception e) {
+                        aOutputDetail.setPay(new Pay());
                     }
                     break;
                 case "CHILD":
@@ -48,6 +50,7 @@ public class OutputDetailBean implements Serializable {
                     try {
                         aOutputDetail.setPay(new PayBean().getPay(new GeneralUserSetting().getCurrentPayIdChild()));
                     } catch (Exception e) {
+                        aOutputDetail.setPay(new Pay());
                     }
                     break;
             }

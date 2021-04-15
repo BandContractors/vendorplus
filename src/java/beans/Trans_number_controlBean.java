@@ -234,6 +234,98 @@ public class Trans_number_controlBean implements Serializable {
         return transno;
     }
 
+    public String getNewTransNumber(TransactionType aTransType, int aUserId, int aStoreId) {
+        String transno = "";
+        long CurNo = 0;
+        long NewNo = 0;
+
+        java.util.Calendar calendar = new GregorianCalendar();
+        Date aDate = new CompanySetting().getCURRENT_SERVER_DATE();
+        calendar.setTime(aDate);
+        int d = calendar.get(java.util.Calendar.DAY_OF_MONTH);
+        String D = String.format("%02d", d);
+        int m = calendar.get(java.util.Calendar.MONTH) + 1;
+        String M = String.format("%02d", m);
+        int y = calendar.get(java.util.Calendar.YEAR);
+        Format formatter = new SimpleDateFormat("YY");
+        String Y = formatter.format(aDate);
+        //first init
+        this.initDayTransNumber(aTransType, y, m, d);
+
+        //get current trans day number
+        try {
+            //X/W/Z
+            if (aTransType.getTrans_number_format().contains("X")) {//counter on day
+                CurNo = this.getTrans_number_controlUnique(aTransType.getTransactionTypeId(), y, m, d).getDay_count();
+            } else if (aTransType.getTrans_number_format().contains("W")) {//counter on month
+                CurNo = this.getTrans_number_controlUnique(aTransType.getTransactionTypeId(), y, m, d).getMonth_count();
+            } else if (aTransType.getTrans_number_format().contains("Z")) {//counter on year
+                CurNo = this.getTrans_number_controlUnique(aTransType.getTransactionTypeId(), y, m, d).getYear_count();
+            }
+        } catch (NullPointerException npe) {
+        }
+        NewNo = CurNo + 1;
+        String X = "";
+        if (NewNo <= 99) {
+            X = String.format("%02d", NewNo);
+        } else if (NewNo <= 999) {
+            X = String.format("%03d", NewNo);
+        } else if (NewNo <= 9999) {
+            X = String.format("%04d", NewNo);
+        } else if (NewNo <= 99999) {
+            X = String.format("%05d", NewNo);
+        } else if (NewNo <= 999999) {
+            X = String.format("%06d", NewNo);
+        } else {
+            X = String.format("%07d", NewNo);
+        }
+
+        //U for userid
+        int UserId = aUserId;//new GeneralUserSetting().getCurrentUser().getUserDetailId();
+        String U = "";
+        if (UserId <= 99) {
+            U = String.format("%02d", UserId);
+        } else if (UserId <= 999) {
+            U = String.format("%03d", UserId);
+        } else if (UserId <= 9999) {
+            U = String.format("%04d", UserId);
+        } else if (UserId <= 99999) {
+            U = String.format("%05d", UserId);
+        } else if (UserId <= 999999) {
+            U = String.format("%06d", UserId);
+        } else {
+            U = String.format("%07d", UserId);
+        }
+
+        String C = aTransType.getTransaction_type_code();
+        if (null == C) {
+            C = "";
+        }
+        String S = new StoreBean().getStore(aStoreId).getStore_code();//new GeneralUserSetting().getCurrentStore().getStore_code();
+        if (null == S || S.length() == 0) {
+            S = "";
+        }
+        String TransNumberFormat = aTransType.getTrans_number_format();
+        for (int i = 0; i < TransNumberFormat.length(); i++) {
+            if (TransNumberFormat.charAt(i) == 'C') {
+                transno = transno + C;
+            } else if (TransNumberFormat.charAt(i) == 'Y') {
+                transno = transno + Y;
+            } else if (TransNumberFormat.charAt(i) == 'M') {
+                transno = transno + M;
+            } else if (TransNumberFormat.charAt(i) == 'D') {
+                transno = transno + D;
+            } else if (TransNumberFormat.charAt(i) == 'X' || TransNumberFormat.charAt(i) == 'W' || TransNumberFormat.charAt(i) == 'Z') {
+                transno = transno + X;
+            } else if (TransNumberFormat.charAt(i) == 'S') {
+                transno = transno + S;
+            } else if (TransNumberFormat.charAt(i) == 'U') {
+                transno = transno + U;
+            }
+        }
+        return transno;
+    }
+
     public long countTrans_number_control(TransactionType aTransType, int aYear, int aMonth, int aDay) {
         String sql;
         sql = "SELECT count(*) as total_records FROM trans_number_control WHERE trans_type_id=? AND year_num=? AND month_num=? AND day_num=?";

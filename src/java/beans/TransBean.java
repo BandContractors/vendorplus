@@ -46,6 +46,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import javax.faces.application.ConfigurableNavigationHandler;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -1470,6 +1472,31 @@ public class TransBean implements Serializable {
         }
     }
 
+    public void saveTransCECcallFromSINew(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
+        //for safety reasons, double check the balance
+        trans.setChangeAmount(this.getChangeAmount(trans));
+        //get some details
+        String OrderTransNo = trans.getTransactionRef();
+        //save
+        this.saveTransCECNew(aLevel, aStoreId, aTransTypeId, aTransReasonId, aSaleType, trans, aActiveTransItems, aSelectedTransactor, aSelectedBillTransactor, aTransUserDetail, aSelectedSchemeTransactor, aAuthorisedByUserDetail, aSelectedAccCoa);
+        //update a few things needed after sales invoice saving
+        if (OrderTransNo.length() > 0) {
+            Trans OrderTrans = this.getTransByNumberType(OrderTransNo, 11);
+            //get order's invoioce status 0,1,2
+            int InvoiceStatus = this.getOrderInvoiceStatus(OrderTrans);
+            //get order's invoioce pay status 0,1,2
+            //save invoice status if not 0
+            if (InvoiceStatus > 0) {
+                this.updateOrderStatus(OrderTrans.getTransactionId(), "is_invoiced", InvoiceStatus);
+            }
+            if (trans.getAmountTendered() >= trans.getGrandTotal()) {
+                this.updateOrderStatus(OrderTrans.getTransactionId(), "is_paid", 1);
+            } else if (trans.getAmountTendered() > 0 && trans.getAmountTendered() < trans.getGrandTotal()) {
+                this.updateOrderStatus(OrderTrans.getTransactionId(), "is_paid", 2);
+            }
+        }
+    }
+
     public void saveTransCECcallFromOpenBalance(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa, TransItem aTransItem) {
         int valid = new TransItemBean().validateOpenBalance(trans, aActiveTransItems, aTransItem, aSelectedAccCoa);
         if (valid == 1) {
@@ -1979,6 +2006,455 @@ public class TransBean implements Serializable {
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Transaction NOT saved! Double check details, ensure transaction ref numbers have not been captured already"));
             }
         }
+    }
+
+    public void saveTransCECNew(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
+        int InsertedTransItems = 0;
+        TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
+        TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
+        //Store store = new StoreBean().getStore(aStoreId);
+        String ValidationMessage = this.validateTransCEC(aStoreId, aTransTypeId, aTransReasonId, aSaleType, trans, aActiveTransItems, aSelectedTransactor, aSelectedBillTransactor);
+        long payid = 0;
+        //-------
+        String sql = null;
+        String sql2 = null;
+        String msg = "";
+
+        TransItemBean TransItemBean = new TransItemBean();
+        PointsTransactionBean NewPointsTransactionBean = new PointsTransactionBean();
+        PointsTransaction NewPointsTransaction = new PointsTransaction();
+
+        //first clear current session
+        FacesContext context = FacesContext.getCurrentInstance();
+        HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+        HttpSession httpSession = request.getSession(true);
+        switch (aLevel) {
+            case "PARENT":
+                httpSession.setAttribute("CURRENT_TRANSACTION_ID", 0);
+                httpSession.setAttribute("CURRENT_PAY_ID", 0);
+                break;
+            case "CHILD":
+                httpSession.setAttribute("CURRENT_TRANSACTION_ID_CHILD", 0);
+                httpSession.setAttribute("CURRENT_PAY_ID_CHILD", 0);
+                break;
+        }
+
+        if (ValidationMessage.length() > 0) {
+            switch (aLevel) {
+                case "PARENT":
+                    this.setActionMessage("Transaction NOT saved");
+                    break;
+                case "CHILD":
+                    this.setActionMessageChild("Transaction NOT saved");
+                    break;
+            }
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ValidationMessage));
+        } else {
+            try {
+                this.insertTransCEC(aStoreId, aTransTypeId, aTransReasonId, aSaleType, trans, aActiveTransItems);
+                if (trans.getTransactionId() == 0) {
+                    switch (aLevel) {
+                        case "PARENT":
+                            this.setActionMessage("Transaction NOT saved");
+                            break;
+                        case "CHILD":
+                            this.setActionMessageChild("Transaction NOT saved");
+                            break;
+                    }
+                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("An error occured - transaction cannot be saved"));
+                } else {
+                    //set store2 for transfer in session!
+                    switch (aLevel) {
+                        case "PARENT":
+                            httpSession.setAttribute("CURRENT_TRANSACTION_ID", trans.getTransactionId());
+                            if ("TRANSFER".equals(transtype.getTransactionTypeName())) {
+                                httpSession.setAttribute("CURRENT_STORE2_ID", trans.getStore2Id());
+                            } else {
+                                httpSession.setAttribute("CURRENT_STORE2_ID", 0);
+                            }
+                            break;
+                        case "CHILD":
+                            httpSession.setAttribute("CURRENT_TRANSACTION_ID_CHILD", trans.getTransactionId());
+                            if ("TRANSFER".equals(transtype.getTransactionTypeName())) {
+                                httpSession.setAttribute("CURRENT_STORE2_ID_CHILD", trans.getStore2Id());
+                            } else {
+                                httpSession.setAttribute("CURRENT_STORE2_ID_CHILD", 0);
+                            }
+                            break;
+                    }
+                    //save trans items
+                    //trans.setStoreId(VARCHAR);
+                    TransItemBean tib = new TransItemBean();
+                    if (trans.getTransactionTypeId() == 16 || trans.getTransactionTypeId() == 76) {//Journal Entry, Opening Balance
+                        tib.saveTransItemsJournalEntry(trans, aActiveTransItems, trans.getTransactionId());
+                    } else if (trans.getTransactionTypeId() == 18) {//Cash Transfer
+                        tib.saveTransItemsCashTransfer(trans, aActiveTransItems, trans.getTransactionId());
+                    } else if (trans.getTransactionTypeId() == 75) {//Cash Adjustment
+                        tib.saveTransItemsCashAdjustment(trans, aActiveTransItems, trans.getTransactionId());
+                    } else {
+                        //tib.saveTransItemsCEC(aStoreId, aTransTypeId, aTransReasonId, aSaleType, trans, aActiveTransItems, trans.getTransactionId());
+                        InsertedTransItems = tib.insertTransItems(aStoreId, aTransTypeId, aTransReasonId, aSaleType, trans, aActiveTransItems, trans.getTransactionId());
+                        if (InsertedTransItems == aActiveTransItems.size()) {
+                            trans.setStoreId(aStoreId);
+                            trans.setTransactionTypeId(aTransTypeId);
+                            trans.setTransactionReasonId(aTransReasonId);
+                            this.saveTransOthersThread(trans);
+                        }
+                    }
+                    //insert PointsTransaction for both the awarded and spent points to the stage area
+                    if (("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) && (trans.getPointsAwarded() != 0 || trans.getSpendPoints() != 0)) {
+                        if (trans.getPointsCardId() != 0 && !trans.getCardNumber().equals("")) {
+                            //1. insert PointsTransaction for both the awarded and spent points to the stage area
+                            NewPointsTransaction.setPointsCardId(trans.getPointsCardId());
+                            NewPointsTransaction.setTransactionDate(new java.sql.Date(trans.getTransactionDate().getTime()));
+                            NewPointsTransaction.setPointsAwarded(trans.getPointsAwarded());
+                            NewPointsTransaction.setPointsSpent(trans.getSpendPoints());
+                            NewPointsTransaction.setTransactionId(trans.getTransactionId());
+                            NewPointsTransaction.setTransBranchId(CompanySetting.getBranchId());
+                            NewPointsTransaction.setPointsSpentAmount(trans.getSpendPoints() * CompanySetting.getSpendAmountPerPoint());
+                            NewPointsTransactionBean.addPointsTransactionToStage(NewPointsTransaction);
+                        }
+                    }
+                    //Move all, if any PointsTransactions in the stage area to the live server
+                    //The move function after deletes all if any in the stage area, so only the stage area will have those records not committed due to failure to connect to the server
+                    //Transs will be moved if connectivity to the InterBranch DB is ON
+                    if (new DBConnection().isINTER_BRANCH_MySQLConnectionAvailable().equals("ON")) {
+                        NewPointsTransactionBean.movePointsTransactionsFromStageToLive();
+                    }
+                    //insert approvals
+                    if (("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) && trans.getCashDiscount() > 0 && new GeneralUserSetting().getIsApproveDiscountNeeded() == 1 && "APPROVED".equals(new GeneralUserSetting().getCurrentApproveDiscountStatus())) {
+                        this.insertApproveTrans(new GeneralUserSetting().getCurrentTransactionId(), "DISCOUNT", new GeneralUserSetting().getCurrentApproveUserId());
+                    }
+                    if (("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) && trans.getSpendPointsAmount() > 0 && new GeneralUserSetting().getIsApprovePointsNeeded() == 1 && "APPROVED".equals(new GeneralUserSetting().getCurrentApprovePointsStatus())) {
+                        this.insertApproveTrans(new GeneralUserSetting().getCurrentTransactionId(), "SPEND POINT", new GeneralUserSetting().getCurrentApproveUserId());
+                    }
+                    //delete if any draft trans was used
+                    if (trans.getTransactionHistId() > 0) {
+                        this.deleteTransFromHist(trans.getTransactionHistId());
+                    }
+                    //TAX API
+                    if (aTransTypeId == 2 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0 && new Item_tax_mapBean().countItemsNotMappedSynced(aActiveTransItems) == 0) {//SALES INVOICE
+                        int IsThreadOn = 0;
+                        try {
+                            IsThreadOn = Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_THREAD_ON").getParameter_value());
+                        } catch (Exception e) {
+                            //
+                        }
+                        if (IsThreadOn == 0) {
+                            new InvoiceBean().submitTaxInvoice(trans.getTransactionId());
+                        } else if (IsThreadOn == 1) {
+                            new InvoiceBean().submitTaxInvoiceThread(trans.getTransactionId());
+                        }
+                    }
+                    //clear
+                    this.clearAll2(trans, aActiveTransItems, null, null, aSelectedTransactor, 2, aSelectedBillTransactor, aTransUserDetail, aSelectedSchemeTransactor, aAuthorisedByUserDetail, aSelectedAccCoa);
+                    TransItemBean = null;
+                    NewPointsTransactionBean = null;
+                    NewPointsTransaction = null;
+                    switch (aLevel) {
+                        case "PARENT":
+                            this.setActionMessage("Saved Successfully ( TransactionId : " + new GeneralUserSetting().getCurrentTransactionId() + " )");
+                            break;
+                        case "CHILD":
+                            this.setActionMessageChild("Saved Successfully ( TransactionId : " + new GeneralUserSetting().getCurrentTransactionIdChild() + " )");
+                            break;
+                    }
+                    //Refresh Print output
+                    new OutputDetailBean().refreshOutput(aLevel, "");
+                    //refresh draft
+                    if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) {
+                        this.refreshTranssDraft(aStoreId, new GeneralUserSetting().getCurrentUser().getUserDetailId(), aTransTypeId, aTransReasonId);
+                    }
+                    //Auto Printing Invoice
+                    if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) {
+                        //1. Update Invoice
+                        //2. Auto Printing Invoice
+                        if (this.AutoPrintAfterSave) {
+                            org.primefaces.PrimeFaces.current().executeScript("doPrintHiddenClick()");
+                        }
+                    }
+                    //check need for child dialogue
+                    if ("HIRE RETURN NOTE".equals(transtype.getTransactionTypeName())) {
+                        //find out if there is a return invoice candidate
+                        if (this.isReturnNoteForInvoice(new GeneralUserSetting().getCurrentTransactionId()) == 1) {
+                            this.openChildReturnHireInvoice(new GeneralUserSetting().getCurrentTransactionId());
+                        }
+                    }
+                    //Refresh stock alerts
+                    new UtilityBean().refreshAlertsThread();
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
+                switch (aLevel) {
+                    case "PARENT":
+                        this.setActionMessage("Transaction NOT saved");
+                        break;
+                    case "CHILD":
+                        this.setActionMessageChild("Transaction NOT saved");
+                        break;
+                }
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Transaction NOT saved! Double check details, ensure transaction ref numbers have not been captured already"));
+            }
+        }
+    }
+
+    public void saveTransOthersThread(Trans t) {
+        try {
+            Runnable task = new Runnable() {
+                @Override
+                public void run() {
+                    long payid = 0;
+                    //Trans t = new TransBean().getTrans(aTransactionId);
+                    List<TransItem> tis = new TransItemBean().getTransItemsByTransactionId(t.getTransactionId());
+                    TransactionType tt = new TransactionTypeBean().getTransactionType(t.getTransactionTypeId());
+                    TransactionReason tr = new TransactionReasonBean().getTransactionReason(t.getTransactionReasonId());
+                    new TransItemBean().adjustStockForTransItems(t, tis);
+                    payid = savePayForTrans(t);
+                    postJournalsForTrans(tt, tr, t, tis, payid);
+                    if (tt.getTransactionTypeId() == 2 || tt.getTransactionTypeId() == 1) {
+                        new PayTransBean().updateTransTotalPaid(t.getTransactionId());
+                    }
+                    StockBean.deleteZeroQtyStock();
+                }
+            };
+            Executor e = Executors.newSingleThreadExecutor();
+            e.execute(task);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void postJournalsForTrans(TransactionType transtype, TransactionReason transreason, Trans trans, List<TransItem> aActiveTransItems, long payid) {
+        //Save Sales Journal Entry
+        //dt1 = new Date();
+        if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE RETURN INVOICE".equals(transtype.getTransactionTypeName())) {
+            Pay savedpay = null;
+            long savedpayid = 0;
+            try {
+                //savedpayid = new GeneralUserSetting().getCurrentPayId();
+                savedpayid = payid;
+            } catch (NullPointerException npe) {
+                savedpayid = 0;
+            }
+            if (savedpayid > 0) {
+                savedpay = new PayBean().getPay(savedpayid);
+            }
+            new AccJournalBean().postJournalSaleInvoice(trans, aActiveTransItems, savedpay, new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getAccPeriodId());
+        }
+        //Save Purchase Invoice Journal Entry
+        long PostJobId = 0;
+        if ("PURCHASE INVOICE".equals(transtype.getTransactionTypeName())) {
+            Pay savedpay = null;
+            long savedpayid = 0;
+            try {
+                //savedpayid = new GeneralUserSetting().getCurrentPayId();
+                savedpayid = payid;
+            } catch (NullPointerException npe) {
+                savedpayid = 0;
+            }
+            if (savedpayid > 0) {
+                savedpay = new PayBean().getPay(savedpayid);
+            }
+            PostJobId = new AccJournalBean().postJournalPurchaseInvoice(trans, aActiveTransItems, savedpay, new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getAccPeriodId());
+        }
+        //Save Asset Depreciation Schedule
+        if ("PURCHASE INVOICE".equals(transtype.getTransactionTypeName()) && transreason.getTransactionReasonId() == 29) {
+            //pay just for reference
+            Pay savedpay = new Pay();
+            long savedpayid = 0;
+            try {
+                //savedpayid = new GeneralUserSetting().getCurrentPayId();
+                savedpayid = payid;
+            } catch (NullPointerException npe) {
+                savedpayid = 0;
+            }
+            if (savedpayid > 0) {
+                savedpay = new PayBean().getPay(savedpayid);
+            }
+            Stock assetstock = null;
+            AccDepScheduleBean depschbean = new AccDepScheduleBean();
+            int assetstoreid = trans.getStoreId();
+            for (TransItem assetti : aActiveTransItems) {
+                assetstock = new StockBean().getStock(assetstoreid, assetti.getItemId(), assetti.getBatchno(), assetti.getCodeSpecific(), assetti.getDescSpecific());
+                //Build:1-20-000-020 Land:1-20-000-010 but let us exclude LAND
+                if (null != assetstock && assetstock.getAccountCode().length() > 0 && !assetstock.getAccountCode().equals("1-20-000-010")) {
+                    depschbean.insertAccDepSchedules(depschbean.calcAccDepSchedules(assetstock));
+                    //post to the ledger the first year's depriciation
+                    AccDepSchedule aAccDepSchedule = depschbean.getAccDepScheduleByYear(assetstock.getStockId(), 1);
+                    AccPeriod accprd4firstpost = null;
+                    AccPeriod accprd4trans = null;
+                    try {
+                        accprd4firstpost = new AccPeriodBean().getAccPeriod(assetstock.getDepStartDate());
+                    } catch (Exception e) {
+                        accprd4firstpost = null;
+                    }
+                    try {
+                        accprd4trans = new AccPeriodBean().getAccPeriod(trans.getTransactionDate());
+                    } catch (Exception e) {
+                        accprd4trans = null;
+                    }
+                    if (null == accprd4firstpost || null == accprd4trans) {
+                        //do nothing; means;
+                        //dep start date is for not yet set acc period OR
+                        //current date doesnt have correspondiong acc period 
+                    } else {
+                        if (accprd4firstpost.getAccPeriodId() == accprd4trans.getAccPeriodId()) {
+                            new AccJournalBean().postJournalDepreciateAsset(trans, assetstock, aAccDepSchedule, accprd4firstpost.getAccPeriodId(), PostJobId);
+                            aAccDepSchedule.setDepForAccPeriodId(accprd4firstpost.getAccPeriodId());
+                            aAccDepSchedule.setDepFromDate(accprd4firstpost.getStartDate());
+                            aAccDepSchedule.setDepToDate(accprd4firstpost.getEndDate());
+                            aAccDepSchedule.setPost_status(1);
+                            new AccDepScheduleBean().updateAccDepSchedule(aAccDepSchedule);
+                        }
+                    }
+                }
+            }
+        }
+        //Save Dispose Stock Journal Entry
+        if ("DISPOSE STOCK".equals(transtype.getTransactionTypeName())) {
+            new AccJournalBean().postJournalDisposeStock(trans, new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getAccPeriodId());
+        }
+        //Save Journal Entry - Journal Entry
+        if ("JOURNAL ENTRY".equals(transtype.getTransactionTypeName())) {
+            new AccJournalBean().postJournalJournalEntry(trans, aActiveTransItems, new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getAccPeriodId());
+        }
+        //Save Journal Entry - Cash Transfer
+        if ("CASH TRANSFER".equals(transtype.getTransactionTypeName())) {
+            new AccJournalBean().postJournalCashTransfer(trans, aActiveTransItems, new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getAccPeriodId());
+        }
+        //Save Journal Entry - Cash Adjustment
+        if ("CASH ADJUSTMENT".equals(transtype.getTransactionTypeName())) {
+            new AccJournalBean().postJournalCashAdjustment(trans, aActiveTransItems, new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getAccPeriodId());
+        }
+        //Save Expense Journal Entry
+        if ("EXPENSE ENTRY".equals(transtype.getTransactionTypeName())) {
+            Pay savedpay = null;
+            long savedpayid = 0;
+            try {
+                //savedpayid = new GeneralUserSetting().getCurrentPayId();
+                savedpayid = payid;
+            } catch (NullPointerException npe) {
+                savedpayid = 0;
+            }
+            if (savedpayid > 0) {
+                savedpay = new PayBean().getPay(savedpayid);
+            }
+            new AccJournalBean().postJournalExpenseEntry(trans, aActiveTransItems, savedpay, new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getAccPeriodId());
+        }
+        //Save Opening Balance - Journal Entry
+        if ("OPENING BALANCE".equals(transtype.getTransactionTypeName())) {
+            new AccJournalBean().postJournalOpenBalance(trans, aActiveTransItems, new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getAccPeriodId());
+        }
+        //Save STOCK CONSUMPTION Journal Entry
+        if ("STOCK CONSUMPTION".equals(transtype.getTransactionTypeName())) {
+            new AccJournalBean().postJournalStockConsumption(trans, new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getAccPeriodId());
+        }
+    }
+
+    public void savePayForTransThread(Trans aTrans) {
+        try {
+            Runnable task = new Runnable() {
+                @Override
+                public void run() {
+                    long x = savePayForTrans(aTrans);
+                }
+            };
+            Executor e = Executors.newSingleThreadExecutor();
+            e.execute(task);
+        } catch (Exception e) {
+            //System.err.println("subtractStockCallThread:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public long savePayForTrans(Trans aTrans) {
+        TransactionType transtype = new TransactionTypeBean().getTransactionType(aTrans.getTransactionTypeId());
+        long payid = 0;
+        String sql = null;
+        String sql2 = null;
+        String msg = "";
+        try {
+            if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "PURCHASE INVOICE".equals(transtype.getTransactionTypeName()) || "EXPENSE ENTRY".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE RETURN INVOICE".equals(transtype.getTransactionTypeName())) {
+                Pay InnerPay = new Pay();
+                InnerPay.setPayDate(aTrans.getTransactionDate());
+                double paidamountt = 0;
+                if ((aTrans.getChangeAmount() > 0)) {
+                    paidamountt = aTrans.getGrandTotal() - aTrans.getSpendPointsAmount();
+                } else {
+                    paidamountt = aTrans.getAmountTendered();
+                }
+                InnerPay.setPaidAmount(paidamountt);
+                InnerPay.setPayMethodId(aTrans.getPayMethod());
+                InnerPay.setAddUserDetailId(aTrans.getAddUserDetailId());
+                InnerPay.setEditUserDetailId(aTrans.getAddUserDetailId());
+                InnerPay.setAddDate(new java.util.Date());
+                InnerPay.setEditDate(new java.util.Date());
+                InnerPay.setPointsSpent(aTrans.getSpendPoints());
+                InnerPay.setPointsSpentAmount(aTrans.getSpendPointsAmount());
+                InnerPay.setPayRefNo("");
+                InnerPay.setPay_number("");
+                if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE RETURN INVOICE".equals(transtype.getTransactionTypeName())) {
+                    InnerPay.setPayCategory("IN");
+                    InnerPay.setPayTypeId(14);//CASH RECEIPT
+                    if (paidamountt > 0) {//SOME PAYMENT, thus CASH or PREPAID
+                        if (aTrans.getPayMethod() == 6) {//PREPAID INCOME
+                            InnerPay.setPayReasonId(90);
+                        } else {//CASH
+                            InnerPay.setPayReasonId(21);
+                        }
+                    } else {//Otherwise full/part credit sale
+                        InnerPay.setPayReasonId(22);
+                    }
+                } else if ("PURCHASE INVOICE".equals(transtype.getTransactionTypeName()) || "EXPENSE ENTRY".equals(transtype.getTransactionTypeName())) {
+                    InnerPay.setPayCategory("OUT");
+                    InnerPay.setPayTypeId(15);//CASH PAYMENT
+                    if (paidamountt >= 0) {//SOME PAYMENT, thus CASH or PREPAID
+                        if (aTrans.getPayMethod() == 7) {//PREPAID INCOME
+                            InnerPay.setPayReasonId(91);
+                        } else {//CASH
+                            InnerPay.setPayReasonId(26);
+                        }
+                    } else {//Otherwise full/part credit purchase
+                        InnerPay.setPayReasonId(25);
+                    }
+                }
+                InnerPay.setBillTransactorId(aTrans.getBillTransactorId());
+                InnerPay.setStoreId(aTrans.getStoreId());
+                try {
+                    InnerPay.setAccChildAccountId(aTrans.getAccChildAccountId());
+                } catch (NullPointerException npe) {
+                    InnerPay.setAccChildAccountId(0);
+                }
+                InnerPay.setCurrencyCode(aTrans.getCurrencyCode());
+                InnerPay.setXRate(aTrans.getXrate());
+                InnerPay.setStatus(1);
+                InnerPay.setStatusDesc("");
+                //define output
+                InnerPay.setDeletePayId(0);
+                payid = 0;
+                try {
+                    payid = new PayBean().payInsertUpdate(InnerPay);
+                } catch (NullPointerException npe) {
+                    payid = 0;
+                }
+                //insert PayTrans
+                PayTrans paytrans = new PayTrans();
+                paytrans.setPayId(payid);
+                paytrans.setTransactionId(aTrans.getTransactionId());
+                paytrans.setTransPaidAmount(paidamountt);
+                if (aTrans.getTransactionNumber().length() > 0) {
+                    paytrans.setTransactionNumber(aTrans.getTransactionNumber());
+                } else {
+                    paytrans.setTransactionNumber(Long.toString(aTrans.getTransactionId()));
+                }
+                paytrans.setTransactionTypeId(aTrans.getTransactionTypeId());
+                paytrans.setTransactionReasonId(aTrans.getTransactionReasonId());
+                new PayTransBean().savePayTrans(paytrans);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return payid;
     }
 
     public void saveTransCallOrderInvoice(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
