@@ -2095,10 +2095,10 @@ public class TransBean implements Serializable {
                         //tib.saveTransItemsCEC(aStoreId, aTransTypeId, aTransReasonId, aSaleType, trans, aActiveTransItems, trans.getTransactionId());
                         InsertedTransItems = tib.insertTransItems(aStoreId, aTransTypeId, aTransReasonId, aSaleType, trans, aActiveTransItems, trans.getTransactionId());
                         if (InsertedTransItems == aActiveTransItems.size()) {
-                            trans.setStoreId(aStoreId);
-                            trans.setTransactionTypeId(aTransTypeId);
-                            trans.setTransactionReasonId(aTransReasonId);
-                            this.saveTransOthersThread(trans);
+                            //trans.setStoreId(aStoreId);
+                            //trans.setTransactionTypeId(aTransTypeId);
+                            //trans.setTransactionReasonId(aTransReasonId);
+                            this.saveTransOthersThread(trans.getTransactionId(),trans.getPayMethod());
                         }
                     }
                     //insert PointsTransaction for both the awarded and spent points to the stage area
@@ -2198,13 +2198,14 @@ public class TransBean implements Serializable {
         }
     }
 
-    public void saveTransOthersThread(Trans t) {
+    public void saveTransOthersThread(long aTransactionId, int aPayMethodId) {
         try {
             Runnable task = new Runnable() {
                 @Override
                 public void run() {
                     long payid = 0;
-                    //Trans t = new TransBean().getTrans(aTransactionId);
+                    Trans t = new TransBean().getTrans(aTransactionId);
+                    t.setPayMethod(aPayMethodId);
                     List<TransItem> tis = new TransItemBean().getTransItemsByTransactionId(t.getTransactionId());
                     TransactionType tt = new TransactionTypeBean().getTransactionType(t.getTransactionTypeId());
                     TransactionReason tr = new TransactionReasonBean().getTransactionReason(t.getTransactionReasonId());
