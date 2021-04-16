@@ -70,10 +70,10 @@
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
-                        <p:ajax listener="#{dashboardBean.searchDayCloseDashboard()}" process="pnlgFilter" update="growl1 formReport:pnlSales formReport:pnlCashReceipt formReport:pnlPurchases formReport:pnlCashPayment formReport:pnlStockMovement"/>
+                        <p:ajax listener="#{dashboardBean.searchDayCloseDashboard()}" process="pnlgFilter" update="growl1 formReport:pnlSales formReport:pnlCashReceipt formReport:pnlPurchases formReport:pnlCashPayment"/>
                     </p:commandButton>
                     <p:commandButton id="cmdbReset" value="RESET">
-                        <p:ajax listener="#{dashboardBean.initDayCloseDashboard()}" process="pnlgFilter" update="pnlgFilter growl1 formReport:pnlSales formReport:pnlCashReceipt formReport:pnlPurchases formReport:pnlCashPayment formReport:pnlStockMovement"/>
+                        <p:ajax listener="#{dashboardBean.initDayCloseDashboard()}" process="pnlgFilter" update="pnlgFilter growl1 formReport:pnlSales formReport:pnlCashReceipt formReport:pnlPurchases formReport:pnlCashPayment"/>
                     </p:commandButton>
                 </h:panelGrid>
 
@@ -344,63 +344,6 @@
                                         </td>
                                         <td align="right" valign="middle">
                                             #{utilityBean.formatDoubleToString(cpa.paidAmount)}
-                                        </td>
-                                    </tr>
-                                </ui:repeat>
-                            </table>
-                        </h:panelGrid>
-                    </div>
-                    <div class="col">
-                        <h:panelGrid id="pnlStockMovement" style="-webkit-print-color-adjust: exact;">
-                            <table cellspacing="0" cellpadding="2" border="0" style="background-color: #ff3d41;width: 100%;">
-                                <tr style="background-color: #E60000;">
-                                    <td colspan="3" align="center" valign="bottom">
-                                        <b>STOCK AFFECTED</b>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td colspan="3" align="center" valign="bottom">
-                                        <b>+ #{utilityBean.formatDoubleToString(dashboardBean.countItemsAdded)} Items</b>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td colspan="3" align="center" valign="bottom">
-                                        <b>- #{utilityBean.formatDoubleToString(dashboardBean.countItemsSubtracted)} Items</b>
-                                    </td>
-                                </tr>
-                                <tr style="background-color: #E60000;">
-                                    <td colspan="3" align="center" valign="bottom">
-                                        <b>Added(+) Stock</b>
-                                    </td>
-                                </tr>
-                                <ui:repeat var="ma" value="#{dashboardBean.dayCloseStockMovementAdded}">
-                                    <tr>
-                                        <td align="left" valign="middle">
-                                            #{ma.transaction_type_name}
-                                        </td>
-                                        <td align="left" valign="middle">
-                                            #{utilityBean.formatDoubleToString(ma.item_id)}
-                                        </td>
-                                        <td align="right" valign="middle">
-                                            #{utilityBean.formatDoubleToString(ma.qty_added)}
-                                        </td>
-                                    </tr>
-                                </ui:repeat>
-                                <tr style="background-color: #E60000;">
-                                    <td colspan="3" align="center" valign="bottom">
-                                        <b>Subtracted(-) Stock</b>
-                                    </td>
-                                </tr>
-                                <ui:repeat var="ms" value="#{dashboardBean.dayCloseStockMovementSubtracted}">
-                                    <tr>
-                                        <td align="left" valign="middle">
-                                            #{ms.transaction_type_name}
-                                        </td>
-                                        <td align="left" valign="middle">
-                                            #{utilityBean.formatDoubleToString(ms.item_id)}
-                                        </td>
-                                        <td align="right" valign="middle">
-                                            #{utilityBean.formatDoubleToString(ms.qty_subtracted)}
                                         </td>
                                     </tr>
                                 </ui:repeat>

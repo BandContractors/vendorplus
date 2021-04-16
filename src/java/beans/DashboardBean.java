@@ -1942,7 +1942,7 @@ public class DashboardBean implements Serializable {
                 this.refreshDayClosePurchaseList(BtnFrmToDate);
                 this.refreshDayCloseCashReceiptList(BtnFrmToDate);
                 this.refreshDayCloseCashPaymentList(BtnFrmToDate);
-                this.refreshDayCloseStockMovementList(BtnFrmToDate);
+                //this.refreshDayCloseStockMovementList(BtnFrmToDate);
 
             } else {
 
