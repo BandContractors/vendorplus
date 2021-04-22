@@ -1,8 +1,14 @@
 package utilities;
 
+import api_sm_bi.Bi_stg_sale_invoice;
+import api_sm_bi.Bi_stg_sale_invoiceBean;
+import api_sm_bi.Bi_stg_sale_invoice_item;
 import beans.AccCurrencyBean;
 import beans.Alert_generalBean;
 import beans.Parameter_listBean;
+import com.google.gson.Gson;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
 import connections.DBConnection;
 import entities.CompanySetting;
 import entities.Item;
@@ -22,6 +28,7 @@ import java.text.DecimalFormat;
 import java.text.Format;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -43,9 +50,15 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import sessions.GeneralUserSetting;
+import test.IntfInvoice;
+import test.IntfTrans;
+import test.IntfTransItem;
 
 @ManagedBean
 @SessionScoped
@@ -717,10 +730,35 @@ public class UtilityBean implements Serializable {
     }
 
 //    public static void main(String[] args) {
-//        DecimalFormat decimalFormat = new DecimalFormat();
-//            decimalFormat.applyPattern("00");
-//            System.out.println("DF:"+ decimalFormat.format(10));
+//        new UtilityBean().sampleSendInvoice();
 //    }
+
+    public void sampleSendInvoice() {
+        try {
+            Gson gson = new Gson();
+            String json = "";
+            //creating JSON STRING from Object - Branch
+            Bi_stg_sale_invoice saleInvoice = new Bi_stg_sale_invoice();
+            saleInvoice.setBranch_code("Branch01");
+            saleInvoice.setGross_amount(500000);
+            Bi_stg_sale_invoice_item saleInvoiceItems = new Bi_stg_sale_invoice_item();
+
+            Bi_stg_sale_invoiceBean invBean = new Bi_stg_sale_invoiceBean();
+            invBean.setSaleInvoice(saleInvoice);
+            invBean.setSaleInvoiceItems(saleInvoiceItems);
+
+            json = gson.toJson(invBean);
+            System.out.println("invBean:" + json);
+            com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
+            WebResource webResource = client.resource("http://localhost:8080/SMbi/Trans");
+            ClientResponse response = webResource.type("application/json").post(ClientResponse.class, json);
+            String output = response.getEntity(String.class);
+            System.out.println("output:" + output);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public String getEmptyIfNull(String aStringValue) {
         if (aStringValue == null) {
             return "";
