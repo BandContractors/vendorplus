@@ -4858,9 +4858,9 @@ public class TransItemBean implements Serializable {
             ps.setLong(1, aTransId);
             ps.executeUpdate();
             deleted = 1;
-        } catch (SQLException se) {
+        } catch (Exception e) {
             deleted = 0;
-            System.err.println("deleteTransItemsCEC:" + se.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return deleted;
     }

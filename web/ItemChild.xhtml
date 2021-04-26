@@ -426,6 +426,8 @@
                                 <h:inputText value="#{itemBean.item_tax_mapObj.item_id_tax}" style="width: 280px;color:#{itemBean.item_tax_mapObj.item_id_tax eq itemBean.itemTaxObj.goodsCode ? '#238823':'#d2222d'};"/>
                                 <h:outputLabel value="UNSPC Code:"/>
                                 <h:inputText value="#{itemBean.item_tax_mapObj.item_code_tax}" style="width: 280px;color:#{itemBean.item_tax_mapObj.item_code_tax eq itemBean.itemTaxObj.commodityCategoryCode ? '#238823':'#d2222d'};"/>
+                                <h:outputLabel value="Tax Rate:"/>
+                                <h:inputText value="#{itemBean.item_tax_mapObj.taxRateLocal}" style="width: 280px;color:#{itemBean.item_tax_mapObj.taxRateLocal.length() eq itemBean.item_tax_mapObj.taxRateRemote.length() ? '#238823':'#d2222d'};"/>
                                 <h:outputLabel value="Synced"/>
                                 <h:selectOneMenu value="#{itemBean.item_tax_mapObj.is_synced}" style="width: 280px">
                                     <f:selectItem itemLabel="No" itemValue="0"/>
@@ -443,6 +445,8 @@
                                 <h:inputText value="#{itemBean.itemTaxObj.goodsCode}" disabled="true" style="width: 280px"/>
                                 <h:outputLabel value="Category Code:"/>
                                 <h:inputText value="#{itemBean.itemTaxObj.commodityCategoryCode}" disabled="true" style="width: 280px"/>
+                                <h:outputLabel value="Tax Rate:"/>
+                                <h:inputText value="#{itemBean.item_tax_mapObj.taxRateRemote}" disabled="true" style="width: 280px"/>
                             </h:panelGrid>
                         </h:panelGrid>
                         <p:growl id="growl2"/>

@@ -2010,6 +2010,10 @@ public class TransBean implements Serializable {
 
     public void saveTransCECNew(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
         int InsertedTransItems = 0;
+        double CheckValueBfr = 0;
+        double CheckValueAfr = 0;
+        int DeleteInserted = 0;
+        CheckValueBfr = this.checkTrans(0, trans, aActiveTransItems);
         TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
         TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
         //Store store = new StoreBean().getStore(aStoreId);
@@ -2094,94 +2098,122 @@ public class TransBean implements Serializable {
                     } else {
                         //tib.saveTransItemsCEC(aStoreId, aTransTypeId, aTransReasonId, aSaleType, trans, aActiveTransItems, trans.getTransactionId());
                         InsertedTransItems = tib.insertTransItems(aStoreId, aTransTypeId, aTransReasonId, aSaleType, trans, aActiveTransItems, trans.getTransactionId());
-                        if (InsertedTransItems == aActiveTransItems.size()) {
+                        CheckValueAfr = this.checkTrans(trans.getTransactionId(), null, null);
+                        if (CheckValueBfr == CheckValueAfr) {
+                            DeleteInserted = 0;
+                        } else {
+                            DeleteInserted = 1;
+                        }
+                        if (DeleteInserted == 0 && InsertedTransItems == aActiveTransItems.size()) {
                             //trans.setStoreId(aStoreId);
                             //trans.setTransactionTypeId(aTransTypeId);
                             //trans.setTransactionReasonId(aTransReasonId);
-                            this.saveTransOthersThread(trans.getTransactionId(),trans.getPayMethod());
+                            this.saveTransOthersThread(trans.getTransactionId(), trans.getPayMethod());
                         }
                     }
-                    //insert PointsTransaction for both the awarded and spent points to the stage area
-                    if (("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) && (trans.getPointsAwarded() != 0 || trans.getSpendPoints() != 0)) {
-                        if (trans.getPointsCardId() != 0 && !trans.getCardNumber().equals("")) {
-                            //1. insert PointsTransaction for both the awarded and spent points to the stage area
-                            NewPointsTransaction.setPointsCardId(trans.getPointsCardId());
-                            NewPointsTransaction.setTransactionDate(new java.sql.Date(trans.getTransactionDate().getTime()));
-                            NewPointsTransaction.setPointsAwarded(trans.getPointsAwarded());
-                            NewPointsTransaction.setPointsSpent(trans.getSpendPoints());
-                            NewPointsTransaction.setTransactionId(trans.getTransactionId());
-                            NewPointsTransaction.setTransBranchId(CompanySetting.getBranchId());
-                            NewPointsTransaction.setPointsSpentAmount(trans.getSpendPoints() * CompanySetting.getSpendAmountPerPoint());
-                            NewPointsTransactionBean.addPointsTransactionToStage(NewPointsTransaction);
+                    if (DeleteInserted == 1) {
+                        //delete inserted
+                        int deleted1 = new TransItemBean().deleteTransItemsCEC(trans.getTransactionId());
+                        if (deleted1 == 1) {
+                            int deleted2 = this.deleteTransCEC(trans.getTransactionId());
                         }
-                    }
-                    //Move all, if any PointsTransactions in the stage area to the live server
-                    //The move function after deletes all if any in the stage area, so only the stage area will have those records not committed due to failure to connect to the server
-                    //Transs will be moved if connectivity to the InterBranch DB is ON
-                    if (new DBConnection().isINTER_BRANCH_MySQLConnectionAvailable().equals("ON")) {
-                        NewPointsTransactionBean.movePointsTransactionsFromStageToLive();
-                    }
-                    //insert approvals
-                    if (("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) && trans.getCashDiscount() > 0 && new GeneralUserSetting().getIsApproveDiscountNeeded() == 1 && "APPROVED".equals(new GeneralUserSetting().getCurrentApproveDiscountStatus())) {
-                        this.insertApproveTrans(new GeneralUserSetting().getCurrentTransactionId(), "DISCOUNT", new GeneralUserSetting().getCurrentApproveUserId());
-                    }
-                    if (("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) && trans.getSpendPointsAmount() > 0 && new GeneralUserSetting().getIsApprovePointsNeeded() == 1 && "APPROVED".equals(new GeneralUserSetting().getCurrentApprovePointsStatus())) {
-                        this.insertApproveTrans(new GeneralUserSetting().getCurrentTransactionId(), "SPEND POINT", new GeneralUserSetting().getCurrentApproveUserId());
-                    }
-                    //delete if any draft trans was used
-                    if (trans.getTransactionHistId() > 0) {
-                        this.deleteTransFromHist(trans.getTransactionHistId());
-                    }
-                    //TAX API
-                    if (aTransTypeId == 2 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0 && new Item_tax_mapBean().countItemsNotMappedSynced(aActiveTransItems) == 0) {//SALES INVOICE
-                        int IsThreadOn = 0;
-                        try {
-                            IsThreadOn = Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_THREAD_ON").getParameter_value());
-                        } catch (Exception e) {
-                            //
+                        //display msg
+                        switch (aLevel) {
+                            case "PARENT":
+                                httpSession.setAttribute("CURRENT_TRANSACTION_ID", 0);
+                                httpSession.setAttribute("CURRENT_PAY_ID", 0);
+                                this.setActionMessage("Try saving again - Transaction NOT saved");
+                                break;
+                            case "CHILD":
+                                httpSession.setAttribute("CURRENT_TRANSACTION_ID_CHILD", 0);
+                                httpSession.setAttribute("CURRENT_PAY_ID_CHILD", 0);
+                                this.setActionMessageChild("Try saving again - Transaction NOT saved");
+                                break;
                         }
-                        if (IsThreadOn == 0) {
-                            new InvoiceBean().submitTaxInvoice(trans.getTransactionId());
-                        } else if (IsThreadOn == 1) {
-                            new InvoiceBean().submitTaxInvoiceThread(trans.getTransactionId());
+                        FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Try saving again - Transaction NOT saved"));
+                    } else {
+                        //insert PointsTransaction for both the awarded and spent points to the stage area
+                        if (("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) && (trans.getPointsAwarded() != 0 || trans.getSpendPoints() != 0)) {
+                            if (trans.getPointsCardId() != 0 && !trans.getCardNumber().equals("")) {
+                                //1. insert PointsTransaction for both the awarded and spent points to the stage area
+                                NewPointsTransaction.setPointsCardId(trans.getPointsCardId());
+                                NewPointsTransaction.setTransactionDate(new java.sql.Date(trans.getTransactionDate().getTime()));
+                                NewPointsTransaction.setPointsAwarded(trans.getPointsAwarded());
+                                NewPointsTransaction.setPointsSpent(trans.getSpendPoints());
+                                NewPointsTransaction.setTransactionId(trans.getTransactionId());
+                                NewPointsTransaction.setTransBranchId(CompanySetting.getBranchId());
+                                NewPointsTransaction.setPointsSpentAmount(trans.getSpendPoints() * CompanySetting.getSpendAmountPerPoint());
+                                NewPointsTransactionBean.addPointsTransactionToStage(NewPointsTransaction);
+                            }
                         }
-                    }
-                    //clear
-                    this.clearAll2(trans, aActiveTransItems, null, null, aSelectedTransactor, 2, aSelectedBillTransactor, aTransUserDetail, aSelectedSchemeTransactor, aAuthorisedByUserDetail, aSelectedAccCoa);
-                    TransItemBean = null;
-                    NewPointsTransactionBean = null;
-                    NewPointsTransaction = null;
-                    switch (aLevel) {
-                        case "PARENT":
-                            this.setActionMessage("Saved Successfully ( TransactionId : " + new GeneralUserSetting().getCurrentTransactionId() + " )");
-                            break;
-                        case "CHILD":
-                            this.setActionMessageChild("Saved Successfully ( TransactionId : " + new GeneralUserSetting().getCurrentTransactionIdChild() + " )");
-                            break;
-                    }
-                    //Refresh Print output
-                    new OutputDetailBean().refreshOutput(aLevel, "");
-                    //refresh draft
-                    if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) {
-                        this.refreshTranssDraft(aStoreId, new GeneralUserSetting().getCurrentUser().getUserDetailId(), aTransTypeId, aTransReasonId);
-                    }
-                    //Auto Printing Invoice
-                    if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) {
-                        //1. Update Invoice
-                        //2. Auto Printing Invoice
-                        if (this.AutoPrintAfterSave) {
-                            org.primefaces.PrimeFaces.current().executeScript("doPrintHiddenClick()");
+                        //Move all, if any PointsTransactions in the stage area to the live server
+                        //The move function after deletes all if any in the stage area, so only the stage area will have those records not committed due to failure to connect to the server
+                        //Transs will be moved if connectivity to the InterBranch DB is ON
+                        if (new DBConnection().isINTER_BRANCH_MySQLConnectionAvailable().equals("ON")) {
+                            NewPointsTransactionBean.movePointsTransactionsFromStageToLive();
                         }
-                    }
-                    //check need for child dialogue
-                    if ("HIRE RETURN NOTE".equals(transtype.getTransactionTypeName())) {
-                        //find out if there is a return invoice candidate
-                        if (this.isReturnNoteForInvoice(new GeneralUserSetting().getCurrentTransactionId()) == 1) {
-                            this.openChildReturnHireInvoice(new GeneralUserSetting().getCurrentTransactionId());
+                        //insert approvals
+                        if (("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) && trans.getCashDiscount() > 0 && new GeneralUserSetting().getIsApproveDiscountNeeded() == 1 && "APPROVED".equals(new GeneralUserSetting().getCurrentApproveDiscountStatus())) {
+                            this.insertApproveTrans(new GeneralUserSetting().getCurrentTransactionId(), "DISCOUNT", new GeneralUserSetting().getCurrentApproveUserId());
                         }
+                        if (("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) && trans.getSpendPointsAmount() > 0 && new GeneralUserSetting().getIsApprovePointsNeeded() == 1 && "APPROVED".equals(new GeneralUserSetting().getCurrentApprovePointsStatus())) {
+                            this.insertApproveTrans(new GeneralUserSetting().getCurrentTransactionId(), "SPEND POINT", new GeneralUserSetting().getCurrentApproveUserId());
+                        }
+                        //delete if any draft trans was used
+                        if (trans.getTransactionHistId() > 0) {
+                            this.deleteTransFromHist(trans.getTransactionHistId());
+                        }
+                        //TAX API
+                        if (aTransTypeId == 2 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0 && new Item_tax_mapBean().countItemsNotMappedSynced(aActiveTransItems) == 0) {//SALES INVOICE
+                            int IsThreadOn = 0;
+                            try {
+                                IsThreadOn = Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_THREAD_ON").getParameter_value());
+                            } catch (Exception e) {
+                                //
+                            }
+                            if (IsThreadOn == 0) {
+                                new InvoiceBean().submitTaxInvoice(trans.getTransactionId());
+                            } else if (IsThreadOn == 1) {
+                                new InvoiceBean().submitTaxInvoiceThread(trans.getTransactionId());
+                            }
+                        }
+                        //clear
+                        this.clearAll2(trans, aActiveTransItems, null, null, aSelectedTransactor, 2, aSelectedBillTransactor, aTransUserDetail, aSelectedSchemeTransactor, aAuthorisedByUserDetail, aSelectedAccCoa);
+                        TransItemBean = null;
+                        NewPointsTransactionBean = null;
+                        NewPointsTransaction = null;
+                        switch (aLevel) {
+                            case "PARENT":
+                                this.setActionMessage("Saved Successfully ( TransactionId : " + new GeneralUserSetting().getCurrentTransactionId() + " )");
+                                break;
+                            case "CHILD":
+                                this.setActionMessageChild("Saved Successfully ( TransactionId : " + new GeneralUserSetting().getCurrentTransactionIdChild() + " )");
+                                break;
+                        }
+                        //Refresh Print output
+                        new OutputDetailBean().refreshOutput(aLevel, "");
+                        //refresh draft
+                        if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) {
+                            this.refreshTranssDraft(aStoreId, new GeneralUserSetting().getCurrentUser().getUserDetailId(), aTransTypeId, aTransReasonId);
+                        }
+                        //Auto Printing Invoice
+                        if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) {
+                            //1. Update Invoice
+                            //2. Auto Printing Invoice
+                            if (this.AutoPrintAfterSave) {
+                                org.primefaces.PrimeFaces.current().executeScript("doPrintHiddenClick()");
+                            }
+                        }
+                        //check need for child dialogue
+                        if ("HIRE RETURN NOTE".equals(transtype.getTransactionTypeName())) {
+                            //find out if there is a return invoice candidate
+                            if (this.isReturnNoteForInvoice(new GeneralUserSetting().getCurrentTransactionId()) == 1) {
+                                this.openChildReturnHireInvoice(new GeneralUserSetting().getCurrentTransactionId());
+                            }
+                        }
+                        //Refresh stock alerts
+                        new UtilityBean().refreshAlertsThread();
                     }
-                    //Refresh stock alerts
-                    new UtilityBean().refreshAlertsThread();
                 }
             } catch (Exception e) {
                 LOGGER.log(Level.ERROR, e);
@@ -2196,6 +2228,27 @@ public class TransBean implements Serializable {
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Transaction NOT saved! Double check details, ensure transaction ref numbers have not been captured already"));
             }
         }
+    }
+
+    public double checkTrans(long aTransactionId, Trans aTrans, List<TransItem> aTransItems) {
+        double value = 0;
+        int CountItems = 0;
+        double CountQty = 0;
+        try {
+            if (aTransactionId == 0) {
+                CountItems = aTransItems.size();
+                CountQty = new TransItemBean().getTransItemsTotalQty(aTransItems);
+            } else if (aTransactionId > 0) {
+                //Trans t = new TransBean().getTrans(aTransactionId);
+                List<TransItem> tis = new TransItemBean().getTransItemsByTransactionId(aTransactionId);
+                CountItems = tis.size();
+                CountQty = new TransItemBean().getTransItemsTotalQty(tis);
+            }
+            value = CountQty + CountItems;
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return value;
     }
 
     public void saveTransOthersThread(long aTransactionId, int aPayMethodId) {

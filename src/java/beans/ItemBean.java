@@ -1077,6 +1077,8 @@ public class ItemBean implements Serializable {
             this.Item_tax_mapObj.setItem_code_tax("");
             this.Item_tax_mapObj.setIs_synced(0);
             this.Item_tax_mapObj.setUnit_code_tax("");
+            this.Item_tax_mapObj.setTaxRateLocal("");
+            this.Item_tax_mapObj.setTaxRateRemote("");
             //clear ItemTax
             this.ItemTaxObj.setGoodsCode("");
             this.ItemTaxObj.setGoodsName("");
@@ -1092,6 +1094,7 @@ public class ItemBean implements Serializable {
                     this.Item_tax_mapObj.setItem_id_tax(im.getItem_id_tax());
                     this.Item_tax_mapObj.setItem_code_tax(im.getItem_code_tax());
                     this.Item_tax_mapObj.setIs_synced(im.getIs_synced());
+                    this.Item_tax_mapObj.setTaxRateLocal(this.ItemObj.getVatRated());
                 }
                 Unit un = new UnitBean().getUnit(this.ItemObj.getUnitId());
                 if (un != null) {
@@ -1111,12 +1114,39 @@ public class ItemBean implements Serializable {
                         this.ItemTaxObj.setGoodsName(it.getGoodsName());
                         this.ItemTaxObj.setCommodityCategoryCode(it.getCommodityCategoryCode());
                         this.ItemTaxObj.setMeasureUnit(it.getMeasureUnit());
+                        this.Item_tax_mapObj.setTaxRateRemote(this.getVatTaxRatesRemote(it));
                     }
                 }
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
+    }
+
+    public String getVatTaxRatesRemote(ItemTax aItemTax) {
+        String str = "";
+        if (Double.parseDouble(aItemTax.getTaxRate()) > 0) {
+            if (str == "") {
+                str = "STANDARD";
+            } else {
+                str = str + "," + "STANDARD";
+            }
+        }
+        if (aItemTax.getIsExempt().equals("101")) {
+            if (str == "") {
+                str = "EXEMPT";
+            } else {
+                str = str + "," + "EXEMPT";
+            }
+        }
+        if (aItemTax.getIsZeroRate().equals("101")) {
+            if (str == "") {
+                str = "ZERO";
+            } else {
+                str = str + "," + "ZERO";
+            }
+        }
+        return str;
     }
 
     public void clearItem() {

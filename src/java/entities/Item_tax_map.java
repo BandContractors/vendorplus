@@ -18,6 +18,8 @@ public class Item_tax_map implements Serializable {
     private int is_synced;
     private String description;
     private String unit_code_tax;
+    private String TaxRateLocal;//repsents the tax rate saved locally
+    private String TaxRateRemote;//repsents the tax rate at the tax body
 
     /**
      * @return the item_tax_map_id
@@ -129,6 +131,34 @@ public class Item_tax_map implements Serializable {
      */
     public void setUnit_code_tax(String unit_code_tax) {
         this.unit_code_tax = unit_code_tax;
+    }
+
+    /**
+     * @return the TaxRateLocal
+     */
+    public String getTaxRateLocal() {
+        return TaxRateLocal;
+    }
+
+    /**
+     * @param TaxRateLocal the TaxRateLocal to set
+     */
+    public void setTaxRateLocal(String TaxRateLocal) {
+        this.TaxRateLocal = TaxRateLocal;
+    }
+
+    /**
+     * @return the TaxRateRemote
+     */
+    public String getTaxRateRemote() {
+        return TaxRateRemote;
+    }
+
+    /**
+     * @param TaxRateRemote the TaxRateRemote to set
+     */
+    public void setTaxRateRemote(String TaxRateRemote) {
+        this.TaxRateRemote = TaxRateRemote;
     }
 
 }

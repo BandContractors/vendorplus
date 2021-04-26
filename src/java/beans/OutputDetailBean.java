@@ -152,7 +152,7 @@ public class OutputDetailBean implements Serializable {
                 aOutputDetail.setTotal_items(aOutputDetail.getTrans_items().size());
                 //aOutputDetail.setTotal_items_list(new ArrayList<>());
                 List<Integer> itmlist = new ArrayList<>();
-                for (int x = 1; x <= (15 - aOutputDetail.getTotal_items()); x++) {
+                for (int x = 1; x <= (10 - aOutputDetail.getTotal_items()); x++) {//changed from 15 to 10 to avoid 2 pages
                     itmlist.add(x);
                 }
                 aOutputDetail.setTotal_items_list(itmlist);
