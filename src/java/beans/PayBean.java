@@ -233,6 +233,170 @@ public class PayBean implements Serializable {
         }
         return PayId;
     }
+    
+    public long payInsertUpdateFix(Pay pay) {
+        long PayId = 0;
+        String sql = null;
+        if (pay.getPayId() == 0) {
+            sql = "{call sp_insert_pay_fix(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+        } else if (pay.getPayId() > 0) {
+            sql = "{call sp_update_pay(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+        }
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                CallableStatement cs = conn.prepareCall(sql);) {
+            try {
+                cs.setDate("in_pay_date", new java.sql.Date(pay.getPayDate().getTime()));
+            } catch (NullPointerException npe) {
+                cs.setDate("in_pay_date", null);
+            }
+            try {
+                cs.setDouble("in_paid_amount", pay.getPaidAmount());
+            } catch (NullPointerException npe) {
+                cs.setDouble("in_paid_amount", 0);
+            }
+            try {
+                cs.setInt("in_pay_method_id", pay.getPayMethodId());
+            } catch (NullPointerException npe) {
+                cs.setInt("in_pay_method_id", 0);
+            }
+            try {
+                cs.setInt("in_edit_user_detail_id", pay.getEditUserDetailId());
+            } catch (NullPointerException npe) {
+                cs.setInt("in_edit_user_detail_id", 0);
+            }
+            try {
+                cs.setDouble("in_points_spent", pay.getPointsSpent());
+            } catch (NullPointerException npe) {
+                cs.setDouble("in_points_spent", 0);
+            }
+            try {
+                cs.setDouble("in_points_spent_amount", pay.getPointsSpentAmount());
+            } catch (NullPointerException npe) {
+                cs.setDouble("in_points_spent_amount", 0);
+            }
+            try {
+                cs.setTimestamp(6, new java.sql.Timestamp(pay.getAddDate().getTime()));
+            } catch (NullPointerException npe) {
+                cs.setTimestamp(6, null);
+            }
+            try {
+                cs.setTimestamp("in_edit_date", new java.sql.Timestamp(new java.util.Date().getTime()));//will be made null by the SP
+            } catch (NullPointerException npe) {
+                cs.setTimestamp("in_edit_date", null);
+            }
+            try {
+                cs.setString("in_pay_ref_no", pay.getPayRefNo());
+            } catch (NullPointerException npe) {
+                cs.setString("in_pay_ref_no", "");
+            }
+            try {
+                cs.setString("in_pay_category", pay.getPayCategory());
+            } catch (NullPointerException npe) {
+                cs.setString("in_pay_category", "");
+            }
+            try {
+                cs.setLong("in_bill_transactor_id", pay.getBillTransactorId());
+            } catch (NullPointerException npe) {
+                cs.setLong("in_bill_transactor_id", 0);
+            }
+            try {
+                cs.setInt("in_pay_type_id", pay.getPayTypeId());
+            } catch (NullPointerException npe) {
+                cs.setInt("in_pay_type_id", 0);
+            }
+            try {
+                cs.setInt("in_pay_reason_id", pay.getPayReasonId());
+            } catch (NullPointerException npe) {
+                cs.setInt("in_pay_reason_id", 0);
+            }
+            try {
+                cs.setInt("in_store_id", pay.getStoreId());
+            } catch (NullPointerException npe) {
+                cs.setInt("in_store_id", 0);
+            }
+            try {
+                cs.setInt("in_acc_child_account_id", pay.getAccChildAccountId());
+            } catch (NullPointerException npe) {
+                cs.setInt("in_acc_child_account_id", 0);
+            }
+            try {
+                cs.setInt("in_acc_child_account_id2", pay.getAccChildAccountId2());
+            } catch (NullPointerException npe) {
+                cs.setInt("in_acc_child_account_id2", 0);
+            }
+            try {
+                cs.setString("in_currency_code", pay.getCurrencyCode());
+            } catch (NullPointerException npe) {
+                cs.setString("in_currency_code", "");
+            }
+            try {
+                cs.setDouble("in_xrate", pay.getXRate());
+            } catch (NullPointerException npe) {
+                cs.setDouble("in_xrate", 1);
+            }
+            try {
+                cs.setInt("in_status", pay.getStatus());
+            } catch (NullPointerException npe) {
+                cs.setInt("in_status", 0);
+            }
+            try {
+                cs.setString("in_status_desc", pay.getStatusDesc());
+            } catch (NullPointerException npe) {
+                cs.setString("in_status_desc", "");
+            }
+            try {
+                cs.setDouble("in_principal_amount", pay.getPrincipalAmount());
+            } catch (NullPointerException npe) {
+                cs.setDouble("in_principal_amount", 0);
+            }
+            try {
+                cs.setDouble("in_interest_amount", pay.getInterestAmount());
+            } catch (NullPointerException npe) {
+                cs.setDouble("in_interest_amount", 0);
+            }
+            try {
+                cs.setLong("in_delete_pay_id", pay.getDeletePayId());
+            } catch (NullPointerException npe) {
+                cs.setLong("in_delete_pay_id", 0);
+            }
+            if (pay.getPayId() > 0) {
+                cs.setLong("in_pay_id", pay.getPayId());
+            }
+            if (pay.getPayId() == 0) {
+                try {
+                    cs.setInt("in_add_user_detail_id", pay.getAddUserDetailId());
+                } catch (NullPointerException npe) {
+                    cs.setInt("in_add_user_detail_id", 0);
+                }
+                cs.registerOutParameter("out_pay_id", VARCHAR);
+            }
+            try {
+                if (pay.getPay_number().length() == 0) {
+                    TransactionType transtype = new TransactionTypeBean().getTransactionType(pay.getPayTypeId());
+                    pay.setPay_number(new Trans_number_controlBean().getNewTransNumber(transtype, pay.getAddUserDetailId(), pay.getStoreId()));
+                    cs.setString("in_pay_number", pay.getPay_number());
+                    new Trans_number_controlBean().updateTrans_number_control(transtype);
+                } else {
+                    cs.setString("in_pay_number", pay.getPay_number());
+                }
+            } catch (NullPointerException npe) {
+                cs.setString("in_pay_number", "");
+            }
+            //System.out.println(cs.toString());
+            cs.executeUpdate();
+            //set output to return
+            if (pay.getPayId() == 0) {
+                PayId = cs.getLong("out_pay_id");
+            } else if (pay.getPayId() > 0) {
+                PayId = pay.getPayId();
+            }
+        } catch (Exception e) {
+            PayId = 0;
+            LOGGER.log(Level.ERROR, e);
+        }
+        return PayId;
+    }
 
     public void saveCashReceiptREVENUE(Pay pay, List<PayTrans> aPayTranss, int aPayTypeId, int aPayReasId, PayTrans aPayTrans) {
         try {

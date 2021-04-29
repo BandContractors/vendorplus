@@ -245,10 +245,10 @@ public class Snapshot_stock_valueBean implements Serializable {
         //delete any existing summary snapshot
         int deleted = this.deleteSnapshot_stock_value_day_sum(aY, aM, aD);
         //take dialy summary
-        String sql = "INSERT INTO snapshot_stock_value_day_sum(y, m, d,snapshot_no,currency_code,cp_value,wp_value,rp_value,store_id,stock_type) "
+        String sql = "INSERT INTO snapshot_stock_value_day_sum(y, m, d,snapshot_no,currency_code,store_id,stock_type,cp_value,wp_value,rp_value) "
                 + "select year(s.snapshot_date) as y,month(s.snapshot_date) as m,day(s.snapshot_date) as d,s.snapshot_no,s.currency_code,"
                 + "s.store_id,IFNULL(i.expense_type,'') as stock_type,"
-                + "sum(s.cp_value) as cp_value,sum(s.wp_value) as wp_value,sum(s.rp_value) as rp_value from snapshot_stock_value s "
+                + "ROUND(sum(s.cp_value),3) as cp_value,ROUND(sum(s.wp_value),3) as wp_value,ROUND(sum(s.rp_value),3) as rp_value from snapshot_stock_value s "
                 + "INNER JOIN item i ON s.item_id=i.item_id AND i.is_asset=0 AND i.is_track=1 "
                 + "WHERE s.snapshot_no=? "
                 + "group by year(s.snapshot_date),month(s.snapshot_date),day(s.snapshot_date),s.snapshot_no,s.currency_code,"

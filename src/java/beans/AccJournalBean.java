@@ -4904,6 +4904,23 @@ public class AccJournalBean implements Serializable {
         }
     }
 
+    public int countJournalsByTrans(long aTransId) {
+        int n = 0;
+        String wheresql = "SELECT count(*) as n FROM acc_journal WHERE transaction_id=" + aTransId;
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(wheresql);) {
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                n = rs.getInt("n");
+            }
+        } catch (Exception e) {
+            //
+        }
+        return n;
+    }
+
     /**
      * @return the ActionMessage
      */

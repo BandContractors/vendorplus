@@ -3634,6 +3634,130 @@ SET out_pay_id=@new_id;
 END//
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS sp_insert_pay_fix;
+DELIMITER //
+CREATE PROCEDURE sp_insert_pay_fix
+(
+	IN in_pay_date date,
+	IN in_paid_amount double,
+	IN in_pay_method_id int,
+	IN in_add_user_detail_id int,
+	IN in_edit_user_detail_id int,
+	IN in_add_date datetime,
+	IN in_edit_date datetime,
+	IN in_points_spent double,
+	IN in_points_spent_amount double,
+	IN in_delete_pay_id bigint,
+	IN in_pay_ref_no varchar(100),
+	IN in_pay_category varchar(10),
+	IN in_bill_transactor_id bigint,
+	IN in_pay_type_id int,
+	IN in_pay_reason_id int,
+	IN in_store_id int,
+	IN in_acc_child_account_id int,
+	IN in_acc_child_account_id2 int,
+	IN in_currency_code varchar(10),
+	IN in_xrate double,
+	IN in_status int,
+	IN in_status_desc varchar(100),
+	IN in_principal_amount double,
+	IN in_interest_amount double,
+	OUT out_pay_id bigint,
+	IN in_pay_number varchar(50)
+) 
+BEGIN 
+	SET @new_id=0;
+	CALL sp_get_new_id("pay","pay_id",@new_id);
+
+	SET @cur_sys_datetime=null;
+	CALL sp_get_current_system_datetime(@cur_sys_datetime);
+
+	SET @edit_datetime=null;
+	SET @add_user_detail_id=null;
+	SET @edit_user_detail_id=null;
+
+	SET @bill_transactor_id=null;
+	if (in_bill_transactor_id!=0) then 
+		SET @bill_transactor_id=in_bill_transactor_id;
+	end if;
+	SET @delete_pay_id=null;
+	if (in_delete_pay_id!=0) then 
+		SET @delete_pay_id=in_delete_pay_id;
+	end if;
+	SET @acc_child_account_id=null;
+	if (in_acc_child_account_id!=0) then 
+		SET @acc_child_account_id=in_acc_child_account_id;
+	end if;
+	SET @acc_child_account_id2=null;
+	if (in_acc_child_account_id2!=0) then 
+		SET @acc_child_account_id2=in_acc_child_account_id2;
+	end if;
+	if (in_add_user_detail_id!=0) then 
+		SET @add_user_detail_id=in_add_user_detail_id;
+	end if;
+
+	INSERT INTO pay
+	(
+		pay_id,
+		pay_date,
+		paid_amount,
+		pay_method_id,
+		add_user_detail_id,
+		edit_user_detail_id,
+		add_date,
+		edit_date,
+		points_spent,
+		points_spent_amount,
+		delete_pay_id,
+		pay_ref_no,
+		pay_category,
+		bill_transactor_id,
+		pay_type_id,
+		pay_reason_id,
+		store_id,
+		acc_child_account_id,
+		acc_child_account_id2,
+		currency_code,
+		xrate,
+		status,
+		status_desc,
+		principal_amount,
+		interest_amount,
+		pay_number
+	) 
+    VALUES
+	(
+		@new_id,
+		in_pay_date,
+		in_paid_amount,
+		in_pay_method_id,
+		@add_user_detail_id,
+		@edit_user_detail_id,
+		in_add_date,
+		@edit_datetime,
+		in_points_spent,
+		in_points_spent_amount,
+		@delete_pay_id,
+		in_pay_ref_no,
+		in_pay_category,
+		@bill_transactor_id,
+		in_pay_type_id,
+		in_pay_reason_id,
+		in_store_id,
+		@acc_child_account_id,
+		@acc_child_account_id2,
+		in_currency_code,
+		in_xrate,
+		in_status,
+		in_status_desc,
+		in_principal_amount,
+		in_interest_amount,
+		in_pay_number
+	); 
+SET out_pay_id=@new_id;
+END//
+DELIMITER ;
+
 DROP PROCEDURE IF EXISTS sp_update_pay;
 DELIMITER //
 CREATE PROCEDURE sp_update_pay

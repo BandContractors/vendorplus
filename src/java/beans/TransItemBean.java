@@ -26,6 +26,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -1864,6 +1865,7 @@ public class TransItemBean implements Serializable {
             }
             inserted = 1;
         } catch (Exception e) {
+            LOGGER.log(Level.INFO, Arrays.toString(e.getStackTrace()));
             LOGGER.log(Level.ERROR, e);
         }
         return inserted;
@@ -6017,9 +6019,21 @@ public class TransItemBean implements Serializable {
                 //do nothing
             } else {
                 item = new ItemBean().getItem(aTransItem.getItemId());
-                aTransItem.setDescription(item.getDescription());
-                aTransItem.setAlias_name(item.getAlias_name());
-                aTransItem.setDisplay_alias_name(item.getDisplay_alias_name());
+                try {
+                    aTransItem.setDescription(item.getDescription());
+                } catch (NullPointerException npe) {
+                    aTransItem.setDescription("");
+                }
+                try {
+                    aTransItem.setAlias_name(item.getAlias_name());
+                } catch (NullPointerException npe) {
+                    aTransItem.setAlias_name("");
+                }
+                try {
+                    aTransItem.setDisplay_alias_name(item.getDisplay_alias_name());
+                } catch (NullPointerException npe) {
+                    aTransItem.setDisplay_alias_name(0);
+                }
                 try {
                     aTransItem.setUnitSymbol(new UnitBean().getUnit(item.getUnitId()).getUnitSymbol());
                 } catch (NullPointerException npe) {
@@ -6030,9 +6044,21 @@ public class TransItemBean implements Serializable {
                 } catch (NullPointerException npe) {
                     aTransItem.setAccountName("");
                 }
-                aTransItem.setItem_currency_code(item.getCurrencyCode());
-                aTransItem.setIs_general(item.getIsGeneral());
-                aTransItem.setOverride_gen_name(item.getOverride_gen_name());
+                try {
+                    aTransItem.setItem_currency_code(item.getCurrencyCode());
+                } catch (NullPointerException npe) {
+                    aTransItem.setItem_currency_code("");
+                }
+                try {
+                    aTransItem.setIs_general(item.getIsGeneral());
+                } catch (NullPointerException npe) {
+                    aTransItem.setIs_general(0);
+                }
+                try {
+                    aTransItem.setOverride_gen_name(item.getOverride_gen_name());
+                } catch (NullPointerException npe) {
+                    aTransItem.setOverride_gen_name(0);
+                }
                 if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
                     if (null == new Item_tax_mapBean().getItem_tax_mapSynced(aTransItem.getItemId())) {
                         aTransItem.setIs_tax_synced(0);

@@ -2262,8 +2262,12 @@ public class TransBean implements Serializable {
                     List<TransItem> tis = new TransItemBean().getTransItemsByTransactionId(t.getTransactionId());
                     TransactionType tt = new TransactionTypeBean().getTransactionType(t.getTransactionTypeId());
                     TransactionReason tr = new TransactionReasonBean().getTransactionReason(t.getTransactionReasonId());
-                    new TransItemBean().adjustStockForTransItems(t, tis);
-                    payid = savePayForTrans(t);
+                    try {
+                        new TransItemBean().adjustStockForTransItems(t, tis);
+                    } catch (Exception e) {
+                        //do nothing
+                    }
+                    payid = savePayForTrans(t, 0);
                     postJournalsForTrans(tt, tr, t, tis, payid);
                     if (tt.getTransactionTypeId() == 2 || tt.getTransactionTypeId() == 1) {
                         new PayTransBean().updateTransTotalPaid(t.getTransactionId());
@@ -2410,7 +2414,7 @@ public class TransBean implements Serializable {
             Runnable task = new Runnable() {
                 @Override
                 public void run() {
-                    long x = savePayForTrans(aTrans);
+                    long x = savePayForTrans(aTrans,0);
                 }
             };
             Executor e = Executors.newSingleThreadExecutor();
@@ -2421,7 +2425,7 @@ public class TransBean implements Serializable {
         }
     }
 
-    public long savePayForTrans(Trans aTrans) {
+    public long savePayForTrans(Trans aTrans, int aFromFix) {
         TransactionType transtype = new TransactionTypeBean().getTransactionType(aTrans.getTransactionTypeId());
         long payid = 0;
         String sql = null;
@@ -2441,7 +2445,7 @@ public class TransBean implements Serializable {
                 InnerPay.setPayMethodId(aTrans.getPayMethod());
                 InnerPay.setAddUserDetailId(aTrans.getAddUserDetailId());
                 InnerPay.setEditUserDetailId(aTrans.getAddUserDetailId());
-                InnerPay.setAddDate(new java.util.Date());
+                InnerPay.setAddDate(aTrans.getAddDate());
                 InnerPay.setEditDate(new java.util.Date());
                 InnerPay.setPointsSpent(aTrans.getSpendPoints());
                 InnerPay.setPointsSpentAmount(aTrans.getSpendPointsAmount());
@@ -2487,7 +2491,11 @@ public class TransBean implements Serializable {
                 InnerPay.setDeletePayId(0);
                 payid = 0;
                 try {
-                    payid = new PayBean().payInsertUpdate(InnerPay);
+                    if (aFromFix == 0) {
+                        payid = new PayBean().payInsertUpdate(InnerPay);
+                    } else if (aFromFix == 1) {
+                        payid = new PayBean().payInsertUpdateFix(InnerPay);
+                    }
                 } catch (NullPointerException npe) {
                     payid = 0;
                 }
@@ -4145,51 +4153,6 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
             return 0;
         }
-    }
-
-    public void convertTransToJournalAllstart() {
-        String StartDate = new CompanySetting().getCURRENT_SERVER_DATE().toString();
-        //System.out.println("Started:" + StartDate);
-        this.ActionMessage = this.convertTransToJournalAll();
-        String EndDate = new CompanySetting().getCURRENT_SERVER_DATE().toString();
-        this.ActionMessage = this.ActionMessage + "Started:" + StartDate + " Ended:" + EndDate;
-        //System.out.println("Ended:" + EndDate);
-    }
-
-    public void convertTransToJournalAllstart2() {
-        String StartDate = new CompanySetting().getCURRENT_SERVER_DATE().toString();
-        //System.out.println("Started:" + StartDate);
-        this.ActionMessage = this.convertTransToJournalAll2();
-        String EndDate = new CompanySetting().getCURRENT_SERVER_DATE().toString();
-        this.ActionMessage = this.ActionMessage + "Started:" + StartDate + " Ended:" + EndDate;
-        //System.out.println("Ended:" + EndDate);
-    }
-
-    public void convertPayToJournalAllstart() {
-        String StartDate = new CompanySetting().getCURRENT_SERVER_DATE().toString();
-        //System.out.println("Started:" + StartDate);
-        this.ActionMessage = this.convertPayToJournalAll();
-        String EndDate = new CompanySetting().getCURRENT_SERVER_DATE().toString();
-        this.ActionMessage = this.ActionMessage + "Started:" + StartDate + " Ended:" + EndDate;
-        //System.out.println("Ended:" + EndDate);
-    }
-
-    public void convertOverPayAllstart(String aMode) {
-        String StartDate = new CompanySetting().getCURRENT_SERVER_DATE().toString();
-        //System.out.println("Started:" + StartDate);
-        this.ActionMessage = this.convertOverPayAll(aMode);
-        String EndDate = new CompanySetting().getCURRENT_SERVER_DATE().toString();
-        this.ActionMessage = this.ActionMessage + "Started:" + StartDate + " Ended:" + EndDate;
-        //System.out.println("Ended:" + EndDate);
-    }
-
-    public void convertPayToJournalAllstart2() {
-        String StartDate = new CompanySetting().getCURRENT_SERVER_DATE().toString();
-        //System.out.println("Started:" + StartDate);
-        this.ActionMessage = this.convertPayToJournalAll2();
-        String EndDate = new CompanySetting().getCURRENT_SERVER_DATE().toString();
-        this.ActionMessage = this.ActionMessage + "Started:" + StartDate + " Ended:" + EndDate;
-        //System.out.println("Ended:" + EndDate);
     }
 
     public String convertTransToJournalAll() {

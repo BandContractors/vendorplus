@@ -3,16 +3,26 @@ package utilities;
 import api_sm_bi.Bi_stg_sale_invoice;
 import api_sm_bi.Bi_stg_sale_invoiceBean;
 import api_sm_bi.Bi_stg_sale_invoice_item;
+import api_tax.efris_bean.T124;
 import beans.AccCurrencyBean;
+import beans.AccJournalBean;
 import beans.Alert_generalBean;
 import beans.Parameter_listBean;
+import beans.PayTransBean;
+import beans.TransBean;
+import beans.TransItemBean;
+import beans.TransactionReasonBean;
+import beans.TransactionTypeBean;
 import com.google.gson.Gson;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import connections.DBConnection;
 import entities.CompanySetting;
 import entities.Item;
+import entities.Trans;
 import entities.TransItem;
+import entities.TransactionReason;
+import entities.TransactionType;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
@@ -23,12 +33,12 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import static java.sql.Types.VARCHAR;
 import java.text.DecimalFormat;
 import java.text.Format;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -50,15 +60,9 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import javax.servlet.http.HttpServletRequest;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import sessions.GeneralUserSetting;
-import test.IntfInvoice;
-import test.IntfTrans;
-import test.IntfTransItem;
 
 @ManagedBean
 @SessionScoped
@@ -71,6 +75,7 @@ public class UtilityBean implements Serializable {
     private static final String TIME24HOURS_PATTERN = "([01]?[0-9]|2[0-3]):[0-5][0-9]";
     private String HOST_NAME;
     private String IP;
+    private String FileNameWithPath = "";
 
     public boolean isTime24Hour(String time) {
         pattern = Pattern.compile(TIME24HOURS_PATTERN);
@@ -120,6 +125,7 @@ public class UtilityBean implements Serializable {
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 CallableStatement cs = conn.prepareCall(sql);) {
+            //System.out.println("aTableName:" + aTableName + ",aColumnName=" + aColumnName);
             cs.setString(1, aTableName);
             cs.setString(2, aColumnName);
             cs.registerOutParameter("out_new_id", VARCHAR);
@@ -732,7 +738,6 @@ public class UtilityBean implements Serializable {
 //    public static void main(String[] args) {
 //        new UtilityBean().sampleSendInvoice();
 //    }
-
     public void sampleSendInvoice() {
         try {
             Gson gson = new Gson();
@@ -971,6 +976,68 @@ public class UtilityBean implements Serializable {
         return computerName;
     }
 
+    public void callgenerateUNSPCexcel(String aFileNameWithPath) {
+        String APIMode = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_MODE").getParameter_value();
+        if (APIMode.equals("OFFLINE")) {
+            new T124().generateUNSPCexcelOffline(aFileNameWithPath);
+        } else {
+            new T124().generateUNSPCexcelOnline(aFileNameWithPath);
+        }
+    }
+
+    public void cleanSaleInvoiceTranss() {
+        try {
+            Runnable task = new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        String sql = "select * from transaction where transaction_type_id=2 and amount_tendered>0 and total_paid=0";
+                        ResultSet rs = null;
+                        Connection conn = DBConnection.getMySQLConnection();
+                        PreparedStatement ps = conn.prepareStatement(sql);
+                        rs = ps.executeQuery();
+                        int x=0;
+                        while (rs.next()) {
+                            x=x+1;
+                            System.out.println("X:" + x);
+                            long payid = 0;
+                            Trans t = new TransBean().getTrans(rs.getLong("transaction_id"));
+                            t.setPayMethod(1);
+                            List<TransItem> tis = new TransItemBean().getTransItemsByTransactionId(t.getTransactionId());
+                            TransactionType tt = new TransactionTypeBean().getTransactionType(t.getTransactionTypeId());
+                            TransactionReason tr = new TransactionReasonBean().getTransactionReason(t.getTransactionReasonId());
+                            /*
+                             try {
+                             new TransItemBean().adjustStockForTransItems(t, tis);
+                             } catch (Exception e) {
+                             //do nothing
+                             }
+                             */
+                            if (new PayTransBean().getTotalPaidByTransId(t.getTransactionId()) == 0) {
+                                payid = new TransBean().savePayForTrans(t,1);
+                                System.out.println("--Pay:" + x);
+                            }
+                            if (payid > 0 && new AccJournalBean().countJournalsByTrans(t.getTransactionId()) == 0) {
+                                new TransBean().postJournalsForTrans(tt, tr, t, tis, payid);
+                                System.out.println("--Journal:" + x);
+                            }
+                            if (tt.getTransactionTypeId() == 2 || tt.getTransactionTypeId() == 1) {
+                                new PayTransBean().updateTransTotalPaid(t.getTransactionId());
+                                System.out.println("--TPaid:" + x);
+                            }
+                        }
+                    } catch (Exception e) {
+                        LOGGER.log(Level.ERROR, e);
+                    }
+                }
+            };
+            Executor e = Executors.newSingleThreadExecutor();
+            e.execute(task);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     /**
      * @return the pattern
      */
@@ -1032,6 +1099,20 @@ public class UtilityBean implements Serializable {
      */
     public void setIP(String IP) {
         this.IP = IP;
+    }
+
+    /**
+     * @return the FileNameWithPath
+     */
+    public String getFileNameWithPath() {
+        return FileNameWithPath;
+    }
+
+    /**
+     * @param FileNameWithPath the FileNameWithPath to set
+     */
+    public void setFileNameWithPath(String FileNameWithPath) {
+        this.FileNameWithPath = FileNameWithPath;
     }
 
 }

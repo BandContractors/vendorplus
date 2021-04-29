@@ -2462,17 +2462,17 @@ public class ItemBean implements Serializable {
         try {
             this.SearchItemDesc = "";
         } catch (Exception e) {
-            LOGGER.log(Level.ERROR, e);
+            //LOGGER.log(Level.ERROR, e);
         }
         try {
             this.SelectedItem = null;
         } catch (Exception e) {
-            LOGGER.log(Level.ERROR, e);
+            //LOGGER.log(Level.ERROR, e);
         }
         try {
             this.ItemObjectList.clear();
         } catch (Exception e) {
-            LOGGER.log(Level.ERROR, e);
+            //LOGGER.log(Level.ERROR, e);
         }
     }
 

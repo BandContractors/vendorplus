@@ -10,10 +10,12 @@ TRUNCATE TABLE stock_ledger;
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_15',10,Now(),'6.0','');
 
+-- Substitute X with current month stock table e.g. 'stock_ledger_2021_04' for April 2021
 INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
-VALUES (75, 'COMPANY_SETTING', 'CURRENT_TABLE_NAME_STOCK_LEDGER', 'stock_ledger','Current monthly stock leger table; created at the beginning of each month');
+VALUES (75, 'COMPANY_SETTING', 'CURRENT_TABLE_NAME_STOCK_LEDGER', X,'Current monthly stock leger table; created at the beginning of each month');
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_15',15,Now(),'6.0','');
+ALTER TABLE X CHANGE COLUMN stock_ledger_id stock_ledger_id BIGINT(20) NOT NULL AUTO_INCREMENT ;
 
 CREATE TABLE snapshot_stock_value_day_sum AS 
 select year(s.snapshot_date) as y,month(s.snapshot_date) as m,day(s.snapshot_date) as d,s.snapshot_no,s.currency_code,

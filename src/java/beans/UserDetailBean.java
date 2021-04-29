@@ -47,17 +47,61 @@ public class UserDetailBean implements Serializable {
 
     public void setUserDetailFromResultset(UserDetail aUserDetail, ResultSet aResultSet) {
         try {
-            aUserDetail.setUserDetailId(aResultSet.getInt("user_detail_id"));
-            aUserDetail.setUserName(aResultSet.getString("user_name"));
-            aUserDetail.setUserPassword(Security.Decrypt(aResultSet.getString("user_password")));
-            aUserDetail.setUserPasswordConfirm(Security.Decrypt(aResultSet.getString("user_password")));
-            aUserDetail.setFirstName(aResultSet.getString("first_name"));
-            aUserDetail.setSecondName(aResultSet.getString("second_name"));
-            aUserDetail.setThirdName(aResultSet.getString("third_name"));
-            aUserDetail.setIsUserLocked(aResultSet.getString("is_user_locked"));
-            aUserDetail.setIsUserGenAdmin(aResultSet.getString("is_user_gen_admin"));
-            aUserDetail.setUserCategoryId(aResultSet.getInt("user_category_id"));
-            aUserDetail.setUserImgUrl(aResultSet.getString("user_img_url"));
+            try {
+                aUserDetail.setUserDetailId(aResultSet.getInt("user_detail_id"));
+            } catch (NullPointerException npe) {
+                aUserDetail.setUserDetailId(0);
+            }
+            if (null == aResultSet.getString("user_name")) {
+                aUserDetail.setUserName("");
+            } else {
+                aUserDetail.setUserName(aResultSet.getString("user_name"));
+            }
+            if (null == aResultSet.getString("user_password")) {
+                aUserDetail.setUserPassword("");
+            } else {
+                aUserDetail.setUserPassword(Security.Decrypt(aResultSet.getString("user_password")));
+            }
+            if (null == aResultSet.getString("user_password")) {
+                aUserDetail.setUserPasswordConfirm("");
+            } else {
+                aUserDetail.setUserPasswordConfirm(Security.Decrypt(aResultSet.getString("user_password")));
+            }
+            if (null == aResultSet.getString("first_name")) {
+                aUserDetail.setFirstName("");
+            } else {
+                aUserDetail.setFirstName(aResultSet.getString("first_name"));
+            }
+            if (null == aResultSet.getString("second_name")) {
+                aUserDetail.setSecondName("");
+            } else {
+                aUserDetail.setSecondName(aResultSet.getString("second_name"));
+            }
+            if (null == aResultSet.getString("third_name")) {
+                aUserDetail.setThirdName("");
+            } else {
+                aUserDetail.setThirdName(aResultSet.getString("third_name"));
+            }
+            if (null == aResultSet.getString("is_user_locked")) {
+                aUserDetail.setIsUserLocked("No");
+            } else {
+                aUserDetail.setIsUserLocked(aResultSet.getString("is_user_locked"));
+            }
+            if (null == aResultSet.getString("is_user_gen_admin")) {
+                aUserDetail.setIsUserGenAdmin("No");
+            } else {
+                aUserDetail.setIsUserGenAdmin(aResultSet.getString("is_user_gen_admin"));
+            }
+            try {
+                aUserDetail.setUserCategoryId(aResultSet.getInt("user_category_id"));
+            } catch (NullPointerException e) {
+                aUserDetail.setUserCategoryId(0);
+            }
+            if (null == aResultSet.getString("user_img_url")) {
+                aUserDetail.setUserImgUrl("");
+            } else {
+                aUserDetail.setUserImgUrl(aResultSet.getString("user_img_url"));
+            }
             if (null == aResultSet.getString("email_address")) {
                 aUserDetail.setEmail_address("");
             } else {
@@ -68,7 +112,11 @@ public class UserDetailBean implements Serializable {
             } else {
                 aUserDetail.setPhone_no(aResultSet.getString("phone_no"));
             }
-            aUserDetail.setTrans_code(Security.Decrypt(aResultSet.getString("trans_code")));
+            if (null == aResultSet.getString("trans_code")) {
+                aUserDetail.setTrans_code("");
+            } else {
+                aUserDetail.setTrans_code(Security.Decrypt(aResultSet.getString("trans_code")));
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }

@@ -20,6 +20,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import sessions.GeneralUserSetting;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 /*
  * To change this template, choose Tools | Templates
@@ -34,6 +36,7 @@ import sessions.GeneralUserSetting;
 public class Cash_balancing_dailyBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    static Logger LOGGER = Logger.getLogger(Cash_balancing_dailyBean.class.getName());
 
     private String ActionMessage = null;
     private List<Cash_balancing_daily> Cash_balancing_dailyList;
@@ -158,7 +161,7 @@ public class Cash_balancing_dailyBean implements Serializable {
                 aCash_balancing_daily.setNet_cash(0);
             }
         } catch (Exception e) {
-            System.err.println("setCash_balancing_dailyFromResultset:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -178,7 +181,7 @@ public class Cash_balancing_dailyBean implements Serializable {
                 return null;
             }
         } catch (Exception e) {
-            System.err.println("getCash_balancing_daily:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
             return null;
         }
     }
@@ -249,7 +252,7 @@ public class Cash_balancing_dailyBean implements Serializable {
                     }
                 }
             } catch (Exception e) {
-                System.err.println("refreshCash_balancing_dailyList:New:" + e.getMessage());
+                LOGGER.log(Level.ERROR, e);
             }
         }
     }
@@ -288,7 +291,7 @@ public class Cash_balancing_dailyBean implements Serializable {
                     this.Cash_balancing_dailyList.add(cbdList);
                 }
             } catch (Exception e) {
-                System.err.println("refreshReportCash_balancing_daily:List:" + e.getMessage());
+                LOGGER.log(Level.ERROR, e);
             }
 
             //summary
@@ -335,7 +338,7 @@ public class Cash_balancing_dailyBean implements Serializable {
                     this.Cash_balancing_dailySummary.add(cbdSummary);
                 }
             } catch (Exception e) {
-                System.err.println("refreshReportCash_balancing_daily:Summary:" + e.getMessage());
+                LOGGER.log(Level.ERROR, e);
             }
         }
     }
@@ -365,7 +368,7 @@ public class Cash_balancing_dailyBean implements Serializable {
                 aCash_balancing_daily.setCash_over(aCash_balancing_daily.getActual_cash_count() - aCash_balancing_daily.getNet_cash());
             }
         } catch (Exception e) {
-            System.err.println("calculateCashOverOrShort:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -390,7 +393,7 @@ public class Cash_balancing_dailyBean implements Serializable {
             }
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
         } catch (Exception e) {
-            System.out.println("callSaveCash_balancing_daily:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -421,8 +424,7 @@ public class Cash_balancing_dailyBean implements Serializable {
                 saved = 1;
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("saveCash_balancing_daily:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return saved;
     }

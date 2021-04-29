@@ -26,43 +26,43 @@
         <h:form id="form" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
                     return false;">
             <h:panelGrid styleClass="clsGridMainHeader" columns="1">
-                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeader" value="Admin Panel"/>
+                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeader" value="Admin Tasks Panel"/>
             </h:panelGrid>
 
-            <h:panelGrid styleClass="clsGridMainCommands" columns="1">
-                <h:panelGrid styleClass="clsGridMainCommands1" columns="1">
-                    <p:commandButton styleClass="clsButtonBig" id="cmdbSave1" value="Trans-To-Journal" accesskey="t" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
-                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
-                            <p:graphicImage name="/images/ajax-loader.gif"/>
-                        </p:dialog>
-                        <p:ajax listener="#{transBean.convertTransToJournalAllstart()}" process="@form" update="@form" />
-                    </p:commandButton>
-                    <p:commandButton styleClass="clsButtonBig" id="cmdbSave2" value="Pay-To-Journal" accesskey="p" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
-                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
-                            <p:graphicImage name="/images/ajax-loader.gif"/>
-                        </p:dialog>
-                        <p:ajax listener="#{transBean.convertPayToJournalAllstart()}" process="@form" update="@form" />
-                    </p:commandButton>
-                    <p:commandButton styleClass="clsButtonBig" id="cmdbSave3" value="Over-Pay-Sales(FULL)" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
-                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
-                            <p:graphicImage name="/images/ajax-loader.gif"/>
-                        </p:dialog>
-                        <p:ajax listener="#{transBean.convertOverPayAllstart('FULL')}" process="@form" update="@form" />
-                    </p:commandButton>
-                    <p:commandButton styleClass="clsButtonBig" id="cmdbSave4" value="Over-Pay-Sales(PAR)" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
-                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
-                            <p:graphicImage name="/images/ajax-loader.gif"/>
-                        </p:dialog>
-                        <p:ajax listener="#{transBean.convertOverPayAllstart('PART')}" process="@form" update="@form" />
-                    </p:commandButton>
-                </h:panelGrid>
-            </h:panelGrid>
-
+            <p:accordionPanel widgetVar="basic">
+                <p:tab title="Admin Tasks Panel">
+                    <p>
+                        A panel with some administrative tasks that may be needed from time to time.
+                    </p>
+                </p:tab>
+                <p:tab title="Generate UNSPC Excel">
+                    <h:panelGrid columns="1">
+                        <h:outputLabel id="lbl"  value="Filename with path (e.g D:\\Commodity.xlsx):"/>
+                        <h:inputText value="#{utilityBean.fileNameWithPath}" autocomplete="yes"/>
+                        <p:commandButton styleClass="clsButtonBig" id="cmdbSGenUNSPC" value="Gen.UNSPC Excel" accesskey="t" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                            <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                                <p:graphicImage name="/images/ajax-loader.gif"/>
+                            </p:dialog>
+                            <p:ajax listener="#{utilityBean.callgenerateUNSPCexcel(utilityBean.fileNameWithPath)}" process="@form" update="@form" />
+                        </p:commandButton>
+                    </h:panelGrid>
+                </p:tab>
+                <p:tab title="Clean Invoice (TotalPaid Not Updated)">
+                    <h:panelGrid columns="1">
+                        <p:commandButton styleClass="clsButtonBig" id="cmdbCleanInvoice" value="Clean.Invoice" accesskey="t" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                            <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                                <p:graphicImage name="/images/ajax-loader.gif"/>
+                            </p:dialog>
+                            <p:ajax listener="#{utilityBean.cleanSaleInvoiceTranss()}" process="@form" update="@form" />
+                        </p:commandButton>
+                    </h:panelGrid>
+                </p:tab>
+            </p:accordionPanel>
             <h:panelGrid styleClass="clsGridMainMessages" columns="1">
                 <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{transBean.actionMessage}"/>
                 <h:messages id="msgsMainMessage" style="color: red"/><br/>
             </h:panelGrid>
-            <p:growl/>
+            <p:growl id="growl1"/>
         </h:form>
     </h:body>
 </html>
