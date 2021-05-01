@@ -2414,7 +2414,7 @@ public class TransBean implements Serializable {
             Runnable task = new Runnable() {
                 @Override
                 public void run() {
-                    long x = savePayForTrans(aTrans,0);
+                    long x = savePayForTrans(aTrans, 0);
                 }
             };
             Executor e = Executors.newSingleThreadExecutor();
@@ -11216,7 +11216,8 @@ public class TransBean implements Serializable {
 
     public void reSubmitInvoiceTaxAPI(long aInnerTransId, long aTransTypeId, Trans aTrans, TransBean aTransBean) {
         try {
-            if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
+            List<TransItem> tis = new TransItemBean().getTransItemsByTransactionId(aInnerTransId);
+            if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0 && new Item_tax_mapBean().countItemsNotMappedSynced(tis) == 0) {
                 if (aTransTypeId == 2) {//Invoice
                     new InvoiceBean().submitTaxInvoice(aInnerTransId);
                 } else if (aTransTypeId == 82) {//Credit Note
