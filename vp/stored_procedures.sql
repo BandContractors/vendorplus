@@ -5242,7 +5242,7 @@ BEGIN
 		(ifnull(time_scope_from,'')='' OR HOUR(@cur_sys_datetime)>HOUR(time_scope_from) OR (HOUR(@cur_sys_datetime)=HOUR(time_scope_from) AND MINUTE(@cur_sys_datetime)>=MINUTE(time_scope_from))) AND 
 		(ifnull(time_scope_to,'')='' OR HOUR(@cur_sys_datetime)<HOUR(time_scope_to) OR (HOUR(@cur_sys_datetime)=HOUR(time_scope_to) AND MINUTE(@cur_sys_datetime)<=MINUTE(time_scope_to))) AND 
 		(find_in_set(in_category_id,dpi.category_scope)<>0 OR find_in_set(in_sub_category_id,dpi.sub_category_scope)<>0 OR find_in_set(in_item_id,dpi.item_scope)<>0) AND 
-		dpi.item_qty=in_item_qty AND 
+		dpi.item_qty<=in_item_qty AND 
 		@cur_sys_datetime BETWEEN dp.start_date AND dp.end_date;
 END//
 DELIMITER ;

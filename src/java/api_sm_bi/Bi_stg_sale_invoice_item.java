@@ -1,7 +1,6 @@
 package api_sm_bi;
 
 import java.io.Serializable;
-import java.util.Date;
 import javax.faces.bean.*;
 
 @ManagedBean
@@ -9,296 +8,168 @@ import javax.faces.bean.*;
 public class Bi_stg_sale_invoice_item implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private String section_code;
-    private String branch_code;
-    private String business_code;
-    private String group_code;
-    private String invoice_number;
-    private Date sales_date;
-    private String customer_name;
-    private double gross_amount;
-    private double trade_discount;
-    private double cash_discount;
-    private double tax_amount;
-    private double profit_margin;
-    private double amount_tendered;
-    private String staff_code;
-    private String currency_code;
-    private String country_code;
-    private String loc_level2_code;
-    private String loc_level3_code;
+    private String bi_item_code;
+    private String src_item_description;
+    private double qty;
+    private double unit_price;
+    private double unit_trade_discount;
+    private double unit_vat;
+    private double amount;
+    private String vat_rated;
+    private double unit_cost_price;
+    private double unit_profit_margin;
 
     public Bi_stg_sale_invoice_item() {
-        this.section_code = "";
-        this.branch_code = "";
-        this.business_code = "";
-        this.group_code = "";
-        this.invoice_number = "";
-        this.sales_date = new Date();
-        this.customer_name = "";
-        this.gross_amount = 0;
-        this.trade_discount = 0;
-        this.cash_discount = 0;
-        this.tax_amount = 0;
-        this.profit_margin = 0;
-        this.amount_tendered = 0;
-        this.staff_code = "";
-        this.currency_code = "";
-        this.country_code = "";
-        this.loc_level2_code = "";
-        this.loc_level3_code = "";
+        this.bi_item_code = "";
+        this.src_item_description = "";
+        this.qty = 0;
+        this.unit_price = 0;
+        this.unit_trade_discount = 0;
+        this.unit_vat = 0;
+        this.amount = 0;
+        this.vat_rated = "";
+        this.unit_cost_price = 0;
+        this.unit_profit_margin = 0;
     }
 
     /**
-     * @return the section_code
+     * @return the bi_item_code
      */
-    public String getSection_code() {
-        return section_code;
+    public String getBi_item_code() {
+        return bi_item_code;
     }
 
     /**
-     * @param section_code the section_code to set
+     * @param bi_item_code the bi_item_code to set
      */
-    public void setSection_code(String section_code) {
-        this.section_code = section_code;
+    public void setBi_item_code(String bi_item_code) {
+        this.bi_item_code = bi_item_code;
     }
 
     /**
-     * @return the branch_code
+     * @return the src_item_description
      */
-    public String getBranch_code() {
-        return branch_code;
+    public String getSrc_item_description() {
+        return src_item_description;
     }
 
     /**
-     * @param branch_code the branch_code to set
+     * @param src_item_description the src_item_description to set
      */
-    public void setBranch_code(String branch_code) {
-        this.branch_code = branch_code;
+    public void setSrc_item_description(String src_item_description) {
+        this.src_item_description = src_item_description;
     }
 
     /**
-     * @return the business_code
+     * @return the qty
      */
-    public String getBusiness_code() {
-        return business_code;
+    public double getQty() {
+        return qty;
     }
 
     /**
-     * @param business_code the business_code to set
+     * @param qty the qty to set
      */
-    public void setBusiness_code(String business_code) {
-        this.business_code = business_code;
+    public void setQty(double qty) {
+        this.qty = qty;
     }
 
     /**
-     * @return the group_code
+     * @return the unit_price
      */
-    public String getGroup_code() {
-        return group_code;
+    public double getUnit_price() {
+        return unit_price;
     }
 
     /**
-     * @param group_code the group_code to set
+     * @param unit_price the unit_price to set
      */
-    public void setGroup_code(String group_code) {
-        this.group_code = group_code;
+    public void setUnit_price(double unit_price) {
+        this.unit_price = unit_price;
     }
 
     /**
-     * @return the invoice_number
+     * @return the unit_trade_discount
      */
-    public String getInvoice_number() {
-        return invoice_number;
+    public double getUnit_trade_discount() {
+        return unit_trade_discount;
     }
 
     /**
-     * @param invoice_number the invoice_number to set
+     * @param unit_trade_discount the unit_trade_discount to set
      */
-    public void setInvoice_number(String invoice_number) {
-        this.invoice_number = invoice_number;
+    public void setUnit_trade_discount(double unit_trade_discount) {
+        this.unit_trade_discount = unit_trade_discount;
     }
 
     /**
-     * @return the sales_date
+     * @return the unit_vat
      */
-    public Date getSales_date() {
-        return sales_date;
+    public double getUnit_vat() {
+        return unit_vat;
     }
 
     /**
-     * @param sales_date the sales_date to set
+     * @param unit_vat the unit_vat to set
      */
-    public void setSales_date(Date sales_date) {
-        this.sales_date = sales_date;
+    public void setUnit_vat(double unit_vat) {
+        this.unit_vat = unit_vat;
     }
 
     /**
-     * @return the customer_name
+     * @return the amount
      */
-    public String getCustomer_name() {
-        return customer_name;
+    public double getAmount() {
+        return amount;
     }
 
     /**
-     * @param customer_name the customer_name to set
+     * @param amount the amount to set
      */
-    public void setCustomer_name(String customer_name) {
-        this.customer_name = customer_name;
+    public void setAmount(double amount) {
+        this.amount = amount;
     }
 
     /**
-     * @return the gross_amount
+     * @return the vat_rated
      */
-    public double getGross_amount() {
-        return gross_amount;
+    public String getVat_rated() {
+        return vat_rated;
     }
 
     /**
-     * @param gross_amount the gross_amount to set
+     * @param vat_rated the vat_rated to set
      */
-    public void setGross_amount(double gross_amount) {
-        this.gross_amount = gross_amount;
+    public void setVat_rated(String vat_rated) {
+        this.vat_rated = vat_rated;
     }
 
     /**
-     * @return the trade_discount
+     * @return the unit_cost_price
      */
-    public double getTrade_discount() {
-        return trade_discount;
+    public double getUnit_cost_price() {
+        return unit_cost_price;
     }
 
     /**
-     * @param trade_discount the trade_discount to set
+     * @param unit_cost_price the unit_cost_price to set
      */
-    public void setTrade_discount(double trade_discount) {
-        this.trade_discount = trade_discount;
+    public void setUnit_cost_price(double unit_cost_price) {
+        this.unit_cost_price = unit_cost_price;
     }
 
     /**
-     * @return the cash_discount
+     * @return the unit_profit_margin
      */
-    public double getCash_discount() {
-        return cash_discount;
+    public double getUnit_profit_margin() {
+        return unit_profit_margin;
     }
 
     /**
-     * @param cash_discount the cash_discount to set
+     * @param unit_profit_margin the unit_profit_margin to set
      */
-    public void setCash_discount(double cash_discount) {
-        this.cash_discount = cash_discount;
-    }
-
-    /**
-     * @return the tax_amount
-     */
-    public double getTax_amount() {
-        return tax_amount;
-    }
-
-    /**
-     * @param tax_amount the tax_amount to set
-     */
-    public void setTax_amount(double tax_amount) {
-        this.tax_amount = tax_amount;
-    }
-
-    /**
-     * @return the profit_margin
-     */
-    public double getProfit_margin() {
-        return profit_margin;
-    }
-
-    /**
-     * @param profit_margin the profit_margin to set
-     */
-    public void setProfit_margin(double profit_margin) {
-        this.profit_margin = profit_margin;
-    }
-
-    /**
-     * @return the amount_tendered
-     */
-    public double getAmount_tendered() {
-        return amount_tendered;
-    }
-
-    /**
-     * @param amount_tendered the amount_tendered to set
-     */
-    public void setAmount_tendered(double amount_tendered) {
-        this.amount_tendered = amount_tendered;
-    }
-
-    /**
-     * @return the staff_code
-     */
-    public String getStaff_code() {
-        return staff_code;
-    }
-
-    /**
-     * @param staff_code the staff_code to set
-     */
-    public void setStaff_code(String staff_code) {
-        this.staff_code = staff_code;
-    }
-
-    /**
-     * @return the currency_code
-     */
-    public String getCurrency_code() {
-        return currency_code;
-    }
-
-    /**
-     * @param currency_code the currency_code to set
-     */
-    public void setCurrency_code(String currency_code) {
-        this.currency_code = currency_code;
-    }
-
-    /**
-     * @return the country_code
-     */
-    public String getCountry_code() {
-        return country_code;
-    }
-
-    /**
-     * @param country_code the country_code to set
-     */
-    public void setCountry_code(String country_code) {
-        this.country_code = country_code;
-    }
-
-    /**
-     * @return the loc_level2_code
-     */
-    public String getLoc_level2_code() {
-        return loc_level2_code;
-    }
-
-    /**
-     * @param loc_level2_code the loc_level2_code to set
-     */
-    public void setLoc_level2_code(String loc_level2_code) {
-        this.loc_level2_code = loc_level2_code;
-    }
-
-    /**
-     * @return the loc_level3_code
-     */
-    public String getLoc_level3_code() {
-        return loc_level3_code;
-    }
-
-    /**
-     * @param loc_level3_code the loc_level3_code to set
-     */
-    public void setLoc_level3_code(String loc_level3_code) {
-        this.loc_level3_code = loc_level3_code;
+    public void setUnit_profit_margin(double unit_profit_margin) {
+        this.unit_profit_margin = unit_profit_margin;
     }
 
 }

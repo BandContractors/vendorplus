@@ -26,17 +26,17 @@
         <h:form id="form" styleClass="clsMainFrom" enctype="multipart/form-data">
 
             <h:panelGrid styleClass="clsGridMainHeader" columns="1">
-                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeader" value="SETTINGS for #{companySetting.getBranchCode()}"/>
+                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeader" value="#{companySetting.getLICENSE_CLIENT_NAME()} / #{companySetting.getBranchCode()}"/>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainInput" columns="4">
-                <h:outputLabel  value="Company Name (From License)"/>
-                <h:inputText styleClass="clsInput" value="#{companySetting.getLICENSE_CLIENT_NAME()}" disabled="true" />
+                <h:outputLabel  value="Company Code"/>
+                <h:inputText styleClass="clsInput" value="#{companySetting.ECompanyName}" disabled="true" />
 
-                <h:outputLabel  value="Branch Code"/>
+                <h:outputLabel  value="Branch Name"/>
                 <h:inputText styleClass="clsInput" value="#{companySetting.EBranchCode}" disabled="true" />
 
-                <h:outputLabel  value="Branch Id"/>
+                <h:outputLabel  value="Branch Code"/>
                 <h:inputText styleClass="clsInput" value="#{companySetting.EBranchId}" disabled="true" />
 
                 <h:outputLabel  value="Physical Address"/>

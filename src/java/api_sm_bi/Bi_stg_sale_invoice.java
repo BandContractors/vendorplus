@@ -7,7 +7,6 @@ import javax.faces.bean.*;
 @ManagedBean
 @SessionScoped
 public class Bi_stg_sale_invoice implements Serializable {
-
     private static final long serialVersionUID = 1L;
     private String section_code;
     private String branch_code;

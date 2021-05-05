@@ -40,6 +40,25 @@ call sp_delete_snapshot_stock_value_below_last_month('yyy-mm-dd');
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_15',33,Now(),'6.0','');
 
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (76, 'API', 'API_SMBI_URL','','API URL for SMbi (SalesManager BI), leave field empty if not sending data throught that API');
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (77, 'API', 'API_SMBI_GROUP_CODE','','API GROUP CODE for SMbi (SalesManager BI), leave field empty if not sending data throught that API');
+
+CREATE TABLE transaction_smbi_map (
+  transaction_smbi_map_id bigint(20) NOT NULL AUTO_INCREMENT,
+  transaction_id bigint(20) NOT NULL,
+  transaction_type_id int(11) NOT NULL,
+  transaction_reason_id int(11) NOT NULL,
+  transaction_number varchar(50) DEFAULT NULL,
+  sync_status int(1) DEFAULT '0',
+  add_date timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (transaction_smbi_map_id)
+);
+
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_15',58,Now(),'6.0','');
+
 
 
 

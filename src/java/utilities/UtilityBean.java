@@ -739,29 +739,29 @@ public class UtilityBean implements Serializable {
 //        new UtilityBean().sampleSendInvoice();
 //    }
     public void sampleSendInvoice() {
-        try {
-            Gson gson = new Gson();
-            String json = "";
-            //creating JSON STRING from Object - Branch
-            Bi_stg_sale_invoice saleInvoice = new Bi_stg_sale_invoice();
-            saleInvoice.setBranch_code("Branch01");
-            saleInvoice.setGross_amount(500000);
-            Bi_stg_sale_invoice_item saleInvoiceItems = new Bi_stg_sale_invoice_item();
-
-            Bi_stg_sale_invoiceBean invBean = new Bi_stg_sale_invoiceBean();
-            invBean.setSaleInvoice(saleInvoice);
-            invBean.setSaleInvoiceItems(saleInvoiceItems);
-
-            json = gson.toJson(invBean);
-            System.out.println("invBean:" + json);
-            com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
-            WebResource webResource = client.resource("http://localhost:8080/SMbi/Trans");
-            ClientResponse response = webResource.type("application/json").post(ClientResponse.class, json);
-            String output = response.getEntity(String.class);
-            System.out.println("output:" + output);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            Gson gson = new Gson();
+//            String json = "";
+//            //creating JSON STRING from Object - Branch
+//            Bi_stg_sale_invoice saleInvoice = new Bi_stg_sale_invoice();
+//            saleInvoice.setBranch_code("Branch01");
+//            saleInvoice.setGross_amount(500000);
+//            Bi_stg_sale_invoice_item saleInvoiceItems = new Bi_stg_sale_invoice_item();
+//
+//            Bi_stg_sale_invoiceBean invBean = new Bi_stg_sale_invoiceBean();
+//            invBean.setSaleInvoice(saleInvoice);
+//            invBean.setSaleInvoiceItems(saleInvoiceItems);
+//
+//            json = gson.toJson(invBean);
+//            System.out.println("invBean:" + json);
+//            com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
+//            WebResource webResource = client.resource("http://localhost:8080/SMbi/Trans");
+//            ClientResponse response = webResource.type("application/json").post(ClientResponse.class, json);
+//            String output = response.getEntity(String.class);
+//            System.out.println("output:" + output);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
     public String getEmptyIfNull(String aStringValue) {
@@ -996,9 +996,9 @@ public class UtilityBean implements Serializable {
                         Connection conn = DBConnection.getMySQLConnection();
                         PreparedStatement ps = conn.prepareStatement(sql);
                         rs = ps.executeQuery();
-                        int x=0;
+                        int x = 0;
                         while (rs.next()) {
-                            x=x+1;
+                            x = x + 1;
                             System.out.println("X:" + x);
                             long payid = 0;
                             Trans t = new TransBean().getTrans(rs.getLong("transaction_id"));
@@ -1014,7 +1014,7 @@ public class UtilityBean implements Serializable {
                              }
                              */
                             if (new PayTransBean().getTotalPaidByTransId(t.getTransactionId()) == 0) {
-                                payid = new TransBean().savePayForTrans(t,1);
+                                payid = new TransBean().savePayForTrans(t, 1);
                                 System.out.println("--Pay:" + x);
                             }
                             if (payid > 0 && new AccJournalBean().countJournalsByTrans(t.getTransactionId()) == 0) {

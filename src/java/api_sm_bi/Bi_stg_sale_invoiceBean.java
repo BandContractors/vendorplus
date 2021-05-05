@@ -1,7 +1,7 @@
 package api_sm_bi;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.util.List;
 import javax.faces.bean.*;
 
 @ManagedBean
@@ -9,7 +9,7 @@ import javax.faces.bean.*;
 public class Bi_stg_sale_invoiceBean implements Serializable {
     private static final long serialVersionUID = 1L;
     private Bi_stg_sale_invoice saleInvoice;
-    private Bi_stg_sale_invoice_item saleInvoiceItems;
+    private List<Bi_stg_sale_invoice_item> saleInvoiceItems;
 
     /**
      * @return the saleInvoice
@@ -28,14 +28,14 @@ public class Bi_stg_sale_invoiceBean implements Serializable {
     /**
      * @return the saleInvoiceItems
      */
-    public Bi_stg_sale_invoice_item getSaleInvoiceItems() {
+    public List<Bi_stg_sale_invoice_item> getSaleInvoiceItems() {
         return saleInvoiceItems;
     }
 
     /**
      * @param saleInvoiceItems the saleInvoiceItems to set
      */
-    public void setSaleInvoiceItems(Bi_stg_sale_invoice_item saleInvoiceItems) {
+    public void setSaleInvoiceItems(List<Bi_stg_sale_invoice_item> saleInvoiceItems) {
         this.saleInvoiceItems = saleInvoiceItems;
     }
 }
