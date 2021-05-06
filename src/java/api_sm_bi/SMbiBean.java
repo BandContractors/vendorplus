@@ -58,7 +58,7 @@ public class SMbiBean implements Serializable {
         try {
             String sqlN = "SELECT COUNT(*) as n FROM transaction_smbi_map WHERE status_sync=0";
             long n = new UtilityBean().getN(sqlN);
-            double iterations = Math.ceil(n / 50);
+            double iterations = Math.ceil(1.0 * n / 50);
             String sql = "";
             ResultSet rs = null;
             Transaction_smbi_map tsm = null;

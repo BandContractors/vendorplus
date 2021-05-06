@@ -739,9 +739,9 @@ public class UtilityBean implements Serializable {
 
 //    public static void main(String[] args) {
 //        //new UtilityBean().sampleSendInvoice();
-//
+//        double x=1.0*101/50;
+//        System.out.println("AA:" + Math.ceil(x));
 //    }
-
     public List<ThreadClass> getRunningThreads() {
         List<ThreadClass> objs = new ArrayList<>();
         Set<Thread> threads = Thread.getAllStackTraces().keySet();

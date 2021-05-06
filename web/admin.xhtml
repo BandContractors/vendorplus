@@ -60,7 +60,11 @@
                 <p:tab title="Running Threads">
                     <h:panelGrid columns="1">
                         <p:dataTable value="#{utilityBean.getRunningThreads()}" var="t" 
+                                      rowIndexVar="rowIndex"
                                      > 
+                            <p:column headerText="#" style="text-align: left;">
+                                #{rowIndex+1}
+                            </p:column>
                             <p:column>
                                 <!-- column header -->
                                 <f:facet name="header">name</f:facet>
