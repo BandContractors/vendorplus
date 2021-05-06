@@ -8,10 +8,11 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Date;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 /*
  * To change this template, choose Tools | Templates
@@ -26,6 +27,7 @@ import javax.faces.bean.SessionScoped;
 public class Transaction_tax_mapBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    static Logger LOGGER = Logger.getLogger(Transaction_tax_mapBean.class.getName());
 
     public void setTransaction_tax_mapFromResultset(Transaction_tax_map aTransaction_tax_map, ResultSet aResultSet) {
         try {
@@ -94,8 +96,8 @@ public class Transaction_tax_mapBean implements Serializable {
             } catch (NullPointerException npe) {
                 aTransaction_tax_map.setFdn_ref("");
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -178,7 +180,7 @@ public class Transaction_tax_mapBean implements Serializable {
                 saved = 1;
             }
         } catch (Exception e) {
-            System.err.println("saveTransaction_tax_map1:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return saved;
     }
@@ -207,7 +209,7 @@ public class Transaction_tax_mapBean implements Serializable {
                 int x = this.saveTransaction_tax_map(transtaxmap);
             }
         } catch (Exception e) {
-            System.err.println("saveTransaction_tax_map:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -236,7 +238,7 @@ public class Transaction_tax_mapBean implements Serializable {
                 int x = this.saveTransaction_tax_map(transtaxmap);
             }
         } catch (Exception e) {
-            System.err.println("saveTransaction_tax_map_cr_dr_note:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -254,7 +256,7 @@ public class Transaction_tax_mapBean implements Serializable {
             ps.setString(3, aTransNoTax);
             ps.executeUpdate();
         } catch (Exception e) {
-            System.err.println("updateCreditNoteByRefNo:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -268,7 +270,7 @@ public class Transaction_tax_mapBean implements Serializable {
             ps.setInt(2, 0);
             ps.executeUpdate();
         } catch (Exception e) {
-            System.err.println("markTransaction_tax_mapUpdated_more_than_once:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -281,7 +283,7 @@ public class Transaction_tax_mapBean implements Serializable {
             ps.setInt(1, 1);
             ps.executeUpdate();
         } catch (Exception e) {
-            System.err.println("markTransaction_tax_mapMore_than_once_update_reconsiled:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -300,7 +302,7 @@ public class Transaction_tax_mapBean implements Serializable {
                 this.setTransaction_tax_mapFromResultset(ttm, rs);
             }
         } catch (Exception e) {
-            System.err.println("getTransaction_tax_map:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return ttm;
     }
@@ -320,7 +322,7 @@ public class Transaction_tax_mapBean implements Serializable {
                 this.setTransaction_tax_mapFromResultset(ttm, rs);
             }
         } catch (Exception e) {
-            System.err.println("getTransaction_tax_map:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return ttm;
     }
@@ -339,9 +341,8 @@ public class Transaction_tax_mapBean implements Serializable {
                 TaxIN = rs.getString("transaction_number_tax");
             }
         } catch (Exception e) {
-            System.err.println("getTransaction_tax_map:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return TaxIN;
     }
-
 }

@@ -5,20 +5,30 @@ import beans.Parameter_listBean;
 import beans.StoreBean;
 import beans.TransBean;
 import beans.TransItemBean;
-import beans.TransactionReasonBean;
+import beans.Transaction_smbi_mapBean;
 import beans.TransactorBean;
 import com.google.gson.Gson;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import connections.DBConnection;
+import entities.AccCoa;
 import entities.CompanySetting;
 import entities.Trans;
 import entities.TransItem;
+import entities.Transaction_smbi_map;
 import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import javax.faces.bean.*;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import utilities.UtilityBean;
 
 @ManagedBean
 @SessionScoped
@@ -28,6 +38,54 @@ public class SMbiBean implements Serializable {
     static Logger LOGGER = Logger.getLogger(SMbiBean.class.getName());
     private Bi_stg_sale_invoice saleInvoice;
     private List<Bi_stg_sale_invoice_item> saleInvoiceItems;
+
+    public void syncSMbiCallThread() {
+        try {
+            Runnable task = new Runnable() {
+                @Override
+                public void run() {
+                    syncSMbiCall();
+                }
+            };
+            Executor e = Executors.newSingleThreadExecutor();
+            e.execute(task);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void syncSMbiCall() {
+        try {
+            String sqlN = "SELECT COUNT(*) as n FROM transaction_smbi_map WHERE status_sync=0";
+            long n = new UtilityBean().getN(sqlN);
+            double iterations = Math.ceil(n / 50);
+            String sql = "";
+            ResultSet rs = null;
+            Transaction_smbi_map tsm = null;
+            for (int itrn = 1; itrn <= iterations; itrn++) {
+                sql = "SELECT * FROM transaction_smbi_map WHERE status_sync=0 LIMIT 50";
+                rs = null;
+                try (
+                        Connection conn = DBConnection.getMySQLConnection();
+                        PreparedStatement ps = conn.prepareStatement(sql);) {
+                    rs = ps.executeQuery();
+                    while (rs.next()) {
+                        long TransId = rs.getLong("transaction_id");
+                        int TransTypeId = rs.getInt("transaction_type_id");
+                        if (TransTypeId == 2) {//Invoice
+                            sendInvoice(TransId);
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    LOGGER.log(Level.ERROR, e);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
 
     public void sendInvoice(long aTransactionId) {
         try {
@@ -56,9 +114,15 @@ public class SMbiBean implements Serializable {
                 Status s = gson.fromJson(output, Status.class);
                 System.out.println("Success:" + s.getSuccess() + ",Description" + s.getDescription());
                 //update the database table:transaction_smbi_map
+                if (s.getSuccess() == 1) {
+                    new Transaction_smbi_mapBean().updateTransaction_smbi_map(1, new CompanySetting().getCURRENT_SERVER_DATE(), "success", t.getTransactionId(), t.getTransactionTypeId());
+                } else {
+                    new Transaction_smbi_mapBean().updateTransaction_smbi_map(2, new CompanySetting().getCURRENT_SERVER_DATE(), s.getDescription(), t.getTransactionId(), t.getTransactionTypeId());
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
+            LOGGER.log(Level.ERROR, e);
         }
     }
 

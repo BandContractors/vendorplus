@@ -1,5 +1,6 @@
 package beans;
 
+import api_sm_bi.SMbiBean;
 import connections.DBConnection;
 import entities.AccCurrency;
 import entities.CompanySetting;
@@ -279,6 +280,10 @@ public class Login implements Serializable {
                     //API-TAX - take AES public key snapshot
                     if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0 && new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_MODE").getParameter_value().equals("ONLINE")) {
                         new Cdc_generalBean().takeNewSnapshot_AesPublicKeyAtLogin();
+                    }
+                    //API-SMb
+                    if (new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_SMBI_URL").getParameter_value().length() > 0) {
+                        new SMbiBean().syncSMbiCallThread();
                     }
                     //Navigate to the Menu or Home page
                     FacesContext fc = FacesContext.getCurrentInstance();

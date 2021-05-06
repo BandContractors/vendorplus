@@ -19,6 +19,7 @@ import com.sun.jersey.api.client.WebResource;
 import connections.DBConnection;
 import entities.CompanySetting;
 import entities.Item;
+import entities.ThreadClass;
 import entities.Trans;
 import entities.TransItem;
 import entities.TransactionReason;
@@ -39,6 +40,7 @@ import java.text.DecimalFormat;
 import java.text.Format;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -736,8 +738,30 @@ public class UtilityBean implements Serializable {
     }
 
 //    public static void main(String[] args) {
-//        new UtilityBean().sampleSendInvoice();
+//        //new UtilityBean().sampleSendInvoice();
+//
 //    }
+
+    public List<ThreadClass> getRunningThreads() {
+        List<ThreadClass> objs = new ArrayList<>();
+        Set<Thread> threads = Thread.getAllStackTraces().keySet();
+        ThreadClass obj = null;
+        for (Thread t : threads) {
+            obj = new ThreadClass();
+            String name = t.getName();
+            Thread.State state = t.getState();
+            int priority = t.getPriority();
+            String type = t.isDaemon() ? "Daemon" : "Normal";
+            obj.setName(name);
+            obj.setState(state.name());
+            obj.setPriority(priority);
+            obj.setType(type);
+            objs.add(obj);
+            //System.out.printf("%-20s \t %s \t %d \t %s\n", name, state, priority, type);
+        }
+        return objs;
+    }
+
     public void sampleSendInvoice() {
 //        try {
 //            Gson gson = new Gson();

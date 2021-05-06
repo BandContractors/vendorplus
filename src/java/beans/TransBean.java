@@ -2177,6 +2177,10 @@ public class TransBean implements Serializable {
                                 new InvoiceBean().submitTaxInvoiceThread(trans.getTransactionId());
                             }
                         }
+                        //SMbi API
+                        if (new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_SMBI_URL").getParameter_value().length() > 0) {
+                            new Transaction_smbi_mapBean().insertTransaction_smbi_mapCallThread(trans.getTransactionId(), trans.getTransactionTypeId());
+                        }
                         //clear
                         this.clearAll2(trans, aActiveTransItems, null, null, aSelectedTransactor, 2, aSelectedBillTransactor, aTransUserDetail, aSelectedSchemeTransactor, aAuthorisedByUserDetail, aSelectedAccCoa);
                         TransItemBean = null;
@@ -2836,6 +2840,10 @@ public class TransBean implements Serializable {
                         } else if (IsThreadOn == 1) {
                             new InvoiceBean().submitTaxInvoiceThread(trans.getTransactionId());
                         }
+                    }
+                    //SMbi API
+                    if (new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_SMBI_URL").getParameter_value().length() > 0) {
+                        new Transaction_smbi_mapBean().insertTransaction_smbi_mapCallThread(trans.getTransactionId(), trans.getTransactionTypeId());
                     }
                     //Update Total Paid for Sales/Purchase Invoice
                     if (aTransTypeId == 2 || aTransTypeId == 1) {

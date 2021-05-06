@@ -57,6 +57,37 @@
                         </p:commandButton>
                     </h:panelGrid>
                 </p:tab>
+                <p:tab title="Running Threads">
+                    <h:panelGrid columns="1">
+                        <p:dataTable value="#{utilityBean.getRunningThreads()}" var="t" 
+                                     > 
+                            <p:column>
+                                <!-- column header -->
+                                <f:facet name="header">name</f:facet>
+                                <!-- row record -->
+                                #{t.name}
+                            </p:column>
+                            <p:column>
+                                <!-- column header -->
+                                <f:facet name="header">state</f:facet>
+                                <!-- row record -->
+                                #{t.state}
+                            </p:column>
+                            <p:column>
+                                <!-- column header -->
+                                <f:facet name="header">priority</f:facet>
+                                <!-- row record -->
+                                #{t.priority}
+                            </p:column>
+                            <p:column>
+                                <!-- column header -->
+                                <f:facet name="header">type</f:facet>
+                                <!-- row record -->
+                                #{t.type}
+                            </p:column>
+                        </p:dataTable>
+                    </h:panelGrid>
+                </p:tab>
             </p:accordionPanel>
             <h:panelGrid styleClass="clsGridMainMessages" columns="1">
                 <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{transBean.actionMessage}"/>

@@ -51,8 +51,10 @@ CREATE TABLE transaction_smbi_map (
   transaction_type_id int(11) NOT NULL,
   transaction_reason_id int(11) NOT NULL,
   transaction_number varchar(50) DEFAULT NULL,
-  sync_status int(1) DEFAULT '0',
   add_date timestamp NULL DEFAULT NULL,
+  status_sync int(1) DEFAULT '0',
+  status_date timestamp NULL DEFAULT NULL,
+  status_desc varchar(250) NOT NULL,
   PRIMARY KEY (transaction_smbi_map_id)
 );
 
