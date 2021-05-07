@@ -28,7 +28,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.management.ManagementFactory;
+import java.net.HttpURLConnection;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -737,10 +740,8 @@ public class UtilityBean implements Serializable {
         return n;
     }
 
-//    public static void main(String[] args) {
-//        //new UtilityBean().sampleSendInvoice();
-//        double x=1.0*101/50;
-//        System.out.println("AA:" + Math.ceil(x));
+//    public static void main(String[] args) throws ProtocolException, IOException {
+//        
 //    }
     public List<ThreadClass> getRunningThreads() {
         List<ThreadClass> objs = new ArrayList<>();

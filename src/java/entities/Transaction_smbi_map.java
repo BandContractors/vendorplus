@@ -19,6 +19,9 @@ public class Transaction_smbi_map implements Serializable {
     private int status_sync;
     private Date status_date;
     private String status_desc;
+    //for report
+    private String transaction_type_name;
+    private long ItemCount;
 
     /**
      * @return the transaction_smbi_map_id
@@ -144,5 +147,33 @@ public class Transaction_smbi_map implements Serializable {
      */
     public void setStatus_desc(String status_desc) {
         this.status_desc = status_desc;
+    }
+
+    /**
+     * @return the transaction_type_name
+     */
+    public String getTransaction_type_name() {
+        return transaction_type_name;
+    }
+
+    /**
+     * @param transaction_type_name the transaction_type_name to set
+     */
+    public void setTransaction_type_name(String transaction_type_name) {
+        this.transaction_type_name = transaction_type_name;
+    }
+
+    /**
+     * @return the ItemCount
+     */
+    public long getItemCount() {
+        return ItemCount;
+    }
+
+    /**
+     * @param ItemCount the ItemCount to set
+     */
+    public void setItemCount(long ItemCount) {
+        this.ItemCount = ItemCount;
     }
 }
