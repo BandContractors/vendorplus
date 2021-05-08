@@ -57,11 +57,13 @@ CREATE TABLE transaction_smbi_map (
   status_desc varchar(250) NOT NULL,
   PRIMARY KEY (transaction_smbi_map_id)
 );
-
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_15',58,Now(),'6.0','');
 
-
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (78, 'API', 'API_SMBI_SYNC_JOB_REPEAT_AFTER','10','Time in Minutes the Sync Job to SMbi should take before repeating');
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_15',66,Now(),'6.0','');
 
 
 

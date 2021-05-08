@@ -126,7 +126,7 @@
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
-                        <p:ajax listener="#{transaction_smbi_mapBean.updateNotSyncedAndCallSyncJob(itm.transaction_smbi_map_id)}" update="tblDetail"/>
+                        <p:ajax listener="#{transaction_smbi_mapBean.updateNotSyncedAndCallSyncJob(itm.transaction_smbi_map_id,itm.status_sync)}" update="tblDetail"/>
                     </p:commandButton>
                 </p:column>
             </p:dataTable>

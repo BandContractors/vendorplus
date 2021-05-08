@@ -106,7 +106,7 @@ public class SMbiBean implements Serializable {
                 json = gson.toJson(invBean);
                 System.out.println("invBean:" + json);
                 com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
-                WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_SMBI_URL").getParameter_value());
+                WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextName("API", "API_SMBI_URL").getParameter_value());
                 ClientResponse response = webResource.type("application/json").post(ClientResponse.class, json);
                 String output = response.getEntity(String.class);
                 Status s = gson.fromJson(output, Status.class);

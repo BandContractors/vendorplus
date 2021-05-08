@@ -10,6 +10,7 @@ public class Bi_stg_sale_invoiceBean implements Serializable {
     private static final long serialVersionUID = 1L;
     private Bi_stg_sale_invoice saleInvoice;
     private List<Bi_stg_sale_invoice_item> saleInvoiceItems;
+    private String transactionType="SALE INVOICE";
 
     /**
      * @return the saleInvoice
@@ -37,5 +38,19 @@ public class Bi_stg_sale_invoiceBean implements Serializable {
      */
     public void setSaleInvoiceItems(List<Bi_stg_sale_invoice_item> saleInvoiceItems) {
         this.saleInvoiceItems = saleInvoiceItems;
+    }
+
+    /**
+     * @return the transactionType
+     */
+    public String getTransactionType() {
+        return transactionType;
+    }
+
+    /**
+     * @param transactionType the transactionType to set
+     */
+    public void setTransactionType(String transactionType) {
+        this.transactionType = transactionType;
     }
 }

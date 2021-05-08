@@ -5,9 +5,10 @@
  */
 package api;
 
+import api_sm_bi.CheckApiBean;
+import api_sm_bi.SMbiBean;
 import beans.Cdc_generalBean;
 import beans.Parameter_listBean;
-import connections.DBConnection;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Date;
@@ -22,15 +23,17 @@ public class TaskManager {
 
     public void startTask() {
         try {
+            //A) Branch level tasks such as snapshots, etc.
             long RepeatAfter = 24 * 60 * 60 * 1000;//1000 mls=1 sec
-            DBConnection.readConnectionConfigurations("configurations.ConfigFile");
-            new Parameter_listBean().refreshSavedParameterLists();
+            //DBConnection.readConnectionConfigurations("configurations.ConfigFile");
+            //new Parameter_listBean().refreshSavedParameterLists();
             //0:server_start,1:first_login,specific_time_e.g_00:00
             String DailySnapshotTime = "";
             try {
-                DailySnapshotTime = new Parameter_listBean().getParameter_listByContextNameMemory("SNAPSHOT", "DAILY_SNAPSHOT_TIME").getParameter_value();
+                DailySnapshotTime = new Parameter_listBean().getParameter_listByContextName("SNAPSHOT", "DAILY_SNAPSHOT_TIME").getParameter_value();
             } catch (Exception e) {
             }
+            //System.out.println("DailySnapshotTime:" + DailySnapshotTime);
             if (DailySnapshotTime.equals("0")) {//server/tomcat start
                 //STOCK-check if it hasnt been taken
                 if (new Cdc_generalBean().isTodaySnapshotFoundSTOCK()) {
@@ -54,6 +57,20 @@ public class TaskManager {
                     //do nothing
                 }
             }
+            //A) Inter-Branch level tasks such as SMbi.
+            long RepeatAfterMinutes = 0;
+            try {
+                RepeatAfterMinutes = Long.parseLong(new Parameter_listBean().getParameter_listByContextName("API", "API_SMBI_SYNC_JOB_REPEAT_AFTER").getParameter_value());
+            } catch (Exception e) {
+            }
+            //System.out.println("RepeatAfterMinutes:" + RepeatAfterMinutes);
+            //1000 mls=1 sec
+            long DelayMilliseconds = 1000;
+            long RepeatAfterMilliseconds = 1000 * 60 * RepeatAfterMinutes;
+            if (RepeatAfterMinutes > 0 && new Parameter_listBean().getParameter_listByContextName("API", "API_SMBI_URL").getParameter_value().length() > 0) {
+                //System.out.println("SCHEDULE:" + new Date().toString());
+                timer.schedule(new PeriodicTaskSyncSmBi(), DelayMilliseconds, RepeatAfterMilliseconds);
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -66,6 +83,20 @@ public class TaskManager {
             try {
                 new Cdc_generalBean().takeNewSnapshot_stock();
                 new Cdc_generalBean().takeNewSnapshot_cash();
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    private class PeriodicTaskSyncSmBi extends TimerTask {
+
+        @Override
+        public void run() {
+            try {
+                //System.out.println("TASK:" + new Date().toString());
+                if (new CheckApiBean().IsSmBiAvailable() && new Parameter_listBean().getParameter_listByContextName("API", "API_SMBI_URL").getParameter_value().length() > 0) {
+                    new SMbiBean().syncSMbiCallThread();
+                }
             } catch (Exception e) {
             }
         }

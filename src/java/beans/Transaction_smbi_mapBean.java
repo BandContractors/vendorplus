@@ -1,5 +1,6 @@
 package beans;
 
+import api_sm_bi.CheckApiBean;
 import api_sm_bi.SMbiBean;
 import connections.DBConnection;
 import entities.CompanySetting;
@@ -192,11 +193,15 @@ public class Transaction_smbi_mapBean implements Serializable {
         return saved;
     }
 
-    public void updateNotSyncedAndCallSyncJob(long aTransaction_smbi_map_id) {
+    public void updateNotSyncedAndCallSyncJob(long aTransaction_smbi_map_id, int aCurrent_status_sync) {
         try {
-            if(aTransaction_smbi_map_id>0){
-                int x=this.updateTransaction_smbi_map(0,new CompanySetting().getCURRENT_SERVER_DATE(), "", aTransaction_smbi_map_id);
-                new SMbiBean().syncSMbiCallThread();
+            if (aTransaction_smbi_map_id > 0) {
+                if (aCurrent_status_sync == 2) {
+                    int x = this.updateTransaction_smbi_map(0, new CompanySetting().getCURRENT_SERVER_DATE(), "", aTransaction_smbi_map_id);
+                }
+                if (new CheckApiBean().IsSmBiAvailable() && new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_SMBI_URL").getParameter_value().length() > 0) {
+                    new SMbiBean().syncSMbiCallThread();
+                }
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);

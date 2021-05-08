@@ -3,6 +3,7 @@ package utilities;
 import api_sm_bi.Bi_stg_sale_invoice;
 import api_sm_bi.Bi_stg_sale_invoiceBean;
 import api_sm_bi.Bi_stg_sale_invoice_item;
+import api_sm_bi.CheckApiBean;
 import api_tax.efris_bean.T124;
 import beans.AccCurrencyBean;
 import beans.AccJournalBean;
@@ -740,9 +741,10 @@ public class UtilityBean implements Serializable {
         return n;
     }
 
-//    public static void main(String[] args) throws ProtocolException, IOException {
-//        
+//    public static void main(String[] args) {
+//        System.out.println("response:" + new CheckApiBean().IsSmBiAvailable());
 //    }
+
     public List<ThreadClass> getRunningThreads() {
         List<ThreadClass> objs = new ArrayList<>();
         Set<Thread> threads = Thread.getAllStackTraces().keySet();

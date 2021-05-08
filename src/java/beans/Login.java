@@ -282,9 +282,9 @@ public class Login implements Serializable {
                         new Cdc_generalBean().takeNewSnapshot_AesPublicKeyAtLogin();
                     }
                     //API-SMb
-                    if (new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_SMBI_URL").getParameter_value().length() > 0) {
-                        new SMbiBean().syncSMbiCallThread();
-                    }
+//                    if (new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_SMBI_URL").getParameter_value().length() > 0) {
+//                        new SMbiBean().syncSMbiCallThread();
+//                    }
                     //Navigate to the Menu or Home page
                     FacesContext fc = FacesContext.getCurrentInstance();
                     ConfigurableNavigationHandler nav = (ConfigurableNavigationHandler) fc.getApplication().getNavigationHandler();
