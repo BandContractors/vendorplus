@@ -95,7 +95,7 @@ public class TaskManager {
             try {
                 //System.out.println("TASK:" + new Date().toString());
                 if (new CheckApiBean().IsSmBiAvailable() && new Parameter_listBean().getParameter_listByContextName("API", "API_SMBI_URL").getParameter_value().length() > 0) {
-                    new SMbiBean().syncSMbiCallThread();
+                    new SMbiBean().syncSMbiCall();
                 }
             } catch (Exception e) {
             }

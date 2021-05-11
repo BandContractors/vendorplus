@@ -200,7 +200,7 @@ public class Transaction_smbi_mapBean implements Serializable {
                     int x = this.updateTransaction_smbi_map(0, new CompanySetting().getCURRENT_SERVER_DATE(), "", aTransaction_smbi_map_id);
                 }
                 if (new CheckApiBean().IsSmBiAvailable() && new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_SMBI_URL").getParameter_value().length() > 0) {
-                    new SMbiBean().syncSMbiCallThread();
+                    new SMbiBean().syncSMbiCall();
                 }
             }
         } catch (Exception e) {
