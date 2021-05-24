@@ -1,5 +1,6 @@
 package beans;
 
+import api_tax.efris_bean.TaxpayerBean;
 import sessions.GeneralUserSetting;
 import connections.DBConnection;
 import entities.AccCoa;
@@ -19,6 +20,7 @@ import entities.Store;
 import entities.SubCategory;
 import entities.Trans;
 import entities.TransactionReason;
+import entities.Transactor;
 import java.io.Serializable;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -6137,6 +6139,37 @@ public class TransItemBean implements Serializable {
             //get current stock
             if (aTransTypeId == 4) {
                 new TransItemBean().refreshCurrentStock(aActiveTransItems);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void checkExemptTaxpayer(long aTransactorId, TransItem aTransItem) {
+        try {
+            String TIN = "";
+            String ItemCategoryCode = "";
+            try {
+                TIN = new TransactorBean().getTransactor(aTransactorId).getTaxIdentity();
+            } catch (Exception e) {
+                //
+            }
+            try {
+                ItemCategoryCode = new Item_tax_mapBean().getItem_tax_mapSynced(aTransItem.getItemId()).getItem_code_tax();
+            } catch (Exception e) {
+                //
+            }
+            if (TIN.length() > 0 && ItemCategoryCode.length() > 0) {
+                String APIMode = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_MODE").getParameter_value();
+                int CommTaxpayerCode = new TaxpayerBean().checkDeemedExemptTaxpayer(APIMode, TIN, ItemCategoryCode);
+                //0 Error, 1 Normal, 2 Exempt, 3 Deemed
+                if (CommTaxpayerCode == 2) {
+                    aTransItem.setVatRated2("EXEMPT");
+                } else if (CommTaxpayerCode == 1 || CommTaxpayerCode == 3) {
+                    FacesContext.getCurrentInstance().addMessage("", new FacesMessage("Item Not Exempt for Taxpayer"));
+                } else {
+                    FacesContext.getCurrentInstance().addMessage("", new FacesMessage("Error Occurred"));
+                }
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);

@@ -228,10 +228,11 @@
                 </p:remoteCommand>
             </h:panelGrid>
             <h:panelGrid id="pgrdOverrideWarranty" columns="2">
-                <h:panelGrid id="pgrdOverride2" columns="3" rendered="#{transItem.overridePrices}">
+                <h:panelGrid id="pgrdOverride2" columns="4" rendered="#{transItem.overridePrices}">
                     <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="UnitPrice(New)"/>
                     <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="TradeDisc(New)"/>
                     <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="VATRated(New)"/>
+                    <h:outputLabel value=""/>
 
                     <h:inputText id="itxtUnitPrice2" styleClass="clsInputTransItem" style="width: 150px" disabled="false" value="#{transItem.unitPrice2}" autocomplete="off">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -242,6 +243,9 @@
                     <h:selectOneMenu styleClass="clsMenu" style="width: 150px" id="menuVatRated2" value="#{transItem.vatRated2}">
                         <f:selectItems value="#{utilityBean.getStringArrayFromCommaSeperatedStr(itemBean.selectedItem.vatRated)}"/>
                     </h:selectOneMenu>
+                    <h:commandButton value="Check Exempt">
+                        <f:ajax listener="#{transItemBean.checkExemptTaxpayer(trans.transactorId,transItem)}" execute="@form" render="gridTransItem gridItemStatus pgrdMsgs"/>
+                    </h:commandButton>
                 </h:panelGrid>
                 <h:panelGrid id="pgrdWarranty2" columns="2" rendered="#{transItem.specifyWarranty}">
                     <h:outputLabel styleClass="clsLabelTransItem" style="width: 200px" value="Warranty"/>
