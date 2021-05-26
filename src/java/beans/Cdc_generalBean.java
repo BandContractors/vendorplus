@@ -429,7 +429,10 @@ public class Cdc_generalBean implements Serializable {
             Cdc_general cdcgenSaved = this.getCdc_generalByJobId(cdcid);
             if (null != cdcgenSaved) {
                 int saved = new SecurityPKI().saveNewAesPublicKey();
-                long recordsInserted = 1;
+                long recordsInserted = 0;
+                if (saved == 1) {
+                    recordsInserted = 1;
+                }
                 Cdc_general cdcgenUpdate = new Cdc_general();
                 cdcgenUpdate.setCdc_general_id(cdcgenSaved.getCdc_general_id());
                 cdcgenUpdate.setRecords_affected(recordsInserted);

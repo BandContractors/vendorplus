@@ -30,12 +30,15 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONObject;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 @ManagedBean
 @SessionScoped
 public class SecurityPKI implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    static Logger LOGGER = Logger.getLogger(SecurityPKI.class.getName());
 
     public PrivateKey getPrivate(String aFilename, String aPassword, String aAlias) throws Exception {
         InputStream ins = new FileInputStream(aFilename);
@@ -78,7 +81,7 @@ public class SecurityPKI implements Serializable {
             byte[] byteArray = Base64.decodeBase64(strToDecrypt); //Base64.getDecoder().decode(strToDecrypt);
             return new String(cipher.doFinal(byteArray));
         } catch (Exception e) {
-            System.out.println("Error while decrypting: " + e.toString());
+            LOGGER.log(Level.ERROR, e);
         }
         return null;
     }
@@ -96,7 +99,6 @@ public class SecurityPKI implements Serializable {
         X509EncodedKeySpec X509publicKey = new X509EncodedKeySpec(byteKey);
         KeyFactory kf = KeyFactory.getInstance("RSA");
         PublicKey publicKey = kf.generatePublic(X509publicKey);
-
         return publicKey;
     }
 
@@ -147,7 +149,7 @@ public class SecurityPKI implements Serializable {
             cipher.init(Cipher.ENCRYPT_MODE, originalKey);
             return Base64.encodeBase64String(cipher.doFinal(strToEncrypt.getBytes("UTF-8")));
         } catch (Exception e) {
-            System.out.println("Error while encrypting: " + e.toString());
+            LOGGER.log(Level.ERROR, e);
         }
         return null;
     }
@@ -163,7 +165,7 @@ public class SecurityPKI implements Serializable {
             byte[] byteArray = Base64.decodeBase64(strToDecrypt); //Base64.getDecoder().decode(strToDecrypt);
             return new String(cipher.doFinal(byteArray));
         } catch (Exception e) {
-            System.out.println("Error while decrypting: " + e.toString());
+            LOGGER.log(Level.ERROR, e);
         }
         return null;
     }
@@ -175,7 +177,7 @@ public class SecurityPKI implements Serializable {
             cipher.init(Cipher.DECRYPT_MODE, originalKey);
             return new String(cipher.doFinal(strToDecrypt));
         } catch (Exception e) {
-            System.out.println("Error while decrypting(AESdecrypt2): " + e.toString());
+            LOGGER.log(Level.ERROR, e);
         }
         return null;
     }
@@ -202,7 +204,7 @@ public class SecurityPKI implements Serializable {
             cipher.init(Cipher.ENCRYPT_MODE, originalKey);
             return Base64.encodeBase64String(cipher.doFinal(strToEncrypt.getBytes("UTF-8")));
         } catch (Exception e) {
-            System.out.println("Error while encrypting: " + e.toString());
+            LOGGER.log(Level.ERROR, e);
         }
         return null;
     }
@@ -218,7 +220,7 @@ public class SecurityPKI implements Serializable {
             byte[] byteArray = Base64.decodeBase64(strToDecrypt); //Base64.getDecoder().decode(strToDecrypt);
             return new String(cipher.doFinal(byteArray));
         } catch (Exception e) {
-            System.out.println("Error while decrypting: " + e.toString());
+            LOGGER.log(Level.ERROR, e);
         }
         return null;
     }
@@ -230,7 +232,7 @@ public class SecurityPKI implements Serializable {
             AesPublicKey = SecurityPKI.decrypt(this.AESPublicKey(CompanySetting.getTaxIdentity(), new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value()), key);
         } catch (Exception e) {
             AesPublicKey = "";
-            System.out.println("getNewAesPublicKey:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return AesPublicKey;
     }
@@ -248,7 +250,7 @@ public class SecurityPKI implements Serializable {
                 saved = 1;
             }
         } catch (Exception e) {
-            System.out.println("saveNewAesPublicKey:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return saved;
     }
