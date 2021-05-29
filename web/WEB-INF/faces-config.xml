@@ -17,6 +17,17 @@
             <base-name>ConfigFile</base-name>
             <var>ConfigFile</var>
         </resource-bundle>
-
+        <resource-bundle>
+            <base-name>language_en</base-name>
+            <var>en</var>
+        </resource-bundle>
+        <resource-bundle>
+            <base-name>language_fr</base-name>
+            <var>fr</var>
+        </resource-bundle>
+        <resource-bundle>
+            <base-name>language_zh_CN</base-name>
+            <var>zh_CN</var>
+        </resource-bundle>
     </application>
 </faces-config>

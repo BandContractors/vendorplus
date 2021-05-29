@@ -10,7 +10,6 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.faces.application.FacesMessage;
@@ -116,6 +115,16 @@ public class UserDetailBean implements Serializable {
                 aUserDetail.setTrans_code("");
             } else {
                 aUserDetail.setTrans_code(Security.Decrypt(aResultSet.getString("trans_code")));
+            }
+            if (null == aResultSet.getString("language_system")) {
+                aUserDetail.setLanguage_system("");
+            } else {
+                aUserDetail.setLanguage_system(aResultSet.getString("language_system"));
+            }
+            if (null == aResultSet.getString("language_output")) {
+                aUserDetail.setLanguage_output("");
+            } else {
+                aUserDetail.setLanguage_output(aResultSet.getString("language_output"));
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -223,9 +232,9 @@ public class UserDetailBean implements Serializable {
         } else {
 
             if (userdetail.getUserDetailId() == 0) {
-                sql = "{call sp_insert_user_detail(?,?,?,?,?,?,?,?,?,?,?,?)}";
+                sql = "{call sp_insert_user_detail(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
             } else if (userdetail.getUserDetailId() > 0) {
-                sql = "{call sp_update_user_detail(?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+                sql = "{call sp_update_user_detail(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
             }
 
             try (
@@ -244,6 +253,8 @@ public class UserDetailBean implements Serializable {
                     cs.setString("in_email_address", userdetail.getEmail_address());
                     cs.setString("in_phone_no", userdetail.getPhone_no());
                     cs.setString("in_trans_code", Security.Encrypt(userdetail.getTrans_code()));
+                    cs.setString("in_language_system", userdetail.getLanguage_system());
+                    cs.setString("in_language_output", userdetail.getLanguage_output());
                     cs.executeUpdate();
                     this.setActionMessage("Saved Successfully");
                     this.clearUserDetail(userdetail);
@@ -262,6 +273,8 @@ public class UserDetailBean implements Serializable {
                     cs.setString("in_email_address", userdetail.getEmail_address());
                     cs.setString("in_phone_no", userdetail.getPhone_no());
                     cs.setString("in_trans_code", Security.Encrypt(userdetail.getTrans_code()));
+                    cs.setString("in_language_system", userdetail.getLanguage_system());
+                    cs.setString("in_language_output", userdetail.getLanguage_output());
                     cs.executeUpdate();
                     this.setActionMessage("Saved Successfully");
                     this.clearUserDetail(userdetail);
@@ -463,6 +476,8 @@ public class UserDetailBean implements Serializable {
             UserDetailTo.setEmail_address(UserDetailFrom.getEmail_address());
             UserDetailTo.setPhone_no(UserDetailFrom.getPhone_no());
             UserDetailTo.setTrans_code(UserDetailFrom.getTrans_code());
+            UserDetailTo.setLanguage_system(UserDetailFrom.getLanguage_system());
+            UserDetailTo.setLanguage_output(UserDetailFrom.getLanguage_output());
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -485,6 +500,8 @@ public class UserDetailBean implements Serializable {
             userdetail.setPhone_no("");
             userdetail.setTrans_code("");
             userdetail.setNew_trans_code("");
+            userdetail.setLanguage_system("");
+            userdetail.setLanguage_output("");
         }
     }
 

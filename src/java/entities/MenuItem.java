@@ -32,7 +32,10 @@ public class MenuItem implements Serializable {
     private String DEFAULT_FOCUS_CONTROL_ID;
     private int ENABLE_AUTO_COMPLETE_ITEM_SEARCH;
     private int PURCHASE_INVOICE_MODE;
-    
+    private String LANG_VAR_SYS;
+    private String LANG_VAR_OUT;
+    private String LANG_BASE_NAME_SYS;
+    private String LANG_BASE_NAME_OUT;
 
     /**
      * @return the SYSTEM_NAME
@@ -224,7 +227,8 @@ public class MenuItem implements Serializable {
     }
 
     /**
-     * @param ENABLE_AUTO_COMPLETE_ITEM_SEARCH the ENABLE_AUTO_COMPLETE_ITEM_SEARCH to set
+     * @param ENABLE_AUTO_COMPLETE_ITEM_SEARCH the
+     * ENABLE_AUTO_COMPLETE_ITEM_SEARCH to set
      */
     public void setENABLE_AUTO_COMPLETE_ITEM_SEARCH(int ENABLE_AUTO_COMPLETE_ITEM_SEARCH) {
         this.ENABLE_AUTO_COMPLETE_ITEM_SEARCH = ENABLE_AUTO_COMPLETE_ITEM_SEARCH;
@@ -242,5 +246,61 @@ public class MenuItem implements Serializable {
      */
     public void setPURCHASE_INVOICE_MODE(int PURCHASE_INVOICE_MODE) {
         this.PURCHASE_INVOICE_MODE = PURCHASE_INVOICE_MODE;
+    }
+
+    /**
+     * @return the LANG_VAR_SYS
+     */
+    public String getLANG_VAR_SYS() {
+        return LANG_VAR_SYS;
+    }
+
+    /**
+     * @param LANG_VAR_SYS the LANG_VAR_SYS to set
+     */
+    public void setLANG_VAR_SYS(String LANG_VAR_SYS) {
+        this.LANG_VAR_SYS = LANG_VAR_SYS;
+    }
+
+    /**
+     * @return the LANG_VAR_OUT
+     */
+    public String getLANG_VAR_OUT() {
+        return LANG_VAR_OUT;
+    }
+
+    /**
+     * @param LANG_VAR_OUT the LANG_VAR_OUT to set
+     */
+    public void setLANG_VAR_OUT(String LANG_VAR_OUT) {
+        this.LANG_VAR_OUT = LANG_VAR_OUT;
+    }
+
+    /**
+     * @return the LANG_BASE_NAME_SYS
+     */
+    public String getLANG_BASE_NAME_SYS() {
+        return LANG_BASE_NAME_SYS;
+    }
+
+    /**
+     * @param LANG_BASE_NAME_SYS the LANG_BASE_NAME_SYS to set
+     */
+    public void setLANG_BASE_NAME_SYS(String LANG_BASE_NAME_SYS) {
+        this.LANG_BASE_NAME_SYS = LANG_BASE_NAME_SYS;
+    }
+
+    /**
+     * @return the LANG_BASE_NAME_OUT
+     */
+    public String getLANG_BASE_NAME_OUT() {
+        return LANG_BASE_NAME_OUT;
+    }
+
+    /**
+     * @param LANG_BASE_NAME_OUT the LANG_BASE_NAME_OUT to set
+     */
+    public void setLANG_BASE_NAME_OUT(String LANG_BASE_NAME_OUT) {
+        this.LANG_BASE_NAME_OUT = LANG_BASE_NAME_OUT;
     }
 }

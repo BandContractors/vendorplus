@@ -125,6 +125,54 @@ public class MenuItemBean implements Serializable {
             } catch (NullPointerException npe) {
                 this.MenuItemObj.setPURCHASE_INVOICE_MODE(0);
             }
+            try {
+                String LangSys = "ENGLISH";
+                if (null == gus.getCurrentUser().getLanguage_system()) {
+                    //do nothing
+                } else {
+                    LangSys = gus.getCurrentUser().getLanguage_system();
+                }
+                if (LangSys.equals("ENGLISH")) {
+                    this.MenuItemObj.setLANG_VAR_SYS("en");
+                    this.MenuItemObj.setLANG_BASE_NAME_SYS("language_en");
+                } else if (LangSys.equals("SIMPLIFIED_CHINESE")) {
+                    this.MenuItemObj.setLANG_VAR_SYS("zh_CN");
+                    this.MenuItemObj.setLANG_BASE_NAME_SYS("language_zh_CN");
+                } else if (LangSys.equals("FRENCH")) {
+                    this.MenuItemObj.setLANG_VAR_SYS("fr");
+                    this.MenuItemObj.setLANG_BASE_NAME_SYS("language_fr");
+                } else {
+                    this.MenuItemObj.setLANG_VAR_SYS("en");
+                    this.MenuItemObj.setLANG_BASE_NAME_SYS("language_en");
+                }
+            } catch (Exception e) {
+                this.MenuItemObj.setLANG_VAR_SYS("en");
+                this.MenuItemObj.setLANG_BASE_NAME_SYS("language_en");
+            }
+            try {
+                String LangOut = "ENGLISH";
+                if (null == gus.getCurrentUser().getLanguage_output()) {
+                    //do nothing
+                } else {
+                    LangOut = gus.getCurrentUser().getLanguage_output();
+                }
+                if (LangOut.equals("ENGLISH")) {
+                    this.MenuItemObj.setLANG_VAR_OUT("en");//language_en
+                    this.MenuItemObj.setLANG_BASE_NAME_OUT("language_en");
+                } else if (LangOut.equals("SIMPLIFIED_CHINESE")) {
+                    this.MenuItemObj.setLANG_VAR_OUT("zh_CN");//language_zh_CN
+                    this.MenuItemObj.setLANG_BASE_NAME_OUT("language_zh_CN");
+                } else if (LangOut.equals("FRENCH")) {
+                    this.MenuItemObj.setLANG_VAR_OUT("fr");//language_fr
+                    this.MenuItemObj.setLANG_BASE_NAME_OUT("language_fr");
+                } else {
+                    this.MenuItemObj.setLANG_VAR_OUT("en");//language_en
+                    this.MenuItemObj.setLANG_BASE_NAME_OUT("language_en");
+                }
+            } catch (Exception e) {
+                this.MenuItemObj.setLANG_VAR_OUT("en");
+                this.MenuItemObj.setLANG_BASE_NAME_OUT("language_en");
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }

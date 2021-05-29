@@ -29,90 +29,101 @@
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainInput" columns="6">
-                
+
                 <h:outputLabel  value="User Name:"/>
                 <h:inputText styleClass="clsInput" id="itxtUserName" value="#{userDetail.userName}" title="Username MUST be between 5-to-20 characters" autocomplete="off" disabled="#{userDetail.userName=='system'}">
                 </h:inputText>
-                
+
                 <h:outputLabel  value="Password:" title="Password MUST be between 5-to-20 characters"/>
                 <h:inputSecret styleClass="clsInput" id="isecUserPassword" value="#{userDetail.userPassword}" redisplay="true" autocomplete="off">
                 </h:inputSecret>
-                
+
                 <h:outputLabel  value="Confirm Password:" title="Re-enter password to confirm"/>
                 <h:inputSecret styleClass="clsInput" id="isecUserPasswordConfirm" value="#{userDetail.userPasswordConfirm}" redisplay="true" autocomplete="off">
                 </h:inputSecret>
-                
+
                 <h:outputLabel  value="First Name:"/>
                 <h:inputText styleClass="clsInput" id="itxtFirstName" value="#{userDetail.firstName}" autocomplete="off" disabled="#{userDetail.userName=='system'}">
                 </h:inputText>
-                
+
                 <h:outputLabel  value="Second Name:"/>
                 <h:inputText styleClass="clsInput" id="itxtSecondName" value="#{userDetail.secondName}" autocomplete="off" disabled="#{userDetail.userName=='system'}">
                 </h:inputText>
-                
+
                 <h:outputLabel  value="Third Name:"/>
                 <h:inputText styleClass="clsInput" id="itxtThirdName" value="#{userDetail.thirdName}" autocomplete="off" disabled="#{userDetail.userName=='system'}">
                 </h:inputText>
-                
+
                 <h:outputLabel  value="Lock User?:"/>
-                <h:selectOneMenu styleClass="clsMenu" id="menuIsUserLocked" value="#{userDetail.isUserLocked}" disabled="#{userDetail.userName=='system'}">
+                <h:selectOneMenu styleClass="clsMenu" id="menuIsUserLocked" value="#{userDetail.isUserLocked}" disabled="#{userDetail.userName=='system'}" style="width: 225px;">
                     <f:selectItem itemLabel="" itemValue=""/>
                     <f:selectItem itemLabel="Yes" itemValue="Yes"/>
                     <f:selectItem itemLabel="No" itemValue="No"/>
                 </h:selectOneMenu>
-                
+
                 <h:outputLabel  value="General Admin?:"/>
-                <h:selectOneMenu styleClass="clsMenu" id="menuIsUserGenAdmin" value="#{userDetail.isUserGenAdmin}" disabled="#{userDetail.userName=='system'}">
+                <h:selectOneMenu styleClass="clsMenu" id="menuIsUserGenAdmin" value="#{userDetail.isUserGenAdmin}" disabled="#{userDetail.userName=='system'}" style="width: 225px;">
                     <f:selectItem itemLabel="" itemValue=""/>
                     <f:selectItem itemLabel="Yes" itemValue="Yes"/>
                     <f:selectItem itemLabel="No" itemValue="No"/>
                 </h:selectOneMenu>
-                
+
                 <h:outputLabel  value="User Category:"/>
-                <h:selectOneMenu styleClass="clsMenu" id="menuUserCategory" value="#{userDetail.userCategoryId}">
+                <h:selectOneMenu styleClass="clsMenu" id="menuUserCategory" value="#{userDetail.userCategoryId}" style="width: 225px;">
                     <f:selectItem itemLabel="" itemValue="0"/>
                     <f:selectItems value="#{userCategoryBean.userCategories}" var="u" itemLabel="#{u.userCategoryName}" itemValue="#{u.userCategoryId}"/>
                 </h:selectOneMenu>
-                
+
                 <h:outputLabel  value="Phone No:"/>
                 <h:inputText styleClass="clsInput" id="itxtPhone_no" value="#{userDetail.phone_no}" autocomplete="off" disabled="#{userDetail.userName=='system'}">
                 </h:inputText>
-                
+
                 <h:outputLabel  value="Email Address:"/>
                 <h:inputText styleClass="clsInput" id="itxtEmail_address" value="#{userDetail.email_address}" autocomplete="off" disabled="#{userDetail.userName=='system'}">
                 </h:inputText>
-                
+
                 <h:outputLabel  value="User Code:"/>
                 <h:inputSecret styleClass="clsInput" id="isecTrans_code" value="#{userDetail.trans_code}" redisplay="true" autocomplete="off">
                 </h:inputSecret>
-                
+
                 <h:outputLabel  value="User Image:"/>
                 <h:inputText styleClass="clsInput" id="isecUserImgUrl" value="#{userDetail.userImgUrl}" autocomplete="off"  disabled="#{userDetail.userName=='system'}">
                 </h:inputText>
+
+                <h:outputLabel  value="System Language:"/>
+                <h:selectOneMenu id="menuLanguageSystem" value="#{userDetail.language_system}" style="width: 225px;">
+                    <f:selectItem itemLabel="ENGLISH" itemValue="ENGLISH"/>
+                    <f:selectItem itemLabel="CHINESE" itemValue="SIMPLIFIED_CHINESE"/>
+                    <f:selectItem itemLabel="FRENCH" itemValue="FRENCH"/>
+                </h:selectOneMenu>
+
+                <h:outputLabel  value="Output Language:"/>
+                <h:selectOneMenu id="menuLanguageOutput" value="#{userDetail.language_output}" style="width: 225px;">
+                    <f:selectItem itemLabel="ENGLISH" itemValue="ENGLISH"/>
+                    <f:selectItem itemLabel="CHINESE" itemValue="SIMPLIFIED_CHINESE"/>
+                    <f:selectItem itemLabel="FRENCH" itemValue="FRENCH"/>
+                </h:selectOneMenu>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainCommands" columns="2">
-            <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
-                <h:commandButton styleClass="clsButton" id="cmdbSave" value="Save">
-                    <f:actionListener binding="#{userDetailBean.saveUserDetail(userDetail)}" />
-                </h:commandButton>
-                <h:commandButton styleClass="clsButton" id="cmdbClear" value="Clear">
-                    <f:actionListener binding="#{userDetailBean.clearUserDetail(userDetail)}" />
-                </h:commandButton>
-                <h:commandButton styleClass="clsButton" id="cmdbDelete" value="Delete" onclick="return confirmDelete();">
-                    <f:actionListener binding="#{userDetailBean.deleteUserDetail(userDetail)}" />
-                </h:commandButton>
-            </h:panelGrid>
-            <h:panelGrid styleClass="clsGridMainCommands2" columns="4">
-            </h:panelGrid>
-
+                <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
+                    <h:commandButton styleClass="clsButton" id="cmdbSave" value="Save">
+                        <f:actionListener binding="#{userDetailBean.saveUserDetail(userDetail)}" />
+                    </h:commandButton>
+                    <h:commandButton styleClass="clsButton" id="cmdbClear" value="Clear">
+                        <f:actionListener binding="#{userDetailBean.clearUserDetail(userDetail)}" />
+                    </h:commandButton>
+                    <h:commandButton styleClass="clsButton" id="cmdbDelete" value="Delete" onclick="return confirmDelete();">
+                        <f:actionListener binding="#{userDetailBean.deleteUserDetail(userDetail)}" />
+                    </h:commandButton>
+                </h:panelGrid>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainMessages" columns="1">
                 <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{userDetailBean.actionMessage}"/>
                 <h:messages id="msgsMainMessage" style="color: red"/><br/>
             </h:panelGrid>
-            
+
             <h:panelGrid styleClass="clsGridMainSearch" columns="1">
                 <h:outputLabel id="olblMainSearch" value="Search Users"/>
                 <h:outputLabel id="olblMainSearchDesc" value="(Search by username or any of the names(First,Second,Third)!)"/>
@@ -133,43 +144,43 @@
                     <!-- row record -->
                     #{u.userName}
                 </h:column>
-                
+
                 <h:column>
                     <!-- column header -->
                     <f:facet name="header">First Name</f:facet>
                     <!-- row record -->
                     #{u.firstName}
                 </h:column>
-                
+
                 <h:column>
                     <!-- column header -->
                     <f:facet name="header">Second Name</f:facet>
                     <!-- row record -->
                     #{u.secondName}
                 </h:column>
-                
+
                 <h:column>
                     <!-- column header -->
                     <f:facet name="header">Third Name</f:facet>
                     <!-- row record -->
                     #{u.thirdName}
                 </h:column>
-                
+
                 <h:column>
                     <!-- column header -->
                     <f:facet name="header">Locked?</f:facet>
                     <!-- row record -->
                     #{u.isUserLocked}
                 </h:column>
-                
+
                 <h:column>
                     <!-- column header -->
                     <f:facet name="header">Admin</f:facet>
                     <!-- row record -->
                     #{u.isUserGenAdmin}
                 </h:column>
-                
-                 <h:column>
+
+                <h:column>
                     <!-- column header -->
                     <f:facet name="header">User Category</f:facet>
                     <!-- row record -->
@@ -183,7 +194,7 @@
                     <h:commandLink value="Edit" action="#{userDetailBean.displayUserDetail(u,userDetail)}" />
                     &nbsp;
                 </h:column>
-                
+
             </h:dataTable>
 
         </h:form>

@@ -413,7 +413,9 @@ CREATE PROCEDURE sp_insert_user_detail
 	IN in_user_img_url varchar(255),
 	IN in_email_address varchar(100),
 	IN in_phone_no varchar(50),
-	IN in_trans_code varchar(255)
+	IN in_trans_code varchar(255),
+    IN in_language_system varchar(50),
+    IN in_language_output varchar(50)
 ) 
 BEGIN 
 	SET @new_id=0;
@@ -438,7 +440,9 @@ BEGIN
 		user_img_url,
 		email_address,
 		phone_no,
-		trans_code
+		trans_code,
+        language_system,
+		language_output
 	) 
     VALUES
 	(
@@ -456,7 +460,9 @@ BEGIN
 		in_user_img_url,
 		in_email_address,
 		in_phone_no,
-		in_trans_code
+		in_trans_code,
+        in_language_system,
+		in_language_output
 	); 
 END//
 DELIMITER ;
@@ -477,7 +483,9 @@ CREATE PROCEDURE sp_update_user_detail
 	IN in_user_img_url varchar(255),
 	IN in_email_address varchar(100),
 	IN in_phone_no varchar(50),
-	IN in_trans_code varchar(255)
+	IN in_trans_code varchar(255),
+    IN in_language_system varchar(50),
+    IN in_language_output varchar(50)
 ) 
 BEGIN 
 
@@ -497,7 +505,9 @@ BEGIN
 		user_img_url=in_user_img_url,
 		email_address=in_email_address,
 		phone_no=in_phone_no,
-		trans_code=in_trans_code 
+		trans_code=in_trans_code,
+        language_system=in_language_system,
+		language_output=in_language_output 
 	WHERE user_detail_id=in_user_detail_id; 
 END//
 DELIMITER ;

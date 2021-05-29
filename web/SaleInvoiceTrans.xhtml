@@ -22,7 +22,7 @@
             function doPrintHiddenClick() {
                 document.getElementById("TransactionFormSales:cmdbvPrint").click();
             }
-        </script> 
+        </script>
     </h:head>
     <f:metadata>
         <f:viewAction action="#{accCurrencyBean.refreshCurrencyListActive()}"/>
@@ -276,10 +276,10 @@
                 </h:panelGrid>
             </h:panelGrid>
             <h:panelGrid id="pgrdItemCommands" columns="2">
-                <h:commandButton styleClass="clsButtonMedium" value="Add Item (ALT+A)" accesskey="a">
+                <h:commandButton styleClass="clsButtonMedium" value="#{langsys['Add']} #{langsys['Item']} (ALT+A)" accesskey="a">
                     <f:ajax listener="#{transItemBean.addTransItemCallCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentSaleType,trans,statusBean,transItemBean.activeTransItems,transItem,itemBean.selectedItem)}" execute="@form" render="gridTransItem pgrdOverrideWarranty pgrdSpecific gridItemStatus dtblTransactionItem pgrdTotals pgrdScheme pgrdPayment pgrdMsgs"/>
                 </h:commandButton>
-                <h:commandButton styleClass="clsButtonMedium" value="Clear Item (ALT+R)" accesskey="r">
+                <h:commandButton styleClass="clsButtonMedium" value="#{langsys['Clear']} #{langsys['Item']} (ALT+R)" accesskey="r">
                     <f:ajax listener="#{transBean.clearAll(trans,transItemBean.activeTransItems,transItem,itemBean.selectedItem,transactorBean.selectedTransactor,1,null)}" execute="@form" render="gridTransItem pgrdOverrideWarranty pgrdSpecific"/>
                 </h:commandButton>
             </h:panelGrid>

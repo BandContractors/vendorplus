@@ -37,6 +37,8 @@ public class UserDetail implements Serializable {
     private String phone_no;
     private String trans_code;
     private String new_trans_code;
+    private String language_system;
+    private String language_output;
 
     /**
      * @return the UserDetailId
@@ -288,6 +290,34 @@ public class UserDetail implements Serializable {
      */
     public void setNew_trans_code(String new_trans_code) {
         this.new_trans_code = new_trans_code;
+    }
+
+    /**
+     * @return the language_system
+     */
+    public String getLanguage_system() {
+        return language_system;
+    }
+
+    /**
+     * @param language_system the language_system to set
+     */
+    public void setLanguage_system(String language_system) {
+        this.language_system = language_system;
+    }
+
+    /**
+     * @return the language_output
+     */
+    public String getLanguage_output() {
+        return language_output;
+    }
+
+    /**
+     * @param language_output the language_output to set
+     */
+    public void setLanguage_output(String language_output) {
+        this.language_output = language_output;
     }
     
     

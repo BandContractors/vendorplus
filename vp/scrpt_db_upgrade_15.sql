@@ -65,6 +65,16 @@ VALUES (78, 'API', 'API_SMBI_SYNC_JOB_REPEAT_AFTER','10','Time in Minutes the Sy
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_15',66,Now(),'6.0','');
 
+UPDATE parameter_list SET description = 'Currency formatting Language [Locale Code]  e.g en for Englidh, fr for French' WHERE (parameter_list_id = '18');
+UPDATE parameter_list SET description = 'Currency formatting [Country Code]  e.g US for USA' WHERE (parameter_list_id = '19');
+
+ALTER TABLE user_detail 
+ADD COLUMN language_system VARCHAR(50) NOT NULL DEFAULT 'ENGLISH',
+ADD COLUMN language_output VARCHAR(50) NOT NULL DEFAULT 'ENGLISH';
+
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_15',76,Now(),'6.0','');
+
 
 
 
