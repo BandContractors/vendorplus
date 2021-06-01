@@ -743,11 +743,7 @@ public class UtilityBean implements Serializable {
     }
 
 //    public static void main(String[] args) {
-//        //System.out.println("response:" + new CheckApiBean().IsSmBiAvailable());
-//        String json = "{\"transactionType\":\"CHECK API\"}";
-//        JSONObject parentjob = new JSONObject(json);
-//        String a=parentjob.getString("transactionType");
-//        System.out.println(parentjob.getString("transactionType"));
+//        System.out.println("A-Exempt".toUpperCase().contains("eXempt".toUpperCase()));
 //    }
 
     public List<ThreadClass> getRunningThreads() {

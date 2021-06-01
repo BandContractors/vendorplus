@@ -37,15 +37,15 @@ public class SellerDetails {
 
     public SellerDetails() {
         this.address = "";
-        this.businessName="";
-        this.emailAddress="";
-        this.legalName="";
-        this.linePhone="";
-        this.mobilePhone="";
-        this.ninBrn="";
-        this.placeOfBusiness="";
-        this.referenceNo="";
-        this.tin="";
+        this.businessName = "";
+        this.emailAddress = "";
+        this.legalName = "";
+        this.linePhone = "";
+        this.mobilePhone = "";
+        this.ninBrn = "";
+        this.placeOfBusiness = "";
+        this.referenceNo = "";
+        this.tin = "";
     }
 
     // Getter Methods 

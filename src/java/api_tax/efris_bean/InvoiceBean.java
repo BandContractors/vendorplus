@@ -373,6 +373,7 @@ public class InvoiceBean implements Serializable {
             if (TotalVat > 0) {
                 td = new TaxDetails();
                 td.setGrossAmount(ub.formatDoublePlain2DP(TotalAmountIncVatR));
+                td.setTaxCategoryCode("01");
                 td.setTaxCategory("Standard");
                 td.setTaxRateName("VAT-Standard");//free entry
                 Double vatPerc = trans.getVatPerc();
@@ -387,6 +388,7 @@ public class InvoiceBean implements Serializable {
             if (TotalAmountExempt > 0) {
                 td = new TaxDetails();
                 td.setGrossAmount(ub.formatDoublePlain2DP(TotalAmountExemptR));
+                td.setTaxCategoryCode("03");
                 td.setTaxCategory("Exempt");
                 td.setTaxRateName("VAT-Exempt");//free entry
                 td.setTaxRate("-");
@@ -398,6 +400,7 @@ public class InvoiceBean implements Serializable {
             if (TotalAmountZero > 0) {
                 td = new TaxDetails();
                 td.setGrossAmount(ub.formatDoublePlain2DP(TotalAmountZeroR));
+                td.setTaxCategoryCode("02");
                 td.setTaxCategory("Zero");
                 td.setTaxRateName("VAT-Zero");//free entry
                 td.setTaxRate("0");
@@ -949,18 +952,18 @@ public class InvoiceBean implements Serializable {
             //tax details
             for (int i = 0; i < jSONArray_TaxDetails.length(); i++) {
                 jsonObj = (JSONObject) jSONArray_TaxDetails.get(i);
-                if (TotalVat > 0 && (jsonObj.get("taxCategory").toString().equals("Standard") || Double.parseDouble(jsonObj.get("taxAmount").toString()) > 0)) {
+                if (TotalVat > 0 && (jsonObj.get("taxCategoryCode").toString().equals("01") || jsonObj.get("taxCategory").toString().toUpperCase().contains("STANDARD") || Double.parseDouble(jsonObj.get("taxAmount").toString()) > 0)) {
                     Double NetAmountR = acb.roundAmountMinTwoDps(aTrans.getCurrencyCode(), TotalAmountIncVatR - TotalVatR);
                     jsonObj.put("netAmount", "" + ub.formatDoublePlain2DP(-1 * NetAmountR) + "");
                     jsonObj.put("taxAmount", "" + ub.formatDoublePlain2DP(-1 * TotalVatR) + "");
                     jsonObj.put("grossAmount", "" + ub.formatDoublePlain2DP(-1 * TotalAmountIncVatR) + "");
                     jSONArray_TaxDetailsNew.put(jsonObj);
-                } else if (TotalAmountExempt > 0 && jsonObj.get("taxCategory").toString().equals("Exempt")) {
+                } else if (TotalAmountExempt > 0 && (jsonObj.get("taxCategoryCode").toString().equals("03") || jsonObj.get("taxCategory").toString().toUpperCase().contains("EXEMPT"))) {
                     jsonObj.put("netAmount", "" + ub.formatDoublePlain2DP(-1 * TotalAmountExemptR) + "");
                     jsonObj.put("taxAmount", "0");
                     jsonObj.put("grossAmount", "" + ub.formatDoublePlain2DP(-1 * TotalAmountExemptR) + "");
                     jSONArray_TaxDetailsNew.put(jsonObj);
-                } else if (TotalAmountZero > 0 && jsonObj.get("taxCategory").toString().equals("Zero")) {
+                } else if (TotalAmountZero > 0 && (jsonObj.get("taxCategoryCode").toString().equals("02") || jsonObj.get("taxCategory").toString().toUpperCase().contains("ZERO"))) {
                     jsonObj.put("netAmount", "" + ub.formatDoublePlain2DP(-1 * TotalAmountZeroR) + "");
                     jsonObj.put("taxAmount", "0");
                     jsonObj.put("grossAmount", "" + ub.formatDoublePlain2DP(-1 * TotalAmountZeroR) + "");
@@ -1292,6 +1295,7 @@ public class InvoiceBean implements Serializable {
             if (TotalVat > 0) {
                 td = new TaxDetails();
                 td.setGrossAmount(ub.formatDoublePlain2DP(TotalAmountIncVatR));
+                td.setTaxCategoryCode("01");
                 td.setTaxCategory("Standard");
                 td.setTaxRateName("VAT-Standard");//free entry
                 Double vatPerc = trans.getVatPerc();
@@ -1306,6 +1310,7 @@ public class InvoiceBean implements Serializable {
             if (TotalAmountExempt > 0) {
                 td = new TaxDetails();
                 td.setGrossAmount(ub.formatDoublePlain2DP(TotalAmountExemptR));
+                td.setTaxCategoryCode("03");
                 td.setTaxCategory("Exempt");
                 td.setTaxRateName("VAT-Exempt");//free entry
                 td.setTaxRate("-");
@@ -1317,6 +1322,7 @@ public class InvoiceBean implements Serializable {
             if (TotalAmountZero > 0) {
                 td = new TaxDetails();
                 td.setGrossAmount(ub.formatDoublePlain2DP(TotalAmountZeroR));
+                td.setTaxCategoryCode("02");
                 td.setTaxCategory("Zero");
                 td.setTaxRateName("VAT-Zero");//free entry
                 td.setTaxRate("0");

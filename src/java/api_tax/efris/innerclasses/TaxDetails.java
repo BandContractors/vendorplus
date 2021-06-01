@@ -20,6 +20,7 @@ public class TaxDetails {
         this.taxCategory = "";
         this.taxRate = "";
         this.taxRateName = "";
+        this.taxCategoryCode="";
     }
 
     public TaxDetails(String taxCategory, String netAmount, String taxRate, String taxAmount, String grossAmount, String exciseUnit, String exciseCurrency, String taxRateName) {
@@ -41,6 +42,7 @@ public class TaxDetails {
     private String exciseUnit;
     private String exciseCurrency;
     private String taxRateName;
+    private String taxCategoryCode;
 
     // Getter Methods 
     public String getTaxCategory() {
@@ -106,5 +108,19 @@ public class TaxDetails {
 
     public void setTaxRateName(String taxRateName) {
         this.taxRateName = taxRateName;
+    }
+
+    /**
+     * @return the taxCategoryCode
+     */
+    public String getTaxCategoryCode() {
+        return taxCategoryCode;
+    }
+
+    /**
+     * @param taxCategoryCode the taxCategoryCode to set
+     */
+    public void setTaxCategoryCode(String taxCategoryCode) {
+        this.taxCategoryCode = taxCategoryCode;
     }
 }
