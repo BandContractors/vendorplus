@@ -47,15 +47,15 @@
             </h:panelGrid>
             <div class="ui-fluid">
                 <h:panelGrid id="pnlgItemDetail" styleClass="clsGridMainInput" columns="6">
-                    <h:outputLabel value="Currency:"/>
+                    <h:outputLabel value="#{langsys['Currency:']}"/>
                     <h:selectOneMenu id="menuCurrency" value="#{itemBean.itemObj.currencyCode}" style="width: 200px">
                         <f:selectItems value="#{accCurrencyBean.currencyList}" var="ac" itemLabel="#{ac.currencyCode}" itemValue="#{ac.currencyCode}"/>
                         <f:ajax event="change" execute="@this" render="@this"/>
                     </h:selectOneMenu>
-                    <h:outputLabel value="Is Suspended?"/>
+                    <h:outputLabel value="#{langsys['Is Suspended']}?"/>
                     <h:selectOneMenu id="menuIsSuspended" value="#{itemBean.itemObj.isSuspended}" style="width: 200px">
-                        <f:selectItem itemLabel="No" itemValue="No"/>
-                        <f:selectItem itemLabel="Yes" itemValue="Yes"/>
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="#{langsys['No']}"/>
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="#{langsys['Yes']}"/>
                     </h:selectOneMenu>
 
                     <h:outputLabel value="Asset Item?"/>
