@@ -32,9 +32,9 @@
         <h:form enctype="multipart/form-data" id="formMain" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
                     return false;">
             <h:panelGrid id="pnlgHeader" styleClass="clsGridMainHeader" columns="1">
-                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeaderS" value="Items for Sale: Goods (Merchandise, Finished Goods) and Services" rendered="#{generalUserSetting.currentItemPurpose.equals('Stock')}"/>
-                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeaderE" value="Items for Expenditure: Raw Materials, Consumables and Services" rendered="#{generalUserSetting.currentItemPurpose.equals('Expense')}"/>
-                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeaderA" value="Asset Item Detail" rendered="#{generalUserSetting.currentItemPurpose.equals('Asset')}"/>
+                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeaderS" value="#{langsys['Items']} #{langsys['for']} #{langsys['Sale']}: #{langsys['Goods']} (#{langsys['Merchandise']}, #{langsys['Finished']} #{langsys['Goods']}) #{langsys['and']} #{langsys['Services']}" rendered="#{generalUserSetting.currentItemPurpose.equals('Stock')}"/>
+                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeaderE" value="#{langsys['Items']} #{langsys['for']} #{langsys['Expenditure']}: #{langsys['Raw Materials']}, #{langsys['Consumables']} #{langsys['and']} #{langsys['Services']}" rendered="#{generalUserSetting.currentItemPurpose.equals('Expense')}"/>
+                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeaderA" value="#{langsys['Asset']} #{langsys['Item']} #{langsys['Detail']}" rendered="#{generalUserSetting.currentItemPurpose.equals('Asset')}"/>
             </h:panelGrid>
 
             <h:panelGrid id="pnlgBarCode" columns="2">  
