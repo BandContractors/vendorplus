@@ -47,15 +47,15 @@
             </h:panelGrid>
             <div class="ui-fluid">
                 <h:panelGrid id="pnlgItemDetail" styleClass="clsGridMainInput" columns="6">
-                    <h:outputLabel value="#{langsys['Currency:']}"/>
+                    <h:outputLabel value="#{langsys['Currency']}:"/>
                     <h:selectOneMenu id="menuCurrency" value="#{itemBean.itemObj.currencyCode}" style="width: 200px">
                         <f:selectItems value="#{accCurrencyBean.currencyList}" var="ac" itemLabel="#{ac.currencyCode}" itemValue="#{ac.currencyCode}"/>
                         <f:ajax event="change" execute="@this" render="@this"/>
                     </h:selectOneMenu>
-                    <h:outputLabel value="#{langsys['Is Suspended']}?"/>
+                    <h:outputLabel value="#{langsys['Is']} #{langsys['Suspended']}?"/>
                     <h:selectOneMenu id="menuIsSuspended" value="#{itemBean.itemObj.isSuspended}" style="width: 200px">
-                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="#{langsys['No']}"/>
-                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="#{langsys['Yes']}"/>
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="No"/>
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="Yes"/>
                     </h:selectOneMenu>
 
                     <h:outputLabel value="Asset Item?"/>
@@ -112,7 +112,7 @@
                         <f:selectItems value="#{categoryBean.categories}" var="c" itemLabel="#{c.categoryName}" itemValue="#{c.categoryId}"/>
                         <f:ajax event="change" render="menuSubCategory"/>
                     </h:selectOneMenu>
-                    <h:outputLabel value="SubCategory:"/>
+                    <h:outputLabel value="Subcategory:"/>
                     <h:selectOneMenu id="menuSubCategory" value="#{itemBean.itemObj.subCategoryId}" style="width: 200px">
                         <f:selectItem itemLabel="" itemValue="0"/>
                         <f:selectItems value="#{subCategoryBean.getSubCategoriesByCategoryId(itemBean.itemObj.categoryId)}" var="s" itemLabel="#{s.subCategoryName}" itemValue="#{s.subCategoryId}"/>
@@ -128,14 +128,14 @@
                         <f:selectItem itemLabel="" itemValue="0"/>
                         <f:selectItems value="#{unitBean.units}" var="u" itemLabel="#{u.unitName}" itemValue="#{u.unitId}"/>
                     </h:selectOneMenu>
-                    <h:outputLabel value="Re-order Level:"/>
+                    <h:outputLabel value="Reorder Level:"/>
                     <h:inputText id="itxtReorderLevel" value="#{itemBean.itemObj.reorderLevel}" autocomplete="off" style="width: 193px"/>
                     <h:outputLabel value="Account Name:"/>
                     <h:selectOneMenu id="menuExpenseAccountCode" value="#{itemBean.itemObj.expenseAccountCode}" style="width: 200px;background-color: #{listOptionBean.getColorByBoolean(!generalUserSetting.currentItemPurpose.equals('Asset'))}" disabled="#{generalUserSetting.currentItemPurpose.equals('Asset')}">
                         <f:selectItem itemLabel="" itemValue=""/>
                         <f:selectItems value="#{accCoaBean.getAccCoaObjectListByInventoryType(generalUserSetting.currentItemPurpose,itemBean.itemObj.expense_type)}" var="ea" itemLabel="#{ea.accountName}" itemValue="#{ea.accountCode}"/>
                     </h:selectOneMenu>
-                    <h:outputLabel value="Retailsale Price:"/>
+                    <h:outputLabel value="Retail Sale Price:"/>
                     <h:inputText id="itxtUnitRetailsalePrice" value="#{itemBean.itemObj.unitRetailsalePrice}" autocomplete="off" style="width: 193px">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
@@ -171,7 +171,7 @@
                     </h:selectOneMenu>
                     <h:outputLabel value="Image Full Name:"/>
                     <h:inputText id="itxtImageName" value="#{itemBean.itemObj.itemImgUrl}" autocomplete="off" style="width: 193px"/>
-                    <h:outputLabel value="Unit HirePrice/#{generalUserSetting.DEFAULT_DURATION_TYPE}:"/>
+                    <h:outputLabel value="Unit Hire Price/#{generalUserSetting.DEFAULT_DURATION_TYPE}:"/>
                     <h:inputText id="itxtUnitHirePrice" value="#{itemBean.itemObj.unit_hire_price}" autocomplete="off" style="width: 193px" disabled="#{itemBean.itemObj.is_hire==0}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
@@ -211,7 +211,7 @@
                         <f:selectItem itemLabel="Override Show Yes" itemValue="1"/>
                         <f:selectItem itemLabel="Override Show No" itemValue="2"/>
                     </h:selectOneMenu>
-                    <h:outputLabel value="Hide UnitPrice on Invoice?" title="Hide UnitPrice on Invoice?"/>
+                    <h:outputLabel value="Hide Unit Price on Invoice?" title="Hide UnitPrice on Invoice?"/>
                     <h:selectOneMenu id="menuHideUnitPriceInvoice" value="#{itemBean.itemObj.hide_unit_price_invoice}" style="width: 200px">
                         <f:selectItem itemLabel="No" itemValue="0"/>
                         <f:selectItem itemLabel="Yes" itemValue="1"/>
