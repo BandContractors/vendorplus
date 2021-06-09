@@ -7,6 +7,7 @@ import javax.faces.bean.SessionScoped;
 @ManagedBean
 @SessionScoped
 public class Parameter_list implements Serializable {
+
     private static final long serialVersionUID = 1L;
     private long parameter_list_id;
     private String context;
@@ -14,6 +15,15 @@ public class Parameter_list implements Serializable {
     private String parameter_value;
     private String description;
     private int store_id;
+
+    public Parameter_list() {
+        parameter_list_id = 0;
+        context = "";
+        parameter_name = "";
+        parameter_value = "";
+        description = "";
+        store_id = 0;
+    }
 
     /**
      * @return the parameter_list_id

@@ -173,13 +173,14 @@ public class Parameter_listBean implements Serializable {
         String sql;
         sql = "SELECT * FROM parameter_list WHERE context='" + aContext + "' AND parameter_name='" + aParameter_name + "'";
         ResultSet rs = null;
-        Parameter_list pl = null;
+        //Parameter_list pl = null;
+        Parameter_list pl = new Parameter_list();
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             rs = ps.executeQuery();
             if (rs.next()) {
-                pl = new Parameter_list();
+                //pl = new Parameter_list();
                 this.setParameter_listFromResultset(pl, rs);
             }
         } catch (Exception e) {
@@ -190,12 +191,13 @@ public class Parameter_listBean implements Serializable {
 
     public Parameter_list getParameter_listByContextNameMemory(String aContext, String aParameter_name) {
         int ListItemIndex = 0;
-        Parameter_list pl = null;
+        //Parameter_list pl = null;
+        Parameter_list pl = new Parameter_list();
         try {
             int ListItemNo = SavedParameterLists.size();
             while (ListItemIndex < ListItemNo) {
                 if (aContext.equals(SavedParameterLists.get(ListItemIndex).getContext()) && aParameter_name.equals(SavedParameterLists.get(ListItemIndex).getParameter_name())) {
-                    pl = new Parameter_list();
+                    //pl = new Parameter_list();
                     pl = SavedParameterLists.get(ListItemIndex);
                     break;
                 }
