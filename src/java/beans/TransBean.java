@@ -740,7 +740,7 @@ public class TransBean implements Serializable {
             GroupRightBean grb = new GroupRightBean();
 
             if (null == transtype) {
-                msg = "-.-.-. INVALID TRANSACTION -.-.-.";
+                msg = "INVALID TRANSACTION";
             } else if (trans.getTransactionId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, Integer.toString(transreason.getTransactionReasonId()), "Add") == 0) {
                 msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
             } else if (!ItemMessage.equals("")) {
@@ -773,7 +773,7 @@ public class TransBean implements Serializable {
             } else if (trans.getTransactorId() == 0 && transtype.getIsTransactorMandatory().equals("Yes")) {
                 msg = "Select a valid Consumer/Business you are transacting with...";
             } else if (aActiveTransItems.size() < 1 & !"UNPACK".equals(transtype.getTransactionTypeName()) & trans.getTransactionId() == 0) {
-                msg = "No item(s) found for this " + transtype.getTransactionOutputLabel();
+                msg = "No item found for this " + transtype.getTransactionOutputLabel();
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && trans.getPayMethod() == 0 && trans.getTransactionId() == 0) {
                 msg = "Select Payment Method";
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && "No".equals(CompanySetting.getIsAllowDebt()) && (trans.getAmountTendered() + trans.getSpendPointsAmount()) < trans.getGrandTotal()) {
@@ -783,9 +783,9 @@ public class TransBean implements Serializable {
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && "Yes".equals(CompanySetting.getIsAllowDebt()) && (trans.getAmountTendered() + trans.getSpendPointsAmount()) < trans.getGrandTotal() && trans.getTransactorId() == 0) {
                 msg = "Amount tendered is LESS THAN grand total, you MUST select a valid Customer for this Debt Sale";
             } else if (("TRANSFER".equals(transtype.getTransactionTypeName()) || "TRANSFER REQUEST".equals(transtype.getTransactionTypeName())) && trans.getStore2Id() == 0) {
-                msg = "Select the " + CompanySetting.getStoreEquivName() + " to which item(s) are requested from / transferred to...";
+                msg = "Select the " + CompanySetting.getStoreEquivName() + " to which item is requested from / transferred to...";
             } else if (("TRANSFER".equals(transtype.getTransactionTypeName()) || "TRANSFER REQUEST".equals(transtype.getTransactionTypeName())) && store.getStoreId() == trans.getStore2Id()) {
-                msg = "You cannot request/trasfer item(s) to and from the same " + CompanySetting.getStoreEquivName() + "...";
+                msg = "You cannot request/trasfer item to and from the same " + CompanySetting.getStoreEquivName() + "...";
             } else if ("Yes".equals(transtype.getIsTransactionUserMandatory()) && trans.getTransactionUserDetailId() == 0) {
                 msg = "Select " + transtype.getTransactionUserLabel();
             } else if ("Yes".equals(transtype.getIsTransactionRefMandatory()) && trans.getTransactionRef().equals("")) {
@@ -2023,6 +2023,8 @@ public class TransBean implements Serializable {
         String sql = null;
         String sql2 = null;
         String msg = "";
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
 
         TransItemBean TransItemBean = new TransItemBean();
         PointsTransactionBean NewPointsTransactionBean = new PointsTransactionBean();
@@ -2046,26 +2048,33 @@ public class TransBean implements Serializable {
         if (ValidationMessage.length() > 0) {
             switch (aLevel) {
                 case "PARENT":
-                    this.setActionMessage("Transaction NOT saved");
+                    msg = "Transaction NOT saved";
+                    //this.setActionMessage("Transaction NOT saved");
+                    this.setActionMessage(ub.translateWordsInText(BaseName, msg));
                     break;
                 case "CHILD":
-                    this.setActionMessageChild("Transaction NOT saved");
+                    //this.setActionMessageChild("Transaction NOT saved");
+                    msg = "Transaction NOT saved";
+                    this.setActionMessageChild(ub.translateWordsInText(BaseName, msg));
                     break;
             }
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ValidationMessage));
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, ValidationMessage)));
         } else {
             try {
                 this.insertTransCEC(aStoreId, aTransTypeId, aTransReasonId, aSaleType, trans, aActiveTransItems);
                 if (trans.getTransactionId() == 0) {
                     switch (aLevel) {
                         case "PARENT":
-                            this.setActionMessage("Transaction NOT saved");
+                            msg = "Transaction NOT saved";
+                            this.setActionMessage(ub.translateWordsInText(BaseName, msg));
                             break;
                         case "CHILD":
-                            this.setActionMessageChild("Transaction NOT saved");
+                            msg = "Transaction NOT saved";
+                            this.setActionMessageChild(ub.translateWordsInText(BaseName, msg));
                             break;
                     }
-                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("An error occured - transaction cannot be saved"));
+                    msg = "An error occured - transaction cannot be saved";
+                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                 } else {
                     //set store2 for transfer in session!
                     switch (aLevel) {
@@ -2130,7 +2139,8 @@ public class TransBean implements Serializable {
                                 this.setActionMessageChild("Try saving again - Transaction NOT saved");
                                 break;
                         }
-                        FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Try saving again - Transaction NOT saved"));
+                        msg = "Try saving again - Transaction NOT saved";
+                        FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                     } else {
                         //insert PointsTransaction for both the awarded and spent points to the stage area
                         if (("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) && (trans.getPointsAwarded() != 0 || trans.getSpendPoints() != 0)) {
@@ -2188,10 +2198,12 @@ public class TransBean implements Serializable {
                         NewPointsTransaction = null;
                         switch (aLevel) {
                             case "PARENT":
-                                this.setActionMessage("Saved Successfully ( TransactionId : " + new GeneralUserSetting().getCurrentTransactionId() + " )");
+                                msg = "Saved Successfully (Transaction Id: " + new GeneralUserSetting().getCurrentTransactionId() + ")";
+                                this.setActionMessage(ub.translateWordsInText(BaseName, msg));
                                 break;
                             case "CHILD":
-                                this.setActionMessageChild("Saved Successfully ( TransactionId : " + new GeneralUserSetting().getCurrentTransactionIdChild() + " )");
+                                msg = "Saved Successfully (Transaction Id : " + new GeneralUserSetting().getCurrentTransactionIdChild() + ")";
+                                this.setActionMessageChild(ub.translateWordsInText(BaseName, msg));
                                 break;
                         }
                         //Refresh Print output
@@ -2223,13 +2235,13 @@ public class TransBean implements Serializable {
                 LOGGER.log(Level.ERROR, e);
                 switch (aLevel) {
                     case "PARENT":
-                        this.setActionMessage("Transaction NOT saved");
+                        this.setActionMessage(ub.translateWordsInText(BaseName, "Transaction NOT saved"));
                         break;
                     case "CHILD":
-                        this.setActionMessageChild("Transaction NOT saved");
+                        this.setActionMessageChild(ub.translateWordsInText(BaseName, "Transaction NOT saved"));
                         break;
                 }
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Transaction NOT saved! Double check details, ensure transaction ref numbers have not been captured already"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Transaction NOT saved! Double check details, ensure transaction ref numbers have not been captured already")));
             }
         }
     }

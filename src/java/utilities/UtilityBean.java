@@ -1,9 +1,5 @@
 package utilities;
 
-import api_sm_bi.Bi_stg_sale_invoice;
-import api_sm_bi.Bi_stg_sale_invoiceBean;
-import api_sm_bi.Bi_stg_sale_invoice_item;
-import api_sm_bi.CheckApiBean;
 import api_tax.efris_bean.T124;
 import beans.AccCurrencyBean;
 import beans.AccJournalBean;
@@ -14,9 +10,6 @@ import beans.TransBean;
 import beans.TransItemBean;
 import beans.TransactionReasonBean;
 import beans.TransactionTypeBean;
-import com.google.gson.Gson;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
 import connections.DBConnection;
 import entities.CompanySetting;
 import entities.Item;
@@ -29,16 +22,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.management.ManagementFactory;
-import java.net.HttpURLConnection;
 import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import static java.sql.Types.VARCHAR;
 import java.text.DecimalFormat;
 import java.text.Format;
@@ -50,6 +39,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -68,7 +58,6 @@ import javax.management.ReflectionException;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.json.JSONObject;
 import sessions.GeneralUserSetting;
 
 @ManagedBean
@@ -743,9 +732,9 @@ public class UtilityBean implements Serializable {
     }
 
 //    public static void main(String[] args) {
-//        System.out.println("A-Exempt".toUpperCase().contains("eXempt".toUpperCase()));
+//        String X="Iwe():,!./-H";
+//        System.out.println(X.replaceAll("[^a-zA-Z0-9]", ""));
 //    }
-
     public List<ThreadClass> getRunningThreads() {
         List<ThreadClass> objs = new ArrayList<>();
         Set<Thread> threads = Thread.getAllStackTraces().keySet();
@@ -1064,6 +1053,22 @@ public class UtilityBean implements Serializable {
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
+    }
+
+    public String translateWordsInText(String aToLanguageBaseName, String aFromText) {
+        String ToText = "";
+        ResourceBundle properties = ResourceBundle.getBundle(aToLanguageBaseName);//language_zh_CN,language_en
+        String[] exampleArray = aFromText.split(" ");
+        String Word = "";
+        for (int i = 0; i < exampleArray.length; i++) {
+            try {
+                Word = properties.getString(exampleArray[i].replaceAll("[^a-zA-Z0-9]", ""));
+            } catch (Exception e) {
+                Word = "?" + exampleArray[i].replaceAll("[^a-zA-Z0-9]", "") + "?";
+            }
+            ToText = ToText + " " + Word;
+        }
+        return ToText;
     }
 
     /**
