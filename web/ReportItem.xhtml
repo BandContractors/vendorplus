@@ -28,28 +28,28 @@
 
         <h:form id="formReport">
             <h:panelGrid id="id0" columns="1" styleClass="clsPanelReportFilterTitle">
-                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="All Items Report"/>
+                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="#{langsys['All']} #{langsys['Items']} #{langsys['Report']}"/>
             </h:panelGrid>
             <h:panelGrid id="id1" columns="10" styleClass="clsPanelReportFilter">
-                <h:outputLabel styleClass="clsLabelReportFilter" value="ACTIVE:"/>
-                <h:selectBooleanCheckbox label="Active" value="#{generalUserSetting.reportRetrievalOption}">
+                <h:outputLabel styleClass="clsLabelReportFilter" value="#{langsys['ACTIVE']}:"/>
+                <h:selectBooleanCheckbox label="Active" value="#{langsys['']}#{generalUserSetting.reportRetrievalOption}">
                 </h:selectBooleanCheckbox>
-                <h:outputLabel styleClass="clsLabelReportFilter" value="Category:"/>
+                <h:outputLabel styleClass="clsLabelReportFilter" value="#{langsys['Category']}:"/>
                 <h:selectOneMenu styleClass="clsInputReportFilter" id="menuCategory" value="#{item.categoryId}">
                     <f:selectItem itemLabel="" itemValue="0"/>
-                    <f:selectItems value="#{categoryBean.categories}" var="c" itemLabel="#{c.categoryName}" itemValue="#{c.categoryId}"/>
+                    <f:selectItems value="#{categoryBean.categories}" var="c" itemLabel="#{langsys[c.categoryName]}" itemValue="#{c.categoryId}"/>
                     <f:ajax event="change" render="menuSubCategory"/>
                 </h:selectOneMenu>
-                <h:outputLabel styleClass="clsLabelReportFilter" value="SubCategory:"/>
+                <h:outputLabel styleClass="clsLabelReportFilter" value="#{langsys['SubCategory']}:"/>
                 <h:selectOneMenu styleClass="clsInputReportFilter" id="menuSubCategory" value="#{item.subCategoryId}">
                     <f:selectItem itemLabel="" itemValue="0"/>
-                    <f:selectItems value="#{subCategoryBean.getSubCategoriesByCategoryId(item.categoryId)}" var="s" itemLabel="#{s.subCategoryName}" itemValue="#{s.subCategoryId}"/>
+                    <f:selectItems value="#{subCategoryBean.getSubCategoriesByCategoryId(item.categoryId)}" var="s" itemLabel="#{langsys['s.subCategoryName']}" itemValue="#{s.subCategoryId}"/>
                 </h:selectOneMenu>
-                <h:outputLabel styleClass="clsLabelReportFilter" value="Is Suspended ?"/>
+                <h:outputLabel styleClass="clsLabelReportFilter" value="#{langsys['Is']} #{langsys['Suspended']} ?"/>
                 <h:selectOneMenu styleClass="clsInputReportFilter" id="menuIsSuspended" value="#{item.isSuspended}">
                     <f:selectItem itemLabel="" itemValue=""/>
-                    <f:selectItem itemLabel="Yes" itemValue="Yes"/>
-                    <f:selectItem itemLabel="No" itemValue="No"/>
+                    <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="Yes"/>
+                    <f:selectItem itemLabel="#{langsys['No']}" itemValue="No"/>
                 </h:selectOneMenu>
 
                 <p:commandButton styleClass="clsButtonReportFilter" id="cmdbSearch" value="Search" update="tblReportItem tblReportItemSummary pnlgActionMessage" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
@@ -71,63 +71,63 @@
                     <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
                     <p:columnToggler datasource="tblReportItem" trigger="toggler" />
                 </f:facet>
-                <p:column headerText="Type">
+                <p:column headerText="#{langsys['Type']}">
                     <h:outputText value="#{rts.itemType}">
                     </h:outputText>
                 </p:column>
-                <p:column headerText="ItemId">
+                <p:column headerText="#{langsys['ItemId']}">
                     <h:outputText value="#{rts.itemId}">
                     </h:outputText>
                 </p:column>
-                <p:column headerText="ItemCode">
+                <p:column headerText="#{langsys['ItemCode']}">
                     <h:outputText value="#{rts.itemCode}">
                     </h:outputText>
                 </p:column>
 
-                <p:column headerText="Description">
+                <p:column headerText="#{langsys['Description']}">
                     <h:outputText value="#{rts.description}">
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Unit">
+                <p:column headerText="#{langsys['Unit']}">
                     <h:outputText value="#{rts.unitSymbol}">
                     </h:outputText>
                 </p:column>
 
-                <p:column headerText="ReorderLevel">
+                <p:column headerText="#{langsys['ReorderLevel']}">
                     <h:outputText value="#{rts.reorderLevel}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="CostPrice">
+                <p:column headerText="#{langsys['CostPrice']}">
                     <h:outputText value="#{rts.unitCostPrice}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="WholeSalePrice">
+                <p:column headerText="#{langsys['WholeSalePrice']}">
                     <h:outputText value="#{rts.unitWholesalePrice}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="RetailSalePrice">
+                <p:column headerText="#{langsys['RetailSalePrice']}">
                     <h:outputText value="#{rts.unitRetailsalePrice}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="VatRated">
+                <p:column headerText="#{langsys['VatRated']}">
                     <h:outputText value="#{rts.vatRated}">
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Suspended">
+                <p:column headerText="#{langsys['Suspended']}">
                     <h:outputText value="#{rts.isSuspended}">
                     </h:outputText>
                 </p:column>
 
-                <p:column headerText="Category">
+                <p:column headerText="#{langsys['Category']}">
                     <h:outputText value="#{rts.categoryName}">
                     </h:outputText>
                 </p:column>
 
-                <p:column headerText="SubCategory">
+                <p:column headerText="#{langsys['SubCategory']}">
                     <h:outputText value="#{rts.subCategoryName}">
                     </h:outputText>
                 </p:column>
@@ -135,24 +135,24 @@
             </p:dataTable>
 
             <h:panelGrid id="id15" columns="1" style="margin-top: 20px;">
-                <p:panel header="Export All Items Report">
+                <p:panel header="#{langsys['']}Export #{langsys['']}All #{langsys['Items']} #{langsys['Report']}">
                     <h:commandLink>
-                        <p:commandButton icon="ui-icon-circle-arrow-s" value="Excel"/>
+                        <p:commandButton icon="ui-icon-circle-arrow-s" value="#{langsys['Excel']}"/>
                         <p:dataExporter type="xls" target="tblReportItem" fileName="AllItemsReport" />
                     </h:commandLink>
 
                     <h:commandLink>
-                        <p:commandButton icon="ui-icon-circle-arrow-s" value="PDF"/>
+                        <p:commandButton icon="ui-icon-circle-arrow-s" value="#{langsys['PDF']}"/>
                         <p:dataExporter type="pdf" target="tblReportItem" fileName="AllItemsReport"/>
                     </h:commandLink>
 
                     <h:commandLink>
-                        <p:commandButton icon="ui-icon-circle-arrow-s" value="CSV"/>
+                        <p:commandButton icon="ui-icon-circle-arrow-s" value="#{langsys['CSV']}"/>
                         <p:dataExporter type="csv" target="tblReportItem" fileName="AllItemsReport" />
                     </h:commandLink>
 
                     <h:commandLink>
-                        <p:commandButton icon="ui-icon-circle-arrow-s" value="XML"/>
+                        <p:commandButton icon="ui-icon-circle-arrow-s" value="#{langsys['XML']}"/>
                         <p:dataExporter type="xml" target="tblReportItem" fileName="AllItemsReport" />
                     </h:commandLink>
                 </p:panel>
@@ -164,17 +164,17 @@
                     All Items Summary Report
                 </f:facet>
 
-                <p:column headerText="Category">
+                <p:column headerText="#{langsys['Category']}">
                     <h:outputText value="#{rtss.categoryName}">
                     </h:outputText>
                 </p:column>
 
-                <p:column headerText="SubCategory">
+                <p:column headerText="#{langsys['SubCategory']}">
                     <h:outputText value="#{rtss.subCategoryName}">
                     </h:outputText>
                 </p:column>
 
-                <p:column headerText="Items">
+                <p:column headerText="#{langsys['Items']}">
                     <h:outputText value="#{rtss.countItems}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
@@ -184,22 +184,22 @@
             <h:panelGrid id="id16" columns="1" style="margin-top: 20px;">
                 <p:panel header="Export All Items Summary Report">
                     <h:commandLink>
-                        <p:commandButton icon="ui-icon-circle-arrow-s" value="Excel"/>
+                        <p:commandButton icon="ui-icon-circle-arrow-s" value="#{langsys['Excel']}"/>
                         <p:dataExporter type="xls" target="tblReportItemSummary" fileName="AllItemsReportSummary" />
                     </h:commandLink>
 
                     <h:commandLink>
-                        <p:commandButton icon="ui-icon-circle-arrow-s" value="PDF"/>
+                        <p:commandButton icon="ui-icon-circle-arrow-s" value="#{langsys['PDF']}"/>
                         <p:dataExporter type="pdf" target="tblReportItemSummary" fileName="AllItemsReportSummary"/>
                     </h:commandLink>
 
                     <h:commandLink>
-                        <p:commandButton icon="ui-icon-circle-arrow-s" value="CSV"/>
+                        <p:commandButton icon="ui-icon-circle-arrow-s" value="#{langsys['CSV']}"/>
                         <p:dataExporter type="csv" target="tblReportItemSummary" fileName="AllItemsReportSummary" />
                     </h:commandLink>
 
                     <h:commandLink>
-                        <p:commandButton icon="ui-icon-circle-arrow-s" value="XML"/>
+                        <p:commandButton icon="ui-icon-circle-arrow-s" value="#{langsys['XML']}"/>
                         <p:dataExporter type="xml" target="tblReportItemSummary" fileName="AllItemsReportSummary" />
                     </h:commandLink>
                 </p:panel>

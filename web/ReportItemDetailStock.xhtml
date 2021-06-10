@@ -27,20 +27,20 @@
         <ui:include src="Menu.xhtml"/>
         <h:form id="formReport">
             <h:panelGrid id="pnlgHeader" columns="1" styleClass="clsPanelReportFilterTitle">
-                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="Report Listing Item Details set for Stock (Items for Sale)"/>
+                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="#{langsys['Report']} #{langsys['Listing']} #{langsys['Item']} #{langsys['Details']} #{langsys['set']} #{langsys['for']} #{langsys['Stock']} (#{langsys['Items']} #{langsys['for']} #{langsys['Sale']})"/>
             </h:panelGrid>
             <h:panelGrid id="pnlgFilter" columns="6" styleClass="clsPanelReportFilter">
-                <p:outputLabel value="Item Type"/>
-                <p:outputLabel value="Category"/>
-                <p:outputLabel value="Subcategory"/>
-                <p:outputLabel value="Currency"/>
-                <p:outputLabel value="General?"/>
-                <p:outputLabel value="Suspended?"/>
+                <p:outputLabel value="#{langsys['Item']} #{langsys['Type']}"/>
+                <p:outputLabel value="#{langsys['Category']}"/>
+                <p:outputLabel value="#{langsys['Subcategory']}"/>
+                <p:outputLabel value="#{langsys['Currency']}"/>
+                <p:outputLabel value="#{langsys['General']}?"/>
+                <p:outputLabel value="#{langsys['Suspended']}?"/>
 
                 <h:selectOneMenu id="menuItemType" value="#{item.itemType}">
                     <f:selectItem itemLabel="" itemValue=""/>
-                    <f:selectItem itemLabel="PRODUCT" itemValue="PRODUCT"/>
-                    <f:selectItem itemLabel="SERVICE" itemValue="SERVICE"/>
+                    <f:selectItem itemLabel="#{langsys['PRODUCT']}" itemValue="PRODUCT"/>
+                    <f:selectItem itemLabel="#{langsys['SERVICE']}" itemValue="SERVICE"/>
                 </h:selectOneMenu>
                 <h:selectOneMenu id="menuCategory" value="#{item.categoryId}">
                     <f:selectItem itemLabel="" itemValue="0"/>
@@ -58,17 +58,17 @@
                 </h:selectOneMenu>
                 <h:selectOneMenu id="menuIsGeneral" value="#{item.isGeneral}">
                     <f:selectItem itemLabel=""/>
-                    <f:selectItem itemLabel="Yes" itemValue="11"/>
-                    <f:selectItem itemLabel="No" itemValue="10"/>
+                    <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="11"/>
+                    <f:selectItem itemLabel="#{langsys['No']}" itemValue="10"/>
                 </h:selectOneMenu>
                 <h:selectOneMenu id="menuIsSuspended" value="#{item.isSuspended}">
                     <f:selectItem itemLabel="" itemValue=""/>
-                    <f:selectItem itemLabel="Yes" itemValue="Yes"/>
-                    <f:selectItem itemLabel="No" itemValue="No"/>
+                    <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="Yes"/>
+                    <f:selectItem itemLabel="#{langsys['No']}" itemValue="No"/>
                 </h:selectOneMenu>
 
                 <p:outputLabel value=""/>
-                <p:commandButton id="cmdbSearch" value="SEARCH (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                <p:commandButton id="cmdbSearch" value="#{langsys['SEARCH']} (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                     <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                         <p:graphicImage name="/images/ajax-loader.gif"/>
                     </p:dialog>
@@ -105,55 +105,55 @@
                         <p:dataExporter type="xml" target="tblDetail" fileName="Item_Detail_Stock" />
                     </h:commandLink>
                 </f:facet>
-                <p:column headerText="Item Type">
+                <p:column headerText="#{langsys['Item']} #{langsys['Type']}">
                     <h:outputLabel value="#{itm.itemType} "/>
                 </p:column>
-                <p:column headerText="Item Code">
+                <p:column headerText="#{langsys['Item']} #{langsys['Code']}">
                     <h:outputLabel value="#{itm.itemCode} "/>
                 </p:column>
-                <p:column headerText="Description">
+                <p:column headerText="#{langsys['Description']}">
                     <p:outputLabel value="#{itm.description}"/>
                 </p:column>
-                <p:column headerText="Unit">
+                <p:column headerText="#{langsys['Unit']}">
                     <h:outputText value="#{itm.unitSymbol}"/>
                 </p:column>
-                <p:column headerText="Reorder Level">
+                <p:column headerText="#{langsys['Reorder']} #{langsys['Level']}">
                     <h:outputText value="#{itm.reorderLevel}"/>
                 </p:column>
-                <p:column headerText="Currency">
+                <p:column headerText="#{langsys['Currency']}">
                     <h:outputText value="#{itm.currencyCode}"/>
                 </p:column>
-                <p:column headerText="Retailsale Price" style="text-align: right;">
+                <p:column headerText="#{langsys['Retailsale']} #{langsys['Price']}" style="text-align: right;">
                     <h:outputText value="#{itm.unitRetailsalePrice}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Wholesale Price" style="text-align: right;">
+                <p:column headerText="#{langsys['Wholesale']} #{langsys['Price']}" style="text-align: right;">
                     <h:outputText value="#{itm.unitWholesalePrice}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Unit Hire Price" style="text-align: right;">
+                <p:column headerText="#{langsys['Unit']} #{langsys['Hire']} #{langsys['Price']}" style="text-align: right;">
                     <h:outputText value="#{itm.unit_hire_price}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Sale">
+                <p:column headerText="#{langsys['Sale']}">
                     <h:outputText value="#{utilityBean.returnYesNoString(itm.isSale)}"/>
                 </p:column>
-                <p:column headerText="Buy">
+                <p:column headerText="#{langsys['Buy']}">
                     <h:outputText value="#{utilityBean.returnYesNoString(itm.isBuy)}"/>
                 </p:column>
-                <p:column headerText="Track">
+                <p:column headerText="#{langsys['Track']}">
                     <h:outputText value="#{utilityBean.returnYesNoString(itm.isTrack)}"/>
                 </p:column>
-                <p:column headerText="General">
+                <p:column headerText="#{langsys['General']}">
                     <h:outputText value="#{utilityBean.returnYesNoString(itm.isGeneral)}"/>
                 </p:column>
-                <p:column headerText="Category">
+                <p:column headerText="#{langsys['Category']}">
                     <h:outputText value="#{itm.categoryName}"/>
                 </p:column>
-                <p:column headerText="Subcategory">
+                <p:column headerText="#{langsys['Subcategory']}">
                     <h:outputText value="#{itm.subCategoryName}"/>
                 </p:column>
             </p:dataTable>
