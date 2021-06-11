@@ -785,7 +785,7 @@ public class TransBean implements Serializable {
             } else if (("TRANSFER".equals(transtype.getTransactionTypeName()) || "TRANSFER REQUEST".equals(transtype.getTransactionTypeName())) && trans.getStore2Id() == 0) {
                 msg = "Select the " + CompanySetting.getStoreEquivName() + " to which item is requested from / transferred to...";
             } else if (("TRANSFER".equals(transtype.getTransactionTypeName()) || "TRANSFER REQUEST".equals(transtype.getTransactionTypeName())) && store.getStoreId() == trans.getStore2Id()) {
-                msg = "You cannot request/trasfer item to and from the same " + CompanySetting.getStoreEquivName() + "...";
+                msg = "You cannot request or trasfer item to and from the same " + CompanySetting.getStoreEquivName() + "...";
             } else if ("Yes".equals(transtype.getIsTransactionUserMandatory()) && trans.getTransactionUserDetailId() == 0) {
                 msg = "Select " + transtype.getTransactionUserLabel();
             } else if ("Yes".equals(transtype.getIsTransactionRefMandatory()) && trans.getTransactionRef().equals("")) {
@@ -793,7 +793,7 @@ public class TransBean implements Serializable {
             } else if ("Yes".equals(transtype.getIsTransactionRefMandatory()) && trans.getTransactionRef().equals("")) {
                 msg = "Select " + transtype.getTransactionRefLabel();
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && trans.isBillOther() && trans.getBillTransactorId() == 0) {
-                msg = "Select a valid Consumer/Business you are billing...";
+                msg = "Select Billing Customer";
             } else if (trans.getAuthorisedByUserDetailId() == 0 && transtype.getIsAuthoriseUserMandatory().equals("Yes")) {
                 msg = "Select Authorise User";
             } else if (trans.getAuthoriseDate() == null && transtype.getIsAuthoriseDateMandatory().equals("Yes")) {

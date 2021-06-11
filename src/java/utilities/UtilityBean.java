@@ -732,8 +732,8 @@ public class UtilityBean implements Serializable {
     }
 
 //    public static void main(String[] args) {
-//        String X="Iwe():,!./-H";
-//        System.out.println(X.replaceAll("[^a-zA-Z0-9]", ""));
+//        String str="Abc";
+//        System.out.println(str.matches(".*\\d.*"));
 //    }
     public List<ThreadClass> getRunningThreads() {
         List<ThreadClass> objs = new ArrayList<>();
@@ -1059,14 +1059,22 @@ public class UtilityBean implements Serializable {
         String ToText = "";
         ResourceBundle properties = ResourceBundle.getBundle(aToLanguageBaseName);//language_zh_CN,language_en
         String[] exampleArray = aFromText.split(" ");
-        String Word = "";
+        String WordBefore = "";
+        String WordAfter = "";
         for (int i = 0; i < exampleArray.length; i++) {
-            try {
-                Word = properties.getString(exampleArray[i].replaceAll("[^a-zA-Z0-9]", ""));
-            } catch (Exception e) {
-                Word = "?" + exampleArray[i].replaceAll("[^a-zA-Z0-9]", "") + "?";
+            WordBefore = exampleArray[i].replaceAll("[^a-zA-Z0-9 ]", "").trim();
+            if (WordBefore.length() > 1) {
+                if (WordBefore.matches(".*\\d.*")) {//str.matches(".*\\d.*")
+                    WordAfter = WordBefore;
+                } else {
+                    try {
+                        WordAfter = properties.getString(WordBefore);
+                    } catch (Exception e) {
+                        WordAfter = "?" + WordBefore + "?";
+                    }
+                }
+                ToText = ToText + " " + WordAfter;
             }
-            ToText = ToText + " " + Word;
         }
         return ToText;
     }
