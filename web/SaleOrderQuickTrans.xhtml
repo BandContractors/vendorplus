@@ -53,19 +53,19 @@
                     return false;">  
             <h:panelGrid id="pnlHeader" styleClass="clsGridMainHeader" columns="4" style="width:100%;float:left;">
                 <h:panelGrid id="pnlOrderCategory" columns="3">
-                    <h:commandButton style="border-radius: 5px;border: none;width: 120px;height:45px;font-size: 16px;background-color:#{transBean.setBgColorIfEqual(transBean.orderMode1,trans.delivery_mode,1)};" value="#{transBean.orderMode1}" rendered="#{transBean.orderMode1.length()>0}">
+                    <h:commandButton style="border-radius: 5px;border: none;width: 120px;height:45px;font-size: 16px;background-color:#{transBean.setBgColorIfEqual(transBean.orderMode1,trans.delivery_mode,1)};" value="#{langsys[transBean.orderMode1]}" rendered="#{transBean.orderMode1.length()>0}">
                         <f:ajax listener="#{transBean.updateDelivery_mode(trans,transBean.orderMode1)}" execute="@this" render="pnlOrderCategory"/>
                     </h:commandButton>
-                    <h:commandButton style="border-radius: 5px;border: none;width: 120px;height:45px;font-size: 16px;background-color:#{transBean.setBgColorIfEqual(transBean.orderMode2,trans.delivery_mode,1)};" value="#{transBean.orderMode2}" rendered="#{transBean.orderMode2.length()>0}">
+                    <h:commandButton style="border-radius: 5px;border: none;width: 120px;height:45px;font-size: 16px;background-color:#{transBean.setBgColorIfEqual(transBean.orderMode2,trans.delivery_mode,1)};" value="#{langsys[transBean.orderMode2]}" rendered="#{transBean.orderMode2.length()>0}">
                         <f:ajax listener="#{transBean.updateDelivery_mode(trans,transBean.orderMode2)}" execute="@this" render="pnlOrderCategory"/>
                     </h:commandButton>
-                    <h:commandButton style="border-radius: 5px;border: none;width: 120px;height:45px;font-size: 16px;background-color:#{transBean.setBgColorIfEqual(transBean.orderMode3,trans.delivery_mode,1)};" value="#{transBean.orderMode3}" rendered="#{transBean.orderMode3.length()>0}">
+                    <h:commandButton style="border-radius: 5px;border: none;width: 120px;height:45px;font-size: 16px;background-color:#{transBean.setBgColorIfEqual(transBean.orderMode3,trans.delivery_mode,1)};" value="#{langsys[transBean.orderMode3]}" rendered="#{transBean.orderMode3.length()>0}">
                         <f:ajax listener="#{transBean.updateDelivery_mode(trans,transBean.orderMode3)}" execute="@this" render="pnlOrderCategory"/>
                     </h:commandButton>
                 </h:panelGrid>
                 <h:panelGrid id="pnlTransNumber" rendered="#{trans.transactionId>0}">
-                    <h:outputLabel value="Order Number" style="color: white;"/>
-                    <h:outputLabel value="#{trans.transactionNumber}" style="color: white;"/>
+                    <h:outputLabel value="#{langsys['Order']} #{langsys['Number']}" style="color: white;"/>
+                    <h:outputLabel value="#{langsys[trans.transactionNumber]}" style="color: white;"/>
                 </h:panelGrid>
                 <h:panelGrid columns="3">
                     <h:selectOneMenu style="height: 31px;" styleClass="clsMenu" id="menuTransactionReason" value="#{trans.transactionReasonId}">
@@ -77,7 +77,7 @@
                     </h:selectOneMenu>
                     <p:calendar styleClass="clsInput" id="calTransactionDate"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.transactionDate}" size="8" disabled="true"/>
                 </h:panelGrid>
-                <p:commandButton icon="fa fa-fw fa-arrow-right" style="width: 120px;height: 55px;color: white;background-color: black;" id="cmdbManage" value="ORDERS"  action="#{navigationBean.redirectToSaleOrderQuickManage()}"/>
+                <p:commandButton icon="fa fa-fw fa-arrow-right" style="width: 120px;height: 55px;color: white;background-color: black;" id="cmdbManage" value="#{langsys['ORDERS']}"  action="#{navigationBean.redirectToSaleOrderQuickManage()}"/>
             </h:panelGrid>
             <h:panelGrid id="pnlMessage" columns="4">
                 <h:outputLabel id="olblItemAddedStstus" class="clsSuccessStatus" value="#{statusBean.itemAddedStatus}" rendered="#{statusBean.showItemAddedStatus==1}"/>
@@ -128,14 +128,14 @@
                         </p:column>
                         <p:column style="width: 200px;">
                             <!-- column header -->
-                            <f:facet name="header">Item Description</f:facet>
+                            <f:facet name="header">#{langsys['Item']} #{langsys['Description']}</f:facet>
                             <!-- row record -->
                             <p:outputLabel value="#{transItemBean.showItemDescriptionCECexcSpecific(ati)}" escape="false"/>
                             <h:inputText style="width: 200px" value="#{ati.descSpecific}" rendered="#{ati.is_general==1}" title="Specify more details"/>
                         </p:column>
                         <p:column style="width: 100px;">
                             <!-- column header -->
-                            <f:facet name="header">Unit Price</f:facet>
+                            <f:facet name="header">#{langsys['Unit']} #{langsys['Price']}</f:facet>
                             <!-- row record -->
                             #{ati.unitSymbol}
                             <h:inputText id="itxtUnitPrice" style="width: 100px" disabled="#{ati.is_general==0 and ati.is_override_price==0}" value="#{ati.unitPrice}" autocomplete="off">
@@ -145,7 +145,7 @@
                         </p:column>
                         <p:column style="width: 100px;">
                             <!-- column header -->
-                            <f:facet name="header">Qty</f:facet>
+                            <f:facet name="header">#{langsys['Qty']}</f:facet>
                             <!-- row record -->
                             <h:commandButton id="cmdbAddQty" value="+" style="width: 30px;">
                                 <f:ajax listener="#{transItemBean.addQtyTransItemCEC(11,16,trans,transItemBean.activeTransItems,ati)}" execute="@form" render="dtblTransactionItem TransactionFormSales:pgrdTotals"/>
@@ -160,7 +160,7 @@
                         </p:column>
                         <p:column style="width: 100px;text-align: right;">
                             <!-- column header -->
-                            <f:facet name="header">Amount</f:facet>
+                            <f:facet name="header">#{langsys['Amount']}</f:facet>
                             <!-- row record -->
                             <h:outputLabel id="lblAmount" value="#{ati.amountIncVat}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -181,7 +181,7 @@
                     <h:panelGrid columns="2" style="float: right;">
                         <h:panelGrid columns="1">
                             <h:panelGrid columns="2">
-                                <p:commandLink actionListener="#{transactorBean.openChildTransactor('CUSTOMER')}" value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}"/>
+                                <p:commandLink actionListener="#{transactorBean.openChildTransactor('CUSTOMER')}" value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}"/>
                                 <p:autoComplete placeholder="#{utilityBean.returnOneString(trans.transactorName,'Name',1)}" id="autcTransactor" value="#{transactorBean.selectedTransactor}" 
                                                 completeMethod="#{transactorBean.getTransactorActiveObjectList}" 
                                                 var="trct" 
@@ -190,13 +190,13 @@
                                                 converter="TransactorConverter" style="text-align: left" 
                                                 forceSelection="true" queryDelay="0" 
                                                 >
-                                    <p:column headerText="Names" style="text-align: left" >  
+                                    <p:column headerText="#{langsys['Names']}" style="text-align: left" >  
                                         #{trct.transactorNames} 
                                     </p:column> 
-                                    <p:column headerText="Type" style="text-align: left" >  
+                                    <p:column headerText="#{langsys['Type']}" style="text-align: left" >  
                                         #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)} 
                                     </p:column> 
-                                    <p:column headerText="Contact Person" style="text-align: left">  
+                                    <p:column headerText="#{langsys['Contact']} #{langsys['Person']}" style="text-align: left">  
                                         #{trct.cpName} 
                                     </p:column> 
                                     <p:ajax event="itemSelect" listener="#{trans.setTransactorId(transactorBean.selectedTransactor.transactorId)}"/>
@@ -204,7 +204,7 @@
                                     <p:ajax event="blur" listener="#{trans.setDeliveryAddress(transactorBean.selectedTransactor.physicalAddress)}" update="TransactionFormSales:itxtDelAddress"/>
                                     <p:ajax event="blur" listener="#{transBean.refreshCustomerBalances(trans)}" update="olblDebtCredit itxtDebtCredit itxtPrepaidAcc"/>
                                 </p:autoComplete>
-                                <h:outputLabel value="Deliver To"/>
+                                <h:outputLabel value="#{langsys['Deliver']} #{langsys['To']}"/>
                                 <h:inputTextarea id="itxtDelAddress" value="#{trans.deliveryAddress}" style="font-size: 10px;height: 20px;width: 234px;"/>
                             </h:panelGrid>
                             <p:scrollPanel mode="native" style="width:450px;height:#{transBean.locationList.size() gt 9? 150:transBean.locationList.size() gt 0? 75:0}px">
@@ -227,15 +227,15 @@
                             </p:scrollPanel>
                         </h:panelGrid>
                         <h:panelGrid id="pgrdTotals" columns="2">
-                            <h:outputLabel styleClass="clsLabelTransItem" value="Sub Total"/>
+                            <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Subtotal']}"/>
                             <h:inputText id="itxtSubTotal" value="#{trans.subTotal}" styleClass="clsInputTransItem" style="width: 120px" disabled="true">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:inputText>
-                            <h:outputLabel styleClass="clsLabelTransItem" value="Trade Disc"/>
+                            <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Item']} #{langsys['Discount']}"/>
                             <h:inputText id="itxtTotalTradeDiscount" value="#{trans.totalTradeDiscount}" styleClass="clsInputTransItem" style="width: 120px" autocomplete="off" disabled="true"> 
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:inputText>
-                            <h:outputLabel styleClass="clsLabelTransItem" value="Cash Disc"/>
+                            <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Cash']} #{langsys['Discount']}"/>
                             <h:inputText id="itxtCashDiscount" value="#{trans.cashDiscount}" styleClass="clsInputTransItem" style="width: 120px;" autocomplete="off" disabled="#{companySetting.getBoolIsAllowDiscount()}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                 <f:ajax event="blur" listener="#{transBean.setTransTotalsAndUpdateCEC(11,16,trans, transItemBean.activeTransItems)}" render="itxtGrandTotal itxtChange itxtTotalVat"/>
@@ -244,16 +244,16 @@
                             <h:inputText id="itxtTotalVat" value="#{trans.totalVat}" styleClass="clsInputTransItem" style="width: 120px" disabled="true">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:inputText>
-                            <h:outputLabel styleClass="clsLabelTransItem" value="GRAND TOTAL"/>
+                            <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['TOTAL']}"/>
                             <h:inputText id="itxtGrandTotal" value="#{trans.grandTotal}" styleClass="clsInputTransItem" style="width: 120px;background-color: yellow;font-weight: bold;font-size: 20px;" disabled="true">
                                 <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                 <f:ajax event="change" render="itxtChange"/>
                             </h:inputText>
-                            <h:outputLabel id="olblDebtCredit" style="color: coral;font-weight: bold;" value="Receivable(#{generalUserSetting.LOCAL_CURRENCY.currencyCode})"/>
+                            <h:outputLabel id="olblDebtCredit" style="color: coral;font-weight: bold;" value="#{langsys['Receivable']}(#{generalUserSetting.LOCAL_CURRENCY.currencyCode})"/>
                             <h:inputText disabled="true" style="color: coral;font-weight: bold;width: 120px;" styleClass="clsInput" id="itxtDebtCredit" value="#{accJournalBean.returnBalanceString(trans.balance_receivable)}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:inputText>
-                            <h:outputLabel id="olblDeposit" style="color: green;font-weight: bold;" value="Deposit(#{trans.currencyCode})"/>
+                            <h:outputLabel id="olblDeposit" style="color: green;font-weight: bold;" value="#{langsys['Deposit']}(#{trans.currencyCode})"/>
                             <h:inputText disabled="true" style="color: green;font-weight: bold;width: 120px;" styleClass="clsInput" id="itxtPrepaidAcc" value="#{accJournalBean.returnBalanceString(trans.deposit_customer)}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:inputText>
@@ -262,52 +262,52 @@
                 </h:panelGrid>
                 <h:panelGrid id="pnlSendTo" columns="1" style="text-align: center;">
                     <h:panelGrid id="pnlStore" columns="1">
-                        <h:outputLabel value="Send To"/>
+                        <h:outputLabel value="#{langsys['Send']} #{langsys['To']}"/>
                         <c:forEach var="st" items="#{transBean.storeList}">
                             <h:commandButton style="width: 100px;min-height:40px;font-size: 12px;word-wrap: break-word;white-space:normal;border: none;border-radius: 5px;background-color:#{transBean.setBgColorIfEqual(st.storeId,trans.store2Id,5)};" value="#{st.storeName}">
                                 <f:ajax listener="#{transBean.updateStore2Id(trans,st.storeId)}" render="TransactionFormSales:pnlStore"/>
                             </h:commandButton>
                         </c:forEach>
                     </h:panelGrid>
-                    <h:outputLabel value="Message"/>
+                    <h:outputLabel value="#{langsys['Message']}"/>
                     <h:inputTextarea value="#{trans.transactionComment}" style="font-size: 10px;height: 50px;width: 100px;"/>
                     <h:panelGrid columns="1" id="pnlPrintFile">
                         <h:selectBooleanCheckbox value="#{transBean.autoPrintAfterSave}"/>
-                        <h:outputLabel value="Print.After.Save"/>
-                        <h:commandButton style="width: 100px;min-height:40px;font-size: 12px;word-wrap: break-word;white-space:normal;border: none;border-radius: 5px;background-color:#{transBean.setBgColorIfEqual('1',transBean.overridePrintVersion,5)};" value="Print File 1">
+                        <h:outputLabel value="#{langsys['Print']}#{langsys['After']}#{langsys['Save']}"/>
+                        <h:commandButton style="width: 100px;min-height:40px;font-size: 12px;word-wrap: break-word;white-space:normal;border: none;border-radius: 5px;background-color:#{transBean.setBgColorIfEqual('1',transBean.overridePrintVersion,5)};" value="#{langsys['Print']} #{langsys['File']} 1">
                             <f:ajax listener="#{transBean.updatePrintFile(1)}" render="TransactionFormSales:pnlPrintFile pnlgOutput"/>
                         </h:commandButton>
-                        <h:commandButton style="width: 100px;min-height:40px;font-size: 12px;word-wrap: break-word;white-space:normal;border: none;border-radius: 5px;background-color:#{transBean.setBgColorIfEqual('2',transBean.overridePrintVersion,5)};" value="Print File 2">
+                        <h:commandButton style="width: 100px;min-height:40px;font-size: 12px;word-wrap: break-word;white-space:normal;border: none;border-radius: 5px;background-color:#{transBean.setBgColorIfEqual('2',transBean.overridePrintVersion,5)};" value="#{langsys['Print']} #{langsys['File']} 2">
                             <f:ajax listener="#{transBean.updatePrintFile(2)}" render="TransactionFormSales:pnlPrintFile pnlgOutput"/>
                         </h:commandButton>
                     </h:panelGrid>
                 </h:panelGrid>
                 <h:panelGrid id="pnlButtons" columns="1" style="text-align: center;">
-                    <p:keyboard placeholder="User Code" id="keybUserCode" value="#{trans.user_code}" password="true" layout="custom" layoutTemplate="123-close,456-clear,789-back,0" showMode="button" style="width: 120px;height: 30px;border-color: red;"/>
+                    <p:keyboard placeholder="#{langsys['User']} #{langsys['Code']}" id="keybUserCode" value="#{trans.user_code}" password="true" layout="custom" layoutTemplate="123-close,456-clear,789-back,0" showMode="button" style="width: 120px;height: 30px;border-color: red;"/>
                     <h:panelGrid columns="1" style="border-style: double;background-color: yellow;">
-                        <p:commandButton icon="fa fa-fw fa-send" style="width: 120px;height: 70px;color: white;background-color: black;" id="cmdbSave" value="Send" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                        <p:commandButton icon="fa fa-fw fa-send" style="width: 120px;height: 70px;color: white;background-color: black;" id="cmdbSave" value="#{langsys['Send']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                             <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                                 <p:graphicImage name="/images/ajax-loader.gif"/>
                             </p:dialog>
                             <p:ajax  listener="#{transBean.saveTransCallQuickOrder('Send','PARENT',generalUserSetting.currentStore.storeId,11,16,generalUserSetting.currentSaleType,trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor,transBean.authorisedByUserDetail,null,statusBean)}" process="@form" update="pnlHeader pnlCentre pnlButtons pnlMessage growl1 pnlgOutput"/>
                         </p:commandButton>
-                        <p:commandButton icon="fa fa-fw fa-thumbs-o-up" style="width: 120px;height: 70px;color: white;background-color: black;" id="cmdbSaveProcess" value="Process" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                        <p:commandButton icon="fa fa-fw fa-thumbs-o-up" style="width: 120px;height: 70px;color: white;background-color: black;" id="cmdbSaveProcess" value="#{langsys['Process']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                             <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                                 <p:graphicImage name="/images/ajax-loader.gif"/>
                             </p:dialog>
                             <p:ajax listener="#{transBean.saveTransCallQuickOrder('Process','PARENT',generalUserSetting.currentStore.storeId,11,16,generalUserSetting.currentSaleType,trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor,transBean.authorisedByUserDetail,null,statusBean)}" process="@form" update="pnlHeader pnlCentre pnlButtons pnlMessage growl1 pnlgOutput"/>
                         </p:commandButton>
-                        <p:commandButton icon="fa fa-fw fa-money" style="width: 120px;height: 70px;color: white;background-color: black;" id="cmdbPay" value="Pay" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" actionListener="#{transBean.saveTransCallQuickOrder('Pay','PARENT',generalUserSetting.currentStore.storeId,11,16,generalUserSetting.currentSaleType,trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor,transBean.authorisedByUserDetail,null,statusBean)}" process="@form" update="@form">
+                        <p:commandButton icon="fa fa-fw fa-money" style="width: 120px;height: 70px;color: white;background-color: black;" id="cmdbPay" value="#{langsys['Pay']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" actionListener="#{transBean.saveTransCallQuickOrder('Pay','PARENT',generalUserSetting.currentStore.storeId,11,16,generalUserSetting.currentSaleType,trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor,transBean.authorisedByUserDetail,null,statusBean)}" process="@form" update="@form">
                             <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                                 <p:graphicImage name="/images/ajax-loader.gif"/>
                             </p:dialog>
                         </p:commandButton>
-                        <p:commandButton icon="fa fa-fw fa-save" style="width: 120px;height: 70px;color: white;background-color: black;" id="cmdbSaveInvoice" value="Invoice" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" actionListener="#{transBean.saveTransCallQuickOrder('Invoice','PARENT',generalUserSetting.currentStore.storeId,11,16,generalUserSetting.currentSaleType,trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor,transBean.authorisedByUserDetail,null,statusBean)}" process="@form" update="@form">
+                        <p:commandButton icon="fa fa-fw fa-save" style="width: 120px;height: 70px;color: white;background-color: black;" id="cmdbSaveInvoice" value="#{langsys['Invoice']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" actionListener="#{transBean.saveTransCallQuickOrder('Invoice','PARENT',generalUserSetting.currentStore.storeId,11,16,generalUserSetting.currentSaleType,trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor,transBean.authorisedByUserDetail,null,statusBean)}" process="@form" update="@form">
                             <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                                 <p:graphicImage name="/images/ajax-loader.gif"/>
                             </p:dialog>
                         </p:commandButton>
-                        <p:commandButton icon="fa fa-fw fa-eraser" style="width: 120px;height: 70px;color: white;background-color: black;" id="cmdbClear" value="Clear">
+                        <p:commandButton icon="fa fa-fw fa-eraser" style="width: 120px;height: 70px;color: white;background-color: black;" id="cmdbClear" value="#{langsys['Clear']}">
                             <f:ajax listener="#{transBean.clearAll2CallQuickOder(trans,transItemBean.activeTransItems,transItem,itemBean.selectedItem,transactorBean.selectedTransactor,2,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor,null,null,statusBean)}" execute="@form" render="pnlHeader pnlCentre pnlButtons pnlMessage growl1 pnlgOutput"/>
                             <f:ajax listener="#{transBean.setActionMessage('')}" execute="@form" render="pnlHeader pnlCentre pnlButtons pnlMessage growl1 pnlgOutput"/>
                         </p:commandButton>

@@ -205,14 +205,14 @@
             </h:panelGrid>
             <p:fieldset legend="Depreciation" id="fsDepreciation">
                 <h:panelGrid id="pgrdDepreciation" columns="5">
-                    <h:outputLabel value="#{langsys['Depreciation']} #{langsys['Start']} #{langsys['Date']}"/>
-                    <h:outputLabel value="#{langsys['Depreciation']} #{langsys['Method']}"/>
-                    <h:outputLabel value="#{langsys['Depreciation']} #{langsys['Value']}"/>
-                    <h:outputLabel value="#{langsys['Depreciation']} #{langsys['Rate']}"/>
+                    <h:outputLabel value="#{langsys['Start']} #{langsys['Date']}"/>
+                    <h:outputLabel value="#{langsys['Method']}"/>
+                    <h:outputLabel value="#{langsys['Value']}"/>
+                    <h:outputLabel value="#{langsys['Rate']}"/>
                     <h:outputLabel value="#{langsys['Effective']} #{langsys['Life']}(#{langsys['Years']})"/>
                     <p:calendar id="calDepStartDate" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{transItem.depStartDate}" size="20" pattern="#{companySetting.getDateFormat()}"/>
                     <h:selectOneMenu styleClass="clsMenu" id="menuDepMethod" style="width: 200px;" value="#{transItem.depMethodId}">
-                        <f:selectItems value="#{depMethodBean.depMethods}" var="dm" itemLabel="#{langsys[dm.depMethodName]}" itemValue="#{dm.depMethodId}"/>
+                        <f:selectItems value="#{depMethodBean.depMethods}" var="dm" itemLabel="#{dm.depMethodName}" itemValue="#{dm.depMethodId}"/>
                         <f:ajax event="change"/>
                     </h:selectOneMenu>
                     <h:inputText id="itxtResidualValue" styleClass="clsInputTransItem" autocomplete="off" value="#{transItem.residualValue}">

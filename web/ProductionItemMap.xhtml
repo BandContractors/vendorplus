@@ -30,11 +30,11 @@
         <h:form id="ItemMapForm" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
                     return false;">
             <h:panelGrid styleClass="clsGridMainHeader" columns="1">
-                <h:outputLabel styleClass="clsLabelTop" id="olblItemMapHeader" value="Product Inputs"/>
+                <h:outputLabel styleClass="clsLabelTop" id="olblItemMapHeader" value="#{langsys['Product']} #{langsys['Inputs']}"/>
             </h:panelGrid>
 
             <h:panelGrid id="gridParentItem" styleClass="clsGridMainInput" columns="3">
-                <p:outputLabel value="Product (Output)"/>
+                <p:outputLabel value="#{langsys['Product']} (#{langsys['Output']})"/>
                 <p:autoComplete id="autcItem1" widgetVar="WautcItem1" value="#{itemBean.selectedItem}"  
                                 completeMethod="#{itemBean.getItemObjectListForProduction}" 
                                 var="itm" 
@@ -43,16 +43,16 @@
                                 converter="ItemConverter" style="text-align: left" 
                                 forceSelection="true" queryDelay="0" 
                                 >
-                    <p:column headerText="Item Description" style="text-align: left" >  
+                    <p:column headerText="#{langsys['Item']} #{langsys['Description']}" style="text-align: left" >  
                         #{itm.description} 
                     </p:column>
-                    <p:column headerText="Alias" style="text-align: left" >  
+                    <p:column headerText="#{langsys['Alias']}" style="text-align: left" >  
                         #{itm.alias_name} 
                     </p:column>
-                    <p:column headerText="Unit" style="text-align: left">  
+                    <p:column headerText="#{langsys['Unit']}" style="text-align: left">  
                         #{itm.unitSymbol}
                     </p:column> 
-                    <p:column headerText="Category" style="text-align: left">  
+                    <p:column headerText="#{langsys['Category']}" style="text-align: left">  
                         #{itm.categoryName}
                     </p:column>
                     <p:ajax event="blur" listener="#{itemProductionMap.setOutputItemId(itemBean.selectedItem.itemId)}" process="@this" update="proItemId"/>
@@ -60,11 +60,11 @@
                 </p:autoComplete>
                 <p:outputLabel id="proItemId" value="#{unitBean.getUnit(itemBean.selectedItem.unitId).unitSymbol}"/>
             </h:panelGrid>
-            <p:fieldset legend="Raw Material (Input)">
+            <p:fieldset legend="#{langsys['Raw Material']} (#{langsys['Input']})">
                 <h:panelGrid id="gridChildItems" columns="4">
-                    <p:outputLabel value="Item Description"/>
-                    <p:outputLabel value="Unit"/>
-                    <p:outputLabel value="Qty"/>
+                    <p:outputLabel value="#{langsys['Item']} #{langsys['Description']}"/>
+                    <p:outputLabel value="#{langsys['Unit']}"/>
+                    <p:outputLabel value="#{langsys['Qty']}"/>
                     <p:outputLabel value=""/>
                     <p:autoComplete id="proItem" widgetVar="WproItem" value="#{itemBean.selectedItemX}"  
                                     completeMethod="#{itemBean.getItemObjectListForRawMaterial}" 
@@ -74,19 +74,19 @@
                                     converter="ItemConverter" style="text-align: left" 
                                     forceSelection="true" queryDelay="0" 
                                     >
-                        <p:column headerText="Item Description" style="text-align: left" >  
+                        <p:column headerText="#{langsys['Item']} #{langsys['Description']}" style="text-align: left" >  
                             #{pro_itm.description} 
                         </p:column> 
-                        <p:column headerText="Item Code" style="text-align: left" >  
+                        <p:column headerText="#{langsys['Item']} #{langsys['Code']}" style="text-align: left" >  
                             #{pro_itm.itemCode} 
                         </p:column> 
-                        <p:column headerText="Unit" style="text-align: left">  
+                        <p:column headerText="#{langsys['Unit']}" style="text-align: left">  
                             #{pro_itm.unitSymbol}
                         </p:column> 
-                        <p:column headerText="Category" style="text-align: left">  
+                        <p:column headerText="#{langsys['Category']}" style="text-align: left">  
                             #{pro_itm.categoryName}
                         </p:column>
-                        <p:column headerText="Currency" style="text-align: left">
+                        <p:column headerText="#{langsys['Currency']}" style="text-align: left">
                             <h:outputText value="#{pro_itm.currencyCode}">
                             </h:outputText>
                         </p:column>
@@ -95,7 +95,7 @@
                     </p:autoComplete>
                     <p:outputLabel id="inputUnit" value="#{unitBean.getUnit(itemBean.selectedItemX.unitId).unitSymbol}"/>
                     <p:inputText value="#{itemProductionMap.inputQty}"/>                    
-                    <p:commandButton id="cmdbAddItem" value="Add Item" >
+                    <p:commandButton id="cmdbAddItem" value="#{langsys['Add']} #{langsys['Item']}" >
                         <p:ajax listener="#{itemProductionMapBean.addItem(itemProductionMap,itemProductionMapBean.itemProductionMapsListEdit,itemBean.selectedItemX)}" process="@form" update="gridChildItems dtblListEdit growl1"/>
                     </p:commandButton>
                 </h:panelGrid>
@@ -105,19 +105,19 @@
                              >
                     <p:column>
                         <!-- column header -->
-                        <f:facet name="header">Raw Material(Input)</f:facet>
+                        <f:facet name="header">#{langsys['Raw Material']}(#{langsys['Input']})</f:facet>
                         <!-- row record -->
                         #{itm1.inputItemName}
                     </p:column>
                     <p:column style="width: 50px;">
                         <!-- column header -->
-                        <f:facet name="header">Unit</f:facet>
+                        <f:facet name="header">#{langsys['Unit']}</f:facet>
                         <!-- row record -->
                         #{itm1.inputItemUnit}
                     </p:column>
                     <p:column style="width: 100px;">
                         <!-- column header -->
-                        <f:facet name="header">Qty</f:facet>
+                        <f:facet name="header">#{langsys['Qty']}</f:facet>
                         <!-- row record -->
                         #{itm1.inputQty}
                     </p:column>
@@ -130,7 +130,7 @@
                         </h:commandLink>
                     </p:column> 
                 </p:dataTable>
-                <h:commandButton styleClass="clsButtonBig" value="Save" >
+                <h:commandButton styleClass="clsButtonBig" value="#{langsys['Save']}" >
                     <f:ajax listener="#{itemProductionMapBean.saveItemProductionMap(itemProductionMap,itemProductionMapBean.itemProductionMapsListEdit,itemProductionMapBean.itemProductionMapsList)}" execute="gridParentItem gridChildItems" render="dtblList growl2"/>
                 </h:commandButton>
             </p:fieldset>
@@ -140,7 +140,7 @@
                          >  
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Product (Output)</f:facet>
+                    <f:facet name="header">#{langsys['Product']} (#{langsys['Output']})</f:facet>
                     <!-- row record -->
                     #{itm2.outputItemName}
                 </p:column>
@@ -152,7 +152,7 @@
                 </p:column>
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Raw Material (Input)</f:facet>
+                    <f:facet name="header">#{langsys['Raw Material']} (#{langsys['Input']})</f:facet>
                     <!-- row record -->
                     #{itm2.inputItemName}
                 </p:column>
@@ -164,7 +164,7 @@
                 </p:column>
                 <p:column style="width: 50px;">
                     <!-- column header -->
-                    <f:facet name="header">Qty</f:facet>
+                    <f:facet name="header">#{langsys['Qty']}</f:facet>
                     <!-- row record -->
                     #{itm2.inputQty}
                 </p:column>
@@ -172,7 +172,7 @@
                     <!-- column header -->
                     <f:facet name="header"></f:facet>
                     <!-- row record -->
-                    <h:commandLink value="Delete" action="#{itemProductionMapBean.deleteItemProductionMap(itm2,itemProductionMap,itemProductionMapBean.itemProductionMapsList)}" onclick="return confirmDelete();">
+                    <h:commandLink value="#{langsys['Delete']}" action="#{itemProductionMapBean.deleteItemProductionMap(itm2,itemProductionMap,itemProductionMapBean.itemProductionMapsList)}" onclick="return confirmDelete();">
                         <f:ajax execute="@form" render="ItemMapForm:dtblList ItemMapForm:growl2"/>
                     </h:commandLink>
                 </p:column> 

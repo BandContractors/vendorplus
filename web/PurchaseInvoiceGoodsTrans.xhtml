@@ -76,8 +76,8 @@
                 </p:panel>
                 <p:panelGrid columns="3" id="pnlTransactor">
                     <p:commandLink actionListener="#{transactorBean.openChildTransactor('SUPPLIER')}" value="#{langsys[menuItemBean.menuItemObj.SUPPLIER_NAME]}"/>
-                    <h:outputLabel id="olblDebtCredit" style="color: coral;font-weight: bold;" value="#{langsys['Payable']} (#{langsys[generalUserSetting.LOCAL_CURRENCY.currencyCode]})"/>
-                    <h:outputLabel id="olblDeposit" style="color: green;font-weight: bold;" value="#{langsys['Prepaid']} (#{langsys[trans.currencyCode]})"/>
+                    <h:outputLabel id="olblDebtCredit" style="color: coral;font-weight: bold;" value="#{langsys['Payable']} (#{generalUserSetting.LOCAL_CURRENCY.currencyCode})"/>
+                    <h:outputLabel id="olblDeposit" style="color: green;font-weight: bold;" value="#{langsys['Prepaid']} (#{trans.currencyCode})"/>
                     <h:inputText id="itxtRetrievedTransactor" value="#{transactorBean.getTransactor(trans.transactorId).transactorNames}" disabled="true" rendered="#{trans.transactionRef.length()>0}">
                         <f:ajax event="blur" render="olblDebtCredit itxtDebtCredit itxtPrepaidAcc"/>
                     </h:inputText>
