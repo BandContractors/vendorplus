@@ -26,23 +26,23 @@
         <h:form id="form" styleClass="clsMainFrom">
 
             <h:panelGrid styleClass="clsGridMainHeader" columns="1">
-                <h:outputLabel styleClass="clsLabelTop" id="olbltransactor_segmentHeader" value="Partner Segment"/>
+                <h:outputLabel styleClass="clsLabelTop" id="olbltransactor_segmentHeader" value="#{langsys['Partner']} #{langsys['Segment']}"/>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainInput" columns="2">
-                <h:outputLabel  value="Segment Name:"/>
+                <h:outputLabel  value="#{langsys['Segment']} #{langsys['Name']}:"/>
                 <h:inputText styleClass="clsInput" id="itxtSegmentName" value="#{transactor_segment.segment_name}" autocomplete="off"/>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainCommands" columns="1">
                 <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
-                    <h:commandButton styleClass="clsButton" id="cmdbSave" value="Save">
+                    <h:commandButton styleClass="clsButton" id="cmdbSave" value="#{langsys['Save']}">
                         <f:ajax listener="#{transactor_segmentBean.saveTransactor_segment(transactor_segment)}" execute="@form" render="@form" />
                     </h:commandButton>
-                    <h:commandButton styleClass="clsButton" id="cmdbClear" value="Clear">
+                    <h:commandButton styleClass="clsButton" id="cmdbClear" value="#{langsys['Clear']}">
                         <f:ajax listener="#{transactor_segmentBean.clearTransactor_segment(transactor_segment)}" execute="@form" render="@form" />
                     </h:commandButton>
-                    <h:commandButton styleClass="clsButton" id="cmdbDelete" value="Delete" onclick="return confirmDelete();">
+                    <h:commandButton styleClass="clsButton" id="cmdbDelete" value="#{langsys['Delete']}" onclick="return confirmDelete();">
                         <f:ajax listener="#{transactor_segmentBean.deleteTransactor_segment(transactor_segment)}" execute="@form" render="@form" />
                     </h:commandButton>
                 </h:panelGrid>
@@ -63,15 +63,15 @@
                 </p:column>
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Segment Name</f:facet>
+                    <f:facet name="header">#{langsys['Segment']} #{langsys['Name']}</f:facet>
                     <!-- row record -->
                     #{s.segment_name}
                 </p:column>
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Action</f:facet>
+                    <f:facet name="header">#{langsys['Action']}</f:facet>
                     <!-- row record -->
-                    <h:commandLink value="Edit">
+                    <h:commandLink value="#{langsys['Edit']}">
                         <f:ajax listener="#{transactor_segmentBean.displayTransactor_segment(s,transactor_segment)}" execute="@form" render="@form"/>
                     </h:commandLink>
                     &nbsp;

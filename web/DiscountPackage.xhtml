@@ -29,42 +29,42 @@
         <h:form id="form" styleClass="clsMainFrom">
 
             <h:panelGrid styleClass="clsGridMainHeader" columns="1">
-                <h:outputLabel styleClass="clsLabelTop" id="olbldiscountPackageHeader" value="Trade Discount Packages"/>
+                <h:outputLabel styleClass="clsLabelTop" id="olbldiscountPackageHeader" value="#{langsys['Item']} #{langsys['Discount']} #{langsys['Packages']}"/>
             </h:panelGrid>
 
             <h:panelGrid id="pnlgInput" styleClass="clsGridMainInput" columns="4">
                 <h:panelGrid columns="2">
-                    <h:outputLabel  value="Package Name:"/>
+                    <h:outputLabel  value="#{langsys['Package']} #{langsys['Name']}:"/>
                     <h:inputText styleClass="clsInput" id="itxtPackageName" value="#{discountPackage.packageName}" autocomplete="off" style="width: 200px;"/>
-                    <h:outputLabel  value="Start Date:"/>
+                    <h:outputLabel  value="#{langsys['Start']} #{langsys['Date']}:"/>
                     <p:calendar styleClass="clsInput" id="calStartDate" pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{discountPackage.startDate}" size="16"/>
-                    <h:outputLabel  value="End Date:"/>
+                    <h:outputLabel  value="#{langsys['End']} #{langsys['Date']}:"/>
                     <p:calendar styleClass="clsInput" id="calEndDate" pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{discountPackage.endDate}" size="16"/>
-                    <h:outputLabel  value="From Day Time:"/>
+                    <h:outputLabel  value="#{langsys['From']} #{langsys['Day']} #{langsys['Time']}:"/>
                     <p:calendar styleClass="clsInput" id="calFromTime" pattern="HH:mm" value="#{discountPackage.fromTime}" size="16" timeOnly="true"/>
-                    <h:outputLabel  value="To Day Time:"/>
+                    <h:outputLabel  value="#{langsys['To']} #{langsys['Day']} #{langsys['Time']}:"/>
                     <p:calendar styleClass="clsInput" id="calToTime" pattern="HH:mm" value="#{discountPackage.toTime}" size="16" timeOnly="true"/>
                 </h:panelGrid>
                 <h:panelGrid columns="1" style="background-color: yellow;width: 170px;">
-                    <h:outputLabel  value="Only on Day(s)" style="font-weight: bold;"/>
+                    <h:outputLabel  value="#{langsys['Only']} #{langsys['on']} #{langsys['Day']}" style="font-weight: bold;"/>
                     <p:selectManyCheckbox id="grididDays" value="#{discountPackage.selectedDays}" layout="grid" columns="2">
                         <f:selectItems  value="#{storeBean.weekDaysList}" var="wd" itemLabel="#{wd.storeName}" itemValue="#{wd.storeId}" />
                     </p:selectManyCheckbox>
                 </h:panelGrid>
                 <h:panelGrid columns="1">
-                    <h:outputLabel  value="Only to #{companySetting.getStoreEquivName()}(s)" style="font-weight: bold;"/>
+                    <h:outputLabel  value="#{langsys['Only']} #{langsys['to']} #{companySetting.getStoreEquivName()}" style="font-weight: bold;"/>
                     <p:selectManyCheckbox id="gridid" value="#{discountPackage.selectedStores}" layout="grid" columns="1">
                         <f:selectItems  value="#{storeBean.storesAll}" var="st" itemLabel="#{st.storeName}" itemValue="#{st.storeId}" />
                     </p:selectManyCheckbox>
                 </h:panelGrid>
                 <h:panelGrid columns="1" style="background-color: yellow;">
-                    <h:outputLabel  value="Only to Segment(s)" style="font-weight: bold;"/>
+                    <h:outputLabel  value="#{langsys['Only']} #{langsys['to']} #{langsys['Segment']}" style="font-weight: bold;"/>
                     <p:selectManyCheckbox id="grididSegment" value="#{discountPackage.selectedSegments}" layout="grid" columns="1">
                         <f:selectItems  value="#{transactor_segmentBean.transactor_segments}" var="ts" itemLabel="#{ts.segment_name}" itemValue="#{ts.transactor_segment_id}" />
                     </p:selectManyCheckbox>
                 </h:panelGrid>
                 <h:panelGrid columns="1">
-                    <h:outputLabel  value="Only to Partner(s)" style="font-weight: bold;"/>
+                    <h:outputLabel  value="#{langsys['Only']} #{langsys['to']} #{langsys['Partner']}" style="font-weight: bold;"/>
                     <p:autoComplete id="autcTransactor" multiple="true" value="#{discountPackage.selectedTransactors}" 
                                     completeMethod="#{transactorBean.getTransactorActiveObjectList}" 
                                     var="trct" 
@@ -73,16 +73,16 @@
                                     converter="TransactorConverter" style="text-align: left;" 
                                     forceSelection="true" queryDelay="0" 
                                     >
-                        <p:column headerText="Names" style="text-align: left" >  
+                        <p:column headerText="#{langsys['Names']}" style="text-align: left" >  
                             #{trct.transactorNames} 
                         </p:column>
-                        <p:column headerText="Reference No" style="text-align: left" >  
+                        <p:column headerText="#{langsys['Reference']} #{langsys['No.']}" style="text-align: left" >  
                             #{trct.transactorRef} 
                         </p:column>
-                        <p:column headerText="Type" style="text-align: left" >  
+                        <p:column headerText="#{langsys['Type']}" style="text-align: left" >  
                             #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)}
                         </p:column> 
-                        <p:column headerText="Contact Person" style="text-align: left">  
+                        <p:column headerText="#{langsys['Contact']} #{langsys['Person']}" style="text-align: left">  
                             #{trct.cpName} 
                         </p:column> 
                     </p:autoComplete>
@@ -91,16 +91,16 @@
 
             <h:panelGrid styleClass="clsGridMainCommands" columns="1">
                 <h:panelGrid styleClass="clsGridMainCommands1" columns="3">
-                    <p:commandButton styleClass="clsButtonBig" id="cmdbSave" value="SAVE (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                    <p:commandButton styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['SAVE']} (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
                         <p:ajax listener="#{discountPackageBean.saveDiscountPackage(discountPackage)}" process="@form" update="@this pnlgInput pnlMessage pnlList" />
                     </p:commandButton>
-                    <p:commandButton styleClass="clsButtonBig" id="cmdbClear" value="CLEAR (ALT+C)" accesskey="c">
+                    <p:commandButton styleClass="clsButtonBig" id="cmdbClear" value="#{langsys['CLEAR']} (ALT+C)" accesskey="c">
                         <p:ajax listener="#{discountPackageBean.clearDiscountPackage(discountPackage)}" process="@form" update="pnlgInput pnlMessage"/>
                     </p:commandButton>
-                    <p:commandButton styleClass="clsButtonBig" id="cmdbDelete" value="DELETE (ALT+D)" accesskey="d"  onclick="return confirmDelete();">
+                    <p:commandButton styleClass="clsButtonBig" id="cmdbDelete" value="#{langsys['DELETE']} (ALT+D)" accesskey="d"  onclick="return confirmDelete();">
                         <p:ajax listener="#{discountPackageBean.deleteDiscountPackage(discountPackage)}" process="@form" update="pnlgInput pnlMessage pnlList"/>
                     </p:commandButton>
                 </h:panelGrid>
@@ -111,7 +111,7 @@
             </h:panelGrid>
             <h:panelGrid id="pnlList" columns="1">
                 <h:panelGrid id="pnlgSearch" styleClass="clsGridMainSearch" columns="2">
-                    <h:outputLabel id="olblMainSearch" value="Search Discount Package:"/>
+                    <h:outputLabel id="olblMainSearch" value="#{langsys['Search']} #{langsys['Discount']} #{langsys['Package']}:"/>
                     <h:inputText id="itxtMainSearch" value="#{discountPackageBean.searchPackageName}" autocomplete="off">
                         <f:ajax event="keyup" listener="#{discountPackageBean.refreshList(discountPackageBean.searchPackageName)}" render="dtblDiscountPackage"/>
                     </h:inputText>
@@ -121,34 +121,34 @@
                              > 
                     <p:column>
                         <!-- column header -->
-                        <f:facet name="header"> Package Name </f:facet>
+                        <f:facet name="header"> #{langsys['Package']} #{langsys['Name']} </f:facet>
                         <!-- row record -->
                         <h:outputLabel style="color: #{d.statusColor};" value="#{d.packageName}"/>
                     </p:column>
 
                     <p:column>
                         <!-- column header -->
-                        <f:facet name="header"> Start Date </f:facet>
+                        <f:facet name="header"> #{langsys['Start']} #{langsys['Date']} </f:facet>
                         <!-- row record -->
                         <h:outputLabel value="#{utilityBean.formatDateTime(d.startDate)}" style="color: #{d.statusColor};"/>
                     </p:column>
 
                     <p:column>
                         <!-- column header -->
-                        <f:facet name="header"> End Date </f:facet>
+                        <f:facet name="header"> #{langsys['End']} #{langsys['Date']} </f:facet>
                         <!-- row record -->
                         <h:outputLabel value="#{utilityBean.formatDateTime(d.endDate)}" style="color: #{d.statusColor};"/>
                     </p:column>
 
                     <p:column>
                         <!-- column header -->
-                        <f:facet name="header">Action</f:facet>
+                        <f:facet name="header">#{langsys['Action']}</f:facet>
                         <!-- row record -->
-                        <p:commandLink value="Edit" style="color: #{d.statusColor};">
+                        <p:commandLink value="#{langsys['Edit']}" style="color: #{d.statusColor};">
                             <p:ajax listener="#{discountPackageBean.displayDiscountPackage(d,discountPackage)}" process="dtblDiscountPackage" update="form:pnlgInput"/>
                         </p:commandLink>
                         &nbsp;
-                        <p:commandLink value="Items" style="color: #{d.statusColor};">
+                        <p:commandLink value="#{langsys['Items']}" style="color: #{d.statusColor};">
                             <p:ajax listener="#{discountPackageItemBean.refreshDiscountPackageItems(d.discountPackageId)}"/>
                             <p:ajax listener="#{discountPackageItemBean.clearDiscountPackageItem(discountPackageItem)}"/>
                             <p:ajax listener="#{discountPackageItemBean.setActionMessage('')}"/>
@@ -160,12 +160,12 @@
             </h:panelGrid>
             <p:sidebar widgetVar="sbarItems" position="left" style="width: 500px;">
                 <h:panelGrid id="pnlgItemsLabel" style="background-color:black;color: white;">
-                    <h:outputLabel value="Items Included in : #{discountPackage.packageName}"/>
+                    <h:outputLabel value="#{langsys['Items']} #{langsys['Included']} #{langsys['in']} : #{discountPackage.packageName}"/>
                 </h:panelGrid>
                 <p:scrollPanel mode="native" style="width:100%;height:90%;border: none;">
                     <h:panelGrid columns="1" id="pnlSideInput1">
                         <h:panelGrid columns="1">
-                            <h:outputLabel  value="Categories" style="font-weight: bold;"/>
+                            <h:outputLabel  value="#{langsys['Categories']}" style="font-weight: bold;"/>
                             <p:autoComplete id="autcCategory" multiple="true" value="#{discountPackageItem.selectedCategories}" 
                                             completeMethod="#{categoryBean.getCategoriesByCategoryName}" 
                                             var="cat" 
@@ -174,13 +174,13 @@
                                             converter="CategoryConverter" style="text-align: left;" 
                                             forceSelection="true" queryDelay="0" 
                                             >
-                                <p:column headerText="Category" style="text-align: left" >  
+                                <p:column headerText="#{langsys['Category']}" style="text-align: left" >  
                                     #{cat.categoryName} 
                                 </p:column>
                             </p:autoComplete>
                         </h:panelGrid>
                         <h:panelGrid columns="1">
-                            <h:outputLabel  value="Subcategories" style="font-weight: bold;"/>
+                            <h:outputLabel  value="#{langsys['Subcategories']}" style="font-weight: bold;"/>
                             <p:autoComplete id="autcSubCategory" multiple="true" value="#{discountPackageItem.selectedSubCategories}" 
                                             completeMethod="#{subCategoryBean.getSubCategoriesByCatSubcatName}" 
                                             var="subcat" 
@@ -189,16 +189,16 @@
                                             converter="SubCategoryConverter" style="text-align: left;" 
                                             forceSelection="true" queryDelay="0" 
                                             >
-                                <p:column headerText="Subcategory" style="text-align: left" >  
+                                <p:column headerText="#{langsys['Subcategory']}" style="text-align: left" >  
                                     #{subcat.subCategoryName} 
                                 </p:column>
-                                <p:column headerText="Category" style="text-align: left" >  
+                                <p:column headerText="#{langsys['Category']}" style="text-align: left" >  
                                     #{subcat.categoryName} 
                                 </p:column>
                             </p:autoComplete>
                         </h:panelGrid>
                         <h:panelGrid columns="1">
-                            <h:outputLabel  value="Items" style="font-weight: bold;"/>
+                            <h:outputLabel  value="#{langsys['']}Items" style="font-weight: bold;"/>
                             <p:autoComplete id="autcItem" multiple="true" widgetVar="WautcItem" value="#{discountPackageItem.selectedItems}"  
                                             completeMethod="#{itemBean.getItemObjectList}" 
                                             var="itm" 
@@ -207,25 +207,25 @@
                                             converter="ItemConverter" style="text-align: left" 
                                             forceSelection="true" queryDelay="0" 
                                             >
-                                <p:column headerText="Item Description" style="text-align: left" >  
+                                <p:column headerText="#{langsys['Item']} #{langsys['Description']}" style="text-align: left" >  
                                     #{itm.description} 
                                 </p:column>
-                                <p:column headerText="Retailsale Price" style="text-align: left">  
+                                <p:column headerText="#{langsys['Retail']} #{langsys['Sale']} #{langsys['Price']}" style="text-align: left">  
                                     <h:outputLabel value="#{itm.unitRetailsalePrice}">
                                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                     </h:outputLabel>
                                 </p:column>
-                                <p:column headerText="Wholesale Price" style="text-align: left">  
+                                <p:column headerText="#{langsys['Wholesale']} #{langsys['Price']}" style="text-align: left">  
                                     <h:outputLabel value="#{itm.unitWholesalePrice}">
                                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                     </h:outputLabel>
                                 </p:column>
-                                <p:column headerText="Hire Price" style="text-align: left">  
+                                <p:column headerText="#{langsys['Hire']} #{langsys['Price']}" style="text-align: left">  
                                     <h:outputLabel value="#{itm.unit_hire_price}">
                                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                     </h:outputLabel>
                                 </p:column>
-                                <p:column headerText="Currency" style="text-align: left">
+                                <p:column headerText="#{langsys['Currency']}" style="text-align: left">
                                     <h:outputText value="#{itm.currencyCode}">
                                     </h:outputText>
                                 </p:column>
@@ -233,34 +233,34 @@
                         </h:panelGrid>
                     </h:panelGrid>
                     <h:panelGrid id="pnlSideInput2" columns="2">
-                        <h:outputLabel  value="Quantity"/>
+                        <h:outputLabel  value="#{langsys['Quantity']}"/>
                         <h:inputText id="itxtQty" styleClass="clsInputTransItem" style="width: 195px" value="#{discountPackageItem.itemQty}" autocomplete="off" disabled="true">
                             <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
-                        <h:outputLabel  value="Retailsale Discount (%)"/>
+                        <h:outputLabel  value="#{langsys['Retail']} #{langsys['Sale']} #{langsys['Discount']} (%)"/>
                         <h:inputText id="itxtRetailsaleDiscount" styleClass="clsInputTransItem" style="width: 195px" value="#{discountPackageItem.retailsaleDiscountAmt}" autocomplete="off">
                             <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
-                        <h:outputLabel  value="Wholesale Discount (%)"/>
+                        <h:outputLabel  value="#{langsys['Wholesale']} #{langsys['Discount']} (%)"/>
                         <h:inputText id="itxtWholesaleDiscount" styleClass="clsInputTransItem" style="width: 195px" value="#{discountPackageItem.wholesaleDiscountAmt}" autocomplete="off">
                             <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
-                        <h:outputLabel  value="HirePrice Discount (%)"/>
+                        <h:outputLabel  value="#{langsys['Hire']} #{langsys['Price']} #{langsys['Discount']} (%)"/>
                         <h:inputText id="itxtHirePriceDiscount" styleClass="clsInputTransItem" style="width: 195px" value="#{discountPackageItem.hire_price_discount_amt}" autocomplete="off">
                             <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
                     </h:panelGrid>
                     <h:panelGrid columns="4">
-                        <p:commandButton id="cmdbSaveItems" value="Save" style="height: 40px;width: 100px;background-color: black;color: white;">
+                        <p:commandButton id="cmdbSaveItems" value="#{langsys['Save']}" style="height: 40px;width: 100px;background-color: black;color: white;">
                             <p:ajax listener="#{discountPackageItemBean.saveDiscountPackageItem(discountPackageItem,discountPackage)}" process="@form" update="pnlMessage2 pnlSideInput1 pnlSideInput2 dtblDPItems" />
                         </p:commandButton>
-                        <p:commandButton id="cmdbClearItems" value="Clear" style="height: 40px;width: 100px;background-color: black;color: white;">
+                        <p:commandButton id="cmdbClearItems" value="#{langsys['Clear']}" style="height: 40px;width: 100px;background-color: black;color: white;">
                             <p:ajax listener="#{discountPackageItemBean.clearDiscountPackageItem(discountPackageItem)}" process="@form" update="pnlMessage2 pnlSideInput1 pnlSideInput2"/>
                         </p:commandButton>
-                        <p:commandButton id="cmdbDeleteItems" value="Delete" style="height: 40px;width: 100px;background-color: black;color: white;">
+                        <p:commandButton id="cmdbDeleteItems" value="#{langsys['Delete']}" style="height: 40px;width: 100px;background-color: black;color: white;">
                             <p:ajax listener="#{discountPackageItemBean.deleteDiscountPackageItem(discountPackageItem)}" process="@form" update="pnlMessage2 pnlSideInput1 pnlSideInput2 dtblDPItems"/>
                         </p:commandButton>
-                        <p:commandButton id="cmdCloseItems" value="Close" oncomplete="PF('sbarItems').hide()" style="height: 40px;width: 100px;background-color: black;color: white;"/>
+                        <p:commandButton id="cmdCloseItems" value="#{langsys['Close']}" oncomplete="PF('sbarItems').hide()" style="height: 40px;width: 100px;background-color: black;color: white;"/>
                     </h:panelGrid>
                     <h:panelGrid  id="pnlMessage2" columns="1">
                         <h:outputLabel value="#{discountPackageItemBean.actionMessage}" style="color: red;"/>
@@ -270,7 +270,7 @@
                                  > 
                         <p:column>
                             <!-- column header -->
-                            <f:facet name="header">Qty</f:facet>
+                            <f:facet name="header">#{langsys['Qty']}</f:facet>
                             <!-- row record -->
                             <h:outputLabel value="#{di.itemQty}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -278,7 +278,7 @@
                         </p:column>
                         <p:column>
                             <!-- column header -->
-                            <f:facet name="header">Retail Disc(%)</f:facet>
+                            <f:facet name="header">#{langsys['Retail']} #{langsys['Discount']}(%)</f:facet>
                             <!-- row record -->
                             <h:outputLabel value="#{di.retailsaleDiscountAmt}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -286,7 +286,7 @@
                         </p:column>
                         <p:column>
                             <!-- column header -->
-                            <f:facet name="header">Wholesale Disc(%)</f:facet>
+                            <f:facet name="header">#{langsys['Wholesale']} #{langsys['Discount']}(%)</f:facet>
                             <!-- row record -->
                             <h:outputLabel value="#{di.wholesaleDiscountAmt}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -294,7 +294,7 @@
                         </p:column>
                         <p:column>
                             <!-- column header -->
-                            <f:facet name="header">Hire Disc(%)</f:facet>
+                            <f:facet name="header">#{langsys['Hire']} #{langsys['Discount']}(%)</f:facet>
                             <!-- row record -->
                             <h:outputLabel value="#{di.hire_price_discount_amt}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -304,7 +304,7 @@
                             <!-- column header -->
                             <f:facet name="header"></f:facet>
                             <!-- row record -->
-                            <p:commandLink value="Edit">
+                            <p:commandLink value="#{langsys['Edit']}">
                                 <p:ajax listener="#{discountPackageItemBean.displayDiscountPackageItem(di,discountPackageItem)}" process="dtblDPItems" update="form:pnlSideInput1 form:pnlSideInput2"/>
                             </p:commandLink>
                         </p:column>

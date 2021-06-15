@@ -33,17 +33,17 @@
         <h:form id="TransactionFormTransfer" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
                     return false;">
             <h:panelGrid styleClass="clsGridMainHeader" columns="3">
-                <h:outputLabel styleClass="clsLabelTop" id="olblTransactionHeader" value="ITEM TRANSFER REQUEST"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="Stock:No effect"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:No effect"/>
+                <h:outputLabel styleClass="clsLabelTop" id="olblTransactionHeader" value="#{langsys['ITEM']} #{langsys['TRANSFER']} #{langsys['REQUEST']}"/>
+                <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Stock']}:#{langsys['No']} #{langsys['effect']}"/>
+                <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Ledger']}:#{langsys['No']} #{langsys['effect']}"/>
             </h:panelGrid>
 
             <h:panelGrid id="pnlgHeader" styleClass="clsGridMainInput" columns="5">
-                <h:outputLabel  value="Request From"/>
-                <h:outputLabel  value="Request To"/>
-                <h:outputLabel  value="#{transBean.transTypeObj.transactionDateLabel}"/>
-                <h:outputLabel  value="Delivery Date"/>
-                <h:outputLabel  value="#{transBean.transTypeObj.transactionRefLabel}"/>
+                <h:outputLabel  value="#{langsys['Request']} #{langsys['From']}"/>
+                <h:outputLabel  value="#{langsys['Request']} #{langsys['To']}"/>
+                <h:outputLabel  value="#{langsys[transBean.transTypeObj.transactionDateLabel]}"/>
+                <h:outputLabel  value="#{langsys['Delivery']} #{langsys['Date']}"/>
+                <h:outputLabel  value="#{langsys[transBean.transTypeObj.transactionRefLabel]}"/>
 
                 <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}"/>
                 <h:selectOneMenu styleClass="clsMenu" id="menuToStore" value="#{trans.store2Id}" >
@@ -55,10 +55,10 @@
                 <h:inputText styleClass="clsInput" id="itxtTransactionRef" value="#{trans.transactionRef}" autocomplete="off"/>
             </h:panelGrid>
             <h:panelGrid id="gridTransItem" styleClass="clsGridMainInput" columns="4">
-                <h:outputLabel styleClass="clsLabelTransItem" value="Item Description"/>
-                <h:outputLabel styleClass="clsLabelTransItem" value="Item Details"/>
-                <h:outputLabel styleClass="clsLabelTransItem" value="Unit"/>
-                <h:outputLabel styleClass="clsLabelTransItem" value="Qty"/>
+                <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Item']} #{langsys['Description']}"/>
+                <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Item']} #{langsys['Details']}"/>
+                <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Unit']}"/>
+                <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Qty']}"/>
                 
                 <p:autoComplete id="autcItem" widgetVar="WautcItem" value="#{itemBean.selectedItem}"  
                                 completeMethod="#{itemBean.getItemObjectListForStockDispose}" 
@@ -68,19 +68,19 @@
                                 converter="ItemConverter" style="text-align: left" 
                                 forceSelection="true" queryDelay="0" 
                                 >
-                    <p:column headerText="Item Description" style="text-align: left" >  
+                    <p:column headerText="#{langsys['Item']} #{langsys['Description']}" style="text-align: left" >  
                         #{itm.description} 
                     </p:column>
-                    <p:column headerText="Alias" style="text-align: left" >  
+                    <p:column headerText="#{langsys['Alias']}" style="text-align: left" >  
                         #{itm.alias_name} 
                     </p:column>
-                    <p:column headerText="Item Code" style="text-align: left" >  
+                    <p:column headerText="#{langsys['Item']} #{langsys['Code']}" style="text-align: left" >  
                         #{itm.itemCode} 
                     </p:column>
-                    <p:column headerText="Unit" style="text-align: left">  
+                    <p:column headerText="#{langsys['Unit']}" style="text-align: left">  
                         #{unitBean.getUnit(itm.unitId).unitSymbol}
                     </p:column> 
-                    <p:column headerText="Category" style="text-align: left">  
+                    <p:column headerText="#{langsys['Category']}" style="text-align: left">  
                         #{categoryBean.getCategory(itm.categoryId).categoryName}
                     </p:column>
                     <p:ajax event="itemSelect" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,'',trans,transItem,itemBean.selectedItem,1.0)}" process="@this" update="itxtUnit itxtNarration"/>
@@ -93,10 +93,10 @@
                 </h:inputText>
             </h:panelGrid>
             <h:panelGrid id="gridTransItemButtons" styleClass="clsGridMainInput" columns="4">
-                <h:commandButton styleClass="clsButtonMedium" value="Add Item (ALT+A)" accesskey="a" >
+                <h:commandButton styleClass="clsButtonMedium" value="#{langsys['Add']} #{langsys['Item']} (ALT+A)" accesskey="a" >
                     <f:ajax listener="#{transItemBean.addTransItemTransferRequest(trans,statusBean,transItemBean.activeTransItems,transItem,itemBean.selectedItem)}" execute="@form" render="@form"/>
                 </h:commandButton>
-                <h:commandButton styleClass="clsButtonMedium" value="Clear Item (ALT+R)" accesskey="r">
+                <h:commandButton styleClass="clsButtonMedium" value="#{langsys['Clear']} #{langsys['Item']} (ALT+R)" accesskey="r">
                     <f:ajax listener="#{transBean.clearAll(trans,transItemBean.activeTransItems,transItem,itemBean.selectedItem,transactorBean.selectedTransactor,1,null)}" execute="@form" render="@form"/>
                 </h:commandButton>
             </h:panelGrid>
@@ -116,21 +116,21 @@
                 </p:column>
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Item Description</f:facet>
+                    <f:facet name="header">#{langsys['Item']} #{langsys['Description']}</f:facet>
                     <!-- row record -->
-                    <p:outputLabel value="#{transItemBean.showItemDescriptionCEC(ati)}" escape="false"/>
+                    <p:outputLabel value="#{langsys['']}#{transItemBean.showItemDescriptionCEC(ati)}" escape="false"/>
                     #{ati.narration}
                 </p:column>
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Unit</f:facet>
+                    <f:facet name="header">#{langsys['Unit']}</f:facet>
                     <!-- row record -->
                     #{ati.unitSymbol}
                 </p:column>
 
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Requested Qty</f:facet>
+                    <f:facet name="header">#{langsys['Requested']} #{langsys['Qty']}</f:facet>
                     <!-- row record -->
                     <h:inputText value="#{ati.itemQty}" style="width: 50px;">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -140,7 +140,7 @@
 
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Action</f:facet>
+                    <f:facet name="header">#{langsys['Action']}</f:facet>
                     <!-- row record -->
                     <h:commandButton id="cmdbRemoveItem" value="-">
                         <f:ajax listener="#{transItemBean.removeTransItemCEC(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans,transItemBean.activeTransItems,ati)}" execute="@form" render="@form"/>
@@ -149,8 +149,8 @@
             </p:dataTable>
 
             <h:panelGrid id="pgrdTermsConditions" styleClass="clsGridMainInput" columns="2">
-                <h:outputLabel styleClass="clsLabelTransItem" value="Request.Authorised.By"/>
-                <h:outputLabel styleClass="clsLabelTransItem" value="Request.Authorised.Date"/>
+                <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Request']} #{langsys['Authorised']} #{langsys['By']}"/>
+                <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Request']} #{langsys['Authorised']} #{langsys['Date']}"/>
                 <p:autoComplete id="autcTransactionUser" value="#{transBean.authorisedByUserDetail}" 
                                 completeMethod="#{userDetailBean.getUserDetailObjectListActive}" 
                                 var="ud" 
@@ -159,10 +159,10 @@
                                 converter="UserDetailConverter" style="text-align: left" 
                                 forceSelection="true" queryDelay="0" 
                                 >
-                    <p:column headerText="User/Staff Names" style="text-align: left" >  
+                    <p:column headerText="#{langsys['User']}/#{langsys['Staff']} #{langsys['Names']}" style="text-align: left" >  
                         #{ud.firstName} #{ud.secondName} #{ud.thirdName} 
                     </p:column> 
-                    <p:column headerText="User Category" style="text-align: left" >  
+                    <p:column headerText="#{langsys['User']} #{langsys['Category']}" style="text-align: left" >  
                         #{userCategoryBean.getUserCategory(ud.userCategoryId).userCategoryName} 
                     </p:column> 
                     <p:ajax event="itemSelect" listener="#{trans.setAuthorisedByUserDetailId(transBean.authorisedByUserDetail.userDetailId)}"/>
@@ -173,13 +173,13 @@
 
             <h:panelGrid styleClass="clsGridMainCommands" columns="1">
                 <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
-                    <p:commandButton styleClass="clsButtonBig" id="cmdbSave" value="SAVE (ALT+S)" accesskey="s" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                    <p:commandButton styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['SAVE']} (ALT+S)" accesskey="s" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
                         <p:ajax listener="#{transBean.saveTransCEC('PARENT',generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,'',trans,transItemBean.activeTransItems,null,null,null,null,transBean.authorisedByUserDetail,null)}" process="@form" update="@this pnlgHeader gridTransItem dtblTransactionItem pgrdTermsConditions pnlgMessage growl1 pnlgOutput"/>
                     </p:commandButton>
-                    <p:commandButton styleClass="clsButtonBig" id="cmdbClear" value="CLEAR (ALT+C)" accesskey="c">
+                    <p:commandButton styleClass="clsButtonBig" id="cmdbClear" value="#{langsys['CLEAR']} (ALT+C)" accesskey="c">
                         <p:ajax listener="#{transBean.clearAll2(trans,transItemBean.activeTransItems,transItem,itemBean.selectedItem,null,2,null,null,null,transBean.authorisedByUserDetail,null)}" process="@form" update="@this pnlgHeader gridTransItem gridItemStatus dtblTransactionItem pgrdTermsConditions pnlgMessage growl1 pnlgOutput"/>
                     </p:commandButton>
                 </h:panelGrid>

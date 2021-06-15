@@ -29,12 +29,12 @@
         <h:form id="form" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
                     return false;">
             <h:panelGrid styleClass="clsGridMainHeader" columns="1">
-                <h:outputLabel styleClass="clsLabelTop" id="olblTransactorHeader" value="MERGE PARTNER RECORDS"/>
+                <h:outputLabel styleClass="clsLabelTop" id="olblTransactorHeader" value="#{langsys['MERGE']} #{langsys['PARTNER']} #{langsys['RECORDS']}"/>
             </h:panelGrid>
 
             <h:panelGrid id="gridMainInput" styleClass="clsGridMainInput" columns="2">
                 <h:panelGrid id="pnlRetain" columns="2" styleClass="green" style="text-align: right;">
-                    <h:outputLabel value="Add records to:"/>
+                    <h:outputLabel value="#{langsys['Add']} #{langsys['records']} #{langsys['to']}:"/>
                     <p:autoComplete id="autcTransactor" value="#{transactorBean.selectedTransactor}" 
                                     completeMethod="#{transactorBean.getTransactorObjectList}" 
                                     var="trct" 
@@ -43,16 +43,16 @@
                                     converter="TransactorConverter" style="text-align: left" 
                                     forceSelection="true" queryDelay="0" 
                                     >
-                        <p:column headerText="Names" style="text-align: left" >  
+                        <p:column headerText="#{langsys['Names']}" style="text-align: left" >  
                             #{trct.transactorNames} 
                         </p:column> 
-                        <p:column headerText="Reference No" style="text-align: left" >  
+                        <p:column headerText="#{langsys['Reference']} #{langsys['No.']}" style="text-align: left" >  
                             #{trct.transactorRef} 
                         </p:column>
-                        <p:column headerText="Type" style="text-align: left" >  
+                        <p:column headerText="#{langsys['Type']}" style="text-align: left" >  
                             #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)} 
                         </p:column> 
-                        <p:column headerText="Contact Person" style="text-align: left">  
+                        <p:column headerText="#{langsys['Contact']} #{langsys['Person']}" style="text-align: left">  
                             #{trct.cpName} 
                         </p:column> 
                         <p:ajax event="itemSelect" listener="#{trans.setTransactorId(transactorBean.selectedTransactor.transactorId)}"/>
@@ -60,25 +60,25 @@
                         <p:ajax event="blur" listener="#{transBean.refreshCustomerBalances(trans)}" update="itxtRecBalance1 itxtPayBalance1 itxtDepBalance1 itxtAdvBalance1"/>
                         <p:ajax event="blur" listener="#{transBean.refreshSupplierBalances(trans)}" update="itxtRecBalance1 itxtPayBalance1 itxtDepBalance1 itxtAdvBalance1"/>
                     </p:autoComplete>
-                    <h:outputLabel value="Receivable Balance:"/>
+                    <h:outputLabel value="#{langsys['Receivable']} #{langsys['Balance']}:"/>
                     <h:inputText id="itxtRecBalance1" value="#{trans.balance_receivable}" autocomplete="off" style="width: 242px;" disabled="true">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
-                    <h:outputLabel value="Payable Balance:"/>
+                    <h:outputLabel value="#{langsys['Payable']} #{langsys['Balance']}:"/>
                     <h:inputText id="itxtPayBalance1" value="#{trans.balance_payable}" autocomplete="off" style="width: 242px;" disabled="true">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
-                    <h:outputLabel value="#{menuItemBean.menuItemObj.CUSTOMER_NAME} Deposit Balance:"/>
+                    <h:outputLabel value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]} #{langsys['Deposit']} #{langsys['Balance']}:"/>
                     <h:inputText id="itxtDepBalance1" value="#{trans.deposit_customer}" autocomplete="off" style="width: 242px;" disabled="true">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
-                    <h:outputLabel value="#{menuItemBean.menuItemObj.SUPPLIER_NAME} Advance Balance:"/>
+                    <h:outputLabel value="#{langsys[menuItemBean.menuItemObj.SUPPLIER_NAME]} #{langsys['Advance']} #{langsys['Balance']}:"/>
                     <h:inputText id="itxtAdvBalance1" value="#{trans.deposit_supplier}" autocomplete="off" style="width: 242px;" disabled="true">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
                 </h:panelGrid>
                 <h:panelGrid id="pnlDelete" columns="2" styleClass="red" style="text-align: right;">
-                    <h:outputLabel value="Delete records from:"/>
+                    <h:outputLabel value="#{langsys['Delete']} #{langsys['records']} #{langsys['from']}:"/>
                     <p:autoComplete id="autcTransactor2" value="#{transactorBean.selectedBillTransactor}" 
                                     completeMethod="#{transactorBean.getTransactorObjectList}" 
                                     var="trct" 
@@ -87,13 +87,13 @@
                                     converter="TransactorConverter" style="text-align: left" 
                                     forceSelection="true" queryDelay="0" 
                                     >
-                        <p:column headerText="Names" style="text-align: left" >  
+                        <p:column headerText="#{langsys['Names']}" style="text-align: left" >  
                             #{trct.transactorNames} 
                         </p:column> 
-                        <p:column headerText="Type" style="text-align: left" >  
+                        <p:column headerText="#{langsys['Type']}" style="text-align: left" >  
                             #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)} 
                         </p:column> 
-                        <p:column headerText="Contact Person" style="text-align: left">  
+                        <p:column headerText="#{langsys['Contact']} #{langsys['Person']}" style="text-align: left">  
                             #{trct.cpName} 
                         </p:column> 
                         <p:ajax event="itemSelect" listener="#{trans.setBillTransactorId(transactorBean.selectedBillTransactor.transactorId)}"/>
@@ -101,19 +101,19 @@
                         <p:ajax event="blur" listener="#{transBean.refreshCustomerBalances2(trans)}" update="itxtRecBalance2 itxtPayBalance2 itxtDepBalance2 itxtAdvBalance2"/>
                         <p:ajax event="blur" listener="#{transBean.refreshSupplierBalances2(trans)}" update="itxtRecBalance2 itxtPayBalance2 itxtDepBalance2 itxtAdvBalance2"/>
                     </p:autoComplete>
-                    <h:outputLabel value="Receivable Balance:"/>
+                    <h:outputLabel value="#{langsys['Receivable']} #{langsys['Balance']}:"/>
                     <h:inputText id="itxtRecBalance2" value="#{trans.balance_receivable2}" autocomplete="off" style="width: 242px;" disabled="true">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
-                    <h:outputLabel value="Payable Balance:"/>
+                    <h:outputLabel value="#{langsys['Payable']} #{langsys['Balance']}:"/>
                     <h:inputText id="itxtPayBalance2" value="#{trans.balance_payable2}" autocomplete="off" style="width: 242px;" disabled="true">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
-                    <h:outputLabel value="#{menuItemBean.menuItemObj.CUSTOMER_NAME} Deposit Balance:"/>
+                    <h:outputLabel value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]} #{langsys['Deposit']} #{langsys['Balance']}:"/>
                     <h:inputText id="itxtDepBalance2" value="#{trans.deposit_customer2}" autocomplete="off" style="width: 242px;" disabled="true">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
-                    <h:outputLabel value="#{menuItemBean.menuItemObj.SUPPLIER_NAME} Advance Balance:"/>
+                    <h:outputLabel value="#{langsys[menuItemBean.menuItemObj.SUPPLIER_NAME]} #{langsys['Advance']} #{langsys['Balance']}:"/>
                     <h:inputText id="itxtAdvBalance2" value="#{trans.deposit_supplier2}" autocomplete="off" style="width: 242px;" disabled="true">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
@@ -121,7 +121,7 @@
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainCommands" columns="1">
-                <p:commandButton styleClass="clsButtonBig" id="cmdbDelete" value="MERGE" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                <p:commandButton styleClass="clsButtonBig" id="cmdbDelete" value="#{langsys['MERGE']}" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                     <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                         <p:graphicImage name="/images/ajax-loader.gif"/>
                     </p:dialog>

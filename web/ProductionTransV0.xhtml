@@ -46,7 +46,7 @@
                     <f:selectItem itemValue="#{transBean.transReasonObj.transactionReasonId}" itemLabel="#{generalUserSetting.getCurrentStore().getStoreName()} / #{transBean.transReasonObj.transactionReasonName}"/>
                 </h:selectOneMenu>
                 <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Stock']}:#{langsys['Output']}↑ #{langsys['Input']}↓"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Ledger']}:#{langsys['INV']}-#{langsys['ACC']}↓↑ #{langsys['COS']}-#{langsys['ACC']}↓↑"/>
+                <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Ledger']}:INV ACC↓↑ COS-ACC↓↑"/>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainInput" columns="3">

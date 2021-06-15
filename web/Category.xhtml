@@ -26,35 +26,35 @@
         <h:form id="form" styleClass="clsMainFrom">
 
             <h:panelGrid styleClass="clsGridMainHeader" columns="1">
-                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeader" value="Item - Category"/>
+                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeader" value="#{langsys['Item']} #{langsys['Category']}"/>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainInput" columns="2">
-                <h:outputLabel  value="Category Name:"/>
+                <h:outputLabel  value="#{langsys['Category']} #{langsys['Name']}:"/>
                 <h:inputText styleClass="clsInput" id="itxtCategoryName" value="#{category.categoryName}" autocomplete="off"/>
-                <h:outputLabel  value="Display on Quick Order:"/>
+                <h:outputLabel  value="#{langsys['Display']} #{langsys['on']} #{langsys['Quick']} #{langsys['Order']}:"/>
                 <h:selectOneMenu value="#{category.display_quick_order}">
-                    <f:selectItem itemLabel="No" itemValue="0"/>
-                    <f:selectItem itemLabel="Yes" itemValue="1"/>
+                    <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
+                    <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
                 </h:selectOneMenu>
-                <h:outputLabel  value="List Rank:"/>
+                <h:outputLabel  value="#{langsys['List']} #{langsys['Rank']}:"/>
                 <h:inputText styleClass="clsInput" value="#{category.list_rank}" autocomplete="off"/>
-                <h:outputLabel value="Restrict Quick Access to #{companySetting.getStoreEquivName()}:"/>
+                <h:outputLabel value="#{langsys['Restrict']} #{langsys['Quick']} #{langsys['Access']} #{langsys['to']} #{companySetting.getStoreEquivName()}:"/>
                 <h:selectOneMenu styleClass="clsMenu" id="menuStore" value="#{category.store_quick_order}">
-                    <f:selectItem itemLabel="None(ShowOnAll)" itemValue="0"/>
+                    <f:selectItem itemLabel="#{langsys['None']}(#{langsys['Show']}#{langsys['On']}#{langsys['All']})" itemValue="0"/>
                     <f:selectItems value="#{storeBean.stores}" var="c" itemLabel="#{c.storeName}" itemValue="#{c.storeId}"/>
                 </h:selectOneMenu>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainCommands" columns="1">
                 <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
-                    <h:commandButton styleClass="clsButton" id="cmdbSave" value="Save">
+                    <h:commandButton styleClass="clsButton" id="cmdbSave" value="#{langsys['Save']}">
                         <f:ajax listener="#{categoryBean.saveCategory(category)}" execute="@form" render="@form" />
                     </h:commandButton>
-                    <h:commandButton styleClass="clsButton" id="cmdbClear" value="Clear">
+                    <h:commandButton styleClass="clsButton" id="cmdbClear" value="#{langsys['Clear']}">
                         <f:ajax listener="#{categoryBean.clearCategory(category)}" execute="@form" render="@form" />
                     </h:commandButton>
-                    <h:commandButton styleClass="clsButton" id="cmdbDelete" value="Delete" onclick="return confirmDelete();">
+                    <h:commandButton styleClass="clsButton" id="cmdbDelete" value="#{langsys['Delete']}" onclick="return confirmDelete();">
                         <f:ajax listener="#{categoryBean.deleteCategoryByObject(category)}" execute="@form" render="@form" />
                     </h:commandButton>
                 </h:panelGrid>
@@ -66,7 +66,7 @@
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainSearch" columns="1">
-                <h:outputLabel id="olblMainSearch" value="Search Category"/>
+                <h:outputLabel id="olblMainSearch" value="#{langsys['Search']} #{langsys['Category']}"/>
                 <h:inputText id="itxtMainSearch" value="#{categoryBean.searchCategoryName}" autocomplete="off">
                     <f:ajax event="keyup" render="dtblCategory" />
                 </h:inputText>
@@ -76,33 +76,33 @@
                          > 
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Category Name</f:facet>
+                    <f:facet name="header">#{langsys['Category']} #{langsys['Name']}</f:facet>
                     <!-- row record -->
                     #{c.categoryName}
                 </p:column>
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Quick Menu </f:facet>
+                    <f:facet name="header">#{langsys['Quick']} #{langsys['Menu']} </f:facet>
                     <!-- row record -->
                     #{utilityBean.returnYesNoString(c.display_quick_order)}
                 </p:column>
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">List Rank</f:facet>
+                    <f:facet name="header">#{langsys['List']} #{langsys['Rank']}</f:facet>
                     <!-- row record -->
                     #{c.list_rank}
                 </p:column>
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Restrict Quick Access to #{companySetting.getStoreEquivName()} Name</f:facet>
+                    <f:facet name="header">#{langsys['Restrict']} #{langsys['Quick']} #{langsys['Access']} #{langsys['to']} #{companySetting.getStoreEquivName()} Name</f:facet>
                     <!-- row record -->
                     #{c.store_quick_order eq 0 ? 'None' : storeBean.getStore(c.store_quick_order).storeName}
                 </p:column>
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Action</f:facet>
+                    <f:facet name="header">#{langsys['Action']}</f:facet>
                     <!-- row record -->
-                    <h:commandLink value="Edit">
+                    <h:commandLink value="#{langsys['Edit']}">
                         <f:ajax listener="#{categoryBean.displayCategory(c,category)}" execute="@form" render="@form"/>
                     </h:commandLink>
                     &nbsp;

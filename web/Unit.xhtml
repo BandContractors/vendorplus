@@ -30,18 +30,18 @@
         <h:form id="form" styleClass="clsMainFrom">
 
             <h:panelGrid styleClass="clsGridMainHeader" columns="1">
-                <h:outputLabel styleClass="clsLabelTop" id="olblUnitHeader" value="Item - Unit"/>
+                <h:outputLabel styleClass="clsLabelTop" id="olblUnitHeader" value="#{langsys['Item']} #{langsys['Unit']}"/>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainInput" columns="6">
-                <h:outputLabel  value="Unit Name:"/>
+                <h:outputLabel  value="#{langsys['Unit']} #{langsys['Name']}:"/>
                 <h:inputText styleClass="clsInput" id="itxtUnitName" value="#{unit.unitName}" autocomplete="off" style="width: 250px;"> 
                 </h:inputText>
 
-                <h:outputLabel  value="Unit Symbol:"/>
+                <h:outputLabel  value="#{langsys['Unit']} #{langsys['Symbol']}:"/>
                 <h:inputText styleClass="clsInput" id="itxtUnitSymbol" value="#{unit.unitSymbol}" autocomplete="off" style="width: 100px;">
                 </h:inputText>
-                <h:outputLabel  value="Tax Code:"/>
+                <h:outputLabel  value="Tax #{langsys['Code']}:"/>
                 <p:autoComplete id="autcUnitTax" widgetVar="WautcItem" value="#{unitBean.unit_tax_listObj}"  
                                 completeMethod="#{unitBean.searchUnit_tax_lists}" 
                                 var="unt" 
@@ -51,10 +51,10 @@
                                 forceSelection="true" queryDelay="0" 
                                 onkeypress="if (event.keyCode == 13)
                                             return false;" >
-                    <p:column headerText="Code" style="text-align: left" >  
+                    <p:column headerText="#{langsys['Code']}" style="text-align: left" >  
                         #{unt.unit_symbol_tax} 
                     </p:column>
-                    <p:column headerText="Name" style="text-align: left" >  
+                    <p:column headerText="#{langsys['Name']}" style="text-align: left" >  
                         #{unt.unit_name_tax} 
                     </p:column>
                 </p:autoComplete>
@@ -62,13 +62,13 @@
 
             <h:panelGrid styleClass="clsGridMainCommands" columns="1">
                 <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
-                    <h:commandButton styleClass="clsButton" id="cmdbSave" value="Save">
+                    <h:commandButton styleClass="clsButton" id="cmdbSave" value="#{langsys['Save']}">
                         <f:ajax listener="#{unitBean.saveUnit(unit,unitBean.unit_tax_listObj)}" execute="@form" render="@form" />
                     </h:commandButton>
-                    <h:commandButton styleClass="clsButton" id="cmdbClear" value="Clear">
+                    <h:commandButton styleClass="clsButton" id="cmdbClear" value="#{langsys['Clear']}">
                         <f:ajax listener="#{unitBean.clearUnit(unit,unitBean.unit_tax_listObj)}" execute="@form" render="@form" />
                     </h:commandButton>
-                    <h:commandButton styleClass="clsButton" id="cmdbDelete" value="Delete" onclick="return confirmDelete();">
+                    <h:commandButton styleClass="clsButton" id="cmdbDelete" value="#{langsys['Delete']}" onclick="return confirmDelete();">
                         <f:ajax listener="#{unitBean.deleteUnitByObject(unit)}" execute="@form" render="@form" />
                     </h:commandButton>
                 </h:panelGrid>
@@ -80,7 +80,7 @@
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainSearch" columns="1">
-                <h:outputLabel id="olblMainSearch" value="Search Unit"/>
+                <h:outputLabel id="olblMainSearch" value="#{langsys['Search']} #{langsys['Unit']}"/>
                 <h:inputText id="itxtMainSearch" value="#{unitBean.searchUnitName}" autocomplete="off">
                     <f:ajax event="keyup" render="dtblUnit"/>
                 </h:inputText>
@@ -90,30 +90,30 @@
                          > 
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Unit Name</f:facet>
+                    <f:facet name="header">#{langsys['Unit']} #{langsys['Name']}</f:facet>
                     <!-- row record -->
                     #{u.unitName}
                 </p:column>
 
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Unit Symbol</f:facet>
+                    <f:facet name="header">#{langsys['Unit']} #{langsys['Symbol']}</f:facet>
                     <!-- row record -->
                     #{u.unitSymbol}
                 </p:column>
 
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Tax Code</f:facet>
+                    <f:facet name="header">Tax #{langsys['Code']}</f:facet>
                     <!-- row record -->
                     #{u.unit_symbol_tax}
                 </p:column>
 
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Action</f:facet>
+                    <f:facet name="header">#{langsys['Action']}</f:facet>
                     <!-- row record -->
-                    <h:commandLink value="Edit">
+                    <h:commandLink value="#{langsys['Edit']}">
                         <f:ajax listener="#{unitBean.displayUnit(u,unit,unitBean.unit_tax_listObj)}" execute="@form" render="@form"/>
                     </h:commandLink>
                     &nbsp;
