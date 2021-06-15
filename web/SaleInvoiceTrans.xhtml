@@ -92,7 +92,7 @@
                 <p:autoComplete id="autcTransactor" value="#{transactorBean.selectedTransactor}" 
                                 completeMethod="#{transactorBean.getTransactorActiveObjectList}" 
                                 var="trct" 
-                                itemLabel="#{langsys[trct.transactorNames]}" 
+                                itemLabel="#{trct.transactorNames}" 
                                 itemValue="#{trct}" 
                                 converter="TransactorConverter" style="text-align: left" 
                                 forceSelection="true" queryDelay="0" 
@@ -115,7 +115,7 @@
                     <p:ajax event="blur" listener="#{transBean.refreshTransList(11,transactorBean.selectedTransactor.transactorId,20,'is_invoiced','0,2')}" update="menuTransRefNumber" />
                 </p:autoComplete>
                 <p:selectOneMenu id="menuTransRefNumber" value="#{trans.transactionRef}" editable="true" dynamic="true" style="width: 140px;">
-                    <f:selectItem itemLabel="#{langsys['Select']} #{langsys['or']} #{langsys['Type']}..." itemValue="0"/>
+                    <f:selectItem itemLabel="#{langsys['Select']} #{langsys['or']} #{langsys['Type']}" itemValue="0"/>
                     <f:selectItems value="#{transBean.transList}" var="stl" itemLabel="#{langsys[stl.transactionNumber]}" itemValue="#{stl.transactionNumber}"/>
                     <p:ajax listener="#{transBean.loadOrderForInvoiceTrans(trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor,transBean.authorisedByUserDetail,transItemBean.selectedAccCoa)}" process="@form" update="pnlHeader gridTransItem pgrdOverrideWarranty pgrdSpecific gridItemStatus dtblTransactionItem pgrdTotals pgrdScheme pgrdPayment pgrdMsgs pgrdTransUser pgrdApprove growl1"/>
                 </p:selectOneMenu>
