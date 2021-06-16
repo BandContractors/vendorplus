@@ -740,52 +740,52 @@ public class TransBean implements Serializable {
             GroupRightBean grb = new GroupRightBean();
 
             if (null == transtype) {
-                msg = "INVALID TRANSACTION";
+                msg = "Invalid Transaction";
             } else if (trans.getTransactionId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, Integer.toString(transreason.getTransactionReasonId()), "Add") == 0) {
-                msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
+                msg = "Access Denied";
             } else if (!ItemMessage.equals("")) {
-                msg = "INSUFFICIENT STOCK FOR ITEM(" + ItemMessage + ")...";
+                msg = "Insufficient Stock for Item ##" + ItemMessage;
             } else if (!ItemMessage2.equals("") && "HIRE RETURN NOTE".equals(transtype.getTransactionTypeName())) {
-                msg = "TOTAL RETURNED IS GREATER THAN BALANCE FOR ITEM(" + ItemMessage2 + ")...";
+                msg = "Returned Greater than Balance for Item  ##" + ItemMessage2;
             } else if (!ItemMessage3.equals("") && "HIRE DELIVERY NOTE".equals(transtype.getTransactionTypeName())) {
-                msg = "TOTAL DELIVERED IS GREATER THAN BALANCE UNDELIVERED FOR ITEM(" + ItemMessage2 + ")...";
+                msg = "Delivered Greater than Balance for Item ##" + ItemMessage3;
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && "COST-PRICE SALE INVOICE".equals(aSaleType) && trans.getTransactorId() == 0) {
-                msg = "PLEASE SELECT " + transtype.getBillTransactorLabel();
+                msg = "Select " + transtype.getBillTransactorLabel();
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && "No".equals(CompanySetting.getIsCashDiscountVatLiable()) && trans.getCashDiscount() > (trans.getSubTotal() - trans.getTotalTradeDiscount() + trans.getTotalVat())) {
-                msg = "Cash Discount is Invalid, it cannot exceed grand total, please check company settings... ";
+                msg = "Cash Discount cannot exceed grand total";
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && "Yes".equals(CompanySetting.getIsCashDiscountVatLiable()) && trans.getCashDiscount() > (trans.getSubTotal() - trans.getTotalTradeDiscount())) {
-                msg = "Cash Discount is set as a liability, it cannot extend to VAT or exceed grand total, please check company settings... ";
+                msg = "Cash Discount cannot extend to VAT or exceed grand total";
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && trans.getCashDiscount() < 0 || trans.getAmountTendered() < 0 || trans.getSpendPointsAmount() < 0 || trans.getGrandTotal() < 0) {
-                msg = "Either [Cash Discount] or [Amount Tendered] or [Points Spent Amount] is INVALID, please check... ";
+                msg = "Check Cash Discount or Amount Tendered or Points Spent Amount";
             } else if ("PURCHASE INVOICE".equals(transtype.getTransactionTypeName()) && trans.getCashDiscount() < 0) {
-                msg = "[Cash Discount] is INVALID, please check... ";
+                msg = "Check Cash Discount";
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && trans.getCashDiscount() > 0 && new GeneralUserSetting().getIsApproveDiscountNeeded() == 1 && !"APPROVED".equals(new GeneralUserSetting().getCurrentApproveDiscountStatus())) {
-                msg = "YOU ARE NOT ALLOWED TO ISSUE CASH DISCOUNT, SEEK APPROVAL...";
+                msg = "Access Denied to Cash Discount";
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && trans.getSpendPointsAmount() > 0 && new GeneralUserSetting().getIsApprovePointsNeeded() == 1 && !"APPROVED".equals(new GeneralUserSetting().getCurrentApprovePointsStatus())) {
-                msg = "YOU ARE NOT ALLOWED TO SPEND POINTS, SEEK APPROVAL...";
+                msg = "Access Denied to Spend Points";
             } else if (trans.getTransactionDate() == null) {
                 msg = "Select " + transtype.getTransactionDateLabel();
                 if ("UNPACK".equals(transtype.getTransactionTypeName())) {
                     aActiveTransItems.clear();
                 }
             } else if ((new GeneralUserSetting().getDaysFromDateToLicenseExpiryDate(trans.getTransactionDate()) <= 0 || new GeneralUserSetting().getDaysFromDateToLicenseExpiryDate(new CompanySetting().getCURRENT_SERVER_DATE()) <= 0) && CompanySetting.getLicenseType() != 9) {
-                msg = "INCORRECT SERVER DATE or LICENSE HAS EXPIRED !";
+                msg = "Server Date is Wrong or Lincese is Expired";
             } else if (trans.getTransactorId() == 0 && transtype.getIsTransactorMandatory().equals("Yes")) {
-                msg = "Select a valid Consumer/Business you are transacting with...";
+                msg = "Select Valid Customer";
             } else if (aActiveTransItems.size() < 1 & !"UNPACK".equals(transtype.getTransactionTypeName()) & trans.getTransactionId() == 0) {
-                msg = "No item found for this " + transtype.getTransactionOutputLabel();
+                msg = "Item not Found for " + transtype.getTransactionOutputLabel();
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && trans.getPayMethod() == 0 && trans.getTransactionId() == 0) {
                 msg = "Select Payment Method";
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && "No".equals(CompanySetting.getIsAllowDebt()) && (trans.getAmountTendered() + trans.getSpendPointsAmount()) < trans.getGrandTotal()) {
-                msg = "Amount tendered is LESS THAN grand total";
+                msg = "Amount tendered is Less than Grand Total";
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && trans.getSpendPointsAmount() > trans.getBalancePointsAmount()) {
-                msg = "Amount entered for spending POINTS exceeds the available balance on points available for this customer; please edit accordingly";
+                msg = "Amount entered for spending points exceeds the available points balance";
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && "Yes".equals(CompanySetting.getIsAllowDebt()) && (trans.getAmountTendered() + trans.getSpendPointsAmount()) < trans.getGrandTotal() && trans.getTransactorId() == 0) {
-                msg = "Amount tendered is LESS THAN grand total, you MUST select a valid Customer for this Debt Sale";
+                msg = "Amount Tendered is Less than Grand Total. Select Customer";
             } else if (("TRANSFER".equals(transtype.getTransactionTypeName()) || "TRANSFER REQUEST".equals(transtype.getTransactionTypeName())) && trans.getStore2Id() == 0) {
-                msg = "Select the " + CompanySetting.getStoreEquivName() + " to which item is requested from / transferred to...";
+                msg = "Select the " + CompanySetting.getStoreEquivName() + " for Item Transfer";
             } else if (("TRANSFER".equals(transtype.getTransactionTypeName()) || "TRANSFER REQUEST".equals(transtype.getTransactionTypeName())) && store.getStoreId() == trans.getStore2Id()) {
-                msg = "You cannot request or trasfer item to and from the same " + CompanySetting.getStoreEquivName() + "...";
+                msg = "Select different To and From " + CompanySetting.getStoreEquivName() + "...";
             } else if ("Yes".equals(transtype.getIsTransactionUserMandatory()) && trans.getTransactionUserDetailId() == 0) {
                 msg = "Select " + transtype.getTransactionUserLabel();
             } else if ("Yes".equals(transtype.getIsTransactionRefMandatory()) && trans.getTransactionRef().equals("")) {
@@ -805,63 +805,63 @@ public class TransBean implements Serializable {
             } else if (trans.getPayDueDate() == null && transtype.getIsPayDueDateMandatory().equals("Yes")) {
                 msg = "Select Pay Due Date";
             } else if (trans.getExpiryDate() == null && transtype.getIsExpiryDateMandatory().equals("Yes")) {
-                msg = "Select Expiry Date for this " + transtype.getTransactionOutputLabel();
+                msg = "Select Expiry Date for " + transtype.getTransactionOutputLabel();
             } else if (aSelectedTransactor != null && aSelectedTransactor.getIsSuspended().equals("Yes")) {
-                msg = aSelectedTransactor.getTransactorNames() + " IS SUSPENDED [ " + aSelectedTransactor.getSuspendedReason() + " ]";
+                msg = "Suspended ##" + aSelectedTransactor.getTransactorNames() + " for " + aSelectedTransactor.getSuspendedReason();
             } else if (aSelectedBillTransactor != null && aSelectedBillTransactor.getIsSuspended().equals("Yes")) {
-                msg = aSelectedBillTransactor.getTransactorNames() + " IS SUSPENDED [ " + aSelectedBillTransactor.getSuspendedReason() + " ]";
+                msg = "Suspended ##" + aSelectedBillTransactor.getTransactorNames() + " for " + aSelectedBillTransactor.getSuspendedReason();
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && trans.getGrandTotal() > 0 && trans.getAccChildAccountId() == 0) {
-                msg = "Select Payment Receipt Account...";
+                msg = "Select Payment Receipt Account";
             } else if ("PURCHASE INVOICE".equals(transtype.getTransactionTypeName()) && trans.getAmountTendered() < trans.getGrandTotal() && trans.getTransactorId() == 0) {
-                msg = "Please select " + transtype.getTransactorLabel();
+                msg = "Select " + transtype.getTransactorLabel();
             } else if ("PURCHASE INVOICE".equals(transtype.getTransactionTypeName()) && trans.getAmountTendered() >= 0 && trans.getAccChildAccountId() == 0) {
-                msg = "Please select the Payment Account";
+                msg = "Select Payment Account";
             } else if ("JOURNAL ENTRY".equals(transtype.getTransactionTypeName()) && trans.getTotalDebit() != trans.getTotalCredit()) {
-                msg = "TOTAL DEBIT IS NOT EQUAL TO TOTAL CREDIT...!";
+                msg = "Debit is not Equal to Credit";
             } else if ("EXPENSE ENTRY".equals(transtype.getTransactionTypeName()) && (trans.getAmountTendered() <= 0 && trans.getGrandTotal() <= 0) && trans.getTransactionId() == 0) {
-                msg = "Please enter Spent/Paid Amount";
+                msg = "Enter Spent or Paid Amount";
             } else if ("EXPENSE ENTRY".equals(transtype.getTransactionTypeName()) && trans.getAccChildAccountId() == 0) {
-                msg = "Please select the Payment Account";
+                msg = "Select Payment Account";
             } else if (null == new AccPeriodBean().getAccPeriod(trans.getTransactionDate())) {
-                msg = "Date selected does not MATCH any accounting period; Go to Accounts>Account Period, click Add New and Save OR contact system administrator...";
+                msg = "Selected Date does not Match Accounting Period";
             } else if (new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getIsClosed() == 1) {
-                msg = "Date selected is for a CLOSED accounting period; please contact system administrator...";
+                msg = "Selected Date is for a Closed Accounting Period";
             } else if (trans.getTransactionId() == 0 && (trans.getPayMethod() == 6 || trans.getPayMethod() == 7) && trans.getAmountTendered() <= 0) {
-                msg = "The amount tendered is not accepted for the selected payment method...";
+                msg = "Amount Tendered Not Accepted for Payment Method";
             } else if (trans.getTransactionId() == 0 && trans.getPayMethod() == 6 && trans.getAmountTendered() > new AccLedgerBean().getPrepaidIncomeAccBalanceTrade(new TransBean().getBillClientId(trans.getTransactorId(), trans.getBillTransactorId()), trans.getCurrencyCode())) {
-                msg = "Insufficient funds on the Client/Customer Deposit account...";
+                msg = "Insufficient Funds on the Customer Deposit Account";
             } else if (trans.getTransactionId() == 0 && trans.getPayMethod() == 7 && trans.getAmountTendered() > new AccLedgerBean().getPrepaidExpenseAccBalanceTrade(new TransBean().getBillClientId(trans.getTransactorId(), trans.getBillTransactorId()), trans.getCurrencyCode())) {
-                msg = "Insufficient funds on the Supplier Advance Expense account...";
+                msg = "Insufficient Funds on the Supplier Advance Expense Account";
             } else if ("HIRE INVOICE".equals(transtype.getTransactionTypeName()) && (trans.getFrom_date() == null || trans.getTo_date() == null)) {
-                msg = "Specify the following: From Date, To Date";
+                msg = "Specify From and To Date";
             } else if ("HIRE INVOICE".equals(transtype.getTransactionTypeName()) && trans.getGrandTotal() > 0 && trans.getAccChildAccountId() == 0) {
-                msg = "Select Payment Receipt Account...";
+                msg = "Select Payment Receipt Account";
             } else if ("HIRE RETURN INVOICE".equals(transtype.getTransactionTypeName()) && trans.getGrandTotal() > 0 && trans.getAccChildAccountId() == 0) {
-                msg = "Select Payment Receipt Account...";
+                msg = "Select Payment Receipt Account";
             } else if ("HIRE INVOICE".equals(transtype.getTransactionTypeName()) && trans.getSite_id() == 0) {
-                msg = "Select Site...";
+                msg = "Select Site";
             } else if ("HIRE DELIVERY NOTE".equals(transtype.getTransactionTypeName()) && new UtilityBean().countIntegers(trans.getTransactor_driver()) < 9) {
-                msg = "Driver's phone number is missing...";
+                msg = "Missing Driver Phone Number";
             } else if ("HIRE DELIVERY NOTE".equals(transtype.getTransactionTypeName()) && new UtilityBean().countIntegers(trans.getTransactor_rep()) < 9) {
-                msg = "Representative's phone number is missing...";
+                msg = "Missing Representative Phone Number";
             } else if ("HIRE RETURN NOTE".equals(transtype.getTransactionTypeName()) && new UtilityBean().countIntegers(trans.getTransactor_rep()) < 9) {
-                msg = "Representative's phone number is missing...";
+                msg = "Missing Representative Phone Number";
             } else if ("SALE ORDER".equals(transtype.getTransactionTypeName()) && trans.getTransactorId() == 0 && trans.getLocation_id() == 0) {
-                msg = "Select Location OR " + transtype.getTransactorLabel();
+                msg = "Select Location or " + transtype.getTransactorLabel();
             } else if ("SALE ORDER".equals(transtype.getTransactionTypeName()) && trans.getStore2Id() == 0) {
-                msg = "Select " + CompanySetting.getStoreEquivName() + " to send the order to...";
+                msg = "Select " + CompanySetting.getStoreEquivName() + " to send Order to";
             } else if (trans.getTransactionId() == 0 && !new AccLedgerBean().checkerBalancePass(trans.getPayMethod(), trans.getAccChildAccountId(), trans.getCurrencyCode(), trans.getAmountTendered(), transtype.getTransactionTypeId(), transreason.getTransactionReasonId(), 0, 0)) {
-                msg = "Paying account is out of Funds...";
+                msg = "Paying Account is out of Funds";
             } else if ("PURCHASE INVOICE".equals(transtype.getTransactionTypeName()) && trans.getAmountTendered() > trans.getGrandTotal()) {
-                msg = "Paid amount CANNOT EXCEED Grand Total";
+                msg = "Paid Amount cannot Exceed Grand Total";
             } else if (trans.getTransactionId() > 0 && (trans.getAmountTendered() + trans.getSpendPointsAmount()) > trans.getGrandTotal()) {
-                msg = "Paid amount CANNOT EXCEED the New Grand Total";
+                msg = "Paid Amount cannot Exceed New Grand Total";
             } else if (trans.getTransactionId() > 0 && new TransItemBean().getAnyItemMixAddSubtractQty(new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans), transtype.getTransactionTypeName()) == 1) {
-                msg = "You CANNOT Add(Debit Note) and Subtract(Credit Note) different items in the same UPDATE";
+                msg = "You Cannot Add or Debit and Subtract or Credit different items in the same Update";
             }
         } catch (Exception e) {
             msg = "An error has occured during the validation process";
-            System.err.println("--:validateTransCEC:--" + e.getMessage());
+            //System.err.println("--:validateTransCEC:--" + e.getMessage());
             LOGGER.log(Level.ERROR, e);
         }
         return msg;
