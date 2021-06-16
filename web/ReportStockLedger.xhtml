@@ -29,21 +29,21 @@
         <ui:include src="Menu.xhtml"/>
         <h:form id="formReport">
             <h:panelGrid id="pnlgHeader" columns="3" styleClass="clsPanelReportFilterTitle">
-                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="Stock Movement (Stock Ledger) Detail Report"/>
-                <p:commandLink id="cmdbToday" value="Today's Date" style="color: white;">
+                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="#{langsys['Stock']} #{langsys['Movement']} (#{langsys['Stock']} #{langsys['Ledger']}) #{langsys['Detail']} #{langsys['Report']}"/>
+                <p:commandLink id="cmdbToday" value="#{langsys['Today']} #{langsys['Date']}" style="color: white;">
                     <p:ajax listener="#{stock_ledgerBean.setDateToToday()}" process="@this" update="pnlgFilter"/>
                 </p:commandLink>
-                <p:commandLink id="cmdbYesturday" value="Yesterday's Date" style="color: white;">
+                <p:commandLink id="cmdbYesturday" value="#{langsys['Yesterday']} #{langsys['Date']}" style="color: white;">
                     <p:ajax listener="#{stock_ledgerBean.setDateToYesturday()}" process="@this" update="pnlgFilter"/>
                 </p:commandLink>
             </h:panelGrid>
             <h:panelGrid id="pnlgFilter" columns="3" styleClass="clsPanelReportFilter">
                 <h:panelGrid columns="2">
-                    <p:outputLabel value="From Date:"/>
+                    <p:outputLabel value="#{langsys['From']} #{langsys['Date']}:"/>
                     <p:calendar id="calDate1"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{stock_ledgerBean.date1}" size="20"/>
-                    <p:outputLabel value="To Date:"/>
+                    <p:outputLabel value="#{langsys['To']} #{langsys['Date']}:"/>
                     <p:calendar id="calDate2"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{stock_ledgerBean.date2}" size="20"/>
-                    <p:outputLabel value="Item Description:"/>
+                    <p:outputLabel value="#{langsys['Item']} #{langsys['Description']}:"/>
                     <p:autoComplete id="autcItem" widgetVar="WautcItem" value="#{itemBean.selectedItem}"  
                                     completeMethod="#{itemBean.getItemObjectListActive}" 
                                     var="itm" 
@@ -53,32 +53,32 @@
                                     forceSelection="true" queryDelay="0" 
                                     onkeypress="if (event.keyCode == 13)
                                                     return false;" >
-                        <p:column headerText="Item Description" style="text-align: left" >  
+                        <p:column headerText="#{langsys['Item']} #{langsys['Description']}" style="text-align: left" >  
                             #{itm.description} 
                         </p:column>
-                        <p:column headerText="Alias" style="text-align: left" >  
+                        <p:column headerText="#{langsys['Alias']}" style="text-align: left" >  
                             #{itm.alias_name} 
                         </p:column>
-                        <p:column headerText="Item Code" style="text-align: left" >  
+                        <p:column headerText="#{langsys['Item']} #{langsys['Code']}" style="text-align: left" >  
                             #{itm.itemCode} 
                         </p:column>
-                        <p:column headerText="Unit" style="text-align: left">  
+                        <p:column headerText="#{langsys['Unit']}" style="text-align: left">  
                             #{unitBean.getUnit(itm.unitId).unitSymbol}
                         </p:column> 
-                        <p:column headerText="Category" style="text-align: left">  
+                        <p:column headerText="#{langsys['Category']}" style="text-align: left">  
                             #{categoryBean.getCategory(itm.categoryId).categoryName}
                         </p:column>
-                        <p:column headerText="Retailsale Price" style="text-align: left">  
+                        <p:column headerText="#{langsys['Retail']} #{langsys['Sale']} #{langsys['Price']}" style="text-align: left">  
                             <h:outputText value="#{itm.unitRetailsalePrice}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="Wholesale Price" style="text-align: left">
+                        <p:column headerText="#{langsys['Wholesale']} #{langsys['Price']}" style="text-align: left">
                             <h:outputText value="#{itm.unitWholesalePrice}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="Currency" style="text-align: left">
+                        <p:column headerText="#{langsys['Currency']}" style="text-align: left">
                             <h:outputText value="#{itm.currencyCode}">
                             </h:outputText>
                         </p:column>
@@ -87,28 +87,28 @@
                 <h:panelGrid columns="2">
                     <p:outputLabel value="#{companySetting.getStoreEquivName()}:"/>
                     <p:selectOneMenu id="menuFromStore" value="#{stock_ledger.store_id}" style="width: 200px;" >
-                        <f:selectItem itemLabel="Select" itemValue="0"/>
+                        <f:selectItem itemLabel="#{langsys['Select']}" itemValue="0"/>
                         <f:selectItems value="#{storeBean.stores}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
                     </p:selectOneMenu>
-                    <p:outputLabel value="Transaction Type:"/>
+                    <p:outputLabel value="#{langsys['Transaction']} #{langsys['Type']}:"/>
                     <p:selectOneMenu id="menuTransactionType" value="#{stock_ledger.transaction_type_id}" style="width: 200px;">
                         <f:selectItem itemLabel="" itemValue="0"/>
                         <f:selectItems value="#{transactionTypeBean.getTransTypesWithItems()}" var="tt" itemLabel="#{tt.transactionTypeName}" itemValue="#{tt.transactionTypeId}"/>
                     </p:selectOneMenu>
-                    <p:outputLabel value="Added By:"/>
+                    <p:outputLabel value="#{langsys['Added']} #{langsys['By']}:"/>
                     <p:selectOneMenu id="menuAddUser" value="#{stock_ledger.user_detail_id}" style="width: 200px;">
-                        <f:selectItem itemLabel="Select"/>
+                        <f:selectItem itemLabel="#{langsys['Select']}"/>
                         <f:selectItems value="#{userDetailBean.getUserDetails()}" var="ua" itemLabel="#{ua.firstName} #{ua.secondName} #{ua.thirdName}" itemValue="#{ua.userDetailId}"/>
                     </p:selectOneMenu>            
                 </h:panelGrid>
                 <h:panelGrid columns="1">
-                    <p:commandButton id="cmdbSearch" value="SEARCH" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" style="width: 150px;">
+                    <p:commandButton id="cmdbSearch" value="#{langsys['SEARCH']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" style="width: 150px;">
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
                         <p:ajax listener="#{stock_ledgerBean.reportStock_ledger(stock_ledger,stock_ledgerBean,itemBean.selectedItem)}" process="pnlgFilter" update="pnlgMessage pnlgData growl1"/>
                     </p:commandButton>
-                    <p:commandButton id="cmdbReset" value="RESET" style="width: 150px;">
+                    <p:commandButton id="cmdbReset" value="#{langsys['RESET']}" style="width: 150px;">
                         <p:ajax listener="#{stock_ledgerBean.resetStock_ledgerDetail(stock_ledger,stock_ledgerBean,itemBean.selectedItem)}" process="pnlgFilter" update="pnlgFilter pnlgMessage pnlgData growl1"/>
                     </p:commandButton>
                     <h:panelGrid columns="2">
@@ -127,7 +127,7 @@
                              paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
                              rowsPerPageTemplate="50,100,200,400">
                     <f:facet name="header">
-                        Stock Movement (Summary) : #{stock_ledgerBean.stock_ledgerSummary.size()} Records Found
+                        #{langsys['Stock']} #{langsys['Movement']} (#{langsys['Summary']}) : #{stock_ledgerBean.stock_ledgerSummary.size()} #{langsys['Records']} #{langsys['Found']}
                         <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
                         <p:columnToggler datasource="tblSummary" trigger="toggler" />
                     </f:facet>
@@ -149,21 +149,21 @@
                             <p:dataExporter type="xml" target="tblSummary" fileName="Stock_Ledger_Summary" />
                         </h:commandLink>
                     </f:facet>
-                    <p:column headerText="Item Description" style="width: 40%;font-size: 13px;text-align: right;">
+                    <p:column headerText="#{langsys['Item']} #{langsys['Description']}" style="width: 40%;font-size: 13px;text-align: right;">
                         <h:outputText value="#{itm.description} "/>
                         <h:outputText value="#{itm.batchno} "/>
                         <h:outputText value="#{itm.code_specific} "/>
                         <h:outputText value="#{itm.desc_specific} "/>
                     </p:column>
-                    <p:column headerText="Unit" style="width: 6%;font-size: 13px;">
+                    <p:column headerText="#{langsys['Unit']}" style="width: 6%;font-size: 13px;">
                         <h:outputText value="#{itm.unit_symbol}"/>
                     </p:column>
-                    <p:column headerText="Open Qty" style="text-align: right;width: 7%;font-size: 13px;">
+                    <p:column headerText="#{langsys['Open']} #{langsys['Qty']}" style="text-align: right;width: 7%;font-size: 13px;">
                         <h:outputText value="#{itm.qty_open}">
                             <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
-                    <p:column headerText="Stock Changes (Added, Subtracted)" style="width: 40%;font-size: 13px;">
+                    <p:column headerText="#{langsys['Stock']} #{langsys['Changes']} (#{langsys['Added']}, #{langsys['Subtracted']})" style="width: 40%;font-size: 13px;">
                         <ui:repeat var="lst" value="#{itm.stock_ledgerList}" varStatus="status">
                             <h:outputText value="#{lst.transaction_type_name}" rendered="#{lst.qty_added>0 or lst.qty_subtracted>0}"/>
                             <h:outputText value="#{lst.qty_added}" style="background-color: #00B461;color: white;font-size: 13px;" rendered="#{lst.qty_added>0}">
@@ -176,7 +176,7 @@
                             <h:outputText value="&nbsp;"/>
                         </ui:repeat>
                     </p:column>
-                    <p:column headerText="Close Qty" style="text-align: right;width: 7%;font-size: 13px;">
+                    <p:column headerText="#{langsys['Close']} #{langsys['Qty']}" style="text-align: right;width: 7%;font-size: 13px;">
                         <h:outputText value="#{itm.qty_close}">
                             <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
@@ -187,7 +187,7 @@
                              paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
                              rowsPerPageTemplate="50,100,200,400">
                     <f:facet name="header">
-                        Stock Movement (Detail) : #{stock_ledgerBean.stock_ledgerList.size()} Records Found
+                        #{langsys['Stock']} #{langsys['Movement']} (#{langsys['Detail']}) : #{stock_ledgerBean.stock_ledgerList.size()}#{langsys['Records']}  #{langsys['Found']}
                         <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
                         <p:columnToggler datasource="tblDetail" trigger="toggler" />
                     </f:facet>
@@ -209,41 +209,41 @@
                             <p:dataExporter type="xml" target="tblDetail" fileName="Stock_Ledger" />
                         </h:commandLink>
                     </f:facet>
-                    <p:column headerText="Date" style="font-size: 13px;width: 12%;">
+                    <p:column headerText="#{langsys['Date']}" style="font-size: 13px;width: 12%;">
                         <h:outputText value="#{utilityBean.formatDateTime(itm.add_date)}"/>
                     </p:column>
                     <p:column headerText="#{companySetting.getStoreEquivName()}" style="font-size: 13px;width: 8%;">
                         <h:outputText value="#{itm.store_name}"/>
                     </p:column>
-                    <p:column headerText="Transaction" style="font-size: 13px;width: 12%;">
+                    <p:column headerText="#{langsys['Transaction']}" style="font-size: 13px;width: 12%;">
                         <h:outputText value="#{itm.transaction_type_name} "/>
                     </p:column>
-                    <p:column headerText="Transaction No" style="font-size: 13px;width: 12%;">
+                    <p:column headerText="#{langsys['Transaction']} #{langsys['No.']}" style="font-size: 13px;width: 12%;">
                         <h:outputText value="#{itm.transaction_number} "/>
                     </p:column>
-                    <p:column headerText="Item Description" style="font-size: 13px;width: 24%;">
+                    <p:column headerText="#{langsys['Item']} #{langsys['Description']}" style="font-size: 13px;width: 24%;">
                         <h:outputText value="#{itm.description} "/>
                         <h:outputText value="#{itm.batchno} "/>
                         <h:outputText value="#{itm.code_specific} "/>
                         <h:outputText value="#{itm.desc_specific} "/>
                     </p:column>
-                    <p:column headerText="Unit" style="font-size: 13px;width: 5%;">
+                    <p:column headerText="#{langsys['Unit']}" style="font-size: 13px;width: 5%;">
                         <h:outputText value="#{itm.unit_symbol}"/>
                     </p:column>
-                    <p:column headerText="User" style="font-size: 13px;width: 8%;">
+                    <p:column headerText="#{langsys['User']}" style="font-size: 13px;width: 8%;">
                         <h:outputText value="#{itm.user_name} "/>
                     </p:column>
-                    <p:column headerText="Subtract" style="text-align: right;background-color: red;color: white;font-size: 13px;width: 7%;">
+                    <p:column headerText="#{langsys['Subtract']}" style="text-align: right;background-color: red;color: white;font-size: 13px;width: 7%;">
                         <h:outputText value="#{itm.qty_subtracted}" rendered="#{itm.qty_subtracted>0}">
                             <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
-                    <p:column headerText="Add" style="text-align: right;background-color: #00B461;color: white;font-size: 13px;width: 5%;">
+                    <p:column headerText="#{langsys['Add']}" style="text-align: right;background-color: #00B461;color: white;font-size: 13px;width: 5%;">
                         <h:outputText value="#{itm.qty_added}" rendered="#{itm.qty_added>0}">
                             <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
-                    <p:column headerText="Balance" style="text-align: right;background-color: yellow;font-size: 13px;width: 7%;">
+                    <p:column headerText="#{langsys['Balance']}" style="text-align: right;background-color: yellow;font-size: 13px;width: 7%;">
                         <h:outputText value="#{itm.qty_bal}">
                             <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
