@@ -54,7 +54,7 @@
                         <f:selectItems value="#{accCurrencyBean.currencyList}" var="ac" itemLabel="#{ac.currencyCode}" itemValue="#{ac.currencyCode}"/>
                         <f:ajax event="change" execute="@this" render="pnlInput pnlButtons"/>
                     </h:selectOneMenu>
-                    <h:outputLabel  value="#{langsys['Received']} #{langsys['from']} #{langsys['Share']} #{langsys['Holder']}:"/>
+                    <h:outputLabel  value="#{langsys['Received']} #{langsys['from']} #{langsys['Shareholder']}:"/>
                     <h:selectOneMenu styleClass="clsMenu" style="width: 350px;" id="menuAccount2" value="#{pay.accChildAccountId2}">
                         <f:selectItem itemValue="" itemLabel=""/>
                         <f:selectItems value="#{accChildAccountBean.getAccChildAccounts('3-10-000-010',0,0)}" var="ca" itemLabel="#{ca.childAccountCode} (#{ca.childAccountName})" itemValue="#{ca.accChildAccountId}"/>

@@ -144,7 +144,7 @@
                 <h:outputLabel value=""/>
                 <h:outputLabel value=""/>
                 <h:outputLabel value=""/>
-                <h:outputLabel id="lblCur" value="#{langsys[itemBean.selectedItem.currencyCode]}" style="color: red;"/>
+                <h:outputLabel id="lblCur" value="#{itemBean.selectedItem.currencyCode}" style="color: red;"/>
 
                 <p:tooltip id="toolTipTrackSW" for="lblWarranty" value="#{langsys['Specify']} #{langsys['the']} #{langsys['Warranty']} #{langsys['supplied']} #{langsys['with']} #{langsys['this']} #{langsys['Item']}" trackMouse="true" />
                 <p:focus for="autcItem"/>
@@ -197,7 +197,7 @@
                     <!-- column header -->
                     <f:facet name="header">#{langsys['Item']} #{langsys['Description']}</f:facet>
                     <!-- row record -->
-                    <p:outputLabel value="#{langsys[transItemBean.showItemDescriptionCEC(ati)]}" escape="false"/>   
+                    <p:outputLabel value="#{transItemBean.showItemDescriptionCEC(ati)}" escape="false"/>   
                 </p:column>
 
                 <p:column>

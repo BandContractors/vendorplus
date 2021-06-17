@@ -116,24 +116,24 @@
                         <p:dataExporter type="xml" target="tblDetail" fileName="Adjust_Stock_Detail" />
                     </h:commandLink>
                 </f:facet>
-                <p:column headerText="View/Edit" exportable="false">
+                <p:column headerText="#{langsys['View']}/#{langsys['Edit']}" exportable="false">
                     <p:commandButton id="cmdbView" icon="ui-icon-search" oncomplete="PF('dlgAdjustStock').show();" actionListener="#{transBean.initSalesInvoiceSession(itm.transactionId,'View')}" update=":formTransactionAdjustStock"/>
                     <p:commandButton id="cmdbEdit" icon="ui-icon-pencil" oncomplete="PF('dlgAdjustStock').show();" actionListener="#{transBean.initSalesInvoiceSession(itm.transactionId,'Edit')}" update=":formTransactionAdjustStock"/>
                 </p:column>
-                <p:column headerText="Transaction">
+                <p:column headerText="#{langsys['Transaction']}">
                     <h:outputLabel value="#{transactionReasonBean.getTransactionReason(itm.transactionReasonId).transactionReasonName} "/>
                     <h:outputLabel value="#{itm.transactionNumber}"/>
                 </p:column>
                 <p:column headerText="#{transactionTypeBean.getTransactionType(71).transactionDateLabel}" rendered="#{transBean.dateType.equals('Adjust Date')}">
                     <h:outputText value="#{utilityBean.formatDate(itm.transactionDate)}"/>
                 </p:column>
-                <p:column headerText="Add Date" rendered="#{transBean.dateType.equals('Add Date')}">
+                <p:column headerText="#{langsys['Add']} #{langsys['Date']}" rendered="#{transBean.dateType.equals('Add Date')}">
                     <h:outputText value="#{utilityBean.formatDate(itm.addDate)}"/>
                 </p:column>
                 <p:column headerText="#{transactionTypeBean.getTransactionType(71).transactionUserLabel}">
                     <h:outputText value="#{userDetailBean.getUserDetail(itm.transactionUserDetailId).userName}"/>
                 </p:column>
-                <p:column headerText="Added By">
+                <p:column headerText="#{langsys['Added']} #{langsys['By']}">
                     <h:outputText value="#{userDetailBean.getUserDetail(itm.addUserDetailId).userName}"/>
                 </p:column>
             </p:dataTable>

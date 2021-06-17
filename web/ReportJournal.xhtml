@@ -26,15 +26,15 @@
         <ui:include src="Menu.xhtml"/>
         <h:form id="formReport">
             <h:panelGrid id="pnlgHeader" columns="1" styleClass="clsPanelReportFilterTitle">
-                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="Journal Entry Report"/>
+                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="#{langsys['Journal']} #{langsys['Entry']} #{langsys['Report']}"/>
             </h:panelGrid>
             <h:panelGrid id="pnlgFilter" columns="7" styleClass="clsPanelReportFilter">
-                <p:outputLabel value="Acc. Period"/>
-                <p:outputLabel value="Date Type"/>
-                <p:outputLabel value="From #{accJournalBean.dateType}" id="lblDate1"/>
-                <p:outputLabel value="To #{accJournalBean.dateType}" id="lblDate2"/>
-                <p:outputLabel value="Account"/>
-                <p:outputLabel value="Child Account"/>
+                <p:outputLabel value="#{langsys['Accounting']} #{langsys['Period']}"/>
+                <p:outputLabel value="#{langsys['Date']} #{langsys['Type']}"/>
+                <p:outputLabel value="#{langsys['From']} #{accJournalBean.dateType}" id="lblDate1"/>
+                <p:outputLabel value="#{langsys['To']} #{accJournalBean.dateType}" id="lblDate2"/>
+                <p:outputLabel value="#{langsys['Account']}"/>
+                <p:outputLabel value="#{langsys['Child']} #{langsys['Account']}"/>
                 <p:outputLabel value=""/>
 
                 <h:selectOneMenu id="menuAccPeriod" value="#{accJournal.accPeriodId}" >
@@ -43,8 +43,8 @@
                 </h:selectOneMenu>
                 <h:selectOneMenu id="menuDateType" value="#{accJournalBean.dateType}" >
                     <f:selectItem itemLabel=""/>
-                    <f:selectItem itemValue="Journal Date" itemLabel="Journal Date"/>
-                    <f:selectItem itemValue="Add Date" itemLabel="Add Date"/>
+                    <f:selectItem itemValue="#{langsys['Journal']} #{langsys['Date']}" itemLabel="#{langsys['Journal']} #{langsys['Date']}"/>
+                    <f:selectItem itemValue="#{langsys['Add']} #{langsys['Date']}" itemLabel="#{langsys['Add']} #{langsys['Date']}"/>
                     <f:ajax event="change" execute="@this" render="lblDate1 lblDate2"/>
                 </h:selectOneMenu>
                 <p:calendar id="calDate1"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{accJournalBean.date1}" size="12"/>
@@ -59,16 +59,16 @@
                                 converter="AccCoaConverter" style="text-align: left" 
                                 forceSelection="true" queryDelay="0" 
                                 >
-                    <p:column headerText="Account Name" style="text-align: left" >  
+                    <p:column headerText="#{langsys['Account']} #{langsys['Name']}" style="text-align: left" >  
                         #{itm.accountName} 
                     </p:column> 
-                    <p:column headerText="Account Code" style="text-align: left" >  
+                    <p:column headerText="#{langsys['Account']} #{langsys['Code']}" style="text-align: left" >  
                         #{itm.accountCode} 
                     </p:column> 
-                    <p:column headerText="Type" style="text-align: left">  
+                    <p:column headerText="#{langsys['Type']}" style="text-align: left">  
                         #{accTypeBean.getAccTypeById(itm.accTypeId).accTypeName}
                     </p:column> 
-                    <p:column headerText="Group/Category" style="text-align: left"> 
+                    <p:column headerText="#{langsys['Group']}/#{langsys['Category']}" style="text-align: left"> 
                         #{accGroupBean.getAccGroupById(itm.accGroupId).accGroupName} / 
                         #{accCategoryBean.getAccCategoryById(itm.accCategoryId).accCategoryName}
                     </p:column> 
@@ -79,7 +79,7 @@
                     <f:selectItem itemLabel="" itemValue=""/>
                     <f:selectItems value="#{accChildAccountBean.getAccChildAccounts(accJournal.accountCode,0,0)}" var="ea" itemLabel="#{ea.childAccountName}" itemValue="#{ea.accChildAccountId}"/>
                 </h:selectOneMenu>
-                <p:commandButton id="cmdbSearch" value="SEARCH" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                <p:commandButton id="cmdbSearch" value="#{langsys['SEARCH']}" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                     <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                         <p:graphicImage name="/images/ajax-loader.gif"/>
                     </p:dialog>
@@ -95,24 +95,24 @@
                          rowsPerPageTemplate="50,100,200,400">
                 <f:facet name="header">
                     <p:dataTable id="tblSummary" var="sm" value="#{accJournalBean.accJournalSummary}">
-                        <p:column headerText="Currency">
+                        <p:column headerText="#{langsys['Currency']}">
                             <h:outputText value="#{sm.currencyCode}"/>
                         </p:column>
-                        <p:column headerText="Total Debit Amount" style="text-align: right;">
+                        <p:column headerText="#{langsys['Total']} #{langsys['Debit']} #{langsys['Amount']}" style="text-align: right;">
                             <h:outputText value="#{sm.debitAmount}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="Total Credit Amount" style="text-align: right;">
+                        <p:column headerText="#{langsys['Total']} #{langsys['Credit']} #{langsys['Amount']}" style="text-align: right;">
                             <h:outputText value="#{sm.creditAmount}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="Net Amount" style="text-align: right;">
+                        <p:column headerText="#{langsys['Net']} #{langsys['Amount']}" style="text-align: right;">
                             <h:outputText value="#{accJournalBean.returnNetAmountString(sm.debitAmount,sm.creditAmount)}"/>
                         </p:column>
                     </p:dataTable>
-                    #{accJournalBean.accJournalList.size()} Records Found
+                    #{accJournalBean.accJournalList.size()} #{langsys['Records']} #{langsys['Found']}
                     <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
                     <p:columnToggler datasource="tblDetail" trigger="toggler" />
                 </f:facet>
@@ -134,46 +134,46 @@
                         <p:dataExporter type="xml" target="tblDetail" fileName="Journal_Entry" />
                     </h:commandLink>
                 </f:facet>
-                <p:column headerText="Journal Date" rendered="#{accJournalBean.dateType.equals('Journal Date')}">
+                <p:column headerText="#{langsys['Journal']} #{langsys['Date']}" rendered="#{accJournalBean.dateType.equals('Journal Date')}">
                     <h:outputText value="#{utilityBean.formatDate(itm.journalDate)}"/>
                 </p:column>
-                <p:column headerText="Add Date" rendered="#{accJournalBean.dateType.equals('Add Date')}">
+                <p:column headerText="#{langsys['Add']} #{langsys['Date']}" rendered="#{accJournalBean.dateType.equals('Add Date')}">
                     <h:outputText value="#{utilityBean.formatDate(itm.addDate)}"/>
                 </p:column>
-                <p:column headerText="Transaction">
+                <p:column headerText="#{langsys['Transaction']}">
                     <h:outputText value="#{transactionTypeBean.getTransactionType(itm.payTypeId).transactionTypeName}" rendered="#{null==itm.transactionTypeId or itm.transactionTypeId==0}"/>
                     <h:outputText value="#{transactionTypeBean.getTransactionType(itm.transactionTypeId).transactionTypeName}"/>
                 </p:column>
-                <p:column headerText="Sub Type">
+                <p:column headerText="#{langsys['Subtype']}">
                     <h:outputLabel value="#{transactionReasonBean.getTransactionReason(itm.payReasonId).transactionReasonName} " rendered="#{null==itm.transactionReasonId or itm.transactionReasonId==0}"/>
                     <h:outputLabel value="#{transactionReasonBean.getTransactionReason(itm.transactionReasonId).transactionReasonName} "/>
                     <h:outputText value="#{itm.payId}" rendered="#{itm.transactionId==0 and itm.payId>0}"/>
                     <h:outputText value="#{itm.transaction_number}" rendered="#{itm.transactionId>0}"/>
                 </p:column>
-                <p:column headerText="Partner">
+                <p:column headerText="#{langsys['Partner']}">
                     <h:outputText value="#{transactorBean.getTransactor(itm.billTransactorId).transactorNames} " rendered="#{itm.billTransactorId>0}"/>
                     <h:outputText value="#{accChildAccountBean.getAccChildAccById(payBean.getPay(itm.payId).accChildAccountId2).childAccountName}"  rendered="#{itm.billTransactorId==0}"/>
                 </p:column>
-                <p:column headerText="Account Name">
+                <p:column headerText="#{langsys['Account']} #{langsys['Name']}">
                     <h:outputText value="#{accCoaBean.getAccCoaByCodeOrId(itm.accountCode,0).accountName}"/>
                 </p:column>
-                <p:column headerText="Child Account">
+                <p:column headerText="#{langsys['Child']} #{langsys['Account']}">
                     <h:outputText value="#{accChildAccountBean.getAccChildAccById(itm.accChildAccountId).childAccountName}"/>
                 </p:column>
-                <p:column headerText="CUR">
+                <p:column headerText="#{langsys['Currency']}">
                     <h:outputText value="#{itm.currencyCode}"/>
                 </p:column>
-                <p:column headerText="Debit Amount" style="text-align: right;">
+                <p:column headerText="#{langsys['Debit']} #{langsys['Amount']}" style="text-align: right;">
                     <h:outputText value="#{itm.debitAmount}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Credit Amount" style="text-align: right;">
+                <p:column headerText="#{langsys['Credit']} #{langsys['Amount']}" style="text-align: right;">
                     <h:outputText value="#{itm.creditAmount}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Narration">
+                <p:column headerText="#{langsys['Narration']}">
                     <h:outputText value="#{itm.narration}"/>
                 </p:column>
             </p:dataTable>
