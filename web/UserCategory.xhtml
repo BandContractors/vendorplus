@@ -25,24 +25,24 @@
         <h:form id="form" styleClass="clsMainFrom">
 
             <h:panelGrid styleClass="clsGridMainHeader" columns="1">
-                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeader" value="User Category"/>
+                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeader" value="#{langsys['User']} #{langsys['Category']}"/>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainInput" columns="2">
-                <h:outputLabel  value="UserCategory Name:"/>
+                <h:outputLabel  value="#{langsys['User']} #{langsys['Category']} #{langsys['Name']}:"/>
                 <h:inputText styleClass="clsInput" id="itxtUserCategoryName" value="#{userCategory.userCategoryName}" autocomplete="off">
                 </h:inputText>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainCommands" columns="2">
             <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
-                <h:commandButton styleClass="clsButton" id="cmdbSave" value="Save">
+                <h:commandButton styleClass="clsButton" id="cmdbSave" value="#{langsys['Save']}">
                     <f:ajax listener="#{userCategoryBean.saveUserCategory(userCategory)}" execute="@form" render="@form" />
                 </h:commandButton>
-                <h:commandButton styleClass="clsButton" id="cmdbClear" value="Clear">
+                <h:commandButton styleClass="clsButton" id="cmdbClear" value="#{langsys['Clear']}">
                     <f:ajax listener="#{userCategoryBean.clearUserCategory(userCategory)}" execute="@form" render="@form" />
                 </h:commandButton>
-                <h:commandButton styleClass="clsButton" id="cmdbDelete" value="Delete" onclick="return confirmDelete();">
+                <h:commandButton styleClass="clsButton" id="cmdbDelete" value="#{langsys['Delete']}" onclick="return confirmDelete();">
                     <f:ajax listener="#{userCategoryBean.deleteUserCategoryByObject(userCategory)}" execute="@form" render="@form" />
                 </h:commandButton>
             </h:panelGrid>
@@ -57,8 +57,8 @@
             </h:panelGrid>
             
             <h:panelGrid styleClass="clsGridMainSearch" columns="1">
-                <h:outputLabel id="olblMainSearch" value="Search UserCategory"/>
-                <h:outputLabel id="olblMainSearchDesc" value="(Type UserCategory Name to search!)"/>
+                <h:outputLabel id="olblMainSearch" value="#{langsys['Search']} #{langsys['User']} #{langsys['Category']}"/>
+                <h:outputLabel id="olblMainSearchDesc" value="(#{langsys['Type']} #{langsys['User']} #{langsys['Category']} #{langsys['Name']} #{langsys['to']} #{langsys['search']}!)"/>
                 <h:inputText id="itxtMainSearch" value="#{userCategoryBean.searchUserCategoryName}" autocomplete="off">
                     <f:ajax event="keyup" render="dtblUserCategory"/>
                 </h:inputText>
@@ -72,16 +72,16 @@
                          > 
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header">UserCategory Name</f:facet>
+                    <f:facet name="header">#{langsys['User']} #{langsys['Category']} #{langsys['Name']}</f:facet>
                     <!-- row record -->
                     #{uc.userCategoryName}
                 </h:column>
 
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header">Action</f:facet>
+                    <f:facet name="header">#{langsys['Action']}</f:facet>
                     <!-- row record -->
-                    <h:commandLink value="Edit">
+                    <h:commandLink value="#{langsys['Edit']}">
                         <f:ajax listener="#{userCategoryBean.displayUserCategory(uc,userCategory)}" execute="@form" render="@form"/>
                     </h:commandLink>
                     &nbsp;

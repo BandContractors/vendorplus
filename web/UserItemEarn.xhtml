@@ -29,54 +29,54 @@
                     return false;">
 
             <h:panelGrid styleClass="clsGridMainHeader" columns="1">
-                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeader" value="Set User Item Earning"/>
+                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeader" value="#{langsys['Set']} #{langsys['User']} #{langsys['Item']} #{langsys['Earning']}"/>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainInput" columns="4">
-                <h:outputLabel  value="User Category:"/>
+                <h:outputLabel  value="#{langsys['User']} #{langsys['Category']}:"/>
                 <h:selectOneMenu styleClass="clsMenu" id="menuUserCategory" value="#{userItemEarn.userCategoryId}">
                     <f:selectItem itemLabel="" itemValue="0"/>
                     <f:selectItems value="#{userCategoryBean.userCategories}" var="u" itemLabel="#{u.userCategoryName}" itemValue="#{u.userCategoryId}"/>
                 </h:selectOneMenu>
                 <h:outputLabel  value=""/>
                 <h:outputLabel  value=""/>
-                <h:outputLabel  value="Transaction Type:"/>
+                <h:outputLabel  value="#{langsys['Transaction']} #{langsys['Type']}:"/>
                 <h:selectOneMenu styleClass="clsMenu" id="menuTransactionType" value="#{userItemEarn.transactionTypeId}">
                     <f:selectItem itemLabel="" itemValue="0"/>
                     <f:selectItems value="#{transactionTypeBean.transactionTypes}" var="t" itemLabel="#{t.transactionTypeName}" itemValue="#{t.transactionTypeId}"/>
                     <f:ajax event="change" render="menuTransactionReason"/>
                 </h:selectOneMenu>
-                <h:outputLabel  value="Transaction SubType:"/>
+                <h:outputLabel  value="#{langsys['Transaction']} #{langsys['Subtype']}:"/>
                 <h:selectOneMenu styleClass="clsMenu" id="menuTransactionReason" value="#{userItemEarn.transactionReasonId}">
                     <f:selectItem itemLabel="" itemValue="0"/>
                     <f:selectItems value="#{transactionReasonBean.getTransactionReasons(userItemEarn.transactionTypeId)}" var="tr" itemLabel="#{tr.transactionReasonName}" itemValue="#{tr.transactionReasonId}"/>
                 </h:selectOneMenu>
                 
-                <h:outputLabel  value="Item Category:"/>
+                <h:outputLabel  value="#{langsys['Item']} #{langsys['Category']}:"/>
                 <h:selectOneMenu styleClass="clsMenu" id="menuCategory" value="#{userItemEarn.itemCategoryId}">
                     <f:selectItem itemLabel="" itemValue="0"/>
                     <f:selectItems value="#{categoryBean.categories}" var="c" itemLabel="#{c.categoryName}" itemValue="#{c.categoryId}"/>
                     <f:ajax event="change" render="menuSubCategory"/>
                 </h:selectOneMenu>
-                <h:outputLabel  value="Item SubCategory:"/>
+                <h:outputLabel  value="#{langsys['Item']} #{langsys['Subcategory']}:"/>
                 <h:selectOneMenu styleClass="clsMenu" id="menuSubCategory" value="#{userItemEarn.itemSubCategoryId}">
                     <f:selectItem itemLabel="" itemValue="0"/>
                     <f:selectItems value="#{subCategoryBean.getSubCategoriesByCategoryId(userItemEarn.itemCategoryId)}" var="s" itemLabel="#{s.subCategoryName}" itemValue="#{s.subCategoryId}"/>
                 </h:selectOneMenu>
-                <h:outputLabel  value="Earn Perc(%):"/>
+                <h:outputLabel  value="#{langsys['Earn']} #{langsys['Percentage']}(%):"/>
                 <h:inputText styleClass="clsInput" id="itxtEarnPerc" value="#{userItemEarn.earnPerc}" autocomplete="off">
                 </h:inputText>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainCommands" columns="1">
                 <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
-                    <h:commandButton styleClass="clsButtonBig" id="cmdbSave" value="SAVE (ALT+S)" accesskey="s">
+                    <h:commandButton styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['SAVE']} (ALT+S)" accesskey="s">
                         <f:ajax listener="#{userItemEarnBean.saveUserItemEarn(userItemEarn)}" execute="@form" render="@form" />
                     </h:commandButton>
-                    <h:commandButton styleClass="clsButtonBig" id="cmdbClear" value="CLEAR (ALT+C)" accesskey="c">
+                    <h:commandButton styleClass="clsButtonBig" id="cmdbClear" value="#{langsys['CLEAR']} (ALT+C)" accesskey="c">
                         <f:ajax listener="#{userItemEarnBean.clearUserItemEarn(userItemEarn)}" execute="@form" render="@form" />
                     </h:commandButton>
-                    <h:commandButton styleClass="clsButtonBig" id="cmdbDelete" value="DELETE (ALT+D)" onclick="return confirmDelete();" accesskey="d">
+                    <h:commandButton styleClass="clsButtonBig" id="cmdbDelete" value="#{langsys['DELETE']} (ALT+D)" onclick="return confirmDelete();" accesskey="d">
                         <f:ajax listener="#{userItemEarnBean.deleteUserItemEarn(userItemEarn)}" execute="@form" render="@form" />
                     </h:commandButton>
                 </h:panelGrid>
@@ -95,49 +95,49 @@
                          >
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header">Trans. Type</f:facet>
+                    <f:facet name="header">#{langsys['Transaction']} #{langsys['Type']}</f:facet>
                     <!-- row record -->
                     #{transactionTypeBean.getTransactionType(itm.transactionTypeId).transactionTypeName}
                 </h:column>
                  <h:column>
                     <!-- column header -->
-                    <f:facet name="header">Trans. SubType</f:facet>
+                    <f:facet name="header">#{langsys['Transaction']} #{langsys['Subtype']}</f:facet>
                     <!-- row record -->
                     #{transactionReasonBean.getTransactionReason(itm.transactionReasonId).transactionReasonName}
                 </h:column>
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header">User Category</f:facet>
+                    <f:facet name="header">#{langsys['User']} #{langsys['Category']}</f:facet>
                     <!-- row record -->
                     #{userCategoryBean.getUserCategory(itm.userCategoryId).userCategoryName}
                 </h:column>
 
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header">Item Category</f:facet>
+                    <f:facet name="header">#{langsys['Item']} #{langsys['Category']}</f:facet>
                     <!-- row record -->
                     #{categoryBean.getCategory(itm.itemCategoryId).categoryName}
                 </h:column>
 
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header">Item SubCategory</f:facet>
+                    <f:facet name="header">#{langsys['Item']} #{langsys['Subcategory']}</f:facet>
                     <!-- row record -->
                     #{subCategoryBean.getSubCategory(itm.itemSubCategoryId).subCategoryName}
                 </h:column>
 
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header">Earn Perc(%)</f:facet>
+                    <f:facet name="header">#{langsys['Earn']} #{langsys['Percentage']}(%)</f:facet>
                     <!-- row record -->
                     #{itm.earnPerc}
                 </h:column>
 
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header">Action</f:facet>
+                    <f:facet name="header">#{langsys['Action']}</f:facet>
                     <!-- row record -->
-                    <h:commandLink value="Edit">
+                    <h:commandLink value="#{langsys['Edit']}">
                         <f:ajax listener="#{userItemEarnBean.displayUserItemEarn(itm,userItemEarn)}" execute="@form" render="@form"/>
                     </h:commandLink>
                     &nbsp;

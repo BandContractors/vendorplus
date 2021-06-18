@@ -25,30 +25,30 @@
         <h:form id="form" styleClass="clsMainFrom">
 
             <h:panelGrid styleClass="clsGridMainHeader" columns="1">
-                <h:outputLabel styleClass="clsLabelTop" id="olblbranchHeader" value="Group Detail"/>
+                <h:outputLabel styleClass="clsLabelTop" id="olblbranchHeader" value="#{langsys['Group']} #{langsys['Detail']}"/>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainInput" columns="4">
-                <h:outputLabel  value="Group Name:"/>
+                <h:outputLabel  value="#{langsys['Group']} #{langsys['Name']}:"/>
                 <h:inputText styleClass="clsInput" id="itxtGroupName" value="#{groupDetail.groupName}" autocomplete="off">  
                 </h:inputText>
-                <h:outputLabel  value="Is Active?:"/>
+                <h:outputLabel  value="#{langsys['Is']} #{langsys['Active']}?:"/>
                 <h:selectOneMenu styleClass="clsMenu" id="menuIsActive" value="#{groupDetail.isActive}">
-                    <f:selectItem itemLabel="Yes" itemValue="Yes"/>
-                    <f:selectItem itemLabel="No" itemValue="No"/>
+                    <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="#{langsys['Yes']}"/>
+                    <f:selectItem itemLabel="#{langsys['No']}" itemValue="#{langsys['No']}"/>
                 </h:selectOneMenu>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainCommands" columns="2">
             <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
-                <h:commandButton styleClass="clsButton" id="cmdbSave" value="Save">
+                <h:commandButton styleClass="clsButton" id="cmdbSave" value="#{langsys['Save']}">
                     <f:actionListener binding="#{groupDetailBean.saveGroupDetail(groupDetail)}" />
                     <f:actionListener binding="#{groupDetailBean.clearGroupDetail(groupDetail)}" />
                 </h:commandButton>
-                <h:commandButton styleClass="clsButton" id="cmdbClear" value="Clear">
+                <h:commandButton styleClass="clsButton" id="cmdbClear" value="#{langsys['Clear']}">
                     <f:actionListener binding="#{groupDetailBean.clearGroupDetail(groupDetail)}" />
                 </h:commandButton>
-                <h:commandButton styleClass="clsButton" id="cmdbDelete" value="Delete" onclick="return confirmDelete();">
+                <h:commandButton styleClass="clsButton" id="cmdbDelete" value="#{langsys['Delete']}" onclick="return confirmDelete();">
                     <f:actionListener binding="#{groupDetailBean.deleteGroupDetail(groupDetail)}" />
                     <f:actionListener binding="#{groupDetailBean.clearGroupDetail(groupDetail)}" />
                 </h:commandButton>
@@ -71,23 +71,23 @@
                          > 
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header"> Group Name </f:facet>
+                    <f:facet name="header"> #{langsys['Group']} #{langsys['Name']} </f:facet>
                     <!-- row record -->
                     #{g.groupName}
                 </h:column>
 
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header"> Is Active </f:facet>
+                    <f:facet name="header"> #{langsys['Is']} #{langsys['Active']} </f:facet>
                     <!-- row record -->
                     #{g.isActive}
                 </h:column>
 
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header">Action</f:facet>
+                    <f:facet name="header">#{langsys['Action']}</f:facet>
                     <!-- row record -->
-                    <h:commandLink value="Edit" action="#{groupDetailBean.displayGroupDetail(g,groupDetail)}" />
+                    <h:commandLink value="#{langsys['Edit']}" action="#{groupDetailBean.displayGroupDetail(g,groupDetail)}" />
                     &nbsp;
                 </h:column>
                 

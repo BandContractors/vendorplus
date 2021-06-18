@@ -25,79 +25,79 @@
         <h:form id="form" styleClass="clsMainFrom">
 
             <h:panelGrid styleClass="clsGridMainHeader" columns="1">
-                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeader" value="User Details"/>
+                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeader" value="#{langsys['User']} #{langsys['Details']}"/>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainInput" columns="6">
 
-                <h:outputLabel  value="User Name:"/>
+                <h:outputLabel  value="#{langsys['Username']}:"/>
                 <h:inputText styleClass="clsInput" id="itxtUserName" value="#{userDetail.userName}" title="Username MUST be between 5-to-20 characters" autocomplete="off" disabled="#{userDetail.userName=='system'}">
                 </h:inputText>
 
-                <h:outputLabel  value="Password:" title="Password MUST be between 5-to-20 characters"/>
+                <h:outputLabel  value="#{langsys['Password']}:" title="Password MUST be between 5-to-20 characters"/>
                 <h:inputSecret styleClass="clsInput" id="isecUserPassword" value="#{userDetail.userPassword}" redisplay="true" autocomplete="off">
                 </h:inputSecret>
 
-                <h:outputLabel  value="Confirm Password:" title="Re-enter password to confirm"/>
+                <h:outputLabel  value="#{langsys['Confirm']} #{langsys['Password']}:" title="Re-enter password to confirm"/>
                 <h:inputSecret styleClass="clsInput" id="isecUserPasswordConfirm" value="#{userDetail.userPasswordConfirm}" redisplay="true" autocomplete="off">
                 </h:inputSecret>
 
-                <h:outputLabel  value="First Name:"/>
+                <h:outputLabel  value="#{langsys['First']} #{langsys['Name']}:"/>
                 <h:inputText styleClass="clsInput" id="itxtFirstName" value="#{userDetail.firstName}" autocomplete="off" disabled="#{userDetail.userName=='system'}">
                 </h:inputText>
 
-                <h:outputLabel  value="Second Name:"/>
+                <h:outputLabel  value="#{langsys['Second']} #{langsys['Name']}:"/>
                 <h:inputText styleClass="clsInput" id="itxtSecondName" value="#{userDetail.secondName}" autocomplete="off" disabled="#{userDetail.userName=='system'}">
                 </h:inputText>
 
-                <h:outputLabel  value="Third Name:"/>
+                <h:outputLabel  value="#{langsys['Third']} #{langsys['Name']}:"/>
                 <h:inputText styleClass="clsInput" id="itxtThirdName" value="#{userDetail.thirdName}" autocomplete="off" disabled="#{userDetail.userName=='system'}">
                 </h:inputText>
 
-                <h:outputLabel  value="Lock User?:"/>
+                <h:outputLabel  value="#{langsys['Lock']} #{langsys['User']}?:"/>
                 <h:selectOneMenu styleClass="clsMenu" id="menuIsUserLocked" value="#{userDetail.isUserLocked}" disabled="#{userDetail.userName=='system'}" style="width: 225px;">
                     <f:selectItem itemLabel="" itemValue=""/>
-                    <f:selectItem itemLabel="Yes" itemValue="Yes"/>
-                    <f:selectItem itemLabel="No" itemValue="No"/>
+                    <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="#{langsys['Yes']}"/>
+                    <f:selectItem itemLabel="#{langsys['No']}" itemValue="#{langsys['No']}"/>
                 </h:selectOneMenu>
 
-                <h:outputLabel  value="General Admin?:"/>
+                <h:outputLabel  value="#{langsys['General']} #{langsys['Admin']}?:"/>
                 <h:selectOneMenu styleClass="clsMenu" id="menuIsUserGenAdmin" value="#{userDetail.isUserGenAdmin}" disabled="#{userDetail.userName=='system'}" style="width: 225px;">
                     <f:selectItem itemLabel="" itemValue=""/>
-                    <f:selectItem itemLabel="Yes" itemValue="Yes"/>
-                    <f:selectItem itemLabel="No" itemValue="No"/>
+                    <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="#{langsys['Yes']}"/>
+                    <f:selectItem itemLabel="#{langsys['No']}" itemValue="#{langsys['No']}"/>
                 </h:selectOneMenu>
 
-                <h:outputLabel  value="User Category:"/>
+                <h:outputLabel  value="#{langsys['User']} #{langsys['Category']}:"/>
                 <h:selectOneMenu styleClass="clsMenu" id="menuUserCategory" value="#{userDetail.userCategoryId}" style="width: 225px;">
                     <f:selectItem itemLabel="" itemValue="0"/>
                     <f:selectItems value="#{userCategoryBean.userCategories}" var="u" itemLabel="#{u.userCategoryName}" itemValue="#{u.userCategoryId}"/>
                 </h:selectOneMenu>
 
-                <h:outputLabel  value="Phone No:"/>
+                <h:outputLabel  value="#{langsys['Phone']} #{langsys['No.']}:"/>
                 <h:inputText styleClass="clsInput" id="itxtPhone_no" value="#{userDetail.phone_no}" autocomplete="off" disabled="#{userDetail.userName=='system'}">
                 </h:inputText>
 
-                <h:outputLabel  value="Email Address:"/>
+                <h:outputLabel  value="#{langsys['Email']} #{langsys['Address']}:"/>
                 <h:inputText styleClass="clsInput" id="itxtEmail_address" value="#{userDetail.email_address}" autocomplete="off" disabled="#{userDetail.userName=='system'}">
                 </h:inputText>
 
-                <h:outputLabel  value="User Code:"/>
+                <h:outputLabel  value="#{langsys['User']} #{langsys['Code']}:"/>
                 <h:inputSecret styleClass="clsInput" id="isecTrans_code" value="#{userDetail.trans_code}" redisplay="true" autocomplete="off">
                 </h:inputSecret>
 
-                <h:outputLabel  value="User Image:"/>
+                <h:outputLabel  value="#{langsys['User']} #{langsys['Image']}:"/>
                 <h:inputText styleClass="clsInput" id="isecUserImgUrl" value="#{userDetail.userImgUrl}" autocomplete="off"  disabled="#{userDetail.userName=='system'}">
                 </h:inputText>
 
-                <h:outputLabel  value="System Language:"/>
+                <h:outputLabel  value="#{langsys['System']} #{langsys['Language']}:"/>
                 <h:selectOneMenu id="menuLanguageSystem" value="#{userDetail.language_system}" style="width: 225px;">
                     <f:selectItem itemLabel="ENGLISH" itemValue="ENGLISH"/>
                     <f:selectItem itemLabel="CHINESE" itemValue="SIMPLIFIED_CHINESE"/>
                     <f:selectItem itemLabel="FRENCH" itemValue="FRENCH"/>
                 </h:selectOneMenu>
 
-                <h:outputLabel  value="Output Language:"/>
+                <h:outputLabel  value="#{langsys['Output']} #{langsys['Language']}:"/>
                 <h:selectOneMenu id="menuLanguageOutput" value="#{userDetail.language_output}" style="width: 225px;">
                     <f:selectItem itemLabel="ENGLISH" itemValue="ENGLISH"/>
                     <f:selectItem itemLabel="CHINESE" itemValue="SIMPLIFIED_CHINESE"/>
@@ -107,13 +107,13 @@
 
             <h:panelGrid styleClass="clsGridMainCommands" columns="2">
                 <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
-                    <h:commandButton styleClass="clsButton" id="cmdbSave" value="Save">
+                    <h:commandButton styleClass="clsButton" id="cmdbSave" value="#{langsys['Save']}">
                         <f:actionListener binding="#{userDetailBean.saveUserDetail(userDetail)}" />
                     </h:commandButton>
-                    <h:commandButton styleClass="clsButton" id="cmdbClear" value="Clear">
+                    <h:commandButton styleClass="clsButton" id="cmdbClear" value="#{langsys['Clear']}">
                         <f:actionListener binding="#{userDetailBean.clearUserDetail(userDetail)}" />
                     </h:commandButton>
-                    <h:commandButton styleClass="clsButton" id="cmdbDelete" value="Delete" onclick="return confirmDelete();">
+                    <h:commandButton styleClass="clsButton" id="cmdbDelete" value="#{langsys['Delete']}" onclick="return confirmDelete();">
                         <f:actionListener binding="#{userDetailBean.deleteUserDetail(userDetail)}" />
                     </h:commandButton>
                 </h:panelGrid>
@@ -125,8 +125,8 @@
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainSearch" columns="1">
-                <h:outputLabel id="olblMainSearch" value="Search Users"/>
-                <h:outputLabel id="olblMainSearchDesc" value="(Search by username or any of the names(First,Second,Third)!)"/>
+                <h:outputLabel id="olblMainSearch" value="#{langsys['Search']} #{langsys['Users']}"/>
+                <h:outputLabel id="olblMainSearchDesc" value="(#{langsys['Search']} #{langsys['by']} #{langsys['username']} #{langsys['or']} #{langsys['any']} #{langsys['of']} #{langsys['the']} #{langsys['names']}(#{langsys['First']},#{langsys['Second']},#{langsys['Third']})!)"/>
                 <h:inputText id="itxtMainSearch" value="#{userDetailBean.searchUserName}" autocomplete="off">
                     <f:ajax event="keyup" render="dtblUserDetail"/>
                 </h:inputText>
@@ -140,58 +140,58 @@
                          > 
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header">User Name</f:facet>
+                    <f:facet name="header">#{langsys['Username']}</f:facet>
                     <!-- row record -->
                     #{u.userName}
                 </h:column>
 
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header">First Name</f:facet>
+                    <f:facet name="header">#{langsys['First']} #{langsys['']}</f:facet>
                     <!-- row record -->
                     #{u.firstName}
                 </h:column>
 
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header">Second Name</f:facet>
+                    <f:facet name="header">#{langsys['Second']} #{langsys['Name']}</f:facet>
                     <!-- row record -->
                     #{u.secondName}
                 </h:column>
 
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header">Third Name</f:facet>
+                    <f:facet name="header">#{langsys['Third']} #{langsys['Name']}</f:facet>
                     <!-- row record -->
                     #{u.thirdName}
                 </h:column>
 
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header">Locked?</f:facet>
+                    <f:facet name="header">#{langsys['Locked']}?</f:facet>
                     <!-- row record -->
                     #{u.isUserLocked}
                 </h:column>
 
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header">Admin</f:facet>
+                    <f:facet name="header">#{langsys['Admin']}</f:facet>
                     <!-- row record -->
                     #{u.isUserGenAdmin}
                 </h:column>
 
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header">User Category</f:facet>
+                    <f:facet name="header">#{langsys['User']} #{langsys['Category']}</f:facet>
                     <!-- row record -->
                     #{userCategoryBean.getUserCategory(u.userCategoryId).userCategoryName}
                 </h:column>
 
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header">Action</f:facet>
+                    <f:facet name="header">#{langsys['Action']}</f:facet>
                     <!-- row record -->
-                    <h:commandLink value="Edit" action="#{userDetailBean.displayUserDetail(u,userDetail)}" />
+                    <h:commandLink value="#{langsys['Edit']}" action="#{userDetailBean.displayUserDetail(u,userDetail)}" />
                     &nbsp;
                 </h:column>
 

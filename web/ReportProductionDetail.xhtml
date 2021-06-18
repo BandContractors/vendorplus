@@ -28,29 +28,29 @@
         <ui:include src="Menu.xhtml"/>
         <h:form id="formReport">
             <h:panelGrid id="pnlgHeader" columns="3" styleClass="clsPanelReportFilterTitle">
-                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="Production Detail Report"/>
-                <p:commandLink id="cmdbToday" value="Today's Date" style="color: white;">
+                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="#{langsys['Production']} #{langsys['Detail']} #{langsys['Report']}"/>
+                <p:commandLink id="cmdbToday" value="#{langsys['Today']}" style="color: white;">
                     <p:ajax listener="#{transProductionBean.setDateToToday()}" process="@this" update="pnlgFilter"/>
                 </p:commandLink>
-                <p:commandLink id="cmdbYesturday" value="Yesterday's Date" style="color: white;">
+                <p:commandLink id="cmdbYesturday" value="#{langsys['Yesterday']}" style="color: white;">
                     <p:ajax listener="#{transProductionBean.setDateToYesturday()}" process="@this" update="pnlgFilter"/>
                 </p:commandLink>
             </h:panelGrid>
             <div class="ui-fluid">
                 <h:panelGrid id="pnlgFilter" columns="5" styleClass="clsPanelReportFilter">
                     <p:outputLabel value="#{companySetting.getStoreEquivName()}"/>
-                    <p:outputLabel value="Date Type"/>
-                    <p:outputLabel value="From #{transProductionBean.dateType}" id="lblDate1"/>
-                    <p:outputLabel value="To #{transProductionBean.dateType}" id="lblDate2"/>
+                    <p:outputLabel value="#{langsys['Date']} #{langsys['Type']}"/>
+                    <p:outputLabel value="#{langsys['From']} #{transProductionBean.dateType}" id="lblDate1"/>
+                    <p:outputLabel value="#{langsys['To']} #{transProductionBean.dateType}" id="lblDate2"/>
                     <p:outputLabel value="#{transactionTypeBean.getTransactionType(70).transactionNumberLabel}"/>
                     <p:selectOneMenu id="menuFromStore" value="#{transProduction.storeId}" >
-                        <f:selectItem itemLabel="Select" itemValue="0"/>
+                        <f:selectItem itemLabel="#{langsys['Select']}" itemValue="0"/>
                         <f:selectItems value="#{storeBean.stores}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
                     </p:selectOneMenu>
                     <p:selectOneMenu id="menuDateType" value="#{transProductionBean.dateType}">
-                        <f:selectItem itemLabel="Select" itemValue=""/>
-                        <f:selectItem itemValue="Add Date" itemLabel="Add Date"/>
-                        <f:selectItem itemValue="Production Date" itemLabel="Production Date"/>
+                        <f:selectItem itemLabel="#{langsys['Select']}" itemValue=""/>
+                        <f:selectItem itemValue="#{langsys['Add']} #{langsys['Date']}" itemLabel="#{langsys['Add']} #{langsys['Date']}"/>
+                        <f:selectItem itemValue="#{langsys['Production']} #{langsys['Date']}" itemLabel="#{langsys['Production']} #{langsys['Date']}"/>
                         <f:ajax event="change" execute="@this" render="lblDate1 lblDate2"/>
                     </p:selectOneMenu>
                     <p:calendar id="calDate1"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{transProductionBean.date1}"/>
@@ -59,9 +59,9 @@
 
                     <h:outputLabel value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}"/>
                     <h:outputLabel value="#{transactionTypeBean.getTransactionType(11).transactionNumberLabel}"/>
-                    <p:outputLabel value="Added By"/>
+                    <p:outputLabel value="#{langsys['Added']} #{langsys['By']}"/>
                     <h:outputLabel value="#{transactionTypeBean.getTransactionType(70).transactionUserLabel}"/>              
-                    <h:outputLabel value="SUMMARIZE RESULTS BY:"/>
+                    <h:outputLabel value="#{langsys['SUMMARIZE']} #{langsys['RESULTS']} #{langsys['BY']}:"/>
 
                     <p:autoComplete id="autcTransactor" value="#{transactorBean.selectedTransactor}" 
                                     completeMethod="#{transactorBean.getTransactorObjectList}" 
@@ -71,16 +71,16 @@
                                     converter="TransactorConverter" style="text-align: left" 
                                     forceSelection="true" queryDelay="0" 
                                     >
-                        <p:column headerText="Names" style="text-align: left" >  
+                        <p:column headerText="#{langsys['Names']}" style="text-align: left" >  
                             #{trct.transactorNames} 
                         </p:column>
-                        <p:column headerText="Reference No" style="text-align: left" >  
+                        <p:column headerText="#{langsys['Reference']} #{langsys['No.']}" style="text-align: left" >  
                             #{trct.transactorRef} 
                         </p:column>
-                        <p:column headerText="Type" style="text-align: left" >  
+                        <p:column headerText="#{langsys['Type']}" style="text-align: left" >  
                             #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)} 
                         </p:column> 
-                        <p:column headerText="Contact Person" style="text-align: left">  
+                        <p:column headerText="#{langsys['Contact']} #{langsys['Person']}" style="text-align: left">  
                             #{trct.cpName} 
                         </p:column> 
                         <p:ajax event="itemSelect" listener="#{transProduction.setTransactor_id(transactorBean.selectedTransactor.transactorId)}"/>
@@ -88,27 +88,27 @@
                     </p:autoComplete>
                     <p:inputText value="#{transProduction.transactionRef}"/>
                     <p:selectOneMenu id="menuAddUser" value="#{transProduction.addUserDetailId}">
-                        <f:selectItem itemLabel="Select"/>
+                        <f:selectItem itemLabel="#{langsys['Select']}"/>
                         <f:selectItems value="#{userDetailBean.getUserDetails()}" var="ua" itemLabel="#{ua.firstName} #{ua.secondName} #{ua.thirdName}" itemValue="#{ua.userDetailId}"/>
                     </p:selectOneMenu>
                     <p:selectOneMenu id="menuTransUser" value="#{transProduction.transactionUserDetailId}">
-                        <f:selectItem itemLabel="Select" itemValue="0"/>
+                        <f:selectItem itemLabel="#{langsys['Select']}" itemValue="0"/>
                         <f:selectItems value="#{userDetailBean.getUserDetails()}" var="ut" itemLabel="#{ut.firstName} #{ut.secondName} #{ut.thirdName}" itemValue="#{ut.userDetailId}"/>
                     </p:selectOneMenu>
                     <p:selectOneMenu id="menuSummariseBy" value="#{transProductionBean.fieldName}">
-                        <f:selectItem itemLabel="Select" itemValue=""/>
-                        <f:selectItem itemLabel="Added By" itemValue="add_user_detail_id"/>
+                        <f:selectItem itemLabel="#{langsys['Select']}" itemValue=""/>
+                        <f:selectItem itemLabel="#{langsys['Added']} #{langsys['By']}" itemValue="add_user_detail_id"/>
                         <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(70).transactionUserLabel}" itemValue="transaction_user_detail_id"/>
                         <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(70).transactionDateLabel}" itemValue="transaction_date"/>
                     </p:selectOneMenu>
 
-                    <p:commandButton id="cmdbSearch" value="SEARCH (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                    <p:commandButton id="cmdbSearch" value="#{langsys['SEARCH']} (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
                         <p:ajax listener="#{transProductionBean.reportProductionDetail(transProduction,transProductionBean)}" process="pnlgFilter" update="menuDateType pnlgFilter pnlgMessage tblDetail"/>
                     </p:commandButton>
-                    <p:commandButton id="cmdbReset" value="RESET (ALT+R)" accesskey="r">
+                    <p:commandButton id="cmdbReset" value="#{langsys['RESET']} (ALT+R)" accesskey="r">
                         <p:ajax listener="#{transProductionBean.resetProductionDetail(transProduction,transProductionBean,'VIEW')}" process="pnlgFilter" update="pnlgFilter pnlgMessage tblDetail"/>
                     </p:commandButton>
                 </h:panelGrid>
@@ -125,7 +125,7 @@
                         <p:column headerText="" style="text-align: left;" rendered="#{transProductionBean.fieldName.equals('')}">
 
                         </p:column>
-                        <p:column headerText="Added By" style="text-align: left;" rendered="#{transProductionBean.fieldName.equals('add_user_detail_id')}">
+                        <p:column headerText="#{langsys['Added']} #{langsys['By']}" style="text-align: left;" rendered="#{transProductionBean.fieldName.equals('add_user_detail_id')}">
                             <h:outputText value="#{userDetailBean.getUserDetail(sm.addUserDetailId).userName}" rendered="#{sm.addUserDetailId>0}"/>
                         </p:column>
                         <p:column headerText="#{transactionTypeBean.getTransactionType(70).transactionUserLabel}" style="text-align: left;" rendered="#{transProductionBean.fieldName.equals('transaction_user_detail_id')}">
@@ -134,13 +134,13 @@
                         <p:column headerText="#{transactionTypeBean.getTransactionType(70).transactionDateLabel}" style="text-align: left;" rendered="#{transProductionBean.fieldName.equals('transaction_date')}">
                             <h:outputText value="#{utilityBean.formatDate(sm.transactionDate)}"/>
                         </p:column>
-                        <p:column headerText="Total Number" style="text-align: right;">
+                        <p:column headerText="#{langsys['Total']} #{langsys['Number']}" style="text-align: right;">
                             <h:outputText value="#{sm.outputQty}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                     </p:dataTable>
-                    #{transProductionBean.transList.size()} Records Found
+                    #{transProductionBean.transList.size()} #{langsys['Records']} #{langsys['Found']}
                     <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
                     <p:columnToggler datasource="tblDetail" trigger="toggler" />
                 </f:facet>
@@ -162,7 +162,7 @@
                         <p:dataExporter type="xml" target="tblDetail" fileName="Production_Detail" />
                     </h:commandLink>
                 </f:facet>
-                <p:column headerText="View" exportable="false">
+                <p:column headerText="#{langsys['View']}" exportable="false">
                     <p:commandButton id="cmdbView" icon="ui-icon-search" oncomplete="PF('dlgPIR').show();" actionListener="#{transProductionBean.initTransProductionSession(itm.transactionId,'View')}" update=":formTransactionPIR"/>
                     <p:commandButton id="cmdbEdit" icon="ui-icon-pencil" oncomplete="PF('dlgPIR').show();" actionListener="#{transProductionBean.initTransProductionSession(itm.transactionId,'Edit')}" update=":formTransactionPIR"/>
                 </p:column>
@@ -175,28 +175,28 @@
                 <p:column headerText="#{transactionTypeBean.getTransactionType(11).transactionNumberLabel}">
                     <h:outputLabel value="#{itm.transactionRef}"/>
                 </p:column>
-                <p:column headerText="Order Qty">
+                <p:column headerText="#{langsys['Order']} #{langsys['Qty']}">
                     <h:outputText value="#{itm.orderedQty}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Order Unit">
+                <p:column headerText="#{langsys['Order']} #{langsys['Unit']}">
                     #{itm.outputItemUnit}
                     #{transProductionBean.getPCsOrdered(itm)}
                 </p:column>
-                <p:column headerText="Produced Item">
+                <p:column headerText="#{langsys['Produced']} #{langsys['Item']}">
                     <h:outputLabel value="#{transItemBean.showItemDescriptionCEC(itm.outputItemName,itm.codeSpecific,itm.descSpecific,itm.descMore)}"/>
                 </p:column>
-                <p:column headerText="Produced Qty">
+                <p:column headerText="#{langsys['Produced']} #{langsys['Qty']}">
                     <h:outputText value="#{itm.outputQty}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Produced Unit">
+                <p:column headerText="#{langsys['Produced']} #{langsys['Unit']}">
                     #{itm.outputItemUnit}
                     #{transProductionBean.getPCsProduced(itm)}
                 </p:column>
-                <p:column headerText="Unit Cost">
+                <p:column headerText="#{langsys['Unit']} #{langsys['Cost']}">
                     <h:outputText value="#{itm.outputUnitCost}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
@@ -204,13 +204,13 @@
                 <p:column headerText="#{transactionTypeBean.getTransactionType(70).transactionDateLabel}" rendered="#{transProductionBean.dateType.equals('Production Date')}">
                     <h:outputText value="#{utilityBean.formatDate(itm.transactionDate)}"/>
                 </p:column>
-                <p:column headerText="Add Date" rendered="#{transProductionBean.dateType.equals('Add Date')}">
+                <p:column headerText="#{langsys['Add']} #{langsys['Date']}" rendered="#{transProductionBean.dateType.equals('Add Date')}">
                     <h:outputText value="#{utilityBean.formatDate(itm.addDate)}"/>
                 </p:column>
                 <p:column headerText="#{transactionTypeBean.getTransactionType(70).transactionUserLabel}" rendered="#{transProductionBean.dateType.equals('Production Date')}">
                     <h:outputText value="#{userDetailBean.getUserDetail(itm.transactionUserDetailId).userName}"/>
                 </p:column>
-                <p:column headerText="Added By" rendered="#{transProductionBean.dateType.equals('Add Date')}">
+                <p:column headerText="#{langsys['Added']} #{langsys['By']}" rendered="#{transProductionBean.dateType.equals('Add Date')}">
                     <h:outputText value="#{userDetailBean.getUserDetail(itm.addUserDetailId).userName}"/>
                 </p:column>
             </p:dataTable>
