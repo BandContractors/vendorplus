@@ -60,7 +60,7 @@
                         <h:outputLabel value="#{langsys['From']} #{langsys['Date']}:"/>
                         <p:calendar id="calDate1"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{payBean.date1}" size="12"/>
                         <h:outputLabel value="#{langsys['To']} #{langsys['Date']}:"/>
-                        <p:calendar id="calDate2"  pattern="#{langsys['']}#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{payBean.date2}" size="12"/>
+                        <p:calendar id="calDate2"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{payBean.date2}" size="12"/>
 
                         <h:outputLabel  value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}:"/>
                         <p:autoComplete id="autcTransactor" value="#{payBean.selectedBillTransactor}" 

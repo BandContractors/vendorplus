@@ -134,7 +134,7 @@
                         <p:column headerText="#{transactionTypeBean.getTransactionType(1).transactionUserLabel}" style="text-align: left;" rendered="#{transBean.fieldName.equals('transaction_user_detail_id')}">
                             <h:outputText value="#{userDetailBean.getUserDetail(sm.transactionUserDetailId).userName}"/>
                         </p:column>
-                        <p:column headerText="#{langsys['']}#{menuItemBean.menuItemObj.SUPPLIER_NAME}" style="text-align: left;" rendered="#{transBean.fieldName.equals('transactor_id')}">
+                        <p:column headerText="#{langsys[menuItemBean.menuItemObj.SUPPLIER_NAME]}" style="text-align: left;" rendered="#{transBean.fieldName.equals('transactor_id')}">
                             <h:outputText value="#{transactorBean.getTransactor(sm.transactorId).transactorNames}"/>
                         </p:column>
                         <p:column headerText="#{langsys['Transaction']} #{langsys['Type']}" style="text-align: left;" rendered="#{transBean.fieldName.equals('transaction_reason_id')}">

@@ -32,7 +32,7 @@
             </h:panelGrid>
             <h:panelGrid id="id1" columns="10" styleClass="clsPanelReportFilter">
                 <h:outputLabel styleClass="clsLabelReportFilter" value="#{langsys['ACTIVE']}:"/>
-                <h:selectBooleanCheckbox label="Active" value="#{langsys['']}#{generalUserSetting.reportRetrievalOption}">
+                <h:selectBooleanCheckbox label="Active" value="#{generalUserSetting.reportRetrievalOption}">
                 </h:selectBooleanCheckbox>
                 <h:outputLabel styleClass="clsLabelReportFilter" value="#{langsys['Category']}:"/>
                 <h:selectOneMenu styleClass="clsInputReportFilter" id="menuCategory" value="#{item.categoryId}">
@@ -135,7 +135,7 @@
             </p:dataTable>
 
             <h:panelGrid id="id15" columns="1" style="margin-top: 20px;">
-                <p:panel header="#{langsys['']}Export #{langsys['']}All #{langsys['Items']} #{langsys['Report']}">
+                <p:panel header="#{langsys['Export']} #{langsys['All']} #{langsys['Items']} #{langsys['Report']}">
                     <h:commandLink>
                         <p:commandButton icon="ui-icon-circle-arrow-s" value="#{langsys['Excel']}"/>
                         <p:dataExporter type="xls" target="tblReportItem" fileName="AllItemsReport" />

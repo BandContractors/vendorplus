@@ -154,7 +154,7 @@
                 <h:inputText id="itxtUnit" styleClass="clsInputTransItem" value="#{unitBean.getUnit(itemBean.getItem(transItem.itemId).getUnitId()).unitSymbol}" disabled="true" style="width: 170px"/>
                 <h:selectOneMenu styleClass="clsMenu" id="menuAssetAcc" value="#{transItem.accountCode}" style="width: 170px">
                     <f:selectItem itemLabel="" itemValue=""/>
-                    <f:selectItems value="#{accCoaBean.getAccCoaObjectListBeginWith1('1-20-000')}" var="ea" itemLabel="#{langsys['']}#{ea.accountName}" itemValue="#{ea.accountCode}"/>
+                    <f:selectItems value="#{accCoaBean.getAccCoaObjectListBeginWith1('1-20-000')}" var="ea" itemLabel="#{ea.accountName}" itemValue="#{ea.accountCode}"/>
                     <f:ajax event="change" render="itxtAssetAcc"/>
                 </h:selectOneMenu>
                 <h:inputText id="itxtAssetAcc" styleClass="clsInputTransItem" value="#{transItem.accountCode}" style="width: 150px;" disabled="true"/>

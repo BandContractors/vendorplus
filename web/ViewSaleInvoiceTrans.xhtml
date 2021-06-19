@@ -42,7 +42,7 @@
                     <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="6">
                         <h:outputLabel  value="From:"/>
                         <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{storeBean.getStore(transBean.transObj.storeId).storeName}" style="width: 170px;"/>
-                        <h:outputLabel  value="Currency:"/>
+                        <h:outputLabel  value="#{langsys['Currency']}:"/>
                         <h:inputText styleClass="clsInput" id="itxtCurrency" disabled="true" value="#{transBean.transObj.currencyCode}" style="width: 170px;"/>
                         <h:outputLabel  value="#{transactionTypeBean.getTransactionType(2).transactionDateLabel}:"/>
                         <h:inputText id="itxtTransactionDate" value="#{utilityBean.formatDate(transBean.transObj.transactionDate)}" disabled="true"/>

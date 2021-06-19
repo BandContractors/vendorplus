@@ -323,7 +323,7 @@
                 <h:inputText id="itxtGrandTotal" value="#{trans.grandTotal}" styleClass="clsInputTransItem" style="width: 180px;background-color: yellow;font-weight: bold;font-size: 20px;" disabled="true">
                     <f:convertNumber pattern="#{accCurrencyBean.getNumberFormatByCurrency(trans.currencyCode)}" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
-                <p:dialog header="#{langsys['']}Cash #{langsys['']}Discount" widgetVar="dlgCashDiscount" modal="true" height="100">
+                <p:dialog header="#{langsys['Cash']} #{langsys['Discount']}" widgetVar="dlgCashDiscount" modal="true" height="100">
                     <p:ajax event="open" process="@this" update="pnlgFilter1"/>
                     <h:panelGrid id="pnlgFilter1" columns="2">
                         <p:outputLabel value="#{langsys['Subtotal']}-#{langsys['Discount']} (#{trans.currencyCode}):"/>

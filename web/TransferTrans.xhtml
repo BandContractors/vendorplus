@@ -59,7 +59,7 @@
                     <p:ajax event="blur" listener="#{utilityBean.clearList(transItemBean.activeTransItems)}" update="dtblTransactionItem" />
                 </h:selectOneMenu>
                 <p:selectOneMenu id="menuTransNumber" value="#{trans.transactionRef}" editable="true" dynamic="true">
-                    <f:selectItem itemLabel="#{langsys['']}Select #{langsys['']}or #{langsys['']}Type" itemValue="0"/>
+                    <f:selectItem itemLabel="#{langsys['Select']} #{langsys['or']} #{langsys['Type']}" itemValue="0"/>
                     <f:selectItems value="#{transBean.transList}" var="stl" itemLabel="#{stl.transactionNumber}" itemValue="#{stl.transactionNumber}"/>
                 </p:selectOneMenu>
                 <p:commandButton id="cbtnOK" value="#{langsys['OK']}" style="background-color: black;color: white;font-weight: bold;" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" >

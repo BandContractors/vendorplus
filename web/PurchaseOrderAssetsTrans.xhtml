@@ -68,16 +68,16 @@
                                 converter="TransactorConverter" style="text-align: left" 
                                 forceSelection="true" queryDelay="0" 
                                 >
-                    <p:column headerText="#{langsys['']}Names" style="text-align: left" >  
+                    <p:column headerText="#{langsys['Names']}" style="text-align: left" >  
                         #{trct.transactorNames} 
                     </p:column> 
-                    <p:column headerText="#{langsys['']}Reference #{langsys['']}No" style="text-align: left" >  
+                    <p:column headerText="#{langsys['Reference']} #{langsys['No.']}" style="text-align: left" >  
                         #{trct.transactorRef} 
                     </p:column>
-                    <p:column headerText="#{langsys['']}Type" style="text-align: left" >  
+                    <p:column headerText="#{langsys['Type']}" style="text-align: left" >  
                         #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)} 
                     </p:column> 
-                    <p:column headerText="#{langsys['']}Contact #{langsys['']}Person" style="text-align: left">  
+                    <p:column headerText="#{langsys['Contact']} #{langsys['Person']}" style="text-align: left">  
                         #{trct.cpName} 
                     </p:column> 
                     <p:ajax event="itemSelect" listener="#{trans.setTransactorId(transactorBean.selectedTransactor.transactorId)}"/>

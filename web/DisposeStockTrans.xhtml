@@ -108,7 +108,7 @@
                 </h:selectOneMenu>
                 <h:selectOneMenu id="menuBatchSpecific" styleClass="clsMenu" value="#{transItem.stockId}" style="width: 500px;">
                     <c:if test="#{stockBean.specificList.size()>1}" >
-                        <f:selectItem itemLabel="#{langsys['']}Select"/>
+                        <f:selectItem itemLabel="#{langsys['Select']}"/>
                     </c:if>
                     <f:selectItems value="#{stockBean.specificList}" var="ic" itemLabel="#{ic.batchno} #{ic.codeSpecific} #{ic.descSpecific}" itemValue="#{ic.stockId}"/>
                 </h:selectOneMenu>

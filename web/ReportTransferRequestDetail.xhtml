@@ -118,7 +118,7 @@
                         <p:column headerText="#{transactionTypeBean.getTransactionType(13).transactionDateLabel}" style="text-align: left;" rendered="#{transBean.fieldName.equals('transaction_date')}">
                             <h:outputText value="#{utilityBean.formatDate(sm.transactionDate)}"/>
                         </p:column>
-                        <p:column headerText="#{langsys['']}Total #{langsys['']}Requests" style="text-align: right;">
+                        <p:column headerText="#{langsys['Total']} #{langsys['Requests']}" style="text-align: right;">
                             <h:outputText value="#{sm.grandTotal}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
