@@ -746,9 +746,9 @@ public class TransBean implements Serializable {
             } else if (!ItemMessage.equals("")) {
                 msg = "Insufficient Stock for Item ##" + ItemMessage;
             } else if (!ItemMessage2.equals("") && "HIRE RETURN NOTE".equals(transtype.getTransactionTypeName())) {
-                msg = "Returned Greater than Balance for Item  ##" + ItemMessage2;
+                msg = "Returned Greater Than Balance for Item  ##" + ItemMessage2;
             } else if (!ItemMessage3.equals("") && "HIRE DELIVERY NOTE".equals(transtype.getTransactionTypeName())) {
-                msg = "Delivered Greater than Balance for Item ##" + ItemMessage3;
+                msg = "Delivered Greater Than Balance for Item ##" + ItemMessage3;
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && "COST-PRICE SALE INVOICE".equals(aSaleType) && trans.getTransactorId() == 0) {
                 msg = "Select " + transtype.getBillTransactorLabel();
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && "No".equals(CompanySetting.getIsCashDiscountVatLiable()) && trans.getCashDiscount() > (trans.getSubTotal() - trans.getTotalTradeDiscount() + trans.getTotalVat())) {
@@ -777,11 +777,11 @@ public class TransBean implements Serializable {
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && trans.getPayMethod() == 0 && trans.getTransactionId() == 0) {
                 msg = "Select Payment Method";
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && "No".equals(CompanySetting.getIsAllowDebt()) && (trans.getAmountTendered() + trans.getSpendPointsAmount()) < trans.getGrandTotal()) {
-                msg = "Amount tendered is Less than Grand Total";
+                msg = "Amount tendered is Less Than Grand Total";
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && trans.getSpendPointsAmount() > trans.getBalancePointsAmount()) {
                 msg = "Amount entered for spending points exceeds the available points balance";
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && "Yes".equals(CompanySetting.getIsAllowDebt()) && (trans.getAmountTendered() + trans.getSpendPointsAmount()) < trans.getGrandTotal() && trans.getTransactorId() == 0) {
-                msg = "Amount Tendered is Less than Grand Total. Select Customer";
+                msg = "Amount Tendered is Less Than Grand Total. Select Customer";
             } else if (("TRANSFER".equals(transtype.getTransactionTypeName()) || "TRANSFER REQUEST".equals(transtype.getTransactionTypeName())) && trans.getStore2Id() == 0) {
                 msg = "Select the " + CompanySetting.getStoreEquivName() + " for Item Transfer";
             } else if (("TRANSFER".equals(transtype.getTransactionTypeName()) || "TRANSFER REQUEST".equals(transtype.getTransactionTypeName())) && store.getStoreId() == trans.getStore2Id()) {
@@ -860,7 +860,7 @@ public class TransBean implements Serializable {
                 msg = "You Cannot Add or Debit and Subtract or Credit different items in the same Update";
             }
         } catch (Exception e) {
-            msg = "An error has occured during the validation process";
+            msg = "An Error has Occured During the Validation Process";
             //System.err.println("--:validateTransCEC:--" + e.getMessage());
             LOGGER.log(Level.ERROR, e);
         }
@@ -1118,6 +1118,8 @@ public class TransBean implements Serializable {
     }
 
     public void saveTransCallQuickOrder(String aAction, String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa, StatusBean aStatusBean) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         //reset messages
         this.ActionMessage = "";
         aStatusBean.setItemAddedStatus("");
@@ -1139,14 +1141,14 @@ public class TransBean implements Serializable {
         }
 
         if (LocationNeeded == 1 && trans.getLocation_id() == 0) {
-            this.ActionMessage = "Please select Location...!";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(this.ActionMessage));
+            this.ActionMessage = "Select Location";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, this.ActionMessage)));
         } else if (UserCodeNeeded == 1 && trans.getUser_code().length() == 0) {
-            this.ActionMessage = "Please enter User Code...!";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(this.ActionMessage));
+            this.ActionMessage = "Enter User Code";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, this.ActionMessage)));
         } else if (UserCodeNeeded == 2 && trans.getTransactionUserDetailId() == 0) {
-            this.ActionMessage = "Please select User/Staff...!";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(this.ActionMessage));
+            this.ActionMessage = "Select User or Staff";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, this.ActionMessage)));
         } else {
             UserDetail ud;
             if (UserCodeNeeded == 1) {
@@ -1157,11 +1159,11 @@ public class TransBean implements Serializable {
                 ud = new GeneralUserSetting().getCurrentUser();
             }
             if (null == ud) {
-                this.ActionMessage = "Invalid user...!";
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(this.ActionMessage));
+                this.ActionMessage = "Invalid User";
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, this.ActionMessage)));
             } else if (trans.getDelivery_mode().length() == 0) {
-                this.ActionMessage = "Specify Delivery Mode...!";
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(this.ActionMessage));
+                this.ActionMessage = "Specify Delivery Mode";
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, this.ActionMessage)));
             } else {
                 if (aAction.equals("Send")) {
                     trans.setIs_processed(0);
@@ -2009,6 +2011,9 @@ public class TransBean implements Serializable {
     }
 
     public void saveTransCECNew(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         int InsertedTransItems = 0;
         double CheckValueBfr = 0;
         double CheckValueAfr = 0;
@@ -2022,9 +2027,6 @@ public class TransBean implements Serializable {
         //-------
         String sql = null;
         String sql2 = null;
-        String msg = "";
-        UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
 
         TransItemBean TransItemBean = new TransItemBean();
         PointsTransactionBean NewPointsTransactionBean = new PointsTransactionBean();
@@ -2054,7 +2056,7 @@ public class TransBean implements Serializable {
                     break;
                 case "CHILD":
                     //this.setActionMessageChild("Transaction NOT saved");
-                    msg = "Transaction NOT saved";
+                    msg = "Transaction Not Saved";
                     this.setActionMessageChild(ub.translateWordsInText(BaseName, msg));
                     break;
             }
@@ -2065,15 +2067,15 @@ public class TransBean implements Serializable {
                 if (trans.getTransactionId() == 0) {
                     switch (aLevel) {
                         case "PARENT":
-                            msg = "Transaction NOT saved";
+                            msg = "Transaction Not Saved";
                             this.setActionMessage(ub.translateWordsInText(BaseName, msg));
                             break;
                         case "CHILD":
-                            msg = "Transaction NOT saved";
+                            msg = "Transaction Not Saved";
                             this.setActionMessageChild(ub.translateWordsInText(BaseName, msg));
                             break;
                     }
-                    msg = "An error occured - transaction cannot be saved";
+                    msg = "Transaction Not Saved due to Error";
                     FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                 } else {
                     //set store2 for transfer in session!
@@ -2131,15 +2133,15 @@ public class TransBean implements Serializable {
                             case "PARENT":
                                 httpSession.setAttribute("CURRENT_TRANSACTION_ID", 0);
                                 httpSession.setAttribute("CURRENT_PAY_ID", 0);
-                                this.setActionMessage("Try saving again - Transaction NOT saved");
+                                this.setActionMessage("Transaction Not Saved");
                                 break;
                             case "CHILD":
                                 httpSession.setAttribute("CURRENT_TRANSACTION_ID_CHILD", 0);
                                 httpSession.setAttribute("CURRENT_PAY_ID_CHILD", 0);
-                                this.setActionMessageChild("Try saving again - Transaction NOT saved");
+                                this.setActionMessageChild("Transaction Not Saved");
                                 break;
                         }
-                        msg = "Try saving again - Transaction NOT saved";
+                        msg = "Transaction Not Saved";
                         FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                     } else {
                         //insert PointsTransaction for both the awarded and spent points to the stage area
@@ -2235,10 +2237,10 @@ public class TransBean implements Serializable {
                 LOGGER.log(Level.ERROR, e);
                 switch (aLevel) {
                     case "PARENT":
-                        this.setActionMessage(ub.translateWordsInText(BaseName, "Transaction NOT saved"));
+                        this.setActionMessage(ub.translateWordsInText(BaseName, "Transaction Not Saved"));
                         break;
                     case "CHILD":
-                        this.setActionMessageChild(ub.translateWordsInText(BaseName, "Transaction NOT saved"));
+                        this.setActionMessageChild(ub.translateWordsInText(BaseName, "Transaction Not Saved"));
                         break;
                 }
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Transaction NOT saved! Double check details, ensure transaction ref numbers have not been captured already")));
@@ -2552,6 +2554,9 @@ public class TransBean implements Serializable {
     }
 
     public long saveTransCECE(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         long SavedTransId = 0;
         TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
         TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
@@ -2561,7 +2566,6 @@ public class TransBean implements Serializable {
         //-------
         String sql = null;
         String sql2 = null;
-        String msg = "";
 
         TransItemBean TransItemBean = new TransItemBean();
         PointsTransactionBean NewPointsTransactionBean = new PointsTransactionBean();
@@ -2585,26 +2589,26 @@ public class TransBean implements Serializable {
         if (ValidationMessage.length() > 0) {
             switch (aLevel) {
                 case "PARENT":
-                    this.setActionMessage("Transaction NOT saved");
+                    this.setActionMessage(ub.translateWordsInText(BaseName, "Transaction Not Saved"));
                     break;
                 case "CHILD":
-                    this.setActionMessageChild("Transaction NOT saved");
+                    this.setActionMessageChild(ub.translateWordsInText(BaseName, "Transaction Not Saved"));
                     break;
             }
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ValidationMessage));
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, ValidationMessage)));
         } else {
             try {
                 this.insertTransCEC(aStoreId, aTransTypeId, aTransReasonId, aSaleType, trans, aActiveTransItems);
                 if (trans.getTransactionId() == 0) {
                     switch (aLevel) {
                         case "PARENT":
-                            this.setActionMessage("Transaction NOT saved");
+                            this.setActionMessage(ub.translateWordsInText(BaseName, "Transaction Not Saved"));
                             break;
                         case "CHILD":
-                            this.setActionMessageChild("Transaction NOT saved");
+                            this.setActionMessageChild(ub.translateWordsInText(BaseName, "Transaction Not Saved"));
                             break;
                     }
-                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("An error occured - transaction cannot be saved"));
+                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Transaction Not Saved Due to Error")));
                 } else {
                     //set store2 for transfer in session!
                     switch (aLevel) {
@@ -2872,11 +2876,11 @@ public class TransBean implements Serializable {
                     switch (aLevel) {
                         case "PARENT":
                             SavedTransId = new GeneralUserSetting().getCurrentTransactionId();
-                            this.setActionMessage("Saved Successfully (TransactionId : " + SavedTransId + ")");
+                            this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully Transaction Id " + SavedTransId));
                             break;
                         case "CHILD":
                             SavedTransId = new GeneralUserSetting().getCurrentTransactionIdChild();
-                            this.setActionMessageChild("Saved Successfully [TransactionId : " + SavedTransId + "]");
+                            this.setActionMessageChild(ub.translateWordsInText(BaseName, "Saved Successfully Transaction Id " + SavedTransId));
                             break;
                     }
 
@@ -2909,13 +2913,13 @@ public class TransBean implements Serializable {
                 LOGGER.log(Level.ERROR, e);
                 switch (aLevel) {
                     case "PARENT":
-                        this.setActionMessage("Transaction NOT saved");
+                        this.setActionMessage(ub.translateWordsInText(BaseName, "Transaction Not Saved"));
                         break;
                     case "CHILD":
-                        this.setActionMessageChild("Transaction NOT saved");
+                        this.setActionMessageChild(ub.translateWordsInText(BaseName, "Transaction Not Saved"));
                         break;
                 }
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Transaction NOT saved! Double check details, ensure transaction ref numbers have not been captured already"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Transaction Not Saved") + ". " + ub.translateWordsInText(BaseName, "Ensure Transaction Reference Number is not Captured Already")));
             }
         }
         return SavedTransId;
@@ -15226,6 +15230,8 @@ public class TransBean implements Serializable {
     }
 
     public void quickOrderActions(Trans aTrans, List<Trans> aActiveTranss, String aAction) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         List<Trans> at = aActiveTranss;
         int ListItemIndex = 0;
         int ListItemNo = at.size();
@@ -15243,10 +15249,10 @@ public class TransBean implements Serializable {
             ud = new UserDetailBean().getUserDetailWithTransCode(aTrans.getUser_code());
         }
         if (UserCodeNeeded == 1 && aTrans.getUser_code().length() == 0) {
-            this.ActionMessage = "Please enter User Code...!";
+            this.ActionMessage = "Enter User Code";
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("User", this.ActionMessage));
         } else if (null == ud) {
-            this.ActionMessage = "Invalid user...!";
+            this.ActionMessage = "Invalid User";
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("User", this.ActionMessage));
         } else {
             this.RefreshCurrentUser(ud, new GeneralUserSetting().getCurrentStore());
@@ -15271,18 +15277,18 @@ public class TransBean implements Serializable {
                     if (count == 1) {
                         int selectedindex = this.getSelectedIndex(at);
                         if (at.get(selectedindex).getIs_invoiced() == 1) {
-                            this.ActionMessage = "Selected Order is already INVOICED...";
+                            this.ActionMessage = "Selected Order is already Invoiced";
                         } else if (at.get(selectedindex).getIs_cancel() == 1) {
-                            this.ActionMessage = "Selected Order is already CANCELLED...";
+                            this.ActionMessage = "Selected Order is already Cancelled";
                         } else if (at.get(selectedindex).getStoreId() != new GeneralUserSetting().getCurrentStore().getStoreId()) {
-                            this.ActionMessage = "ORDER " + CompanySetting.getStoreEquivName() + " AND INVOICE " + CompanySetting.getStoreEquivName() + " MUST BE THE SAME...";
+                            this.ActionMessage = "Order and Invoice must be in the same " + CompanySetting.getStoreEquivName();
                         } else {
                             this.openOrderChildSalesInvoice(at.get(selectedindex).getTransactionId(), ud);
                         }
                     } else if (count == 0) {
-                        this.ActionMessage = "Please select order to Invoice";
+                        this.ActionMessage = "Select Order to Invoice";
                     } else {
-                        this.ActionMessage = "Please select only ONE(1) order to Invoice";
+                        this.ActionMessage = "Select only one Order to Invoice";
                     }
                     if (this.ActionMessage.length() > 0) {
                         break;
@@ -15295,13 +15301,13 @@ public class TransBean implements Serializable {
                     if (countsel == 1) {
                         int selectedindex = this.getSelectedIndex(at);
                         if (at.get(selectedindex).getIs_invoiced() == 1) {
-                            this.ActionMessage = "INVOICED Order cannot be PAID from here... use Cash Receipt window...";
+                            this.ActionMessage = "Use Cash Receipt Window to pay Invoiced Order";
                         } else if (at.get(selectedindex).getIs_cancel() == 1) {
-                            this.ActionMessage = "Selected Order is already CANCELLED...";
+                            this.ActionMessage = "Selected Order is already Cancelled";
                         } else if (at.get(selectedindex).getIs_paid() == 1) {
-                            this.ActionMessage = "Selected Order is already PAID...";
+                            this.ActionMessage = "Selected Order is already Paid";
                         } else if (at.get(selectedindex).getStoreId() != new GeneralUserSetting().getCurrentStore().getStoreId()) {
-                            this.ActionMessage = "ORDER " + CompanySetting.getStoreEquivName() + " AND PAY " + CompanySetting.getStoreEquivName() + " MUST BE THE SAME...";
+                            this.ActionMessage = "Order and Payment Must be in the same " + CompanySetting.getStoreEquivName();
                         } else {
                             this.getOrderSalesInvoice(at.get(selectedindex).getTransactionId(), ud);
                             this.TransChild.setTransactionRef(at.get(selectedindex).getTransactionNumber());
@@ -15316,9 +15322,9 @@ public class TransBean implements Serializable {
                             this.TransChild.setAccChildAccountId(ChildAccountId);
                             //check - save invoice with full payment
                             if (null == this.TransChild || this.ActiveTransItemsChild.size() <= 0) {
-                                this.ActionMessage = "ORDER NOT PAID, please check details...";
+                                this.ActionMessage = "Order Not Paid";
                             } else if (ChildAccountId == 0) {
-                                this.ActionMessage = "You do not have a CASH ACCOUNT to receive cash, please contact administrator...";
+                                this.ActionMessage = "Select Cash Account to receive cash";
                             } else {
                                 //save
                                 this.setAutoPrintAfterSave(false);
@@ -15336,9 +15342,9 @@ public class TransBean implements Serializable {
                             }
                         }
                     } else if (countsel == 0) {
-                        this.ActionMessage = "Please select order to Pay";
+                        this.ActionMessage = "Select Order to Pay";
                     } else {
-                        this.ActionMessage = "Please select only ONE(1) order to Pay";
+                        this.ActionMessage = "Select only One order to Pay";
                     }
                     if (this.ActionMessage.length() > 0) {
                         break;
@@ -15369,13 +15375,13 @@ public class TransBean implements Serializable {
                     int countselectedStoresTo = this.countSelectedStores(at, "TO");
                     if (countselected > 1) {
                         if (countselectedCancel > 0) {
-                            this.ActionMessage = "You cannot MERGE selection with CANCELLED Order(s)...";
+                            this.ActionMessage = "Merging with Cancelled Order Failed";
                         } else if (countselectedInvoiced > 0) {
-                            this.ActionMessage = "You cannot MERGE selection with INVOICED Order(s)...";
+                            this.ActionMessage = "Merging with Invoiced Order Failed";
                         } else if (countselectedStoresFrom > 1) {
-                            this.ActionMessage = "You cannot MERGE orders FROM different STORES...";
+                            this.ActionMessage = "Orders to Merge should be From the same " + CompanySetting.getStoreEquivName();
                         } else if (countselectedStoresTo > 1) {
-                            this.ActionMessage = "You cannot MERGE orders TO different STORES...";
+                            this.ActionMessage = "Orders to Merge should be To the same " + CompanySetting.getStoreEquivName();
                         } else {
                             Trans FirstTrans = this.getFirstTransFromSelected(this.getSelectedTranss(at));
                             String TranssIDsExcFirst = this.getSelectedTranssIDsExcFirst(FirstTrans, at);
@@ -15389,9 +15395,9 @@ public class TransBean implements Serializable {
                             }
                         }
                     } else if (countselected == 1) {
-                        this.ActionMessage = "Please select more than 1 order to Merge";
+                        this.ActionMessage = "Select more than 1 order to Merge";
                     } else {
-                        this.ActionMessage = "Please select only orders to Merge";
+                        this.ActionMessage = "Select only orders to Merge";
                     }
                     if (this.ActionMessage.length() > 0) {
                         break;
@@ -15403,9 +15409,9 @@ public class TransBean implements Serializable {
                     if (countedit == 1) {
                         int selectedindex = this.getSelectedIndex(at);
                         if (at.get(selectedindex).getIs_invoiced() == 1) {
-                            this.ActionMessage = "Selected Order is INVOICED, it cannot be edited...";
+                            this.ActionMessage = "Selected Order is Invoiced and cannot be edited";
                         } else if (at.get(selectedindex).getIs_cancel() == 1) {
-                            this.ActionMessage = "Selected Order is CANCELLED, it cannot be edited...";
+                            this.ActionMessage = "Selected Order is Cancelled and it cannot be edited...";
                         } else {
                             //update session
                             FacesContext context = FacesContext.getCurrentInstance();
@@ -15418,9 +15424,9 @@ public class TransBean implements Serializable {
                             nav.performNavigation("SaleOrderQuickTrans?faces-redirect=true");
                         }
                     } else if (countedit == 0) {
-                        this.ActionMessage = "Please select order to Edit";
+                        this.ActionMessage = "Select order to Edit";
                     } else {
-                        this.ActionMessage = "Please select only ONE(1) order to Edit";
+                        this.ActionMessage = "Select only one order to Edit";
                     }
                     if (this.ActionMessage.length() > 0) {
                         break;
@@ -15437,6 +15443,7 @@ public class TransBean implements Serializable {
                     break;
             }
             if (this.ActionMessage.length() > 0) {
+                this.ActionMessage = ub.translateWordsInText(BaseName, this.ActionMessage);
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Feedback Information", this.ActionMessage));
             }
         }

@@ -20,7 +20,6 @@ import entities.Store;
 import entities.SubCategory;
 import entities.Trans;
 import entities.TransactionReason;
-import entities.Transactor;
 import java.io.Serializable;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -34,8 +33,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -77,6 +74,8 @@ public class TransItemBean implements Serializable {
     private String CategoryName;
     private String SubCategoryName;
     private List<TransItem> TempTransItemsList = new ArrayList<>();
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     public void specifySize(TransItem aTransItem) {
         if (null != aTransItem) {
@@ -777,6 +776,9 @@ public class TransItemBean implements Serializable {
     }
 
     public void saveTransItemCEC(int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aTrans, TransItem transitem) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+
         String sql = null;
         String msg = "";
 
@@ -1326,8 +1328,8 @@ public class TransItemBean implements Serializable {
                 }
             } catch (Exception e) {
                 LOGGER.log(Level.ERROR, e);
-                this.setActionMessage("TransItem NOT saved");
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("TransItem NOT saved!"));
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Transaction Item Not Saved"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Transaction Item Not Saved")));
             }
         }
     }
@@ -2055,6 +2057,8 @@ public class TransItemBean implements Serializable {
     }
 
     public void saveTransItemJournalEntry(Trans aTrans, TransItem transitem) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         String sql = null;
         String sql2 = null;
         String msg = "";
@@ -2202,8 +2206,8 @@ public class TransItemBean implements Serializable {
                 }
             } catch (Exception e) {
                 LOGGER.log(Level.ERROR, e);
-                this.setActionMessage("TransItem NOT saved");
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("TransItem NOT saved!"));
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Transaction Item Not Saved"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Transaction Item Not Saved")));
             }
         }
     }
@@ -5765,7 +5769,7 @@ public class TransItemBean implements Serializable {
             if (aSelectedItem.getIsTrack() == 1 && !"HIRE RETURN INVOICE".equals(transtype.getTransactionTypeName())) {
                 if (transtype.getTransactionTypeName().equals("STOCK ADJUSTMENT")) {
                     if (NewTransItem.getNarration().equals("Subtract") && (st == null || st.getCurrentqty() == 0)) {//this item and batch does not exist in this store OR its quatity is 0 (out of stock)
-                        status = "SELECTED ITEM and BATCH - DOES NOT EXIST or IS OUT OF STOCK !";
+                        status = "Selected Item and Batch not Found";
                         StockFail1 = 1;
                     }
                 } else {
@@ -5773,7 +5777,7 @@ public class TransItemBean implements Serializable {
                         //ignore check
                     } else {
                         if (st == null || st.getCurrentqty() == 0) {//this item and batch does not exist in this store OR its quatity is 0 (out of stock)
-                            status = "SELECTED ITEM and BATCH - DOES NOT EXIST or IS OUT OF STOCK !";
+                            status = "Selected Item and Batch not Found";
                             StockFail1 = 1;
                         }
                     }
@@ -5783,7 +5787,7 @@ public class TransItemBean implements Serializable {
                 if (transtype.getTransactionTypeName().equals("STOCK ADJUSTMENT")) {
                     if (NewTransItem.getNarration().equals("Subtract") && ((NewTransItem.getItemQty() + this.getListTotalItemBatchQty(aActiveTransItems, NewTransItem.getItemId(), NewTransItem.getBatchno(), NewTransItem.getCodeSpecific(), NewTransItem.getDescSpecific())) > st.getCurrentqty())) {
                         //check if supplied qty + existing qty is more than total current stock qty
-                        status = "SELECTED ITEM and BATCH - INSUFFICIENT STOCK !";
+                        status = "Insufficient Stock";
                         StockFail2 = 1;
                     }
                 } else {
@@ -5792,7 +5796,7 @@ public class TransItemBean implements Serializable {
                     } else {
                         if ((NewTransItem.getItemQty() + this.getListTotalItemBatchQty(aActiveTransItems, NewTransItem.getItemId(), NewTransItem.getBatchno(), NewTransItem.getCodeSpecific(), NewTransItem.getDescSpecific())) > st.getCurrentqty()) {
                             //check if supplied qty + existing qty is more than total current stock qty
-                            status = "SELECTED ITEM and BATCH - INSUFFICIENT STOCK !";
+                            status = "Insufficient Stock";
                             StockFail2 = 1;
                         }
                     }
@@ -5808,7 +5812,7 @@ public class TransItemBean implements Serializable {
             }
 
             if (NewTransItem.getItemQty() <= 0) {
-                status = "ENTER ITEM QUANTITY !";
+                status = "Enter Item Quantity";
                 StockFail3 = 1;
             }
             if (StockFail1 == 0 && StockFail2 == 0 && StockFail3 == 0) {
@@ -5974,7 +5978,7 @@ public class TransItemBean implements Serializable {
                     ItemFoundAtIndex = itemExists(aActiveTransItems, ti.getItemId(), ti.getBatchno(), ti.getCodeSpecific(), ti.getDescSpecific());
                 }
                 if (ti.getAmount() < 0 || ti.getAmountExcVat() < 0 || ti.getAmountExcVat() < 0) {
-                    status = "Discount cannot exceed unit price or you need to review prices set";
+                    status = "Discount cannot exceed unit price";
                 } else {
                     if (ItemFoundAtIndex == -1) {
                         //round off amounts basing on currency rules
@@ -6008,7 +6012,7 @@ public class TransItemBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            status = "ERROR OCCURED - ITEM NOT ADDED";
+            status = "Item Not Saved due to Error";
             LOGGER.log(Level.ERROR, e);
         }
         return status;
@@ -6097,6 +6101,8 @@ public class TransItemBean implements Serializable {
     }
 
     public void addTransItemCallCEC(int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aTrans, StatusBean aStatusBean, List<TransItem> aActiveTransItems, TransItem NewTransItem, Item aSelectedItem) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         String status = "";
         aStatusBean.setItemAddedStatus("");
         aStatusBean.setItemNotAddedStatus("");
@@ -6105,33 +6111,33 @@ public class TransItemBean implements Serializable {
         try {
             //check
             if (aTransTypeId == 71 && NewTransItem.getNarration().length() == 0) {//STOCK ADJUSTMENT
-                status = "please select Adjustment Type...";
+                status = "Select Adjustment Type";
             } else if (aTransTypeId == 71 && NewTransItem.getUnitCostPrice() == 0) {//STOCK ADJUSTMENT
-                status = "please enter Unit Cost...";
+                status = "Enter Unit Cost";
             } else if (NewTransItem.getCodeSpecific().length() > 250) {
-                status = "Code cannot be more than 250 characters...";
+                status = "Code cannot be more than 250 Characters";
             } else if (NewTransItem.getDescSpecific().length() > 250) {
-                status = "Name cannot be more than 250 characters...";
+                status = "Name cannot be more than 250 Characters";
             } else if (NewTransItem.getDescMore().length() > 250) {
-                status = "More Description cannot be more than 250 characters...";
+                status = "More Description cannot be more than 250 Characters";
             } else if (NewTransItem.getUnitPrice() < 0 || NewTransItem.getAmount() < 0 || NewTransItem.getUnitPrice2() < 0 || NewTransItem.getUnitTradeDiscount2() < 0) {
-                status = "Prices cannot be be in Negative...";
+                status = "Prices cannot be be in Negative";
             } else {
                 status = this.addTransItemCEC(aStoreId, aTransTypeId, aTransReasonId, aSaleType, aTrans, aActiveTransItems, NewTransItem, aSelectedItem);
             }
             if (status.length() > 0) {
                 aStatusBean.setItemAddedStatus("");
-                aStatusBean.setItemNotAddedStatus(status);
+                aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, status));
                 aStatusBean.setShowItemAddedStatus(0);
                 aStatusBean.setShowItemNotAddedStatus(1);
-                FacesContext.getCurrentInstance().addMessage("Add Item", new FacesMessage(status));
+                FacesContext.getCurrentInstance().addMessage("Add Item", new FacesMessage(ub.translateWordsInText(BaseName, status)));
             } else {
                 TransBean transB = new TransBean();
                 transB.clearAll(null, aActiveTransItems, NewTransItem, aSelectedItem, null, 1, null);
                 //update totals
                 transB.setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems);
                 //update display status
-                aStatusBean.setItemAddedStatus("ITEM ADDED");
+                aStatusBean.setItemAddedStatus(ub.translateWordsInText(BaseName, status));
                 aStatusBean.setItemNotAddedStatus("");
                 aStatusBean.setShowItemAddedStatus(1);
                 aStatusBean.setShowItemNotAddedStatus(0);
@@ -7113,18 +7119,18 @@ public class TransItemBean implements Serializable {
     }
 
     public void addTransItemAutoAdd(Trans aTrans, StatusBean aStatusBean, List<TransItem> aActiveTransItems, TransItem NewTransItem, Item aSelectedItem, String aEntryMode) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         double IncludedVat;
         double ExcludedVat;
         double VatPercent;
         try {
-
             //update vat perc to be used
             if ("SALE INVOICE".equals(new GeneralUserSetting().getCurrentTransactionTypeName()) && "COST-PRICE SALE INVOICE".equals(new GeneralUserSetting().getCurrentSaleType())) {
                 VatPercent = 0;
             } else {
                 VatPercent = CompanySetting.getVatPerc();
             }
-
             //Update Override prices
             if (("SALE INVOICE".equals(new GeneralUserSetting().getCurrentTransactionTypeName()) || "SALE ORDER".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) && NewTransItem.isOverridePrices()) {
                 NewTransItem.setUnitPrice(NewTransItem.getUnitPrice2());
@@ -7334,7 +7340,7 @@ public class TransItemBean implements Serializable {
                 transB.clearAll(null, aActiveTransItems, NewTransItem, aSelectedItem, null, 1, null);
             }// for ItemClick - Do not clear
 
-            aStatusBean.setItemAddedStatus("ITEM ADDED");
+            aStatusBean.setItemAddedStatus(ub.translateWordsInText(BaseName, "Item Added"));
             aStatusBean.setItemNotAddedStatus("");
             aStatusBean.setShowItemAddedStatus(1);
             aStatusBean.setShowItemNotAddedStatus(0);
@@ -10977,6 +10983,10 @@ public class TransItemBean implements Serializable {
     }
 
     public void updateModelTransItemAutoAddCEC(int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aTrans, TransItem aTransItemToUpdate, StatusBean aStatusBean, List<TransItem> aActiveTransItems, TransItem aSelectedTransItem, Item aSelectedItem, String aEntryMode) {//auto=1 for itemCode, auto=0 is for desc/code    ,2 is for other
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
+
         //Capture Modes can be: BarCode,ItemClick
         TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
         TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
@@ -11001,7 +11011,7 @@ public class TransItemBean implements Serializable {
 
         if (aSelectedItem == null) {
             aStatusBean.setItemAddedStatus("");
-            aStatusBean.setItemNotAddedStatus("UNABLE TO FIND ITEM WITH GIVEN DETAILS");
+            aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Item Not Found"));
             aStatusBean.setShowItemAddedStatus(0);
             aStatusBean.setShowItemNotAddedStatus(1);
             new ItemBean().clearItem(aSelectedItem);
@@ -11038,57 +11048,6 @@ public class TransItemBean implements Serializable {
             }
             //get account code for the item
             aSelectedTransItem.setAccountCode(this.getTransItemInventCostAccount(transtype, transreason, aSelectedItem));
-//            try {
-//                if (transtype.getTransactionTypeName().equals("SALE INVOICE") || transtype.getTransactionTypeName().equals("SALE ORDER")) {
-//                    if (aSelectedItem.getItemType().equals("PRODUCT")) {//4-10-000-010 - SALES Products
-//                        aSelectedTransItem.setAccountCode("4-10-000-010");
-//                    } else if (aSelectedItem.getItemType().equals("SERVICE")) {//4-10-000-020 - SALES Services	
-//                        aSelectedTransItem.setAccountCode("4-10-000-020");
-//                    }
-//                } else if (transtype.getTransactionTypeName().equals("PURCHASE INVOICE") || transtype.getTransactionTypeName().equals("EXPENSE ENTRY")) {
-//                    if (transreason.getTransactionReasonId() == 1) {//GOOD AND SERVICE
-//                        if (aSelectedItem.getItemType().equals("PRODUCT")) {
-//                            aSelectedTransItem.setAccountCode("5-10-000-010");
-//                        } else if (aSelectedItem.getItemType().equals("SERVICE")) {
-//                            aSelectedTransItem.setAccountCode("5-10-000-020");
-//                        }
-//                    } else if (transreason.getTransactionReasonId() == 27 || transreason.getTransactionReasonId() == 43) {//EXPENSE,EXPENSE ENTRY
-//                        aSelectedTransItem.setAccountCode(aSelectedItem.getExpenseAccountCode());
-//                    } else if (transreason.getTransactionReasonId() == 29) {//ASSET
-//                        aSelectedTransItem.setAccountCode(aSelectedItem.getAssetAccountCode());
-//                    }
-//                } else if (transtype.getTransactionTypeName().equals("PURCHASE ORDER")) {
-//                    if (transreason.getTransactionReasonId() == 12) {//GOOD AND SERVICE
-//                        if (aSelectedItem.getItemType().equals("PRODUCT")) {
-//                            aSelectedTransItem.setAccountCode("5-10-000-010");
-//                        } else if (aSelectedItem.getItemType().equals("SERVICE")) {
-//                            aSelectedTransItem.setAccountCode("5-10-000-020");
-//                        }
-//                    } else if (transreason.getTransactionReasonId() == 30) {//EXPENSE
-//                        aSelectedTransItem.setAccountCode(aSelectedItem.getExpenseAccountCode());
-//                    } else if (transreason.getTransactionReasonId() == 31) {//ASSET
-//                        aSelectedTransItem.setAccountCode(aSelectedItem.getAssetAccountCode());
-//                    }
-//                } else if (transtype.getTransactionTypeName().equals("ITEM RECEIVED")) {
-//                    //aSelectedTransItem.setAccountCode(aSelectedItem.getAssetAccountCode());
-//                    if (transreason.getTransactionReasonId() == 13) {//GOOD/PRODUCT
-//                        if (aSelectedItem.getItemType().equals("PRODUCT")) {
-//                            aSelectedTransItem.setAccountCode("5-10-000-010");
-//                        } else if (aSelectedItem.getItemType().equals("SERVICE")) {
-//                            aSelectedTransItem.setAccountCode("5-10-000-020");
-//                        }
-//                    } else if (transreason.getTransactionReasonId() == 32) {//EXPENSE
-//                        aSelectedTransItem.setAccountCode(aSelectedItem.getExpenseAccountCode());
-//                    } else if (transreason.getTransactionReasonId() == 28) {//ASSET
-//                        aSelectedTransItem.setAccountCode(aSelectedItem.getAssetAccountCode());
-//                    }
-//                } else {
-//                    aSelectedTransItem.setAccountCode("");
-//                }
-//            } catch (NullPointerException npe) {
-//                aSelectedTransItem.setAccountCode("");
-//            }
-
             if ("EXEMPT SALE INVOICE".equals(aSaleType)) {
                 aSelectedTransItem.setUnitPrice(0);
                 aSelectedTransItem.setUnitTradeDiscount(0);
@@ -11113,7 +11072,6 @@ public class TransItemBean implements Serializable {
                     aSelectedTransItem.setUnitPrice(0);
                 }
                 if (dpi != null) {
-                    //aSelectedTransItem.setUnitTradeDiscount(dpi.getRetailsaleDiscountAmt());
                     aSelectedTransItem.setUnitTradeDiscount(aSelectedItem.getUnitRetailsalePrice() * dpi.getRetailsaleDiscountAmt() / 100);
                 }
             }
@@ -11126,7 +11084,7 @@ public class TransItemBean implements Serializable {
                 aSelectedTransItem.setItemQty(0);
                 aSelectedTransItem.setAmount(0);
                 aStatusBean.setItemAddedStatus("");
-                aStatusBean.setItemNotAddedStatus("(" + aSelectedItem.getDescription() + ") " + "ITEM HAS BATCHES, ENTER ITEM DESCRIPTION MANUALLY...");
+                aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Search Item Manually to Select Batch for ##" + aSelectedItem.getDescription()));
                 aStatusBean.setShowItemAddedStatus(0);
                 aStatusBean.setShowItemNotAddedStatus(1);
                 new ItemBean().clearItem(aSelectedItem);
@@ -11203,7 +11161,7 @@ public class TransItemBean implements Serializable {
                     //BACK
                     //check if supplied qty + existing qty is more than total current stock qty
                     aStatusBean.setItemAddedStatus("");
-                    aStatusBean.setItemNotAddedStatus("(" + aSelectedItem.getDescription() + ") " + "SELECTED ITEM and BATCH - INSUFFICIENT STOCK !");
+                    aStatusBean.setItemNotAddedStatus("Insunfficient Stock for ##" + aSelectedItem.getDescription());
                     aStatusBean.setShowItemAddedStatus(0);
                     aStatusBean.setShowItemNotAddedStatus(1);
                     new ItemBean().clearItem(aSelectedItem);
@@ -12190,5 +12148,19 @@ public class TransItemBean implements Serializable {
      */
     public void setTempTransItemsList(List<TransItem> TempTransItemsList) {
         this.TempTransItemsList = TempTransItemsList;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 }
