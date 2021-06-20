@@ -532,6 +532,8 @@ public class TransBean implements Serializable {
     }
 
     public void RetrieveAndUpdateTransAndItemsGDN(int aTransTypeId, int aRetrieveTransTypeId, int aRetrieveTransTypeId2, Trans aTrans, List<TransItem> aTransItems) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         int CurrStoreId = 0;
         int CurrTransTypeId = 0;
         String CurCode1 = "";
@@ -586,7 +588,7 @@ public class TransBean implements Serializable {
                 aTrans.setTransactorId(0);
                 //aTrans.setTransactionRef("");
                 aTransItems.clear();
-                FacesContext.getCurrentInstance().addMessage("Retrieve PO", new FacesMessage("Either Currency or Transaction-Type of the Order does NOT match with selected currency..."));
+                FacesContext.getCurrentInstance().addMessage("Retrieve PO", new FacesMessage(ub.translateWordsInText(BaseName, "Order Currency or Transaction Type Does Not Match with Selected Currency")));
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -594,6 +596,8 @@ public class TransBean implements Serializable {
     }
 
     public void loadTransForGDN(int aTransTypeIdChoice, Trans aTrans, List<TransItem> aTransItems) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         int CurrStoreId = 0;
         int RetrieveTransTypeId = 0;
         if (aTransTypeIdChoice == 0) {
@@ -626,7 +630,7 @@ public class TransBean implements Serializable {
                     }
                 } else {
                     aTransItems.clear();
-                    FacesContext.getCurrentInstance().addMessage("Retrieved", new FacesMessage("Transaction-Type or Client or Transaction Number does NOT match with selected..."));
+                    FacesContext.getCurrentInstance().addMessage("Retrieved", new FacesMessage(ub.translateWordsInText(BaseName, "Transaction Type or Customer or Transaction Number Does Not Match")));
                 }
             } catch (Exception e) {
                 LOGGER.log(Level.ERROR, e);
@@ -1538,6 +1542,9 @@ public class TransBean implements Serializable {
     }
 
     public void saveTransCEC(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         //Date dt1 = null, dt2 = null;
         //long tms = 0;
         //long ms = 0;
@@ -1555,7 +1562,6 @@ public class TransBean implements Serializable {
         //-------
         String sql = null;
         String sql2 = null;
-        String msg = "";
 
         TransItemBean TransItemBean = new TransItemBean();
         PointsTransactionBean NewPointsTransactionBean = new PointsTransactionBean();
@@ -1579,13 +1585,13 @@ public class TransBean implements Serializable {
         if (ValidationMessage.length() > 0) {
             switch (aLevel) {
                 case "PARENT":
-                    this.setActionMessage("Transaction NOT saved");
+                    this.setActionMessage(ub.translateWordsInText(BaseName, "Transaction Not Saved"));
                     break;
                 case "CHILD":
-                    this.setActionMessageChild("Transaction NOT saved");
+                    this.setActionMessageChild(ub.translateWordsInText(BaseName, "Transaction Not Saved"));
                     break;
             }
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ValidationMessage));
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, ValidationMessage)));
         } else {
             try {
                 //dt1 = new Date();
@@ -1597,13 +1603,13 @@ public class TransBean implements Serializable {
                 if (trans.getTransactionId() == 0) {
                     switch (aLevel) {
                         case "PARENT":
-                            this.setActionMessage("Transaction NOT saved");
+                            this.setActionMessage(ub.translateWordsInText(BaseName, "Transaction Not Saved"));
                             break;
                         case "CHILD":
-                            this.setActionMessageChild("Transaction NOT saved");
+                            this.setActionMessageChild(ub.translateWordsInText(BaseName, "Transaction Not Saved"));
                             break;
                     }
-                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("An error occured - transaction cannot be saved"));
+                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Error" + ", " + "Transaction Not Saved")));
                 } else {
                     //set store2 for transfer in session!
                     switch (aLevel) {
@@ -1943,10 +1949,10 @@ public class TransBean implements Serializable {
                     //TimeStr = TimeStr + " deleteZeroStock:" + ms;
                     switch (aLevel) {
                         case "PARENT":
-                            this.setActionMessage("Saved Successfully ( TransactionId : " + new GeneralUserSetting().getCurrentTransactionId() + " )");
+                            this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully Transaction Id " + new GeneralUserSetting().getCurrentTransactionId()));
                             break;
                         case "CHILD":
-                            this.setActionMessageChild("Saved Successfully ( TransactionId : " + new GeneralUserSetting().getCurrentTransactionIdChild() + " )");
+                            this.setActionMessageChild(ub.translateWordsInText(BaseName, "Saved Successfully Transaction Id  " + new GeneralUserSetting().getCurrentTransactionIdChild()));
                             break;
                     }
 
@@ -1999,13 +2005,13 @@ public class TransBean implements Serializable {
                 LOGGER.log(Level.ERROR, e);
                 switch (aLevel) {
                     case "PARENT":
-                        this.setActionMessage("Transaction NOT saved");
+                        this.setActionMessage(ub.translateWordsInText(BaseName, "Transaction Not Saved"));
                         break;
                     case "CHILD":
-                        this.setActionMessageChild("Transaction NOT saved");
+                        this.setActionMessageChild(ub.translateWordsInText(BaseName, "Transaction Not Saved"));
                         break;
                 }
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Transaction NOT saved! Double check details, ensure transaction ref numbers have not been captured already"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Transaction Not Saved") + ", " + ub.translateWordsInText(BaseName, "Ensure Transaction Reference Number is Not Captured Already")));
             }
         }
     }
@@ -4759,8 +4765,10 @@ public class TransBean implements Serializable {
     }
 
     public void loadDraftTrans(Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
-        String sql = null;
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         String msg = "";
+        String sql = null;
         long TransHistId = 0;
         TransHistId = trans.getTransactionHistId();
         try {
@@ -4800,12 +4808,12 @@ public class TransBean implements Serializable {
                     Size = Integer.parseInt(SizeStr);
                 }
                 if (PortName.length() > 0 && ClientPcName.length() > 0 && Size > 0 && (new GeneralUserSetting().getCurrentTransactionTypeId() == 2 || new GeneralUserSetting().getCurrentTransactionTypeId() == 11)) {
-                    UtilityBean ub = new UtilityBean();
+                    //UtilityBean ub = new UtilityBean();
                     ub.invokeLocalCustomerDisplay(ClientPcName, PortName, Size, ub.formatDoubleToString(trans.getGrandTotal()), "");
                 }
             } else {
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Select a valid draft sale record..."));
-                this.setActionMessage("No draft sale record loaded");
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Select Valid Draft Sale Record")));
+                this.setActionMessage(ub.translateWordsInText(BaseName, "No Draft Sale Record Loaded"));
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -4872,8 +4880,10 @@ public class TransBean implements Serializable {
     }
 
     public void loadOrderForInvoiceTrans(Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
-        String sql = null;
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         String msg = "";
+        String sql = null;
         long OrderId = 0;
         String OrderNumber = trans.getTransactionRef();
         long TransactorId = 0;
@@ -4914,11 +4924,6 @@ public class TransBean implements Serializable {
                         aActiveTransItems.get(i).setTransactionId(0);
                         item = ib.getItem(aActiveTransItems.get(i).getItemId());
                         aActiveTransItems.get(i).setAccountCode(tib.getTransItemInventCostAccount(transtype, transreason, item));
-//                        if (item.getItemType().equals("PRODUCT")) {//4-10-000-010 - SALES Products
-//                            aActiveTransItems.get(i).setAccountCode("4-10-000-010");
-//                        } else if (item.getItemType().equals("SERVICE")) {//4-10-000-020 - SALES Services	
-//                            aActiveTransItems.get(i).setAccountCode("4-10-000-020");
-//                        }
                         double OrderInvoiceQtyBalance = this.getOrderInvoiceQtyBalance(TransactorId, OrderNumber, aActiveTransItems.get(i));
                         if (OrderInvoiceQtyBalance > 0) {
                             aActiveTransItems.get(i).setItemQty(OrderInvoiceQtyBalance);
@@ -4951,12 +4956,10 @@ public class TransBean implements Serializable {
                     //set totals
                     this.setTransTotalsAndUpdateCEC(trans.getTransactionTypeId(), trans.getTransactionReasonId(), trans, aActiveTransItems);
                 } else {
-                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Select a valid sales order number that matches with client..."));
-                    this.setActionMessage("No sale order record loaded");
+                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Select Valid Sale Order Number that Matches with the Customer")));
+                    this.setActionMessage(ub.translateWordsInText(BaseName, "No Sale Order Record Loaded"));
                 }
             } else {
-                //FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Select a valid sales order number that matches with client..."));
-                //this.setActionMessage("No sale order record loaded");
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);

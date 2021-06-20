@@ -5978,7 +5978,7 @@ public class TransItemBean implements Serializable {
                     ItemFoundAtIndex = itemExists(aActiveTransItems, ti.getItemId(), ti.getBatchno(), ti.getCodeSpecific(), ti.getDescSpecific());
                 }
                 if (ti.getAmount() < 0 || ti.getAmountExcVat() < 0 || ti.getAmountExcVat() < 0) {
-                    status = "Discount cannot exceed unit price";
+                    status = "Discount cannot exceed Unit Price";
                 } else {
                     if (ItemFoundAtIndex == -1) {
                         //round off amounts basing on currency rules
@@ -6121,7 +6121,7 @@ public class TransItemBean implements Serializable {
             } else if (NewTransItem.getDescMore().length() > 250) {
                 status = "More Description cannot be more than 250 Characters";
             } else if (NewTransItem.getUnitPrice() < 0 || NewTransItem.getAmount() < 0 || NewTransItem.getUnitPrice2() < 0 || NewTransItem.getUnitTradeDiscount2() < 0) {
-                status = "Prices cannot be be in Negative";
+                status = "Prices cannot be Negative";
             } else {
                 status = this.addTransItemCEC(aStoreId, aTransTypeId, aTransReasonId, aSaleType, aTrans, aActiveTransItems, NewTransItem, aSelectedItem);
             }
@@ -6464,6 +6464,8 @@ public class TransItemBean implements Serializable {
     }
 
     public void addTransItemSaleQuotationCEC(int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aTrans, StatusBean aStatusBean, List<TransItem> aActiveTransItems, TransItem NewTransItem, Item aSelectedItem) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
         TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
         Store store = new StoreBean().getStore(aStoreId);
@@ -6495,7 +6497,7 @@ public class TransItemBean implements Serializable {
             int StockFail1 = 0, StockFail2 = 0, StockFail3 = 0;
             if (NewTransItem.getItemQty() <= 0) {
                 aStatusBean.setItemAddedStatus("");
-                aStatusBean.setItemNotAddedStatus("ENTER ITEM QUANTITY !");
+                aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Enter Item Quantity"));
                 aStatusBean.setShowItemAddedStatus(0);
                 aStatusBean.setShowItemNotAddedStatus(1);
                 StockFail3 = 1;
@@ -6503,7 +6505,7 @@ public class TransItemBean implements Serializable {
 
             if (NewTransItem.getCodeSpecific().length() > 250) {
                 aStatusBean.setItemAddedStatus("");
-                aStatusBean.setItemNotAddedStatus("Code cannot be more than 250 characters...");
+                aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Code Cannot be More Than 250 Characters"));
                 aStatusBean.setShowItemAddedStatus(0);
                 aStatusBean.setShowItemNotAddedStatus(1);
                 StockFail3 = 1;
@@ -6511,7 +6513,7 @@ public class TransItemBean implements Serializable {
 
             if (NewTransItem.getDescSpecific().length() > 250) {
                 aStatusBean.setItemAddedStatus("");
-                aStatusBean.setItemNotAddedStatus("Name cannot be more than 250 characters...");
+                aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Name Cannot be More Than 250 Characters"));
                 aStatusBean.setShowItemAddedStatus(0);
                 aStatusBean.setShowItemNotAddedStatus(1);
                 StockFail3 = 1;
@@ -6519,7 +6521,7 @@ public class TransItemBean implements Serializable {
 
             if (NewTransItem.getDescMore().length() > 250) {
                 aStatusBean.setItemAddedStatus("");
-                aStatusBean.setItemNotAddedStatus("More Description cannot be more than 250 characters...");
+                aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "More Description Cannot be More Than 250 Characters"));
                 aStatusBean.setShowItemAddedStatus(0);
                 aStatusBean.setShowItemNotAddedStatus(1);
                 StockFail3 = 1;
@@ -6527,7 +6529,7 @@ public class TransItemBean implements Serializable {
 
             if (NewTransItem.getUnitPrice() < 0 || NewTransItem.getAmount() < 0 || NewTransItem.getUnitPrice2() < 0 || NewTransItem.getUnitTradeDiscount2() < 0) {
                 aStatusBean.setItemAddedStatus("");
-                aStatusBean.setItemNotAddedStatus("Prices cannot be in Negative...");
+                aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Prices Cannot be Negative"));
                 aStatusBean.setShowItemAddedStatus(0);
                 aStatusBean.setShowItemNotAddedStatus(1);
                 StockFail3 = 1;
@@ -6643,7 +6645,7 @@ public class TransItemBean implements Serializable {
                 int ItemFoundAtIndex = itemExists(aActiveTransItems, ti.getItemId(), ti.getBatchno(), ti.getCodeSpecific(), ti.getDescSpecific());
                 if (ti.getAmount() < 0 || ti.getAmountExcVat() < 0 || ti.getAmountExcVat() < 0) {
                     aStatusBean.setItemAddedStatus("");
-                    aStatusBean.setItemNotAddedStatus("Discount cannot exceed unit price or you need to review prices set");
+                    aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Discount Cannot Exceed Unit Price or Prices are Wrong"));
                     aStatusBean.setShowItemAddedStatus(0);
                     aStatusBean.setShowItemNotAddedStatus(1);
                 } else {
@@ -6674,7 +6676,7 @@ public class TransItemBean implements Serializable {
                     TransBean transB = new TransBean();
                     transB.clearAll(null, aActiveTransItems, NewTransItem, aSelectedItem, null, 1, null);
 
-                    aStatusBean.setItemAddedStatus("ITEM ADDED");
+                    aStatusBean.setItemAddedStatus(ub.translateWordsInText(BaseName, "Item Added"));
                     aStatusBean.setItemNotAddedStatus("");
                     aStatusBean.setShowItemAddedStatus(1);
                     aStatusBean.setShowItemNotAddedStatus(0);
@@ -8827,24 +8829,26 @@ public class TransItemBean implements Serializable {
     }
 
     public void addTransItemDeliveryCEC(int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aTrans, StatusBean aStatusBean, List<TransItem> aActiveTransItems, TransItem NewTransItem, Item aSelectedItem, AccCoa aSelectedAccCoa) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
         TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
         Store store = new StoreBean().getStore(aStoreId);
 
         if (null != aSelectedItem && aSelectedItem.getIsSale() == 0) {
             aStatusBean.setItemAddedStatus("");
-            aStatusBean.setItemNotAddedStatus("This item is set up not to be Sold!");
+            aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Item Setup Not to be Sold"));
             aStatusBean.setShowItemAddedStatus(0);
             aStatusBean.setShowItemNotAddedStatus(1);
         } else {
             if (NewTransItem.getItemQty() <= 0) {
                 aStatusBean.setItemAddedStatus("");
-                aStatusBean.setItemNotAddedStatus("PLEASE ENTER VALID ITEM-QUANTITY...!");
+                aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Enter Valid Item Quantity"));
                 aStatusBean.setShowItemAddedStatus(0);
                 aStatusBean.setShowItemNotAddedStatus(1);
             } else if (NewTransItem.getItemId() == 0) {
                 aStatusBean.setItemAddedStatus("");
-                aStatusBean.setItemNotAddedStatus("SELECT A VALID ITEM...!");
+                aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Select Valid Item"));
                 aStatusBean.setShowItemAddedStatus(0);
                 aStatusBean.setShowItemNotAddedStatus(1);
             } else {
@@ -8996,7 +9000,7 @@ public class TransItemBean implements Serializable {
                 TransBean transB = new TransBean();
                 transB.clearAll(null, aActiveTransItems, NewTransItem, aSelectedItem, null, 1, aSelectedAccCoa);
 
-                aStatusBean.setItemAddedStatus("ITEM ADDED");
+                aStatusBean.setItemAddedStatus(ub.translateWordsInText(BaseName, "Item Added"));
                 aStatusBean.setItemNotAddedStatus("");
                 aStatusBean.setShowItemAddedStatus(1);
                 aStatusBean.setShowItemNotAddedStatus(0);
@@ -10385,153 +10389,128 @@ public class TransItemBean implements Serializable {
     }
 
     public void updateModelTransItemCEC(int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aTrans, TransItem aTransItemToUpdate, Item aItem, double aDefaultQty) {
-        TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
-        TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
-        Store store = new StoreBean().getStore(aStoreId);
-        DiscountPackageItem dpi = null;
-        if (aItem == null || transtype == null) {
-            aTransItemToUpdate.setItemId(0);
-            aTransItemToUpdate.setUnitPrice(0);
-            aTransItemToUpdate.setVatRated("");
-            aTransItemToUpdate.setItemQty(0);
-            aTransItemToUpdate.setAmount(0);
-            aTransItemToUpdate.setItemCode("");
-            new ItemBean().clearItem(aItem);
-            aTransItemToUpdate.setUnitPrice2(0);
-            aTransItemToUpdate.setUnitCostPrice(0);
-            aTransItemToUpdate.setUnitTradeDiscount(0);
-            aTransItemToUpdate.setUnitTradeDiscount2(0);
-            aTransItemToUpdate.setVatRated2("");
-            aTransItemToUpdate.setDuration_value(0);
-        } else {
-            //for where item currency is different from trans currency, we first get the factor to convert to trans currency
-            double xrate = 1;
-            double XrateMultiply = 1;
-            AccCurrency LocalCurrency = null;
-            LocalCurrency = new AccCurrencyBean().getLocalCurrency();
-            try {
-                if ("ITEM RECEIVED".equals(transtype.getTransactionTypeName())) {
-                    xrate = 1;
-                } else {
-                    xrate = new AccXrateBean().getXrate(aItem.getCurrencyCode(), aTrans.getCurrencyCode());
-                }
-            } catch (NullPointerException npe) {
-                xrate = 1;
-            }
-            try {
-                if (aItem.getCurrencyCode().equals(LocalCurrency.getCurrencyCode()) && !aTrans.getCurrencyCode().equals(LocalCurrency.getCurrencyCode())) {
-                    XrateMultiply = 1 / xrate;
-                } else {
-                    XrateMultiply = xrate;
-                }
-            } catch (NullPointerException npe) {
-                XrateMultiply = 1;
-            }
-            aItem.setUnit_hire_price(aItem.getUnit_hire_price() * XrateMultiply);
-            aItem.setUnitRetailsalePrice(aItem.getUnitRetailsalePrice() * XrateMultiply);
-            aItem.setUnitWholesalePrice(aItem.getUnitWholesalePrice() * XrateMultiply);
-            aItem.setUnit_special_price(aItem.getUnit_special_price() * XrateMultiply);
-
-            aTransItemToUpdate.setItemId(aItem.getItemId());
-            aTransItemToUpdate.setIsTradeDiscountVatLiable(CompanySetting.getIsTradeDiscountVatLiable());
-            if (transtype.getTransactionTypeName().equals("SALE ORDER") || transtype.getTransactionTypeName().equals("SALE QUOTATION") || transtype.getTransactionTypeName().equals("SALE INVOICE") || transtype.getTransactionTypeName().equals("HIRE INVOICE") || transtype.getTransactionTypeName().equals("HIRE QUOTATION") || transtype.getTransactionTypeName().equals("HIRE RETURN INVOICE")) {
-                dpi = new DiscountPackageItemBean().getActiveDiscountPackageItem(store.getStoreId(), aItem.getItemId(), 1, aTrans.getTransactorId(), aItem.getCategoryId(), aItem.getSubCategoryId());
-            } else {
-                dpi = null;
-            }
-            if (dpi != null) {
-                //dpaItem.setRetailsaleDiscountAmt(dpaItem.getRetailsaleDiscountAmt() * XrateMultiply);
-                //dpaItem.setWholesaleDiscountAmt(dpaItem.getWholesaleDiscountAmt() * XrateMultiply);
-            }
-
-            //get account code for the cost of inventory
-            aTransItemToUpdate.setAccountCode(this.getTransItemInventCostAccount(transtype, transreason, aItem));
-
-            if (transtype.getTransactionTypeName().equals("HIRE INVOICE") || transtype.getTransactionTypeName().equals("HIRE QUOTATION") || transtype.getTransactionTypeName().equals("HIRE RETURN INVOICE")) {
-                aTransItemToUpdate.setDuration_value(aTrans.getDuration_value());
-            } else {
-                aTransItemToUpdate.setDuration_value(0);
-            }
-            //apply recent unit cost
-            if (transtype.getTransactionTypeName().equals("ITEM RECEIVED") || transtype.getTransactionTypeName().equals("PRODUCTION") || transtype.getTransactionTypeName().equals("STOCK ADJUSTMENT") || transtype.getTransactionTypeName().equals("DISPOSE STOCK")) {
-                aTransItemToUpdate.setUnitCostPrice(this.getItemLatestUnitCostPrice(aItem.getItemId(), "", "", ""));
-            }
-//            if (transtype.getTransactionTypeName().equals("ITEM RECEIVED") || transtype.getTransactionTypeName().equals("PRODUCTION")) {
-//                long LatestTransItemId = 0;
-//                if (transreason.getTransactionReasonId() == 13) {//GOOD/PRODUCT
-//                    try {
-//                        LatestTransItemId = this.getItemUnitCostPriceLatestTransItemId2(9, 13, store.getStoreId(), aItem.getItemId(), "", "", "");
-//                    } catch (NullPointerException npe) {
-//                        LatestTransItemId = 0;
-//                    }
-//                } else if (transreason.getTransactionReasonId() == 32) {//EXPENSE
-//                    try {
-//                        LatestTransItemId = this.getItemUnitCostPriceLatestTransItemId2(9, 32, store.getStoreId(), aItem.getItemId(), "", "", "");
-//                    } catch (NullPointerException npe) {
-//                        LatestTransItemId = 0;
-//                    }
-//                } else if (transreason.getTransactionReasonId() == 28) {//ASSET
-//                    try {
-//                        LatestTransItemId = this.getItemUnitCostPriceLatestTransItemId2(9, 28, store.getStoreId(), aItem.getItemId(), "", "", "");
-//                    } catch (NullPointerException npe) {
-//                        LatestTransItemId = 0;
-//                    }
-//                }
-//                if (LatestTransItemId > 0) {
-//                    try {
-//                        aTransItemToUpdate.setUnitCostPrice(new TransItemBean().getTransItem(LatestTransItemId).getUnitCostPrice());
-//                    } catch (NullPointerException npe) {
-//                    }
-//                }
-//            }
-
-            if ("EXEMPT SALE INVOICE".equals(aSaleType)) {
+        try {
+            TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
+            TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
+            Store store = new StoreBean().getStore(aStoreId);
+            DiscountPackageItem dpi = null;
+            if (aItem == null || transtype == null) {
+                aTransItemToUpdate.setItemId(0);
                 aTransItemToUpdate.setUnitPrice(0);
+                aTransItemToUpdate.setVatRated("");
+                aTransItemToUpdate.setItemQty(0);
+                aTransItemToUpdate.setAmount(0);
+                aTransItemToUpdate.setItemCode("");
+                new ItemBean().clearItem(aItem);
+                aTransItemToUpdate.setUnitPrice2(0);
+                aTransItemToUpdate.setUnitCostPrice(0);
                 aTransItemToUpdate.setUnitTradeDiscount(0);
-            } else if ("COST-PRICE SALE INVOICE".equals(aSaleType)) {
-                //aTransItemToUpdate.setUnitPrice(aItem.getUnitCostPrice());
-                aTransItemToUpdate.setUnitTradeDiscount(0);
-            } else if ("WHOLE SALE QUOTATION".equals(aSaleType) || "WHOLE SALE INVOICE".equals(aSaleType) || "WHOLE SALE ORDER".equals(aSaleType)) {
-                aTransItemToUpdate.setUnitPrice(aItem.getUnitWholesalePrice());
-                if (dpi != null) {
-                    //aTransItemToUpdate.setUnitTradeDiscount(dpaItem.getWholesaleDiscountAmt());
-                    aTransItemToUpdate.setUnitTradeDiscount(aItem.getUnitWholesalePrice() * dpi.getWholesaleDiscountAmt() / 100);
-                }
-            } else if ("SPECIAL SALE INVOICE".equals(aSaleType) || "SPECIAL SALE QUOTATION".equals(aSaleType) || "SPECIAL SALE ORDER".equals(aSaleType)) {
-                aTransItemToUpdate.setUnitPrice(aItem.getUnit_special_price());
-                if (dpi != null) {
-                    aTransItemToUpdate.setUnitTradeDiscount(0);
-                }
-            } else if (transtype.getTransactionTypeName().equals("HIRE INVOICE") || transtype.getTransactionTypeName().equals("HIRE QUOTATION") || transtype.getTransactionTypeName().equals("HIRE RETURN INVOICE")) {
-                aTransItemToUpdate.setUnitPrice(aItem.getUnit_hire_price());
-                if (dpi != null) {
-                    aTransItemToUpdate.setUnitTradeDiscount(aItem.getUnit_hire_price() * dpi.getHire_price_discount_amt() / 100);
-                }
+                aTransItemToUpdate.setUnitTradeDiscount2(0);
+                aTransItemToUpdate.setVatRated2("");
+                aTransItemToUpdate.setDuration_value(0);
             } else {
-                if (transtype.getTransactionTypeName().equals("SALE ORDER") || transtype.getTransactionTypeName().equals("SALE QUOTATION") || transtype.getTransactionTypeName().equals("SALE INVOICE") || transtype.getTransactionTypeName().equals("EXPENSE ENTRY") || transtype.getTransactionTypeName().equals("PURCHASE INVOICE") || transtype.getTransactionTypeName().equals("DISPOSE STOCK")) {
-                    aTransItemToUpdate.setUnitPrice(aItem.getUnitRetailsalePrice());
-                } else {
-                    aTransItemToUpdate.setUnitPrice(0);
+                //for where item currency is different from trans currency, we first get the factor to convert to trans currency
+                double xrate = 1;
+                double XrateMultiply = 1;
+                AccCurrency LocalCurrency = null;
+                LocalCurrency = new AccCurrencyBean().getLocalCurrency();
+                try {
+                    if ("ITEM RECEIVED".equals(transtype.getTransactionTypeName())) {
+                        xrate = 1;
+                    } else {
+                        xrate = new AccXrateBean().getXrate(aItem.getCurrencyCode(), aTrans.getCurrencyCode());
+                    }
+                } catch (NullPointerException npe) {
+                    xrate = 1;
                 }
-                if (dpi != null) {
-                    aTransItemToUpdate.setUnitTradeDiscount(aItem.getUnitRetailsalePrice() * dpi.getRetailsaleDiscountAmt() / 100);
+                try {
+                    if (aItem.getCurrencyCode().equals(LocalCurrency.getCurrencyCode()) && !aTrans.getCurrencyCode().equals(LocalCurrency.getCurrencyCode())) {
+                        XrateMultiply = 1 / xrate;
+                    } else {
+                        XrateMultiply = xrate;
+                    }
+                } catch (NullPointerException npe) {
+                    XrateMultiply = 1;
                 }
-            }
-            //aTransItemToUpdate.setVatRated(aItem.getVatRated());
-            aTransItemToUpdate.setVatRated(new UtilityBean().getFirstStringFromCommaSeperatedStr(aItem.getVatRated()));
-            aTransItemToUpdate.setItemCode(aItem.getItemCode());
+                aItem.setUnit_hire_price(aItem.getUnit_hire_price() * XrateMultiply);
+                aItem.setUnitRetailsalePrice(aItem.getUnitRetailsalePrice() * XrateMultiply);
+                aItem.setUnitWholesalePrice(aItem.getUnitWholesalePrice() * XrateMultiply);
+                aItem.setUnit_special_price(aItem.getUnit_special_price() * XrateMultiply);
 
-            //Default override prices
-            aTransItemToUpdate.setUnitPrice2(aTransItemToUpdate.getUnitPrice());
-            aTransItemToUpdate.setUnitTradeDiscount2(aTransItemToUpdate.getUnitTradeDiscount());
-            aTransItemToUpdate.setVatRated2(aTransItemToUpdate.getVatRated());
-            //Default qty
-            aTransItemToUpdate.setItemQty(aDefaultQty);
-            if (transtype.getTransactionTypeName().equals("HIRE INVOICE") || transtype.getTransactionTypeName().equals("HIRE QUOTATION") || transtype.getTransactionTypeName().equals("HIRE RETURN INVOICE")) {
-                aTransItemToUpdate.setAmount(aTransItemToUpdate.getItemQty() * aTransItemToUpdate.getUnitPrice() * aTransItemToUpdate.getDuration_value());
-            } else {
-                aTransItemToUpdate.setAmount(aTransItemToUpdate.getItemQty() * aTransItemToUpdate.getUnitPrice());
+                aTransItemToUpdate.setItemId(aItem.getItemId());
+                aTransItemToUpdate.setIsTradeDiscountVatLiable(CompanySetting.getIsTradeDiscountVatLiable());
+                if (transtype.getTransactionTypeName().equals("SALE ORDER") || transtype.getTransactionTypeName().equals("SALE QUOTATION") || transtype.getTransactionTypeName().equals("SALE INVOICE") || transtype.getTransactionTypeName().equals("HIRE INVOICE") || transtype.getTransactionTypeName().equals("HIRE QUOTATION") || transtype.getTransactionTypeName().equals("HIRE RETURN INVOICE")) {
+                    dpi = new DiscountPackageItemBean().getActiveDiscountPackageItem(store.getStoreId(), aItem.getItemId(), 1, aTrans.getTransactorId(), aItem.getCategoryId(), aItem.getSubCategoryId());
+                } else {
+                    dpi = null;
+                }
+                if (dpi != null) {
+                    //dpaItem.setRetailsaleDiscountAmt(dpaItem.getRetailsaleDiscountAmt() * XrateMultiply);
+                    //dpaItem.setWholesaleDiscountAmt(dpaItem.getWholesaleDiscountAmt() * XrateMultiply);
+                }
+
+                //get account code for the cost of inventory
+                aTransItemToUpdate.setAccountCode(this.getTransItemInventCostAccount(transtype, transreason, aItem));
+
+                if (transtype.getTransactionTypeName().equals("HIRE INVOICE") || transtype.getTransactionTypeName().equals("HIRE QUOTATION") || transtype.getTransactionTypeName().equals("HIRE RETURN INVOICE")) {
+                    aTransItemToUpdate.setDuration_value(aTrans.getDuration_value());
+                } else {
+                    aTransItemToUpdate.setDuration_value(0);
+                }
+                //apply recent unit cost
+                if (transtype.getTransactionTypeName().equals("ITEM RECEIVED") || transtype.getTransactionTypeName().equals("PRODUCTION") || transtype.getTransactionTypeName().equals("STOCK ADJUSTMENT") || transtype.getTransactionTypeName().equals("DISPOSE STOCK")) {
+                    aTransItemToUpdate.setUnitCostPrice(this.getItemLatestUnitCostPrice(aItem.getItemId(), "", "", ""));
+                }
+                if ("EXEMPT SALE INVOICE".equals(aSaleType)) {
+                    aTransItemToUpdate.setUnitPrice(0);
+                    aTransItemToUpdate.setUnitTradeDiscount(0);
+                } else if ("COST-PRICE SALE INVOICE".equals(aSaleType)) {
+                    //aTransItemToUpdate.setUnitPrice(aItem.getUnitCostPrice());
+                    aTransItemToUpdate.setUnitTradeDiscount(0);
+                } else if ("WHOLE SALE QUOTATION".equals(aSaleType) || "WHOLE SALE INVOICE".equals(aSaleType) || "WHOLE SALE ORDER".equals(aSaleType)) {
+                    aTransItemToUpdate.setUnitPrice(aItem.getUnitWholesalePrice());
+                    if (dpi != null) {
+                        //aTransItemToUpdate.setUnitTradeDiscount(dpaItem.getWholesaleDiscountAmt());
+                        aTransItemToUpdate.setUnitTradeDiscount(aItem.getUnitWholesalePrice() * dpi.getWholesaleDiscountAmt() / 100);
+                    }
+                } else if ("SPECIAL SALE INVOICE".equals(aSaleType) || "SPECIAL SALE QUOTATION".equals(aSaleType) || "SPECIAL SALE ORDER".equals(aSaleType)) {
+                    aTransItemToUpdate.setUnitPrice(aItem.getUnit_special_price());
+                    if (dpi != null) {
+                        aTransItemToUpdate.setUnitTradeDiscount(0);
+                    }
+                } else if (transtype.getTransactionTypeName().equals("HIRE INVOICE") || transtype.getTransactionTypeName().equals("HIRE QUOTATION") || transtype.getTransactionTypeName().equals("HIRE RETURN INVOICE")) {
+                    aTransItemToUpdate.setUnitPrice(aItem.getUnit_hire_price());
+                    if (dpi != null) {
+                        aTransItemToUpdate.setUnitTradeDiscount(aItem.getUnit_hire_price() * dpi.getHire_price_discount_amt() / 100);
+                    }
+                } else {
+                    if (transtype.getTransactionTypeName().equals("SALE ORDER") || transtype.getTransactionTypeName().equals("SALE QUOTATION") || transtype.getTransactionTypeName().equals("SALE INVOICE") || transtype.getTransactionTypeName().equals("EXPENSE ENTRY") || transtype.getTransactionTypeName().equals("PURCHASE INVOICE") || transtype.getTransactionTypeName().equals("DISPOSE STOCK")) {
+                        aTransItemToUpdate.setUnitPrice(aItem.getUnitRetailsalePrice());
+                    } else {
+                        aTransItemToUpdate.setUnitPrice(0);
+                    }
+                    if (dpi != null) {
+                        aTransItemToUpdate.setUnitTradeDiscount(aItem.getUnitRetailsalePrice() * dpi.getRetailsaleDiscountAmt() / 100);
+                    }
+                }
+                //aTransItemToUpdate.setVatRated(aItem.getVatRated());
+                aTransItemToUpdate.setVatRated(new UtilityBean().getFirstStringFromCommaSeperatedStr(aItem.getVatRated()));
+                aTransItemToUpdate.setItemCode(aItem.getItemCode());
+
+                //Default override prices
+                aTransItemToUpdate.setUnitPrice2(aTransItemToUpdate.getUnitPrice());
+                aTransItemToUpdate.setUnitTradeDiscount2(aTransItemToUpdate.getUnitTradeDiscount());
+                aTransItemToUpdate.setVatRated2(aTransItemToUpdate.getVatRated());
+                //Default qty
+                aTransItemToUpdate.setItemQty(aDefaultQty);
+                if (transtype.getTransactionTypeName().equals("HIRE INVOICE") || transtype.getTransactionTypeName().equals("HIRE QUOTATION") || transtype.getTransactionTypeName().equals("HIRE RETURN INVOICE")) {
+                    aTransItemToUpdate.setAmount(aTransItemToUpdate.getItemQty() * aTransItemToUpdate.getUnitPrice() * aTransItemToUpdate.getDuration_value());
+                } else {
+                    aTransItemToUpdate.setAmount(aTransItemToUpdate.getItemQty() * aTransItemToUpdate.getUnitPrice());
+                }
             }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
