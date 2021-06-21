@@ -27,10 +27,10 @@
 
         <h:form id="formReport" style="text-align: center;">
             <h:panelGrid id="id0" columns="1" styleClass="clsPanelReportFilterTitle">
-                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="Provider List Report"/>
+                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="#{langsys['Provider']} #{langsys['List']} #{langsys['Report']}"/>
             </h:panelGrid>
             <h:panelGrid id="pnlgFilter" columns="6" styleClass="clsPanelReportFilter">
-                <p:commandButton id="cmdbSearch" value="SEARCH (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                <p:commandButton id="cmdbSearch" value="#{langsys['SEARCH']} (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                     <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                         <p:graphicImage name="/images/ajax-loader.gif"/>
                     </p:dialog>
@@ -46,7 +46,7 @@
                          paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
                          rowsPerPageTemplate="100,400,800,1000,2000">
                 <f:facet name="header">
-                    #{transactorBean.transactorList.size()} Records Found
+                    #{transactorBean.transactorList.size()} #{langsys['Records']} #{langsys['Found']}
                     <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
                     <p:columnToggler datasource="tblDetail" trigger="toggler" />
                 </f:facet>
@@ -68,43 +68,43 @@
                         <p:dataExporter type="xml" target="tblDetail" fileName="Provider_List" />
                     </h:commandLink>
                 </f:facet>
-                <p:column headerText="Id" style="text-align: left;">
+                <p:column headerText="#{langsys['Id']}" style="text-align: left;">
                     <h:outputText value="#{rts.transactorId}">
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Ref No" style="text-align: left;">
+                <p:column headerText="#{langsys['Reference']} #{langsys['No.']}" style="text-align: left;">
                     <h:outputText value="#{rts.transactorRef}">
                     </h:outputText>
                 </p:column>
-                <p:column headerText="File Ref" style="text-align: left;">
+                <p:column headerText="#{langsys['File']} #{langsys['Reference']}" style="text-align: left;">
                     <h:outputText value="#{rts.fileReference}">
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Category" style="text-align: left;">
+                <p:column headerText="#{langsys['Category']}" style="text-align: left;">
                     <h:outputText value="#{rts.category}">
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Provider Names" style="text-align: left;">
+                <p:column headerText="#{langsys['Provider']} #{langsys['Names']}" style="text-align: left;">
                     <h:outputText value="#{rts.transactorNames}">
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Phone" style="text-align: left;">
+                <p:column headerText="#{langsys['Phone']}" style="text-align: left;">
                     <h:outputText value="#{rts.phone}">
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Email" style="text-align: left;">
+                <p:column headerText="#{langsys['Email']}" style="text-align: left;">
                     <h:outputText value="#{rts.email}">
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Tax Identity" style="text-align: left;">
+                <p:column headerText="#{langsys['Tax']} #{langsys['Identity']}" style="text-align: left;">
                     <h:outputText value="#{rts.taxIdentity}">
                     </h:outputText>
                 </p:column>
-                <p:column headerText="ID Type" style="text-align: left;">
+                <p:column headerText="#{langsys['ID']} #{langsys['Type']}" style="text-align: left;">
                     <h:outputText value="#{rts.idType}">
                     </h:outputText>
                 </p:column>
-                <p:column headerText="ID Number" style="text-align: left;">
+                <p:column headerText="#{langsys['ID']} #{langsys['Number']}" style="text-align: left;">
                     <h:outputText value="#{rts.idNumber}">
                     </h:outputText>
                 </p:column>

@@ -28,38 +28,38 @@
         <ui:include src="Menu.xhtml"/>
         <h:form id="formReport">
             <h:panelGrid id="pnlgHeader" columns="3" styleClass="clsPanelReportFilterTitle">
-                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="SMbi Interface Report"/>
-                <p:commandLink id="cmdbToday" value="Today's Date" style="color: white;">
+                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="SMbi #{langsys['Interface']} #{langsys['Report']}"/>
+                <p:commandLink id="cmdbToday" value="#{langsys['Today']}" style="color: white;">
                     <p:ajax listener="#{transaction_smbi_mapBean.setDateToToday()}" process="@this" update="pnlgFilter"/>
                 </p:commandLink>
-                <p:commandLink id="cmdbYesturday" value="Yesterday's Date" style="color: white;">
+                <p:commandLink id="cmdbYesturday" value="#{langsys['Yesterday']}" style="color: white;">
                     <p:ajax listener="#{transaction_smbi_mapBean.setDateToYesturday()}" process="@this" update="pnlgFilter"/>
                 </p:commandLink>
             </h:panelGrid>
             <h:panelGrid id="pnlgFilter" columns="3" styleClass="clsPanelReportFilter">
                 <h:panelGrid columns="2">
-                    <p:outputLabel value="From Add Date:" id="lblDate1"/>
+                    <p:outputLabel value="#{langsys['From']} #{langsys['Add']} #{langsys['Date']}:" id="lblDate1"/>
                     <p:calendar id="calDate1"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{transaction_smbi_mapBean.date1}" size="18"/>
-                    <p:outputLabel value="To Add Date:" id="lblDate2"/>
+                    <p:outputLabel value="#{langsys['To']} #{langsys['Add']} #{langsys['Date']}:" id="lblDate2"/>
                     <p:calendar id="calDate2"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{transaction_smbi_mapBean.date2}" size="18"/>
                 </h:panelGrid>
                 <h:panelGrid columns="2">
-                    <p:outputLabel value="Transaction Type:"/>
+                    <p:outputLabel value="#{langsys['Transaction']} #{langsys['Type']}:"/>
                     <p:selectOneMenu id="menuTransactionType" value="#{transaction_smbi_mapBean.transactionTypeId}" style="width: 200px;">
                         <f:selectItem itemLabel="" itemValue="0"/>
-                        <f:selectItem itemLabel="Sale Invoice" itemValue="2"/>
+                        <f:selectItem itemLabel="#{langsys['Sale']} #{langsys['Invoice']}" itemValue="2"/>
                     </p:selectOneMenu>
-                    <p:outputLabel value="Transaction No:"/>
+                    <p:outputLabel value="#{langsys['Transaction']} #{langsys['No.']}:"/>
                     <p:inputText id="itxtInvoiceNo" value="#{transaction_smbi_mapBean.transactionNumber}" style="width: 215px;"/>
                 </h:panelGrid>
                 <h:panelGrid columns="1">
-                    <p:commandButton id="cmdbSearch" value="SEARCH (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" style="width: 200px;">
+                    <p:commandButton id="cmdbSearch" value="#{langsys['SEARCH']} (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" style="width: 200px;">
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
                         <p:ajax listener="#{transaction_smbi_mapBean.reportSMbiAPI()}" process="pnlgFilter" update=" pnlgFilter pnlgMessage growl1 tblDetail"/>
                     </p:commandButton>
-                    <p:commandButton id="cmdbReset" value="RESET (ALT+R)" accesskey="r" style="width: 200px;">
+                    <p:commandButton id="cmdbReset" value="#{langsys['RESET']} (ALT+R)" accesskey="r" style="width: 200px;">
                         <p:ajax listener="#{transaction_smbi_mapBean.resetSMbiAPI()}" process="pnlgFilter" update="pnlgFilter pnlgMessage growl1 tblDetail"/>
                     </p:commandButton>
                 </h:panelGrid>
@@ -74,17 +74,17 @@
                          rowsPerPageTemplate="50,100,200,400">
                 <f:facet name="header">
                     <p:dataTable id="tblSummary" var="sm" value="#{transaction_smbi_mapBean.transListSummary}">
-                        <p:column headerText="Transaction Type" style="text-align: left;">
+                        <p:column headerText="#{langsys['Transaction']} #{langsys['Type']}" style="text-align: left;">
                             <h:outputText value="#{sm.transaction_type_name}"/>
                         </p:column>
-                        <p:column headerText="Syc Status" style="text-align: left;">
+                        <p:column headerText="#{langsys['Syc']} #{langsys['Status']}" style="text-align: left;">
                             <h:outputText value="#{sm.status_sync eq 1 ? 'Yes':sm.status_sync eq 0 ? 'No':'Fail'}"/>
                         </p:column>
-                        <p:column headerText="Total Count" style="text-align: left;">
+                        <p:column headerText="#{langsys['Total']} #{langsys['Count']}" style="text-align: left;">
                             <h:outputText value="#{sm.itemCount}"/>
                         </p:column>
                     </p:dataTable>
-                    #{transBean.transList.size()} Records Found
+                    #{transBean.transList.size()} #{langsys['Records']} #{langsys['Found']}
                     <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
                     <p:columnToggler datasource="tblDetail" trigger="toggler" />
                 </f:facet>
@@ -106,22 +106,22 @@
                         <p:dataExporter type="xml" target="tblDetail" fileName="SMbi_Interface" />
                     </h:commandLink>
                 </f:facet>
-                <p:column headerText="Transaction Type">
+                <p:column headerText="#{langsys['Transaction']} #{langsys['Type']}">
                     <h:outputLabel value="#{itm.transaction_type_name} "/>
                 </p:column>
-                <p:column headerText="Transaction No">
+                <p:column headerText="#{langsys['Transaction']} #{langsys['No.']}">
                     <h:outputLabel value="#{itm.transaction_number}"/>
                 </p:column>
-                <p:column headerText="Add Date">
+                <p:column headerText="#{langsys['Add']} #{langsys['Date']}">
                     <h:outputText value="#{utilityBean.formatDate(itm.add_date)}"/>
                 </p:column>
-                <p:column headerText="Sync Status">
+                <p:column headerText="#{langsys['Sync']} #{langsys['Status']}">
                     <h:outputText value="#{itm.status_sync eq 1 ? 'Yes':itm.status_sync eq 0 ? 'No':'Fail'}" styleClass="#{itm.status_sync eq 1 ? 'green':itm.status_sync eq 0 ? 'red':'amber'}" style="width: 60px;color: #ffffff !important;text-align: right !important;"/>
                 </p:column>
-                <p:column headerText="Sync Message">
+                <p:column headerText="#{langsys['Sync']} #{langsys['Message']}">
                     <h:outputText value="#{itm.status_desc}"/>
                 </p:column>
-                <p:column headerText="Sync/Re-sync" exportable="false" visible="true">
+                <p:column headerText="#{langsys['Sync']}/#{langsys['Re-Sync']}" exportable="false" visible="true">
                     <p:commandButton id="cmdbSync" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" icon="ui-icon-arrowreturnthick-1-n" style="width: 20px;height: 30px;margin: 5px;"  rendered="#{itm.status_sync ne 1}">
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>

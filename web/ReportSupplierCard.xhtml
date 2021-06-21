@@ -32,20 +32,20 @@
 
         <h:form id="formReport">
             <h:panelGrid id="id0" columns="1" styleClass="clsPanelReportFilterTitle">
-                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="#{menuItemBean.menuItemObj.SUPPLIER_NAME} Statement Report"/>
+                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="#{langsys[menuItemBean.menuItemObj.SUPPLIER_NAME]} #{langsys['Statement']} #{langsys['Report']}"/>
             </h:panelGrid>
             <h:panelGrid id="id1" columns="9" styleClass="clsPanelReportFilter">
-                <p:outputLabel styleClass="clsLabelReportFilter" id="id2" value="From #{companySetting.getStoreEquivName()}:"/>
+                <p:outputLabel styleClass="clsLabelReportFilter" id="id2" value="#{langsys['From']} #{companySetting.getStoreEquivName()}:"/>
                 <h:selectOneMenu styleClass="clsInputReportFilter" id="menuFromStore" value="#{trans.storeId}" >
                     <f:selectItem itemLabel="" itemValue="0"/>
                     <f:selectItems value="#{storeBean.stores}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
                 </h:selectOneMenu>
-                <p:outputLabel styleClass="clsLabelReportFilter" id="id10" value="From Date:"/>
+                <p:outputLabel styleClass="clsLabelReportFilter" id="id10" value="#{langsys['From']} #{langsys['Date']}:"/>
                 <p:calendar styleClass="clsInputReportFilter" id="calTransDateFrom"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{trans.transactionDate}" size="10"/>
-                <p:outputLabel styleClass="clsLabelReportFilter" id="id11" value="To Date:"/>
+                <p:outputLabel styleClass="clsLabelReportFilter" id="id11" value="#{langsys['To']} #{langsys['Date']}:"/>
                 <p:calendar styleClass="clsInputReportFilter" id="calTransDateTo"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{trans.transactionDate2}" size="10">
                 </p:calendar>
-                <h:outputLabel styleClass="clsLabelReportFilter" value="#{menuItemBean.menuItemObj.SUPPLIER_NAME}:"/>
+                <h:outputLabel styleClass="clsLabelReportFilter" value="#{langsys[menuItemBean.menuItemObj.SUPPLIER_NAME]}:"/>
                 <p:autoComplete styleClass="clsInputReportFilter" id="autcBillTransactor" value="#{transactorBean.selectedBillTransactor}" 
                                 completeMethod="#{transactorBean.getTransactorObjectList}" 
                                 var="trct2" 
@@ -54,16 +54,16 @@
                                 converter="TransactorConverter" style="text-align: left" 
                                 forceSelection="true" 
                                 >
-                    <p:column headerText="Names" style="text-align: left" >  
+                    <p:column headerText="#{langsys['Names']}" style="text-align: left" >  
                         #{trct2.transactorNames} 
                     </p:column> 
-                    <p:column headerText="Contact Person" style="text-align: left">  
+                    <p:column headerText="#{langsys['Contact']} #{langsys['Person']}" style="text-align: left">  
                         #{trct2.cpName} 
                     </p:column> 
                     <p:ajax event="itemSelect" listener="#{trans.setBillTransactorId(transactorBean.selectedBillTransactor.transactorId)}"/>
                     <p:ajax event="change" listener="#{trans.setBillTransactorId(transactorBean.selectedBillTransactor.transactorId)}" rendered="#{transactorBean.selectedBillTransactor!=null} "/>
                 </p:autoComplete>
-                <p:commandButton styleClass="clsButtonReportFilter" id="cmdbSearch" value="Search" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                <p:commandButton styleClass="clsButtonReportFilter" id="cmdbSearch" value="#{langsys['Search']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                     <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                         <p:graphicImage name="/images/ajax-loader.gif"/>
                     </p:dialog>
@@ -73,7 +73,7 @@
             <h:panelGrid id="pnlgActionMessage">
                 <p:outputLabel value="#{transBean.actionMessage}" style="color: red;"/>
             </h:panelGrid>
-            <p:commandButton id="cmdbPrint" value="Print #{menuItemBean.menuItemObj.SUPPLIER_NAME} Statement (ALT+P)" icon="ui-icon-print" type="button" accesskey="p">
+            <p:commandButton id="cmdbPrint" value="#{langsys['Print']} #{langsys[menuItemBean.menuItemObj.SUPPLIER_NAME]} #{langsys['Statement']} (ALT+P)" icon="ui-icon-print" type="button" accesskey="p">
                 <p:printer target="pnlTransaction" rendered="false"/>
             </p:commandButton>
             <p:panel id="pnlTransaction" style="border: none;">
@@ -82,18 +82,18 @@
                     <tr style="background-color: yellow;font-weight: bold">
                         <td colspan="3" align="center">
                             #{transactorBean.selectedBillTransactor.transactorNames}
-                            <br/>Payable(#{accCurrencyBean.localCurrency.currencyCode}):<h:outputLabel style="color: coral;" value="#{accJournalBean.returnBalanceString(accLedgerBean.getPayableAccBalanceTrade(transactorBean.selectedBillTransactor.transactorId))}">
+                            <br/>#{langsys['Payable']}(#{accCurrencyBean.localCurrency.currencyCode}):<h:outputLabel style="color: coral;" value="#{accJournalBean.returnBalanceString(accLedgerBean.getPayableAccBalanceTrade(transactorBean.selectedBillTransactor.transactorId))}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
-                            <br/>Prepaid(#{accCurrencyBean.localCurrency.currencyCode}):<h:outputLabel style="color: green;" value="#{accJournalBean.returnBalanceString(accLedgerBean.getPrepaidExpenseAccBalanceToCur(transactorBean.selectedBillTransactor.transactorId,accCurrencyBean.localCurrency.currencyCode))}">
+                            <br/>#{langsys['Prepaid']}(#{accCurrencyBean.localCurrency.currencyCode}):<h:outputLabel style="color: green;" value="#{accJournalBean.returnBalanceString(accLedgerBean.getPrepaidExpenseAccBalanceToCur(transactorBean.selectedBillTransactor.transactorId,accCurrencyBean.localCurrency.currencyCode))}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
                         </td>
                         <td colspan="3" align="right">
-                            Purchase(Supply) and payment transactions for period
+                            #{langsys['Purchase']}(#{langsys['Supply']}) #{langsys['and']} #{langsys['payment']} #{langsys['transactions']} #{langsys['for']} #{langsys['period']}
                             <br/>
-                            From 
-                            <h:outputText value="#{utilityBean.formatDate(trans.transactionDate)}"/> To 
+                            #{langsys['From']} 
+                            <h:outputText value="#{utilityBean.formatDate(trans.transactionDate)}"/> #{langsys['To']} 
                             <h:outputText value="#{utilityBean.formatDate(trans.transactionDate2)}"/>
                         </td>
                         <td colspan="1">
@@ -116,16 +116,16 @@
                         </td>
                     </tr>
                     <tr style="background-color: #ADD8E6;font-weight: bold">
-                        <td>#{menuItemBean.menuItemObj.SUPPLIER_NAME}</td>
+                        <td>#{langsys[menuItemBean.menuItemObj.SUPPLIER_NAME]}</td>
                         <td>#{transactionTypeBean.getTransactionType(1).transactionNumberLabel}</td>
                         <td>#{transactionTypeBean.getTransactionType(1).transactionDateLabel}</td>
                         <td>#{transactionTypeBean.getTransactionType(1).transactionUserLabel}</td>
-                        <td>Item Description</td>
-                        <td>Amount</td>
-                        <td>Grand Total</td>
-                        <td>Total Paid</td>
-                        <td>Balance</td>
-                        <td>CUR</td>
+                        <td>#{langsys['Item']} #{langsys['Description']}</td>
+                        <td>#{langsys['Amount']}</td>
+                        <td>#{langsys['Total']}</td>
+                        <td>#{langsys['Total']} #{langsys['Paid']}</td>
+                        <td>#{langsys['Balance']}</td>
+                        <td>#{langsys['Currency']}</td>
                     </tr>
                     <ui:repeat var="t" value="#{transBean.supplierCardTranss}" varStatus="status">
                         <tr style="background-color: #E5E5E5">

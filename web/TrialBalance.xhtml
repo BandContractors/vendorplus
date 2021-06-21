@@ -27,19 +27,19 @@
 
         <h:form id="formReport">
             <h:panelGrid id="pnlgHeader" columns="1" styleClass="clsPanelReportFilterTitle">
-                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="Listing of the ending balance in each account (Trial Balance)"/>
+                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="#{langsys['Listing']} #{langsys['of']} #{langsys['the']} #{langsys['ending']} #{langsys['balance']} #{langsys['in']} #{langsys['each']} #{langsys['account']} (#{langsys['Trial']} #{langsys['Balance']})"/>
             </h:panelGrid>
             <h:panelGrid id="pnlgFilter" columns="6" styleClass="clsPanelReportFilter">
-                <p:outputLabel styleClass="clsLabelReportFilter" value="Accounting Period:"/>
+                <p:outputLabel styleClass="clsLabelReportFilter" value="#{langsys['Accounting']} #{langsys['Period']}:"/>
                 <h:selectOneMenu styleClass="clsInputReportFilter" id="menuAccPeriod" value="#{accLedger.accPeriodId}" >
                     <f:selectItems value="#{accPeriodBean.returnAccPeriodsCurrentFirst()}" var="ap" itemLabel="#{ap.accPeriodName}" itemValue="#{ap.accPeriodId}"/>
                 </h:selectOneMenu>
-                <p:outputLabel styleClass="clsLabelReportFilter" value="Account Type:"/>
+                <p:outputLabel styleClass="clsLabelReportFilter" value="#{langsys['Account']} #{langsys['Type']}:"/>
                 <h:selectOneMenu styleClass="clsInputReportFilter" id="menuAccType" value="#{accType.accTypeId}" >
                     <f:selectItem itemLabel=""/>
                     <f:selectItems value="#{accTypeBean.getAccTypeObjectListAll()}" var="at" itemLabel="#{at.accTypeName}" itemValue="#{at.accTypeId}"/>
                 </h:selectOneMenu>
-                <p:commandButton id="cmdbSearch" value="SEARCH (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                <p:commandButton id="cmdbSearch" value="#{langsys['SEARCH']} (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                     <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                         <p:graphicImage name="/images/ajax-loader.gif"/>
                     </p:dialog>
@@ -55,24 +55,24 @@
                          rowsPerPageTemplate="50,100,200,400">
                 <f:facet name="header">
                     <p:dataTable id="tblSummary" var="sm" value="#{accLedgerBean.accLedgerSummary}">
-                        <p:column headerText="Currency">
+                        <p:column headerText="#{langsys['Currency']}">
                             <h:outputText value="#{sm.currencyCode}"/>
                         </p:column>
-                        <p:column headerText="Total Debit Amount" style="text-align: right;">
+                        <p:column headerText="#{langsys['Total']} #{langsys['Debit']} #{langsys['Amount']}" style="text-align: right;">
                             <h:outputText value="#{sm.debitAmount}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="Total Credit Amount" style="text-align: right;">
+                        <p:column headerText="#{langsys['Total']} #{langsys['Credit']} #{langsys['Amount']}" style="text-align: right;">
                             <h:outputText value="#{sm.creditAmount}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="Balance" style="text-align: right;">
+                        <p:column headerText="#{langsys['Balance']}" style="text-align: right;">
                             <h:outputText value="#{accJournalBean.returnNetAmountString(sm.debitAmount,sm.creditAmount)}"/>
                         </p:column>
                     </p:dataTable>
-                    #{accLedgerBean.accLedgerList.size()} Records Found
+                    #{accLedgerBean.accLedgerList.size()} #{langsys['Records']} #{langsys['Found']}
                     <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
                     <p:columnToggler datasource="tblDetail" trigger="toggler" />
                 </f:facet>
@@ -94,29 +94,29 @@
                         <p:dataExporter type="xml" target="tblDetail" fileName="General_Ledger" />
                     </h:commandLink>
                 </f:facet>
-                <p:column headerText="Account Type">
+                <p:column headerText="#{langsys['Account']} #{langsys['Type']}">
                     <h:outputText value="#{accTypeBean.getAccTypeById(accCoaBean.getAccCoaByCodeOrId(itm.accountCode,0).accTypeId).accTypeName}"/>
                 </p:column>
-                <p:column headerText="Account Name">
+                <p:column headerText="#{langsys['Account']} #{langsys['Name']}">
                     <h:outputText value="#{accCoaBean.getAccCoaByCodeOrId(itm.accountCode,0).accountName}"/>
                 </p:column>
-                <p:column headerText="Account Code">
+                <p:column headerText="#{langsys['Account']} #{langsys['Code']}">
                     <h:outputText value="#{itm.accountCode}"/>
                 </p:column>
-                <p:column headerText="Currency">
+                <p:column headerText="#{langsys['Currency']}">
                     <h:outputText value="#{itm.currencyCode}"/>
                 </p:column>
-                <p:column headerText="Total Debit" style="text-align: right;">
+                <p:column headerText="#{langsys['Total']} #{langsys['Debit']}" style="text-align: right;">
                     <h:outputText value="#{itm.debitAmount}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Total Credit" style="text-align: right;">
+                <p:column headerText="#{langsys['Total']} #{langsys['Credit']}" style="text-align: right;">
                     <h:outputText value="#{itm.creditAmount}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Balance" style="text-align: right;">
+                <p:column headerText="#{langsys['Balance']}" style="text-align: right;">
                     <h:outputText value="#{accJournalBean.returnNetAmountString(itm.debitAmount,itm.creditAmount)}"/>
                 </p:column>
             </p:dataTable>

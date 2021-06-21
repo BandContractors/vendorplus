@@ -170,7 +170,7 @@
                             </h:panelGrid>
                         </h:panelGrid>
                     </p:panel>
-                    <p:panel header="#{langsys['Used']} #{langsys['Item']}(s) (#{langsys['Input']}/#{langsys['Raw Material']})">
+                    <p:panel header="#{langsys['Used']} #{langsys['Item']} (#{langsys['Input']}/#{langsys['Raw Material']})">
                         <h:panelGrid id="gridRawMaterialItem" styleClass="clsGridMainInput" columns="8">
                             <p:commandLink actionListener="#{itemBean.openChildItem('Expense',transItem.itemId)}" value="#{langsys['Item']} #{langsys['Description']}"/>
                             <h:outputLabel value="#{langsys['Unit']}"/> 

@@ -27,11 +27,11 @@
 
         <h:form id="formReport">
             <h:panelGrid id="pnlgHeader" columns="3" styleClass="clsPanelReportFilterTitle">
-                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="Sales User Earn Report"/>
-                <p:commandLink id="cmdbToday" value="Today's Date" style="color: white;">
+                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="#{langsys['Sales']} #{langsys['User']} #{langsys['Earn']} #{langsys['Report']}"/>
+                <p:commandLink id="cmdbToday" value="#{langsys['Today']}" style="color: white;">
                     <p:ajax listener="#{transBean.setTransDateToToday(trans)}" process="@this" update="id1"/>
                 </p:commandLink>
-                <p:commandLink id="cmdbYesturday" value="Yesterday's Date" style="color: white;">
+                <p:commandLink id="cmdbYesturday" value="#{langsys['Yesterday']}" style="color: white;">
                     <p:ajax listener="#{transBean.setTransDateToYesturday(trans)}" process="@this" update="id1"/>
                 </p:commandLink>
             </h:panelGrid>
@@ -42,29 +42,29 @@
                         <f:selectItem itemLabel="" itemValue="0"/>
                         <f:selectItems value="#{storeBean.stores}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
                     </p:selectOneMenu>
-                    <p:outputLabel  id="id10" value="Sales Date(From):"/>
+                    <p:outputLabel  id="id10" value="#{langsys['Sales']} #{langsys['Date']}(#{langsys['From']}):"/>
                     <p:calendar id="calTransDateFrom"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{trans.transactionDate}" size="8"/>
-                    <p:outputLabel  id="id4" value="Trans Type:"/>
+                    <p:outputLabel  id="id4" value="#{langsys['Transaction']} #{langsys['Type']}:"/>
                     <p:selectOneMenu id="menuTransactionType" value="#{trans.transactionTypeId}">
                         <f:selectItem itemValue="0" itemLabel=""/>
-                        <f:selectItem itemValue="2" itemLabel="SALE INVOICE"/>
+                        <f:selectItem itemValue="2" itemLabel="#{langsys['SALE']} #{langsys['INVOICE']}"/>
                         <f:ajax event="change" render="menuTransactionType menuTransactionReason"/>
                     </p:selectOneMenu>
                     
-                    <p:outputLabel  value="Earned By:"/>
+                    <p:outputLabel  value="#{langsys['Earned']} #{langsys['By']}:"/>
                     <p:selectOneMenu id="menuTransUser" value="#{trans.transactionUserDetailId}">
                         <f:selectItem itemLabel="" itemValue="0"/>
                         <f:selectItems value="#{userDetailBean.getUserDetails()}" var="ut" itemLabel="#{ut.firstName} #{ut.secondName} #{ut.thirdName}" itemValue="#{ut.userDetailId}"/>
                     </p:selectOneMenu>
-                    <p:outputLabel  id="id11" value="Sales Date(To):"/>
+                    <p:outputLabel  id="id11" value="#{langsys['Sales']} #{langsys['Date']}(#{langsys['To']}):"/>
                     <p:calendar id="calTransDateTo"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{trans.transactionDate2}" size="8"/>
-                    <p:outputLabel  id="id5" value="Trans Sub Type:"/>
+                    <p:outputLabel  id="id5" value="#{langsys['Transaction']} #{langsys['Subtype']}:"/>
                     <p:selectOneMenu id="menuTransactionReason" value="#{trans.transactionReasonId}">
                         <f:selectItem itemLabel="" itemValue="0"/>
                         <f:selectItems value="#{transactionReasonBean.getTransactionReasons(trans.transactionTypeId)}" var="tr" itemLabel="#{tr.transactionReasonName}" itemValue="#{tr.transactionReasonId}"/>
                     </p:selectOneMenu>
                     
-                    <p:commandButton styleClass="clsButtonReportFilter" id="cmdbSearch" value="Search" update="tblTransaction pnlgActionMessage tblTransactionSummary" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                    <p:commandButton styleClass="clsButtonReportFilter" id="cmdbSearch" value="#{langsys['Search']}" update="tblTransaction pnlgActionMessage tblTransactionSummary" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
@@ -79,12 +79,12 @@
             <p:dataTable tableStyle="width:auto;" id="tblTransactionSummary" var="rtss" value="#{transBean.getReportTransEarnUserSummary(trans)}" 
                          >
                 <f:facet name="header">
-                    User Earn Summary Report
+                    #{langsys['User']} #{langsys['Earn']} #{langsys['Summary']} #{langsys['Report']}
                 </f:facet>
-                <p:column headerText="Earned By">
+                <p:column headerText="#{langsys['Earned']} #{langsys['By']}">
                     <h:outputText value="#{userDetailBean.getUserDetail(rtss.earnUserId).firstName} #{userDetailBean.getUserDetail(rtss.earnUserId).secondName}"/>
                 </p:column>
-                <p:column headerText="Total Earned Amount">
+                <p:column headerText="#{langsys['Total']} #{langsys['Earned']} #{langsys['Amount']}">
                     <h:outputText value="#{rtss.totalEarnAmount}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
@@ -96,7 +96,7 @@
                          rowsPerPageTemplate="10,20,50,100,200,500" 
                          >
                 <f:facet name="header">
-                    User Earn Report (#{transItemBean.getReportTransItemCount()} Items Returned)
+                    #{langsys['User']} #{langsys['Earn']} #{langsys['Report']} (#{transItemBean.getReportTransItemCount()} Items Returned)
                     <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
                     <p:columnToggler datasource="tblTransaction" trigger="toggler" />
                 </f:facet>
@@ -122,50 +122,50 @@
                     <h:outputText value="#{rts.storeName}">
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Transaction">
+                <p:column headerText="#{langsys['Transaction']}">
                     <h:outputText value="#{rts.transactionTypeName}" />
                 </p:column>
-                <p:column headerText="Id">
+                <p:column headerText="#{langsys['Id']}">
                     <h:outputText value="#{rts.transactionId}">
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Date">
+                <p:column headerText="#{langsys['Date']}">
                     <h:outputText value="#{utilityBean.formatDate(rts.transactionDate)}"/>
                 </p:column>
-                <p:column headerText="Item Description">
+                <p:column headerText="#{langsys['Item']} #{langsys['Description']}">
                     <h:outputText value="#{rts.description}">
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Unit">
+                <p:column headerText="#{langsys['Unit']}">
                     <h:outputText value="#{rts.unitSymbol}">
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Qty">
+                <p:column headerText="#{langsys['Qty']}">
                     <h:outputText value="#{rts.itemQty}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Unit Price">
+                <p:column headerText="#{langsys['Unit']} #{langsys['Price']}">
                     <h:outputText value="#{rts.unitPriceIncVat}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Trans Amount">
+                <p:column headerText="#{langsys['Transaction']} #{langsys['Amount']}">
                     <h:outputText value="#{rts.amountIncVat}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Earned Perc(%)">
+                <p:column headerText="#{langsys['Earned']} #{langsys['Percentage']}(%)">
                     <h:outputText value="#{rts.earnPerc}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Earned Amount">
+                <p:column headerText="#{langsys['Earned']} #{langsys['Amount']}">
                     <h:outputText value="#{rts.earnAmount}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Earned By">
+                <p:column headerText="#{langsys['Earned']} #{langsys['By']}">
                     <h:outputText value="#{rts.transactionUserDetailName}">
                     </h:outputText>
                 </p:column>
