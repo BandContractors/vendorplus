@@ -12,15 +12,18 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import static java.sql.Types.VARCHAR;
 import java.util.ArrayList;
 import java.util.List;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import utilities.CustomValidator;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import utilities.UtilityBean;
 
 
 /*
@@ -36,6 +39,7 @@ import utilities.CustomValidator;
 public class ItemProductionMapBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    static Logger LOGGER = Logger.getLogger(ItemProductionMapBean.class.getName());
 
     private List<ItemProductionMap> ItemProductionMaps;
     private String ActionMessage = null;
@@ -52,13 +56,15 @@ public class ItemProductionMapBean implements Serializable {
     private List<ItemProductionMap> ItemProductionMapsListEdit = new ArrayList<>();
     private List<ItemProductionMap> ItemProductionMapsList = new ArrayList<>();
     private List<Item> itemList = new ArrayList<>();
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     public void saveItemProductionMap(ItemProductionMap itemproductionmap) {
-
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         String sql = null;
         String sql2 = null;
-        String msg = "";
-//        Item itemObj=null;
 
         if (itemproductionmap != null) {
 
@@ -82,20 +88,22 @@ public class ItemProductionMapBean implements Serializable {
                     cs.setDouble("in_input_qty", itemproductionmap.getInputQty());
                     cs.executeUpdate();
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
-                this.setActionMessage("ItemProductionMap NOT saved");
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("ItemProductionMap NOT saved!"));
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Item Production Map Not Saved"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Item Production Map Not Saved")));
             }
         } else {
-            this.setActionMessage("Please select atleast one raw material");
+            this.setActionMessage(ub.translateWordsInText(BaseName, "Select Raw Material"));
         }
 
         this.clearItemProductionMap(itemproductionmap);
-        this.setActionMessage("Saved Successfully");
+        this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
     }
 
     public void saveItemProductionMap(ItemProductionMap aItemProductionMap, List<ItemProductionMap> aInputItems, List<ItemProductionMap> aItems) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         String msg = "";
         msg = this.validateItemProductionMap(aItemProductionMap, aInputItems);
         if (msg.length() > 0) {
@@ -119,12 +127,12 @@ public class ItemProductionMapBean implements Serializable {
                     //refresh the list
                     this.refreshChildList(aItemProductionMap.getOutputItemId(), aItems);
                 } else {
-                    msg = "NOT saved";
+                    msg = "Not Saved";
                 }
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } catch (Exception e) {
-                System.err.println("saveItem_combination:" + e.getMessage());
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("NOT saved!"));
+                LOGGER.log(Level.ERROR, e);
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Not Saved")));
             }
         }
     }
@@ -179,16 +187,8 @@ public class ItemProductionMapBean implements Serializable {
                 this.updateLookUpsUI(aObject);
                 aList.add(aObject);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return aList;
     }
@@ -207,16 +207,8 @@ public class ItemProductionMapBean implements Serializable {
                 this.updateLookUpsUI(aObject);
                 aList.add(aObject);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return aList;
     }
@@ -235,36 +227,42 @@ public class ItemProductionMapBean implements Serializable {
                 CallableStatement cs = conn.prepareCall(sql);) {
             cs.executeUpdate();
             save_status = 1;
-        } catch (SQLException se) {
+        } catch (Exception e) {
             save_status = 0;
-            System.err.println("saveValidatedItem:" + se.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return save_status;
     }
 
     public void addItem(ItemProductionMap aItemProductionMap, List<ItemProductionMap> aItemProductionMapList, Item aInputItem) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         String msg = "";
-        if (null == aItemProductionMap) {
-            msg = "Select Item to add";
-        } else if (aItemProductionMap.getOutputItemId() == 0 || aItemProductionMap.getInputItemId() == 0 || aItemProductionMap.getInputQty() < 0) {//aItemProductionMap.getInputQty() <= 0
-            msg = "Check Parent, Child Item and Qty";
-        } else if (this.combinationExists(aItemProductionMap.getOutputItemId(), aItemProductionMap.getInputItemId())) {
-            msg = "Input item already exists...";
-        } else if (this.differentCurrencyExists(aItemProductionMap.getOutputItemId(), aItemProductionMap.getInputItemId())) {
-            msg = "Both Input and Output items MUST be of the same Currency...";
-        } else {
-            ItemProductionMap ic = new ItemProductionMap();
-            ic.setItemProductionMapId(aItemProductionMap.getItemProductionMapId());
-            ic.setOutputItemId(aItemProductionMap.getOutputItemId());
-            ic.setInputItemId(aItemProductionMap.getInputItemId());
-            ic.setInputQty(aItemProductionMap.getInputQty());
-            this.updateLookUpsUI(ic);
-            this.ItemProductionMapsListEdit.add(ic);
-            this.clearItemProductionChild(aItemProductionMap);
-            new ItemBean().clearItem(aInputItem);
-        }
-        if (msg.length() > 0) {
-            FacesContext.getCurrentInstance().addMessage("Add", new FacesMessage(msg));
+        try {
+            if (null == aItemProductionMap) {
+                msg = "Select Item to Add";
+            } else if (aItemProductionMap.getOutputItemId() == 0 || aItemProductionMap.getInputItemId() == 0 || aItemProductionMap.getInputQty() < 0) {//aItemProductionMap.getInputQty() <= 0
+                msg = "Check Parent and Child Item and Qty";
+            } else if (this.combinationExists(aItemProductionMap.getOutputItemId(), aItemProductionMap.getInputItemId())) {
+                msg = "Input Item Exists";
+            } else if (this.differentCurrencyExists(aItemProductionMap.getOutputItemId(), aItemProductionMap.getInputItemId())) {
+                msg = "Both Input and Output Items Must be of the Same Currency";
+            } else {
+                ItemProductionMap ic = new ItemProductionMap();
+                ic.setItemProductionMapId(aItemProductionMap.getItemProductionMapId());
+                ic.setOutputItemId(aItemProductionMap.getOutputItemId());
+                ic.setInputItemId(aItemProductionMap.getInputItemId());
+                ic.setInputQty(aItemProductionMap.getInputQty());
+                this.updateLookUpsUI(ic);
+                this.ItemProductionMapsListEdit.add(ic);
+                this.clearItemProductionChild(aItemProductionMap);
+                new ItemBean().clearItem(aInputItem);
+            }
+            if (msg.length() > 0) {
+                FacesContext.getCurrentInstance().addMessage("Add", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -280,7 +278,7 @@ public class ItemProductionMapBean implements Serializable {
                 found = true;
             }
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return found;
     }
@@ -301,7 +299,7 @@ public class ItemProductionMapBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return found;
     }
@@ -331,7 +329,7 @@ public class ItemProductionMapBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.out.println("updateLookUpsUI:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -344,7 +342,7 @@ public class ItemProductionMapBean implements Serializable {
                 aItemProductionMap.setInputQty(0);
             }
         } catch (Exception e) {
-            System.out.println("clearItemProduction:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -367,17 +365,9 @@ public class ItemProductionMapBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
 
     }
@@ -401,17 +391,9 @@ public class ItemProductionMapBean implements Serializable {
                 ItemProductionMaps2.add(itemproductionmap);
             }
             return ItemProductionMaps2;
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
     }
 
@@ -433,19 +415,10 @@ public class ItemProductionMapBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
-
     }
 
     public ItemProductionMap getItemProductionMapByInputItemId(long InputItemId) {
@@ -466,29 +439,23 @@ public class ItemProductionMapBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
     }
 
     public void deleteItemProductionMap(ItemProductionMap aItemProdForDel, ItemProductionMap aOutput, List<ItemProductionMap> aList) {
-        String msg;
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
 
         if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Delete") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
             String sql = "DELETE FROM item_production_map WHERE item_production_map_id=?";
             try (
@@ -496,11 +463,11 @@ public class ItemProductionMapBean implements Serializable {
                     PreparedStatement ps = conn.prepareStatement(sql);) {
                 ps.setLong(1, aItemProdForDel.getItemProductionMapId());
                 ps.executeUpdate();
-                this.setActionMessage("Deleted Successfully!");
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Deleted Successfully"));
                 this.refreshChildList(aOutput.getOutputItemId(), aList);
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
-                this.setActionMessage("ItemProductionMap NOT deleted");
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Item Production Map Not Deleted"));
             }
         }
     }
@@ -535,16 +502,8 @@ public class ItemProductionMapBean implements Serializable {
                 itemproductionmap.setInputQty(rs.getDouble("input_qty"));
                 ItemProductionMaps.add(itemproductionmap);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return ItemProductionMaps;
     }
@@ -569,16 +528,8 @@ public class ItemProductionMapBean implements Serializable {
             if (rs.next()) {
                 this.SelectedMapGroupId = rs.getLong("map_group_id");
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return this.SelectedMapGroupId;
     }
@@ -601,16 +552,8 @@ public class ItemProductionMapBean implements Serializable {
                 itemproductionmap.setInputQty(rs.getDouble("input_qty"));
                 ItemProductionMaps.add(itemproductionmap);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return ItemProductionMaps;
     }
@@ -644,8 +587,8 @@ public class ItemProductionMapBean implements Serializable {
             cs.registerOutParameter("out_new_id", VARCHAR);
             cs.executeUpdate();
             NewId = cs.getLong(3);
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             NewId = 0;
         }
         return NewId;
@@ -668,16 +611,8 @@ public class ItemProductionMapBean implements Serializable {
             while (rs.next()) {
                 records = records + 1;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return records;
     }
@@ -694,16 +629,8 @@ public class ItemProductionMapBean implements Serializable {
             while (rs.next()) {
                 records = records + 1;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return records;
     }
@@ -724,16 +651,8 @@ public class ItemProductionMapBean implements Serializable {
                 new ItemBean().setItemFromResultset(item, rs);
                 this.ItemObjectList.add(item);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return ItemObjectList;
     }
@@ -754,16 +673,8 @@ public class ItemProductionMapBean implements Serializable {
                 new ItemBean().setItemFromResultset(item, rs);
                 this.ItemObjectList.add(item);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return ItemObjectList;
     }
@@ -791,8 +702,8 @@ public class ItemProductionMapBean implements Serializable {
                 aItemProductionMap.setInputQty(0);
             }
 
-        } catch (SQLException se) {
-            System.err.println("setItemFromResultset:" + se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -812,7 +723,7 @@ public class ItemProductionMapBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.out.println("updateLookUpsUIInput:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -840,7 +751,7 @@ public class ItemProductionMapBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.out.println("updateLookUpsUIInput:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -870,7 +781,7 @@ public class ItemProductionMapBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.out.println("updateLookUpsUIInput:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -1047,6 +958,20 @@ public class ItemProductionMapBean implements Serializable {
      */
     public void setItemProductionMapsList(List<ItemProductionMap> ItemProductionMapsList) {
         this.ItemProductionMapsList = ItemProductionMapsList;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 
 }

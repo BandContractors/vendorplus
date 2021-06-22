@@ -450,6 +450,8 @@ public class TransBean implements Serializable {
     }
 
     public void RetrieveAndUpdateTransAndItems(int aTransTypeId, int aRetrieveTransTypeId, int aRetrieveTransReasId, Trans aTrans, List<TransItem> aTransItems) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         int CurrStoreId = 0;
         int CurrTransTypeId = 0;
         String CurCode1 = "";
@@ -524,7 +526,7 @@ public class TransBean implements Serializable {
                 aTrans.setTransactorId(0);
                 //aTrans.setTransactionRef("");
                 aTransItems.clear();
-                FacesContext.getCurrentInstance().addMessage("Retrieve PO", new FacesMessage("Either Currency or Transaction-Type of the Order does NOT match with selected currency..."));
+                FacesContext.getCurrentInstance().addMessage("Retrieve PO", new FacesMessage(ub.translateWordsInText(BaseName, "Either Currency or Transaction Type of the Order does Not Match with Selected Currency")));
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -1544,7 +1546,6 @@ public class TransBean implements Serializable {
     public void saveTransCEC(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
         UtilityBean ub = new UtilityBean();
         String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
-        String msg = "";
         //Date dt1 = null, dt2 = null;
         //long tms = 0;
         //long ms = 0;

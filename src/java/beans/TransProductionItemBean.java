@@ -14,15 +14,17 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import sessions.GeneralUserSetting;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 /*
  * To change this template, choose Tools | Templates
@@ -37,7 +39,7 @@ import sessions.GeneralUserSetting;
 public class TransProductionItemBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    static Logger LOGGER = Logger.getLogger(TransProductionItemBean.class.getName());
     private List<TransProductionItem> TransProductionItems;
     private String ActionMessage = null;
     private TransProductionItem SelectedTransProductionItem = null;
@@ -56,6 +58,8 @@ public class TransProductionItemBean implements Serializable {
     private String CategoryName;
     private String SubCategoryName;
     private List<TransProductionItem> atransProItemsList = new ArrayList<>();
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     public TransProductionItem getTransProductionItemById(long aTransProductionItemId) {
         String sql = "{call sp_search_trans_production_item_by_id(?)}";
@@ -70,17 +74,9 @@ public class TransProductionItemBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
     }
 
@@ -100,16 +96,8 @@ public class TransProductionItemBean implements Serializable {
                 this.updateLookUpsUI(tpi);
                 getTransProductionItems().add(tpi);
             }
-        } catch (SQLException se) {
-            System.err.println("getTransProductionItemsByTransProductionId:" + se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return getTransProductionItems();
     }
@@ -124,7 +112,7 @@ public class TransProductionItemBean implements Serializable {
                 aTransProductionItem.setInputItemName(item.getDescription());
             }
         } catch (Exception e) {
-            System.out.println("updateLookUpsUI:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -186,8 +174,8 @@ public class TransProductionItemBean implements Serializable {
             }
             return transProductionItem;
 
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
         }
     }
@@ -296,8 +284,8 @@ public class TransProductionItemBean implements Serializable {
                     //i = new StockBean().subtractStock(stock, calInputQty);
                     i = new StockBean().subtractStock(stock, aItemProductionMap.getInputQtyTotal());
                     stock.setSpecific_size(1);
-                    String TableName=new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                    new Stock_ledgerBean().callInsertStock_ledger(TableName,"Subtract", stock, aItemProductionMap.getInputQtyTotal(), "Add", 70, aTransProductionID, new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                    String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
+                    new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", stock, aItemProductionMap.getInputQtyTotal(), "Add", 70, aTransProductionID, new GeneralUserSetting().getCurrentUser().getUserDetailId());
                     try {
                         FromUnitCost = new StockBean().getStock(stock.getStoreId(), stock.getItemId(), stock.getBatchno(), stock.getCodeSpecific(), stock.getDescSpecific()).getUnitCost();
                     } catch (NullPointerException npe) {
@@ -311,8 +299,8 @@ public class TransProductionItemBean implements Serializable {
                 } else if (aTransProductionItem.getTransProductionId() > 0) {
                     //do nothing; this is for edit
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("TransProduction NOT saved!"));
             }
 
@@ -329,8 +317,8 @@ public class TransProductionItemBean implements Serializable {
                 this.atransProItemsList.add(aTransProductionItem);
                 this.saveTransProItemsCEC(aTransProduction, aTransProductionItem);
             }
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -388,9 +376,8 @@ public class TransProductionItemBean implements Serializable {
                 } else if (aTransProductionItem.getTransProductionItemId() > 0) {
                     //do nothing; this is for edit
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
-//                this.setActionMessage("TransItem NOT saved");
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("TransItem NOT saved!"));
             }
         }
@@ -410,8 +397,8 @@ public class TransProductionItemBean implements Serializable {
                 icb.setItemProductionMapFromResultset(ic, rs);
                 ItemProductionMaps.add(ic);
             }
-        } catch (SQLException se) {
-            se.printStackTrace();
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return ItemProductionMaps;
     }
@@ -569,6 +556,20 @@ public class TransProductionItemBean implements Serializable {
      */
     public void setAtransProItemsList(List<TransProductionItem> atransProItemsList) {
         this.atransProItemsList = atransProItemsList;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 
     /**

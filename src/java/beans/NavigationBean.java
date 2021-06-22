@@ -10,10 +10,12 @@ import java.util.List;
 import javax.faces.application.ConfigurableNavigationHandler;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import utilities.UtilityBean;
 
 @ManagedBean
 @SessionScoped
@@ -21,6 +23,8 @@ public class NavigationBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private String NavMsg;
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     public String redirectToBranch() {
         return "Branch?faces-redirect=true";
@@ -1194,7 +1198,7 @@ public class NavigationBean implements Serializable {
     public String redirectToReportSalesTaxAPI() {
         return "ReportSalesTaxAPI?faces-redirect=true";
     }
-    
+
     public String redirectToReportSMbiAPI() {
         return "ReportSMbiAPI?faces-redirect=true";
     }
@@ -1506,6 +1510,8 @@ public class NavigationBean implements Serializable {
     }
 
     public void checkAccessDenied(String aFunctionName, String aRole) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         String RealFunctionName = "";
         RealFunctionName = aFunctionName;
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
@@ -1513,7 +1519,7 @@ public class NavigationBean implements Serializable {
         GroupRightBean grb = new GroupRightBean();
 
         if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, RealFunctionName, aRole) == 0) {
-            this.setNavMsg(RealFunctionName + ": Unauthorized access, contact system admin...");
+            this.setNavMsg(RealFunctionName + " : " + ub.translateWordsInText(BaseName, "Not Authorized to Access"));
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(getNavMsg()));
             FacesContext fc = FacesContext.getCurrentInstance();
             ConfigurableNavigationHandler nav = (ConfigurableNavigationHandler) fc.getApplication().getNavigationHandler();
@@ -1606,7 +1612,8 @@ public class NavigationBean implements Serializable {
     }
 
     public void checkCurrentPage(String aTransactionType, String aTransactorType, String aSaleType) {
-
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         int LogOut = 0;
         if (!aTransactionType.equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
             //in the wrong place
@@ -1617,7 +1624,7 @@ public class NavigationBean implements Serializable {
 
         if (LogOut == 1) {
             //log-out
-            this.setNavMsg("You will be logged out! Stop opening multiple Transactional Pages...");
+            this.setNavMsg(ub.translateWordsInText(BaseName, "Stop Opening Multiple Transaction Pages"));
             FacesContext.getCurrentInstance().addMessage("Security", new FacesMessage(getNavMsg()));
             Login aLogin = new Login();
             aLogin.userLogout();
@@ -1763,5 +1770,19 @@ public class NavigationBean implements Serializable {
 
     public String redirectToReportProdInputOutputDetail() {
         return "ReportProdInputOutput?faces-redirect=true";
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 }
