@@ -32,31 +32,31 @@
                         return false;"> 
                 <p:panel id="pnlTransaction">
                     <h:panelGrid styleClass="clsGridMainHeader" columns="4" style="width: 100%">
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="VIEW" rendered="#{transProductionBean.actionType.equals('View')}"/>
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="EDIT" rendered="#{transProductionBean.actionType.equals('Edit')}"/>
+                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['VIEW']}" rendered="#{transProductionBean.actionType.equals('View')}"/>
+                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['EDIT']}" rendered="#{transProductionBean.actionType.equals('Edit')}"/>
                         <h:outputLabel style="background-color:#00B461;color: white;" value="#{transactionTypeBean.getTransactionType(70).transactionOutputLabel} : #{transProductionBean.transProdObj.transaction_number}"/>
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="Stock(Product↑↓ Raw Material↑↓)"/>
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:INV-ACC↓↑ COS-ACC↓↑"/>
+                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Stock']}(#{langsys['Product']}↑↓ #{langsys['Raw Material']}↑↓)"/>
+                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Ledger']}:INV-ACC↓↑ COS-ACC↓↑"/>
                     </h:panelGrid>
                     <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="4">
-                        <h:outputLabel  value="From:"/>
+                        <h:outputLabel  value="#{langsys['From']}:"/>
                         <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{storeBean.getStore(transProductionBean.transProdObj.storeId).storeName}" style="width: 200px;"/>  
-                        <h:outputLabel  value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}:"/>
+                        <h:outputLabel  value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}:"/>
                         <h:inputText styleClass="clsInput" disabled="true" value="#{transProductionBean.transProdObj.transactor_names}" style="width: 500px;"/>
 
                         <h:outputLabel  value="#{transactionTypeBean.getTransactionType(70).transactionDateLabel}:"/>
                         <h:inputText id="itxtTransactionDate" value="#{utilityBean.formatDate(transProductionBean.transProdObj.transactionDate)}" disabled="true" style="width: 200px;"/>
-                        <h:outputLabel value="Product:"/>
+                        <h:outputLabel value="#{langsys['Product']}:"/>
                         <h:inputText disabled="true" value="#{transItemBean.showItemDescriptionCEC(transProductionBean.transProdObj.outputItemName, transProductionBean.transProdObj.codeSpecific, transProductionBean.transProdObj.descSpecific, transProductionBean.transProdObj.descMore)}" style="width: 500px;"/>
 
-                        <h:outputLabel value="Unit Cost:"/>
+                        <h:outputLabel value="#{langsys['Unit']} #{langsys['Cost']}:"/>
                         <h:inputText value="#{transProductionBean.transProdObj.outputUnitCost}" style="width: 200px;" disabled="true">
                             <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
-                        <h:outputLabel value="Produced Qty:"/>
+                        <h:outputLabel value="#{langsys['Produced']} #{langsys['Qty']}:"/>
                         <h:inputText value="#{utilityBean.formatDoubleToString(transProductionBean.transProdObj.outputQty)} #{transProductionBean.transProdObj.outputItemUnit} #{transProductionBean.getPCsProduced(transProductionBean.transProdObj)}" style="width: 500px;" disabled="true"/>
 
-                        <h:outputLabel value="Total Cost:"/>
+                        <h:outputLabel value="#{langsys['Total']} #{langsys['Cost']}:"/>
                         <h:inputText value="#{transProductionBean.transProdObj.outputTotalCost}" style="width: 200px;" disabled="true">
                             <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
@@ -83,25 +83,25 @@
                         </p:column>
                         <p:column>
                             <!-- column header -->
-                            <f:facet name="header">Item Description</f:facet>
+                            <f:facet name="header">#{langsys['Item']} #{langsys['Description']}</f:facet>
                             <!-- row record -->
                             #{transItemBean.showItemDescriptionCEC(ati.inputItemName,ati.codeSpecific,ati.descSpecific,ati.descMore)}
                         </p:column>
                         <p:column>
                             <!-- column header -->
-                            <f:facet name="header">Unit</f:facet>
+                            <f:facet name="header">#{langsys['Unit']}</f:facet>
                             <!-- row record -->
                             #{unitBean.getUnit(itemBean.getItem(ati.inputItemId).getUnitId()).unitSymbol}
                         </p:column>
                         <p:column>
                             <!-- column header -->
-                            <f:facet name="header">Batch No</f:facet>
+                            <f:facet name="header">#{langsys['Batch']} #{langsys['No.']}</f:facet>
                             <!-- row record -->
                             <p:outputLabel value="#{ati.batchno}"/>
                         </p:column>
                         <p:column>
                             <!-- column header -->
-                            <f:facet name="header">Qty Before Prod</f:facet>
+                            <f:facet name="header">#{langsys['Qty']} #{langsys['Before']} #{langsys['Production']}</f:facet>
                             <!-- row record -->
                             <h:outputLabel value="#{ati.input_qty_bfr_prod}" rendered="#{ati.input_qty_bfr_prod>0}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -109,7 +109,7 @@
                         </p:column>
                         <p:column>
                             <!-- column header -->
-                            <f:facet name="header">Unit Qty Used</f:facet>
+                            <f:facet name="header">#{langsys['Unit']} #{langsys['Qty']} #{langsys['Used']}</f:facet>
                             <!-- row record -->
                             <h:inputText value="#{ati.input_unit_qty}" style="width: 60px;" disabled="true" autocomplete="off" rendered="#{ati.input_unit_qty>0}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -117,7 +117,7 @@
                         </p:column>
                         <p:column>
                             <!-- column header -->
-                            <f:facet name="header">Total Qty Used</f:facet>
+                            <f:facet name="header">#{langsys['Total']} #{langsys['Qty']} #{langsys['Used']}</f:facet>
                             <!-- row record -->
                             <h:inputText value="#{ati.inputQty}" style="width: 80px;" disabled="true" autocomplete="off">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -125,7 +125,7 @@
                         </p:column>
                         <p:column>
                             <!-- column header -->
-                            <f:facet name="header">Qty After Prod</f:facet>
+                            <f:facet name="header">#{langsys['Qty']} #{langsys['After']} #{langsys['Production']}</f:facet>
                             <!-- row record -->
                             <h:outputLabel value="#{ati.input_qty_afr_prod}" rendered="#{ati.input_qty_afr_prod>0}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -133,7 +133,7 @@
                         </p:column>
                         <p:column>
                             <!-- column header -->
-                            <f:facet name="header">Cur</f:facet>
+                            <f:facet name="header">#{langsys['Currency']}</f:facet>
                             <!-- row record -->
                             <h:outputLabel value="#{itemBean.getItem(ati.inputItemId).currencyCode}" style="width: 50px;"/>
                         </p:column>

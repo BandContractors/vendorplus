@@ -33,11 +33,11 @@
                         return false;"> 
                 <p:panel id="pnlTransactionCredit">
                     <h:panelGrid columns="2">
-                        <h:outputLabel value="Print.File"/>
+                        <h:outputLabel value="#{langsys['Print']} #{langsys['File']}"/>
                         <h:selectOneMenu styleClass="clsMenu" value="#{transBean.overridePrintVersion}">
                             <f:selectItem itemLabel="" itemValue="0"/>
-                            <f:selectItem itemLabel="Print File 1" itemValue="1"/>
-                            <f:selectItem itemLabel="Print File 2" itemValue="2"/>
+                            <f:selectItem itemLabel="#{langsys['Print']} #{langsys['File']} 1" itemValue="1"/>
+                            <f:selectItem itemLabel="#{langsys['Print']} #{langsys['File']} 2" itemValue="2"/>
                             <f:ajax event="change" render="pnlgOutputCredit"/>
                         </h:selectOneMenu>
                     </h:panelGrid>

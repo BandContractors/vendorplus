@@ -37,51 +37,51 @@
                         return false;"> 
                 <p:panel id="pnlTransaction">
                     <h:panelGrid styleClass="clsGridMainHeader" columns="4" style="width: 100%">
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="VIEW" rendered="#{payBean.actionType.equals('View')}"/>
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="CANCEL" rendered="#{payBean.actionType.equals('Cancel')}"/>
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="Liability Payment : Pay No : #{payBean.payObj.pay_number}"/>
+                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['VIEW']}" rendered="#{payBean.actionType.equals('View')}"/>
+                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['CANCEL']}" rendered="#{payBean.actionType.equals('Cancel')}"/>
+                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Liability']} #{langsys['Payment']} : #{langsys['Pay']} #{langsys['No.']} : #{payBean.payObj.pay_number}"/>
                         <h:outputLabel style="background-color:#00B461;color: white;" value=""/>
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:Cash↓ Liab↓"/>
+                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Ledger']}:#{langsys['Cash']}↓ Liab↓"/>
                     </h:panelGrid>
                     <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="6">
-                        <h:outputLabel value="Liability Account"/>
+                        <h:outputLabel value="#{langsys['Liability']} #{langsys['Account']}"/>
                         <h:inputText value="#{payBean.getPaidLiabilityAccount(payBean.payObj.payId)}" disabled="true"/>
-                        <h:outputLabel value="Paid To"/>
+                        <h:outputLabel value="#{langsys['Paid']} #{langsys['To']}"/>
                         <h:inputText value="#{transactorBean.getTransactor(payBean.payObj.billTransactorId).transactorNames}" disabled="true"/>
-                        <h:outputLabel value="Amount Paid"/>
+                        <h:outputLabel value="#{langsys['Amount']} #{langsys['Paid']}"/>
                         <h:inputText value="#{payBean.payObj.paidAmount}" disabled="true">
                             <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
 
-                        <h:outputLabel value="Pay Date:"/>
+                        <h:outputLabel value="#{langsys['Pay']} #{langsys['Date']}:"/>
                         <h:inputText value="#{utilityBean.formatDate(payBean.payObj.payDate)}" disabled="true"/>
-                        <h:outputLabel value="Add Date:"/>
+                        <h:outputLabel value="#{langsys['Add']} #{langsys['Date']}:"/>
                         <h:inputText value="#{utilityBean.formatDate(payBean.payObj.addDate)}" disabled="true"/>
-                        <h:outputLabel value="Paid By:"/>
+                        <h:outputLabel value="#{langsys['Paid']} #{langsys['By']}:"/>
                         <h:inputText value="#{userDetailBean.getUserDetail(payBean.payObj.addUserDetailId).userName}" disabled="true"/>
 
-                        <h:outputLabel value="Payment Method:"/>
+                        <h:outputLabel value="#{langsys['Payment']} #{langsys['Method']}:"/>
                         <h:inputText value="#{payMethodBean.getPayMethod(payBean.payObj.payMethodId).payMethodName}" disabled="true"/>
-                        <h:outputLabel value="Paid from Account:"/>
+                        <h:outputLabel value="#{langsys['Paid']} #{langsys['from']} #{langsys['Account']}:"/>
                         <h:inputText value="#{accChildAccountBean.getAccChildAccById(payBean.payObj.accChildAccountId).childAccountName}" disabled="true"/>
-                        <h:outputLabel value="Reference No:"/>
+                        <h:outputLabel value="#{langsys['Reference']} #{langsys['No.']}:"/>
                         <h:inputText value="#{payBean.payObj.payRefNo}" disabled="true"/>
-                        <h:outputLabel value="Currency:"/>
+                        <h:outputLabel value="#{langsys['Currency']}:"/>
                         <h:inputText value="#{payBean.payObj.currencyCode}" disabled="true"/>
 
                     </h:panelGrid>
                     <h:panelGrid styleClass="clsGridMainCommands" columns="2" style="width: 100%">
                         <h:panelGrid styleClass="clsGridMainCommands1" columns="2">
-                            <h:commandButton styleClass="clsButtonVeryBig" id="cmdbCancel" value="CANCEL (ALT+C)" onclick="return confirmCancel();" accesskey="c" rendered="#{payBean.actionType.equals('Cancel') and generalUserSetting.currentStore.storeId==payBean.payObj.storeId and payBean.payObj.paidAmount>0}">
+                            <h:commandButton styleClass="clsButtonVeryBig" id="cmdbCancel" value="#{langsys['CANCEL']} (ALT+C)" onclick="return confirmCancel();" accesskey="c" rendered="#{payBean.actionType.equals('Cancel') and generalUserSetting.currentStore.storeId==payBean.payObj.storeId and payBean.payObj.paidAmount>0}">
                                 <f:ajax listener="#{payBean.cancelPayV2(payBean.payObj,payBean.payTransList)}" execute="pnlTransaction" render="pnlTransaction pnlgOutput"/>
                             </h:commandButton>
                         </h:panelGrid>
                         <h:panelGrid columns="1">
-                            <h:outputLabel value="Print.File" style="color: white;"/>
+                            <h:outputLabel value="#{langsys['Print']} #{langsys['File']}" style="color: white;"/>
                             <h:selectOneMenu styleClass="clsMenu" value="#{transBean.overridePrintVersion}">
                                 <f:selectItem itemLabel="" itemValue="0"/>
-                                <f:selectItem itemLabel="Print File 1" itemValue="1"/>
-                                <f:selectItem itemLabel="Print File 2" itemValue="2"/>
+                                <f:selectItem itemLabel="#{langsys['Print']} #{langsys['File']} 1" itemValue="1"/>
+                                <f:selectItem itemLabel="#{langsys['Print']} #{langsys['File']} 2" itemValue="2"/>
                                 <f:ajax event="change" render="pnlgOutput"/>
                             </h:selectOneMenu>
                         </h:panelGrid>

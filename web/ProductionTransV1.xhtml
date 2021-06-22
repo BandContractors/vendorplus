@@ -45,15 +45,15 @@
                 <h:selectOneMenu styleClass="clsMenu" id="menuTransactionReason" value="#{trans.transactionReasonId}">
                     <f:selectItem itemValue="#{transBean.transReasonObj.transactionReasonId}" itemLabel="#{generalUserSetting.getCurrentStore().getStoreName()} / #{transBean.transReasonObj.transactionReasonName}"/>
                 </h:selectOneMenu>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="Stock:Output↑ Input↓"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:INV-ACC↓↑ COS-ACC↓↑"/>
+                <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Stock']}:#{langsys['Output']}↑ #{langsys['Input']}↓"/>
+                <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Ledger']}:INV-ACC↓↑ COS-ACC↓↑"/>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainInput" columns="3">
                 <h:outputLabel  value="#{transBean.transTypeObj.transactionDateLabel}:"/>
                 <p:calendar id="calTransactionDate"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.transactionDate}" size="8"/>
                 <h:panelGrid id="pnlSearch" columns="5" style="background-color: #b3f2b3;width: 100%;">
-                    <h:outputLabel value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}:"/>
+                    <h:outputLabel value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}:"/>
                     <p:autoComplete id="autcTransactorSearch" value="#{transactorBean.selectedTransactor}" 
                                     completeMethod="#{transactorBean.getTransactorActiveObjectList}" 
                                     var="trct" 
@@ -62,13 +62,13 @@
                                     converter="TransactorConverter" style="text-align: left;" 
                                     forceSelection="true" 
                                     >
-                        <p:column headerText="#{menuItemBean.menuItemObj.CUSTOMER_NAME}" style="text-align: left" >  
+                        <p:column headerText="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}" style="text-align: left" >  
                             #{trct.transactorNames} 
                         </p:column> 
-                        <p:column headerText="Type" style="text-align: left" >  
+                        <p:column headerText="#{langsys['Type']}" style="text-align: left" >  
                             #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)} 
                         </p:column> 
-                        <p:column headerText="Contact Person" style="text-align: left">  
+                        <p:column headerText="#{langsys['Contact']} #{langsys['Person']}" style="text-align: left">  
                             #{trct.cpName} 
                         </p:column> 
                         <p:ajax event="itemSelect" listener="#{trans.setTransactorId(transactorBean.selectedTransactor.transactorId)}" />
@@ -78,11 +78,11 @@
                     </p:autoComplete>
                     <h:outputLabel  value="#{transBean.transTypeRefObj.transactionNumberLabel}:"/>
                     <p:selectOneMenu id="menuTransNumber" value="#{trans.transactionRef}" editable="true" dynamic="true">
-                        <f:selectItem itemLabel="Select or Type..." itemValue="0"/>
+                        <f:selectItem itemLabel="#{langsys['Select']} #{langsys['or']} #{langsys['Type']}" itemValue="0"/>
                         <f:selectItems value="#{transBean.transList}" var="stl" itemLabel="#{stl.transactionNumber}" itemValue="#{stl.transactionNumber}"/>
                         <p:ajax listener="#{transProductionBean.refreshOrderProducedList(trans,transProductionBean.orderProducedList,transItem)}" process="@form" update="TransFormProd:pnlgProduced TransFormProd:gridTransItem TransFormProd:pgrdSpecific TransFormProd:gridRawMaterialItem TransFormProd:dtbRawItem "/>
                     </p:selectOneMenu>
-                    <p:commandButton id="cbtnAcquire" value="OK" style="background-color: black;color: white;font-weight: bold;" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" >
+                    <p:commandButton id="cbtnAcquire" value="#{langsys['OK']}" style="background-color: black;color: white;font-weight: bold;" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" >
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
@@ -92,13 +92,13 @@
             </h:panelGrid>
             <h:panelGrid columns="2">
                 <h:panelGrid columns="1">
-                    <p:panel header="Produced Item (Output/Product)">
+                    <p:panel header="#{langsys['Produced']} #{langsys['Item']} (#{langsys['Output']}/#{langsys['Product']})">
                         <h:panelGrid id="gridTransItem" columns="5">
-                            <p:commandLink actionListener="#{itemBean.openChildItem('Stock',transItem.itemId)}" value="Produced Item"/>  
+                            <p:commandLink actionListener="#{itemBean.openChildItem('Stock',transItem.itemId)}" value="#{langsys['Produced']} #{langsys['Item']}"/>  
                             <h:outputLabel value="PCs"/>
-                            <h:outputLabel value="Size"/>
-                            <h:outputLabel value="Unit"/>
-                            <h:outputLabel value="Qty"/>
+                            <h:outputLabel value="#{langsys['Size']}"/>
+                            <h:outputLabel value="#{langsys['Unit']}"/>
+                            <h:outputLabel value="#{langsys['Qty']}"/>
 
                             <p:autoComplete id="proItem" widgetVar="WproItem" value="#{itemBean.selectedItem}"  
                                             completeMethod="#{itemBean.getItemObjectListForProduction}" 
@@ -110,22 +110,22 @@
                                             rendered="#{transItem.transactionItemId==0}" 
                                             disabled="#{trans.transactionRef.length()>0}"
                                             >
-                                <p:column headerText="Item Description" style="text-align: left" >  
+                                <p:column headerText="#{langsys['Item']} #{langsys['Description']}" style="text-align: left" >  
                                     #{pro_itm.description} 
                                 </p:column> 
-                                <p:column headerText="Alias" style="text-align: left" >  
+                                <p:column headerText="#{langsys['Alias']}" style="text-align: left" >  
                                     #{pro_itm.alias_name} 
                                 </p:column> 
-                                <p:column headerText="Item Code" style="text-align: left" >  
+                                <p:column headerText="#{langsys['Item']} #{langsys['Code']}" style="text-align: left" >  
                                     #{pro_itm.itemCode} 
                                 </p:column> 
-                                <p:column headerText="Unit" style="text-align: left">  
+                                <p:column headerText="#{langsys['Unit']}" style="text-align: left">  
                                     #{unitBean.getUnit(pro_itm.unitId).unitSymbol}
                                 </p:column> 
-                                <p:column headerText="Category" style="text-align: left">  
+                                <p:column headerText="#{langsys['Category']}" style="text-align: left">  
                                     #{categoryBean.getCategory(pro_itm.categoryId).categoryName}
                                 </p:column>
-                                <p:column headerText="Currency" style="text-align: left">
+                                <p:column headerText="#{langsys['Currency']}" style="text-align: left">
                                     <h:outputText value="#{pro_itm.currencyCode}">
                                     </h:outputText>
                                 </p:column>
@@ -158,10 +158,10 @@
                                 <f:ajax event="keyup" listener="#{transProductionBean.updateListUponChangeOutputQty(transItem,generalUserSetting.currentStore.storeId,transProductionBean.itmCombinationList)}" execute="@this" render="totQty dtbRawItem"/>
                             </p:inputText>
 
-                            <h:outputLabel value="Batch"/>
-                            <h:outputLabel value="Mnf.Date"/>
-                            <h:outputLabel value="Exp.Date"/>
-                            <h:outputLabel value="Unit.Cost"/>
+                            <h:outputLabel value="#{langsys['Batch']}"/>
+                            <h:outputLabel value="#{langsys['Manuf']} #{langsys['Date']}"/>
+                            <h:outputLabel value="#{langsys['Expiry']} #{langsys['Date']}"/>
+                            <h:outputLabel value="#{langsys['Unit']} #{langsys['Cost']}"/>
                             <h:outputLabel value=""/>
                             <p:inputText id="batch" value="#{transItem.batchno}" style="width: 205px"/>
                             <p:calendar id="calMnfDate" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{transItem.itemMnfDate}" size="8" pattern="#{companySetting.getDateFormat()}">
@@ -175,24 +175,24 @@
                         </h:panelGrid>
                         <h:panelGrid id="pgrdSpecific">
                             <h:panelGrid id="pgrdSpecific2" columns="3" rendered="#{itemBean.selectedItem.isGeneral==1 || transItem.is_general==1}">
-                                <h:outputLabel value="Specific.Name"/>
-                                <h:outputLabel value="Specific.Code"/>
-                                <h:outputLabel value="More.Description"/>
+                                <h:outputLabel value="#{langsys['Specific']} #{langsys['Name']}"/>
+                                <h:outputLabel value="#{langsys['Specific']} #{langsys['Code']}"/>
+                                <h:outputLabel value="#{langsys['More']} #{langsys['Description']}"/>
                                 <p:inputText id="itxtDescSppecific" style="width: 205px" disabled="false" value="#{transItem.descSpecific}"/>
                                 <p:inputText id="itxtCodeSpecific" style="width: 110px" disabled="false" value="#{transItem.codeSpecific}"/>
                                 <p:inputTextarea id="itxaDescMore" rows="1" cols="25" value="#{transItem.descMore}"/>
                             </h:panelGrid>
                         </h:panelGrid>
                     </p:panel>
-                    <p:panel header="Used Item(s) (Input/Raw Material)">
+                    <p:panel header="#{langsys['Used']} #{langsys['Item']} (#{langsys['Input']}/#{langsys['Raw Material']})">
                         <h:panelGrid id="gridRawMaterialItem" styleClass="clsGridMainInput" columns="8">
-                            <p:commandLink actionListener="#{itemBean.openChildItem('Expense',transItem.itemId)}" value="Item Description"/>
-                            <h:outputLabel value="Unit"/> 
-                            <h:outputLabel value="Batch"/> 
-                            <h:outputLabel value="Current Qty"/> 
-                            <h:outputLabel value="Unit Qty Used"/>
-                            <h:outputLabel value="Total Qty Used"/>
-                            <h:outputLabel value="Qty Left (Balance)"/> 
+                            <p:commandLink actionListener="#{itemBean.openChildItem('Expense',transItem.itemId)}" value="#{langsys['Item']} #{langsys['Description']}"/>
+                            <h:outputLabel value="#{langsys['Unit']}"/> 
+                            <h:outputLabel value="#{langsys['Batch']}"/> 
+                            <h:outputLabel value="#{langsys['Current']} #{langsys['Qty']}"/> 
+                            <h:outputLabel value="#{langsys['Unit']} #{langsys['Qty']} #{langsys['Used']}"/>
+                            <h:outputLabel value="#{langsys['Total']} #{langsys['Qty']} #{langsys['Used']}"/>
+                            <h:outputLabel value="#{langsys['Qty']} #{langsys['Left']} (#{langsys['Balance']})"/> 
                             <h:outputLabel value=""/> 
                             <p:autoComplete id="rawItem" widgetVar="WrawItem" value="#{itemBean.selectedItemX}"  
                                             completeMethod="#{itemBean.getItemObjectListForRawMaterial}" 
@@ -202,19 +202,19 @@
                                             converter="ItemConverter" style="text-align: left" 
                                             forceSelection="true" queryDelay="0" 
                                             >
-                                <p:column headerText="Item Description" style="text-align: left" >  
+                                <p:column headerText="#{langsys['Item']} #{langsys['Description']}" style="text-align: left" >  
                                     #{raw_itm.description} 
                                 </p:column>
-                                <p:column headerText="Alias" style="text-align: left" >  
+                                <p:column headerText="#{langsys['Alias']}" style="text-align: left" >  
                                     #{raw_itm.alias_name} 
                                 </p:column>
-                                <p:column headerText="Item Code" style="text-align: left" >  
+                                <p:column headerText="#{langsys['Item']} #{langsys['Code']}" style="text-align: left" >  
                                     #{raw_itm.itemCode} 
                                 </p:column>
-                                <p:column headerText="Unit" style="text-align: left">  
+                                <p:column headerText="#{langsys['Unit']}" style="text-align: left">  
                                     #{unitBean.getUnit(raw_itm.unitId).unitSymbol}
                                 </p:column> 
-                                <p:column headerText="Category" style="text-align: left">  
+                                <p:column headerText="#{langsys['Category']}" style="text-align: left">  
                                     #{categoryBean.getCategory(raw_itm.categoryId).categoryName}
                                 </p:column>
                                 <p:ajax event="itemSelect" listener="#{itemProductionMapBean.updateModelInput(transProductionBean.itemProductionMapObj,itemBean.selectedItemX,transItem)}" process="@this" update="outsideInputUnit itxtQty3 itxtQty4"/>
@@ -243,7 +243,7 @@
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                 <f:ajax event="keyup" listener="#{transProductionBean.updateUponChangeInputQtyLeft(transItem,transProductionBean.itemProductionMapObj)}" execute="@this" render="itxtQty3 itxtQty4" />
                             </p:inputText>
-                            <h:commandButton styleClass="clsButtonSmall" value="Add">
+                            <h:commandButton styleClass="clsButtonSmall" value="#{langsys['Add']}">
                                 <f:ajax listener="#{transProductionBean.addTransProductionItem(transItem,itemBean.selectedItemX,transProductionBean.itemProductionMapObj)}" execute="gridRawMaterialItem" render="dtbRawItem growl1Raw gridRawMaterialItem itxtUnitCost"/>
                             </h:commandButton>
                             <p:growl id="growl1Raw" sticky="true"/>
@@ -263,19 +263,19 @@
                             </p:column>
                             <p:column>
                                 <!-- column header -->
-                                <f:facet name="header">Item Description</f:facet>
+                                <f:facet name="header">#{langsys['Item']} #{langsys['Description']}</f:facet>
                                 <!-- row record -->
                                 #{ati.inputItemName}
                             </p:column>
                             <p:column>
                                 <!-- column header -->
-                                <f:facet name="header">Unit</f:facet>
+                                <f:facet name="header">#{langsys['Unit']}</f:facet>
                                 <!-- row record -->
                                 #{ati.inputItemUnit}
                             </p:column>
                             <p:column>
                                 <!-- column header -->
-                                <f:facet name="header">Batch</f:facet>
+                                <f:facet name="header">#{langsys['Batch']}</f:facet>
                                 <!-- row record -->
                                 <h:selectOneMenu id="menuBatchInputInside" value="#{ati.batchno}" style="width: 100px;">
                                     <f:selectItem itemLabel="" itemValue=""/>
@@ -285,7 +285,7 @@
                             </p:column>
                             <p:column>
                                 <!-- column header -->
-                                <f:facet name="header">Current Qty</f:facet>
+                                <f:facet name="header">#{langsys['Current']} #{langsys['Qty']}</f:facet>
                                 <!-- row record -->
                                 <p:inputText id="currentQty" value="#{ati.inputQtyCurrent}" style="width: 50px;" disabled="true">
                                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -293,7 +293,7 @@
                             </p:column>
                             <p:column>
                                 <!-- column header -->
-                                <f:facet name="header">Unit Qty Used</f:facet>
+                                <f:facet name="header">#{langsys['Unit']} #{langsys['Qty']} #{langsys['Used']}</f:facet>
                                 <!-- row record -->
                                 <p:inputText id="unitQty" value="#{ati.inputQty}" style="width: 50px;">
                                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -302,7 +302,7 @@
                             </p:column>                      
                             <p:column>
                                 <!-- column header -->
-                                <f:facet name="header">Total Qty Used</f:facet>
+                                <f:facet name="header">#{langsys['Total']} #{langsys['Qty']} #{langsys['Used']}</f:facet>
                                 <!-- row record -->
                                 <h:inputText value="#{ati.inputQtyTotal}" id="totQty" style="width: 50px;">
                                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -311,7 +311,7 @@
                             </p:column>
                             <p:column>
                                 <!-- column header -->
-                                <f:facet name="header">Qty Left (Balance)</f:facet>
+                                <f:facet name="header">#{langsys['Qty']} #{langsys['Left']} (#{langsys['Balance']})</f:facet>
                                 <!-- row record -->
                                 <h:inputText value="#{ati.inputQtyBalance}" id="leftQty" style="width: 50px;">
                                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -320,7 +320,7 @@
                             </p:column>
                             <p:column>
                                 <!-- column header -->
-                                <f:facet name="header">Action</f:facet>
+                                <f:facet name="header">#{langsys['Action']}</f:facet>
                                 <!-- row record -->
                                 <h:commandLink value="Remove">
                                     <f:ajax execute="dtbRawItem" listener="#{transProductionBean.removeTransProductionItem(transItem,ati)}" render="dtbRawItem TransFormProd:itxtUnitCost"/>
@@ -338,10 +338,10 @@
                                         converter="UserDetailConverter" style="text-align: left" 
                                         forceSelection="true" queryDelay="0" 
                                         >
-                            <p:column headerText="User/Staff Names" style="text-align: left" >  
+                            <p:column headerText="#{langsys['User']}/#{langsys['Staff']} #{langsys['Names']}" style="text-align: left" >  
                                 #{ud.firstName} #{ud.secondName} #{ud.thirdName} 
                             </p:column> 
-                            <p:column headerText="User Category" style="text-align: left" >  
+                            <p:column headerText="#{langsys['User']} #{langsys['Category']}" style="text-align: left" >  
                                 #{userCategoryBean.getUserCategory(ud.userCategoryId).userCategoryName} 
                             </p:column> 
                             <p:ajax event="itemSelect" listener="#{trans.setTransactionUserDetailId(transBean.transUserDetail.userDetailId)}"/>
@@ -350,7 +350,7 @@
                     </h:panelGrid>
                 </h:panelGrid>
                 <h:panelGrid columns="1" id="pnlgProduced">
-                    <p:panel header="Production Summary for Selected Order">
+                    <p:panel header="#{langsys['Production']} #{langsys['Summary']} #{langsys['for']} #{langsys['Selected']} #{langsys['Order']}">
                         <p:dataTable rowIndexVar="rowIndex" id="dtblProduced"  value="#{transProductionBean.orderProducedList}" var="ati" 
                                      styleClass="cls-table" tableStyle="width:auto;" 
                                      >  
@@ -366,7 +366,7 @@
                             </p:column>
                             <p:column style="font-size: 12px;">
                                 <!-- column header -->
-                                <f:facet name="header">Production Item</f:facet>
+                                <f:facet name="header">#{langsys['Production']} #{langsys['Item']}</f:facet>
                                 <!-- row record -->
                                 #{ati.outputItemName} 
                                 #{ati.descSpecific} 
@@ -374,7 +374,7 @@
                             </p:column>
                             <p:column style="font-size: 12px;">
                                 <!-- column header -->
-                                <f:facet name="header">Ordered Qty</f:facet>
+                                <f:facet name="header">#{langsys['Ordered']} #{langsys['Qty']}</f:facet>
                                 <!-- row record -->
                                 <p:outputLabel value="#{ati.orderedQty}">
                                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -384,7 +384,7 @@
                             </p:column>                      
                             <p:column style="font-size: 12px;">
                                 <!-- column header -->
-                                <f:facet name="header">Produced Qty</f:facet>
+                                <f:facet name="header">#{langsys['Produced']} #{langsys['Qty']}</f:facet>
                                 <!-- row record -->
                                 <p:outputLabel value="#{ati.outputQty}">
                                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -399,13 +399,13 @@
 
             <h:panelGrid styleClass="clsGridMainCommands" columns="1">
                 <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
-                    <p:commandButton styleClass="clsButtonBig" id="cmdbSave" value="SAVE (ALT+S)" accesskey="s" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                    <p:commandButton styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['SAVE']} (ALT+S)" accesskey="s" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>                                
                         <p:ajax listener="#{transProductionBean.saveTransProductionCEC(generalUserSetting.currentStore.storeId,70,107,transItem,transProductionBean.itmCombinationList,transBean.transUserDetail,trans,itemBean.selectedItem,transactorBean.selectedTransactor,transProductionBean.orderProducedList)}" process="@form" update="dtbRawItem gridTransItem gridItemStatus pgrdOthers pgrdSpecific pnlgProduced pgrdMsgs pnlgOutput growl1"/>
                     </p:commandButton>
-                    <p:commandButton styleClass="clsButtonBig" id="cmdbClear" value="CLEAR (ALT+C)" accesskey="c">
+                    <p:commandButton styleClass="clsButtonBig" id="cmdbClear" value="#{langsys['CLEAR']} (ALT+C)" accesskey="c">
                         <p:ajax listener="#{transProductionBean.clearAll(trans,transProductionBean.itmCombinationList,transItem,itemBean.selectedItem,transactorBean.selectedTransactor,2,null,transBean.transUserDetail,null,null,null)}" process="@form" update="@form"/>
                     </p:commandButton>
                 </h:panelGrid>

@@ -32,7 +32,7 @@
                         return false;"> 
                 <p:panel id="pnlCAT">
                     <h:panelGrid columns="1">
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{accLedgerBean.categoryHeader} (#{accLedgerBean.i} out of #{accLedgerBean.n} records returned)"/>
+                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{accLedgerBean.categoryHeader} (#{accLedgerBean.i} #{langsys['out']} #{langsys['of']} #{accLedgerBean.n} #{langsys['records']} #{langsys['returned']})"/>
                     </h:panelGrid>
                     <p:dataTable rowIndexVar="rowIndex" id="dtblCAT" value="#{accLedgerBean.journalList}" var="j" 
                                  styleClass="cls-table" tableStyle="width:auto;" 
@@ -45,36 +45,36 @@
                             <!-- row record -->
                             #{rowIndex+1}
                         </p:column>
-                        <p:column headerText="Date" style="font-size: 13px;">
+                        <p:column headerText="#{langsys['Date']}" style="font-size: 13px;">
                             <h:outputText value="#{utilityBean.formatDate(j.journalDate)}"/>
                         </p:column>
                         <p:column style="font-size: 13px;">
                             <!-- column header -->
-                            <f:facet name="header">Transaction</f:facet>
+                            <f:facet name="header">#{langsys['Transaction']}</f:facet>
                             <!-- row record -->
                             #{j.transaction_type_name}
                         </p:column>
                         <p:column style="font-size: 13px;">
                             <!-- column header -->
-                            <f:facet name="header">TransNo</f:facet>
+                            <f:facet name="header">#{langsys['Transaction']} #{langsys['No.']}</f:facet>
                             <!-- row record -->
                             #{j.transaction_number}
                         </p:column>
                         <p:column style="font-size: 13px;">
                             <!-- column header -->
-                            <f:facet name="header">Account</f:facet>
+                            <f:facet name="header">#{langsys['Account']}</f:facet>
                             <!-- row record -->
                             #{j.account_name}
                         </p:column>
                         <p:column style="font-size: 13px;">
                             <!-- column header -->
-                            <f:facet name="header">Cur</f:facet>
+                            <f:facet name="header">#{langsys['Currency']}</f:facet>
                             <!-- row record -->
                             #{j.currencyCode}
                         </p:column>
                         <p:column style="font-size: 13px;text-align: right;">
                             <!-- column header -->
-                            <f:facet name="header">Amount</f:facet>
+                            <f:facet name="header">#{langsys['Amount']}</f:facet>
                             <!-- row record -->
                             <h:outputLabel value="#{j.amount}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>

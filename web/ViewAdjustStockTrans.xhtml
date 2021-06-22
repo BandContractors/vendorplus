@@ -33,14 +33,14 @@
                         return false;"> 
                 <p:panel id="pnlTransaction">
                     <h:panelGrid styleClass="clsGridMainHeader" columns="4" style="width: 100%">
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="VIEW" rendered="#{transBean.actionType.equals('View')}"/>
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="EDIT" rendered="#{transBean.actionType.equals('Edit')}"/>
+                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['VIEW']}" rendered="#{transBean.actionType.equals('View')}"/>
+                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['EDIT']}" rendered="#{transBean.actionType.equals('Edit')}"/>
                         <h:outputLabel style="background-color:#00B461;color: white;" value="#{transactionReasonBean.getTransactionReason(transBean.transObj.transactionReasonId).transactionReasonName} : #{transBean.transObj.transactionNumber}"/>
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="Stock↓↑"/>
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:NONE"/>
+                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Stock']}↓↑"/>
+                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Ledger']}:#{langsys['NONE']}"/>
                     </h:panelGrid>
                     <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="4">
-                        <h:outputLabel  value="From:"/>
+                        <h:outputLabel  value="#{langsys['From']}:"/>
                         <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{storeBean.getStore(transBean.transObj.storeId).storeName}" style="width: 170px;"/>
                         <h:outputLabel  value="#{transactionTypeBean.getTransactionType(71).transactionDateLabel}:"/>
                         <h:inputText id="itxtTransactionDate" value="#{utilityBean.formatDate(transBean.transObj.transactionDate)}" disabled="true"/>
@@ -56,31 +56,31 @@
                         </p:column>
                         <p:column>
                             <!-- column header -->
-                            <f:facet name="header">Item Description</f:facet>
+                            <f:facet name="header">#{langsys['Item']} #{langsys['Description']}</f:facet>
                             <!-- row record -->
                             <p:outputLabel value="#{transItemBean.showItemDescriptionCEC(ati)}" escape="false"/>
                         </p:column>
                         <p:column>
                             <!-- column header -->
-                            <f:facet name="header">Unit</f:facet>
+                            <f:facet name="header">#{langsys['Unit']}</f:facet>
                             <!-- row record -->
                             #{ati.unitSymbol}
                         </p:column>
                         <p:column>
                             <!-- column header -->
-                            <f:facet name="header">Batch No</f:facet>
+                            <f:facet name="header">#{langsys['Batch']} #{langsys['No.']}</f:facet>
                             <!-- row record -->
                             #{ati.batchno}
                         </p:column>
                         <p:column>
                             <!-- column header -->
-                            <f:facet name="header">Adjustment Type</f:facet>
+                            <f:facet name="header">#{langsys['Adjustment']} #{langsys['Type']}</f:facet>
                             <!-- row record -->
                             #{ati.narration}
                         </p:column>
                         <p:column>
                             <!-- column header -->
-                            <f:facet name="header">Qty</f:facet>
+                            <f:facet name="header">#{langsys['Qty']}</f:facet>
                             <!-- row record -->
                             <h:inputText value="#{ati.itemQty}" style="width: 50px;" disabled="true" autocomplete="off">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -89,8 +89,8 @@
                     </p:dataTable>
                     <h:panelGrid style="background-color: yellow;width: 100%"/>
                     <h:panelGrid styleClass="clsGridMainInput" columns="2">
-                        <h:outputLabel value="Authorised.By"/>
-                        <h:outputLabel value="Authorised.On"/>
+                        <h:outputLabel value="#{langsys['Authorised']} #{langsys['By']}"/>
+                        <h:outputLabel value="#{langsys['Authorised']} #{langsys['On']}"/>
                         <h:inputText disabled="true" style="width: 170px;" value="#{userDetailBean.getUserDetail(transBean.transObj.authorisedByUserDetailId).userName}"/>
                         <h:inputText disabled="true" style="width: 170px;" value="#{utilityBean.formatDate(transBean.transObj.authoriseDate)}"/>
                     </h:panelGrid>

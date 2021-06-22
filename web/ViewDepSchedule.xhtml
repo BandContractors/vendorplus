@@ -33,29 +33,29 @@
                 <p:growl id="growl2"/>
                 <p:panel id="pnlCAT">
                     <h:panelGrid columns="1">
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="Depriciation schedule for #{accDepScheduleBean.itemDescription}"/>
+                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Depreciation']} #{langsys['schedule']} #{langsys['for']} #{accDepScheduleBean.itemDescription}"/>
                     </h:panelGrid>
                     <p:dataTable rowIndexVar="rowIndex" id="dtblDS" value="#{accDepScheduleBean.accDepScheduleList}" var="ds" 
                                  styleClass="cls-table" tableStyle="width:auto;" >
-                        <p:column headerText="Number" style="font-size: 13px;">
+                        <p:column headerText="#{langsys['Number']}" style="font-size: 13px;">
                             <h:outputText value="#{ds.yearNumber}"/>
                         </p:column>
-                        <p:column headerText="Acc Period" style="font-size: 13px;">
+                        <p:column headerText="#{langsys['Accounting']} #{langsys['Period']}" style="font-size: 13px;">
                             <h:outputText value="#{ds.acc_period_name}"/>
                             <h:selectOneMenu id="menuAccPeriod" value="#{ds.depForAccPeriodId}" rendered="#{ds.depForAccPeriodId==0}" >
                                 <f:selectItem itemLabel="" itemValue="0"/>
                                 <f:selectItems value="#{accPeriodBean.returnAccPeriodsCurrentFirst()}" var="ap" itemLabel="#{ap.accPeriodName}" itemValue="#{ap.accPeriodId}"/>
                             </h:selectOneMenu>
                         </p:column>
-                        <p:column headerText="From Date" style="font-size: 13px;">
+                        <p:column headerText="#{langsys['From']} #{langsys['Date']}" style="font-size: 13px;">
                             <h:outputText value="#{utilityBean.formatDate(ds.depFromDate)}"/>
                         </p:column>
-                        <p:column headerText="To Date" style="font-size: 13px;">
+                        <p:column headerText="#{langsys['To']} #{langsys['Date']}" style="font-size: 13px;">
                             <h:outputText value="#{utilityBean.formatDate(ds.depToDate)}"/>
                         </p:column>
                         <p:column style="font-size: 13px;text-align: right;">
                             <!-- column header -->
-                            <f:facet name="header">Amount</f:facet>
+                            <f:facet name="header">#{langsys['Amount']}</f:facet>
                             <!-- row record -->
                             <h:outputLabel value="#{ds.depAmount}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -63,7 +63,7 @@
                         </p:column>
                         <p:column style="font-size: 13px;">
                             <!-- column header -->
-                            <f:facet name="header">Posted</f:facet>
+                            <f:facet name="header">#{langsys['Posted']}</f:facet>
                             <!-- row record -->
                             #{ds.post_status eq 1 ? 'Yes':'No'}
                         </p:column>
@@ -72,11 +72,11 @@
                             <f:facet name="header"></f:facet>
                             <!-- row record -->
                             <h:outputText value="&nbsp;&nbsp;" rendered="#{ds.post_status==1}"/>
-                            <h:commandLink value="Cancel" rendered="#{ds.post_status==1}">
+                            <h:commandLink value="#{langsys['Cancel']}" rendered="#{ds.post_status==1}">
                                 <f:ajax listener="#{accDepScheduleBean.cancelAccDepSchedule(ds)}" execute="@form" render="formDS:growl2 formDS:dtblDS"/>
                             </h:commandLink>
                             <h:outputText value="&nbsp;&nbsp;" rendered="#{ds.post_status==0}"/>
-                            <h:commandLink value="Post" rendered="#{ds.post_status==0}">
+                            <h:commandLink value="#{langsys['Post']}" rendered="#{ds.post_status==0}">
                                 <f:ajax listener="#{accDepScheduleBean.postAccDepSchedule(ds)}" execute="@form" render="formDS:growl2 formDS:dtblDS"/>
                             </h:commandLink>
                         </p:column>

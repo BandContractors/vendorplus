@@ -27,18 +27,18 @@
         <h:form id="TransactionFormSales" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
                     return false;">  
             <h:panelGrid styleClass="clsGridMainHeader" columns="4">
-                <h:outputLabel style="background-color:#00B461;color: white;" value="VIEW" rendered="#{transBean.actionType.equals('View')}"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="EDIT" rendered="#{transBean.actionType.equals('Edit')}"/>
+                <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['VIEW']}" rendered="#{transBean.actionType.equals('View')}"/>
+                <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['EDIT']}" rendered="#{transBean.actionType.equals('Edit')}"/>
                 <h:outputLabel style="background-color:#00B461;color: white;" value="#{transactionReasonBean.getTransactionReason(95).transactionReasonName} : #{transBean.transObj.transactionNumber}"/>               
-                <h:outputLabel style="background-color:#00B461;color: white;" value="Inventory:No effect"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:No effect"/>
+                <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Inventory']}:#{langsys['No.']} #{langsys['effect']}"/>
+                <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Ledger']}:#{langsys['No.']} #{langsys['effect']}"/>
             </h:panelGrid>
             <h:panelGrid id="pnlHeader" columns="5" style="background-color: #E5E5E5;width: 100%;">
-                <h:outputLabel value="From"/>
+                <h:outputLabel value="#{langsys['From']}"/>
                 <h:outputLabel value="#{transactionTypeBean.getTransactionType(65).transactionNumberLabel}"/>
                 <h:outputLabel value="#{transactionTypeBean.getTransactionType(65).transactionDateLabel}"/>
-                <h:outputLabel value="From Date"/>
-                <h:outputLabel value="To Date"/>
+                <h:outputLabel value="#{langsys['From']} #{langsys['Date']}"/>
+                <h:outputLabel value="#{langsys['To']} #{langsys['Date']}"/>
                 
                 <h:inputText id="itxtFromStore" disabled="true" value="#{storeBean.getStore(transBean.transObj.storeId).storeName}"/>
                 <h:inputText id="itxtTransactionNo" value="#{transBean.refTrans.transactionNumber}"  disabled="true"/>
@@ -46,8 +46,8 @@
                 <h:inputText value="#{utilityBean.formatDate(transBean.refTrans.from_date)}" style="width: 100px;"  disabled="true"/>
                 <h:inputText value="#{utilityBean.formatDate(transBean.refTrans.to_date)}" style="width: 100px;" disabled="true"/>
                 
-                <h:outputLabel value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}"/>
-                <h:outputLabel value="Site"/>
+                <h:outputLabel value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}"/>
+                <h:outputLabel value="#{langsys['Site']}"/>
                 <h:outputLabel value=""/>
                 <h:outputLabel value=""/>
                 <h:outputLabel value=""/>
@@ -61,9 +61,9 @@
             <h:panelGrid id="pnlHeader2" columns="6">
                 <h:outputLabel value="#{transactionTypeBean.getTransactionType(66).transactionDateLabel}"/>
                 <h:inputText value="#{utilityBean.formatDate(transBean.transObj.transactionDate)}" disabled="true"/>
-                <h:outputLabel value="Vehicle"/>
+                <h:outputLabel value="#{langsys['Vehicle']}"/>
                 <h:inputText id="itxtVehicle" value="#{transBean.transObj.transactor_vehicle}" disabled="true"/>
-                <h:outputLabel value="Driver"/>
+                <h:outputLabel value="#{langsys['Driver']}"/>
                 <h:inputText id="itxtDriver" value="#{transBean.transObj.transactor_driver}" disabled="true"/>
             </h:panelGrid>
 
@@ -78,25 +78,25 @@
                 </p:column>
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Item Description</f:facet>
+                    <f:facet name="header">#{langsys['Item']} #{langsys['Description']}</f:facet>
                     <!-- row record -->
                     <p:outputLabel value="#{transItemBean.showItemDescriptionCEC(ati)}" escape="false"/>
                 </p:column>
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Unit</f:facet>
+                    <f:facet name="header">#{langsys['Unit']}</f:facet>
                     <!-- row record -->
                     #{unitBean.getUnit(itemBean.getItem(ati.itemId).getUnitId()).unitSymbol}
                 </p:column>
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Batch</f:facet>
+                    <f:facet name="header">#{langsys['Batch']}</f:facet>
                     <!-- row record -->
                     #{ati.batchno}
                 </p:column>
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Hired</f:facet>
+                    <f:facet name="header">#{langsys['Hired']}</f:facet>
                     <!-- row record -->
                     <h:outputLabel value="#{ati.qty_taken}" style="color: blue;">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -104,7 +104,7 @@
                 </p:column>
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Total Delivered</f:facet>
+                    <f:facet name="header">#{langsys['Total']} #{langsys['Delivered']}</f:facet>
                     <!-- row record -->
                     <h:outputLabel value="#{ati.qty_total}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -112,7 +112,7 @@
                 </p:column>
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Total UnDelivered</f:facet>
+                    <f:facet name="header">#{langsys['Total']} #{langsys['Undelivered']}</f:facet>
                     <!-- row record -->
                     <h:outputLabel value="#{ati.qty_balance}" style="color: red;">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -120,7 +120,7 @@
                 </p:column>
                 <p:column style="text-align: center;">
                     <!-- column header -->
-                    <f:facet name="header">Delivered</f:facet>
+                    <f:facet name="header">#{langsys['Delivered']}</f:facet>
                     <!-- row record -->
                     <h:inputText value="#{ati.itemQty}" style="width: 50px;" disabled="#{transBean.actionType.equals('View') or generalUserSetting.currentStore.storeId!=transBean.transObj.storeId}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -131,16 +131,16 @@
             <h:panelGrid id="pgrdTransUser" columns="4">
                 <h:outputLabel  value="#{transactionTypeBean.getTransactionType(66).transactionUserLabel}:"/>
                 <h:inputText value="#{userDetailBean.getUserDetail(transBean.transObj.transactionUserDetailId).userName}" disabled="true"/>
-                <h:outputLabel value="#{menuItemBean.menuItemObj.CUSTOMER_NAME} Rep:"/>
+                <h:outputLabel value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]} Rep:"/>
                 <h:inputText value="#{transBean.transObj.transactor_rep}" disabled="true"/>
-                <h:outputLabel  value="Add Date"/>
+                <h:outputLabel  value="#{langsys['Add']} #{langsys['Date']}"/>
                 <h:inputText value="#{utilityBean.formatDate(transBean.transObj.addDate)}" disabled="true"/>
-                <h:outputLabel  value="Added By"/>
+                <h:outputLabel  value="#{langsys['Added']} #{langsys['By']}"/>
                 <h:inputText value="#{userDetailBean.getUserDetail(transBean.transObj.addUserDetailId).userName}" disabled="true"/>
             </h:panelGrid>
             <h:panelGrid id="pgrdCommands" styleClass="clsGridMainCommands" columns="1">
                 <h:panelGrid styleClass="clsGridMainCommands1" columns="6">
-                    <p:commandButton styleClass="clsButtonBig" id="cmdbSave" value="SAVE (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                    <p:commandButton styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['SAVE']} (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
