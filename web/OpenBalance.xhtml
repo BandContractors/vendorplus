@@ -38,18 +38,18 @@
                     <f:selectItem itemValue="#{generalUserSetting.getCurrentTransactionReasonId()}" itemLabel="#{transactionReasonBean.getTransactionReason(generalUserSetting.getCurrentTransactionReasonId()).transactionReasonName}"/>
                     <f:ajax execute="@this"/>
                 </h:selectOneMenu>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="Record Opening Balance"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="Stock:No effect"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="Ledger:Accounts↑↓"/>
+                <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Record']} #{langsys['Opening']} #{langsys['Balance']}"/>
+                <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Stock']}:#{langsys['No.']} #{langsys['effect']}"/>
+                <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Ledger']}:#{langsys['Accounts']}↑↓"/>
             </h:panelGrid>
             <div class="ui-fluid">
                 <h:panelGrid id="pnlgInput" styleClass="clsGridMainInput">
                     <h:panelGrid id="gridTransItemC" styleClass="clsGridMainInput" columns="5" rendered="#{generalUserSetting.currentTransactionReasonId==117}">
-                        <h:outputLabel  value="From"/>
-                        <h:outputLabel  value="Currency"/>
-                        <h:outputLabel  value="Opening Date"/>
-                        <h:outputLabel value="Customer"/>
-                        <h:outputLabel  value="Reference No"/>
+                        <h:outputLabel  value="#{langsys['From']}"/>
+                        <h:outputLabel  value="#{langsys['Currency']}"/>
+                        <h:outputLabel  value="#{langsys['Opening']} #{langsys['Date']}"/>
+                        <h:outputLabel value="#{langsys['Customer']}"/>
+                        <h:outputLabel  value="#{langsys['Reference']} #{langsys['No.']}"/>
 
                         <h:inputText styleClass="clsInput" disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}"/>
                         <h:selectOneMenu styleClass="clsMenu" id="menuCurrencyC" value="#{trans.currencyCode}">
@@ -65,16 +65,16 @@
                                         converter="TransactorConverter" style="text-align: left" 
                                         forceSelection="true" queryDelay="0" 
                                         >
-                            <p:column headerText="Names" style="text-align: left" >  
+                            <p:column headerText="#{langsys['Names']}" style="text-align: left" >  
                                 #{trct.transactorNames} 
                             </p:column> 
-                            <p:column headerText="Reference No" style="text-align: left" >  
+                            <p:column headerText="#{langsys['Reference']} #{langsys['No.']}" style="text-align: left" >  
                                 #{trct.transactorRef} 
                             </p:column>
-                            <p:column headerText="Type" style="text-align: left" >  
+                            <p:column headerText="#{langsys['Type']}" style="text-align: left" >  
                                 #{trct.transactorType} 
                             </p:column> 
-                            <p:column headerText="Contact Person" style="text-align: left">  
+                            <p:column headerText="#{langsys['Contact']} #{langsys['Person']}" style="text-align: left">  
                                 #{trct.cpName} 
                             </p:column> 
                             <p:ajax event="itemSelect" listener="#{trans.setTransactorId(transactorBean.selectedTransactor.transactorId)}"/>
@@ -82,8 +82,8 @@
                         </p:autoComplete>
                         <h:inputText styleClass="clsInput" value="#{trans.transactionRef}" autocomplete="off"/>
 
-                        <h:outputLabel value="Account"/>
-                        <h:outputLabel value="Amount (Dr)"/>
+                        <h:outputLabel value="#{langsys['Account']}"/>
+                        <h:outputLabel value="#{langsys['Amount']} (Dr)"/>
                         <h:outputLabel value=""/>
                         <h:outputLabel value=""/>
                         <h:outputLabel value=""/>
@@ -96,11 +96,11 @@
                         <h:outputLabel value=""/>
                     </h:panelGrid>
                     <h:panelGrid id="gridTransItemS" styleClass="clsGridMainInput" columns="5" rendered="#{generalUserSetting.currentTransactionReasonId==118}">
-                        <h:outputLabel  value="From"/>
-                        <h:outputLabel  value="Currency"/>
-                        <h:outputLabel  value="Opening Date"/>
-                        <h:outputLabel value="Supplier"/>
-                        <h:outputLabel  value="Reference No"/>
+                        <h:outputLabel  value="#{langsys['From']}"/>
+                        <h:outputLabel  value="#{langsys['Currency']}"/>
+                        <h:outputLabel  value="#{langsys['Opening']} #{langsys['Date']}"/>
+                        <h:outputLabel value="#{langsys['Supplier']}"/>
+                        <h:outputLabel  value="#{langsys['Reference']} #{langsys['No.']}"/>
 
                         <h:inputText styleClass="clsInput" disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}"/>
                         <h:selectOneMenu styleClass="clsMenu" id="menuCurrencyS" value="#{trans.currencyCode}">
@@ -116,16 +116,16 @@
                                         converter="TransactorConverter" style="text-align: left" 
                                         forceSelection="true" queryDelay="0" 
                                         >
-                            <p:column headerText="Names" style="text-align: left" >  
+                            <p:column headerText="#{langsys['Names']}" style="text-align: left" >  
                                 #{trct.transactorNames} 
                             </p:column> 
-                            <p:column headerText="Reference No" style="text-align: left" >  
+                            <p:column headerText="#{langsys['Reference']} #{langsys['No.']}" style="text-align: left" >  
                                 #{trct.transactorRef} 
                             </p:column>
-                            <p:column headerText="Type" style="text-align: left" >  
+                            <p:column headerText="#{langsys['Type']}" style="text-align: left" >  
                                 #{trct.transactorType} 
                             </p:column> 
-                            <p:column headerText="Contact Person" style="text-align: left">  
+                            <p:column headerText="#{langsys['Contact']} #{langsys['Person']}" style="text-align: left">  
                                 #{trct.cpName} 
                             </p:column> 
                             <p:ajax event="itemSelect" listener="#{trans.setTransactorId(transactorBean.selectedTransactor.transactorId)}"/>
@@ -133,8 +133,8 @@
                         </p:autoComplete>
                         <h:inputText styleClass="clsInput" value="#{trans.transactionRef}" autocomplete="off"/>
 
-                        <h:outputLabel value="Account"/>
-                        <h:outputLabel value="Amount (Cr)"/>
+                        <h:outputLabel value="#{langsys['Account']}"/>
+                        <h:outputLabel value="#{langsys['Amount']} (Cr)"/>
                         <h:outputLabel value=""/>
                         <h:outputLabel value=""/>
                         <h:outputLabel value=""/>
@@ -147,10 +147,10 @@
                         <h:outputLabel value=""/>
                     </h:panelGrid>
                     <h:panelGrid id="gridTransItemA" styleClass="clsGridMainInput" columns="4" rendered="#{generalUserSetting.currentTransactionReasonId==119}">
-                        <h:outputLabel  value="From"/>
-                        <h:outputLabel  value="Currency"/>
-                        <h:outputLabel  value="Opening Date"/>
-                        <h:outputLabel  value="Reference No"/>
+                        <h:outputLabel  value="#{langsys['From']}"/>
+                        <h:outputLabel  value="#{langsys['Currency']}"/>
+                        <h:outputLabel  value="#{langsys['Opening']} #{langsys['Date']}"/>
+                        <h:outputLabel  value="#{langsys['Reference']} #{langsys['No.']}"/>
 
                         <h:inputText styleClass="clsInput" disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}"/>
                         <h:selectOneMenu styleClass="clsMenu" id="menuCurrencyA" value="#{trans.currencyCode}">
@@ -160,12 +160,12 @@
                         <p:calendar styleClass="clsInput" pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.transactionDate}"/> 
                         <h:inputText styleClass="clsInput" value="#{trans.transactionRef}" autocomplete="off"/>
 
-                        <h:outputLabel value="Cash.Account"/>
-                        <h:outputLabel value="Child.Account"/>
-                        <h:outputLabel value="Amount (Dr)"/>
+                        <h:outputLabel value="#{langsys['Cash']} #{langsys['Account']}"/>
+                        <h:outputLabel value="#{langsys['Child']} #{langsys['Account']}"/>
+                        <h:outputLabel value="#{langsys['Amount']} (Dr)"/>
                         <h:outputLabel value=""/>
                         <p:selectOneMenu id="menuCashAccount" value="#{transItem.accountCode}" >
-                            <f:selectItem itemLabel="Select" itemValue=""/>
+                            <f:selectItem itemLabel="#{langsys['Select']}" itemValue=""/>
                             <f:selectItems value="#{accCoaBean.getAccCoaObjectListBeginWith1('1-00-000')}" var="acc" itemLabel="#{acc.accountName}" itemValue="#{acc.accountCode}"/>
                             <p:ajax event="change" process="@this menuCurrencyA menuChildAccA" update="menuChildAccA"/>
                         </p:selectOneMenu>
@@ -179,11 +179,11 @@
                         <h:outputLabel value=""/>
                     </h:panelGrid>
                     <h:panelGrid id="gridTransItemO" styleClass="clsGridMainInput" columns="5" rendered="#{generalUserSetting.currentTransactionReasonId==120}">
-                        <h:outputLabel  value="From"/>
-                        <h:outputLabel  value="Currency"/>
-                        <h:outputLabel  value="Opening Date"/>
-                        <h:outputLabel value="Partner"/>
-                        <h:outputLabel  value="Reference No"/>
+                        <h:outputLabel  value="#{langsys['From']}"/>
+                        <h:outputLabel  value="#{langsys['Currency']}"/>
+                        <h:outputLabel  value="#{langsys['Opening']} #{langsys['Date']}"/>
+                        <h:outputLabel value="#{langsys['Partner']}"/>
+                        <h:outputLabel  value="#{langsys['Reference']} #{langsys['No.']}"/>
 
                         <h:inputText styleClass="clsInput" disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}"/>
                         <h:selectOneMenu styleClass="clsMenu" id="menuCurrencyO" value="#{trans.currencyCode}">
@@ -199,16 +199,16 @@
                                         converter="TransactorConverter" style="text-align: left" 
                                         forceSelection="true" queryDelay="0" 
                                         >
-                            <p:column headerText="Names" style="text-align: left" >  
+                            <p:column headerText="#{langsys['Names']}" style="text-align: left" >  
                                 #{trct.transactorNames} 
                             </p:column> 
-                            <p:column headerText="Reference No" style="text-align: left" >  
+                            <p:column headerText="#{langsys['Reference']} #{langsys['No.']}" style="text-align: left" >  
                                 #{trct.transactorRef} 
                             </p:column>
-                            <p:column headerText="Type" style="text-align: left" >  
+                            <p:column headerText="#{langsys['Type']}" style="text-align: left" >  
                                 #{trct.transactorType} 
                             </p:column> 
-                            <p:column headerText="Contact Person" style="text-align: left">  
+                            <p:column headerText="#{langsys['Contact']} #{langsys['Person']}" style="text-align: left">  
                                 #{trct.cpName} 
                             </p:column> 
                             <p:ajax event="itemSelect" listener="#{trans.setTransactorId(transactorBean.selectedTransactor.transactorId)}"/>
@@ -216,10 +216,10 @@
                         </p:autoComplete>
                         <h:inputText styleClass="clsInput" value="#{trans.transactionRef}" autocomplete="off"/>
 
-                        <h:outputLabel value="Account"/>
-                        <h:outputLabel value="Child.Account"/>
-                        <h:outputLabel value="Amount (Dr)"/>
-                        <h:outputLabel value="Amount (Cr)"/>
+                        <h:outputLabel value="#{langsys['Account']}"/>
+                        <h:outputLabel value="#{langsys['Child']} #{langsys['Account']}"/>
+                        <h:outputLabel value="#{langsys['Amount']} (Dr)"/>
+                        <h:outputLabel value="#{langsys['Amount']} (Cr)"/>
                         <h:outputLabel value=""/>
                         <p:autoComplete id="autcItemO" value="#{transItemBean.selectedAccCoa}"  
                                         completeMethod="#{accCoaBean.getAccCoaObjectListAllActive}" 
@@ -229,16 +229,16 @@
                                         converter="AccCoaConverter" style="text-align: left" 
                                         forceSelection="true" queryDelay="0" 
                                         >
-                            <p:column headerText="Account Name" style="text-align: left" >  
+                            <p:column headerText="#{langsys['Account']} #{langsys['Name']}" style="text-align: left" >  
                                 #{itm.accountName} 
                             </p:column> 
-                            <p:column headerText="Account Code" style="text-align: left" >  
+                            <p:column headerText="#{langsys['Account']} #{langsys['Code']}" style="text-align: left" >  
                                 #{itm.accountCode} 
                             </p:column> 
-                            <p:column headerText="Type" style="text-align: left">  
+                            <p:column headerText="#{langsys['Type']}" style="text-align: left">  
                                 #{accTypeBean.getAccTypeById(itm.accTypeId).accTypeName}
                             </p:column> 
-                            <p:column headerText="Group/Category" style="text-align: left"> 
+                            <p:column headerText="#{langsys['Group']}/#{langsys['Category']}" style="text-align: left"> 
                                 #{accGroupBean.getAccGroupById(itm.accGroupId).accGroupName} / 
                                 #{accCategoryBean.getAccCategoryById(itm.accCategoryId).accCategoryName}
                             </p:column> 

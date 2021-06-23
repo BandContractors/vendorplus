@@ -83,7 +83,7 @@
                         </h:panelGrid>
                         
                         <h:panelGrid style="width: 290px; margin: 0px;" columns="2" rendered="#{generalUserSetting.outputDetailParent.transactor.transactorId>0}">
-                            <h:outputLabel style="font-size: 12px;" value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}:"/>
+                            <h:outputLabel style="font-size: 12px;" value="#{langout[menuItemBean.menuItemObj.CUSTOMER_NAME]}:"/>
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transactor.transactorNames}"/>
                             <h:outputLabel style="font-size: 12px;" value="#{langout['Tax']} #{langout['Id']} #{langout['No.']}:" rendered="#{generalUserSetting.outputDetailParent.transactor.taxIdentity.length()>0}"/>
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transactor.taxIdentity}" rendered="#{generalUserSetting.outputDetailParent.transactor.taxIdentity.length()>0}"/>

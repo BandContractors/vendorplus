@@ -15,7 +15,7 @@
         <h:form id="vTransactionForm">
             <ui:composition>
                 <p:panel style="text-align: center;">
-                    <p:commandButton id="cmdbvPrintOrder" value="PRINT" icon="ui-icon-print" type="button">
+                    <p:commandButton id="cmdbvPrintOrder" value="#{langout['PRINT']}" icon="ui-icon-print" type="button">
                         <p:printer target="vTransactionGrid" rendered="false"/>
                     </p:commandButton>
                 </p:panel>
@@ -35,15 +35,15 @@
                         <h:panelGrid style="width: 290px; margin: 0px;float:left;" columns="2">
                             <h:outputLabel value="#{companySetting.getPhysicalAddress()}"/>
                             <h:panelGrid id="IpgrdSalesInvoiceHeader3" style="margin: 0px;float: right;" columns="1">
-                                <h:outputLabel id="IolblSalesInvoiceTel" value="Tel:#{companySetting.getPhone()}" rendered="#{companySetting.getPhone().length()>0}"/>
-                                <h:outputLabel id="IolblSalesInvoiceMob" value="Mob:#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','MOBILE_NUMBER').parameter_value}" rendered="#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','MOBILE_NUMBER').parameter_value.length()>0}"/>
+                                <h:outputLabel id="IolblSalesInvoiceTel" value="#{langout['Telephone']}:#{companySetting.getPhone()}" rendered="#{companySetting.getPhone().length()>0}"/>
+                                <h:outputLabel id="IolblSalesInvoiceMob" value="#{langout['Mobile']}:#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','MOBILE_NUMBER').parameter_value}" rendered="#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','MOBILE_NUMBER').parameter_value.length()>0}"/>
                                 <h:outputLabel id="IolblSalesInvoiceTIN" value="TIN:#{companySetting.getTaxIdentity()}" rendered="#{companySetting.getTaxIdentity().length()>0}"/>
                             </h:panelGrid>
                         </h:panelGrid>
 
                         <h:panelGrid id="IpgrdSalesInvoiceHeader34" style="width: 290px; margin: 0px;border-bottom-style: dotted;" columns="1">
-                            <h:outputLabel id="IolblSalesInvoiceWebsite" value="Website: #{companySetting.getWebsite()}" rendered="#{companySetting.getWebsite().length()>0}"/>
-                            <h:outputLabel id="IolblSalesInvoiceEmail" value="Email: #{companySetting.getEmail()}" rendered="#{companySetting.getEmail().length()>0}"/>
+                            <h:outputLabel id="IolblSalesInvoiceWebsite" value="#{langout['Website']}: #{companySetting.getWebsite()}" rendered="#{companySetting.getWebsite().length()>0}"/>
+                            <h:outputLabel id="IolblSalesInvoiceEmail" value="#{langout['Email']}: #{companySetting.getEmail()}" rendered="#{companySetting.getEmail().length()>0}"/>
                         </h:panelGrid>
 
                         <h:panelGrid id="IpgrdSalesInvoiceHeader4" style="width: 290px; margin: 0px;" columns="2">
@@ -54,11 +54,11 @@
                         </h:panelGrid>
 
                         <h:panelGrid id="IpgrdSalesInvoiceHeader5" style="width: 290px; margin: 0px;" columns="2">
-                            <h:outputLabel style="font-size: 12px;" value="Order/Sales No:" rendered="#{generalUserSetting.outputDetailParent.trans.transactionRef.length()>0}"/>
+                            <h:outputLabel style="font-size: 12px;" value="#{langout['Order']}/#{langout['Sales']} #{langout['No.']}:" rendered="#{generalUserSetting.outputDetailParent.trans.transactionRef.length()>0}"/>
                             <h:outputLabel style="font-size: 14px;font-weight: bold;" value="#{generalUserSetting.outputDetailParent.trans.transactionRef}" rendered="#{generalUserSetting.outputDetailParent.trans.transactionRef.length()>0}"/>
-                            <h:outputLabel style="font-size: 12px;" value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}:"/>
+                            <h:outputLabel style="font-size: 12px;" value="#{langout[menuItemBean.menuItemObj.CUSTOMER_NAME]}:"/>
                             <h:outputLabel id="IolblSalesInvoiceCustomer" style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transactor.transactorNames} #{generalUserSetting.outputDetailParent.trans.location_name}"/>
-                            <h:outputLabel style="font-size: 12px;" value="Phone:" rendered="#{generalUserSetting.outputDetailParent.transactor.phone.length()>0}"/>
+                            <h:outputLabel style="font-size: 12px;" value="#{langout['Phone']}:" rendered="#{generalUserSetting.outputDetailParent.transactor.phone.length()>0}"/>
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transactor.phone}" rendered="#{generalUserSetting.outputDetailParent.transactor.phone.length()>0}"/>
                         </h:panelGrid>
 
@@ -71,13 +71,13 @@
                                          > 
                                 <h:column>
                                     <!-- column header -->
-                                    <f:facet name="header">ITEM</f:facet>
+                                    <f:facet name="header">#{langout['ITEM']}</f:facet>
                                     <!-- row record -->
                                     <h:outputLabel style="font-size: 12px;" value="#{transItemBean.showItemDescriptionCEC(ti)}" escape="false"/>
                                 </h:column>
                                 <h:column>
                                     <!-- column header -->
-                                    <f:facet name="header">QTY</f:facet>
+                                    <f:facet name="header">#{langout['QTY']}</f:facet>
                                     <!-- row record -->
                                     <h:outputLabel style="font-size: 10px;" value="#{ti.itemQty}">
                                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -87,9 +87,9 @@
                             </h:dataTable>
                         </h:panelGrid>
                         <h:panelGrid id="IpgrdSalesInvoiceFooter12" style="width: 290px; margin: 0px;border-bottom-style: dotted" columns="2">
-                            <h:outputLabel value="Delivery Address:"/>
+                            <h:outputLabel value="#{langout['Delivery']} #{langout['Address']}:"/>
                             <h:outputLabel value="#{generalUserSetting.outputDetailParent.trans.deliveryAddress}"/>
-                            <h:outputLabel value="Delivered By: "/>
+                            <h:outputLabel value="#{langout['Delivered']} #{langout['By']}: "/>
                             <h:outputLabel value="#{generalUserSetting.outputDetailParent.trans.transactor_driver}"/>
                         </h:panelGrid>
                     </h:panelGrid>
