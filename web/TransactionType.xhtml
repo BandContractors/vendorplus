@@ -31,18 +31,18 @@
         <h:form id="formx" styleClass="clsMainFrom">
 
             <h:panelGrid styleClass="clsGridMainHeader" columns="1">
-                <h:outputLabel styleClass="clsLabelTop" id="olblTransactionHeader" value="Transaction Type Settings"/>
+                <h:outputLabel styleClass="clsLabelTop" id="olblTransactionHeader" value="#{langsys['Transaction']} #{langsys['Type']} #{langsys['Settings']}"/>
             </h:panelGrid>
 
             <h:panelGrid id="pgrdTransactionTypeOptions" columns="2" styleClass="clsLikeMainFromWidth" style="background-color: red;text-align: center;">
                 <h:panelGrid columns="2" id="pgrdTransactionTypeOptions1">
-                    <h:outputLabel  value="Select a Transaction Type:"/>
+                    <h:outputLabel  value="#{langsys['Select']} #{langsys['Transaction']} #{langsys['Type']}:"/>
                     <h:selectOneMenu styleClass="clsMenu" id="menuTransactionType" value="#{transactionType.transactionTypeId}">
                         <f:selectItems value="#{transactionTypeBean.transactionTypes}" var="tt" itemLabel="#{tt.transactionTypeName}" itemValue="#{tt.transactionTypeId}"/>
                     </h:selectOneMenu>
                 </h:panelGrid>
                 <h:panelGrid id="pgrdTransactionTypeOptions2">
-                    <p:commandButton id="cbtnView" value="VIEW SETTINGS" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                    <p:commandButton id="cbtnView" value="#{langsys['VIEW']} #{langsys['SETTINGS']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
@@ -52,110 +52,110 @@
             </h:panelGrid>
 
             <h:panelGrid id="pnlgTransactionType" columns="4">
-                <h:outputLabel value="Transaction Type Id:"/>
+                <h:outputLabel value="#{langsys['Transaction']} #{langsys['Type']} #{langsys['Id']}:"/>
                 <h:inputText value="#{transactionTypeBean.transactionTypeForEdit.transactionTypeId}" disabled="true"/>
-                <h:outputLabel value="Transaction Name:"/>
+                <h:outputLabel value="#{langsys['Transaction']} #{langsys['Name']}:"/>
                 <h:inputText value="#{transactionTypeBean.transactionTypeForEdit.transactionTypeName}" disabled="true"/>
 
-                <h:outputLabel value="Description"/>
+                <h:outputLabel value="#{langsys['Description']}"/>
                 <h:inputText value="#{transactionTypeBean.transactionTypeForEdit.description}"/>
-                <h:outputLabel value="Transaction Group"/>
+                <h:outputLabel value="#{langsys['Transaction']} #{langsys['Group']}"/>
                 <h:inputText value="#{transactionTypeBean.transactionTypeForEdit.groupName}"/>
 
-                <h:outputLabel value="Transaction Number Label"/>
+                <h:outputLabel value="#{langsys['Transaction']} #{langsys['Number']} #{langsys['Label']}"/>
                 <h:inputText value="#{transactionTypeBean.transactionTypeForEdit.transactionNumberLabel}"/>
-                <h:outputLabel value="Transaction Output Label"/>
+                <h:outputLabel value="#{langsys['Transaction']} #{langsys['Output']} #{langsys['Label']}"/>
                 <h:inputText value="#{transactionTypeBean.transactionTypeForEdit.transactionOutputLabel}"/>
 
-                <h:outputLabel value="Transactor Label"/>
+                <h:outputLabel value="#{langsys['Transactor']} #{langsys['Label']}"/>
                 <h:inputText value="#{transactionTypeBean.transactionTypeForEdit.transactorLabel}" disabled="true"/>
-                <h:outputLabel value="Bill Transactor Label"/>
+                <h:outputLabel value="#{langsys['Bill']} #{langsys['Transactor']} #{langsys['Label']}"/>
                 <h:inputText value="#{transactionTypeBean.transactionTypeForEdit.billTransactorLabel}" disabled="true"/>
 
-                <h:outputLabel value="Transaction Reference Label"/>
+                <h:outputLabel value="#{langsys['Transaction']} #{langsys['Reference']} #{langsys['Label']}"/>
                 <h:inputText value="#{transactionTypeBean.transactionTypeForEdit.transactionRefLabel}"/>
-                <h:outputLabel value="Transaction Date Label"/>
+                <h:outputLabel value="#{langsys['Transaction']} #{langsys['Date']} #{langsys['Label']}"/>
                 <h:inputText value="#{transactionTypeBean.transactionTypeForEdit.transactionDateLabel}"/>
 
-                <h:outputLabel value="Transaction User Label"/>
+                <h:outputLabel value="#{langsys['Transaction']} #{langsys['User']} #{langsys['Label']}"/>
                 <h:inputText value="#{transactionTypeBean.transactionTypeForEdit.transactionUserLabel}"/>
-                <h:outputLabel value="Is Transactor Mandatory"/>
+                <h:outputLabel value="#{langsys['Is']} #{langsys['Transactor']} #{langsys['Mandatory']}"/>
                 <h:selectOneMenu value="#{transactionTypeBean.transactionTypeForEdit.isTransactorMandatory}">
-                    <f:selectItem itemValue="No" itemLabel="No"/>
-                    <f:selectItem itemValue="Yes" itemLabel="Yes"/>
+                    <f:selectItem itemValue="#{langsys['No']}" itemLabel="#{langsys['No']}"/>
+                    <f:selectItem itemValue="#{langsys['Yes']}" itemLabel="#{langsys['Yes']}"/>
                 </h:selectOneMenu>
 
-                <h:outputLabel value="Is Transaction User Mandatory"/>
+                <h:outputLabel value="#{langsys['Is']} #{langsys['Transaction']} #{langsys['User']} #{langsys['Mandatory']}"/>
                 <h:selectOneMenu value="#{transactionTypeBean.transactionTypeForEdit.isTransactionUserMandatory}">
-                    <f:selectItem itemValue="No" itemLabel="No"/>
-                    <f:selectItem itemValue="Yes" itemLabel="Yes"/>
+                    <f:selectItem itemValue="#{langsys['No']}" itemLabel="#{langsys['No']}"/>
+                    <f:selectItem itemValue="#{langsys['Yes']}" itemLabel="#{langsys['Yes']}"/>
                 </h:selectOneMenu>
-                <h:outputLabel value="Is Transaction Reference Mandatory"/>
+                <h:outputLabel value="#{langsys['Is']} #{langsys['Transaction']} #{langsys['Reference']} #{langsys['Mandatory']}"/>
                 <h:selectOneMenu value="#{transactionTypeBean.transactionTypeForEdit.isTransactionRefMandatory}">
-                    <f:selectItem itemValue="No" itemLabel="No"/>
-                    <f:selectItem itemValue="Yes" itemLabel="Yes"/>
+                    <f:selectItem itemValue="#{langsys['No']}" itemLabel="#{langsys['No']}"/>
+                    <f:selectItem itemValue="#{langsys['Yes']}" itemLabel="#{langsys['Yes']}"/>
                 </h:selectOneMenu>
 
-                <h:outputLabel value="Is Authorise User Mandatory"/>
+                <h:outputLabel value="#{langsys['Is']} #{langsys['Authorise']} #{langsys['User']} #{langsys['Mandatory']}"/>
                 <h:selectOneMenu value="#{transactionTypeBean.transactionTypeForEdit.isAuthoriseUserMandatory}">
-                    <f:selectItem itemValue="No" itemLabel="No"/>
-                    <f:selectItem itemValue="Yes" itemLabel="Yes"/>
+                    <f:selectItem itemValue="#{langsys['No']}" itemLabel="#{langsys['No']}"/>
+                    <f:selectItem itemValue="#{langsys['Yes']}" itemLabel="#{langsys['Yes']}"/>
                 </h:selectOneMenu>
-                <h:outputLabel value="Is Authorise Date Mandatory"/>
+                <h:outputLabel value="#{langsys['Is']} #{langsys['Authorise']} #{langsys['Date']} #{langsys['Mandatory']}"/>
                 <h:selectOneMenu value="#{transactionTypeBean.transactionTypeForEdit.isAuthoriseDateMandatory}">
-                    <f:selectItem itemValue="No" itemLabel="No"/>
-                    <f:selectItem itemValue="Yes" itemLabel="Yes"/>
+                    <f:selectItem itemValue="#{langsys['No']}" itemLabel="#{langsys['No']}"/>
+                    <f:selectItem itemValue="#{langsys['Yes']}" itemLabel="#{langsys['Yes']}"/>
                 </h:selectOneMenu>
 
-                <h:outputLabel value="Is Delivery Address Mandatory"/>
+                <h:outputLabel value="#{langsys['Is']} #{langsys['Delivery']} #{langsys['Address']} #{langsys['Mandatory']}"/>
                 <h:selectOneMenu value="#{transactionTypeBean.transactionTypeForEdit.isDeliveryAddressMandatory}">
-                    <f:selectItem itemValue="No" itemLabel="No"/>
-                    <f:selectItem itemValue="Yes" itemLabel="Yes"/>
+                    <f:selectItem itemValue="#{langsys['No']}" itemLabel="#{langsys['No']}"/>
+                    <f:selectItem itemValue="#{langsys['Yes']}" itemLabel="#{langsys['Yes']}"/>
                 </h:selectOneMenu>
-                <h:outputLabel value="Is Delivery Date Mandatory"/>
+                <h:outputLabel value="#{langsys['Is']} #{langsys['Delivery']} #{langsys['Date']} #{langsys['Mandatory']}"/>
                 <h:selectOneMenu value="#{transactionTypeBean.transactionTypeForEdit.isDeliveryDateMandatory}">
-                    <f:selectItem itemValue="No" itemLabel="No"/>
-                    <f:selectItem itemValue="Yes" itemLabel="Yes"/>
+                    <f:selectItem itemValue="#{langsys['No']}" itemLabel="#{langsys['No']}"/>
+                    <f:selectItem itemValue="#{langsys['Yes']}" itemLabel="#{langsys['Yes']}"/>
                 </h:selectOneMenu>
 
-                <h:outputLabel value="Is Pay Due Date Mandatory"/>
+                <h:outputLabel value="#{langsys['Is']} #{langsys['Pay']} #{langsys['Due']} #{langsys['Date']} #{langsys['Mandatory']}"/>
                 <h:selectOneMenu value="#{transactionTypeBean.transactionTypeForEdit.isPayDueDateMandatory}">
-                    <f:selectItem itemValue="No" itemLabel="No"/>
-                    <f:selectItem itemValue="Yes" itemLabel="Yes"/>
+                    <f:selectItem itemValue="#{langsys['No']}" itemLabel="#{langsys['No']}"/>
+                    <f:selectItem itemValue="#{langsys['Yes']}" itemLabel="#{langsys['Yes']}"/>
                 </h:selectOneMenu>
-                <h:outputLabel value="Is Expiry Date Mandatory"/>
+                <h:outputLabel value="#{langsys['Is']} #{langsys['Expiry']} #{langsys['Date']} #{langsys['Mandatory']}"/>
                 <h:selectOneMenu value="#{transactionTypeBean.transactionTypeForEdit.isExpiryDateMandatory}">
-                    <f:selectItem itemValue="No" itemLabel="No"/>
-                    <f:selectItem itemValue="Yes" itemLabel="Yes"/>
+                    <f:selectItem itemValue="#{langsys['No']}" itemLabel="#{langsys['No']}"/>
+                    <f:selectItem itemValue="#{langsys['Yes']}" itemLabel="#{langsys['Yes']}"/>
                 </h:selectOneMenu>
 
-                <h:outputLabel value="Print File Name 1"/>
+                <h:outputLabel value="#{langsys['Print']} #{langsys['File']} #{langsys['Name']} 1"/>
                 <h:inputText value="#{transactionTypeBean.transactionTypeForEdit.print_file_name1}"/>
-                <h:outputLabel value="Print File Name 2"/>
+                <h:outputLabel value="#{langsys['Print']} #{langsys['File']} #{langsys['Name']} 2"/>
                 <h:inputText value="#{transactionTypeBean.transactionTypeForEdit.print_file_name2}"/>
-                <h:outputLabel value="Default Print File"/>
+                <h:outputLabel value="#{langsys['Default']} #{langsys['Print']} #{langsys['File']}"/>
                 <h:selectOneMenu value="#{transactionTypeBean.transactionTypeForEdit.default_print_file}">
                     <f:selectItem itemValue="0" itemLabel=""/>
                     <f:selectItem itemValue="1" itemLabel="1"/>
                     <f:selectItem itemValue="2" itemLabel="2"/>
                 </h:selectOneMenu>
-                <h:outputLabel value="Transaction Type Code"/>
+                <h:outputLabel value="#{langsys['Transaction']} #{langsys['Type']} #{langsys['Code']}"/>
                 <h:inputText value="#{transactionTypeBean.transactionTypeForEdit.transaction_type_code}"/>
-                <h:outputLabel value="Default Currency Code"/>
+                <h:outputLabel value="#{langsys['Default']} #{langsys['Currency']} #{langsys['Code']}"/>
                 <h:selectOneMenu value="#{transactionTypeBean.transactionTypeForEdit.default_currency_code}" style="width: 220px">
                     <f:selectItem itemLabel="" itemValue=""/>
                     <f:selectItems value="#{accCurrencyBean.currencyList}" var="ac" itemLabel="#{ac.currencyCode}" itemValue="#{ac.currencyCode}"/>
                 </h:selectOneMenu>
-                <h:outputLabel value="Transaction Number Format (S,U,C,Y,M,D,X/W/Z)"/>
+                <h:outputLabel value="#{langsys['Transaction']} #{langsys['Number']} #{langsys['Format']} (S,U,C,Y,M,D,X/W/Z)"/>
                 <h:inputText value="#{transactionTypeBean.transactionTypeForEdit.trans_number_format}"/>
-                <h:outputLabel value="Output Footer Message"/>
+                <h:outputLabel value="#{langsys['Output']} #{langsys['Footer']} #{langsys['Message']}"/>
                 <h:inputText value="#{transactionTypeBean.transactionTypeForEdit.output_footer_message}"/>
-                <h:outputLabel value="Default Terms and Conditions"/>
+                <h:outputLabel value="#{langsys['Default']} #{langsys['Terms']} #{langsys['and']} #{langsys['Conditions']}"/>
                 <h:inputText value="#{transactionTypeBean.transactionTypeForEdit.default_term_condition}"/>
             </h:panelGrid>
 
             <h:panelGrid id="pgrdTransactionTypeSave" styleClass="clsLikeMainFromWidth" style="background-color: red;text-align: center;">
-                <p:commandButton id="cbtnUpdate" value="UPDATE SETTINGS" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                <p:commandButton id="cbtnUpdate" value="#{langsys['UPDATE']} #{langsys['SETTINGS']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                     <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                         <p:graphicImage name="/images/ajax-loader.gif"/>
                     </p:dialog>
@@ -170,49 +170,49 @@
             <p:dataTable id="dtblTransactionTypes" tableStyle="width:auto;" value="#{transactionTypeBean.transactionTypeList}" var="t"> 
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">ID</f:facet>
+                    <f:facet name="header">#{langsys['ID']}</f:facet>
                     <!-- row record -->
                     #{t.transactionTypeId}
                 </p:column>
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Transaction Name</f:facet>
+                    <f:facet name="header">#{langsys['Transaction']} #{langsys['Name']}</f:facet>
                     <!-- row record -->
                     #{t.transactionTypeName}
                 </p:column>
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Transaction Number Label</f:facet>
+                    <f:facet name="header">#{langsys['Transaction']} #{langsys['Number']} #{langsys['Label']}</f:facet>
                     <!-- row record -->
                     #{t.transactionNumberLabel}
                 </p:column>
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Transaction Output Label</f:facet>
+                    <f:facet name="header">#{langsys['Transaction']} #{langsys['Output']} #{langsys['Label']}</f:facet>
                     <!-- row record -->
                     #{t.transactionOutputLabel}
                 </p:column>
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Code</f:facet>
+                    <f:facet name="header">#{langsys['Code']}</f:facet>
                     <!-- row record -->
                     #{t.transaction_type_code}
                 </p:column>
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Print File Name 1</f:facet>
+                    <f:facet name="header">#{langsys['Print']} #{langsys['File']} #{langsys['Name']} 1</f:facet>
                     <!-- row record -->
                     #{t.print_file_name1}
                 </p:column>
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Print File Name 2</f:facet>
+                    <f:facet name="header">#{langsys['Print']} #{langsys['File']} #{langsys['Name']} 2</f:facet>
                     <!-- row record -->
                     #{t.print_file_name2}
                 </p:column>
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Default Print File</f:facet>
+                    <f:facet name="header">#{langsys['Default']} #{langsys['Print']} #{langsys['File']}</f:facet>
                     <!-- row record -->
                     #{t.default_print_file}
                 </p:column>

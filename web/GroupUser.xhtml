@@ -25,18 +25,18 @@
         <h:form id="form" styleClass="clsMainFrom">
 
             <h:panelGrid styleClass="clsGridMainHeader" columns="1">
-                <h:outputLabel styleClass="clsLabelTop" id="olblGroupUserHeader" value="Group User(s)"/>
+                <h:outputLabel styleClass="clsLabelTop" id="olblGroupUserHeader" value="#{langsys['Group']} #{langsys['User']}"/>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainInput" columns="4">
-                <h:outputLabel  value="Select Group:"/>
+                <h:outputLabel  value="#{langsys['Select']} #{langsys['Group']}:"/>
                 <h:selectOneMenu styleClass="clsMenu" id="menuGroupDetail" value="#{groupUser.groupDetailId}">
                     <f:selectItem itemLabel="" itemValue="0"/>
                     <f:selectItems value="#{groupDetailBean.groupDetails}" var="g" itemLabel="#{g.groupName}" itemValue="#{g.groupDetailId}"/>
                     <f:ajax event="change" render="dtblGroupUser" listener="#{groupUserBean.setSelectedGroupDetailId(groupUser.groupDetailId)}"/>
                 </h:selectOneMenu>
                 
-                <h:outputLabel  value="Select User:"/>
+                <h:outputLabel  value="#{langsys['Select']} #{langsys['User']}:"/>
                 <h:selectOneMenu styleClass="clsMenu" id="menuUserDetail" value="#{groupUser.userDetailId}">
                     <f:selectItem itemLabel="" itemValue="0"/>
                     <f:selectItems value="#{userDetailBean.userDetails}" var="u" itemLabel="#{u.userName} (#{u.firstName} #{u.secondName} #{u.thirdName})" itemValue="#{u.userDetailId}"/>
@@ -46,7 +46,7 @@
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainCommands" columns="1">
-                <h:commandButton id="cmdbAdd" value="Add user to group">
+                <h:commandButton id="cmdbAdd" value="#{langsys['Add']} #{langsys['user']} #{langsys['to']} #{langsys['group']}">
                     <f:actionListener binding="#{groupUserBean.saveGroupUser(groupUser)}" />
                     <f:actionListener binding="#{groupUserBean.clearGroupUser(groupUser)}" rendered="dtblGroupUser" />
                 </h:commandButton>
@@ -65,14 +65,14 @@
                          > 
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header">Group Name</f:facet>
+                    <f:facet name="header">#{langsys['Group']} #{langsys['Name']}</f:facet>
                     <!-- row record -->
                     #{groupDetailBean.getGroupDetail(gu.groupDetailId).getGroupName()}
                 </h:column>
                 
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header">User Name</f:facet>
+                    <f:facet name="header">#{langsys['User']} #{langsys['Name']}</f:facet>
                     <!-- row record -->
                     #{userDetailBean.getUserDetail(gu.userDetailId).getUserName()}
                     (#{userDetailBean.getUserDetail(gu.userDetailId).getFirstName()} 
@@ -82,9 +82,9 @@
 
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header">Action</f:facet>
+                    <f:facet name="header">#{langsys['Action']}</f:facet>
                     <!-- row record -->
-                    <h:commandLink value="Remove user from group" action="#{groupUserBean.deleteGroupUserByObject(gu)}" />
+                    <h:commandLink value="#{langsys['Remove']} #{langsys['user']} #{langsys['from']} #{langsys['group']}" action="#{groupUserBean.deleteGroupUserByObject(gu)}" />
                     &nbsp;
                 </h:column>
                 

@@ -26,43 +26,43 @@
         <h:form id="form" styleClass="clsMainFrom">
 
             <h:panelGrid styleClass="clsGridMainHeader" columns="1">
-                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeader" value="License Details"/>
+                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeader" value="#{langsys['License']} #{langsys['Details']}"/>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainInput" columns="2">
-                <h:outputLabel  value="LICENSE-CLIENT-ID:"/>
+                <h:outputLabel  value="#{langsys['LICENSE']} #{langsys['CLIENT']} #{langsys['ID']}:"/>
                 <h:inputText styleClass="clsInput" value="#{companySetting.getLICENSE_CLIENT_ID()}" disabled="true"/>
 
-                <h:outputLabel  value="LICENSE-CLIENT-NAMES:"/>
+                <h:outputLabel  value="#{langsys['LICENSE']} #{langsys['CLIENT']} #{langsys['NAMES']}:"/>
                 <h:inputText styleClass="clsInput" value="#{companySetting.getLICENSE_CLIENT_NAME()}" disabled="true"/>
 
-                <h:outputLabel  value="PACKAGE-NAME:"/>
+                <h:outputLabel  value="#{langsys['PACKAGE']} #{langsys['NAME']}:"/>
                 <h:inputText styleClass="clsInput" value="#{companySetting.getPACKAGE_NAME()}" disabled="true"/>
 
-                <h:outputLabel  value="PACKAGE-DETAILS:"/>
+                <h:outputLabel  value="#{langsys['PACKAGE']} #{langsys['DETAILS']}:"/>
                 <h:outputLabel value="#{companySetting.displayPackageUsers(companySetting.getPackageUsers(companySetting.getPACKAGE_NAME()))}"/> 
 
-                <h:outputLabel  value="LICENSE-EXPIRY-DATE:"/>
+                <h:outputLabel  value="#{langsys['LICENSE']} #{langsys['EXPIRY']} #{langsys['DATE']}:"/>
                 <h:inputText value="#{utilityBean.formatDate(companySetting.getLICENSE_EXPIRY_DATE())}" disabled="true" rendered="#{companySetting.getLicenseType() ne 9 and companySetting.getLicenseType() ne 0}"/>
                 <h:inputText value="N/A" disabled="true" rendered="#{companySetting.getLicenseType() eq 9}"/>
-                <h:outputLabel  value="LICENSE-DAYS-LEFT:"/>
+                <h:outputLabel  value="#{langsys['LICENSE']} #{langsys['DAYS']} #{langsys['LEFT']}:"/>
                 <h:outputLabel value="#{companySetting.getLicenseDaysLeft()}" rendered="#{companySetting.getLicenseType() ne 9}"/>
                 <h:outputLabel value="N/A" rendered="#{companySetting.getLicenseType() eq 9}"/>
                 <h:outputLabel value=""/>
                 <h:outputLabel value=""/>
-                <h:outputLabel  value="BRANCH-PASSWORD-CODE:"/>
+                <h:outputLabel  value="#{langsys['BRANCH']} #{langsys['PASSWORD']} #{langsys['CODE']}:"/>
                 <h:outputText value="#{dBConnection.getBRANCH_PASSWORD_CODE()}"/> 
-                <h:outputLabel  value="INTER-BRANCH-PASSWORD-CODE:"/>
+                <h:outputLabel  value="#{langsys['INTER']} #{langsys['BRANCH']} #{langsys['PASSWORD']} #{langsys['CODE']}:"/>
                 <h:outputText value="#{dBConnection.getINTER_BRANCH_PASSWORD_CODE()}"/>
                 <h:outputLabel value=""/>
                 <h:outputLabel value=""/>
             </h:panelGrid>  
 
-            <h:outputLabel  value="-----------------------------Active and Old(within 12 hrs) User Sessions---"/>
+            <h:outputLabel  value="-----------------------------#{langsys['Active']} #{langsys['and']} #{langsys['Old']}(#{langsys['within']} 12 hrs) #{langsys['User']} #{langsys['Sessions']}---"/>
             <p:dataTable id="dtblLoginSession" value="#{loginSessionBean.getLoginSessions()}" var="ls">
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Username</f:facet>
+                    <f:facet name="header">#{langsys['Username']}</f:facet>
                     <!-- row record -->
                     #{userDetailBean.getUserDetail(ls.userDetailId).userName}
                 </p:column>
@@ -76,35 +76,35 @@
 
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Session Creation Date</f:facet>
+                    <f:facet name="header">#{langsys['Session']} #{langsys['Creation']} #{langsys['Date']}</f:facet>
                     <!-- row record -->
                     <h:outputLabel value="#{utilityBean.formatDateTime(ls.addDate)}"/>
                 </p:column>
 
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Session Id</f:facet>
+                    <f:facet name="header">#{langsys['Session']} Id</f:facet>
                     <!-- row record -->
                     #{ls.sessionId}
                 </p:column>
 
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Remote IP</f:facet>
+                    <f:facet name="header">#{langsys['Remote']} IP</f:facet>
                     <!-- row record -->
                     #{ls.remoteIp}
                 </p:column>
 
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Remote Host</f:facet>
+                    <f:facet name="header">#{langsys['Remote']} #{langsys['Host']}</f:facet>
                     <!-- row record -->
                     #{ls.remoteHost}
                 </p:column>
 
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Remote User</f:facet>
+                    <f:facet name="header">#{langsys['Remote']} #{langsys['User']}</f:facet>
                     <!-- row record -->
                     #{ls.remoteUser}
                 </p:column>

@@ -25,36 +25,36 @@
         <h:form id="form" styleClass="clsMainFrom">
 
             <h:panelGrid styleClass="clsGridMainHeader" columns="1">
-                <h:outputLabel styleClass="clsLabelTop" id="olblPayMethodHeader" value="Payment Method"/>
+                <h:outputLabel styleClass="clsLabelTop" id="olblPayMethodHeader" value="#{langsys['Payment']} #{langsys['Method']}"/>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainInput" columns="2">
-                <h:outputLabel  value="PayMethod Name:"/>
+                <h:outputLabel  value="#{langsys['Pay']} #{langsys['Method']} #{langsys['Name']}:"/>
                 <h:inputText styleClass="clsInput" id="itxtPayMethodName" value="#{payMethod.payMethodName}" disabled="true"/>
-                <h:outputLabel  value="Display Order:"/>
+                <h:outputLabel  value="#{langsys['Display']} #{langsys['Order']}:"/>
                 <h:inputText styleClass="clsInput" value="#{payMethod.displayOrder}"/>
-                <h:outputLabel  value="Default Method:"/>
+                <h:outputLabel  value="#{langsys['Default']} #{langsys['Method']}:"/>
                 <h:selectOneMenu value="#{payMethod.isDefault}">
-                    <f:selectItem itemLabel="No" itemValue="0"/>
-                    <f:selectItem itemLabel="Yes" itemValue="1"/>
+                    <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
+                    <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
                 </h:selectOneMenu>
-                <h:outputLabel  value="Active?:"/>
+                <h:outputLabel  value="#{langsys['Active']}?:"/>
                 <h:selectOneMenu value="#{payMethod.isActive}">
-                    <f:selectItem itemLabel="Yes" itemValue="1"/>
-                    <f:selectItem itemLabel="No" itemValue="0"/>
+                    <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
+                    <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
                 </h:selectOneMenu>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainCommands" columns="2">
                 <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
-                    <h:commandButton styleClass="clsButton" id="cmdbSave" value="Save">
+                    <h:commandButton styleClass="clsButton" id="cmdbSave" value="#{langsys['Save']}">
                         <f:actionListener binding="#{payMethodBean.savePayMethod(payMethod)}" />
                         <f:actionListener binding="#{payMethodBean.clearPayMethod(payMethod)}" />
                     </h:commandButton>
-                    <h:commandButton styleClass="clsButton" id="cmdbClear" value="Clear">
+                    <h:commandButton styleClass="clsButton" id="cmdbClear" value="#{langsys['Clear']}">
                         <f:actionListener binding="#{payMethodBean.clearPayMethod(payMethod)}" />
                     </h:commandButton>
-                    <h:commandButton styleClass="clsButton" id="cmdbDelete" value="Delete" onclick="return confirmDelete();">
+                    <h:commandButton styleClass="clsButton" id="cmdbDelete" value="#{langsys['Delete']}" onclick="return confirmDelete();">
                         <f:actionListener binding="#{payMethodBean.deletePayMethodByObject(payMethod)}" />
                         <f:actionListener binding="#{payMethodBean.clearPayMethod(payMethod)}" />
                     </h:commandButton>
@@ -70,7 +70,7 @@
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainSearch" columns="1">
-                <h:outputLabel id="olblMainSearch" value="Search PayMethod"/>
+                <h:outputLabel id="olblMainSearch" value="#{langsys['Search']} #{langsys['Pay']} #{langsys['Method']}"/>
                 <h:inputText id="itxtMainSearch" value="#{payMethodBean.searchPayMethodName}" autocomplete="off">
                     <f:ajax event="keyup" render="dtblPayMethod"/>
                 </h:inputText>
@@ -84,39 +84,39 @@
                          > 
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header">Pay Method Name</f:facet>
+                    <f:facet name="header">#{langsys['Pay']} #{langsys['Method']} #{langsys['Name']}</f:facet>
                     <!-- row record -->
                     #{p.payMethodName}
                 </h:column>
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header">Order</f:facet>
+                    <f:facet name="header">#{langsys['Order']}</f:facet>
                     <!-- row record -->
                     #{p.displayOrder}
                 </h:column>
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header">Default</f:facet>
+                    <f:facet name="header">#{langsys['Default']}</f:facet>
                     <!-- row record -->
                     #{utilityBean.returnYesNoString(p.isDefault)}
                 </h:column>
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header">Active</f:facet>
+                    <f:facet name="header">#{langsys['Active']}</f:facet>
                     <!-- row record -->
                     #{utilityBean.returnYesNoString(p.isActive)}
                 </h:column>
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header">Deleted</f:facet>
+                    <f:facet name="header">#{langsys['Deleted']}</f:facet>
                     <!-- row record -->
                     #{utilityBean.returnYesNoString(p.isDeleted)}
                 </h:column>
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header">Action</f:facet>
+                    <f:facet name="header">#{langsys['Action']}</f:facet>
                     <!-- row record -->
-                    <h:commandLink value="Edit" action="#{payMethodBean.displayPayMethod(p,payMethod)}" />
+                    <h:commandLink value="#{langsys['Edit']}" action="#{payMethodBean.displayPayMethod(p,payMethod)}" />
                     &nbsp;
                 </h:column>
             </h:dataTable>

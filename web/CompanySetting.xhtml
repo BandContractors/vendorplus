@@ -30,173 +30,173 @@
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainInput" columns="4">
-                <h:outputLabel  value="Company Code"/>
+                <h:outputLabel  value="#{langsys['Company']} #{langsys['Code']}"/>
                 <h:inputText styleClass="clsInput" value="#{companySetting.ECompanyName}" disabled="true" />
 
-                <h:outputLabel  value="Branch Name"/>
+                <h:outputLabel  value="#{langsys['Branch']} #{langsys['Name']}"/>
                 <h:inputText styleClass="clsInput" value="#{companySetting.EBranchCode}" disabled="true" />
 
-                <h:outputLabel  value="Branch Code"/>
+                <h:outputLabel  value="#{langsys['Branch']} #{langsys['Code']}"/>
                 <h:inputText styleClass="clsInput" value="#{companySetting.EBranchId}" disabled="true" />
 
-                <h:outputLabel  value="Physical Address"/>
+                <h:outputLabel  value="#{langsys['Physical']} #{langsys['Address']}"/>
                 <h:inputText styleClass="clsInput" value="#{companySetting.EPhysicalAddress}" />
 
-                <h:outputLabel  value="Phone"/>
+                <h:outputLabel  value="#{langsys['Phone']}"/>
                 <h:inputText styleClass="clsInput" value="#{companySetting.EPhone}" />
 
-                <h:outputLabel  value="Fax"/>
+                <h:outputLabel  value="#{langsys['Fax']}"/>
                 <h:inputText styleClass="clsInput" value="#{companySetting.EFax}" />
 
-                <h:outputLabel  value="Email"/>
+                <h:outputLabel  value="#{langsys['Email']}"/>
                 <h:inputText styleClass="clsInput" value="#{companySetting.EEmail}" />
 
-                <h:outputLabel  value="Website"/>
+                <h:outputLabel  value="#{langsys['Website']}"/>
                 <h:inputText styleClass="clsInput" value="#{companySetting.EWebsite}" />
 
-                <h:outputLabel  value="Currency Used"/>
+                <h:outputLabel  value="#{langsys['Currency']} #{langsys['Used']}"/>
                 <h:inputText styleClass="clsInput" value="#{companySetting.ECurrencyUsed}" />
 
                 <h:outputLabel  value=""/>
                 <h:outputLabel  value=""/>
 
-                <h:outputLabel  value="Tax Identity"/>
+                <h:outputLabel  value="#{langsys['Tax']} #{langsys['Identity']}"/>
                 <h:inputText styleClass="clsInput" value="#{companySetting.ETaxIdentity}" />
 
                 <h:outputLabel  value="VAT(%)"/>
                 <h:inputText styleClass="clsInput" value="#{companySetting.EVatPerc}" />
 
-                <h:outputLabel  value="Sale prices are VAT Inclusive?"/>
+                <h:outputLabel  value="#{langsys['Sale']} #{langsys['prices']} #{langsys['are']} VAT #{langsys['Inclusive']}?"/>
                 <h:selectOneMenu styleClass="clsMenu" value="#{companySetting.EIsVatInclusive}">
-                    <f:selectItem itemLabel="Yes" itemValue="Yes"/>
-                    <f:selectItem itemLabel="No" itemValue="No"/>
+                    <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="#{langsys['Yes']}"/>
+                    <f:selectItem itemLabel="#{langsys['No']}" itemValue="#{langsys['No']}"/>
                 </h:selectOneMenu>
 
-                <h:outputLabel  value="Is Trade-Discount VAT Liable?"/>
+                <h:outputLabel  value="#{langsys['Is']} #{langsys['Trade']} #{langsys['Discount']} VAT #{langsys['Liable']}?"/>
                 <h:selectOneMenu styleClass="clsMenu" value="#{companySetting.EIsTradeDiscountVatLiable}">
-                    <f:selectItem itemLabel="No" itemValue="No"/>
+                    <f:selectItem itemLabel="#{langsys['No']}" itemValue="#{langsys['No']}"/>
                 </h:selectOneMenu>
 
-                <h:outputLabel  value="Is Cash-Discount VAT Liable?"/>
+                <h:outputLabel  value="#{langsys['Is']} #{langsys['Cash']} #{langsys['Discount']} VAT #{langsys['Liable']}?"/>
                 <h:selectOneMenu styleClass="clsMenu" value="#{companySetting.EIsCashDiscountVatLiable}">
-                    <f:selectItem itemLabel="No" itemValue="No"/>
+                    <f:selectItem itemLabel="#{langsys['No']}" itemValue="#{langsys['No']}"/>
                 </h:selectOneMenu>
 
-                <h:outputLabel  value="Allow Cash-Discount?"/>
+                <h:outputLabel  value="#{langsys['Allow']} #{langsys['Cash']} #{langsys['Discount']}?"/>
                 <h:selectOneMenu styleClass="clsMenu" value="#{companySetting.EIsAllowDiscount}">
-                    <f:selectItem itemLabel="Yes" itemValue="Yes"/>
-                    <f:selectItem itemLabel="No" itemValue="No"/>
+                    <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="#{langsys['Yes']}"/>
+                    <f:selectItem itemLabel="#{langsys['No']}" itemValue="#{langsys['No']}"/>
                 </h:selectOneMenu>
 
-                <h:outputLabel  value="Allow Debt?"/>
+                <h:outputLabel  value="#{langsys['Allow']} #{langsys['Debt']}?"/>
                 <h:selectOneMenu styleClass="clsMenu" value="#{companySetting.EIsAllowDebt}">
-                    <f:selectItem itemLabel="Yes" itemValue="Yes"/>
-                    <f:selectItem itemLabel="No" itemValue="No"/>
+                    <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="#{langsys['Yes']}"/>
+                    <f:selectItem itemLabel="#{langsys['No']}" itemValue="#{langsys['No']}"/>
                 </h:selectOneMenu>
 
-                <h:outputLabel  value="Is #{menuItemBean.menuItemObj.CUSTOMER_NAME} Mandatory?"/>
+                <h:outputLabel  value="#{langsys['Is']} #{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]} #{langsys['Mandatory']}?"/>
                 <h:selectOneMenu styleClass="clsMenu" value="#{companySetting.EIsCustomerMandatory}">
-                    <f:selectItem itemLabel="Yes" itemValue="Yes"/>
-                    <f:selectItem itemLabel="No" itemValue="No"/>
+                    <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="#{langsys['Yes']}"/>
+                    <f:selectItem itemLabel="#{langsys['No']}" itemValue="#{langsys['No']}"/>
                 </h:selectOneMenu>
 
-                <h:outputLabel  value="Is #{menuItemBean.menuItemObj.SUPPLIER_NAME} Mandatory?"/>
+                <h:outputLabel  value="#{langsys['Is']} #{langsys[menuItemBean.menuItemObj.SUPPLIER_NAME]} #{langsys['Mandatory']}?"/>
                 <h:selectOneMenu styleClass="clsMenu" value="#{companySetting.EIsSupplierMandatory}">
-                    <f:selectItem itemLabel="Yes" itemValue="Yes"/>
-                    <f:selectItem itemLabel="No" itemValue="No"/>
+                    <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="#{langsys['Yes']}"/>
+                    <f:selectItem itemLabel="#{langsys['No']}" itemValue="#{langsys['No']}"/>
                 </h:selectOneMenu>
 
-                <h:outputLabel  value="Is MapItems Active?"/>
+                <h:outputLabel  value="#{langsys['Is']} #{langsys['Map']} #{langsys['Items']} #{langsys['Active']}?"/>
                 <h:selectOneMenu styleClass="clsMenu" value="#{companySetting.EIsMapItemsActive}">
-                    <f:selectItem itemLabel="Yes" itemValue="Yes"/>
-                    <f:selectItem itemLabel="No" itemValue="No"/>
+                    <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="#{langsys['Yes']}"/>
+                    <f:selectItem itemLabel="#{langsys['No']}" itemValue="#{langsys['No']}"/>
                 </h:selectOneMenu>
 
-                <h:outputLabel  value="Award Amount Per Point"/>
+                <h:outputLabel  value="#{langsys['Award']} #{langsys['Amount']} #{langsys['Per']} #{langsys['Point']}"/>
                 <h:inputText styleClass="clsInput" value="#{companySetting.EAwardAmountPerPoint}" />
 
-                <h:outputLabel  value="Spend Amount Per Point"/>
+                <h:outputLabel  value="#{langsys['Spend']} #{langsys['Amount']} #{langsys['Per']} #{langsys['Point']}"/>
                 <h:inputText styleClass="clsInput" value="#{companySetting.ESpendAmountPerPoint}" />
 
-                <h:outputLabel  value="Sloghan"/>
+                <h:outputLabel  value="#{langsys['Sloghan']}"/>
                 <h:inputText styleClass="clsInput" value="#{companySetting.ESloghan}" />
-                <h:outputLabel  value="Allow Auto Unpack on SALE?"/>
+                <h:outputLabel  value="#{langsys['Allow']} #{langsys['Auto']} #{langsys['Unpack']} #{langsys['on']} #{langsys['SALE']}?"/>
                 <h:selectOneMenu styleClass="clsMenu" value="#{companySetting.EIsAllowAutoUnpack}">
-                    <f:selectItem itemLabel="No" itemValue="No"/>
-                    <f:selectItem itemLabel="Yes" itemValue="Yes"/>
+                    <f:selectItem itemLabel="#{langsys['No']}" itemValue="#{langsys['No']}"/>
+                    <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="#{langsys['Yes']}"/>
                 </h:selectOneMenu>
 
-                <h:outputLabel  value="Sales Receipt/Invoice Name"/>
+                <h:outputLabel  value="#{langsys['Sales']} #{langsys['Receipt']}/#{langsys['Invoice']} #{langsys['Name']}"/>
                 <h:inputText styleClass="clsInput" value="#{companySetting.ESalesReceiptName}" />
-                <h:outputLabel  value="Show Developer on Sales Receipt/Invoice?"/>
+                <h:outputLabel  value="#{langsys['Show']} #{langsys['Developer']} #{langsys['on']} #{langsys['Sales']} #{langsys['Receipt']}/#{langsys['Invoice']}?"/>
                 <h:selectOneMenu styleClass="clsMenu" value="#{companySetting.EIsShowDeveloper}" disabled="true">
-                    <f:selectItem itemLabel="Yes" itemValue="Yes"/>
-                    <f:selectItem itemLabel="No" itemValue="No"/>
+                    <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="#{langsys['Yes']}"/>
+                    <f:selectItem itemLabel="#{langsys['No']}" itemValue="#{langsys['No']}"/>
                 </h:selectOneMenu>
 
-                <h:outputLabel  value="Developer Email"/>
+                <h:outputLabel  value="#{langsys['Developer']} #{langsys['Email']}"/>
                 <h:inputText styleClass="clsinput" value="#{companySetting.EDeveloperEmail}"/>
 
-                <h:outputLabel  value="Developer Phone"/>
+                <h:outputLabel  value="#{langsys['Developer']} #{langsys['Phone']}"/>
                 <h:inputText styleClass="clsinput" value="#{companySetting.EDeveloperPhone}"/>
 
-                <h:outputLabel  value="Current Logo"/>
+                <h:outputLabel  value="#{langsys['Current']} #{langsys['Logo']}"/>
                 <h:graphicImage id="gimgLogo" alt="L.O.G.O" value="#{companySetting.getLogoUrl()}"/>
-                <h:outputLabel  value="Specify Logo Name (MaxSize:64KB MaxDimension:200x200)"/>
+                <h:outputLabel  value="#{langsys['Specify']} #{langsys['Logo']} #{langsys['Name']} (MaxSize:64KB MaxDimension:200x200)"/>
                 <h:inputTextarea styleClass="clsinput" value="#{companySetting.ELogoUrl}"/>
 
-                <h:outputLabel  value="Show Logo on Sales Receipt/Invoice?"/>
+                <h:outputLabel  value="#{langsys['Show']} #{langsys['Logo']} #{langsys['on']} #{langsys['Sales']} #{langsys['Receipt']}/#{langsys['Invoice']}?"/>
                 <h:selectOneMenu styleClass="clsMenu" value="#{companySetting.EShowLogoInvoice}">
-                    <f:selectItem itemLabel="Yes" itemValue="Yes"/>
-                    <f:selectItem itemLabel="No" itemValue="No"/>
+                    <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="#{langsys['Yes']}"/>
+                    <f:selectItem itemLabel="#{langsys['No']}" itemValue="#{langsys['No']}"/>
                 </h:selectOneMenu>
 
-                <h:outputLabel  value="Show Branch on Sales Receipt/Invoice?"/>
+                <h:outputLabel  value="#{langsys['Show']} #{langsys['Branch']} #{langsys['on']} #{langsys['Sales']} #{langsys['Receipt']}/#{langsys['Invoice']}?"/>
                 <h:selectOneMenu styleClass="clsMenu" value="#{companySetting.EShowBranchInvoice}">
-                    <f:selectItem itemLabel="Yes" itemValue="Yes"/>
-                    <f:selectItem itemLabel="No" itemValue="No"/>
+                    <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="#{langsys['Yes']}"/>
+                    <f:selectItem itemLabel="#{langsys['No']}" itemValue="#{langsys['No']}"/>
                 </h:selectOneMenu>
 
-                <h:outputLabel  value="Show #{companySetting.getStoreEquivName()} on Sales Receipt/Invoice?"/>
+                <h:outputLabel  value="#{langsys['Show']} #{companySetting.getStoreEquivName()} #{langsys['on']} #{langsys['Sales']} #{langsys['Receipt']}/#{langsys['Invoice']}?"/>
                 <h:selectOneMenu styleClass="clsMenu" value="#{companySetting.EShowStoreInvoice}">
-                    <f:selectItem itemLabel="Yes" itemValue="Yes"/>
-                    <f:selectItem itemLabel="No" itemValue="No"/>
+                    <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="#{langsys['Yes']}"/>
+                    <f:selectItem itemLabel="#{langsys['No']}" itemValue="#{langsys['No']}"/>
                 </h:selectOneMenu>
 
-                <h:outputLabel  value="Sales Receipt Version?"/>
+                <h:outputLabel  value="#{langsys['Sales']} #{langsys['Receipt']} #{langsys['Version']}?"/>
                 <h:selectOneMenu styleClass="clsMenu" value="#{companySetting.ESalesReceiptVersion}">
-                    <f:selectItem itemLabel="1-Size Small" itemValue="1"/>
-                    <f:selectItem itemLabel="2-Size A4" itemValue="2"/>
+                    <f:selectItem itemLabel="1-#{langsys['Size']} #{langsys['Small']}" itemValue="1"/>
+                    <f:selectItem itemLabel="2-#{langsys['Size']} A4" itemValue="2"/>
                 </h:selectOneMenu>
 
-                <h:outputLabel  value="Time Zone"/>
+                <h:outputLabel  value="#{langsys['Time']} #{langsys['Zone']}"/>
                 <h:inputText styleClass="clsinput" value="#{companySetting.ETimeZone}"/>
 
-                <h:outputLabel  value="Date Format"/>
+                <h:outputLabel  value="#{langsys['Date']} #{langsys['Format']}"/>
                 <h:inputText styleClass="clsinput" value="#{companySetting.EDateFormat}"/>
 
-                <h:outputLabel  value="Enforce Selection of Transaction User?"/>
+                <h:outputLabel  value="#{langsys['Enforce']} #{langsys['Selection']} #{langsys['of']} #{langsys['Transaction']} #{langsys['User']}?"/>
                 <h:selectOneMenu styleClass="clsMenu" value="#{companySetting.EEnforceTransUserSelect}">
-                    <f:selectItem itemLabel="Yes" itemValue="Yes"/>
-                    <f:selectItem itemLabel="No" itemValue="No"/>
+                    <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="#{langsys['Yes']}"/>
+                    <f:selectItem itemLabel="#{langsys['No']}" itemValue="#{langsys['No']}"/>
                 </h:selectOneMenu>
 
-                <h:outputLabel  value="Show VAT Analysis on Sales Receipt/Invoice?"/>
+                <h:outputLabel  value="#{langsys['Show']} VAT #{langsys['Analysis']} #{langsys['on']} #{langsys['Sales']} #{langsys['Receipt']}/#{langsys['Invoice']}?"/>
                 <h:selectOneMenu styleClass="clsMenu" value="#{companySetting.EShowVatAnalysisInvoice}">
-                    <f:selectItem itemLabel="Yes" itemValue="Yes"/>
-                    <f:selectItem itemLabel="No" itemValue="No"/>
+                    <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="#{langsys['Yes']}"/>
+                    <f:selectItem itemLabel="#{langsys['No']}" itemValue="#{langsys['No']}"/>
                 </h:selectOneMenu>
 
-                <h:outputLabel  value="Store/Section Equivalent Name"/>
+                <h:outputLabel  value="#{langsys['Store']}/#{langsys['Section']} #{langsys['Equivalent']} #{langsys['Name']}"/>
                 <h:inputText styleClass="clsinput" value="#{companySetting.EStoreEquivName}"/>
 
             </h:panelGrid>
-            <h:outputLabel value="LICENSE KEY (Copy and paste the License Key here)"/>
+            <h:outputLabel value="#{langsys['LICENSE']} #{langsys['KEY']} (#{langsys['Copy']} #{langsys['and']} #{langsys['paste']} #{langsys['the']} #{langsys['License']} #{langsys['Key']} #{langsys['here']})"/>
             <h:inputText style="width: 1050px;font-size: 12px;" id="license_key" value="#{companySetting.ELicenseKey}" required="true" autocomplete="off"/>
 
 
             <h:panelGrid styleClass="clsGridMainCommands" columns="2">
-                <p:commandButton styleClass="clsButton" id="cmdbSave" value="UPDATE" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                <p:commandButton styleClass="clsButton" id="cmdbSave" value="#{langsys['UPDATE']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>

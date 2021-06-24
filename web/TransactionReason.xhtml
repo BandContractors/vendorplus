@@ -25,7 +25,7 @@
         <h:form id="form" styleClass="clsMainFrom">
 
             <h:panelGrid styleClass="clsGridMainHeader" columns="1">
-                <h:outputLabel styleClass="clsLabelTop" id="olblTransactionReasonHeader" value="Transaction Sub Type"/>
+                <h:outputLabel styleClass="clsLabelTop" id="olblTransactionReasonHeader" value="#{langsys['Transaction']} #{langsys['Subtype']}"/>
             </h:panelGrid>
 
             <h:dataTable id="dtblTransactionReason" value="#{transactionReasonBean.transactionReasons}" var="tr" 
@@ -36,19 +36,19 @@
                          > 
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header">ID</f:facet>
+                    <f:facet name="header">#{langsys['ID']}</f:facet>
                     <!-- row record -->
                     #{tr.transactionReasonId}
                 </h:column>
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header">Transaction Type</f:facet>
+                    <f:facet name="header">#{langsys['Transaction']} #{langsys['Type']}</f:facet>
                     <!-- row record -->
                     #{tr.transactionTypeName}
                 </h:column>
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header">Transaction Sub Type</f:facet>
+                    <f:facet name="header">#{langsys['Transaction']} #{langsys['Subtype']}</f:facet>
                     <!-- row record -->
                     #{tr.transactionReasonName}
                 </h:column>
