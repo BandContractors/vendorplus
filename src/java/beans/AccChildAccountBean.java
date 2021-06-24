@@ -9,7 +9,6 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -18,11 +17,13 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import sessions.GeneralUserSetting;
-
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+
 /**
  *
  * @author btwesigye
@@ -32,6 +33,7 @@ import sessions.GeneralUserSetting;
 public class AccChildAccountBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    static Logger LOGGER = Logger.getLogger(AccChildAccountBean.class.getName());
     private String ActionMessage = null;
     private AccChildAccount AccChildAccountObj = new AccChildAccount();
     private List<AccChildAccount> AccChildAccountList;
@@ -124,8 +126,8 @@ public class AccChildAccountBean implements Serializable {
             } catch (NullPointerException npe) {
                 accchildaccount.setBalance_checker_on(0);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -224,9 +226,9 @@ public class AccChildAccountBean implements Serializable {
                     this.clearAccChildAccount(aAccChildAccount);
                     this.refreshAccChildAccounts();
                     x = 1;
-                } catch (SQLException se) {
+                } catch (Exception e) {
                     x = 0;
-                    System.err.println(se.getMessage());
+                    LOGGER.log(Level.ERROR, e);
                 }
             }
         }
@@ -285,16 +287,8 @@ public class AccChildAccountBean implements Serializable {
                 this.setAccChildAccountFromResultset(ca, rs);
                 this.AccChildAccountList.add(ca);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -318,16 +312,8 @@ public class AccChildAccountBean implements Serializable {
                 this.setAccChildAccountFromResultset(ca, rs);
                 cas.add(ca);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return cas;
     }
@@ -352,16 +338,8 @@ public class AccChildAccountBean implements Serializable {
                 this.setAccChildAccountFromResultset(ca, rs);
                 cas.add(ca);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return cas;
     }
@@ -380,16 +358,8 @@ public class AccChildAccountBean implements Serializable {
                 this.setAccChildAccountFromResultset(ca, rs);
                 cas.add(ca);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return cas;
     }
@@ -408,16 +378,8 @@ public class AccChildAccountBean implements Serializable {
                 this.setAccChildAccountFromResultset(ca, rs);
                 cas.add(ca);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return cas;
     }
@@ -436,20 +398,12 @@ public class AccChildAccountBean implements Serializable {
                 this.setAccChildAccountFromResultset(ca, rs);
                 cas.add(ca);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return cas;
     }
-    
+
     public List<AccChildAccount> getAccChildAccountsByParentStartWith(String aParentCodeStartWith) {
         String sql;
         sql = "SELECT * FROM acc_child_account WHERE (acc_coa_account_code LIKE '" + aParentCodeStartWith + "%')  AND is_active=1 AND is_deleted=0 ORDER BY child_account_name ASC";
@@ -464,16 +418,8 @@ public class AccChildAccountBean implements Serializable {
                 this.setAccChildAccountFromResultset(ca, rs);
                 cas.add(ca);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return cas;
     }
@@ -525,16 +471,8 @@ public class AccChildAccountBean implements Serializable {
                 this.setAccChildAccountFromResultset(ca, rs);
                 cas.add(ca);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return cas;
     }
@@ -583,16 +521,8 @@ public class AccChildAccountBean implements Serializable {
                 this.setAccChildAccountFromResultset(ca, rs);
                 cas.add(ca);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return cas;
     }
@@ -632,16 +562,8 @@ public class AccChildAccountBean implements Serializable {
                 this.setAccChildAccountFromResultset(ca, rs);
                 cas.add(ca);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return cas;
     }
@@ -665,16 +587,8 @@ public class AccChildAccountBean implements Serializable {
                 this.setAccChildAccountFromResultset(aca, rs);
                 ParentAccCode = aca.getAccCoaAccountCode();
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return ParentAccCode;
     }
@@ -696,16 +610,8 @@ public class AccChildAccountBean implements Serializable {
                 aca = new AccChildAccount();
                 this.setAccChildAccountFromResultset(aca, rs);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return aca;
     }
@@ -727,16 +633,8 @@ public class AccChildAccountBean implements Serializable {
                 aca = new AccChildAccount();
                 this.setAccChildAccountFromResultset(aca, rs);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return aca;
     }

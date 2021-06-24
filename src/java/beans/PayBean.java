@@ -27,12 +27,14 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import utilities.UtilityBean;
 
 /*
  * To change this template, choose Tools | Templates
@@ -69,6 +71,8 @@ public class PayBean implements Serializable {
     private String ActionType;
     private int OverridePrintVersion;
     private boolean PayAll;
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     public long payInsertUpdate(Pay pay) {
         long PayId = 0;
@@ -233,7 +237,7 @@ public class PayBean implements Serializable {
         }
         return PayId;
     }
-    
+
     public long payInsertUpdateFix(Pay pay) {
         long PayId = 0;
         String sql = null;
@@ -399,9 +403,11 @@ public class PayBean implements Serializable {
     }
 
     public void saveCashReceiptREVENUE(Pay pay, List<PayTrans> aPayTranss, int aPayTypeId, int aPayReasId, PayTrans aPayTrans) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         try {
             if (aPayTrans.getAccount_code().length() <= 0) {
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Select Revenue Account..."));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Select Revenue Account")));
             } else {
                 aPayTrans.setTransPaidAmount(pay.getPaidAmount());
                 try {
@@ -449,127 +455,135 @@ public class PayBean implements Serializable {
     }
 
     public void saveCashReceipt(Pay pay, List<PayTrans> aPayTranss, int aPayTypeId, int aPayReasId) {
-        String sql = null;
-        String sql2 = null;
+        UtilityBean ub = new UtilityBean();
+        String BaseName = getMenuItemBean().getMenuItemObj().getLANG_BASE_NAME_SYS();
         String msg = "";
-        TransactorLedger NewTransactorLedger;
-        TransactorLedgerBean NewTransactorLedgerBean;
-        Trans NewTrans;
-        TransBean NewTransBean;
-        Transactor NewTransactor;
-        Transactor NewBillTransactor;
-        TransactorBean NewTransactorBean;
+        try {
+            String sql = null;
+            String sql2 = null;
+            TransactorLedger NewTransactorLedger;
+            TransactorLedgerBean NewTransactorLedgerBean;
+            Trans NewTrans;
+            TransBean NewTransBean;
+            Transactor NewTransactor;
+            Transactor NewBillTransactor;
+            TransactorBean NewTransactorBean;
 
-        UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
-        List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
-        GroupRightBean grb = new GroupRightBean();
+            UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
+            List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
+            GroupRightBean grb = new GroupRightBean();
 
-        if (pay.getPayId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, Integer.toString(aPayReasId), "Add") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (pay.getPayId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, Integer.toString(aPayReasId), "Edit") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (pay.getPayDate() == null) {
-            msg = "Select Receipt Date";
-            this.setActionMessage("Payment NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (pay.getBillTransactorId() == 0 && (aPayReasId == 21 || aPayReasId == 22 || aPayReasId == 90)) {
-            msg = "Specify the Client/Customer...";
-            this.setActionMessage("Cash Receipt NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (pay.getAccChildAccountId2() == 0 && aPayReasId == 23) {
-            msg = "Specify the Share Holder...";
-            this.setActionMessage("Payment NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (pay.getAccChildAccountId2() == 0 && aPayReasId == 24) {
-            msg = "Specify the Loan(Current/Long-Term) Account...";
-            this.setActionMessage("Payment NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (pay.getPayMethodId() == 0) {
-            msg = "Invalid payment method...";
-            this.setActionMessage("Payment NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (pay.getAccChildAccountId() == 0) {
-            msg = "Invalid Cash Receipt Account...";
-            this.setActionMessage("Payment NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (pay.getCurrencyCode().length() <= 0) {
-            msg = "Specify Currency Code Please...";
-            this.setActionMessage("Payment NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (pay.getPaidAmount() <= 0) {
-            msg = "Invalid amount received...";
-            this.setActionMessage("Payment NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (aPayReasId == 22 && new PayTransBean().getRecGreaterBalStr(aPayTranss).length() > 0) {
-            msg = "Amount cannot be greater than receivable balance, refer to:" + new PayTransBean().getRecGreaterBalStr(aPayTranss) + "...";
-            this.setActionMessage("Payment NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (null == new AccPeriodBean().getAccPeriod(pay.getPayDate())) {
-            this.setActionMessage("");
-            msg = "Date selected does not MATCH any accounting period; Go to Accounts>Account Period, click Add New and Save OR contact system administrator...";
-            this.setActionMessage("Transaction NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (pay.getPayRefNo().length() > 100 || pay.getStatusDesc().length() > 100) {
-            msg = "Please check [Reference no] and/or [Status Description]. Text cannot exceed 100 characters...";
-            this.setActionMessage("Payment NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else {
-            pay.setAddUserDetailId(new GeneralUserSetting().getCurrentUser().getUserDetailId());
-            pay.setEditUserDetailId(new GeneralUserSetting().getCurrentUser().getUserDetailId());//will be made null by the SP
-            pay.setPayCategory(new GeneralUserSetting().getCurrentPayCategory());
-            pay.setStoreId(new GeneralUserSetting().getCurrentStore().getStoreId());
-            pay.setDeletePayId(0);
-            AccCurrency LocalCurrency = null;
-            LocalCurrency = new AccCurrencyBean().getLocalCurrency();
-            pay.setXRate(new AccXrateBean().getXrate(pay.getCurrencyCode(), LocalCurrency.getCurrencyCode()));
-            pay.setPayTypeId(aPayTypeId);
-            pay.setPayReasonId(aPayReasId);
-            long SavedPayId = this.payInsertUpdate(pay);
-            //manage session variable
-            FacesContext context = FacesContext.getCurrentInstance();
-            HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
-            HttpSession httpSession = request.getSession(true);
-            httpSession.setAttribute("CURRENT_PAY_ID", SavedPayId);
+            if (pay.getPayId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, Integer.toString(aPayReasId), "Add") == 0) {
+                msg = "Not Allowed to Access this Function";
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (pay.getPayId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, Integer.toString(aPayReasId), "Edit") == 0) {
+                msg = "Not Allowed to Access this Function";
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (pay.getPayDate() == null) {
+                msg = "Select Receipt Date";
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (pay.getBillTransactorId() == 0 && (aPayReasId == 21 || aPayReasId == 22 || aPayReasId == 90)) {
+                msg = "Specify Customer";
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Cash Receipt Not Saved"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (pay.getAccChildAccountId2() == 0 && aPayReasId == 23) {
+                msg = "Specify the Shareholder";
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (pay.getAccChildAccountId2() == 0 && aPayReasId == 24) {
+                msg = "Specify Loan Account";
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (pay.getPayMethodId() == 0) {
+                msg = "Invalid Payment Method";
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (pay.getAccChildAccountId() == 0) {
+                msg = "Invalid Cash Receipt Account";
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (pay.getCurrencyCode().length() <= 0) {
+                msg = "Specify Currency Code";
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (pay.getPaidAmount() <= 0) {
+                msg = "Invalid Recipt Amount";
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (aPayReasId == 22 && new PayTransBean().getRecGreaterBalStr(aPayTranss).length() > 0) {
+                msg = "Amount Cannot be Greater Than Receivable Balance ## " + new PayTransBean().getRecGreaterBalStr(aPayTranss);
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (null == new AccPeriodBean().getAccPeriod(pay.getPayDate())) {
+                this.setActionMessage("");
+                msg = "Date Selected Does Not Match any Accounting Period";
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (pay.getPayRefNo().length() > 100 || pay.getStatusDesc().length() > 100) {
+                msg = "Reference Numner and Status Description Cannot Exceed 100 Characters";
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else {
+                pay.setAddUserDetailId(new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                pay.setEditUserDetailId(new GeneralUserSetting().getCurrentUser().getUserDetailId());//will be made null by the SP
+                pay.setPayCategory(new GeneralUserSetting().getCurrentPayCategory());
+                pay.setStoreId(new GeneralUserSetting().getCurrentStore().getStoreId());
+                pay.setDeletePayId(0);
+                AccCurrency LocalCurrency = null;
+                LocalCurrency = new AccCurrencyBean().getLocalCurrency();
+                pay.setXRate(new AccXrateBean().getXrate(pay.getCurrencyCode(), LocalCurrency.getCurrencyCode()));
+                pay.setPayTypeId(aPayTypeId);
+                pay.setPayReasonId(aPayReasId);
+                long SavedPayId = this.payInsertUpdate(pay);
+                //manage session variable
+                FacesContext context = FacesContext.getCurrentInstance();
+                HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+                HttpSession httpSession = request.getSession(true);
+                httpSession.setAttribute("CURRENT_PAY_ID", SavedPayId);
 
-            pay.setPayId(SavedPayId);
-            //insert pay transs items
-            if (aPayReasId == 21 || aPayReasId == 22 || aPayReasId == 115) {
-                new PayTransBean().savePayTranss(pay, aPayTranss);
-            }
-            //Refresh Print output
-            new OutputDetailBean().refreshOutput("PARENT", "SOURCE-PAY");
+                pay.setPayId(SavedPayId);
+                //insert pay transs items
+                if (aPayReasId == 21 || aPayReasId == 22 || aPayReasId == 115) {
+                    new PayTransBean().savePayTranss(pay, aPayTranss);
+                }
+                //Refresh Print output
+                new OutputDetailBean().refreshOutput("PARENT", "SOURCE-PAY");
 
-            //insert Journal
-            if (aPayReasId == 21 || aPayReasId == 22) {//CASH/CREDIT SALE
-                new AccJournalBean().postJournalCashReceiptReceivable(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId());
-            } else if (aPayReasId == 23) {//CAPITAL
-                new AccJournalBean().postJournalCashReceiptCapital(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId());
-            } else if (aPayReasId == 24) {//LOAN
-                new AccJournalBean().postJournalCashReceiptLoan(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId());
-            } else if (aPayReasId == 90) {//CUSTOMER DEPOSIT (Prepaid Income)
-                new AccJournalBean().postJournalCashReceiptPrepaidIncome(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId());
-            } else if (aPayReasId == 115) {//OTHER REVENUE
-                new AccJournalBean().postJournalCashReceiptOtherRevenue(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId(), aPayTranss);
+                //insert Journal
+                if (aPayReasId == 21 || aPayReasId == 22) {//CASH/CREDIT SALE
+                    new AccJournalBean().postJournalCashReceiptReceivable(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId());
+                } else if (aPayReasId == 23) {//CAPITAL
+                    new AccJournalBean().postJournalCashReceiptCapital(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId());
+                } else if (aPayReasId == 24) {//LOAN
+                    new AccJournalBean().postJournalCashReceiptLoan(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId());
+                } else if (aPayReasId == 90) {//CUSTOMER DEPOSIT (Prepaid Income)
+                    new AccJournalBean().postJournalCashReceiptPrepaidIncome(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId());
+                } else if (aPayReasId == 115) {//OTHER REVENUE
+                    new AccJournalBean().postJournalCashReceiptOtherRevenue(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId(), aPayTranss);
+                }
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
+                if (aPayReasId == 22) {
+                    this.updateOrderPayStatus(aPayTranss);
+                }
+                //Update Total Paid for Sales/Purchase Invoice
+                if (aPayReasId == 21 || aPayReasId == 22 || aPayReasId == 115) {
+                    new PayTransBean().updateTranssTotalPaid(aPayTranss);
+                }
+                this.clearPayPayTranss(pay, aPayTranss);
+                this.PayAll = false;
             }
-            this.setActionMessage("Saved Successfully");
-            if (aPayReasId == 22) {
-                this.updateOrderPayStatus(aPayTranss);
-            }
-            //Update Total Paid for Sales/Purchase Invoice
-            if (aPayReasId == 21 || aPayReasId == 22 || aPayReasId == 115) {
-                new PayTransBean().updateTranssTotalPaid(aPayTranss);
-            }
-            this.clearPayPayTranss(pay, aPayTranss);
-            this.PayAll = false;
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
     public void saveCashPaymentLIABILITY(Pay pay, List<PayTrans> aPayTranss, int aPayTypeId, int aPayReasId, PayTrans aPayTrans) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         try {
             if (aPayTrans.getAccount_code().length() <= 0) {
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Select Liability Account..."));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Select Liability Account")));
             } else {
                 aPayTrans.setTransPaidAmount(pay.getPaidAmount());
                 try {
@@ -586,122 +600,127 @@ public class PayBean implements Serializable {
     }
 
     public void saveCashPayment(Pay pay, List<PayTrans> aPayTranss, int aPayTypeId, int aPayReasId) {
-        String sql = null;
-        String sql2 = null;
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         String msg = "";
-        TransactorLedger NewTransactorLedger;
-        TransactorLedgerBean NewTransactorLedgerBean;
-        Trans NewTrans;
-        TransBean NewTransBean;
-        Transactor NewTransactor;
-        Transactor NewBillTransactor;
-        TransactorBean NewTransactorBean;
+        try {
+            String sql = null;
+            String sql2 = null;
+            TransactorLedger NewTransactorLedger;
+            TransactorLedgerBean NewTransactorLedgerBean;
+            Trans NewTrans;
+            TransBean NewTransBean;
+            Transactor NewTransactor;
+            Transactor NewBillTransactor;
+            TransactorBean NewTransactorBean;
 
-        UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
-        List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
-        GroupRightBean grb = new GroupRightBean();
+            UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
+            List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
+            GroupRightBean grb = new GroupRightBean();
 
-        if (pay.getPayId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, Integer.toString(aPayReasId), "Add") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (pay.getPayId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, Integer.toString(aPayReasId), "Edit") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (pay.getPayDate() == null) {
-            msg = "Select Pay Date";
-            this.setActionMessage("Payment NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (pay.getBillTransactorId() == 0 && (aPayReasId == 25 || aPayReasId == 26 || aPayReasId == 91)) {
-            msg = "Specify the Bill Transactor (Client/Supplier)...";
-            this.setActionMessage("Payment NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (pay.getPayMethodId() == 0) {
-            msg = "Invalid payment method...";
-            this.setActionMessage("Payment NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (pay.getAccChildAccountId() == 0) {
-            msg = "Invalid Cash Paid Account...";
-            this.setActionMessage("Payment NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (pay.getAccChildAccountId2() == 0 && aPayReasId == 33) {
-            msg = "Select Loan Acccount...";
-            this.setActionMessage("Payment NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (pay.getAccChildAccountId2() == 0 && aPayReasId == 34) {
-            msg = "Select Shareholder's Acccount...";
-            this.setActionMessage("Payment NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (pay.getCurrencyCode().length() <= 0) {
-            msg = "Specify Currency Code Please...";
-            this.setActionMessage("Payment NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (pay.getPaidAmount() <= 0) {
-            msg = "Invalid amount paid...";
-            this.setActionMessage("Payment NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (aPayReasId == 25 && new PayTransBean().getRecGreaterBalStr(aPayTranss).length() > 0) {
-            msg = "Amount cannot be greater than payable balance, refer to:" + new PayTransBean().getRecGreaterBalStr(aPayTranss) + "...";
-            this.setActionMessage("Payment NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (null == new AccPeriodBean().getAccPeriod(pay.getPayDate())) {
-            this.setActionMessage("");
-            msg = "Date selected does not MATCH any accounting period; Go to Accounts>Account Period, click Add New and Save OR contact system administrator...";
-            this.setActionMessage("Transaction NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (!new AccLedgerBean().checkerBalancePass(pay.getPayMethodId(), pay.getAccChildAccountId(), pay.getCurrencyCode(), pay.getPaidAmount(), aPayTypeId, 0, 0, 0)) {
-            msg = "Paying account is out of Funds...";
-            this.setActionMessage("Transaction NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else if (pay.getPayRefNo().length() > 100 || pay.getStatusDesc().length() > 100) {
-            msg = "Please check [Reference no] and/or [Status Description]. Text cannot exceed 100 characters...";
-            this.setActionMessage("Payment NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        } else {
-            pay.setAddUserDetailId(new GeneralUserSetting().getCurrentUser().getUserDetailId());
-            pay.setEditUserDetailId(new GeneralUserSetting().getCurrentUser().getUserDetailId());//will be made null by the SP
-            pay.setPayCategory(new GeneralUserSetting().getCurrentPayCategory());
-            pay.setStoreId(new GeneralUserSetting().getCurrentStore().getStoreId());
-            pay.setDeletePayId(0);
-            AccCurrency LocalCurrency = null;
-            LocalCurrency = new AccCurrencyBean().getLocalCurrency();
-            pay.setXRate(new AccXrateBean().getXrate(pay.getCurrencyCode(), LocalCurrency.getCurrencyCode()));
-            pay.setPayTypeId(aPayTypeId);
-            pay.setPayReasonId(aPayReasId);
-            long SavedPayId = this.payInsertUpdate(pay);
+            if (pay.getPayId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, Integer.toString(aPayReasId), "Add") == 0) {
+                msg = "Not Allowed to Access this Function";
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (pay.getPayId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, Integer.toString(aPayReasId), "Edit") == 0) {
+                msg = "Not Allowed to Access this Function";
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (pay.getPayDate() == null) {
+                msg = "Select Pay Date";
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (pay.getBillTransactorId() == 0 && (aPayReasId == 25 || aPayReasId == 26 || aPayReasId == 91)) {
+                msg = "Specify Client or Supplier";
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (pay.getPayMethodId() == 0) {
+                msg = "Invalid Payment Method";
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (pay.getAccChildAccountId() == 0) {
+                msg = "Invalid Cash Paid Account";
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (pay.getAccChildAccountId2() == 0 && aPayReasId == 33) {
+                msg = "Select Loan Acccount";
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (pay.getAccChildAccountId2() == 0 && aPayReasId == 34) {
+                msg = "Select Shareholder Acccount";
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (pay.getCurrencyCode().length() <= 0) {
+                msg = "Specify Currency Code";
+                this.setActionMessage("Payment Not Saved");
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            } else if (pay.getPaidAmount() <= 0) {
+                msg = "Invalid Amount Paid";
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (aPayReasId == 25 && new PayTransBean().getRecGreaterBalStr(aPayTranss).length() > 0) {
+                msg = "Amount Cannot be Greater Than Payable Balance ## " + new PayTransBean().getRecGreaterBalStr(aPayTranss);
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (null == new AccPeriodBean().getAccPeriod(pay.getPayDate())) {
+                this.setActionMessage("");
+                msg = "Date Selected Does Not Match any Accounting Period";
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Transaction NOT saved"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (!new AccLedgerBean().checkerBalancePass(pay.getPayMethodId(), pay.getAccChildAccountId(), pay.getCurrencyCode(), pay.getPaidAmount(), aPayTypeId, 0, 0, 0)) {
+                msg = "Paying Account is Out of Funds";
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Transaction NOT saved"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (pay.getPayRefNo().length() > 100 || pay.getStatusDesc().length() > 100) {
+                msg = "Reference Number and Status Description Cannot Exceed 100 Characters";
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else {
+                pay.setAddUserDetailId(new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                pay.setEditUserDetailId(new GeneralUserSetting().getCurrentUser().getUserDetailId());//will be made null by the SP
+                pay.setPayCategory(new GeneralUserSetting().getCurrentPayCategory());
+                pay.setStoreId(new GeneralUserSetting().getCurrentStore().getStoreId());
+                pay.setDeletePayId(0);
+                AccCurrency LocalCurrency = null;
+                LocalCurrency = new AccCurrencyBean().getLocalCurrency();
+                pay.setXRate(new AccXrateBean().getXrate(pay.getCurrencyCode(), LocalCurrency.getCurrencyCode()));
+                pay.setPayTypeId(aPayTypeId);
+                pay.setPayReasonId(aPayReasId);
+                long SavedPayId = this.payInsertUpdate(pay);
 
-            //manage session variable
-            FacesContext context = FacesContext.getCurrentInstance();
-            HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
-            HttpSession httpSession = request.getSession(true);
-            httpSession.setAttribute("CURRENT_PAY_ID", SavedPayId);
-            //Refresh Print output
-            new OutputDetailBean().refreshOutput("PARENT", "SOURCE-PAY");
-            pay.setPayId(new GeneralUserSetting().getCurrentPayId());
-            //insert pay transs items
-            if (aPayReasId == 25 || aPayReasId == 26 || aPayReasId == 105) {
-                new PayTransBean().savePayTranss(pay, aPayTranss);
+                //manage session variable
+                FacesContext context = FacesContext.getCurrentInstance();
+                HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+                HttpSession httpSession = request.getSession(true);
+                httpSession.setAttribute("CURRENT_PAY_ID", SavedPayId);
+                //Refresh Print output
+                new OutputDetailBean().refreshOutput("PARENT", "SOURCE-PAY");
+                pay.setPayId(new GeneralUserSetting().getCurrentPayId());
+                //insert pay transs items
+                if (aPayReasId == 25 || aPayReasId == 26 || aPayReasId == 105) {
+                    new PayTransBean().savePayTranss(pay, aPayTranss);
+                }
+                //insert Journal
+                if (aPayReasId == 25 || aPayReasId == 26) {//CASH/CREDIT PURCHASE
+                    new AccJournalBean().postJournalCashPaymentPurchase(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId());
+                } else if (aPayReasId == 33) {//LOAN
+                    new AccJournalBean().postJournalCashPaymentLoan(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId());
+                } else if (aPayReasId == 34) {//CASH DRAWING
+                    new AccJournalBean().postJournalCashPaymentDraw(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId());
+                } else if (aPayReasId == 91) {//PREPAID EXPENSE
+                    new AccJournalBean().postJournalCashPaymentPrepaidExpense(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId());
+                } else if (aPayReasId == 105) {//LIABILITY PAYMENT
+                    new AccJournalBean().postJournalCashPaymentLiability(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId(), aPayTranss);
+                }
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
+                //Update Total Paid for Sales/Purchase Invoice
+                if (aPayReasId == 25 || aPayReasId == 26 || aPayReasId == 105) {
+                    new PayTransBean().updateTranssTotalPaid(aPayTranss);
+                }
+                this.clearPayPayTranss(pay, aPayTranss);
+                this.PayAll = false;
             }
-            //insert Journal
-            if (aPayReasId == 25 || aPayReasId == 26) {//CASH/CREDIT PURCHASE
-                new AccJournalBean().postJournalCashPaymentPurchase(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId());
-            } else if (aPayReasId == 33) {//LOAN
-                new AccJournalBean().postJournalCashPaymentLoan(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId());
-            } else if (aPayReasId == 34) {//CASH DRAWING
-                new AccJournalBean().postJournalCashPaymentDraw(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId());
-            } else if (aPayReasId == 91) {//PREPAID EXPENSE
-                new AccJournalBean().postJournalCashPaymentPrepaidExpense(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId());
-            } else if (aPayReasId == 105) {//LIABILITY PAYMENT
-                new AccJournalBean().postJournalCashPaymentLiability(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId(), aPayTranss);
-            }
-            this.setActionMessage("Saved Successfully");
-            //Update Total Paid for Sales/Purchase Invoice
-            if (aPayReasId == 25 || aPayReasId == 26 || aPayReasId == 105) {
-                new PayTransBean().updateTranssTotalPaid(aPayTranss);
-            }
-            this.clearPayPayTranss(pay, aPayTranss);
-            this.PayAll = false;
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
-
     }
 
     public boolean updatePay(Pay pay) {
@@ -3078,5 +3097,19 @@ public class PayBean implements Serializable {
      */
     public void setPayAll(boolean PayAll) {
         this.PayAll = PayAll;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 }

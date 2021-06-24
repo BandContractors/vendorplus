@@ -1600,8 +1600,10 @@ public class NavigationBean implements Serializable {
     }
 
     public void checkLicenseExpired() {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         if (CompanySetting.getLicenseDaysLeft() <= 0 && CompanySetting.getLicenseType() != 9) {
-            this.setNavMsg("--- LICENSE IS EXPIRED, CONTACT SYSTEM VENDOR ---");
+            this.setNavMsg(ub.translateWordsInText(BaseName, "License Expired") + ", " + ub.translateWordsInText(BaseName, "Contact System Vendor"));
             FacesContext.getCurrentInstance().addMessage("License", new FacesMessage(getNavMsg()));
             FacesContext fc = FacesContext.getCurrentInstance();
             ConfigurableNavigationHandler nav = (ConfigurableNavigationHandler) fc.getApplication().getNavigationHandler();

@@ -6691,6 +6691,8 @@ public class TransItemBean implements Serializable {
     }
 
     public void addTransItemTransferRequest(Trans aTrans, StatusBean aStatusBean, List<TransItem> aActiveTransItems, TransItem NewTransItem, Item aSelectedItem) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         try {
             //reset messages
             aStatusBean.setItemAddedStatus("");
@@ -6801,7 +6803,7 @@ public class TransItemBean implements Serializable {
                 }
                 TransBean transB = new TransBean();
                 transB.clearAll(null, aActiveTransItems, NewTransItem, aSelectedItem, null, 1, null);
-                aStatusBean.setItemAddedStatus("ITEM ADDED");
+                aStatusBean.setItemAddedStatus(ub.translateWordsInText(BaseName, "Item Added"));
                 aStatusBean.setItemNotAddedStatus("");
                 aStatusBean.setShowItemAddedStatus(1);
                 aStatusBean.setShowItemNotAddedStatus(0);
@@ -7359,112 +7361,118 @@ public class TransItemBean implements Serializable {
     }
 
     public void addTransItemUNPACK(StatusBean aStatusBean, List<TransItem> aActiveTransItems, TransItem NewTransItem, Trans NewTrans, Item aItem) {
-        if (aItem.getIsTrack() == 0) {
-            aStatusBean.setItemAddedStatus("");
-            aStatusBean.setItemNotAddedStatus("A non-trackable item cannot be be UNPACKED... !");
-            aStatusBean.setShowItemAddedStatus(0);
-            aStatusBean.setShowItemNotAddedStatus(1);
-        } else {
-            //check for selected specific stock item
-            try {
-                if (NewTransItem.getStockId() > 0) {
-                    this.updateTransItemBatchSpecific(NewTransItem, NewTransItem.getStockId());
-                }
-            } catch (Exception e) {
-            }
-
-            //get item's stock details
-            //get and check number of batches
-            StockBean sb = new StockBean();
-            Stock st = new Stock();
-            st = sb.getStock(new GeneralUserSetting().getCurrentStore().getStoreId(), NewTransItem.getItemId(), NewTransItem.getBatchno(), NewTransItem.getCodeSpecific(), NewTransItem.getDescSpecific());
-            if (st == null || st.getCurrentqty() == 0) {//this item and batch does not exist in this store OR its quatity is 0 (out of stock)
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        try {
+            if (aItem.getIsTrack() == 0) {
                 aStatusBean.setItemAddedStatus("");
-                aStatusBean.setItemNotAddedStatus("SELECTED BIG ITEM and BATCH - DOES NOT EXIST or IS OUT OF STOCK !");
-                aStatusBean.setShowItemAddedStatus(0);
-                aStatusBean.setShowItemNotAddedStatus(1);
-            } else if (NewTransItem.getItemQty() < 0) {
-                //BACK
-                //check if supplied qty + existing qty is more than total current stock qty
-                aStatusBean.setItemAddedStatus("");
-                aStatusBean.setItemNotAddedStatus("QUANTITY CANNOT BE NEGATIVE...");
-                aStatusBean.setShowItemAddedStatus(0);
-                aStatusBean.setShowItemNotAddedStatus(1);
-            } else if ((NewTransItem.getItemQty() + this.getListTotalItemBatchQty(aActiveTransItems, NewTransItem.getItemId(), NewTransItem.getBatchno(), NewTransItem.getCodeSpecific(), NewTransItem.getDescSpecific())) > st.getCurrentqty()) {
-                //BACK
-                //check if supplied qty + existing qty is more than total current stock qty
-                aStatusBean.setItemAddedStatus("");
-                aStatusBean.setItemNotAddedStatus("SELECTED BIG ITEM and BATCH - INSUFFICIENT STOCK !");
-                aStatusBean.setShowItemAddedStatus(0);
-                aStatusBean.setShowItemNotAddedStatus(1);
-            } else if ("UNPACK".equals(new GeneralUserSetting().getCurrentTransactionTypeName()) && (NewTransItem.getItemId2() == 0 || NewTransItem.getItemQty2() == 0)) {
-                //BACK
-                //check if supplied qty + existing qty is more than total current stock qty
-                aStatusBean.setItemAddedStatus("");
-                aStatusBean.setItemNotAddedStatus("SELECTED ITEM/QUANTITY TO UNPACK TO IS INVALID !");
+                aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Non Trackable Item Cannot be be Unpacked"));
                 aStatusBean.setShowItemAddedStatus(0);
                 aStatusBean.setShowItemNotAddedStatus(1);
             } else {
-                TransItem ti = new TransItem();
-                ti.setTransactionItemId(NewTransItem.getTransactionItemId());
-                ti.setTransactionId(NewTransItem.getTransactionId());
-                ti.setItemId(NewTransItem.getItemId());
-                ti.setBatchno(NewTransItem.getBatchno());
+                //check for selected specific stock item
                 try {
-                    ti.setCodeSpecific(NewTransItem.getCodeSpecific());
-                } catch (NullPointerException npe) {
-                    ti.setCodeSpecific("");
-                }
-                try {
-                    ti.setDescSpecific(NewTransItem.getDescSpecific());
-                } catch (NullPointerException npe) {
-                    ti.setDescSpecific("");
-                }
-                try {
-                    ti.setDescMore(NewTransItem.getDescMore());
-                } catch (NullPointerException npe) {
-                    ti.setDescMore("");
+                    if (NewTransItem.getStockId() > 0) {
+                        this.updateTransItemBatchSpecific(NewTransItem, NewTransItem.getStockId());
+                    }
+                } catch (Exception e) {
                 }
 
-                ti.setItemQty(NewTransItem.getItemQty());
-                ti.setUnitPrice(NewTransItem.getUnitPrice());
-                ti.setUnitTradeDiscount(NewTransItem.getUnitTradeDiscount());
-                ti.setAmount(NewTransItem.getAmount());
-                ti.setVatRated(NewTransItem.getVatRated());
-                //for UNPACK
-                ti.setItemId2(NewTransItem.getItemId2());
-                ti.setItemQty2(NewTransItem.getItemQty2());
-                try {
-                    ti.setItemExpryDate(st.getItemExpDate());
-                } catch (NullPointerException npe) {
-                    ti.setItemExpryDate(null);
-                }
-                try {
-                    ti.setItemMnfDate(st.getItemMnfDate());
-                } catch (NullPointerException npe) {
-                    ti.setItemMnfDate(null);
-                }
-                //for profit margin
-                ti.setUnitCostPrice(0);
-                ti.setUnitProfitMargin(0);
-
-                if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "LIST_ITEMS_APPEND").getParameter_value().equals("0")) {
-                    this.updateLookUpsUI(ti);
-                    aActiveTransItems.add(0, ti);
+                //get item's stock details
+                //get and check number of batches
+                StockBean sb = new StockBean();
+                Stock st = new Stock();
+                st = sb.getStock(new GeneralUserSetting().getCurrentStore().getStoreId(), NewTransItem.getItemId(), NewTransItem.getBatchno(), NewTransItem.getCodeSpecific(), NewTransItem.getDescSpecific());
+                if (st == null || st.getCurrentqty() == 0) {//this item and batch does not exist in this store OR its quatity is 0 (out of stock)
+                    aStatusBean.setItemAddedStatus("");
+                    aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Selected Big Item and Batch Does Not Exist or Is Out of Stock"));
+                    aStatusBean.setShowItemAddedStatus(0);
+                    aStatusBean.setShowItemNotAddedStatus(1);
+                } else if (NewTransItem.getItemQty() < 0) {
+                    //BACK
+                    //check if supplied qty + existing qty is more than total current stock qty
+                    aStatusBean.setItemAddedStatus("");
+                    aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Quantity Cannot be Negative"));
+                    aStatusBean.setShowItemAddedStatus(0);
+                    aStatusBean.setShowItemNotAddedStatus(1);
+                } else if ((NewTransItem.getItemQty() + this.getListTotalItemBatchQty(aActiveTransItems, NewTransItem.getItemId(), NewTransItem.getBatchno(), NewTransItem.getCodeSpecific(), NewTransItem.getDescSpecific())) > st.getCurrentqty()) {
+                    //BACK
+                    //check if supplied qty + existing qty is more than total current stock qty
+                    aStatusBean.setItemAddedStatus("");
+                    aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Insufficient Stock for Selected Big Item and Batch"));
+                    aStatusBean.setShowItemAddedStatus(0);
+                    aStatusBean.setShowItemNotAddedStatus(1);
+                } else if ("UNPACK".equals(new GeneralUserSetting().getCurrentTransactionTypeName()) && (NewTransItem.getItemId2() == 0 || NewTransItem.getItemQty2() == 0)) {
+                    //BACK
+                    //check if supplied qty + existing qty is more than total current stock qty
+                    aStatusBean.setItemAddedStatus("");
+                    aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Selected Item or Quantity to Unpack To is Invalid"));
+                    aStatusBean.setShowItemAddedStatus(0);
+                    aStatusBean.setShowItemNotAddedStatus(1);
                 } else {
-                    this.updateLookUpsUI(ti);
-                    aActiveTransItems.add(ti);
-                }
-                TransBean transB = new TransBean();
-                //transB.saveTrans(NewTrans, aActiveTransItems, null, null, null, null, null, null);
-                transB.saveTransCEC("PARENT", new GeneralUserSetting().getCurrentStore().getStoreId(), new GeneralUserSetting().getCurrentTransactionTypeId(), new GeneralUserSetting().getCurrentTransactionReasonId(), "", NewTrans, aActiveTransItems, null, null, null, null, null, null);
-                transB.clearAll(NewTrans, null, NewTransItem, aItem, null, 1, null);
+                    TransItem ti = new TransItem();
+                    ti.setTransactionItemId(NewTransItem.getTransactionItemId());
+                    ti.setTransactionId(NewTransItem.getTransactionId());
+                    ti.setItemId(NewTransItem.getItemId());
+                    ti.setBatchno(NewTransItem.getBatchno());
+                    try {
+                        ti.setCodeSpecific(NewTransItem.getCodeSpecific());
+                    } catch (NullPointerException npe) {
+                        ti.setCodeSpecific("");
+                    }
+                    try {
+                        ti.setDescSpecific(NewTransItem.getDescSpecific());
+                    } catch (NullPointerException npe) {
+                        ti.setDescSpecific("");
+                    }
+                    try {
+                        ti.setDescMore(NewTransItem.getDescMore());
+                    } catch (NullPointerException npe) {
+                        ti.setDescMore("");
+                    }
 
-                aStatusBean.setItemAddedStatus("ITEM ADDED");
-                aStatusBean.setItemNotAddedStatus("");
-                aStatusBean.setShowItemAddedStatus(1);
-                aStatusBean.setShowItemNotAddedStatus(0);
+                    ti.setItemQty(NewTransItem.getItemQty());
+                    ti.setUnitPrice(NewTransItem.getUnitPrice());
+                    ti.setUnitTradeDiscount(NewTransItem.getUnitTradeDiscount());
+                    ti.setAmount(NewTransItem.getAmount());
+                    ti.setVatRated(NewTransItem.getVatRated());
+                    //for UNPACK
+                    ti.setItemId2(NewTransItem.getItemId2());
+                    ti.setItemQty2(NewTransItem.getItemQty2());
+                    try {
+                        ti.setItemExpryDate(st.getItemExpDate());
+                    } catch (NullPointerException npe) {
+                        ti.setItemExpryDate(null);
+                    }
+                    try {
+                        ti.setItemMnfDate(st.getItemMnfDate());
+                    } catch (NullPointerException npe) {
+                        ti.setItemMnfDate(null);
+                    }
+                    //for profit margin
+                    ti.setUnitCostPrice(0);
+                    ti.setUnitProfitMargin(0);
+
+                    if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "LIST_ITEMS_APPEND").getParameter_value().equals("0")) {
+                        this.updateLookUpsUI(ti);
+                        aActiveTransItems.add(0, ti);
+                    } else {
+                        this.updateLookUpsUI(ti);
+                        aActiveTransItems.add(ti);
+                    }
+                    TransBean transB = new TransBean();
+                    //transB.saveTrans(NewTrans, aActiveTransItems, null, null, null, null, null, null);
+                    transB.saveTransCEC("PARENT", new GeneralUserSetting().getCurrentStore().getStoreId(), new GeneralUserSetting().getCurrentTransactionTypeId(), new GeneralUserSetting().getCurrentTransactionReasonId(), "", NewTrans, aActiveTransItems, null, null, null, null, null, null);
+                    transB.clearAll(NewTrans, null, NewTransItem, aItem, null, 1, null);
+
+                    aStatusBean.setItemAddedStatus(ub.translateWordsInText(BaseName, "Item Added"));
+                    aStatusBean.setItemNotAddedStatus("");
+                    aStatusBean.setShowItemAddedStatus(1);
+                    aStatusBean.setShowItemNotAddedStatus(0);
+                }
             }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 

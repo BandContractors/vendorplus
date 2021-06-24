@@ -10,7 +10,6 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import static java.sql.Types.VARCHAR;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +17,8 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 
 /*
@@ -33,7 +34,7 @@ import javax.faces.context.FacesContext;
 public class ItemMapBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    static Logger LOGGER = Logger.getLogger(ItemMapBean.class.getName());
     private List<ItemMap> ItemMaps;
     private String ActionMessage = null;
     private ItemMap SelectedItemMap = null;
@@ -123,8 +124,8 @@ public class ItemMapBean implements Serializable {
                             this.clearItemMap(itemmap);
                             this.setActionMessage("Saved Successfully");
                         }
-                    } catch (SQLException se) {
-                        System.err.println(se.getMessage());
+                    } catch (Exception e) {
+                        LOGGER.log(Level.ERROR, e);
                         this.setActionMessage("ItemMap NOT saved");
                         FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("ItemMap NOT saved!"));
                     }
@@ -154,17 +155,9 @@ public class ItemMapBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
 
     }
@@ -190,17 +183,9 @@ public class ItemMapBean implements Serializable {
                 ItemMaps2.add(itemmap);
             }
             return ItemMaps2;
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
     }
 
@@ -224,19 +209,10 @@ public class ItemMapBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
-
     }
 
     public ItemMap getItemMapBySmallItemId(long SmallItemId) {
@@ -259,19 +235,10 @@ public class ItemMapBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
-
     }
 
     public void deleteItemMap(ItemMap itemmap) {
@@ -292,8 +259,8 @@ public class ItemMapBean implements Serializable {
                 ps.executeUpdate();
                 this.setActionMessage("Deleted Successfully!");
                 //this.clearItemMap(itemmap);
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
                 this.setActionMessage("ItemMap NOT deleted");
             }
         }
@@ -334,16 +301,8 @@ public class ItemMapBean implements Serializable {
                 this.SelectedMapGroupId = rs.getLong("map_group_id");
                 ItemMaps.add(itemmap);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return ItemMaps;
     }
@@ -368,16 +327,8 @@ public class ItemMapBean implements Serializable {
             if (rs.next()) {
                 this.SelectedMapGroupId = rs.getLong("map_group_id");
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return this.SelectedMapGroupId;
     }
@@ -403,16 +354,8 @@ public class ItemMapBean implements Serializable {
                 this.SelectedMapGroupId = rs.getLong("map_group_id");
                 ItemMaps.add(itemmap);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return ItemMaps;
     }
@@ -439,8 +382,8 @@ public class ItemMapBean implements Serializable {
             cs.registerOutParameter("out_new_id", VARCHAR);
             cs.executeUpdate();
             NewId = cs.getLong(3);
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             NewId = 0;
         }
         return NewId;
@@ -463,16 +406,8 @@ public class ItemMapBean implements Serializable {
             while (rs.next()) {
                 records = records + 1;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return records;
     }
@@ -489,16 +424,8 @@ public class ItemMapBean implements Serializable {
             while (rs.next()) {
                 records = records + 1;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return records;
     }
