@@ -26,30 +26,30 @@
         <h:form id="form" styleClass="clsMainFrom">
 
             <h:panelGrid styleClass="clsGridMainHeader" columns="1">
-                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeader" value="Item - SubCategory"/>
+                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeader" value="#{langsys['Item']} - #{langsys['Subcategory']}"/>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainInput" columns="4">
-                <h:outputLabel  value="Category Name:"/>
+                <h:outputLabel  value="#{langsys['Category']} #{langsys['Name']}:"/>
                 <h:selectOneMenu styleClass="clsMenu" id="menuCategory" value="#{subCategory.categoryId}">
                     <f:selectItem itemLabel="" itemValue="0"/>
                     <f:selectItems value="#{categoryBean.categories}" var="c" itemLabel="#{c.categoryName}" itemValue="#{c.categoryId}"/>
                 </h:selectOneMenu>
                 
-                <h:outputLabel  value="SubCategory Name:"/>
+                <h:outputLabel  value="#{langsys['Subcategory']} #{langsys['Name']}:"/>
                 <h:inputText styleClass="clsInput" id="itxtSubCategoryName" value="#{subCategory.subCategoryName}" autocomplete="off">
                 </h:inputText>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainCommands" columns="1">
             <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
-                <h:commandButton styleClass="clsButton" id="cmdbSave" value="Save">
+                <h:commandButton styleClass="clsButton" id="cmdbSave" value="#{langsys['Save']}">
                     <f:ajax listener="#{subCategoryBean.saveSubCategory(subCategory)}" execute="@form" render="@form" />
                 </h:commandButton>
-                <h:commandButton styleClass="clsButton" id="cmdbClear" value="Clear">
+                <h:commandButton styleClass="clsButton" id="cmdbClear" value="#{langsys['Clear']}">
                     <f:ajax listener="#{subCategoryBean.clearSubCategory(subCategory)}" execute="@form" render="@form" />
                 </h:commandButton>
-                <h:commandButton styleClass="clsButton" id="cmdbDelete" value="Delete" onclick="return confirmDelete();">
+                <h:commandButton styleClass="clsButton" id="cmdbDelete" value="#{langsys['Delete']}" onclick="return confirmDelete();">
                     <f:ajax listener="#{subCategoryBean.deleteSubCategoryByObject(subCategory)}" execute="@form" render="@form" />
                 </h:commandButton>
             </h:panelGrid>
@@ -61,8 +61,8 @@
             </h:panelGrid>
             
             <h:panelGrid styleClass="clsGridMainSearch" columns="1">
-                <h:outputLabel id="olblMainSearch" value="Search SubCategory"/>
-                <h:outputLabel id="olblMainSearchDesc" value="(Type Category or SubCategory Name to search!)"/>
+                <h:outputLabel id="olblMainSearch" value="#{langsys['Search']} #{langsys['Subcategory']}"/>
+                <h:outputLabel id="olblMainSearchDesc" value="(#{langsys['Type']} #{langsys['Category']} #{langsys['or']} #{langsys['Subcategory']} #{langsys['Name']} #{langsys['to']} #{langsys['search']}!)"/>
                 <h:inputText id="itxtMainSearch" value="#{subCategoryBean.searchSubCategoryName}" autocomplete="off">
                     <f:ajax event="keyup" render="dtblSubCategory"/>
                 </h:inputText>
@@ -72,23 +72,23 @@
                          > 
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Category Name</f:facet>
+                    <f:facet name="header">#{langsys['Category']} #{langsys['Name']}</f:facet>
                     <!-- row record -->
                     #{sc.categoryName}
                 </p:column>
                 
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">SubCategory Name</f:facet>
+                    <f:facet name="header">#{langsys['Subcategory']} #{langsys['Name']}</f:facet>
                     <!-- row record -->
                     #{sc.subCategoryName}
                 </p:column>
 
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Action</f:facet>
+                    <f:facet name="header">#{langsys['Action']}</f:facet>
                     <!-- row record -->
-                    <h:commandLink value="Edit">
+                    <h:commandLink value="#{langsys['Edit']}">
                         <f:ajax listener="#{subCategoryBean.displaySubCategory(sc,subCategory)}" execute="@form" render="@form"/>
                     </h:commandLink>
                     &nbsp;

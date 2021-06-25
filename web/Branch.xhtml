@@ -25,28 +25,28 @@
         <h:form id="form" styleClass="clsMainFrom">
 
             <h:panelGrid styleClass="clsGridMainHeader" columns="1">
-                <h:outputLabel styleClass="clsLabelTop" id="olblbranchHeader" value="Branch"/>
+                <h:outputLabel styleClass="clsLabelTop" id="olblbranchHeader" value="#{langsys['Branch']}"/>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainInput" columns="4">
-                <h:outputLabel  value="Branch Code:"/>
+                <h:outputLabel  value="#{langsys['Branch']} #{langsys['Code']}:"/>
                 <h:inputText styleClass="clsInput" id="itxtBranchCode" value="#{branch.branchCode}" autocomplete="off">  
                 </h:inputText>
-                <h:outputLabel  value="Branch Name:"/>
+                <h:outputLabel  value="#{langsys['Branch']} #{langsys['Name']}:"/>
                 <h:inputText styleClass="clsInput" id="itxtBranchName" value="#{branch.branchName}" autocomplete="off">  
                 </h:inputText>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainCommands" columns="2">
             <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
-                <h:commandButton styleClass="clsButton" id="cmdbSave" value="Save">
+                <h:commandButton styleClass="clsButton" id="cmdbSave" value="#{langsys['Save']}">
                     <f:actionListener binding="#{branchBean.saveBranch(branch)}" />
                     <f:actionListener binding="#{branchBean.clearBranch(branch)}" />
                 </h:commandButton>
-                <h:commandButton styleClass="clsButton" id="cmdbClear" value="Clear">
+                <h:commandButton styleClass="clsButton" id="cmdbClear" value="#{langsys['Clear']}">
                     <f:actionListener binding="#{branchBean.clearBranch(branch)}" />
                 </h:commandButton>
-                <h:commandButton styleClass="clsButton" id="cmdbDelete" value="Delete" onclick="return confirmDelete();">
+                <h:commandButton styleClass="clsButton" id="cmdbDelete" value="#{langsys['Delete']}" onclick="return confirmDelete();">
                     <f:actionListener binding="#{branchBean.deleteBranch(branch)}" />
                     <f:actionListener binding="#{branchBean.clearBranch(branch)}" />
                 </h:commandButton>
@@ -69,30 +69,30 @@
                          > 
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header"> Branch Id </f:facet>
+                    <f:facet name="header"> #{langsys['Branch']} #{langsys['Id']} </f:facet>
                     <!-- row record -->
                     #{b.branchId}
                 </h:column>
                 
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header"> Branch Code </f:facet>
+                    <f:facet name="header"> #{langsys['Branch']} #{langsys['Code']} </f:facet>
                     <!-- row record -->
                     #{b.branchCode}
                 </h:column>
 
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header"> Branch Name </f:facet>
+                    <f:facet name="header"> #{langsys['Branch']} #{langsys['Name']} </f:facet>
                     <!-- row record -->
                     #{b.branchName}
                 </h:column>
 
                 <h:column>
                     <!-- column header -->
-                    <f:facet name="header">Action</f:facet>
+                    <f:facet name="header">#{langsys['Action']}</f:facet>
                     <!-- row record -->
-                    <h:commandLink value="Edit" action="#{branchBean.displayBranch(b,branch)}" />
+                    <h:commandLink value="#{langsys['Edit']}" action="#{branchBean.displayBranch(b,branch)}" />
                     &nbsp;
                 </h:column>
                 

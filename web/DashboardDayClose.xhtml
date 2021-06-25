@@ -48,31 +48,31 @@
             <ui:include src="Menu.xhtml"/>
             <h:form id="formReport">
                 <h:panelGrid id="pnlgHeader" columns="3" styleClass="clsPanelReportFilterTitle">
-                    <h:outputLabel styleClass="clsLabelReportFilterTitle" value="Day Closing Dashboard"/>
-                    <p:commandLink id="cmdbToday" value="Today's Date" style="color: white;">
+                    <h:outputLabel styleClass="clsLabelReportFilterTitle" value="#{langsys['Day']} #{langsys['Closing']} #{langsys['Dashboard']}"/>
+                    <p:commandLink id="cmdbToday" value="#{langsys['Today']}" style="color: white;">
                         <p:ajax listener="#{dashboardBean.setDateToToday()}" process="@this" update="pnlgFilter"/>
                     </p:commandLink>
-                    <p:commandLink id="cmdbYesturday" value="Yesterday's Date" style="color: white;">
+                    <p:commandLink id="cmdbYesturday" value="#{langsys['Yesterday']}" style="color: white;">
                         <p:ajax listener="#{dashboardBean.setDateToYesturday()}" process="@this" update="pnlgFilter"/>
                     </p:commandLink>
                 </h:panelGrid>
                 <h:panelGrid id="pnlgFilter" columns="8" styleClass="clsPanelReportFilter" style="-webkit-print-color-adjust: exact;">
                     <p:outputLabel value="#{companySetting.getStoreEquivName()}:"/>
                     <p:selectOneMenu id="menuFromStore" value="#{dashboardBean.store_id}" style="width: 200px;">
-                        <f:selectItem itemLabel="Select" itemValue="0"/>
+                        <f:selectItem itemLabel="#{langsys['Select']}" itemValue="0"/>
                         <f:selectItems value="#{dashboardBean.storeList}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
                     </p:selectOneMenu>
-                    <p:outputLabel value="From Date:"/>
+                    <p:outputLabel value="#{langsys['From']} #{langsys['Date']}:"/>
                     <p:calendar pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{dashboardBean.fromDate}" size="8"/>
-                    <p:outputLabel id="id11" value="To Date:"/>
+                    <p:outputLabel id="id11" value="#{langsys['To']} #{langsys['Date']}:"/>
                     <p:calendar pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{dashboardBean.toDate}" size="8"/>
-                    <p:commandButton id="cmdbSearch" value="SEARCH" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                    <p:commandButton id="cmdbSearch" value="#{langsys['SEARCH']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
                         <p:ajax listener="#{dashboardBean.searchDayCloseDashboard()}" process="pnlgFilter" update="growl1 formReport:pnlSales formReport:pnlCashReceipt formReport:pnlPurchases formReport:pnlCashPayment"/>
                     </p:commandButton>
-                    <p:commandButton id="cmdbReset" value="RESET">
+                    <p:commandButton id="cmdbReset" value="#{langsys['RESET']}">
                         <p:ajax listener="#{dashboardBean.initDayCloseDashboard()}" process="pnlgFilter" update="pnlgFilter growl1 formReport:pnlSales formReport:pnlCashReceipt formReport:pnlPurchases formReport:pnlCashPayment"/>
                     </p:commandButton>
                 </h:panelGrid>
@@ -85,7 +85,7 @@
                             <table cellspacing="0" cellpadding="2" border="0" style="background-color: #b3f2b3;width: 100%;">
                                 <tr style="background-color: #00B461;">
                                     <td colspan="3" align="center" valign="bottom">
-                                        <b>SALES</b>
+                                        <b>#{langsys['SALES']}</b>
                                     </td>
                                 </tr>
                                 <tr>
@@ -100,7 +100,7 @@
                                 </tr>
                                 <tr style="background-color: #00B461;">
                                     <td colspan="3" align="center" valign="bottom">
-                                        <b>Cash Sales</b>
+                                        <b>#{langsys['Cash']} #{langsys['Sales']}</b>
                                     </td>
                                 </tr>
                                 <ui:repeat var="cs" value="#{dashboardBean.dayCloseSalesCash}">
@@ -115,7 +115,7 @@
                                 </ui:repeat>
                                 <tr style="background-color: #00B461;">
                                     <td colspan="3" align="center" valign="bottom">
-                                        <b>Credit Sales</b>
+                                        <b>#{langsys['Credit']} #{langsys['Sales']}</b>
                                     </td>
                                 </tr>
                                 <ui:repeat var="cc" value="#{dashboardBean.dayCloseSalesCredit}">
@@ -130,7 +130,7 @@
                                 </ui:repeat>
                                 <tr style="background-color: #00B461;">
                                     <td colspan="3" align="center" valign="bottom">
-                                        <b>#{companySetting.getStoreEquivName()} Sales</b>
+                                        <b>#{companySetting.getStoreEquivName()} #{langsys['Sales']}</b>
                                     </td>
                                 </tr>
                                 <ui:repeat var="st" value="#{dashboardBean.dayCloseSalesStore}">
@@ -154,7 +154,7 @@
                             <table cellspacing="0" cellpadding="2" border="0" style="background-color: #b3f2b3;width: 100%;">
                                 <tr style="background-color: #00B461;">
                                     <td colspan="3" align="center" valign="bottom">
-                                        <b>CASH RECEIVED</b>
+                                        <b>#{langsys['CASH']} #{langsys['RECEIVED']}</b>
                                     </td>
                                 </tr>
                                 <tr>
@@ -169,7 +169,7 @@
                                 </tr>
                                 <tr style="background-color: #00B461;">
                                     <td colspan="3" align="center" valign="bottom">
-                                        <b>Cash Receipt Type</b>
+                                        <b>#{langsys['Cash']} #{langsys['Receipt']} #{langsys['Type']}</b>
                                     </td>
                                 </tr>
                                 <ui:repeat var="crt" value="#{dashboardBean.dayCloseCashReceiptType}">
@@ -187,7 +187,7 @@
                                 </ui:repeat>
                                 <tr style="background-color: #00B461;">
                                     <td colspan="3" align="center" valign="bottom">
-                                        <b>Cash Receipt Account</b>
+                                        <b>#{langsys['Cash']} #{langsys['Receipt']} #{langsys['Account']}</b>
                                     </td>
                                 </tr>
                                 <ui:repeat var="cra" value="#{dashboardBean.dayCloseCashReceiptAccount}">
@@ -211,7 +211,7 @@
                             <table cellspacing="0" cellpadding="2" border="0" style="background-color: #ff3d41;width: 100%;">
                                 <tr style="background-color: #E60000;">
                                     <td colspan="3" align="center" valign="bottom">
-                                        <b>PURCHASES &amp; EXPENSES</b>
+                                        <b>#{langsys['PURCHASES']} &amp; #{langsys['EXPENSES']}</b>
                                     </td>
                                 </tr>
                                 <tr>
@@ -226,7 +226,7 @@
                                 </tr>
                                 <tr style="background-color: #E60000;">
                                     <td colspan="3" align="center" valign="bottom">
-                                        <b>Cash Purchases &amp; Expenses</b>
+                                        <b>#{langsys['Cash']} #{langsys['Purchases']} &amp; #{langsys['Expenses']}</b>
                                     </td>
                                 </tr>
                                 <ui:repeat var="capu" value="#{dashboardBean.dayClosePurchasesCash}">
@@ -241,7 +241,7 @@
                                 </ui:repeat>
                                 <tr style="background-color: #E60000;">
                                     <td colspan="3" align="center" valign="bottom">
-                                        <b>Credit Purchases &amp; Expenses</b>
+                                        <b>#{langsys['Credit']} #{langsys['Purchases']} &amp; #{langsys['Expenses']}</b>
                                     </td>
                                 </tr>
                                 <ui:repeat var="crpu" value="#{dashboardBean.dayClosePurchasesCredit}">
@@ -256,7 +256,7 @@
                                 </ui:repeat>
                                 <tr style="background-color: #E60000;">
                                     <td colspan="3" align="center" valign="bottom">
-                                        <b>Type of Purchases/Expenses</b>
+                                        <b>#{langsys['Type']} #{langsys['of']} #{langsys['Purchases']}/#{langsys['Expenses']}</b>
                                     </td>
                                 </tr>
                                 <ui:repeat var="typu" value="#{dashboardBean.dayClosePurchasesType}">
@@ -274,7 +274,7 @@
                                 </ui:repeat>
                                 <tr style="background-color: #E60000;">
                                     <td colspan="3" align="center" valign="bottom">
-                                        <b>#{companySetting.getStoreEquivName()} Purchases &amp; Expenses</b>
+                                        <b>#{companySetting.getStoreEquivName()} #{langsys['Purchases']} &amp; #{langsys['Expenses']}</b>
                                     </td>
                                 </tr>
                                 <ui:repeat var="stpu" value="#{dashboardBean.dayClosePurchasesStore}">
@@ -298,7 +298,7 @@
                             <table cellspacing="0" cellpadding="2" border="0" style="background-color: #ff3d41;width: 100%;">
                                 <tr style="background-color: #E60000;">
                                     <td colspan="3" align="center" valign="bottom">
-                                        <b>CASH PAID OUT</b>
+                                        <b>#{langsys['CASH']} #{langsys['PAID']} #{langsys['OUT']}</b>
                                     </td>
                                 </tr>
                                 <tr>
@@ -313,7 +313,7 @@
                                 </tr>
                                 <tr style="background-color: #E60000;">
                                     <td colspan="3" align="center" valign="bottom">
-                                        <b>Cash Payment Type</b>
+                                        <b>#{langsys['Cash']} #{langsys['Payment']} #{langsys['Type']}</b>
                                     </td>
                                 </tr>
                                 <ui:repeat var="cpt" value="#{dashboardBean.dayCloseCashPaymentType}">
@@ -331,7 +331,7 @@
                                 </ui:repeat>
                                 <tr style="background-color: #E60000;">
                                     <td colspan="3" align="center" valign="bottom">
-                                        <b>Cash Payment Account</b>
+                                        <b>#{langsys['Cash']} #{langsys['Payment']} #{langsys['Account']}</b>
                                     </td>
                                 </tr>
                                 <ui:repeat var="cpa" value="#{dashboardBean.dayCloseCashPaymentAccount}">

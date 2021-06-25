@@ -28,21 +28,21 @@
 
         <h:form id="formReport">
             <h:panelGrid id="id0" columns="1" styleClass="clsPanelReportFilterTitle">
-                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="Transactions Bill Report"/>
+                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="#{langsys['Transactions']} #{langsys['Bill']} #{langsys['Report']}"/>
             </h:panelGrid>
             <h:panelGrid id="id1" columns="8" styleClass="clsPanelReportFilter">
-                <p:outputLabel styleClass="clsLabelReportFilter" id="id2" value="FromStore:"/>
+                <p:outputLabel styleClass="clsLabelReportFilter" id="id2" value="#{langsys['From']} #{langsys['Store']}:"/>
                 <h:selectOneMenu styleClass="clsInputReportFilter" id="menuFromStore" value="#{trans.storeId}" >
                     <f:selectItem itemLabel="" itemValue="0"/>
                     <f:selectItems value="#{storeBean.stores}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
                 </h:selectOneMenu>
-                <p:outputLabel styleClass="clsLabelReportFilter" id="id10" value="TransDate(From):"/>
+                <p:outputLabel styleClass="clsLabelReportFilter" id="id10" value="#{langsys['Transaction']} #{langsys['Date']}(#{langsys['From']}):"/>
                 <p:calendar styleClass="clsInputReportFilter" id="calTransDateFrom"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{trans.transactionDate}">
                 </p:calendar>
-                <p:outputLabel styleClass="clsLabelReportFilter" id="id11" value="TransDate(To):"/>
+                <p:outputLabel styleClass="clsLabelReportFilter" id="id11" value="#{langsys['Transaction']} #{langsys['Date']}(#{langsys['To']}):"/>
                 <p:calendar styleClass="clsInputReportFilter" id="calTransDateTo"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{trans.transactionDate2}">
                 </p:calendar>
-                <h:outputLabel styleClass="clsLabelReportFilter" value="Bill Transactor(Provider):"/>
+                <h:outputLabel styleClass="clsLabelReportFilter" value="#{langsys['Bill']} #{langsys['Transactor']}(#{langsys['Provider']}):"/>
                 <p:autoComplete styleClass="clsInputReportFilter" id="autcBillTransactor" value="#{transactorBean.selectedBillTransactor}" 
                                 completeMethod="#{transactorBean.getTransactorObjectList}" 
                                 var="trct2" 
@@ -51,17 +51,17 @@
                                 converter="TransactorConverter" style="text-align: left" 
                                 forceSelection="true" 
                                 >
-                    <p:column headerText="Names" style="text-align: left" >  
+                    <p:column headerText="#{langsys['Names']}" style="text-align: left" >  
                         #{trct2.transactorNames} 
                     </p:column> 
-                    <p:column headerText="Contact Person" style="text-align: left">  
+                    <p:column headerText="#{langsys['Contact']} #{langsys['Person']}" style="text-align: left">  
                         #{trct2.cpName} 
                     </p:column> 
                     <p:ajax event="itemSelect" listener="#{trans.setBillTransactorId(transactorBean.selectedBillTransactor.transactorId)}"/>
                     <p:ajax event="change" listener="#{trans.setBillTransactorId(transactorBean.selectedBillTransactor.transactorId)}" rendered="#{transactorBean.selectedBillTransactor!=null} "/>
                 </p:autoComplete>
 
-                <p:commandButton styleClass="clsButtonReportFilter" id="cmdbSearch" value="Search" update="pnlTransaction pnlgActionMessage" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                <p:commandButton styleClass="clsButtonReportFilter" id="cmdbSearch" value="#{langsys['Search']}" update="pnlTransaction pnlgActionMessage" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                     <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                         <p:graphicImage name="/images/ajax-loader.gif"/>
                     </p:dialog>
@@ -70,7 +70,7 @@
             <h:panelGrid id="pnlgActionMessage">
                 <p:outputLabel value="#{transBean.actionMessage}" style="color: red;"/>
             </h:panelGrid>
-            <p:commandButton id="cmdbPrint" styleClass="clsButtonBigLonger" value="Print Bill Below (ALT+P)" icon="ui-icon-print" type="button" accesskey="p">
+            <p:commandButton id="cmdbPrint" styleClass="clsButtonBigLonger" value="#{langsys['Print']} #{langsys['Bill']} #{langsys['Below']} (ALT+P)" icon="ui-icon-print" type="button" accesskey="p">
                 <p:printer target="pnlTransaction" rendered="false"/>
             </p:commandButton>
             <p:panel id="pnlTransaction" style="border: none;">
@@ -89,14 +89,14 @@
                     </tr>
                     <tr style="background-color: #ADD8E6;font-weight: bold">
                         <td>#{transactionTypeBean.getTransactionType(2).transactionNumberLabel}</td>
-                        <td>SchemeName</td>
-                        <td>SchemeCardNo</td>
-                        <td>#{menuItemBean.menuItemObj.CUSTOMER_NAME}</td>
-                        <td>#{transactionTypeBean.getTransactionType(2).transactionDateLabel}</td>
-                        <td>Category</td>
-                        <td>Amount</td>
-                        <td>GrandTotal</td>
-                        <td>#{transactionTypeBean.getTransactionType(2).transactionUserLabel}</td>
+                        <td>#{langsys['Scheme']} #{langsys['Name']}</td>
+                        <td>#{langsys['Scheme']} #{langsys['Card']} #{langsys['No.']}</td>
+                        <td>#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}</td>
+                        <td>#{langsys[transactionTypeBean.getTransactionType(2).transactionDateLabel]}</td>
+                        <td>#{langsys['Category']}</td>
+                        <td>#{langsys['Amount']}</td>
+                        <td>#{langsys['Total']}</td>
+                        <td>#{langsys[transactionTypeBean.getTransactionType(2).transactionUserLabel]}</td>
                     </tr>
                     <ui:repeat var="t" value="#{transBean.getReportBill(trans)}" varStatus="status">
                         <tr style="background-color: #E5E5E5">

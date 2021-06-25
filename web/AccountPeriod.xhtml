@@ -33,55 +33,55 @@
         <h:form id="frmMain" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
                     return false;">
             <h:panelGrid styleClass="clsGridMainHeader" columns="1">
-                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeader" value="Accounting Period"/>
+                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeader" value="#{langsys['Accounting']} #{langsys['Period']}"/>
             </h:panelGrid>
             <h:panelGrid id="pnlgInput">
                 <h:panelGrid styleClass="clsGridMainInput" columns="4" rendered="#{accPeriod.action_mode>0}">
-                    <h:outputLabel  value="Account Period:"/>
+                    <h:outputLabel  value="#{langsys['Account']} #{langsys['Period']}:"/>
                     <h:inputText styleClass="clsInput" id="itxtAccPeriodName" value="#{accPeriod.accPeriodName}" autocomplete="on" style="width: 150px;"/>
-                    <h:outputLabel  value="Current?"/>
+                    <h:outputLabel  value="#{langsys['Current']}?"/>
                     <h:selectOneMenu styleClass="clsMenu" id="menuIsCurrent" value="#{accPeriod.isCurrent}" disabled="true">
-                        <f:selectItem itemLabel="Yes" itemValue="1"/>
-                        <f:selectItem itemLabel="No" itemValue="0"/>
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
                     </h:selectOneMenu>
 
-                    <h:outputLabel  value="Start Date:"/>
+                    <h:outputLabel  value="#{langsys['Start']} #{langsys['Date']}:"/>
                     <p:calendar styleClass="clsInput" id="calStartDate" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{accPeriod.startDate}" pattern="#{companySetting.getDateFormat()}" size="11"/>
-                    <h:outputLabel  value="Open?"/>
+                    <h:outputLabel  value="#{langsys['Open']}?"/>
                     <h:selectOneMenu styleClass="clsMenu" id="menuIsOpen" value="#{accPeriod.isOpen}" disabled="true">
-                        <f:selectItem itemLabel="Yes" itemValue="1"/>
-                        <f:selectItem itemLabel="No" itemValue="0"/>
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
                     </h:selectOneMenu>
 
-                    <h:outputLabel  value="End Date:"/>
+                    <h:outputLabel  value="#{langsys['End']} #{langsys['Date']}:"/>
                     <p:calendar styleClass="clsInput" id="calEndDate" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{accPeriod.endDate}" pattern="#{companySetting.getDateFormat()}" size="11"/>
-                    <h:outputLabel  value="Closed?"/>
+                    <h:outputLabel  value="#{langsys['Closed']}?"/>
                     <h:selectOneMenu styleClass="clsMenu" id="menuIsClosed" value="#{accPeriod.isClosed}" disabled="true">
-                        <f:selectItem itemLabel="Yes" itemValue="1"/>
-                        <f:selectItem itemLabel="No" itemValue="0"/>
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
                     </h:selectOneMenu>
 
-                    <h:outputLabel  value="Order:"/>
+                    <h:outputLabel  value="#{langsys['Order']}:"/>
                     <h:inputText styleClass="clsInput" id="itxtOrder" value="#{accPeriod.orderNo}" autocomplete="off" style="width: 150px;"/>
                     <h:outputLabel  value=""/>
                     <h:outputLabel  value=""/>
                 </h:panelGrid>
                 <h:panelGrid styleClass="clsGridMainCommands" columns="1" rendered="#{accPeriod.action_mode>0}">
                     <h:panelGrid styleClass="clsGridMainCommands1" columns="2">
-                        <p:commandButton styleClass="clsButtonBig" id="cmdbSave" value="SAVE" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                        <p:commandButton styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['SAVE']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                             <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                                 <p:graphicImage name="/images/ajax-loader.gif"/>
                             </p:dialog>
                             <f:ajax listener="#{accPeriodBean.saveAccPeriod2(accPeriod)}" execute="@form" render="frmMain:pnlgInput frmMain:pnlgAddNew frmMain:pgrdMsgs frmMain:growl1 frmMain:dtblAccountPeriod" />
                         </p:commandButton>
-                        <p:commandButton styleClass="clsButtonBig" id="cmdbClear" value="CLEAR">
+                        <p:commandButton styleClass="clsButtonBig" id="cmdbClear" value="#{langsys['CLEAR']}">
                             <f:ajax listener="#{accPeriodBean.clearAccPeriod(accPeriod)}" execute="@form" render="frmMain:pnlgInput frmMain:pnlgAddNew frmMain:pgrdMsgs frmMain:growl1 frmMain:dtblAccountPeriod" />
                         </p:commandButton>
                     </h:panelGrid>
                 </h:panelGrid>
             </h:panelGrid>
             <h:panelGrid id="pnlgAddNew" styleClass="clsGridMainInput" style="text-align: center !important;">
-                <p:commandButton id="cmdbNew" value="Add New Accounting Period" icon="ui-icon-pencil" rendered="#{accPeriod.action_mode==0}">
+                <p:commandButton id="cmdbNew" value="#{langsys['Add']} #{langsys['New']} #{langsys['Accounting']} #{langsys['Period']}" icon="ui-icon-pencil" rendered="#{accPeriod.action_mode==0}">
                     <p:ajax listener="#{accPeriodBean.initAddNewAccPeriod(accPeriod)}" process="@form" update="frmMain:pnlgInput frmMain:pgrdMsgs frmMain:growl1 frmMain:pnlgAddNew"/>
                 </p:commandButton>
             </h:panelGrid>
@@ -96,55 +96,55 @@
                          tableStyle="width:auto;">
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Order</f:facet>
+                    <f:facet name="header">#{langsys['Order']}</f:facet>
                     <!-- row record -->
                     #{itm.orderNo}
                 </p:column>
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Account Period</f:facet>
+                    <f:facet name="header">#{langsys['Account']} #{langsys['Period']}</f:facet>
                     <!-- row record -->
                     #{itm.accPeriodName}
                 </p:column>
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Start Date</f:facet>
+                    <f:facet name="header">#{langsys['Start']} #{langsys['Date']}</f:facet>
                     <!-- row record -->
                     <h:outputLabel value="#{utilityBean.formatDate(itm.startDate)}"/>
                 </p:column>
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">End Date</f:facet>
+                    <f:facet name="header">#{langsys['End']} #{langsys['Date']}</f:facet>
                     <!-- row record -->
                     <h:outputLabel value="#{utilityBean.formatDate(itm.endDate)}"/>
                 </p:column>
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Current</f:facet>
+                    <f:facet name="header">#{langsys['Current']}</f:facet>
                     <!-- row record -->
                     <h:selectOneMenu value="#{itm.isCurrent}" disabled="true">
-                        <f:selectItem itemLabel="Yes" itemValue="1"/>
-                        <f:selectItem itemLabel="No" itemValue="0"/>
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
                     </h:selectOneMenu>
                 </p:column>
 
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Open</f:facet>
+                    <f:facet name="header">#{langsys['Open']}</f:facet>
                     <!-- row record -->
                     <h:selectOneMenu value="#{itm.isOpen}" disabled="true">
-                        <f:selectItem itemLabel="Yes" itemValue="1"/>
-                        <f:selectItem itemLabel="No" itemValue="0"/>
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
                     </h:selectOneMenu>
 
                 </p:column>
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">Closed</f:facet>
+                    <f:facet name="header">#{langsys['Closed']}</f:facet>
                     <!-- row record -->
                     <h:selectOneMenu value="#{itm.isClosed}" disabled="true">
-                        <f:selectItem itemLabel="Yes" itemValue="1"/>
-                        <f:selectItem itemLabel="No" itemValue="0"/>
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
                     </h:selectOneMenu>
                 </p:column>
                 <p:column>
@@ -153,27 +153,27 @@
 
                     </f:facet>
                     <!-- row record -->
-                    <h:commandLink value="Edit">
+                    <h:commandLink value="#{langsys['Edit']}">
                         <f:ajax listener="#{accPeriodBean.copyAccPeriod(itm,accPeriod)}" execute="@form" render="frmMain:pnlgInput frmMain:pnlgAddNew frmMain:pgrdMsgs frmMain:growl1 frmMain:dtblAccountPeriod"/>
                     </h:commandLink>
                     <h:outputText value="&nbsp;&nbsp;" rendered="#{itm.isOpen==0 and itm.is_reopen==0}"/>
-                    <h:commandLink value="Open" rendered="#{itm.isOpen==0 and itm.is_reopen==0}">
+                    <h:commandLink value="#{langsys['Open']}" rendered="#{itm.isOpen==0 and itm.is_reopen==0}">
                         <f:ajax listener="#{accPeriodBean.openAccPeriod(itm)}" execute="@form" render="frmMain:pnlgInput frmMain:pnlgAddNew frmMain:pgrdMsgs frmMain:growl1 frmMain:dtblAccountPeriod"/>
                     </h:commandLink>
                     <h:outputText value="&nbsp;&nbsp;" rendered="#{itm.isClosed==0 and itm.isOpen==1}"/>
-                    <h:commandLink value="Close" rendered="#{itm.isClosed==0 and itm.isOpen==1}">
+                    <h:commandLink value="#{langsys['Close']}" rendered="#{itm.isClosed==0 and itm.isOpen==1}">
                         <f:ajax listener="#{accPeriodBean.closeAccPeriod(itm)}" execute="@form" render="frmMain:pnlgInput frmMain:pnlgAddNew frmMain:pgrdMsgs frmMain:growl1 frmMain:dtblAccountPeriod"/>
                     </h:commandLink>
                     <h:outputText value="&nbsp;&nbsp;" rendered="#{itm.isClosed==1}"/>
-                    <h:commandLink value="ReOpen" rendered="#{itm.isClosed==1}">
+                    <h:commandLink value="#{langsys['ReOpen']}" rendered="#{itm.isClosed==1}">
                         <f:ajax listener="#{accPeriodBean.reOpenAccPeriod(itm)}" execute="@form" render="frmMain:pnlgInput frmMain:pnlgAddNew frmMain:pgrdMsgs frmMain:growl1 frmMain:dtblAccountPeriod"/>
                     </h:commandLink>
                     <h:outputText value="&nbsp;&nbsp;"/>
-                    <h:commandLink value="Del">
+                    <h:commandLink value="#{langsys['Delete']}">
                         <f:ajax listener="#{accPeriodBean.deleteAccPeriod(itm)}" execute="@form" render="frmMain:pnlgInput frmMain:pnlgAddNew frmMain:pgrdMsgs frmMain:growl1 frmMain:dtblAccountPeriod"/>
                     </h:commandLink>
                     <h:outputText value="&nbsp;&nbsp;" rendered="#{itm.isOpen==1 and itm.isClosed==0}"/>
-                    <h:commandLink value="OpenBal" rendered="#{itm.isOpen==1 and itm.isClosed==0}">
+                    <h:commandLink value="#{langsys['Open']} #{langsys['Balance']}" rendered="#{itm.isOpen==1 and itm.isClosed==0}">
                         <f:ajax listener="#{accLedgerBean.reportAccLedgerOpenBal(itm.accPeriodId)}" execute="@form" render="frmMain:pnlgInput frmMain:pnlgAddNew frmMain:pgrdMsgs frmMain:growl1 frmMain:dtblAccountPeriod frmMain:tblOpenBal"/>
                     </h:commandLink>
                 </p:column>
@@ -206,27 +206,27 @@
                         <p:dataExporter type="xml" target="tblOpenBal" fileName="Open_Bal_Prev_Period" />
                     </h:commandLink>
                 </f:facet>
-                <p:column headerText="Account Type">
+                <p:column headerText="#{langsys['Account']} #{langsys['Type']}">
                     <h:outputText value="#{accTypeBean.getAccTypeById(accCoaBean.getAccCoaByCodeOrId(itm.accountCode,0).accTypeId).accTypeName}"/>
                 </p:column>
-                <p:column headerText="Account Name">
+                <p:column headerText="#{langsys['Account']} #{langsys['Name']}">
                     <h:outputText value="#{accCoaBean.getAccCoaByCodeOrId(itm.accountCode,0).accountName}"/>
                 </p:column>
-                <p:column headerText="Account Code">
+                <p:column headerText="#{langsys['Account']} #{langsys['Code']}">
                     <h:outputText value="#{itm.accountCode}"/>
                 </p:column>
-                <p:column headerText="Child Account">
+                <p:column headerText="#{langsys['Child']} #{langsys['Account']}">
                     <h:outputText value="#{accChildAccountBean.getAccChildAccById(itm.accChildAccountId).childAccountName}"/>
                 </p:column>
-                <p:column headerText="Currency">
+                <p:column headerText="#{langsys['Currency']}">
                     <h:outputText value="#{itm.currencyCode}"/>
                 </p:column>
-                <p:column headerText="Debit Bal" style="text-align: right;">
+                <p:column headerText="#{langsys['Debit']} #{langsys['Balance']}" style="text-align: right;">
                     <h:outputText value="#{itm.debitAmount}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Credit Bal" style="text-align: right;">
+                <p:column headerText="#{langsys['Credit']} #{langsys['Balance']}" style="text-align: right;">
                     <h:outputText value="#{itm.creditAmount}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
