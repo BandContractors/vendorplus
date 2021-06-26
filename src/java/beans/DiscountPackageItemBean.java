@@ -1,11 +1,8 @@
 package beans;
 
-import sessions.GeneralUserSetting;
 import connections.DBConnection;
 import entities.Category;
 import entities.DiscountPackage;
-import entities.GroupRight;
-import entities.UserDetail;
 import entities.DiscountPackageItem;
 import entities.Item;
 import entities.SubCategory;
@@ -14,13 +11,15 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import utilities.UtilityBean;
 
 /*
  * To change this template, choose Tools | Templates
@@ -35,10 +34,13 @@ import javax.faces.context.FacesContext;
 public class DiscountPackageItemBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    static Logger LOGGER = Logger.getLogger(DiscountPackageItemBean.class.getName());
     private List<DiscountPackageItem> DiscountPackageItems;
     private String ActionMessage = null;
     DiscountPackageItem SelectedDiscountPackageItem = null;
     private List<DiscountPackageItem> DiscountPackageItemsList;
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     public String getCategoryIdsStrFromList(DiscountPackageItem aDiscountPackageItem) {
         String CategoryIdsSrt = "";
@@ -58,7 +60,7 @@ public class DiscountPackageItemBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.out.println("getCategoryIdsStrFromList:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return CategoryIdsSrt;
     }
@@ -81,7 +83,7 @@ public class DiscountPackageItemBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.out.println("getSubCategoryIdsStrFromList:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return SubCategoryIdsSrt;
     }
@@ -104,7 +106,7 @@ public class DiscountPackageItemBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.out.println("getItemIdsStrFromList:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return ItemIdsSrt;
     }
@@ -123,7 +125,7 @@ public class DiscountPackageItemBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.out.println("getCategoryListFromIdsStr:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return lst;
     }
@@ -142,7 +144,7 @@ public class DiscountPackageItemBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.out.println("getSubCategoryListFromIdsStr:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return lst;
     }
@@ -161,14 +163,16 @@ public class DiscountPackageItemBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.out.println("getItemListFromIdsStr:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return lst;
     }
 
     public void saveDiscountPackageItem(DiscountPackageItem aDiscountPackageItem, DiscountPackage aDiscountPackage) {
-        String sql = null;
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         String msg = "";
+        String sql = null;
         //update lookups
         try {
             aDiscountPackageItem.setDiscountPackageId(aDiscountPackage.getDiscountPackageId());
@@ -179,20 +183,20 @@ public class DiscountPackageItemBean implements Serializable {
             //
         }
         if (aDiscountPackageItem.getDiscountPackageId() == 0) {
-            msg = "Select package...";
-            this.setActionMessage(msg);
+            msg = "Select Package";
+            this.setActionMessage(ub.translateWordsInText(BaseName, msg));
         } else if (aDiscountPackageItem.getCategory_scope().length() == 0 && aDiscountPackageItem.getSub_category_scope().length() == 0 && aDiscountPackageItem.getItem_scope().length() == 0) {
-            msg = "Select package items (category and/or subcategory and/or items)...";
-            this.setActionMessage(msg);
+            msg = "Select Package Items Category or Subcategory or Items";
+            this.setActionMessage(ub.translateWordsInText(BaseName, msg));
         } else if (aDiscountPackageItem.getItemQty() <= 0) {
-            msg = "Specify Quanity please...";
-            this.setActionMessage(msg);
+            msg = "Specify Quantity";
+            this.setActionMessage(ub.translateWordsInText(BaseName, msg));
         } else if (aDiscountPackageItem.getWholesaleDiscountAmt() <= 0 && aDiscountPackageItem.getRetailsaleDiscountAmt() <= 0 && aDiscountPackageItem.getHire_price_discount_amt() <= 0) {
-            msg = "Specify percentage discount...";
-            this.setActionMessage(msg);
+            msg = "Specify Percent Discount";
+            this.setActionMessage(ub.translateWordsInText(BaseName, msg));
         } else if (aDiscountPackageItem.getRetailsaleDiscountAmt() > 100 || aDiscountPackageItem.getWholesaleDiscountAmt() > 100 || aDiscountPackageItem.getHire_price_discount_amt() > 100) {
-            msg = "Discount percent cannot exceed 100%...";
-            this.setActionMessage(msg);
+            msg = "Discount Percent Cannot Exceed 100";
+            this.setActionMessage(ub.translateWordsInText(BaseName, msg));
         } else {
             if (aDiscountPackageItem.getDiscountPackageItemId() == 0) {
                 sql = "{call sp_insert_discount_package_item(?,?,?,?,?,?,?,?,?,?)}";
@@ -216,7 +220,7 @@ public class DiscountPackageItemBean implements Serializable {
                     cs.executeUpdate();
                     this.refreshDiscountPackageItems(aDiscountPackageItem.getDiscountPackageId());
                     this.clearDiscountPackageItem(aDiscountPackageItem);
-                    this.setActionMessage("Saved Successfully");
+                    this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
                 } else if (aDiscountPackageItem.getDiscountPackageItemId() > 0) {
                     cs.setLong("in_discount_package_item_id", aDiscountPackageItem.getDiscountPackageItemId());
                     cs.setInt("in_discount_package_id", aDiscountPackageItem.getDiscountPackageId());
@@ -232,11 +236,11 @@ public class DiscountPackageItemBean implements Serializable {
                     cs.executeUpdate();
                     this.refreshDiscountPackageItems(aDiscountPackageItem.getDiscountPackageId());
                     this.clearDiscountPackageItem(aDiscountPackageItem);
-                    this.setActionMessage("Saved Successfully");
+                    this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
                 }
             } catch (Exception e) {
-                System.err.println(e.getMessage());
-                this.setActionMessage("DiscountPackageItem NOT saved");
+                LOGGER.log(Level.ERROR, e);
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Discount Package Item Not Saved"));
             }
         }
     }
@@ -298,8 +302,8 @@ public class DiscountPackageItemBean implements Serializable {
             } catch (NullPointerException npe) {
                 aDiscountPackageItem.setItem_scope("");
             }
-        } catch (SQLException se) {
-            System.err.println("setDiscountPackageItemFromResultset:" + se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -318,23 +322,16 @@ public class DiscountPackageItemBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println("getDiscountPackageItem:" + se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println("getDiscountPackageItem:" + ex.getMessage());
-                }
-            }
         }
-
     }
 
     public void deleteDiscountPackageItem(DiscountPackageItem discountPackageItem) {
-        String msg;
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         if (null == discountPackageItem || discountPackageItem.getDiscountPackageItemId() == 0) {
             //
         } else {
@@ -344,12 +341,12 @@ public class DiscountPackageItemBean implements Serializable {
                     PreparedStatement ps = conn.prepareStatement(sql);) {
                 ps.setLong(1, discountPackageItem.getDiscountPackageItemId());
                 ps.executeUpdate();
-                this.setActionMessage("Deleted Successfully!");
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Deleted Successfully"));
                 this.refreshDiscountPackageItems(discountPackageItem.getDiscountPackageId());
                 this.clearDiscountPackageItem(discountPackageItem);
             } catch (Exception e) {
-                System.err.println("deleteDiscountPackageItem:" + e.getMessage());
-                this.setActionMessage("DiscountPackageItem NOT deleted");
+                LOGGER.log(Level.ERROR, e);
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Discount Package Item Not Deleted"));
             }
         }
     }
@@ -361,8 +358,8 @@ public class DiscountPackageItemBean implements Serializable {
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             ps.setLong(1, aDiscountPackageItemId);
             ps.executeUpdate();
-        } catch (SQLException se) {
-            System.err.println("deleteDiscountPackageItems:" + se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -435,7 +432,7 @@ public class DiscountPackageItemBean implements Serializable {
                 this.DiscountPackageItemsList.add(discountPackageItem);
             }
         } catch (Exception e) {
-            System.err.println("refreshDiscountPackageItems:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -474,16 +471,8 @@ public class DiscountPackageItemBean implements Serializable {
                 this.setDiscountPackageItemFromResultset(discountPackageItem, rs);
                 DiscountPackageItems.add(discountPackageItem);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return DiscountPackageItems;
     }
@@ -507,23 +496,10 @@ public class DiscountPackageItemBean implements Serializable {
                 this.setDiscountPackageItemFromResultset(dpi, rs);
             }
         } catch (Exception e) {
-            System.err.println("getActiveDiscountPackageItem:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return dpi;
     }
-    
-//    public double getActiveWholesaleDiscount(int StoreI, long ItemI, double Qty) {
-//        double DiscountAmount = 0;
-//        SelectedDiscountPackageItem = this.getActiveDiscountPackageItem(StoreI, ItemI, Qty);
-//        if (SelectedDiscountPackageItem == null) {
-//            DiscountAmount = 0;
-//            return 0;
-//        } else {
-//            DiscountAmount = SelectedDiscountPackageItem.getWholesaleDiscountAmt();
-//            SelectedDiscountPackageItem = null;
-//            return DiscountAmount;
-//        }
-//    }
 
     /**
      * @param DiscountPackageItems the DiscountPackageItems to set
@@ -558,5 +534,19 @@ public class DiscountPackageItemBean implements Serializable {
      */
     public void setDiscountPackageItemsList(List<DiscountPackageItem> DiscountPackageItemsList) {
         this.DiscountPackageItemsList = DiscountPackageItemsList;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 }

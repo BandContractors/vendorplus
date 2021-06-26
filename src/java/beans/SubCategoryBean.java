@@ -1,9 +1,7 @@
 package beans;
 
-
 import sessions.GeneralUserSetting;
 import connections.DBConnection;
-import entities.Category;
 import entities.GroupRight;
 import entities.SubCategory;
 import entities.UserDetail;
@@ -12,19 +10,21 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import utilities.UtilityBean;
 
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author btwesigye
@@ -32,14 +32,17 @@ import javax.faces.context.FacesContext;
 @ManagedBean
 @SessionScoped
 public class SubCategoryBean implements Serializable {
-    private static final long serialVersionUID = 1L;
 
+    private static final long serialVersionUID = 1L;
+    static Logger LOGGER = Logger.getLogger(SubCategoryBean.class.getName());
     private List<SubCategory> SubCategories;
-    private String ActionMessage=null;
-    private SubCategory SelectedSubCategory=null;
+    private String ActionMessage = null;
+    private SubCategory SelectedSubCategory = null;
     private int SelectedSubCategoryId;
-    private String SearchSubCategoryName="";
-    
+    private String SearchSubCategoryName = "";
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
+
     public void setSubCategoryFromResultset(SubCategory aSubCategory, ResultSet aResultSet) {
         try {
             try {
@@ -57,59 +60,61 @@ public class SubCategoryBean implements Serializable {
             } catch (NullPointerException npe) {
                 aSubCategory.setSubCategoryName("");
             }
-        } catch (SQLException se) {
-            System.err.println("setSubCategoryFromResultset:" + se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void saveSubCategory(SubCategory subcat) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         String sql = null;
-        String msg=null;
-        UserDetail aCurrentUserDetail=new GeneralUserSetting().getCurrentUser();
-        List<GroupRight> aCurrentGroupRights=new GeneralUserSetting().getCurrentGroupRights();
-        GroupRightBean grb=new GroupRightBean();
+        UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
+        List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
+        GroupRightBean grb = new GroupRightBean();
 
-      if (subcat.getSubCategoryId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail,aCurrentGroupRights,"8", "Add")==0) {
-            msg="YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-      }else if (subcat.getSubCategoryId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail,aCurrentGroupRights,"8", "Edit")==0) {
-            msg="YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-      }else if (subcat.getCategoryId()==0 || subcat.getSubCategoryName().length()<=0) {
-            msg="Category and Subcategory cannot be empty...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-      }else{
-        if (subcat.getSubCategoryId() == 0) {
-            sql = "{call sp_insert_sub_category(?,?)}";
-        } else if (subcat.getSubCategoryId() > 0) {
-            sql = "{call sp_update_sub_category(?,?,?)}";
-        }
-
-        try (
-                Connection conn = DBConnection.getMySQLConnection();
-                CallableStatement cs = conn.prepareCall(sql);) {
+        if (subcat.getSubCategoryId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Add") == 0) {
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+        } else if (subcat.getSubCategoryId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Edit") == 0) {
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+        } else if (subcat.getCategoryId() == 0 || subcat.getSubCategoryName().length() <= 0) {
+            msg = "Category and Subcategory Cannot be Empty";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+        } else {
             if (subcat.getSubCategoryId() == 0) {
-                cs.setInt(1, subcat.getCategoryId());
-                cs.setString(2, subcat.getSubCategoryName());
-                cs.executeUpdate();
-                this.setActionMessage("Saved Successfully");
-                this.clearSubCategory(subcat);
+                sql = "{call sp_insert_sub_category(?,?)}";
             } else if (subcat.getSubCategoryId() > 0) {
-                cs.setInt(1, subcat.getSubCategoryId());
-                cs.setInt(2, subcat.getCategoryId());
-                cs.setString(3, subcat.getSubCategoryName());
-                cs.executeUpdate();
-                this.setActionMessage("Saved Successfully");
-                this.clearSubCategory(subcat);
+                sql = "{call sp_update_sub_category(?,?,?)}";
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-            this.setActionMessage("SubCategory NOT saved");
+
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    CallableStatement cs = conn.prepareCall(sql);) {
+                if (subcat.getSubCategoryId() == 0) {
+                    cs.setInt(1, subcat.getCategoryId());
+                    cs.setString(2, subcat.getSubCategoryName());
+                    cs.executeUpdate();
+                    this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
+                    this.clearSubCategory(subcat);
+                } else if (subcat.getSubCategoryId() > 0) {
+                    cs.setInt(1, subcat.getSubCategoryId());
+                    cs.setInt(2, subcat.getCategoryId());
+                    cs.setString(3, subcat.getSubCategoryName());
+                    cs.executeUpdate();
+                    this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
+                    this.clearSubCategory(subcat);
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Subcategory Not Saved"));
+            }
         }
-     }   
-        
+
     }
-    
+
     public SubCategory getSubCategory(int aSubCategoryId) {
         String sql = "{call sp_search_sub_category_by_id(?)}";
         ResultSet rs = null;
@@ -125,54 +130,46 @@ public class SubCategoryBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
+    }
 
-    }
-    
     public void deleteSubCategory() {
-         this.deleteSubCategoryById(this.SelectedSubCategoryId);
+        this.deleteSubCategoryById(this.SelectedSubCategoryId);
     }
-    
+
     public void deleteSubCategoryByObject(SubCategory SubCat) {
-         this.deleteSubCategoryById(SubCat.getSubCategoryId());
+        this.deleteSubCategoryById(SubCat.getSubCategoryId());
     }
 
     public void deleteSubCategoryById(int aSubCategoryId) {
-        String msg;
-        UserDetail aCurrentUserDetail=new GeneralUserSetting().getCurrentUser();
-        List<GroupRight> aCurrentGroupRights=new GeneralUserSetting().getCurrentGroupRights();
-        GroupRightBean grb=new GroupRightBean();
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
+        UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
+        List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
+        GroupRightBean grb = new GroupRightBean();
 
-        if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail,aCurrentGroupRights,"8", "Delete")==0) {
-            msg="YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        }else
-        {
-        String sql = "DELETE FROM sub_category WHERE sub_category_id=?";
-        try (
-                Connection conn = DBConnection.getMySQLConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);) {
-            ps.setInt(1, aSubCategoryId);
-            ps.executeUpdate();
-            this.setActionMessage("Deleted Successfully!");
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-            this.setActionMessage("Category NOT deleted");
+        if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Delete") == 0) {
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+        } else {
+            String sql = "DELETE FROM sub_category WHERE sub_category_id=?";
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                ps.setInt(1, aSubCategoryId);
+                ps.executeUpdate();
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Deleted Successfully!"));
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Category Not Deleted"));
+            }
         }
     }
-    }
-    
+
     public void displaySubCategory(SubCategory SubCatFrom, SubCategory SubCatTo) {
         SubCatTo.setSubCategoryId(SubCatFrom.getSubCategoryId());
         SubCatTo.setCategoryId(SubCatFrom.getCategoryId());
@@ -185,10 +182,10 @@ public class SubCategoryBean implements Serializable {
         SubCat.setCategoryName("");
         SubCat.setSubCategoryName("");
     }
-    
+
     public List<SubCategory> getSubCategories() {
         String sql;
-        sql="{call sp_search_sub_category_by_none()}";
+        sql = "{call sp_search_sub_category_by_none()}";
         ResultSet rs = null;
         SubCategories = new ArrayList<SubCategory>();
         try (
@@ -201,23 +198,15 @@ public class SubCategoryBean implements Serializable {
                 subcat.setCategoryName(rs.getString("category_name"));
                 SubCategories.add(subcat);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return SubCategories;
     }
 
     public List<SubCategory> getSubCategoriesByCatSubcatName(String aCategorySubcategoryName) {
         String sql;
-        sql="{call sp_search_sub_category_by_name(?)}";
+        sql = "{call sp_search_sub_category_by_name(?)}";
         ResultSet rs = null;
         SubCategories = new ArrayList<SubCategory>();
         try (
@@ -231,23 +220,15 @@ public class SubCategoryBean implements Serializable {
                 subcat.setCategoryName(rs.getString("category_name"));
                 SubCategories.add(subcat);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return SubCategories;
     }
-    
+
     public List<SubCategory> getSubCategoriesByCategoryId(int aCategoryId) {
         String sql;
-        sql="{call sp_search_sub_category_by_category_id(?)}";
+        sql = "{call sp_search_sub_category_by_category_id(?)}";
         ResultSet rs = null;
         SubCategories = new ArrayList<SubCategory>();
         try (
@@ -260,20 +241,12 @@ public class SubCategoryBean implements Serializable {
                 this.setSubCategoryFromResultset(subcat, rs);
                 SubCategories.add(subcat);
             }
-        } catch (SQLException se) {
-            System.err.println("getSubCategoriesByCategoryId:" + se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println("getSubCategoriesByCategoryId:" + ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return SubCategories;
     }
-        
+
     /**
      * @return the ActionMessage
      */
@@ -287,11 +260,10 @@ public class SubCategoryBean implements Serializable {
     public void setActionMessage(String aActionMessage) {
         this.ActionMessage = aActionMessage;
     }
-    
+
     /**
      * @return the SubCategories
      */
-
     /**
      * @param SubCategories the SubCategories to set
      */
@@ -339,5 +311,19 @@ public class SubCategoryBean implements Serializable {
      */
     public void setSearchSubCategoryName(String SearchSubCategoryName) {
         this.SearchSubCategoryName = SearchSubCategoryName;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 }

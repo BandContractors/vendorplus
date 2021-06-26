@@ -15,10 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import utilities.UtilityBean;
 
 
 /*
@@ -46,51 +48,55 @@ public class ItemMapBean implements Serializable {
     private int ShowItemNotAddedStatus = 0;
     private long SelectedMapGroupId;
     long NewId = 0;
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     public void saveItemMap(ItemMap itemmap) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         String sql = null;
         String sql2 = null;
-        String msg = "";
         if (itemmap != null) {
             if (new ItemBean().getItem(itemmap.getBigItemId()).getItemType().equals("SERVICE") || new ItemBean().getItem(itemmap.getSmallItemId()).getItemType().equals("SERVICE")) {
-                msg = "SERVICE Item cannot be Mapped...";
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+                msg = "Service Item Cannot be Mapped";
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else {
                 UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
                 List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
                 GroupRightBean grb = new GroupRightBean();
 
                 if (itemmap.getItemMapId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Add") == 0) {
-                    msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+                    msg = "Not Allowed to Access this Function";
+                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                 } else if (itemmap.getItemMapId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Edit") == 0) {
-                    msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+                    msg = "Not Allowed to Access this Function";
+                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                 } else if (itemmap.getBigItemId() == 0 || itemmap.getSmallItemId() == 0) {
-                    msg = "Either BigItem or SmallItem is not selected";
-                    this.setActionMessage("ItemMap not saved");
-                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+                    msg = "Select Big Item and Small Item";
+                    this.setActionMessage("Item Map Not Saved");
+                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                 } else if (itemmap.getBigItemId() == itemmap.getSmallItemId()) {
-                    msg = "BigItem and SmallItem cannot be identical, you cannot map an item to itself!";
-                    this.setActionMessage("ItemMap not saved");
-                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+                    msg = "Big Item and Small Item Cannot be the Same";
+                    this.setActionMessage("Item Map Not Saved");
+                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                 } else if (itemmap.getFractionQty() == 0) {
-                    msg = "Specifiy how many times is the SmallItem to the BigItem";
-                    this.setActionMessage("ItemMap not saved");
-                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+                    msg = "Specifiy Qty of Small Item in Big Item";
+                    this.setActionMessage("Item Map Not Saved");
+                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                 } else if (itemmap.getPosition() == 0) {
-                    msg = "Specifiy the position of this mapping in the group";
-                    this.setActionMessage("ItemMap not saved");
-                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+                    msg = "Specifiy Mapping Position in the Group";
+                    this.setActionMessage("Item Map Not Saved");
+                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                 } else if ((this.itemCountInMap("BIG", itemmap.getBigItemId()) > 0 && itemmap.getItemMapId() == 0) || (this.itemCountInMap("BIG", itemmap.getBigItemId()) > 0 && this.itemCountInMap("BIG", itemmap.getBigItemId()) != 1 && itemmap.getItemMapId() > 0)) {
-                    msg = "The selected BigItem already exists and cannot be a BigItem more than once!";
-                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+                    msg = "Selected Big Item is already Mapped";
+                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                 } else if ((this.itemCountInMap("SMALL", itemmap.getSmallItemId()) > 0 && itemmap.getItemMapId() == 0) || (this.itemCountInMap("SMALL", itemmap.getSmallItemId()) > 0 && this.itemCountInMap("SMALL", itemmap.getSmallItemId()) != 1 && itemmap.getItemMapId() > 0)) {
-                    msg = "The selected SmallItem already exists and cannot be a SmallItem more than once!";
-                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+                    msg = "Selected Small Item is already Mapped";
+                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                 } else if ((this.groupCountInMap(this.SelectedMapGroupId) >= 2 && itemmap.getItemMapId() == 0) || (this.groupCountInMap(this.SelectedMapGroupId) >= 2 && this.groupCountInMap(this.SelectedMapGroupId) != 2 && itemmap.getItemMapId() > 0)) {
-                    msg = "You cannot map beyong 3 levels(Item1, Item2, Item3)";
-                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+                    msg = "You Cannot Map Beyond 3 Levels";
+                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                 } else {
 
                     if (itemmap.getItemMapId() == 0) {
@@ -112,7 +118,7 @@ public class ItemMapBean implements Serializable {
                             cs.setLong("in_map_group_id", this.SelectedMapGroupId);
                             cs.executeUpdate();
                             this.clearItemMap(itemmap);
-                            this.setActionMessage("Saved Successfully");
+                            this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
                         } else if (itemmap.getItemMapId() > 0) {
                             cs.setLong("in_item_map_id", itemmap.getItemMapId());
                             cs.setLong("in_big_item_id", itemmap.getBigItemId());
@@ -122,12 +128,12 @@ public class ItemMapBean implements Serializable {
                             cs.setLong("in_map_group_id", this.SelectedMapGroupId);
                             cs.executeUpdate();
                             this.clearItemMap(itemmap);
-                            this.setActionMessage("Saved Successfully");
+                            this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
                         }
                     } catch (Exception e) {
                         LOGGER.log(Level.ERROR, e);
-                        this.setActionMessage("ItemMap NOT saved");
-                        FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("ItemMap NOT saved!"));
+                        this.setActionMessage(ub.translateWordsInText(BaseName, "Item Map Not Saved"));
+                        FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Item Map Not Saved!")));
                     }
                 }
             }
@@ -242,14 +248,16 @@ public class ItemMapBean implements Serializable {
     }
 
     public void deleteItemMap(ItemMap itemmap) {
-        String msg;
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
 
         if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Delete") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
             String sql = "DELETE FROM item_map WHERE item_map_id=?";
             try (
@@ -257,11 +265,11 @@ public class ItemMapBean implements Serializable {
                     PreparedStatement ps = conn.prepareStatement(sql);) {
                 ps.setLong(1, itemmap.getItemMapId());
                 ps.executeUpdate();
-                this.setActionMessage("Deleted Successfully!");
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Deleted Successfully"));
                 //this.clearItemMap(itemmap);
             } catch (Exception e) {
                 LOGGER.log(Level.ERROR, e);
-                this.setActionMessage("ItemMap NOT deleted");
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Item Map Not Deleted"));
             }
         }
     }
@@ -561,6 +569,20 @@ public class ItemMapBean implements Serializable {
      */
     public void setShowItemNotAddedStatus(int ShowItemNotAddedStatus) {
         this.ShowItemNotAddedStatus = ShowItemNotAddedStatus;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 
 }

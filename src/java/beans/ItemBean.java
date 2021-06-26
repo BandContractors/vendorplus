@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
@@ -80,6 +81,8 @@ public class ItemBean implements Serializable {
     private String SearchUNSPSC = "";
     private Item_tax_map Item_tax_mapObj;
     private ItemTax ItemTaxObj;
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     public void refreshInventoryType(Item aItem, String aItemPurpose) {
         try {
@@ -141,12 +144,14 @@ public class ItemBean implements Serializable {
     }
 
     public void saveItem() {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         //first convert vat rated from array to string
         this.ItemObj.setVatRated(new UtilityBean().getCommaSeperatedStrFromStringArray(this.ItemObj.getSelectedVatRateds()));
-        String msg = "";
         msg = this.validateItem(this.ItemObj);
         if (msg.length() > 0) {
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
             try {
                 if (this.saveValidatedItem(this.ItemObj) == 1) {
@@ -155,52 +160,54 @@ public class ItemBean implements Serializable {
                     String SyncStatus = "";
                     if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
                         if (null == new Item_tax_mapBean().getItem_tax_mapSyncedByName(this.ItemObj.getDescription())) {
-                            SyncStatus = "Synced:No";
+                            SyncStatus = "No";
                         } else {
-                            SyncStatus = "Synced:Yes";
+                            SyncStatus = "Yes";
                         }
                     }
                     //display Message
                     if (SyncStatus.length() == 0) {
-                        this.setActionMessage("Saved Successfully");
+                        this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
                     } else {
-                        this.setActionMessage("Saved Successfully" + ", " + SyncStatus);
+                        this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully") + ", Synced : " + ub.translateWordsInText(BaseName, SyncStatus));
                     }
                     this.clearItem();
                     this.refreshStockLocation(0);
                 } else {
-                    this.setActionMessage("Item NOT saved");
-                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Item NOT saved!"));
+                    this.setActionMessage(ub.translateWordsInText(BaseName, "Item Not Saved"));
+                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Item Not Saved")));
                 }
             } catch (Exception e) {
                 LOGGER.log(Level.ERROR, e);
-                this.setActionMessage("Item NOT saved");
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Item NOT saved!"));
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Item Not Saved"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Item Not Saved")));
             }
         }
     }
 
     public void saveItem(Item aItem) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         //first convert vat rated from array to string
         aItem.setVatRated(new UtilityBean().getCommaSeperatedStrFromStringArray(aItem.getSelectedVatRateds()));
-        String msg = "";
         msg = this.validateItem(aItem);
         if (msg.length() > 0) {
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
             try {
                 if (this.saveValidatedItem(aItem) == 1) {
-                    this.setActionMessage("Saved Successfully");
+                    this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
                     this.clearItem(aItem);
                     this.refreshStockLocation(0);
                 } else {
-                    this.setActionMessage("Item NOT saved");
-                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Item NOT saved!"));
+                    this.setActionMessage(ub.translateWordsInText(BaseName, "Item Not Saved"));
+                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Item Not Saved")));
                 }
             } catch (Exception e) {
                 LOGGER.log(Level.ERROR, e);
-                this.setActionMessage("Item NOT saved");
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Item NOT saved!"));
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Item Not Saved"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Item Not Saved")));
             }
         }
     }
@@ -221,37 +228,37 @@ public class ItemBean implements Serializable {
             qtybal = 0;
         }
         if (aItem.getItemId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Add") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
+            msg = "Not Allowed to Access this Function";
         } else if (aItem.getItemId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Edit") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
+            msg = "Not Allowed to Access this Function";
         } else if (aItem.getCategoryId() == 0) {
-            msg = "Select a valid Category please";
+            msg = "Select Valid Category";
         } else if (aItem.getItemType().length() <= 0) {
-            msg = "Select a valid Item Type please";
+            msg = "Select Valid Item Type";
         } else if (aItem.getUnitId() == 0) {
-            msg = "Select a valid Unit please";
+            msg = "Select Valid Unit";
         } else if (new CustomValidator().TextSize(aItem.getDescription(), 1, 100).equals("FAIL")) {
-            msg = "Enter Item Description!";
+            msg = "Enter Item Description";
         } else if (new CustomValidator().TextSize(aItem.getIsSuspended(), 2, 3).equals("FAIL")) {
-            msg = "Select value for Is Suspended!";
+            msg = "Select Value for Is Suspended";
         } else if (new CustomValidator().TextSize(aItem.getVatRated(), 2, 50).equals("FAIL")) {
-            msg = "Select value for Vat Rated!";
+            msg = "Select Value for VAT Rated";
         } else if (aItem.getUnitCostPrice() > aItem.getUnitRetailsalePrice()) {
-            msg = "Cost Price cannot be greater than Retailsale Price!";
+            msg = "Cost Price Cannot be Greater Than Retail Sale Price";
         } else if (aItem.getUnitCostPrice() > aItem.getUnitWholesalePrice()) {
-            msg = "Cost Price cannot be greater than Wholesale Price!";
+            msg = "Cost Price Cannot be Greater Than Wholesale Price";
         } else if ((new CustomValidator().CheckRecords(sql2) > 0 && aItem.getItemId() == 0) || (new CustomValidator().CheckRecords(sql2) > 0 && new CustomValidator().CheckRecords(sql2) != 1 && aItem.getItemId() > 0)) {
-            msg = "Item Code OR Description already exists!";
+            msg = "Item Code or Description Exists";
         } else if (aItem.getDisplay_alias_name() == 1 && aItem.getAlias_name().length() == 0) {
-            msg = "Please specify the Item Alias Name...";
+            msg = "Specify Item Alias Name";
         } else if (aItem.getIsAsset() == 1 && (aItem.getAssetType().length() == 0 || aItem.getAssetAccountCode().length() == 0)) {
-            msg = "Please specify the Asset Type and/or Account...";
+            msg = "Specify Asset Type and Account";
         } else if (aItem.getIsAsset() == 0 && (aItem.getExpense_type().length() == 0 || aItem.getExpenseAccountCode().length() == 0)) {
-            msg = "Please specify the Account Type and/or Name...";
+            msg = "Specify Account Type and Name";
         } else if (aItem.getIsSale() == 1 && aItem.getItem_code_tax().length() == 0 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
-            msg = "Please specify the UN Item(Product/Service) Code...";
+            msg = "Specify Item Tax Code";
         } else if (aItem.getItemId() > 0 && aItem.getItemType().equals("SERVICE") && qtybal > 0) {
-            msg = "Item specified as SERVICE has STOCK, you may adjust stock if you wish to change item type...";
+            msg = "Adjust Current Stock before Changing Item Type";
         } else {
             msg = "";
         }
@@ -1022,13 +1029,15 @@ public class ItemBean implements Serializable {
     }
 
     public void deleteItem(Item aItem) {
-        String msg;
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
 
         if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Delete") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
+            msg = "Not Allowed to Access this Function";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
         } else {
             String sql = "DELETE FROM item WHERE item_id=?";
@@ -1037,11 +1046,11 @@ public class ItemBean implements Serializable {
                     PreparedStatement ps = conn.prepareStatement(sql);) {
                 ps.setLong(1, aItem.getItemId());
                 ps.executeUpdate();
-                this.setActionMessage("Deleted Successfully!");
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Deleted Successfully"));
                 this.clearItem(aItem);
             } catch (Exception e) {
                 LOGGER.log(Level.ERROR, e);
-                this.setActionMessage("Item NOT deleted");
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Item Not Deleted"));
             }
         }
     }
@@ -2834,5 +2843,19 @@ public class ItemBean implements Serializable {
      */
     public List<Item> getItemObjectList() {
         return ItemObjectList;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 }

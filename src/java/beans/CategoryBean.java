@@ -5,7 +5,6 @@ import connections.DBConnection;
 import entities.GroupRight;
 import entities.UserDetail;
 import entities.Category;
-import entities.Trans;
 import java.io.Serializable;
 import java.sql.*;
 import java.util.ArrayList;
@@ -13,12 +12,16 @@ import java.util.List;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.*;
 import javax.faces.context.FacesContext;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import utilities.UtilityBean;
 
 @ManagedBean
 @SessionScoped
 public class CategoryBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    static Logger LOGGER = Logger.getLogger(CategoryBean.class.getName());
     private List<Category> Categories;
     private String ActionMessage;
     private Category SelectedCategory = null;
@@ -28,24 +31,28 @@ public class CategoryBean implements Serializable {
     private String TempString1;
     private int TempId2;
     private String TempString2;
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     public void saveCategory(Category cat) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         String sql = null;
-        String msg = null;
 
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
 
         if (cat.getCategoryId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Add") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if (cat.getCategoryId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Edit") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if (cat.getCategoryName().length() <= 0) {
             msg = "Category Name Needed...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
             if (cat.getCategoryId() == 0) {
                 sql = "{call sp_insert_category(?,?,?,?)}";
@@ -62,7 +69,7 @@ public class CategoryBean implements Serializable {
                     cs.setInt(3, cat.getList_rank());
                     cs.setInt(4, cat.getStore_quick_order());
                     cs.executeUpdate();
-                    this.setActionMessage("Saved Successfully");
+                    this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
                     this.clearCategory(cat);
                 } else if (cat.getCategoryId() > 0) {
                     cs.setInt(1, cat.getCategoryId());
@@ -71,11 +78,11 @@ public class CategoryBean implements Serializable {
                     cs.setInt(4, cat.getList_rank());
                     cs.setInt(5, cat.getStore_quick_order());
                     cs.executeUpdate();
-                    this.setActionMessage("Saved Successfully");
+                    this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
                     this.clearCategory(cat);
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
                 this.setActionMessage("Category NOT saved");
             }
         }
@@ -108,8 +115,8 @@ public class CategoryBean implements Serializable {
             } catch (NullPointerException npe) {
                 aCategory.setStore_quick_order(0);
             }
-        } catch (SQLException se) {
-            System.err.println("setCategoryFromResultset:" + se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -128,19 +135,10 @@ public class CategoryBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
-
     }
 
     public void deleteCategory() {
@@ -152,14 +150,16 @@ public class CategoryBean implements Serializable {
     }
 
     public void deleteCategoryById(int CatId) {
-        String msg;
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
 
         if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Delete") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
             String sql = "DELETE FROM category WHERE category_id=?";
             try (
@@ -167,10 +167,10 @@ public class CategoryBean implements Serializable {
                     PreparedStatement ps = conn.prepareStatement(sql);) {
                 ps.setInt(1, CatId);
                 ps.executeUpdate();
-                this.setActionMessage("Deleted Successfully!");
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
-                this.setActionMessage("Category NOT deleted");
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Deleted Successfully"));
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Category Not Deleted"));
             }
         }
     }
@@ -205,16 +205,8 @@ public class CategoryBean implements Serializable {
                 this.setCategoryFromResultset(cat, rs);
                 Categories.add(cat);
             }
-        } catch (SQLException se) {
-            System.err.println("getCategories:" + se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println("getCategories:" + ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return Categories;
     }
@@ -234,16 +226,8 @@ public class CategoryBean implements Serializable {
                 this.setCategoryFromResultset(cat, rs);
                 Categories.add(cat);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return Categories;
     }
@@ -267,16 +251,8 @@ public class CategoryBean implements Serializable {
                 this.setCategoryFromResultset(cat, rs);
                 Categories.add(cat);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return Categories;
     }
@@ -420,6 +396,20 @@ public class CategoryBean implements Serializable {
      */
     public void setTempString2(String TempString2) {
         this.TempString2 = TempString2;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 
 }

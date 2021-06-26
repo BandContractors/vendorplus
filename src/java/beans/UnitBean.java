@@ -11,13 +11,16 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import utilities.UtilityBean;
 
 /*
  * To change this template, choose Tools | Templates
@@ -32,7 +35,7 @@ import javax.faces.context.FacesContext;
 public class UnitBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    static Logger LOGGER = Logger.getLogger(UnitBean.class.getName());
     private List<Unit> Units;
     private String ActionMessage = null;
     private Unit SelectedUnit = null;
@@ -40,23 +43,27 @@ public class UnitBean implements Serializable {
     private String SearchUnitName = "";
     private List<Unit_tax_list> Unit_tax_lists;
     private Unit_tax_list Unit_tax_listObj = new Unit_tax_list();
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     public void saveUnit(Unit unit, Unit_tax_list aUnit_tax_listObj) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         String sql = null;
-        String msg = null;
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
 
         if (unit.getUnitId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Add") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if (unit.getUnitId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Edit") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if (unit.getUnitName().length() <= 0 || unit.getUnitSymbol().length() <= 0) {
-            msg = "Unit Name and Symbol Cannot be empty...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Unit Name and Symbol Cannot be Empty";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
             if (null != aUnit_tax_listObj) {
                 unit.setUnit_symbol_tax(aUnit_tax_listObj.getUnit_symbol_tax());
@@ -77,7 +84,7 @@ public class UnitBean implements Serializable {
                     cs.setString(2, unit.getUnitSymbol());
                     cs.setString(3, unit.getUnit_symbol_tax());
                     cs.executeUpdate();
-                    this.setActionMessage("Saved Successfully");
+                    this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
                     this.clearUnit(unit, aUnit_tax_listObj);
                 } else if (unit.getUnitId() > 0) {
                     cs.setInt(1, unit.getUnitId());
@@ -85,12 +92,12 @@ public class UnitBean implements Serializable {
                     cs.setString(3, unit.getUnitSymbol());
                     cs.setString(4, unit.getUnit_symbol_tax());
                     cs.executeUpdate();
-                    this.setActionMessage("Saved Successfully");
+                    this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
                     this.clearUnit(unit, aUnit_tax_listObj);
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
-                this.setActionMessage("Unit NOT saved");
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Unit NOT saved"));
             }
         }
 
@@ -114,17 +121,9 @@ public class UnitBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
     }
 
@@ -137,14 +136,16 @@ public class UnitBean implements Serializable {
     }
 
     public void deleteUnitById(int UnitId) {
-        String msg;
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
 
         if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Delete") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
             String sql = "DELETE FROM unit WHERE unit_id=?";
             try (
@@ -152,10 +153,10 @@ public class UnitBean implements Serializable {
                     PreparedStatement ps = conn.prepareStatement(sql);) {
                 ps.setInt(1, UnitId);
                 ps.executeUpdate();
-                this.setActionMessage("Deleted Successfully!");
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
-                this.setActionMessage("Unit NOT deleted");
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Deleted Successfully"));
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Unit Not Deleted"));
             }
         }
     }
@@ -218,16 +219,8 @@ public class UnitBean implements Serializable {
                 unit.setUnit_symbol_tax(rs.getString("unit_symbol_tax"));
                 Units.add(unit);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return Units;
     }
@@ -254,16 +247,8 @@ public class UnitBean implements Serializable {
                 unit.setUnit_symbol_tax(rs.getString("unit_symbol_tax"));
                 Units.add(unit);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return Units;
     }
@@ -285,7 +270,7 @@ public class UnitBean implements Serializable {
                 lst.add(obj);
             }
         } catch (Exception e) {
-            System.err.println("getUnit_tax_lists:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return lst;
     }
@@ -307,7 +292,7 @@ public class UnitBean implements Serializable {
                 return null;
             }
         } catch (Exception e) {
-            System.err.println("findUnit_tax_list:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
             return null;
         }
     }
@@ -329,7 +314,7 @@ public class UnitBean implements Serializable {
                 return null;
             }
         } catch (Exception e) {
-            System.err.println("findUnit_tax_list:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
             return null;
         }
     }
@@ -350,7 +335,7 @@ public class UnitBean implements Serializable {
                 lst.add(obj);
             }
         } catch (Exception e) {
-            System.err.println("searchUnit_tax_lists:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return lst;
     }
@@ -441,6 +426,20 @@ public class UnitBean implements Serializable {
      */
     public void setUnit_tax_listObj(Unit_tax_list Unit_tax_listObj) {
         this.Unit_tax_listObj = Unit_tax_listObj;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 
 }
