@@ -14,11 +14,13 @@ import java.util.Date;
 import java.util.List;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import sessions.GeneralUserSetting;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import utilities.UtilityBean;
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -38,6 +40,8 @@ public class AccChildAccountBean implements Serializable {
     private AccChildAccount AccChildAccountObj = new AccChildAccount();
     private List<AccChildAccount> AccChildAccountList;
     private String ChildAccountCategory;
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     public void setAccChildAccountFromResultset(AccChildAccount accchildaccount, ResultSet aResultSet) {
         try {
@@ -132,22 +136,25 @@ public class AccChildAccountBean implements Serializable {
     }
 
     public int saveAccChildAccount(AccChildAccount aAccChildAccount) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         String sql = "";
         int x = 0;
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
         if (aAccChildAccount.getAccChildAccountId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "85", "Add") == 0) {
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR..."));
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Not Allowed to Access this Function")));
         } else if (aAccChildAccount.getAccChildAccountId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "85", "Edit") == 0) {
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR..."));
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Not Allowed to Access this Function")));
         } else {
             if (aAccChildAccount.getAccCoaId() == 0) {
-                this.setActionMessage("Please select Parent Accout...");
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Select Parent Accout"));
             } else if (aAccChildAccount.getChildAccountCode().length() <= 0) {
-                this.setActionMessage("Please specify Child Account Code...");
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Sspecify Child Account Code"));
             } else if (aAccChildAccount.getChildAccountName().length() <= 0) {
-                this.setActionMessage("Please specify Child Account Name...");
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Specify Child Account Name"));
             } else {
                 try {
                     aAccChildAccount.setAccCoaAccountCode(new AccCoaBean().getAccCoaByCodeOrId("", aAccChildAccount.getAccCoaId()).getAccountCode());
@@ -701,6 +708,20 @@ public class AccChildAccountBean implements Serializable {
      */
     public void setActionMessage(String ActionMessage) {
         this.ActionMessage = ActionMessage;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 
 }

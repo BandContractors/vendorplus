@@ -17,11 +17,13 @@ import java.util.Date;
 import java.util.List;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import sessions.GeneralUserSetting;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import utilities.UtilityBean;
 
 /*
  * To change this template, choose Tools | Templates
@@ -46,6 +48,8 @@ public class Cash_balancing_dailyBean implements Serializable {
     private Date FromDate;
     private Date ToDate;
     private int AccChildAccId;
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     public void setCash_balancing_dailyFromResultset(Cash_balancing_daily aCash_balancing_daily, ResultSet aResultSet) {
         try {
@@ -373,25 +377,27 @@ public class Cash_balancing_dailyBean implements Serializable {
     }
 
     public void callSaveCash_balancing_daily(Cash_balancing_daily aCash_balancing_daily) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = getMenuItemBean().getMenuItemObj().getLANG_BASE_NAME_SYS();
         String msg = null;
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
         try {
             if (aCash_balancing_daily.getCash_balancing_daily_id() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "122", "Add") == 0) {
-                msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
+                msg = "Not Allowed to Access this Function";
             } else if (aCash_balancing_daily.getCash_balancing_daily_id() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "122", "Edit") == 0) {
-                msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
+                msg = "Not Allowed to Access this Function";
             } else {
                 int i = this.saveCash_balancing_daily(aCash_balancing_daily);
                 if (i == 1) {
                     msg = "Saved Successfully";
                     this.refreshCash_balancing_daily();
                 } else {
-                    msg = "Record NOT Saved";
+                    msg = "Record Not Saved";
                 }
             }
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -637,5 +643,19 @@ public class Cash_balancing_dailyBean implements Serializable {
      */
     public void setCash_balancing_dailySummary(List<Cash_balancing_daily> Cash_balancing_dailySummary) {
         this.Cash_balancing_dailySummary = Cash_balancing_dailySummary;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 }

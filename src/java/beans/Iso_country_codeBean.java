@@ -9,7 +9,10 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 /*
  * To change this template, choose Tools | Templates
@@ -24,7 +27,10 @@ import javax.faces.bean.SessionScoped;
 public class Iso_country_codeBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    static Logger LOGGER = Logger.getLogger(Iso_country_codeBean.class.getName());
     private List<Iso_country_code> Iso_country_codeList;
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     public void setIso_country_codeFromResultset(Iso_country_code aIso_country_code, ResultSet aResultSet) {
         try {
@@ -54,7 +60,7 @@ public class Iso_country_codeBean implements Serializable {
                 aIso_country_code.setNumeric_code("");
             }
         } catch (Exception e) {
-            System.err.println("setIso_country_codeFromResultset:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -72,7 +78,7 @@ public class Iso_country_codeBean implements Serializable {
                 this.setIso_country_codeFromResultset(icc, rs);
             }
         } catch (Exception e) {
-            System.err.println("getIso_country_code:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return icc;
     }
@@ -91,7 +97,7 @@ public class Iso_country_codeBean implements Serializable {
                 this.setIso_country_codeFromResultset(idt, rs);
             }
         } catch (Exception e) {
-            System.err.println("getIso_country_codeByCode:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return idt;
     }
@@ -112,7 +118,7 @@ public class Iso_country_codeBean implements Serializable {
                 idts.add(iso_country_code);
             }
         } catch (Exception e) {
-            System.err.println("getIso_country_codes:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return idts;
     }
@@ -137,7 +143,7 @@ public class Iso_country_codeBean implements Serializable {
                 this.Iso_country_codeList.add(iso_country_code);
             }
         } catch (Exception e) {
-            System.err.println("refreshIso_country_codesList:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -153,6 +159,20 @@ public class Iso_country_codeBean implements Serializable {
      */
     public void setIso_country_codeList(List<Iso_country_code> Iso_country_codeList) {
         this.Iso_country_codeList = Iso_country_codeList;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 
 }

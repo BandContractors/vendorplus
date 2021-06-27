@@ -16,16 +16,18 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import sessions.GeneralUserSetting;
 import utilities.UtilityBean;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 /*
  * To change this template, choose Tools | Templates
@@ -40,14 +42,16 @@ import utilities.UtilityBean;
 public class AccJournalBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    static Logger LOGGER = Logger.getLogger(AccJournalBean.class.getName());
     private List<AccJournal> AccJournalList;
     private List<AccJournal> AccJournalSummary;
     private AccJournal AccJournalObj;
     private String DateType;
     private Date Date1;
     private Date Date2;
-
     private String ActionMessage = null;
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     public void setAccJournalFromResultset(AccJournal accjournal, ResultSet aResultSet) {
         try {
@@ -186,8 +190,8 @@ public class AccJournalBean implements Serializable {
             } catch (NullPointerException npe) {
                 accjournal.setJobId(0);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -261,8 +265,8 @@ public class AccJournalBean implements Serializable {
             //Post Jounal to specific table
             //this.saveAccJournalSpecify(aAccJournal);
             this.saveAccJournalSpecific(aAccJournal);
-        } catch (SQLException se) {
-            System.err.println("saveAccJournal:" + se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -336,8 +340,8 @@ public class AccJournalBean implements Serializable {
                 cs.executeUpdate();
                 //Post JounalSpecify to LedgerSpecify
                 new AccLedgerBean().postJounalToLedgerSpecify(aAccJournal);
-            } catch (SQLException se) {
-                System.err.println("saveAccJournalSpecify:" + se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
     }
@@ -413,7 +417,7 @@ public class AccJournalBean implements Serializable {
                 //new AccLedgerBean().postJounalToLedgerSpecify(aAccJournal);
                 new AccLedgerBean().postJounalToLedgerSpecific(aAccJournal);
             } catch (Exception e) {
-                System.err.println("saveAccJournalSpecific:" + e.getMessage());
+                LOGGER.log(Level.ERROR, e);
             }
         }
     }
@@ -444,7 +448,7 @@ public class AccJournalBean implements Serializable {
                 TableName = TableNameLedger;
             }
         } catch (Exception e) {
-
+            LOGGER.log(Level.ERROR, e);
         }
         return TableName;
     }
@@ -718,8 +722,8 @@ public class AccJournalBean implements Serializable {
                 }
                 ListItemIndex3 = ListItemIndex3 + 1;
             }
-        } catch (Exception exc) {
-            System.err.println(exc.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -822,8 +826,8 @@ public class AccJournalBean implements Serializable {
                 }
                 ListItemIndex3 = ListItemIndex3 + 1;
             }
-        } catch (Exception exc) {
-            System.err.println(exc.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -920,8 +924,8 @@ public class AccJournalBean implements Serializable {
                 }
                 ListItemIndex3 = ListItemIndex3 + 1;
             }
-        } catch (Exception exc) {
-            System.err.println(exc.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -1000,7 +1004,7 @@ public class AccJournalBean implements Serializable {
             x = 1;
         } catch (Exception e) {
             x = 0;
-            e.printStackTrace();
+            LOGGER.log(Level.ERROR, e);
         }
         return x;
     }
@@ -1065,7 +1069,7 @@ public class AccJournalBean implements Serializable {
             x = 1;
         } catch (Exception e) {
             x = 0;
-            e.printStackTrace();
+            LOGGER.log(Level.ERROR, e);
         }
         return x;
     }
@@ -1224,8 +1228,8 @@ public class AccJournalBean implements Serializable {
                 }
                 ListItemIndex = ListItemIndex + 1;
             }
-        } catch (Exception exc) {
-            System.err.println(exc.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -1311,8 +1315,8 @@ public class AccJournalBean implements Serializable {
                 }
                 ListItemIndex2 = ListItemIndex2 + 1;
             }
-        } catch (Exception exc) {
-            System.err.println(exc.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -1378,8 +1382,8 @@ public class AccJournalBean implements Serializable {
                 this.saveAccJournal(accjournal);
                 ListItemIndex = ListItemIndex + 1;
             }
-        } catch (Exception exc) {
-            System.err.println(exc.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -1517,8 +1521,8 @@ public class AccJournalBean implements Serializable {
                 }
                 ListItemIndex = ListItemIndex + 1;
             }
-        } catch (Exception exc) {
-            System.err.println("postJournalOpenBalance:" + exc.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -1656,8 +1660,8 @@ public class AccJournalBean implements Serializable {
                 }
                 ListItemIndex = ListItemIndex + 1;
             }
-        } catch (Exception exc) {
-            System.err.println("postJournalOpenBalanceCANCEL:" + exc.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -1786,8 +1790,8 @@ public class AccJournalBean implements Serializable {
 
                 ListItemIndex = ListItemIndex + 1;
             }
-        } catch (Exception exc) {
-            System.err.println(exc.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -1889,8 +1893,8 @@ public class AccJournalBean implements Serializable {
 
                 ListItemIndex = ListItemIndex + 1;
             }
-        } catch (Exception exc) {
-            System.err.println("postJournalCashAdjustment:" + exc.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -2078,8 +2082,8 @@ public class AccJournalBean implements Serializable {
                 }
                 ListItemIndex = ListItemIndex + 1;
             }
-        } catch (Exception exc) {
-            System.err.println(exc.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return JobId;
     }
@@ -2237,8 +2241,8 @@ public class AccJournalBean implements Serializable {
                 }
                 ListItemIndex = ListItemIndex + 1;
             }
-        } catch (Exception exc) {
-            System.err.println(exc.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -3877,8 +3881,8 @@ public class AccJournalBean implements Serializable {
                 accjournal.setNarration("ACCUM DEPRECIATION");
                 this.saveAccJournal(accjournal);
             }
-        } catch (Exception exc) {
-            System.err.println(exc.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -3970,7 +3974,7 @@ public class AccJournalBean implements Serializable {
                 this.saveAccJournal(accjournal);
             }
         } catch (Exception e) {
-            System.err.println("postJournalDepreciateAsset:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -4061,7 +4065,7 @@ public class AccJournalBean implements Serializable {
                 this.saveAccJournal(accjournal);
             }
         } catch (Exception e) {
-            System.err.println("postJournalDepreciateAsset:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -4152,7 +4156,7 @@ public class AccJournalBean implements Serializable {
                 this.saveAccJournal(accjournal);
             }
         } catch (Exception e) {
-            System.err.println("postJournalDepreciateAssetREVERSE:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -4183,8 +4187,8 @@ public class AccJournalBean implements Serializable {
                     this.setAccJournalFromResultset(accjournal, rs);
                     this.AccJournalList.add(accjournal);
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
     }
@@ -4245,7 +4249,7 @@ public class AccJournalBean implements Serializable {
                 this.AccJournalList.add(accjournal);
             }
         } catch (Exception e) {
-            System.err.println("reportAccJournal:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
 
         try (
@@ -4272,8 +4276,8 @@ public class AccJournalBean implements Serializable {
                 }
                 this.AccJournalSummary.add(accjournalsum);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -4324,8 +4328,8 @@ public class AccJournalBean implements Serializable {
                 this.setAccJournalFromResultset(accjournal, rs);
                 this.AccJournalList.add(accjournal);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
 
         try (
@@ -4368,8 +4372,8 @@ public class AccJournalBean implements Serializable {
                 }
                 this.AccJournalSummary.add(accjournalsum);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -4430,8 +4434,8 @@ public class AccJournalBean implements Serializable {
                 this.setAccJournalFromResultset(accjournal, rs);
                 this.AccJournalList.add(accjournal);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
 
         try (
@@ -4463,8 +4467,8 @@ public class AccJournalBean implements Serializable {
                 }
                 this.AccJournalSummary.add(accjournalsum);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -4522,8 +4526,8 @@ public class AccJournalBean implements Serializable {
                 this.setAccJournalFromResultset(accjournal, rs);
                 this.AccJournalList.add(accjournal);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
 
         try (
@@ -4555,8 +4559,8 @@ public class AccJournalBean implements Serializable {
                 }
                 this.AccJournalSummary.add(accjournalsum);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -4593,8 +4597,8 @@ public class AccJournalBean implements Serializable {
                 this.setAccJournalFromResultset(accjournal, rs);
                 accjournallist.add(accjournal);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return accjournallist;
     }
@@ -4636,9 +4640,9 @@ public class AccJournalBean implements Serializable {
                     MaxJobId = 0;
                 }
             }
-        } catch (SQLException se) {
+        } catch (Exception e) {
             MaxJobId = 0;
-            System.err.println(se.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return MaxJobId;
     }
@@ -4900,7 +4904,7 @@ public class AccJournalBean implements Serializable {
                 accjournal.setJobId(0);
             }
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -5017,6 +5021,20 @@ public class AccJournalBean implements Serializable {
      */
     public void setAccJournalSummary(List<AccJournal> AccJournalSummary) {
         this.AccJournalSummary = AccJournalSummary;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 
 }

@@ -10,17 +10,19 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import sessions.GeneralUserSetting;
 import utilities.UtilityBean;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 /*
  * To change this template, choose Tools | Templates
@@ -35,8 +37,11 @@ import utilities.UtilityBean;
 public class AccPeriodBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    static Logger LOGGER = Logger.getLogger(AccPeriodBean.class.getName());
     private List<AccPeriod> AccPeriodObjectList;
     private String ActionMessage;
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     public void setAccPeriodFromResultset(AccPeriod aAccPeriod, ResultSet aResultSet) {
         try {
@@ -115,8 +120,8 @@ public class AccPeriodBean implements Serializable {
             } catch (NullPointerException npe) {
                 aAccPeriod.setLastEditDate(null);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -190,20 +195,23 @@ public class AccPeriodBean implements Serializable {
                 cs.executeUpdate();
                 saved = 1;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return saved;
     }
 
     public void saveAccPeriod2(AccPeriod aAccPeriod) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
         if (aAccPeriod.getAccPeriodId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "53", "Add") == 0) {
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR..."));
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Not Allowed to Access this Function")));
         } else if (aAccPeriod.getAccPeriodId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "53", "Edit") == 0) {
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR..."));
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Not Allowed to Access this Function")));
         } else {
             String sql = "{call sp_save_acc_period(?,?,?,?,?,?,?,?,?,?,?,?)}";
             try (
@@ -275,8 +283,8 @@ public class AccPeriodBean implements Serializable {
                     this.clearAccPeriod(aAccPeriod);
                     this.arrangeAccPeriodsOrder();
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
     }
@@ -291,13 +299,15 @@ public class AccPeriodBean implements Serializable {
                 cs.executeUpdate();
                 saved = 1;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return saved;
     }
 
     public void closeAccPeriod(AccPeriod aAccPeriod) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         String msg = "";
         int x = 0;
         String sql = "{call sp_close_account_period(?)}";
@@ -317,24 +327,26 @@ public class AccPeriodBean implements Serializable {
                         cs.setInt("in_acc_period_id", 0);
                     }
                     cs.executeUpdate();
-                    msg = "Accounting Period CLOSED Successfully!";
-                    this.setActionMessage(msg);
-                    FacesContext.getCurrentInstance().addMessage("Close", new FacesMessage(msg));
+                    msg = "Accounting Period Closed Successfully";
+                    this.setActionMessage(ub.translateWordsInText(BaseName, msg));
+                    FacesContext.getCurrentInstance().addMessage("Close", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                 } else {
-                    msg = "Accounting Period NOT CLOSED!";
-                    this.setActionMessage(msg);
-                    FacesContext.getCurrentInstance().addMessage("Close", new FacesMessage(msg));
+                    msg = "Accounting Period Not Closed";
+                    this.setActionMessage(ub.translateWordsInText(BaseName, msg));
+                    FacesContext.getCurrentInstance().addMessage("Close", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                 }
             }
         } catch (Exception e) {
             msg = "An error occured:" + "closeAccPeriod:" + e.getMessage();
-            System.err.println(msg);
+            LOGGER.log(Level.ERROR, e);
             this.setActionMessage(msg);
             FacesContext.getCurrentInstance().addMessage("Close", new FacesMessage(msg));
         }
     }
 
     public void reOpenAccPeriod(AccPeriod aAccPeriod) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         String msg = "";
         int x = 0;
         String sql = "{call sp_reopen_account_period(?)}";
@@ -354,24 +366,26 @@ public class AccPeriodBean implements Serializable {
                         cs.setInt("in_acc_period_id", 0);
                     }
                     cs.executeUpdate();
-                    msg = "Accounting Period RE-OPENED Successfully!";
+                    msg = "Accounting Period Reopened Successfully";
                     this.setActionMessage(msg);
-                    FacesContext.getCurrentInstance().addMessage("ReOpen", new FacesMessage(msg));
+                    FacesContext.getCurrentInstance().addMessage("Reopen", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                 } else {
-                    msg = "Accounting Period NOT RE-OPENED!";
-                    this.setActionMessage(msg);
-                    FacesContext.getCurrentInstance().addMessage("ReOpen", new FacesMessage(msg));
+                    msg = "Accounting Period Not Reopened";
+                    this.setActionMessage(ub.translateWordsInText(BaseName, msg));
+                    FacesContext.getCurrentInstance().addMessage("Reopen", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                 }
             }
         } catch (Exception e) {
-            msg = "An error occured:" + "reOpenAccPeriod:" + e.getMessage();
-            System.err.println(msg);
-            this.setActionMessage(msg);
-            FacesContext.getCurrentInstance().addMessage("ReOpen", new FacesMessage(msg));
+            msg = "An Error Occured on Reopening";
+            LOGGER.log(Level.ERROR, e);
+            this.setActionMessage(ub.translateWordsInText(BaseName, msg));
+            FacesContext.getCurrentInstance().addMessage("ReOpen", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         }
     }
 
     public void openAccPeriod(AccPeriod aAccPeriodToOpen) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         String msg = "";
         String sql = "";
         int x = 0;
@@ -383,14 +397,14 @@ public class AccPeriodBean implements Serializable {
             aAccPeriodToOpen.setIsClosed(0);
             x = this.saveAccPeriod(aAccPeriodToOpen);
             if (x == 1) {
-                msg = "Accounting Period OPENED Successfully!";
+                msg = "Accounting Period Opened Successfully";
                 this.setActionMessage(msg);
-                FacesContext.getCurrentInstance().addMessage("Open", new FacesMessage(msg));
+                FacesContext.getCurrentInstance().addMessage("Open", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             }
         } else if (null != PrevAccPeriod && PrevAccPeriod.getIsClosed() == 0) {
-            msg = "Accounting Period CANNOT BE OPENED, when the previous Accounting Period is NOT CLOSED!";
+            msg = "Accounting Period Cannot be Opened as the Previous Accounting Period is Not Closed";
             this.setActionMessage(msg);
-            FacesContext.getCurrentInstance().addMessage("Open", new FacesMessage(msg));
+            FacesContext.getCurrentInstance().addMessage("Open", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
             aAccPeriodToOpen.setIsOpen(1);
             aAccPeriodToOpen.setIsCurrent(1);
@@ -413,14 +427,14 @@ public class AccPeriodBean implements Serializable {
                         cs.setInt("in_opened_acc_period_id", 0);
                     }
                     cs.executeUpdate();
-                    msg = "Accounting Period OPENED Successfully!";
+                    msg = "Accounting Period Opened Successfully";
                     this.setActionMessage(msg);
-                    FacesContext.getCurrentInstance().addMessage("Open", new FacesMessage(msg));
+                    FacesContext.getCurrentInstance().addMessage("Open", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                 } catch (Exception e) {
-                    msg = "An error occured:" + "openAccPeriod:" + e.getMessage();
-                    System.err.println(msg);
-                    this.setActionMessage(msg);
-                    FacesContext.getCurrentInstance().addMessage("Close", new FacesMessage(msg));
+                    msg = "An Error Occured during Opening of Accounting Period";
+                    LOGGER.log(Level.ERROR, e);
+                    this.setActionMessage(ub.translateWordsInText(BaseName, msg));
+                    FacesContext.getCurrentInstance().addMessage("Close", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                 }
             }
             //post scheduled depreciation
@@ -451,16 +465,8 @@ public class AccPeriodBean implements Serializable {
                 accperiod = new AccPeriod();
                 this.setAccPeriodFromResultset(accperiod, rs);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return accperiod;
     }
@@ -482,16 +488,8 @@ public class AccPeriodBean implements Serializable {
                 accperiod = new AccPeriod();
                 this.setAccPeriodFromResultset(accperiod, rs);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return accperiod;
     }
@@ -508,16 +506,8 @@ public class AccPeriodBean implements Serializable {
                 accperiod = new AccPeriod();
                 this.setAccPeriodFromResultset(accperiod, rs);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return accperiod;
     }
@@ -535,7 +525,7 @@ public class AccPeriodBean implements Serializable {
                 this.setAccPeriodFromResultset(accperiod, rs);
             }
         } catch (Exception e) {
-            System.err.println("getAccPeriodLatest:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return accperiod;
     }
@@ -552,16 +542,8 @@ public class AccPeriodBean implements Serializable {
                 accperiod = new AccPeriod();
                 this.setAccPeriodFromResultset(accperiod, rs);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return accperiod;
     }
@@ -581,16 +563,8 @@ public class AccPeriodBean implements Serializable {
                 this.setAccPeriodFromResultset(accperiod, rs);
                 this.getAccPeriodObjectList().add(accperiod);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return getAccPeriodObjectList();
     }
@@ -609,16 +583,8 @@ public class AccPeriodBean implements Serializable {
                 this.setAccPeriodFromResultset(accperiod, rs);
                 aps.add(accperiod);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return aps;
     }
@@ -637,16 +603,8 @@ public class AccPeriodBean implements Serializable {
                 this.setAccPeriodFromResultset(accperiod, rs);
                 lst.add(accperiod);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return lst;
     }
@@ -671,16 +629,8 @@ public class AccPeriodBean implements Serializable {
                 }
                 orderno = orderno + 1;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -785,7 +735,7 @@ public class AccPeriodBean implements Serializable {
                 aAccPeriod.setLastEditDate(null);
             }
         } catch (Exception e) {
-            System.out.println("initAddNewAccPeriod:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -834,7 +784,9 @@ public class AccPeriodBean implements Serializable {
     }
 
     public void deleteAccPeriod(AccPeriod aAccPeriod) {
-        String msg;
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
@@ -844,11 +796,11 @@ public class AccPeriodBean implements Serializable {
             aAccPeriod.setAction_mode(0);
         }
         if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "53", "Delete") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if (new UtilityBean().getN(sql2) > 0) {
-            msg = "SELECTED ACCOUNTING PERIOD CANNOT BE DELETED; IT HAS JOURNAL ENTRIES, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Selected Accounting Period has Journal Entries Hence Cannot be Deleted";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
             String sql = "DELETE FROM acc_period WHERE acc_period_id=?";
             try (
@@ -856,11 +808,11 @@ public class AccPeriodBean implements Serializable {
                     PreparedStatement ps = conn.prepareStatement(sql);) {
                 ps.setInt(1, aAccPeriod.getAccPeriodId());
                 ps.executeUpdate();
-                this.setActionMessage("Deleted Successfully!");
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Deleted Successfully"));
                 this.clearAccPeriod(aAccPeriod);
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
-                this.setActionMessage("Account Period not deleted");
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Account Period Not Deleted"));
             }
         }
     }
@@ -880,8 +832,8 @@ public class AccPeriodBean implements Serializable {
                 cs.executeUpdate();
                 saved = 1;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return saved;
     }
@@ -901,8 +853,8 @@ public class AccPeriodBean implements Serializable {
                 cs.executeUpdate();
                 saved = 1;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return saved;
     }
@@ -933,5 +885,19 @@ public class AccPeriodBean implements Serializable {
      */
     public void setActionMessage(String ActionMessage) {
         this.ActionMessage = ActionMessage;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 }

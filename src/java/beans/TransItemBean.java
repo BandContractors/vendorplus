@@ -7969,24 +7969,27 @@ public class TransItemBean implements Serializable {
     }
 
     public void addTransItemJournalEntry(Trans aTrans, StatusBean aStatusBean, List<TransItem> aActiveTransItems, TransItem NewTransItem, Item aSelectedItem, AccCoa aSelectedAccCoa) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         if (null == aSelectedAccCoa || NewTransItem.getAccountCode().length() <= 0) {
             aStatusBean.setItemAddedStatus("");
-            aStatusBean.setItemNotAddedStatus("PLEASE ENTER VALID ACCOUNT...!");
+            aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Enter Valid Account"));
             aStatusBean.setShowItemAddedStatus(0);
             aStatusBean.setShowItemNotAddedStatus(1);
         } else if (aTrans.getTransactorId() <= 0 && aSelectedAccCoa.getIsTransactorMandatory() == 1) {
             aStatusBean.setItemAddedStatus("");
-            aStatusBean.setItemNotAddedStatus("PLEASE ENTER VALID NAME(CUSTOMER/SUPPLIER/PROVIDER/EMPLOYEE)...!");
+            aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Enter Valid Name for the Entity"));
             aStatusBean.setShowItemAddedStatus(0);
             aStatusBean.setShowItemNotAddedStatus(1);
         } else if (aSelectedAccCoa.getIsChild() == 0 && NewTransItem.getCodeSpecific().length() <= 0) {
             aStatusBean.setItemAddedStatus("");
-            aStatusBean.setItemNotAddedStatus("PLEASE SPECIFY CHILD ACCOUNT...!");
+            aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Specify Child Account"));
             aStatusBean.setShowItemAddedStatus(0);
             aStatusBean.setShowItemNotAddedStatus(1);
         } else if (NewTransItem.getAmountExcVat() <= 0 && NewTransItem.getAmountIncVat() <= 0) {
             aStatusBean.setItemAddedStatus("");
-            aStatusBean.setItemNotAddedStatus("PLEASE ENTER CREDIT OR DEBIT AMOUNT...!");
+            aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Enter Credit or Debit Amount"));
             aStatusBean.setShowItemAddedStatus(0);
             aStatusBean.setShowItemNotAddedStatus(1);
         } else {
@@ -8128,7 +8131,7 @@ public class TransItemBean implements Serializable {
             ti.setUnitProfitMargin(0);
             TransBean transB = new TransBean();
             transB.clearAll(null, aActiveTransItems, NewTransItem, aSelectedItem, null, 1, aSelectedAccCoa);
-            aStatusBean.setItemAddedStatus("ITEM ADDED");
+            aStatusBean.setItemAddedStatus(ub.translateWordsInText(BaseName, "Item Added"));
             aStatusBean.setItemNotAddedStatus("");
             aStatusBean.setShowItemAddedStatus(1);
             aStatusBean.setShowItemNotAddedStatus(0);
@@ -8274,6 +8277,9 @@ public class TransItemBean implements Serializable {
     }
 
     public void addTransItemCashTransfer(Trans aTrans, StatusBean aStatusBean, List<TransItem> aActiveTransItems, TransItem NewTransItem, Item aSelectedItem, AccCoa aSelectedAccCoa) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         String FromCurCode = "";
         String ToCurCode = "";
         String FromAccCode = "";
@@ -8303,32 +8309,32 @@ public class TransItemBean implements Serializable {
             }
             if (FromAccCode.length() <= 0 || ToAccCode.length() <= 0) {
                 aStatusBean.setItemAddedStatus("");
-                aStatusBean.setItemNotAddedStatus("PLEASE ENTER VALID FROM/TO ACCOUNTS...!");
+                aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Enter From and To Accounts"));
                 aStatusBean.setShowItemAddedStatus(0);
                 aStatusBean.setShowItemNotAddedStatus(1);
             } else if (FromCurCode.length() <= 0 || ToCurCode.length() <= 0) {
                 aStatusBean.setItemAddedStatus("");
-                aStatusBean.setItemNotAddedStatus("PLEASE ENTER VALID FROM/TO CURRENCY...!");
+                aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Enter From and To Curreny"));
                 aStatusBean.setShowItemAddedStatus(0);
                 aStatusBean.setShowItemNotAddedStatus(1);
             } else if (FromAccCode.equals(ToAccCode) && FromCurCode.equals(ToCurCode)) {
                 aStatusBean.setItemAddedStatus("");
-                aStatusBean.setItemNotAddedStatus("FROM/TO ACCOUNTS AND CURRENCIES CANNOT BE THE SAME...!");
+                aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "From and To Accounts Cannot be the Same"));
                 aStatusBean.setShowItemAddedStatus(0);
                 aStatusBean.setShowItemNotAddedStatus(1);
             } else if (!FromCurCode.equals(LocalCurrencyCode) && !ToCurCode.equals(LocalCurrencyCode) && !FromCurCode.equals(ToCurCode)) {
                 aStatusBean.setItemAddedStatus("");
-                aStatusBean.setItemNotAddedStatus("ONE OF THE ACCOUNTS BETWEEN FROM AND TO MUST BE A LOCAL CURRENCY...!");
+                aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "One of the Accounts Between From and To Must be a Local Currency"));
                 aStatusBean.setShowItemAddedStatus(0);
                 aStatusBean.setShowItemNotAddedStatus(1);
             } else if (FromAmount <= 0 || ToAmount <= 0) {
                 aStatusBean.setItemAddedStatus("");
-                aStatusBean.setItemNotAddedStatus("PLEASE ENTER TRANSFER AMOUNT...!");
+                aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Enter Transfer Amount"));
                 aStatusBean.setShowItemAddedStatus(0);
                 aStatusBean.setShowItemNotAddedStatus(1);
             } else if (BalCheckerOn == 1 && (FromAccBalance <= 0 || FromAmount > FromAccBalance)) {
                 aStatusBean.setItemAddedStatus("");
-                aStatusBean.setItemNotAddedStatus("AVAILABLE ACC BALANCE IS LESS THAN AMOUNT FOR TRANSFER...!");
+                aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Available Account Balance is Less Than Transfer Amount"));
                 aStatusBean.setShowItemAddedStatus(0);
                 aStatusBean.setShowItemNotAddedStatus(1);
             } else {
@@ -8471,7 +8477,7 @@ public class TransItemBean implements Serializable {
                 ti.setUnitProfitMargin(0);
                 TransBean transB = new TransBean();
                 transB.clearAll(null, aActiveTransItems, NewTransItem, aSelectedItem, null, 1, aSelectedAccCoa);
-                aStatusBean.setItemAddedStatus("ITEM ADDED");
+                aStatusBean.setItemAddedStatus(ub.translateWordsInText(BaseName, "Item Added"));
                 aStatusBean.setItemNotAddedStatus("");
                 aStatusBean.setShowItemAddedStatus(1);
                 aStatusBean.setShowItemNotAddedStatus(0);
@@ -8480,6 +8486,9 @@ public class TransItemBean implements Serializable {
     }
 
     public void addTransItemCashAdjustment(Trans aTrans, StatusBean aStatusBean, List<TransItem> aActiveTransItems, TransItem NewTransItem, Item aSelectedItem, AccCoa aSelectedAccCoa) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         String FromCurCode = "";
         String FromAccCode = "";
         double AdjustAmount = 0;
@@ -8499,22 +8508,22 @@ public class TransItemBean implements Serializable {
             }
             if (FromAccCode.length() <= 0) {
                 aStatusBean.setItemAddedStatus("");
-                aStatusBean.setItemNotAddedStatus("PLEASE ENTER VALID CASH ACCOUNT...!");
+                aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Enter Cash Account"));
                 aStatusBean.setShowItemAddedStatus(0);
                 aStatusBean.setShowItemNotAddedStatus(1);
             } else if (AdjustAmount <= 0) {
                 aStatusBean.setItemAddedStatus("");
-                aStatusBean.setItemNotAddedStatus("PLEASE ENTER AMOUNT TO ADJUST...!");
+                aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Enter Amount to Adjust"));
                 aStatusBean.setShowItemAddedStatus(0);
                 aStatusBean.setShowItemNotAddedStatus(1);
             } else if (BalCheckerOn == 1 && NewBalance < 0) {
                 aStatusBean.setItemAddedStatus("");
-                aStatusBean.setItemNotAddedStatus("NEW BALANCE ON THE ACCOUNT CANNOT BE NEGATIVE...!");
+                aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "New Balance on the Account Cannot be Negative"));
                 aStatusBean.setShowItemAddedStatus(0);
                 aStatusBean.setShowItemNotAddedStatus(1);
             } else if (AdjustAmount < 0) {
                 aStatusBean.setItemAddedStatus("");
-                aStatusBean.setItemNotAddedStatus("AMOUNT TO ADJUST CANNOT BE NEGATIVE...!");
+                aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Amount to Adjust Cannot be Negative"));
                 aStatusBean.setShowItemAddedStatus(0);
                 aStatusBean.setShowItemNotAddedStatus(1);
             } else {
@@ -8657,7 +8666,7 @@ public class TransItemBean implements Serializable {
                 ti.setUnitProfitMargin(0);
                 TransBean transB = new TransBean();
                 transB.clearAll(null, aActiveTransItems, NewTransItem, aSelectedItem, null, 1, aSelectedAccCoa);
-                aStatusBean.setItemAddedStatus("ITEM ADDED");
+                aStatusBean.setItemAddedStatus(ub.translateWordsInText(BaseName, "Item Added"));
                 aStatusBean.setItemNotAddedStatus("");
                 aStatusBean.setShowItemAddedStatus(1);
                 aStatusBean.setShowItemNotAddedStatus(0);

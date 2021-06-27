@@ -16,15 +16,17 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import utilities.UtilityBean;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 /*
  * To change this template, choose Tools | Templates
@@ -39,7 +41,7 @@ import utilities.UtilityBean;
 public class AccLedgerBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    static Logger LOGGER = Logger.getLogger(AccLedgerBean.class.getName());
     private String ActionMessage = null;
     private List<AccLedger> AccLedgerList;
     private List<AccLedger> AccLedgerSummary;
@@ -55,6 +57,8 @@ public class AccLedgerBean implements Serializable {
     private long n;
     private long i;
     private String OpenBalanceHeader = "";
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     public void setAccLedgerFromResultset(AccLedger accledger, ResultSet aResultSet) {
         try {
@@ -109,8 +113,8 @@ public class AccLedgerBean implements Serializable {
             } catch (NullPointerException npe) {
                 accledger.setCreditAmountLc(0);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -163,8 +167,8 @@ public class AccLedgerBean implements Serializable {
                 cs.setDouble("in_credit_amount_lc", aAccJournal.getCreditAmount() * aAccJournal.getXrate());
             }
             cs.executeUpdate();
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -220,8 +224,8 @@ public class AccLedgerBean implements Serializable {
                     cs.setDouble("in_credit_amount_lc", aAccJournal.getCreditAmount() * aAccJournal.getXrate());
                 }
                 cs.executeUpdate();
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
     }
@@ -278,7 +282,7 @@ public class AccLedgerBean implements Serializable {
                 }
                 cs.executeUpdate();
             } catch (Exception e) {
-                System.err.println("postJounalToLedgerSpecific:" + e.getMessage());
+                LOGGER.log(Level.ERROR, e);
             }
         }
     }
@@ -321,16 +325,8 @@ public class AccLedgerBean implements Serializable {
                 //accledger = new AccLedger();
                 this.setAccLedgerFromResultset(accledger, rs);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return accledger;
     }
@@ -376,16 +372,8 @@ public class AccLedgerBean implements Serializable {
                     //accledger = new AccLedger();
                     this.setAccLedgerFromResultset(accledger, rs);
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
-            } finally {
-                if (rs != null) {
-                    try {
-                        rs.close();
-                    } catch (SQLException ex) {
-                        System.err.println(ex.getMessage());
-                    }
-                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
         return accledger;
@@ -432,7 +420,7 @@ public class AccLedgerBean implements Serializable {
                     this.setAccLedgerFromResultset(accledger, rs);
                 }
             } catch (Exception e) {
-                System.err.println("searchAccLedgerSpecific:" + e.getMessage());
+                LOGGER.log(Level.ERROR, e);
             }
         }
         return accledger;
@@ -462,8 +450,8 @@ public class AccLedgerBean implements Serializable {
                     this.setAccLedgerFromResultset(accledger, rs);
                     this.AccLedgerList.add(accledger);
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
     }
@@ -498,8 +486,8 @@ public class AccLedgerBean implements Serializable {
                     this.setAccLedgerFromResultset(accledger, rs);
                     this.AccLedgerList.add(accledger);
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
 
@@ -527,8 +515,8 @@ public class AccLedgerBean implements Serializable {
                 }
                 this.getAccLedgerSummary().add(accledgersum);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -546,7 +534,7 @@ public class AccLedgerBean implements Serializable {
             LocCurCode = "";
         }
         wheresql = " AND 1=1";
-        
+
         if (aActiveFlag == 1) {
             wheresql = " AND ac.is_active=1";////1 is active ONLY
         } else if (aActiveFlag == 0) {
@@ -616,7 +604,7 @@ public class AccLedgerBean implements Serializable {
                 this.getAccLedgerCashAccBal().add(accledger);
             }
         } catch (Exception e) {
-            System.err.println("reportCashAccBalances:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -689,8 +677,8 @@ public class AccLedgerBean implements Serializable {
                     }
                     this.getAccLedgerCashAccBal().add(accledger);
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
     }
@@ -735,8 +723,8 @@ public class AccLedgerBean implements Serializable {
                 }
                 bal = accledger.getDebitAmount() - accledger.getCreditAmount();
             }
-        } catch (SQLException se) {
-            System.err.println("getCashAccBalance:" + se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return bal;
     }
@@ -793,8 +781,8 @@ public class AccLedgerBean implements Serializable {
                     }
                     bal = accledger.getDebitAmount() - accledger.getCreditAmount();
                 }
-            } catch (SQLException se) {
-                System.err.println("getCashAccBalance:" + se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
         return bal;
@@ -1020,8 +1008,8 @@ public class AccLedgerBean implements Serializable {
                 }
                 this.getAccLedgerReceivablesAccBal().add(accledger);
             }
-        } catch (SQLException se) {
-            System.err.println("reportReceivableAccBalances:" + se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -1096,8 +1084,8 @@ public class AccLedgerBean implements Serializable {
                         this.getAccLedgerReceivablesAccBal().add(accledger);
                     }
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
     }
@@ -1157,8 +1145,8 @@ public class AccLedgerBean implements Serializable {
                     }
                     DebitBalance = DebitBalance + (accledger.getDebitAmountLc() - accledger.getCreditAmountLc());
                 }
-            } catch (SQLException se) {
-                System.err.println("getReceivableAccBalance:" + se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
         return DebitBalance;
@@ -1219,8 +1207,8 @@ public class AccLedgerBean implements Serializable {
                     }
                     DebitBalance = DebitBalance + (accledger.getDebitAmountLc() - accledger.getCreditAmountLc());
                 }
-            } catch (SQLException se) {
-                System.err.println("getReceivableAccTradeBalance:" + se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
         return DebitBalance;
@@ -1287,8 +1275,8 @@ public class AccLedgerBean implements Serializable {
                     }
                     DebitBalance = DebitBalance + (accledger.getDebitAmountLc() - accledger.getCreditAmountLc());
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
         return DebitBalance;
@@ -1331,8 +1319,8 @@ public class AccLedgerBean implements Serializable {
                     }
                     CreditBalance = CreditBalance + (accledger.getCreditAmount() - accledger.getDebitAmount());
                 }
-            } catch (SQLException se) {
-                System.err.println("getPrepaidIncomeAccBalance:" + se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
         return CreditBalance;
@@ -1376,8 +1364,8 @@ public class AccLedgerBean implements Serializable {
                     }
                     CreditBalance = CreditBalance + (accledger.getCreditAmount() - accledger.getDebitAmount());
                 }
-            } catch (SQLException se) {
-                System.err.println("getPrepaidIncomeAccBalance:" + se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
         return CreditBalance;
@@ -1429,8 +1417,8 @@ public class AccLedgerBean implements Serializable {
                 }
                 CreditBalance = CreditBalance + (accledger.getCreditAmountLc() - accledger.getDebitAmountLc());
             }
-        } catch (SQLException se) {
-            System.err.println("getPrepaidIncomeAccBalanceToCur:" + se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return CreditBalance;
     }
@@ -1445,12 +1433,6 @@ public class AccLedgerBean implements Serializable {
             String wheresql = "";
             String ordersql = "";
             ResultSet rs = null;
-//        String LocCurCode = "";
-//        try {
-//            LocCurCode = new AccCurrencyBean().getLocalCurrency().getCurrencyCode();
-//        } catch (NullPointerException npe) {
-//            LocCurCode = "";
-//        }
             wheresql = "";
             ordersql = "";
             sqlsum = sqlsum + wheresql + ordersql;
@@ -1476,22 +1458,10 @@ public class AccLedgerBean implements Serializable {
                     } catch (NullPointerException npe) {
                         accledger.setCreditAmount(0);
                     }
-//                try {
-//                    //accledger.setDebitAmountLc(accledger.getDebitAmount() * new AccXrateBean().getXrateMultiply(LocCurCode, accledger.getCurrencyCode()));
-//                    accledger.setDebitAmountLc(accledger.getDebitAmount() * new AccXrateBean().getXrateMultiply(accledger.getCurrencyCode(), LocCurCode));
-//                } catch (NullPointerException npe) {
-//                    accledger.setDebitAmountLc(0);
-//                }
-//                try {
-//                    //accledger.setCreditAmountLc(accledger.getCreditAmount() * new AccXrateBean().getXrateMultiply(LocCurCode, accledger.getCurrencyCode()));
-//                    accledger.setCreditAmountLc(accledger.getCreditAmount() * new AccXrateBean().getXrateMultiply(accledger.getCurrencyCode(), LocCurCode));
-//                } catch (NullPointerException npe) {
-//                    accledger.setCreditAmountLc(0);
-//                }
                     DebitBalance = DebitBalance + (accledger.getDebitAmount() - accledger.getCreditAmount());
                 }
-            } catch (SQLException se) {
-                System.err.println("getPrepaidExpenseAccBalance:" + se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
         return DebitBalance;
@@ -1507,12 +1477,6 @@ public class AccLedgerBean implements Serializable {
             String wheresql = "";
             String ordersql = "";
             ResultSet rs = null;
-//        String LocCurCode = "";
-//        try {
-//            LocCurCode = new AccCurrencyBean().getLocalCurrency().getCurrencyCode();
-//        } catch (NullPointerException npe) {
-//            LocCurCode = "";
-//        }
             wheresql = "";
             ordersql = "";
             sqlsum = sqlsum + wheresql + ordersql;
@@ -1538,22 +1502,10 @@ public class AccLedgerBean implements Serializable {
                     } catch (NullPointerException npe) {
                         accledger.setCreditAmount(0);
                     }
-//                try {
-//                    //accledger.setDebitAmountLc(accledger.getDebitAmount() * new AccXrateBean().getXrateMultiply(LocCurCode, accledger.getCurrencyCode()));
-//                    accledger.setDebitAmountLc(accledger.getDebitAmount() * new AccXrateBean().getXrateMultiply(accledger.getCurrencyCode(), LocCurCode));
-//                } catch (NullPointerException npe) {
-//                    accledger.setDebitAmountLc(0);
-//                }
-//                try {
-//                    //accledger.setCreditAmountLc(accledger.getCreditAmount() * new AccXrateBean().getXrateMultiply(LocCurCode, accledger.getCurrencyCode()));
-//                    accledger.setCreditAmountLc(accledger.getCreditAmount() * new AccXrateBean().getXrateMultiply(accledger.getCurrencyCode(), LocCurCode));
-//                } catch (NullPointerException npe) {
-//                    accledger.setCreditAmountLc(0);
-//                }
                     DebitBalance = DebitBalance + (accledger.getDebitAmount() - accledger.getCreditAmount());
                 }
-            } catch (SQLException se) {
-                System.err.println("getPrepaidExpenseAccBalance:" + se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
         return DebitBalance;
@@ -1605,8 +1557,8 @@ public class AccLedgerBean implements Serializable {
                 }
                 DebitBalance = DebitBalance + (accledger.getDebitAmountLc() - accledger.getCreditAmountLc());
             }
-        } catch (SQLException se) {
-            System.err.println("getPrepaidExpenseAccBalanceToCur:" + se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return DebitBalance;
     }
@@ -1677,8 +1629,8 @@ public class AccLedgerBean implements Serializable {
                 }
                 this.getAccLedgerPayablesAccBal().add(accledger);
             }
-        } catch (SQLException se) {
-            System.err.println("reportPayableAccBalances:" + se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -1753,8 +1705,8 @@ public class AccLedgerBean implements Serializable {
                         this.getAccLedgerPayablesAccBal().add(accledger);
                     }
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
     }
@@ -1814,8 +1766,8 @@ public class AccLedgerBean implements Serializable {
                     }
                     CreditBalance = CreditBalance + (accledger.getCreditAmountLc() - accledger.getDebitAmountLc());
                 }
-            } catch (SQLException se) {
-                System.err.println("getPayableAccBalance:" + se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
         return CreditBalance;
@@ -1876,8 +1828,8 @@ public class AccLedgerBean implements Serializable {
                     }
                     CreditBalance = CreditBalance + (accledger.getCreditAmountLc() - accledger.getDebitAmountLc());
                 }
-            } catch (SQLException se) {
-                System.err.println("getPayableAccBalanceTrade:" + se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
         return CreditBalance;
@@ -1957,8 +1909,8 @@ public class AccLedgerBean implements Serializable {
                     }
                     CreditBalance = CreditBalance + (accledger.getCreditAmountLc() - accledger.getDebitAmountLc());
                 }
-            } catch (SQLException se) {
-                System.err.println("getPayableAccBalance:" + se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
         return CreditBalance;
@@ -2025,8 +1977,8 @@ public class AccLedgerBean implements Serializable {
                     }
                     CreditBalance = CreditBalance + (accledger.getCreditAmountLc() - accledger.getDebitAmountLc());
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
         return CreditBalance;
@@ -2137,8 +2089,8 @@ public class AccLedgerBean implements Serializable {
                     this.setAccLedgerFromResultset(accledger, rs);
                     this.AccLedgerList.add(accledger);
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
 
@@ -2166,12 +2118,15 @@ public class AccLedgerBean implements Serializable {
                 }
                 this.getAccLedgerSummary().add(accledgersum);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
     public void reportAccLedgerOpenBal(int aAccPeriodId) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         this.OpenBalanceHeader = "";
         String sql = "SELECT * FROM view_ledger_open_bal al WHERE al.acc_period_id=" + aAccPeriodId + " ORDER BY  al.account_code ASC";
         ResultSet rs = null;
@@ -2186,9 +2141,9 @@ public class AccLedgerBean implements Serializable {
                 this.setAccLedgerFromResultset(accledger, rs);
                 this.AccLedgerListOpenBal.add(accledger);
             }
-            this.OpenBalanceHeader = this.AccLedgerListOpenBal.size() + " Opening Balance Records For " + new AccPeriodBean().getAccPeriodById(aAccPeriodId).getAccPeriodName();
+            this.OpenBalanceHeader = this.AccLedgerListOpenBal.size() + " " + ub.translateWordsInText(BaseName, "Opening Balance Records for") + " " + new AccPeriodBean().getAccPeriodById(aAccPeriodId).getAccPeriodName();
         } catch (Exception e) {
-            System.err.println("reportAccLedgerOpenBal:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -2260,7 +2215,7 @@ public class AccLedgerBean implements Serializable {
                 this.CategoryList.add(al);
             }
         } catch (Exception e) {
-            System.err.println("refreshViewCategoryBalanceSheet:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -2328,7 +2283,7 @@ public class AccLedgerBean implements Serializable {
             }
             this.i = recs;
         } catch (Exception e) {
-            System.err.println("refreshViewCategoryIncomeStatement:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -2361,8 +2316,8 @@ public class AccLedgerBean implements Serializable {
             } else if (aDrCrBalance.equals("Cr")) {
                 balance = totalCr - totalDr;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return balance;
     }
@@ -2409,8 +2364,8 @@ public class AccLedgerBean implements Serializable {
             } else if (aDrCrBalance.equals("Cr")) {
                 balance = totalCr - totalDr;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return balance;
     }
@@ -3432,5 +3387,19 @@ public class AccLedgerBean implements Serializable {
      */
     public void setOpenBalanceHeader(String OpenBalanceHeader) {
         this.OpenBalanceHeader = OpenBalanceHeader;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 }

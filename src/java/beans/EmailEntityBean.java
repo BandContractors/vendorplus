@@ -9,14 +9,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.mail.Message;
-import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
@@ -24,6 +22,9 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import sessions.GeneralUserSetting;
 import utilities.Security;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import utilities.UtilityBean;
 
 /*
  * To change this template, choose Tools | Templates
@@ -38,8 +39,11 @@ import utilities.Security;
 public class EmailEntityBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    static Logger LOGGER = Logger.getLogger(EmailEntityBean.class.getName());
     private String ActionMessage = null;
     private List<EmailEntity> EmailEntitys;
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     public void setEmail(EmailEntity aEmailEntity) {
         String x1 = "";
@@ -104,20 +108,22 @@ public class EmailEntityBean implements Serializable {
     }
 
     public void validateSendEmail(Contact_list aContact_list, EmailEntity aEmailEntity) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         this.ActionMessage = "";
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
         if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Add") == 0) {
-            FacesContext.getCurrentInstance().addMessage("Send", new FacesMessage("YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR..."));
+            FacesContext.getCurrentInstance().addMessage("Send", new FacesMessage(ub.translateWordsInText(BaseName, "Not Allowed to Access this Function")));
         } else if (aEmailEntity.getSubject().length() <= 1) {
-            FacesContext.getCurrentInstance().addMessage("Send", new FacesMessage("Enter Subject..."));
+            FacesContext.getCurrentInstance().addMessage("Send", new FacesMessage(ub.translateWordsInText(BaseName, "Enter Subject")));
         } else if (aEmailEntity.getMessage().length() <= 1) {
-            FacesContext.getCurrentInstance().addMessage("Send", new FacesMessage("Enter Message..."));
+            FacesContext.getCurrentInstance().addMessage("Send", new FacesMessage(ub.translateWordsInText(BaseName, "Enter Message")));
         } else if (aContact_list.getCategory().length() == 0 && aEmailEntity.getToEmail().length() == 0) {
-            FacesContext.getCurrentInstance().addMessage("Send", new FacesMessage("Enter To Email..."));
+            FacesContext.getCurrentInstance().addMessage("Send", new FacesMessage(ub.translateWordsInText(BaseName, "Enter To Email")));
         } else if (aContact_list.getCategory().length() > 0 && aEmailEntity.getToEmail().length() > 0) {
-            FacesContext.getCurrentInstance().addMessage("Send", new FacesMessage("Either you select category>subcategory OR enter to email adreess BUT not both..."));
+            FacesContext.getCurrentInstance().addMessage("Send", new FacesMessage(ub.translateWordsInText(BaseName, "Either Select Category or Subcategory or Enter To Email Adreess but Not Both")));
         } else {
             this.setEmail(aEmailEntity);
             String msg = "";
@@ -136,8 +142,8 @@ public class EmailEntityBean implements Serializable {
                 RecipientType = "TO";
             }
             int sent = this.sendEmail(EmailsList, aEmailEntity, RecipientType, SendBatchSize);
-            this.setActionMessage(sent + " Emails Sent");
-            FacesContext.getCurrentInstance().addMessage("Email Feedback", new FacesMessage(this.getActionMessage()));
+            this.setActionMessage(ub.translateWordsInText(BaseName, "Emails Sent ##" + sent));
+            FacesContext.getCurrentInstance().addMessage("Email Feedback", new FacesMessage(ub.translateWordsInText(BaseName, this.getActionMessage())));
         }
     }
 
@@ -230,7 +236,7 @@ public class EmailEntityBean implements Serializable {
         props.put("mail.smtp.port", aEmailEntity.getPort());
         props.put("mail.smtp.ssl.enable", aEmailEntity.isSslFlag());
         // do not change - end
-        
+
         Transport transport = null;
         String emails = "";
         try {
@@ -281,15 +287,8 @@ public class EmailEntityBean implements Serializable {
                     emails = "";
                 }
             }
-        } catch (Exception ex) {
-            System.out.println("Email sending failed");
-            Logger.getLogger(EmailEntityBean.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-                transport.close();
-            } catch (MessagingException ex) {
-                Logger.getLogger(EmailEntityBean.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return counter;
     }
@@ -306,5 +305,19 @@ public class EmailEntityBean implements Serializable {
      */
     public void setActionMessage(String ActionMessage) {
         this.ActionMessage = ActionMessage;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 }

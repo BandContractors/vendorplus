@@ -16,7 +16,6 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import static java.sql.Types.VARCHAR;
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,11 +24,15 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import utilities.CustomValidator;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import utilities.UtilityBean;
 
 /*
  * To change this template, choose Tools | Templates
@@ -44,7 +47,7 @@ import utilities.CustomValidator;
 public class TransactorBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    static Logger LOGGER = Logger.getLogger(TransactorBean.class.getName());
     private List<Transactor> Transactors;
     private String ActionMessage = null;
     private String SearchTransactorNames = "";
@@ -58,6 +61,8 @@ public class TransactorBean implements Serializable {
     private Transactor TransactorObj;
     private List<Transactor> TransactorListSimilar = new ArrayList<Transactor>();
     private Transactor ParentTransactor;
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     public void updateTaxpayer(Transactor aTransactor) {
         try {
@@ -78,7 +83,7 @@ public class TransactorBean implements Serializable {
                     } else {
                         taxpayer = new TaxpayerBean().getTaxpayerDetailFromTaxOnline(aTransactor.getTaxIdentity());
                     }
-                    
+
                     if (null == taxpayer) {
                         //do nothing
                     } else {
@@ -92,7 +97,7 @@ public class TransactorBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.out.println("updateTaxpayer:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -123,17 +128,9 @@ public class TransactorBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
     }
 
@@ -172,57 +169,59 @@ public class TransactorBean implements Serializable {
         GroupRightBean grb = new GroupRightBean();
 
         if (transactor.getTransactorId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, new NavigationBean().getTransactorReasonStr(new GeneralUserSetting().getTransactorType()), "Add") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
+            msg = "Not Allowed to Access this Function";
         } else if (transactor.getTransactorId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, new NavigationBean().getTransactorReasonStr(new GeneralUserSetting().getTransactorType()), "Edit") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
+            msg = "Not Allowed to Access this Function";
         } else if (new CustomValidator().TextSize(transactor.getTransactorType(), 1, 20).equals("FAIL")) {
-            msg = "Transactor Type MUST be specified and cannot exceed 20 characters";
+            msg = "Type Must be Between 1 and 20 Characters";
         } else if (new CustomValidator().TextSize(transactor.getCategory(), 1, 20).equals("FAIL")) {
-            msg = "Transactor Category MUST be specified and cannot exceed 20 characters";
+            msg = "Category Must be Between 1 and 20 Characters";
         } else if (new CustomValidator().TextSize(transactor.getTransactorNames(), 3, 100).equals("FAIL")) {
-            msg = "Names MUST be between 3-to-100 characters";
+            msg = "Names Must be Between 3 and 100 Characters";
         } else if (new CustomValidator().TextSize(transactor.getPhone(), 0, 100).equals("FAIL")) {
-            msg = "Transactor's Phone cannot exceed 100 characters";
+            msg = "Phone Must be Between 1 and 100 Characters";
         } else if (new CustomValidator().TextSize(transactor.getEmail(), 0, 100).equals("FAIL")) {
-            msg = "Transactor's email cannot exceed 100 characters";
+            msg = "Email Must be Between 1 and 100 Characters";
         } else if (new CustomValidator().TextSize(transactor.getWebsite(), 0, 100).equals("FAIL")) {
-            msg = "Transactor's website cannot exceed 100 characters";
+            msg = "Website Must be Between 1 and 100 Characters";
         } else if (new CustomValidator().TextSize(transactor.getCpName(), 0, 100).equals("FAIL")) {
-            msg = "Contact person's name cannot exceed 100 characters";
+            msg = "Contact Person Name Must be Between 1 and 100 Characters";
         } else if (new CustomValidator().TextSize(transactor.getCpTitle(), 0, 100).equals("FAIL")) {
-            msg = "Contact person's title cannot exceed 100 characters";
+            msg = "Contact Person Ttitle Must be Between 1 and 100 Characters";
         } else if (new CustomValidator().TextSize(transactor.getCpPhone(), 0, 100).equals("FAIL")) {
-            msg = "Contact person's phone cannot exceed 100 characters";
+            msg = "Contact Person Phone Must be Between 1 and 100 Characters";
         } else if (new CustomValidator().TextSize(transactor.getCpEmail(), 0, 100).equals("FAIL")) {
-            msg = "Contact person's email cannot exceed 100 characters";
+            msg = "Contact Person Email Must be Between 1 and 100 Characters";
         } else if (new CustomValidator().TextSize(transactor.getPhysicalAddress(), 0, 255).equals("FAIL")) {
-            msg = "Physical address cannot exceed 255 characters";
+            msg = "Physical Address Must be Between 1 and 250 Characters";
         } else if (new CustomValidator().TextSize(transactor.getTaxIdentity(), 0, 100).equals("FAIL")) {
-            msg = "Tax Identity cannot exceed 100 characters";
+            msg = "Tax Identity Must be Between 1 and 100 Characters";
         } else if (new CustomValidator().TextSize(transactor.getAccountDetails(), 0, 255).equals("FAIL")) {
-            msg = "Account details cannot exceed 255 characters";
+            msg = "Account Details Cannot Exceed 255 Characters";
         } else if ((new CustomValidator().CheckRecords(sql2) > 0 && transactor.getTransactorId() == 0) || (new CustomValidator().CheckRecords(sql3) > 0 && transactor.getTransactorId() > 0)) {
-            msg = "Transactor Name(s) already exists, please enter different name(s) !";
+            msg = "Name Already Exists";
         } else if (transtype.getTrans_number_format().length() == 0 && ((new CustomValidator().CheckRecords(sql4) > 0 && transactor.getTransactorId() == 0) || (new CustomValidator().CheckRecords(sql5) > 0 && transactor.getTransactorId() > 0))) {
-            msg = "Transactor Reference Number already exists!";
+            msg = "Reference Number Already Exists!";
         } else if (TaxBranchNo.length() > 0 && transactor.getCategory().equals("Business") && transactor.getTaxIdentity().length() == 0) {
-            msg = "Specify Tax Identification Number for the Business";
+            msg = "Enter Tax Identification Number for the Business";
         } else if (TaxBranchNo.length() > 0 && transactor.getCategory().equals("Government") && transactor.getTaxIdentity().length() == 0) {
-            msg = "Specify Tax Identification Number for the Government Entity";
+            msg = "Enter Tax Identification Number for the Government Entity";
         } else if (TaxBranchNo.length() > 0 && transactor.getCategory().equals("Consumer") && transactor.getTaxIdentity().length() == 0 && transactor.getIdNumber().length() == 0 && transactor.getPhone().length() == 0) {
-            msg = "Specify Phone Number or Identification Number for the Consumer";
+            msg = "Enter Phone Number or Identification Number for the Consumer";
         }
         return msg;
     }
 
     public void saveTransactor(Transactor transactor, List<SalaryDeduction> aSalaryDeductions) {
-        String sql = null;
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         String msg = "";
+        String sql = null;
         GroupRightBean grb = new GroupRightBean();
         String ValidationMsg = this.validateTransactor(transactor, aSalaryDeductions);
 
         if (ValidationMsg.length() > 0) {
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ValidationMsg));
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, ValidationMsg)));
         } else {
             try {
                 long status = 0;
@@ -243,16 +242,15 @@ public class TransactorBean implements Serializable {
                     if (transactor.getTransactorType().equals("EMPLOYEE")) {
                         new SalaryDeductionBean().saveSalaryDeductions(status, aSalaryDeductions);
                     }
-                    this.setActionMessage("Saved Successfully : " + transactor.getTransactorRef());
+                    this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully ## " + transactor.getTransactorRef()));
                     this.clearTransactor2(transactor, aSalaryDeductions);
                 } else {
-                    this.setActionMessage("Transaction NOT saved");
+                    this.setActionMessage(ub.translateWordsInText(BaseName, "Transaction Not Saved"));
                 }
-            } catch (Exception se) {
-                System.err.println(se.getMessage());
-                se.printStackTrace();
-                this.setActionMessage("Transactor NOT saved");
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Transactor NOT saved!"));
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Transaction Not Saved"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Transaction Not Saved")));
             }
         }
     }
@@ -351,9 +349,9 @@ public class TransactorBean implements Serializable {
             } else {
                 status = transactor.getTransactorId();
             }
-        } catch (SQLException se) {
+        } catch (Exception e) {
             status = 0;
-            System.err.println(se.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return status;
     }
@@ -533,7 +531,7 @@ public class TransactorBean implements Serializable {
                 transactor.setTransactor_segment_id(0);
             }
             return transactor;
-        } catch (SQLException se) {
+        } catch (Exception e) {
             return null;
         }
     }
@@ -717,7 +715,7 @@ public class TransactorBean implements Serializable {
             } catch (NullPointerException npe) {
                 transactor.setStore_id(0);
             }
-        } catch (SQLException se) {
+        } catch (Exception e) {
         }
     }
 
@@ -734,17 +732,9 @@ public class TransactorBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
     }
 
@@ -765,16 +755,8 @@ public class TransactorBean implements Serializable {
             } else {
                 curno = 0;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         if (curno == 0) {
             if (this.getCountTransactors() > 0) {
@@ -801,16 +783,8 @@ public class TransactorBean implements Serializable {
             } else {
                 curcount = 0;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return curcount;
     }
@@ -827,39 +801,41 @@ public class TransactorBean implements Serializable {
                 this.setTransactorFromResultSet(aTransactor, rs);
             }
         } catch (Exception e) {
-            System.err.println("setTransactor:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
     public void deleteTransactorCall(Transactor aTransactor, List<SalaryDeduction> aSalaryDeductions) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         String msg = "";
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
         try {
             if (aTransactor.getTransactorId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, new NavigationBean().getTransactorReasonStr(new GeneralUserSetting().getTransactorType()), "Delete") == 0) {
-                msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+                msg = "Not Allowed to Access this Function";
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else {
                 if (this.getTransactorRecords(aTransactor.getTransactorId()) > 0) {
-                    msg = new GeneralUserSetting().getTransactorType() + " has transactions in the system; cannot be deleted; try suspending instead!";
-                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+                    msg = "Try Suspending Entity as it has Transactions in the System";
+                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                 } else {
                     int status = this.deleteTransactor(aTransactor.getTransactorId());
                     if (status == 1) {
-                        msg = "Deleted Successfully!";
-                        FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+                        msg = "Deleted Successfully";
+                        FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                         this.clearTransactor2(aTransactor, aSalaryDeductions);
                     } else {
-                        msg = "Transactor NOT deleted!";
-                        FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+                        msg = "Transactor Not Deleted!";
+                        FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                     }
                 }
             }
         } catch (Exception e) {
-            System.err.println("deleteTransactorCall:" + e.getMessage());
-            msg = "Transactor NOT deleted";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            LOGGER.log(Level.ERROR, e);
+            msg = "Transactor Not Deleted";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         }
     }
 
@@ -874,43 +850,45 @@ public class TransactorBean implements Serializable {
             status = 1;
         } catch (Exception e) {
             status = 0;
-            System.err.println("deleteTransactor:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return status;
     }
 
     public void mergeTransactorRecordsCall(Trans aTrans, Transactor aTransactor, Transactor aBillTransactor) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         String msg = "";
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
         try {
             if (aTrans.getTransactorId() == 0 || aTrans.getBillTransactorId() == 0) {
-                msg = "Please select valid partner(s)...";
+                msg = "Select Valid Partner";
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
             } else if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "View") == 0) {
-                msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
+                msg = "Not Allowed to Access this Function";
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
             } else {
                 int merged = this.mergeTransactorRecords(aTrans.getTransactorId(), aTrans.getBillTransactorId());
                 int deleted = 0;
                 if (merged == 0) {
-                    msg = "Its possible records are not fully merged; please try again or contact administrator!";
-                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+                    msg = "It is Possible that Records are Not Fully Merged";
+                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                 } else {
                     deleted = this.deleteTransactor(aTrans.getBillTransactorId());
                 }
                 if (deleted == 1) {
-                    msg = "Records merged and deleted Successfully!";
+                    msg = "Records Merged and Deleted Successfully";
                     new TransBean().initTransactorMerge(aTrans, aTransactor, aBillTransactor);
-                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                 } else {
-                    msg = "Its possible records are fully merged but partner not deleted; please try again or contact administrator!";
-                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+                    msg = "It is Possible Records are Merged but Partner not Deleted";
+                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                 }
             }
         } catch (Exception e) {
-            System.err.println("mergeTransactorRecordsCall:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -1163,16 +1141,8 @@ public class TransactorBean implements Serializable {
             while (rs.next()) {
                 Transactors.add(this.getTransactorFromResultSet(rs));
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return Transactors;
     }
@@ -1201,7 +1171,7 @@ public class TransactorBean implements Serializable {
                     this.TransactorList.add(this.getTransactorFromResultSet(rs));
                 }
             } catch (Exception e) {
-                System.err.println("refreshTransactorsListByNameRefFile:" + e.getMessage());
+                LOGGER.log(Level.ERROR, e);
             }
         }
     }
@@ -1222,7 +1192,7 @@ public class TransactorBean implements Serializable {
                     this.TransactorListSimilar.add(this.getTransactorFromResultSet(rs));
                 }
             } catch (Exception e) {
-                System.err.println("refreshTransactorsListSimilar:" + e.getMessage());
+                LOGGER.log(Level.ERROR, e);
             }
         }
     }
@@ -1241,16 +1211,8 @@ public class TransactorBean implements Serializable {
             while (rs.next()) {
                 NewTransactors.add(this.getTransactorFromResultSet(rs));
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return NewTransactors;
     }
@@ -1276,16 +1238,8 @@ public class TransactorBean implements Serializable {
             while (rs.next()) {
                 TransactorStringList.add(rs.getString("transactor_names"));
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return TransactorStringList;
     }
@@ -1307,16 +1261,8 @@ public class TransactorBean implements Serializable {
             while (rs.next()) {
                 TransactorObjectList.add(this.getTransactorFromResultSet(rs));
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return TransactorObjectList;
     }
@@ -1338,16 +1284,8 @@ public class TransactorBean implements Serializable {
             while (rs.next()) {
                 TransactorObjectList.add(this.getTransactorFromResultSet(rs));
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return TransactorObjectList;
     }
@@ -1365,16 +1303,8 @@ public class TransactorBean implements Serializable {
                 while (rs.next()) {
                     this.ReportTransactors.add(this.getTransactorFromResultSet(rs));
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
-            } finally {
-                if (rs != null) {
-                    try {
-                        rs.close();
-                    } catch (SQLException ex) {
-                        System.err.println(ex.getMessage());
-                    }
-                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         } else {
             this.ReportTransactors.clear();
@@ -1395,16 +1325,8 @@ public class TransactorBean implements Serializable {
                 while (rs.next()) {
                     this.TransactorList.add(this.getTransactorFromResultSet(rs));
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
-            } finally {
-                if (rs != null) {
-                    try {
-                        rs.close();
-                    } catch (SQLException ex) {
-                        System.err.println(ex.getMessage());
-                    }
-                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         }
     }
@@ -1420,8 +1342,8 @@ public class TransactorBean implements Serializable {
             sd.setAmount(0);
             sd.setDeductionName("");
             this.getSalaryDeductions().add(sd);
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -1563,7 +1485,7 @@ public class TransactorBean implements Serializable {
                 records = records + rs.getLong("records");
             }
         } catch (Exception e) {
-            System.err.println("getTransactorRecords:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return records;
     }
@@ -1598,7 +1520,7 @@ public class TransactorBean implements Serializable {
                 Transactors.add(this.getTransactorFromResultSet(rs));
             }
         } catch (Exception e) {
-            System.err.println("getTransactorsAll:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return Transactors;
     }
@@ -1756,5 +1678,19 @@ public class TransactorBean implements Serializable {
      */
     public void setParentTransactor(Transactor ParentTransactor) {
         this.ParentTransactor = ParentTransactor;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 }
