@@ -17,14 +17,18 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import utilities.CustomValidator;
-
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import utilities.UtilityBean;
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+
 /**
  *
  * @author btwesigye
@@ -34,7 +38,7 @@ import utilities.CustomValidator;
 public class ItemLocationBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    static Logger LOGGER = Logger.getLogger(ItemLocationBean.class.getName());
     private List<ItemLocation> ItemLocations;
     private String ActionMessage = null;
     private ItemLocation SelectedItemLocation = null;
@@ -43,11 +47,15 @@ public class ItemLocationBean implements Serializable {
     private int SelectedItemId;
     private int SelectedLocationId;
     private List<ItemLocation> ItemLocationsList;
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     public void saveItemLocation(ItemLocation aItemLocation) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         String sql = null;
         String sql2 = null;
-        String msg = null;
 
         sql2 = "SELECT * FROM item_location WHERE item_id=" + aItemLocation.getItemId() + " AND location_id=" + aItemLocation.getLocationId();
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
@@ -55,15 +63,15 @@ public class ItemLocationBean implements Serializable {
         GroupRightBean grb = new GroupRightBean();
 
         if (aItemLocation.getItemLocationId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Add") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if (aItemLocation.getItemLocationId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Edit") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if (aItemLocation.getItemId() == 0 || aItemLocation.getLocationId() == 0) {
-            this.setActionMessage("Select ITEM and LOCATION please...!");
+            this.setActionMessage("Select Item and Location");
         } else if (new CustomValidator().CheckRecords(sql2) > 0) {
-            this.setActionMessage("ITEM already EXISTS at the LOCATION...!");
+            this.setActionMessage("Item Already Exists at Location");
         } else if (aItemLocation.getItemLocationId() != 0) {
             //do nothing
         } else {
@@ -74,13 +82,12 @@ public class ItemLocationBean implements Serializable {
                 cs.setLong(1, aItemLocation.getItemId());
                 cs.setLong(2, aItemLocation.getLocationId());
                 cs.executeUpdate();
-                this.setActionMessage("Saved Successfully");
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
-                this.setActionMessage("NOT saved");
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Not Saved"));
             }
         }
-
     }
 
     public ItemLocation getItemLocation(ItemLocation aItemLocation) {
@@ -107,19 +114,10 @@ public class ItemLocationBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
-
     }
 
     public void deleteItemLocation() {
@@ -131,25 +129,27 @@ public class ItemLocationBean implements Serializable {
     }
 
     public void deleteItemLocationById(long itemLocationId) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         String sql = "DELETE FROM item_location WHERE item_location_id=?";
-        String msg;
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
 
         if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Delete") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
             try (
                     Connection conn = DBConnection.getMySQLConnection();
                     PreparedStatement ps = conn.prepareStatement(sql);) {
                 ps.setLong(1, itemLocationId);
                 ps.executeUpdate();
-                this.setActionMessage("Deleted Successfully!");
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
-                this.setActionMessage("NOT deleted");
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Deleted Successfully"));
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Not Deleted"));
             }
         }
     }
@@ -209,16 +209,8 @@ public class ItemLocationBean implements Serializable {
                 itemLocation.setLocationName(rs.getString("location_name"));
                 ItemLocations.add(itemLocation);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return ItemLocations;
     }
@@ -258,16 +250,8 @@ public class ItemLocationBean implements Serializable {
                 itemLocation.setUnitSymbol(rs.getString("unit_symbol"));
                 this.getItemLocationsList().add(itemLocation);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -377,5 +361,19 @@ public class ItemLocationBean implements Serializable {
      */
     public void setItemLocationsList(List<ItemLocation> ItemLocationsList) {
         this.ItemLocationsList = ItemLocationsList;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 }

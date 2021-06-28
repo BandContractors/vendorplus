@@ -8678,14 +8678,16 @@ public class TransBean implements Serializable {
     }
 
     public void refreshReportCustomerCard(Trans aTrans) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         String sql;
         sql = "{call sp_report_customer_card(?,?,?,?)}";
         ResultSet rs = null;
         this.CustomerCardTranss = new ArrayList<Trans>();
         if (aTrans != null) {
             if (null == aTrans.getTransactionDate() || null == aTrans.getTransactionDate2() || aTrans.getBillTransactorId() == 0) {
-                this.ActionMessage = "Please select Date Range and the Customer...";
-                FacesContext.getCurrentInstance().addMessage("Customer Card", new FacesMessage(this.ActionMessage));
+                this.ActionMessage = "Select Date Range and Customer";
+                FacesContext.getCurrentInstance().addMessage("Customer Card", new FacesMessage(ub.translateWordsInText(BaseName, this.ActionMessage)));
             } else {
                 try (
                         Connection conn = DBConnection.getMySQLConnection();
@@ -8782,14 +8784,16 @@ public class TransBean implements Serializable {
     }
 
     public void refreshReportSupplierCard(Trans aTrans) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         String sql;
         sql = "{call sp_report_supplier_card(?,?,?,?)}";
         ResultSet rs = null;
-        this.setSupplierCardTranss(new ArrayList<Trans>());
+        this.setSupplierCardTranss(new ArrayList<>());
         if (aTrans != null) {
             if (null == aTrans.getTransactionDate() || null == aTrans.getTransactionDate2() || aTrans.getBillTransactorId() == 0) {
-                this.ActionMessage = "Please select Date Range and the Supplier...";
-                FacesContext.getCurrentInstance().addMessage("Supplier Card", new FacesMessage(this.ActionMessage));
+                this.ActionMessage = "Select Date Range and Supplier";
+                FacesContext.getCurrentInstance().addMessage("Supplier Card", new FacesMessage(ub.translateWordsInText(BaseName, this.ActionMessage)));
             } else {
                 try (
                         Connection conn = DBConnection.getMySQLConnection();
@@ -11031,13 +11035,15 @@ public class TransBean implements Serializable {
     }
 
     public void reportSalesInvoiceDetail(Trans aTrans, TransBean aTransBean) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         String msg = "";
         aTransBean.setActionMessage("");
         try {
             if ((aTransBean.getDate1() != null && aTransBean.getDate2() != null) || aTrans.getTransactionNumber().length() > 0 || aTrans.getTransactionRef().length() > 0) {
                 //okay no problem
             } else {
-                msg = "EITHER select date range OR specify Invoice/Reference Number";
+                msg = "Either Select Date Range or Specify Invoice Number or Specify Reference Number";
             }
         } catch (Exception e) {
             //do nothing
@@ -11049,8 +11055,8 @@ public class TransBean implements Serializable {
         this.TransList = new ArrayList<>();
         this.TransListSummary = new ArrayList<>();
         if (msg.length() > 0) {
-            aTransBean.setActionMessage(msg);
-            FacesContext.getCurrentInstance().addMessage("Report", new FacesMessage(msg));
+            aTransBean.setActionMessage(ub.translateWordsInText(BaseName, msg));
+            FacesContext.getCurrentInstance().addMessage("Report", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
             String sql = "SELECT * FROM view_transaction_cr_dr WHERE 1=1";
             String sqlsum = "";
@@ -11288,13 +11294,15 @@ public class TransBean implements Serializable {
     }
 
     public void reportSalesTaxAPI(Trans aTrans, TransBean aTransBean) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         String msg = "";
         aTransBean.setActionMessage("");
         try {
             if ((aTransBean.getDate1() != null && aTransBean.getDate2() != null) || aTrans.getTransactionNumber().length() > 0 || aTrans.getTransactionRef().length() > 0) {
                 //okay no problem
             } else {
-                msg = "EITHER select date range OR specify Transaction Number from This/Tax System";
+                msg = "Either Select Date Range or Specify Transaction Number";
             }
         } catch (Exception e) {
             //do nothing
@@ -11306,8 +11314,8 @@ public class TransBean implements Serializable {
         this.TransList = new ArrayList<>();
         this.TransListSummary = new ArrayList<>();
         if (msg.length() > 0) {
-            aTransBean.setActionMessage(msg);
-            FacesContext.getCurrentInstance().addMessage("Report", new FacesMessage(msg));
+            aTransBean.setActionMessage(ub.translateWordsInText(BaseName, msg));
+            FacesContext.getCurrentInstance().addMessage("Report", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
             //1. detail
             String WhereAppend = "";
@@ -12264,12 +12272,6 @@ public class TransBean implements Serializable {
         if (aTrans.getTransactionUserDetailId() > 0) {
             wheresql = wheresql + " AND transaction_user_detail_id=" + aTrans.getTransactionUserDetailId();
         }
-//        if (aTrans.getBillTransactorId() > 0) {
-//            WhereAppend = WhereAppend + " AND bill_transactor_id=" + aTrans.getBillTransactorId();
-//        }
-//        if (aTrans.getTransactorId() > 0) {
-//            WhereAppend = WhereAppend + " AND transactor_id=" + aTrans.getTransactorId();
-//        }
         if (aTransBean.getDateType().length() > 0 && aTransBean.getDate1() != null && aTransBean.getDate2() != null) {
             switch (aTransBean.getDateType()) {
                 case "Dispose Date":
@@ -12800,12 +12802,6 @@ public class TransBean implements Serializable {
         if (aTrans.getTransactionUserDetailId() > 0) {
             wheresql = wheresql + " AND transaction_user_detail_id=" + aTrans.getTransactionUserDetailId();
         }
-//        if (aTrans.getBillTransactorId() > 0) {
-//            WhereAppend = WhereAppend + " AND bill_transactor_id=" + aTrans.getBillTransactorId();
-//        }
-//        if (aTrans.getTransactorId() > 0) {
-//            WhereAppend = WhereAppend + " AND transactor_id=" + aTrans.getTransactorId();
-//        }
         if (aTransBean.getDateType().length() > 0 && aTransBean.getDate1() != null && aTransBean.getDate2() != null) {
             switch (aTransBean.getDateType()) {
                 case "Request Date":
@@ -12935,12 +12931,6 @@ public class TransBean implements Serializable {
         if (aTrans.getTransactionUserDetailId() > 0) {
             wheresql = wheresql + " AND transaction_user_detail_id=" + aTrans.getTransactionUserDetailId();
         }
-//        if (aTrans.getBillTransactorId() > 0) {
-//            WhereAppend = WhereAppend + " AND bill_transactor_id=" + aTrans.getBillTransactorId();
-//        }
-//        if (aTrans.getTransactorId() > 0) {
-//            WhereAppend = WhereAppend + " AND transactor_id=" + aTrans.getTransactorId();
-//        }
         if (aTransBean.getDateType().length() > 0 && aTransBean.getDate1() != null && aTransBean.getDate2() != null) {
             switch (aTransBean.getDateType()) {
                 case "Transfer Date":
@@ -13949,13 +13939,15 @@ public class TransBean implements Serializable {
     }
 
     public void reportTransItemDetail(Trans aTrans, TransBean aTransBean, Item aItem, Transactor aTransactor, int aCategoryId) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         String msg = "";
         aTransBean.setActionMessage("");
         try {
             if (aTransBean.getDate1() != null && aTransBean.getDate2() != null) {
                 //okay no problem
             } else {
-                msg = "Kindly select a date range...";
+                msg = "Select Date Range";
             }
         } catch (Exception e) {
             //do nothing
@@ -13964,8 +13956,8 @@ public class TransBean implements Serializable {
             aTransBean.setDateType("Add Date");
         }
         if (msg.length() > 0) {
-            aTransBean.setActionMessage(msg);
-            FacesContext.getCurrentInstance().addMessage("Report", new FacesMessage(msg));
+            aTransBean.setActionMessage(ub.translateWordsInText(BaseName, msg));
+            FacesContext.getCurrentInstance().addMessage("Report", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
             ResultSet rs = null;
             ResultSet rssum = null;

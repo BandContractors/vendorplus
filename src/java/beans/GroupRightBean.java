@@ -15,8 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import utilities.UtilityBean;
 
 /*
  * To change this template, choose Tools | Templates
@@ -31,7 +35,7 @@ import javax.faces.context.FacesContext;
 public class GroupRightBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    static Logger LOGGER = Logger.getLogger(GroupRightBean.class.getName());
     private List<GroupRight> GroupRights;
     private String ActionMessage = null;
     private GroupRight SelectedGroupRight = null;
@@ -49,23 +53,27 @@ public class GroupRightBean implements Serializable {
     private boolean AllAdd;
     private boolean AllEdit;
     private boolean AllDelete;
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     public void saveGroupRight() {
-        String msg = null;
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
 
         if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Add") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Edit") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if (this.SelectedGroupDetailId == 0 || this.SelectedStoreId == 0) {
             //do nothing
-            this.setActionMessage("Group Rights NOT saved!");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Group Rights NOT saved!"));
+            this.setActionMessage(ub.translateWordsInText(BaseName, "Group Rights Not Saved"));
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Group Rights Not Saved")));
         } else {
             int ListItemIndex = 0;
             int ListItemNo = this.GroupRightsForEdit.size();
@@ -74,21 +82,22 @@ public class GroupRightBean implements Serializable {
                 ListItemIndex = ListItemIndex + 1;
             }
             this.retrieveGroupRightsForEdit();
-            this.setActionMessage("Group Rights saved successfully");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Group Rights saved successfully"));
+            this.setActionMessage(ub.translateWordsInText(BaseName, "Group Rights Saved Successfully"));
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Group Rights Saved Successfully")));
         }
     }
 
     public void addGroupRight(GroupRight groupright) {
-        String sql = null;
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         String msg = "";
+        String sql = null;
 
         if (groupright.getGroupRightId() == 0) {
             sql = "{call sp_insert_group_right(?,?,?,?,?,?,?)}";
         } else if (groupright.getGroupRightId() > 0) {
             sql = "{call sp_update_group_right(?,?,?,?,?,?,?,?)}";
         }
-
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 CallableStatement cs = conn.prepareCall(sql);) {
@@ -101,7 +110,7 @@ public class GroupRightBean implements Serializable {
                 cs.setString("in_allow_edit", groupright.getAllowEdit());
                 cs.setString("in_allow_delete", groupright.getAllowDelete());
                 cs.executeUpdate();
-                this.setActionMessage("Saved Successfully");
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
                 this.clearGroupRight(groupright);
             } else if (groupright.getGroupRightId() > 0) {
                 cs.setInt("in_group_right_id", groupright.getGroupRightId());
@@ -113,15 +122,14 @@ public class GroupRightBean implements Serializable {
                 cs.setString("in_allow_edit", groupright.getAllowEdit());
                 cs.setString("in_allow_delete", groupright.getAllowDelete());
                 cs.executeUpdate();
-                this.setActionMessage("Saved Successfully");
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
                 this.clearGroupRight(groupright);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-            this.setActionMessage("GroupRight NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("GroupRight NOT saved!"));
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
+            this.setActionMessage(ub.translateWordsInText(BaseName, "Group Right Not Saved"));
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Group Right Not Saved")));
         }
-
     }
 
     public GroupRight getGroupRight(int GrpRightId) {
@@ -146,33 +154,27 @@ public class GroupRightBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
-
     }
 
     public void deleteGroupRight(GroupRight groupright) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         String sql = "DELETE FROM group_right WHERE group_right_id=?";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             ps.setInt(1, groupright.getGroupRightId());
             ps.executeUpdate();
-            this.setActionMessage("Deleted Successfully!");
+            this.setActionMessage(ub.translateWordsInText(BaseName, "Deleted Successfully"));
             this.clearGroupRight(groupright);
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-            this.setActionMessage("GroupRight NOT deleted");
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
+            this.setActionMessage(ub.translateWordsInText(BaseName, "Group Right Not Deleted"));
         }
     }
 
@@ -203,7 +205,6 @@ public class GroupRightBean implements Serializable {
      */
     public List<GroupRight> getGroupRights() {
         String sql;
-
         if (this.getSelectedGroupDetailId() != 0 && this.getSelectedStoreId() != 0) {
             sql = "SELECT * FROM group_right gr WHERE gr.group_detail_id=" + this.getSelectedGroupDetailId() + " AND gr.store_id=" + this.getSelectedStoreId() + "";
         } else if (this.getSelectedGroupDetailId() != 0 && this.getSelectedStoreId() == 0) {
@@ -232,16 +233,8 @@ public class GroupRightBean implements Serializable {
                 groupright.setAllowDelete(rs.getString("allow_delete"));
                 GroupRights.add(groupright);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
         }
         return GroupRights;
     }
@@ -270,22 +263,14 @@ public class GroupRightBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException | NullPointerException se) {
-            System.err.println(se.getMessage());
+        } catch (SQLException | NullPointerException e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
     }
 
     public List<GroupRight> retrieveGroupRightsForEdit() {
-        this.GroupRightsForEdit = new ArrayList<GroupRight>(); 
+        this.GroupRightsForEdit = new ArrayList<GroupRight>();
         if (this.SelectedGroupDetailId == 0 || this.SelectedStoreId == 0) {
             return null;
         } else {
@@ -433,16 +418,8 @@ public class GroupRightBean implements Serializable {
                 groupright.setAllowDelete(rs.getString("allow_delete"));
                 NewCurrentGroupRights.add(groupright);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
         }
         return NewCurrentGroupRights;
     }
@@ -934,6 +911,20 @@ public class GroupRightBean implements Serializable {
      */
     public void setAllDelete(boolean AllDelete) {
         this.AllDelete = AllDelete;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 
 }

@@ -16,6 +16,8 @@ import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import utilities.UtilityBean;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 /*
  * To change this template, choose Tools | Templates
@@ -30,6 +32,7 @@ import utilities.UtilityBean;
 public class CashFlowStatementBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    static Logger LOGGER = Logger.getLogger(CashFlowStatementBean.class.getName());
     private List<CashFlowStatement> CashReceiptsList;
     private List<CashFlowStatement> CashPaymentsList;
     private String ActionMessage;
@@ -137,7 +140,7 @@ public class CashFlowStatementBean implements Serializable {
                 aCashFlowStatement.setTotal(0.0);
             }
         } catch (Exception e) {
-            System.out.println("clear:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -254,7 +257,7 @@ public class CashFlowStatementBean implements Serializable {
                     this.CashReceiptsList.add(cfsCR);
                 }
             } catch (Exception e) {
-                System.err.println("reportCashFlowStatement:CR:" + e.getMessage());
+                LOGGER.log(Level.ERROR, e);
             }
             //CP
             //System.out.println("CP:" + sqlCP);
@@ -269,7 +272,7 @@ public class CashFlowStatementBean implements Serializable {
                     this.CashPaymentsList.add(cfsCP);
                 }
             } catch (Exception e) {
-                System.err.println("reportCashFlowStatement:CP:" + e.getMessage());
+                LOGGER.log(Level.ERROR, e);
             }
             //Cash at Beginning
             sqlCB = "SELECT "
@@ -310,7 +313,7 @@ public class CashFlowStatementBean implements Serializable {
                     this.CashAtBegin.setTotal(this.CashAtBegin.getJan() + this.CashAtBegin.getFeb() + this.CashAtBegin.getMar() + this.CashAtBegin.getApr() + this.CashAtBegin.getMay() + this.CashAtBegin.getJun() + this.CashAtBegin.getJul() + this.CashAtBegin.getAug() + this.CashAtBegin.getSep() + this.CashAtBegin.getOct() + this.CashAtBegin.getNov() + this.CashAtBegin.getDec());
                 }
             } catch (Exception e) {
-                System.err.println("reportCashFlowStatement:CB:" + e.getMessage());
+                LOGGER.log(Level.ERROR, e);
             }
             //Cash at End
 
@@ -518,7 +521,7 @@ public class CashFlowStatementBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.out.println("refreshChartCFS:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 

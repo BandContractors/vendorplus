@@ -10,13 +10,16 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import utilities.UtilityBean;
 
 /*
  * To change this template, choose Tools | Templates
@@ -31,26 +34,30 @@ import javax.faces.context.FacesContext;
 public class TransactionReasonBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    static Logger LOGGER = Logger.getLogger(TransactionReasonBean.class.getName());
     private List<TransactionReason> TransactionReasons;
     private String ActionMessage = null;
     private TransactionReason SelectedTransactionReason = null;
     private int SelectedTransactionReasonId;
     private String SearchTransactionReasonName = "";
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     public void saveTransactionReason(TransactionReason tr) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         String sql = null;
-        String msg = null;
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
 
         if (tr.getTransactionReasonId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Add") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if (tr.getTransactionReasonId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Edit") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
             if (tr.getTransactionReasonId() == 0) {
                 sql = "{call sp_insert_transaction_reason(?,?)}";
@@ -65,17 +72,17 @@ public class TransactionReasonBean implements Serializable {
                     cs.setInt(1, tr.getTransactionTypeId());
                     cs.setString(2, tr.getTransactionReasonName());
                     cs.executeUpdate();
-                    this.setActionMessage("Saved Successfully");
+                    this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
                 } else if (tr.getTransactionReasonId() > 0) {
                     cs.setInt(1, tr.getTransactionReasonId());
                     cs.setInt(2, tr.getTransactionTypeId());
                     cs.setString(3, tr.getTransactionReasonName());
                     cs.executeUpdate();
-                    this.setActionMessage("Saved Successfully");
+                    this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
-                this.setActionMessage("TransactionReason NOT saved");
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);//(se.getMessage());
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Transaction Reason Not Saved"));
             }
         }
     }
@@ -98,19 +105,10 @@ public class TransactionReasonBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
-
     }
 
     public TransactionReason getTransactionReason2(String TraReasId) {
@@ -131,19 +129,10 @@ public class TransactionReasonBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
-
     }
 
     public void deleteTransactionReason() {
@@ -155,25 +144,27 @@ public class TransactionReasonBean implements Serializable {
     }
 
     public void deleteTransactionReasonById(int TraReasId) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         String sql = "DELETE FROM transaction_reason WHERE transaction_reason_id=?";
-        String msg;
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
 
         if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Delete") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
             try (
                     Connection conn = DBConnection.getMySQLConnection();
                     PreparedStatement ps = conn.prepareStatement(sql);) {
                 ps.setInt(1, TraReasId);
                 ps.executeUpdate();
-                this.setActionMessage("Deleted Successfully!");
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
-                this.setActionMessage("Transaction Reason NOT deleted");
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Deleted Successfully"));
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);//(se.getMessage());
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Transaction Reason Not Deleted"));
             }
         }
     }
@@ -213,16 +204,8 @@ public class TransactionReasonBean implements Serializable {
                 tr.setDescription(rs.getString("description"));
                 TransactionReasons.add(tr);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
         }
         return TransactionReasons;
     }
@@ -245,16 +228,8 @@ public class TransactionReasonBean implements Serializable {
                 tr.setDescription(rs.getString("description"));
                 TransactionReasons.add(tr);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
         }
         return TransactionReasons;
     }
@@ -277,16 +252,8 @@ public class TransactionReasonBean implements Serializable {
                 tr.setDescription(rs.getString("description"));
                 TransactionReasons.add(tr);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
         }
         return TransactionReasons;
     }
@@ -355,5 +322,19 @@ public class TransactionReasonBean implements Serializable {
      */
     public void setSearchTransactionReasonName(String SearchTransactionReasonName) {
         this.SearchTransactionReasonName = SearchTransactionReasonName;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 }

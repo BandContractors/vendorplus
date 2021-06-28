@@ -18,10 +18,12 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import utilities.UtilityBean;
 
 /*
  * To change this template, choose Tools | Templates
@@ -44,6 +46,8 @@ public class Transaction_smbi_mapBean implements Serializable {
     private String ActionMessage = null;
     private List<Transaction_smbi_map> TransList;
     private List<Transaction_smbi_map> TransListSummary;
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     public void setTransaction_smbi_mapFromResultset(Transaction_smbi_map aTransaction_smbi_map, ResultSet aResultSet) {
         try {
@@ -337,13 +341,15 @@ public class Transaction_smbi_mapBean implements Serializable {
     }
 
     public void reportSMbiAPI() {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = getMenuItemBean().getMenuItemObj().getLANG_BASE_NAME_SYS();
         String msg = "";
         this.setActionMessage("");
         try {
             if ((this.getDate1() != null && this.getDate2() != null) || (this.getTransactionNumber().length() > 0 && this.getTransactionTypeId() > 0)) {
                 //okay no problem
             } else {
-                msg = "EITHER [select date range] OR [specify Transaction Number and Type]";
+                msg = "Either Select Date Range or Specify Transaction Number and Type";
             }
         } catch (Exception e) {
             //do nothing
@@ -352,8 +358,8 @@ public class Transaction_smbi_mapBean implements Serializable {
         this.TransList = new ArrayList<>();
         this.TransListSummary = new ArrayList<>();
         if (msg.length() > 0) {
-            this.setActionMessage(msg);
-            FacesContext.getCurrentInstance().addMessage("Report", new FacesMessage(msg));
+            this.setActionMessage(ub.translateWordsInText(BaseName, msg));
+            FacesContext.getCurrentInstance().addMessage("Report", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
             //1. detail
             String WhereAppend = "";
@@ -530,5 +536,19 @@ public class Transaction_smbi_mapBean implements Serializable {
      */
     public void setTransListSummary(List<Transaction_smbi_map> TransListSummary) {
         this.TransListSummary = TransListSummary;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 }

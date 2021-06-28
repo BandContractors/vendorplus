@@ -13,12 +13,16 @@ import java.util.List;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.*;
 import javax.faces.context.FacesContext;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import utilities.UtilityBean;
 
 @ManagedBean
 @SessionScoped
 public class TransactionTypeBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    static Logger LOGGER = Logger.getLogger(TransactionTypeBean.class.getName());
     private List<TransactionType> TransactionTypes;
     private String ActionMessage;
     private TransactionType SelectedTransactionType = null;
@@ -27,6 +31,8 @@ public class TransactionTypeBean implements Serializable {
     private List<TransactionType> TransactionTypesForEdit;
     private TransactionType TransactionTypeForEdit = new TransactionType();
     private List<TransactionType> TransactionTypeList;
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     public int transNeeds(int aTransId, String aNeeded) {
         /*
@@ -115,15 +121,17 @@ public class TransactionTypeBean implements Serializable {
     }
 
     public void updateTransactionTypes(List<TransactionType> aTransactionTypes) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         String sql = null;
-        String msg = null;
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
 
         if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Edit") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
             List<TransactionType> att = aTransactionTypes;
             int ListItemIndex = 0;
@@ -428,6 +436,9 @@ public class TransactionTypeBean implements Serializable {
     }
 
     public void updateTransactionType(TransactionType tt) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         String sql = null;
         this.setActionMessage("");
         if (tt.getTransactionTypeId() > 0) {
@@ -466,11 +477,11 @@ public class TransactionTypeBean implements Serializable {
                     cs.setString("in_default_term_condition", tt.getDefault_term_condition());
                     cs.executeUpdate();
                     String mg = "Transaction Settings Updated Successfully";
-                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(mg));
+                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                     this.refreshTransactionTypeList();
                 }
             } catch (Exception e) {
-                System.err.println(e.getMessage());
+                LOGGER.log(Level.ERROR, e);//(e.getMessage());
             }
         }
     }
@@ -488,19 +499,10 @@ public class TransactionTypeBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
-
     }
 
     public void setTransactionTypeGivenId(TransactionType aTransactionType, int TtId) {
@@ -515,16 +517,8 @@ public class TransactionTypeBean implements Serializable {
                 this.clearTransactionType(aTransactionType);
                 this.updateTransactionTypeFromResultset(aTransactionType, rs);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
         }
     }
 
@@ -540,18 +534,9 @@ public class TransactionTypeBean implements Serializable {
             if (rs.next()) {
                 this.updateTransactionTypeFromResultset(this.TransactionTypeForEdit, rs);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
         }
-
     }
 
     public void deleteTransactionType() {
@@ -563,25 +548,27 @@ public class TransactionTypeBean implements Serializable {
     }
 
     public void deleteTransactionTypeById(int TtId) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         String sql = "DELETE FROM transaction_type WHERE transaction_type_id=?";
-        String msg;
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
 
         if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Delete") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
             try (
                     Connection conn = DBConnection.getMySQLConnection();
                     PreparedStatement ps = conn.prepareStatement(sql);) {
                 ps.setInt(1, TtId);
                 ps.executeUpdate();
-                this.setActionMessage("Deleted Successfully!");
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
-                this.setActionMessage("TransactionType NOT deleted");
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Deleted Successfully"));
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);//(se.getMessage());
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Transaction Type Not Deleted"));
             }
         }
     }
@@ -614,16 +601,8 @@ public class TransactionTypeBean implements Serializable {
             while (rs.next()) {
                 TransactionTypesForEdit.add(this.getTransactionTypeFromResultset(rs));
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
         }
     }
 
@@ -671,16 +650,8 @@ public class TransactionTypeBean implements Serializable {
             while (rs.next()) {
                 TransactionTypes.add(this.getTransactionTypeFromResultset(rs));
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
         }
         return TransactionTypes;
     }
@@ -700,16 +671,8 @@ public class TransactionTypeBean implements Serializable {
                 this.updateTransactionTypeFromResultset(tt, rs);
                 this.TransactionTypeList.add(tt);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
         }
     }
 
@@ -739,16 +702,8 @@ public class TransactionTypeBean implements Serializable {
             while (rs.next()) {
                 tts.add(this.getTransactionTypeFromResultset(rs));
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
         }
         return tts;
     }
@@ -768,16 +723,8 @@ public class TransactionTypeBean implements Serializable {
             while (rs.next()) {
                 tts.add(this.getTransactionTypeFromResultset(rs));
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
         }
         return tts;
     }
@@ -796,16 +743,8 @@ public class TransactionTypeBean implements Serializable {
             } else {
                 x = 1;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
         }
         return x;
     }
@@ -913,6 +852,20 @@ public class TransactionTypeBean implements Serializable {
      */
     public void setTransactionTypeList(List<TransactionType> TransactionTypeList) {
         this.TransactionTypeList = TransactionTypeList;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 
 }

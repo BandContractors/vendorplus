@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +23,7 @@ import utilities.CustomValidator;
 import utilities.Security;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import utilities.UtilityBean;
 
 /*
  * To change this template, choose Tools | Templates
@@ -43,6 +45,8 @@ public class UserDetailBean implements Serializable {
     private UserDetail SelectedUserDetail = null;
     private int SelectedUserDetailId;
     private String SearchUserName = "";
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     public void setUserDetailFromResultset(UserDetail aUserDetail, ResultSet aResultSet) {
         try {
@@ -179,8 +183,10 @@ public class UserDetailBean implements Serializable {
     }
 
     public void saveUserDetail(UserDetail userdetail) {
-        String sql = null;
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         String msg = "";
+        String sql = null;
         String sql2 = null;
         sql2 = "SELECT * FROM user_detail WHERE user_name='" + userdetail.getUserName() + "'";
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
@@ -188,47 +194,47 @@ public class UserDetailBean implements Serializable {
         GroupRightBean grb = new GroupRightBean();
 
         if (userdetail.getUserDetailId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Add") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if (userdetail.getUserDetailId() > 0 && new GeneralUserSetting().getChangePasswordAllowed() != 1 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Edit") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if (userdetail.getUserCategoryId() == 0) {
-            msg = "Please select the User Category";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Select User Category";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if (new CustomValidator().CheckPassword(userdetail.getUserPassword(), userdetail.getUserPasswordConfirm()).equals("FAIL")) {
-            msg = "Ensure that user passwords match and are between 5-to-20 characters";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "New and Confirm Password Should Match and Between 5 to 20 Characters";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if (new CustomValidator().TextSize(userdetail.getUserName(), 5, 20).equals("FAIL")) {
-            msg = "User Name MUST be between 5-to-20 characters";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "User Name Must be Between 5 to 20 Characters";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if (new CustomValidator().TextSize(userdetail.getFirstName(), 3, 100).equals("FAIL")) {
-            msg = "First Name MUST be between 3-to-100 characters";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "First Name Must be Between 3 to 100 Characters";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if (new CustomValidator().TextSize(userdetail.getSecondName(), 0, 100).equals("FAIL")) {
-            msg = "Second Name cannot exceed 100 characters";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Second Name Must be Between 1 and 100 Characters";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if (new CustomValidator().TextSize(userdetail.getThirdName(), 0, 100).equals("FAIL")) {
-            msg = "Third Name cannot exceed 100 characters";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Third Name Must be Netween 1 and 100 Characters";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if (new CustomValidator().TextSize(userdetail.getIsUserLocked(), 2, 3).equals("FAIL")) {
-            msg = "Please select an option for Lock User? !";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Sselect Option for Lock User";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if (new CustomValidator().TextSize(userdetail.getIsUserGenAdmin(), 2, 3).equals("FAIL")) {
-            msg = "Please select an option for General Admin !";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Select Option for General Admin";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if ((new CustomValidator().CheckRecords(sql2) > 0 && userdetail.getUserDetailId() == 0) || (new CustomValidator().CheckRecords(sql2) > 0 && new CustomValidator().CheckRecords(sql2) != 1 && userdetail.getUserDetailId() > 0)) {
-            msg = "Username already exists, please enter a different username !";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Username Already Exists";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if (!this.IsTransCodeValid(userdetail)) {
-            msg = "Please enter a different User Code...!";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Enter Different User Code";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if (userdetail.getTrans_code().length() < 4) {
-            msg = "User Code must be at least 4 characters...!";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "User Code Must be At Least 4 Characters";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if (this.isLicensePackageViolated(userdetail, CompanySetting.getPackageUsers(CompanySetting.getPACKAGE_NAME()))) {
-            msg = "YOUR CURRENT LICENSE PACKAGE LIMITS ADDITION OF MORE USERS, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Unable to Add New User Due to License Limit";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
 
             if (userdetail.getUserDetailId() == 0) {
@@ -256,7 +262,7 @@ public class UserDetailBean implements Serializable {
                     cs.setString("in_language_system", userdetail.getLanguage_system());
                     cs.setString("in_language_output", userdetail.getLanguage_output());
                     cs.executeUpdate();
-                    this.setActionMessage("Saved Successfully");
+                    this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
                     this.clearUserDetail(userdetail);
 
                 } else if (userdetail.getUserDetailId() > 0) {
@@ -276,13 +282,13 @@ public class UserDetailBean implements Serializable {
                     cs.setString("in_language_system", userdetail.getLanguage_system());
                     cs.setString("in_language_output", userdetail.getLanguage_output());
                     cs.executeUpdate();
-                    this.setActionMessage("Saved Successfully");
+                    this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
                     this.clearUserDetail(userdetail);
                 }
             } catch (Exception e) {
                 LOGGER.log(Level.ERROR, e);
-                this.setActionMessage("UserDetail NOT saved");
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("UserDetail NOT saved!"));
+                this.setActionMessage(ub.translateWordsInText(BaseName, "User Detail Not Saved"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "User Detail Not Saved")));
             }
         }
     }
@@ -436,14 +442,16 @@ public class UserDetailBean implements Serializable {
     }
 
     public void deleteUserDetail(UserDetail userdetail) {
-        String msg;
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
 
         if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Delete") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
             String sql = "DELETE FROM user_detail WHERE user_detail_id=?";
             try (
@@ -451,11 +459,11 @@ public class UserDetailBean implements Serializable {
                     PreparedStatement ps = conn.prepareStatement(sql);) {
                 ps.setInt(1, userdetail.getUserDetailId());
                 ps.executeUpdate();
-                this.setActionMessage("Deleted Successfully!");
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Deleted Successfully"));
                 this.clearUserDetail(userdetail);
             } catch (Exception e) {
                 LOGGER.log(Level.ERROR, e);
-                this.setActionMessage("UserDetail NOT deleted");
+                this.setActionMessage(ub.translateWordsInText(BaseName, "User Detail Not Deleted"));
             }
         }
     }
@@ -577,19 +585,19 @@ public class UserDetailBean implements Serializable {
     }
 
     public void changePassword(UserDetail aUserDetail) {
-        String msg;
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         UserDetail OldUD = new GeneralUserSetting().getCurrentUser();
-
         UserDetail NewUD = new UserDetail();
         NewUD = aUserDetail;
-
         try {
             if (!NewUD.getOldUserPassword().equals(OldUD.getUserPassword())) {
-                msg = "Old password is not correct...";
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+                msg = "Incorrect Old Password";
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else if (!NewUD.getNewUserPassword().equals(NewUD.getNewUserPasswordConfirm())) {
-                msg = "New passwords do not match...";
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+                msg = "New Passwords Do Not Match";
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else {
                 OldUD.setUserPassword(NewUD.getNewUserPassword());
                 OldUD.setUserPasswordConfirm(NewUD.getNewUserPasswordConfirm());
@@ -605,13 +613,15 @@ public class UserDetailBean implements Serializable {
             }
 
         } catch (NullPointerException npe) {
-            msg = "Invalid user...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Invalid User";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         }
     }
 
     public void changeTransCode(UserDetail aUserDetail) {
-        String msg;
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         try {
             if (aUserDetail.getNew_trans_code().length() > 0) {
                 UserDetail ud = new GeneralUserSetting().getCurrentUser();
@@ -619,8 +629,8 @@ public class UserDetailBean implements Serializable {
                 this.saveUserDetail(ud);
             }
         } catch (NullPointerException npe) {
-            msg = "user code not saved...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "User Code Not Saved";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         }
     }
 
@@ -826,6 +836,20 @@ public class UserDetailBean implements Serializable {
      */
     public void setUserDetailObjectList(List<UserDetail> UserDetailObjectList) {
         this.UserDetailObjectList = UserDetailObjectList;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 
 }

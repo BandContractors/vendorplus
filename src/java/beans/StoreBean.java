@@ -10,18 +10,21 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
-
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import utilities.UtilityBean;
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+
 /**
  *
  * @author btwesigye
@@ -38,6 +41,9 @@ public class StoreBean implements Serializable {
     private int SelectedStoreId;
     private String SearchStoreName = "";
     private List<Store> StoresList;
+    static Logger LOGGER = Logger.getLogger(StoreBean.class.getName());
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     public void refreshStoresList() {
         String sql;
@@ -60,23 +66,25 @@ public class StoreBean implements Serializable {
                 this.StoresList.add(store);
             }
         } catch (Exception e) {
-            System.err.println("refreshStoresList:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//"refreshStoresList:" + e.getMessage());
         }
     }
 
     public void saveStore(Store store) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         String sql = null;
-        String msg = null;
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
 
         if (store.getStoreId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Add") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if (store.getStoreId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Edit") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
             if (store.getStoreId() == 0) {
                 sql = "{call sp_insert_store(?,?)}";
@@ -91,19 +99,19 @@ public class StoreBean implements Serializable {
                     cs.setString(1, store.getStoreName());
                     cs.setString(2, store.getStore_code());
                     cs.executeUpdate();
-                    this.setActionMessage("Saved Successfully");
+                    this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
                     this.clearStore(store);
                 } else if (store.getStoreId() > 0) {
                     cs.setInt(1, store.getStoreId());
                     cs.setString(2, store.getStoreName());
                     cs.setString(3, store.getStore_code());
                     cs.executeUpdate();
-                    this.setActionMessage("Saved Successfully");
+                    this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
                     this.clearStore(store);
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
-                this.setActionMessage("Store NOT saved");
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);//se.getMessage());
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Store Not Saved"));
             }
         }
     }
@@ -125,19 +133,10 @@ public class StoreBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//se.getMessage());
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
-
     }
 
     public Store getStoreByNameEqual(String aStoreName) {
@@ -157,17 +156,9 @@ public class StoreBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//se.getMessage());
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
     }
 
@@ -176,15 +167,17 @@ public class StoreBean implements Serializable {
     }
 
     public void deleteStore(Store store) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         String sql = "DELETE FROM store WHERE store_id=?";
-        String msg;
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
 
         if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Delete") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if (null == store) {
 
         } else {
@@ -193,11 +186,11 @@ public class StoreBean implements Serializable {
                     PreparedStatement ps = conn.prepareStatement(sql);) {
                 ps.setInt(1, store.getStoreId());
                 ps.executeUpdate();
-                this.setActionMessage("Deleted Successfully!");
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Deleted Successfully"));
                 this.clearStore(SelectedStore);
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
-                this.setActionMessage("Store NOT deleted");
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);//se.getMessage());
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Store Not Deleted"));
             }
         }
     }
@@ -237,16 +230,8 @@ public class StoreBean implements Serializable {
                 store.setStore_code(rs.getString("store_code"));
                 Stores.add(store);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//se.getMessage());
         }
         return Stores;
     }
@@ -268,16 +253,8 @@ public class StoreBean implements Serializable {
                 store.setStore_code(rs.getString("store_code"));
                 Stores.add(store);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//se.getMessage());
         }
         return Stores;
     }
@@ -306,16 +283,8 @@ public class StoreBean implements Serializable {
                 store.setStore_code(rs.getString("store_code"));
                 Stores.add(store);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//se.getMessage());
         }
         return Stores;
     }
@@ -336,16 +305,8 @@ public class StoreBean implements Serializable {
                 store.setStore_code(rs.getString("store_code"));
                 Stores.add(store);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//se.getMessage());
         }
         return Stores;
     }
@@ -378,7 +339,7 @@ public class StoreBean implements Serializable {
                 stores.add(store);
             }
         } catch (Exception e) {
-            System.err.println("getWeekDaysList:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//"getWeekDaysList:" + e.getMessage());
         }
         return stores;
     }
@@ -451,6 +412,20 @@ public class StoreBean implements Serializable {
      */
     public void setStoresList(List<Store> StoresList) {
         this.StoresList = StoresList;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 
 }

@@ -10,14 +10,17 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import utilities.CustomValidator;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import utilities.UtilityBean;
 
 /*
  * To change this template, choose Tools | Templates
@@ -32,16 +35,20 @@ import utilities.CustomValidator;
 public class UserItemEarnBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    static Logger LOGGER = Logger.getLogger(UserItemEarnBean.class.getName());
     private List<UserItemEarn> UserItemEarnsAll;
     private String ActionMessage = null;
     private UserItemEarn SelectedUserItemEarn = null;
     private UserItemEarn SelectedUserItemEarnX = null;
     private long SelectedUserItemEarnId;
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     public void saveUserItemEarn(UserItemEarn uie) {
-        String sql = null;
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         String msg = "";
+        String sql = null;
         String sql2 = null;
         if (uie.getItemSubCategoryId() > 0) {
             sql2 = "SELECT * FROM user_item_earn WHERE transaction_type_id=" + uie.getTransactionTypeId() + " and user_category_id=" + uie.getUserCategoryId() + " and item_category_id=" + uie.getItemCategoryId() + " and item_sub_category_id=" + uie.getItemSubCategoryId();
@@ -54,29 +61,29 @@ public class UserItemEarnBean implements Serializable {
         GroupRightBean grb = new GroupRightBean();
 
         if (uie.getUserItemEarnId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Add") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if (uie.getUserItemEarnId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Edit") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if (uie.getItemCategoryId() == 0) {
-            msg = "Select a valid Item Category please";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Select Item Category";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if (uie.getUserCategoryId() == 0) {
-            msg = "Select a valid User Category please";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Select User Category";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if (uie.getTransactionTypeId() == 0) {
-            msg = "Select a valid Transaction Type please";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        }else if (uie.getTransactionReasonId() == 0) {
-            msg = "Select a valid Transaction Reason please";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Select Transaction Type";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+        } else if (uie.getTransactionReasonId() == 0) {
+            msg = "Select Transaction Reason";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if (uie.getEarnPerc() < 0) {
-            msg = "Enter a valid Earn Percentage";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Enter Earn Percentage";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if ((new CustomValidator().CheckRecords(sql2) > 0 && uie.getUserItemEarnId() == 0) || (new CustomValidator().CheckRecords(sql2) > 0 && new CustomValidator().CheckRecords(sql2) != 1 && uie.getUserItemEarnId() > 0)) {
-            msg = "Transaction Type, User category, Item Category already exists!";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Transaction Type and User Category and Item Category Already Exists";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
 
             if (uie.getUserItemEarnId() == 0) {
@@ -107,13 +114,13 @@ public class UserItemEarnBean implements Serializable {
                     cs.setInt("in_item_sub_category_id", uie.getItemSubCategoryId());
                     cs.setDouble("in_earn_perc", uie.getEarnPerc());
                     cs.executeUpdate();
-                    this.setActionMessage("Saved Successfully");
+                    this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
                     this.clearUserItemEarn(uie);
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
-                this.setActionMessage("UserItemEarn NOT saved");
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("UserItemEarn NOT saved!"));
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);//(se.getMessage());
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Not Saved"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Not Saved")));
             }
         }
     }
@@ -139,22 +146,13 @@ public class UserItemEarnBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
-
     }
-    
-    public UserItemEarn getUserItemEarnByTtypeTreasIcatIsubcatUcat(int aTransTypeId,int aTransReasId,int aItemCatId,int aItemSubCatId,int aUserCatId) {
+
+    public UserItemEarn getUserItemEarnByTtypeTreasIcatIsubcatUcat(int aTransTypeId, int aTransReasId, int aItemCatId, int aItemSubCatId, int aUserCatId) {
         String sql = "{call sp_search_user_item_earn_by_ttype_treas_icat_isubcat_ucat(?,?,?,?,?)}";
         ResultSet rs = null;
         try (
@@ -179,30 +177,23 @@ public class UserItemEarnBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
-
     }
 
     public void deleteUserItemEarn(UserItemEarn uie) {
-        String msg;
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
 
         if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Delete") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
             String sql = "DELETE FROM user_item_earn WHERE user_item_earn_id=?";
             try (
@@ -210,11 +201,11 @@ public class UserItemEarnBean implements Serializable {
                     PreparedStatement ps = conn.prepareStatement(sql);) {
                 ps.setLong(1, uie.getUserItemEarnId());
                 ps.executeUpdate();
-                this.setActionMessage("Deleted Successfully!");
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Deleted Successfully"));
                 this.clearUserItemEarn(uie);
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
-                this.setActionMessage("UserItemEarn NOT deleted");
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);//(se.getMessage());
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Not Deleted"));
             }
         }
     }
@@ -280,16 +271,8 @@ public class UserItemEarnBean implements Serializable {
                 uie.setEarnPerc(rs.getDouble("earn_perc"));
                 UserItemEarnsAll.add(uie);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
         }
         return UserItemEarnsAll;
     }
@@ -355,6 +338,20 @@ public class UserItemEarnBean implements Serializable {
      */
     public void setSelectedUserItemEarnX(UserItemEarn SelectedUserItemEarnX) {
         this.SelectedUserItemEarnX = SelectedUserItemEarnX;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 
 }

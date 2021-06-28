@@ -13,84 +13,90 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.*;
 import javax.faces.context.FacesContext;
 import utilities.CustomValidator;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import utilities.UtilityBean;
 
 @ManagedBean
 @SessionScoped
 public class GroupDetailBean implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+    static Logger LOGGER = Logger.getLogger(GroupDetailBean.class.getName());
     private List<GroupDetail> GroupDetails;
-    private String ActionMessage=null;
-    private GroupDetail SelectedGroupDetail=null;
+    private String ActionMessage = null;
+    private GroupDetail SelectedGroupDetail = null;
     private long SelectedGroupDetailId;
-    private String SearchGroupName="";
-    private String SearchIsActive="";
-    
-    public String getRightTextColor(String Allow){
-        if("Yes".equals(Allow)){
+    private String SearchGroupName = "";
+    private String SearchIsActive = "";
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
+
+    public String getRightTextColor(String Allow) {
+        if ("Yes".equals(Allow)) {
             return "blue";
-        }else{
+        } else {
             return "red";
         }
     }
-    
+
     public void saveGroupDetail(GroupDetail groupdetail) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         String sql = null;
-        String msg="";
         String sql2 = null;
-        sql2="SELECT * FROM group_detail WHERE group_name='" + groupdetail.getGroupName() + "'";
-        
-        UserDetail aCurrentUserDetail=new GeneralUserSetting().getCurrentUser();
-        List<GroupRight> aCurrentGroupRights=new GeneralUserSetting().getCurrentGroupRights();
-        GroupRightBean grb=new GroupRightBean();
+        sql2 = "SELECT * FROM group_detail WHERE group_name='" + groupdetail.getGroupName() + "'";
 
-        if (groupdetail.getGroupDetailId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail,aCurrentGroupRights,"88", "Add")==0) {
-            msg="YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        }else if (groupdetail.getGroupDetailId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail,aCurrentGroupRights,"88", "Edit")==0) {
-            msg="YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        }else if(new CustomValidator().TextSize(groupdetail.getIsActive(), 1, 3).equals("FAIL")){
-            msg="Enter Is Active?!";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        }else if(new CustomValidator().TextSize(groupdetail.getGroupName(), 1, 50).equals("FAIL")){
-            msg="Enter Group Name!";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        }else if((new CustomValidator().CheckRecords(sql2)>0 && groupdetail.getGroupDetailId()==0) || (new CustomValidator().CheckRecords(sql2)>0 && new CustomValidator().CheckRecords(sql2)!=1 && groupdetail.getGroupDetailId()>0)){
-            msg="Group already exists!";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        }else
-        {
-            
-        if (groupdetail.getGroupDetailId() == 0) {
-            sql = "{call sp_insert_group_detail(?,?)}";
-        } else if (groupdetail.getGroupDetailId() > 0) {
-            sql = "{call sp_update_group_detail(?,?,?)}";
-        }
-
-        try (
-                Connection conn = DBConnection.getMySQLConnection();
-                CallableStatement cs = conn.prepareCall(sql);) {
+        UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
+        List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
+        GroupRightBean grb = new GroupRightBean();
+        if (groupdetail.getGroupDetailId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Add") == 0) {
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+        } else if (groupdetail.getGroupDetailId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Edit") == 0) {
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+        } else if (new CustomValidator().TextSize(groupdetail.getIsActive(), 1, 3).equals("FAIL")) {
+            msg = "Enter Is Active";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+        } else if (new CustomValidator().TextSize(groupdetail.getGroupName(), 1, 50).equals("FAIL")) {
+            msg = "Enter Group Name";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+        } else if ((new CustomValidator().CheckRecords(sql2) > 0 && groupdetail.getGroupDetailId() == 0) || (new CustomValidator().CheckRecords(sql2) > 0 && new CustomValidator().CheckRecords(sql2) != 1 && groupdetail.getGroupDetailId() > 0)) {
+            msg = "Group Already Exists";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+        } else {
             if (groupdetail.getGroupDetailId() == 0) {
-                cs.setString("in_group_name", groupdetail.getGroupName());
-                cs.setString("in_is_active", groupdetail.getIsActive());
-                cs.executeUpdate();
-                this.setActionMessage("Saved Successfully");
-                this.clearGroupDetail(groupdetail);
+                sql = "{call sp_insert_group_detail(?,?)}";
             } else if (groupdetail.getGroupDetailId() > 0) {
-                cs.setLong("in_group_detail_id", groupdetail.getGroupDetailId());
-                cs.setString("in_group_name", groupdetail.getGroupName());
-                cs.setString("in_is_active", groupdetail.getIsActive());
-                cs.executeUpdate();
-                this.setActionMessage("Updated Successfully");
-                this.clearGroupDetail(groupdetail);
+                sql = "{call sp_update_group_detail(?,?,?)}";
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-            this.setActionMessage("GroupDetail NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("GroupDetail NOT saved!"));
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    CallableStatement cs = conn.prepareCall(sql);) {
+                if (groupdetail.getGroupDetailId() == 0) {
+                    cs.setString("in_group_name", groupdetail.getGroupName());
+                    cs.setString("in_is_active", groupdetail.getIsActive());
+                    cs.executeUpdate();
+                    this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
+                    this.clearGroupDetail(groupdetail);
+                } else if (groupdetail.getGroupDetailId() > 0) {
+                    cs.setLong("in_group_detail_id", groupdetail.getGroupDetailId());
+                    cs.setString("in_group_name", groupdetail.getGroupName());
+                    cs.setString("in_is_active", groupdetail.getIsActive());
+                    cs.executeUpdate();
+                    this.setActionMessage(ub.translateWordsInText(BaseName, "Updated Successfully"));
+                    this.clearGroupDetail(groupdetail);
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);//(se.getMessage());
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Group Detail Not Saved"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Group Detail Not Saved")));
+            }
         }
     }
-    }
-    
+
     public GroupDetail getGroupDetail(int GroupDetailId) {
         String sql = "{call sp_search_group_detail_by_id(?)}";
         ResultSet rs = null;
@@ -108,23 +114,14 @@ public class GroupDetailBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
-
     }
-    
+
     public GroupDetail findGroupDetailByName(String GroupName) {
-        String sql = "{call sp_search_group_by_name(?)}";  
+        String sql = "{call sp_search_group_by_name(?)}";
         ResultSet rs = null;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -140,60 +137,54 @@ public class GroupDetailBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
     }
 
     public void deleteGroupDetail(GroupDetail groupdetail) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         String sql = "DELETE FROM group_detail WHERE group_detail_id=?";
-        String msg;
-        UserDetail aCurrentUserDetail=new GeneralUserSetting().getCurrentUser();
-        List<GroupRight> aCurrentGroupRights=new GeneralUserSetting().getCurrentGroupRights();
-        GroupRightBean grb=new GroupRightBean();
+        UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
+        List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
+        GroupRightBean grb = new GroupRightBean();
 
-        if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail,aCurrentGroupRights,"88", "Delete")==0) {
-            msg="YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        }else
-        {
-        try (
-                Connection conn = DBConnection.getMySQLConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);) {
-            ps.setInt(1, groupdetail.getGroupDetailId());
-            ps.executeUpdate();
-            this.setActionMessage("Deleted Successfully!");
-            this.clearGroupDetail(groupdetail);
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-            this.setActionMessage("GroupDetail NOT deleted");
+        if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Delete") == 0) {
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+        } else {
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                ps.setInt(1, groupdetail.getGroupDetailId());
+                ps.executeUpdate();
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Deleted Successfully"));
+                this.clearGroupDetail(groupdetail);
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);//(se.getMessage());
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Group Detail Not Deleted"));
+            }
         }
-    }
     }
 
     public void displayGroupDetail(GroupDetail GroupDetailFrom, GroupDetail GroupDetailTo) {
-                GroupDetailTo.setGroupDetailId(GroupDetailFrom.getGroupDetailId());
-                GroupDetailTo.setGroupName(GroupDetailFrom.getGroupName());
-                GroupDetailTo.setIsActive(GroupDetailFrom.getIsActive());
+        GroupDetailTo.setGroupDetailId(GroupDetailFrom.getGroupDetailId());
+        GroupDetailTo.setGroupName(GroupDetailFrom.getGroupName());
+        GroupDetailTo.setIsActive(GroupDetailFrom.getIsActive());
     }
 
     public void clearGroupDetail(GroupDetail groupdetail) {
-        if(groupdetail!=null){
-                groupdetail.setGroupDetailId(0);
-                groupdetail.setGroupName("");
-                groupdetail.setIsActive("");
+        if (groupdetail != null) {
+            groupdetail.setGroupDetailId(0);
+            groupdetail.setGroupName("");
+            groupdetail.setIsActive("");
         }
     }
-    public void clearSelectedGroupDetail(){
+
+    public void clearSelectedGroupDetail() {
         this.clearGroupDetail(this.getSelectedGroupDetail());
     }
 
@@ -216,16 +207,8 @@ public class GroupDetailBean implements Serializable {
                 groupdetail.setIsActive(rs.getString("is_active"));
                 GroupDetails.add(groupdetail);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
         }
         return GroupDetails;
     }
@@ -305,5 +288,19 @@ public class GroupDetailBean implements Serializable {
      */
     public void setSelectedGroupDetail(GroupDetail SelectedGroupDetail) {
         this.SelectedGroupDetail = SelectedGroupDetail;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 }

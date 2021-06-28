@@ -16,12 +16,14 @@ import java.util.Date;
 import java.util.List;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import org.apache.commons.math3.util.Precision;
 import sessions.GeneralUserSetting;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import utilities.UtilityBean;
 
 /*
  * To change this template, choose Tools | Templates
@@ -44,6 +46,8 @@ public class AccCurrencyBean implements Serializable {
     private List<AccCurrency> CurrencyList;
     private static List<AccCurrency> SavedCurrencyLists = new ArrayList<>();
     private List<Acc_currency_tax_list> Acc_currency_tax_lists;
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     public void setAccCurrencyFromResultset(AccCurrency acccurrency, ResultSet aResultSet) {
         try {
@@ -145,6 +149,9 @@ public class AccCurrencyBean implements Serializable {
     }
 
     public void saveAccCurrency(AccCurrency aAccCurrency) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
@@ -276,14 +283,16 @@ public class AccCurrencyBean implements Serializable {
     }
 
     public void deleteAccCurrency(AccCurrency aAccCurrency) {
-        String msg;
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
 
         if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Delete") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
             String sql = "UPDATE acc_currency SET is_deleted=1 WHERE acc_currency_id=?";
             try (
@@ -291,10 +300,10 @@ public class AccCurrencyBean implements Serializable {
                     PreparedStatement ps = conn.prepareStatement(sql);) {
                 ps.setInt(1, aAccCurrency.getAccCurrencyId());
                 ps.executeUpdate();
-                this.setActionMessage("Deleted Successfully!");
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Deleted Successfully"));
                 this.clearAccCurrency(aAccCurrency);
             } catch (Exception e) {
-                this.setActionMessage("Currency not deleted");
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Not Deleted"));
                 LOGGER.log(Level.ERROR, e);
             }
         }
@@ -814,6 +823,20 @@ public class AccCurrencyBean implements Serializable {
      */
     public static void setSavedCurrencyLists(List<AccCurrency> aSavedCurrencyLists) {
         SavedCurrencyLists = aSavedCurrencyLists;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 
 }

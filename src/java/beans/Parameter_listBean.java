@@ -7,15 +7,16 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import utilities.Security;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import utilities.UtilityBean;
 
 /*
  * To change this template, choose Tools | Templates
@@ -31,11 +32,13 @@ public class Parameter_listBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = Logger.getLogger(Parameter_listBean.class.getName());
-    
+
     private String ActionMessage = null;
     private List<Parameter_list> Parameter_lists = new ArrayList<>();
     private Parameter_list Parameter_listObject = new Parameter_list();
     private static List<Parameter_list> SavedParameterLists = new ArrayList<>();
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     public void setParameter_listFromResultset(Parameter_list aParameter_list, ResultSet aResultSet) {
         try {
@@ -75,6 +78,8 @@ public class Parameter_listBean implements Serializable {
     }
 
     public long saveParameter_list(Parameter_list aParameter_list) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         String sql = null;
         long status = 0;
         if (aParameter_list.getParameter_list_id() == 0) {
@@ -101,7 +106,7 @@ public class Parameter_listBean implements Serializable {
                 }
                 cs.executeUpdate();
                 status = 1;
-                this.setActionMessage("Saved Successfully");
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
                 this.clearParameter_list(aParameter_list);
             } else if (aParameter_list.getParameter_list_id() > 0) {
                 cs.setLong("in_parameter_list_id", aParameter_list.getParameter_list_id());
@@ -120,12 +125,12 @@ public class Parameter_listBean implements Serializable {
                 }
                 cs.executeUpdate();
                 status = 1;
-                this.setActionMessage("Saved Successfully");
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
                 this.clearParameter_list(aParameter_list);
             }
         } catch (Exception e) {
             status = 0;
-            this.setActionMessage("Not Saved");
+            this.setActionMessage(ub.translateWordsInText(BaseName, "Not Saved"));
             LOGGER.log(Level.ERROR, e);
         }
         return status;
@@ -321,10 +326,12 @@ public class Parameter_listBean implements Serializable {
     }
 
     public String encryptParameterValue(String aParameterValue) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         String encryptedValue = "";
         try {
             if (aParameterValue.length() == 0) {
-                this.setActionMessage("Please enter a value");
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Enter Value"));
             } else {
                 encryptedValue = Security.Encrypt(aParameterValue);
             }
@@ -387,5 +394,19 @@ public class Parameter_listBean implements Serializable {
      */
     public static void setSavedParameterLists(List<Parameter_list> aSavedParameterLists) {
         SavedParameterLists = aSavedParameterLists;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 }

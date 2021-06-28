@@ -18,17 +18,21 @@ import java.util.Date;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import org.primefaces.model.DashboardColumn;
 import org.primefaces.model.DashboardModel;
 import org.primefaces.model.DefaultDashboardColumn;
 import org.primefaces.model.DefaultDashboardModel;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 @ManagedBean(name = "dashboardBean")
 @SessionScoped
 public class DashboardBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    static Logger LOGGER = Logger.getLogger(DashboardBean.class.getName());
     private String YearsSalesByYear;
     private String AmountSalesByYear;
     private String MonthSalesByMonth;
@@ -111,6 +115,9 @@ public class DashboardBean implements Serializable {
     private List<MonthList> MonthListSelected;
     private int ViewState;
 
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
+
     public void initSalesDashboard() {
         try {
             this.StoreList = new StoreBean().getStores();
@@ -129,7 +136,7 @@ public class DashboardBean implements Serializable {
             this.refreshAvgSalesByMonth(this.ClickedYear);
             this.refreshSalesByDay(this.ClickedYear, this.ClickedMonthNo, "");
         } catch (Exception e) {
-            System.err.println("initSalesDashboard:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("initSalesDashboard:" + e.getMessage());
         }
     }
 
@@ -149,7 +156,7 @@ public class DashboardBean implements Serializable {
             this.stock_type = "";
             this.refreshStockByYear(this.SelectedYear, this.SelectedDisplayYears, this.stock_type);
         } catch (Exception e) {
-            System.err.println("initStockDashboard:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("initStockDashboard:" + e.getMessage());
         }
     }
 
@@ -170,7 +177,7 @@ public class DashboardBean implements Serializable {
             this.refreshExpensesByMonth(this.ClickedYear);
             this.refreshExpensesByDay(this.ClickedYear, this.ClickedMonthNo, "");
         } catch (Exception e) {
-            System.err.println("initExpensesDashboard:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("initExpensesDashboard:" + e.getMessage());
         }
     }
 
@@ -191,7 +198,7 @@ public class DashboardBean implements Serializable {
             this.refreshSaleItemsByYear(this.SelectedYear, this.SelectedDisplayItems);
             this.refreshCategorySaleItemsByYear(this.SelectedYear, this.SelectedDisplayItems);
         } catch (Exception e) {
-            System.err.println("initSaleItemsDashboard:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("initSaleItemsDashboard:" + e.getMessage());
         }
     }
 
@@ -224,7 +231,7 @@ public class DashboardBean implements Serializable {
             }
             //this.refreshCategorySaleItemsByYear(this.SelectedYear, this.SelectedDisplayItems);
         } catch (Exception e) {
-            System.err.println("initTopSoldItemsByMonthDashboard:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("initTopSoldItemsByMonthDashboard:" + e.getMessage());
         }
     }
 
@@ -241,7 +248,7 @@ public class DashboardBean implements Serializable {
             this.refreshExpenseItemsByYear(this.SelectedYear, this.SelectedDisplayItems);
             this.refreshCategoryExpenseItemsByYear(this.SelectedYear, this.SelectedDisplayItems);
         } catch (Exception e) {
-            System.err.println("initExpenseItemsDashboard:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("initExpenseItemsDashboard:" + e.getMessage());
         }
     }
 
@@ -263,7 +270,7 @@ public class DashboardBean implements Serializable {
             this.refreshAvgSalesByMonth(this.ClickedYear);
             this.refreshSalesByDay(this.ClickedYear, this.ClickedMonthNo, "");
         } catch (Exception e) {
-            System.err.println("searchSalesDashboard:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("searchSalesDashboard:" + e.getMessage());
         }
     }
 
@@ -282,7 +289,7 @@ public class DashboardBean implements Serializable {
             this.ClickedMonthName = new UtilityBean().convertMonthNoToName(this.ClickedMonthNo, 0);
             this.refreshStockByYear(this.SelectedYear, this.SelectedDisplayYears, this.stock_type);
         } catch (Exception e) {
-            System.err.println("searchStockDashboard:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("searchStockDashboard:" + e.getMessage());
         }
     }
 
@@ -303,7 +310,7 @@ public class DashboardBean implements Serializable {
             this.refreshExpensesByMonth(this.ClickedYear);
             this.refreshExpensesByDay(this.ClickedYear, this.ClickedMonthNo, "");
         } catch (Exception e) {
-            System.err.println("searchExpensesDashboard:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("searchExpensesDashboard:" + e.getMessage());
         }
     }
 
@@ -324,7 +331,7 @@ public class DashboardBean implements Serializable {
             this.refreshSaleItemsByYear(this.SelectedYear, this.SelectedDisplayItems);
             this.refreshCategorySaleItemsByYear(this.SelectedYear, this.SelectedDisplayItems);
         } catch (Exception e) {
-            System.err.println("searchSaleItemsDashboard:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("searchSaleItemsDashboard:" + e.getMessage());
         }
     }
 
@@ -358,7 +365,7 @@ public class DashboardBean implements Serializable {
             }
             //this.refreshCategorySaleItemsByYear(this.SelectedYear, this.SelectedDisplayItems);
         } catch (Exception e) {
-            System.err.println("searchTopSoldItemsByMonthDashboard:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("searchTopSoldItemsByMonthDashboard:" + e.getMessage());
         }
     }
 
@@ -375,7 +382,7 @@ public class DashboardBean implements Serializable {
             this.refreshExpenseItemsByYear(this.SelectedYear, this.SelectedDisplayItems);
             this.refreshCategoryExpenseItemsByYear(this.SelectedYear, this.SelectedDisplayItems);
         } catch (Exception e) {
-            System.err.println("searchExpenseItemsDashboard:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("searchExpenseItemsDashboard:" + e.getMessage());
         }
     }
 
@@ -410,7 +417,7 @@ public class DashboardBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            LOGGER.log(Level.ERROR, e);//(e.getMessage());
         }
     }
 
@@ -449,7 +456,7 @@ public class DashboardBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println("refreshStockByYear:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("refreshStockByYear:" + e.getMessage());
         }
     }
 
@@ -498,7 +505,7 @@ public class DashboardBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println("refreshStockByYear:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("refreshStockByYear:" + e.getMessage());
         }
     }
 
@@ -543,7 +550,7 @@ public class DashboardBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            LOGGER.log(Level.ERROR, e);//(e.getMessage());
         }
     }
 
@@ -560,7 +567,7 @@ public class DashboardBean implements Serializable {
                 SalesForYear = rs.getDouble("amount");
             }
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            LOGGER.log(Level.ERROR, e);//(e.getMessage());
         }
         return SalesForYear;
     }
@@ -607,7 +614,7 @@ public class DashboardBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            LOGGER.log(Level.ERROR, e);//(e.getMessage());
         }
     }
 
@@ -617,7 +624,7 @@ public class DashboardBean implements Serializable {
             AmountTopSoldItemsByMonth[aSelMonth - 1] = "";
             QtyTopSoldItemsByMonth[aSelMonth - 1] = "";
         } catch (Exception e) {
-            System.err.println("IndexError:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("IndexError:" + e.getMessage());
         }
         String sql = "";
         if (this.store_id == 0) {
@@ -664,7 +671,7 @@ public class DashboardBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            LOGGER.log(Level.ERROR, e);//(e.getMessage());
         }
     }
 
@@ -704,7 +711,7 @@ public class DashboardBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            LOGGER.log(Level.ERROR, e);//(e.getMessage());
         }
     }
 
@@ -753,7 +760,7 @@ public class DashboardBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println("refreshCategorySaleItemsByYear:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("refreshCategorySaleItemsByYear:" + e.getMessage());
         }
     }
 
@@ -796,7 +803,7 @@ public class DashboardBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println("refreshCategoryExpenseItemsByYear:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("refreshCategoryExpenseItemsByYear:" + e.getMessage());
         }
     }
 
@@ -874,7 +881,7 @@ public class DashboardBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            LOGGER.log(Level.ERROR, e);//(e.getMessage());
         }
     }
 
@@ -911,7 +918,7 @@ public class DashboardBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            LOGGER.log(Level.ERROR, e);//(e.getMessage());
         }
     }
 
@@ -951,7 +958,7 @@ public class DashboardBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            LOGGER.log(Level.ERROR, e);//(e.getMessage());
         }
     }
 
@@ -991,7 +998,7 @@ public class DashboardBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            LOGGER.log(Level.ERROR, e);//(e.getMessage());
         }
     }
 
@@ -1034,7 +1041,7 @@ public class DashboardBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            LOGGER.log(Level.ERROR, e);//(e.getMessage());
         }
     }
 
@@ -1121,7 +1128,7 @@ public class DashboardBean implements Serializable {
             this.TotalSales = totalsales;
             this.TotalCashDiscount = totaldisc;
         } catch (Exception e) {
-            System.err.println("refreshDayCloseSalesList:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("refreshDayCloseSalesList:" + e.getMessage());
         }
         //for store
         try (
@@ -1159,7 +1166,7 @@ public class DashboardBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println("refreshDayCloseSalesList:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("refreshDayCloseSalesList:" + e.getMessage());
         }
     }
 
@@ -1220,7 +1227,7 @@ public class DashboardBean implements Serializable {
             }
             this.TotalPurchases = totalpurchases;
         } catch (Exception e) {
-            System.err.println("refreshDayClosePurchaseList-Total:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("refreshDayClosePurchaseList-Total:" + e.getMessage());
         }
         //credit and cash purchase
         try (
@@ -1266,7 +1273,7 @@ public class DashboardBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println("refreshDayClosePurchaseList-CashCredit:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("refreshDayClosePurchaseList-CashCredit:" + e.getMessage());
         }
         //for type
         try (
@@ -1299,7 +1306,7 @@ public class DashboardBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println("refreshDayClosePurchaseList-Type:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("refreshDayClosePurchaseList-Type:" + e.getMessage());
         }
         //for store
         try (
@@ -1332,85 +1339,10 @@ public class DashboardBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println("refreshDayClosePurchaseList-Store:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("refreshDayClosePurchaseList-Store:" + e.getMessage());
         }
     }
 
-//    public void refreshDayClosePurchaseList(String aDatesString) {
-//        ResultSet rs;
-//        ResultSet rs2;
-//        this.DayClosePurchaseList = new ArrayList<>();
-//        this.DayClosePurchaseList2 = new ArrayList<>();
-//        String sql = "SELECT "
-//                + "tr.transaction_reason_name,t.currency_code,sum(t.grand_total) as grand_total "
-//                + "FROM transaction t inner join transaction_reason tr on t.transaction_reason_id=tr.transaction_reason_id "
-//                + "WHERE t.transaction_type_id IN(1,19) "
-//                + "AND cast(t.transaction_date as date) IN(" + aDatesString + ") "
-//                + "GROUP BY tr.transaction_reason_name,t.currency_code";
-//        String sql2 = "SELECT "
-//                + "tr.transaction_reason_name,t.currency_code,sum(t.grand_total) as grand_total "
-//                + "FROM transaction t inner join transaction_reason tr on t.transaction_reason_id=tr.transaction_reason_id "
-//                + "WHERE t.transaction_type_id IN(1,19) "
-//                + "AND cast(t.add_date as date) IN(" + aDatesString + ") "
-//                + "GROUP BY tr.transaction_reason_name,t.currency_code";
-//        //for TransDate
-//        try (
-//                Connection conn = DBConnection.getMySQLConnection();
-//                PreparedStatement ps = conn.prepareStatement(sql);) {
-//            rs = ps.executeQuery();
-//            Trans trans;
-//            while (rs.next()) {
-//                trans = new Trans();
-//                try {
-//                    trans.setCurrencyCode(rs.getString("currency_code"));
-//                } catch (NullPointerException npe) {
-//                    trans.setCurrencyCode("");
-//                }
-//                try {
-//                    trans.setGrandTotal(rs.getDouble("grand_total"));
-//                } catch (NullPointerException npe) {
-//                    trans.setGrandTotal(0);
-//                }
-//                try {
-//                    trans.setTransactionReasonName(rs.getString("transaction_reason_name"));
-//                } catch (NullPointerException npe) {
-//                    trans.setTransactionReasonName("");
-//                }
-//                this.DayClosePurchaseList.add(trans);
-//            }
-//        } catch (Exception e) {
-//            System.err.println("refreshDayClosePurchaseList:" + e.getMessage());
-//        }
-//
-//        //for AddDate
-//        try (
-//                Connection conn = DBConnection.getMySQLConnection();
-//                PreparedStatement ps = conn.prepareStatement(sql2);) {
-//            rs2 = ps.executeQuery();
-//            Trans trans2;
-//            while (rs2.next()) {
-//                trans2 = new Trans();
-//                try {
-//                    trans2.setCurrencyCode(rs2.getString("currency_code"));
-//                } catch (NullPointerException npe) {
-//                    trans2.setCurrencyCode("");
-//                }
-//                try {
-//                    trans2.setGrandTotal(rs2.getDouble("grand_total"));
-//                } catch (NullPointerException npe) {
-//                    trans2.setGrandTotal(0);
-//                }
-//                try {
-//                    trans2.setTransactionReasonName(rs2.getString("transaction_reason_name"));
-//                } catch (NullPointerException npe) {
-//                    trans2.setTransactionReasonName("");
-//                }
-//                this.DayClosePurchaseList2.add(trans2);
-//            }
-//        } catch (Exception e) {
-//            System.err.println("refreshDayClosePurchaseList2:" + e.getMessage());
-//        }
-//    }
     public void refreshDayCloseCashReceiptList(String aBtnFrmToDate) {
         ResultSet rs;
         ResultSet rs2;
@@ -1456,7 +1388,7 @@ public class DashboardBean implements Serializable {
             }
             this.TotalCashReceipt = totalreceipt;
         } catch (Exception e) {
-            System.err.println("refreshDayCloseCashReceiptList:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("refreshDayCloseCashReceiptList:" + e.getMessage());
         }
         //Cash Receipt Type
         try (
@@ -1489,7 +1421,7 @@ public class DashboardBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println("refreshDayCloseCashReceiptList-Type:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("refreshDayCloseCashReceiptList-Type:" + e.getMessage());
         }
         //Cash Receipt Account
         try (
@@ -1522,85 +1454,10 @@ public class DashboardBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println("refreshDayCloseCashReceiptList-Account:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("refreshDayCloseCashReceiptList-Account:" + e.getMessage());
         }
     }
 
-//    public void refreshDayCloseCashReceiptList(String aDatesString) {
-//        ResultSet rs;
-//        ResultSet rs2;
-//        this.DayCloseCashReceiptList = new ArrayList<>();
-//        this.DayCloseCashReceiptList2 = new ArrayList<>();
-//        String sql = "SELECT "
-//                + "tr.transaction_reason_name,p.currency_code,sum(p.paid_amount) as paid_amount "
-//                + "FROM pay p inner join transaction_reason tr on p.pay_reason_id=tr.transaction_reason_id "
-//                + "WHERE p.pay_type_id=14 AND p.pay_method_id!=6 "
-//                + "AND cast(p.pay_date as date) IN(" + aDatesString + ") "
-//                + "GROUP BY tr.transaction_reason_name,p.currency_code";
-//        String sql2 = "SELECT "
-//                + "tr.transaction_reason_name,p.currency_code,sum(p.paid_amount) as paid_amount "
-//                + "FROM pay p inner join transaction_reason tr on p.pay_reason_id=tr.transaction_reason_id "
-//                + "WHERE p.pay_type_id=14 AND p.pay_method_id!=6 "
-//                + "AND cast(p.add_date as date) IN(" + aDatesString + ") "
-//                + "GROUP BY tr.transaction_reason_name,p.currency_code";
-//        //for PayDate
-//        try (
-//                Connection conn = DBConnection.getMySQLConnection();
-//                PreparedStatement ps = conn.prepareStatement(sql);) {
-//            rs = ps.executeQuery();
-//            Pay pay;
-//            while (rs.next()) {
-//                pay = new Pay();
-//                try {
-//                    pay.setCurrencyCode(rs.getString("currency_code"));
-//                } catch (NullPointerException npe) {
-//                    pay.setCurrencyCode("");
-//                }
-//                try {
-//                    pay.setPaidAmount(rs.getDouble("paid_amount"));
-//                } catch (NullPointerException npe) {
-//                    pay.setPaidAmount(0);
-//                }
-//                try {
-//                    pay.setPayRefNo(rs.getString("transaction_reason_name"));
-//                } catch (NullPointerException npe) {
-//                    pay.setPayRefNo("");
-//                }
-//                this.DayCloseCashReceiptList.add(pay);
-//            }
-//        } catch (Exception e) {
-//            System.err.println("refreshDayCloseCashReceiptList:" + e.getMessage());
-//        }
-//
-//        //for AddDate
-//        try (
-//                Connection conn = DBConnection.getMySQLConnection();
-//                PreparedStatement ps = conn.prepareStatement(sql2);) {
-//            rs2 = ps.executeQuery();
-//            Pay pay2;
-//            while (rs2.next()) {
-//                pay2 = new Pay();
-//                try {
-//                    pay2.setCurrencyCode(rs2.getString("currency_code"));
-//                } catch (NullPointerException npe) {
-//                    pay2.setCurrencyCode("");
-//                }
-//                try {
-//                    pay2.setPaidAmount(rs2.getDouble("paid_amount"));
-//                } catch (NullPointerException npe) {
-//                    pay2.setPaidAmount(0);
-//                }
-//                try {
-//                    pay2.setPayRefNo(rs2.getString("transaction_reason_name"));
-//                } catch (NullPointerException npe) {
-//                    pay2.setPayRefNo("");
-//                }
-//                this.DayCloseCashReceiptList2.add(pay2);
-//            }
-//        } catch (Exception e) {
-//            System.err.println("refreshDayCloseCashReceiptList2:" + e.getMessage());
-//        }
-//    }
     public void refreshDayCloseStockMovementList(String aBtnFrmToDate) {
         ResultSet rs;
         ResultSet rs2;
@@ -1657,7 +1514,7 @@ public class DashboardBean implements Serializable {
             }
             this.CountItemsAdded = totaladded;
         } catch (Exception e) {
-            System.err.println("refreshDayCloseStockMovementList-Added:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("refreshDayCloseStockMovementList-Added:" + e.getMessage());
         }
         //subtracted
         try (
@@ -1673,7 +1530,7 @@ public class DashboardBean implements Serializable {
             }
             this.CountItemsSubtracted = totalsubtracted;
         } catch (Exception e) {
-            System.err.println("refreshDayCloseStockMovementList-Subtracted:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("refreshDayCloseStockMovementList-Subtracted:" + e.getMessage());
         }
         //added-type
         try (
@@ -1706,7 +1563,7 @@ public class DashboardBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println("refreshDayCloseStockMovementList-Added-Type:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("refreshDayCloseStockMovementList-Added-Type:" + e.getMessage());
         }
         //subtracted-type
         try (
@@ -1739,7 +1596,7 @@ public class DashboardBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println("refreshDayCloseStockMovementList-Subtracted-Type:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("refreshDayCloseStockMovementList-Subtracted-Type:" + e.getMessage());
         }
     }
 
@@ -1788,7 +1645,7 @@ public class DashboardBean implements Serializable {
             }
             this.TotalCashPayment = totalpayment;
         } catch (Exception e) {
-            System.err.println("refreshDayCloseCashPaymentList-Total:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("refreshDayCloseCashPaymentList-Total:" + e.getMessage());
         }
         //Cash Payment Type
         try (
@@ -1821,7 +1678,7 @@ public class DashboardBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println("refreshDayCloseCashPaymentList-Type:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("refreshDayCloseCashPaymentList-Type:" + e.getMessage());
         }
         //Cash Payment Account
         try (
@@ -1854,85 +1711,10 @@ public class DashboardBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println("refreshDayCloseCashPaymentList-Account:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("refreshDayCloseCashPaymentList-Account:" + e.getMessage());
         }
     }
 
-//    public void refreshDayCloseCashPaymentList(String aDatesString) {
-//        ResultSet rs;
-//        ResultSet rs2;
-//        this.DayCloseCashPaymentList = new ArrayList<>();
-//        this.DayCloseCashPaymentList2 = new ArrayList<>();
-//        String sql = "SELECT "
-//                + "tr.transaction_reason_name,p.currency_code,sum(p.paid_amount) as paid_amount "
-//                + "FROM pay p inner join transaction_reason tr on p.pay_reason_id=tr.transaction_reason_id "
-//                + "WHERE p.pay_type_id=15 AND p.pay_method_id!=7 "
-//                + "AND cast(p.pay_date as date) IN(" + aDatesString + ") "
-//                + "GROUP BY tr.transaction_reason_name,p.currency_code";
-//        String sql2 = "SELECT "
-//                + "tr.transaction_reason_name,p.currency_code,sum(p.paid_amount) as paid_amount "
-//                + "FROM pay p inner join transaction_reason tr on p.pay_reason_id=tr.transaction_reason_id "
-//                + "WHERE p.pay_type_id=15 AND p.pay_method_id!=7 "
-//                + "AND cast(p.add_date as date) IN(" + aDatesString + ") "
-//                + "GROUP BY tr.transaction_reason_name,p.currency_code";
-//        //for PayDate
-//        try (
-//                Connection conn = DBConnection.getMySQLConnection();
-//                PreparedStatement ps = conn.prepareStatement(sql);) {
-//            rs = ps.executeQuery();
-//            Pay pay;
-//            while (rs.next()) {
-//                pay = new Pay();
-//                try {
-//                    pay.setCurrencyCode(rs.getString("currency_code"));
-//                } catch (NullPointerException npe) {
-//                    pay.setCurrencyCode("");
-//                }
-//                try {
-//                    pay.setPaidAmount(rs.getDouble("paid_amount"));
-//                } catch (NullPointerException npe) {
-//                    pay.setPaidAmount(0);
-//                }
-//                try {
-//                    pay.setPayRefNo(rs.getString("transaction_reason_name"));
-//                } catch (NullPointerException npe) {
-//                    pay.setPayRefNo("");
-//                }
-//                this.DayCloseCashPaymentList.add(pay);
-//            }
-//        } catch (Exception e) {
-//            System.err.println("refreshDayCloseCashPaymentList:" + e.getMessage());
-//        }
-//
-//        //for AddDate
-//        try (
-//                Connection conn = DBConnection.getMySQLConnection();
-//                PreparedStatement ps = conn.prepareStatement(sql2);) {
-//            rs2 = ps.executeQuery();
-//            Pay pay2;
-//            while (rs2.next()) {
-//                pay2 = new Pay();
-//                try {
-//                    pay2.setCurrencyCode(rs2.getString("currency_code"));
-//                } catch (NullPointerException npe) {
-//                    pay2.setCurrencyCode("");
-//                }
-//                try {
-//                    pay2.setPaidAmount(rs2.getDouble("paid_amount"));
-//                } catch (NullPointerException npe) {
-//                    pay2.setPaidAmount(0);
-//                }
-//                try {
-//                    pay2.setPayRefNo(rs2.getString("transaction_reason_name"));
-//                } catch (NullPointerException npe) {
-//                    pay2.setPayRefNo("");
-//                }
-//                this.DayCloseCashPaymentList2.add(pay2);
-//            }
-//        } catch (Exception e) {
-//            System.err.println("refreshDayCloseCashPaymentList2:" + e.getMessage());
-//        }
-//    }
     public void searchDayCloseDashboard() {
         try {
             String BtnFrmToDate = "";
@@ -1948,7 +1730,7 @@ public class DashboardBean implements Serializable {
 
             }
         } catch (Exception e) {
-            System.err.println("searchDayCloseDashboard:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("searchDayCloseDashboard:" + e.getMessage());
         }
     }
 
@@ -1959,7 +1741,7 @@ public class DashboardBean implements Serializable {
             this.setDateToToday();
             this.searchDayCloseDashboard();
         } catch (Exception e) {
-            System.err.println("initDayCloseDashboard:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);//("initDayCloseDashboard:" + e.getMessage());
         }
     }
 
@@ -2011,20 +1793,6 @@ public class DashboardBean implements Serializable {
         this.setToDate(cal2.getTime());
     }
 
-//    public void initDayCloseDashboard() {
-//        try {
-//            Date CurrentServerDate = new CompanySetting().getCURRENT_SERVER_DATE();
-//            try {
-//                this.MultipleDates.clear();
-//            } catch (Exception e) {
-//                this.MultipleDates = new ArrayList<>();
-//            }
-//            this.MultipleDates.add(CurrentServerDate);
-//            this.searchDayCloseDashboard();
-//        } catch (Exception e) {
-//            System.err.println("initDayCloseDashboard:" + e.getMessage());
-//        }
-//    }
     @PostConstruct
     public void initDayCloseDashboardUI() {
         model = new DefaultDashboardModel();
@@ -3137,6 +2905,20 @@ public class DashboardBean implements Serializable {
      */
     public void setViewState(int ViewState) {
         this.ViewState = ViewState;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 
 }

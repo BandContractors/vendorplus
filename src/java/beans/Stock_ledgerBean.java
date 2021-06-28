@@ -15,13 +15,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.text.DecimalFormat;
-import java.text.Format;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import utilities.UtilityBean;
@@ -48,6 +48,8 @@ public class Stock_ledgerBean implements Serializable {
     private Date Date1;
     private Date Date2;
     private List<Stock_ledger> Stock_ledgerSummary;
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     public void setStock_ledgerFromResultset(Stock_ledger aStock_ledger, ResultSet aResultSet) {
         try {
@@ -461,6 +463,8 @@ public class Stock_ledgerBean implements Serializable {
     }
 
     public void reportStock_ledger(Stock_ledger aStock_ledger, Stock_ledgerBean aStock_ledgerBean, Item aItem) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         String msg = "";
         aStock_ledgerBean.setActionMessage("");
         int Month1 = 0;
@@ -475,19 +479,17 @@ public class Stock_ledgerBean implements Serializable {
         } catch (Exception e) {
         }
         if (Month1 == 0 || Month2 == 0 || Month1 != Month2 || Year1 == 0 || Year2 == 0 || Year1 != Year2) {
-            msg = "[From Date] and [To Date] must be within same month";
+            msg = "From Date and To Date Must be Within Same Month";
+        }
+        if (msg.length() > 0) {
+            aStock_ledgerBean.setActionMessage(ub.translateWordsInText(BaseName, msg));
+            FacesContext.getCurrentInstance().addMessage("Report", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
-            if (msg.length() > 0) {
-                aStock_ledgerBean.setActionMessage(msg);
-                FacesContext.getCurrentInstance().addMessage("Report", new FacesMessage(msg));
-            } else {
-                String TableName = this.getStockLedgerTableName(Year1, Month1);
-                this.reportStock_ledgerSummary(TableName, aStock_ledger, aStock_ledgerBean, aItem);
-                this.reportStock_ledgerDetail(TableName, aStock_ledger, aStock_ledgerBean, aItem);
-            }
+            String TableName = this.getStockLedgerTableName(Year1, Month1);
+            this.reportStock_ledgerSummary(TableName, aStock_ledger, aStock_ledgerBean, aItem);
+            this.reportStock_ledgerDetail(TableName, aStock_ledger, aStock_ledgerBean, aItem);
         }
     }
-//yeah
 
     public void reportStock_ledgerDetail(String aTableName, Stock_ledger aStock_ledger, Stock_ledgerBean aStock_ledgerBean, Item aItem) {
         aStock_ledgerBean.setActionMessage("");
@@ -836,5 +838,19 @@ public class Stock_ledgerBean implements Serializable {
      */
     public void setStock_ledgerSummary(List<Stock_ledger> Stock_ledgerSummary) {
         this.Stock_ledgerSummary = Stock_ledgerSummary;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 }

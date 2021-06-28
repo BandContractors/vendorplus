@@ -13,18 +13,24 @@ import java.util.List;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.*;
 import javax.faces.context.FacesContext;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import utilities.UtilityBean;
 
 @ManagedBean
 @SessionScoped
 public class PayMethodBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    static Logger LOGGER = Logger.getLogger(PayMethodBean.class.getName());
     private List<PayMethod> PayMethods;
     private String ActionMessage;
     private PayMethod SelectedPayMethod = null;
     private int SelectedPayMethodId;
     private String SearchPayMethodName = "";
     private List<PayMethod> PayMethodsList;
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     public void setPayMethodFromResultset(PayMethod aPayMethod, ResultSet aResultSet) {
         try {
@@ -58,24 +64,26 @@ public class PayMethodBean implements Serializable {
             } catch (NullPointerException npe) {
                 aPayMethod.setIsDeleted(0);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
         }
     }
 
     public void savePayMethod(PayMethod pm) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         String sql = null;
-        String msg = null;
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
 
         if (pm.getPayMethodId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Add") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if (pm.getPayMethodId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Edit") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
             if (pm.getPayMethodId() == 0) {
                 sql = "{call sp_insert_pay_method(?,?,?,?,?)}";
@@ -87,14 +95,7 @@ public class PayMethodBean implements Serializable {
                     Connection conn = DBConnection.getMySQLConnection();
                     CallableStatement cs = conn.prepareCall(sql);) {
                 if (pm.getPayMethodId() == 0) {
-//                    cs.setString("in_pay_method_name", pm.getPayMethodName());
-//                    cs.setInt("in_display_order", pm.getDisplayOrder());
-//                    cs.setInt("in_is_default", pm.getIsDefault());
-//                    cs.setInt("in_is_active", pm.getIsActive());
-//                    cs.setInt("in_is_deleted", 0);
-//                    cs.executeUpdate();
-//                    this.setActionMessage("Saved Successfully");
-                    this.setActionMessage("Adding a new Pay Method is not supported currently");
+                    this.setActionMessage(ub.translateWordsInText(BaseName, "Adding New Payment Method is Not Supported Currently"));
                 } else if (pm.getPayMethodId() > 0) {
                     cs.setInt("in_pay_method_id", pm.getPayMethodId());
                     cs.setString("in_pay_method_name", pm.getPayMethodName());
@@ -103,11 +104,11 @@ public class PayMethodBean implements Serializable {
                     cs.setInt("in_is_active", pm.getIsActive());
                     cs.setInt("in_is_deleted", pm.getIsDeleted());
                     cs.executeUpdate();
-                    this.setActionMessage("Saved Successfully");
+                    this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
-                this.setActionMessage("PayMethod NOT saved");
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);//(se.getMessage());
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Method Not Saved"));
             }
         }
     }
@@ -127,17 +128,9 @@ public class PayMethodBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
     }
 
@@ -155,17 +148,9 @@ public class PayMethodBean implements Serializable {
             } else {
                 return null;
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
             return null;
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
         }
     }
 
@@ -178,25 +163,27 @@ public class PayMethodBean implements Serializable {
     }
 
     public void deletePayMethodById(int PMId) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String msg = "";
         String sql = "DELETE FROM pay_method WHERE pay_method_id=?";
-        String msg;
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
 
         if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Delete") == 0) {
-            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+            msg = "Not Allowed to Access this Function";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
             try (
                     Connection conn = DBConnection.getMySQLConnection();
                     PreparedStatement ps = conn.prepareStatement(sql);) {
                 ps.setInt(1, PMId);
                 ps.executeUpdate();
-                this.setActionMessage("Deleted Successfully!");
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
-                this.setActionMessage("PayMethod NOT deleted");
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Deleted Successfully"));
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);//(se.getMessage());
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Method Not Deleted"));
             }
         }
     }
@@ -233,16 +220,8 @@ public class PayMethodBean implements Serializable {
                 this.setPayMethodFromResultset(pm, rs);
                 PayMethods.add(pm);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
         }
         return PayMethods;
     }
@@ -269,8 +248,8 @@ public class PayMethodBean implements Serializable {
                 this.setPayMethodFromResultset(pm, rs);
                 this.PayMethodsList.add(pm);
             }
-        } catch (SQLException se) {
-            System.err.println("refreshPayMethodsPayReport:" + se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//("refreshPayMethodsPayReport:" + se.getMessage());
         }
     }
 
@@ -292,8 +271,8 @@ public class PayMethodBean implements Serializable {
                 this.setPayMethodFromResultset(pm, rs);
                 aPayMethods.add(pm);
             }
-        } catch (SQLException se) {
-            System.err.println("refreshPayMethodsPayReport2:" + se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//("refreshPayMethodsPayReport2:" + se.getMessage());
         }
     }
 
@@ -311,16 +290,8 @@ public class PayMethodBean implements Serializable {
                 this.setPayMethodFromResultset(pm, rs);
                 PayMethods.add(pm);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
         }
         return PayMethods;
     }
@@ -339,16 +310,8 @@ public class PayMethodBean implements Serializable {
                 this.setPayMethodFromResultset(pm, rs);
                 PayMethods.add(pm);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
         }
         return PayMethods;
     }
@@ -368,16 +331,8 @@ public class PayMethodBean implements Serializable {
                 this.setPayMethodFromResultset(pm, rs);
                 PayMethods.add(pm);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
         }
         return PayMethods;
     }
@@ -401,16 +356,8 @@ public class PayMethodBean implements Serializable {
                 aTrans.setPayMethod(PayMethods.get(0).getPayMethodId());
             } catch (NullPointerException npe) {
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
         }
         return PayMethods;
     }
@@ -434,16 +381,8 @@ public class PayMethodBean implements Serializable {
                 this.setPayMethodFromResultset(pm, rs);
                 this.PayMethods.add(pm);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
         }
     }
 
@@ -461,16 +400,8 @@ public class PayMethodBean implements Serializable {
                 this.setPayMethodFromResultset(pm, rs);
                 PayMethods.add(pm);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
         }
         return PayMethods;
     }
@@ -489,16 +420,8 @@ public class PayMethodBean implements Serializable {
                 this.setPayMethodFromResultset(pm, rs);
                 PayMethods.add(pm);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
         }
         return PayMethods;
     }
@@ -522,16 +445,8 @@ public class PayMethodBean implements Serializable {
                 this.setPayMethodFromResultset(pm, rs);
                 PayMethods.add(pm);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//(se.getMessage());
         }
         return PayMethods;
     }
@@ -611,6 +526,20 @@ public class PayMethodBean implements Serializable {
      */
     public void setPayMethodsList(List<PayMethod> PayMethodsList) {
         this.PayMethodsList = PayMethodsList;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 
 }

@@ -18,7 +18,8 @@ import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
-//import org.primefaces.component.commandbutton.CommandButton;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 /*
  * To change this template, choose Tools | Templates
@@ -33,6 +34,7 @@ import javax.faces.bean.SessionScoped;
 public class ReportBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    static Logger LOGGER = Logger.getLogger(ReportBean.class.getName());
     private String ActionMessage = null;
     private String DateType;
     private Date Date1;
@@ -175,7 +177,7 @@ public class ReportBean implements Serializable {
                 this.getTransList().add(trans);
             }
         } catch (Exception e) {
-            System.err.println("reportOverpaidTrans-1:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
 
         try (
@@ -269,7 +271,7 @@ public class ReportBean implements Serializable {
                 this.getTransListSummary().add(transsum);
             }
         } catch (Exception e) {
-            System.err.println("reportOverpaidTrans-2:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -313,7 +315,7 @@ public class ReportBean implements Serializable {
                 aList.add(new TransBean().getTransHistFromResultset(rs));
             }
         } catch (Exception e) {
-            System.err.println("getTransHistory:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return aList;
     }
