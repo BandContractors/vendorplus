@@ -81,11 +81,11 @@ public class ItemMapBean implements Serializable {
                     this.setActionMessage("Item Map Not Saved");
                     FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                 } else if (itemmap.getFractionQty() == 0) {
-                    msg = "Specifiy Qty of Small Item in Big Item";
+                    msg = "Specify Qty of Small Item in Big Item";
                     this.setActionMessage("Item Map Not Saved");
                     FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                 } else if (itemmap.getPosition() == 0) {
-                    msg = "Specifiy Mapping Position in the Group";
+                    msg = "Specify Mapping Position in the Group";
                     this.setActionMessage("Item Map Not Saved");
                     FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                 } else if ((this.itemCountInMap("BIG", itemmap.getBigItemId()) > 0 && itemmap.getItemMapId() == 0) || (this.itemCountInMap("BIG", itemmap.getBigItemId()) > 0 && this.itemCountInMap("BIG", itemmap.getBigItemId()) != 1 && itemmap.getItemMapId() > 0)) {

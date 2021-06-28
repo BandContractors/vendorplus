@@ -75,6 +75,11 @@ ADD COLUMN language_output VARCHAR(50) NOT NULL DEFAULT 'ENGLISH';
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_15',76,Now(),'6.0','');
 
+UPDATE parameter_list SET parameter_value = 'District,Town' WHERE parameter_list_id = 61;
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_15',79,Now(),'6.0','');
+
+
 
 
 

@@ -150,7 +150,7 @@ public class AccChildAccountBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Not Allowed to Access this Function")));
         } else {
             if (aAccChildAccount.getAccCoaId() == 0) {
-                this.setActionMessage(ub.translateWordsInText(BaseName, "Select Parent Accout"));
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Select Parent Account"));
             } else if (aAccChildAccount.getChildAccountCode().length() <= 0) {
                 this.setActionMessage(ub.translateWordsInText(BaseName, "Sspecify Child Account Code"));
             } else if (aAccChildAccount.getChildAccountName().length() <= 0) {

@@ -8314,7 +8314,7 @@ public class TransItemBean implements Serializable {
                 aStatusBean.setShowItemNotAddedStatus(1);
             } else if (FromCurCode.length() <= 0 || ToCurCode.length() <= 0) {
                 aStatusBean.setItemAddedStatus("");
-                aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Enter From and To Curreny"));
+                aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Enter From and To Currency"));
                 aStatusBean.setShowItemAddedStatus(0);
                 aStatusBean.setShowItemNotAddedStatus(1);
             } else if (FromAccCode.equals(ToAccCode) && FromCurCode.equals(ToCurCode)) {
