@@ -78,8 +78,8 @@
                     </p:autoComplete>
 
                     <p:outputLabel value="#{langsys['Added']} #{langsys['By']}"/>
-                    <h:outputLabel value="#{transactionTypeBean.getTransactionType(1).transactionUserLabel}"/>
-                    <p:outputLabel value="#{transactionTypeBean.getTransactionType(1).transactionNumberLabel}"/>
+                    <h:outputLabel value="#{langsys[transactionTypeBean.getTransactionType(1).transactionUserLabel]}"/>
+                    <p:outputLabel value="#{langsys[transactionTypeBean.getTransactionType(1).transactionNumberLabel]}"/>
                     <p:outputLabel value="#{langsys['Transaction']} #{langsys['Type']}"/>
                     <h:outputLabel value="#{langsys['SUMMARIZE']} #{langsys['RESULTS']} #{langsys['BY']}:"/>
                     <p:selectOneMenu id="menuAddUser" value="#{trans.addUserDetailId}">
@@ -98,9 +98,9 @@
                     <p:selectOneMenu id="menuSummariseBy" value="#{transBean.fieldName}">
                         <f:selectItem itemLabel="#{langsys['Select']}" itemValue=""/>
                         <f:selectItem itemLabel="#{langsys['Added']} #{langsys['By']}" itemValue="add_user_detail_id"/>
-                        <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(1).transactionUserLabel}" itemValue="transaction_user_detail_id"/>
+                        <f:selectItem itemLabel="#{langsys[transactionTypeBean.getTransactionType(1).transactionUserLabel]}" itemValue="transaction_user_detail_id"/>
                         <f:selectItem itemLabel="#{langsys[menuItemBean.menuItemObj.SUPPLIER_NAME]}" itemValue="transactor_id"/>
-                        <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(1).transactionDateLabel}" itemValue="transaction_date"/>
+                        <f:selectItem itemLabel="#{langsys[transactionTypeBean.getTransactionType(1).transactionDateLabel]}" itemValue="transaction_date"/>
                         <f:selectItem itemLabel="#{langsys['Transaction']} #{langsys['Type']}" itemValue="transaction_reason_id"/>
                         <f:selectItem itemLabel="#{companySetting.getStoreEquivName()}" itemValue="store_id"/>
                     </p:selectOneMenu>
@@ -131,7 +131,7 @@
                         <p:column headerText="#{langsys['Added']} #{langsys['By']}" style="text-align: left;" rendered="#{transBean.fieldName.equals('add_user_detail_id')}">
                             <h:outputText value="#{userDetailBean.getUserDetail(sm.addUserDetailId).userName}" rendered="#{sm.addUserDetailId>0}"/>
                         </p:column>
-                        <p:column headerText="#{transactionTypeBean.getTransactionType(1).transactionUserLabel}" style="text-align: left;" rendered="#{transBean.fieldName.equals('transaction_user_detail_id')}">
+                        <p:column headerText="#{langsys[transactionTypeBean.getTransactionType(1).transactionUserLabel]}" style="text-align: left;" rendered="#{transBean.fieldName.equals('transaction_user_detail_id')}">
                             <h:outputText value="#{userDetailBean.getUserDetail(sm.transactionUserDetailId).userName}"/>
                         </p:column>
                         <p:column headerText="#{langsys[menuItemBean.menuItemObj.SUPPLIER_NAME]}" style="text-align: left;" rendered="#{transBean.fieldName.equals('transactor_id')}">
@@ -140,7 +140,7 @@
                         <p:column headerText="#{langsys['Transaction']} #{langsys['Type']}" style="text-align: left;" rendered="#{transBean.fieldName.equals('transaction_reason_id')}">
                             <h:outputText value="#{transactionReasonBean.getTransactionReason(sm.transactionReasonId).transactionReasonName}"/>
                         </p:column>
-                        <p:column headerText="#{transactionTypeBean.getTransactionType(1).transactionDateLabel}" style="text-align: left;" rendered="#{transBean.fieldName.equals('transaction_date')}">
+                        <p:column headerText="#{langsys[transactionTypeBean.getTransactionType(1).transactionDateLabel]}" style="text-align: left;" rendered="#{transBean.fieldName.equals('transaction_date')}">
                             <h:outputText value="#{utilityBean.formatDate(sm.transactionDate)}"/>
                         </p:column>
                         <p:column headerText="#{companySetting.getStoreEquivName()}" style="text-align: left;" rendered="#{transBean.fieldName.equals('store_id')}">
@@ -204,7 +204,7 @@
                     <h:outputLabel value="#{transactionReasonBean.getTransactionReason(itm.transactionReasonId).transactionReasonName} "/>
                     <h:outputLabel value="#{itm.transactionNumber}"/>
                 </p:column>
-                <p:column headerText="#{transactionTypeBean.getTransactionType(1).transactionDateLabel}" rendered="#{transBean.dateType.equals('Invoice Date')}">
+                <p:column headerText="#{langsys[transactionTypeBean.getTransactionType(1).transactionDateLabel]}" rendered="#{transBean.dateType.equals('Invoice Date')}">
                     <h:outputText value="#{utilityBean.formatDate(itm.transactionDate)}"/>
                 </p:column>
                 <p:column headerText="#{langsys['Add']} #{langsys['Date']}" rendered="#{transBean.dateType.equals('Add Date')}">
@@ -234,7 +234,7 @@
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="#{transactionTypeBean.getTransactionType(1).transactionUserLabel}">
+                <p:column headerText="#{langsys[transactionTypeBean.getTransactionType(1).transactionUserLabel]}">
                     <h:outputText value="#{userDetailBean.getUserDetail(itm.transactionUserDetailId).userName}"/>
                 </p:column>
                 <p:column headerText="#{langsys['Added']} #{langsys['By']}">

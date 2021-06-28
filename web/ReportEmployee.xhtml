@@ -30,7 +30,7 @@
                 <h:outputLabel styleClass="clsLabelReportFilterTitle" value="Employee List Report"/>
             </h:panelGrid>
             <h:panelGrid id="pnlgFilter" columns="6" styleClass="clsPanelReportFilter">
-                <p:commandButton id="cmdbSearch" value="SEARCH (ALT+S)" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                <p:commandButton id="cmdbSearch" value="#{langsys['SEARCH']} (ALT+S)" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                     <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                         <p:graphicImage name="/images/ajax-loader.gif"/>
                     </p:dialog>
@@ -46,7 +46,7 @@
                          paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
                          rowsPerPageTemplate="100,400,800,1000,2000">
                 <f:facet name="header">
-                    #{transactorBean.transactorList.size()} Records Found
+                    #{transactorBean.transactorList.size()} #{langsys['Records']} #{langsys['Found']}
                     <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
                     <p:columnToggler datasource="tblDetail" trigger="toggler" />
                 </f:facet>

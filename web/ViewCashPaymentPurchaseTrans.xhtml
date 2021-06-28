@@ -89,11 +89,11 @@
                             #{transItemBean.showTransItemsSummary(pts.transactionId)}
                         </p:column>
                         <p:column>
-                            <f:facet name="header">#{transactionTypeBean.getTransactionType(1).transactionNumberLabel}</f:facet>
+                            <f:facet name="header">#{langsys[transactionTypeBean.getTransactionType(1).transactionNumberLabel]}</f:facet>
                                 #{pts.transactionNumber}
                         </p:column>
                         <p:column>
-                            <f:facet name="header">#{transactionTypeBean.getTransactionType(1).transactionRefLabel}</f:facet>
+                            <f:facet name="header">#{langsys[transactionTypeBean.getTransactionType(1).transactionRefLabel]}</f:facet>
                                 #{pts.transactionRef}
                         </p:column>
                         <p:column>

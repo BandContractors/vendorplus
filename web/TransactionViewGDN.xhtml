@@ -104,7 +104,7 @@
                     </p:dataTable>
 
                     <h:panelGrid styleClass="clsGridMainInput" columns="2" style="width: 100%">
-                        <h:outputLabel styleClass="clsLabelTransItem" style="border-bottom-style: solid;" value="#{transactionTypeBean.getTransactionType(12).transactionDateLabel}"/>
+                        <h:outputLabel styleClass="clsLabelTransItem" style="border-bottom-style: solid;" value="#{langsys[transactionTypeBean.getTransactionType(12).transactionDateLabel]}"/>
                         <h:outputLabel styleClass="clsInput" style="border-bottom-style: solid;" value="#{langsys['Delivery']} #{langsys['Address']}"/>
                         <h:outputText styleClass="clsInput" value="#{utilityBean.formatDate(salesInvoiceBean.getCurrentTransaction().transactionDate)}"/>
                         <div style="width: 250px;">

@@ -175,7 +175,7 @@
                             </h:outputText>
                         </p:column>
                     </p:dataTable>
-                    #{transBean.transList.size()} Records Found
+                    #{transBean.transList.size()} #{langsys['Records']} #{langsys['Found']}
                     <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
                     <p:columnToggler datasource="tblDetail" trigger="toggler" />
                 </f:facet>

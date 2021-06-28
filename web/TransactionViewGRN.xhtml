@@ -121,8 +121,8 @@
                     <h:panelGrid styleClass="clsGridMainInput" columns="2" style="width: 100%">
                         <h:outputLabel styleClass="clsInput" value="#{userDetailBean.getUserDetail(salesInvoiceBean.getCurrentTransaction().transactionUserDetailId).firstName} #{userDetailBean.getUserDetail(salesInvoiceBean.getCurrentTransaction().transactionUserDetailId).secondName}"/>
                         <h:outputText styleClass="clsInput" value="#{utilityBean.formatDate(salesInvoiceBean.getCurrentTransaction().transactionDate)}"/>
-                        <h:outputLabel styleClass="clsLabelTransItem" style="border-top-style: solid;" value="#{transactionTypeBean.getTransactionType(9).transactionUserLabel}"/>
-                        <h:outputLabel styleClass="clsLabelTransItem" style="border-top-style: solid;" value="#{transactionTypeBean.getTransactionType(9).transactionDateLabel}"/>
+                        <h:outputLabel styleClass="clsLabelTransItem" style="border-top-style: solid;" value="#{langsys[transactionTypeBean.getTransactionType(9).transactionUserLabel]}"/>
+                        <h:outputLabel styleClass="clsLabelTransItem" style="border-top-style: solid;" value="#{langsys[transactionTypeBean.getTransactionType(9).transactionDateLabel]}"/>
                     </h:panelGrid>
                 </h:panelGrid>
                 <h:panelGrid>

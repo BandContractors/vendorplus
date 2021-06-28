@@ -122,7 +122,7 @@
                     </p:column>
                     <p:column>
                         <f:facet name="header">#{langsys['Reference']}</f:facet>
-                        <h:outputLabel value="#{transactionTypeBean.getTransactionType(pts.transactionTypeId).transactionRefLabel}:#{pts.transactionRef}" rendered="#{pts.transactionRef.length()>0}"/>
+                        <h:outputLabel value="#{langsys[transactionTypeBean.getTransactionType(pts.transactionTypeId).transactionRefLabel]}:#{pts.transactionRef}" rendered="#{pts.transactionRef.length()>0}"/>
                     </p:column>
                     <p:column>
                         <f:facet name="header">#{langsys['Currency']}</f:facet>

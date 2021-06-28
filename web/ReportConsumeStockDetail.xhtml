@@ -55,9 +55,9 @@
                     <p:calendar id="calDate1"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{transBean.date1}" size="12"/>
                     <p:calendar id="calDate2"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{transBean.date2}" size="12"/>
 
-                    <p:outputLabel value="#{transactionTypeBean.getTransactionType(72).transactionNumberLabel}"/>
+                    <p:outputLabel value="#{langsys[transactionTypeBean.getTransactionType(72).transactionNumberLabel]}"/>
                     <p:outputLabel value="#{langsys['Added']} #{langsys['By']}"/>
-                    <h:outputLabel value="#{transactionTypeBean.getTransactionType(72).transactionUserLabel}"/>              
+                    <h:outputLabel value="#{langsys[transactionTypeBean.getTransactionType(72).transactionUserLabel]}"/>              
                     <h:outputLabel value="#{langsys['SUMMARIZE']} #{langsys['RESULTS']} #{langsys['BY']}:"/>
                     <p:inputText id="itxtInvoiceNo" value="#{trans.transactionNumber}"/>
                     <p:selectOneMenu id="menuTransUser" value="#{trans.transactionUserDetailId}">
@@ -71,8 +71,8 @@
                     <p:selectOneMenu id="menuSummariseBy" value="#{transBean.fieldName}">
                         <f:selectItem itemLabel="#{langsys['Select']}" itemValue=""/>
                         <f:selectItem itemLabel="#{langsys['Added']} #{langsys['By']}" itemValue="add_user_detail_id"/>
-                        <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(72).transactionUserLabel}" itemValue="transaction_user_detail_id"/>
-                        <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(72).transactionDateLabel}" itemValue="transaction_date"/>
+                        <f:selectItem itemLabel="#{langsys[transactionTypeBean.getTransactionType(72).transactionUserLabel]}" itemValue="transaction_user_detail_id"/>
+                        <f:selectItem itemLabel="#{langsys[transactionTypeBean.getTransactionType(72).transactionDateLabel]}" itemValue="transaction_date"/>
                     </p:selectOneMenu>
                     <p:commandButton id="cmdbSearch" value="#{langsys['SEARCH']} (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
@@ -123,13 +123,13 @@
                     <h:outputLabel value="#{transactionReasonBean.getTransactionReason(itm.transactionReasonId).transactionReasonName} "/>
                     <h:outputLabel value="#{itm.transactionNumber}"/>
                 </p:column>
-                <p:column headerText="#{transactionTypeBean.getTransactionType(72).transactionDateLabel}" rendered="#{transBean.dateType.equals('Consume Date')}">
+                <p:column headerText="#{langsys[transactionTypeBean.getTransactionType(72).transactionDateLabel]}" rendered="#{transBean.dateType.equals('Consume Date')}">
                     <h:outputText value="#{utilityBean.formatDate(itm.transactionDate)}"/>
                 </p:column>
                 <p:column headerText="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}">
                     <h:outputText value="#{transactorBean.getTransactor(itm.transactorId).transactorNames}"/>
                 </p:column>
-                <p:column headerText="#{transactionTypeBean.getTransactionType(72).transactionRefLabel}">
+                <p:column headerText="#{langsys[transactionTypeBean.getTransactionType(72).transactionRefLabel]}">
                     <h:outputText value="#{itm.transactionRef}"/>
                 </p:column>
                 <p:column headerText="#{langsys['Cost']} #{langsys['Amount']}" style="text-align: right;">
@@ -140,7 +140,7 @@
                 <p:column headerText="#{langsys['Add']} #{langsys['Date']}" rendered="#{transBean.dateType.equals('Add Date')}">
                     <h:outputText value="#{utilityBean.formatDate(itm.addDate)}"/>
                 </p:column>
-                <p:column headerText="#{transactionTypeBean.getTransactionType(72).transactionUserLabel}">
+                <p:column headerText="#{langsys[transactionTypeBean.getTransactionType(72).transactionUserLabel]}">
                     <h:outputText value="#{userDetailBean.getUserDetail(itm.transactionUserDetailId).userName}"/>
                 </p:column>
                 <p:column headerText="#{langsys['Added']} #{langsys['By']}">

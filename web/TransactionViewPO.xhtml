@@ -45,7 +45,7 @@
                             <h:outputLabel value="#{transactorBean.getTransactor(salesInvoiceBean.getCurrentTransaction().transactorId).phone}"/>
                         </h:panelGrid>
                         <h:panelGrid style="margin: 0px;text-align: left;" columns="1">
-                            <h:outputLabel value="#{transactionTypeBean.getTransactionType(8).transactionDateLabel}" style="border-bottom-style: solid;"/>
+                            <h:outputLabel value="#{langsys[transactionTypeBean.getTransactionType(8).transactionDateLabel]}" style="border-bottom-style: solid;"/>
                             <h:outputText styleClass="clsInput" id="itxtvOrderDate" value="#{utilityBean.formatDate(salesInvoiceBean.getCurrentTransaction().transactionDate)}"/>
                         </h:panelGrid>
                         <h:panelGrid style="margin: 0px;text-align: left;" columns="1">

@@ -58,7 +58,7 @@
 
             <h:panelGrid id="pgrdTransViewOptions2" columns="4" styleClass="clsLikeMainFromWidth" style="background-color:bisque;">
                 <h:panelGrid id="pgrdTransViewOptions21" columns="1" style="background-color:bisque;">
-                    <h:outputLabel  style="text-align: right;" value="#{transactionTypeBean.getTransactionType(transactionType.transactionTypeId).transactionNumberLabel}"/>
+                    <h:outputLabel  style="text-align: right;" value="#{langsys[transactionTypeBean.getTransactionType(transactionType.transactionTypeId).transactionNumberLabel]}"/>
                     <h:inputText styleClass="clsInput" id="itxtTransactionNo2" value="#{trans.transactionNumber2}" autocomplete="off">
                         <f:ajax event="change" listener="#{trans.setTransactionNumber3('')}" render="itxtTransactionNo2 itxtTransactionNo3"/>
                     </h:inputText>
@@ -67,10 +67,10 @@
                     <h:outputLabel  value="#{langsys['OR']}"/>
                 </h:panelGrid>
                 <h:panelGrid id="pgrdTransViewOptions23" columns="1" style="background-color:bisque;">
-                    <h:outputLabel  style="text-align: right;" value="#{transactionTypeBean.getTransactionType(transactionType.transactionTypeId).transactionNumberLabel} BY #{generalUserSetting.getCurrentUser().userName}"/>
+                    <h:outputLabel  style="text-align: right;" value="#{langsys[transactionTypeBean.getTransactionType(transactionType.transactionTypeId).transactionNumberLabel]} #{langsys['BY']} #{generalUserSetting.getCurrentUser().userName}"/>
                     <h:selectOneMenu styleClass="clsMenu" id="menuTransactionNo3" value="#{trans.transactionNumber3}">
                         <f:selectItem itemValue="" itemLabel=""/>
-                        <f:selectItems value="#{transBean.getTranssByAddUser(generalUserSetting.getCurrentUser().userDetailId,transactionType.transactionTypeId,generalUserSetting.getCurrentStore().getStoreId())}" var="t2" itemLabel="No:#{t2.transactionNumber} Ref:#{t2.transactionRef} Amount:#{t2.grandTotal})" itemValue="#{t2.transactionNumber}"/>
+                        <f:selectItems value="#{transBean.getTranssByAddUser(generalUserSetting.getCurrentUser().userDetailId,transactionType.transactionTypeId,generalUserSetting.getCurrentStore().getStoreId())}" var="t2" itemLabel="#{langsys['No.']}:#{t2.transactionNumber} #{langsys['Reference']}:#{t2.transactionRef} #{langsys['Amount']}:#{t2.grandTotal})" itemValue="#{t2.transactionNumber}"/>
                         <f:ajax event="change"  listener="#{trans.setTransactionNumber2('')}" render="itxtTransactionNo2 menuTransactionNo3"/>
                     </h:selectOneMenu>
                 </h:panelGrid>
@@ -80,7 +80,7 @@
             </h:panelGrid>
 
             <h:panelGrid id="pgrdTransHeader" styleClass="clsGridMainInput" columns="6">
-                <h:outputLabel  value="#{transactionTypeBean.getTransactionType(trans.transactionTypeId).transactionNumberLabel}"/>
+                <h:outputLabel  value="#{langsys[transactionTypeBean.getTransactionType(trans.transactionTypeId).transactionNumberLabel]}"/>
                 <h:inputText styleClass="clsInput" id="itxtTransactionId" disabled="true" value="#{trans.transactionNumber}"/>
                 <h:outputLabel  value="#{langsys['Transaction']} #{langsys['Type']}"/>
                 <h:inputText styleClass="clsInput" id="itxtTransactionType" disabled="true" value="#{transactionTypeBean.getTransactionType(trans.transactionTypeId).transactionTypeName}">

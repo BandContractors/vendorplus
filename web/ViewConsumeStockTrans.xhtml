@@ -42,11 +42,11 @@
                     <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="8">
                         <h:outputLabel  value="#{langsys['From']}:"/>
                         <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{storeBean.getStore(transBean.transObj.storeId).storeName}" style="width: 170px;"/>
-                        <h:outputLabel  value="#{transactionTypeBean.getTransactionType(72).transactionDateLabel}:"/>
+                        <h:outputLabel  value="#{langsys[transactionTypeBean.getTransactionType(72).transactionDateLabel]}:"/>
                         <h:inputText id="itxtTransactionDate" value="#{utilityBean.formatDate(transBean.transObj.transactionDate)}" disabled="true"/>
                         <h:outputLabel  value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}:"/>
                         <h:inputText value="#{transactorBean.getTransactor(transBean.transObj.transactorId).transactorNames}" disabled="true"/>
-                        <h:outputLabel  value="#{transactionTypeBean.getTransactionType(72).transactionRefLabel}:"/>
+                        <h:outputLabel  value="#{langsys[transactionTypeBean.getTransactionType(72).transactionRefLabel]}:"/>
                         <h:inputText styleClass="clsInput" id="itxtReference" value="#{transBean.transObj.transactionRef}" style="width: 130px;" disabled="true"/>
                     </h:panelGrid>
                     <p:dataTable rowIndexVar="rowIndex" id="dtblTransactionItem" value="#{transBean.transItemList}" var="ati" 

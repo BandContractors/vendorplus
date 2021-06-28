@@ -71,7 +71,7 @@
                             </h:outputText>
                         </p:column>
                     </p:dataTable>
-                    #{stockBean.stocksList.size()} Records Found
+                    #{stockBean.stocksList.size()} #{langsys['Records']} #{langsys['Found']}
                     <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
                     <p:columnToggler datasource="tblDetail" trigger="toggler" />
                 </f:facet>

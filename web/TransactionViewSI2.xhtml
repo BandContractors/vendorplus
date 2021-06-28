@@ -41,7 +41,7 @@
                     </h:panelGrid>
 
                     <h:panelGrid styleClass="clsGridMainInput" columns="4" style="width: 100%">
-                        <h:outputLabel  value="#{transactionTypeBean.getTransactionType(2).transactionRefLabel}:"/>
+                        <h:outputLabel  value="#{langsys[transactionTypeBean.getTransactionType(2).transactionRefLabel]}:"/>
                         <h:inputText styleClass="clsInput" id="itxtvvTransactionId" disabled="true" value="#{salesInvoiceBean.getCurrentTransaction().transactionRef}" style="border: none;"/>
                         <h:outputLabel  value="#{langsys['From']}:"/>
                         <h:inputText styleClass="clsInput" id="itxtvFromStore" disabled="true" value="#{storeBean.getStore(salesInvoiceBean.getCurrentTransaction().storeId).storeName}" style="border: none;"/>

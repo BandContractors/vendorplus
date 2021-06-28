@@ -180,8 +180,8 @@
             </h:panelGrid>
 
             <h:panelGrid id="gridItemStatus" styleClass="clsGridItemStatus" columns="1">
-                <h:outputLabel id="olblItemAddedStstus" class="clsSuccessStatus" value="#{langsys[statusBean.itemAddedStatus]}" rendered="#{statusBean.showItemAddedStatus==1}"/>
-                <h:outputLabel id="olblItemNotAddedStstus" class="clsFailStatus" value="#{langsys[statusBean.itemNotAddedStatus]}" rendered="#{statusBean.showItemNotAddedStatus==1}"/>
+                <h:outputLabel id="olblItemAddedStstus" class="clsSuccessStatus" value="#{statusBean.itemAddedStatus}" rendered="#{statusBean.showItemAddedStatus==1}"/>
+                <h:outputLabel id="olblItemNotAddedStstus" class="clsFailStatus" value="#{statusBean.itemNotAddedStatus}" rendered="#{statusBean.showItemNotAddedStatus==1}"/>
             </h:panelGrid>
             <p:dataTable rowIndexVar="rowIndex" id="dtblTransactionItem" value="#{transItemBean.activeTransItems}" var="ati" 
                          styleClass="cls-table" tableStyle="width:auto;">  

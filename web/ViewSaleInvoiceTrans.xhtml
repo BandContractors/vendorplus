@@ -232,7 +232,7 @@
                     </h:panelGrid>
                     <h:panelGrid style="background-color: yellow;width: 100%"/>
                     <h:panelGrid styleClass="clsGridMainInput" columns="2">
-                        <h:outputLabel  value="#{transactionTypeBean.getTransactionType(2).transactionUserLabel}:"/>
+                        <h:outputLabel  value="#{langsys[transactionTypeBean.getTransactionType(2).transactionUserLabel]}:"/>
                         <h:inputText disabled="true" style="width: 170px;" value="#{userDetailBean.getUserDetail(transBean.transObj.transactionUserDetailId).userName}"/>
                     </h:panelGrid>
                     <h:panelGrid id="pgrdApprove">

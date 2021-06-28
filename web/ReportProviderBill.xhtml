@@ -92,11 +92,11 @@
                         <td>#{langsys['Scheme']} #{langsys['Name']}</td>
                         <td>#{langsys['Card']} #{langsys['No.']}</td>
                         <td>#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}</td>
-                        <td>#{transactionTypeBean.getTransactionType(2).transactionDateLabel}</td>
+                        <td>#{langsys[transactionTypeBean.getTransactionType(2).transactionDateLabel]}</td>
                         <td>#{langsys['Category']}</td>
                         <td>#{langsys['Amount']}</td>
                         <td>#{langsys['Total']}</td>
-                        <td>#{transactionTypeBean.getTransactionType(2).transactionUserLabel}</td>
+                        <td>#{langsys[transactionTypeBean.getTransactionType(2).transactionUserLabel]}</td>
                     </tr>
                     <ui:repeat var="t" value="#{transBean.getReportBill(trans)}" varStatus="status">
                         <tr style="background-color: #E5E5E5">

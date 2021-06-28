@@ -167,7 +167,7 @@
                     <h:panelGrid styleClass="clsGridMainInput" columns="2" style="width: 100%">
                         <h:outputLabel styleClass="clsInput" value="#{userDetailBean.getUserDetail(salesInvoiceBean.getCurrentTransaction().transactionUserDetailId).firstName} #{userDetailBean.getUserDetail(salesInvoiceBean.getCurrentTransaction().transactionUserDetailId).secondName}"/>
                         <h:outputText styleClass="clsInput" value="#{utilityBean.formatDate(salesInvoiceBean.getCurrentTransaction().expiryDate)}"/>
-                        <h:outputLabel styleClass="clsLabelTransItem" style="border-top-style: solid;" value="#{transactionTypeBean.getTransactionType(10).transactionUserLabel}"/>
+                        <h:outputLabel styleClass="clsLabelTransItem" style="border-top-style: solid;" value="#{langsys[transactionTypeBean.getTransactionType(10).transactionUserLabel]}"/>
                         <h:outputLabel styleClass="clsLabelTransItem" style="border-top-style: solid;" value="#{langsys['Expiry']} #{langsys['Date']}"/>
                     </h:panelGrid>
                 </h:panelGrid>
