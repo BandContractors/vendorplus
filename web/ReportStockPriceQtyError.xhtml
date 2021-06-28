@@ -41,11 +41,11 @@
 
                 <h:selectOneMenu id="menuStockType" value="#{stock.stock_type}" >
                     <f:selectItem itemLabel="" itemValue=""/>
-                    <f:selectItem itemLabel="#{langsys['Merchandise']}" itemValue="#{langsys['Merchandise']}"/>
-                    <f:selectItem itemLabel="#{langsys['Finished']} #{langsys['Goods']}" itemValue="#{langsys['Finished']} #{langsys['Goods']}"/>
-                    <f:selectItem itemLabel="#{langsys['Raw Material']}" itemValue="#{langsys['Raw Material']}"/>
-                    <f:selectItem itemLabel="#{langsys['Consumption']}" itemValue="#{langsys['Consumption']}"/>
-                    <f:selectItem itemLabel="#{langsys['Services']}" itemValue="#{langsys['Services']}"/>
+                    <f:selectItem itemLabel="#{langsys['Merchandise']}" itemValue="Merchandise"/>
+                    <f:selectItem itemLabel="#{langsys['Finished']} #{langsys['Goods']}" itemValue="Finished Goods"/>
+                    <f:selectItem itemLabel="#{langsys['Raw Material']}" itemValue="Raw Material"/>
+                    <f:selectItem itemLabel="#{langsys['Consumption']}" itemValue="Consumption"/>
+                    <f:selectItem itemLabel="#{langsys['Services']}" itemValue="Services"/>
                 </h:selectOneMenu>
                 <h:selectOneMenu id="menuFromStore" value="#{stock.storeId}" >
                     <f:selectItem itemLabel="" itemValue="0"/>

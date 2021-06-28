@@ -261,7 +261,7 @@
 
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">#{langsys['Total']}x</f:facet>
+                    <f:facet name="header">#{langsys['Total']}</f:facet>
                     <!-- row record -->
                     <h:commandButton id="cmdbRemoveItem" value="-">
                         <f:ajax listener="#{transItemBean.removeTransItemCEC(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans,transItemBean.activeTransItems,ati)}" execute="@form" render="dtblTransactionItem TransactionFormPurchase:pgrdTotals"/>

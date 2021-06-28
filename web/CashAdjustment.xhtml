@@ -71,8 +71,8 @@
                     <h:outputLabel value="#{langsys['Adjustment']} #{langsys['Type']}:"/>
                     <h:selectOneMenu id="menuType" styleClass="clsMenu" value="#{transItem.narration}" style="width: 180px;">
                         <f:selectItem itemLabel="" itemValue=""/>
-                        <f:selectItem itemLabel="#{langsys['Add']}(#{langsys['Debit']})" itemValue="#{langsys['Add']}"/>
-                        <f:selectItem itemLabel="#{langsys['Subtract']}(#{langsys['Credit']})" itemValue="#{langsys['Subtract']}"/>
+                        <f:selectItem itemLabel="#{langsys['Add']}(#{langsys['Debit']})" itemValue="Add"/>
+                        <f:selectItem itemLabel="#{langsys['Subtract']}(#{langsys['Credit']})" itemValue="Subtract"/>
                         <f:ajax listener="#{accLedgerBean.refreshNewBalance(transItem)}" execute="@form" render="lblAmount itxtAmountTo"/>
                     </h:selectOneMenu>
                     <h:outputLabel id="lblAmount" value="#{transItem.narration} #{langsys['Amount']}:"/>

@@ -253,7 +253,7 @@
                     <!-- column header -->
                     <f:facet name="header">#{langsys['Inventory']}/#{langsys['Cost']} #{langsys['Account']}</f:facet>
                     <!-- row record -->
-                    <p:outputLabel id="lblAccountCodeInner" value="#{langsys[ati.accountCode]}"/>
+                    <p:outputLabel id="lblAccountCodeInner" value="#{ati.accountCode}"/>
                     <p:tooltip id="toolTipTrackAccCode" for="lblAccountCodeInner" value="#{langsys[ati.accountName]}" trackMouse="true" />    
                 </p:column>
 

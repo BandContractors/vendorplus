@@ -96,7 +96,7 @@
                     <h:outputLabel value="#{langsys['Asset']} #{langsys['Account']} :"/>
                     <h:selectOneMenu id="menuAssetAccountCode" value="#{itemBean.itemObj.assetAccountCode}" style="width: 200px;background-color: #{listOptionBean.getColorByBoolean(generalUserSetting.currentItemPurpose.equals('Asset'))}" disabled="#{!generalUserSetting.currentItemPurpose.equals('Asset')}">
                         <f:selectItem itemLabel="" itemValue=""/>
-                        <f:selectItems value="#{accCoaBean.getAccCoaObjectListBeginWith1('1-20-000')}" var="ac" itemLabel="#{langsys[ac.accountName]}" itemValue="#{ac.accountCode}"/>
+                        <f:selectItems value="#{accCoaBean.getAccCoaObjectListBeginWith1('1-20-000')}" var="ac" itemLabel="#{ac.accountName}" itemValue="#{ac.accountCode}"/>
                     </h:selectOneMenu>
                     <h:outputLabel value="#{langsys['Description']}:"/>
                     <h:inputText id="itxtDescription" value="#{itemBean.itemObj.description}" autocomplete="off" style="width: 193px"/>
@@ -127,7 +127,7 @@
                     <h:outputLabel value="#{langsys['Unit']}:"/>
                     <h:selectOneMenu id="menuUnit" value="#{itemBean.itemObj.unitId}" style="width: 200px">
                         <f:selectItem itemLabel="" itemValue="0"/>
-                        <f:selectItems value="#{unitBean.units}" var="u" itemLabel="#{langsys[u.unitName]}" itemValue="#{u.unitId}"/>
+                        <f:selectItems value="#{unitBean.units}" var="u" itemLabel="#{u.unitName}" itemValue="#{u.unitId}"/>
                     </h:selectOneMenu>
                     <h:outputLabel value="#{langsys['Reorder']} #{langsys['Level']}:"/>
                     <h:inputText id="itxtReorderLevel" value="#{itemBean.itemObj.reorderLevel}" autocomplete="off" style="width: 193px"/>
@@ -250,7 +250,7 @@
                                  > 
                         <h:column>
                             <!-- column header -->
-                            <f:facet name="header">#{langsys[companySetting.getStoreEquivName()]}</f:facet>
+                            <f:facet name="header">#{companySetting.getStoreEquivName()}</f:facet>
                             <!-- row record -->
                             #{storeBean.getStore(stck.storeId).storeName}
                         </h:column>

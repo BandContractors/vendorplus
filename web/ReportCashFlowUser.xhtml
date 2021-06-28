@@ -49,8 +49,8 @@
                 </h:selectOneMenu>
                 <h:selectOneMenu id="menuDateType" value="#{accJournalBean.dateType}" >
                     <f:selectItem itemLabel=""/>
-                    <f:selectItem itemValue="#{langsys['Journal']} #{langsys['Date']}" itemLabel="#{langsys['Journal']} #{langsys['Date']}"/>
-                    <f:selectItem itemValue="#{langsys['Add']} #{langsys['Date']}" itemLabel="#{langsys['Add']} #{langsys['Date']}"/>
+                    <f:selectItem itemValue="Journal Date" itemLabel="#{langsys['Journal']} #{langsys['Date']}"/>
+                    <f:selectItem itemValue="Add Date" itemLabel="#{langsys['Add']} #{langsys['Date']}"/>
                     <f:ajax event="change" execute="@this" render="lblDate1 lblDate2"/>
                 </h:selectOneMenu>
                 <p:calendar id="calDate1"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{accJournalBean.date1}" size="12"/>

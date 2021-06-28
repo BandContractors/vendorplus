@@ -38,8 +38,8 @@
                     </h:panelGrid>
 
                     <h:panelGrid columns="1" style="text-align: center; width:100%;margin: 0px;background-color: gray;color: white;-webkit-print-color-adjust: exact;">
-                        <h:outputLabel value="#{generalUserSetting.outputDetailParent.transaction_type.transactionOutputLabel}" style="font-size:30px;font-weight: bold;"/>
-                        <h:outputLabel value="#{generalUserSetting.outputDetailParent.transaction_type.transactionNumberLabel}:#{generalUserSetting.outputDetailParent.trans.transactionNumber}" style="font-weight: bold;"/>
+                        <h:outputLabel value="#{langout[generalUserSetting.outputDetailParent.transaction_type.transactionOutputLabel]}" style="font-size:30px;font-weight: bold;"/>
+                        <h:outputLabel value="#{langout[generalUserSetting.outputDetailParent.transaction_type.transactionNumberLabel]}:#{generalUserSetting.outputDetailParent.trans.transactionNumber}" style="font-weight: bold;"/>
                     </h:panelGrid>
 
                     <h:panelGrid columns="4" style="width:100%;margin: 0px;">
@@ -48,7 +48,7 @@
                             <h:outputLabel value="#{generalUserSetting.outputDetailParent.store.storeName}"/>
                         </h:panelGrid>
                         <h:panelGrid style="margin: 0px;text-align: left;" columns="1">
-                            <h:outputLabel value="#{generalUserSetting.outputDetailParent.transaction_type.transactionDateLabel}" style="border-bottom-style: solid;"/>
+                            <h:outputLabel value="#{langout[generalUserSetting.outputDetailParent.transaction_type.transactionDateLabel]}" style="border-bottom-style: solid;"/>
                             <h:outputText styleClass="clsInput" id="itxtvOrderDate" value="#{utilityBean.formatDate(generalUserSetting.outputDetailParent.trans.transactionDate)}"/>
                         </h:panelGrid>
                         <h:panelGrid style="margin: 0px;text-align: left;" columns="1">

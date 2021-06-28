@@ -65,9 +65,9 @@
                     <h:outputLabel  value="#{langsys['Category']}:" id="lblCategory"/>
                     <h:selectOneMenu styleClass="clsMenu" id="menuTransactorCategory" value="#{transactorBean.transactorObj.category}" style="width: 206px;">
                         <f:selectItem itemLabel="" />
-                        <f:selectItem itemLabel="#{langsys['Consumer']}" itemValue="#{langsys['Consumer']}"/>
-                        <f:selectItem itemLabel="#{langsys['Business']}" itemValue="#{langsys['Business']}"/>
-                        <f:selectItem itemLabel="#{langsys['Government']}" itemValue="#{langsys['Government']}"/>
+                        <f:selectItem itemLabel="#{langsys['Consumer']}" itemValue="Consumer"/>
+                        <f:selectItem itemLabel="#{langsys['Business']}" itemValue="Business"/>
+                        <f:selectItem itemLabel="#{langsys['Government']}" itemValue="Government"/>
                     </h:selectOneMenu>
                     <h:outputLabel  value="#{langsys['Segment']}:"/>
                     <h:selectOneMenu styleClass="clsMenu" id="menuTransactorSegment" value="#{transactorBean.transactorObj.transactor_segment_id}" style="width: 206px;">
@@ -158,8 +158,8 @@
                     </h:inputTextarea>
                     <h:outputLabel  value="#{langsys['Is']} #{langsys['Suspended']}?:"/>
                     <h:selectOneMenu styleClass="clsMenu" value="#{transactorBean.transactorObj.isSuspended}" style="width: 206px;">
-                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="#{langsys['No']}"/>
-                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="#{langsys['Yes']}"/>
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="No"/>
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="Yes"/>
                     </h:selectOneMenu>
                     <h:outputLabel  value="#{langsys['Suspended']} #{langsys['Reason']}:"/>
                     <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.suspendedReason}" autocomplete="off" style="color: red;width: 203px;"/>
@@ -179,12 +179,12 @@
                             <!-- row record -->
                             <h:selectOneMenu styleClass="clsMenu" value="#{sd.deductionName}" style="width: 100px;">
                                 <f:selectItem itemLabel="" itemValue=""/>
-                                <f:selectItem itemLabel="#{langsys['MEDICAL']}" itemValue="#{langsys['MEDICAL']}"/>
-                                <f:selectItem itemLabel="#{langsys['HOUSING']}" itemValue="#{langsys['HOUSING']}"/>
-                                <f:selectItem itemLabel="#{langsys['RBS']}" itemValue="#{langsys['RBS']}"/>
-                                <f:selectItem itemLabel="#{langsys['PAYE']}" itemValue="#{langsys['PAYE']}"/>
-                                <f:selectItem itemLabel="#{langsys['NSSF']}" itemValue="#{langsys['NSSF']}"/>
-                                <f:selectItem itemLabel="#{langsys['Other']}" itemValue="#{langsys['OTHER']}"/>
+                                <f:selectItem itemLabel="#{langsys['MEDICAL']}" itemValue="MEDICAL"/>
+                                <f:selectItem itemLabel="#{langsys['HOUSING']}" itemValue="HOUSING"/>
+                                <f:selectItem itemLabel="#{langsys['RBS']}" itemValue="RBS"/>
+                                <f:selectItem itemLabel="#{langsys['PAYE']}" itemValue="PAYE"/>
+                                <f:selectItem itemLabel="#{langsys['NSSF']}" itemValue="NSSF"/>
+                                <f:selectItem itemLabel="#{langsys['Other']}" itemValue="OTHER"/>
                             </h:selectOneMenu>
                         </p:column>
                         <p:column>

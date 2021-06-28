@@ -45,22 +45,22 @@
                     <f:selectItem itemValue="#{transBean.transReasonObj.transactionReasonId}" itemLabel="#{transBean.transReasonObj.transactionReasonName}"/>
                     <f:ajax execute="@this"/>
                 </h:selectOneMenu>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Prices']} #{langsys['are']} VAT #{langsys['inclusive:']}#{companySetting.EIsVatInclusive}"/>
+                <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Prices']} #{langsys['are']} VAT #{langsys['inclusive']}:#{companySetting.EIsVatInclusive}"/>
                 <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Stock']}:#{langsys['No.']} #{langsys['effect']}"/>
                 <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Ledger']}:#{langsys['No.']} #{langsys['effect']}"/>
             </h:panelGrid>
             <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="7">
                 <h:outputLabel  value="#{langsys['From']}:"/>
-                <h:outputLabel  value="#{langsys[transBean.transTypeObj.transactionRefLabel]}:"/>
+                <h:outputLabel  value="#{transBean.transTypeObj.transactionRefLabel}:"/>
                 <h:outputLabel  value="#{langsys['Currency']}:"/>
                 <p:commandLink actionListener="#{transactorBean.openChildTransactor('CUSTOMER')}" value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}:"/>
-                <h:outputLabel  value="#{langsys[transBean.transTypeObj.transactionDateLabel]}:"/>
+                <h:outputLabel  value="#{transBean.transTypeObj.transactionDateLabel}:"/>
                 <h:outputLabel id="olblDebtCredit" style="color: coral;font-weight: bold;" value="#{langsys['Receivable']} (#{generalUserSetting.LOCAL_CURRENCY.currencyCode}):"/>
                 <h:outputLabel id="olblDeposit" style="color: green;font-weight: bold;" value="#{langsys['Deposit']} (#{trans.currencyCode})"/>
 
                 <h:inputText style="width: 120px;" styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}">
                 </h:inputText>
-                <h:inputText style="width: 120px;" styleClass="clsInput" id="itxtTransactionRef" value="#{langsys[trans.transactionRef]}" autocomplete="off">
+                <h:inputText style="width: 120px;" styleClass="clsInput" id="itxtTransactionRef" value="#{trans.transactionRef}" autocomplete="off">
                 </h:inputText>
                 <h:selectOneMenu style="width: 80px;" styleClass="clsMenu" id="menuCurrency" value="#{trans.currencyCode}">
                     <f:selectItems value="#{accCurrencyBean.currencyList}" var="ac" itemLabel="#{ac.currencyCode}" itemValue="#{ac.currencyCode}"/>

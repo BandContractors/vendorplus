@@ -67,7 +67,7 @@
                     <h:outputLabel style="font-size: 16px;" value="#{langout['Goods']}/#{langout['Services']} #{langout['Supplied']}" rendered="#{generalUserSetting.outputDetailParent.pay.payReasonId==25 or generalUserSetting.outputDetailParent.pay.payReasonId==26}"/>
                     <h:outputLabel style="font-size: 16px;" value="#{langout['Owner']} #{langout['Cash']} #{langout['Drawing']}" rendered="#{generalUserSetting.outputDetailParent.pay.payReasonId==34}"/>
                     <h:outputLabel style="font-size: 16px;" value="#{langout['Loan']} #{langout['Installment']}" rendered="#{generalUserSetting.outputDetailParent.pay.payReasonId==33}"/>
-                    <h:outputLabel style="font-size: 16px;" value="#{langout['Cash']} #{langout['Advance']} #{langout['to']} #{menuItemBean.menuItemObj.SUPPLIER_NAME}" rendered="#{generalUserSetting.outputDetailParent.pay.payReasonId==91}"/>
+                    <h:outputLabel style="font-size: 16px;" value="#{langout['Cash']} #{langout['Advance']} #{langout['to']} #{langout[menuItemBean.menuItemObj.SUPPLIER_NAME]}" rendered="#{generalUserSetting.outputDetailParent.pay.payReasonId==91}"/>
                     <h:outputLabel style="font-size: 16px;" value="#{langout['Liability']} #{langout['Payment']}" rendered="#{generalUserSetting.outputDetailParent.pay.payReasonId==105}"/>
                     <h:outputLabel style="font-size: 12px;" value="#{payTransBean.getPaidForSummary(generalUserSetting.outputDetailParent.pay.payId)}"/>
                 </h:panelGrid>

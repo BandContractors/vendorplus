@@ -54,8 +54,8 @@
                     </p:selectOneMenu>
                     <p:selectOneMenu id="menuDateType" value="#{transBean.dateType}">
                         <f:selectItem itemLabel="#{langsys['Select']}" itemValue=""/>
-                        <f:selectItem itemValue="#{langsys['Add']} #{langsys['Date']}" itemLabel="#{langsys['Add']} #{langsys['Date']}"/>
-                        <f:selectItem itemValue="#{langsys['Transfer']} #{langsys['Date']}" itemLabel="#{langsys['Transfer']} #{langsys['Date']}"/>
+                        <f:selectItem itemValue="Add Date" itemLabel="#{langsys['Add']} #{langsys['Date']}"/>
+                        <f:selectItem itemValue="Transfer Date" itemLabel="#{langsys['Transfer']} #{langsys['Date']}"/>
                         <f:ajax event="change" execute="@this" render="lblDate1 lblDate2"/>
                     </p:selectOneMenu>
                     <p:calendar id="calDate1"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{transBean.date1}" size="12"/>

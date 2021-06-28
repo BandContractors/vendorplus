@@ -57,15 +57,15 @@
                 <h:outputLabel  value="#{langsys['Lock']} #{langsys['User']}?:"/>
                 <h:selectOneMenu styleClass="clsMenu" id="menuIsUserLocked" value="#{userDetail.isUserLocked}" disabled="#{userDetail.userName=='system'}" style="width: 225px;">
                     <f:selectItem itemLabel="" itemValue=""/>
-                    <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="#{langsys['Yes']}"/>
-                    <f:selectItem itemLabel="#{langsys['No']}" itemValue="#{langsys['No']}"/>
+                    <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="Yes"/>
+                    <f:selectItem itemLabel="#{langsys['No']}" itemValue="No"/>
                 </h:selectOneMenu>
 
                 <h:outputLabel  value="#{langsys['General']} #{langsys['Admin']}?:"/>
                 <h:selectOneMenu styleClass="clsMenu" id="menuIsUserGenAdmin" value="#{userDetail.isUserGenAdmin}" disabled="#{userDetail.userName=='system'}" style="width: 225px;">
                     <f:selectItem itemLabel="" itemValue=""/>
-                    <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="#{langsys['Yes']}"/>
-                    <f:selectItem itemLabel="#{langsys['No']}" itemValue="#{langsys['No']}"/>
+                    <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="Yes"/>
+                    <f:selectItem itemLabel="#{langsys['No']}" itemValue="No"/>
                 </h:selectOneMenu>
 
                 <h:outputLabel  value="#{langsys['User']} #{langsys['Category']}:"/>

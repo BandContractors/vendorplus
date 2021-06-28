@@ -101,10 +101,10 @@
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
                 <h:selectOneMenu id="menuReason" styleClass="clsMenu" value="#{transItem.narration}" style="width: 100px;">
-                    <f:selectItem itemLabel="#{langsys['EXPIRED']}" itemValue="#{langsys['EXPIRED']}"/>
-                    <f:selectItem itemLabel="#{langsys['DAMAGE']}" itemValue="#{langsys['DAMAGE']}"/>
-                    <f:selectItem itemLabel="#{langsys['LOST']}" itemValue="#{langsys['LOST']}"/>
-                    <f:selectItem itemLabel="#{langsys['OTHER']}" itemValue="#{langsys['OTHER']}"/>
+                    <f:selectItem itemLabel="#{langsys['EXPIRED']}" itemValue="EXPIRED"/>
+                    <f:selectItem itemLabel="#{langsys['DAMAGE']}" itemValue="DAMAGE"/>
+                    <f:selectItem itemLabel="#{langsys['LOST']}" itemValue="LOST"/>
+                    <f:selectItem itemLabel="#{langsys['OTHER']}" itemValue="OTHER"/>
                 </h:selectOneMenu>
                 <h:selectOneMenu id="menuBatchSpecific" styleClass="clsMenu" value="#{transItem.stockId}" style="width: 500px;">
                     <c:if test="#{stockBean.specificList.size()>1}" >

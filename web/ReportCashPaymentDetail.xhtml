@@ -51,8 +51,8 @@
                     </p:selectOneMenu>
                     <p:selectOneMenu id="menuDateType" value="#{payBean.dateType}" style="width: 120px;">
                         <f:selectItem itemLabel="#{langsys['Select']}" itemValue=""/>
-                        <f:selectItem itemValue="#{langsys['Add']} #{langsys['Date']}" itemLabel="#{langsys['Add']} #{langsys['Date']}"/>
-                        <f:selectItem itemValue="#{langsys['Pay']} #{langsys['Date']}" itemLabel="#{langsys['Pay']} #{langsys['Date']}"/>
+                        <f:selectItem itemValue="Add Date" itemLabel="#{langsys['Add']} #{langsys['Date']}"/>
+                        <f:selectItem itemValue="Pay Date" itemLabel="#{langsys['Pay']} #{langsys['Date']}"/>
                         <f:ajax event="change" execute="@this" render="lblDate1 lblDate2"/>
                     </p:selectOneMenu>
                     <p:calendar id="calDate1"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{payBean.date1}" size="12"/>

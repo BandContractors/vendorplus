@@ -45,8 +45,8 @@
                     <p:outputLabel value="#{langsys['Date']} #{langsys['Type']}:"/>
                     <p:selectOneMenu id="menuDateType" value="#{transBean.dateType}" style="width: 200px;">
                         <f:selectItem itemLabel="" itemValue=""/>
-                        <f:selectItem itemValue="#{langsys['Add']} #{langsys['Date']}" itemLabel="#{langsys['Add']} #{langsys['Date']}"/>
-                        <f:selectItem itemValue="#{langsys['Opening']} #{langsys['Date']}" itemLabel="#{langsys['Opening']} #{langsys['Date']}"/>
+                        <f:selectItem itemValue="Add Date" itemLabel="#{langsys['Add']} #{langsys['Date']}"/>
+                        <f:selectItem itemValue="Opening Date" itemLabel="#{langsys['Opening']} #{langsys['Date']}"/>
                         <f:ajax event="change" execute="@this" render="lblDate1 lblDate2"/>
                     </p:selectOneMenu>
                     <p:outputLabel value="#{langsys['From']} #{transBean.dateType}:" id="lblDate1"/>
@@ -98,7 +98,7 @@
                 <h:panelGrid columns="2">
                     <h:outputLabel value="#{langsys['Entry']} #{langsys['Type']}:"/>
                     <p:selectOneMenu id="menuSEntryPoint" value="#{transBean.fieldName}" style="width: 220px;">
-                        <f:selectItem itemLabel="#{langsys['Manual']}" itemValue="#{langsys['Manual']}"/>
+                        <f:selectItem itemLabel="#{langsys['Manual']}" itemValue="Manual"/>
                     </p:selectOneMenu>
                     <p:outputLabel value="#{langsys['Reference']} #{langsys['No']}:"/>
                     <p:inputText id="itxtRefNo" value="#{trans.transactionRef}" style="width: 235px;"/>

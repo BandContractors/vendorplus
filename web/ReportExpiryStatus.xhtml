@@ -37,17 +37,17 @@
                     <p:outputLabel value="#{langsys['Stock']} #{langsys['Type']}:"/>
                     <h:selectOneMenu id="menuStockType" value="#{item.stock_type}" style="width: 200px;" >
                         <f:selectItem itemLabel="" itemValue=""/>
-                        <f:selectItem itemLabel="#{langsys['Merchandise']}" itemValue="#{langsys['Merchandise']}"/>
-                        <f:selectItem itemLabel="#{langsys['Finished']} #{langsys['Goods']}" itemValue="#{langsys['Finished']} #{langsys['Goods']}"/>
-                        <f:selectItem itemLabel="#{langsys['Raw Material']}" itemValue="#{langsys['Raw Material']}"/>
-                        <f:selectItem itemLabel="#{langsys['Consumption']}" itemValue="#{langsys['Consumption']}"/>
-                        <f:selectItem itemLabel="#{langsys['Services']}" itemValue="#{langsys['Services']}"/>
+                        <f:selectItem itemLabel="#{langsys['Merchandise']}" itemValue="Merchandise"/>
+                        <f:selectItem itemLabel="#{langsys['Finished']} #{langsys['Goods']}" itemValue="Finished Goods"/>
+                        <f:selectItem itemLabel="#{langsys['Raw Material']}" itemValue="Raw Material"/>
+                        <f:selectItem itemLabel="#{langsys['Consumption']}" itemValue="Consumption"/>
+                        <f:selectItem itemLabel="#{langsys['Services']}" itemValue="Services"/>
                     </h:selectOneMenu>
                     <p:outputLabel value="#{langsys['Item']} #{langsys['Type']}:"/>
                     <h:selectOneMenu id="menuItemType" value="#{item.itemType}" style="width: 200px;">
                         <f:selectItem itemLabel="" itemValue=""/>
-                        <f:selectItem itemLabel="#{langsys['PRODUCT']}" itemValue="#{langsys['PRODUCT']}"/>
-                        <f:selectItem itemLabel="#{langsys['SERVICE']}" itemValue="#{langsys['SERVICE']}"/>
+                        <f:selectItem itemLabel="#{langsys['PRODUCT']}" itemValue="PRODUCT"/>
+                        <f:selectItem itemLabel="#{langsys['SERVICE']}" itemValue="SERVICE"/>
                     </h:selectOneMenu>
 
                     <p:outputLabel value="#{langsys['Category']}:"/>
