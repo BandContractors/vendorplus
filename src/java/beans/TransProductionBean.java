@@ -737,7 +737,11 @@ public class TransProductionBean implements Serializable {
 
     public void addTransProductionItem(TransItem aTransItem, Item aItem, ItemProductionMap aItemProductionMap) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         if (null == aItemProductionMap || null == aItem) {
             msg = "Select Item to Add";
@@ -951,7 +955,11 @@ public class TransProductionBean implements Serializable {
 
     public void saveTransProductionCEC(int aStoreId, int aTransTypeId, int aTransReasonId, TransItem transItem, List<ItemProductionMap> aActiveTransItems, UserDetail aTransUserDetail, Trans trans, Item aProducedItem, Transactor aSelectedTransactor, List<TransProduction> aOrderProducedList) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         try {
             String ValidationMessage = this.validateTransProduction(aStoreId, aTransTypeId, aTransReasonId, transItem, aActiveTransItems, aTransUserDetail, trans, aOrderProducedList);
@@ -990,7 +998,11 @@ public class TransProductionBean implements Serializable {
 
     public void saveTransProduction(int aStoreId, int aTransTypeId, int aTransReasonId, TransItem transItem, List<ItemProductionMap> aTransProducts, Trans trans) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         String sql = null;
         long InsertedTransId = 0;
@@ -1226,7 +1238,11 @@ public class TransProductionBean implements Serializable {
 
     public void reportProductionDetail(TransProduction aTransProd, TransProductionBean aTransProdBean) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         if (aTransProdBean.getDateType().length() == 0) {
             aTransProdBean.setDateType("Add Date");

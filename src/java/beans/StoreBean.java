@@ -72,7 +72,11 @@ public class StoreBean implements Serializable {
 
     public void saveStore(Store store) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         String sql = null;
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
@@ -168,7 +172,11 @@ public class StoreBean implements Serializable {
 
     public void deleteStore(Store store) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         String sql = "DELETE FROM store WHERE store_id=?";
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();

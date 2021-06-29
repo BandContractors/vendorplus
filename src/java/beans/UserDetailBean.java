@@ -184,7 +184,11 @@ public class UserDetailBean implements Serializable {
 
     public void saveUserDetail(UserDetail userdetail) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         String sql = null;
         String sql2 = null;
@@ -443,7 +447,11 @@ public class UserDetailBean implements Serializable {
 
     public void deleteUserDetail(UserDetail userdetail) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
@@ -586,7 +594,11 @@ public class UserDetailBean implements Serializable {
 
     public void changePassword(UserDetail aUserDetail) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         UserDetail OldUD = new GeneralUserSetting().getCurrentUser();
         UserDetail NewUD = new UserDetail();
@@ -620,7 +632,11 @@ public class UserDetailBean implements Serializable {
 
     public void changeTransCode(UserDetail aUserDetail) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         try {
             if (aUserDetail.getNew_trans_code().length() > 0) {

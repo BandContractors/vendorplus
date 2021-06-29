@@ -61,7 +61,11 @@ public class ItemProductionMapBean implements Serializable {
 
     public void saveItemProductionMap(ItemProductionMap itemproductionmap) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         String sql = null;
         String sql2 = null;
@@ -103,7 +107,11 @@ public class ItemProductionMapBean implements Serializable {
 
     public void saveItemProductionMap(ItemProductionMap aItemProductionMap, List<ItemProductionMap> aInputItems, List<ItemProductionMap> aItems) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         msg = this.validateItemProductionMap(aItemProductionMap, aInputItems);
         if (msg.length() > 0) {
@@ -236,7 +244,11 @@ public class ItemProductionMapBean implements Serializable {
 
     public void addItem(ItemProductionMap aItemProductionMap, List<ItemProductionMap> aItemProductionMapList, Item aInputItem) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         try {
             if (null == aItemProductionMap) {
@@ -447,7 +459,11 @@ public class ItemProductionMapBean implements Serializable {
 
     public void deleteItemProductionMap(ItemProductionMap aItemProdForDel, ItemProductionMap aOutput, List<ItemProductionMap> aList) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();

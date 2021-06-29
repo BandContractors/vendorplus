@@ -1511,7 +1511,11 @@ public class NavigationBean implements Serializable {
 
     public void checkAccessDenied(String aFunctionName, String aRole) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String RealFunctionName = "";
         RealFunctionName = aFunctionName;
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
@@ -1601,7 +1605,11 @@ public class NavigationBean implements Serializable {
 
     public void checkLicenseExpired() {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         if (CompanySetting.getLicenseDaysLeft() <= 0 && CompanySetting.getLicenseType() != 9) {
             this.setNavMsg(ub.translateWordsInText(BaseName, "License Expired") + ", " + ub.translateWordsInText(BaseName, "Contact System Vendor"));
             FacesContext.getCurrentInstance().addMessage("License", new FacesMessage(getNavMsg()));
@@ -1615,7 +1623,11 @@ public class NavigationBean implements Serializable {
 
     public void checkCurrentPage(String aTransactionType, String aTransactorType, String aSaleType) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         int LogOut = 0;
         if (!aTransactionType.equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
             //in the wrong place

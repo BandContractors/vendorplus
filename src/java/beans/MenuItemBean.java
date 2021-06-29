@@ -94,7 +94,7 @@ public class MenuItemBean implements Serializable {
             }
             try {
                 this.MenuItemObj.setLOC_LEVEL_2_LABEL("District");
-                this.MenuItemObj.setLOC_LEVEL_3_LABEL("Town/Village");
+                this.MenuItemObj.setLOC_LEVEL_3_LABEL("Town");
                 String ParaValue = pb.getParameter_listByContextNameMemory("LOCATION", "LEVEL_2_3_LABEL").getParameter_value();
                 if (ParaValue.length() > 0) {
                     String[] Levs = ParaValue.split(",");

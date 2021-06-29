@@ -203,7 +203,11 @@ public class AccPeriodBean implements Serializable {
 
     public void saveAccPeriod2(AccPeriod aAccPeriod) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
@@ -307,7 +311,11 @@ public class AccPeriodBean implements Serializable {
 
     public void closeAccPeriod(AccPeriod aAccPeriod) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         int x = 0;
         String sql = "{call sp_close_account_period(?)}";
@@ -346,7 +354,11 @@ public class AccPeriodBean implements Serializable {
 
     public void reOpenAccPeriod(AccPeriod aAccPeriod) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         int x = 0;
         String sql = "{call sp_reopen_account_period(?)}";
@@ -385,7 +397,11 @@ public class AccPeriodBean implements Serializable {
 
     public void openAccPeriod(AccPeriod aAccPeriodToOpen) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         String sql = "";
         int x = 0;
@@ -785,7 +801,11 @@ public class AccPeriodBean implements Serializable {
 
     public void deleteAccPeriod(AccPeriod aAccPeriod) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();

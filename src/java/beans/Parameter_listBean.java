@@ -79,7 +79,11 @@ public class Parameter_listBean implements Serializable {
 
     public long saveParameter_list(Parameter_list aParameter_list) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String sql = null;
         long status = 0;
         if (aParameter_list.getParameter_list_id() == 0) {
@@ -327,7 +331,11 @@ public class Parameter_listBean implements Serializable {
 
     public String encryptParameterValue(String aParameterValue) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String encryptedValue = "";
         try {
             if (aParameterValue.length() == 0) {

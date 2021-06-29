@@ -122,7 +122,11 @@ public class TransactionTypeBean implements Serializable {
 
     public void updateTransactionTypes(List<TransactionType> aTransactionTypes) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         String sql = null;
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
@@ -437,7 +441,11 @@ public class TransactionTypeBean implements Serializable {
 
     public void updateTransactionType(TransactionType tt) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         String sql = null;
         this.setActionMessage("");
@@ -549,7 +557,11 @@ public class TransactionTypeBean implements Serializable {
 
     public void deleteTransactionTypeById(int TtId) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         String sql = "DELETE FROM transaction_type WHERE transaction_type_id=?";
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();

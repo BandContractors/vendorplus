@@ -42,7 +42,11 @@ public class GroupDetailBean implements Serializable {
 
     public void saveGroupDetail(GroupDetail groupdetail) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         String sql = null;
         String sql2 = null;
@@ -145,7 +149,11 @@ public class GroupDetailBean implements Serializable {
 
     public void deleteGroupDetail(GroupDetail groupdetail) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         String sql = "DELETE FROM group_detail WHERE group_detail_id=?";
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();

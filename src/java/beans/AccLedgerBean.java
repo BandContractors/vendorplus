@@ -2125,7 +2125,11 @@ public class AccLedgerBean implements Serializable {
 
     public void reportAccLedgerOpenBal(int aAccPeriodId) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         this.OpenBalanceHeader = "";
         String sql = "SELECT * FROM view_ledger_open_bal al WHERE al.acc_period_id=" + aAccPeriodId + " ORDER BY  al.account_code ASC";

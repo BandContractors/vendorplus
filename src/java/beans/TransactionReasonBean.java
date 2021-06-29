@@ -45,7 +45,11 @@ public class TransactionReasonBean implements Serializable {
 
     public void saveTransactionReason(TransactionReason tr) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         String sql = null;
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
@@ -145,7 +149,11 @@ public class TransactionReasonBean implements Serializable {
 
     public void deleteTransactionReasonById(int TraReasId) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         String sql = "DELETE FROM transaction_reason WHERE transaction_reason_id=?";
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();

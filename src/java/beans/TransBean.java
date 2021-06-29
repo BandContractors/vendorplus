@@ -451,7 +451,11 @@ public class TransBean implements Serializable {
 
     public void RetrieveAndUpdateTransAndItems(int aTransTypeId, int aRetrieveTransTypeId, int aRetrieveTransReasId, Trans aTrans, List<TransItem> aTransItems) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         int CurrStoreId = 0;
         int CurrTransTypeId = 0;
         String CurCode1 = "";
@@ -535,7 +539,11 @@ public class TransBean implements Serializable {
 
     public void RetrieveAndUpdateTransAndItemsGDN(int aTransTypeId, int aRetrieveTransTypeId, int aRetrieveTransTypeId2, Trans aTrans, List<TransItem> aTransItems) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         int CurrStoreId = 0;
         int CurrTransTypeId = 0;
         String CurCode1 = "";
@@ -599,7 +607,11 @@ public class TransBean implements Serializable {
 
     public void loadTransForGDN(int aTransTypeIdChoice, Trans aTrans, List<TransItem> aTransItems) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         int CurrStoreId = 0;
         int RetrieveTransTypeId = 0;
         if (aTransTypeIdChoice == 0) {
@@ -1125,7 +1137,11 @@ public class TransBean implements Serializable {
 
     public void saveTransCallQuickOrder(String aAction, String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa, StatusBean aStatusBean) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         //reset messages
         this.ActionMessage = "";
         aStatusBean.setItemAddedStatus("");
@@ -1545,7 +1561,11 @@ public class TransBean implements Serializable {
 
     public void saveTransCEC(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         //Date dt1 = null, dt2 = null;
         //long tms = 0;
         //long ms = 0;
@@ -2019,7 +2039,11 @@ public class TransBean implements Serializable {
 
     public void saveTransCECNew(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         int InsertedTransItems = 0;
         double CheckValueBfr = 0;
@@ -2562,7 +2586,11 @@ public class TransBean implements Serializable {
 
     public long saveTransCECE(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         long SavedTransId = 0;
         TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
@@ -4767,7 +4795,11 @@ public class TransBean implements Serializable {
 
     public void loadDraftTrans(Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         String sql = null;
         long TransHistId = 0;
@@ -4882,7 +4914,11 @@ public class TransBean implements Serializable {
 
     public void loadOrderForInvoiceTrans(Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         String sql = null;
         long OrderId = 0;
@@ -8679,7 +8715,11 @@ public class TransBean implements Serializable {
 
     public void refreshReportCustomerCard(Trans aTrans) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String sql;
         sql = "{call sp_report_customer_card(?,?,?,?)}";
         ResultSet rs = null;
@@ -8785,7 +8825,11 @@ public class TransBean implements Serializable {
 
     public void refreshReportSupplierCard(Trans aTrans) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String sql;
         sql = "{call sp_report_supplier_card(?,?,?,?)}";
         ResultSet rs = null;
@@ -11036,7 +11080,11 @@ public class TransBean implements Serializable {
 
     public void reportSalesInvoiceDetail(Trans aTrans, TransBean aTransBean) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         aTransBean.setActionMessage("");
         try {
@@ -11295,7 +11343,11 @@ public class TransBean implements Serializable {
 
     public void reportSalesTaxAPI(Trans aTrans, TransBean aTransBean) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         aTransBean.setActionMessage("");
         try {
@@ -13940,7 +13992,11 @@ public class TransBean implements Serializable {
 
     public void reportTransItemDetail(Trans aTrans, TransBean aTransBean, Item aItem, Transactor aTransactor, int aCategoryId) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         aTransBean.setActionMessage("");
         try {
@@ -15227,7 +15283,11 @@ public class TransBean implements Serializable {
 
     public void quickOrderActions(Trans aTrans, List<Trans> aActiveTranss, String aAction) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         List<Trans> at = aActiveTranss;
         int ListItemIndex = 0;
         int ListItemNo = at.size();

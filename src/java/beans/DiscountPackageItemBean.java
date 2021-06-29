@@ -170,7 +170,11 @@ public class DiscountPackageItemBean implements Serializable {
 
     public void saveDiscountPackageItem(DiscountPackageItem aDiscountPackageItem, DiscountPackage aDiscountPackage) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         String sql = null;
         //update lookups
@@ -330,7 +334,11 @@ public class DiscountPackageItemBean implements Serializable {
 
     public void deleteDiscountPackageItem(DiscountPackageItem discountPackageItem) {
         UtilityBean ub = new UtilityBean();
-        String BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String msg = "";
         if (null == discountPackageItem || discountPackageItem.getDiscountPackageItemId() == 0) {
             //
