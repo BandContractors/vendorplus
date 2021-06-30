@@ -27,8 +27,9 @@
     <h:body>
         <ui:include src="Menu.xhtml"/>
         <h:form id="form">
-            <h:panelGrid styleClass="clsPanelReportFilterTitle" columns="1">
+            <h:panelGrid styleClass="clsPanelReportFilterTitle" columns="2">
                 <h:outputLabel styleClass="clsLabelTop" id="olblContact_listHeader" value="#{langsys['MORE']} #{langsys['COMPANY']} #{langsys['SETTINGS']} "/>
+                <h:outputLabel styleClass="clsLabelTop" style="background-color: #000000;font-weight: bold;" value="#{langsys['All']} #{langsys['Text']} #{langsys['Must']} #{langsys['be']} #{langsys['Entered']} #{langsys['in']} #{langsys['English']} "/>
             </h:panelGrid>
             <h:panelGrid columns="2">
                 <h:outputLabel  value="#{langsys['Context']}"/>

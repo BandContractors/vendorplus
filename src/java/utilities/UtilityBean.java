@@ -736,7 +736,6 @@ public class UtilityBean implements Serializable {
 //        System.out.println(ar.length + ar[0]);
 //        System.out.println(ar[1]);
 //    }
-    
     public List<ThreadClass> getRunningThreads() {
         List<ThreadClass> objs = new ArrayList<>();
         Set<Thread> threads = Thread.getAllStackTraces().keySet();
@@ -1059,33 +1058,38 @@ public class UtilityBean implements Serializable {
 
     public String translateWordsInText(String aToLanguageBaseName, String aFromText) {
         String ToText = "";
-        ResourceBundle properties = ResourceBundle.getBundle(aToLanguageBaseName);//language_zh_CN,language_en
-        String[] PartArray = aFromText.split("##");
-        String Part1 = PartArray[0];
-        String Part2 = "";
-        if (PartArray.length > 1) {
-            Part2 = PartArray[1];
-        }
-        String[] exampleArray = Part1.split(" ");
-        String WordBefore = "";
-        String WordAfter = "";
-        for (int i = 0; i < exampleArray.length; i++) {
-            WordBefore = exampleArray[i].replaceAll("[^a-zA-Z0-9 ]", "").trim();
-            if (WordBefore.length() > 1) {
-                if (WordBefore.matches(".*\\d.*")) {//str.matches(".*\\d.*")
-                    WordAfter = WordBefore;
-                } else {
-                    try {
-                        WordAfter = properties.getString(WordBefore);
-                    } catch (Exception e) {
-                        WordAfter = "?" + WordBefore + "?";
-                    }
-                }
-                ToText = ToText + " " + WordAfter;
+        try {
+            ResourceBundle properties = ResourceBundle.getBundle(aToLanguageBaseName);//language_zh_CN,language_en
+            String[] PartArray = aFromText.split("##");
+            String Part1 = PartArray[0];
+            String Part2 = "";
+            if (PartArray.length > 1) {
+                Part2 = PartArray[1];
             }
-        }
-        if (Part2.length() > 0) {
-            ToText = ToText + " " + Part2;
+            String[] exampleArray = Part1.split(" ");
+            String WordBefore = "";
+            String WordAfter = "";
+            for (int i = 0; i < exampleArray.length; i++) {
+                WordBefore = exampleArray[i].replaceAll("[^a-zA-Z0-9 ]", "").trim();
+                if (WordBefore.length() > 1) {
+                    if (WordBefore.matches(".*\\d.*")) {//str.matches(".*\\d.*")
+                        WordAfter = WordBefore;
+                    } else {
+                        try {
+                            WordAfter = properties.getString(WordBefore);
+                        } catch (Exception e) {
+                            WordAfter = "?" + WordBefore + "?";
+                        }
+                    }
+                    ToText = ToText + " " + WordAfter;
+                }
+            }
+            if (Part2.length() > 0) {
+                ToText = ToText + " " + Part2;
+            }
+        } catch (Exception e) {
+            ToText = aFromText;
+            LOGGER.log(Level.ERROR, e);
         }
         return ToText;
     }

@@ -7615,7 +7615,7 @@ public class TransItemBean implements Serializable {
             } else {
                 if (NewTransItem.getItemQty() <= 0 || NewTransItem.getUnitPrice() <= 0 || NewTransItem.getUnitVat() < 0 || NewTransItem.getUnitTradeDiscount() < 0) {
                     aStatusBean.setItemAddedStatus("");
-                    aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Enter Valid Item Quantity or Unit Price or Unit VAT or Unit Trade Discount"));
+                    aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Enter Valid Item Quantity or Unit Price or Unit VAT or Unit Discount"));
                     aStatusBean.setShowItemAddedStatus(0);
                     aStatusBean.setShowItemNotAddedStatus(1);
                 } else if (NewTransItem.getItemId() == 0) {

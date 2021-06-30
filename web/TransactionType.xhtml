@@ -30,8 +30,9 @@
         <ui:include src="Menu.xhtml"/>
         <h:form id="formx" styleClass="clsMainFrom">
 
-            <h:panelGrid styleClass="clsGridMainHeader" columns="1">
+            <h:panelGrid styleClass="clsGridMainHeader" columns="2">
                 <h:outputLabel styleClass="clsLabelTop" id="olblTransactionHeader" value="#{langsys['Transaction']} #{langsys['Type']} #{langsys['Settings']}"/>
+                <h:outputLabel styleClass="clsLabelTop" style="background-color: #000000;font-weight: bold;" value="#{langsys['All']} #{langsys['Text']} #{langsys['Must']} #{langsys['be']} #{langsys['Entered']} #{langsys['in']} #{langsys['English']}"/>
             </h:panelGrid>
 
             <h:panelGrid id="pgrdTransactionTypeOptions" columns="2" styleClass="clsLikeMainFromWidth" style="background-color: red;text-align: center;">
@@ -52,9 +53,9 @@
             </h:panelGrid>
 
             <h:panelGrid id="pnlgTransactionType" columns="4">
-                <h:outputLabel value="#{langsys['Transaction']} #{langsys['Type']} #{langsys['Id']}:"/>
+                <h:outputLabel value="#{langsys['Transaction']} #{langsys['Type']} #{langsys['Id']}"/>
                 <h:inputText value="#{transactionTypeBean.transactionTypeForEdit.transactionTypeId}" disabled="true"/>
-                <h:outputLabel value="#{langsys['Transaction']} #{langsys['Name']}:"/>
+                <h:outputLabel value="#{langsys['Transaction']} #{langsys['Name']}"/>
                 <h:inputText value="#{transactionTypeBean.transactionTypeForEdit.transactionTypeName}" disabled="true"/>
 
                 <h:outputLabel value="#{langsys['Description']}"/>

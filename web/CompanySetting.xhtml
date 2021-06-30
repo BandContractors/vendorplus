@@ -25,8 +25,9 @@
         <ui:include src="Menu.xhtml"/>
         <h:form id="form" styleClass="clsMainFrom" enctype="multipart/form-data">
 
-            <h:panelGrid styleClass="clsGridMainHeader" columns="1">
+            <h:panelGrid styleClass="clsGridMainHeader" columns="2">
                 <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeader" value="#{companySetting.getLICENSE_CLIENT_NAME()} / #{companySetting.getBranchCode()}"/>
+                <h:outputLabel styleClass="clsLabelTop" style="background-color: #000000;font-weight: bold;" value="#{langsys['All']} #{langsys['Text']} #{langsys['Must']} #{langsys['be']} #{langsys['Entered']} #{langsys['in']} #{langsys['English']} "/>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainInput" columns="4">
