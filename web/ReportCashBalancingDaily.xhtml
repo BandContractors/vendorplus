@@ -88,7 +88,7 @@
 
                 <p:dataTable id="tblList" tableStyle="width:auto;" var="itmList" value="#{cash_balancing_dailyBean.cash_balancing_dailyList}"> 
                     <f:facet name="header">
-                        Detailed report - Cash balancing report for the days within the selected period
+                        #{langsys['Detailed']} #{langsys['report']} - #{langsys['Cash']} #{langsys['balancing']} #{langsys['report']} #{langsys['for']} #{langsys['the']} #{langsys['days']} #{langsys['within']} #{langsys['the']} #{langsys['selected']} #{langsys['period']}
                     </f:facet>
                     <p:column headerText="#{langsys['Day']}" style="font-size: 13px;text-align: left;">
                         <h:outputText value="#{utilityBean.formatDate(itmList.balancing_date)} "/>

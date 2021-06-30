@@ -92,7 +92,7 @@
                 <h:column>
                     <!-- column header -->
                     <f:facet name="header">
-                        ADD
+                        #{langsys['ADD']}
                         <h:selectBooleanCheckbox value="#{groupRightBean.allAdd}">
                             <f:ajax listener="#{groupRightBean.allowAll('Add', groupRightBean.allAdd)}" render="dtblGroupRightEdit"/>
                         </h:selectBooleanCheckbox>
@@ -107,7 +107,7 @@
                 <h:column>
                     <!-- column header -->
                     <f:facet name="header">
-                        EDIT
+                        #{langsys['EDIT']}
                         <h:selectBooleanCheckbox value="#{groupRightBean.allEdit}">
                             <f:ajax listener="#{groupRightBean.allowAll('Edit', groupRightBean.allEdit)}" render="dtblGroupRightEdit"/>
                         </h:selectBooleanCheckbox>
@@ -122,7 +122,7 @@
                 <h:column>
                     <!-- column header -->
                     <f:facet name="header">
-                        DELETE
+                        #{langsys['DELETE']}
                         <h:selectBooleanCheckbox value="#{groupRightBean.allDelete}">
                             <f:ajax listener="#{groupRightBean.allowAll('Delete', groupRightBean.allDelete)}" render="dtblGroupRightEdit"/>
                         </h:selectBooleanCheckbox>

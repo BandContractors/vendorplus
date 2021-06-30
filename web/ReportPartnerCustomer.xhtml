@@ -68,7 +68,7 @@
                         <p:dataExporter type="xml" target="tblDetail" fileName="#{langsys['Customer']}_#{langsys['List']}" />
                     </h:commandLink>
                 </f:facet>
-                <p:column headerText="Id" style="text-align: left;">
+                <p:column headerText="#{langsys['Id']}" style="text-align: left;">
                     <h:outputText value="#{rts.transactorId}">
                     </h:outputText>
                 </p:column>
@@ -100,11 +100,11 @@
                     <h:outputText value="#{rts.taxIdentity}">
                     </h:outputText>
                 </p:column>
-                <p:column headerText="ID #{langsys['Type']}" style="text-align: left;">
+                <p:column headerText="#{langsys['ID']} #{langsys['Type']}" style="text-align: left;">
                     <h:outputText value="#{rts.idType}">
                     </h:outputText>
                 </p:column>
-                <p:column headerText="ID #{langsys['Number']}" style="text-align: left;">
+                <p:column headerText="#{langsys['ID']} #{langsys['Number']}" style="text-align: left;">
                     <h:outputText value="#{rts.idNumber}">
                     </h:outputText>
                 </p:column>

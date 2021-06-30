@@ -99,7 +99,7 @@
                         <p:ajax event="itemSelect" listener="#{trans.setBillTransactorId(transactorBean.selectedBillTransactor.transactorId)}"/>
                         <p:ajax event="change" listener="#{trans.setBillTransactorId(transactorBean.selectedBillTransactor.transactorId)}" rendered="#{transactorBean.selectedBillTransactor!=null} "/>
                     </p:autoComplete>
-                    <p:outputLabel value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}:"/> 
+                    <p:outputLabel value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}:"/> 
                     <p:autoComplete id="autcTransactor" value="#{transactorBean.selectedTransactor}" 
                                     completeMethod="#{transactorBean.getTransactorObjectList}" 
                                     var="trct" 
