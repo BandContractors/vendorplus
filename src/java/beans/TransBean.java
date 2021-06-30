@@ -795,11 +795,11 @@ public class TransBean implements Serializable {
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && trans.getPayMethod() == 0 && trans.getTransactionId() == 0) {
                 msg = "Select Payment Method";
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && "No".equals(CompanySetting.getIsAllowDebt()) && (trans.getAmountTendered() + trans.getSpendPointsAmount()) < trans.getGrandTotal()) {
-                msg = "Amount tendered is Less Than Grand Total";
+                msg = "Amount tendered is Less Than Total";
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && trans.getSpendPointsAmount() > trans.getBalancePointsAmount()) {
                 msg = "Amount entered for spending points exceeds the available points balance";
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && "Yes".equals(CompanySetting.getIsAllowDebt()) && (trans.getAmountTendered() + trans.getSpendPointsAmount()) < trans.getGrandTotal() && trans.getTransactorId() == 0) {
-                msg = "Amount Tendered is Less Than Grand Total. Select Customer";
+                msg = "Amount Tendered is Less Than Total. Select Customer";
             } else if (("TRANSFER".equals(transtype.getTransactionTypeName()) || "TRANSFER REQUEST".equals(transtype.getTransactionTypeName())) && trans.getStore2Id() == 0) {
                 msg = "Select the " + CompanySetting.getStoreEquivName() + " for Item Transfer";
             } else if (("TRANSFER".equals(transtype.getTransactionTypeName()) || "TRANSFER REQUEST".equals(transtype.getTransactionTypeName())) && store.getStoreId() == trans.getStore2Id()) {
@@ -871,9 +871,9 @@ public class TransBean implements Serializable {
             } else if (trans.getTransactionId() == 0 && !new AccLedgerBean().checkerBalancePass(trans.getPayMethod(), trans.getAccChildAccountId(), trans.getCurrencyCode(), trans.getAmountTendered(), transtype.getTransactionTypeId(), transreason.getTransactionReasonId(), 0, 0)) {
                 msg = "Paying Account is out of Funds";
             } else if ("PURCHASE INVOICE".equals(transtype.getTransactionTypeName()) && trans.getAmountTendered() > trans.getGrandTotal()) {
-                msg = "Paid Amount cannot Exceed Grand Total";
+                msg = "Paid Amount cannot Exceed Total";
             } else if (trans.getTransactionId() > 0 && (trans.getAmountTendered() + trans.getSpendPointsAmount()) > trans.getGrandTotal()) {
-                msg = "Paid Amount cannot Exceed New Grand Total";
+                msg = "Paid Amount cannot Exceed New Total";
             } else if (trans.getTransactionId() > 0 && new TransItemBean().getAnyItemMixAddSubtractQty(new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans), transtype.getTransactionTypeName()) == 1) {
                 msg = "You Cannot Add or Debit and Subtract or Credit different items in the same Update";
             }
@@ -9968,7 +9968,7 @@ public class TransBean implements Serializable {
         //--aTrans.setTotalVat() is already set from the interface
         //re-calculate the others
         aTrans.setTotalTradeDiscount(this.getTotalTradeDiscountCEC(aTrans, aActiveTransItems));
-        //Manually calculate Grand Total
+        //Manually calculate Total
         double GTotal = 0;
         GTotal = (aTrans.getSubTotal() + aTrans.getTotalVat()) - (aTrans.getTotalTradeDiscount() + aTrans.getCashDiscount());
         GTotal = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), GTotal);
