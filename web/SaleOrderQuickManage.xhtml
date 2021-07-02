@@ -63,7 +63,7 @@
                     </h:commandButton>
                 </h:panelGrid>
                 <h:panelGrid id="pnlTodayYesturday" columns="2" style="border-bottom-style: solid;border-bottom: 1;border-bottom-color: white;">
-                    <h:commandButton style="border-radius: 5px;border: none;width: 90px;height:45px;font-size: 16px;background-color:#{transBean.setBgColorIfEqual('1',transBean.todayoryest,0)};" value="#{langsys['ToDay']}">
+                    <h:commandButton style="border-radius: 5px;border: none;width: 90px;height:45px;font-size: 16px;background-color:#{transBean.setBgColorIfEqual('1',transBean.todayoryest,0)};" value="#{langsys['Today']}">
                         <f:ajax listener="#{transBean.updateTodayYesturday(1)}" execute="@this" render="pnlTodayYesturday"/>
                     </h:commandButton>
                     <h:commandButton style="border-radius: 5px;border: none;width: 90px;height:45px;font-size: 16px;background-color:#{transBean.setBgColorIfEqual('2',transBean.todayoryest,0)};" value="#{langsys['Yesterday']}">
@@ -106,7 +106,7 @@
                             #{langsys['Order']}
                         </f:facet>
                         <!-- row record -->
-                        <p:commandLink value="#{langsys[t.delivery_mode]} #{langsys[t.transactionNumber]}" actionListener="#{transBean.viewOrderOutput(t)}" style="color: white;text-decoration:#{t.is_cancel eq 1 ? 'line-through':'none'};" process="@form" update="@form"/>
+                        <p:commandLink value="#{langsys[t.delivery_mode]} #{t.transactionNumber}" actionListener="#{transBean.viewOrderOutput(t)}" style="color: white;text-decoration:#{t.is_cancel eq 1 ? 'line-through':'none'};" process="@form" update="@form"/>
                     </p:column>
                     <p:column>
                         <!-- column header -->

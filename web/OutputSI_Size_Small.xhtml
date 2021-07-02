@@ -87,7 +87,7 @@
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transactor.transactorNames}"/>
                             <h:outputLabel style="font-size: 12px;" value="#{langout['Tax']} #{langout['Id']} #{langout['No.']}:" rendered="#{generalUserSetting.outputDetailParent.transactor.taxIdentity.length()>0}"/>
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transactor.taxIdentity}" rendered="#{generalUserSetting.outputDetailParent.transactor.taxIdentity.length()>0}"/>
-                            <h:outputLabel style="font-size: 12px;" value="#{langout['Phone:']}" rendered="#{generalUserSetting.outputDetailParent.transactor.phone.length()>0}"/>
+                            <h:outputLabel style="font-size: 12px;" value="#{langout['Phone']}:" rendered="#{generalUserSetting.outputDetailParent.transactor.phone.length()>0}"/>
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transactor.phone}" rendered="#{generalUserSetting.outputDetailParent.transactor.phone.length()>0}"/>
                             <h:outputLabel style="font-size: 12px;" value="#{langout['Address']}:" rendered="#{generalUserSetting.outputDetailParent.trans.deliveryAddress.length()>0}"/>
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.trans.deliveryAddress}" rendered="#{generalUserSetting.outputDetailParent.trans.deliveryAddress.length()>0}"/>
@@ -135,7 +135,7 @@
                             <h:outputLabel style="font-size: 16px;" id="IolblSalesInvoiceSubTotal" value="#{generalUserSetting.outputDetailParent.trans.subTotal}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
-                            <h:outputLabel style="font-size: 16px;" value="#{langout['Item']} #{langout['Discount']}:" rendered="#{generalUserSetting.outputDetailParent.trans.totalTradeDiscount>0}"/>
+                            <h:outputLabel style="font-size: 16px;" value="#{langout['Discount']}:" rendered="#{generalUserSetting.outputDetailParent.trans.totalTradeDiscount>0}"/>
                             <h:outputLabel style="font-size: 16px;" id="IolblSalesInvoiceTotalTradeDiscount" value="#{generalUserSetting.outputDetailParent.trans.totalTradeDiscount}" rendered="#{generalUserSetting.outputDetailParent.trans.totalTradeDiscount>0}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>

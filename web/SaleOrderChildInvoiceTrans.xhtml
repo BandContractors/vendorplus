@@ -6,6 +6,7 @@
       xmlns:p="http://primefaces.org/ui"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <f:loadBundle basename="#{menuItemBean.menuItemObj.LANG_BASE_NAME_SYS}" var="langsys" />
     <p:panel id="pnlChild">
         <h:panelGrid columns="2">
             <h:panelGrid columns="1">
@@ -52,7 +53,7 @@
                         <h:selectOneMenu id="menuAccountChild" value="#{transBean.transChild.accChildAccountId}">
                             <f:selectItems value="#{accChildAccountBean.getAccChildAccountsForCashReceipt(transBean.transChild.currencyCode, transBean.transChild.payMethod,generalUserSetting.getCurrentStore().storeId,generalUserSetting.getCurrentUser().userDetailId)}" var="ca" itemLabel="#{ca.childAccountCode} (#{ca.childAccountName})" itemValue="#{ca.accChildAccountId}"/>
                         </h:selectOneMenu>
-                        <h:selectBooleanCheckbox label="" value="#{langsys[transBean.transChild.displayLoyalty]}">
+                        <h:selectBooleanCheckbox label="" value="#{transBean.transChild.displayLoyalty}">
                             <f:ajax render="pgrdLoyaltyChild"/>
                         </h:selectBooleanCheckbox>
                     </h:panelGrid>
@@ -85,7 +86,7 @@
                     </h:panelGrid>
                 </h:panelGrid>
                 <h:panelGrid id="pnlgButtonsChild" columns="3">
-                    <p:commandButton icon="fa fa-fw fa-save" title="#{langsys['Save']} #{langsys['Invoice']}" value="SAVE" style="width: 120px;height: 55px;float: left;" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" actionListener="#{transBean.saveTransCallOrderInvoice('PARENT',transBean.transChild.storeId,2,2,'',transBean.transChild,transBean.activeTransItemsChild,null,null,null,null,null,null)}" process="@form" update="pnlgHeaderChild pgrdPaymentChild pnlItemsChild pgrdMsgsChild gwowl1Child pnlgOutputChild">
+                    <p:commandButton icon="fa fa-fw fa-save" title="#{langsys['Save']} #{langsys['Invoice']}" value="#{langsys['SAVE']}" style="width: 120px;height: 55px;float: left;" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" actionListener="#{transBean.saveTransCallOrderInvoice('PARENT',transBean.transChild.storeId,2,2,'',transBean.transChild,transBean.activeTransItemsChild,null,null,null,null,null,null)}" process="@form" update="pnlgHeaderChild pgrdPaymentChild pnlItemsChild pgrdMsgsChild gwowl1Child pnlgOutputChild">
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>

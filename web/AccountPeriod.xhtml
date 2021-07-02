@@ -165,7 +165,7 @@
                         <f:ajax listener="#{accPeriodBean.closeAccPeriod(itm)}" execute="@form" render="frmMain:pnlgInput frmMain:pnlgAddNew frmMain:pgrdMsgs frmMain:growl1 frmMain:dtblAccountPeriod"/>
                     </h:commandLink>
                     <h:outputText value="&nbsp;&nbsp;" rendered="#{itm.isClosed==1}"/>
-                    <h:commandLink value="#{langsys['ReOpen']}" rendered="#{itm.isClosed==1}">
+                    <h:commandLink value="#{langsys['Reopen']}" rendered="#{itm.isClosed==1}">
                         <f:ajax listener="#{accPeriodBean.reOpenAccPeriod(itm)}" execute="@form" render="frmMain:pnlgInput frmMain:pnlgAddNew frmMain:pgrdMsgs frmMain:growl1 frmMain:dtblAccountPeriod"/>
                     </h:commandLink>
                     <h:outputText value="&nbsp;&nbsp;"/>

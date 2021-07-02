@@ -61,7 +61,7 @@
                     <p:autoComplete id="autcTransactor" value="#{transactorBean.selectedTransactor}" 
                                     completeMethod="#{transactorBean.getTransactorActiveObjectList}" 
                                     var="trct" 
-                                    itemLabel="#{langsys[trct.transactorNames]}" 
+                                    itemLabel="#{trct.transactorNames}" 
                                     itemValue="#{trct}" 
                                     converter="TransactorConverter" style="text-align: left" 
                                     forceSelection="true" queryDelay="0" 
