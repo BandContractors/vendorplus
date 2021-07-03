@@ -86,14 +86,14 @@
                     <h:panelGrid rendered="#{60 gt login.LICENSE_DAYS_LEFT and login.LICENSE_TYPE ne 9 and login.LICENSE_TYPE ne 0}">
                         <p:spacer/>
                         <p:spacer/>
-                        <p:outputLabel value="#{langsys['License']} #{langsys['Expiry']} #{langsys['Notice']}!" style="color: red;font-size: 20px;font-weight: bold;"/>
+                        <p:outputLabel value="License Expiry Notice!" style="color: red;font-size: 20px;font-weight: bold;"/>
                         <c:if test="#{0>=login.LICENSE_DAYS_LEFT}">
-                            <p:outputLabel value="#{langsys['Your']} #{langsys['license']} #{langsys['has']} #{langsys['expired']}!" style="font-weight: bold;"/>
+                            <p:outputLabel value="Your license has expired!" style="font-weight: bold;"/>
                         </c:if>
                         <c:if test="#{login.LICENSE_DAYS_LEFT>0}">
-                            <p:outputLabel value="#{langsys['Your']} #{langsys['license']} #{langsys['is']} #{langsys['left']} #{langsys['with']} #{login.LICENSE_DAYS_LEFT} #{langsys['day']}(s) #{langsys['to']} #{langsys['expire']}!" style="font-weight: bold;"/>
+                            <p:outputLabel value="Your license is left with #{login.LICENSE_DAYS_LEFT} day(s) to expire!" style="font-weight: bold;"/>
                         </c:if>
-                        <p:outputLabel value="#{langsys['Kindly']} #{langsys['contact']} WINGERsoft #{langsys['to']} #{langsys['avoid']} #{langsys['service']} #{langsys['disruption']}!"/>
+                        <p:outputLabel value="Kindly contact WINGERsoft to avoid service disruption!"/>
                     </h:panelGrid>
                 </h:panelGrid>
             </h:panelGrid>
