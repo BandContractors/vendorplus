@@ -49,12 +49,12 @@
                 <h:outputLabel  value=""/>
             </h:panelGrid>  
             <h:panelGrid styleClass="clsPanelReportFilterTitle" columns="1">
-                    <p:commandButton styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['UPDATE']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
-                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
-                            <p:graphicImage name="/images/ajax-loader.gif"/>
-                        </p:dialog>
-                        <p:ajax listener="#{parameter_listBean.saveParameter_list(parameter_list)}" process="@form" update="@form" />
-                    </p:commandButton>
+                <p:commandButton styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['UPDATE']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{parameter_listBean.saveParameter_list(parameter_list)}" process="@form" update="@form" />
+                </p:commandButton>
             </h:panelGrid>
             <h:panelGrid styleClass="clsGridMainMessages" columns="1">
                 <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{contact_listBean.actionMessage}"/>
