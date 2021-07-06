@@ -26,33 +26,33 @@
         <h:form id="form" styleClass="clsMainFrom">
 
             <h:panelGrid styleClass="clsGridMainHeader" columns="1">
-                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeader" value="My Account Details"/>
+                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeader" value="#{langsys['My']} #{langsys['Account']} #{langsys['Details']}"/>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainInput" columns="2">
-                <h:outputLabel  value="Username:"/>
+                <h:outputLabel  value="#{langsys['Username']}:"/>
                 <h:inputText styleClass="clsInput" id="itxtUserName" value="#{generalUserSetting.getCurrentUser().userName}" disabled="true">
                 </h:inputText>
 
-                <h:outputLabel  value="User Account Names:"/>
+                <h:outputLabel  value="#{langsys['User']} #{langsys['Account']} #{langsys['Names']}:"/>
                 <h:inputText styleClass="clsInput" id="itxtNames" value="#{generalUserSetting.getCurrentUserNames()}" disabled="true">
                 </h:inputText>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainInput" columns="2" style="background-color: bisque">
-                <h:outputLabel  value="Old Password:"/>
+                <h:outputLabel  value="#{langsys['Old']} #{langsys['Password']}:"/>
                 <h:inputSecret styleClass="clsInput" id="isecOldUserPassword" value="#{userDetail.oldUserPassword}" redisplay="true">
                 </h:inputSecret>
 
-                <h:outputLabel  value="New Password:" title="New password MUST be between to-20 characters"/>
+                <h:outputLabel  value="#{langsys['New']} #{langsys['Password']}:" title="#{langsys['New']} #{langsys['password']} #{langsys['MUST']} #{langsys['be']} #{langsys['between']} 5-to-20 #{langsys['characters']}"/>
                 <h:inputSecret styleClass="clsInput" id="isecNewUserPassword" value="#{userDetail.newUserPassword}" redisplay="true">
                 </h:inputSecret>
 
-                <h:outputLabel  value="Confirm New Password:" title="Re-enter new password to confirm"/>
+                <h:outputLabel  value="#{langsys['Confirm']} #{langsys['New']} #{langsys['Password']}:" title="#{langsys['Re-enter']} #{langsys['new']} #{langsys['password']} #{langsys['to']} #{langsys['confirm']}"/>
                 <h:inputSecret styleClass="clsInput" id="isecNewUserPasswordConfirm" value="#{userDetail.newUserPasswordConfirm}" redisplay="true">
                 </h:inputSecret>
                 
-                <p:commandButton styleClass="clsButtonBig" id="cmdbChangePassword" value="Change Password" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                <p:commandButton styleClass="clsButtonBig" id="cmdbChangePassword" value="#{langsys['Change']} #{langsys['Password']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                     <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                         <p:graphicImage name="/images/ajax-loader.gif"/>
                     </p:dialog>
@@ -61,10 +61,10 @@
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainInput" columns="2" style="background-color: bisque">
-                <h:outputLabel  value="New User Code:"/>
+                <h:outputLabel  value="#{langsys['New']} #{langsys['User']} #{langsys['Code']}:"/>
                 <h:inputSecret styleClass="clsInput" id="isecTrans_code" value="#{userDetail.new_trans_code}" redisplay="true" autocomplete="off">
                 </h:inputSecret>
-                <p:commandButton styleClass="clsButtonBig" id="cmdbChangeUserCode" value="Change User Code" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                <p:commandButton styleClass="clsButtonBig" id="cmdbChangeUserCode" value="#{langsys['Change']} #{langsys['User']} #{langsys['Code']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                     <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                         <p:graphicImage name="/images/ajax-loader.gif"/>
                     </p:dialog>
