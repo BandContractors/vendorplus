@@ -241,11 +241,15 @@ public class InvoiceBean implements Serializable {
                 //do nothing
             } else {
                 if (transactor.getTransactorId() > 0) {
-                    if (transactor.getCategory().equals("Business")) {
-                        BuyerType = "B2B";
-                    } else if (transactor.getCategory().equals("Government")) {
-                        BuyerType = "B2G";
-                    } else {
+                    try {
+                        if (transactor.getCategory().equals("Business")) {
+                            BuyerType = "B2B";
+                        } else if (transactor.getCategory().equals("Government")) {
+                            BuyerType = "B2G";
+                        } else {
+                            BuyerType = "B2C";
+                        }
+                    } catch (Exception e) {
                         BuyerType = "B2C";
                     }
                 } else {
