@@ -1,5 +1,6 @@
 package api_sm_bi;
 
+import beans.CreditDebitNoteBean;
 import beans.ItemBean;
 import beans.Parameter_listBean;
 import beans.StoreBean;
@@ -36,6 +37,8 @@ public class SMbiBean implements Serializable {
     static Logger LOGGER = Logger.getLogger(SMbiBean.class.getName());
     private Bi_stg_sale_invoice saleInvoice;
     private List<Bi_stg_sale_invoice_item> saleInvoiceItems;
+    private Bi_stg_sale_cr_dr_note saleCreditDebitNote;
+    private List<Bi_stg_sale_cr_dr_note_item> saleCreditDebitNoteItems;
 
     public void syncSMbiCallThread() {
         try {
@@ -73,14 +76,15 @@ public class SMbiBean implements Serializable {
                         if (TransTypeId == 2) {//Invoice
                             sendInvoice(TransId);
                         }
+                        if (TransTypeId == 82 || TransTypeId == 83) {//82-126-CREDIT NOTE, 83-127-DEBIT NOTE
+                            sendCreditDebitNote(TransId);
+                        }
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
                     LOGGER.log(Level.ERROR, e);
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
             LOGGER.log(Level.ERROR, e);
         }
     }
@@ -104,13 +108,13 @@ public class SMbiBean implements Serializable {
                 invBean.setSaleInvoice(saleInvoice);
                 invBean.setSaleInvoiceItems(saleInvoiceItems);
                 json = gson.toJson(invBean);
-                System.out.println("invBean:" + json);
+                //System.out.println("invBean:" + json);
                 com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
                 WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextName("API", "API_SMBI_URL").getParameter_value());
                 ClientResponse response = webResource.type("application/json").post(ClientResponse.class, json);
                 String output = response.getEntity(String.class);
                 Status s = gson.fromJson(output, Status.class);
-                System.out.println("Success:" + s.getSuccess() + ",Description" + s.getDescription());
+                //System.out.println("Success:" + s.getSuccess() + ",Description" + s.getDescription());
                 //update the database table:transaction_smbi_map
                 if (s.getSuccess() == 1) {
                     new Transaction_smbi_mapBean().updateTransaction_smbi_map(1, new CompanySetting().getCURRENT_SERVER_DATE(), "success", t.getTransactionId(), t.getTransactionTypeId());
@@ -119,7 +123,6 @@ public class SMbiBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
             LOGGER.log(Level.ERROR, e);
         }
     }
@@ -174,7 +177,114 @@ public class SMbiBean implements Serializable {
                 saleInvoiceItems.add(item);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void sendCreditDebitNote(long aTransactionId) {
+        try {
+            Trans t = new CreditDebitNoteBean().getTrans_cr_dr_note(aTransactionId);
+            List<TransItem> tis = new CreditDebitNoteBean().getTransItemsByTransactionId_cr_dr_note(aTransactionId);
+            if (null == t || null == tis) {
+                //do nothing
+            } else {
+                Gson gson = new Gson();
+                String json = "";
+                //init objects
+                saleCreditDebitNote = new Bi_stg_sale_cr_dr_note();
+                saleCreditDebitNoteItems = new ArrayList<>();
+                //prepare
+                this.prepareCreditDebitNote(t, tis);
+                //creating JSON STRING from Object - Branch
+                Bi_stg_sale_cr_dr_noteBean noteBean = new Bi_stg_sale_cr_dr_noteBean();
+                if (saleCreditDebitNote.getNote_type().equals("CREDIT NOTE")) {
+                    noteBean.setTransactionType("CREDIT NOTE");
+                } else if (saleCreditDebitNote.getNote_type().equals("DEBIT NOTE")) {
+                    noteBean.setTransactionType("DEBIT NOTE");
+                } else {
+                    noteBean.setTransactionType("");
+                }
+                noteBean.setSaleCreditDebitNote(saleCreditDebitNote);
+                noteBean.setSaleCreditDebitNoteItems(saleCreditDebitNoteItems);
+                json = gson.toJson(noteBean);
+                //System.out.println("noteBean:" + json);
+                com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
+                WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextName("API", "API_SMBI_URL").getParameter_value());
+                ClientResponse response = webResource.type("application/json").post(ClientResponse.class, json);
+                String output = response.getEntity(String.class);
+                Status s = gson.fromJson(output, Status.class);
+                //System.out.println("Success:" + s.getSuccess() + ",Description" + s.getDescription());
+                //update the database table:transaction_smbi_map
+                if (s.getSuccess() == 1) {
+                    new Transaction_smbi_mapBean().updateTransaction_smbi_map(1, new CompanySetting().getCURRENT_SERVER_DATE(), "success", t.getTransactionId(), t.getTransactionTypeId());
+                } else {
+                    new Transaction_smbi_mapBean().updateTransaction_smbi_map(2, new CompanySetting().getCURRENT_SERVER_DATE(), s.getDescription(), t.getTransactionId(), t.getTransactionTypeId());
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void prepareCreditDebitNote(Trans aTrans, List<TransItem> aTransItems) {
+        try {
+            //Cr/Dr Note
+            try {
+                saleCreditDebitNote.setSection_code(new StoreBean().getStore(aTrans.getStoreId()).getStore_code());
+            } catch (Exception e) {
+                saleCreditDebitNote.setSection_code("");
+            }
+            saleCreditDebitNote.setBranch_code(Integer.toString(CompanySetting.getBranchId()));
+            saleCreditDebitNote.setBusiness_code(CompanySetting.getCompanyName());
+            saleCreditDebitNote.setGroup_code(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_SMBI_GROUP_CODE").getParameter_value());
+            //82->126->CREDIT NOTE, 83->127->DEBIT NOTE
+            if (aTrans.getTransactionTypeId() == 82) {
+                saleCreditDebitNote.setNote_type("CREDIT NOTE");
+            } else if (aTrans.getTransactionTypeId() == 83) {
+                saleCreditDebitNote.setNote_type("DEBIT NOTE");
+            } else {
+                saleCreditDebitNote.setNote_type("");
+            }
+            saleCreditDebitNote.setNote_number(aTrans.getTransactionNumber());
+            saleCreditDebitNote.setInvoice_number_ref(aTrans.getTransactionRef());
+            saleCreditDebitNote.setNote_date(aTrans.getTransactionDate());
+            try {
+                if (aTrans.getBillTransactorId() > 0) {
+                    saleCreditDebitNote.setCustomer_name(new TransactorBean().getTransactor(aTrans.getBillTransactorId()).getTransactorNames());
+                } else {
+                    saleCreditDebitNote.setCustomer_name("Walk-In Customer");
+                }
+            } catch (Exception e) {
+                //
+            }
+            saleCreditDebitNote.setGross_amount(aTrans.getGrandTotal());
+            saleCreditDebitNote.setTrade_discount(aTrans.getTotalTradeDiscount());
+            saleCreditDebitNote.setCash_discount(aTrans.getCashDiscount());
+            saleCreditDebitNote.setTax_amount(aTrans.getTotalVat());
+            saleCreditDebitNote.setProfit_margin(aTrans.getTotalProfitMargin());
+            saleCreditDebitNote.setAmount_tendered(aTrans.getAmountTendered());
+            saleCreditDebitNote.setStaff_code("");
+            saleCreditDebitNote.setCurrency_code(aTrans.getCurrencyCode());
+            saleCreditDebitNote.setCountry_code("");
+            saleCreditDebitNote.setLoc_level2_code("");
+            saleCreditDebitNote.setLoc_level3_code("");
+            //Cr/Dr Note Items
+            Bi_stg_sale_cr_dr_note_item item = null;
+            for (int i = 0; i < aTransItems.size(); i++) {
+                item = new Bi_stg_sale_cr_dr_note_item();
+                item.setBi_item_code(Long.toString(aTransItems.get(i).getItemId()));
+                item.setSrc_item_description(new ItemBean().getItem(aTransItems.get(i).getItemId()).getDescription());
+                item.setQty(aTransItems.get(i).getItemQty());
+                item.setUnit_price(aTransItems.get(i).getUnitPriceExcVat());
+                item.setUnit_trade_discount(aTransItems.get(i).getUnitTradeDiscount());
+                item.setUnit_vat(aTransItems.get(i).getUnitVat());
+                item.setAmount(aTransItems.get(i).getAmountIncVat());
+                item.setVat_rated(aTransItems.get(i).getVatRated());
+                item.setUnit_cost_price(aTransItems.get(i).getUnitCostPrice());
+                item.setUnit_profit_margin(aTransItems.get(i).getUnitProfitMargin());
+                saleCreditDebitNoteItems.add(item);
+            }
+        } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
     }
@@ -205,5 +315,33 @@ public class SMbiBean implements Serializable {
      */
     public void setSaleInvoiceItems(List<Bi_stg_sale_invoice_item> saleInvoiceItems) {
         this.saleInvoiceItems = saleInvoiceItems;
+    }
+
+    /**
+     * @return the saleCreditDebitNote
+     */
+    public Bi_stg_sale_cr_dr_note getSaleCreditDebitNote() {
+        return saleCreditDebitNote;
+    }
+
+    /**
+     * @param saleCreditDebitNote the saleCreditDebitNote to set
+     */
+    public void setSaleCreditDebitNote(Bi_stg_sale_cr_dr_note saleCreditDebitNote) {
+        this.saleCreditDebitNote = saleCreditDebitNote;
+    }
+
+    /**
+     * @return the saleCreditDebitNoteItems
+     */
+    public List<Bi_stg_sale_cr_dr_note_item> getSaleCreditDebitNoteItems() {
+        return saleCreditDebitNoteItems;
+    }
+
+    /**
+     * @param saleCreditDebitNoteItems the saleCreditDebitNoteItems to set
+     */
+    public void setSaleCreditDebitNoteItems(List<Bi_stg_sale_cr_dr_note_item> saleCreditDebitNoteItems) {
+        this.saleCreditDebitNoteItems = saleCreditDebitNoteItems;
     }
 }
