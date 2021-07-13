@@ -3992,11 +3992,11 @@ public class TransBean implements Serializable {
             long SavedCrDrNoteTransId = 0;
             int ExistCountDrCrNotes = new CreditDebitNoteBean().getCountDebitAndCreditNotes(OldTrans.getTransactionNumber());
             if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE RETURN INVOICE".equals(transtype.getTransactionTypeName())) {
-                if (ExistCountDrCrNotes == 0) {
-                    SavedCrDrNoteTransId = new CreditDebitNoteBean().saveCreditDebitNote(OldTrans, aNewTrans, OldTransItems, aNewTransItems);
-                }
+                //if (ExistCountDrCrNotes == 0) {
+                SavedCrDrNoteTransId = new CreditDebitNoteBean().saveCreditDebitNote(OldTrans, aNewTrans, OldTransItems, aNewTransItems);
+                //}
             }
-            //ens-insert credit/debit note
+            //end-insert credit/debit note
             TransItemBean = null;
             //clean stock
             StockBean.deleteZeroQtyStock();
@@ -4044,6 +4044,16 @@ public class TransBean implements Serializable {
                         }
                     }
                 }
+            }
+            //SMbi API
+            if (aTransTypeId == 2 && new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_SMBI_URL").getParameter_value().length() > 0) {
+                int CrDrTransTypeId = 0;
+                if (aNewTrans.getGrandTotal() > OldTrans.getGrandTotal() || aNewTrans.getTotalVat() > OldTrans.getTotalVat()) {//Debit note
+                    CrDrTransTypeId = 83;
+                } else if (aNewTrans.getGrandTotal() < OldTrans.getGrandTotal() || aNewTrans.getTotalVat() < OldTrans.getTotalVat()) {//Credit note
+                    CrDrTransTypeId = 82;
+                }
+                new Transaction_smbi_mapBean().insertTransaction_smbi_mapCallThread(SavedCrDrNoteTransId, CrDrTransTypeId);
             }
             //Update Total Paid for Sales/Purchase Invoice
             if (aTransTypeId == 2 || aTransTypeId == 1) {

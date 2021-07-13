@@ -1,7 +1,9 @@
 package api_sm_bi;
 
 import beans.Parameter_listBean;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import java.io.Serializable;
 import javax.faces.bean.*;
@@ -26,7 +28,7 @@ public class CheckApiBean implements Serializable {
             if (statuscode == 200) {
                 isavailbale = true;
             }
-        } catch (Exception e) {
+        } catch (UniformInterfaceException | ClientHandlerException e) {
             LOGGER.log(Level.ERROR, e);
         }
         return isavailbale;

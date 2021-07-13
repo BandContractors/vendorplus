@@ -63,12 +63,10 @@ public class TaskManager {
                 RepeatAfterMinutes = Long.parseLong(new Parameter_listBean().getParameter_listByContextName("API", "API_SMBI_SYNC_JOB_REPEAT_AFTER").getParameter_value());
             } catch (Exception e) {
             }
-            //System.out.println("RepeatAfterMinutes:" + RepeatAfterMinutes);
             //1000 mls=1 sec
             long DelayMilliseconds = 1000;
             long RepeatAfterMilliseconds = 1000 * 60 * RepeatAfterMinutes;
             if (RepeatAfterMinutes > 0 && new Parameter_listBean().getParameter_listByContextName("API", "API_SMBI_URL").getParameter_value().length() > 0) {
-                //System.out.println("SCHEDULE:" + new Date().toString());
                 timer.schedule(new PeriodicTaskSyncSmBi(), DelayMilliseconds, RepeatAfterMilliseconds);
             }
         } catch (Exception e) {
@@ -93,7 +91,6 @@ public class TaskManager {
         @Override
         public void run() {
             try {
-                //System.out.println("TASK:" + new Date().toString());
                 if (new CheckApiBean().IsSmBiAvailable() && new Parameter_listBean().getParameter_listByContextName("API", "API_SMBI_URL").getParameter_value().length() > 0) {
                     new SMbiBean().syncSMbiCall();
                 }

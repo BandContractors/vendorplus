@@ -18,6 +18,8 @@ import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import sessions.GeneralUserSetting;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 /*
  * To change this template, choose Tools | Templates
@@ -32,6 +34,7 @@ import sessions.GeneralUserSetting;
 public class CreditDebitNoteBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    static Logger LOGGER = Logger.getLogger(CreditDebitNoteBean.class.getName());
 
     public Trans getTrans_cr_dr_note(long aTransactionId) {
         String sql = "{call sp_search_transaction_by_id_cr_dr_note(?)}";
@@ -47,7 +50,7 @@ public class CreditDebitNoteBean implements Serializable {
                 return null;
             }
         } catch (Exception e) {
-            System.err.println("getTrans_cr_dr_note:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
             return null;
         }
     }
@@ -112,6 +115,7 @@ public class CreditDebitNoteBean implements Serializable {
             //Remain Unchanged: New trans to take precendance
             //CashDiscount,edit_user_detail_id,CardNumber,AmountTendered,ChangeAmount,TotalProfitMargin
             tb.copyTransObject(aNewTrans, CreditDebitTrans);//From,To
+            CreditDebitTrans.setTransactionDate(new CompanySetting().getCURRENT_SERVER_DATE());
             CreditDebitTrans.setTransactionId(0);
             CreditDebitTrans.setTransactionNumber("");
             CreditDebitTrans.setTransactionTypeId(TransTypeId);
@@ -133,7 +137,7 @@ public class CreditDebitNoteBean implements Serializable {
             }
             //save
         } catch (Exception e) {
-            System.err.println("saveCreditDebitNote:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return SavedNoteId;
     }
@@ -364,7 +368,7 @@ public class CreditDebitNoteBean implements Serializable {
             cs.executeUpdate();
             InsertedTransId = cs.getLong("out_transaction_id");
         } catch (Exception e) {
-            System.err.println("insertTrans_cr_dr_note:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return InsertedTransId;
     }
@@ -380,8 +384,7 @@ public class CreditDebitNoteBean implements Serializable {
                 ListItemIndex = ListItemIndex + 1;
             }
         } catch (Exception e) {
-            System.err.println("saveTransItems_cr_dr_note:" + e.getMessage());
-            //npe.printStackTrace();
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -535,7 +538,7 @@ public class CreditDebitNoteBean implements Serializable {
                 //do nothing; this is for edit
             }
         } catch (Exception e) {
-            System.err.println("saveTransItem_cr_dr_note:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -556,7 +559,7 @@ public class CreditDebitNoteBean implements Serializable {
                 tis.add(ti);
             }
         } catch (Exception e) {
-            System.err.println("getTransItemsByTransactionId_cr_dr_note:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return tis;
     }
@@ -577,7 +580,7 @@ public class CreditDebitNoteBean implements Serializable {
                 n = rs.getInt("ncount");
             }
         } catch (Exception e) {
-            System.err.println("getCountDebitAndCreditNotes:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return n;
     }

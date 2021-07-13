@@ -119,19 +119,36 @@ public class Transaction_smbi_mapBean implements Serializable {
     public void insertTransaction_smbi_mapCall(long aTransaction_id, int aTransaction_type_id) {
         try {
             if (aTransaction_id > 0 && aTransaction_type_id > 0) {
-                Trans t = new TransBean().getTrans(aTransaction_id);
-                if (null != t && aTransaction_type_id == 2) {//SalesInvoice
-                    Transaction_smbi_map tsmbi = new Transaction_smbi_map();
-                    tsmbi.setTransaction_id(t.getTransactionId());
-                    tsmbi.setTransaction_type_id(t.getTransactionTypeId());
-                    tsmbi.setTransaction_reason_id(t.getTransactionReasonId());
-                    tsmbi.setTransaction_number(t.getTransactionNumber());
-                    Date dt = new CompanySetting().getCURRENT_SERVER_DATE();
-                    tsmbi.setAdd_date(dt);
-                    tsmbi.setStatus_sync(0);
-                    tsmbi.setStatus_date(dt);
-                    tsmbi.setStatus_desc("not synced");
-                    int s = this.insertTransaction_smbi_map(tsmbi);
+                if (aTransaction_type_id == 2) {//SalesInvoice
+                    Trans t = new TransBean().getTrans(aTransaction_id);
+                    if (null != t) {
+                        Transaction_smbi_map tsmbi = new Transaction_smbi_map();
+                        tsmbi.setTransaction_id(t.getTransactionId());
+                        tsmbi.setTransaction_type_id(t.getTransactionTypeId());
+                        tsmbi.setTransaction_reason_id(t.getTransactionReasonId());
+                        tsmbi.setTransaction_number(t.getTransactionNumber());
+                        Date dt = new CompanySetting().getCURRENT_SERVER_DATE();
+                        tsmbi.setAdd_date(dt);
+                        tsmbi.setStatus_sync(0);
+                        tsmbi.setStatus_date(dt);
+                        tsmbi.setStatus_desc("not synced");
+                        int s = this.insertTransaction_smbi_map(tsmbi);
+                    }
+                } else if (aTransaction_type_id == 82 || aTransaction_type_id == 83) {//82-126-CREDIT NOTE, 83-127-DEBIT NOTE
+                    Trans t = new CreditDebitNoteBean().getTrans_cr_dr_note(aTransaction_id);
+                    if (null != t) {
+                        Transaction_smbi_map tsmbi = new Transaction_smbi_map();
+                        tsmbi.setTransaction_id(t.getTransactionId());
+                        tsmbi.setTransaction_type_id(t.getTransactionTypeId());
+                        tsmbi.setTransaction_reason_id(t.getTransactionReasonId());
+                        tsmbi.setTransaction_number(t.getTransactionNumber());
+                        Date dt = new CompanySetting().getCURRENT_SERVER_DATE();
+                        tsmbi.setAdd_date(dt);
+                        tsmbi.setStatus_sync(0);
+                        tsmbi.setStatus_date(dt);
+                        tsmbi.setStatus_desc("not synced");
+                        int s = this.insertTransaction_smbi_map(tsmbi);
+                    }
                 }
             }
         } catch (Exception e) {
