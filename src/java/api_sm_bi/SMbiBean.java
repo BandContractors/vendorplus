@@ -230,6 +230,12 @@ public class SMbiBean implements Serializable {
         try {
             //Cr/Dr Note
             try {
+                Trans Invoice = new TransBean().getTransByTransNumber(aTrans.getTransactionRef());
+                saleCreditDebitNote.setSales_date(Invoice.getTransactionDate());
+            } catch (Exception e) {
+                saleCreditDebitNote.setSales_date(aTrans.getTransactionDate());
+            }
+            try {
                 saleCreditDebitNote.setSection_code(new StoreBean().getStore(aTrans.getStoreId()).getStore_code());
             } catch (Exception e) {
                 saleCreditDebitNote.setSection_code("");

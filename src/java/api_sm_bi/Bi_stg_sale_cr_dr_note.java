@@ -17,6 +17,7 @@ public class Bi_stg_sale_cr_dr_note implements Serializable {
     private String note_number;
     private String invoice_number_ref;
     private Date note_date;
+    private Date sales_date;
     private String customer_name;
     private double gross_amount;
     private double trade_discount;
@@ -331,6 +332,20 @@ public class Bi_stg_sale_cr_dr_note implements Serializable {
      */
     public void setNote_date(Date note_date) {
         this.note_date = note_date;
+    }
+
+    /**
+     * @return the sales_date
+     */
+    public Date getSales_date() {
+        return sales_date;
+    }
+
+    /**
+     * @param sales_date the sales_date to set
+     */
+    public void setSales_date(Date sales_date) {
+        this.sales_date = sales_date;
     }
 
 }
