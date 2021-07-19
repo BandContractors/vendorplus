@@ -79,8 +79,21 @@ UPDATE parameter_list SET parameter_value = 'District,Town' WHERE parameter_list
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_15',79,Now(),'6.0','');
 
-
-
-
-
-
+create table loyalty_transaction (
+loyalty_transaction_id bigint(20) not null auto_increment, 
+card_number varchar(20) not null, 
+invoice_number varchar(50) not null, 
+transaction_date date not null, 
+points_awarded double not null, 
+points_spent double not null, 
+points_spent_amount double not null, 
+currency_code varchar(10) not null, 
+add_date datetime not null, 
+staff_code varchar(50) not null,
+status_sync int(1) DEFAULT '0',
+status_date timestamp NULL DEFAULT NULL,
+status_desc varchar(250) NOT NULL,
+primary key (loyalty_transaction_id)
+);
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_15',98,Now(),'6.0','');
