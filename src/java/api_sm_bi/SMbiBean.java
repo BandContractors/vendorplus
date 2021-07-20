@@ -27,6 +27,9 @@ import java.util.concurrent.Executors;
 import javax.faces.bean.*;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.primefaces.json.JSONArray;
+import org.primefaces.json.JSONObject;
+import sessions.GeneralUserSetting;
 import utilities.UtilityBean;
 
 @ManagedBean
@@ -293,6 +296,44 @@ public class SMbiBean implements Serializable {
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
+    }
+
+    public LoyaltyCard getLoyaltyCardDetail(String aCardNumber) {
+        LoyaltyCard loyaltycard = null;
+        try {
+            if (aCardNumber.length() > 0) {
+                String sectioncode = new GeneralUserSetting().getCurrentStore().getStore_code();
+                String branchcode = Integer.toString(CompanySetting.getBranchId());
+                String businesscode = CompanySetting.getCompanyName();
+                String groupcode = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_SMBI_GROUP_CODE").getParameter_value();
+                Gson gson = new Gson();
+                String json = "";
+                //creating JSON STRING from Object
+                GetLoyaltyCardBean cardBean = new GetLoyaltyCardBean();
+                cardBean.setTransactionType("LOYALTY CARD");
+                cardBean.setSectionCode(sectioncode);
+                cardBean.setBranchCode(branchcode);
+                cardBean.setBusinessCode(businesscode);
+                cardBean.setGroupCode(groupcode);
+                json = gson.toJson(cardBean);
+                com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
+                WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextName("API", "API_SMBI_URL").getParameter_value());
+                ClientResponse response = webResource.type("application/json").post(ClientResponse.class, json);
+                String output = response.getEntity(String.class);
+                JSONObject jobj = new JSONObject(output);
+                JSONObject jobjS = jobj.getJSONObject("status");
+                Status s = gson.fromJson(jobjS.toString(), Status.class);
+                if (s.getSuccess() == 1) {
+                    JSONObject jobjL = jobj.getJSONObject("loyaltyCard");
+                    loyaltycard = gson.fromJson(jobjL.toString(), LoyaltyCard.class);
+                } else {
+                    loyaltycard = null;
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return loyaltycard;
     }
 
     /**
