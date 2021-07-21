@@ -81,6 +81,7 @@ VALUES('scrpt_db_upgrade_15',79,Now(),'6.0','');
 
 create table loyalty_transaction (
 loyalty_transaction_id bigint(20) not null auto_increment, 
+store_id int(11) NOT NULL,
 card_number varchar(20) not null, 
 invoice_number varchar(50) not null, 
 transaction_date date not null, 

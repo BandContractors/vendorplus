@@ -55,6 +55,11 @@ public class Loyalty_transactionBean implements Serializable {
                 aLoyalty_transaction.setLoyalty_transaction_id(0);
             }
             try {
+                aLoyalty_transaction.setStore_id(aResultSet.getInt("store_id"));
+            } catch (NullPointerException npe) {
+                aLoyalty_transaction.setStore_id(0);
+            }
+            try {
                 aLoyalty_transaction.setCard_number(aResultSet.getString("card_number"));
             } catch (NullPointerException npe) {
                 aLoyalty_transaction.setCard_number("");
@@ -124,6 +129,25 @@ public class Loyalty_transactionBean implements Serializable {
         }
     }
 
+    public Loyalty_transaction getLoyalty_transaction(long aLoyalty_transaction_id) {
+        String sql = "select * from loyalty_transaction where loyalty_transaction_id=?";
+        ResultSet rs = null;
+        Loyalty_transaction lt = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aLoyalty_transaction_id);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                lt = new Loyalty_transaction();
+                this.setLoyalty_transactionFromResultset(lt, rs);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return lt;
+    }
+
     public void insertLoyalty_transactionCallThread(long aLoyalty_transaction_id) {
         try {
             Runnable task = new Runnable() {
@@ -185,8 +209,8 @@ public class Loyalty_transactionBean implements Serializable {
                 + "(card_number,invoice_number,transaction_date,"
                 + "points_awarded,amount_awarded,points_spent,amount_spent,"
                 + "currency_code,staff_code,"
-                + "add_date,status_sync,status_date,status_desc)"
-                + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                + "add_date,status_sync,status_date,status_desc,store_id)"
+                + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -255,6 +279,11 @@ public class Loyalty_transactionBean implements Serializable {
                     ps.setString(13, aLoyalty_transaction.getStatus_desc());
                 } catch (NullPointerException npe) {
                     ps.setString(13, "");
+                }
+                try {
+                    ps.setInt(14, aLoyalty_transaction.getStore_id());
+                } catch (NullPointerException npe) {
+                    ps.setInt(14, 0);
                 }
                 ps.executeUpdate();
                 saved = 1;

@@ -2,6 +2,7 @@ package api_sm_bi;
 
 import beans.CreditDebitNoteBean;
 import beans.ItemBean;
+import beans.Loyalty_transactionBean;
 import beans.Parameter_listBean;
 import beans.StoreBean;
 import beans.TransBean;
@@ -13,6 +14,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import connections.DBConnection;
 import entities.CompanySetting;
+import entities.Loyalty_transaction;
 import entities.Trans;
 import entities.TransItem;
 import entities.Transaction_smbi_map;
@@ -27,7 +29,6 @@ import java.util.concurrent.Executors;
 import javax.faces.bean.*;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.primefaces.json.JSONArray;
 import org.primefaces.json.JSONObject;
 import sessions.GeneralUserSetting;
 import utilities.UtilityBean;
@@ -42,6 +43,7 @@ public class SMbiBean implements Serializable {
     private List<Bi_stg_sale_invoice_item> saleInvoiceItems;
     private Bi_stg_sale_cr_dr_note saleCreditDebitNote;
     private List<Bi_stg_sale_cr_dr_note_item> saleCreditDebitNoteItems;
+    private LoyaltyTransaction loyaltyTransaction;
 
     public void syncSMbiCallThread() {
         try {
@@ -59,6 +61,11 @@ public class SMbiBean implements Serializable {
     }
 
     public void syncSMbiCall() {
+        syncSMbiCall1();
+        syncSMbiCall2();
+    }
+    
+    public void syncSMbiCall1() {//transaction_smbi_map
         try {
             String sqlN = "SELECT COUNT(*) as n FROM transaction_smbi_map WHERE status_sync=0";
             long n = new UtilityBean().getN(sqlN);
@@ -82,6 +89,34 @@ public class SMbiBean implements Serializable {
                         if (TransTypeId == 82 || TransTypeId == 83) {//82-126-CREDIT NOTE, 83-127-DEBIT NOTE
                             sendCreditDebitNote(TransId);
                         }
+                    }
+                } catch (Exception e) {
+                    LOGGER.log(Level.ERROR, e);
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+    
+    public void syncSMbiCall2() {//loyalty_transaction
+        try {
+            String sqlN = "SELECT COUNT(*) as n FROM loyalty_transaction WHERE status_sync=0";
+            long n = new UtilityBean().getN(sqlN);
+            double iterations = Math.ceil(1.0 * n / 50);
+            String sql = "";
+            ResultSet rs = null;
+            Transaction_smbi_map tsm = null;
+            for (int itrn = 1; itrn <= iterations; itrn++) {
+                sql = "SELECT * FROM loyalty_transaction WHERE status_sync=0 LIMIT 50";
+                rs = null;
+                try (
+                        Connection conn = DBConnection.getMySQLConnection();
+                        PreparedStatement ps = conn.prepareStatement(sql);) {
+                    rs = ps.executeQuery();
+                    while (rs.next()) {
+                        long LoyTransId = rs.getLong("loyalty_transaction_id");
+                        sendLoyaltyTransaction(LoyTransId);
                     }
                 } catch (Exception e) {
                     LOGGER.log(Level.ERROR, e);
@@ -336,6 +371,62 @@ public class SMbiBean implements Serializable {
         return loyaltycard;
     }
 
+    public void sendLoyaltyTransaction(long aLoyaltyTransactionId) {
+        try {
+            Loyalty_transaction t = new Loyalty_transactionBean().getLoyalty_transaction(aLoyaltyTransactionId);
+            if (null != t) {
+                Gson gson = new Gson();
+                String json = "";
+                //init objects
+                loyaltyTransaction = new LoyaltyTransaction();
+                //prepare
+                this.prepareLoyaltyTransaction(t);
+                //creating JSON STRING from Object
+                LoyaltyTransactionBean loyTrans = new LoyaltyTransactionBean();
+                loyTrans.setTransactionType("LOYALTY");
+                loyTrans.setLoyaltyTransaction(loyaltyTransaction);
+                json = gson.toJson(loyTrans);
+                com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
+                WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextName("API", "API_SMBI_URL").getParameter_value());
+                ClientResponse response = webResource.type("application/json").post(ClientResponse.class, json);
+                String output = response.getEntity(String.class);
+                Status s = gson.fromJson(output, Status.class);
+                //update the database table
+                if (s.getSuccess() == 1) {
+                    new Loyalty_transactionBean().updateLoyalty_transaction(1, new CompanySetting().getCURRENT_SERVER_DATE(), "success", t.getLoyalty_transaction_id());
+                } else {
+                    new Loyalty_transactionBean().updateLoyalty_transaction(2, new CompanySetting().getCURRENT_SERVER_DATE(), s.getDescription(), t.getLoyalty_transaction_id());
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void prepareLoyaltyTransaction(Loyalty_transaction aLoyalty_transaction) {
+        try {
+            try {
+                loyaltyTransaction.setSection_code(new StoreBean().getStore(aLoyalty_transaction.getStore_id()).getStore_code());
+            } catch (Exception e) {
+                loyaltyTransaction.setSection_code("");
+            }
+            loyaltyTransaction.setBranch_code(Integer.toString(CompanySetting.getBranchId()));
+            loyaltyTransaction.setBusiness_code(CompanySetting.getCompanyName());
+            loyaltyTransaction.setGroup_code(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_SMBI_GROUP_CODE").getParameter_value());
+            loyaltyTransaction.setCard_number(aLoyalty_transaction.getCard_number());
+            loyaltyTransaction.setInvoice_number(aLoyalty_transaction.getInvoice_number());
+            loyaltyTransaction.setTransaction_date(aLoyalty_transaction.getTransaction_date());
+            loyaltyTransaction.setPoints_awarded(aLoyalty_transaction.getPoints_awarded());
+            loyaltyTransaction.setAmount_awarded(aLoyalty_transaction.getAmount_awarded());
+            loyaltyTransaction.setPoints_spent(aLoyalty_transaction.getPoints_spent());
+            loyaltyTransaction.setAmount_spent(aLoyalty_transaction.getAmount_spent());
+            loyaltyTransaction.setCurrency_code(aLoyalty_transaction.getCurrency_code());
+            loyaltyTransaction.setStaff_code(aLoyalty_transaction.getStaff_code());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     /**
      * @return the saleInvoice
      */
@@ -390,5 +481,19 @@ public class SMbiBean implements Serializable {
      */
     public void setSaleCreditDebitNoteItems(List<Bi_stg_sale_cr_dr_note_item> saleCreditDebitNoteItems) {
         this.saleCreditDebitNoteItems = saleCreditDebitNoteItems;
+    }
+
+    /**
+     * @return the loyaltyTransaction
+     */
+    public LoyaltyTransaction getLoyaltyTransaction() {
+        return loyaltyTransaction;
+    }
+
+    /**
+     * @param loyaltyTransaction the loyaltyTransaction to set
+     */
+    public void setLoyaltyTransaction(LoyaltyTransaction loyaltyTransaction) {
+        this.loyaltyTransaction = loyaltyTransaction;
     }
 }

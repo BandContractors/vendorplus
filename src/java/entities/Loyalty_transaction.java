@@ -10,6 +10,7 @@ public class Loyalty_transaction implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private long loyalty_transaction_id;
+    private int store_id;
     private String section_code;
     private String branch_code;
     private String business_code;
@@ -299,6 +300,20 @@ public class Loyalty_transaction implements Serializable {
      */
     public void setLoyalty_transaction_id(long loyalty_transaction_id) {
         this.loyalty_transaction_id = loyalty_transaction_id;
+    }
+
+    /**
+     * @return the store_id
+     */
+    public int getStore_id() {
+        return store_id;
+    }
+
+    /**
+     * @param store_id the store_id to set
+     */
+    public void setStore_id(int store_id) {
+        this.store_id = store_id;
     }
 
 }
