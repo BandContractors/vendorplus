@@ -3,6 +3,7 @@ package beans;
 import connections.DBConnection;
 import entities.Pay;
 import entities.PayTrans;
+import entities.PointsCard;
 import sessions.GeneralUserSetting;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -57,7 +58,8 @@ public class OutputDetailBean implements Serializable {
             tb.updateLookup(aOutputDetail.getTrans());
 
             try {
-                aOutputDetail.setPoints_card(new PointsCardBean().getPointsCardByCardNumber(aOutputDetail.getTrans().getCardNumber()));
+                //aOutputDetail.setPoints_card(new PointsCardBean().getPointsCardByCardNumber(aOutputDetail.getTrans().getCardNumber()));
+                aOutputDetail.setPoints_card(new PointsCard());
             } catch (Exception e) {
             }
             try {

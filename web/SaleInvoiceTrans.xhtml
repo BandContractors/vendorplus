@@ -543,8 +543,7 @@
                         </h:inputText>
                         <h:inputText id="itxtSpendPointsAmount" value="#{trans.spendPointsAmount}" styleClass="clsInputTransItem" style="width: 150px;background-color: aquamarine" disabled="false" autocomplete="off">
                             <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                            <f:ajax event="change" listener="#{transBean.setTransTotalsAndUpdateCEC(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans, transItemBean.activeTransItems)}" render="itxtChange pgrdApprove"/>
-                            <f:ajax event="keyup" listener="#{transBean.setTransTotalsAndUpdateCEC(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans, transItemBean.activeTransItems)}" render="itxtChange pgrdApprove"/>
+                            <f:ajax event="blur" listener="#{transBean.setTransTotalsAndUpdateCEC(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans, transItemBean.activeTransItems)}" render="itxtChange pgrdApprove"/>
                         </h:inputText>
                         <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value=""/>
                     </h:panelGrid>

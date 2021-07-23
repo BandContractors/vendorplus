@@ -22,7 +22,9 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -64,7 +66,7 @@ public class SMbiBean implements Serializable {
         syncSMbiCall1();
         syncSMbiCall2();
     }
-    
+
     public void syncSMbiCall1() {//transaction_smbi_map
         try {
             String sqlN = "SELECT COUNT(*) as n FROM transaction_smbi_map WHERE status_sync=0";
@@ -98,7 +100,7 @@ public class SMbiBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void syncSMbiCall2() {//loyalty_transaction
         try {
             String sqlN = "SELECT COUNT(*) as n FROM loyalty_transaction WHERE status_sync=0";
@@ -350,17 +352,30 @@ public class SMbiBean implements Serializable {
                 cardBean.setBranchCode(branchcode);
                 cardBean.setBusinessCode(businesscode);
                 cardBean.setGroupCode(groupcode);
+                cardBean.setCardNumber(aCardNumber);
                 json = gson.toJson(cardBean);
+                //System.out.println("json:" + json);
                 com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
                 WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextName("API", "API_SMBI_URL").getParameter_value());
                 ClientResponse response = webResource.type("application/json").post(ClientResponse.class, json);
                 String output = response.getEntity(String.class);
+                //System.out.println("output:" + output);
                 JSONObject jobj = new JSONObject(output);
                 JSONObject jobjS = jobj.getJSONObject("status");
                 Status s = gson.fromJson(jobjS.toString(), Status.class);
                 if (s.getSuccess() == 1) {
                     JSONObject jobjL = jobj.getJSONObject("loyaltyCard");
-                    loyaltycard = gson.fromJson(jobjL.toString(), LoyaltyCard.class);
+                    //loyaltycard = gson.fromJson(jobjL.toString(), LoyaltyCard.class);
+                    loyaltycard = new LoyaltyCard();
+                    loyaltycard.setCard_number(jobjL.get("card_number").toString());
+                    loyaltycard.setFirst_name(jobjL.get("first_name").toString());
+                    loyaltycard.setSecond_name(jobjL.get("second_name").toString());
+                    loyaltycard.setThird_name(jobjL.get("third_name").toString());
+                    loyaltycard.setEmail(jobjL.get("email").toString());
+                    loyaltycard.setPhone(jobjL.get("phone").toString());
+                    loyaltycard.setDob(null);
+                    loyaltycard.setCurrency_code(jobjL.get("currency_code").toString());
+                    loyaltycard.setPoints_balance(Double.parseDouble(jobjL.get("points_balance").toString()));
                 } else {
                     loyaltycard = null;
                 }

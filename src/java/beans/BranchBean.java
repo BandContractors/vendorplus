@@ -18,76 +18,76 @@ import utilities.CustomValidator;
 @ManagedBean
 @SessionScoped
 public class BranchBean implements Serializable {
-private List<Branch> Branches;
-    private String ActionMessage=null;
-    private Branch SelectedBranch=null;
+
+    private List<Branch> Branches;
+    private String ActionMessage = null;
+    private Branch SelectedBranch = null;
     private long SelectedBranchId;
-    private String SearchBranchCode="";
-    private String SearchBranchName="";
-    
+    private String SearchBranchCode = "";
+    private String SearchBranchName = "";
+
     public void saveBranch(Branch branch) {
         String sql = null;
-        String msg="";
+        String msg = "";
         String sql2 = null;
-        sql2="SELECT * FROM branch WHERE branch_code='" + branch.getBranchCode() + "' OR branch_name='" + branch.getBranchName() + "'";
-        
-        UserDetail aCurrentUserDetail=new GeneralUserSetting().getCurrentUser();
-        List<GroupRight> aCurrentGroupRights=new GeneralUserSetting().getCurrentGroupRights();
-        GroupRightBean grb=new GroupRightBean();
-        
-        if (branch.getBranchId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail,aCurrentGroupRights,"87", "Add")==0) {
-            msg="YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        }else if (branch.getBranchId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail,aCurrentGroupRights,"87", "Edit")==0) {
-            msg="YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        }else if(new CustomValidator().TextSize(branch.getBranchName(), 1, 100).equals("FAIL")){
-            msg="Enter Branch Branch Name!";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        }else if(new CustomValidator().TextSize(branch.getBranchCode(), 1, 20).equals("FAIL")){
-            msg="Enter Branch Branch Code!";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        }else if((new CustomValidator().INTER_BRANCH_CheckRecords(sql2)>0 && branch.getBranchId()==0) || (new CustomValidator().INTER_BRANCH_CheckRecords(sql2)>0 && new CustomValidator().INTER_BRANCH_CheckRecords(sql2)!=1 && branch.getBranchId()>0)){
-            msg="Branch Code OR BranchName already exists!";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        }else
-        {
-            
-        if (branch.getBranchId() == 0) {
-            sql = "{call sp_insert_branch(?,?)}";
-        } else if (branch.getBranchId() > 0) {
-            sql = "{call sp_update_branch(?,?,?)}";
-        }
+        sql2 = "SELECT * FROM branch WHERE branch_code='" + branch.getBranchCode() + "' OR branch_name='" + branch.getBranchName() + "'";
 
-        try (
-                Connection conn = DBConnection.getINTER_BRANCH_MySQLConnection();
-                CallableStatement cs = conn.prepareCall(sql);) {
+        UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
+        List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
+        GroupRightBean grb = new GroupRightBean();
+
+        if (branch.getBranchId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "87", "Add") == 0) {
+            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+        } else if (branch.getBranchId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "87", "Edit") == 0) {
+            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+        } else if (new CustomValidator().TextSize(branch.getBranchName(), 1, 100).equals("FAIL")) {
+            msg = "Enter Branch Branch Name!";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+        } else if (new CustomValidator().TextSize(branch.getBranchCode(), 1, 20).equals("FAIL")) {
+            msg = "Enter Branch Branch Code!";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+        } else if ((new CustomValidator().INTER_BRANCH_CheckRecords(sql2) > 0 && branch.getBranchId() == 0) || (new CustomValidator().INTER_BRANCH_CheckRecords(sql2) > 0 && new CustomValidator().INTER_BRANCH_CheckRecords(sql2) != 1 && branch.getBranchId() > 0)) {
+            msg = "Branch Code OR BranchName already exists!";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
+        } else {
+
             if (branch.getBranchId() == 0) {
-                cs.setString("in_branch_code", branch.getBranchCode());
-                cs.setString("in_branch_name", branch.getBranchName());
-                cs.executeUpdate();
-                this.setActionMessage("Saved Successfully");
-                this.clearBranch(branch);
+                sql = "{call sp_insert_branch(?,?)}";
             } else if (branch.getBranchId() > 0) {
-                cs.setLong("in_branch_id", branch.getBranchId());
-                cs.setString("in_branch_code", branch.getBranchCode());
-                cs.setString("in_branch_name", branch.getBranchName());
-                cs.executeUpdate();
-                this.setActionMessage("Updated Successfully");
-                this.clearBranch(branch);
+                sql = "{call sp_update_branch(?,?,?)}";
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-            this.setActionMessage("Branch NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Branch NOT saved!"));
-        } catch(NullPointerException npe){
-            System.err.println(npe.getMessage());
-            this.setActionMessage("Branch NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Inter-Branch Database Connectivity is either LOST or PROBLEMATIC, contact admin...!"));
+
+            try (
+                    Connection conn = DBConnection.getINTER_BRANCH_MySQLConnection();
+                    CallableStatement cs = conn.prepareCall(sql);) {
+                if (branch.getBranchId() == 0) {
+                    cs.setString("in_branch_code", branch.getBranchCode());
+                    cs.setString("in_branch_name", branch.getBranchName());
+                    cs.executeUpdate();
+                    this.setActionMessage("Saved Successfully");
+                    this.clearBranch(branch);
+                } else if (branch.getBranchId() > 0) {
+                    cs.setLong("in_branch_id", branch.getBranchId());
+                    cs.setString("in_branch_code", branch.getBranchCode());
+                    cs.setString("in_branch_name", branch.getBranchName());
+                    cs.executeUpdate();
+                    this.setActionMessage("Updated Successfully");
+                    this.clearBranch(branch);
+                }
+            } catch (SQLException se) {
+                System.err.println(se.getMessage());
+                this.setActionMessage("Branch NOT saved");
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Branch NOT saved!"));
+            } catch (NullPointerException npe) {
+                System.err.println(npe.getMessage());
+                this.setActionMessage("Branch NOT saved");
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Inter-Branch Database Connectivity is either LOST or PROBLEMATIC, contact admin...!"));
+            }
         }
     }
-    }
-    
+
     public Branch getBranch(int BranchId) {
         String sql = "{call sp_search_branch_by_id(?)}";
         ResultSet rs = null;
@@ -108,7 +108,7 @@ private List<Branch> Branches;
         } catch (SQLException se) {
             System.err.println(se.getMessage());
             return null;
-        } catch(NullPointerException npe){
+        } catch (NullPointerException npe) {
             System.err.println(npe.getMessage());
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Inter-Branch Database Connectivity is either LOST or PROBLEMATIC, contact admin...!"));
             return null;
@@ -123,7 +123,7 @@ private List<Branch> Branches;
         }
 
     }
-    
+
     public boolean IsCompanyBranchInvalid() {
         String sql = "{call sp_search_branch_by_id(?)}";
         ResultSet rs = null;
@@ -140,11 +140,11 @@ private List<Branch> Branches;
         } catch (SQLException se) {
             System.err.println(se.getMessage());
             return true;
-        } catch(NullPointerException npe){
+        } catch (NullPointerException npe) {
             System.err.println(npe.getMessage());
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Inter-Branch Database Connectivity is either LOST or PROBLEMATIC, contact admin...!"));
             return true;
-        }finally {
+        } finally {
             if (rs != null) {
                 try {
                     rs.close();
@@ -155,9 +155,9 @@ private List<Branch> Branches;
         }
 
     }
-    
+
     public static Branch findBranchByCode(String BranchCode) {
-        String sql = "{call sp_search_branch_by_code(?)}";  
+        String sql = "{call sp_search_branch_by_code(?)}";
         ResultSet rs = null;
         try (
                 Connection conn = DBConnection.getINTER_BRANCH_MySQLConnection();
@@ -176,11 +176,11 @@ private List<Branch> Branches;
         } catch (SQLException se) {
             System.err.println(se.getMessage());
             return null;
-        } catch(NullPointerException npe){
+        } catch (NullPointerException npe) {
             System.err.println(npe.getMessage());
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Inter-Branch Database Connectivity is either LOST or PROBLEMATIC, contact admin...!"));
             return null;
-        }finally {
+        } finally {
             if (rs != null) {
                 try {
                     rs.close();
@@ -194,47 +194,47 @@ private List<Branch> Branches;
     public void deleteBranch(Branch branch) {
         String sql = "DELETE FROM branch WHERE branch_id=?";
         String msg;
-        
-        UserDetail aCurrentUserDetail=new GeneralUserSetting().getCurrentUser();
-        List<GroupRight> aCurrentGroupRights=new GeneralUserSetting().getCurrentGroupRights();
-        GroupRightBean grb=new GroupRightBean();
-        
-        if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail,aCurrentGroupRights,"87", "Delete")==0) {
-            msg="YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
+
+        UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
+        List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
+        GroupRightBean grb = new GroupRightBean();
+
+        if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "87", "Delete") == 0) {
+            msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-        }else
-        {
-        try (
-                Connection conn = DBConnection.getINTER_BRANCH_MySQLConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);) {
-            ps.setLong(1, branch.getBranchId());
-            ps.executeUpdate();
-            this.setActionMessage("Deleted Successfully!");
-            this.clearBranch(branch);
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-            this.setActionMessage("Branch NOT deleted");
-        }catch(NullPointerException npe){
-            System.err.println(npe.getMessage());
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Inter-Branch Database Connectivity is either LOST or PROBLEMATIC, contact admin...!"));
-        }
+        } else {
+            try (
+                    Connection conn = DBConnection.getINTER_BRANCH_MySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                ps.setLong(1, branch.getBranchId());
+                ps.executeUpdate();
+                this.setActionMessage("Deleted Successfully!");
+                this.clearBranch(branch);
+            } catch (SQLException se) {
+                System.err.println(se.getMessage());
+                this.setActionMessage("Branch NOT deleted");
+            } catch (NullPointerException npe) {
+                System.err.println(npe.getMessage());
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Inter-Branch Database Connectivity is either LOST or PROBLEMATIC, contact admin...!"));
+            }
         }
     }
 
     public void displayBranch(Branch BranchFrom, Branch BranchTo) {
-                BranchTo.setBranchId(BranchFrom.getBranchId());
-                BranchTo.setBranchCode(BranchFrom.getBranchCode());
-                BranchTo.setBranchName(BranchFrom.getBranchName());
+        BranchTo.setBranchId(BranchFrom.getBranchId());
+        BranchTo.setBranchCode(BranchFrom.getBranchCode());
+        BranchTo.setBranchName(BranchFrom.getBranchName());
     }
 
     public void clearBranch(Branch branch) {
-        if(branch!=null){
-                branch.setBranchId(0);
-                branch.setBranchCode("");
-                branch.setBranchName("");
+        if (branch != null) {
+            branch.setBranchId(0);
+            branch.setBranchCode("");
+            branch.setBranchName("");
         }
     }
-    public void clearSelectedBranch(){
+
+    public void clearSelectedBranch() {
         this.clearBranch(this.getSelectedBranch());
     }
 
@@ -259,11 +259,11 @@ private List<Branch> Branches;
             }
         } catch (SQLException se) {
             System.err.println(se.getMessage());
-        } catch(NullPointerException npe){
+        } catch (NullPointerException npe) {
             System.err.println(npe.getMessage());
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Inter-Branch Database Connectivity is either LOST or PROBLEMATIC, contact admin...!"));
             Branches.clear();
-        }finally {
+        } finally {
             if (rs != null) {
                 try {
                     rs.close();

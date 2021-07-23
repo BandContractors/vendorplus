@@ -44,7 +44,7 @@
                             <h:outputLabel id="IolblSalesInvoiceWebsite" value="#{langout['Website']}: #{companySetting.getWebsite()}" rendered="#{companySetting.getWebsite().length()>0}"/>
                             <h:outputLabel id="IolblSalesInvoiceEmail" value="#{langout['Email']}: #{companySetting.getEmail()}" rendered="#{companySetting.getEmail().length()>0}"/>
                         </h:panelGrid>
-
+                        
                         <h:panelGrid columns="1" style="width: 290px; margin: 0px;background-color: gray;text-align: center;-webkit-print-color-adjust: exact;">
                             <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 18pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">#{langout[generalUserSetting.outputDetailParent.transaction_type.transactionOutputLabel]}</h:outputLabel>
                         </h:panelGrid>
@@ -72,7 +72,7 @@
                             <h:outputLabel style="font-size: 12px;" value="#{langout['Verification']} #{langout['Code']}:" rendered="#{generalUserSetting.outputDetailParent.trans.verification_code_tax.length() gt 0}"/>
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.trans.verification_code_tax}" rendered="#{generalUserSetting.outputDetailParent.trans.verification_code_tax.length() gt 0}"/>
                         </h:panelGrid>
-
+                        
                         <h:panelGrid style="width: 290px; margin: 0px;" columns="2" rendered="#{generalUserSetting.outputDetailParent.bill_transactor.transactorId!=generalUserSetting.outputDetailParent.transactor.transactorId}">
                             <h:outputLabel style="font-size: 12px;" value="#{langout['Bill']} #{langout['For']}:"/>
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.bill_transactor.transactorNames}"/>
@@ -81,7 +81,7 @@
                             <h:outputLabel style="font-size: 12px;" value="#{langout['Phone']}:" rendered="#{generalUserSetting.outputDetailParent.bill_transactor.phone.length()>0}"/>
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.bill_transactor.phone}" rendered="#{generalUserSetting.outputDetailParent.bill_transactor.phone.length()>0}"/>
                         </h:panelGrid>
-
+                        
                         <h:panelGrid style="width: 290px; margin: 0px;" columns="2" rendered="#{generalUserSetting.outputDetailParent.transactor.transactorId>0}">
                             <h:outputLabel style="font-size: 12px;" value="#{langout[menuItemBean.menuItemObj.CUSTOMER_NAME]}:"/>
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transactor.transactorNames}"/>
@@ -200,7 +200,7 @@
                         </h:panelGrid>
 
                         <h:panelGrid id="IpgrdSalesInvoicePointsCard">
-                            <h:panelGrid style="width: 290px; margin: 0px;border-bottom-style: dotted" columns="2" rendered="#{generalUserSetting.outputDetailParent.trans.cardNumber.length()>0}">
+                            <h:panelGrid style="width: 290px; margin: 0px;border-bottom-style: dotted" columns="2" rendered="#{generalUserSetting.outputDetailParent.points_card.cardNumber.length()>0}">
                                 <h:outputLabel style="font-size: 12px;" value="#{langout['Card']} #{langout['Number']}:"/>
                                 <h:outputLabel style="font-size: 12px;" id="IolblSalesInvoiceCardNo" value="#{generalUserSetting.outputDetailParent.points_card.cardNumber}"/>
                                 <h:outputLabel style="font-size: 12px;" value="#{langout['Card']} #{langout['Holder']}:"/>

@@ -5,6 +5,7 @@ import api_sm_bi.SMbiBean;
 import connections.DBConnection;
 import entities.CompanySetting;
 import entities.Loyalty_transaction;
+import entities.Trans;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -22,6 +23,7 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import sessions.GeneralUserSetting;
 import utilities.UtilityBean;
 
 /*
@@ -153,7 +155,7 @@ public class Loyalty_transactionBean implements Serializable {
             Runnable task = new Runnable() {
                 @Override
                 public void run() {
-                    insertLoyalty_transactionCall(aLoyalty_transaction_id);
+                    //insertLoyalty_transactionCall(aLoyalty_transaction_id);
                 }
             };
             Executor e = Executors.newSingleThreadExecutor();
@@ -163,44 +165,29 @@ public class Loyalty_transactionBean implements Serializable {
         }
     }
 
-    public void insertLoyalty_transactionCall(long aLoyalty_transaction_id) {
+    public int insertLoyalty_transaction(Trans aTrans) {
+        int saved = 0;
         try {
-//            if (aTransaction_id > 0 && aTransaction_type_id > 0) {
-//                if (aTransaction_type_id == 2) {//SalesInvoice
-//                    Trans t = new TransBean().getTrans(aTransaction_id);
-//                    if (null != t) {
-//                        Loyalty_transaction tsmbi = new Loyalty_transaction();
-//                        tsmbi.setTransaction_id(t.getTransactionId());
-//                        tsmbi.setTransaction_type_id(t.getTransactionTypeId());
-//                        tsmbi.setTransaction_reason_id(t.getTransactionReasonId());
-//                        tsmbi.setTransaction_number(t.getTransactionNumber());
-//                        Date dt = new CompanySetting().getCURRENT_SERVER_DATE();
-//                        tsmbi.setAdd_date(dt);
-//                        tsmbi.setStatus_sync(0);
-//                        tsmbi.setStatus_date(dt);
-//                        tsmbi.setStatus_desc("not synced");
-//                        int s = this.insertLoyalty_transaction(tsmbi);
-//                    }
-//                } else if (aTransaction_type_id == 82 || aTransaction_type_id == 83) {//82-126-CREDIT NOTE, 83-127-DEBIT NOTE
-//                    Trans t = new CreditDebitNoteBean().getTrans_cr_dr_note(aTransaction_id);
-//                    if (null != t) {
-//                        Loyalty_transaction tsmbi = new Loyalty_transaction();
-//                        tsmbi.setTransaction_id(t.getTransactionId());
-//                        tsmbi.setTransaction_type_id(t.getTransactionTypeId());
-//                        tsmbi.setTransaction_reason_id(t.getTransactionReasonId());
-//                        tsmbi.setTransaction_number(t.getTransactionNumber());
-//                        Date dt = new CompanySetting().getCURRENT_SERVER_DATE();
-//                        tsmbi.setAdd_date(dt);
-//                        tsmbi.setStatus_sync(0);
-//                        tsmbi.setStatus_date(dt);
-//                        tsmbi.setStatus_desc("not synced");
-//                        int s = this.insertLoyalty_transaction(tsmbi);
-//                    }
-//                }
-//            }
+            Loyalty_transaction lt = new Loyalty_transaction();
+            lt.setCard_number(aTrans.getCardNumber());
+            lt.setInvoice_number(aTrans.getTransactionNumber());
+            lt.setTransaction_date(aTrans.getTransactionDate());
+            lt.setPoints_awarded(aTrans.getPointsAwarded());
+            lt.setAmount_awarded(aTrans.getPointsAwarded() * CompanySetting.getAwardAmountPerPoint());
+            lt.setPoints_spent(aTrans.getSpendPointsAmount()/CompanySetting.getSpendAmountPerPoint());
+            lt.setAmount_spent(aTrans.getSpendPointsAmount());
+            lt.setCurrency_code(aTrans.getCurrencyCode());
+            lt.setStaff_code(new UserDetailBean().getUserDetail(aTrans.getAddUserDetailId()).getUserName());
+            lt.setAdd_date(new CompanySetting().getCURRENT_SERVER_DATE());
+            lt.setStatus_sync(0);
+            lt.setStatus_date(new CompanySetting().getCURRENT_SERVER_DATE());
+            lt.setStatus_desc("");
+            lt.setStore_id(aTrans.getStoreId());
+            saved = this.insertLoyalty_transaction(lt);
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
+        return saved;
     }
 
     public int insertLoyalty_transaction(Loyalty_transaction aLoyalty_transaction) {
