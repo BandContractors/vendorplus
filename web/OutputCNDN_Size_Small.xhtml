@@ -77,7 +77,7 @@
                             <h:outputLabel style="font-size: 12px;" value="#{langout['Original']} FDN:" rendered="#{generalUserSetting.outputDetailParent.trans.fdn_ref.length() gt 0}"/>
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.trans.fdn_ref}" rendered="#{generalUserSetting.outputDetailParent.trans.fdn_ref.length() gt 0}"/>
                         </h:panelGrid>
-                        
+
                         <h:panelGrid style="width: 290px; margin: 0px;" columns="2" rendered="#{generalUserSetting.outputDetailParent.bill_transactor.transactorId!=generalUserSetting.outputDetailParent.transactor.transactorId}">
                             <h:outputLabel style="font-size: 12px;" value="#{langout['Bill']} #{langout['For']}:"/>
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.bill_transactor.transactorNames}"/>
@@ -86,7 +86,7 @@
                             <h:outputLabel style="font-size: 12px;" value="#{langout['Phone']}:" rendered="#{generalUserSetting.outputDetailParent.bill_transactor.phone.length()>0}"/>
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.bill_transactor.phone}" rendered="#{generalUserSetting.outputDetailParent.bill_transactor.phone.length()>0}"/>
                         </h:panelGrid>
-                        
+
                         <h:panelGrid style="width: 290px; margin: 0px;" columns="2" rendered="#{generalUserSetting.outputDetailParent.transactor.transactorId>0}">
                             <h:outputLabel style="font-size: 12px;" value="#{langout[menuItemBean.menuItemObj.CUSTOMER_NAME]}:"/>
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transactor.transactorNames}"/>
@@ -156,8 +156,8 @@
                             <h:outputLabel style="font-size: 16px; font-weight: bold;" id="IolblSalesInvoiceGrandTotal" value="#{generalUserSetting.outputDetailParent.trans.grandTotal}">
                                 <f:convertNumber pattern="#{accCurrencyBean.getNumberFormatByCurrency(generalUserSetting.outputDetailParent.trans.currencyCode)}" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
-                            <h:outputLabel style="font-size: 16px;" value="#{langout['Points']} #{langout['Spent']} #{langout['Amount']}:" rendered="#{generalUserSetting.outputDetailParent.pay.pointsSpentAmount>0}"/>
-                            <h:outputLabel id="IolblSalesInvoicePointsAmountSpent" value="#{generalUserSetting.outputDetailParent.pay.pointsSpentAmount}" rendered="#{generalUserSetting.outputDetailParent.pay.pointsSpentAmount>0}">
+                            <h:outputLabel style="font-size: 16px;" value="#{langout['Points']} #{langout['Spent']} #{langout['Amount']}:" rendered="#{generalUserSetting.outputDetailParent.loyalty_transaction.amount_spent>0}"/>
+                            <h:outputLabel id="IolblSalesInvoicePointsAmountSpent" value="#{generalUserSetting.outputDetailParent.pay.pointsSpentAmount}" rendered="#{generalUserSetting.outputDetailParent.loyalty_transaction.amount_spent>0}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
                         </h:panelGrid>
@@ -193,21 +193,15 @@
                         </h:panelGrid>
 
                         <h:panelGrid id="IpgrdSalesInvoicePointsCard">
-                            <h:panelGrid style="width: 290px; margin: 0px;border-bottom-style: dotted" columns="2" rendered="#{generalUserSetting.outputDetailParent.points_card.cardNumber.length()>0}">
-                                <h:outputLabel style="font-size: 12px;" value="#{langout['Card']} #{langout['Number']}:"/>
-                                <h:outputLabel style="font-size: 12px;" id="IolblSalesInvoiceCardNo" value="#{generalUserSetting.outputDetailParent.points_card.cardNumber}"/>
-                                <h:outputLabel style="font-size: 12px;" value="#{langout['Card']} #{langout['Holder']}:"/>
-                                <h:outputLabel style="font-size: 12px;" id="IolblSalesInvoiceCardHolder" value="#{generalUserSetting.outputDetailParent.points_card.cardHolder}"/>
+                            <h:panelGrid style="width: 290px; margin: 0px;border-bottom-style: dotted" columns="2" rendered="#{generalUserSetting.outputDetailParent.loyalty_transaction.card_number.length()>0}">
+                                <h:outputLabel style="font-size: 12px;" value="#{langout['Loyalty']} #{langout['Card']} #{langout['Number']}:"/>
+                                <h:outputLabel style="font-size: 12px;" id="IolblSalesInvoiceCardNo" value="#{generalUserSetting.outputDetailParent.loyalty_transaction.card_number}"/>
                                 <h:outputLabel style="font-size: 12px;" value="#{langout['Points']} #{langout['Spent']}:"/>
-                                <h:outputLabel style="font-size: 12px;" id="IolblSalesInvoicePointsSpent" value="#{generalUserSetting.outputDetailParent.pay.pointsSpent}">
+                                <h:outputLabel style="font-size: 12px;" id="IolblSalesInvoicePointsSpent" value="#{generalUserSetting.outputDetailParent.loyalty_transaction.points_spent}">
                                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputLabel>
                                 <h:outputLabel style="font-size: 12px;" value="#{langout['Points']} #{langout['Awarded']} :"/>
-                                <h:outputLabel style="font-size: 12px;" id="IolblSalesInvoicePointsAwarded" value="#{generalUserSetting.outputDetailParent.trans.pointsAwarded}">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                                </h:outputLabel>
-                                <h:outputLabel style="font-size: 12px;" value="#{langout['Points']} #{langout['Balance']} :"/>
-                                <h:outputLabel style="font-size: 12px;" id="IolblSalesInvoicePointsBalance" value="#{generalUserSetting.outputDetailParent.points_card.pointsBalance}">
+                                <h:outputLabel style="font-size: 12px;" id="IolblSalesInvoicePointsAwarded" value="#{generalUserSetting.outputDetailParent.loyalty_transaction.points_awarded}">
                                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputLabel>
                             </h:panelGrid>

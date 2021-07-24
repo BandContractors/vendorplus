@@ -3,7 +3,6 @@ package beans;
 import connections.DBConnection;
 import entities.Pay;
 import entities.PayTrans;
-import entities.PointsCard;
 import sessions.GeneralUserSetting;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -21,12 +20,12 @@ import utilities.ConvertNumToWordBean;
 @ManagedBean
 @SessionScoped
 public class OutputDetailBean implements Serializable {
-
+    
     private static final long serialVersionUID = 1L;
-
+    
     public OutputDetailBean() {
     }
-
+    
     public void refreshOutput(String aLevel, String aSource) {
         try {
             TransBean tb = new TransBean();
@@ -56,10 +55,11 @@ public class OutputDetailBean implements Serializable {
                     break;
             }
             tb.updateLookup(aOutputDetail.getTrans());
-
+            
             try {
-                //aOutputDetail.setPoints_card(new PointsCardBean().getPointsCardByCardNumber(aOutputDetail.getTrans().getCardNumber()));
-                aOutputDetail.setPoints_card(new PointsCard());
+                if (aOutputDetail.getTrans().getCardNumber().length() > 0) {
+                    aOutputDetail.setLoyalty_transaction(new Loyalty_transactionBean().getLoyalty_transaction(aOutputDetail.getTrans().getTransactionNumber()));
+                }
             } catch (Exception e) {
             }
             try {
@@ -264,7 +264,7 @@ public class OutputDetailBean implements Serializable {
             System.err.println("refreshOutput:" + e.getMessage());
         }
     }
-
+    
     public void refreshOutputCrDr(String aLevel, String aSource) {
         try {
             TransBean tb = new TransBean();
@@ -369,7 +369,7 @@ public class OutputDetailBean implements Serializable {
             System.err.println("refreshOutputCrDr:" + e.getMessage());
         }
     }
-
+    
     public String getGoodOrService(long aPayId) {
         String good_or_service = "";
         int good_found = 0;
@@ -405,7 +405,7 @@ public class OutputDetailBean implements Serializable {
         }
         return good_or_service;
     }
-
+    
     public void refreshOutputProduction(String aLevel, String aSource) {
         try {
             TransProductionBean tb = new TransProductionBean();
@@ -482,7 +482,7 @@ public class OutputDetailBean implements Serializable {
             System.err.println("refreshOutputProduction:" + e.getMessage());
         }
     }
-
+    
     public void clearOutputDetail(String aLevel) {
         FacesContext context = FacesContext.getCurrentInstance();
         HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
@@ -496,7 +496,7 @@ public class OutputDetailBean implements Serializable {
                 break;
         }
     }
-
+    
     public String getVatRatedCode(String Vatrated) {
         switch (Vatrated) {
             case "STANDARD":
@@ -509,5 +509,5 @@ public class OutputDetailBean implements Serializable {
                 return "";
         }
     }
-
+    
 }

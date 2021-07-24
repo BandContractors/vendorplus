@@ -150,6 +150,25 @@ public class Loyalty_transactionBean implements Serializable {
         return lt;
     }
 
+    public Loyalty_transaction getLoyalty_transaction(String aInvoice_number) {
+        String sql = "select * from loyalty_transaction where invoice_number=?";
+        ResultSet rs = null;
+        Loyalty_transaction lt = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setString(1, aInvoice_number);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                lt = new Loyalty_transaction();
+                this.setLoyalty_transactionFromResultset(lt, rs);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return lt;
+    }
+
     public void insertLoyalty_transactionCallThread(long aLoyalty_transaction_id) {
         try {
             Runnable task = new Runnable() {
@@ -174,7 +193,7 @@ public class Loyalty_transactionBean implements Serializable {
             lt.setTransaction_date(aTrans.getTransactionDate());
             lt.setPoints_awarded(aTrans.getPointsAwarded());
             lt.setAmount_awarded(aTrans.getPointsAwarded() * CompanySetting.getAwardAmountPerPoint());
-            lt.setPoints_spent(aTrans.getSpendPointsAmount()/CompanySetting.getSpendAmountPerPoint());
+            lt.setPoints_spent(aTrans.getSpendPointsAmount() / CompanySetting.getSpendAmountPerPoint());
             lt.setAmount_spent(aTrans.getSpendPointsAmount());
             lt.setCurrency_code(aTrans.getCurrencyCode());
             lt.setStaff_code(new UserDetailBean().getUserDetail(aTrans.getAddUserDetailId()).getUserName());

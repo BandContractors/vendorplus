@@ -146,8 +146,8 @@
                             <h:inputText id="itxtvAmountTendered" value="#{generalUserSetting.outputDetailParent.trans.amountTendered}" styleClass="clsInputTransItem" style="width: 150px;border: none;" disabled="true">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:inputText>
-                            <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langout['Spent']} #{langout['Points']} #{langout['Amount']}"/>
-                            <h:inputText id="itxtvSpendPointsAmount" value="#{generalUserSetting.outputDetailParent.pay.pointsSpentAmount}" styleClass="clsInputTransItem" style="width: 150px;border: none;" disabled="true">
+                            <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langout['Points']} #{langout['Amount']} #{langout['Spent']}"/>
+                            <h:inputText id="itxtvSpendPointsAmount" value="#{generalUserSetting.outputDetailParent.loyalty_transaction.amount_spent}" styleClass="clsInputTransItem" style="width: 150px;border: none;" disabled="true">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:inputText>
                             <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langout['Balance']}" rendered="#{generalUserSetting.outputDetailParent.trans.changeAmount>=0}"/>
@@ -187,21 +187,15 @@
                     </h:panelGrid>
 
                     <h:panelGrid columns="2" style="width:100%;-webkit-print-color-adjust: exact;">
-                        <h:panelGrid id="pgrdvSalesInvoicePointsCard" style="margin: 0px;text-align: right;float: left;" columns="2" rendered="#{generalUserSetting.outputDetailParent.points_card.cardNumber.length()>0}">
-                            <h:outputLabel style="font-size: 14px;" value="#{langout['Card']} #{langout['Number']}:"/>
-                            <h:inputText style="font-size: 14px;border: none;" id="olblvSalesInvoiceCardNo" value="#{generalUserSetting.outputDetailParent.points_card.cardNumber}" disabled="true"/>
-                            <h:outputLabel style="font-size: 14px;" value="#{langout['Card']} #{langout['Holder']}:"/>
-                            <h:inputText  style="font-size: 14px;border: none;" id="olblvSalesInvoiceCardHolder" value="#{generalUserSetting.outputDetailParent.points_card.cardHolder}" disabled="true"/>
+                        <h:panelGrid id="pgrdvSalesInvoicePointsCard" style="margin: 0px;text-align: right;float: left;" columns="2" rendered="#{generalUserSetting.outputDetailParent.loyalty_transaction.card_number.length()>0}">
+                            <h:outputLabel style="font-size: 14px;" value="#{langout['Loyalty']} #{langout['Card']} #{langout['Number']}:"/>
+                            <h:inputText style="font-size: 14px;border: none;" id="olblvSalesInvoiceCardNo" value="#{generalUserSetting.outputDetailParent.loyalty_transaction.card_number}" disabled="true"/>
                             <h:outputLabel style="font-size: 14px;" value="#{langout['Points']} #{langout['Spent']}:"/>
-                            <h:inputText  style="font-size: 14px;border: none;" id="olblvSalesInvoicePointsSpent" value="#{generalUserSetting.outputDetailParent.pay.pointsSpent}" disabled="true">
+                            <h:inputText  style="font-size: 14px;border: none;" id="olblvSalesInvoicePointsSpent" value="#{generalUserSetting.outputDetailParent.loyalty_transaction.points_spent}" disabled="true">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:inputText >
                             <h:outputLabel style="font-size: 14px;" value="#{langout['Points']} #{langout['Awarded']}:"/>
-                            <h:inputText  style="font-size: 14px;border: none;" id="olblvSalesInvoicePointsAwarded" value="#{generalUserSetting.outputDetailParent.trans.pointsAwarded}" disabled="true">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                            </h:inputText >
-                            <h:outputLabel style="font-size: 14px;" value="#{langout['Points']} #{langout['Balance']}:"/>
-                            <h:inputText  style="font-size: 14px;border: none;" id="olblSalesInvoicePointsBalance" value="#{generalUserSetting.outputDetailParent.points_card.pointsBalance}" disabled="true">
+                            <h:inputText  style="font-size: 14px;border: none;" id="olblvSalesInvoicePointsAwarded" value="#{generalUserSetting.outputDetailParent.loyalty_transaction.points_awarded}" disabled="true">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:inputText >
                         </h:panelGrid>
@@ -213,7 +207,7 @@
                                 <h:outputLabel style="font-size: 14px;" value="Vatable #{langout['Amount']}"/>
                                 <h:outputLabel style="font-size: 14px;" value="VAT"/>
 
-                                <h:outputLabel style="font-size: 14px;" value="#{langout['Standard']}[S]"/>
+                                <h:outputLabel style="font-size: 14px;" value="#{langout['Standard']}"/>
                                 <h:outputLabel style="font-size: 14px;" value="#{generalUserSetting.outputDetailParent.trans.vatPerc}">
                                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputLabel>
@@ -224,14 +218,14 @@
                                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputLabel>
 
-                                <h:outputLabel style="font-size: 14px;" value="#{langout['Zero']}[Z]"/>
+                                <h:outputLabel style="font-size: 14px;" value="#{langout['Zero']}"/>
                                 <h:outputLabel style="font-size: 14px;" value="0"/>
                                 <h:outputLabel style="font-size: 14px;" value="#{generalUserSetting.outputDetailParent.trans.totalZeroVatableAmount}">
                                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputLabel>
                                 <h:outputLabel style="font-size: 14px;" value="0"/>
 
-                                <h:outputLabel style="font-size: 14px;" value="#{langout['Exempt']}[E]"/>
+                                <h:outputLabel style="font-size: 14px;" value="#{langout['Exempt']}"/>
                                 <h:outputLabel style="font-size: 14px;" value="n/a"/>
                                 <h:outputLabel style="font-size: 14px;" value="#{generalUserSetting.outputDetailParent.trans.totalExemptVatableAmount}">
                                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>

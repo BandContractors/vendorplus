@@ -1,6 +1,7 @@
 package beans;
 
 import entities.AccChildAccount;
+import entities.Loyalty_transaction;
 import entities.TransItem;
 import entities.Pay;
 import entities.PayMethod;
@@ -22,8 +23,9 @@ import javax.faces.bean.SessionScoped;
 @ManagedBean(name = "outputDetail")
 @SessionScoped
 public class OutputDetail implements Serializable {
+
     private static final long serialVersionUID = 1L;
-    
+
     private Trans trans;
     private Pay pay;
     private PointsCard points_card;
@@ -47,11 +49,11 @@ public class OutputDetail implements Serializable {
     private String pay_reason;
     private String pay_reason2;
     private TransProduction transProduction;
-    private List<TransProductionItem> trans_prod_items = new ArrayList<TransProductionItem>();
+    private List<TransProductionItem> trans_prod_items = new ArrayList<>();
     private String TransAmountInWords;
     private String PayAmountInWords;
-    
-    
+    private Loyalty_transaction loyalty_transaction;
+
     public OutputDetail() {
     }
 
@@ -417,6 +419,20 @@ public class OutputDetail implements Serializable {
      */
     public void setPayAmountInWords(String PayAmountInWords) {
         this.PayAmountInWords = PayAmountInWords;
+    }
+
+    /**
+     * @return the loyalty_transaction
+     */
+    public Loyalty_transaction getLoyalty_transaction() {
+        return loyalty_transaction;
+    }
+
+    /**
+     * @param loyalty_transaction the loyalty_transaction to set
+     */
+    public void setLoyalty_transaction(Loyalty_transaction loyalty_transaction) {
+        this.loyalty_transaction = loyalty_transaction;
     }
 
 }
