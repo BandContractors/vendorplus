@@ -6073,6 +6073,15 @@ public class TransItemBean implements Serializable {
                 } catch (NullPointerException npe) {
                     aTransItem.setOverride_gen_name(0);
                 }
+                try {
+                    if (null == item.getItemCode()) {
+                        aTransItem.setItemCode("");
+                    } else {
+                        aTransItem.setItemCode(item.getItemCode());
+                    }
+                } catch (Exception e) {
+                    aTransItem.setItemCode("");
+                }
                 if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
                     if (null == new Item_tax_mapBean().getItem_tax_mapSynced(aTransItem.getItemId())) {
                         aTransItem.setIs_tax_synced(0);

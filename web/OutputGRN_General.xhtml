@@ -71,9 +71,15 @@
                         </p:column>
                         <p:column>
                             <!-- column header -->
-                            <f:facet name="header">#{langout['Item']} #{langout['Description']}</f:facet>
+                            <f:facet name="header">#{langout['Description']}</f:facet>
                             <!-- row record -->
                             <p:outputLabel value="#{transItemBean.showItemDescriptionCEC(ti2)}" escape="false"/>
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langout['Code']}</f:facet>
+                            <!-- row record -->
+                            <p:outputLabel value="#{ti2.itemCode}" escape="false"/>
                         </p:column>
                         <p:column>
                             <!-- column header -->

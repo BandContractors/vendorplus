@@ -1162,6 +1162,8 @@ CREATE PROCEDURE sp_insert_transactor
 	IN in_month_net_pay double,
 	IN in_store_id int,
 	IN in_transactor_segment_id int,
+    IN in_is_credit_limit int(1),
+	IN in_credit_limit double,
 	OUT out_transactor_id bigint
 ) 
 BEGIN 
@@ -1219,7 +1221,9 @@ BEGIN
 		month_gross_pay,
 		month_net_pay,
 		store_id,
-		transactor_segment_id
+		transactor_segment_id,
+        is_credit_limit,
+		credit_limit
 	) 
     VALUES
 	(
@@ -1259,7 +1263,9 @@ BEGIN
 		in_month_gross_pay,
 		in_month_net_pay,
 		in_store_id,
-		in_transactor_segment_id
+		in_transactor_segment_id,
+        in_is_credit_limit,
+		in_credit_limit
 	); 
 SET out_transactor_id=@new_id;
 END//
@@ -1302,7 +1308,9 @@ CREATE PROCEDURE sp_update_transactor
 	IN in_position varchar(50),
 	IN in_month_gross_pay double,
 	IN in_month_net_pay double,
-	IN in_transactor_segment_id int
+	IN in_transactor_segment_id int,
+    IN in_is_credit_limit int(1),
+	IN in_credit_limit double
 ) 
 BEGIN 
 
@@ -1353,7 +1361,9 @@ BEGIN
 		position=in_position,
 		month_gross_pay=in_month_gross_pay,
 		month_net_pay=in_month_net_pay,
-		transactor_segment_id=in_transactor_segment_id 
+		transactor_segment_id=in_transactor_segment_id,
+        is_credit_limit=in_is_credit_limit,
+		credit_limit=in_credit_limit 
 	WHERE transactor_id=in_transactor_id; 
 END//
 DELIMITER ;

@@ -62,7 +62,7 @@
                     </h:panelGrid>
 
                     <p:dataTable rowIndexVar="rowIndex" id="dtblvTransactionItem" value="#{generalUserSetting.outputDetailParent.trans_items}" var="ti2" 
-                                 styleClass="cls-table" tableStyle="width:auto;" 
+                                 styleClass="cls-table" tableStyle="width: auto;" 
                                  >  
                         <p:column>
                             <!-- column header -->
@@ -76,7 +76,12 @@
                             <!-- row record -->
                             <p:outputLabel value="#{transItemBean.showItemDescriptionCEC(ti2)}" escape="false"/>
                         </p:column>
-
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langout['Item']} #{langout['Code']}</f:facet>
+                            <!-- row record -->
+                            <p:outputLabel value="#{ti2.itemCode}" escape="false"/>
+                        </p:column>
                         <p:column>
                             <!-- column header -->
                             <f:facet name="header">#{langout['Unit']}</f:facet>

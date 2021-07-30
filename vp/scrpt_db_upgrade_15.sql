@@ -99,3 +99,12 @@ primary key (loyalty_transaction_id)
 );
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_15',98,Now(),'6.0','');
+
+ALTER TABLE transactor 
+ADD COLUMN is_credit_limit int(1) default 0 not null AFTER transactor_segment_id;
+ALTER TABLE transactor 
+ADD COLUMN credit_limit double default 0 not null AFTER is_credit_limit;
+
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_15',108,Now(),'6.0','');
+

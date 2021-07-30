@@ -94,14 +94,18 @@
                 <h:selectOneMenu id="menuLanguageSystem" value="#{userDetail.language_system}" style="width: 225px;">
                     <f:selectItem itemLabel="ENGLISH" itemValue="ENGLISH"/>
                     <f:selectItem itemLabel="CHINESE" itemValue="SIMPLIFIED_CHINESE"/>
+                    <!--
                     <f:selectItem itemLabel="FRENCH" itemValue="FRENCH"/>
+                    -->
                 </h:selectOneMenu>
 
                 <h:outputLabel  value="#{langsys['Output']} #{langsys['Language']}:"/>
                 <h:selectOneMenu id="menuLanguageOutput" value="#{userDetail.language_output}" style="width: 225px;">
                     <f:selectItem itemLabel="ENGLISH" itemValue="ENGLISH"/>
                     <f:selectItem itemLabel="CHINESE" itemValue="SIMPLIFIED_CHINESE"/>
+                    <!--
                     <f:selectItem itemLabel="FRENCH" itemValue="FRENCH"/>
+                    -->
                 </h:selectOneMenu>
             </h:panelGrid>
 

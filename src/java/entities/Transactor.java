@@ -54,6 +54,8 @@ public class Transactor implements Serializable {
     private int store_id;
     private String trans_number_format;
     private int transactor_segment_id;
+    private int is_credit_limit;
+    private double credit_limit;
 
     /**
      * @return the TransactorId
@@ -557,6 +559,34 @@ public class Transactor implements Serializable {
      */
     public void setTransactor_segment_id(int transactor_segment_id) {
         this.transactor_segment_id = transactor_segment_id;
+    }
+
+    /**
+     * @return the is_credit_limit
+     */
+    public int getIs_credit_limit() {
+        return is_credit_limit;
+    }
+
+    /**
+     * @param is_credit_limit the is_credit_limit to set
+     */
+    public void setIs_credit_limit(int is_credit_limit) {
+        this.is_credit_limit = is_credit_limit;
+    }
+
+    /**
+     * @return the credit_limit
+     */
+    public double getCredit_limit() {
+        return credit_limit;
+    }
+
+    /**
+     * @param credit_limit the credit_limit to set
+     */
+    public void setCredit_limit(double credit_limit) {
+        this.credit_limit = credit_limit;
     }
 
 }

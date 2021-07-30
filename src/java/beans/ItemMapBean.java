@@ -3,6 +3,7 @@ package beans;
 import sessions.GeneralUserSetting;
 import connections.DBConnection;
 import entities.GroupRight;
+import entities.Item;
 import entities.UserDetail;
 import entities.ItemMap;
 import java.io.Serializable;
@@ -38,20 +39,15 @@ public class ItemMapBean implements Serializable {
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = Logger.getLogger(ItemMapBean.class.getName());
     private List<ItemMap> ItemMaps;
-    private String ActionMessage = null;
     private ItemMap SelectedItemMap = null;
     private int SelectedItemMapId;
     private String SearchItemMap = "";
-    private String ItemAddedStatus = "Item Added";
-    private String ItemNotAddedStatus = "Item Not Added";
-    private int ShowItemAddedStatus = 0;
-    private int ShowItemNotAddedStatus = 0;
     private long SelectedMapGroupId;
     long NewId = 0;
     @ManagedProperty("#{menuItemBean}")
     private MenuItemBean menuItemBean;
 
-    public void saveItemMap(ItemMap itemmap) {
+    public void saveItemMap(ItemMap aItemMap, Item aBigItem, Item aSmallItem) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
         try {
@@ -61,8 +57,8 @@ public class ItemMapBean implements Serializable {
         String msg = "";
         String sql = null;
         String sql2 = null;
-        if (itemmap != null) {
-            if (new ItemBean().getItem(itemmap.getBigItemId()).getItemType().equals("SERVICE") || new ItemBean().getItem(itemmap.getSmallItemId()).getItemType().equals("SERVICE")) {
+        if (aItemMap != null) {
+            if ((null != aBigItem && aBigItem.getItemType().equals("SERVICE")) || (null != aSmallItem && aSmallItem.equals("SERVICE"))) {
                 msg = "Service Item Cannot be Mapped";
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else {
@@ -70,42 +66,38 @@ public class ItemMapBean implements Serializable {
                 List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
                 GroupRightBean grb = new GroupRightBean();
 
-                if (itemmap.getItemMapId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Add") == 0) {
+                if (aItemMap.getItemMapId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Add") == 0) {
                     msg = "Not Allowed to Access this Function";
                     FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
-                } else if (itemmap.getItemMapId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Edit") == 0) {
+                } else if (aItemMap.getItemMapId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Edit") == 0) {
                     msg = "Not Allowed to Access this Function";
                     FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
-                } else if (itemmap.getBigItemId() == 0 || itemmap.getSmallItemId() == 0) {
+                } else if (aItemMap.getBigItemId() == 0 || aItemMap.getSmallItemId() == 0) {
                     msg = "Select Big Item and Small Item";
-                    this.setActionMessage("Item Map Not Saved");
                     FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
-                } else if (itemmap.getBigItemId() == itemmap.getSmallItemId()) {
+                } else if (aItemMap.getBigItemId() == aItemMap.getSmallItemId()) {
                     msg = "Big Item and Small Item Cannot be the Same";
-                    this.setActionMessage("Item Map Not Saved");
                     FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
-                } else if (itemmap.getFractionQty() == 0) {
+                } else if (aItemMap.getFractionQty() == 0) {
                     msg = "Specify Qty of Small Item in Big Item";
-                    this.setActionMessage("Item Map Not Saved");
                     FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
-                } else if (itemmap.getPosition() == 0) {
+                } else if (aItemMap.getPosition() == 0) {
                     msg = "Specify Mapping Position in the Group";
-                    this.setActionMessage("Item Map Not Saved");
                     FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
-                } else if ((this.itemCountInMap("BIG", itemmap.getBigItemId()) > 0 && itemmap.getItemMapId() == 0) || (this.itemCountInMap("BIG", itemmap.getBigItemId()) > 0 && this.itemCountInMap("BIG", itemmap.getBigItemId()) != 1 && itemmap.getItemMapId() > 0)) {
+                } else if ((this.itemCountInMap("BIG", aItemMap.getBigItemId()) > 0 && aItemMap.getItemMapId() == 0) || (this.itemCountInMap("BIG", aItemMap.getBigItemId()) > 0 && this.itemCountInMap("BIG", aItemMap.getBigItemId()) != 1 && aItemMap.getItemMapId() > 0)) {
                     msg = "Selected Big Item is already Mapped";
                     FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
-                } else if ((this.itemCountInMap("SMALL", itemmap.getSmallItemId()) > 0 && itemmap.getItemMapId() == 0) || (this.itemCountInMap("SMALL", itemmap.getSmallItemId()) > 0 && this.itemCountInMap("SMALL", itemmap.getSmallItemId()) != 1 && itemmap.getItemMapId() > 0)) {
+                } else if ((this.itemCountInMap("SMALL", aItemMap.getSmallItemId()) > 0 && aItemMap.getItemMapId() == 0) || (this.itemCountInMap("SMALL", aItemMap.getSmallItemId()) > 0 && this.itemCountInMap("SMALL", aItemMap.getSmallItemId()) != 1 && aItemMap.getItemMapId() > 0)) {
                     msg = "Selected Small Item is already Mapped";
                     FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
-                } else if ((this.groupCountInMap(this.SelectedMapGroupId) >= 2 && itemmap.getItemMapId() == 0) || (this.groupCountInMap(this.SelectedMapGroupId) >= 2 && this.groupCountInMap(this.SelectedMapGroupId) != 2 && itemmap.getItemMapId() > 0)) {
+                } else if ((this.groupCountInMap(this.SelectedMapGroupId) >= 2 && aItemMap.getItemMapId() == 0) || (this.groupCountInMap(this.SelectedMapGroupId) >= 2 && this.groupCountInMap(this.SelectedMapGroupId) != 2 && aItemMap.getItemMapId() > 0)) {
                     msg = "You Cannot Map Beyond 3 Levels";
                     FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                 } else {
 
-                    if (itemmap.getItemMapId() == 0) {
+                    if (aItemMap.getItemMapId() == 0) {
                         sql = "{call sp_insert_item_map(?,?,?,?,?)}";
-                    } else if (itemmap.getItemMapId() > 0) {
+                    } else if (aItemMap.getItemMapId() > 0) {
                         sql = "{call sp_update_item_map(?,?,?,?,?,?)}";
                     }
                     if (this.SelectedMapGroupId == 0) {
@@ -114,30 +106,32 @@ public class ItemMapBean implements Serializable {
                     try (
                             Connection conn = DBConnection.getMySQLConnection();
                             CallableStatement cs = conn.prepareCall(sql);) {
-                        if (itemmap.getItemMapId() == 0) {
-                            cs.setLong("in_big_item_id", itemmap.getBigItemId());
-                            cs.setLong("in_small_item_id", itemmap.getSmallItemId());
-                            cs.setDouble("in_fraction_qty", itemmap.getFractionQty());
-                            cs.setInt("in_position", itemmap.getPosition());
+                        if (aItemMap.getItemMapId() == 0) {
+                            cs.setLong("in_big_item_id", aItemMap.getBigItemId());
+                            cs.setLong("in_small_item_id", aItemMap.getSmallItemId());
+                            cs.setDouble("in_fraction_qty", aItemMap.getFractionQty());
+                            cs.setInt("in_position", aItemMap.getPosition());
                             cs.setLong("in_map_group_id", this.SelectedMapGroupId);
                             cs.executeUpdate();
-                            this.clearItemMap(itemmap);
-                            this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
-                        } else if (itemmap.getItemMapId() > 0) {
-                            cs.setLong("in_item_map_id", itemmap.getItemMapId());
-                            cs.setLong("in_big_item_id", itemmap.getBigItemId());
-                            cs.setLong("in_small_item_id", itemmap.getSmallItemId());
-                            cs.setDouble("in_fraction_qty", itemmap.getFractionQty());
-                            cs.setInt("in_position", itemmap.getPosition());
+                            //this.clearItemMap(aItemMap, aBigItem, aSmallItem);
+                            msg = "Saved Successfully";
+                            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+                        } else if (aItemMap.getItemMapId() > 0) {
+                            cs.setLong("in_item_map_id", aItemMap.getItemMapId());
+                            cs.setLong("in_big_item_id", aItemMap.getBigItemId());
+                            cs.setLong("in_small_item_id", aItemMap.getSmallItemId());
+                            cs.setDouble("in_fraction_qty", aItemMap.getFractionQty());
+                            cs.setInt("in_position", aItemMap.getPosition());
                             cs.setLong("in_map_group_id", this.SelectedMapGroupId);
                             cs.executeUpdate();
-                            this.clearItemMap(itemmap);
-                            this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
+                            //this.clearItemMap(aItemMap, aBigItem, aSmallItem);
+                            msg = "Saved Successfully";
+                            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                         }
                     } catch (Exception e) {
                         LOGGER.log(Level.ERROR, e);
-                        this.setActionMessage(ub.translateWordsInText(BaseName, "Item Map Not Saved"));
-                        FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Item Map Not Saved!")));
+                        msg = "Item Map Not Saved";
+                        FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                     }
                 }
             }
@@ -273,11 +267,10 @@ public class ItemMapBean implements Serializable {
                     PreparedStatement ps = conn.prepareStatement(sql);) {
                 ps.setLong(1, itemmap.getItemMapId());
                 ps.executeUpdate();
-                this.setActionMessage(ub.translateWordsInText(BaseName, "Deleted Successfully"));
-                //this.clearItemMap(itemmap);
+                msg = "Deleted Successfully";
+                FacesContext.getCurrentInstance().addMessage("Delete", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } catch (Exception e) {
                 LOGGER.log(Level.ERROR, e);
-                this.setActionMessage(ub.translateWordsInText(BaseName, "Item Map Not Deleted"));
             }
         }
     }
@@ -376,15 +369,16 @@ public class ItemMapBean implements Serializable {
         return ItemMaps;
     }
 
-    public void clearItemMap(ItemMap im) {
+    public void clearItemMap(ItemMap im, Item aBigItem, Item aSmallItem) {
         if (im != null) {
             im.setItemMapId(0);
-            //im.setBigItemId(0);
-            //im.setSmallItemId(0);
+            im.setBigItemId(0);
+            im.setSmallItemId(0);
             im.setFractionQty(0);
             im.setPosition(0);
-            //im.setMapGroupId(0);
         }
+        new ItemBean().clearItem(aBigItem);
+        new ItemBean().clearItem(aSmallItem);
     }
 
     public long getNewMapGroupId() {
@@ -454,20 +448,6 @@ public class ItemMapBean implements Serializable {
     }
 
     /**
-     * @return the ActionMessage
-     */
-    public String getActionMessage() {
-        return ActionMessage;
-    }
-
-    /**
-     * @param ActionMessage the ActionMessage to set
-     */
-    public void setActionMessage(String ActionMessage) {
-        this.ActionMessage = ActionMessage;
-    }
-
-    /**
      * @return the SelectedItemMap
      */
     public ItemMap getSelectedItemMap() {
@@ -521,62 +501,6 @@ public class ItemMapBean implements Serializable {
      */
     public void setSelectedMapGroupId(long SelectedMapGroupId) {
         this.SelectedMapGroupId = SelectedMapGroupId;
-    }
-
-    /**
-     * @return the ItemAddedStatus
-     */
-    public String getItemAddedStatus() {
-        return ItemAddedStatus;
-    }
-
-    /**
-     * @param ItemAddedStatus the ItemAddedStatus to set
-     */
-    public void setItemAddedStatus(String ItemAddedStatus) {
-        this.ItemAddedStatus = ItemAddedStatus;
-    }
-
-    /**
-     * @return the ItemNotAddedStatus
-     */
-    public String getItemNotAddedStatus() {
-        return ItemNotAddedStatus;
-    }
-
-    /**
-     * @param ItemNotAddedStatus the ItemNotAddedStatus to set
-     */
-    public void setItemNotAddedStatus(String ItemNotAddedStatus) {
-        this.ItemNotAddedStatus = ItemNotAddedStatus;
-    }
-
-    /**
-     * @return the ShowItemAddedStatus
-     */
-    public int getShowItemAddedStatus() {
-        return ShowItemAddedStatus;
-    }
-
-    /**
-     * @param ShowItemAddedStatus the ShowItemAddedStatus to set
-     */
-    public void setShowItemAddedStatus(int ShowItemAddedStatus) {
-        this.ShowItemAddedStatus = ShowItemAddedStatus;
-    }
-
-    /**
-     * @return the ShowItemNotAddedStatus
-     */
-    public int getShowItemNotAddedStatus() {
-        return ShowItemNotAddedStatus;
-    }
-
-    /**
-     * @param ShowItemNotAddedStatus the ShowItemNotAddedStatus to set
-     */
-    public void setShowItemNotAddedStatus(int ShowItemNotAddedStatus) {
-        this.ShowItemNotAddedStatus = ShowItemNotAddedStatus;
     }
 
     /**

@@ -39,7 +39,7 @@
             <h:panelGrid id="pnlInput" styleClass="clsGridMainInput" columns="4">
                 <h:panelGrid id="pnlSearch" columns="1">
                     <h:outputLabel  value="#{langsys['Type']} #{langsys['Name']}/#{langsys['Reference']}/#{langsys['File']}"/>
-                    <h:inputText value="#{transactorBean.searchTransactorNames}" autocomplete="off" style="width: 203px;">
+                    <h:inputText value="#{transactorBean.searchTransactorNames}" autocomplete="off" style="width: 200px;">
                         <f:ajax event="keyup" listener="#{transactorBean.refreshTransactorsListByNameRefFile(transactorBean.searchTransactorNames,transactorBean.transactorObj.transactorType)}" render="pnlSearchResult"/>
                     </h:inputText>
                     <h:panelGrid id="pnlSearchResult">
@@ -60,18 +60,18 @@
                 </h:panelGrid>
                 <h:panelGrid id="pnlCol1" columns="2">
                     <h:outputLabel  value="#{langsys['Type']}:"/>
-                    <h:selectOneMenu styleClass="clsMenu" id="menuTransactorType" value="#{transactorBean.transactorObj.transactorType}" style="width: 206px;">
+                    <h:selectOneMenu styleClass="clsMenu" id="menuTransactorType" value="#{transactorBean.transactorObj.transactorType}" style="width: 210px;">
                         <f:selectItem itemLabel="#{transactorBean.getDisplayName(menuItemBean.menuItemObj,transactorBean.transactorObj)}" itemValue="#{transactorBean.transactorObj.transactorType}"/>
                     </h:selectOneMenu>
                     <h:outputLabel  value="#{langsys['Category']}:" id="lblCategory"/>
-                    <h:selectOneMenu styleClass="clsMenu" id="menuTransactorCategory" value="#{transactorBean.transactorObj.category}" style="width: 206px;">
+                    <h:selectOneMenu styleClass="clsMenu" id="menuTransactorCategory" value="#{transactorBean.transactorObj.category}" style="width: 210px;">
                         <f:selectItem itemLabel="" />
                         <f:selectItem itemLabel="#{langsys['Consumer']}" itemValue="Consumer"/>
                         <f:selectItem itemLabel="#{langsys['Business']}" itemValue="Business"/>
                         <f:selectItem itemLabel="#{langsys['Government']}" itemValue="Government"/>
                     </h:selectOneMenu>
                     <h:outputLabel  value="#{langsys['Segment']}:"/>
-                    <h:selectOneMenu styleClass="clsMenu" id="menuTransactorSegment" value="#{transactorBean.transactorObj.transactor_segment_id}" style="width: 206px;">
+                    <h:selectOneMenu styleClass="clsMenu" id="menuTransactorSegment" value="#{transactorBean.transactorObj.transactor_segment_id}" style="width: 210px;">
                         <f:selectItem itemLabel="" itemValue="0"/>
                         <f:selectItems value="#{transactor_segmentBean.transactor_segments}" var="s" itemLabel="#{s.segment_name}" itemValue="#{s.transactor_segment_id}"/>
                     </h:selectOneMenu>
@@ -119,7 +119,7 @@
                     <h:inputText styleClass="clsInput" id="itxtCpEmail" value="#{transactorBean.transactorObj.cpEmail}" autocomplete="off" style="width: 203px;">
                     </h:inputText>
                     <h:outputLabel  value="#{langsys['Date']} #{langsys['of']} #{langsys['Birth']}(DOB):"/>
-                    <p:calendar styleClass="clsInput" id="calDOB" navigator="true" showButtonPanel="true" value="#{transactorBean.transactorObj.DOB}" pattern="#{companySetting.getDateFormat()}" size="16"/>
+                    <p:calendar styleClass="clsInput" id="calDOB" navigator="true" showButtonPanel="true" value="#{transactorBean.transactorObj.DOB}" pattern="#{companySetting.getDateFormat()}" size="17"/>
                 </h:panelGrid>
                 <h:panelGrid id="pnlCol2" columns="2">
                     <h:outputLabel  value="#{langsys['Sex']}:"/>
@@ -140,9 +140,9 @@
                     <h:outputLabel  value="#{langsys[menuItemBean.menuItemObj.LOC_LEVEL_3_LABEL]}:"/>
                     <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.locTown}" autocomplete="on" style="width: 203px;"/>
                     <h:outputLabel  value="#{langsys['Physical']} #{langsys['Address']}:"/>
-                    <h:inputTextarea styleClass="clsInput" id="itxaPhysicalAddress" rows="2" value="#{transactorBean.transactorObj.physicalAddress}" style="width: 202px;"/>
+                    <h:inputTextarea styleClass="clsInput" id="itxaPhysicalAddress" rows="1" value="#{transactorBean.transactorObj.physicalAddress}" style="width: 205px;"/>
                     <h:outputLabel  value="#{langsys['First']} #{langsys['Date']}:"/>
-                    <p:calendar styleClass="clsInput" navigator="true" showButtonPanel="true" value="#{transactorBean.transactorObj.firstDate}" pattern="#{companySetting.getDateFormat()}" size="16"/>
+                    <p:calendar styleClass="clsInput" navigator="true" showButtonPanel="true" value="#{transactorBean.transactorObj.firstDate}" pattern="#{companySetting.getDateFormat()}" size="17"/>
                     <h:outputLabel  value="#{langsys['File']} #{langsys['Reference']}:"/>
                     <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.fileReference}" autocomplete="off" style="width: 203px;"/>
                     <h:outputLabel  value="ID #{langsys['Type']}:"/>
@@ -153,17 +153,26 @@
                     <h:outputLabel  value="ID #{langsys['Number']}:"/>
                     <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.idNumber}" autocomplete="off" style="width: 203px;"/>
                     <h:outputLabel  value="ID #{langsys['Expiry']} #{langsys['Date']}:"/>
-                    <p:calendar styleClass="clsInput" navigator="true" showButtonPanel="true" value="#{transactorBean.transactorObj.idExpiryDate}" pattern="#{companySetting.getDateFormat()}" size="16"/>
+                    <p:calendar styleClass="clsInput" navigator="true" showButtonPanel="true" value="#{transactorBean.transactorObj.idExpiryDate}" pattern="#{companySetting.getDateFormat()}" size="17"/>
                     <h:outputLabel  value="#{langsys['Account']} #{langsys['Details']}:"/>
-                    <h:inputTextarea styleClass="clsInput" id="itxaAccountDetails" rows="2" value="#{transactorBean.transactorObj.accountDetails}" style="width: 202px;">
+                    <h:inputTextarea styleClass="clsInput" id="itxaAccountDetails" rows="1" value="#{transactorBean.transactorObj.accountDetails}" style="width: 202px;">
                     </h:inputTextarea>
-                    <h:outputLabel  value="#{langsys['Is']} #{langsys['Suspended']}?:"/>
-                    <h:selectOneMenu styleClass="clsMenu" value="#{transactorBean.transactorObj.isSuspended}" style="width: 206px;">
+                    <h:outputLabel  value="#{langsys['Is']} #{langsys['Suspended']}:"/>
+                    <h:selectOneMenu styleClass="clsMenu" value="#{transactorBean.transactorObj.isSuspended}" style="width: 210px;">
                         <f:selectItem itemLabel="#{langsys['No']}" itemValue="No"/>
                         <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="Yes"/>
                     </h:selectOneMenu>
                     <h:outputLabel  value="#{langsys['Suspended']} #{langsys['Reason']}:"/>
                     <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.suspendedReason}" autocomplete="off" style="color: red;width: 203px;"/>
+                    <h:outputLabel  value="#{langsys['Is']} #{langsys['Credit']} #{langsys['Limit']}:"/>
+                    <h:selectOneMenu styleClass="clsMenu" value="#{transactorBean.transactorObj.is_credit_limit}" style="width: 210px;">
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel  value="#{langsys['Credit']} #{langsys['Limit']} (#{generalUserSetting.LOCAL_CURRENCY.currencyCode}):"/>
+                    <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.credit_limit}" autocomplete="off" style="width: 203px;">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:inputText>
                 </h:panelGrid>
                 <h:panelGrid id="pnlSalary" columns="1" rendered="#{transactorBean.transactorObj.transactorType.equals('EMPLOYEE')}">
                     <h:outputLabel  value="#{langsys['Gross']} #{langsys['Pay']} (#{langsys['Monthly']}):"/>

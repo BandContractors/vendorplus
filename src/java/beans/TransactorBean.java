@@ -4,6 +4,8 @@ import api_tax.efris.innerclasses.Taxpayer;
 import api_tax.efris_bean.TaxpayerBean;
 import sessions.GeneralUserSetting;
 import connections.DBConnection;
+import entities.AccCurrency;
+import entities.CompanySetting;
 import entities.GroupRight;
 import entities.MenuItem;
 import entities.SalaryDeduction;
@@ -63,6 +65,55 @@ public class TransactorBean implements Serializable {
     private Transactor ParentTransactor;
     @ManagedProperty("#{menuItemBean}")
     private MenuItemBean menuItemBean;
+
+    public int creditLimitExceeded(long aTransactorId, long aBillTransactorId, double aNewCredit, String aNewCreditCurrenyCode) {
+        int x = 0;
+        long Id = 0;
+        Double prevcredit = 0.0;
+        Double creditlimit = 0.0;
+        AccCurrency LocalCurrency = null;
+        LocalCurrency = new AccCurrencyBean().getLocalCurrency();
+        if ((aTransactorId > 0 || aBillTransactorId > 0) && aNewCredit > 0) {
+            if (aBillTransactorId > 0) {
+                Id = aBillTransactorId;
+            } else {
+                Id = aTransactorId;
+            }
+            Transactor tr = this.getTransactor(Id);
+            if (tr.getIs_credit_limit() == 1) {
+                creditlimit = tr.getCredit_limit();//in local currency
+                //convert aNewCredit to local currency
+                if (!aNewCreditCurrenyCode.equals(LocalCurrency.getCurrencyCode())) {
+                    double xrate = 1;
+                    double XrateMultiply = 1;
+                    try {
+                        xrate = new AccXrateBean().getXrate(aNewCreditCurrenyCode, LocalCurrency.getCurrencyCode());
+                    } catch (NullPointerException npe) {
+                        xrate = 1;
+                    }
+                    try {
+                        XrateMultiply = xrate;
+                    } catch (NullPointerException npe) {
+                        XrateMultiply = 1;
+                    }
+                    aNewCredit = aNewCredit * XrateMultiply;
+                }
+                //get previous credit
+                prevcredit = new AccLedgerBean().getReceivableAccBalanceTrade(Id);
+                //check
+                if ((prevcredit + aNewCredit) > creditlimit) {
+                    x = 1;
+                } else {
+                    x = 0;
+                }
+            } else {
+                x = 0;
+            }
+        } else {
+            x = 0;
+        }
+        return x;
+    }
 
     public void updateTaxpayer(Transactor aTransactor) {
         try {
@@ -146,8 +197,6 @@ public class TransactorBean implements Serializable {
             }
             this.TransactorObj.setTransactorType(new GeneralUserSetting().getTransactorType());
             this.TransactorObj.setTrans_number_format(new TransactionTypeBean().getTransactionType(17).getTrans_number_format());
-            //init transactor ref no
-            //this.setNewTransctorRef(this.TransactorObj);
         }
     }
 
@@ -263,9 +312,9 @@ public class TransactorBean implements Serializable {
         String sql = null;
         long status = 0;
         if (transactor.getTransactorId() == 0) {
-            sql = "{call sp_insert_transactor(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_insert_transactor(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         } else if (transactor.getTransactorId() > 0) {
-            sql = "{call sp_update_transactor(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_update_transactor(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         }
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -346,6 +395,16 @@ public class TransactorBean implements Serializable {
                 cs.setInt("in_transactor_segment_id", transactor.getTransactor_segment_id());
             } catch (NullPointerException npe) {
                 cs.setInt("in_transactor_segment_id", 0);
+            }
+            try {
+                cs.setInt("in_is_credit_limit", transactor.getIs_credit_limit());
+            } catch (Exception e) {
+                cs.setInt("in_is_credit_limit", 0);
+            }
+            try {
+                cs.setDouble("in_credit_limit", transactor.getCredit_limit());
+            } catch (Exception e) {
+                cs.setDouble("in_credit_limit", 0);
             }
             cs.executeUpdate();
             if (transactor.getTransactorId() == 0) {
@@ -534,6 +593,16 @@ public class TransactorBean implements Serializable {
             } catch (NullPointerException npe) {
                 transactor.setTransactor_segment_id(0);
             }
+            try {
+                transactor.setIs_credit_limit(rs.getInt("is_credit_limit"));
+            } catch (Exception e) {
+                transactor.setIs_credit_limit(0);
+            }
+            try {
+                transactor.setCredit_limit(rs.getDouble("credit_limit"));
+            } catch (Exception e) {
+                transactor.setCredit_limit(0);
+            }
             return transactor;
         } catch (Exception e) {
             return null;
@@ -718,6 +787,16 @@ public class TransactorBean implements Serializable {
                 transactor.setStore_id(rs.getInt("store_id"));
             } catch (NullPointerException npe) {
                 transactor.setStore_id(0);
+            }
+            try {
+                transactor.setIs_credit_limit(rs.getInt("is_credit_limit"));
+            } catch (Exception e) {
+                transactor.setIs_credit_limit(0);
+            }
+            try {
+                transactor.setCredit_limit(rs.getDouble("credit_limit"));
+            } catch (Exception e) {
+                transactor.setCredit_limit(0);
             }
         } catch (Exception e) {
         }
@@ -942,6 +1021,8 @@ public class TransactorBean implements Serializable {
         TransactorTo.setStore_id(TransactorFrom.getStore_id());
         //new SalaryDeductionBean().setSalaryDeductions(TransactorFrom.getTransactorId(), this.SalaryDeductions);
         this.SalaryDeductions = new SalaryDeductionBean().getSalaryDeductions(TransactorFrom.getTransactorId());
+        TransactorTo.setIs_credit_limit(TransactorFrom.getIs_credit_limit());
+        TransactorTo.setCredit_limit(TransactorFrom.getCredit_limit());
     }
 
     public void clearTransactor(Transactor transactor) {
@@ -982,6 +1063,8 @@ public class TransactorBean implements Serializable {
             transactor.setTransactor_segment_id(0);
             transactor.setStore_id(0);
             transactor.setLocCountry(new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "COUNTRY_CODE").getParameter_value());
+            transactor.setIs_credit_limit(0);
+            transactor.setCredit_limit(0);
         }
     }
 
@@ -1035,6 +1118,8 @@ public class TransactorBean implements Serializable {
             //init transactor ref no
             //this.setNewTransctorRef(transactor);
             transactor.setLocCountry(new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "COUNTRY_CODE").getParameter_value());
+            transactor.setIs_credit_limit(0);
+            transactor.setCredit_limit(0);
         }
     }
 
@@ -1079,6 +1164,8 @@ public class TransactorBean implements Serializable {
                 transactor.setTransactor_segment_id(0);
                 transactor.setStore_id(0);
                 this.setSearchTransactorNames("");
+                transactor.setIs_credit_limit(0);
+                transactor.setCredit_limit(0);
             }
         }
     }
@@ -1128,6 +1215,8 @@ public class TransactorBean implements Serializable {
                 } catch (NullPointerException npe) {
                 }
                 this.TransactorList = null;
+                transactor.setIs_credit_limit(0);
+                transactor.setCredit_limit(0);
             }
         }
     }

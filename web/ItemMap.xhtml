@@ -21,6 +21,9 @@
         </script> 
     </h:head>
     <f:event listener="#{navigationBean.checkAccessDenied('8', 'View')}" type="preRenderView" />
+    <f:metadata>
+        <f:viewAction action="#{itemMapBean.clearItemMap(itemMap,itemBean.selectedItem,itemBean.selectedItemX)}"/>
+    </f:metadata>
     <h:body>
         <ui:include src="Menu.xhtml"/>
         <h:form id="ItemMapForm" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
@@ -84,18 +87,13 @@
                     <p:ajax event="change" listener="#{itemMap.setSmallItemId(itemBean.selectedItemX.itemId)}" rendered="#{itemBean.selectedItemX!=null}" process="@this" update="dtblItemMap"/>
                 </p:autoComplete>
 
-                <h:selectOneMenu styleClass="clsInputTransItem" id="menuPosition" value="{langsys[itemMap.position]}">
+                <h:selectOneMenu styleClass="clsInputTransItem" id="menuPosition" value="#{itemMap.position}">
                     <f:selectItem itemLabel="1" itemValue="1"/>
                     <f:selectItem itemLabel="2" itemValue="2"/>
                 </h:selectOneMenu>
                 <h:commandButton styleClass="clsButtonBig" value="#{langsys['Save']}" >
-                    <f:ajax listener="#{itemMapBean.saveItemMap(itemMap)}" execute="gridItemMapDetail" render="dtblItemMap grdMainMessages"/>
+                    <f:ajax listener="#{itemMapBean.saveItemMap(itemMap,itemBean.selectedItem,itemBean.selectedItemX)}" execute="gridItemMapDetail" render="dtblItemMap growl1"/>
                 </h:commandButton>
-            </h:panelGrid>
-
-            <h:panelGrid id="gridItemStatus" styleClass="clsGridItemStatus" columns="1">
-                <h:outputLabel id="olblItemAddedStstus" class="clsSuccessStatus" value="#{itemMapBean.getItemAddedStatus()}" rendered="#{itemMapBean.getShowItemAddedStatus()==1}"/>
-                <h:outputLabel id="olblItemNotAddedStstus" class="clsFailStatus" value="#{itemMapBean.getItemNotAddedStatus()}" rendered="#{itemMapBean.getShowItemNotAddedStatus()==1}"/>
             </h:panelGrid>
 
             <p:dataTable rowIndexVar="rowIndex" style="width: 790px" id="dtblItemMap" value="#{itemMapBean.getItemMaps(itemMap.bigItemId,itemMap.smallItemId)}" var="im" 
@@ -133,17 +131,12 @@
                     <!-- column header -->
                     <f:facet name="header">#{langsys['Action']}</f:facet>
                     <!-- row record -->
-                    <h:commandLink value="#{langsys['Delete']} #{langsys['mapping']}" action="#{itemMapBean.deleteItemMap(im)}" onclick="return confirmDelete();">
-                        <f:ajax execute="@form" render="dtblItemMap"/>
+                    <h:commandLink value="#{langsys['Delete']} #{langsys['Mapping']}" action="#{itemMapBean.deleteItemMap(im)}" onclick="return confirmDelete();">
+                        <f:ajax execute="dtblItemMap" render="dtblItemMap"/>
                     </h:commandLink>
                 </p:column> 
             </p:dataTable>
-
-            <h:panelGrid id="grdMainMessages" styleClass="clsGridMainMessages" columns="1">
-                <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{itemBean.actionMessage}"/>
-                <h:messages id="msgsMainMessage" style="color: red"/><br/>
-            </h:panelGrid>
-
+            <p:growl id="growl1"/>
         </h:form>
     </h:body>
 </html>

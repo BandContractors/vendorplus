@@ -408,7 +408,7 @@
                 <p:dialog header="#{langsys['Cash']} #{langsys['Discount']}" widgetVar="dlgCashDiscount" modal="true" height="100">
                     <p:ajax event="open" process="@this" update="pnlgFilter1"/>
                     <h:panelGrid id="pnlgFilter1" columns="2">
-                        <p:outputLabel value="#{langsys['Subtotal']} #{langsys['Item']}#{langsys['Discount']} (#{trans.currencyCode}):"/>
+                        <p:outputLabel value="#{langsys['Subtotal']} (#{trans.currencyCode}):"/>
                         <p:inputText value="#{trans.subTotal-trans.totalTradeDiscount}" readonly="true" style="background-color: #E5E5E5">
                             <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </p:inputText>
@@ -423,10 +423,10 @@
                         </p:inputText>
                     </h:panelGrid>
                 </p:dialog>
-                <p:dialog header="#{langsys['Specify']} #{langsys['NEW']} #{langsys['Total']}" widgetVar="dlgCashDiscount2" modal="true" height="100">
+                <p:dialog header="#{langsys['Specify']} #{langsys['New']} #{langsys['Total']}" widgetVar="dlgCashDiscount2" modal="true" height="100">
                     <p:ajax event="open" listener="#{transBean.setGrandTotal2(trans.grandTotal)}" process="@this" update="itxtGrandTotal2"/>
                     <h:panelGrid id="pnlgFilter2" columns="2">
-                        <p:outputLabel value="#{langsys['NEW']} #{langsys['Total']}:"/>
+                        <p:outputLabel value="#{langsys['New']} #{langsys['Total']}:"/>
                         <p:inputText id="itxtGrandTotal2" value="#{transBean.grandTotal2}" autocomplete="off">
                             <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             <p:ajax event="blur" listener="#{transBean.setCashDiscountFromGrandTotalCEC(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans, transItemBean.activeTransItems,transBean.grandTotal2)}" update=":TransactionFormSales:cmdlCashDiscount :TransactionFormSales:itxtCashDiscount :TransactionFormSales:itxtGrandTotal :TransactionFormSales:itxtChange :TransactionFormSales:pgrdApprove :TransactionFormSales:itxtTotalVat"/>
