@@ -53,19 +53,19 @@
                 <f:facet name="{Exporters}">
                     <h:commandLink>
                         <p:graphicImage name="images/excel.png" width="24"/>
-                        <p:dataExporter type="xls" target="tblDetail" fileName="#{langsys['Supplier']}_#{langsys['List']}" />
+                        <p:dataExporter type="xls" target="tblDetail" fileName="Supplier_List" />
                     </h:commandLink>
                     <h:commandLink>
                         <p:graphicImage name="images/pdf.png" width="24"/>
-                        <p:dataExporter type="pdf" target="tblDetail" fileName="#{langsys['Supplier']}_#{langsys['List']}"/>
+                        <p:dataExporter type="pdf" target="tblDetail" fileName="Supplier_List"/>
                     </h:commandLink>
                     <h:commandLink>
                         <p:graphicImage name="images/csv.png" width="24"/>
-                        <p:dataExporter type="csv" target="tblDetail" fileName="#{langsys['Supplier']}_#{langsys['List']}" />
+                        <p:dataExporter type="csv" target="tblDetail" fileName="Supplier_List" />
                     </h:commandLink>
                     <h:commandLink>
                         <p:graphicImage name="images/xml.png" width="24"/>
-                        <p:dataExporter type="xml" target="tblDetail" fileName="#{langsys['Supplier']}_#{langsys['List']}" />
+                        <p:dataExporter type="xml" target="tblDetail" fileName="Supplier_List" />
                     </h:commandLink>
                 </f:facet>
                 <p:column headerText="Id" style="text-align: left;">
@@ -100,12 +100,13 @@
                     <h:outputText value="#{rts.taxIdentity}">
                     </h:outputText>
                 </p:column>
-                <p:column headerText="ID #{langsys['Type']}" style="text-align: left;">
-                    <h:outputText value="#{rts.idType}">
+                <p:column headerText="#{langsys['ID']} #{langsys['Number']}" style="text-align: left;">
+                    <h:outputText value="#{rts.idType}:#{rts.idNumber}" rendered="#{rts.idNumber.length() gt 0}">
                     </h:outputText>
                 </p:column>
-                <p:column headerText="ID #{langsys['Number']}" style="text-align: left;">
-                    <h:outputText value="#{rts.idNumber}">
+                <p:column headerText="#{langsys['Credit']} #{langsys['Limit']}" style="text-align: right;">
+                    <h:outputText value="#{rts.credit_limit}" rendered="#{rts.is_credit_limit eq 1}">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
             </p:dataTable>

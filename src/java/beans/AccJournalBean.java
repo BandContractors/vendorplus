@@ -4,6 +4,7 @@ import connections.DBConnection;
 import entities.AccDepSchedule;
 import entities.AccJournal;
 import entities.CompanySetting;
+import entities.InvoiceAge;
 import entities.Pay;
 import entities.PayTrans;
 import entities.Stock;
@@ -52,6 +53,9 @@ public class AccJournalBean implements Serializable {
     private String ActionMessage = null;
     @ManagedProperty("#{menuItemBean}")
     private MenuItemBean menuItemBean;
+    private List<InvoiceAge> InvoiceAgeList;
+    private List<InvoiceAge> InvoiceAgeListSummary;
+    private String[] InvoiceAgeCategoryArray;
 
     public void setAccJournalFromResultset(AccJournal accjournal, ResultSet aResultSet) {
         try {
@@ -4925,6 +4929,170 @@ public class AccJournalBean implements Serializable {
         return n;
     }
 
+    public void initReportInvoiceAge(InvoiceAge aInvoiceAge, List<InvoiceAge> aInvoiceAgeList, List<InvoiceAge> aInvoiceAgeListSummary) {
+        String AgeBand = "";
+        try {
+            AgeBand = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "SALES_INVOICE_AGING_BAND").getParameter_value();
+            if (null == AgeBand || AgeBand.isEmpty() || AgeBand.length() != 9) {
+                AgeBand = "0030,0060";
+            }
+        } catch (Exception e) {
+            AgeBand = "0030,0060";
+        }
+        try {
+            String[] arr = new UtilityBean().getStringArrayFromCommaSeperatedStr(AgeBand);
+            this.InvoiceAgeCategoryArray = new String[3];
+            this.InvoiceAgeCategoryArray[0] = "0-" + Integer.parseInt(arr[0]) + " days";
+            this.InvoiceAgeCategoryArray[1] = (Integer.parseInt(arr[0]) + 1) + "-" + Integer.parseInt(arr[1]) + " days";
+            this.InvoiceAgeCategoryArray[2] = (Integer.parseInt(arr[1]) + 1) + "+ days";
+        } catch (Exception e) {
+        }
+        try {
+            if (aInvoiceAge != null) {
+                aInvoiceAge.setDays_category("");
+            }
+        } catch (NullPointerException npe) {
+        }
+        try {
+            if (null != aInvoiceAgeList) {
+                aInvoiceAgeList.clear();
+            }
+        } catch (NullPointerException npe) {
+        }
+        try {
+            if (null != aInvoiceAgeListSummary) {
+                aInvoiceAgeListSummary.clear();
+            }
+        } catch (NullPointerException npe) {
+        }
+    }
+
+    public void setInvoiceAgeFromResultset(InvoiceAge aInvoiceAge, ResultSet aResultSet) {
+        try {
+            try {
+                aInvoiceAge.setTransaction_id(aResultSet.getLong("transaction_id"));
+            } catch (NullPointerException npe) {
+                aInvoiceAge.setTransaction_id(0);
+            }
+            try {
+                aInvoiceAge.setTransaction_number(aResultSet.getString("transaction_number"));
+            } catch (NullPointerException npe) {
+                aInvoiceAge.setTransaction_number("");
+            }
+            try {
+                aInvoiceAge.setTransactor_id(aResultSet.getLong("transactor_id"));
+            } catch (NullPointerException npe) {
+                aInvoiceAge.setTransactor_id(0);
+            }
+            try {
+                aInvoiceAge.setTransactor_names(aResultSet.getString("transactor_names"));
+            } catch (NullPointerException npe) {
+                aInvoiceAge.setTransactor_names("");
+            }
+            try {
+                aInvoiceAge.setCurrency_code(aResultSet.getString("currency_code"));
+            } catch (NullPointerException npe) {
+                aInvoiceAge.setCurrency_code("");
+            }
+            try {
+                aInvoiceAge.setTransaction_date(new Date(aResultSet.getDate("transaction_date").getTime()));
+            } catch (NullPointerException npe) {
+                aInvoiceAge.setTransaction_date(null);
+            }
+            try {
+                aInvoiceAge.setAge_days(aResultSet.getInt("age_days"));
+            } catch (NullPointerException npe) {
+                aInvoiceAge.setAge_days(0);
+            }
+            try {
+                aInvoiceAge.setDays_category(aResultSet.getString("days_category"));
+            } catch (NullPointerException npe) {
+                aInvoiceAge.setDays_category("");
+            }
+            try {
+                aInvoiceAge.setGrand_total(aResultSet.getDouble("grand_total"));
+            } catch (NullPointerException npe) {
+                aInvoiceAge.setGrand_total(0);
+            }
+            try {
+                aInvoiceAge.setTotal_paid(aResultSet.getDouble("total_paid"));
+            } catch (NullPointerException npe) {
+                aInvoiceAge.setTotal_paid(0);
+            }
+            try {
+                aInvoiceAge.setBalance(aResultSet.getDouble("balance"));
+            } catch (NullPointerException npe) {
+                aInvoiceAge.setBalance(0);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void reportInvoiceAge(String aDays_category) {
+        String sql = "SELECT * FROM view_sales_invoice_age WHERE 1=1";
+        String sqlsum = "SELECT days_category,currency_code,sum(balance) as balance,count(*) as n from view_sales_invoice_age WHERE 1=1 ";
+        String wheresql = "";
+        String ordersql = " ORDER BY transactor_names ASC,days_category DESC";
+        String ordersqlsum = " ORDER BY days_category DESC,currency_code ASC";
+        String groupbysum = " GROUP BY days_category,currency_code";
+        ResultSet rs = null;
+        ResultSet rs2 = null;
+        this.setInvoiceAgeList(new ArrayList<>());
+        this.setInvoiceAgeListSummary(new ArrayList<>());
+        if (aDays_category.length() > 0) {
+            wheresql = wheresql + " AND days_category='" + aDays_category + "'";
+        }
+        sql = sql + wheresql + ordersql;
+        sqlsum = sqlsum + wheresql + groupbysum + ordersqlsum;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            InvoiceAge obj = null;
+            while (rs.next()) {
+                obj = new InvoiceAge();
+                this.setInvoiceAgeFromResultset(obj, rs);
+                this.getInvoiceAgeList().add(obj);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+
+        //summary
+        double nTotal = this.getInvoiceAgeList().size();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps2 = conn.prepareStatement(sqlsum);) {
+            rs2 = ps2.executeQuery();
+            InvoiceAge obj2 = null;
+            while (rs2.next()) {
+                obj2 = new InvoiceAge();
+                try {
+                    obj2.setDays_category(rs2.getString("days_category"));
+                } catch (NullPointerException npe) {
+                    obj2.setDays_category("");
+                }
+                try {
+                    obj2.setCurrency_code(rs2.getString("currency_code"));
+                } catch (NullPointerException npe) {
+                    obj2.setCurrency_code("");
+                }
+                try {
+                    obj2.setBalance(rs2.getDouble("balance"));
+                } catch (NullPointerException npe) {
+                    obj2.setBalance(0);
+                }
+                if (nTotal > 0) {
+                    obj2.setPerc(100.0 * rs2.getInt("n") / nTotal);
+                }
+                this.getInvoiceAgeListSummary().add(obj2);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     /**
      * @return the ActionMessage
      */
@@ -5035,6 +5203,48 @@ public class AccJournalBean implements Serializable {
      */
     public void setMenuItemBean(MenuItemBean menuItemBean) {
         this.menuItemBean = menuItemBean;
+    }
+
+    /**
+     * @return the InvoiceAgeList
+     */
+    public List<InvoiceAge> getInvoiceAgeList() {
+        return InvoiceAgeList;
+    }
+
+    /**
+     * @param InvoiceAgeList the InvoiceAgeList to set
+     */
+    public void setInvoiceAgeList(List<InvoiceAge> InvoiceAgeList) {
+        this.InvoiceAgeList = InvoiceAgeList;
+    }
+
+    /**
+     * @return the InvoiceAgeListSummary
+     */
+    public List<InvoiceAge> getInvoiceAgeListSummary() {
+        return InvoiceAgeListSummary;
+    }
+
+    /**
+     * @param InvoiceAgeListSummary the InvoiceAgeListSummary to set
+     */
+    public void setInvoiceAgeListSummary(List<InvoiceAge> InvoiceAgeListSummary) {
+        this.InvoiceAgeListSummary = InvoiceAgeListSummary;
+    }
+
+    /**
+     * @return the InvoiceAgeCategoryArray
+     */
+    public String[] getInvoiceAgeCategoryArray() {
+        return InvoiceAgeCategoryArray;
+    }
+
+    /**
+     * @param InvoiceAgeCategoryArray the InvoiceAgeCategoryArray to set
+     */
+    public void setInvoiceAgeCategoryArray(String[] InvoiceAgeCategoryArray) {
+        this.InvoiceAgeCategoryArray = InvoiceAgeCategoryArray;
     }
 
 }

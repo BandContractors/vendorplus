@@ -108,3 +108,9 @@ ADD COLUMN credit_limit double default 0 not null AFTER is_credit_limit;
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_15',108,Now(),'6.0','');
 
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (79, 'COMPANY_SETTING', 'SALES_INVOICE_AGING_BAND', '0030,0060','E.g. 0030,0060 for 0-30days, 31-60 days and 61+days');
+
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_15',114,Now(),'6.0','');
+

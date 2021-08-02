@@ -620,5 +620,16 @@ select year(cdc_date) as y,month(cdc_date) as m,day(cdc_date) as d,max(snapshot_
 	where cdc_function='STOCK' and is_passed=1  
 	group by year(cdc_date),month(cdc_date),day(cdc_date) 
 	order by year(cdc_date),month(cdc_date),day(cdc_date);
-
-
+    
+CREATE OR REPLACE VIEW view_sales_invoice_age AS 
+select 
+	t1.transaction_id,t1.transaction_number,ifnull(t2.transactor_id,0) as transactor_id,ifnull(t2.transactor_names,'') as transactor_names,t1.currency_code,t1.transaction_date,
+    DATEDIFF(now(),t1.transaction_date) as age_days,t1.grand_total,t1.total_paid,(t1.grand_total-t1.total_paid) as balance,
+    CASE 
+		WHEN CAST(SUBSTRING(p.parameter_value,1,4) AS UNSIGNED)>0 AND DATEDIFF(now(),transaction_date)<=CAST(SUBSTRING(p.parameter_value,1,4) AS UNSIGNED) THEN 'A'
+		WHEN CAST(SUBSTRING(p.parameter_value,6,4) AS UNSIGNED)>0 AND DATEDIFF(now(),transaction_date)<=CAST(SUBSTRING(p.parameter_value,6,4) AS UNSIGNED) THEN 'B' 
+		WHEN CAST(SUBSTRING(p.parameter_value,6,4) AS UNSIGNED)>0 AND DATEDIFF(now(),transaction_date)>CAST(SUBSTRING(p.parameter_value,6,4) AS UNSIGNED) THEN 'C' 
+		ELSE 'D' 
+	END as days_category 
+	from transaction t1 inner join transactor t2 on t1.bill_transactor_id=t2.transactor_id inner join parameter_list p on p.parameter_list_id=79 
+	where t1.transaction_type_id=2 and t1.grand_total>t1.total_paid;

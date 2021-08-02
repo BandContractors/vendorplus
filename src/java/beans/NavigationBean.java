@@ -1378,6 +1378,10 @@ public class NavigationBean implements Serializable {
     public String redirectToReportReceivableSummary() {
         return "ReportReceivableSummary?faces-redirect=true";
     }
+    
+    public String redirectToReportSalesInvoiceAge() {
+        return "ReportSalesInvoiceAge?faces-redirect=true";
+    }
 
     public String redirectToReportPayableDetail() {
         return "ReportPayableDetail?faces-redirect=true";

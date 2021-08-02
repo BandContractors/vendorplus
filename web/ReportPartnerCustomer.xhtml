@@ -42,7 +42,7 @@
             </h:panelGrid>
 
             <p:dataTable tableStyle="width:auto;" id="tblDetail" var="rts" value="#{transactorBean.transactorList}" 
-                         paginator="true" rows="50" 
+                         paginator="true" rows="50"   
                          paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
                          rowsPerPageTemplate="100,400,800,1000,2000">
                 <f:facet name="header">
@@ -53,19 +53,19 @@
                 <f:facet name="{Exporters}">
                     <h:commandLink>
                         <p:graphicImage name="images/excel.png" width="24"/>
-                        <p:dataExporter type="xls" target="tblDetail" fileName="#{langsys['Customer']}_#{langsys['List']}" />
+                        <p:dataExporter type="xls" target="tblDetail" fileName="Customer_List" />
                     </h:commandLink>
                     <h:commandLink>
                         <p:graphicImage name="images/pdf.png" width="24"/>
-                        <p:dataExporter type="pdf" target="tblDetail" fileName="#{langsys['Customer']}_#{langsys['List']}"/>
+                        <p:dataExporter type="pdf" target="tblDetail" fileName="Customer_List"/>
                     </h:commandLink>
                     <h:commandLink>
                         <p:graphicImage name="images/csv.png" width="24"/>
-                        <p:dataExporter type="csv" target="tblDetail" fileName="#{langsys['Customer']}_#{langsys['List']}" />
+                        <p:dataExporter type="csv" target="tblDetail" fileName="Customer_List" />
                     </h:commandLink>
                     <h:commandLink>
                         <p:graphicImage name="images/xml.png" width="24"/>
-                        <p:dataExporter type="xml" target="tblDetail" fileName="#{langsys['Customer']}_#{langsys['List']}" />
+                        <p:dataExporter type="xml" target="tblDetail" fileName="Customer_List" />
                     </h:commandLink>
                 </f:facet>
                 <p:column headerText="#{langsys['Id']}" style="text-align: left;">
@@ -100,12 +100,13 @@
                     <h:outputText value="#{rts.taxIdentity}">
                     </h:outputText>
                 </p:column>
-                <p:column headerText="#{langsys['ID']} #{langsys['Type']}" style="text-align: left;">
-                    <h:outputText value="#{rts.idType}">
+                <p:column headerText="#{langsys['ID']} #{langsys['Number']}" style="text-align: left;">
+                    <h:outputText value="#{rts.idType}:#{rts.idNumber}" rendered="#{rts.idNumber.length() gt 0}">
                     </h:outputText>
                 </p:column>
-                <p:column headerText="#{langsys['ID']} #{langsys['Number']}" style="text-align: left;">
-                    <h:outputText value="#{rts.idNumber}">
+                <p:column headerText="#{langsys['Credit']} #{langsys['Limit']}" style="text-align: right;">
+                    <h:outputText value="#{rts.credit_limit}" rendered="#{rts.is_credit_limit eq 1}">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
             </p:dataTable>
