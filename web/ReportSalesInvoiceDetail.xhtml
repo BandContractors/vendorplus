@@ -81,7 +81,7 @@
                 </h:panelGrid>
                 <h:panelGrid columns="2">
                     <p:outputLabel value="#{langsys[transactionTypeBean.getTransactionType(2).transactionRefLabel]}:"/>
-                    <p:inputText id="itxtRefNo" value="#{trans.transactionRef}" style="width: 235px;"/>
+                    <p:inputText id="itxtRefNo" value="#{trans.transactionRef}" style="width: 230px;"/>
                     <p:outputLabel value="#{langsys['Bill']} #{langsys['For']}:"/>
                     <p:autoComplete id="autcBillTransactor" value="#{transactorBean.selectedBillTransactor}" 
                                     completeMethod="#{transactorBean.getTransactorObjectList}" 

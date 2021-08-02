@@ -803,12 +803,12 @@ public class TransBean implements Serializable {
                 msg = "Amount entered for spending points exceeds the available points balance";
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && "Yes".equals(CompanySetting.getIsAllowDebt()) && (trans.getAmountTendered() + trans.getSpendPointsAmount()) < trans.getGrandTotal() && trans.getTransactorId() == 0) {
                 msg = "Select Customer for the Credit Sale";
-            } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && "Yes".equals(CompanySetting.getIsAllowDebt()) && new TransactorBean().creditLimitExceeded(trans.getTransactorId(), trans.getBillTransactorId(), trans.getGrandTotal() - (trans.getAmountTendered() + trans.getSpendPointsAmount()), trans.getCurrencyCode()) == 1) {
+            } else if (trans.getTransactionId() == 0 && "SALE INVOICE".equals(transtype.getTransactionTypeName()) && "Yes".equals(CompanySetting.getIsAllowDebt()) && new TransactorBean().creditLimitExceeded(trans.getTransactorId(), trans.getBillTransactorId(), trans.getGrandTotal() - (trans.getAmountTendered() + trans.getSpendPointsAmount()), trans.getCurrencyCode()) == 1) {
                 msg = "You Cannot Exceed Customer Credit Limit";
             } else if (("TRANSFER".equals(transtype.getTransactionTypeName()) || "TRANSFER REQUEST".equals(transtype.getTransactionTypeName())) && trans.getStore2Id() == 0) {
                 msg = "Select the " + CompanySetting.getStoreEquivName() + " for Item Transfer";
             } else if (("TRANSFER".equals(transtype.getTransactionTypeName()) || "TRANSFER REQUEST".equals(transtype.getTransactionTypeName())) && store.getStoreId() == trans.getStore2Id()) {
-                msg = "Select different To and From " + CompanySetting.getStoreEquivName() + "...";
+                msg = "Select different To and From " + CompanySetting.getStoreEquivName();
             } else if ("Yes".equals(transtype.getIsTransactionUserMandatory()) && trans.getTransactionUserDetailId() == 0) {
                 msg = "Select " + transtype.getTransactionUserLabel();
             } else if ("Yes".equals(transtype.getIsTransactionRefMandatory()) && trans.getTransactionRef().equals("")) {
