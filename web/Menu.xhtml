@@ -471,6 +471,8 @@
                         <p:separator />
                         <p:menuitem value="#{langsys['Receivables']} #{langsys['Summary']}" action="#{navigationBean.redirectToReportReceivableSummary()}" />
                         <p:separator />
+                        <p:menuitem value="#{langsys['Invoice']} #{langsys['Aging']}" action="#{navigationBean.redirectToReportSalesInvoiceAge()}" />
+                        <p:separator />
                     </p:submenu>
                     <p:separator />
                     <p:submenu label="#{langsys['Payables']}">
