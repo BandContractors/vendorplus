@@ -14,8 +14,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -23,7 +21,6 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import sessions.GeneralUserSetting;
 import utilities.UtilityBean;
 
 /*
@@ -70,6 +67,16 @@ public class Loyalty_transactionBean implements Serializable {
                 aLoyalty_transaction.setInvoice_number(aResultSet.getString("invoice_number"));
             } catch (NullPointerException npe) {
                 aLoyalty_transaction.setInvoice_number("");
+            }
+            try {
+                aLoyalty_transaction.setCredit_note_number(aResultSet.getString("credit_note_number"));
+            } catch (NullPointerException npe) {
+                aLoyalty_transaction.setCredit_note_number("");
+            }
+            try {
+                aLoyalty_transaction.setDebit_note_number(aResultSet.getString("debit_note_number"));
+            } catch (NullPointerException npe) {
+                aLoyalty_transaction.setDebit_note_number("");
             }
             try {
                 aLoyalty_transaction.setTransaction_date(new Date(aResultSet.getDate("transaction_date").getTime()));
@@ -150,8 +157,11 @@ public class Loyalty_transactionBean implements Serializable {
         return lt;
     }
 
-    public Loyalty_transaction getLoyalty_transaction(String aInvoice_number) {
-        String sql = "select * from loyalty_transaction where invoice_number=?";
+    public Loyalty_transaction getLoyalty_transaction_temp(String aInvoice_number) {
+        String sql = "select 0 as loyalty_transaction_id,max(store_id) as store_id,max(card_number) as card_number,"
+                + "max(invoice_number) as invoice_number,'' as credit_note_number,'' as debit_note_number,null as transaction_date,"
+                + "sum(points_awarded) as points_awarded,sum(amount_awarded) as amount_awarded,sum(points_spent) as points_spent,sum(amount_spent) as amount_spent,"
+                + "max(currency_code) as currency_code,null as add_date,'' as staff_code,0 as status_sync,null as status_date,'' as status_desc from loyalty_transaction where invoice_number=?";
         ResultSet rs = null;
         Loyalty_transaction lt = null;
         try (
@@ -169,31 +179,18 @@ public class Loyalty_transactionBean implements Serializable {
         return lt;
     }
 
-    public void insertLoyalty_transactionCallThread(long aLoyalty_transaction_id) {
-        try {
-            Runnable task = new Runnable() {
-                @Override
-                public void run() {
-                    //insertLoyalty_transactionCall(aLoyalty_transaction_id);
-                }
-            };
-            Executor e = Executors.newSingleThreadExecutor();
-            e.execute(task);
-        } catch (Exception e) {
-            LOGGER.log(Level.ERROR, e);
-        }
-    }
-
     public int insertLoyalty_transaction(Trans aTrans) {
         int saved = 0;
         try {
             Loyalty_transaction lt = new Loyalty_transaction();
             lt.setCard_number(aTrans.getCardNumber());
             lt.setInvoice_number(aTrans.getTransactionNumber());
+            lt.setCredit_note_number("");
+            lt.setDebit_note_number("");
             lt.setTransaction_date(aTrans.getTransactionDate());
             lt.setPoints_awarded(aTrans.getPointsAwarded());
-            lt.setAmount_awarded(aTrans.getPointsAwarded() * CompanySetting.getAwardAmountPerPoint());
-            lt.setPoints_spent(aTrans.getSpendPointsAmount() / CompanySetting.getSpendAmountPerPoint());
+            lt.setAmount_awarded(aTrans.getGrandTotal());//aTrans.getPointsAwarded() * CompanySetting.getAwardAmountPerPoint()
+            lt.setPoints_spent(aTrans.getSpendPoints());//aTrans.getSpendPointsAmount() / CompanySetting.getSpendAmountPerPoint()
             lt.setAmount_spent(aTrans.getSpendPointsAmount());
             lt.setCurrency_code(aTrans.getCurrencyCode());
             lt.setStaff_code(new UserDetailBean().getUserDetail(aTrans.getAddUserDetailId()).getUserName());
@@ -209,14 +206,50 @@ public class Loyalty_transactionBean implements Serializable {
         return saved;
     }
 
+    public int insertLoyalty_transaction_cr_dr(long aCrDrNoteTransId) {
+        int saved = 0;
+        try {
+            Trans trans = new CreditDebitNoteBean().getTrans_cr_dr_note(aCrDrNoteTransId);
+            Loyalty_transaction lt = new Loyalty_transaction();
+            lt.setCard_number(trans.getCardNumber());
+            lt.setInvoice_number(trans.getTransactionRef());
+            if (trans.getGrandTotal() < 0) {
+                lt.setCredit_note_number(trans.getTransactionNumber());
+                lt.setDebit_note_number("");
+            } else {
+                lt.setCredit_note_number("");
+                lt.setDebit_note_number(trans.getTransactionNumber());
+            }
+            lt.setTransaction_date(trans.getTransactionDate());
+            lt.setPoints_awarded(trans.getPointsAwarded());
+            lt.setAmount_awarded(trans.getGrandTotal());
+            lt.setAmount_spent(trans.getSpendPointsAmount());
+            //calc points spent from amount spent
+            double XrateMultiply = new AccXrateBean().getXrateMultiply(new AccCurrencyBean().getLocalCurrency().getCurrencyCode(), trans.getCurrencyCode());
+            double SpendPts = trans.getSpendPointsAmount() / (CompanySetting.getSpendAmountPerPoint() * XrateMultiply);
+            lt.setPoints_spent(SpendPts);
+            lt.setCurrency_code(trans.getCurrencyCode());
+            lt.setStaff_code(new UserDetailBean().getUserDetail(trans.getAddUserDetailId()).getUserName());
+            lt.setAdd_date(new CompanySetting().getCURRENT_SERVER_DATE());
+            lt.setStatus_sync(0);
+            lt.setStatus_date(new CompanySetting().getCURRENT_SERVER_DATE());
+            lt.setStatus_desc("");
+            lt.setStore_id(trans.getStoreId());
+            saved = this.insertLoyalty_transaction(lt);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return saved;
+    }
+
     public int insertLoyalty_transaction(Loyalty_transaction aLoyalty_transaction) {
         int saved = 0;
         String sql = "INSERT INTO loyalty_transaction"
                 + "(card_number,invoice_number,transaction_date,"
                 + "points_awarded,amount_awarded,points_spent,amount_spent,"
                 + "currency_code,staff_code,"
-                + "add_date,status_sync,status_date,status_desc,store_id)"
-                + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                + "add_date,status_sync,status_date,status_desc,store_id,credit_note_number,debit_note_number)"
+                + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -290,6 +323,16 @@ public class Loyalty_transactionBean implements Serializable {
                     ps.setInt(14, aLoyalty_transaction.getStore_id());
                 } catch (NullPointerException npe) {
                     ps.setInt(14, 0);
+                }
+                try {
+                    ps.setString(15, aLoyalty_transaction.getCredit_note_number());
+                } catch (NullPointerException npe) {
+                    ps.setString(15, "");
+                }
+                try {
+                    ps.setString(16, aLoyalty_transaction.getDebit_note_number());
+                } catch (NullPointerException npe) {
+                    ps.setString(16, "");
                 }
                 ps.executeUpdate();
                 saved = 1;

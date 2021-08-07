@@ -17,7 +17,6 @@ import entities.CompanySetting;
 import entities.Pay;
 import entities.TransItem;
 import entities.GroupRight;
-import entities.PointsTransaction;
 import entities.Transactor;
 import entities.Item;
 import entities.Location;
@@ -25,7 +24,6 @@ import entities.PayMethod;
 import entities.PayTrans;
 import entities.TransactionType;
 import entities.UserDetail;
-import entities.PointsCard;
 import entities.Site;
 import entities.Stock;
 import entities.Stock_out;
@@ -734,14 +732,12 @@ public class TransBean implements Serializable {
                     } else {//Insert
                         ItemMessage = new TransItemBean().getAnyItemTotalQtyGreaterThanCurrentQty(aActiveTransItems, Store2Id, transtype.getTransactionTypeName());
                     }
-                    //ItemMessage = new TransItemBean().getAnyItemTotalQtyGreaterThanCurrentQty(aActiveTransItems, Store2Id, transtype.getTransactionTypeName());
                 } else {
                     if (trans.getTransactionId() > 0) {//Update
                         ItemMessage = new TransItemBean().getAnyItemTotalQtyGreaterThanCurrentQty(new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans), store.getStoreId(), transtype.getTransactionTypeName());
                     } else {//Insert
                         ItemMessage = new TransItemBean().getAnyItemTotalQtyGreaterThanCurrentQty(aActiveTransItems, store.getStoreId(), transtype.getTransactionTypeName());
                     }
-                    //ItemMessage = new TransItemBean().getAnyItemTotalQtyGreaterThanCurrentQty(aActiveTransItems, store.getStoreId(), transtype.getTransactionTypeName());
                 }
             } catch (NullPointerException npe) {
             }
@@ -772,12 +768,12 @@ public class TransBean implements Serializable {
                 msg = "Delivered Greater Than Balance for Item ##" + ItemMessage3;
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && "COST-PRICE SALE INVOICE".equals(aSaleType) && trans.getTransactorId() == 0) {
                 msg = "Select " + transtype.getBillTransactorLabel();
-            } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && "No".equals(CompanySetting.getIsCashDiscountVatLiable()) && trans.getCashDiscount() > (trans.getSubTotal() - trans.getTotalTradeDiscount() + trans.getTotalVat())) {
-                msg = "Cash Discount cannot exceed grand total";
-            } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && "Yes".equals(CompanySetting.getIsCashDiscountVatLiable()) && trans.getCashDiscount() > (trans.getSubTotal() - trans.getTotalTradeDiscount())) {
-                msg = "Cash Discount cannot extend to VAT or exceed grand total";
+            } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && "No".equals(CompanySetting.getIsCashDiscountVatLiable()) && (trans.getCashDiscount() + trans.getSpendPointsAmount()) > (trans.getSubTotal() - trans.getTotalTradeDiscount() + trans.getTotalVat())) {
+                msg = "Cash and Loyalty Discount cannot exceed Total";
+            } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && "Yes".equals(CompanySetting.getIsCashDiscountVatLiable()) && (trans.getCashDiscount() + trans.getSpendPointsAmount()) > (trans.getSubTotal() - trans.getTotalTradeDiscount())) {
+                msg = "Cash and Loyalty Discount cannot extend to VAT or exceed Total";
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && trans.getCashDiscount() < 0 || trans.getAmountTendered() < 0 || trans.getSpendPointsAmount() < 0 || trans.getGrandTotal() < 0) {
-                msg = "Check Cash Discount or Amount Tendered or Points Spent Amount";
+                msg = "Check Cash Discount or Amount Tendered or Loyalty Discount";
             } else if ("PURCHASE INVOICE".equals(transtype.getTransactionTypeName()) && trans.getCashDiscount() < 0) {
                 msg = "Check Cash Discount";
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && trans.getCashDiscount() > 0 && new GeneralUserSetting().getIsApproveDiscountNeeded() == 1 && !"APPROVED".equals(new GeneralUserSetting().getCurrentApproveDiscountStatus())) {
@@ -797,13 +793,13 @@ public class TransBean implements Serializable {
                 msg = "Item not Found for " + transtype.getTransactionOutputLabel();
             } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && trans.getPayMethod() == 0 && trans.getTransactionId() == 0) {
                 msg = "Select Payment Method";
-            } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && "No".equals(CompanySetting.getIsAllowDebt()) && (trans.getAmountTendered() + trans.getSpendPointsAmount()) < trans.getGrandTotal()) {
+            } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && "No".equals(CompanySetting.getIsAllowDebt()) && trans.getAmountTendered() < trans.getGrandTotal()) {
                 msg = "Amount tendered is Less Than Total";
-            } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && trans.getSpendPointsAmount() > trans.getBalancePointsAmount()) {
+            } else if (trans.getTransactionId() == 0 && "SALE INVOICE".equals(transtype.getTransactionTypeName()) && trans.getSpendPointsAmount() > trans.getBalancePointsAmount()) {
                 msg = "Amount entered for spending points exceeds the available points balance";
-            } else if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && "Yes".equals(CompanySetting.getIsAllowDebt()) && (trans.getAmountTendered() + trans.getSpendPointsAmount()) < trans.getGrandTotal() && trans.getTransactorId() == 0) {
+            } else if (trans.getTransactionId() == 0 && "SALE INVOICE".equals(transtype.getTransactionTypeName()) && "Yes".equals(CompanySetting.getIsAllowDebt()) && trans.getAmountTendered() < trans.getGrandTotal() && trans.getTransactorId() == 0) {
                 msg = "Select Customer for the Credit Sale";
-            } else if (trans.getTransactionId() == 0 && "SALE INVOICE".equals(transtype.getTransactionTypeName()) && "Yes".equals(CompanySetting.getIsAllowDebt()) && new TransactorBean().creditLimitExceeded(trans.getTransactorId(), trans.getBillTransactorId(), trans.getGrandTotal() - (trans.getAmountTendered() + trans.getSpendPointsAmount()), trans.getCurrencyCode()) == 1) {
+            } else if (trans.getTransactionId() == 0 && "SALE INVOICE".equals(transtype.getTransactionTypeName()) && "Yes".equals(CompanySetting.getIsAllowDebt()) && new TransactorBean().creditLimitExceeded(trans.getTransactorId(), trans.getBillTransactorId(), trans.getGrandTotal() - trans.getAmountTendered(), trans.getCurrencyCode()) == 1) {
                 msg = "You Cannot Exceed Customer Credit Limit";
             } else if (("TRANSFER".equals(transtype.getTransactionTypeName()) || "TRANSFER REQUEST".equals(transtype.getTransactionTypeName())) && trans.getStore2Id() == 0) {
                 msg = "Select the " + CompanySetting.getStoreEquivName() + " for Item Transfer";
@@ -877,7 +873,7 @@ public class TransBean implements Serializable {
                 msg = "Paying Account is out of Funds";
             } else if ("PURCHASE INVOICE".equals(transtype.getTransactionTypeName()) && trans.getAmountTendered() > trans.getGrandTotal()) {
                 msg = "Paid Amount cannot Exceed Total";
-            } else if (trans.getTransactionId() > 0 && (trans.getAmountTendered() + trans.getSpendPointsAmount()) > trans.getGrandTotal()) {
+            } else if (trans.getTransactionId() > 0 && trans.getAmountTendered() > trans.getGrandTotal()) {
                 msg = "Paid Amount cannot Exceed New Total";
             } else if (trans.getTransactionId() > 0 && new TransItemBean().getAnyItemMixAddSubtractQty(new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans), transtype.getTransactionTypeName()) == 1) {
                 msg = "You Cannot Add or Debit and Subtract or Credit different items in the same Update";
@@ -892,7 +888,7 @@ public class TransBean implements Serializable {
 
     public void insertTransCEC(int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems) {
         long InsertedTransId = 0;
-        String sql = "{call sp_insert_transaction(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+        String sql = "{call sp_insert_transaction(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 CallableStatement cs = conn.prepareCall(sql);) {
@@ -1116,6 +1112,11 @@ public class TransBean implements Serializable {
                 cs.setInt("in_is_cancel", trans.getIs_cancel());
             } catch (NullPointerException npe) {
                 cs.setInt("in_is_cancel", 0);
+            }
+            try {
+                cs.setDouble("in_spent_points_amount", trans.getSpendPointsAmount());
+            } catch (Exception e) {
+                cs.setDouble("in_spent_points_amount", 0);
             }
             //save
             cs.executeUpdate();
@@ -1590,8 +1591,6 @@ public class TransBean implements Serializable {
         String sql2 = null;
 
         TransItemBean TransItemBean = new TransItemBean();
-        PointsTransactionBean NewPointsTransactionBean = new PointsTransactionBean();
-        PointsTransaction NewPointsTransaction = new PointsTransaction();
 
         //first clear current session
         FacesContext context = FacesContext.getCurrentInstance();
@@ -1765,27 +1764,6 @@ public class TransBean implements Serializable {
                     //ms = (dt2.getTime() - dt1.getTime());
                     //tms = tms + ms;
                     //TimeStr = TimeStr + " Pay:" + ms;
-                    //insert PointsTransaction for both the awarded and spent points to the stage area
-                    if (("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) && (trans.getPointsAwarded() != 0 || trans.getSpendPoints() != 0)) {
-                        if (trans.getPointsCardId() != 0 && !trans.getCardNumber().equals("")) {
-                            //1. insert PointsTransaction for both the awarded and spent points to the stage area
-                            NewPointsTransaction.setPointsCardId(trans.getPointsCardId());
-                            NewPointsTransaction.setTransactionDate(new java.sql.Date(trans.getTransactionDate().getTime()));
-                            NewPointsTransaction.setPointsAwarded(trans.getPointsAwarded());
-                            NewPointsTransaction.setPointsSpent(trans.getSpendPoints());
-                            NewPointsTransaction.setTransactionId(trans.getTransactionId());
-                            NewPointsTransaction.setTransBranchId(CompanySetting.getBranchId());
-                            NewPointsTransaction.setPointsSpentAmount(trans.getSpendPoints() * CompanySetting.getSpendAmountPerPoint());
-                            NewPointsTransactionBean.addPointsTransactionToStage(NewPointsTransaction);
-                        }
-                    }
-                    //Move all, if any PointsTransactions in the stage area to the live server
-                    //The move function after deletes all if any in the stage area, so only the stage area will have those records not committed due to failure to connect to the server
-                    //Transs will be moved if connectivity to the InterBranch DB is ON
-                    if (new DBConnection().isINTER_BRANCH_MySQLConnectionAvailable().equals("ON")) {
-                        NewPointsTransactionBean.movePointsTransactionsFromStageToLive();
-                    }
-
                     //insert approvals
                     if (("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) && trans.getCashDiscount() > 0 && new GeneralUserSetting().getIsApproveDiscountNeeded() == 1 && "APPROVED".equals(new GeneralUserSetting().getCurrentApproveDiscountStatus())) {
                         this.insertApproveTrans(new GeneralUserSetting().getCurrentTransactionId(), "DISCOUNT", new GeneralUserSetting().getCurrentApproveUserId());
@@ -1963,8 +1941,6 @@ public class TransBean implements Serializable {
                     //TimeStr = TimeStr + " Clear2:" + ms;
 
                     TransItemBean = null;
-                    NewPointsTransactionBean = null;
-                    NewPointsTransaction = null;
 
                     //clean stock
                     //dt2 = new Date();
@@ -2150,9 +2126,13 @@ public class TransBean implements Serializable {
                             DeleteInserted = 1;
                         }
                         if (DeleteInserted == 0 && InsertedTransItems == aActiveTransItems.size()) {
-                            //trans.setStoreId(aStoreId);
-                            //trans.setTransactionTypeId(aTransTypeId);
-                            //trans.setTransactionReasonId(aTransReasonId);
+                            //insert PointsTransaction for both the awarded and spent points to the stage area
+                            if (("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) && (trans.getPointsAwarded() != 0 || trans.getSpendPoints() != 0)) {
+                                if (!trans.getCardNumber().equals("") && !trans.getCardHolder().equals("")) {
+                                    int x = new Loyalty_transactionBean().insertLoyalty_transaction(trans);
+                                }
+                            }
+                            //pay, stock, journal
                             this.saveTransOthersThread(trans.getTransactionId(), trans.getPayMethod());
                         }
                     }
@@ -2178,12 +2158,6 @@ public class TransBean implements Serializable {
                         msg = "Transaction Not Saved";
                         FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                     } else {
-                        //insert PointsTransaction for both the awarded and spent points to the stage area
-                        if (("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) && (trans.getPointsAwarded() != 0 || trans.getSpendPoints() != 0)) {
-                            if (!trans.getCardNumber().equals("")) {
-                                int x = new Loyalty_transactionBean().insertLoyalty_transaction(trans);
-                            }
-                        }
                         //insert approvals
                         if (("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) && trans.getCashDiscount() > 0 && new GeneralUserSetting().getIsApproveDiscountNeeded() == 1 && "APPROVED".equals(new GeneralUserSetting().getCurrentApproveDiscountStatus())) {
                             this.insertApproveTrans(new GeneralUserSetting().getCurrentTransactionId(), "DISCOUNT", new GeneralUserSetting().getCurrentApproveUserId());
@@ -2473,7 +2447,8 @@ public class TransBean implements Serializable {
                 InnerPay.setPayDate(aTrans.getTransactionDate());
                 double paidamountt = 0;
                 if ((aTrans.getChangeAmount() > 0)) {
-                    paidamountt = aTrans.getGrandTotal() - aTrans.getSpendPointsAmount();
+                    //paidamountt = aTrans.getGrandTotal() - aTrans.getSpendPointsAmount();
+                    paidamountt = aTrans.getGrandTotal();
                 } else {
                     paidamountt = aTrans.getAmountTendered();
                 }
@@ -2483,8 +2458,8 @@ public class TransBean implements Serializable {
                 InnerPay.setEditUserDetailId(aTrans.getAddUserDetailId());
                 InnerPay.setAddDate(aTrans.getAddDate());
                 InnerPay.setEditDate(new java.util.Date());
-                InnerPay.setPointsSpent(aTrans.getSpendPoints());
-                InnerPay.setPointsSpentAmount(aTrans.getSpendPointsAmount());
+                InnerPay.setPointsSpent(0);//aTrans.getSpendPoints()
+                InnerPay.setPointsSpentAmount(0);//aTrans.getSpendPointsAmount()
                 InnerPay.setPayRefNo("");
                 InnerPay.setPay_number("");
                 if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE RETURN INVOICE".equals(transtype.getTransactionTypeName())) {
@@ -2590,8 +2565,6 @@ public class TransBean implements Serializable {
         String sql2 = null;
 
         TransItemBean TransItemBean = new TransItemBean();
-        PointsTransactionBean NewPointsTransactionBean = new PointsTransactionBean();
-        PointsTransaction NewPointsTransaction = new PointsTransaction();
 
         //first clear current session
         FacesContext context = FacesContext.getCurrentInstance();
@@ -2746,26 +2719,6 @@ public class TransBean implements Serializable {
                         paytrans.setTransactionReasonId(trans.getTransactionReasonId());
                         new PayTransBean().savePayTrans(paytrans);
                     }
-                    //insert PointsTransaction for both the awarded and spent points to the stage area
-                    if (("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) && (trans.getPointsAwarded() != 0 || trans.getSpendPoints() != 0)) {
-                        if (trans.getPointsCardId() != 0 && !trans.getCardNumber().equals("")) {
-                            //1. insert PointsTransaction for both the awarded and spent points to the stage area
-                            NewPointsTransaction.setPointsCardId(trans.getPointsCardId());
-                            NewPointsTransaction.setTransactionDate(new java.sql.Date(trans.getTransactionDate().getTime()));
-                            NewPointsTransaction.setPointsAwarded(trans.getPointsAwarded());
-                            NewPointsTransaction.setPointsSpent(trans.getSpendPoints());
-                            NewPointsTransaction.setTransactionId(trans.getTransactionId());
-                            NewPointsTransaction.setTransBranchId(CompanySetting.getBranchId());
-                            NewPointsTransaction.setPointsSpentAmount(trans.getSpendPoints() * CompanySetting.getSpendAmountPerPoint());
-                            NewPointsTransactionBean.addPointsTransactionToStage(NewPointsTransaction);
-                        }
-                    }
-                    //Move all, if any PointsTransactions in the stage area to the live server
-                    //The move function after deletes all if any in the stage area, so only the stage area will have those records not committed due to failure to connect to the server
-                    //Transs will be moved if connectivity to the InterBranch DB is ON
-                    if (new DBConnection().isINTER_BRANCH_MySQLConnectionAvailable().equals("ON")) {
-                        NewPointsTransactionBean.movePointsTransactionsFromStageToLive();
-                    }
 
                     //insert approvals
                     if (("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) && trans.getCashDiscount() > 0 && new GeneralUserSetting().getIsApproveDiscountNeeded() == 1 && "APPROVED".equals(new GeneralUserSetting().getCurrentApproveDiscountStatus())) {
@@ -2890,8 +2843,6 @@ public class TransBean implements Serializable {
                     this.clearAll2(trans, aActiveTransItems, null, null, aSelectedTransactor, 2, aSelectedBillTransactor, aTransUserDetail, aSelectedSchemeTransactor, aAuthorisedByUserDetail, aSelectedAccCoa);
 
                     TransItemBean = null;
-                    NewPointsTransactionBean = null;
-                    NewPointsTransaction = null;
 
                     //clean stock
                     StockBean.deleteZeroQtyStock();
@@ -3136,7 +3087,7 @@ public class TransBean implements Serializable {
         if (SystemUserId == 0) {
             SystemUserId = new GeneralUserSetting().getCurrentUser().getUserDetailId();
         }
-        sql = "{call sp_insert_transaction(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+        sql = "{call sp_insert_transaction(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         if (aTransItem != null) {
             try (
                     Connection conn = DBConnection.getMySQLConnection();
@@ -3202,6 +3153,7 @@ public class TransBean implements Serializable {
                 cs.setInt("in_is_processed", 0);
                 cs.setInt("in_is_paid", 0);
                 cs.setInt("in_is_cancel", 0);
+                cs.setDouble("in_spent_points_amount", 0);
                 //save
                 cs.executeUpdate();
 
@@ -3403,32 +3355,6 @@ public class TransBean implements Serializable {
                     }
                 }
             }
-            //update for the points card transcation
-            //insert PointsTransaction for both the awarded and spent points to the stage area
-            if (null != newPay && isTransCopySuccess && isTransItemCopySuccess && isTransItemReverseSuccess && isTransUpdateSuccess && tt.getTransactionTypeName().equals("SALE INVOICE")) {
-                PointsCard pc = new PointsCard();
-                pc = new PointsCardBean().getPointsCardByCardNumber(aNewTrans.getCardNumber());
-                if ("SALE INVOICE".equals(tt.getTransactionTypeName()) && null != pc) {
-                    //1. insert PointsTransaction for both the awarded and spent points to the stage area
-                    PointsTransaction NewPointsTransaction = new PointsTransaction();
-                    NewPointsTransaction.setPointsCardId(pc.getPointsCardId());
-                    NewPointsTransaction.setTransactionDate(new java.sql.Date(aNewTrans.getTransactionDate().getTime()));
-                    //for points awarded=New - Hist
-                    NewPointsTransaction.setPointsAwarded(aNewTrans.getPointsAwarded() - OldTrans.getPointsAwarded());
-                    //for points spent=Hist - New
-                    NewPointsTransaction.setPointsSpent(newPay.getPointsSpent() - oldPay.getPointsSpent());
-                    NewPointsTransaction.setTransactionId(aNewTrans.getTransactionId());
-                    NewPointsTransaction.setTransBranchId(CompanySetting.getBranchId());
-                    NewPointsTransaction.setPointsSpentAmount(NewPointsTransaction.getPointsSpent() * CompanySetting.getSpendAmountPerPoint());
-                    new PointsTransactionBean().addPointsTransactionToStage(NewPointsTransaction);
-                }
-                //Move all, if any PointsTransactions in the stage area to the live server
-                //The move function after deletes all if any in the stage area, so only the stage area will have those records not committed due to failure to connect to the server
-                //Transs will be moved if connectivity to the InterBranch DB is ON
-                if (new DBConnection().isINTER_BRANCH_MySQLConnectionAvailable().equals("ON")) {
-                    new PointsTransactionBean().movePointsTransactionsFromStageToLive();
-                }
-            }
             //Reverse and Insert Journal
             if ("SALE INVOICE".equals(tt.getTransactionTypeName())) {
                 savedpay = null;
@@ -3600,6 +3526,12 @@ public class TransBean implements Serializable {
     }
 
     public void updateTransCEC(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aNewTrans, List<TransItem> aNewTransItems, Pay aPay) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         //1. copy
         //2. reverse stock(for TIs)
         //3. update trans item
@@ -3656,13 +3588,13 @@ public class TransBean implements Serializable {
         if (ValidationMessage.length() > 0) {
             switch (aLevel) {
                 case "PARENT":
-                    this.setActionMessage("Transaction NOT saved");
+                    this.setActionMessage(ub.translateWordsInText(BaseName, "Transaction Not Saved"));
                     break;
                 case "CHILD":
-                    this.setActionMessageChild("Transaction NOT saved");
+                    this.setActionMessageChild(ub.translateWordsInText(BaseName, "Transaction Not Saved"));
                     break;
             }
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ValidationMessage));
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, ValidationMessage)));
         } else {
             //Copy Trans
             sql = "{call sp_copy_transaction(?,?,?)}";
@@ -3681,7 +3613,7 @@ public class TransBean implements Serializable {
             }
             //Copy TransItem
             if (isTransCopySuccess) {
-                List<TransItem> TransItemsToCopy = new ArrayList<TransItem>();
+                List<TransItem> TransItemsToCopy = new ArrayList<>();
                 TransItemsToCopy = new TransItemBean().getTransItemsByTransactionId(aNewTrans.getTransactionId());
                 int i = 0;
                 int n = TransItemsToCopy.size();
@@ -3774,8 +3706,8 @@ public class TransBean implements Serializable {
                     }
                     if (isTransCopySuccess && isTransItemCopySuccess && isTransItemReverseSuccess && isTransUpdateSuccess && isPayCopySuccess && isPayTransCopySuccess) {
                         newPay.setPaidAmount(aNewTrans.getAmountTendered());
-                        newPay.setPointsSpentAmount(aNewTrans.getSpendPointsAmount());
-                        newPay.setPointsSpent(aNewTrans.getSpendPoints());
+                        newPay.setPointsSpentAmount(0);//aNewTrans.getSpendPointsAmount()
+                        newPay.setPointsSpent(0);//aNewTrans.getSpendPoints()
                         newPay.setEditUserDetailId(new GeneralUserSetting().getCurrentUser().getUserDetailId());
                         newPayId = new PayBean().payInsertUpdate(newPay);
                         switch (aLevel) {
@@ -3798,32 +3730,6 @@ public class TransBean implements Serializable {
                             new PayTransBean().savePayTrans(paytrans);
                         }
                     }
-                }
-            }
-            //update for the points card transcation
-            //insert PointsTransaction for both the awarded and spent points to the stage area
-            if (null != newPay && isTransCopySuccess && isTransItemCopySuccess && isTransItemReverseSuccess && isTransUpdateSuccess && transtype.getTransactionTypeName().equals("SALE INVOICE") || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) {
-                PointsCard pc = new PointsCard();
-                pc = new PointsCardBean().getPointsCardByCardNumber(aNewTrans.getCardNumber());
-                if (("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) && null != pc) {
-                    //1. insert PointsTransaction for both the awarded and spent points to the stage area
-                    PointsTransaction NewPointsTransaction = new PointsTransaction();
-                    NewPointsTransaction.setPointsCardId(pc.getPointsCardId());
-                    NewPointsTransaction.setTransactionDate(new java.sql.Date(aNewTrans.getTransactionDate().getTime()));
-                    //for points awarded=New - Hist
-                    NewPointsTransaction.setPointsAwarded(aNewTrans.getPointsAwarded() - OldTrans.getPointsAwarded());
-                    //for points spent=Hist - New
-                    NewPointsTransaction.setPointsSpent(newPay.getPointsSpent() - oldPay.getPointsSpent());
-                    NewPointsTransaction.setTransactionId(aNewTrans.getTransactionId());
-                    NewPointsTransaction.setTransBranchId(CompanySetting.getBranchId());
-                    NewPointsTransaction.setPointsSpentAmount(NewPointsTransaction.getPointsSpent() * CompanySetting.getSpendAmountPerPoint());
-                    new PointsTransactionBean().addPointsTransactionToStage(NewPointsTransaction);
-                }
-                //Move all, if any PointsTransactions in the stage area to the live server
-                //The move function after deletes all if any in the stage area, so only the stage area will have those records not committed due to failure to connect to the server
-                //Transs will be moved if connectivity to the InterBranch DB is ON
-                if (new DBConnection().isINTER_BRANCH_MySQLConnectionAvailable().equals("ON")) {
-                    new PointsTransactionBean().movePointsTransactionsFromStageToLive();
                 }
             }
             //Reverse and Insert Journal
@@ -3979,9 +3885,12 @@ public class TransBean implements Serializable {
             long SavedCrDrNoteTransId = 0;
             int ExistCountDrCrNotes = new CreditDebitNoteBean().getCountDebitAndCreditNotes(OldTrans.getTransactionNumber());
             if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE RETURN INVOICE".equals(transtype.getTransactionTypeName())) {
-                //if (ExistCountDrCrNotes == 0) {
+                //insert note
                 SavedCrDrNoteTransId = new CreditDebitNoteBean().saveCreditDebitNote(OldTrans, aNewTrans, OldTransItems, aNewTransItems);
-                //}
+                //insert loyalty transaction for the note
+                if (SavedCrDrNoteTransId > 0 && aNewTrans.getCardNumber().length() > 0) {
+                    int x = new Loyalty_transactionBean().insertLoyalty_transaction_cr_dr(SavedCrDrNoteTransId);
+                }
             }
             //end-insert credit/debit note
             TransItemBean = null;
@@ -3990,10 +3899,10 @@ public class TransBean implements Serializable {
             if (isTransCopySuccess && isTransItemCopySuccess && isTransItemReverseSuccess && isTransUpdateSuccess) {
                 switch (aLevel) {
                     case "PARENT":
-                        this.setActionMessage("Saved Successfully ( TransactionId : " + new GeneralUserSetting().getCurrentTransactionId() + " )");
+                        this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully ( Transaction Id : " + new GeneralUserSetting().getCurrentTransactionId() + " )"));
                         break;
                     case "CHILD":
-                        this.setActionMessageChild("Saved Successfully ( TransactionId : " + new GeneralUserSetting().getCurrentTransactionIdChild() + " )");
+                        this.setActionMessageChild(ub.translateWordsInText(BaseName, "Saved Successfully ( Transaction Id : " + new GeneralUserSetting().getCurrentTransactionIdChild() + " )"));
                         break;
                 }
             }
@@ -4765,6 +4674,49 @@ public class TransBean implements Serializable {
                     } catch (NullPointerException npe) {
                         cs.setDouble("in_duration_value", 0);
                     }
+                    //bought in after order module
+                    /*
+                     try {
+                     cs.setLong("in_location_id", trans.getLocation_id());
+                     } catch (Exception e) {
+                     cs.setLong("in_location_id", 0);
+                     }
+                     if (null == trans.getStatus_code()) {
+                     cs.setString("in_status_code", "");
+                     } else {
+                     cs.setString("in_status_code", trans.getStatus_code());
+                     }
+                     if (null == trans.getStatus_date()) {
+                     cs.setTimestamp("in_status_date", null);
+                     } else {
+                     cs.setTimestamp("in_status_date", new java.sql.Timestamp(trans.getStatus_date().getTime()));
+                     }
+                     if (null == trans.getDelivery_mode()) {
+                     cs.setString("in_delivery_mode", "");
+                     } else {
+                     cs.setString("in_delivery_mode", trans.getDelivery_mode());
+                     }
+                     try {
+                     cs.setInt("in_is_processed", trans.getIs_processed());
+                     } catch (Exception npe) {
+                     cs.setInt("in_is_processed", 0);
+                     }
+                     try {
+                     cs.setInt("in_is_paid", trans.getIs_paid());
+                     } catch (Exception npe) {
+                     cs.setInt("in_is_paid", 0);
+                     }
+                     try {
+                     cs.setInt("in_is_cancel", trans.getIs_cancel());
+                     } catch (Exception npe) {
+                     cs.setInt("in_is_cancel", 0);
+                     }
+                     try {
+                     cs.setDouble("in_spent_points_amount", trans.getSpendPointsAmount());
+                     } catch (Exception e) {
+                     cs.setDouble("in_spent_points_amount", 0);
+                     }
+                     */
                     //save
                     cs.executeUpdate();
                     isTransCopySuccess = true;
@@ -5285,15 +5237,13 @@ public class TransBean implements Serializable {
                         aTrans.setSpendPoints(0);
                     }
                     //update for the loyality card point
-                    PointsCard pc = new PointsCard();
-                    pc = new PointsCardBean().getPointsCardByCardNumber(aTrans.getCardNumber());
                     try {
-                        aTrans.setCardHolder(pc.getCardHolder());
+                        aTrans.setCardHolder("");
                     } catch (NullPointerException npe) {
                         aTrans.setCardHolder("");
                     }
                     try {
-                        aTrans.setBalancePointsAmount(pc.getPointsBalance() * new CompanySetting().getESpendAmountPerPoint());
+                        aTrans.setBalancePointsAmount(0);
                     } catch (NullPointerException npe) {
                         aTrans.setBalancePointsAmount(0);
                     }
@@ -5349,15 +5299,13 @@ public class TransBean implements Serializable {
                     aTrans.setSpendPoints(0);
                 }
                 //update for the loyality card point
-                PointsCard pc = new PointsCard();
-                pc = new PointsCardBean().getPointsCardByCardNumber(aTrans.getCardNumber());
                 try {
-                    aTrans.setCardHolder(pc.getCardHolder());
+                    aTrans.setCardHolder("");
                 } catch (NullPointerException npe) {
                     aTrans.setCardHolder("");
                 }
                 try {
-                    aTrans.setBalancePointsAmount(pc.getPointsBalance() * new CompanySetting().getESpendAmountPerPoint());
+                    aTrans.setBalancePointsAmount(0);
                 } catch (NullPointerException npe) {
                     aTrans.setBalancePointsAmount(0);
                 }
@@ -5751,6 +5699,16 @@ public class TransBean implements Serializable {
                 trans.setSource_code(aResultSet.getString("source_code"));
             } catch (NullPointerException npe) {
                 trans.setSource_code("");
+            }
+            try {
+                trans.setTotalPaid(aResultSet.getDouble("total_paid"));
+            } catch (Exception e) {
+                trans.setTotalPaid(0);
+            }
+            try {
+                trans.setSpendPointsAmount(aResultSet.getDouble("spent_points_amount"));
+            } catch (Exception e) {
+                trans.setSpendPointsAmount(0);
             }
             return trans;
 
@@ -6506,6 +6464,16 @@ public class TransBean implements Serializable {
             } catch (NullPointerException npe) {
                 trans.setSource_code("");
             }
+            try {
+                trans.setTotalPaid(aResultSet.getDouble("total_paid"));
+            } catch (Exception e) {
+                trans.setTotalPaid(0);
+            }
+            try {
+                trans.setSpendPointsAmount(aResultSet.getDouble("spent_points_amount"));
+            } catch (Exception e) {
+                trans.setSpendPointsAmount(0);
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -6866,6 +6834,11 @@ public class TransBean implements Serializable {
                 trans.setTotalPaid(aResultSet.getDouble("total_paid"));
             } catch (Exception e) {
                 trans.setTotalPaid(0);
+            }
+            try {
+                trans.setSpendPointsAmount(aResultSet.getDouble("spent_points_amount"));
+            } catch (Exception e) {
+                trans.setSpendPointsAmount(0);
             }
             //return trans;
         } catch (Exception e) {
@@ -10003,14 +9976,21 @@ public class TransBean implements Serializable {
         this.setCashDiscountPerc(aTrans);
     }
 
+    public void setLoyaltyAndUpdate(int aTransTypeId, int aTransReasonId, Trans aTrans, List<TransItem> aActiveTransItems) {
+        if (aTrans.getCardHolder().length() == 0) {
+            aTrans.setCardNumber("");
+        }
+        this.setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems);
+    }
+
     public void setTransTotalsAndUpdateCEC(int aTransTypeId, int aTransReasonId, Trans aTrans, List<TransItem> aActiveTransItems) {
         aTrans.setSubTotal(this.getSubTotalCEC(aTrans, aActiveTransItems));
         aTrans.setTotalTradeDiscount(this.getTotalTradeDiscountCEC(aTrans, aActiveTransItems));
-        aTrans.setTotalVat(this.getTotalVatCEC(aTrans, aActiveTransItems));
-        aTrans.setGrandTotal(this.getGrandTotalCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems));
         aTrans.setTotalStdVatableAmount(this.getTotalStdVatableAmountCEC(aTrans, aTransTypeId, aTransReasonId, aActiveTransItems));
         aTrans.setTotalZeroVatableAmount(this.getTotalZeroVatableAmountCEC(aTrans, aTransTypeId, aTransReasonId, aActiveTransItems));
         aTrans.setTotalExemptVatableAmount(this.getTotalExemptVatableAmountCEC(aTrans, aTransTypeId, aTransReasonId, aActiveTransItems));
+        aTrans.setTotalVat(this.getTotalVatCEC(aTrans, aActiveTransItems));
+        aTrans.setGrandTotal(this.getGrandTotalCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems));
         if (aTransTypeId == 19) {//EXPENSE ENTRY
             aTrans.setAmountTendered(aTrans.getGrandTotal());
         }
@@ -10236,8 +10216,15 @@ public class TransBean implements Serializable {
         }
         //case for cash discount offered, overide vat from totals
         double VatPerc = CompanySetting.getVatPerc();
-        if (aTrans.getCashDiscount() > 0 && TVat > 0 && VatPerc > 0) {
-            TVat = (aTrans.getSubTotal() - aTrans.getTotalTradeDiscount() - aTrans.getCashDiscount()) * VatPerc / 100;
+        /*
+         if ((aTrans.getCashDiscount() + aTrans.getSpendPointsAmount()) > 0 && TVat > 0 && VatPerc > 0) {
+         //TVat = (aTrans.getSubTotal() - aTrans.getTotalTradeDiscount() - aTrans.getCashDiscount()) * VatPerc / 100;
+         TVat = (aTrans.getSubTotal() - aTrans.getTotalTradeDiscount() - aTrans.getCashDiscount() - aTrans.getSpendPointsAmount()) * VatPerc / 100;
+         }
+         */
+        if ((aTrans.getCashDiscount() + aTrans.getSpendPointsAmount()) > 0 && aTrans.getTotalStdVatableAmount() > 0 && VatPerc > 0) {
+            //TVat = (aTrans.getSubTotal() - aTrans.getTotalTradeDiscount() - aTrans.getCashDiscount()) * VatPerc / 100;
+            TVat = aTrans.getTotalStdVatableAmount() * VatPerc / 100;
         }
         TVat = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), TVat);
         return TVat;
@@ -10338,40 +10325,19 @@ public class TransBean implements Serializable {
         TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
         double GTotal = 0;
         if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE QUOTATION".equals(transtype.getTransactionTypeName()) || "HIRE RETURN INVOICE".equals(transtype.getTransactionTypeName())) {
-            GTotal = (aTrans.getSubTotal() + aTrans.getTotalVat()) - (aTrans.getTotalTradeDiscount() + aTrans.getCashDiscount());
+            GTotal = (aTrans.getSubTotal() + aTrans.getTotalVat()) - (aTrans.getTotalTradeDiscount() + aTrans.getCashDiscount() + aTrans.getSpendPointsAmount());
         } else if ("SALE QUOTATION".equals(transtype.getTransactionTypeName())) {
             GTotal = (aTrans.getSubTotal() + aTrans.getTotalVat()) - (aTrans.getTotalTradeDiscount() + aTrans.getCashDiscount());
         } else if ("SALE ORDER".equals(transtype.getTransactionTypeName())) {
             GTotal = (aTrans.getSubTotal() + aTrans.getTotalVat()) - (aTrans.getTotalTradeDiscount() + aTrans.getCashDiscount());
         } else if ("PURCHASE INVOICE".equals(transtype.getTransactionTypeName()) || "EXPENSE ENTRY".equals(transtype.getTransactionTypeName())) {
             GTotal = 0;
-            /*
-             List<TransItem> ati = aActiveTransItems;
-             int ListItemIndex = 0;
-             int ListItemNo = ati.size();
-             while (ListItemIndex < ListItemNo) {
-             GTotal = GTotal + (ati.get(ListItemIndex).getAmount());
-             ListItemIndex = ListItemIndex + 1;
-             }
-             GTotal = GTotal - aTrans.getCashDiscount();
-             */
             GTotal = (aTrans.getSubTotal() + aTrans.getTotalVat()) - (aTrans.getTotalTradeDiscount() + aTrans.getCashDiscount());
         } else if ("PURCHASE ORDER".equals(transtype.getTransactionTypeName())) {
             GTotal = 0;
-            /*
-             List<TransItem> ati = aActiveTransItems;
-             int ListItemIndex = 0;
-             int ListItemNo = ati.size();
-             while (ListItemIndex < ListItemNo) {
-             GTotal = GTotal + (ati.get(ListItemIndex).getAmount());
-             ListItemIndex = ListItemIndex + 1;
-             }
-             GTotal = GTotal - aTrans.getCashDiscount();
-             */
             GTotal = (aTrans.getSubTotal() + aTrans.getTotalVat()) - (aTrans.getTotalTradeDiscount() + aTrans.getCashDiscount());
         } else if ("DISPOSE STOCK".equals(transtype.getTransactionTypeName()) || "STOCK CONSUMPTION".equals(transtype.getTransactionTypeName())) {
             List<TransItem> ati = aActiveTransItems;
-
             int ListItemIndex = 0;
             int ListItemNo = ati.size();
             GTotal = 0;
@@ -10430,11 +10396,12 @@ public class TransBean implements Serializable {
     public double getPointsAwarded(Trans aTrans) {
         double PtsAwarded = 0;
         try {
-            if (aTrans.getSpendPointsAmount() > 0 && aTrans.getCardNumber().length() > 0) {
-                PtsAwarded = aTrans.getGrandTotal() / CompanySetting.getAwardAmountPerPoint();
+            if (aTrans.getCardNumber().length() > 0) {
+                double XrateMultiply = new AccXrateBean().getXrateMultiply(new AccCurrencyBean().getLocalCurrency().getCurrencyCode(), aTrans.getCurrencyCode());
+                PtsAwarded = aTrans.getGrandTotal() / (CompanySetting.getAwardAmountPerPoint() * XrateMultiply);
             }
             return PtsAwarded;
-        } catch (NullPointerException npe) {
+        } catch (Exception e) {
             return 0;
         }
     }
@@ -10464,7 +10431,8 @@ public class TransBean implements Serializable {
         try {
             if (aTrans.getCardNumber().length() > 0) {
                 if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE RETURN INVOICE".equals(transtype.getTransactionTypeName())) {
-                    SpendPts = aTrans.getSpendPointsAmount() / CompanySetting.getSpendAmountPerPoint();
+                    double XrateMultiply = new AccXrateBean().getXrateMultiply(new AccCurrencyBean().getLocalCurrency().getCurrencyCode(), aTrans.getCurrencyCode());
+                    SpendPts = aTrans.getSpendPointsAmount() / (CompanySetting.getSpendAmountPerPoint() * XrateMultiply);
                 } else if ("PURCHASE INVOICE".equals(transtype.getTransactionTypeName())) {
                     SpendPts = 0;
                 }
@@ -10473,7 +10441,7 @@ public class TransBean implements Serializable {
             }
             SpendPts = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), SpendPts);
             return SpendPts;
-        } catch (NullPointerException npe) {
+        } catch (Exception e) {
             return 0;
         }
     }
@@ -10481,44 +10449,41 @@ public class TransBean implements Serializable {
     public void updatePointsCard(Trans aTrans) {
         try {
             if (new CheckApiBean().IsSmBiAvailable() && new Parameter_listBean().getParameter_listByContextName("API", "API_SMBI_URL").getParameter_value().length() > 0) {
-                if (!new AccCurrencyBean().getLocalCurrency().getCurrencyCode().equals(aTrans.getCurrencyCode())) {
-                    this.clearTransPointsDetails(aTrans);
-                } else {
-                    LoyaltyCard loyaltycard = new SMbiBean().getLoyaltyCardDetail(aTrans.getCardNumber());
-                    if (loyaltycard != null) {
-                        String n1 = loyaltycard.getFirst_name();
-                        String n2 = loyaltycard.getSecond_name();
-                        String n3 = loyaltycard.getThird_name();
-                        String an = "";
-                        if (n1.length() > 0) {
-                            if (an.length() == 0) {
-                                an = n1;
-                            } else {
-                                an = an + " " + n1;
-                            }
+                double XrateMultiply = new AccXrateBean().getXrateMultiply(new AccCurrencyBean().getLocalCurrency().getCurrencyCode(), aTrans.getCurrencyCode());
+                LoyaltyCard loyaltycard = new SMbiBean().getLoyaltyCardDetail(aTrans.getCardNumber());
+                if (loyaltycard != null) {
+                    String n1 = loyaltycard.getFirst_name();
+                    String n2 = loyaltycard.getSecond_name();
+                    String n3 = loyaltycard.getThird_name();
+                    String an = "";
+                    if (n1.length() > 0) {
+                        if (an.length() == 0) {
+                            an = n1;
+                        } else {
+                            an = an + " " + n1;
                         }
-                        if (n2.length() > 0) {
-                            if (an.length() == 0) {
-                                an = n2;
-                            } else {
-                                an = an + " " + n2;
-                            }
-                        }
-                        if (n3.length() > 0) {
-                            if (an.length() == 0) {
-                                an = n3;
-                            } else {
-                                an = an + " " + n3;
-                            }
-                        }
-                        aTrans.setCardHolder(an);
-                        aTrans.setBalancePoints(loyaltycard.getPoints_balance());
-                        aTrans.setBalancePointsAmount(aTrans.getBalancePoints() * CompanySetting.getSpendAmountPerPoint());
-                        aTrans.setSpendPointsAmount(0);
-                        aTrans.setSpendPoints(0);
-                    } else {
-                        this.clearTransPointsDetails(aTrans);
                     }
+                    if (n2.length() > 0) {
+                        if (an.length() == 0) {
+                            an = n2;
+                        } else {
+                            an = an + " " + n2;
+                        }
+                    }
+                    if (n3.length() > 0) {
+                        if (an.length() == 0) {
+                            an = n3;
+                        } else {
+                            an = an + " " + n3;
+                        }
+                    }
+                    aTrans.setCardHolder(an);
+                    aTrans.setBalancePoints(loyaltycard.getPoints_balance());
+                    aTrans.setBalancePointsAmount(aTrans.getBalancePoints() * CompanySetting.getSpendAmountPerPoint() * XrateMultiply);
+                    aTrans.setSpendPointsAmount(0);
+                    aTrans.setSpendPoints(0);
+                } else {
+                    this.clearTransPointsDetails(aTrans);
                 }
             } else {
                 this.clearTransPointsDetails(aTrans);
@@ -10605,21 +10570,18 @@ public class TransBean implements Serializable {
         int ListItemIndex = 0;
         int ListItemNo = ati.size();
         GTotalStdVatableAmount = 0;
+        Double CashLoyaltyDisc = aTrans.getCashDiscount() + aTrans.getSpendPointsAmount();
+        Double ItemCashLoyaltyDisc = 0.0;
         if ("SALE QUOTATION".equals(transtype.getTransactionTypeName()) || "SALE ORDER".equals(transtype.getTransactionTypeName()) || "SALE INVOICE".equals(transtype.getTransactionTypeName()) || "PURCHASE INVOICE".equals(transtype.getTransactionTypeName()) || "PURCHASE ORDER".equals(transtype.getTransactionTypeName()) || "EXPENSE ENTRY".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE RETURN INVOICE".equals(transtype.getTransactionTypeName())) {
             while (ListItemIndex < ListItemNo) {
+                if (CashLoyaltyDisc > 0) {
+                    ItemCashLoyaltyDisc = CashLoyaltyDisc * (ati.get(ListItemIndex).getAmountExcVat() / aTrans.getSubTotal());
+                }
                 if ("STANDARD".equals(ati.get(ListItemIndex).getVatRated())) {
-                    if ("Yes".equals(CompanySetting.getIsTradeDiscountVatLiable())) {
-                        if (ati.get(ListItemIndex).getDuration_value() > 0) {
-                            GTotalStdVatableAmount = GTotalStdVatableAmount + ((ati.get(ListItemIndex).getUnitPriceExcVat() - 0) * ati.get(ListItemIndex).getItemQty() * ati.get(ListItemIndex).getDuration_value());
-                        } else {
-                            GTotalStdVatableAmount = GTotalStdVatableAmount + ((ati.get(ListItemIndex).getUnitPriceExcVat() - 0) * ati.get(ListItemIndex).getItemQty());
-                        }
+                    if (ati.get(ListItemIndex).getDuration_value() > 0) {
+                        GTotalStdVatableAmount = GTotalStdVatableAmount + ((ati.get(ListItemIndex).getUnitPriceExcVat() - ati.get(ListItemIndex).getUnitTradeDiscount()) * ati.get(ListItemIndex).getItemQty() * ati.get(ListItemIndex).getDuration_value()) - ItemCashLoyaltyDisc;
                     } else {
-                        if (ati.get(ListItemIndex).getDuration_value() > 0) {
-                            GTotalStdVatableAmount = GTotalStdVatableAmount + ((ati.get(ListItemIndex).getUnitPriceExcVat() - ati.get(ListItemIndex).getUnitTradeDiscount()) * ati.get(ListItemIndex).getItemQty() * ati.get(ListItemIndex).getDuration_value());
-                        } else {
-                            GTotalStdVatableAmount = GTotalStdVatableAmount + ((ati.get(ListItemIndex).getUnitPriceExcVat() - ati.get(ListItemIndex).getUnitTradeDiscount()) * ati.get(ListItemIndex).getItemQty());
-                        }
+                        GTotalStdVatableAmount = GTotalStdVatableAmount + ((ati.get(ListItemIndex).getUnitPriceExcVat() - ati.get(ListItemIndex).getUnitTradeDiscount()) * ati.get(ListItemIndex).getItemQty()) - ItemCashLoyaltyDisc;
                     }
                 }
                 ListItemIndex = ListItemIndex + 1;
@@ -10691,21 +10653,18 @@ public class TransBean implements Serializable {
         int ListItemIndex = 0;
         int ListItemNo = ati.size();
         GTotalZeroVatableAmount = 0;
+        Double CashLoyaltyDisc = aTrans.getCashDiscount() + aTrans.getSpendPointsAmount();
+        Double ItemCashLoyaltyDisc = 0.0;
         if ("SALE QUOTATION".equals(transtype.getTransactionTypeName()) || "SALE ORDER".equals(transtype.getTransactionTypeName()) || "SALE INVOICE".equals(transtype.getTransactionTypeName()) || "PURCHASE INVOICE".equals(transtype.getTransactionTypeName()) || "PURCHASE ORDER".equals(transtype.getTransactionTypeName()) || "EXPENSE ENTRY".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE RETURN INVOICE".equals(transtype.getTransactionTypeName())) {
             while (ListItemIndex < ListItemNo) {
+                if (CashLoyaltyDisc > 0) {
+                    ItemCashLoyaltyDisc = CashLoyaltyDisc * (ati.get(ListItemIndex).getAmountExcVat() / aTrans.getSubTotal());
+                }
                 if ("ZERO".equals(ati.get(ListItemIndex).getVatRated())) {
-                    if ("Yes".equals(CompanySetting.getIsTradeDiscountVatLiable())) {
-                        if (ati.get(ListItemIndex).getDuration_value() > 0) {
-                            GTotalZeroVatableAmount = GTotalZeroVatableAmount + ((ati.get(ListItemIndex).getUnitPriceExcVat() - 0) * ati.get(ListItemIndex).getItemQty() * ati.get(ListItemIndex).getDuration_value());
-                        } else {
-                            GTotalZeroVatableAmount = GTotalZeroVatableAmount + ((ati.get(ListItemIndex).getUnitPriceExcVat() - 0) * ati.get(ListItemIndex).getItemQty());
-                        }
+                    if (ati.get(ListItemIndex).getDuration_value() > 0) {
+                        GTotalZeroVatableAmount = GTotalZeroVatableAmount + ((ati.get(ListItemIndex).getUnitPriceExcVat() - ati.get(ListItemIndex).getUnitTradeDiscount()) * ati.get(ListItemIndex).getItemQty() * ati.get(ListItemIndex).getDuration_value()) - ItemCashLoyaltyDisc;
                     } else {
-                        if (ati.get(ListItemIndex).getDuration_value() > 0) {
-                            GTotalZeroVatableAmount = GTotalZeroVatableAmount + ((ati.get(ListItemIndex).getUnitPriceExcVat() - ati.get(ListItemIndex).getUnitTradeDiscount()) * ati.get(ListItemIndex).getItemQty() * ati.get(ListItemIndex).getDuration_value());
-                        } else {
-                            GTotalZeroVatableAmount = GTotalZeroVatableAmount + ((ati.get(ListItemIndex).getUnitPriceExcVat() - ati.get(ListItemIndex).getUnitTradeDiscount()) * ati.get(ListItemIndex).getItemQty());
-                        }
+                        GTotalZeroVatableAmount = GTotalZeroVatableAmount + ((ati.get(ListItemIndex).getUnitPriceExcVat() - ati.get(ListItemIndex).getUnitTradeDiscount()) * ati.get(ListItemIndex).getItemQty()) - ItemCashLoyaltyDisc;
                     }
                 }
                 ListItemIndex = ListItemIndex + 1;
@@ -10777,21 +10736,18 @@ public class TransBean implements Serializable {
         int ListItemIndex = 0;
         int ListItemNo = ati.size();
         GTotalExemptVatableAmount = 0;
+        Double CashLoyaltyDisc = aTrans.getCashDiscount() + aTrans.getSpendPointsAmount();
+        Double ItemCashLoyaltyDisc = 0.0;
         if ("SALE QUOTATION".equals(transtype.getTransactionTypeName()) || "SALE ORDER".equals(transtype.getTransactionTypeName()) || "SALE INVOICE".equals(transtype.getTransactionTypeName()) || "PURCHASE INVOICE".equals(transtype.getTransactionTypeName()) || "PURCHASE ORDER".equals(transtype.getTransactionTypeName()) || "EXPENSE ENTRY".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) {
             while (ListItemIndex < ListItemNo) {
+                if (CashLoyaltyDisc > 0) {
+                    ItemCashLoyaltyDisc = CashLoyaltyDisc * (ati.get(ListItemIndex).getAmountExcVat() / aTrans.getSubTotal());
+                }
                 if ("EXEMPT".equals(ati.get(ListItemIndex).getVatRated())) {
-                    if ("Yes".equals(CompanySetting.getIsTradeDiscountVatLiable())) {
-                        if (ati.get(ListItemIndex).getDuration_value() > 0) {
-                            GTotalExemptVatableAmount = GTotalExemptVatableAmount + ((ati.get(ListItemIndex).getUnitPriceExcVat() - 0) * ati.get(ListItemIndex).getItemQty() * ati.get(ListItemIndex).getDuration_value());
-                        } else {
-                            GTotalExemptVatableAmount = GTotalExemptVatableAmount + ((ati.get(ListItemIndex).getUnitPriceExcVat() - 0) * ati.get(ListItemIndex).getItemQty());
-                        }
+                    if (ati.get(ListItemIndex).getDuration_value() > 0) {
+                        GTotalExemptVatableAmount = GTotalExemptVatableAmount + ((ati.get(ListItemIndex).getUnitPriceExcVat() - ati.get(ListItemIndex).getUnitTradeDiscount()) * ati.get(ListItemIndex).getItemQty() * ati.get(ListItemIndex).getDuration_value()) - ItemCashLoyaltyDisc;
                     } else {
-                        if (ati.get(ListItemIndex).getDuration_value() > 0) {
-                            GTotalExemptVatableAmount = GTotalExemptVatableAmount + ((ati.get(ListItemIndex).getUnitPriceExcVat() - ati.get(ListItemIndex).getUnitTradeDiscount()) * ati.get(ListItemIndex).getItemQty() * ati.get(ListItemIndex).getDuration_value());
-                        } else {
-                            GTotalExemptVatableAmount = GTotalExemptVatableAmount + ((ati.get(ListItemIndex).getUnitPriceExcVat() - ati.get(ListItemIndex).getUnitTradeDiscount()) * ati.get(ListItemIndex).getItemQty());
-                        }
+                        GTotalExemptVatableAmount = GTotalExemptVatableAmount + ((ati.get(ListItemIndex).getUnitPriceExcVat() - ati.get(ListItemIndex).getUnitTradeDiscount()) * ati.get(ListItemIndex).getItemQty()) - ItemCashLoyaltyDisc;
                     }
                 }
                 ListItemIndex = ListItemIndex + 1;
@@ -10842,7 +10798,8 @@ public class TransBean implements Serializable {
             }
         } else {
             //other cash, bank, mm, eft, etc.
-            ChangeAmt = (aTrans.getAmountTendered() + aTrans.getSpendPointsAmount()) - aTrans.getGrandTotal();
+            //ChangeAmt = (aTrans.getAmountTendered() + aTrans.getSpendPointsAmount()) - aTrans.getGrandTotal();
+            ChangeAmt = aTrans.getAmountTendered() - aTrans.getGrandTotal();
         }
         return ChangeAmt;
     }
@@ -13908,6 +13865,7 @@ public class TransBean implements Serializable {
         httpSession.setAttribute("CURRENT_PAY_ID", 0);
         this.ActionType = aAction;
         this.TransObj = new TransBean().getTrans(aTransId);
+        this.updateLookup(this.TransObj);
         this.TransItemList = new TransItemBean().getTransItemsByTransactionId(aTransId);
         try {
             this.PayObj = new PayBean().getTransactionFirstPayByTransNo(TransObj.getTransactionNumber());//first payment
@@ -14008,7 +13966,7 @@ public class TransBean implements Serializable {
 
     public boolean updateTransactionTable(Trans aNewTrans) {
         boolean isTransUpdateSuccess = false;
-        String newSQL = "{call sp_update_transaction2(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+        String newSQL = "{call sp_update_transaction2(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 CallableStatement cs = conn.prepareCall(newSQL);) {
@@ -14027,6 +13985,7 @@ public class TransBean implements Serializable {
             cs.setDouble("in_amount_tendered", aNewTrans.getAmountTendered());
             cs.setDouble("in_change_amount", aNewTrans.getChangeAmount());
             cs.setDouble("in_total_profit_margin", aNewTrans.getTotalProfitMargin());
+            cs.setDouble("in_spent_points_amount", aNewTrans.getSpendPointsAmount());
             cs.executeUpdate();
             isTransUpdateSuccess = true;
         } catch (Exception e) {

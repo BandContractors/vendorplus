@@ -124,7 +124,9 @@ public class CreditDebitNoteBean implements Serializable {
             CreditDebitTrans.setSubTotal(aNewTrans.getSubTotal() - aOldTrans.getSubTotal());
             CreditDebitTrans.setGrandTotal(aNewTrans.getGrandTotal() - aOldTrans.getGrandTotal());
             CreditDebitTrans.setTotalTradeDiscount(aNewTrans.getTotalTradeDiscount() - aOldTrans.getTotalTradeDiscount());
+            CreditDebitTrans.setCashDiscount(aNewTrans.getCashDiscount() - aOldTrans.getCashDiscount());
             CreditDebitTrans.setPointsAwarded(aNewTrans.getPointsAwarded() - aOldTrans.getPointsAwarded());
+            CreditDebitTrans.setSpendPointsAmount(aNewTrans.getSpendPointsAmount() - aOldTrans.getSpendPointsAmount());
             CreditDebitTrans.setTotalStdVatableAmount(aNewTrans.getTotalStdVatableAmount() - aOldTrans.getTotalStdVatableAmount());
             CreditDebitTrans.setTotalZeroVatableAmount(aNewTrans.getTotalZeroVatableAmount() - aOldTrans.getTotalZeroVatableAmount());
             CreditDebitTrans.setTotalExemptVatableAmount(aNewTrans.getTotalExemptVatableAmount() - aOldTrans.getTotalExemptVatableAmount());
@@ -144,7 +146,7 @@ public class CreditDebitNoteBean implements Serializable {
 
     public long insertTrans_cr_dr_note(int aStoreId, int aTransTypeId, int aTransReasonId, Trans trans) {
         long InsertedTransId = 0;
-        String sql = "{call sp_insert_transaction_cr_dr_note(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+        String sql = "{call sp_insert_transaction_cr_dr_note(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 CallableStatement cs = conn.prepareCall(sql);) {
@@ -363,6 +365,11 @@ public class CreditDebitNoteBean implements Serializable {
                 cs.setInt("in_is_cancel", trans.getIs_cancel());
             } catch (NullPointerException npe) {
                 cs.setInt("in_is_cancel", 0);
+            }
+            try {
+                cs.setDouble("in_spent_points_amount", trans.getSpendPointsAmount());
+            } catch (Exception e) {
+                cs.setDouble("in_spent_points_amount", 0);
             }
             //save
             cs.executeUpdate();

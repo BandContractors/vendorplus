@@ -8,7 +8,6 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -16,6 +15,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import sessions.GeneralUserSetting;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 /*
  * To change this template, choose Tools | Templates
@@ -30,7 +31,7 @@ import sessions.GeneralUserSetting;
 public class AccXrateBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    static Logger LOGGER = Logger.getLogger(AccXrateBean.class.getName());
     private String ActionMessage = null;
     private List<AccXrate> AccXrateList;
 
@@ -101,8 +102,8 @@ public class AccXrateBean implements Serializable {
             } catch (NullPointerException npe) {
                 accxrate.setLastEditDate(null);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -187,8 +188,8 @@ public class AccXrateBean implements Serializable {
                         }
                         cs.executeUpdate();
                     }
-                } catch (SQLException se) {
-                    System.err.println(se.getMessage());
+                } catch (Exception e) {
+                    LOGGER.log(Level.ERROR, e);
                 }
             }
         }
@@ -207,8 +208,8 @@ public class AccXrateBean implements Serializable {
                 axr = new AccXrate();
                 this.setAccXrateFromResultset(axr, rs);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return axr;
     }
@@ -235,16 +236,8 @@ public class AccXrateBean implements Serializable {
                 this.setAccXrateFromResultset(ac, rs);
                 this.AccXrateList.add(ac);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -264,20 +257,12 @@ public class AccXrateBean implements Serializable {
                     SnapshotMaxNo = 0;
                 }
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return SnapshotMaxNo;
     }
-    
+
     public double getXrate(String aFromCurCode, String aToCurCode) {
         String sql;
         double xrate = 1;
@@ -299,8 +284,8 @@ public class AccXrateBean implements Serializable {
                     this.setAccXrateFromResultset(axr, rs);
                     xrate = axr.getBuying();
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         } else if (!aFromCurCode.equals(LocalCurrency.getCurrencyCode()) && aToCurCode.equals(LocalCurrency.getCurrencyCode())) {//Foreign-2-Local
             sql = "SELECT * FROM acc_xrate WHERE is_deleted=0 AND is_Active=1 AND local_currency_id=" + LocalCurrency.getAccCurrencyId() + " AND foreign_currency_code='" + aFromCurCode + "'";
@@ -315,8 +300,8 @@ public class AccXrateBean implements Serializable {
                     this.setAccXrateFromResultset(axr, rs);
                     xrate = axr.getSelling();
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         } else if (!aFromCurCode.equals(LocalCurrency.getCurrencyCode()) && !aToCurCode.equals(LocalCurrency.getCurrencyCode())) {//Foreign-2-Foreign
             double FromXrate = 1;
@@ -334,8 +319,8 @@ public class AccXrateBean implements Serializable {
                     this.setAccXrateFromResultset(axr, rs);
                     FromXrate = axr.getSelling();
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
             //Local to Foreign
             sql = "SELECT * FROM acc_xrate WHERE is_deleted=0 AND is_Active=1 AND local_currency_id=" + LocalCurrency.getAccCurrencyId() + " AND foreign_currency_code='" + aToCurCode + "'";
@@ -350,8 +335,8 @@ public class AccXrateBean implements Serializable {
                     this.setAccXrateFromResultset(axr, rs);
                     ToXrate = axr.getBuying();
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
             //get rate
             xrate = FromXrate / ToXrate;
@@ -411,8 +396,8 @@ public class AccXrateBean implements Serializable {
                         xrate = 1;
                     }
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         } else if (!aFromCurCode.equals(LocalCurrency.getCurrencyCode()) && aToCurCode.equals(LocalCurrency.getCurrencyCode())) {//Foreign-2-Local
             sql = "SELECT * FROM snapshot_xrate WHERE is_deleted=0 AND is_Active=1 AND snapshot_no=" + SnapshotMaxNo + " AND local_currency_id=" + LocalCurrency.getAccCurrencyId() + " AND foreign_currency_code='" + aFromCurCode + "'";
@@ -432,8 +417,8 @@ public class AccXrateBean implements Serializable {
                         xrate = 1;
                     }
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
         } else if (!aFromCurCode.equals(LocalCurrency.getCurrencyCode()) && !aToCurCode.equals(LocalCurrency.getCurrencyCode())) {//Foreign-2-Foreign
             double FromXrate = 1;
@@ -456,8 +441,8 @@ public class AccXrateBean implements Serializable {
                         FromXrate = 1;
                     }
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
             //Local to Foreign
             sql = "SELECT * FROM snapshot_xrate WHERE is_deleted=0 AND is_Active=1 AND snapshot_no=" + SnapshotMaxNo + " AND local_currency_id=" + LocalCurrency.getAccCurrencyId() + " AND foreign_currency_code='" + aToCurCode + "'";
@@ -477,8 +462,8 @@ public class AccXrateBean implements Serializable {
                         ToXrate = 1;
                     }
                 }
-            } catch (SQLException se) {
-                System.err.println(se.getMessage());
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
             //get rate
             xrate = FromXrate / ToXrate;

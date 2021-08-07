@@ -173,12 +173,7 @@
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="#{langsys['Discount']}" style="text-align: right;">
-                            <h:outputText value="#{sm.cashDiscount}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                            </h:outputText>
-                        </p:column>
-                        <p:column headerText="#{langsys['Total']}" style="text-align: right;">
+                        <p:column headerText="#{langsys['Net']} #{langsys['Total']}" style="text-align: right;">
                             <h:outputText value="#{sm.grandTotal}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
@@ -249,11 +244,11 @@
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Discount']}" style="text-align: right;">
-                    <h:outputText value="#{itm.cashDiscount}">
+                    <h:outputText value="#{itm.cashDiscount+itm.spendPointsAmount}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="#{langsys['Total']}" style="text-align: right;">
+                <p:column headerText="#{langsys['Net']} #{langsys['Total']}" style="text-align: right;">
                     <h:outputText value="#{itm.grandTotal}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>

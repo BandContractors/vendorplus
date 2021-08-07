@@ -292,6 +292,7 @@ public class InvoiceBean implements Serializable {
             Double TotalAmountIncVat = 0.0;
             Double TotalAmountExempt = 0.0;
             Double TotalAmountZero = 0.0;
+            Double CashLoyaltyDisc = trans.getCashDiscount() + trans.getSpendPointsAmount();
             for (int i = 0; i < transitems.size(); i++) {
                 String VatRated = transitems.get(i).getVatRated();
                 itm = new ItemBean().getItem(transitems.get(i).getItemId());
@@ -323,6 +324,18 @@ public class InvoiceBean implements Serializable {
                         gd.setTaxRate("0");
                     }
                     //start - new calc
+                    //start-for cash and loyalty discount, re-calculate
+                    Double ItemCashLoyaltyDisc = 0.0;
+                    if (CashLoyaltyDisc > 0) {
+                        ItemCashLoyaltyDisc = CashLoyaltyDisc * (transitems.get(i).getAmountExcVat() / trans.getSubTotal());
+                        if (VatRated.equals("STANDARD")) {
+                            double vatamt = (transitems.get(i).getAmountExcVat() - ItemCashLoyaltyDisc) * tr;
+                            transitems.get(i).setAmountIncVat((transitems.get(i).getAmountExcVat() - ItemCashLoyaltyDisc) + vatamt);
+                        } else {
+                            transitems.get(i).setAmountIncVat(transitems.get(i).getAmountExcVat() - ItemCashLoyaltyDisc);
+                        }
+                    }
+                    //end-for cash and loyalty discount, re-calculate
                     Double Qty = transitems.get(i).getItemQty();
                     //formulae UnitPriceIncVat=AmountIncVat/Qty
                     Double UnitPriceIncVat = transitems.get(i).getAmountIncVat() / Qty;
@@ -898,15 +911,29 @@ public class InvoiceBean implements Serializable {
             Double TotalAmountIncVat = 0.0;
             Double TotalAmountExempt = 0.0;
             Double TotalAmountZero = 0.0;
+            Double CashLoyaltyDisc = aTrans.getCashDiscount() + aTrans.getSpendPointsAmount();
             for (int i = 0; i < jSONArray_GoodsDetials.length(); i++) {
                 jsonObj = (JSONObject) jSONArray_GoodsDetials.get(i);
                 TransItem ti = this.getTransItemFromList(jsonObj.get("itemCode").toString(), aTransItems);
                 Double ChangedQty = ti.getItemQty();
-                Double ChangedAmt = ti.getAmountIncVat();
                 String VatRated = ti.getVatRated();
+                Double vatPerc = ti.getVatPerc();
+                Double tr = vatPerc / 100;
+                //start-for cash and loyalty discount, re-calculate
+                Double ItemCashLoyaltyDisc = 0.0;
+                if (CashLoyaltyDisc != 0) {
+                    ItemCashLoyaltyDisc = CashLoyaltyDisc * (ti.getAmountExcVat() / aTrans.getSubTotal());
+                    if (VatRated.equals("STANDARD")) {
+                        double vatamt = (ti.getAmountExcVat() + ItemCashLoyaltyDisc) * tr;
+                        ti.setAmountIncVat((ti.getAmountExcVat() + ItemCashLoyaltyDisc) + vatamt);
+                    } else {
+                        ti.setAmountIncVat(ti.getAmountExcVat() + ItemCashLoyaltyDisc);
+                    }
+                }
+                //end-for cash and loyalty discount, re-calculate
+                Double ChangedAmt = ti.getAmountIncVat();
+
                 if (ChangedQty < 0) {
-                    Double vatPerc = ti.getVatPerc();
-                    Double tr = vatPerc / 100;
                     //make the negative postive for calculation purposes
                     ChangedQty = (-1 * ChangedQty);
                     ChangedAmt = (-1 * ChangedAmt);
@@ -922,7 +949,6 @@ public class InvoiceBean implements Serializable {
                     Double UnitVat = UnitPriceIncVatRd - UnitPriceExcVat;
                     Double TaxAmount = UnitVat * Qty;
                     Double TaxAmountRd = acb.roundAmountMinTwoDps(aTrans.getCurrencyCode(), TaxAmount);
-
                     //assign
                     //gd.setUnitPrice(ub.formatDoublePlain2DP(UnitPriceIncVatRd));
                     if (VatRated.equals("STANDARD")) {
@@ -1220,11 +1246,32 @@ public class InvoiceBean implements Serializable {
             Double TotalAmountExempt = 0.0;
             Double TotalAmountZero = 0.0;
             JSONObject jsonObj;
+            Double CashLoyaltyDisc = trans.getCashDiscount() + trans.getSpendPointsAmount();
             for (int i = 0; i < jSONArray_GoodsDetials.length(); i++) {
                 jsonObj = (JSONObject) jSONArray_GoodsDetials.get(i);
                 TransItem ti = this.getTransItemFromList(jsonObj.get("itemCode").toString(), transitems);
                 String VatRated = ti.getVatRated();
+                Double vatPerc = ti.getVatPerc();
+                Double tr = vatPerc / 100;
                 Double ChangedQty = ti.getItemQty();
+                //start-for cash and loyalty discount, re-calculate
+                Double ItemCashLoyaltyDisc = 0.0;
+                if (CashLoyaltyDisc != 0) {
+                    ItemCashLoyaltyDisc = CashLoyaltyDisc * (ti.getAmountExcVat() / trans.getSubTotal());
+                    if (VatRated.equals("STANDARD")) {
+                        double vatamt = 0;
+                        if (ItemCashLoyaltyDisc > 0) {
+                            vatamt = (ti.getAmountExcVat() - ItemCashLoyaltyDisc) * tr;
+                            ti.setAmountIncVat((ti.getAmountExcVat() - ItemCashLoyaltyDisc) + vatamt);
+                        } else {
+                            vatamt = (ti.getAmountExcVat() + ItemCashLoyaltyDisc) * tr;
+                            ti.setAmountIncVat((ti.getAmountExcVat() + ItemCashLoyaltyDisc) + vatamt);
+                        }
+                    } else {
+                        ti.setAmountIncVat(ti.getAmountExcVat() - ItemCashLoyaltyDisc);
+                    }
+                }
+                //end-for cash and loyalty discount, re-calculate
                 Double ChangedAmt = ti.getAmountIncVat();
                 if (ChangedQty > 0) {
                     GoodsDetails gd = new GoodsDetails();
@@ -1233,8 +1280,6 @@ public class InvoiceBean implements Serializable {
                     gd.setQty(ub.formatDoublePlain2DP(ChangedQty));
                     gd.setUnitOfMeasure(jsonObj.get("unitOfMeasure").toString());
                     //gd.setTotal(ub.formatDoublePlain2DP(ChangedAmt));
-                    Double vatPerc = ti.getVatPerc();
-                    Double tr = vatPerc / 100;
                     if (VatRated.equals("STANDARD")) {
                         gd.setTaxRate(ub.formatDoublePlain2DP(tr));
                     } else if (VatRated.equals("EXEMPT")) {
@@ -1531,6 +1576,7 @@ public class InvoiceBean implements Serializable {
             if (ItemId == aTransItems.get(i).getItemId() && aTransItems.get(i).getItem_no() == 0) {
                 ti.setItemQty(aTransItems.get(i).getItemQty());
                 ti.setAmountIncVat(aTransItems.get(i).getAmountIncVat());
+                ti.setAmountExcVat(aTransItems.get(i).getAmountExcVat());
                 ti.setUnitVat(aTransItems.get(i).getUnitVat());
                 ti.setVatPerc(aTransItems.get(i).getVatPerc());
                 ti.setVatRated(aTransItems.get(i).getVatRated());

@@ -510,19 +510,19 @@ public class AccJournalBean implements Serializable {
             double GrossSalesAmount = 0;
             double NetSalesAmount = 0;
             double PaidCashAmount = 0;
-            double PaidLoyaltyAmount = 0;
+            double LoyaltyAmountExpense = 0;
             double ReceivableAmount = 0;
             double VatOutputTaxAmount = 0;
             double CashDiscountAmount = 0;
 
             GrossSalesAmount = aTrans.getGrandTotal();
-            PaidLoyaltyAmount = aTrans.getSpendPointsAmount();
+            LoyaltyAmountExpense = aTrans.getSpendPointsAmount();
             if ((aTrans.getChangeAmount() > 0)) {
-                PaidCashAmount = aTrans.getGrandTotal() - aTrans.getSpendPointsAmount();
+                PaidCashAmount = aTrans.getGrandTotal();// - aTrans.getSpendPointsAmount();
             } else {
                 PaidCashAmount = aTrans.getAmountTendered();
             }
-            ReceivableAmount = aTrans.getGrandTotal() - (PaidCashAmount + PaidLoyaltyAmount);
+            ReceivableAmount = aTrans.getGrandTotal() - PaidCashAmount;// + PaidLoyaltyAmount);
             VatOutputTaxAmount = aTrans.getTotalVat();
             CashDiscountAmount = aTrans.getCashDiscount();
             NetSalesAmount = GrossSalesAmount - VatOutputTaxAmount;//-CashDiscountAmount;
@@ -610,7 +610,7 @@ public class AccJournalBean implements Serializable {
                 this.saveAccJournal(accjournal);
             }
             //SALES DISCOUNT (DISCOUNT ALLOWED) - Cash Discount
-            if (CashDiscountAmount > 0) {
+            if ((CashDiscountAmount + LoyaltyAmountExpense) > 0) {
                 //Debit Disc Allowed
                 accjournal.setAccChildAccountId(0);
                 if (aBillTransactor != null) {
@@ -618,7 +618,7 @@ public class AccJournalBean implements Serializable {
                 }
                 accjournal.setAccCoaId(SalesDiscAccountId);
                 accjournal.setAccountCode(SalesDiscAccountCode);
-                accjournal.setDebitAmount(CashDiscountAmount);
+                accjournal.setDebitAmount((CashDiscountAmount + LoyaltyAmountExpense));
                 accjournal.setCreditAmount(0);
                 accjournal.setNarration("SALES DISCOUNT TO CLIENT");
                 this.saveAccJournal(accjournal);

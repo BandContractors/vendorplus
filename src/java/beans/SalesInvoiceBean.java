@@ -1,12 +1,10 @@
 package beans;
 
-
 import sessions.GeneralUserSetting;
 import entities.TransItem;
 import entities.Pay;
 import entities.Transactor;
 import entities.UserDetail;
-import entities.PointsCard;
 import entities.Trans;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -14,25 +12,24 @@ import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 
-
 @ManagedBean(name = "salesInvoiceBean")
 @SessionScoped
-public class SalesInvoiceBean implements Serializable{
+public class SalesInvoiceBean implements Serializable {
+
     private static final long serialVersionUID = 1L;
     private Trans CurrentTransaction;
     private Pay CurrentPay;
-    private PointsCard CurrentPointscard;
     private UserDetail CurrentUserDetail;
     private UserDetail CurrentTransUserDetail;
     private Transactor CurrentTransactor;
     private Transactor CurrentBillTransactor;
     private UserDetail CurrentEditUserDetail;
-    private List<TransItem> CurrentTransactionItems=new ArrayList<TransItem>();
+    private List<TransItem> CurrentTransactionItems = new ArrayList<TransItem>();
 
     public SalesInvoiceBean() {
     }
-    
-    public String getVatRatedCode(String Vatrated){
+
+    public String getVatRatedCode(String Vatrated) {
         switch (Vatrated) {
             case "STANDARD":
                 return "S";
@@ -91,26 +88,6 @@ public class SalesInvoiceBean implements Serializable{
         this.CurrentPay = CurrentPay;
     }
 
-    /**
-     * @return the CurrentPointscard
-     */
-    public PointsCard getCurrentPointscard() {
-        try {
-            //System.out.println("C");
-            this.CurrentPointscard = new PointsCardBean().getPointsCardByCardNumber(this.CurrentTransaction.getCardNumber());
-        } catch (Exception e) {
-            //System.out.println("Ce");
-            this.CurrentPointscard = null;
-        }
-        return CurrentPointscard;
-    }
-
-    /**
-     * @param CurrentPointscard the CurrentPointscard to set
-     */
-    public void setCurrentPointscard(PointsCard CurrentPointscard) {
-        this.CurrentPointscard = CurrentPointscard;
-    }
 
     /**
      * @return the CurrentUserDetail
@@ -227,5 +204,5 @@ public class SalesInvoiceBean implements Serializable{
     public void setCurrentTransUserDetail(UserDetail CurrentTransUserDetail) {
         this.CurrentTransUserDetail = CurrentTransUserDetail;
     }
-    
+
 }

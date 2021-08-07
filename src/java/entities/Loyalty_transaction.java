@@ -17,6 +17,8 @@ public class Loyalty_transaction implements Serializable {
     private String group_code;
     private String card_number;
     private String invoice_number;
+    private String credit_note_number;
+    private String debit_note_number;
     private Date transaction_date;
     private double points_awarded;
     private double amount_awarded;
@@ -314,6 +316,34 @@ public class Loyalty_transaction implements Serializable {
      */
     public void setStore_id(int store_id) {
         this.store_id = store_id;
+    }
+
+    /**
+     * @return the credit_note_number
+     */
+    public String getCredit_note_number() {
+        return credit_note_number;
+    }
+
+    /**
+     * @param credit_note_number the credit_note_number to set
+     */
+    public void setCredit_note_number(String credit_note_number) {
+        this.credit_note_number = credit_note_number;
+    }
+
+    /**
+     * @return the debit_note_number
+     */
+    public String getDebit_note_number() {
+        return debit_note_number;
+    }
+
+    /**
+     * @param debit_note_number the debit_note_number to set
+     */
+    public void setDebit_note_number(String debit_note_number) {
+        this.debit_note_number = debit_note_number;
     }
 
 }

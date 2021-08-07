@@ -114,3 +114,27 @@ VALUES (79, 'COMPANY_SETTING', 'SALES_INVOICE_AGING_BAND', '0030,0060','E.g. 003
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_15',114,Now(),'6.0','');
 
+ALTER TABLE loyalty_transaction 
+ADD COLUMN credit_note_number VARCHAR(50) default '' NOT NULL AFTER invoice_number,
+ADD COLUMN debit_note_number VARCHAR(50) default '' NOT NULL AFTER credit_note_number;
+
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_15',121,Now(),'6.0','');
+
+ALTER TABLE transaction 
+ADD COLUMN spent_points_amount double default 0 NOT NULL AFTER total_paid;
+
+ALTER TABLE transaction_cr_dr_note 
+ADD COLUMN spent_points_amount double default 0 NOT NULL AFTER total_paid;
+
+ALTER TABLE transaction_hist 
+ADD COLUMN total_paid double default 0 NOT NULL AFTER source_code;
+
+ALTER TABLE transaction_hist 
+ADD COLUMN spent_points_amount double default 0 NOT NULL AFTER total_paid;
+
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_15',136,Now(),'6.0','');
+
+
+

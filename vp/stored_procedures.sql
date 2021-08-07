@@ -2130,7 +2130,8 @@ CREATE PROCEDURE sp_insert_transaction
 	IN in_delivery_mode varchar(20),
 	IN in_is_processed int,
 	IN in_is_paid int,
-	IN in_is_cancel int
+	IN in_is_cancel int,
+	IN in_spent_points_amount double
 ) 
 BEGIN 
 	SET @new_id=0;
@@ -2253,7 +2254,8 @@ BEGIN
 		delivery_mode,
 		is_processed,
 		is_paid,
-		is_cancel
+		is_cancel,
+        spent_points_amount
 	) 
     VALUES
 	(
@@ -2316,7 +2318,8 @@ BEGIN
 		in_delivery_mode,
 		in_is_processed,
 		in_is_paid,
-		in_is_cancel
+		in_is_cancel,
+        in_spent_points_amount
 	); 
 SET out_transaction_id=@new_id;
 END//
@@ -2379,7 +2382,8 @@ CREATE PROCEDURE sp_update_transaction
 	IN in_delivery_mode varchar(20),
 	IN in_is_processed int,
 	IN in_is_paid int,
-	IN in_is_cancel int
+	IN in_is_cancel int,
+    IN in_spent_points_amount double
 ) 
 BEGIN 
 
@@ -2475,7 +2479,8 @@ BEGIN
 		delivery_mode=in_delivery_mode,
 		is_processed=in_is_processed,
 		is_paid=in_is_paid,
-		is_cancel=in_is_cancel 
+		is_cancel=in_is_cancel,
+        spent_points_amount=in_spent_points_amount 
 	WHERE transaction_id=in_transaction_id; 
 END//
 DELIMITER ;
@@ -2498,7 +2503,8 @@ CREATE PROCEDURE sp_update_transaction2
 	IN in_total_exempt_vatable_amount double,
 	IN in_amount_tendered double,
 	IN in_change_amount double,
-	IN in_total_profit_margin double 
+	IN in_total_profit_margin double,
+    IN in_spent_points_amount double
 ) 
 BEGIN 
 
@@ -2520,7 +2526,8 @@ BEGIN
 		total_exempt_vatable_amount=in_total_exempt_vatable_amount,
 		amount_tendered=in_amount_tendered,
 		change_amount=in_change_amount,
-		total_profit_margin=in_total_profit_margin 
+		total_profit_margin=in_total_profit_margin,
+        spent_points_amount=in_spent_points_amount 
 	WHERE transaction_id=in_transaction_id; 
 END//
 DELIMITER ;
@@ -7077,7 +7084,8 @@ BEGIN
 	princ_scheme_member,scheme_card_number,transaction_number,delivery_date,delivery_address,
 	pay_terms,terms_conditions,authorised_by_user_detail_id,authorise_date,pay_due_date,expiry_date,
 	acc_child_account_id,currency_code,xrate,from_date,to_date,duration_type,site_id,transactor_rep,
-	transactor_vehicle,transactor_driver,duration_value 
+	transactor_vehicle,transactor_driver,duration_value,
+    location_id,status_code,status_date,delivery_mode,is_processed,is_paid,is_cancel,is_invoiced,is_delivered,source_code,total_paid,spent_points_amount
 	) SELECT @new_id,in_hist_flag,@cur_sys_datetime,
 	transaction_id,transaction_date,store_id,store2_id,transactor_id,transaction_type_id,
 	transaction_reason_id,total_trade_discount,total_vat,add_user_detail_id,add_date,
@@ -7088,7 +7096,8 @@ BEGIN
 	princ_scheme_member,scheme_card_number,transaction_number,delivery_date,delivery_address,
 	pay_terms,terms_conditions,authorised_by_user_detail_id,authorise_date,pay_due_date,expiry_date,
 	acc_child_account_id,currency_code,xrate,from_date,to_date,duration_type,site_id,transactor_rep,
-	transactor_vehicle,transactor_driver,duration_value 
+	transactor_vehicle,transactor_driver,duration_value,
+    location_id,status_code,status_date,delivery_mode,is_processed,is_paid,is_cancel,is_invoiced,is_delivered,source_code,total_paid,spent_points_amount 
 	FROM transaction WHERE transaction_id=in_transaction_id;
 	SET out_transaction_hist_id=@new_id;
 END//
@@ -7113,7 +7122,7 @@ BEGIN
 	unit_cost_price,unit_profit_margin,earn_perc,earn_amount,
 	code_specific,desc_specific,desc_more,warranty_expiry_date,warranty_desc,account_code,purchase_date,
 	dep_start_date,dep_method_id,dep_rate,average_method_id,effective_life,residual_value,narration,qty_balance,duration_value,
-	qty_damage,duration_passed
+	qty_damage,duration_passed,specific_size
 	) SELECT @new_id,in_transaction_hist_id,
 	transaction_item_id,transaction_id,item_id,batchno,item_qty,unit_price,item_expiry_date,
     item_mnf_date,unit_trade_discount,unit_vat,amount,vat_rated,vat_perc,unit_price_exc_vat,
@@ -7121,7 +7130,7 @@ BEGIN
 	unit_cost_price,unit_profit_margin,earn_perc,earn_amount,
 	code_specific,desc_specific,desc_more,warranty_expiry_date,warranty_desc,account_code,purchase_date,
 	dep_start_date,dep_method_id,dep_rate,average_method_id,effective_life,residual_value,narration,qty_balance,duration_value,
-	qty_damage,duration_passed 
+	qty_damage,duration_passed,specific_size 
 	FROM transaction_item WHERE transaction_item_id=in_transaction_item_id AND transaction_id=in_transaction_id;
 END//
 DELIMITER ;
@@ -11693,7 +11702,8 @@ CREATE PROCEDURE sp_insert_transaction_cr_dr_note
 	IN in_delivery_mode varchar(20),
 	IN in_is_processed int,
 	IN in_is_paid int,
-	IN in_is_cancel int
+	IN in_is_cancel int,
+    In in_spent_points_amount double
 ) 
 BEGIN 
 	SET @new_id=0;
@@ -11816,7 +11826,8 @@ BEGIN
 		delivery_mode,
 		is_processed,
 		is_paid,
-		is_cancel
+		is_cancel,
+        spent_points_amount
 	) 
     VALUES
 	(
@@ -11879,7 +11890,8 @@ BEGIN
 		in_delivery_mode,
 		in_is_processed,
 		in_is_paid,
-		in_is_cancel
+		in_is_cancel,
+        in_spent_points_amount
 	); 
 SET out_transaction_id=@new_id;
 END//
@@ -11942,7 +11954,8 @@ CREATE PROCEDURE sp_update_transaction_cr_dr_note
 	IN in_delivery_mode varchar(20),
 	IN in_is_processed int,
 	IN in_is_paid int,
-	IN in_is_cancel int
+	IN in_is_cancel int,
+    In in_spent_points_amount double
 ) 
 BEGIN 
 
@@ -12038,7 +12051,8 @@ BEGIN
 		delivery_mode=in_delivery_mode,
 		is_processed=in_is_processed,
 		is_paid=in_is_paid,
-		is_cancel=in_is_cancel 
+		is_cancel=in_is_cancel,
+        spent_points_amount=in_spent_points_amount 
 	WHERE transaction_id=in_transaction_id; 
 END//
 DELIMITER ;

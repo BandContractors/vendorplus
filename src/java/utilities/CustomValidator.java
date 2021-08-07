@@ -78,31 +78,6 @@ public class CustomValidator implements Serializable {
         return records;
     }
     
-    public long INTER_BRANCH_CheckRecords(String sql)
-    {
-        ResultSet rs = null;
-        long records=0;
-        try (
-                Connection conn = DBConnection.getINTER_BRANCH_MySQLConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);) {
-            rs = ps.executeQuery();
-            while (rs.next()) {
-                records=records+1;
-            }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
-        }
-        return records;
-    }
-    
     public long CheckLongRange(long NumberValue, int MinValue,int MaxValue)
     {
         return 1;

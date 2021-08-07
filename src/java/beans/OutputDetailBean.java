@@ -20,12 +20,12 @@ import utilities.ConvertNumToWordBean;
 @ManagedBean
 @SessionScoped
 public class OutputDetailBean implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     public OutputDetailBean() {
     }
-    
+
     public void refreshOutput(String aLevel, String aSource) {
         try {
             TransBean tb = new TransBean();
@@ -55,13 +55,6 @@ public class OutputDetailBean implements Serializable {
                     break;
             }
             tb.updateLookup(aOutputDetail.getTrans());
-            
-            try {
-                if (aOutputDetail.getTrans().getCardNumber().length() > 0) {
-                    aOutputDetail.setLoyalty_transaction(new Loyalty_transactionBean().getLoyalty_transaction(aOutputDetail.getTrans().getTransactionNumber()));
-                }
-            } catch (Exception e) {
-            }
             try {
                 if (aSource.equals("SOURCE-PAY")) {
                     aOutputDetail.setAdd_user_detail(new UserDetailBean().getUserDetail(aOutputDetail.getPay().getAddUserDetailId()));
@@ -179,7 +172,7 @@ public class OutputDetailBean implements Serializable {
                 }
             } catch (Exception e) {
             }
-            //refresh amoun tin words
+            //refresh amount in words
             try {
                 if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "OUTPUT_SHOW_AMOUNT_IN_WORDS").getParameter_value().equals("1")) {
                     aOutputDetail.setTransAmountInWords(new ConvertNumToWordBean().convertNumToWord(aOutputDetail.getTrans().getGrandTotal(), aOutputDetail.getTrans().getCurrencyCode()));
@@ -264,7 +257,7 @@ public class OutputDetailBean implements Serializable {
             System.err.println("refreshOutput:" + e.getMessage());
         }
     }
-    
+
     public void refreshOutputCrDr(String aLevel, String aSource) {
         try {
             TransBean tb = new TransBean();
@@ -369,7 +362,7 @@ public class OutputDetailBean implements Serializable {
             System.err.println("refreshOutputCrDr:" + e.getMessage());
         }
     }
-    
+
     public String getGoodOrService(long aPayId) {
         String good_or_service = "";
         int good_found = 0;
@@ -405,7 +398,7 @@ public class OutputDetailBean implements Serializable {
         }
         return good_or_service;
     }
-    
+
     public void refreshOutputProduction(String aLevel, String aSource) {
         try {
             TransProductionBean tb = new TransProductionBean();
@@ -482,7 +475,7 @@ public class OutputDetailBean implements Serializable {
             System.err.println("refreshOutputProduction:" + e.getMessage());
         }
     }
-    
+
     public void clearOutputDetail(String aLevel) {
         FacesContext context = FacesContext.getCurrentInstance();
         HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
@@ -496,7 +489,7 @@ public class OutputDetailBean implements Serializable {
                 break;
         }
     }
-    
+
     public String getVatRatedCode(String Vatrated) {
         switch (Vatrated) {
             case "STANDARD":
@@ -509,5 +502,5 @@ public class OutputDetailBean implements Serializable {
                 return "";
         }
     }
-    
+
 }

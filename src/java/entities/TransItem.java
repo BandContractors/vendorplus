@@ -120,6 +120,7 @@ public class TransItem implements Serializable {
     private String currency_code;
     private String transaction_number; 
     private int is_tax_synced=1;
+    private double discount_amount;//cash discount + loyalty discount
     /**
      * @return the TransactionItemId
      */
@@ -1448,6 +1449,20 @@ public class TransItem implements Serializable {
      */
     public void setIs_tax_synced(int is_tax_synced) {
         this.is_tax_synced = is_tax_synced;
+    }
+
+    /**
+     * @return the discount_amount
+     */
+    public double getDiscount_amount() {
+        return discount_amount;
+    }
+
+    /**
+     * @param discount_amount the discount_amount to set
+     */
+    public void setDiscount_amount(double discount_amount) {
+        this.discount_amount = discount_amount;
     }
 
 }

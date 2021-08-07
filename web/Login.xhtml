@@ -77,12 +77,6 @@
                     </h:panelGrid>
                 </h:panelGrid>
                 <h:panelGrid>
-                    <p:commandButton id="cmdbLogin2" value="Go To Inter-Branch (ALT+I)" accesskey="i" rendered="true" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
-                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
-                            <p:graphicImage name="/images/ajax-loader.gif"/>
-                        </p:dialog>
-                        <p:ajax listener="#{login.userLogin(2)}" process="menuStore itxtUserName itxtPassword @this" update="olblActionMessageSuccess olblActionMessageFailure pnlgLoginHeader"/>
-                    </p:commandButton>
                     <h:panelGrid rendered="#{60 gt login.LICENSE_DAYS_LEFT and login.LICENSE_TYPE ne 9 and login.LICENSE_TYPE ne 0}">
                         <p:spacer/>
                         <p:spacer/>

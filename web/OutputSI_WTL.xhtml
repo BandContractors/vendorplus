@@ -173,9 +173,21 @@
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
 
+                            <h:outputLabel value="" rendered="#{generalUserSetting.outputDetailParent.trans.totalTradeDiscount>0}"/>
+                            <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 12pt;color:#000000;font-weight: bold;text-decoration: none;" rendered="#{generalUserSetting.outputDetailParent.trans.totalTradeDiscount>0}">#{langout['Item']} #{langout['Discount']}:</h:outputLabel>
+                            <h:outputText style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 12pt;color:#000000;font-weight: bold;text-decoration: none;" value="#{generalUserSetting.outputDetailParent.trans.totalTradeDiscount}" rendered="#{generalUserSetting.outputDetailParent.trans.totalTradeDiscount>0}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+
                             <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 9pt;color:#000000;font-weight: normal;text-decoration: none;" rendered="#{generalUserSetting.outputDetailParent.trans.cashDiscount>0}">#{utilityBean.formatDoubleToString(generalUserSetting.outputDetailParent.trans.cash_dicsount_perc)}%</h:outputLabel>
-                            <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 12pt;color:#000000;font-weight: bold;text-decoration: none;" rendered="#{generalUserSetting.outputDetailParent.trans.cashDiscount>0}">#{langout['Discount']}:</h:outputLabel>
+                            <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 12pt;color:#000000;font-weight: bold;text-decoration: none;" rendered="#{generalUserSetting.outputDetailParent.trans.cashDiscount>0}">#{langout['Cash']} #{langout['Discount']}:</h:outputLabel>
                             <h:outputText style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 12pt;color:#000000;font-weight: bold;text-decoration: none;" value="#{generalUserSetting.outputDetailParent.trans.cashDiscount}" rendered="#{generalUserSetting.outputDetailParent.trans.cashDiscount>0}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+
+                            <h:outputLabel value="" rendered="#{generalUserSetting.outputDetailParent.trans.spendPointsAmount>0}"/>
+                            <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 12pt;color:#000000;font-weight: bold;text-decoration: none;" rendered="#{generalUserSetting.outputDetailParent.trans.spendPointsAmount>0}">#{langout['Loyalty']} #{langout['Discount']}:</h:outputLabel>
+                            <h:outputText style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 12pt;color:#000000;font-weight: bold;text-decoration: none;" value="#{generalUserSetting.outputDetailParent.trans.spendPointsAmount}" rendered="#{generalUserSetting.outputDetailParent.trans.spendPointsAmount>0}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
 

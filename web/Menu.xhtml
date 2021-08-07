@@ -20,7 +20,7 @@
             }
         </script>
         <f:loadBundle basename="#{menuItemBean.menuItemObj.LANG_BASE_NAME_SYS}" var="langsys" />
-         <f:loadBundle basename="#{menuItemBean.menuItemObj.LANG_BASE_NAME_OUT}" var="langout" />
+        <f:loadBundle basename="#{menuItemBean.menuItemObj.LANG_BASE_NAME_OUT}" var="langout" />
     </h:head>
     <h:body>
         <h:form id="frmMenu">  
@@ -31,7 +31,7 @@
             <p:remoteCommand name="remoteBtnUpdateMenu" process="@this" update="mnubMain"/>
             <p:menubar id="mnubMain">  
                 <p:menuitem value="#{langsys['Home']}" action="#{navigationBean.redirectToHome()}" icon="ui-icon-home" />
-                <p:submenu label="#{langsys['Transaction']}" rendered="#{menuItemBean.menuItemObj.LOGIN_TYPE==1}" icon="ui-icon-plus"> 
+                <p:submenu label="#{langsys['Transaction']}" icon="ui-icon-plus"> 
                     <p:separator />
                     <p:submenu label="#{langsys['Purchase']} #{langsys['and']} #{langsys['Expense']}">  
                         <p:separator />
@@ -175,7 +175,7 @@
                     </p:submenu>
                     <p:separator />
                 </p:submenu>  
-                <p:submenu label="#{langsys['Item']}" rendered="#{menuItemBean.menuItemObj.LOGIN_TYPE==1}" icon="ui-icon-pencil">  
+                <p:submenu label="#{langsys['Item']}" icon="ui-icon-pencil">  
                     <p:separator />
                     <p:menuitem value="#{langsys['Measure']} #{langsys['Units']}" action="#{navigationBean.redirectToUnit()}"/> 
                     <p:separator />
@@ -210,7 +210,7 @@
                     </p:submenu> 
                     <p:separator />
                 </p:submenu> 
-                <p:submenu label="#{langsys['Partner']}" rendered="#{menuItemBean.menuItemObj.LOGIN_TYPE==1}" icon="ui-icon-suitcase">  
+                <p:submenu label="#{langsys['Partner']}" icon="ui-icon-suitcase">  
                     <p:separator />
                     <p:menuitem value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]} #{langsys['Details']}" action="#{navigationBean.redirectToTransactorCustomer()}" /> 
                     <p:separator />
@@ -229,7 +229,7 @@
                     <p:menuitem value="#{langsys['Contact']} #{langsys['List']}" action="#{navigationBean.redirectToContactList()}" /> 
                     <p:separator />
                 </p:submenu>
-                <p:submenu label="#{langsys['Accounts']}" rendered="#{menuItemBean.menuItemObj.LOGIN_TYPE==1}" icon="ui-icon-lightbulb">  
+                <p:submenu label="#{langsys['Accounts']}" icon="ui-icon-lightbulb">  
                     <p:separator />
                     <p:menuitem value="#{langsys['Accounting']} #{langsys['Period']}" action="#{navigationBean.redirectToAccountPeriod()}" /> 
                     <p:separator />
@@ -271,7 +271,7 @@
                     </p:submenu> 
                     <p:separator />
                 </p:submenu>
-                <p:submenu label="#{langsys['Settings']}" rendered="#{menuItemBean.menuItemObj.LOGIN_TYPE==1}" icon="ui-icon-gear"> 
+                <p:submenu label="#{langsys['Settings']}" icon="ui-icon-gear"> 
                     <p:separator />
                     <p:submenu label="#{langsys['Branch']} #{langsys['Settings']}">  
                         <p:separator />
@@ -315,21 +315,8 @@
                     <p:separator />
                     <p:menuitem value="#{langsys['View']} #{langsys['License']} #{langsys['Details']}" action="#{navigationBean.redirectToLicenseDetail()}" />   
                     <p:separator />
-                </p:submenu>  
-                <p:submenu label="#{langsys['Interbranch']}" rendered="#{menuItemBean.menuItemObj.LOGIN_TYPE==2}"> 
-                    <p:separator />
-                    <p:menuitem value="#{langsys['Branch']} #{langsys['Details']}" action="#{navigationBean.redirectToBranch()}" /> 
-                    <p:separator />
-                    <p:submenu label="#{langsys['Points']}">  
-                        <p:separator />
-                        <p:menuitem value="#{langsys['Points']} #{langsys['Card']} #{langsys['Details']}" action="#{navigationBean.redirectToPointsCard()}" />
-                        <p:separator />
-                        <p:menuitem value="#{langsys['Points']} #{langsys['Transactions']}" action="#{navigationBean.redirectToPointsTransaction()}" />
-                        <p:separator />
-                    </p:submenu>
-                    <p:separator />
                 </p:submenu>
-                <p:submenu label="#{langsys['Reports']}" rendered="#{menuItemBean.menuItemObj.LOGIN_TYPE==1}" icon="ui-icon-document">
+                <p:submenu label="#{langsys['Reports']}" icon="ui-icon-document">
                     <p:separator />
                     <p:submenu label="#{langsys['Item']} #{langsys['Detail']}">
                         <p:separator />

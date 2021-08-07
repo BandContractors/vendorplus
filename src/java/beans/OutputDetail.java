@@ -7,7 +7,6 @@ import entities.Pay;
 import entities.PayMethod;
 import entities.Transactor;
 import entities.UserDetail;
-import entities.PointsCard;
 import entities.Store;
 import entities.Trans;
 import entities.TransProduction;
@@ -28,7 +27,6 @@ public class OutputDetail implements Serializable {
 
     private Trans trans;
     private Pay pay;
-    private PointsCard points_card;
     private UserDetail add_user_detail;
     private UserDetail trans_user_detail;
     private Transactor transactor;
@@ -52,7 +50,6 @@ public class OutputDetail implements Serializable {
     private List<TransProductionItem> trans_prod_items = new ArrayList<>();
     private String TransAmountInWords;
     private String PayAmountInWords;
-    private Loyalty_transaction loyalty_transaction;
 
     public OutputDetail() {
     }
@@ -83,20 +80,6 @@ public class OutputDetail implements Serializable {
      */
     public void setPay(Pay pay) {
         this.pay = pay;
-    }
-
-    /**
-     * @return the points_card
-     */
-    public PointsCard getPoints_card() {
-        return points_card;
-    }
-
-    /**
-     * @param points_card the points_card to set
-     */
-    public void setPoints_card(PointsCard points_card) {
-        this.points_card = points_card;
     }
 
     /**
@@ -420,19 +403,4 @@ public class OutputDetail implements Serializable {
     public void setPayAmountInWords(String PayAmountInWords) {
         this.PayAmountInWords = PayAmountInWords;
     }
-
-    /**
-     * @return the loyalty_transaction
-     */
-    public Loyalty_transaction getLoyalty_transaction() {
-        return loyalty_transaction;
-    }
-
-    /**
-     * @param loyalty_transaction the loyalty_transaction to set
-     */
-    public void setLoyalty_transaction(Loyalty_transaction loyalty_transaction) {
-        this.loyalty_transaction = loyalty_transaction;
-    }
-
 }

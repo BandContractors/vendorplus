@@ -26,10 +26,6 @@ public class NavigationBean implements Serializable {
     @ManagedProperty("#{menuItemBean}")
     private MenuItemBean menuItemBean;
 
-    public String redirectToBranch() {
-        return "Branch?faces-redirect=true";
-    }
-
     public String redirectToHome() {
         return "Home?faces-redirect=true";
     }
@@ -306,14 +302,6 @@ public class NavigationBean implements Serializable {
 
     public String redirectToPayMethod() {
         return "PayMethod?faces-redirect=true";
-    }
-
-    public String redirectToPointsCard() {
-        return "PointsCard?faces-redirect=true";
-    }
-
-    public String redirectToPointsTransaction() {
-        return "PointsTransaction?faces-redirect=true";
     }
 
     public String redirectToPurchase() {
@@ -1378,7 +1366,7 @@ public class NavigationBean implements Serializable {
     public String redirectToReportReceivableSummary() {
         return "ReportReceivableSummary?faces-redirect=true";
     }
-    
+
     public String redirectToReportSalesInvoiceAge() {
         return "ReportSalesInvoiceAge?faces-redirect=true";
     }

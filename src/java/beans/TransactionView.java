@@ -1,17 +1,10 @@
 package beans;
 
 
-import beans.TransItemBean;
-import beans.TransactorBean;
-import beans.PayBean;
-import beans.TransBean;
-import beans.PointsCardBean;
-import beans.UserDetailBean;
 import entities.TransItem;
 import entities.Pay;
 import entities.Transactor;
 import entities.UserDetail;
-import entities.PointsCard;
 import entities.Trans;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -29,7 +22,6 @@ public class TransactionView implements Serializable{
     private long PayId;
     private Trans CurrentTransaction;
     private Pay CurrentPay;
-    private PointsCard CurrentPointscard;
     private UserDetail CurrentUserDetail;
     private Transactor CurrentTransactor;
     private UserDetail CurrentEditUserDetail;
@@ -87,25 +79,6 @@ public class TransactionView implements Serializable{
      */
     public void setCurrentPay(Pay CurrentPay) {
         this.CurrentPay = CurrentPay;
-    }
-
-    /**
-     * @return the CurrentPointscard
-     */
-    public PointsCard getCurrentPointscard() {
-        try {
-            this.CurrentPointscard = new PointsCardBean().getPointsCardByCardNumber(this.CurrentTransaction.getCardNumber());
-        } catch (Exception e) {
-            this.CurrentPointscard = null;
-        }
-        return CurrentPointscard;
-    }
-
-    /**
-     * @param CurrentPointscard the CurrentPointscard to set
-     */
-    public void setCurrentPointscard(PointsCard CurrentPointscard) {
-        this.CurrentPointscard = CurrentPointscard;
     }
 
     /**
