@@ -924,10 +924,10 @@ public class InvoiceBean implements Serializable {
                 if (CashLoyaltyDisc != 0) {
                     ItemCashLoyaltyDisc = CashLoyaltyDisc * (ti.getAmountExcVat() / aTrans.getSubTotal());
                     if (VatRated.equals("STANDARD")) {
-                        double vatamt = (ti.getAmountExcVat() + ItemCashLoyaltyDisc) * tr;
-                        ti.setAmountIncVat((ti.getAmountExcVat() + ItemCashLoyaltyDisc) + vatamt);
+                        double vatamt = (ti.getAmountExcVat() - ItemCashLoyaltyDisc) * tr;
+                        ti.setAmountIncVat((ti.getAmountExcVat() - ItemCashLoyaltyDisc) + vatamt);
                     } else {
-                        ti.setAmountIncVat(ti.getAmountExcVat() + ItemCashLoyaltyDisc);
+                        ti.setAmountIncVat(ti.getAmountExcVat() - ItemCashLoyaltyDisc);
                     }
                 }
                 //end-for cash and loyalty discount, re-calculate
@@ -1260,13 +1260,8 @@ public class InvoiceBean implements Serializable {
                     ItemCashLoyaltyDisc = CashLoyaltyDisc * (ti.getAmountExcVat() / trans.getSubTotal());
                     if (VatRated.equals("STANDARD")) {
                         double vatamt = 0;
-                        if (ItemCashLoyaltyDisc > 0) {
-                            vatamt = (ti.getAmountExcVat() - ItemCashLoyaltyDisc) * tr;
-                            ti.setAmountIncVat((ti.getAmountExcVat() - ItemCashLoyaltyDisc) + vatamt);
-                        } else {
-                            vatamt = (ti.getAmountExcVat() + ItemCashLoyaltyDisc) * tr;
-                            ti.setAmountIncVat((ti.getAmountExcVat() + ItemCashLoyaltyDisc) + vatamt);
-                        }
+                        vatamt = (ti.getAmountExcVat() - ItemCashLoyaltyDisc) * tr;
+                        ti.setAmountIncVat((ti.getAmountExcVat() - ItemCashLoyaltyDisc) + vatamt);
                     } else {
                         ti.setAmountIncVat(ti.getAmountExcVat() - ItemCashLoyaltyDisc);
                     }

@@ -9936,6 +9936,32 @@ public class TransItemBean implements Serializable {
         return MixFound;
     }
 
+    public int countItemsWithQtyChanged(List<TransItem> aActiveTransItems, String aTransactionType) {
+        int QtyChanged = 0;
+        try {
+            if ((aTransactionType.equals("SALE INVOICE") && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "DEPLETE_SOLD_STOCK_UPON").getParameter_value().equals("0")) || (aTransactionType.equals("GOODS DELIVERY") && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "DEPLETE_SOLD_STOCK_UPON").getParameter_value().equals("1"))) {
+                List<TransItem> ati = aActiveTransItems;
+                int ListItemIndex = 0;
+                int ListItemNo = ati.size();
+                int Adds = 0;
+                int Subs = 0;
+                while (ListItemIndex < ListItemNo) {
+                    if (ati.get(ListItemIndex).getItemQty() > 0) {
+                        Adds = Adds + 1;
+                    } else if (ati.get(ListItemIndex).getItemQty() < 0) {
+                        Subs = Subs + 1;
+                    }
+                    ListItemIndex = ListItemIndex + 1;
+                }
+                QtyChanged = Adds + Subs;
+            }
+        } catch (Exception e) {
+            QtyChanged = 0;
+            LOGGER.log(Level.ERROR, e);
+        }
+        return QtyChanged;
+    }
+
     public String getAnyItemReturnTotalGreaterThanBalance(List<TransItem> aActiveTransItems, String aTransactionType) {
         List<TransItem> ati = aActiveTransItems;
         int ListItemIndex = 0;

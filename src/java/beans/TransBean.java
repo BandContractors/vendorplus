@@ -878,6 +878,9 @@ public class TransBean implements Serializable {
             } else if (trans.getTransactionId() > 0 && new TransItemBean().getAnyItemMixAddSubtractQty(new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans), transtype.getTransactionTypeName()) == 1) {
                 msg = "You Cannot Add or Debit and Subtract or Credit different items in the same Update";
             }
+            /*else if (trans.getTransactionId() > 0 && new TransItemBean().countItemsWithQtyChanged(new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans), transtype.getTransactionTypeName()) == 0) {
+             msg = "Cannot Save where Item Qty has Not Changed";
+             } */
         } catch (Exception e) {
             msg = "An Error has Occured During the Validation Process";
             //System.err.println("--:validateTransCEC:--" + e.getMessage());
@@ -10222,7 +10225,7 @@ public class TransBean implements Serializable {
          TVat = (aTrans.getSubTotal() - aTrans.getTotalTradeDiscount() - aTrans.getCashDiscount() - aTrans.getSpendPointsAmount()) * VatPerc / 100;
          }
          */
-        if ((aTrans.getCashDiscount() + aTrans.getSpendPointsAmount()) > 0 && aTrans.getTotalStdVatableAmount() > 0 && VatPerc > 0) {
+        if ((aTrans.getCashDiscount() + aTrans.getSpendPointsAmount()) > 0 && aTrans.getTotalStdVatableAmount() >= 0 && VatPerc > 0) {
             //TVat = (aTrans.getSubTotal() - aTrans.getTotalTradeDiscount() - aTrans.getCashDiscount()) * VatPerc / 100;
             TVat = aTrans.getTotalStdVatableAmount() * VatPerc / 100;
         }
