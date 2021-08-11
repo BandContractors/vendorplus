@@ -173,6 +173,11 @@ public class MenuItemBean implements Serializable {
                 this.MenuItemObj.setLANG_VAR_OUT("en");
                 this.MenuItemObj.setLANG_BASE_NAME_OUT("language_en");
             }
+            try {
+                this.MenuItemObj.setSHOW_DETAIL_BY_DEFAULT(Integer.parseInt(pb.getParameter_listByContextNameMemory("COMPANY_SETTING", "SHOW_DETAIL_BY_DEFAULT").getParameter_value()));
+            } catch (NullPointerException npe) {
+                this.MenuItemObj.setSHOW_DETAIL_BY_DEFAULT(1);
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }

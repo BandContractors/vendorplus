@@ -4779,7 +4779,7 @@ public class TransBean implements Serializable {
                 } catch (NullPointerException npe) {
                 }
                 try {
-                    if (trans.getTransactionUserDetailId() > 0) {
+                    if (trans.getTransactionUserDetailId() > 0 && null != aTransUserDetail) {
                         new UserDetailBean().setUserDetail(aTransUserDetail, trans.getTransactionUserDetailId());
                     }
                 } catch (NullPointerException npe) {

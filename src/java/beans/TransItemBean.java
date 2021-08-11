@@ -11260,7 +11260,7 @@ public class TransItemBean implements Serializable {
                     //BACK
                     //check if supplied qty + existing qty is more than total current stock qty
                     aStatusBean.setItemAddedStatus("");
-                    aStatusBean.setItemNotAddedStatus("Insunfficient Stock for ##" + aSelectedItem.getDescription());
+                    aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Insunfficient Stock for ##" + aSelectedItem.getDescription()));
                     aStatusBean.setShowItemAddedStatus(0);
                     aStatusBean.setShowItemNotAddedStatus(1);
                     new ItemBean().clearItem(aSelectedItem);

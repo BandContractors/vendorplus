@@ -741,7 +741,6 @@ public class UtilityBean implements Serializable {
 //        }
 //        System.out.println(X);
 //    }
-    
     public List<ThreadClass> getRunningThreads() {
         List<ThreadClass> objs = new ArrayList<>();
         Set<Thread> threads = Thread.getAllStackTraces().keySet();
@@ -899,6 +898,48 @@ public class UtilityBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
         return FirstString;
+    }
+
+    public String getVATRateStrFromArray(String[] aStringArray) {
+        String CommaSeperatedStr = "";
+        String zero = "";
+        String exempt = "";
+        String standard = "";
+        try {
+            if (aStringArray.length == 0) {
+                CommaSeperatedStr = "";
+            } else {
+                for (int i = 0; i < aStringArray.length; i++) {
+                    if (aStringArray[i].equals("STANDARD")) {
+                        standard = "STANDARD";
+                    } else if (aStringArray[i].equals("EXEMPT")) {
+                        exempt = "EXEMPT";
+                    } else if (aStringArray[i].equals("ZERO")) {
+                        zero = "ZERO";
+                    }
+                }
+                if (zero.length() > 0) {
+                    CommaSeperatedStr = zero;
+                }
+                if (exempt.length() > 0) {
+                    if (CommaSeperatedStr.length() > 0) {
+                        CommaSeperatedStr = CommaSeperatedStr + "," + exempt;
+                    } else {
+                        CommaSeperatedStr = exempt;
+                    }
+                }
+                if (standard.length() > 0) {
+                    if (CommaSeperatedStr.length() > 0) {
+                        CommaSeperatedStr = CommaSeperatedStr + "," + standard;
+                    } else {
+                        CommaSeperatedStr = standard;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return CommaSeperatedStr;
     }
 
     public void printJdbcConnPool() {

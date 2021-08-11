@@ -36,6 +36,7 @@ public class MenuItem implements Serializable {
     private String LANG_VAR_OUT;
     private String LANG_BASE_NAME_SYS;
     private String LANG_BASE_NAME_OUT;
+    private int SHOW_DETAIL_BY_DEFAULT; 
 
     /**
      * @return the SYSTEM_NAME
@@ -302,5 +303,19 @@ public class MenuItem implements Serializable {
      */
     public void setLANG_BASE_NAME_OUT(String LANG_BASE_NAME_OUT) {
         this.LANG_BASE_NAME_OUT = LANG_BASE_NAME_OUT;
+    }
+
+    /**
+     * @return the SHOW_DETAIL_BY_DEFAULT
+     */
+    public int getSHOW_DETAIL_BY_DEFAULT() {
+        return SHOW_DETAIL_BY_DEFAULT;
+    }
+
+    /**
+     * @param SHOW_DETAIL_BY_DEFAULT the SHOW_DETAIL_BY_DEFAULT to set
+     */
+    public void setSHOW_DETAIL_BY_DEFAULT(int SHOW_DETAIL_BY_DEFAULT) {
+        this.SHOW_DETAIL_BY_DEFAULT = SHOW_DETAIL_BY_DEFAULT;
     }
 }

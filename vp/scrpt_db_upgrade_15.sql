@@ -136,5 +136,15 @@ ADD COLUMN spent_points_amount double default 0 NOT NULL AFTER total_paid;
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_15',136,Now(),'6.0','');
 
+UPDATE item SET vat_rated='ZERO,EXEMPT,STANDARD' WHERE item_id>0 AND vat_rated='STANDARD,ZERO,EXEMPT';
+UPDATE item SET vat_rated='ZERO,STANDARD' WHERE item_id>0 AND vat_rated='STANDARD,ZERO';
+UPDATE item SET vat_rated='EXEMPT,STANDARD' WHERE item_id>0 AND vat_rated='STANDARD,EXEMPT';
+
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (80, 'COMPANY_SETTING', 'SHOW_DETAIL_BY_DEFAULT', '1','1 for Yes and 0 for No. Details include Customer, Dates, Currency');
+
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_15',146,Now(),'6.0','');
+
 
 

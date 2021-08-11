@@ -152,7 +152,7 @@ public class ItemBean implements Serializable {
         }
         String msg = "";
         //first convert vat rated from array to string
-        this.ItemObj.setVatRated(new UtilityBean().getCommaSeperatedStrFromStringArray(this.ItemObj.getSelectedVatRateds()));
+        this.ItemObj.setVatRated(new UtilityBean().getVATRateStrFromArray(this.ItemObj.getSelectedVatRateds()));
         msg = this.validateItem(this.ItemObj);
         if (msg.length() > 0) {
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
