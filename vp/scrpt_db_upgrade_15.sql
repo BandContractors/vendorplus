@@ -146,5 +146,10 @@ VALUES (80, 'COMPANY_SETTING', 'SHOW_DETAIL_BY_DEFAULT', '1','1 for Yes and 0 fo
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_15',146,Now(),'6.0','');
 
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (81, 'COMPANY_SETTING', 'SUPPLIER_INVOICE_AGING_BAND', '0030,0060','E.g. 0030,0060 for 0-30days, 31-60 days and 61+days');
+
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_15',152,Now(),'6.0','');
 
 

@@ -4929,10 +4929,48 @@ public class AccJournalBean implements Serializable {
         return n;
     }
 
-    public void initReportInvoiceAge(InvoiceAge aInvoiceAge, List<InvoiceAge> aInvoiceAgeList, List<InvoiceAge> aInvoiceAgeListSummary) {
+    public void initReportSalesInvoiceAge(InvoiceAge aInvoiceAge, List<InvoiceAge> aInvoiceAgeList, List<InvoiceAge> aInvoiceAgeListSummary) {
         String AgeBand = "";
         try {
             AgeBand = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "SALES_INVOICE_AGING_BAND").getParameter_value();
+            if (null == AgeBand || AgeBand.isEmpty() || AgeBand.length() != 9) {
+                AgeBand = "0030,0060";
+            }
+        } catch (Exception e) {
+            AgeBand = "0030,0060";
+        }
+        try {
+            String[] arr = new UtilityBean().getStringArrayFromCommaSeperatedStr(AgeBand);
+            this.InvoiceAgeCategoryArray = new String[3];
+            this.InvoiceAgeCategoryArray[0] = "0-" + Integer.parseInt(arr[0]) + " days";
+            this.InvoiceAgeCategoryArray[1] = (Integer.parseInt(arr[0]) + 1) + "-" + Integer.parseInt(arr[1]) + " days";
+            this.InvoiceAgeCategoryArray[2] = (Integer.parseInt(arr[1]) + 1) + "+ days";
+        } catch (Exception e) {
+        }
+        try {
+            if (aInvoiceAge != null) {
+                aInvoiceAge.setDays_category("");
+            }
+        } catch (NullPointerException npe) {
+        }
+        try {
+            if (null != aInvoiceAgeList) {
+                aInvoiceAgeList.clear();
+            }
+        } catch (NullPointerException npe) {
+        }
+        try {
+            if (null != aInvoiceAgeListSummary) {
+                aInvoiceAgeListSummary.clear();
+            }
+        } catch (NullPointerException npe) {
+        }
+    }
+    
+    public void initReportSupplierInvoiceAge(InvoiceAge aInvoiceAge, List<InvoiceAge> aInvoiceAgeList, List<InvoiceAge> aInvoiceAgeListSummary) {
+        String AgeBand = "";
+        try {
+            AgeBand = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "SUPPLIER_INVOICE_AGING_BAND").getParameter_value();
             if (null == AgeBand || AgeBand.isEmpty() || AgeBand.length() != 9) {
                 AgeBand = "0030,0060";
             }
@@ -5029,9 +5067,73 @@ public class AccJournalBean implements Serializable {
         }
     }
 
-    public void reportInvoiceAge(String aDays_category) {
+    public void reportSalesInvoiceAge(String aDays_category) {
         String sql = "SELECT * FROM view_sales_invoice_age WHERE 1=1";
         String sqlsum = "SELECT days_category,currency_code,sum(balance) as balance,count(*) as n from view_sales_invoice_age WHERE 1=1 ";
+        String wheresql = "";
+        String ordersql = " ORDER BY transactor_names ASC,days_category DESC";
+        String ordersqlsum = " ORDER BY days_category DESC,currency_code ASC";
+        String groupbysum = " GROUP BY days_category,currency_code";
+        ResultSet rs = null;
+        ResultSet rs2 = null;
+        this.setInvoiceAgeList(new ArrayList<>());
+        this.setInvoiceAgeListSummary(new ArrayList<>());
+        if (aDays_category.length() > 0) {
+            wheresql = wheresql + " AND days_category='" + aDays_category + "'";
+        }
+        sql = sql + wheresql + ordersql;
+        sqlsum = sqlsum + wheresql + groupbysum + ordersqlsum;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            InvoiceAge obj = null;
+            while (rs.next()) {
+                obj = new InvoiceAge();
+                this.setInvoiceAgeFromResultset(obj, rs);
+                this.getInvoiceAgeList().add(obj);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+
+        //summary
+        double nTotal = this.getInvoiceAgeList().size();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps2 = conn.prepareStatement(sqlsum);) {
+            rs2 = ps2.executeQuery();
+            InvoiceAge obj2 = null;
+            while (rs2.next()) {
+                obj2 = new InvoiceAge();
+                try {
+                    obj2.setDays_category(rs2.getString("days_category"));
+                } catch (NullPointerException npe) {
+                    obj2.setDays_category("");
+                }
+                try {
+                    obj2.setCurrency_code(rs2.getString("currency_code"));
+                } catch (NullPointerException npe) {
+                    obj2.setCurrency_code("");
+                }
+                try {
+                    obj2.setBalance(rs2.getDouble("balance"));
+                } catch (NullPointerException npe) {
+                    obj2.setBalance(0);
+                }
+                if (nTotal > 0) {
+                    obj2.setPerc(100.0 * rs2.getInt("n") / nTotal);
+                }
+                this.getInvoiceAgeListSummary().add(obj2);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+    
+    public void reportSupplierInvoiceAge(String aDays_category) {
+        String sql = "SELECT * FROM view_supplier_invoice_age WHERE 1=1";
+        String sqlsum = "SELECT days_category,currency_code,sum(balance) as balance,count(*) as n from view_supplier_invoice_age WHERE 1=1 ";
         String wheresql = "";
         String ordersql = " ORDER BY transactor_names ASC,days_category DESC";
         String ordersqlsum = " ORDER BY days_category DESC,currency_code ASC";

@@ -143,6 +143,85 @@ public class ItemBean implements Serializable {
         //System.out.println("OkaY");
     }
 
+    public void checkRemoteTaxRateAndUpdateLocal(long aItemId, String aDescription) {
+        try {
+            Item item = null;
+            if (aItemId > 0) {
+                item = this.getItem(aItemId);
+            } else if (aItemId == 0 && aDescription.length() > 0) {
+                item = this.getItemByDesc(aDescription);
+            }
+            if (null != item) {
+                Item_tax_map im = new Item_tax_mapBean().getItem_tax_mapSynced(item.getItemId());
+                if (null != im) {
+                    String taxratelocal = item.getVatRated();
+                    String taxrateremote = "";
+                    String taxrateadd = "";
+                    String APIMode = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_MODE").getParameter_value();
+                    ItemTax it = null;
+                    if (APIMode.equals("OFFLINE")) {
+                        it = new StockManage().getItemFromTaxOffline(im.getItem_id_tax());
+                    } else {
+                        it = new StockManage().getItemFromTaxOnline(im.getItem_id_tax());
+                    }
+                    if (it != null) {
+                        taxrateremote = this.getVatTaxRatesRemote(it);
+                    }
+                    if (taxrateremote.contains("ZERO") && !taxratelocal.contains("ZERO")) {
+                        if (taxrateadd.length() == 0) {
+                            taxrateadd = "ZERO";
+                        } else {
+                            taxrateadd = taxrateadd + ",ZERO";
+                        }
+                    }
+                    if (taxrateremote.contains("EXEMPT") && !taxratelocal.contains("EXEMPT")) {
+                        if (taxrateadd.length() == 0) {
+                            taxrateadd = "EXEMPT";
+                        } else {
+                            taxrateadd = taxrateadd + ",EXEMPT";
+                        }
+                    }
+                    if (taxrateremote.contains("STANDARD") && !taxratelocal.contains("STANDARD")) {
+                        if (taxrateadd.length() == 0) {
+                            taxrateadd = "STANDARD";
+                        } else {
+                            taxrateadd = taxrateadd + ",STANDARD";
+                        }
+                    }
+                    if (taxrateadd.length() > 0) {
+                        taxratelocal = taxratelocal + taxrateadd;
+                        //re-arrange
+                        String taxratelocalNew = "";
+                        if (taxratelocal.contains("ZERO")) {
+                            taxratelocalNew = "ZERO";
+                        }
+                        if (taxratelocal.contains("EXEMPT")) {
+                            if (taxratelocal.length() == 0) {
+                                taxratelocalNew = "EXEMPT";
+                            } else {
+                                taxratelocalNew = taxratelocalNew + ",EXEMPT";
+                            }
+                        }
+                        if (taxratelocal.contains("STANDARD")) {
+                            if (taxratelocal.length() == 0) {
+                                taxratelocalNew = "STANDARD";
+                            } else {
+                                taxratelocalNew = taxratelocalNew + ",STANDARD";
+                            }
+                        }
+                        // now update new tax rate
+                        if (taxratelocalNew.length() > 0 && taxratelocal.length() > 0) {
+                            item.setVatRated(taxratelocalNew);
+                            this.saveValidatedItem(item);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public void saveItem() {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -174,6 +253,10 @@ public class ItemBean implements Serializable {
                         this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
                     } else {
                         this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully") + ", Synced : " + ub.translateWordsInText(BaseName, SyncStatus));
+                    }
+                    //update local tax rate with remote tax rate
+                    if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
+                        this.checkRemoteTaxRateAndUpdateLocal(this.ItemObj.getItemId(), this.ItemObj.getDescription());
                     }
                     this.clearItem();
                     this.refreshStockLocation(0);
@@ -1153,14 +1236,14 @@ public class ItemBean implements Serializable {
                 str = str + "," + "STANDARD";
             }
         }
-        if (aItemTax.getIsExempt().equals("101")) {
+        if (aItemTax.getIsExempt().equals("101") || aItemTax.getExclusion().equals("1") || aItemTax.getExclusion().equals("3")) {
             if (str == "") {
                 str = "EXEMPT";
             } else {
                 str = str + "," + "EXEMPT";
             }
         }
-        if (aItemTax.getIsZeroRate().equals("101")) {
+        if (aItemTax.getIsZeroRate().equals("101") || aItemTax.getExclusion().equals("0") || aItemTax.getExclusion().equals("3")) {
             if (str == "") {
                 str = "ZERO";
             } else {

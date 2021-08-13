@@ -458,7 +458,7 @@
                         <p:separator />
                         <p:menuitem value="#{langsys['Receivables']} #{langsys['Summary']}" action="#{navigationBean.redirectToReportReceivableSummary()}" />
                         <p:separator />
-                        <p:menuitem value="#{langsys['Invoice']} #{langsys['Aging']}" action="#{navigationBean.redirectToReportSalesInvoiceAge()}" />
+                        <p:menuitem value="#{langsys['Sales']} #{langsys['Invoice']} #{langsys['Aging']}" action="#{navigationBean.redirectToReportSalesInvoiceAge()}" />
                         <p:separator />
                     </p:submenu>
                     <p:separator />
@@ -467,6 +467,8 @@
                         <p:menuitem value="#{langsys['Payables']} #{langsys['Detail']}" action="#{navigationBean.redirectToReportPayableDetail()}" />
                         <p:separator />
                         <p:menuitem value="#{langsys['Payables']} #{langsys['Summary']}" action="#{navigationBean.redirectToReportPayableSummary()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Supplier']} #{langsys['Invoice']} #{langsys['Aging']}" action="#{navigationBean.redirectToReportSupplierInvoiceAge()}" />
                         <p:separator />
                     </p:submenu>
                     <p:separator />

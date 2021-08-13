@@ -732,14 +732,10 @@ public class UtilityBean implements Serializable {
     }
 
 //    public static void main(String[] args) {
-//        int NewNo=12345;
-//        String X = "";
-//        if (NewNo <= 9999) {
-//            X = String.format("%04d", NewNo);
-//        } else {
-//            X = Integer.toString(NewNo);
-//        }
-//        System.out.println(X);
+//        String X="EXEMPT";
+//        System.out.println(X.contains("STANDARD"));
+//        System.out.println(X.contains("ZERO"));
+//        System.out.println(X.contains("EXEMPT"));
 //    }
     public List<ThreadClass> getRunningThreads() {
         List<ThreadClass> objs = new ArrayList<>();
