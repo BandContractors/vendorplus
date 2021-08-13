@@ -10578,7 +10578,8 @@ public class TransBean implements Serializable {
         if ("SALE QUOTATION".equals(transtype.getTransactionTypeName()) || "SALE ORDER".equals(transtype.getTransactionTypeName()) || "SALE INVOICE".equals(transtype.getTransactionTypeName()) || "PURCHASE INVOICE".equals(transtype.getTransactionTypeName()) || "PURCHASE ORDER".equals(transtype.getTransactionTypeName()) || "EXPENSE ENTRY".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE RETURN INVOICE".equals(transtype.getTransactionTypeName())) {
             while (ListItemIndex < ListItemNo) {
                 if (CashLoyaltyDisc > 0) {
-                    ItemCashLoyaltyDisc = CashLoyaltyDisc * (ati.get(ListItemIndex).getAmountExcVat() / aTrans.getSubTotal());
+                    //ItemCashLoyaltyDisc = CashLoyaltyDisc * (ati.get(ListItemIndex).getAmountExcVat() / aTrans.getSubTotal());
+                    ItemCashLoyaltyDisc = CashLoyaltyDisc * (ati.get(ListItemIndex).getAmountExcVat() / (aTrans.getSubTotal()-aTrans.getTotalTradeDiscount()));
                 }
                 if ("STANDARD".equals(ati.get(ListItemIndex).getVatRated())) {
                     if (ati.get(ListItemIndex).getDuration_value() > 0) {

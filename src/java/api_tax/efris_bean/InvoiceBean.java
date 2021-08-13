@@ -327,7 +327,8 @@ public class InvoiceBean implements Serializable {
                     //start-for cash and loyalty discount, re-calculate
                     Double ItemCashLoyaltyDisc = 0.0;
                     if (CashLoyaltyDisc > 0) {
-                        ItemCashLoyaltyDisc = CashLoyaltyDisc * (transitems.get(i).getAmountExcVat() / trans.getSubTotal());
+                        //ItemCashLoyaltyDisc = CashLoyaltyDisc * (transitems.get(i).getAmountExcVat() / trans.getSubTotal());
+                        ItemCashLoyaltyDisc = CashLoyaltyDisc * (transitems.get(i).getAmountExcVat() / (trans.getSubTotal() - trans.getTotalTradeDiscount()));
                         if (VatRated.equals("STANDARD")) {
                             double vatamt = (transitems.get(i).getAmountExcVat() - ItemCashLoyaltyDisc) * tr;
                             transitems.get(i).setAmountIncVat((transitems.get(i).getAmountExcVat() - ItemCashLoyaltyDisc) + vatamt);
@@ -922,7 +923,8 @@ public class InvoiceBean implements Serializable {
                 //start-for cash and loyalty discount, re-calculate
                 Double ItemCashLoyaltyDisc = 0.0;
                 if (CashLoyaltyDisc != 0) {
-                    ItemCashLoyaltyDisc = CashLoyaltyDisc * (ti.getAmountExcVat() / aTrans.getSubTotal());
+                    //ItemCashLoyaltyDisc = CashLoyaltyDisc * (ti.getAmountExcVat() / aTrans.getSubTotal());
+                    ItemCashLoyaltyDisc = CashLoyaltyDisc * (ti.getAmountExcVat() / (aTrans.getSubTotal() - aTrans.getTotalTradeDiscount()));
                     if (VatRated.equals("STANDARD")) {
                         double vatamt = (ti.getAmountExcVat() - ItemCashLoyaltyDisc) * tr;
                         ti.setAmountIncVat((ti.getAmountExcVat() - ItemCashLoyaltyDisc) + vatamt);
@@ -1257,7 +1259,8 @@ public class InvoiceBean implements Serializable {
                 //start-for cash and loyalty discount, re-calculate
                 Double ItemCashLoyaltyDisc = 0.0;
                 if (CashLoyaltyDisc != 0) {
-                    ItemCashLoyaltyDisc = CashLoyaltyDisc * (ti.getAmountExcVat() / trans.getSubTotal());
+                    //ItemCashLoyaltyDisc = CashLoyaltyDisc * (ti.getAmountExcVat() / trans.getSubTotal());
+                    ItemCashLoyaltyDisc = CashLoyaltyDisc * (ti.getAmountExcVat() / (trans.getSubTotal() - trans.getTotalTradeDiscount()));
                     if (VatRated.equals("STANDARD")) {
                         double vatamt = 0;
                         vatamt = (ti.getAmountExcVat() - ItemCashLoyaltyDisc) * tr;

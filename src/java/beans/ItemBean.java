@@ -189,21 +189,21 @@ public class ItemBean implements Serializable {
                         }
                     }
                     if (taxrateadd.length() > 0) {
-                        taxratelocal = taxratelocal + taxrateadd;
+                        taxratelocal = taxratelocal + "," + taxrateadd;
                         //re-arrange
                         String taxratelocalNew = "";
                         if (taxratelocal.contains("ZERO")) {
                             taxratelocalNew = "ZERO";
                         }
                         if (taxratelocal.contains("EXEMPT")) {
-                            if (taxratelocal.length() == 0) {
+                            if (taxratelocalNew.length() == 0) {
                                 taxratelocalNew = "EXEMPT";
                             } else {
                                 taxratelocalNew = taxratelocalNew + ",EXEMPT";
                             }
                         }
                         if (taxratelocal.contains("STANDARD")) {
-                            if (taxratelocal.length() == 0) {
+                            if (taxratelocalNew.length() == 0) {
                                 taxratelocalNew = "STANDARD";
                             } else {
                                 taxratelocalNew = taxratelocalNew + ",STANDARD";

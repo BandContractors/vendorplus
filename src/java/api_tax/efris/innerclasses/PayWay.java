@@ -5,12 +5,15 @@
  */
 package api_tax.efris.innerclasses;
 
+import java.io.Serializable;
+
 /**
  *
  * @author bajuna
  */
 
-    public class PayWay {
+    public class PayWay implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     public PayWay() {
         this.orderNumber="";

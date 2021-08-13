@@ -5,11 +5,14 @@
  */
 package api_tax.efris.innerclasses;
 
+import java.io.Serializable;
+
 /**
  *
  * @author bajuna
  */
-public class GoodsCommodity {
+public class GoodsCommodity implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private String commodityCategoryCode;
     private String parentCode;

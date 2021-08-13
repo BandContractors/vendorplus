@@ -5,11 +5,14 @@
  */
 package api_tax.efris.innerclasses;
 
+import java.io.Serializable;
+
 /**
  *
  * @author bajuna
  */
-public class SellerDetails {
+public class SellerDetails implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private String tin;
     private String ninBrn;

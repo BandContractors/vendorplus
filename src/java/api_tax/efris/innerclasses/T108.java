@@ -5,11 +5,14 @@
  */
 package api_tax.efris.innerclasses;
 
+import java.io.Serializable;
+
 /**
  *
  * @author bajuna
  */
-public class T108 {
+public class T108 implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String antifakeCode;
     private String invoiceNo;
     private String qrCode;

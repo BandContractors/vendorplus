@@ -5,11 +5,14 @@
  */
 package api_tax.efris.innerclasses;
 
+import java.io.Serializable;
+
 /**
  *
  * @author bajuna
  */
-    public class Summary {
+    public class Summary implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     public Summary() {
         this.grossAmount="";

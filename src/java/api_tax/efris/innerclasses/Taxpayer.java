@@ -5,7 +5,10 @@
  */
 package api_tax.efris.innerclasses;
 
-public class Taxpayer {
+import java.io.Serializable;
+
+public class Taxpayer implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String tin = "";
     private String ninBrn = "";
     private String legalName = "";

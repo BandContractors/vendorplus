@@ -5,6 +5,7 @@
  */
 package api_tax.efris.innerclasses;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -12,7 +13,8 @@ import java.util.Date;
  *
  * @author bajuna
  */
-public class BasicInformation {
+public class BasicInformation implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private String invoiceNo;
     private String antifakeCode;

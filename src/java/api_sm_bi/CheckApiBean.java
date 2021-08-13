@@ -27,7 +27,7 @@ public class CheckApiBean implements Serializable {
                 isavailbale = true;
             }
         } catch (Exception e) {
-            LOGGER.log(Level.ERROR, e);
+            isavailbale = false;
         }
         return isavailbale;
     }
