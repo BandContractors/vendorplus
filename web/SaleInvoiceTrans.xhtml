@@ -138,13 +138,15 @@
                     </h:inputText>
                 </h:panelGrid>
             </h:panelGrid>
-            <h:panelGrid id="gridTransItem" styleClass="clsGridMainInput" columns="9">
+            <h:panelGrid id="gridTransItem" styleClass="clsGridMainInput" columns="11">
                 <h:outputLabel styleClass="clsLabelTransItem" style="width: 100px" value="#{langsys['Item']} #{langsys['Code']}"/>
                 <p:commandLink actionListener="#{itemBean.openChildItem('Stock',transItem.itemId)}" value="#{langsys['Item']} #{langsys['Description']}" style="text-decoration: none;"/>
                 <h:outputLabel value=""/>
                 <h:outputLabel styleClass="clsLabelTransItem" style="width: 50px" value="#{langsys['Unit']}"/>
                 <h:outputLabel styleClass="clsLabelTransItem" style="width: 80px" value="#{langsys['Batch']}"/>
+                <h:outputLabel value=""/>
                 <h:outputLabel styleClass="clsLabelTransItem" style="width: 50px" value="#{langsys['Qty']}"/>
+                <h:outputLabel value=""/>
                 <p:commandLink value="#{langsys['Unit Price']}" style="text-decoration: none;">
                     <p:ajax listener="#{transExtBean.reverseOverridePrices(transItem)}" process="@this" update="pgrdOverrideWarranty"/>
                 </p:commandLink>
@@ -219,10 +221,16 @@
                     <f:selectItems value="#{stockBean.batchList}" var="ib" itemLabel="#{ib.batchno}#{stockBean.getExpiryListString(ib.itemExpDate)}" itemValue="#{ib.batchno}"/>
                     <p:ajax listener="#{stockBean.refreshSpecificList(generalUserSetting.getCurrentStore().getStoreId(),transItem.itemId,transItem.batchno)}" process="@this autcItem" update="pgrdSpecific" />
                 </p:selectOneMenu>
+                <h:commandButton value="+" style="width: 34px;height: 30px;">
+                    <f:ajax listener="#{transItemBean.addQtyTransItemCEC(transItem)}" execute="@this itxtQty" render="itxtQty itxtAmount"/>
+                </h:commandButton>
                 <h:inputText id="itxtQty" styleClass="clsInputTransItem" style="width: 50px;height: 24px;" value="#{transItem.itemQty}" autocomplete="off">
                     <f:ajax event="blur" listener="#{transItem.setAmount(transItem.itemQty*transItem.unitPrice)}" render="itxtAmount"/>
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
+                <h:commandButton value="-" style="width: 34px;height: 30px;">
+                    <f:ajax listener="#{transItemBean.subtractQtyTransItemCEC(transItem)}" execute="@this itxtQty" render="itxtQty itxtAmount"/>
+                </h:commandButton>
                 <h:inputText id="itxtUnitPrice" styleClass="clsInputTransItem" style="width: 100px;height: 24px;" disabled="#{itemBean.selectedItem.isGeneral==0}" value="#{transItem.unitPrice}" autocomplete="off">
                     <f:ajax event="blur" listener="#{transItem.setAmount(transItem.itemQty*transItem.unitPrice)}" render="itxtAmount"/>
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -324,10 +332,16 @@
                     <!-- column header -->
                     <f:facet name="header">#{langsys['Qty']}</f:facet>
                     <!-- row record -->
-                    <h:inputText value="#{ati.itemQty}" style="width: 50px;">
+                    <h:commandButton id="cmdbAddQty" value="+" style="width: 34px;">
+                        <f:ajax listener="#{transItemBean.addQtyTransItemCEC(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans,transItemBean.activeTransItems,ati)}" execute="dtblTransactionItem" render="dtblTransactionItem TransactionFormSales:pgrdTotals TransactionFormSales:pgrdPayment TransactionFormSales:gridItemStatus TransactionFormSales:pgrdMsgs"/>
+                    </h:commandButton>
+                    <h:inputText value="#{ati.itemQty}" style="width: 30px;">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         <f:ajax event="change" listener="#{transItemBean.editTransItemCEC(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentSaleType,trans, transItemBean.activeTransItems,ati)}" execute="dtblTransactionItem" render="dtblTransactionItem TransactionFormSales:pgrdTotals TransactionFormSales:pgrdPayment TransactionFormSales:gridItemStatus TransactionFormSales:pgrdMsgs"/>
                     </h:inputText>
+                    <h:commandButton id="cmdbRemoveQty" value="-" style="width: 34px;">
+                        <f:ajax listener="#{transItemBean.subtractQtyTransItemCEC(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans,transItemBean.activeTransItems,ati)}" execute="dtblTransactionItem" render="dtblTransactionItem TransactionFormSales:pgrdTotals TransactionFormSales:pgrdPayment TransactionFormSales:gridItemStatus TransactionFormSales:pgrdMsgs"/>
+                    </h:commandButton>
                 </p:column>
                 <p:column>
                     <!-- column header -->
@@ -463,6 +477,34 @@
                         </p:commandButton>
                     </h:panelGrid>
                 </p:dialog>
+                <p:dialog header="#{langsys['Amount']} #{langsys['Tendered']}" widgetVar="dlgAmountTendered" modal="true" height="200" closable="false">
+                    <h:panelGrid columns="2">
+                        <p:commandButton value="0"  oncomplete="PF('dlgAmountTendered').hide()" style="width: 180px;height: 40px;">
+                            <p:ajax listener="#{transBean.setAmountTenderedFromDialog(0,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans, transItemBean.activeTransItems)}" process="@this" update=":TransactionFormSales:itxtAmountTendered :TransactionFormSales:itxtChange"/>
+                        </p:commandButton>
+                        <p:commandButton value="5,000"  oncomplete="PF('dlgAmountTendered').hide()" style="width: 180px;height: 40px;">
+                            <p:ajax listener="#{transBean.setAmountTenderedFromDialog(5000,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans, transItemBean.activeTransItems)}" process="@this" update=":TransactionFormSales:itxtAmountTendered :TransactionFormSales:itxtChange"/>
+                        </p:commandButton>
+                        <p:commandButton value="10,000"  oncomplete="PF('dlgAmountTendered').hide()" style="width: 180px;height: 40px;">
+                            <p:ajax listener="#{transBean.setAmountTenderedFromDialog(10000,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans, transItemBean.activeTransItems)}" process="@this" update=":TransactionFormSales:itxtAmountTendered :TransactionFormSales:itxtChange"/>
+                        </p:commandButton>
+                        <p:commandButton value="20,000"  oncomplete="PF('dlgAmountTendered').hide()" style="width: 180px;height: 40px;">
+                            <p:ajax listener="#{transBean.setAmountTenderedFromDialog(20000,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans, transItemBean.activeTransItems)}" process="@this" update=":TransactionFormSales:itxtAmountTendered :TransactionFormSales:itxtChange"/>
+                        </p:commandButton>
+                        <p:commandButton value="50,000"  oncomplete="PF('dlgAmountTendered').hide()" style="width: 180px;height: 40px;">
+                            <p:ajax listener="#{transBean.setAmountTenderedFromDialog(50000,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans, transItemBean.activeTransItems)}" process="@this" update=":TransactionFormSales:itxtAmountTendered :TransactionFormSales:itxtChange"/>
+                        </p:commandButton>
+                        <p:commandButton value="100,000"  oncomplete="PF('dlgAmountTendered').hide()" style="width: 180px;height: 40px;">
+                            <p:ajax listener="#{transBean.setAmountTenderedFromDialog(100000,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans, transItemBean.activeTransItems)}" process="@this" update=":TransactionFormSales:itxtAmountTendered :TransactionFormSales:itxtChange"/>
+                        </p:commandButton>
+                        <p:commandButton value="200,000"  oncomplete="PF('dlgAmountTendered').hide()" style="width: 180px;height: 40px;">
+                            <p:ajax listener="#{transBean.setAmountTenderedFromDialog(200000,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans, transItemBean.activeTransItems)}" process="@this" update=":TransactionFormSales:itxtAmountTendered :TransactionFormSales:itxtChange"/>
+                        </p:commandButton>
+                        <p:commandButton value="500,000"  oncomplete="PF('dlgAmountTendered').hide()" style="width: 180px;height: 40px;">
+                            <p:ajax listener="#{transBean.setAmountTenderedFromDialog(500000,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans, transItemBean.activeTransItems)}" process="@this" update=":TransactionFormSales:itxtAmountTendered :TransactionFormSales:itxtChange"/>
+                        </p:commandButton>
+                    </h:panelGrid>
+                </p:dialog>
             </h:panelGrid>
 
             <h:panelGrid id="pgrdScheme" style="background-color: yellow;width: 100%">
@@ -527,7 +569,7 @@
 
             <h:panelGrid id="pgrdPayment" styleClass="clsGridMainInput" columns="1">
                 <h:panelGrid styleClass="clsGridMainInput" columns="5">
-                    <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Amount']} #{langsys['Tendered']} (ALT+T)" for="itxtAmountTendered" accesskey="t"/>
+                    <p:commandLink  onclick="PF('dlgAmountTendered').show();" value="#{langsys['Amount']} #{langsys['Tendered']} (ALT+T)" style="text-decoration: none;" accesskey="t"/>
                     <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Balance']}"/>
                     <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Payment']} #{langsys['Method']}"/>
                     <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Receipt']} #{langsys['Account']}"/>

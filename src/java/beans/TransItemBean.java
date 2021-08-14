@@ -9825,6 +9825,31 @@ public class TransItemBean implements Serializable {
         aTransItem.setIs_override_price(1);
     }
 
+    public void addQtyTransItemCEC(TransItem ti) {
+        try {
+            ti.setItemQty(ti.getItemQty() + 1);
+            if (ti.getItemQty() < 0) {
+                ti.setItemQty(0);
+            }
+            //update amount
+            ti.setAmount(ti.getItemQty() * ti.getUnitPrice());
+        } catch (Exception e) {
+        }
+    }
+
+    public void subtractQtyTransItemCEC(TransItem ti) {
+        try {
+            ti.setItemQty(ti.getItemQty() - 1);
+            if (ti.getItemQty() < 0) {
+                ti.setItemQty(0);
+            }
+            //update amount
+            ti.setAmount(ti.getItemQty() * ti.getUnitPrice());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public void addQtyTransItemCEC(int aTransTypeId, int aTransReasonId, Trans aTrans, List<TransItem> aActiveTransItems, TransItem ti) {
         try {
             ti.setItemQty(ti.getItemQty() + 1);
@@ -9832,7 +9857,6 @@ public class TransItemBean implements Serializable {
                 ti.setItemQty(0);
             }
             //update totals
-            //new TransBean().setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems);
             this.editTransItemCEC(aTransTypeId, aTransReasonId, "", aTrans, aActiveTransItems, ti);
         } catch (Exception e) {
         }
@@ -9845,7 +9869,6 @@ public class TransItemBean implements Serializable {
                 ti.setItemQty(0);
             }
             //update totals
-            //new TransBean().setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems);
             this.editTransItemCEC(aTransTypeId, aTransReasonId, "", aTrans, aActiveTransItems, ti);
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
