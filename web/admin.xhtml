@@ -49,11 +49,21 @@
                 </p:tab>
                 <p:tab title="Clean Invoice (TotalPaid Not Updated)">
                     <h:panelGrid columns="1">
-                        <p:commandButton styleClass="clsButtonBig" id="cmdbCleanInvoice" value="Clean.Invoice" accesskey="t" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                        <p:commandButton styleClass="clsButtonBig" id="cmdbCleanInvoice" value="Clean.Invoice" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                             <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                                 <p:graphicImage name="/images/ajax-loader.gif"/>
                             </p:dialog>
                             <p:ajax listener="#{utilityBean.cleanSaleInvoiceTranss()}" process="@form" update="@form" />
+                        </p:commandButton>
+                    </h:panelGrid>
+                </p:tab>
+                <p:tab title="Update Mapped Items with URA Tax Rates">
+                    <h:panelGrid columns="1">
+                        <p:commandButton styleClass="clsButtonBig" value="Update Mapped Items" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                            <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                                <p:graphicImage name="/images/ajax-loader.gif"/>
+                            </p:dialog>
+                            <p:ajax listener="#{utilityBean.cleanItemTaxRates()}" process="@form" update="@form" />
                         </p:commandButton>
                     </h:panelGrid>
                 </p:tab>

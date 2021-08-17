@@ -604,9 +604,8 @@ UNION
 	WHERE p.pay_type_id=15 AND p.pay_method_id!=7 AND p.pay_reason_id IN(105) ;
     
 CREATE OR REPLACE VIEW view_transaction_cr_dr AS 
-SELECT t.*,ifnull(t2.transaction_id,0) as transaction_id_cr_dr,ifnull(t2.transaction_comment,"") as dr_cr_flag 
+SELECT t.*, ifnull((select group_concat(concat(t2.transaction_id,',',t2.transaction_comment) separator ':') from transaction_cr_dr_note t2 where t2.transaction_ref=t.transaction_number),'') as cr_dr_flag 
 FROM transaction t 
-LEFT JOIN transaction_cr_dr_note t2 on t.transaction_number=t2.transaction_ref 
 WHERE t.transaction_type_id IN(2,65,68);
 
 CREATE OR REPLACE VIEW view_snapshot_stock_value_max_month AS 
@@ -632,7 +631,7 @@ select
 		ELSE 'D' 
 	END as days_category 
 	from transaction t1 inner join transactor t2 on t1.bill_transactor_id=t2.transactor_id inner join parameter_list p on p.parameter_list_id=79 
-	where t1.transaction_type_id=2 and t1.grand_total>t1.total_paid;
+	where (t1.transaction_type_id IN (2,65,68) or t1.transaction_reason_id=117) and t1.grand_total>t1.total_paid;
 
 CREATE OR REPLACE VIEW view_supplier_invoice_age AS 
 select 
@@ -645,4 +644,4 @@ select
 		ELSE 'D' 
 	END as days_category 
 	from transaction t1 inner join transactor t2 on t1.bill_transactor_id=t2.transactor_id inner join parameter_list p on p.parameter_list_id=81 
-	where t1.transaction_type_id=1 and t1.grand_total>t1.total_paid;
+	where (t1.transaction_type_id=1 or t1.transaction_reason_id=118) and t1.grand_total>t1.total_paid;

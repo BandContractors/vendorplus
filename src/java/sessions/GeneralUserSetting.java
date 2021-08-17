@@ -402,6 +402,19 @@ public class GeneralUserSetting implements Serializable {
         return LongResponse;
     }
 
+    public String getCurrentTransactionNumber() {
+        String resp;
+        try {
+            FacesContext context = FacesContext.getCurrentInstance();
+            HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+            HttpSession httpSession = request.getSession(false);
+            resp = (String) httpSession.getAttribute("CURRENT_TRANSACTION_NUMBER");
+        } catch (NullPointerException | ClassCastException npe) {
+            resp = "";
+        }
+        return resp;
+    }
+
     public long getCurrentTransactionIdChild() {
         long LongResponse;
         try {

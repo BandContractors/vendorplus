@@ -55,6 +55,41 @@ public class CreditDebitNoteBean implements Serializable {
         }
     }
 
+    public List<Trans> getTrans_cr_dr_notes(String aTransNumberRef) {
+        List<Trans> aList = new ArrayList<>();
+        String sql = "SELECT * FROM transaction_cr_dr_note WHERE transaction_ref=?";
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setString(1, aTransNumberRef);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                aList.add(new TransBean().getTransFromResultset(rs));
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return aList;
+    }
+
+    public void refreshTrans_cr_dr_notes(String aTransNumberRef, List<Trans> aList) {
+        String sql = "SELECT * FROM transaction_cr_dr_note WHERE transaction_ref=?";
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setString(1, aTransNumberRef);
+            rs = ps.executeQuery();
+            aList.clear();
+            while (rs.next()) {
+                aList.add(new TransBean().getTransFromResultset(rs));
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public TransItem getTransItemFromList(String aItemCode, List<TransItem> aTransItems) {
         TransItem ti = new TransItem();
         for (int i = 0; i < aTransItems.size(); i++) {

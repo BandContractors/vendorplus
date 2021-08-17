@@ -157,7 +157,7 @@ public class ItemBean implements Serializable {
                     String taxratelocal = item.getVatRated();
                     String taxrateremote = "";
                     String taxrateadd = "";
-                    String APIMode = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_MODE").getParameter_value();
+                    String APIMode = new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_MODE").getParameter_value();
                     ItemTax it = null;
                     if (APIMode.equals("OFFLINE")) {
                         it = new StockManage().getItemFromTaxOffline(im.getItem_id_tax());

@@ -4,6 +4,7 @@ import api_tax.efris_bean.T124;
 import beans.AccCurrencyBean;
 import beans.AccJournalBean;
 import beans.Alert_generalBean;
+import beans.ItemBean;
 import beans.Parameter_listBean;
 import beans.PayTransBean;
 import beans.TransBean;
@@ -880,6 +881,22 @@ public class UtilityBean implements Serializable {
         return StringArray;
     }
 
+    public String[] getStringArrayFromXSeperatedStr(String aXSeperatedStr, String aSeperator) {
+        String[] StringArray = null;
+        try {
+            if (null == aXSeperatedStr) {
+                //
+            } else {
+                if (aXSeperatedStr.length() > 0) {
+                    StringArray = aXSeperatedStr.split(aSeperator);
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return StringArray;
+    }
+
     public String getFirstStringFromCommaSeperatedStr(String aCommaSeperatedStr) {
         String FirstString = "";
         try {
@@ -1085,6 +1102,43 @@ public class UtilityBean implements Serializable {
                             if (tt.getTransactionTypeId() == 2 || tt.getTransactionTypeId() == 1) {
                                 new PayTransBean().updateTransTotalPaid(t.getTransactionId());
                                 System.out.println("--TPaid:" + x);
+                            }
+                        }
+                    } catch (Exception e) {
+                        LOGGER.log(Level.ERROR, e);
+                    }
+                }
+            };
+            Executor e = Executors.newSingleThreadExecutor();
+            e.execute(task);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void cleanItemTaxRates() {
+        try {
+            Runnable task = new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        if (new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
+                            String sql = "SELECT * FROM item_tax_map WHERE is_synced=1";
+                            ResultSet rs = null;
+                            Connection conn = DBConnection.getMySQLConnection();
+                            PreparedStatement ps = conn.prepareStatement(sql);
+                            rs = ps.executeQuery();
+                            int x = 0;
+                            long itemid = 0;
+                            ItemBean ib = new ItemBean();
+                            while (rs.next()) {
+                                x = x + 1;
+                                itemid = 0;
+                                itemid = rs.getLong("item_id");
+                                ib.checkRemoteTaxRateAndUpdateLocal(itemid, "");
+                                if (x % 20 == 0) {
+                                    LOGGER.log(Level.ERROR, "Cleaned:" + x);
+                                }
                             }
                         }
                     } catch (Exception e) {
