@@ -427,7 +427,13 @@ public class SMbiBean implements Serializable {
             loyaltyTransaction.setBusiness_code(CompanySetting.getCompanyName());
             loyaltyTransaction.setGroup_code(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_SMBI_GROUP_CODE").getParameter_value());
             loyaltyTransaction.setCard_number(aLoyalty_transaction.getCard_number());
-            loyaltyTransaction.setInvoice_number(aLoyalty_transaction.getInvoice_number());
+            if (aLoyalty_transaction.getCredit_note_number().length() > 0) {
+                loyaltyTransaction.setInvoice_number(aLoyalty_transaction.getCredit_note_number());
+            } else if (aLoyalty_transaction.getDebit_note_number().length() > 0) {
+                loyaltyTransaction.setInvoice_number(aLoyalty_transaction.getDebit_note_number());
+            } else {
+                loyaltyTransaction.setInvoice_number(aLoyalty_transaction.getInvoice_number());
+            }
             loyaltyTransaction.setTransaction_date(aLoyalty_transaction.getTransaction_date());
             loyaltyTransaction.setPoints_awarded(aLoyalty_transaction.getPoints_awarded());
             loyaltyTransaction.setAmount_awarded(aLoyalty_transaction.getAmount_awarded());
