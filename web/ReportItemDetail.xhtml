@@ -120,6 +120,9 @@
                         <p:dataExporter type="xml" target="tblDetail" fileName="Item_Detail" />
                     </h:commandLink>
                 </f:facet>
+                <p:column headerText="#{langsys['Item']} #{langsys['Id']}" style="font-size: 12px;">
+                    <h:outputLabel value="#{itm.itemId} "/>
+                </p:column>
                 <p:column headerText="#{langsys['Purpose']}" style="font-size: 12px;">
                     <h:outputLabel value="#{itm.purpose} "/>
                 </p:column>

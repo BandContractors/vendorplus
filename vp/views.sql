@@ -645,3 +645,10 @@ select
 	END as days_category 
 	from transaction t1 inner join transactor t2 on t1.bill_transactor_id=t2.transactor_id inner join parameter_list p on p.parameter_list_id=81 
 	where (t1.transaction_type_id=1 or t1.transaction_reason_id=118) and t1.grand_total>t1.total_paid;
+    
+CREATE OR REPLACE VIEW view_api_smbi AS 
+select m.*,tt.transaction_type_name from transaction_smbi_map m inner join transaction_type tt on m.transaction_type_id=tt.transaction_type_id 
+UNION 
+SELECT loyalty_transaction_id as transaction_smbi_map_id, loyalty_transaction_id as transaction_id,1010 as transaction_type_id,1010 as transaction_reason_id, 
+card_number as transaction_number,add_date,status_sync,status_date,status_desc, 'LOYALTY' as transaction_type_name 
+FROM loyalty_transaction;

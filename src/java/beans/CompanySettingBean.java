@@ -51,7 +51,7 @@ public class CompanySettingBean implements Serializable {
             try (
                     Connection conn = DBConnection.getMySQLConnection();
                     CallableStatement cs = conn.prepareCall(sql);) {
-                cs.setString("in_ECompanyName", new CompanySetting().getLICENSE_CLIENT_NAME());
+                cs.setString("in_ECompanyName", company.getECompanyName());//new CompanySetting().getLICENSE_CLIENT_NAME()
                 cs.setString("in_EPhysicalAddress", company.getEPhysicalAddress());
                 cs.setString("in_EPhone", company.getEPhone());
                 cs.setString("in_EFax", company.getEFax());

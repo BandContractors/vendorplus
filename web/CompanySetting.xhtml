@@ -32,13 +32,13 @@
 
             <h:panelGrid styleClass="clsGridMainInput" columns="4">
                 <h:outputLabel  value="#{langsys['Company']} #{langsys['Code']}"/>
-                <h:inputText styleClass="clsInput" value="#{companySetting.ECompanyName}" disabled="true" />
+                <h:inputText styleClass="clsInput" value="#{companySetting.ECompanyName}"/>
 
                 <h:outputLabel  value="#{langsys['Branch']} #{langsys['Name']}"/>
-                <h:inputText styleClass="clsInput" value="#{companySetting.EBranchCode}" disabled="true" />
+                <h:inputText styleClass="clsInput" value="#{companySetting.EBranchCode}"/>
 
                 <h:outputLabel  value="#{langsys['Branch']} #{langsys['Code']}"/>
-                <h:inputText styleClass="clsInput" value="#{companySetting.EBranchId}" disabled="true" />
+                <h:inputText styleClass="clsInput" value="#{companySetting.EBranchId}"/>
 
                 <h:outputLabel  value="#{langsys['Physical']} #{langsys['Address']}"/>
                 <h:inputText styleClass="clsInput" value="#{companySetting.EPhysicalAddress}" />
@@ -198,9 +198,9 @@
 
             <h:panelGrid styleClass="clsGridMainCommands" columns="2">
                 <p:commandButton styleClass="clsButton" id="cmdbSave" value="#{langsys['UPDATE']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
-                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
-                            <p:graphicImage name="/images/ajax-loader.gif"/>
-                        </p:dialog>
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
                     <f:actionListener binding="#{companySettingBean.saveCompanySetting(companySetting)}" />
                 </p:commandButton>
             </h:panelGrid>

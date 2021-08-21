@@ -48,6 +48,9 @@
                     <p:selectOneMenu id="menuTransactionType" value="#{transaction_smbi_mapBean.transactionTypeId}" style="width: 200px;">
                         <f:selectItem itemLabel="" itemValue="0"/>
                         <f:selectItem itemLabel="#{langsys['Sale']} #{langsys['Invoice']}" itemValue="2"/>
+                        <f:selectItem itemLabel="#{langsys['Credit']} #{langsys['Note']}" itemValue="82"/>
+                        <f:selectItem itemLabel="#{langsys['Debit']} #{langsys['Note']}" itemValue="83"/>
+                        <f:selectItem itemLabel="#{langsys['Loyalty']}" itemValue="1010"/>
                     </p:selectOneMenu>
                     <p:outputLabel value="#{langsys['Transaction']} #{langsys['No.']}:"/>
                     <p:inputText id="itxtInvoiceNo" value="#{transaction_smbi_mapBean.transactionNumber}" style="width: 215px;"/>
@@ -109,8 +112,12 @@
                 <p:column headerText="#{langsys['Transaction']} #{langsys['Type']}">
                     <h:outputLabel value="#{itm.transaction_type_name} "/>
                 </p:column>
+                <p:column headerText="#{langsys['Transaction']} #{langsys['Id']}">
+                    <h:outputLabel value="#{itm.transaction_id}"/>
+                </p:column>
                 <p:column headerText="#{langsys['Transaction']} #{langsys['No.']}">
-                    <h:outputLabel value="#{itm.transaction_number}"/>
+                    <h:outputLabel value="#{itm.transaction_number}" rendered="#{itm.transaction_type_id ne 1010}"/>
+                    <h:outputLabel value="#{itm.transaction_number} (#{langsys['Card']} #{langsys['No']})" rendered="#{itm.transaction_type_id eq 1010}"/>
                 </p:column>
                 <p:column headerText="#{langsys['Add']} #{langsys['Date']}">
                     <h:outputText value="#{utilityBean.formatDate(itm.add_date)}"/>
@@ -126,7 +133,7 @@
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
-                        <p:ajax listener="#{transaction_smbi_mapBean.updateNotSyncedAndCallSyncJob(itm.transaction_smbi_map_id,itm.status_sync)}" update="tblDetail"/>
+                        <p:ajax listener="#{transaction_smbi_mapBean.updateNotSyncedAndCallSyncJob(itm.transaction_type_id,itm.transaction_smbi_map_id,itm.status_sync)}" update="tblDetail"/>
                     </p:commandButton>
                 </p:column>
             </p:dataTable>
