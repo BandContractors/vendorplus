@@ -189,7 +189,7 @@ public class SMbiBean implements Serializable {
             }
             saleInvoice.setGross_amount(aTrans.getGrandTotal());
             saleInvoice.setTrade_discount(aTrans.getTotalTradeDiscount());
-            saleInvoice.setCash_discount(aTrans.getCashDiscount());
+            saleInvoice.setCash_discount(aTrans.getCashDiscount() + aTrans.getSpendPointsAmount());
             saleInvoice.setTax_amount(aTrans.getTotalVat());
             saleInvoice.setProfit_margin(aTrans.getTotalProfitMargin());
             saleInvoice.setAmount_tendered(aTrans.getAmountTendered());
@@ -303,7 +303,7 @@ public class SMbiBean implements Serializable {
             }
             saleCreditDebitNote.setGross_amount(aTrans.getGrandTotal());
             saleCreditDebitNote.setTrade_discount(aTrans.getTotalTradeDiscount());
-            saleCreditDebitNote.setCash_discount(aTrans.getCashDiscount());
+            saleCreditDebitNote.setCash_discount(aTrans.getCashDiscount() + aTrans.getSpendPointsAmount());
             saleCreditDebitNote.setTax_amount(aTrans.getTotalVat());
             saleCreditDebitNote.setProfit_margin(aTrans.getTotalProfitMargin());
             saleCreditDebitNote.setAmount_tendered(aTrans.getAmountTendered());

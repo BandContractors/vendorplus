@@ -165,6 +165,10 @@ public class CreditDebitNoteBean implements Serializable {
             CreditDebitTrans.setTotalStdVatableAmount(aNewTrans.getTotalStdVatableAmount() - aOldTrans.getTotalStdVatableAmount());
             CreditDebitTrans.setTotalZeroVatableAmount(aNewTrans.getTotalZeroVatableAmount() - aOldTrans.getTotalZeroVatableAmount());
             CreditDebitTrans.setTotalExemptVatableAmount(aNewTrans.getTotalExemptVatableAmount() - aOldTrans.getTotalExemptVatableAmount());
+            CreditDebitTrans.setTotalProfitMargin(aNewTrans.getTotalProfitMargin() - aOldTrans.getTotalProfitMargin());
+            CreditDebitTrans.setAmountTendered(aNewTrans.getAmountTendered() - aOldTrans.getAmountTendered());
+            CreditDebitTrans.setTotalPaid(0);
+            CreditDebitTrans.setChangeAmount(aNewTrans.getChangeAmount() - aOldTrans.getChangeAmount());
             CreditDebitTrans.setTransactionRef(aNewTrans.getTransactionNumber());
             CreditDebitTrans.setTransactionComment(CreditOrDebitNote);
             //save trans credit/debit note
