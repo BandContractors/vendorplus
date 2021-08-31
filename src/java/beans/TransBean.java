@@ -145,6 +145,7 @@ public class TransBean implements Serializable {
     private List<Trans> TransListHist = new ArrayList<>();
     private List<TransItem> TransItemSummary;
     private List<Trans> TransListCrDr = new ArrayList<>();
+    private List<TransItem> TransItemSummary2;
 
     public String setBgColorIfEqual(String aA, String aB, int aContext) {
         if (aA.equals(aB)) {
@@ -14040,6 +14041,7 @@ public class TransBean implements Serializable {
         } else {
             ResultSet rs = null;
             ResultSet rssum = null;
+            ResultSet rssum2 = null;
             this.TransItemList = new ArrayList<>();
             String sql = "SELECT ti.*,t.transaction_number,t.transaction_type_id,t.store_id,i.description,i.unit_id,i.category_id,t.add_date,t.add_user_detail_id FROM transaction_item ti "
                     + "INNER JOIN transaction t ON ti.transaction_id=t.transaction_id "
@@ -14156,7 +14158,7 @@ public class TransBean implements Serializable {
                 LOGGER.log(Level.ERROR, e);
             }
 
-            //summary
+            //summary-category
             this.TransItemSummary = new ArrayList<>();
             String sqlsum = "";
             sqlsum = "SELECT category_id,t.transaction_type_id,t.currency_code,sum(amount_inc_vat) as amount_inc_vat FROM transaction_item ti "
@@ -14196,6 +14198,50 @@ public class TransBean implements Serializable {
                         transitemsum.setTransactionTypeName("");
                     }
                     this.TransItemSummary.add(transitemsum);
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
+            }
+
+            //summary-item
+            this.TransItemSummary2 = new ArrayList<>();
+            String sqlsum2 = "";
+            sqlsum2 = "SELECT description,t.transaction_type_id,t.currency_code,sum(amount_inc_vat) as amount_inc_vat FROM transaction_item ti "
+                    + "INNER JOIN transaction t ON ti.transaction_id=t.transaction_id "
+                    + "INNER JOIN item i ON ti.item_id=i.item_id WHERE 1=1";
+            String ordersqlsum2 = "";
+            String groupbysql2 = "";
+            groupbysql2 = " GROUP BY description,transaction_type_id,currency_code";
+            ordersqlsum2 = " ORDER BY description,transaction_type_id,currency_code";
+            sqlsum2 = sqlsum2 + wheresql + groupbysql2 + ordersqlsum2;
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sqlsum2);) {
+                rssum2 = ps.executeQuery();
+                TransItem transitemsum2 = null;
+                while (rssum2.next()) {
+                    transitemsum2 = new TransItem();
+                    try {
+                        transitemsum2.setDescription(rssum2.getString("description"));
+                    } catch (Exception e) {
+                        transitemsum2.setDescription("");
+                    }
+                    try {
+                        transitemsum2.setCurrency_code(rssum2.getString("currency_code"));
+                    } catch (Exception e) {
+                        transitemsum2.setCurrency_code("");
+                    }
+                    try {
+                        transitemsum2.setAmountIncVat(rssum2.getDouble("amount_inc_vat"));
+                    } catch (NullPointerException npe) {
+                        transitemsum2.setAmountIncVat(0);
+                    }
+                    try {
+                        transitemsum2.setTransactionTypeName(new TransactionTypeBean().getTransactionType(rssum2.getInt("transaction_type_id")).getTransactionTypeName());
+                    } catch (NullPointerException npe) {
+                        transitemsum2.setTransactionTypeName("");
+                    }
+                    this.TransItemSummary2.add(transitemsum2);
                 }
             } catch (Exception e) {
                 LOGGER.log(Level.ERROR, e);
@@ -16606,6 +16652,20 @@ public class TransBean implements Serializable {
      */
     public void setTransListCrDr(List<Trans> TransListCrDr) {
         this.TransListCrDr = TransListCrDr;
+    }
+
+    /**
+     * @return the TransItemSummary2
+     */
+    public List<TransItem> getTransItemSummary2() {
+        return TransItemSummary2;
+    }
+
+    /**
+     * @param TransItemSummary2 the TransItemSummary2 to set
+     */
+    public void setTransItemSummary2(List<TransItem> TransItemSummary2) {
+        this.TransItemSummary2 = TransItemSummary2;
     }
 
 }

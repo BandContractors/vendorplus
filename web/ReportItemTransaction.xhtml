@@ -207,12 +207,7 @@
                                 <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="#{langsys['Unit']} #{langsys['Cost']} #{langsys['Price']}" style="text-align: right;">
-                            <h:outputText value="#{itm.unitCostPrice}">
-                                <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                            </h:outputText>
-                        </p:column>
-                        <p:column headerText="#{langsys['Unit']} #{langsys['Sales']} #{langsys['Price']}" style="text-align: right;">
+                        <p:column headerText="#{langsys['Unit']} #{langsys['Price']}" style="text-align: right;">
                             <h:outputText value="#{itm.unitPriceIncVat}">
                                 <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
@@ -233,7 +228,7 @@
                         </p:column>
                     </p:dataTable>
                 </p:tab>
-                <p:tab title="#{langsys['Summary']}">
+                <p:tab title="#{langsys['Category']} #{langsys['Summary']}">
                     <p:dataTable id="tblSummary" tableStyle="width:auto;" var="itm" value="#{transBean.transItemSummary}" 
                                  paginator="true" rows="50" 
                                  paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
@@ -246,22 +241,22 @@
                         <f:facet name="{Exporters}">
                             <h:commandLink>
                                 <p:graphicImage name="images/excel.png" width="24"/>
-                                <p:dataExporter type="xls" target="tblSummary" fileName="Item_Trans_Summary" />
+                                <p:dataExporter type="xls" target="tblSummary" fileName="Category_Summary" />
                             </h:commandLink>
                             <h:commandLink>
                                 <p:graphicImage name="images/pdf.png" width="24"/>
-                                <p:dataExporter type="pdf" target="tblSummary" fileName="Item_Trans_Summary"/>
+                                <p:dataExporter type="pdf" target="tblSummary" fileName="Category_Summary"/>
                             </h:commandLink>
                             <h:commandLink>
                                 <p:graphicImage name="images/csv.png" width="24"/>
-                                <p:dataExporter type="csv" target="tblSummary" fileName="Item_Trans_Summary" />
+                                <p:dataExporter type="csv" target="tblSummary" fileName="Category_Summary" />
                             </h:commandLink>
                             <h:commandLink>
                                 <p:graphicImage name="images/xml.png" width="24"/>
-                                <p:dataExporter type="xml" target="tblSummary" fileName="Item_Trans_Summary" />
+                                <p:dataExporter type="xml" target="tblSummary" fileName="Category_Summary" />
                             </h:commandLink>
                         </f:facet>
-                        <p:column headerText="#{langsys['Item']} #{langsys['Category']}">
+                        <p:column headerText="#{langsys['Category']}">
                             <h:outputLabel value="#{itm.categoryName}"/>
                         </p:column>
                         <p:column headerText="#{langsys['Transaction']} #{langsys['Type']}">
@@ -272,6 +267,50 @@
                         </p:column>
                         <p:column headerText="#{langsys['Amount']}" style="text-align: right;">
                             <h:outputText value="#{itm.amountIncVat}">
+                                <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+                <p:tab title="#{langsys['Item']} #{langsys['Summary']}">
+                    <p:dataTable id="tblSummary2" tableStyle="width:auto;" var="itm2" value="#{transBean.transItemSummary2}" 
+                                 paginator="true" rows="50" 
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
+                                 rowsPerPageTemplate="50,100,200,400">
+                        <f:facet name="header">
+                            #{transBean.transItemSummary2.size()} #{langsys['Records']} #{langsys['Found']}
+                            <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
+                            <p:columnToggler datasource="tblSummary2" trigger="toggler" />
+                        </f:facet>
+                        <f:facet name="{Exporters}">
+                            <h:commandLink>
+                                <p:graphicImage name="images/excel.png" width="24"/>
+                                <p:dataExporter type="xls" target="tblSummary2" fileName="Item_Summary" />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <p:graphicImage name="images/pdf.png" width="24"/>
+                                <p:dataExporter type="pdf" target="tblSummary2" fileName="Item_Summary"/>
+                            </h:commandLink>
+                            <h:commandLink>
+                                <p:graphicImage name="images/csv.png" width="24"/>
+                                <p:dataExporter type="csv" target="tblSummary2" fileName="Item_Summary" />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <p:graphicImage name="images/xml.png" width="24"/>
+                                <p:dataExporter type="xml" target="tblSummary2" fileName="Item_Summary" />
+                            </h:commandLink>
+                        </f:facet>
+                        <p:column headerText="#{langsys['Item']} #{langsys['Description']}">
+                            <h:outputLabel value="#{itm2.description}"/>
+                        </p:column>
+                        <p:column headerText="#{langsys['Transaction']} #{langsys['Type']}">
+                            <h:outputLabel value="#{itm2.transactionTypeName} "/>
+                        </p:column>
+                        <p:column headerText="#{langsys['Currency']}">
+                            <h:outputLabel value="#{itm2.currency_code}"/>
+                        </p:column>
+                        <p:column headerText="#{langsys['Amount']}" style="text-align: right;">
+                            <h:outputText value="#{itm2.amountIncVat}">
                                 <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
