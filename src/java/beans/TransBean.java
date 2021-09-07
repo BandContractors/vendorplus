@@ -14206,7 +14206,7 @@ public class TransBean implements Serializable {
             //summary-item
             this.TransItemSummary2 = new ArrayList<>();
             String sqlsum2 = "";
-            sqlsum2 = "SELECT description,t.transaction_type_id,t.currency_code,sum(amount_inc_vat) as amount_inc_vat FROM transaction_item ti "
+            sqlsum2 = "SELECT description,t.transaction_type_id,t.currency_code,sum(amount_inc_vat) as amount_inc_vat,sum(item_qty) as qty_sum FROM transaction_item ti "
                     + "INNER JOIN transaction t ON ti.transaction_id=t.transaction_id "
                     + "INNER JOIN item i ON ti.item_id=i.item_id WHERE 1=1";
             String ordersqlsum2 = "";
@@ -14235,6 +14235,11 @@ public class TransBean implements Serializable {
                         transitemsum2.setAmountIncVat(rssum2.getDouble("amount_inc_vat"));
                     } catch (NullPointerException npe) {
                         transitemsum2.setAmountIncVat(0);
+                    }
+                    try {
+                        transitemsum2.setItemQty(rssum2.getDouble("qty_sum"));
+                    } catch (NullPointerException npe) {
+                        transitemsum2.setItemQty(0);
                     }
                     try {
                         transitemsum2.setTransactionTypeName(new TransactionTypeBean().getTransactionType(rssum2.getInt("transaction_type_id")).getTransactionTypeName());
