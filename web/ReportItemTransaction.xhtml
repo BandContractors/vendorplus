@@ -46,7 +46,7 @@
                     <p:selectOneMenu id="menuDateType" value="#{transBean.dateType}" style="width: 200px;">
                         <f:selectItem itemLabel="#{langsys['Select']}" itemValue=""/>
                         <f:selectItem itemValue="Add Date" itemLabel="#{langsys['Add']} #{langsys['Date']}"/>
-                        <f:selectItem itemValue="Transaction Date" itemLabel="#{langsys['Transaction']} #{langsys['Date']}"/>
+                        <f:selectItem itemValue="Trans Date" itemLabel="#{langsys['Transaction']} #{langsys['Date']}"/>
                         <f:ajax event="change" execute="@this" render="lblDate1 lblDate2"/>
                     </p:selectOneMenu>
                     <p:outputLabel value="#{langsys['From']} #{transBean.dateType}:" id="lblDate1"/>

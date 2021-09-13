@@ -75,7 +75,7 @@ import org.apache.log4j.Logger;
 @ManagedBean //(name = "transBean")
 @SessionScoped
 public class TransBean implements Serializable {
-
+    
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = Logger.getLogger(TransBean.class.getName());
     private List<Trans> Transs;
@@ -146,7 +146,7 @@ public class TransBean implements Serializable {
     private List<TransItem> TransItemSummary;
     private List<Trans> TransListCrDr = new ArrayList<>();
     private List<TransItem> TransItemSummary2;
-
+    
     public String setBgColorIfEqual(String aA, String aB, int aContext) {
         if (aA.equals(aB)) {
             return "#007fff";//#2E74B5
@@ -166,7 +166,7 @@ public class TransBean implements Serializable {
             }
         }
     }
-
+    
     public String setBgColorByStatus(int aStatus) {
         if (aStatus == 1) {
             return "#007fff";
@@ -176,7 +176,7 @@ public class TransBean implements Serializable {
             return "#E2E2E2";
         }
     }
-
+    
     public int panelColumnsIfListGreater(int aSize, int aValue) {
         if (aSize > aValue) {
             return 2;
@@ -184,7 +184,7 @@ public class TransBean implements Serializable {
             return 1;
         }
     }
-
+    
     public void updateDelivery_mode(Trans aTrans, String aNewDeliveryMode) {
         if (aTrans.getDelivery_mode().equals(aNewDeliveryMode)) {
             aTrans.setDelivery_mode("");
@@ -192,7 +192,7 @@ public class TransBean implements Serializable {
             aTrans.setDelivery_mode(aNewDeliveryMode);
         }
     }
-
+    
     public void updateStatus(Trans aTrans, String aContext) {
         switch (aContext) {
             case "PROCESSED":
@@ -233,7 +233,7 @@ public class TransBean implements Serializable {
                 break;
         }
     }
-
+    
     public void updateStatus_old(Trans aTrans, String aContext) {
         switch (aContext) {
             case "PROCESSED":
@@ -266,7 +266,7 @@ public class TransBean implements Serializable {
                 break;
         }
     }
-
+    
     public void updateStatus(Trans aTrans, String aContext, int aStatus) {
         switch (aContext) {
             case "PROCESSED":
@@ -283,7 +283,7 @@ public class TransBean implements Serializable {
                 break;
         }
     }
-
+    
     public void updateTodayYesturday(int aValue) {
         if (this.todayoryest == aValue) {
             this.todayoryest = 0;
@@ -291,7 +291,7 @@ public class TransBean implements Serializable {
             this.todayoryest = aValue;
         }
     }
-
+    
     public void updateStore2Id(Trans aTrans, int aStore2Id) {
         if (aTrans.getStore2Id() == aStore2Id) {
             aTrans.setStore2Id(0);
@@ -299,7 +299,7 @@ public class TransBean implements Serializable {
             aTrans.setStore2Id(aStore2Id);
         }
     }
-
+    
     public void updatePrintFile(int aPrintFile) {
         if (aPrintFile == this.OverridePrintVersion) {
             this.OverridePrintVersion = 0;
@@ -311,7 +311,7 @@ public class TransBean implements Serializable {
             this.OverridePrintVersion = 0;
         }
     }
-
+    
     public void updateLocation_id(Trans aTrans, int aLocation_id) {
         if (aTrans.getLocation_id() == aLocation_id) {
             aTrans.setLocation_id(0);
@@ -319,7 +319,7 @@ public class TransBean implements Serializable {
             aTrans.setLocation_id(aLocation_id);
         }
     }
-
+    
     public void updateUserDetail(Trans aTrans, int aUserDetailId) {
         if (aTrans.getTransactionUserDetailId() == aUserDetailId) {
             aTrans.setTransactionUserDetailId(0);
@@ -327,7 +327,7 @@ public class TransBean implements Serializable {
             aTrans.setTransactionUserDetailId(aUserDetailId);
         }
     }
-
+    
     public void updateIs_selected(Trans aTrans) {
         if (aTrans.getIs_selected() == 1) {
             aTrans.setIs_selected(0);
@@ -335,7 +335,7 @@ public class TransBean implements Serializable {
             aTrans.setIs_selected(1);
         }
     }
-
+    
     public void initLocationsByStore(int aStoreId) {
         try {
             try {
@@ -348,7 +348,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void initStoresByStore(int aStoreId) {
         try {
             try {
@@ -361,7 +361,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void initUserDetail(int aUserDetailId) {
         try {
             try {
@@ -374,7 +374,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void initResetDefaultQuickOrder(Trans aTrans) {
         aTrans.setStore2Id(0);
         aTrans.setLocation_id(0);
@@ -419,7 +419,7 @@ public class TransBean implements Serializable {
             aTrans.setStore2Id(0);
         }
     }
-
+    
     public void initQuickOrderManageFilter(Trans aTrans) {
         aTrans.setIs_processed(2);
         aTrans.setIs_cancel(2);
@@ -431,7 +431,7 @@ public class TransBean implements Serializable {
         aTrans.setCategory(null);
         aTrans.setTransactionUserDetailId(0);
     }
-
+    
     public void initQuickOrderManageFilterDashboard(Trans aTrans) {
         aTrans.setIs_processed(0);
         aTrans.setIs_cancel(2);
@@ -443,15 +443,15 @@ public class TransBean implements Serializable {
         aTrans.setCategory(null);
         aTrans.setTransactionUserDetailId(0);
     }
-
+    
     public void refreshPayMethodsActiveIn(String aPayMethodIDs) {
         this.PayMethodList = new PayMethodBean().getPayMethodsActiveIn(aPayMethodIDs);
     }
-
+    
     public void refreshAccChildAccountsForCashReceipt(String aCurrencyCode, int aPayMethodId, int aStoreId, int aUserDetailId) {
         this.AccChildAccountList = new AccChildAccountBean().getAccChildAccountsForCashReceipt(aCurrencyCode, aPayMethodId, aStoreId, aUserDetailId);
     }
-
+    
     public void RetrieveAndUpdateTransAndItems(int aTransTypeId, int aRetrieveTransTypeId, int aRetrieveTransReasId, Trans aTrans, List<TransItem> aTransItems) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -539,7 +539,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void RetrieveAndUpdateTransAndItemsGDN(int aTransTypeId, int aRetrieveTransTypeId, int aRetrieveTransTypeId2, Trans aTrans, List<TransItem> aTransItems) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -607,7 +607,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void loadTransForGDN(int aTransTypeIdChoice, Trans aTrans, List<TransItem> aTransItems) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -654,7 +654,7 @@ public class TransBean implements Serializable {
             }
         }
     }
-
+    
     public void RetrieveAndUpdateTransAndItems2(int aRetrieveTransTypeId, int aRetrieveTransReasId1, int aRetrieveTransReasId2, Trans aTrans, List<TransItem> aTransItems) {
         int CurrStoreId = 0;
         int CurrTransTypeId = 0;
@@ -711,7 +711,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public String validateTransCEC(int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor) {
         String msg = "";
         Store store2 = new StoreBean().getStore(trans.getStore2Id());
@@ -725,7 +725,7 @@ public class TransBean implements Serializable {
             TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
             TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
             Store store = new StoreBean().getStore(aStoreId);
-
+            
             String ItemMessage = "";
             try {
                 if (aTransTypeId == 2 && Store2Id > 0) {
@@ -753,11 +753,11 @@ public class TransBean implements Serializable {
                 ItemMessage3 = new TransItemBean().getAnyItemDeliveryTotalGreaterThanBalance(aActiveTransItems, transtype.getTransactionTypeName());
             } catch (NullPointerException npe) {
             }
-
+            
             UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
             List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
             GroupRightBean grb = new GroupRightBean();
-
+            
             if (null == transtype) {
                 msg = "Invalid Transaction";
             } else if (trans.getTransactionId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, Integer.toString(transreason.getTransactionReasonId()), "Add") == 0) {
@@ -890,7 +890,7 @@ public class TransBean implements Serializable {
         }
         return msg;
     }
-
+    
     public void insertTransCEC(int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems) {
         long InsertedTransId = 0;
         String sql = "{call sp_insert_transaction(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
@@ -1131,7 +1131,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void saveTest(String aLevel, long aTransID) {
         FacesContext context = FacesContext.getCurrentInstance();
         HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
@@ -1145,7 +1145,7 @@ public class TransBean implements Serializable {
         }
         new OutputDetailBean().refreshOutput(aLevel, "");
     }
-
+    
     public void saveTransCallQuickOrder(String aAction, String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa, StatusBean aStatusBean) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -1172,7 +1172,7 @@ public class TransBean implements Serializable {
         } catch (Exception e) {
             //do nothing
         }
-
+        
         if (LocationNeeded == 1 && trans.getLocation_id() == 0) {
             this.ActionMessage = "Select Location";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, this.ActionMessage)));
@@ -1222,7 +1222,7 @@ public class TransBean implements Serializable {
                         }
                     }
                 }
-
+                
                 if (QualifyForSave == 1) {
                     SavedTransId = this.saveTransCECE(aLevel, aStoreId, aTransTypeId, aTransReasonId, aSaleType, trans, aActiveTransItems, aSelectedTransactor, aSelectedBillTransactor, aTransUserDetail, aSelectedSchemeTransactor, aAuthorisedByUserDetail, aSelectedAccCoa);
                 }
@@ -1291,7 +1291,7 @@ public class TransBean implements Serializable {
             }
         }
     }
-
+    
     public double getOrderInvoiceQtyBalance(long aTransactorId, String aTransNo, TransItem aTransItem) {
         String sql = "";
         ResultSet rs = null;
@@ -1335,7 +1335,7 @@ public class TransBean implements Serializable {
         }
         return InvoiceQtyBalance;
     }
-
+    
     public int getOrderInvoiceStatus(Trans aOrderTrans) {
         String sql = "";
         ResultSet rs = null;
@@ -1407,7 +1407,7 @@ public class TransBean implements Serializable {
         }
         return InvoiceStatus;
     }
-
+    
     public int getOrderDeliveryStatus(Trans aOrderTrans) {
         String sql = "";
         ResultSet rs = null;
@@ -1481,7 +1481,7 @@ public class TransBean implements Serializable {
         }
         return DeliveryStatus;
     }
-
+    
     public void saveTransCECcallFromSI(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
         //for safety reasons, double check the balance
         trans.setChangeAmount(this.getChangeAmount(trans));
@@ -1506,7 +1506,7 @@ public class TransBean implements Serializable {
             }
         }
     }
-
+    
     public void saveTransCECcallFromSINew(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
         //for safety reasons, double check the balance
         trans.setChangeAmount(this.getChangeAmount(trans));
@@ -1531,7 +1531,7 @@ public class TransBean implements Serializable {
             }
         }
     }
-
+    
     public void saveTransCECcallFromOpenBalance(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa, TransItem aTransItem) {
         int valid = new TransItemBean().validateOpenBalance(trans, aActiveTransItems, aTransItem, aSelectedAccCoa);
         if (valid == 1) {
@@ -1545,7 +1545,7 @@ public class TransBean implements Serializable {
             }
         }
     }
-
+    
     public void saveTransCECcallFromGDN(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
         long aChoiceId = 99;
         int TransTypeId = 0;
@@ -1569,7 +1569,7 @@ public class TransBean implements Serializable {
             }
         }
     }
-
+    
     public void saveTransCEC(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -1594,7 +1594,7 @@ public class TransBean implements Serializable {
         //-------
         String sql = null;
         String sql2 = null;
-
+        
         TransItemBean TransItemBean = new TransItemBean();
 
         //first clear current session
@@ -1611,7 +1611,7 @@ public class TransBean implements Serializable {
                 httpSession.setAttribute("CURRENT_PAY_ID_CHILD", 0);
                 break;
         }
-
+        
         if (ValidationMessage.length() > 0) {
             switch (aLevel) {
                 case "PARENT":
@@ -2022,7 +2022,7 @@ public class TransBean implements Serializable {
             }
         }
     }
-
+    
     public void saveTransCECNew(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -2044,7 +2044,7 @@ public class TransBean implements Serializable {
         //-------
         String sql = null;
         String sql2 = null;
-
+        
         TransItemBean TransItemBean = new TransItemBean();
 
         //first clear current session
@@ -2061,7 +2061,7 @@ public class TransBean implements Serializable {
                 httpSession.setAttribute("CURRENT_PAY_ID_CHILD", 0);
                 break;
         }
-
+        
         if (ValidationMessage.length() > 0) {
             switch (aLevel) {
                 case "PARENT":
@@ -2244,7 +2244,7 @@ public class TransBean implements Serializable {
             }
         }
     }
-
+    
     public double checkTrans(long aTransactionId, Trans aTrans, List<TransItem> aTransItems) {
         double value = 0;
         int CountItems = 0;
@@ -2265,7 +2265,7 @@ public class TransBean implements Serializable {
         }
         return value;
     }
-
+    
     public void saveTransOthersThread(long aTransactionId, int aPayMethodId) {
         try {
             Runnable task = new Runnable() {
@@ -2296,7 +2296,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void postJournalsForTrans(TransactionType transtype, TransactionReason transreason, Trans trans, List<TransItem> aActiveTransItems, long payid) {
         //Save Sales Journal Entry
         //dt1 = new Date();
@@ -2423,7 +2423,7 @@ public class TransBean implements Serializable {
             new AccJournalBean().postJournalStockConsumption(trans, new AccPeriodBean().getAccPeriod(trans.getTransactionDate()).getAccPeriodId());
         }
     }
-
+    
     public void savePayForTransThread(Trans aTrans) {
         try {
             Runnable task = new Runnable() {
@@ -2439,7 +2439,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public long savePayForTrans(Trans aTrans, int aFromFix) {
         TransactionType transtype = new TransactionTypeBean().getTransactionType(aTrans.getTransactionTypeId());
         long payid = 0;
@@ -2534,7 +2534,7 @@ public class TransBean implements Serializable {
         }
         return payid;
     }
-
+    
     public void saveTransCallOrderInvoice(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
         this.setAutoPrintAfterSave(false);
         long SavedTransId = this.saveTransCECE(aLevel, aStoreId, aTransTypeId, aTransReasonId, aSaleType, trans, aActiveTransItems, aSelectedTransactor, aSelectedBillTransactor, aTransUserDetail, aSelectedSchemeTransactor, aAuthorisedByUserDetail, aSelectedAccCoa);
@@ -2550,7 +2550,7 @@ public class TransBean implements Serializable {
             org.primefaces.PrimeFaces.current().executeScript("doPrintHiddenClick()");
         }
     }
-
+    
     public long saveTransCECE(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -2568,7 +2568,7 @@ public class TransBean implements Serializable {
         //-------
         String sql = null;
         String sql2 = null;
-
+        
         TransItemBean TransItemBean = new TransItemBean();
 
         //first clear current session
@@ -2585,7 +2585,7 @@ public class TransBean implements Serializable {
                 httpSession.setAttribute("CURRENT_PAY_ID_CHILD", 0);
                 break;
         }
-
+        
         if (ValidationMessage.length() > 0) {
             switch (aLevel) {
                 case "PARENT":
@@ -2846,7 +2846,7 @@ public class TransBean implements Serializable {
                         new PayTransBean().updateTransTotalPaid(trans.getTransactionId());
                     }
                     this.clearAll2(trans, aActiveTransItems, null, null, aSelectedTransactor, 2, aSelectedBillTransactor, aTransUserDetail, aSelectedSchemeTransactor, aAuthorisedByUserDetail, aSelectedAccCoa);
-
+                    
                     TransItemBean = null;
 
                     //clean stock
@@ -2902,7 +2902,7 @@ public class TransBean implements Serializable {
         }
         return SavedTransId;
     }
-
+    
     public int isReturnNoteForInvoice(long aReturnTransId) {
         int OneOrZero = 0;
         try {
@@ -2933,7 +2933,7 @@ public class TransBean implements Serializable {
         }
         return OneOrZero;
     }
-
+    
     public void openChildReturnHireInvoice(long aRuturnNoteId) {
         this.getReturnHireInvoice(aRuturnNoteId);
         Map<String, Object> options = new HashMap<String, Object>();
@@ -2949,11 +2949,11 @@ public class TransBean implements Serializable {
         options.put("dynamic", true);
         org.primefaces.PrimeFaces.current().dialog().openDynamic("HireReturnInvoiceTrans", options, null);
     }
-
+    
     public void closeOrderChildSalesInvoice() {
         org.primefaces.PrimeFaces.current().executeScript("PF('dlgInvoice').close()");
     }
-
+    
     public void openOrderParentSalesInvoice() {
         Map<String, Object> options = new HashMap<String, Object>();
         options.put("modal", true);
@@ -2968,13 +2968,13 @@ public class TransBean implements Serializable {
         options.put("dynamic", true);
         org.primefaces.PrimeFaces.current().dialog().openDynamic("SaleOrderParentInvoiceTrans", options, null);
     }
-
+    
     public void openOrderChildSalesInvoice(long aOrderId, UserDetail aUserDetail) {
         this.getOrderSalesInvoice(aOrderId, aUserDetail);
         new OutputDetailBean().refreshOutput("PARENT", "");
         org.primefaces.PrimeFaces.current().executeScript("PF('dlgInvoice').show()");
     }
-
+    
     public void viewOrderOutput(Trans aOrderTrans) {
         //first set current selection in session
         FacesContext context = FacesContext.getCurrentInstance();
@@ -2986,7 +2986,7 @@ public class TransBean implements Serializable {
         new OutputDetailBean().refreshOutput("PARENT", "");
         org.primefaces.PrimeFaces.current().executeScript("PF('dlgOrder').show()");
     }
-
+    
     public void openView(String aLevel, Trans aTrans, String aAction) {
         try {
             TransactionType transtype = new TransactionTypeBean().getTransactionType(aTrans.getTransactionTypeId());
@@ -3064,7 +3064,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public long getBillClientId(long aTransactorId, long aBillTransactorId) {
         long id = 0;
         try {
@@ -3072,7 +3072,7 @@ public class TransBean implements Serializable {
         } catch (NullPointerException npe) {
             id = 0;
         }
-
+        
         if (id == 0) {
             try {
                 id = aTransactorId;
@@ -3080,10 +3080,10 @@ public class TransBean implements Serializable {
                 id = 0;
             }
         }
-
+        
         return id;
     }
-
+    
     public void saveTransAutoUnpack(TransItem aTransItem) {
         String sql = null;
         String sql2 = null;
@@ -3171,7 +3171,7 @@ public class TransBean implements Serializable {
             }
         }
     }
-
+    
     public void callUpdateTrans(Trans aNewTrans, List<TransItem> aNewTransItems, Pay aPay) {
         try {
             //confirm trans type
@@ -3199,7 +3199,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void updateTransV2(Trans aNewTrans, List<TransItem> aNewTransItems, Pay aPay) {
         //1. copy
         //2. reverse stock(for TIs)
@@ -3224,7 +3224,7 @@ public class TransBean implements Serializable {
         Pay savedpay = null;
         Trans savedtrans = null;
         int hasReversed = 0;
-
+        
         TransactionType tt = new TransactionTypeBean().getTransactionType(aNewTrans.getTransactionTypeId());
         TransItemBean TransItemBean = new TransItemBean();
         Trans OldTrans = new Trans();
@@ -3237,11 +3237,11 @@ public class TransBean implements Serializable {
         HttpSession httpSession = request.getSession(true);
         httpSession.setAttribute("CURRENT_TRANSACTION_ID", 0);
         httpSession.setAttribute("CURRENT_PAY_ID", 0);
-
+        
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
-
+        
         if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, Integer.toString(aNewTrans.getTransactionReasonId()), "Edit") == 0) {
             msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
@@ -3455,7 +3455,7 @@ public class TransBean implements Serializable {
             }
         }
     }
-
+    
     public void updateTransCECcallFromSI(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aNewTrans, List<TransItem> aNewTransItems, Pay aPay) {
         //get some details
         String OrderTransNo = aNewTrans.getTransactionRef();
@@ -3471,7 +3471,7 @@ public class TransBean implements Serializable {
             this.updateOrderStatus(OrderTrans.getTransactionId(), "is_invoiced", InvoiceStatus);
         }
     }
-
+    
     public void updateTransCECcallFromOpenBalance(long aTransactionId, Trans aTrans, TransBean aTransBean, AccJournal aAccJournal, AccJournalBean aAccJournalBean, TransItemBean aTransItemBean, TransactorBean aTransactorBean) {
         //do before update
         Trans trans = this.getTrans(aTransactionId);
@@ -3504,7 +3504,7 @@ public class TransBean implements Serializable {
             this.reportOpenBalanceDetail(aTrans, aTransBean, aAccJournal, aAccJournalBean, aTransItemBean, aTransactorBean);
         }
     }
-
+    
     public void updateTransCECcallFromGDN(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aNewTrans, List<TransItem> aNewTransItems, Pay aPay) {
         long aChoiceId = 99;
         int TransTypeId = 0;
@@ -3529,7 +3529,7 @@ public class TransBean implements Serializable {
             this.updateOrderStatus(XTrans.getTransactionId(), "is_delivered", DeliveryStatus);
         }
     }
-
+    
     public void updateTransCEC(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aNewTrans, List<TransItem> aNewTransItems, Pay aPay) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -3546,7 +3546,7 @@ public class TransBean implements Serializable {
         TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
         Store store = new StoreBean().getStore(aStoreId);
         String ValidationMessage = this.validateTransCEC(aStoreId, aTransTypeId, aTransReasonId, aSaleType, aNewTrans, aNewTransItems, null, null);
-
+        
         String sql = null;
         String msg = "";
         long TransHistId = 0;
@@ -3589,7 +3589,7 @@ public class TransBean implements Serializable {
                 httpSession.setAttribute("CURRENT_PAY_ID_CHILD", 0);
                 break;
         }
-
+        
         if (ValidationMessage.length() > 0) {
             switch (aLevel) {
                 case "PARENT":
@@ -3962,7 +3962,7 @@ public class TransBean implements Serializable {
             }
         }
     }
-
+    
     public long getCountTransRecords() {
         String sql = "SELECT COUNT(*) as row_count FROM trans_convert WHERE transaction_id>0 AND convert_status=0";
         ResultSet rs = null;
@@ -3983,7 +3983,7 @@ public class TransBean implements Serializable {
         }
         return rcds;
     }
-
+    
     public long getCountPayRecords() {
         String sql = "SELECT COUNT(*) as row_count FROM pay_convert WHERE convert_status=0 AND pay_reason_id IN(22,25)";
         ResultSet rs = null;
@@ -4004,7 +4004,7 @@ public class TransBean implements Serializable {
         }
         return rcds;
     }
-
+    
     public long getCountOverPayRecords(String aMode) {
         String sql = "";
         if (aMode.equals("FULL")) {
@@ -4030,7 +4030,7 @@ public class TransBean implements Serializable {
         }
         return rcds;
     }
-
+    
     public int updateTransConvertStatus(long aTransId, int aStatus) {
         String sql = null;
         sql = "UPDATE trans_convert SET convert_status=" + aStatus + " WHERE transaction_id=" + aTransId;
@@ -4048,7 +4048,7 @@ public class TransBean implements Serializable {
             return 0;
         }
     }
-
+    
     public int updatePayConvertStatus(long aPayId, int aStatus) {
         String sql = null;
         sql = "UPDATE pay_convert SET convert_status=" + aStatus + " WHERE pay_id=" + aPayId;
@@ -4066,7 +4066,7 @@ public class TransBean implements Serializable {
             return 0;
         }
     }
-
+    
     public int updateOverPayTransConvertStatusFULL(long aTransId, int aStatus) {
         String sql = null;
         sql = "UPDATE aa_trans_not_paid SET convert_status=" + aStatus + " WHERE transaction_id=" + aTransId;
@@ -4084,7 +4084,7 @@ public class TransBean implements Serializable {
             return 0;
         }
     }
-
+    
     public int updateOverPayTransConvertStatusPART(long aTransId, Pay aPay) {
         String sql = null;
         if (aPay.getStatus() == 1) {
@@ -4106,7 +4106,7 @@ public class TransBean implements Serializable {
             return 0;
         }
     }
-
+    
     public int updateOverPayTransConvertStatusPARTFail(long aTransId) {
         String sql = null;
         sql = "UPDATE aa_trans_not_paid SET convert_status=22 WHERE transaction_id=" + aTransId;
@@ -4124,7 +4124,7 @@ public class TransBean implements Serializable {
             return 0;
         }
     }
-
+    
     public String convertTransToJournalAll() {
         int Loops = 1;
         int loop = 1;
@@ -4159,7 +4159,7 @@ public class TransBean implements Serializable {
         }
         return convert_pass + "/" + TotalRecords + " Converted" + " Loops:" + Loops;
     }
-
+    
     public String convertTransToJournalAll2() {
         int Loops = 1;
         int loop = 1;
@@ -4196,7 +4196,7 @@ public class TransBean implements Serializable {
         }
         return convert_pass + "/" + TotalRecords + " Converted" + " Loops:" + Loops;
     }
-
+    
     public String convertPayToJournalAll() {
         int Loops = 1;
         int loop = 1;
@@ -4232,7 +4232,7 @@ public class TransBean implements Serializable {
         }
         return convert_pass + "/" + TotalRecords + " Converted" + " Loops:" + Loops;
     }
-
+    
     public String convertOverPayAll(String aMode) {
         int Loops = 1;
         int loop = 1;
@@ -4259,7 +4259,7 @@ public class TransBean implements Serializable {
                     while (rs.next()) {
                         cTrans = new Trans();
                         cTransBean.setTransFromResultset(cTrans, rs);
-
+                        
                         try {
                             TransPaidAmount = rs.getDouble("trans_paid_amount");
                         } catch (NullPointerException npe) {
@@ -4286,7 +4286,7 @@ public class TransBean implements Serializable {
             while (loop <= Loops && Loops > 0) {
                 String sql_from = "";
                 sql_from = "SELECT * FROM aa_trans_not_paid WHERE convert_status=2 and (grand_total-trans_paid_amount)>0";
-
+                
                 try (
                         Connection conn = DBConnection.getMySQLConnection();
                         PreparedStatement ps = conn.prepareStatement(sql_from);) {
@@ -4294,7 +4294,7 @@ public class TransBean implements Serializable {
                     while (rs.next()) {
                         cTrans = new Trans();
                         cTransBean.setTransFromResultset(cTrans, rs);
-
+                        
                         try {
                             TransPaidAmount = rs.getDouble("trans_paid_amount");
                         } catch (NullPointerException npe) {
@@ -4331,7 +4331,7 @@ public class TransBean implements Serializable {
         }
         return convert_pass + "/" + TotalRecords + " Converted" + " Loops:" + Loops;
     }
-
+    
     public String convertPayToJournalAll2() {
         int Loops = 1;
         int loop = 1;
@@ -4369,7 +4369,7 @@ public class TransBean implements Serializable {
         }
         return convert_pass + "/" + TotalRecords + " Converted" + " Loops:" + Loops;
     }
-
+    
     public int convertTransToJournal(Trans aTrans) {
         int passed = 0;
         String sql = null;
@@ -4401,7 +4401,7 @@ public class TransBean implements Serializable {
         }
         return passed;
     }
-
+    
     public int convertPayToJournal(Pay aPay) {
         int passed = 0;
         String sql = null;
@@ -4421,7 +4421,7 @@ public class TransBean implements Serializable {
         }
         return passed;
     }
-
+    
     public int convertTransNotPaidToPaidFULL(Trans aTrans) {
         int passed = 0;
         String sql = null;
@@ -4453,7 +4453,7 @@ public class TransBean implements Serializable {
         }
         return passed;
     }
-
+    
     public Pay convertTransNotPaidToPaidPART(Trans aTrans) {
         int passed = 0;
         String sql = null;
@@ -4491,7 +4491,7 @@ public class TransBean implements Serializable {
         }
         return pay;
     }
-
+    
     public void saveDraftTrans(Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
         String sql = null;
         String msg = "";
@@ -4658,7 +4658,7 @@ public class TransBean implements Serializable {
                     } catch (NullPointerException npe) {
                         cs.setLong("in_site_id", 0);
                     }
-
+                    
                     try {
                         cs.setString("in_transactor_rep", trans.getTransactor_rep());
                     } catch (NullPointerException npe) {
@@ -4727,7 +4727,7 @@ public class TransBean implements Serializable {
                     isTransCopySuccess = true;
                     //save trans items
                     TransHistId = cs.getLong("out_transaction_hist_id");
-
+                    
                     TransItemBean tib = new TransItemBean();
                     tib.saveDraftTransItems(trans, aActiveTransItems, TransHistId);
                     isTransItemCopySuccess = true;
@@ -4743,10 +4743,10 @@ public class TransBean implements Serializable {
                 }
             }
         } catch (NullPointerException npe) {
-
+            
         }
     }
-
+    
     public void loadDraftTrans(Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -4806,7 +4806,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void loadOrderTrans(Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
         String sql = null;
         String msg = "";
@@ -4865,7 +4865,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void loadOrderForInvoiceTrans(Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -4909,7 +4909,7 @@ public class TransBean implements Serializable {
                     TransItemBean tib = new TransItemBean();
                     ItemBean ib = new ItemBean();
                     Item item = new Item();
-
+                    
                     for (int i = 0; i < aActiveTransItems.size(); i++) {
                         aActiveTransItems.get(i).setTransactionItemId(0);
                         aActiveTransItems.get(i).setTransactionId(0);
@@ -4956,7 +4956,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void deleteDraftTrans(Trans trans) {
         String sql = null;
         String msg = "";
@@ -4965,7 +4965,7 @@ public class TransBean implements Serializable {
         try {
             if (TransHistId > 0) {
                 this.setTransFromHist(trans, TransHistId);
-
+                
             } else {
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Select a valid draft sale record..."));
                 this.setActionMessage("No draft sale record loaded");
@@ -4974,7 +4974,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void callUpdateTransV2(Trans aNewTrans, List<TransItem> aNewTransItems, Pay aPay) {
         try {
             //confirm trans type
@@ -4984,7 +4984,7 @@ public class TransBean implements Serializable {
             try {
                 aTransType = new TransactionTypeBean().getTransactionType(aNewTrans.getTransactionTypeId());
             } catch (NullPointerException npe) {
-
+                
             }
             if ("ITEM RECEIVED".equals(aTransType.getTransactionTypeName()) || "SALE INVOICE".equals(aTransType.getTransactionTypeName()) || "DISPOSE STOCK".equals(aTransType.getTransactionTypeName())) {
                 ItemMessage = new TransItemBean().getAnyItemTotalQtyGreaterThanCurrentQty(new TransItemBean().getTransItemListCurLessPrevQty(aNewTransItems, aNewTrans), aNewTrans.getStoreId(), new TransactionTypeBean().getTransactionType(aNewTrans.getTransactionTypeId()).getTransactionTypeName());
@@ -5009,7 +5009,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public Trans getTrans(long aTransactionId) {
         String sql = "{call sp_search_transaction_by_id(?)}";
         ResultSet rs = null;
@@ -5028,7 +5028,7 @@ public class TransBean implements Serializable {
             return null;
         }
     }
-
+    
     public Trans getTransFromHist(long aTransactionHistId) {
         String sql = "{call sp_search_transaction_hist_by_id(?)}";
         ResultSet rs = null;
@@ -5047,7 +5047,7 @@ public class TransBean implements Serializable {
             return null;
         }
     }
-
+    
     public void setTransFromOrder(Trans aTrans, String aTransOrderNumber, long aTransactorId) {
         String sql = "";
         if (aTransactorId > 0) {
@@ -5068,7 +5068,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void setTransByTransNumber(Trans aTrans, String aTransNumber, long aTransactorId) {
         String sql = "";
         if (aTransactorId > 0) {
@@ -5089,7 +5089,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void setTransFromHist(Trans aTrans, long aTransactionHistId) {
         String sql = "{call sp_search_transaction_hist_by_id(?)}";
         ResultSet rs = null;
@@ -5105,7 +5105,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void deleteTransFromHist(long aTransactionHistId) {
         String sql = "{call sp_delete_transaction_hist_by_id(?)}";
         if (aTransactionHistId > 0) {
@@ -5120,7 +5120,7 @@ public class TransBean implements Serializable {
             }
         }
     }
-
+    
     public Trans getTransByTransNumber(String aTransactionNumber) {
         String sql = "{call sp_search_transaction_by_number(?)}";
         ResultSet rs = null;
@@ -5139,7 +5139,7 @@ public class TransBean implements Serializable {
             return null;
         }
     }
-
+    
     public Trans getTransByIdType(long aTransactionId, int aTransactionTypeId) {
         String sql = "{call sp_search_transaction_by_id_type(?,?)}";
         ResultSet rs = null;
@@ -5159,7 +5159,7 @@ public class TransBean implements Serializable {
             return null;
         }
     }
-
+    
     public Trans getTransByNumberType(String aTransactionNumber, int aTransactionTypeId) {
         String sql = "{call sp_search_transaction_by_number_type(?,?)}";
         ResultSet rs = null;
@@ -5179,16 +5179,16 @@ public class TransBean implements Serializable {
             return null;
         }
     }
-
+    
     public void setTransByStoreIdType(int aStoreId, long aTransactionId, int aTransactionTypeId, Trans aTrans, List<TransItem> aActiveTransItems) {
         String sql = "{call sp_search_transaction_by_store_id_type(?,?,?)}";
         ResultSet rs = null;
-
+        
         String msg;
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
-
+        
         if (aTransactionTypeId == 2 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "RETAIL SALE INVOICE", "View") == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "WHOLE SALE INVOICE", "View") == 0) {
             msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
             FacesContext.getCurrentInstance().addMessage("View", new FacesMessage(msg));
@@ -5252,7 +5252,7 @@ public class TransBean implements Serializable {
                     } catch (NullPointerException npe) {
                         aTrans.setBalancePointsAmount(0);
                     }
-
+                    
                     new NavigationBean().defineTransactionTypes(aTransactionTypeId, new TransactionTypeBean().getTransactionType(aTransactionTypeId).getTransactionTypeName(), "", "");
                 } else {
                     this.clearTransEdit(aTrans);
@@ -5271,7 +5271,7 @@ public class TransBean implements Serializable {
             }
         }
     }
-
+    
     public void setTransByStoreNumberType(int aStoreId, String aTransactionNumber, int aTransactionTypeId, Trans aTrans, List<TransItem> aActiveTransItems) {
         String sql = "{call sp_search_transaction_by_store_number_type(?,?,?)}";
         ResultSet rs = null;
@@ -5314,7 +5314,7 @@ public class TransBean implements Serializable {
                 } catch (NullPointerException npe) {
                     aTrans.setBalancePointsAmount(0);
                 }
-
+                
                 new NavigationBean().defineTransactionTypes(aTransactionTypeId, new TransactionTypeBean().getTransactionType(aTransactionTypeId).getTransactionTypeName(), "", "");
             } else {
                 this.clearTransEdit(aTrans);
@@ -5332,14 +5332,14 @@ public class TransBean implements Serializable {
             new TransItemBean().setTransItemsByTransactionNumber(aActiveTransItems, "");
         }
     }
-
+    
     public Trans getTransFromResultset(ResultSet aResultSet) {
         try {
             Trans trans = new Trans();
             trans.setTransactionId(aResultSet.getLong("transaction_id"));
             trans.setTransactionDate(new Date(aResultSet.getDate("transaction_date").getTime()));
             trans.setStoreId(aResultSet.getInt("store_id"));
-
+            
             try {
                 trans.setStore2Id(aResultSet.getInt("store2_id"));
             } catch (NullPointerException npe) {
@@ -5507,43 +5507,43 @@ public class TransBean implements Serializable {
             } catch (NullPointerException | SQLException npe) {
                 trans.setTransactionUserDetailName("");
             }
-
+            
             try {
                 trans.setTotalProfitMargin(aResultSet.getDouble("total_profit_margin"));
             } catch (NullPointerException npe) {
                 trans.setTotalProfitMargin(0);
             }
-
+            
             try {
                 trans.setTransactionUserDetailId(aResultSet.getInt("transaction_user_detail_id"));
             } catch (NullPointerException | SQLException npe) {
                 trans.setTransactionUserDetailId(0);
             }
-
+            
             try {
                 trans.setBillTransactorId(aResultSet.getLong("bill_transactor_id"));
             } catch (NullPointerException | SQLException npe) {
                 trans.setBillTransactorId(0);
             }
-
+            
             try {
                 trans.setSchemeTransactorId(aResultSet.getLong("scheme_transactor_id"));
             } catch (NullPointerException | SQLException npe) {
                 trans.setSchemeTransactorId(0);
             }
-
+            
             try {
                 trans.setSchemeTransactorName(aResultSet.getString("scheme_transactor_names"));
             } catch (NullPointerException | SQLException npe) {
                 trans.setSchemeTransactorName("");
             }
-
+            
             try {
                 trans.setPrincSchemeMember(aResultSet.getString("princ_scheme_member"));
             } catch (NullPointerException | SQLException npe) {
                 trans.setPrincSchemeMember("");
             }
-
+            
             try {
                 trans.setSchemeCardNumber(aResultSet.getString("scheme_card_number"));
             } catch (NullPointerException | SQLException npe) {
@@ -5716,13 +5716,13 @@ public class TransBean implements Serializable {
                 trans.setSpendPointsAmount(0);
             }
             return trans;
-
+            
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
             return null;
         }
     }
-
+    
     public Trans getTransHistFromResultset(ResultSet aResultSet) {
         try {
             Trans trans = new Trans();
@@ -5902,43 +5902,43 @@ public class TransBean implements Serializable {
             } catch (NullPointerException | SQLException npe) {
                 trans.setTransactionUserDetailName("");
             }
-
+            
             try {
                 trans.setTotalProfitMargin(aResultSet.getDouble("total_profit_margin"));
             } catch (NullPointerException npe) {
                 trans.setTotalProfitMargin(0);
             }
-
+            
             try {
                 trans.setTransactionUserDetailId(aResultSet.getInt("transaction_user_detail_id"));
             } catch (NullPointerException | SQLException npe) {
                 trans.setTransactionUserDetailId(0);
             }
-
+            
             try {
                 trans.setBillTransactorId(aResultSet.getLong("bill_transactor_id"));
             } catch (NullPointerException | SQLException npe) {
                 trans.setBillTransactorId(0);
             }
-
+            
             try {
                 trans.setSchemeTransactorId(aResultSet.getLong("scheme_transactor_id"));
             } catch (NullPointerException | SQLException npe) {
                 trans.setSchemeTransactorId(0);
             }
-
+            
             try {
                 trans.setSchemeTransactorName(aResultSet.getString("scheme_transactor_names"));
             } catch (NullPointerException | SQLException npe) {
                 trans.setSchemeTransactorName("");
             }
-
+            
             try {
                 trans.setPrincSchemeMember(aResultSet.getString("princ_scheme_member"));
             } catch (NullPointerException | SQLException npe) {
                 trans.setPrincSchemeMember("");
             }
-
+            
             try {
                 trans.setSchemeCardNumber(aResultSet.getString("scheme_card_number"));
             } catch (NullPointerException | SQLException npe) {
@@ -6095,13 +6095,13 @@ public class TransBean implements Serializable {
                 trans.setSource_code("");
             }
             return trans;
-
+            
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
             return null;
         }
     }
-
+    
     public void setTransHistFromResultset(Trans trans, ResultSet aResultSet) {
         try {
             //Trans trans = new Trans();
@@ -6109,7 +6109,7 @@ public class TransBean implements Serializable {
             trans.setTransactionId(aResultSet.getLong("transaction_id"));
             trans.setTransactionDate(new Date(aResultSet.getDate("transaction_date").getTime()));
             trans.setStoreId(aResultSet.getInt("store_id"));
-
+            
             try {
                 trans.setStore2Id(aResultSet.getInt("store2_id"));
             } catch (NullPointerException npe) {
@@ -6277,43 +6277,43 @@ public class TransBean implements Serializable {
             } catch (NullPointerException | SQLException npe) {
                 trans.setTransactionUserDetailName("");
             }
-
+            
             try {
                 trans.setTotalProfitMargin(aResultSet.getDouble("total_profit_margin"));
             } catch (NullPointerException npe) {
                 trans.setTotalProfitMargin(0);
             }
-
+            
             try {
                 trans.setTransactionUserDetailId(aResultSet.getInt("transaction_user_detail_id"));
             } catch (NullPointerException | SQLException npe) {
                 trans.setTransactionUserDetailId(0);
             }
-
+            
             try {
                 trans.setBillTransactorId(aResultSet.getLong("bill_transactor_id"));
             } catch (NullPointerException | SQLException npe) {
                 trans.setBillTransactorId(0);
             }
-
+            
             try {
                 trans.setSchemeTransactorId(aResultSet.getLong("scheme_transactor_id"));
             } catch (NullPointerException | SQLException npe) {
                 trans.setSchemeTransactorId(0);
             }
-
+            
             try {
                 trans.setSchemeTransactorName(aResultSet.getString("scheme_transactor_names"));
             } catch (NullPointerException | SQLException npe) {
                 trans.setSchemeTransactorName("");
             }
-
+            
             try {
                 trans.setPrincSchemeMember(aResultSet.getString("princ_scheme_member"));
             } catch (NullPointerException | SQLException npe) {
                 trans.setPrincSchemeMember("");
             }
-
+            
             try {
                 trans.setSchemeCardNumber(aResultSet.getString("scheme_card_number"));
             } catch (NullPointerException | SQLException npe) {
@@ -6483,14 +6483,14 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void setTransFromResultset(Trans trans, ResultSet aResultSet) {
         try {
             //Trans trans = new Trans();
             trans.setTransactionId(aResultSet.getLong("transaction_id"));
             trans.setTransactionDate(new Date(aResultSet.getDate("transaction_date").getTime()));
             trans.setStoreId(aResultSet.getInt("store_id"));
-
+            
             try {
                 trans.setStore2Id(aResultSet.getInt("store2_id"));
             } catch (NullPointerException npe) {
@@ -6648,43 +6648,43 @@ public class TransBean implements Serializable {
             } catch (NullPointerException | SQLException npe) {
                 trans.setEditUserDetailName("");
             }
-
+            
             try {
                 trans.setTotalProfitMargin(aResultSet.getDouble("total_profit_margin"));
             } catch (NullPointerException npe) {
                 trans.setTotalProfitMargin(0);
             }
-
+            
             try {
                 trans.setTransactionUserDetailId(aResultSet.getInt("transaction_user_detail_id"));
             } catch (NullPointerException npe) {
                 trans.setTransactionUserDetailId(0);
             }
-
+            
             try {
                 trans.setBillTransactorId(aResultSet.getLong("bill_transactor_id"));
             } catch (NullPointerException npe) {
                 trans.setBillTransactorId(0);
             }
-
+            
             try {
                 trans.setSchemeTransactorId(aResultSet.getLong("scheme_transactor_id"));
             } catch (NullPointerException npe) {
                 trans.setSchemeTransactorId(0);
             }
-
+            
             try {
                 trans.setPrincSchemeMember(aResultSet.getString("princ_scheme_member"));
             } catch (NullPointerException npe) {
                 trans.setPrincSchemeMember("");
             }
-
+            
             try {
                 trans.setSchemeCardNumber(aResultSet.getString("scheme_card_number"));
             } catch (NullPointerException | SQLException npe) {
                 trans.setSchemeCardNumber("");
             }
-
+            
             try {
                 trans.setTransactionNumber(aResultSet.getString("transaction_number"));
             } catch (NullPointerException | SQLException npe) {
@@ -6850,13 +6850,13 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void setTransFromResultsetBMS(Trans trans, ResultSet aResultSet) {
         try {
             trans.setTransactionId(aResultSet.getLong("transaction_id"));
             trans.setTransactionDate(new Date(aResultSet.getDate("transaction_date").getTime()));
             trans.setStoreId(aResultSet.getInt("store_id"));
-
+            
             try {
                 trans.setStore2Id(aResultSet.getInt("store2_id"));
             } catch (NullPointerException npe) {
@@ -6977,43 +6977,43 @@ public class TransBean implements Serializable {
             } catch (NullPointerException npe) {
                 trans.setIsCashDiscountVatLiable("");
             }
-
+            
             try {
                 trans.setTotalProfitMargin(aResultSet.getDouble("total_profit_margin"));
             } catch (NullPointerException npe) {
                 trans.setTotalProfitMargin(0);
             }
-
+            
             try {
                 trans.setTransactionUserDetailId(aResultSet.getInt("transaction_user_detail_id"));
             } catch (NullPointerException npe) {
                 trans.setTransactionUserDetailId(0);
             }
-
+            
             try {
                 trans.setBillTransactorId(aResultSet.getLong("bill_transactor_id"));
             } catch (NullPointerException npe) {
                 trans.setBillTransactorId(0);
             }
-
+            
             try {
                 trans.setSchemeTransactorId(aResultSet.getLong("scheme_transactor_id"));
             } catch (NullPointerException npe) {
                 trans.setSchemeTransactorId(0);
             }
-
+            
             try {
                 trans.setPrincSchemeMember(aResultSet.getString("princ_scheme_member"));
             } catch (NullPointerException npe) {
                 trans.setPrincSchemeMember("");
             }
-
+            
             try {
                 trans.setSchemeCardNumber(aResultSet.getString("scheme_card_number"));
             } catch (NullPointerException | SQLException npe) {
                 trans.setSchemeCardNumber("");
             }
-
+            
             try {
                 trans.setTransactionNumber(aResultSet.getString("transaction_number"));
             } catch (NullPointerException | SQLException npe) {
@@ -7154,7 +7154,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public TransSummary getTransSummaryFromResultset(ResultSet aResultSet) {
         try {
             TransSummary transSummary = new TransSummary();
@@ -7213,16 +7213,16 @@ public class TransBean implements Serializable {
             } catch (NullPointerException npe) {
                 transSummary.setSumTotalExemptVatableAmount(0);
             }
-
+            
             return transSummary;
-
+            
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
             return null;
         }
-
+        
     }
-
+    
     public int updateTransCECOpenBalance(Trans aTrans) {
         int success = 0;
         String sql = "UPDATE transaction SET grand_total=?,edit_date=?,edit_user_detail_id=? WHERE transaction_id=?";
@@ -7242,7 +7242,7 @@ public class TransBean implements Serializable {
         }
         return success;
     }
-
+    
     public void deleteTrans(Trans trans) {
         String sql = "DELETE FROM trans WHERE transaction_id=?";
         try (
@@ -7257,7 +7257,7 @@ public class TransBean implements Serializable {
             this.setActionMessage("Trans NOT deleted");
         }
     }
-
+    
     public int deleteTransCEC(long aTransId) {
         int deleted = 0;
         String sql = "DELETE FROM transaction WHERE transaction_id=?";
@@ -7273,7 +7273,7 @@ public class TransBean implements Serializable {
         }
         return deleted;
     }
-
+    
     public void clearTrans(Trans trans) {
         if (null != trans) {
             trans.setTransactionId(0);
@@ -7308,13 +7308,13 @@ public class TransBean implements Serializable {
             trans.setCardHolder("");
             trans.setCardNumber("");
             trans.setSubTotal(0);
-
+            
             trans.setSubTotal(0);
             trans.setTotalTradeDiscount(0);
             trans.setTotalVat(0);
             trans.setGrandTotal(0);
             trans.setSpendPoints(0);
-
+            
             trans.setTotalStdVatableAmount(0);
             trans.setTotalZeroVatableAmount(0);
             trans.setTotalExemptVatableAmount(0);
@@ -7331,7 +7331,7 @@ public class TransBean implements Serializable {
             httpSession.setAttribute("APPROVE_POINTS_STATUS", "");
             //for profit margin
             trans.setTotalProfitMargin(0);
-
+            
             trans.setTransactionUserDetailId(0);
             trans.setBillTransactorId(0);
             trans.setSchemeTransactorId(0);
@@ -7339,7 +7339,7 @@ public class TransBean implements Serializable {
             trans.setSchemeCardNumber("");
             trans.setBillOther(false);
             trans.setDisplayLoyalty(false);
-
+            
             trans.setTransactionNumber("");
             trans.setTransactionNumber2("");
             trans.setTransactionNumber3("");
@@ -7422,7 +7422,7 @@ public class TransBean implements Serializable {
             new UtilityBean().clearCustomerDisplay();
         }
     }
-
+    
     public void clearTransEdit(Trans trans) {
         trans.setTransactionId(0);
         trans.setTransactionHistId(0);
@@ -7452,13 +7452,13 @@ public class TransBean implements Serializable {
         trans.setCardHolder("");
         trans.setCardNumber("");
         trans.setSubTotal(0);
-
+        
         trans.setSubTotal(0);
         trans.setTotalTradeDiscount(0);
         trans.setTotalVat(0);
         trans.setGrandTotal(0);
         trans.setSpendPoints(0);
-
+        
         trans.setTotalStdVatableAmount(0);
         trans.setTotalZeroVatableAmount(0);
         trans.setTotalExemptVatableAmount(0);
@@ -7476,7 +7476,7 @@ public class TransBean implements Serializable {
 
         //for profit margin
         trans.setTotalProfitMargin(0);
-
+        
         trans.setTransactionUserDetailId(0);
         trans.setBillTransactorId(0);
         trans.setSchemeTransactorId(0);
@@ -7527,13 +7527,13 @@ public class TransBean implements Serializable {
         //lookups
         trans.setTransactorName("");
     }
-
+    
     public void clearAll(Trans t, List<TransItem> aActiveTransItems, TransItem ti, Item aSelectedItem, Transactor aSelectedTransactor, int ClearNo, AccCoa aSelectedAccCoa) {//Clear No: 0-do not clear, 1 - clear trans item only, 2 - clear all  
         TransItemBean tib = new TransItemBean();
         ItemBean itmB = new ItemBean();
         TransactorBean trB = new TransactorBean();
         AccCoaBean acBean = new AccCoaBean();
-
+        
         if (ClearNo == 1 || ClearNo == 2) {//Clear No: 0-do not clear, 1 - clear trans item only, 2 - clear all
             //clear autoCompletetd item
             itmB.clearSelectedItem();
@@ -7555,7 +7555,7 @@ public class TransBean implements Serializable {
             this.clearTrans(t);
         }
     }
-
+    
     public void clearAll2CallQuickOder(Trans t, List<TransItem> aActiveTransItems, TransItem ti, Item aSelectedItem, Transactor aSelectedTransactor, int ClearNo, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa, StatusBean aStatusBean) {//Clear No: 0-do not clear, 1 - clear trans item only, 2 - clear all  
         //reset messages
         this.ActionMessage = "";
@@ -7575,13 +7575,13 @@ public class TransBean implements Serializable {
         t.setLocation_id(CurrentLocation_id);
         t.setStore2Id(CurrentStore2Id);
     }
-
+    
     public void clearAll2(Trans t, List<TransItem> aActiveTransItems, TransItem ti, Item aSelectedItem, Transactor aSelectedTransactor, int ClearNo, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {//Clear No: 0-do not clear, 1 - clear trans item only, 2 - clear all  
         TransItemBean tib = new TransItemBean();
         ItemBean itmB = new ItemBean();
         TransactorBean trB = new TransactorBean();
         AccCoaBean acBean = new AccCoaBean();
-
+        
         if (ClearNo == 1 || ClearNo == 2) {//Clear No: 0-do not clear, 1 - clear trans item only, 2 - clear all
             //clear autoCompletetd item
             itmB.clearSelectedItem();
@@ -7611,13 +7611,13 @@ public class TransBean implements Serializable {
             new UserDetailBean().clearUserDetail(aAuthorisedByUserDetail);
         }
     }
-
+    
     public void clearAll3(Trans t, List<TransItem> aActiveTransItems, TransItem ti, Item aSelectedItem, Transactor aSelectedTransactor, int ClearNo, AccCoa aSelectedAccCoa, AccCoa aSelectedAccCoa2) {//Clear No: 0-do not clear, 1 - clear trans item only, 2 - clear all  
         TransItemBean tib = new TransItemBean();
         ItemBean itmB = new ItemBean();
         TransactorBean trB = new TransactorBean();
         AccCoaBean acBean = new AccCoaBean();
-
+        
         if (ClearNo == 1 || ClearNo == 2) {//Clear No: 0-do not clear, 1 - clear trans item only, 2 - clear all
             //clear autoCompletetd item
             itmB.clearSelectedItem();
@@ -7640,7 +7640,7 @@ public class TransBean implements Serializable {
             this.clearTrans(t);
         }
     }
-
+    
     public void initClearAll(Trans t, List<TransItem> aActiveTransItems, TransItem ti, Item aSelectedItem, Transactor aSelectedTransactor, int ClearNo, AccCoa aSelectedAccCoa) {//Clear No: 0-do not clear, 1 - clear trans item only, 2 - clear all  
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -7649,7 +7649,7 @@ public class TransBean implements Serializable {
             ItemBean itmB = new ItemBean();
             TransactorBean trB = new TransactorBean();
             AccCoaBean acBean = new AccCoaBean();
-
+            
             if (ClearNo == 1 || ClearNo == 2) {//Clear No: 0-do not clear, 1 - clear trans item only, 2 - clear all
                 //clear autoCompletetd item
                 itmB.clearSelectedItem();
@@ -7682,7 +7682,7 @@ public class TransBean implements Serializable {
             }
         }
     }
-
+    
     public void initClearAll2(Trans t, List<TransItem> aActiveTransItems, TransItem ti, Item aSelectedItem, Transactor aSelectedTransactor, int ClearNo, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor) {//Clear No: 0-do not clear, 1 - clear trans item only, 2 - clear all  
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -7690,7 +7690,7 @@ public class TransBean implements Serializable {
             TransItemBean tib = new TransItemBean();
             ItemBean itmB = new ItemBean();
             TransactorBean trB = new TransactorBean();
-
+            
             if (ClearNo == 1 || ClearNo == 2) {//Clear No: 0-do not clear, 1 - clear trans item only, 2 - clear all
                 //clear autoCompletetd item
                 itmB.clearSelectedItem();
@@ -7725,11 +7725,11 @@ public class TransBean implements Serializable {
                 HttpSession httpSession = request.getSession(true);
                 httpSession.setAttribute("CURRENT_TRANSACTION_ID", 0);
                 httpSession.setAttribute("CURRENT_PAY_ID", 0);
-
+                
             }
         }
     }
-
+    
     public void initClearAllCEC(String aLevel, Trans t, List<TransItem> aActiveTransItems, TransItem ti, Item aSelectedItem, Transactor aSelectedTransactor, int ClearNo, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor) {//Clear No: 0-do not clear, 1 - clear trans item only, 2 - clear all  
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -7737,7 +7737,7 @@ public class TransBean implements Serializable {
             TransItemBean tib = new TransItemBean();
             ItemBean itmB = new ItemBean();
             TransactorBean trB = new TransactorBean();
-
+            
             if (ClearNo == 1 || ClearNo == 2) {//Clear No: 0-do not clear, 1 - clear trans item only, 2 - clear all
                 //clear autoCompletetd item
                 itmB.clearSelectedItem();
@@ -7782,7 +7782,7 @@ public class TransBean implements Serializable {
             new OutputDetailBean().refreshOutput(aLevel, "");
         }
     }
-
+    
     public void copyTransObject(Trans aTransFrom, Trans aTransTo) {
         aTransTo.setTransactionId(aTransFrom.getTransactionId());
         aTransTo.setTransactionHistId(aTransFrom.getTransactionHistId());
@@ -7867,7 +7867,7 @@ public class TransBean implements Serializable {
         aTransTo.setIs_delivered(aTransFrom.getIs_delivered());
         aTransTo.setSource_code(aTransFrom.getSource_code());
     }
-
+    
     public void initOrderForEdit(Trans aTrans, List<TransItem> aActiveTransItems) {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -7885,7 +7885,7 @@ public class TransBean implements Serializable {
             }
         }
     }
-
+    
     public void initRefreshDraft(int aStoreId, int aUserDetailId, int aTransTypeId, int aTransreasonId, Trans t, List<TransItem> aActiveTransItems, TransItem ti, Item aSelectedItem, Transactor aSelectedTransactor, int ClearNo, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor) {//Clear No: 0-do not clear, 1 - clear trans item only, 2 - clear all  
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -7893,7 +7893,7 @@ public class TransBean implements Serializable {
             this.refreshTranssDraft(aStoreId, aUserDetailId, aTransTypeId, aTransreasonId);
         }
     }
-
+    
     public void initClearAllEdit(Trans t, List<TransItem> aActiveTransItems, TransItem ti, Item aSelectedItem, Transactor aSelectedTransactor, int ClearNo) {//Clear No: 0-do not clear, 1 - clear trans item only, 2 - clear all  
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -7901,7 +7901,7 @@ public class TransBean implements Serializable {
             TransItemBean tib = new TransItemBean();
             ItemBean itmB = new ItemBean();
             TransactorBean trB = new TransactorBean();
-
+            
             if (ClearNo == 1 || ClearNo == 2) {//Clear No: 0-do not clear, 1 - clear trans item only, 2 - clear all
                 //clear autoCompletetd item
                 itmB.clearSelectedItem();
@@ -7929,11 +7929,11 @@ public class TransBean implements Serializable {
                 HttpSession httpSession = request.getSession(true);
                 httpSession.setAttribute("CURRENT_TRANSACTION_ID", 0);
                 httpSession.setAttribute("CURRENT_PAY_ID", 0);
-
+                
             }
         }
     }
-
+    
     public void initClearTransReport(Trans trans) {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -7960,7 +7960,7 @@ public class TransBean implements Serializable {
             trans.setSchemeCardNumber("");
         }
     }
-
+    
     public void initClearCustomerCard() {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -7977,7 +7977,7 @@ public class TransBean implements Serializable {
             }
         }
     }
-
+    
     public void initClearSupplierCard() {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -7994,7 +7994,7 @@ public class TransBean implements Serializable {
             }
         }
     }
-
+    
     public void initCurrencyCode(int aTransTypeId, Trans trans) {
         try {
             if (new TransactionTypeBean().checkTransactionTypeNeedsCurrency(aTransTypeId) == 0) {
@@ -8004,7 +8004,7 @@ public class TransBean implements Serializable {
                 String DefaultCurrencyCode = "";
                 String TransTypeCurrencyCode = "";
                 String LocalCurrencyCode = "";
-
+                
                 try {
                     LocalCurrencyCode = new AccCurrencyBean().getLocalCurrency().getCurrencyCode();
                     if (null == LocalCurrencyCode) {
@@ -8029,7 +8029,7 @@ public class TransBean implements Serializable {
                 } catch (NullPointerException npe) {
                     TransTypeCurrencyCode = "";
                 }
-
+                
                 if (TransTypeCurrencyCode.length() > 0) {
                     trans.setCurrencyCode(TransTypeCurrencyCode);
                 } else if (DefaultCurrencyCode.length() > 0) {
@@ -8042,7 +8042,7 @@ public class TransBean implements Serializable {
             trans.setCurrencyCode("");
         }
     }
-
+    
     public void initTransOpenBalance(int aTransTypeId, int aTransReasonId, Trans aTrans, TransItem aTransItem) {
         try {
             //1. currency
@@ -8050,7 +8050,7 @@ public class TransBean implements Serializable {
             String DefaultCurrencyCode = "";
             String TransTypeCurrencyCode = "";
             String LocalCurrencyCode = "";
-
+            
             try {
                 LocalCurrencyCode = new AccCurrencyBean().getLocalCurrency().getCurrencyCode();
                 if (null == LocalCurrencyCode) {
@@ -8094,7 +8094,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void initTransType(int aTransTypeId, int aTransReasonId) {
         try {
             this.TransTypeObj = new TransactionTypeBean().getTransactionType(aTransTypeId);
@@ -8103,7 +8103,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void initTransTypeRef(int aTransTypeId, int aTransReasonId) {
         try {
             this.TransTypeRefObj = new TransactionTypeBean().getTransactionType(aTransTypeId);
@@ -8184,7 +8184,7 @@ public class TransBean implements Serializable {
                 } catch (NullPointerException npe) {
                     trans.setPrincSchemeMember("");
                 }
-
+                
                 try {
                     trans.setSchemeCardNumber(rs.getString("scheme_card_number"));
                 } catch (NullPointerException | SQLException npe) {
@@ -8196,7 +8196,7 @@ public class TransBean implements Serializable {
         }
         return Transs;
     }
-
+    
     public List<Trans> getTranss(long TransactorId) {
         String sql;
         sql = "{call sp_search_transaction_by_transactor_id(?)}";
@@ -8215,7 +8215,7 @@ public class TransBean implements Serializable {
         }
         return Transs;
     }
-
+    
     public void refreshTranssDraft(int aStoreId, int aAddUserDetailId, int aTransTypeId, int aTransReasonId) {
         try {
             this.TranssDraft.clear();
@@ -8240,7 +8240,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public ArrayList<Trans> getTranssDraft(int aStoreId, int aAddUserDetailId, int aTransTypeId, int aTransReasonId) {
         String sql;
         sql = "{call sp_search_transaction_hist_draft_by_user_type(?,?,?,?)}";
@@ -8270,7 +8270,7 @@ public class TransBean implements Serializable {
         }
         return tds;
     }
-
+    
     public List<Trans> getTranssByTrTcTt(long aTransactionId, long aTransactorId, String aTransactorType) {
         List<Trans> aTranss = new ArrayList<Trans>();
         if (aTransactorId != 0) {
@@ -8290,7 +8290,7 @@ public class TransBean implements Serializable {
         }
         return aTranss;
     }
-
+    
     public List<Trans> getTranssByBillTrTcTt(long aTransactionId, long aBillTransactorId, String aTransactorType) {
         List<Trans> aTranss = new ArrayList<Trans>();
         if (aBillTransactorId != 0) {
@@ -8310,7 +8310,7 @@ public class TransBean implements Serializable {
         }
         return aTranss;
     }
-
+    
     public List<Trans> getTranssByBillTrPayCat(long aTransactionId, long aBillTransactorId, String aPayCategory) {
         List<Trans> aTranss = new ArrayList<Trans>();
         if (aBillTransactorId != 0) {
@@ -8336,7 +8336,7 @@ public class TransBean implements Serializable {
         }
         return aTranss;
     }
-
+    
     public List<Trans> getTranssByBillTrPayCatTransNo(String aTransactionNumber, long aBillTransactorId, String aPayCategory) {
         List<Trans> aTranss = new ArrayList<Trans>();
         if (aBillTransactorId != 0) {
@@ -8363,7 +8363,7 @@ public class TransBean implements Serializable {
         this.setTransactorTranss(aTranss);
         return aTranss;
     }
-
+    
     public List<Trans> getTranssByTransactorTransType(long aTransactorId, String aTransactorType) {
         String sql;
         sql = "{call sp_search_transaction_by_transactor_transtype(?,?)}";
@@ -8380,7 +8380,7 @@ public class TransBean implements Serializable {
             } else {
                 ps.setInt(2, 33);//invalid one
             }
-
+            
             rs = ps.executeQuery();
             while (rs.next()) {
                 Transs.add(this.getTransFromResultset(rs));
@@ -8390,7 +8390,7 @@ public class TransBean implements Serializable {
         }
         return Transs;
     }
-
+    
     public List<Trans> getTranssByTransactorTransactionType(long aTransactorId, int aTransactionTypeId) {
         String sql;
         sql = "{call sp_search_transaction_by_transactor_transtype(?,?)}";
@@ -8410,7 +8410,7 @@ public class TransBean implements Serializable {
         }
         return Transs;
     }
-
+    
     public List<Trans> getTranssByBillTransactorTransType(long aBillTransactorId, String aTransactorType) {
         String sql;
         sql = "{call sp_search_transaction_by_bill_transactor_transtype(?,?)}";
@@ -8427,7 +8427,7 @@ public class TransBean implements Serializable {
             } else {
                 ps.setInt(2, 33);//invalid one
             }
-
+            
             rs = ps.executeQuery();
             while (rs.next()) {
                 Transs.add(this.getTransFromResultset(rs));
@@ -8445,7 +8445,7 @@ public class TransBean implements Serializable {
         }
         return Transs;
     }
-
+    
     public List<Trans> getTranssByAddUser(int aAddUserDetailId, int aTransactionTypeId, int aStoreId) {
         String sql;
         sql = "{call sp_search_transaction_by_add_user_detail_id(?,?,?)}";
@@ -8470,7 +8470,7 @@ public class TransBean implements Serializable {
         }
         return Transs;
     }
-
+    
     public List<Trans> getReportTrans(Trans aTrans) {
         String sql;
         sql = "{call sp_report_transaction(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
@@ -8572,7 +8572,7 @@ public class TransBean implements Serializable {
                     } catch (NullPointerException npe) {
                         ps.setLong(15, 0);
                     }
-
+                    
                     rs = ps.executeQuery();
                     //System.out.println(rs.getStatement());
                     while (rs.next()) {
@@ -8586,7 +8586,7 @@ public class TransBean implements Serializable {
         }
         return this.ReportTrans;
     }
-
+    
     public List<Trans> getReportBill(Trans aTrans) {
         String sql;
         sql = "{call sp_report_bill(?,?,?,?)}";
@@ -8619,7 +8619,7 @@ public class TransBean implements Serializable {
                     } catch (NullPointerException npe) {
                         ps.setLong(4, 0);
                     }
-
+                    
                     rs = ps.executeQuery();
                     while (rs.next()) {
                         this.ReportTrans.add(this.getTransFromResultset(rs));
@@ -8633,7 +8633,7 @@ public class TransBean implements Serializable {
         //this.ReportGrandTotal=this.getReportBillGrandTotal(ReportTrans);
         return this.ReportTrans;
     }
-
+    
     public void calcCustomerCardGrandTotals(List<Trans> aCustomerCardTotals) {
         List<Trans> ati = aCustomerCardTotals;
         int ListItemIndex = 0;
@@ -8660,7 +8660,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void calcSupllierCardGrandTotals(List<Trans> aSupllierCardTotals) {
         List<Trans> ati = aSupllierCardTotals;
         int ListItemIndex = 0;
@@ -8687,7 +8687,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void refreshReportCustomerCard(Trans aTrans) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -8797,7 +8797,7 @@ public class TransBean implements Serializable {
             }
         }
     }
-
+    
     public void refreshReportSupplierCard(Trans aTrans) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -8906,7 +8906,7 @@ public class TransBean implements Serializable {
             }
         }
     }
-
+    
     public void refreshReportCustomerCardTotals(Trans aTrans) {
         String sql;
         sql = "{call sp_report_customer_card_totals(?,?,?,?)}";
@@ -8971,7 +8971,7 @@ public class TransBean implements Serializable {
             }
         }
     }
-
+    
     public void refreshReportSupplierCardTotals(Trans aTrans) {
         String sql;
         sql = "{call sp_report_supplier_card_totals(?,?,?,?)}";
@@ -9036,7 +9036,7 @@ public class TransBean implements Serializable {
             }
         }
     }
-
+    
     public double getReportBillTotal(Trans aTrans) {
         double gTotal = 0;
         String sql;
@@ -9086,11 +9086,11 @@ public class TransBean implements Serializable {
         }
         return gTotal;
     }
-
+    
     public long getReportTransCount() {
         return this.ReportTrans.size();
     }
-
+    
     public List<TransSummary> getReportTransSummary(Trans aTrans, TransSummary aTransSummary) {
         String sql;
         sql = "{call sp_report_transaction_summary(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
@@ -9200,7 +9200,7 @@ public class TransBean implements Serializable {
                     } catch (NullPointerException npe) {
                         ps.setLong(16, 0);
                     }
-
+                    
                     rs = ps.executeQuery();
                     //System.out.println(rs.getStatement());
                     while (rs.next()) {
@@ -9214,7 +9214,7 @@ public class TransBean implements Serializable {
         }
         return this.ReportTransSummary;
     }
-
+    
     public List<TransSummary> getReportTransEarnUserSummary(Trans aTrans) {
         String sql;
         sql = "{call sp_report_transaction_user_earn_summary(?,?,?,?,?,?)}";
@@ -9285,7 +9285,7 @@ public class TransBean implements Serializable {
         }
         return this.ReportTransSummary;
     }
-
+    
     public String getFieldName(String aFieldId, String aFieldName) {
         UserDetailBean udb = new UserDetailBean();
         TransactorBean tb = new TransactorBean();
@@ -9308,7 +9308,7 @@ public class TransBean implements Serializable {
             return "";
         }
     }
-
+    
     public boolean isApproveNeeded(Trans aTrans) {
         if (aTrans != null) {
             if ((aTrans.getCashDiscount() > 0 && new GeneralUserSetting().getIsApproveDiscountNeeded() == 1) || (aTrans.getSpendPointsAmount() > 0 && new GeneralUserSetting().getIsApprovePointsNeeded() == 1)) {
@@ -9320,7 +9320,7 @@ public class TransBean implements Serializable {
             return false;
         }
     }
-
+    
     public boolean isDisableOverridePrices(UserDetail aUserDetail, List<GroupRight> aGroupRights) {
         GroupRightBean grb = new GroupRightBean();
         if (grb.IsUserGroupsFunctionAccessAllowed(aUserDetail, aGroupRights, "8", "Edit") == 1 && grb.IsUserGroupsFunctionAccessAllowed(aUserDetail, aGroupRights, "8", "Add") == 1) {
@@ -9329,10 +9329,10 @@ public class TransBean implements Serializable {
             return true;
         }
     }
-
+    
     public void setDateToToday(Trans aTrans) {
         Date CurrentServerDate = new CompanySetting().getCURRENT_SERVER_DATE();
-
+        
         aTrans.setAddDate(CurrentServerDate);
         Calendar cal = Calendar.getInstance();
         cal.setTime(aTrans.getAddDate());
@@ -9342,7 +9342,7 @@ public class TransBean implements Serializable {
         cal.set(Calendar.MILLISECOND, 0);
         // Put it back in the Date object  
         aTrans.setAddDate(cal.getTime());
-
+        
         aTrans.setAddDate2(CurrentServerDate);
         Calendar cal2 = Calendar.getInstance();
         cal2.setTime(aTrans.getAddDate2());
@@ -9353,10 +9353,10 @@ public class TransBean implements Serializable {
         // Put it back in the Date object  
         aTrans.setAddDate2(cal2.getTime());
     }
-
+    
     public void setTransDateToToday(Trans aTrans) {
         Date CurrentServerDate = new CompanySetting().getCURRENT_SERVER_DATE();
-
+        
         aTrans.setTransactionDate(CurrentServerDate);
         Calendar cal = Calendar.getInstance();
         cal.setTime(aTrans.getTransactionDate());
@@ -9366,7 +9366,7 @@ public class TransBean implements Serializable {
         cal.set(Calendar.MILLISECOND, 0);
         // Put it back in the Date object  
         aTrans.setTransactionDate(cal.getTime());
-
+        
         aTrans.setTransactionDate2(CurrentServerDate);
         Calendar cal2 = Calendar.getInstance();
         cal2.setTime(aTrans.getTransactionDate2());
@@ -9377,11 +9377,11 @@ public class TransBean implements Serializable {
         // Put it back in the Date object  
         aTrans.setTransactionDate2(cal2.getTime());
     }
-
+    
     public void setDateToYesturday(Trans aTrans) {
         //Date CurrentServerDate=new CompanySetting().getCURRENT_SERVER_DATE();
         Date CurrentServerDate = new CompanySetting().getCURRENT_SERVER_DATE();
-
+        
         aTrans.setAddDate(CurrentServerDate);
         Calendar cal = Calendar.getInstance();
         cal.setTime(aTrans.getAddDate());
@@ -9392,7 +9392,7 @@ public class TransBean implements Serializable {
         cal.set(Calendar.MILLISECOND, 0);
         // Put it back in the Date object  
         aTrans.setAddDate(cal.getTime());
-
+        
         aTrans.setAddDate2(CurrentServerDate);
         Calendar cal2 = Calendar.getInstance();
         cal2.setTime(aTrans.getAddDate2());
@@ -9404,11 +9404,11 @@ public class TransBean implements Serializable {
         // Put it back in the Date object  
         aTrans.setAddDate2(cal2.getTime());
     }
-
+    
     public void setTransDateToYesturday(Trans aTrans) {
         //Date CurrentServerDate=new CompanySetting().getCURRENT_SERVER_DATE();
         Date CurrentServerDate = new CompanySetting().getCURRENT_SERVER_DATE();
-
+        
         aTrans.setTransactionDate(CurrentServerDate);
         Calendar cal = Calendar.getInstance();
         cal.setTime(aTrans.getTransactionDate());
@@ -9419,7 +9419,7 @@ public class TransBean implements Serializable {
         cal.set(Calendar.MILLISECOND, 0);
         // Put it back in the Date object  
         aTrans.setTransactionDate(cal.getTime());
-
+        
         aTrans.setTransactionDate2(CurrentServerDate);
         Calendar cal2 = Calendar.getInstance();
         cal2.setTime(aTrans.getTransactionDate2());
@@ -9508,7 +9508,7 @@ public class TransBean implements Serializable {
     public void setTypedTransactorName(String TypedTransactorName) {
         this.TypedTransactorName = TypedTransactorName;
     }
-
+    
     public void insertApproveTrans(long aTransactionId, String aFunctionName, int aUserDetailId) {
         String sql = "{call sp_insert_transaction_approve(?,?,?)}";
         try (
@@ -9522,7 +9522,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public long getTransViewAbsoluteTransactionId(long aTransactionId, long aTransactionId2) {
         long AbsoluteTransactionId = 0;
         if (aTransactionId != 0 || aTransactionId2 != 0) {
@@ -9534,7 +9534,7 @@ public class TransBean implements Serializable {
         }
         return AbsoluteTransactionId;
     }
-
+    
     public String getTransViewAbsoluteTransactionNo(String aTransactionNo2, String aTransactionNo3) {
         String AbsoluteTransactionNo = "";
         if (aTransactionNo2.length() > 0 || aTransactionNo3.length() > 0) {
@@ -9546,7 +9546,7 @@ public class TransBean implements Serializable {
         }
         return AbsoluteTransactionNo;
     }
-
+    
     public void ViewTransByTransIdType(long aTransactionId, int aTransactionTypeId, int aOverride) {
         //manage session variables
         FacesContext context = FacesContext.getCurrentInstance();
@@ -9577,7 +9577,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void SaleView(long aTransactionId, long aTransactionId2) {
         Trans aTrans = null;
         //manage session variables
@@ -9609,7 +9609,7 @@ public class TransBean implements Serializable {
             //---SalesInvoiceBean.initSalesInvoiceBean();
         }
     }
-
+    
     public void ViewTrans(long aTransactionId) {
         //manage session variables
         FacesContext context = FacesContext.getCurrentInstance();
@@ -9640,7 +9640,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void ViewSalesTrans(long aTransactionId) {
         //manage session variables
         FacesContext context = FacesContext.getCurrentInstance();
@@ -9670,7 +9670,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void ViewTransSalesInvoice(long aTransactionId) {
         //manage session variables
         FacesContext context = FacesContext.getCurrentInstance();
@@ -9695,7 +9695,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void PurchaseView(long aTransactionId, long aTransactionId2) {
         Trans aTrans = null;
         //manage session variables
@@ -9736,7 +9736,7 @@ public class TransBean implements Serializable {
             //---SalesInvoiceBean.initSalesInvoiceBean();
         }
     }
-
+    
     public void DisposeView(long aTransactionId, long aTransactionId2) {
         Trans aTrans = null;
         //manage session variables
@@ -9769,7 +9769,7 @@ public class TransBean implements Serializable {
             //---SalesInvoiceBean.initSalesInvoiceBean();
         }
     }
-
+    
     public void TransferView(long aTransactionId, long aTransactionId2) {
         Trans aTrans = null;
         //manage session variables
@@ -9802,7 +9802,7 @@ public class TransBean implements Serializable {
             //---SalesInvoiceBean.initSalesInvoiceBean();
         }
     }
-
+    
     public void showSalesInvoice() {
         options = new HashMap<String, Object>();
         options.put("modal", true);
@@ -9811,7 +9811,7 @@ public class TransBean implements Serializable {
         options.put("contentHeight", 420);
         org.primefaces.PrimeFaces.current().dialog().openDynamic("SalesInvoice.xhtml", options, null);
     }
-
+    
     public void printSalesInvoice() {
         options = new HashMap<String, Object>();
         options.put("modal", true);
@@ -9820,12 +9820,12 @@ public class TransBean implements Serializable {
         options.put("contentHeight", 420);
         org.primefaces.PrimeFaces.current().dialog().openDynamic("SalesInvoice.xhtml", options, null);
     }
-
+    
     public void callAnotherButton() {
         //:org.primefaces.PrimeFaces.current().executeScript("doHiddenClick()");
         org.primefaces.PrimeFaces.current().executeScript("doHiddenClick()");
     }
-
+    
     public void autoPrint() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         UIViewRoot root = facesContext.getViewRoot();
@@ -9836,11 +9836,11 @@ public class TransBean implements Serializable {
         //System.out.println("Component Id==" + root.findComponent(":TransFormSales:cmdbPrint").getId());
 
     }
-
+    
     public void dummyAction() {
         //does nothing
     }
-
+    
     public boolean isTransDeleted(long aTransactionId) {
         String sql = "{call sp_search_transaction_deleted_by_id(?)}";
         ResultSet rs = null;
@@ -9866,9 +9866,9 @@ public class TransBean implements Serializable {
                 }
             }
         }
-
+        
     }
-
+    
     public void initClearActionStatus() {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -9904,7 +9904,7 @@ public class TransBean implements Serializable {
     public void setAutoPrintAfterSave(boolean AutoPrintAfterSave) {
         this.AutoPrintAfterSave = AutoPrintAfterSave;
     }
-
+    
     public void setTransTotalsAndUpdate(Trans aTrans, List<TransItem> aActiveTransItems) {
         aTrans.setTotalTradeDiscount(this.getTotalTradeDiscount(aActiveTransItems));
         aTrans.setTotalVat(this.getTotalVat(aActiveTransItems));
@@ -9933,7 +9933,7 @@ public class TransBean implements Serializable {
             ub.invokeLocalCustomerDisplay(ClientPcName, PortName, Size, ub.formatDoubleToString(aTrans.getGrandTotal()), "");
         }
     }
-
+    
     public void setPurchaseTransVatAndUpdate(int aTransTypeId, int aTransReasonId, Trans aTrans, List<TransItem> aActiveTransItems) {
         //reset all item VATs to 0
         this.resetPurchaseItemsUnitVAT(aActiveTransItems);
@@ -9961,7 +9961,7 @@ public class TransBean implements Serializable {
         aTrans.setChangeAmount(this.getChangeAmount(aTrans));
         this.setCashDiscountPerc(aTrans);
     }
-
+    
     public void setPurchaseTransDiscAndUpdate(int aTransTypeId, int aTransReasonId, Trans aTrans, List<TransItem> aActiveTransItems) {
         double GTotal = 0;
         GTotal = (aTrans.getSubTotal() + aTrans.getTotalVat()) - (aTrans.getTotalTradeDiscount() + aTrans.getCashDiscount());
@@ -9980,19 +9980,19 @@ public class TransBean implements Serializable {
         aTrans.setChangeAmount(this.getChangeAmount(aTrans));
         this.setCashDiscountPerc(aTrans);
     }
-
+    
     public void setLoyaltyAndUpdate(int aTransTypeId, int aTransReasonId, Trans aTrans, List<TransItem> aActiveTransItems) {
         if (aTrans.getCardHolder().length() == 0) {
             aTrans.setCardNumber("");
         }
         this.setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems);
     }
-
+    
     public void setAmountTenderedFromDialog(double aAmountTendered, int aTransTypeId, int aTransReasonId, Trans aTrans, List<TransItem> aActiveTransItems) {
         aTrans.setAmountTendered(aAmountTendered);
         this.setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems);
     }
-
+    
     public void setTransTotalsAndUpdateCEC(int aTransTypeId, int aTransReasonId, Trans aTrans, List<TransItem> aActiveTransItems) {
         aTrans.setSubTotal(this.getSubTotalCEC(aTrans, aActiveTransItems));
         aTrans.setTotalTradeDiscount(this.getTotalTradeDiscountCEC(aTrans, aActiveTransItems));
@@ -10022,7 +10022,7 @@ public class TransBean implements Serializable {
             ub.invokeLocalCustomerDisplay(ClientPcName, PortName, Size, ub.formatDoubleToString(aTrans.getGrandTotal()), "");
         }
     }
-
+    
     public void setCashDiscountPercAndUpdateCEC(int aTransTypeId, int aTransReasonId, Trans aTrans, List<TransItem> aActiveTransItems) {
         if (aTrans.getCash_dicsount_perc() > 0) {
             aTrans.setCashDiscount(((aTrans.getSubTotal() - aTrans.getTotalTradeDiscount()) * aTrans.getCash_dicsount_perc()) / 100);
@@ -10032,7 +10032,7 @@ public class TransBean implements Serializable {
         aTrans.setCashDiscount((double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTrans.getCashDiscount()));
         this.setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems);
     }
-
+    
     public void setCashDiscountPercAndUpdateCEC_err(int aTransTypeId, int aTransReasonId, Trans aTrans, List<TransItem> aActiveTransItems) {
         aTrans.setCashDiscount(0);
         this.setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems);
@@ -10041,7 +10041,7 @@ public class TransBean implements Serializable {
         aTrans.setCashDiscount((double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTrans.getCashDiscount()));
         this.setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems);
     }
-
+    
     public void setCashDiscountFromGrandTotalCEC(int aTransTypeId, int aTransReasonId, Trans aTrans, List<TransItem> aActiveTransItems, double aGrandTotal2) {
         double VatPerc = CompanySetting.getVatPerc();
         double DiscountAmount = 0;
@@ -10055,12 +10055,12 @@ public class TransBean implements Serializable {
         this.setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems);
         //this.setCashDiscountPerc(aTrans);
     }
-
+    
     public void setCashDiscountAmtAndUpdateCEC(int aTransTypeId, int aTransReasonId, Trans aTrans, List<TransItem> aActiveTransItems) {
         this.setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems);
         //this.setCashDiscountPerc(aTrans);
     }
-
+    
     public void setCashDiscountPerc(Trans aTrans) {
         try {
             if (aTrans.getCashDiscount() > 0) {
@@ -10077,7 +10077,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public double getCashDiscountRatio(Trans aTrans) {
         double cdr = 1.0;
         double AmountBeforeCashDiscount = 0;
@@ -10097,7 +10097,7 @@ public class TransBean implements Serializable {
         }
         return cdr;
     }
-
+    
     public void setCashDiscountPerc_old(Trans aTrans) {
         try {
             if (aTrans.getCashDiscount() > 0) {
@@ -10114,7 +10114,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void setTransTotalsAndUpdateV2(Trans aTrans, List<TransItem> aActiveTransItems) {
         TransactionType tt = new TransactionTypeBean().getTransactionType(aTrans.getTransactionTypeId());
         aTrans.setTotalTradeDiscount(this.getTotalTradeDiscount(aActiveTransItems));
@@ -10144,12 +10144,12 @@ public class TransBean implements Serializable {
             ub.invokeLocalCustomerDisplay(ClientPcName, PortName, Size, ub.formatDoubleToString(aTrans.getGrandTotal()), "");
         }
     }
-
+    
     public void setTransTotalsAndUpdateJournalEntry(Trans aTrans, List<TransItem> aActiveTransItems) {
         aTrans.setTotalDebit(this.getTotalDebit(aActiveTransItems));
         aTrans.setTotalCredit(this.getTotalCredit(aActiveTransItems));
     }
-
+    
     public double getTotalProfitMargin(List<TransItem> aActiveTransItems) {
         List<TransItem> ati = aActiveTransItems;
         int ListItemIndex = 0;
@@ -10161,7 +10161,7 @@ public class TransBean implements Serializable {
         }
         return TotProfitMargin;
     }
-
+    
     public double getTotalTradeDiscount(List<TransItem> aActiveTransItems) {
         List<TransItem> ati = aActiveTransItems;
         int ListItemIndex = 0;
@@ -10177,7 +10177,7 @@ public class TransBean implements Serializable {
         }
         return TotTradeDisc;
     }
-
+    
     public double getTotalTradeDiscountCEC(Trans aTrans, List<TransItem> aActiveTransItems) {
         List<TransItem> ati = aActiveTransItems;
         int ListItemIndex = 0;
@@ -10194,7 +10194,7 @@ public class TransBean implements Serializable {
         TotTradeDisc = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), TotTradeDisc);
         return TotTradeDisc;
     }
-
+    
     public double getTotalVat(List<TransItem> aActiveTransItems) {
         List<TransItem> ati = aActiveTransItems;
         int ListItemIndex = 0;
@@ -10210,7 +10210,7 @@ public class TransBean implements Serializable {
         }
         return TVat;
     }
-
+    
     public double getTotalVatCEC(Trans aTrans, List<TransItem> aActiveTransItems) {
         List<TransItem> ati = aActiveTransItems;
         int ListItemIndex = 0;
@@ -10239,7 +10239,7 @@ public class TransBean implements Serializable {
         TVat = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), TVat);
         return TVat;
     }
-
+    
     public void resetPurchaseItemsUnitVAT(List<TransItem> aActiveTransItems) {
         List<TransItem> ati = aActiveTransItems;
         int ListItemIndex = 0;
@@ -10254,7 +10254,7 @@ public class TransBean implements Serializable {
             ListItemIndex = ListItemIndex + 1;
         }
     }
-
+    
     public double getSubTotal(List<TransItem> aActiveTransItems) {
         List<TransItem> ati = aActiveTransItems;
         int ListItemIndex = 0;
@@ -10270,7 +10270,7 @@ public class TransBean implements Serializable {
         }
         return SubT;
     }
-
+    
     public double getSubTotalCEC(Trans aTrans, List<TransItem> aActiveTransItems) {
         List<TransItem> ati = aActiveTransItems;
         int ListItemIndex = 0;
@@ -10287,7 +10287,7 @@ public class TransBean implements Serializable {
         SubT = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), SubT);
         return SubT;
     }
-
+    
     public double getGrandTotal(Trans aTrans, List<TransItem> aActiveTransItems) {
         double GTotal = 0;
         if ("SALE INVOICE".equals(new GeneralUserSetting().getCurrentTransactionTypeName()) || "HIRE INVOICE".equals(new GeneralUserSetting().getCurrentTransactionTypeName()) || "HIRE QUOTATION".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
@@ -10318,7 +10318,7 @@ public class TransBean implements Serializable {
             GTotal = GTotal - aTrans.getCashDiscount();
         } else if ("DISPOSE STOCK".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
             List<TransItem> ati = aActiveTransItems;
-
+            
             int ListItemIndex = 0;
             int ListItemNo = ati.size();
             GTotal = 0;
@@ -10329,7 +10329,7 @@ public class TransBean implements Serializable {
         }
         return GTotal;
     }
-
+    
     public double getGrandTotalCEC(int aTransTypeId, int aTransReasonId, Trans aTrans, List<TransItem> aActiveTransItems) {
         TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
         TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
@@ -10359,7 +10359,7 @@ public class TransBean implements Serializable {
         GTotal = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), GTotal);
         return GTotal;
     }
-
+    
     public double getGrandTotalV2(Trans aTrans, List<TransItem> aActiveTransItems) {
         double GTotal = 0;
         TransactionType tt = new TransactionTypeBean().getTransactionType(aTrans.getTransactionTypeId());
@@ -10391,7 +10391,7 @@ public class TransBean implements Serializable {
             GTotal = GTotal - aTrans.getCashDiscount();
         } else if ("DISPOSE STOCK".equals(tt.getTransactionTypeName())) {
             List<TransItem> ati = aActiveTransItems;
-
+            
             int ListItemIndex = 0;
             int ListItemNo = ati.size();
             GTotal = 0;
@@ -10402,7 +10402,7 @@ public class TransBean implements Serializable {
         }
         return GTotal;
     }
-
+    
     public double getPointsAwarded(Trans aTrans) {
         double PtsAwarded = 0;
         try {
@@ -10415,7 +10415,7 @@ public class TransBean implements Serializable {
             return 0;
         }
     }
-
+    
     public double getSpendPoints(Trans aTrans) {
         double SpendPts = 0;
         try {
@@ -10433,7 +10433,7 @@ public class TransBean implements Serializable {
             return 0;
         }
     }
-
+    
     public double getSpendPointsCEC(int aTransTypeId, int aTransReasonId, Trans aTrans) {
         TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
         TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
@@ -10455,7 +10455,7 @@ public class TransBean implements Serializable {
             return 0;
         }
     }
-
+    
     public void updatePointsCard(Trans aTrans) {
         try {
             if (new CheckApiBean().IsSmBiAvailable() && new Parameter_listBean().getParameter_listByContextName("API", "API_SMBI_URL").getParameter_value().length() > 0) {
@@ -10540,11 +10540,11 @@ public class TransBean implements Serializable {
         aTrans.setSpendPointsAmount(0);
         aTrans.setSpendPoints(0);
     }
-
+    
     public double getTotalStdVatableAmount(List<TransItem> aActiveTransItems) {
         double GTotalStdVatableAmount = 0;
         List<TransItem> ati = aActiveTransItems;
-
+        
         int ListItemIndex = 0;
         int ListItemNo = ati.size();
         GTotalStdVatableAmount = 0;
@@ -10570,13 +10570,13 @@ public class TransBean implements Serializable {
         }
         return GTotalStdVatableAmount;
     }
-
+    
     public double getTotalStdVatableAmountCEC(Trans aTrans, int aTransTypeId, int aTransReasonId, List<TransItem> aActiveTransItems) {
         TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
         TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
         double GTotalStdVatableAmount = 0;
         List<TransItem> ati = aActiveTransItems;
-
+        
         int ListItemIndex = 0;
         int ListItemNo = ati.size();
         GTotalStdVatableAmount = 0;
@@ -10601,11 +10601,11 @@ public class TransBean implements Serializable {
         GTotalStdVatableAmount = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), GTotalStdVatableAmount);
         return GTotalStdVatableAmount;
     }
-
+    
     public double getTotalStdVatableAmountV2(Trans aTrans, List<TransItem> aActiveTransItems) {
         double GTotalStdVatableAmount = 0;
         List<TransItem> ati = aActiveTransItems;
-
+        
         int ListItemIndex = 0;
         int ListItemNo = ati.size();
         GTotalStdVatableAmount = 0;
@@ -10624,11 +10624,11 @@ public class TransBean implements Serializable {
         }
         return GTotalStdVatableAmount;
     }
-
+    
     public double getTotalZeroVatableAmount(List<TransItem> aActiveTransItems) {
         double GTotalZeroVatableAmount = 0;
         List<TransItem> ati = aActiveTransItems;
-
+        
         int ListItemIndex = 0;
         int ListItemNo = ati.size();
         GTotalZeroVatableAmount = 0;
@@ -10654,13 +10654,13 @@ public class TransBean implements Serializable {
         }
         return GTotalZeroVatableAmount;
     }
-
+    
     public double getTotalZeroVatableAmountCEC(Trans aTrans, int aTransTypeId, int aTransReasonId, List<TransItem> aActiveTransItems) {
         TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
         TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
         double GTotalZeroVatableAmount = 0;
         List<TransItem> ati = aActiveTransItems;
-
+        
         int ListItemIndex = 0;
         int ListItemNo = ati.size();
         GTotalZeroVatableAmount = 0;
@@ -10684,11 +10684,11 @@ public class TransBean implements Serializable {
         GTotalZeroVatableAmount = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), GTotalZeroVatableAmount);
         return GTotalZeroVatableAmount;
     }
-
+    
     public double getTotalZeroVatableAmountV2(Trans aTrans, List<TransItem> aActiveTransItems) {
         double GTotalZeroVatableAmount = 0;
         List<TransItem> ati = aActiveTransItems;
-
+        
         int ListItemIndex = 0;
         int ListItemNo = ati.size();
         GTotalZeroVatableAmount = 0;
@@ -10707,11 +10707,11 @@ public class TransBean implements Serializable {
         }
         return GTotalZeroVatableAmount;
     }
-
+    
     public double getTotalExemptVatableAmount(List<TransItem> aActiveTransItems) {
         double GTotalExemptVatableAmount = 0;
         List<TransItem> ati = aActiveTransItems;
-
+        
         int ListItemIndex = 0;
         int ListItemNo = ati.size();
         GTotalExemptVatableAmount = 0;
@@ -10737,13 +10737,13 @@ public class TransBean implements Serializable {
         }
         return GTotalExemptVatableAmount;
     }
-
+    
     public double getTotalExemptVatableAmountCEC(Trans aTrans, int aTransTypeId, int aTransReasonId, List<TransItem> aActiveTransItems) {
         TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
         TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
         double GTotalExemptVatableAmount = 0;
         List<TransItem> ati = aActiveTransItems;
-
+        
         int ListItemIndex = 0;
         int ListItemNo = ati.size();
         GTotalExemptVatableAmount = 0;
@@ -10767,11 +10767,11 @@ public class TransBean implements Serializable {
         GTotalExemptVatableAmount = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), GTotalExemptVatableAmount);
         return GTotalExemptVatableAmount;
     }
-
+    
     public double getTotalExemptVatableAmountV2(Trans aTrans, List<TransItem> aActiveTransItems) {
         double GTotalExemptVatableAmount = 0;
         List<TransItem> ati = aActiveTransItems;
-
+        
         int ListItemIndex = 0;
         int ListItemNo = ati.size();
         GTotalExemptVatableAmount = 0;
@@ -10790,7 +10790,7 @@ public class TransBean implements Serializable {
         }
         return GTotalExemptVatableAmount;
     }
-
+    
     public double getChangeAmount(Trans aTrans) {
         double ChangeAmt = 0;
         if (aTrans.getPayMethod() == 6) {
@@ -10814,7 +10814,7 @@ public class TransBean implements Serializable {
         }
         return ChangeAmt;
     }
-
+    
     public double getTotalDebit(List<TransItem> aActiveTransItems) {
         List<TransItem> ati = aActiveTransItems;
         int ListItemIndex = 0;
@@ -10826,7 +10826,7 @@ public class TransBean implements Serializable {
         }
         return Total;
     }
-
+    
     public double getTotalCredit(List<TransItem> aActiveTransItems) {
         List<TransItem> ati = aActiveTransItems;
         int ListItemIndex = 0;
@@ -10838,7 +10838,7 @@ public class TransBean implements Serializable {
         }
         return Total;
     }
-
+    
     public String getPriceConflictMsg(double aCurrentCostPrice, double aNewCostPrice) {
         String PriceConflictMsg;
         if (aNewCostPrice <= 0) {
@@ -10866,7 +10866,7 @@ public class TransBean implements Serializable {
         }
         return SRCInvoice;
     }
-
+    
     public String getPrintoutJsfFile(int aTranstypeId, int aOverrideVersion) {
         String the_file = "";
         switch (aTranstypeId) {
@@ -10919,10 +10919,10 @@ public class TransBean implements Serializable {
                 the_file = "TransactionViewSTR.xhtml";
                 break;
         }
-
+        
         return the_file;
     }
-
+    
     public String getPrintFileName(String aLevel, TransactionType aTransactionType, int aPrintFileNo) {
         String the_file = "Output_0";
         int OutTransTypeId = 0;
@@ -10976,13 +10976,13 @@ public class TransBean implements Serializable {
                     }
                     break;
             }
-
+            
         } catch (NullPointerException npe) {
             System.err.println("getPrintFileName:" + npe.getMessage());
         }
         return the_file + ".xhtml";
     }
-
+    
     public String getPrintFileName2(String aLevel, TransactionType aTransactionType, int aPrintFileNo) {
         String the_file = "Output_0";
         int OutTransTypeId = 0;
@@ -11036,13 +11036,13 @@ public class TransBean implements Serializable {
                     }
                     break;
             }
-
+            
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
         return the_file + ".xhtml";
     }
-
+    
     public void setDateToToday() {
         Date CurrentServerDate = new CompanySetting().getCURRENT_SERVER_DATE();
         this.setDate1(CurrentServerDate);
@@ -11054,7 +11054,7 @@ public class TransBean implements Serializable {
         cal.set(Calendar.MILLISECOND, 0);
         // Put it back in the Date object  
         this.setDate1(cal.getTime());
-
+        
         this.setDate2(CurrentServerDate);
         Calendar cal2 = Calendar.getInstance();
         cal2.setTime(this.getDate2());
@@ -11065,10 +11065,10 @@ public class TransBean implements Serializable {
         // Put it back in the Date object  
         this.setDate2(cal2.getTime());
     }
-
+    
     public void setDateToYesturday() {
         Date CurrentServerDate = new CompanySetting().getCURRENT_SERVER_DATE();
-
+        
         this.setDate1(CurrentServerDate);
         Calendar cal = Calendar.getInstance();
         cal.setTime(this.getDate1());
@@ -11079,7 +11079,7 @@ public class TransBean implements Serializable {
         cal.set(Calendar.MILLISECOND, 0);
         // Put it back in the Date object  
         this.setDate1(cal.getTime());
-
+        
         this.setDate2(CurrentServerDate);
         Calendar cal2 = Calendar.getInstance();
         cal2.setTime(this.getDate2());
@@ -11091,7 +11091,7 @@ public class TransBean implements Serializable {
         // Put it back in the Date object  
         this.setDate2(cal2.getTime());
     }
-
+    
     public void reportSalesInvoiceDetail(Trans aTrans, TransBean aTransBean) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -11198,7 +11198,7 @@ public class TransBean implements Serializable {
             } catch (Exception e) {
                 LOGGER.log(Level.ERROR, e);
             }
-
+            
             try (
                     Connection conn = DBConnection.getMySQLConnection();
                     PreparedStatement ps = conn.prepareStatement(sqlsum);) {
@@ -11291,7 +11291,7 @@ public class TransBean implements Serializable {
             }
         }
     }
-
+    
     public void reSubmitDebitOrCreditNoteTaxAPI(long aInnerTransId, int aInnerTransTypeId, Trans aTrans, TransBean aTransBean, String aUpdateType) {
         //TAX API
         try {
@@ -11312,7 +11312,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void reSubmitInvoiceTaxAPI(long aInnerTransId, long aTransTypeId, Trans aTrans, TransBean aTransBean) {
         try {
             List<TransItem> tis = new TransItemBean().getTransItemsByTransactionId(aInnerTransId);
@@ -11330,7 +11330,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void reGetCreditNoteApprovalStatusTaxAPI(String aReferenceNoTax, long aTransTypeId, Trans aTrans, TransBean aTransBean) {
         try {
             if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
@@ -11345,7 +11345,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void markManyUpdatesReconsiled(long aInnerTransId, int aInnerTransTypeId, Trans aTrans, TransBean aTransBean) {
         try {
             if (aInnerTransTypeId == 2 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {//SALES INVOICE
@@ -11357,7 +11357,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void reportSalesTaxAPI(Trans aTrans, TransBean aTransBean) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -11495,7 +11495,7 @@ public class TransBean implements Serializable {
             } else {
                 sqlsum = "SELECT transaction_type_id,sync_flag,currency_code,sum(grand_total) as grand_total,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount FROM (" + sql + ") as b ";
             }
-
+            
             String OrderAppendSum = "";
             String GroupAppendSum = "";
             if (aTransBean.getFieldName().length() > 0) {
@@ -11601,7 +11601,7 @@ public class TransBean implements Serializable {
             }
         }
     }
-
+    
     public void reportOpenBalanceDetail(Trans aTrans, TransBean aTransBean, AccJournal aAccJournal, AccJournalBean aAccJournalBean, TransItemBean aTransItemBean, TransactorBean aTransactorBean) {
         if (aTransBean.getDateType().length() == 0) {
             aTransBean.setDateType("Add Date");
@@ -11743,7 +11743,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void reportHireInvoiceDetail(Trans aTrans, TransBean aTransBean) {
         if (aTransBean.getDateType().length() == 0) {
             aTransBean.setDateType("Add Date");
@@ -11817,7 +11817,7 @@ public class TransBean implements Serializable {
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-
+        
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sqlsum);) {
@@ -11895,7 +11895,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void reportHireUnReturnedDetail(Trans aTrans, Transactor aTransactor, Item aItem, TransBean aTransBean) {
         aTransBean.setActionMessage("");
         ResultSet rs = null;
@@ -11916,7 +11916,7 @@ public class TransBean implements Serializable {
             sql = "SELECT so.*,t.to_date FROM stock_out so INNER JOIN transaction t ON so.transaction_id=t.transaction_id";
             ordersql = " ORDER BY so.transactor_id DESC,so.transaction_id DESC";
         }
-
+        
         try {
             if (aTrans.getStoreId() > 0) {
                 wheresql = wheresql + " AND so.store_id=" + aTrans.getStoreId();
@@ -12040,7 +12040,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void reportHireQuotationDetail(Trans aTrans, TransBean aTransBean) {
         if (aTransBean.getDateType().length() == 0) {
             aTransBean.setDateType("Add Date");
@@ -12114,7 +12114,7 @@ public class TransBean implements Serializable {
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-
+        
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sqlsum);) {
@@ -12192,7 +12192,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void reportHireDeliveryNoteDetail(Trans aTrans, TransBean aTransBean) {
         if (aTransBean.getDateType().length() == 0) {
             aTransBean.setDateType("Add Date");
@@ -12248,7 +12248,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void reportHireReturnNoteDetail(Trans aTrans, TransBean aTransBean) {
         if (aTransBean.getDateType().length() == 0) {
             aTransBean.setDateType("Add Date");
@@ -12304,7 +12304,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void reportDisposeStockDetail(Trans aTrans, TransBean aTransBean) {
         if (aTransBean.getDateType().length() == 0) {
             aTransBean.setDateType("Add Date");
@@ -12372,7 +12372,7 @@ public class TransBean implements Serializable {
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-
+        
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sqlsum);) {
@@ -12440,7 +12440,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void reportAdjustStockDetail(Trans aTrans, TransBean aTransBean) {
         if (aTransBean.getDateType().length() == 0) {
             aTransBean.setDateType("Add Date");
@@ -12489,7 +12489,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void reportConsumeStockDetail(Trans aTrans, TransBean aTransBean) {
         if (aTransBean.getDateType().length() == 0) {
             aTransBean.setDateType("Add Date");
@@ -12538,7 +12538,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void reportPurchaseInvoiceDetail(Trans aTrans, TransBean aTransBean) {
         if (aTransBean.getDateType().length() == 0) {
             aTransBean.setDateType("Add Date");
@@ -12612,7 +12612,7 @@ public class TransBean implements Serializable {
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-
+        
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sqlsum);) {
@@ -12694,7 +12694,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void reportPurchaseOrderDetail(Trans aTrans, TransBean aTransBean) {
         if (aTransBean.getDateType().length() == 0) {
             aTransBean.setDateType("Add Date");
@@ -12768,7 +12768,7 @@ public class TransBean implements Serializable {
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-
+        
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sqlsum);) {
@@ -12831,7 +12831,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void reportTransferRequestDetail(Trans aTrans, TransBean aTransBean) {
         if (aTransBean.getDateType().length() == 0) {
             aTransBean.setDateType("Add Date");
@@ -12902,7 +12902,7 @@ public class TransBean implements Serializable {
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-
+        
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sqlsum);) {
@@ -12960,7 +12960,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void reportTransferDetail(Trans aTrans, TransBean aTransBean) {
         if (aTransBean.getDateType().length() == 0) {
             aTransBean.setDateType("Add Date");
@@ -13031,7 +13031,7 @@ public class TransBean implements Serializable {
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-
+        
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sqlsum);) {
@@ -13089,7 +13089,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void reportPurchaseItemReceivedDetail(Trans aTrans, TransBean aTransBean) {
         if (aTransBean.getDateType().length() == 0) {
             aTransBean.setDateType("Add Date");
@@ -13163,7 +13163,7 @@ public class TransBean implements Serializable {
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-
+        
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sqlsum);) {
@@ -13226,7 +13226,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void reportSalesQuotationDetail(Trans aTrans, TransBean aTransBean) {
         if (aTransBean.getDateType().length() == 0) {
             aTransBean.setDateType("Add Date");
@@ -13300,7 +13300,7 @@ public class TransBean implements Serializable {
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-
+        
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sqlsum);) {
@@ -13363,7 +13363,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void reportSalesOrderDetail(Trans aTrans, TransBean aTransBean) {
         if (aTransBean.getDateType().length() == 0) {
             aTransBean.setDateType("Add Date");
@@ -13437,7 +13437,7 @@ public class TransBean implements Serializable {
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-
+        
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sqlsum);) {
@@ -13516,7 +13516,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void reportSalesDeliveryDetail(Trans aTrans, TransBean aTransBean) {
         if (aTransBean.getDateType().length() == 0) {
             aTransBean.setDateType("Add Date");
@@ -13574,7 +13574,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void reportSalesInvoiceDetail_Old(Trans aTrans, String aFieldName, String aDateType, Date aDate1, Date aDate2) {
         if (aDateType.length() == 0) {
             this.TransList = new ArrayList<>();
@@ -13649,7 +13649,7 @@ public class TransBean implements Serializable {
             } catch (Exception e) {
                 LOGGER.log(Level.ERROR, e);
             }
-
+            
             try (
                     Connection conn = DBConnection.getMySQLConnection();
                     PreparedStatement ps = conn.prepareStatement(sqlsum);) {
@@ -13718,7 +13718,7 @@ public class TransBean implements Serializable {
             }
         }
     }
-
+    
     public void resetSalesInvoiceDetail(Trans aTrans, TransBean aTransBean, Transactor aBillTransactor, Transactor aTransactor) {
         aTransBean.setActionMessage("");
         try {
@@ -13745,7 +13745,7 @@ public class TransBean implements Serializable {
         } catch (NullPointerException npe) {
         }
     }
-
+    
     public void resetReportOpenBalance(Trans aTrans, TransBean aTransBean, AccJournal aAccJournal, AccJournalBean aAccJournalBean, TransItemBean aTransItemBean, TransactorBean aTransactorBean) {
         aTransBean.setActionMessage("");
         try {
@@ -13772,7 +13772,7 @@ public class TransBean implements Serializable {
         } catch (NullPointerException npe) {
         }
     }
-
+    
     public void resetHireUnReturnedItemsDetail(Trans aTrans, Transactor aTransactor, Item aItem, TransBean aTransBean) {
         aTransBean.setActionMessage("");
         aTransBean.setFieldName("");
@@ -13795,11 +13795,12 @@ public class TransBean implements Serializable {
         } catch (NullPointerException npe) {
         }
     }
-
+    
     public void resetTransItemDetail(Trans aTrans, TransBean aTransBean, Item aItem, Transactor aBillTransactor, int aCategoryId) {
         aTransBean.setActionMessage("");
         try {
             this.clearTrans(aTrans);
+            aTrans.setTransactionTypeId(0);
         } catch (NullPointerException npe) {
         }
         try {
@@ -13818,11 +13819,11 @@ public class TransBean implements Serializable {
             aTransBean.TransItemList.clear();
             aTransBean.TransItemSummary.clear();
             aCategoryId = 0;
-
+            
         } catch (NullPointerException npe) {
         }
     }
-
+    
     public void doTransAll(List<TransItem> aTransItems, boolean aTransAll, Trans aTrans) {
         int ListItemIndex = 0;
         int ListItemNo = 0;
@@ -13843,7 +13844,7 @@ public class TransBean implements Serializable {
         //refreshTransTotalWeight
         new TransItemBean().refreshTransTotalWeight(aTrans, aTransItems);
     }
-
+    
     public void initResetSalesInvoiceDetail(Trans aTrans, TransBean aTransBean, Transactor aBillTransactor, Transactor aTransactor) {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -13851,16 +13852,16 @@ public class TransBean implements Serializable {
             this.resetSalesInvoiceDetail(aTrans, aTransBean, aBillTransactor, aTransactor);
         }
     }
-
+    
     public void initResetHireUnReturnedItemsDetail(Trans aTrans, Transactor aTransactor, Item aItem, TransBean aTransBean) {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
         } else {
-
+            
             this.resetHireUnReturnedItemsDetail(aTrans, aTransactor, aItem, aTransBean);
         }
     }
-
+    
     public void initResetTransItemDetail(Trans aTrans, TransBean aTransBean, Item aItem, Transactor aBillTransactor, int aCategoryId) {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -13868,7 +13869,7 @@ public class TransBean implements Serializable {
             this.resetTransItemDetail(aTrans, aTransBean, aItem, aBillTransactor, aCategoryId);
         }
     }
-
+    
     public void initSalesInvoiceSession(long aTransId, String aAction) {
         //first set current selection in session
         FacesContext context = FacesContext.getCurrentInstance();
@@ -13892,7 +13893,7 @@ public class TransBean implements Serializable {
         //refresh history
         this.TransListHist = new ReportBean().getTransHistory(aTransId);
     }
-
+    
     public void initCreditDebitNoteSession(String aHasTransId, String aAction) {
         try {
             long TransId = Long.parseLong(aHasTransId.split(",")[0]);
@@ -13915,7 +13916,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void initHireReturnInvoiceSession() {
         System.out.println("INITED-initHireReturnInvoiceSession");
         //first set current selection in session
@@ -13934,7 +13935,7 @@ public class TransBean implements Serializable {
 //            this.PayObj = null;
 //        }
     }
-
+    
     public void initSalesInvoiceSession(long aTransId) {
         Trans trans = new Trans();
         Pay pay = new Pay();
@@ -13955,7 +13956,7 @@ public class TransBean implements Serializable {
             httpSession.setAttribute("CURRENT_PAY_ID", 0);
         }
     }
-
+    
     public void initSalesInvoiceSession_old(long aTransId, String aAction, Trans aTrans) {
         //first set current selection in session
         FacesContext context = FacesContext.getCurrentInstance();
@@ -13970,7 +13971,7 @@ public class TransBean implements Serializable {
         aTrans = new TransBean().getTrans(new GeneralUserSetting().getCurrentTransactionId());
         System.out.println("..." + aTrans.getGrandTotal());
     }
-
+    
     public void initSalesInvoiceDetail(Trans t, List<TransItem> aActiveTransItems, TransItem ti, Item aSelectedItem, Transactor aSelectedTransactor, int ClearNo, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor) {//Clear No: 0-do not clear, 1 - clear trans item only, 2 - clear all  
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -13982,7 +13983,7 @@ public class TransBean implements Serializable {
             //System.out.println("---" + t.getTransactionId());
         }
     }
-
+    
     public boolean updateTransactionTable(Trans aNewTrans) {
         boolean isTransUpdateSuccess = false;
         String newSQL = "{call sp_update_transaction2(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
@@ -14013,7 +14014,7 @@ public class TransBean implements Serializable {
         }
         return isTransUpdateSuccess;
     }
-
+    
     public void reportTransItemDetail(Trans aTrans, TransBean aTransBean, Item aItem, Transactor aTransactor, int aCategoryId) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -14071,14 +14072,14 @@ public class TransBean implements Serializable {
                     wheresql = wheresql + " AND t.transactor_id=" + aTransactor.getTransactorId();
                 }
             } catch (NullPointerException npe) {
-
+                
             }
             try {
                 if (null != aItem && aItem.getItemId() > 0) {
                     wheresql = wheresql + " AND ti.item_id=" + aItem.getItemId();
                 }
             } catch (NullPointerException npe) {
-
+                
             }
             if (aTransBean.getDateType().length() > 0 && aTransBean.getDate1() != null && aTransBean.getDate2() != null) {
                 switch (aTransBean.getDateType()) {
@@ -14178,7 +14179,7 @@ public class TransBean implements Serializable {
                     transitemsum = new TransItem();
                     try {
                         transitemsum.setCategoryName(new CategoryBean().getCategory(rssum.getInt("category_id")).getCategoryName());
-
+                        
                     } catch (Exception e) {
                         transitemsum.setCategoryName("");
                     }
@@ -14253,7 +14254,7 @@ public class TransBean implements Serializable {
             }
         }
     }
-
+    
     public void refreshTransListChoice(int aChoiceId, long aTransactorId, int aLimit) {
         int TransTypeId = 0;
         long TransactorId = 0;
@@ -14273,7 +14274,7 @@ public class TransBean implements Serializable {
             this.refreshTransList(TransTypeId, TransactorId, aLimit);
         }
     }
-
+    
     public void refreshTransListChoice(int aChoiceId, long aTransactorId, int aLimit, String aStatusColumn, String aStatusValues) {
         int TransTypeId = 0;
         long TransactorId = 0;
@@ -14289,7 +14290,7 @@ public class TransBean implements Serializable {
             this.refreshTransList(TransTypeId, TransactorId, aLimit);
         }
     }
-
+    
     public void refreshTransList(int aTransTypeId, long aTransactorId, int aLimit) {
         try {
             this.TransList.clear();
@@ -14300,7 +14301,7 @@ public class TransBean implements Serializable {
             this.TransList = this.getTranss(aTransTypeId, aTransactorId, aLimit);
         }
     }
-
+    
     public void refreshTransList(int aTransTypeId, long aTransactorId, int aLimit, String aStatusColumn, String aStatusValues) {
         try {
             this.TransList.clear();
@@ -14311,7 +14312,7 @@ public class TransBean implements Serializable {
             this.TransList = this.getTranss(aTransTypeId, aTransactorId, aLimit, aStatusColumn, aStatusValues);
         }
     }
-
+    
     public void setRecentHirePuporse(Trans aTrans, long aTransactorId) {
         aTrans.setTransactionComment("");
         long TransId = this.getMostRecentTransId(65, 94, aTransactorId);
@@ -14324,7 +14325,7 @@ public class TransBean implements Serializable {
             }
         }
     }
-
+    
     public long getMostRecentTransId(int aTransTypeId, int aTransReasId, long aTransactorId) {
         ResultSet rs = null;
         String sql = "";
@@ -14342,7 +14343,7 @@ public class TransBean implements Serializable {
         }
         return trans_id;
     }
-
+    
     public List<Trans> getTranss(int aTransTypeId, long aTransactorId, int aLimit) {
         String sql = "";
         List<Trans> TempTranss = new ArrayList<>();
@@ -14367,7 +14368,7 @@ public class TransBean implements Serializable {
         }
         return TempTranss;
     }
-
+    
     public List<Trans> getTranss(int aTransTypeId, long aTransactorId, int aLimit, String aStatusColumn, String aStatusValues) {
         String sql = "";
         List<Trans> TempTranss = new ArrayList<>();
@@ -14392,7 +14393,7 @@ public class TransBean implements Serializable {
         }
         return TempTranss;
     }
-
+    
     public void refreshTransListStoreTransferReq(int aTransTypeId, int aFromStoreId, int aToStoreId, int aLimit) {
         try {
             this.TransList.clear();
@@ -14401,7 +14402,7 @@ public class TransBean implements Serializable {
         }
         this.TransList = this.getTranssStoreTransferReq(aTransTypeId, aFromStoreId, aToStoreId, aLimit);
     }
-
+    
     public List<Trans> getTranssStoreTransferReq(int aTransTypeId, int aFromStoreId, int aToStoreId, int aLimit) {
         String sql = "";
         List<Trans> TempTranss = new ArrayList<>();
@@ -14426,7 +14427,7 @@ public class TransBean implements Serializable {
         }
         return TempTranss;
     }
-
+    
     public void getReturnNote(long aHireTransId, Trans aReturnTrans, List<TransItem> aReturnTransItems) {
         aReturnTransItems.clear();
         if (aHireTransId > 0) {
@@ -14474,7 +14475,7 @@ public class TransBean implements Serializable {
             }
         }
     }
-
+    
     public void getReturnNoteByNo(String aHireTransNo, Trans aReturnTrans, List<TransItem> aReturnTransItems) {
         aReturnTransItems.clear();
         if (aHireTransNo.length() > 0) {
@@ -14524,7 +14525,7 @@ public class TransBean implements Serializable {
             }
         }
     }
-
+    
     public void setHireReturnTotalsAndBalances(String aHireTransNo, List<TransItem> aTransItems) {
         try {
             TransItemBean tib = new TransItemBean();
@@ -14588,7 +14589,7 @@ public class TransBean implements Serializable {
             }
         }
     }
-
+    
     public void getDeliveryNoteByTransNo(String aHireTransNo, Trans aDeliveryTrans, List<TransItem> aReturnTransItems) {
         aReturnTransItems.clear();
         if (aHireTransNo.length() > 0) {
@@ -14633,7 +14634,7 @@ public class TransBean implements Serializable {
             }
         }
     }
-
+    
     public String getReturnHireInvoice(long aReturnNoteId) {
         String mg = "";
         TransItemBean tib = new TransItemBean();
@@ -14720,7 +14721,7 @@ public class TransBean implements Serializable {
         }
         return mg;
     }
-
+    
     public String getOrderSalesInvoice(long aOrderId, UserDetail aUserDetail) {
         String mg = "";
         TransItemBean tib = new TransItemBean();
@@ -14770,7 +14771,7 @@ public class TransBean implements Serializable {
         }
         return mg;
     }
-
+    
     public TransItem getHireTotalReturned(String aHireTransNo, TransItem aTransItem) {
         TransItem tempti = new TransItem();
         String sql = "";
@@ -14799,7 +14800,7 @@ public class TransBean implements Serializable {
         }
         return tempti;
     }
-
+    
     public TransItem getHireTotalDelivered(String aHireTransNo, TransItem aTransItem) {
         TransItem tempti = new TransItem();
         String sql = "";
@@ -14823,7 +14824,7 @@ public class TransBean implements Serializable {
         }
         return tempti;
     }
-
+    
     public TransItem getRefTransItemsTotal(int aTransTypeId, int aTransReasonId, String aTransNo, TransItem aTransItem) {
         TransItem tempti = new TransItem();
         String sql = "";
@@ -14851,7 +14852,7 @@ public class TransBean implements Serializable {
         }
         return tempti;
     }
-
+    
     public TransItem getRefTransItemsTotalNoSpecific(int aTransTypeId, int aTransReasonId, String aTransNo, TransItem aTransItem) {
         TransItem tempti = new TransItem();
         String sql = "";
@@ -14879,7 +14880,7 @@ public class TransBean implements Serializable {
         }
         return tempti;
     }
-
+    
     public void calcDuration(Trans aTrans) {
         try {
             if (null != aTrans.getFrom_date() && null != aTrans.getTo_date()) {
@@ -14888,10 +14889,10 @@ public class TransBean implements Serializable {
                 aTrans.setDuration_value(0);
             }
         } catch (NullPointerException npe) {
-
+            
         }
     }
-
+    
     public void calcToWeek(Trans aTrans) {
         try {
             if (null != aTrans.getFrom_date()) {
@@ -14901,10 +14902,10 @@ public class TransBean implements Serializable {
                 aTrans.setTo_date(null);
             }
         } catch (NullPointerException npe) {
-
+            
         }
     }
-
+    
     public void calcDurationReturn(Trans aTrans) {
         try {
             if (null != aTrans.getFrom_date() && null != aTrans.getTo_date()) {
@@ -14913,10 +14914,10 @@ public class TransBean implements Serializable {
                 aTrans.setDuration_value(0);
             }
         } catch (NullPointerException npe) {
-
+            
         }
     }
-
+    
     public void calcDuration(Trans aTrans, Date aFromDate, Date aToDate) {
         try {
             if (null != aFromDate && null != aToDate) {
@@ -14930,10 +14931,10 @@ public class TransBean implements Serializable {
                 aTrans.setDuration_value(0);
             }
         } catch (NullPointerException npe) {
-
+            
         }
     }
-
+    
     public void calcDurationReturn(Trans aTrans, Date aFromDate, Date aToDate) {
         try {
             if (null != aFromDate && null != aToDate) {
@@ -14947,10 +14948,10 @@ public class TransBean implements Serializable {
                 aTrans.setDuration_value(0);
             }
         } catch (NullPointerException npe) {
-
+            
         }
     }
-
+    
     public double calcDuration(Date aFromDate, Date aToDate) {
         double duration = 0;
         try {
@@ -14966,7 +14967,7 @@ public class TransBean implements Serializable {
         }
         return duration;
     }
-
+    
     public double calcDurationReturn(Date aFromDate, Date aToDate) {
         double duration = 0;
         try {
@@ -14982,7 +14983,7 @@ public class TransBean implements Serializable {
         }
         return duration;
     }
-
+    
     public void calcDuration(Trans aTrans, Date aFromDate, Date aToDate, List<TransItem> aTransItems) {
         try {
             if (null != aFromDate && null != aToDate) {
@@ -15000,10 +15001,10 @@ public class TransBean implements Serializable {
                 aTransItems.get(i).setDuration_passed(aTrans.getDuration_value());//cal weeks passed
             }
         } catch (NullPointerException npe) {
-
+            
         }
     }
-
+    
     public void calcDurationPassedOnReturn(Trans aTrans, Trans aRefTrans, List<TransItem> aTransItems) {
         try {
             //aReturnTrans.setDuration_value(this.calcDurationReturn(this.RefTrans.getTo_date(), aReturnTrans.getTransactionDate()));
@@ -15023,10 +15024,10 @@ public class TransBean implements Serializable {
                 aTransItems.get(i).setDuration_passed(weekspassed);//cal weeks passed
             }
         } catch (NullPointerException npe) {
-
+            
         }
     }
-
+    
     public double getDurationPassedOnReturn(Trans aTrans, Trans aRefTrans) {
         double weekspassed = 0;
         try {
@@ -15042,7 +15043,7 @@ public class TransBean implements Serializable {
         }
         return weekspassed;
     }
-
+    
     public double getDurationPassedOnReturn(Date aReturnDate, Date aHireFromDate, double aWeeksHired) {
         double weekspassed = 0;
         try {
@@ -15058,7 +15059,7 @@ public class TransBean implements Serializable {
         }
         return weekspassed;
     }
-
+    
     public void refreshCustomerBalances(Trans aTrans) {
         //receivable balances
         try {
@@ -15075,7 +15076,7 @@ public class TransBean implements Serializable {
             aTrans.setDeposit_customer(0);
         }
     }
-
+    
     public void refreshCustomerBalances2(Trans aTrans) {
         //receivable balances
         try {
@@ -15092,7 +15093,7 @@ public class TransBean implements Serializable {
             aTrans.setDeposit_customer2(0);
         }
     }
-
+    
     public void refreshSupplierBalances(Trans aTrans) {
         //payable balances
         try {
@@ -15109,7 +15110,7 @@ public class TransBean implements Serializable {
             aTrans.setDeposit_supplier(0);
         }
     }
-
+    
     public void refreshSupplierBalances2(Trans aTrans) {
         //payable balances
         try {
@@ -15126,7 +15127,7 @@ public class TransBean implements Serializable {
             aTrans.setDeposit_supplier(0);
         }
     }
-
+    
     public void openChildCashDiscount() {
         Map<String, Object> options = new HashMap<String, Object>();
         options.put("modal", true);
@@ -15141,11 +15142,11 @@ public class TransBean implements Serializable {
         options.put("dynamic", true);
         org.primefaces.PrimeFaces.current().dialog().openDynamic("CashDiscount", options, null);
     }
-
+    
     public void refreshTransListQuickOrderManage(Trans aTrans) {
         //re-set navigation details to order
         new NavigationBean().setToSaleOrderQuick();
-
+        
         this.ActionMessage = "";
         ResultSet rs = null;
         this.TransList = new ArrayList<>();
@@ -15185,7 +15186,7 @@ public class TransBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-
+            
         }
         if (aTrans.getLocation_id() > 0) {
             wheresql = wheresql + " AND location_id=" + aTrans.getLocation_id();
@@ -15213,7 +15214,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void refreshTransListQuickOrderDashboard(Trans aTrans) {
         //re-set navigation details to order
         //new NavigationBean().setToSaleOrderQuick();
@@ -15254,7 +15255,7 @@ public class TransBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-
+            
         }
         //wheresql = WhereAppend + " AND transaction_date BETWEEN '" + new java.sql.Date(aTransBean.getDate1().getTime()) + "' AND '" + new java.sql.Date(aTransBean.getDate2().getTime()) + "'";
         ordersql = " ORDER BY add_date DESC,transaction_id DESC";
@@ -15277,7 +15278,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void updateLookup(Trans aTrans) {
         if (null != aTrans) {
             try {
@@ -15319,12 +15320,12 @@ public class TransBean implements Serializable {
             }
         }
     }
-
+    
     public void closeChildCashDiscount() {
         //org.primefaces.context.RequestContext.getCurrentInstance().closeDialog(this.SelectedTrans);
         org.primefaces.PrimeFaces.current().dialog().closeDynamic(this.SelectedTrans);
     }
-
+    
     public void closeSalesOrderParentInvoice() {
         try {
             //org.primefaces.context.RequestContext.getCurrentInstance().closeDialog("SaleOrderParentInvoiceTrans");
@@ -15333,11 +15334,11 @@ public class TransBean implements Serializable {
             //do nothing
         }
     }
-
+    
     public void onChildCashDiscount(SelectEvent selectEvent) {
         this.SelectedTrans = (Trans) selectEvent.getObject();
     }
-
+    
     public void RefreshCurrentUser(UserDetail aUserDeatail, Store aStore) {
         //create seesion
         FacesContext context = FacesContext.getCurrentInstance();
@@ -15354,7 +15355,7 @@ public class TransBean implements Serializable {
         } catch (NullPointerException npe) {
         }
     }
-
+    
     public void quickOrderActions(Trans aTrans, List<Trans> aActiveTranss, String aAction) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -15566,7 +15567,7 @@ public class TransBean implements Serializable {
                 case "Print":
                     while (ListItemIndex < ListItemNo) {
                         if (at.get(ListItemIndex).getIs_selected() == 1) {
-
+                            
                         }
                         ListItemIndex = ListItemIndex + 1;
                     }
@@ -15578,11 +15579,11 @@ public class TransBean implements Serializable {
             }
         }
     }
-
+    
     public void clickSearchButton() {
         org.primefaces.PrimeFaces.current().executeScript("doSearchClick()");
     }
-
+    
     public int getSelectedIndex(List<Trans> aActiveTranss) {
         List<Trans> at = aActiveTranss;
         int ListItemIndex = 0;
@@ -15595,7 +15596,7 @@ public class TransBean implements Serializable {
         }
         return ListItemIndex;
     }
-
+    
     public Trans getSelectedTransFromAll(List<Trans> aAllTranss) {
         List<Trans> at = aAllTranss;
         int ListItemIndex = 0;
@@ -15610,13 +15611,13 @@ public class TransBean implements Serializable {
         }
         return trans;
     }
-
+    
     public Trans getFirstTransFromSelected(List<Trans> aSelectedTranss) {
         List<Trans> at = aSelectedTranss;
         Trans trans = at.get(0);
         return trans;
     }
-
+    
     public List<Trans> getSelectedTranss(List<Trans> aActiveTranss) {
         List<Trans> at = aActiveTranss;
         List<Trans> SelTranss = new ArrayList<>();
@@ -15630,7 +15631,7 @@ public class TransBean implements Serializable {
         }
         return SelTranss;
     }
-
+    
     public String getSelectedTranssIDsExcFirst(Trans aFirstTrans, List<Trans> aActiveTranss) {
         List<Trans> at = aActiveTranss;
         String SelTranssIDsExcFirst = "";
@@ -15652,7 +15653,7 @@ public class TransBean implements Serializable {
         }
         return SelTranssIDsExcFirst;
     }
-
+    
     public int countSelected(List<Trans> aActiveTranss) {
         List<Trans> at = aActiveTranss;
         int ListItemIndex = 0;
@@ -15666,7 +15667,7 @@ public class TransBean implements Serializable {
         }
         return counter;
     }
-
+    
     public int countSelectedStatus(List<Trans> aActiveTranss, String aStatus) {
         List<Trans> at = aActiveTranss;
         int ListItemIndex = 0;
@@ -15694,7 +15695,7 @@ public class TransBean implements Serializable {
         }
         return counter;
     }
-
+    
     public int countSelectedStores(List<Trans> aActiveTranss, String aFromOrTo) {
         List<Trans> at = aActiveTranss;
         int ListItemIndex = 0;
@@ -15724,7 +15725,7 @@ public class TransBean implements Serializable {
         }
         return counter;
     }
-
+    
     public void clearIs_selected(List<Trans> aActiveTranss) {
         List<Trans> at = aActiveTranss;
         int ListItemIndex = 0;
@@ -15734,7 +15735,7 @@ public class TransBean implements Serializable {
             ListItemIndex = ListItemIndex + 1;
         }
     }
-
+    
     public String processOrder(Trans aTrans, UserDetail aUserDetail) {
         String msg = "";
         String sql = "UPDATE transaction SET is_processed=1 WHERE transaction_id=" + aTrans.getTransactionId();
@@ -15754,7 +15755,7 @@ public class TransBean implements Serializable {
         }
         return msg;
     }
-
+    
     public void updateOrderIsInvoiced(long aOrderId, String aInvoiceNumber, UserDetail aUserDetail) {
         String sql = "UPDATE transaction SET is_invoiced=1, transaction_comment='" + aInvoiceNumber + "' WHERE transaction_id=" + aOrderId;
         try (
@@ -15765,7 +15766,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void updateOrderIsInvoicedPaid(long aOrderId, String aInvoiceNumber, UserDetail aUserDetail) {
         String sql = "UPDATE transaction SET is_invoiced=1,is_paid=1,transaction_comment='" + aInvoiceNumber + "' WHERE transaction_id=" + aOrderId;
         try (
@@ -15776,7 +15777,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public String cancelOrder(Trans aTrans, UserDetail aUserDetail) {
         String msg = "";
         String sql = "UPDATE transaction SET is_cancel=1 WHERE transaction_id=" + aTrans.getTransactionId();
@@ -15796,7 +15797,7 @@ public class TransBean implements Serializable {
         }
         return msg;
     }
-
+    
     public void updateOrderStatus(long aOrderId, String aStatusColumnName, int aStatusValue) {
         //aStatus=is_invoiced,is_cancel,is_processed,is_pad
         String sql = "UPDATE transaction SET " + aStatusColumnName + "=" + aStatusValue + " WHERE transaction_id=" + aOrderId;
@@ -15808,7 +15809,7 @@ public class TransBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public int deleteTranssByIDs(String aAffectedTranssIDs) {
         int passed = 0;
         String sql = "DELETE FROM transaction WHERE transaction_id>0 AND transaction_id IN(" + aAffectedTranssIDs + ")";
@@ -15823,7 +15824,7 @@ public class TransBean implements Serializable {
         }
         return passed;
     }
-
+    
     public String getDisplayCategory(Category aCategory) {
         String outc = "Category";
         try {
@@ -15836,7 +15837,7 @@ public class TransBean implements Serializable {
         }
         return outc;
     }
-
+    
     public String getDisplayStore(int aStoreId) {
         String outc = CompanySetting.getStoreEquivName();
         try {
@@ -15848,7 +15849,7 @@ public class TransBean implements Serializable {
         }
         return outc;
     }
-
+    
     public String getDisplayUserDetail(int aUserDetailId) {
         String outc = "User";
         try {
@@ -15860,7 +15861,7 @@ public class TransBean implements Serializable {
         }
         return outc;
     }
-
+    
     public String getDisplayLocation(int aLocationId) {
         String outc = "Loc";
         try {
@@ -15872,7 +15873,7 @@ public class TransBean implements Serializable {
         }
         return outc;
     }
-
+    
     public void refreshOrderGrandTotal(List<Trans> aActiveTranss) {
         List<Trans> ati = aActiveTranss;
         int ListItemIndex = 0;
@@ -15884,7 +15885,7 @@ public class TransBean implements Serializable {
         }
         this.OrderSummaryTotal = SubT;
     }
-
+    
     public void initTransactorMerge(Trans aTrans, Transactor aTransactor, Transactor aBillTransactor) {
         if (null == aTrans) {
             //do nothing
@@ -16672,5 +16673,5 @@ public class TransBean implements Serializable {
     public void setTransItemSummary2(List<TransItem> TransItemSummary2) {
         this.TransItemSummary2 = TransItemSummary2;
     }
-
+    
 }
