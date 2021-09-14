@@ -12525,3 +12525,14 @@ BEGIN
 	);
 END//
 DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_cr_dr;
+DELIMITER //
+CREATE PROCEDURE sp_search_cr_dr
+(
+	IN in_transaction_number varchar(50)
+) 
+BEGIN 
+	SELECT ifnull((select group_concat(concat(t2.transaction_id,',',t2.transaction_comment) separator ':') from transaction_cr_dr_note t2 where t2.transaction_ref=in_transaction_number),'') as cr_dr_flag;
+END//
+DELIMITER ;
