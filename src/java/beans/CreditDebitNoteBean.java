@@ -2,24 +2,35 @@ package beans;
 
 import connections.DBConnection;
 import entities.CompanySetting;
+import entities.Pay;
 import entities.Store;
 import entities.Trans;
 import entities.TransItem;
 import entities.TransactionReason;
 import entities.TransactionType;
+import entities.Transactor;
 import java.io.Serializable;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import static java.sql.Types.VARCHAR;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import sessions.GeneralUserSetting;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import utilities.UtilityBean;
 
 /*
  * To change this template, choose Tools | Templates
@@ -35,6 +46,19 @@ public class CreditDebitNoteBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = Logger.getLogger(CreditDebitNoteBean.class.getName());
+    private String DateType;
+    private Date Date1;
+    private Date Date2;
+    private String FieldName;
+    private List<Trans> TransList;
+    private List<Trans> TransListSummary;
+    private String ActionMessage = null;
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
+    private Trans TransObj;
+    private List<TransItem> TransItemList;
+    private Pay PayObj;
+    private String ActionType;
 
     public Trans getTrans_cr_dr_note(long aTransactionId) {
         String sql = "{call sp_search_transaction_by_id_cr_dr_note(?)}";
@@ -629,6 +653,469 @@ public class CreditDebitNoteBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
         return n;
+    }
+
+    public void initResetSalesCrDrNoteDetail(Trans aTrans, CreditDebitNoteBean aCreditDebitNoteBean, Transactor aBillTransactor, Transactor aTransactor) {
+        if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
+            // Skip ajax requests.
+        } else {
+            this.resetSalesCrDrNoteDetail(aTrans, aCreditDebitNoteBean, aBillTransactor, aTransactor);
+        }
+    }
+
+    public void resetSalesCrDrNoteDetail(Trans aTrans, CreditDebitNoteBean aCreditDebitNoteBean, Transactor aBillTransactor, Transactor aTransactor) {
+        aCreditDebitNoteBean.setActionMessage("");
+        try {
+            new TransBean().clearTrans(aTrans);
+            aTrans.setTransactionTypeId(0);
+            aTrans.setTransactionReasonId(0);
+        } catch (NullPointerException npe) {
+        }
+        try {
+            new TransactorBean().clearTransactor(aBillTransactor);
+        } catch (NullPointerException npe) {
+        }
+        try {
+            new TransactorBean().clearTransactor(aTransactor);
+        } catch (NullPointerException npe) {
+        }
+        try {
+            aCreditDebitNoteBean.setDateType("");
+            aCreditDebitNoteBean.setDate1(null);
+            aCreditDebitNoteBean.setDate2(null);
+            aCreditDebitNoteBean.setFieldName("");
+            aCreditDebitNoteBean.TransList.clear();
+            aCreditDebitNoteBean.TransListSummary.clear();
+        } catch (NullPointerException npe) {
+        }
+    }
+
+    public void setDateToToday() {
+        Date CurrentServerDate = new CompanySetting().getCURRENT_SERVER_DATE();
+        this.setDate1(CurrentServerDate);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(this.getDate1());
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        // Put it back in the Date object  
+        this.setDate1(cal.getTime());
+
+        this.setDate2(CurrentServerDate);
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTime(this.getDate2());
+        cal2.set(Calendar.HOUR_OF_DAY, 23);
+        cal2.set(Calendar.MINUTE, 59);
+        cal2.set(Calendar.SECOND, 0);
+        cal2.set(Calendar.MILLISECOND, 0);
+        // Put it back in the Date object  
+        this.setDate2(cal2.getTime());
+    }
+
+    public void setDateToYesturday() {
+        Date CurrentServerDate = new CompanySetting().getCURRENT_SERVER_DATE();
+
+        this.setDate1(CurrentServerDate);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(this.getDate1());
+        cal.add(Calendar.DATE, -1);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        // Put it back in the Date object  
+        this.setDate1(cal.getTime());
+
+        this.setDate2(CurrentServerDate);
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTime(this.getDate2());
+        cal2.add(Calendar.DATE, -1);
+        cal2.set(Calendar.HOUR_OF_DAY, 23);
+        cal2.set(Calendar.MINUTE, 59);
+        cal2.set(Calendar.SECOND, 0);
+        cal2.set(Calendar.MILLISECOND, 0);
+        // Put it back in the Date object  
+        this.setDate2(cal2.getTime());
+    }
+
+    public void reportSalesCrDrNoteDetail(Trans aTrans, CreditDebitNoteBean aCreditDebitNoteBean) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
+        try {
+            BaseName = getMenuItemBean().getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
+        String msg = "";
+        aCreditDebitNoteBean.setActionMessage("");
+        try {
+            if ((aCreditDebitNoteBean.getDate1() != null && aCreditDebitNoteBean.getDate2() != null) || aTrans.getTransactionNumber().length() > 0 || aTrans.getTransactionRef().length() > 0) {
+                //okay no problem
+            } else {
+                msg = "Either Select Date Range or Specify Note Number or Specify Invoice Reference Number";
+            }
+        } catch (Exception e) {
+            //do nothing
+        }
+        if (aCreditDebitNoteBean.getDateType().length() == 0) {
+            aCreditDebitNoteBean.setDateType("Add Date");
+        }
+        ResultSet rs = null;
+        this.TransList = new ArrayList<>();
+        this.TransListSummary = new ArrayList<>();
+        if (msg.length() > 0) {
+            aCreditDebitNoteBean.setActionMessage(ub.translateWordsInText(BaseName, msg));
+            FacesContext.getCurrentInstance().addMessage("Report", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+        } else {
+            String sql = "SELECT * FROM transaction_cr_dr_note WHERE 1=1";
+            String sqlsum = "";
+            if (aCreditDebitNoteBean.getFieldName().length() > 0) {
+                sqlsum = "SELECT " + aCreditDebitNoteBean.getFieldName() + ",currency_code,sum(grand_total) as grand_total,sum(total_profit_margin) as total_profit_margin,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount,sum(spent_points_amount) as spent_points_amount FROM transaction_cr_dr_note WHERE 1=1";
+            } else {
+                sqlsum = "SELECT currency_code,sum(grand_total) as grand_total,sum(total_profit_margin) as total_profit_margin,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount,sum(spent_points_amount) as spent_points_amount FROM transaction_cr_dr_note WHERE 1=1";
+            }
+            String wheresql = "";
+            String ordersql = "";
+            String ordersqlsum = "";
+            String groupbysql = "";
+            if (aCreditDebitNoteBean.getFieldName().length() > 0) {
+                groupbysql = " GROUP BY " + aCreditDebitNoteBean.getFieldName() + ",currency_code";
+            } else {
+                groupbysql = " GROUP BY currency_code";
+            }
+            if (aTrans.getStoreId() > 0) {
+                wheresql = wheresql + " AND store_id=" + aTrans.getStoreId();
+            }
+            if (aTrans.getTransactionNumber().length() > 0) {
+                wheresql = wheresql + " AND transaction_number='" + aTrans.getTransactionNumber() + "'";
+            }
+            if (aTrans.getTransactionRef().length() > 0) {
+                wheresql = wheresql + " AND transaction_ref='" + aTrans.getTransactionRef() + "'";
+            }
+            if (aTrans.getAddUserDetailId() > 0) {
+                wheresql = wheresql + " AND add_user_detail_id=" + aTrans.getAddUserDetailId();
+            }
+            if (aTrans.getTransactionUserDetailId() > 0) {
+                wheresql = wheresql + " AND transaction_user_detail_id=" + aTrans.getTransactionUserDetailId();
+            }
+            if (aTrans.getBillTransactorId() > 0) {
+                wheresql = wheresql + " AND bill_transactor_id=" + aTrans.getBillTransactorId();
+            }
+            if (aTrans.getTransactorId() > 0) {
+                wheresql = wheresql + " AND transactor_id=" + aTrans.getTransactorId();
+            }
+            if (aCreditDebitNoteBean.getDateType().length() > 0 && aCreditDebitNoteBean.getDate1() != null && aCreditDebitNoteBean.getDate2() != null) {
+                switch (aCreditDebitNoteBean.getDateType()) {
+                    case "Note Date":
+                        wheresql = wheresql + " AND transaction_date BETWEEN '" + new java.sql.Date(aCreditDebitNoteBean.getDate1().getTime()) + "' AND '" + new java.sql.Date(aCreditDebitNoteBean.getDate2().getTime()) + "'";
+                        break;
+                    case "Add Date":
+                        wheresql = wheresql + " AND add_date BETWEEN '" + new java.sql.Timestamp(aCreditDebitNoteBean.getDate1().getTime()) + "' AND '" + new java.sql.Timestamp(aCreditDebitNoteBean.getDate2().getTime()) + "'";
+                        break;
+                }
+            }
+            ordersql = " ORDER BY add_date DESC,transaction_id DESC";
+            if (aCreditDebitNoteBean.getFieldName().length() > 0) {
+                ordersqlsum = " ORDER BY " + aCreditDebitNoteBean.getFieldName() + ",currency_code";
+            } else {
+                ordersqlsum = " ORDER BY currency_code";
+            }
+            sql = sql + wheresql + ordersql;
+            sqlsum = sqlsum + wheresql + groupbysql + ordersqlsum;
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                rs = ps.executeQuery();
+                Trans trans = null;
+                TransBean tb = new TransBean();
+                while (rs.next()) {
+                    trans = new Trans();
+                    tb.setTransFromResultset(trans, rs);
+                    this.TransList.add(trans);
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
+            }
+
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sqlsum);) {
+                rs = ps.executeQuery();
+                Trans transsum = null;
+                while (rs.next()) {
+                    transsum = new Trans();
+                    if (aCreditDebitNoteBean.getFieldName().length() > 0) {
+                        switch (aCreditDebitNoteBean.getFieldName()) {
+                            case "add_user_detail_id":
+                                try {
+                                    transsum.setAddUserDetailId(rs.getInt("add_user_detail_id"));
+                                } catch (NullPointerException npe) {
+                                    transsum.setAddUserDetailId(0);
+                                }
+                                break;
+                            case "transaction_user_detail_id":
+                                try {
+                                    transsum.setTransactionUserDetailId(rs.getInt("transaction_user_detail_id"));
+                                } catch (NullPointerException npe) {
+                                    transsum.setTransactionUserDetailId(0);
+                                }
+                                break;
+                            case "bill_transactor_id":
+                                try {
+                                    transsum.setBillTransactorId(rs.getLong("bill_transactor_id"));
+                                } catch (NullPointerException npe) {
+                                    transsum.setBillTransactorId(0);
+                                }
+                                break;
+                            case "transactor_id":
+                                try {
+                                    transsum.setTransactorId(rs.getLong("transactor_id"));
+                                } catch (NullPointerException npe) {
+                                    transsum.setTransactorId(0);
+                                }
+                                break;
+                            case "transaction_date":
+                                try {
+                                    transsum.setTransactionDate(new Date(rs.getDate("transaction_date").getTime()));
+                                } catch (NullPointerException | SQLException npe) {
+                                    transsum.setTransactionDate(null);
+                                }
+                                break;
+                            case "store_id":
+                                try {
+                                    transsum.setStoreId(rs.getInt("store_id"));
+                                    Store st = new StoreBean().getStore(transsum.getStoreId());
+                                    transsum.setStoreName(st.getStoreName());
+                                } catch (NullPointerException npe) {
+                                    transsum.setStoreName("");
+                                }
+                                break;
+                        }
+                    }
+                    try {
+                        transsum.setCurrencyCode(rs.getString("currency_code"));
+                    } catch (NullPointerException npe) {
+                        transsum.setCurrencyCode("");
+                    }
+                    try {
+                        transsum.setGrandTotal(rs.getDouble("grand_total"));
+                    } catch (NullPointerException npe) {
+                        transsum.setGrandTotal(0);
+                    }
+                    try {
+                        transsum.setTotalProfitMargin(rs.getDouble("total_profit_margin"));
+                    } catch (NullPointerException npe) {
+                        transsum.setTotalProfitMargin(0);
+                    }
+                    try {
+                        transsum.setTotalVat(rs.getDouble("total_vat"));
+                    } catch (NullPointerException npe) {
+                        transsum.setTotalVat(0);
+                    }
+                    try {
+                        transsum.setCashDiscount(rs.getDouble("cash_discount"));
+                    } catch (NullPointerException npe) {
+                        transsum.setCashDiscount(0);
+                    }
+                    try {
+                        transsum.setSpendPointsAmount(rs.getDouble("spent_points_amount"));
+                    } catch (NullPointerException npe) {
+                        transsum.setSpendPointsAmount(0);
+                    }
+                    this.TransListSummary.add(transsum);
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
+            }
+        }
+    }
+
+    public void initCreditDebitNoteSession(long aTransId, String aAction) {
+        try {
+            long TransId = aTransId;
+            FacesContext context = FacesContext.getCurrentInstance();
+            HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+            HttpSession httpSession = request.getSession(true);
+            httpSession.setAttribute("CURRENT_TRANSACTION_ID", TransId);
+            httpSession.setAttribute("CURRENT_TRANSACTION_ACTION", aAction);
+            httpSession.setAttribute("CURRENT_PAY_ID", 0);
+            this.setActionType(aAction);
+            //this.setTransObj(new CreditDebitNoteBean().getTrans_cr_dr_note(TransId));
+            //this.setTransItemList(new CreditDebitNoteBean().getTransItemsByTransactionId_cr_dr_note(TransId));
+            //this.setPayObj(null);
+            //refresh output
+            new OutputDetailBean().refreshOutputCrDr("PARENT", "");
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    /**
+     * @return the DateType
+     */
+    public String getDateType() {
+        return DateType;
+    }
+
+    /**
+     * @param DateType the DateType to set
+     */
+    public void setDateType(String DateType) {
+        this.DateType = DateType;
+    }
+
+    /**
+     * @return the Date1
+     */
+    public Date getDate1() {
+        return Date1;
+    }
+
+    /**
+     * @param Date1 the Date1 to set
+     */
+    public void setDate1(Date Date1) {
+        this.Date1 = Date1;
+    }
+
+    /**
+     * @return the Date2
+     */
+    public Date getDate2() {
+        return Date2;
+    }
+
+    /**
+     * @param Date2 the Date2 to set
+     */
+    public void setDate2(Date Date2) {
+        this.Date2 = Date2;
+    }
+
+    /**
+     * @return the FieldName
+     */
+    public String getFieldName() {
+        return FieldName;
+    }
+
+    /**
+     * @param FieldName the FieldName to set
+     */
+    public void setFieldName(String FieldName) {
+        this.FieldName = FieldName;
+    }
+
+    /**
+     * @return the TransList
+     */
+    public List<Trans> getTransList() {
+        return TransList;
+    }
+
+    /**
+     * @param TransList the TransList to set
+     */
+    public void setTransList(List<Trans> TransList) {
+        this.TransList = TransList;
+    }
+
+    /**
+     * @return the TransListSummary
+     */
+    public List<Trans> getTransListSummary() {
+        return TransListSummary;
+    }
+
+    /**
+     * @param TransListSummary the TransListSummary to set
+     */
+    public void setTransListSummary(List<Trans> TransListSummary) {
+        this.TransListSummary = TransListSummary;
+    }
+
+    /**
+     * @return the ActionMessage
+     */
+    public String getActionMessage() {
+        return ActionMessage;
+    }
+
+    /**
+     * @param ActionMessage the ActionMessage to set
+     */
+    public void setActionMessage(String ActionMessage) {
+        this.ActionMessage = ActionMessage;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
+    }
+
+    /**
+     * @return the TransObj
+     */
+    public Trans getTransObj() {
+        return TransObj;
+    }
+
+    /**
+     * @param TransObj the TransObj to set
+     */
+    public void setTransObj(Trans TransObj) {
+        this.TransObj = TransObj;
+    }
+
+    /**
+     * @return the TransItemList
+     */
+    public List<TransItem> getTransItemList() {
+        return TransItemList;
+    }
+
+    /**
+     * @param TransItemList the TransItemList to set
+     */
+    public void setTransItemList(List<TransItem> TransItemList) {
+        this.TransItemList = TransItemList;
+    }
+
+    /**
+     * @return the PayObj
+     */
+    public Pay getPayObj() {
+        return PayObj;
+    }
+
+    /**
+     * @param PayObj the PayObj to set
+     */
+    public void setPayObj(Pay PayObj) {
+        this.PayObj = PayObj;
+    }
+
+    /**
+     * @return the ActionType
+     */
+    public String getActionType() {
+        return ActionType;
+    }
+
+    /**
+     * @param ActionType the ActionType to set
+     */
+    public void setActionType(String ActionType) {
+        this.ActionType = ActionType;
     }
 
 }

@@ -1175,6 +1175,10 @@ public class NavigationBean implements Serializable {
         return "ReportSalesInvoiceDetail?faces-redirect=true";
     }
 
+    public String redirectToReportSalesCrDrNoteDetail() {
+        return "ReportSalesCrDrNoteDetail?faces-redirect=true";
+    }
+
     public String redirectToReportOverpaidTrans() {
         return "ReportOverpaidTrans?faces-redirect=true";
     }
@@ -1370,7 +1374,7 @@ public class NavigationBean implements Serializable {
     public String redirectToReportSalesInvoiceAge() {
         return "ReportSalesInvoiceAge?faces-redirect=true";
     }
-    
+
     public String redirectToReportSupplierInvoiceAge() {
         return "ReportSupplierInvoiceAge?faces-redirect=true";
     }
