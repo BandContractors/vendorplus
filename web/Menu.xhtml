@@ -344,12 +344,6 @@
                         <p:separator />
                     </p:submenu>
                     <p:separator />
-                    <p:submenu label="#{langsys['Employee']}">
-                        <p:separator />
-                        <p:menuitem value="#{langsys['Employee']} #{langsys['List']}" action="#{navigationBean.redirectToReportEmployee()}" />
-                        <p:separator />
-                    </p:submenu>
-                    <p:separator />
                     <p:submenu label="#{langsys['Inventory']}">
                         <p:separator />
                         <p:menuitem value="#{langsys['Stock']} #{langsys['Movement']}" action="#{navigationBean.redirectToReportInventoryLedger()}" />
@@ -377,10 +371,6 @@
                         <p:menuitem value="#{langsys['Goods']} #{langsys['Delivery']}" action="#{navigationBean.redirectToReportSalesDeliveryDetail()}" />
                         <p:separator />
                         <p:menuitem value="#{langsys['User']} #{langsys['Earn']} #{langsys['Report']}" action="#{navigationBean.redirectToReportSalesUserEarnDetail()}" />
-                        <p:separator />
-                        <p:menuitem value="#{langsys['TaxBody']} #{langsys['Interface']}" action="#{navigationBean.redirectToReportSalesTaxAPI()}" />
-                        <p:separator />
-                        <p:menuitem value="SMbi #{langsys['Interface']}" action="#{navigationBean.redirectToReportSMbiAPI()}" />
                         <p:separator />
                     </p:submenu>
                     <p:separator />
@@ -497,6 +487,16 @@
                         <p:menuitem value="#{langsys['Overpaid']} #{langsys['Transactions']}" action="#{navigationBean.redirectToReportOverpaidTrans()}" />
                         <p:separator />
                         <p:menuitem value="#{langsys['Stock']} #{langsys['Pricing']}/#{langsys['Qty']} #{langsys['Errors']}" action="#{navigationBean.redirectToReportStockPriceQtyError()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="#{langsys['Interface']} #{langsys['Reports']}">  
+                        <p:separator />
+                        <p:menuitem value="#{langsys['TaxBody']} #{langsys['Sales']}" action="#{navigationBean.redirectToReportSalesTaxAPI()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['TaxBody']} #{langsys['Stock']}" action="#{navigationBean.redirectToReportStockTaxAPI()}" />
+                        <p:separator />
+                        <p:menuitem value="SMbi #{langsys['Interface']}" action="#{navigationBean.redirectToReportSMbiAPI()}" />
                         <p:separator />
                     </p:submenu>
                     <p:separator />

@@ -1191,6 +1191,10 @@ public class NavigationBean implements Serializable {
         return "ReportSalesTaxAPI?faces-redirect=true";
     }
 
+    public String redirectToReportStockTaxAPI() {
+        return "ReportStockTaxAPI?faces-redirect=true";
+    }
+
     public String redirectToReportSMbiAPI() {
         return "ReportSMbiAPI?faces-redirect=true";
     }

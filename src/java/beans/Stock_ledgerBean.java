@@ -622,6 +622,106 @@ public class Stock_ledgerBean implements Serializable {
         }
     }
 
+    public void reportStockTaxAPICall(Stock_ledger aStock_ledger, Stock_ledgerBean aStock_ledgerBean, Item aItem) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
+        String msg = "";
+        aStock_ledgerBean.setActionMessage("");
+        int Month1 = 0;
+        int Month2 = 0;
+        int Year1 = 0;
+        int Year2 = 0;
+        try {
+            Month1 = new UtilityBean().getMonthFromDate(aStock_ledgerBean.getDate1());
+            Month2 = new UtilityBean().getMonthFromDate(aStock_ledgerBean.getDate2());
+            Year1 = new UtilityBean().getYearFromDate(aStock_ledgerBean.getDate1());
+            Year2 = new UtilityBean().getYearFromDate(aStock_ledgerBean.getDate2());
+        } catch (Exception e) {
+        }
+        if (Month1 == 0 || Month2 == 0 || Month1 != Month2 || Year1 == 0 || Year2 == 0 || Year1 != Year2) {
+            msg = "From Date and To Date Must be Within Same Month";
+        }
+        if (msg.length() > 0) {
+            aStock_ledgerBean.setActionMessage(ub.translateWordsInText(BaseName, msg));
+            FacesContext.getCurrentInstance().addMessage("Report", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+        } else {
+            String TableName = this.getStockLedgerTableName(Year1, Month1);
+            this.reportStockTaxAPIDetail(TableName, aStock_ledger, aStock_ledgerBean, aItem);
+        }
+    }
+
+    public void reportStockTaxAPIDetail(String aTableName, Stock_ledger aStock_ledger, Stock_ledgerBean aStock_ledgerBean, Item aItem) {
+        aStock_ledgerBean.setActionMessage("");
+        ResultSet rs = null;
+        this.Stock_ledgerList = new ArrayList<>();
+        String sql = "SELECT l.*,i.description,un.unit_symbol,tt.transaction_type_name,us.user_name,s.store_name "
+                + "FROM " + aTableName + " l "
+                + "INNER JOIN item i ON l.item_id=i.item_id "
+                + "INNER JOIN unit un ON i.unit_id=un.unit_id "
+                + "INNER JOIN transaction_type tt ON l.transaction_type_id=tt.transaction_type_id "
+                + "INNER JOIN user_detail us ON l.user_detail_id=us.user_detail_id "
+                + "INNER JOIN store s ON l.store_id=s.store_id "
+                + "WHERE l.transaction_type_id NOT IN (2,4) AND l.tax_is_updated=1";
+        String wheresql = "";
+        String ordersql = "";
+        if (aStock_ledger.getStore_id() > 0) {
+            wheresql = wheresql + " AND l.store_id=" + aStock_ledger.getStore_id();
+        }
+        if (aStock_ledger.getTransaction_type_id() > 0) {
+            wheresql = wheresql + " AND l.transaction_type_id=" + aStock_ledger.getTransaction_type_id();
+        }
+        if (aStock_ledger.getUser_detail_id() > 0) {
+            wheresql = wheresql + " AND l.user_detail_id=" + aStock_ledger.getUser_detail_id();
+        }
+        try {
+            if (null != aItem && aItem.getItemId() > 0) {
+                wheresql = wheresql + " AND l.item_id=" + aItem.getItemId();
+            }
+        } catch (NullPointerException npe) {
+
+        }
+        if (aStock_ledgerBean.getDate1() != null && aStock_ledgerBean.getDate2() != null) {
+            wheresql = wheresql + " AND l.add_date BETWEEN '" + new java.sql.Timestamp(aStock_ledgerBean.getDate1().getTime()) + "' AND '" + new java.sql.Timestamp(aStock_ledgerBean.getDate2().getTime()) + "'";
+        }
+        ordersql = " ORDER BY l.add_date DESC,l.stock_ledger_id DESC";
+        sql = sql + wheresql + ordersql;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            Stock_ledger sl = null;
+            Stock_ledgerBean slb = new Stock_ledgerBean();
+            String TransNo = "";
+            while (rs.next()) {
+                sl = new Stock_ledger();
+                slb.setStock_ledgerFromResultset(sl, rs);
+                sl.setDescription(rs.getString("description"));
+                sl.setUnit_symbol(rs.getString("unit_symbol"));
+                sl.setTransaction_type_name(rs.getString("transaction_type_name"));
+                sl.setUser_name(rs.getString("user_name"));
+                sl.setStore_name(rs.getString("store_name"));
+                TransNo = "";
+                try {
+                    if (sl.getTransaction_type_id() == 70) {
+                        TransNo = new TransProductionBean().getTransProductionById(sl.getTransaction_id()).getTransaction_number();
+                    } else {
+                        TransNo = new TransBean().getTrans(sl.getTransaction_id()).getTransactionNumber();
+                    }
+                } catch (Exception e) {
+                    //do nothing
+                }
+                sl.setTransaction_number(TransNo);
+                this.Stock_ledgerList.add(sl);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public List<Stock_ledger> getStock_ledgerInner(String aTableName, String aWhereSql) {
         ResultSet rs = null;
         List<Stock_ledger> sll = new ArrayList<>();
