@@ -102,14 +102,11 @@
                     </p:selectOneMenu>            
                 </h:panelGrid>
                 <h:panelGrid columns="1">
-                    <p:commandButton id="cmdbSearch" value="#{langsys['SEARCH']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" style="width: 150px;">
-                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
-                            <p:graphicImage name="/images/ajax-loader.gif"/>
-                        </p:dialog>
-                        <p:ajax listener="#{stock_ledgerBean.reportStockTaxAPICall(stock_ledger,stock_ledgerBean,itemBean.selectedItem)}" process="pnlgFilter" update="pnlgMessage pnlgData growl1"/>
+                    <p:commandButton id="cmdbSearch" value="#{langsys['SEARCH']}" style="width: 150px;">
+                        <p:ajax listener="#{stock_ledgerBean.reportStockTaxAPICall(stock_ledger,stock_ledgerBean,itemBean.selectedItem)}" process="pnlgFilter" update="pnlgMessage tblDetail growl1"/>
                     </p:commandButton>
                     <p:commandButton id="cmdbReset" value="#{langsys['RESET']}" style="width: 150px;">
-                        <p:ajax listener="#{stock_ledgerBean.resetStock_ledgerDetail(stock_ledger,stock_ledgerBean,itemBean.selectedItem)}" process="pnlgFilter" update="pnlgFilter pnlgMessage pnlgData growl1"/>
+                        <p:ajax listener="#{stock_ledgerBean.resetStock_ledgerDetail(stock_ledger,stock_ledgerBean,itemBean.selectedItem)}" process="pnlgFilter" update="pnlgFilter pnlgMessage tblDetail growl1"/>
                     </p:commandButton>
                     <h:panelGrid columns="2">
                         <h:outputLabel value=""/>
@@ -121,81 +118,79 @@
                 <p:outputLabel value="#{stock_ledgerBean.actionMessage}" style="color: red;"/>
             </h:panelGrid>
             <p:growl id="growl1"/>
-            <h:panelGrid id="pnlgData" columns="1">
-                <p:dataTable id="tblDetail" tableStyle="100%;" var="itm" value="#{stock_ledgerBean.stock_ledgerList}" 
-                             paginator="true" rows="50" 
-                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
-                             rowsPerPageTemplate="50,100,200,400">
-                    <f:facet name="header">
-                        #{langsys['Stock']} #{langsys['TaxBody']} #{langsys['Status']} : #{stock_ledgerBean.stock_ledgerList.size()} #{langsys['Records']}  #{langsys['Found']}
-                        <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
-                        <p:columnToggler datasource="tblDetail" trigger="toggler" />
-                    </f:facet>
-                    <f:facet name="{Exporters}">
-                        <h:commandLink>
-                            <p:graphicImage name="images/excel.png" width="24"/>
-                            <p:dataExporter type="xls" target="tblDetail" fileName="Stock_Tax_API" />
-                        </h:commandLink>
-                        <h:commandLink>
-                            <p:graphicImage name="images/pdf.png" width="24"/>
-                            <p:dataExporter type="pdf" target="tblDetail" fileName="Stock_Tax_API"/>
-                        </h:commandLink>
-                        <h:commandLink>
-                            <p:graphicImage name="images/csv.png" width="24"/>
-                            <p:dataExporter type="csv" target="tblDetail" fileName="Stock_Tax_API" />
-                        </h:commandLink>
-                        <h:commandLink>
-                            <p:graphicImage name="images/xml.png" width="24"/>
-                            <p:dataExporter type="xml" target="tblDetail" fileName="Stock_Tax_API" />
-                        </h:commandLink>
-                    </f:facet>
-                    <p:column headerText="#{langsys['Date']}" style="font-size: 13px;width: 12%;">
-                        <h:outputText value="#{utilityBean.formatDateTime(itm.add_date)}"/>
-                    </p:column>
-                    <p:column headerText="#{companySetting.getStoreEquivName()}" style="font-size: 13px;width: 8%;">
-                        <h:outputText value="#{itm.store_name}"/>
-                    </p:column>
-                    <p:column headerText="#{langsys['Transaction']}" style="font-size: 13px;width: 12%;">
-                        <h:outputText value="#{itm.transaction_type_name} "/>
-                    </p:column>
-                    <p:column headerText="#{langsys['Transaction']} #{langsys['No.']}" style="font-size: 13px;width: 12%;">
-                        <h:outputText value="#{itm.transaction_number} "/>
-                    </p:column>
-                    <p:column headerText="#{langsys['Item']} #{langsys['Description']}" style="font-size: 13px;width: 24%;">
-                        <h:outputText value="#{itm.description} "/>
-                        <h:outputText value="#{itm.batchno} "/>
-                        <h:outputText value="#{itm.code_specific} "/>
-                        <h:outputText value="#{itm.desc_specific} "/>
-                    </p:column>
-                    <p:column headerText="#{langsys['Unit']}" style="font-size: 13px;width: 5%;">
-                        <h:outputText value="#{itm.unit_symbol}"/>
-                    </p:column>
-                    <p:column headerText="#{langsys['User']}" style="font-size: 13px;width: 8%;">
-                        <h:outputText value="#{itm.user_name} "/>
-                    </p:column>
-                    <p:column headerText="#{langsys['Subtract']}" style="text-align: right;background-color: red;color: white;font-size: 13px;width: 7%;">
-                        <h:outputText value="#{itm.qty_subtracted}" rendered="#{itm.qty_subtracted>0}">
-                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                        </h:outputText>
-                    </p:column>
-                    <p:column headerText="#{langsys['Add']}" style="text-align: right;background-color: #00B461;color: white;font-size: 13px;width: 5%;">
-                        <h:outputText value="#{itm.qty_added}" rendered="#{itm.qty_added>0}">
-                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                        </h:outputText>
-                    </p:column>
-                    <p:column headerText="#{langsys['Synced']}">
-                        <h:outputText value="#{itm.tax_update_synced eq 1 ? 'Yes':itm.tax_update_synced eq 0 ? 'No':''}" styleClass="#{itm.tax_update_synced eq 1 ? 'green':itm.tax_update_synced eq 0 ? 'red':''}" style="width: 60px;color: #ffffff !important;text-align: right !important;"/>
-                    </p:column>
-                    <p:column headerText="#{langsys['Re-Sync']}" exportable="false" visible="true">
-                        <p:commandButton id="cmdbSync" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" icon="ui-icon-arrowreturnthick-1-n" style="width: 20px;height: 30px;margin: 5px;"  rendered="#{itm.tax_update_synced eq 0}">
-                            <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
-                                <p:graphicImage name="/images/ajax-loader.gif"/>
-                            </p:dialog>
-                            <p:ajax listener="#{transBean.reSubmitInvoiceTaxAPI(itm.stock_ledger_id,itm.transaction_type_id,null,null)}" update="tblDetail"/>
-                        </p:commandButton>
-                    </p:column>
-                </p:dataTable>
-            </h:panelGrid>
+            <p:dataTable id="tblDetail" tableStyle="width:auto;" var="itm" value="#{stock_ledgerBean.stock_ledgerList}" 
+                         paginator="true" rows="50" 
+                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
+                         rowsPerPageTemplate="50,100,200,400">
+                <f:facet name="header">
+                    #{langsys['Stock']} #{langsys['TaxBody']} #{langsys['Status']} : #{stock_ledgerBean.stock_ledgerList.size()} #{langsys['Records']}  #{langsys['Found']}
+                    <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
+                    <p:columnToggler datasource="tblDetail" trigger="toggler" />
+                </f:facet>
+                <f:facet name="{Exporters}">
+                    <h:commandLink>
+                        <p:graphicImage name="images/excel.png" width="24"/>
+                        <p:dataExporter type="xls" target="tblDetail" fileName="Stock_Tax_API" />
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/pdf.png" width="24"/>
+                        <p:dataExporter type="pdf" target="tblDetail" fileName="Stock_Tax_API"/>
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/csv.png" width="24"/>
+                        <p:dataExporter type="csv" target="tblDetail" fileName="Stock_Tax_API" />
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/xml.png" width="24"/>
+                        <p:dataExporter type="xml" target="tblDetail" fileName="Stock_Tax_API" />
+                    </h:commandLink>
+                </f:facet>
+                <p:column headerText="#{langsys['Date']}" style="font-size: 13px;width: 12%;">
+                    <h:outputText value="#{utilityBean.formatDateTime(itm.add_date)}"/>
+                </p:column>
+                <p:column headerText="#{companySetting.getStoreEquivName()}" style="font-size: 13px;width: 8%;">
+                    <h:outputText value="#{itm.store_name}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Transaction']}" style="font-size: 13px;width: 12%;">
+                    <h:outputText value="#{itm.transaction_type_name} "/>
+                </p:column>
+                <p:column headerText="#{langsys['Transaction']} #{langsys['No.']}" style="font-size: 13px;width: 12%;">
+                    <h:outputText value="#{itm.transaction_number} "/>
+                </p:column>
+                <p:column headerText="#{langsys['Item']} #{langsys['Description']}" style="font-size: 13px;width: 24%;">
+                    <h:outputText value="#{itm.description} "/>
+                    <h:outputText value="#{itm.batchno} "/>
+                    <h:outputText value="#{itm.code_specific} "/>
+                    <h:outputText value="#{itm.desc_specific} "/>
+                </p:column>
+                <p:column headerText="#{langsys['Unit']}" style="font-size: 13px;width: 5%;">
+                    <h:outputText value="#{itm.unit_symbol}"/>
+                </p:column>
+                <p:column headerText="#{langsys['User']}" style="font-size: 13px;width: 8%;">
+                    <h:outputText value="#{itm.user_name} "/>
+                </p:column>
+                <p:column headerText="#{langsys['Subtract']}" style="text-align: right;background-color: red;color: white;font-size: 13px;width: 7%;">
+                    <h:outputText value="#{itm.qty_subtracted}" rendered="#{itm.qty_subtracted>0}">
+                        <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['Add']}" style="text-align: right;background-color: #00B461;color: white;font-size: 13px;width: 5%;">
+                    <h:outputText value="#{itm.qty_added}" rendered="#{itm.qty_added>0}">
+                        <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['Synced']}">
+                    <h:outputText value="#{itm.tax_update_synced eq 1 ? 'Yes':itm.tax_update_synced eq 0 ? 'No':''}" styleClass="#{itm.tax_update_synced eq 1 ? 'green':itm.tax_update_synced eq 0 ? 'red':''}" style="width: 60px;color: #ffffff !important;text-align: right !important;"/>
+                </p:column>
+                <p:column headerText="#{langsys['Re-Sync']}" exportable="false" visible="true">
+                    <p:commandButton id="cmdbSync" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" icon="ui-icon-arrowreturnthick-1-n" style="width: 20px;height: 30px;margin: 5px;"  rendered="#{itm.tax_update_synced eq 0}">
+                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                        <p:ajax listener="#{stock_ledgerBean.reSubmitStockTaxAPI(itm,stock_ledger,stock_ledgerBean,itemBean.selectedItem)}" update="tblDetail"/>
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
         </h:form>
     </h:body>
 </html>

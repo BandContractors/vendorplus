@@ -385,6 +385,74 @@ public class Stock_ledgerBean implements Serializable {
         return update_flag;
     }
 
+    public void reSubmitStockTaxAPI(Stock_ledger aStock_ledger4Sync, Stock_ledger aStock_ledger, Stock_ledgerBean aStock_ledgerBean, Item aItem) {
+        try {
+            if (aStock_ledger4Sync.getTransaction_type_id() != 2 && aStock_ledger4Sync.getTransaction_type_id() != 4 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
+                Item_tax_map im = new Item_tax_mapBean().getItem_tax_map(aStock_ledger4Sync.getItem_id());
+                if (null == im) {
+                    //do nothing
+                } else {
+                    double LatestUnitCostPrice = new TransItemBean().getItemLatestUnitCostPrice(aStock_ledger4Sync.getItem_id(), "", "", "");
+                    if (aStock_ledger4Sync.getQty_added() > 0) {
+                        Stock stockadd = new Stock();
+                        stockadd.setItemId(aStock_ledger4Sync.getItem_id());
+                        stockadd.setCurrentqty(aStock_ledger4Sync.getQty_added());
+                        stockadd.setUnitCost(LatestUnitCostPrice);
+                        String SupplierTIN = "";
+                        String SupplierName = "";
+                        long SupplierId = 0;
+                        if (aStock_ledger4Sync.getTransaction_type_id() == 70) {//PRODUCTION
+                            try {
+                                SupplierId = new TransProductionBean().getTransProductionById(aStock_ledger4Sync.getTransaction_id()).getTransactor_id();
+                            } catch (Exception e) {
+                                SupplierId = 0;
+                            }
+                        } else {
+                            try {
+                                SupplierId = new TransBean().getTrans(aStock_ledger4Sync.getTransaction_id()).getTransactorId();
+                            } catch (Exception e) {
+                                SupplierId = 0;
+                            }
+                        }
+                        if (SupplierId == 0) {
+                            SupplierTIN = CompanySetting.getTaxIdentity();
+                            SupplierName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "PAYEE_NAME").getParameter_value();
+                        } else {
+                            Transactor tr = new TransactorBean().getTransactor(SupplierId);
+                            SupplierTIN = tr.getTaxIdentity();
+                            SupplierName = tr.getTransactorNames();
+                        }
+                        String ItemIdTax = "";
+                        try {
+                            ItemIdTax = new Item_tax_mapBean().getItem_tax_map(stockadd.getItemId()).getItem_id_tax();
+                        } catch (Exception e) {
+                            ItemIdTax = "";
+                        }
+                        new StockManage().addStockCall(stockadd, ItemIdTax, aStock_ledger4Sync.getTax_update_id(), SupplierTIN, SupplierName);
+                    } else if (aStock_ledger4Sync.getQty_subtracted() > 0) {
+                        Stock stocksub = new Stock();
+                        stocksub.setItemId(aStock_ledger4Sync.getItem_id());
+                        stocksub.setCurrentqty(aStock_ledger4Sync.getQty_subtracted());
+                        stocksub.setUnitCost(LatestUnitCostPrice);
+                        //get AdjustType
+                        String AdjustType = "105";//Others
+                        String ItemIdTax = "";
+                        try {
+                            ItemIdTax = new Item_tax_mapBean().getItem_tax_map(stocksub.getItemId()).getItem_id_tax();
+                        } catch (Exception e) {
+                            ItemIdTax = "";
+                        }
+                        new StockManage().subtractStockCall(stocksub, ItemIdTax, aStock_ledger4Sync.getTax_update_id(), AdjustType);
+                    }
+                    //refresh UI
+                    this.reportStockTaxAPICall(aStock_ledger, aStock_ledgerBean, aItem);
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public void clearStock_ledger(Stock_ledger aStock_ledger) {
         if (null != aStock_ledger) {
             aStock_ledger.setStock_ledger_id(0);
