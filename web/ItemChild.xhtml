@@ -313,6 +313,12 @@
                          tableStyle="width:auto;">
                 <p:column>
                     <!-- column header -->
+                    <f:facet name="header">#{langsys['ID']}</f:facet>
+                    <!-- row record -->
+                    #{itm.itemId}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
                     <f:facet name="header">#{langsys['Type']}</f:facet>
                     <!-- row record -->
                     #{itm.itemType}

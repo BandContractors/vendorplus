@@ -31,34 +31,31 @@
 
             <h:panelGrid styleClass="clsGridMainInput" columns="2">
                 <h:outputLabel  value="#{langsys['LICENSE']} #{langsys['CLIENT']} #{langsys['ID']}:"/>
-                <h:inputText styleClass="clsInput" value="#{companySetting.getLICENSE_CLIENT_ID()}" disabled="true"/>
+                <h:inputText styleClass="clsInput" value="#{companySetting.getLICENSE_CLIENT_ID()}" disabled="true" style="width: 400px;"/>
 
                 <h:outputLabel  value="#{langsys['LICENSE']} #{langsys['CLIENT']} #{langsys['NAMES']}:"/>
-                <h:inputText styleClass="clsInput" value="#{companySetting.getLICENSE_CLIENT_NAME()}" disabled="true"/>
+                <h:inputText styleClass="clsInput" value="#{companySetting.getLICENSE_CLIENT_NAME()}" disabled="true" style="width: 400px;"/>
 
                 <h:outputLabel  value="#{langsys['PACKAGE']} #{langsys['NAME']}:"/>
-                <h:inputText styleClass="clsInput" value="#{companySetting.getPACKAGE_NAME()}" disabled="true"/>
+                <h:inputText styleClass="clsInput" value="#{companySetting.getPACKAGE_NAME()}" disabled="true" style="width: 400px;"/>
 
                 <h:outputLabel  value="#{langsys['PACKAGE']} #{langsys['DETAILS']}:"/>
-                <h:outputLabel value="#{companySetting.displayPackageUsers(companySetting.getPackageUsers(companySetting.getPACKAGE_NAME()))}"/> 
+                <h:inputText value="#{companySetting.displayPackageUsers(companySetting.getPackageUsers(companySetting.getPACKAGE_NAME()))}" disabled="true" style="width: 400px;"/> 
 
                 <h:outputLabel  value="#{langsys['LICENSE']} #{langsys['EXPIRY']} #{langsys['DATE']}:"/>
-                <h:inputText value="#{utilityBean.formatDate(companySetting.getLICENSE_EXPIRY_DATE())}" disabled="true" rendered="#{companySetting.getLicenseType() ne 9 and companySetting.getLicenseType() ne 0}"/>
-                <h:inputText value="N/A" disabled="true" rendered="#{companySetting.getLicenseType() eq 9}"/>
+                <h:inputText value="#{utilityBean.formatDate(companySetting.getLICENSE_EXPIRY_DATE())}" disabled="true" rendered="#{companySetting.getLicenseType() ne 9}" style="width: 400px;"/>
+                <h:inputText value="N/A" disabled="true" rendered="#{companySetting.getLicenseType() eq 9}" style="width: 400px;"/>
+                
                 <h:outputLabel  value="#{langsys['LICENSE']} #{langsys['DAYS']} #{langsys['LEFT']}:"/>
-                <h:outputLabel value="#{companySetting.getLicenseDaysLeft()}" rendered="#{companySetting.getLicenseType() ne 9}"/>
-                <h:outputLabel value="N/A" rendered="#{companySetting.getLicenseType() eq 9}"/>
-                <h:outputLabel value=""/>
-                <h:outputLabel value=""/>
+                <h:inputText value="#{companySetting.getLicenseDaysLeft()}" rendered="#{companySetting.getLicenseType() ne 9}" disabled="true"  style="width: 400px;"/>
+                <h:inputText value="N/A" rendered="#{companySetting.getLicenseType() eq 9}" disabled="true" style="width: 400px;"/>
+                
                 <h:outputLabel  value="#{langsys['BRANCH']} #{langsys['PASSWORD']} #{langsys['CODE']}:"/>
-                <h:outputText value="#{dBConnection.getBRANCH_PASSWORD_CODE()}"/> 
-                <h:outputLabel  value="#{langsys['INTER']} #{langsys['BRANCH']} #{langsys['PASSWORD']} #{langsys['CODE']}:"/>
-                <h:outputText value="#{dBConnection.getINTER_BRANCH_PASSWORD_CODE()}"/>
-                <h:outputLabel value=""/>
-                <h:outputLabel value=""/>
+                <h:inputText value="#{dBConnection.getBRANCH_PASSWORD_CODE()}" disabled="true" style="width: 400px;"/> 
+               
             </h:panelGrid>  
 
-            <h:outputLabel  value="-----------------------------#{langsys['Active']} #{langsys['and']} #{langsys['Old']}(#{langsys['within']} 12 hrs) #{langsys['User']} #{langsys['Sessions']}---"/>
+            <h:outputLabel  value="#{langsys['Active']} #{langsys['and']} #{langsys['Old']}(#{langsys['within']} 12 hrs) #{langsys['User']} #{langsys['Sessions']}" style="font-weight: bold;"/>
             <p:dataTable id="dtblLoginSession" value="#{loginSessionBean.getLoginSessions()}" var="ls">
                 <p:column>
                     <!-- column header -->
