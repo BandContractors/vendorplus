@@ -82,7 +82,7 @@
 
                 <h:panelGrid id="IpgrdSalesInvoiceFooter1" style="width: 290px; margin: 0px;border-bottom-style: dotted" columns="2">
                     <h:outputLabel style="font-size: 16px;" value="#{langout['Received']} #{langout['By']}:"/>
-                    <h:outputLabel value="#{ugeneralUserSetting.outputDetailParent.add_user_detail.firstName} #{ugeneralUserSetting.outputDetailParent.add_user_detail.secondName}"/>
+                    <h:outputLabel value="#{generalUserSetting.outputDetailParent.trans_user_detail.firstName} #{generalUserSetting.outputDetailParent.trans_user_detail.secondName}"/>
                 </h:panelGrid>
 
                 <h:panelGrid id="IpgrdSalesInvoiceFooter2" style="width: 290px; margin: 0px;border-bottom-style: dotted" columns="1" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getIsShowDeveloper(),'Yes')}">

@@ -52,7 +52,7 @@
                 <h:panelGrid id="pnlSearch" styleClass="clsGridMainInput" columns="2" style="background-color: #b3f2b3;width: 100%;">
                     <h:panelGrid id="pnlSearch1" styleClass="clsGridMainInput" columns="6">
                         <h:outputLabel  value="#{langsys['Currency']}:"/>
-                        <h:selectOneMenu id="menuCurrency" value="#{pay.currencyCode}">
+                        <h:selectOneMenu id="menuCurrency" value="#{pay.currencyCode}" style="width: 240px;height: 24px;">
                             <f:selectItems value="#{accCurrencyBean.currencyList}" var="ac" itemLabel="#{ac.currencyCode}" itemValue="#{ac.currencyCode}"/>
                             <f:ajax event="change" execute="@this" render="pnlInput pnlButtons"/>
                             <f:ajax event="change" listener="#{payTransBean.clearPayTranss(payTransBean.payTranss, pay)}" render="pnlInput"/>
@@ -88,7 +88,7 @@
                             <p:ajax event="change" listener="#{payTransBean.clearPayTranss(payTransBean.payTranss, pay)}" update="pnlInput"/>
                         </p:autoComplete>
                         <h:outputLabel  value="#{langsys['Transaction']} #{langsys['No.']}:"/>
-                        <h:inputText id="itxtTransactionNumber2" value="#{trans.transactionNumber2}" autocomplete="off">
+                        <h:inputText id="itxtTransactionNumber2" value="#{trans.transactionNumber2}" autocomplete="off" style="width: 155px;">
                             <f:ajax event="change" listener="#{pay.setBillTransactorId(transBean.getTransByTransNumber(trans.transactionNumber2).billTransactorId)}" render="pnlInput pnlButtons" />
                             <f:ajax event="change" listener="#{payTransBean.clearPayTranss(payTransBean.payTranss,pay)}" render="pnlInput"/>
                         </h:inputText>
