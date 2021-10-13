@@ -39,6 +39,7 @@ public class SecurityPKI implements Serializable {
 
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = Logger.getLogger(SecurityPKI.class.getName());
+    private String ErrMsg = "";
 
     public PrivateKey getPrivate(String aFilename, String aPassword, String aAlias) throws Exception {
         InputStream ins = new FileInputStream(aFilename);
@@ -59,6 +60,7 @@ public class SecurityPKI implements Serializable {
         String output = response.getEntity(String.class);
 
         String jsonString = output;
+        this.ErrMsg = jsonString;
         JSONObject parentjsonObject = new JSONObject(jsonString);
         JSONObject dataobject = parentjsonObject.getJSONObject("data");
         String content = dataobject.getString("content");
@@ -233,6 +235,7 @@ public class SecurityPKI implements Serializable {
         } catch (Exception e) {
             AesPublicKey = "";
             LOGGER.log(Level.ERROR, e);
+            LOGGER.log(Level.ERROR, this.ErrMsg);
         }
         return AesPublicKey;
     }
@@ -253,5 +256,19 @@ public class SecurityPKI implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
         return saved;
+    }
+
+    /**
+     * @return the ErrMsg
+     */
+    public String getErrMsg() {
+        return ErrMsg;
+    }
+
+    /**
+     * @param ErrMsg the ErrMsg to set
+     */
+    public void setErrMsg(String ErrMsg) {
+        this.ErrMsg = ErrMsg;
     }
 }
