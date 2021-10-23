@@ -2131,10 +2131,13 @@ public class TransBean implements Serializable {
                             DeleteInserted = 1;
                         }
                         if (DeleteInserted == 0 && InsertedTransItems == aActiveTransItems.size()) {
-                            //insert PointsTransaction for both the awarded and spent points to the stage area
-                            if (("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) && (trans.getPointsAwarded() != 0 || trans.getSpendPoints() != 0)) {
-                                if (!trans.getCardNumber().equals("") && !trans.getCardHolder().equals("")) {
-                                    int x = new Loyalty_transactionBean().insertLoyalty_transaction(trans);
+                            //SMbi API insert PointsTransaction for both the awarded and spent points to the stage area
+                            String scope = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_SMBI_SCOPE").getParameter_value();
+                            if (scope.isEmpty() || scope.contains("LOYALTY")) {
+                                if (("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) && (trans.getPointsAwarded() != 0 || trans.getSpendPoints() != 0)) {
+                                    if (!trans.getCardNumber().equals("") && !trans.getCardHolder().equals("")) {
+                                        int x = new Loyalty_transactionBean().insertLoyalty_transaction(trans);
+                                    }
                                 }
                             }
                             //pay, stock, journal
@@ -2188,7 +2191,7 @@ public class TransBean implements Serializable {
                                 new InvoiceBean().submitTaxInvoiceThread(trans.getTransactionId());
                             }
                         }
-                        //SMbi API
+                        //SMbi API Transactions
                         if (new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_SMBI_URL").getParameter_value().length() > 0) {
                             new Transaction_smbi_mapBean().insertTransaction_smbi_mapCallThread(trans.getTransactionId(), trans.getTransactionTypeId());
                         }
@@ -3892,8 +3895,9 @@ public class TransBean implements Serializable {
             if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE RETURN INVOICE".equals(transtype.getTransactionTypeName())) {
                 //insert note
                 SavedCrDrNoteTransId = new CreditDebitNoteBean().saveCreditDebitNote(OldTrans, aNewTrans, OldTransItems, aNewTransItems);
-                //insert loyalty transaction for the note
-                if (SavedCrDrNoteTransId > 0 && aNewTrans.getCardNumber().length() > 0) {
+                //SMbi API insert loyalty transaction for the note
+                String scope = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_SMBI_SCOPE").getParameter_value();
+                if (SavedCrDrNoteTransId > 0 && aNewTrans.getCardNumber().length() > 0 && (scope.isEmpty() || scope.contains("LOYALTY"))) {
                     int x = new Loyalty_transactionBean().insertLoyalty_transaction_cr_dr(SavedCrDrNoteTransId);
                 }
             }

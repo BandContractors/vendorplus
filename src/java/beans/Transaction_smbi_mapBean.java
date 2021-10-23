@@ -36,7 +36,7 @@ import utilities.UtilityBean;
 @ManagedBean(name = "transaction_smbi_mapBean")
 @SessionScoped
 public class Transaction_smbi_mapBean implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = Logger.getLogger(Transaction_smbi_mapBean.class.getName());
     private Date Date1;
@@ -48,7 +48,7 @@ public class Transaction_smbi_mapBean implements Serializable {
     private List<Transaction_smbi_map> TransListSummary;
     @ManagedProperty("#{menuItemBean}")
     private MenuItemBean menuItemBean;
-    
+
     public void setTransaction_smbi_mapFromResultset(Transaction_smbi_map aTransaction_smbi_map, ResultSet aResultSet) {
         try {
             try {
@@ -100,7 +100,7 @@ public class Transaction_smbi_mapBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void insertTransaction_smbi_mapCallThread(long aTransaction_id, int aTransaction_type_id) {
         try {
             Runnable task = new Runnable() {
@@ -115,11 +115,12 @@ public class Transaction_smbi_mapBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void insertTransaction_smbi_mapCall(long aTransaction_id, int aTransaction_type_id) {
         try {
             if (aTransaction_id > 0 && aTransaction_type_id > 0) {
-                if (aTransaction_type_id == 2) {//SalesInvoice
+                String scope = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_SMBI_SCOPE").getParameter_value();
+                if (aTransaction_type_id == 2 && (scope.isEmpty() || scope.contains("SALES"))) {//SalesInvoice
                     Trans t = new TransBean().getTrans(aTransaction_id);
                     if (null != t) {
                         Transaction_smbi_map tsmbi = new Transaction_smbi_map();
@@ -134,7 +135,7 @@ public class Transaction_smbi_mapBean implements Serializable {
                         tsmbi.setStatus_desc("not synced");
                         int s = this.insertTransaction_smbi_map(tsmbi);
                     }
-                } else if (aTransaction_type_id == 82 || aTransaction_type_id == 83) {//82-126-CREDIT NOTE, 83-127-DEBIT NOTE
+                } else if ((aTransaction_type_id == 82 || aTransaction_type_id == 83) && (scope.isEmpty() || scope.contains("SALES"))) {//82-126-CREDIT NOTE, 83-127-DEBIT NOTE
                     Trans t = new CreditDebitNoteBean().getTrans_cr_dr_note(aTransaction_id);
                     if (null != t) {
                         Transaction_smbi_map tsmbi = new Transaction_smbi_map();
@@ -155,7 +156,7 @@ public class Transaction_smbi_mapBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public int insertTransaction_smbi_map(Transaction_smbi_map aTransaction_smbi_map) {
         int saved = 0;
         String sql = "INSERT INTO transaction_smbi_map"
@@ -213,7 +214,7 @@ public class Transaction_smbi_mapBean implements Serializable {
         }
         return saved;
     }
-    
+
     public void updateNotSyncedAndCallSyncJob(int aTransTypeId, long aTransaction_smbi_map_id, int aCurrent_status_sync) {
         try {
             if (aTransaction_smbi_map_id > 0) {
@@ -233,7 +234,7 @@ public class Transaction_smbi_mapBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public int updateTransaction_smbi_map(int aStatus_sync, Date aStatus_date, String aStatus_desc, long aTransaction_smbi_map_id) {
         int saved = 0;
         String sql = "UPDATE transaction_smbi_map SET "
@@ -270,7 +271,7 @@ public class Transaction_smbi_mapBean implements Serializable {
         }
         return saved;
     }
-    
+
     public int updateTransaction_smbi_map(int aStatus_sync, Date aStatus_date, String aStatus_desc, long aTransaction_id, int aTransaction_type_id) {
         int saved = 0;
         String sql = "UPDATE transaction_smbi_map SET "
@@ -312,7 +313,7 @@ public class Transaction_smbi_mapBean implements Serializable {
         }
         return saved;
     }
-    
+
     public void setDateToToday() {
         Date CurrentServerDate = new CompanySetting().getCURRENT_SERVER_DATE();
         this.setDate1(CurrentServerDate);
@@ -324,7 +325,7 @@ public class Transaction_smbi_mapBean implements Serializable {
         cal.set(Calendar.MILLISECOND, 0);
         // Put it back in the Date object  
         this.setDate1(cal.getTime());
-        
+
         this.setDate2(CurrentServerDate);
         Calendar cal2 = Calendar.getInstance();
         cal2.setTime(this.getDate2());
@@ -335,10 +336,10 @@ public class Transaction_smbi_mapBean implements Serializable {
         // Put it back in the Date object  
         this.setDate2(cal2.getTime());
     }
-    
+
     public void setDateToYesturday() {
         Date CurrentServerDate = new CompanySetting().getCURRENT_SERVER_DATE();
-        
+
         this.setDate1(CurrentServerDate);
         Calendar cal = Calendar.getInstance();
         cal.setTime(this.getDate1());
@@ -349,7 +350,7 @@ public class Transaction_smbi_mapBean implements Serializable {
         cal.set(Calendar.MILLISECOND, 0);
         // Put it back in the Date object  
         this.setDate1(cal.getTime());
-        
+
         this.setDate2(CurrentServerDate);
         Calendar cal2 = Calendar.getInstance();
         cal2.setTime(this.getDate2());
@@ -361,7 +362,7 @@ public class Transaction_smbi_mapBean implements Serializable {
         // Put it back in the Date object  
         this.setDate2(cal2.getTime());
     }
-    
+
     public void reportSMbiAPI() {
         UtilityBean ub = new UtilityBean();
         String BaseName = getMenuItemBean().getMenuItemObj().getLANG_BASE_NAME_SYS();
@@ -448,7 +449,7 @@ public class Transaction_smbi_mapBean implements Serializable {
             }
         }
     }
-    
+
     public void reportSMbiAPI_old() {
         UtilityBean ub = new UtilityBean();
         String BaseName = getMenuItemBean().getMenuItemObj().getLANG_BASE_NAME_SYS();
@@ -536,7 +537,7 @@ public class Transaction_smbi_mapBean implements Serializable {
             }
         }
     }
-    
+
     public void resetSMbiAPI() {
         try {
             this.setActionMessage("");

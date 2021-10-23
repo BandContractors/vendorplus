@@ -733,7 +733,7 @@ public class UtilityBean implements Serializable {
     }
 
 //    public static void main(String[] args) {
-//        String X="EXEMPT";
+//        String X="EXEMPT,ZERO";
 //        System.out.println(X.contains("STANDARD"));
 //        System.out.println(X.contains("ZERO"));
 //        System.out.println(X.contains("EXEMPT"));

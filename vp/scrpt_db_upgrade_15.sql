@@ -152,4 +152,7 @@ VALUES (81, 'COMPANY_SETTING', 'SUPPLIER_INVOICE_AGING_BAND', '0030,0060','E.g. 
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_15',152,Now(),'6.0','');
 
-
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (82, 'API', 'API_SMBI_SCOPE', '','Leave empty for all otherwise state comma separted transaction types such as SALES,EXPENSES,INVENTORY,LOYALTY');
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_15',158,Now(),'6.0','');
