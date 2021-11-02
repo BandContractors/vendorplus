@@ -27,6 +27,7 @@
     <f:event listener="#{itemBean.initStockLocation()}" type="preRenderView" />
     <f:event listener="#{itemBean.initItemObj()}" type="preRenderView" />
     <f:event listener="#{itemBean.initItem_tax_mapObj()}" type="preRenderView" />
+    <f:event listener="#{itemBean.initItem_code_otherObj()}" type="preRenderView" />
     <f:event listener="#{itemBean.initItemTaxObj()}" type="preRenderView" />
     <f:event listener="#{itemBean.refreshInventoryType(itemBean.itemObj,generalUserSetting.currentItemPurpose)}" type="preRenderView" />
     <h:body>
@@ -86,7 +87,7 @@
                         <f:selectItem itemLabel="#{langsys['Computer']} #{langsys['Equipment']}" itemValue="COMPUTER"/>
                         <f:selectItem itemLabel="#{langsys['Other']} #{langsys['Fixed']} #{langsys['Asset']}" itemValue="OTHER"/>
                     </h:selectOneMenu>
-                    <h:outputLabel value="#{langsys['Item']} #{langsys['Code']}:"/>
+                    <p:commandLink value="#{langsys['Item']} #{langsys['Code']}:" action="#{itemBean.displayItemCodes()}" oncomplete="PF('sbarItemCode').show()" update="formMain:pnlgItemCode1 formMain:pnlgItemCode2" disabled="#{itemBean.itemObj.itemId eq 0}"/>
                     <h:inputText id="itxtCode" value="#{itemBean.itemObj.itemCode}" autocomplete="off" style="width: 193px"/>
                     <h:outputLabel value="#{langsys['Is']} #{langsys['General']}?"/>
                     <h:selectOneMenu id="menuIsGeneral" value="#{itemBean.itemObj.isGeneral}" style="width: 200px">
@@ -204,7 +205,7 @@
                         <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
                         <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
                     </h:selectOneMenu>
-                    <p:commandLink value="UNSPC #{langsys['Code']}" action="#{itemBean.displayUNSPSC()}" oncomplete="PF('sbarUNSPSC').show()" update="formMain:tabvUNSPC:pnlgManage"/>
+                    <p:commandLink value="Tax #{langsys['Code']}" action="#{itemBean.displayUNSPSC()}" oncomplete="PF('sbarUNSPSC').show()" update="formMain:tabvUNSPC:pnlgManage"/>
                     <h:inputText id="itxtUNSPSC" value="#{itemBean.itemObj.item_code_tax}" autocomplete="off" style="width: 193px;color:#{itemBean.itemObj.is_synced_tax eq 1 ? '#238823':'#d2222d'};"/>
                     <h:outputLabel value="#{langsys['Show']} #{langsys['General']} #{langsys['Name']}?" title="Show General Name?"/>
                     <h:selectOneMenu id="menuOverrideGenName" value="#{itemBean.itemObj.override_gen_name}" style="width: 200px">
@@ -459,6 +460,31 @@
                         <p:growl id="growl2"/>
                     </p:tab>
                 </p:tabView>
+            </p:sidebar>
+            <p:sidebar widgetVar="sbarItemCode" position="bottom" baseZIndex="10000" style="height: 600px;">
+                <h:panelGrid id="pnlgItemCode1" columns="1">
+                    <h:outputLabel value="#{langsys['Item']} #{langsys['Codes']} #{langsys['for']} : #{itemBean.item_code_otherObj.description}" style="font-weight: bold;"/>
+                </h:panelGrid>
+                <h:panelGrid id="pnlgItemCode2" columns="1" style="text-align: center;">
+                    <h:panelGrid columns="3">
+                        <h:outputLabel value="#{langsys['Item']} #{langsys['Code']}:"/>
+                        <h:inputText id="itxtItemCode" value="#{itemBean.item_code_otherObj.item_code}" autocomplete="off"/>
+                        <p:commandButton id="cmdbtnItemCode" value="Add" actionListener="#{itemBean.saveItem_code_otherCall(itemBean.item_code_otherObj)}" update="formMain:itxtItemCode formMain:tblItemCode formMain:growlIC"/>
+                    </h:panelGrid>
+                    <p:dataTable id="tblItemCode" rowIndexVar="rowIndex" tableStyle="width:auto;" var="ic" value="#{itemBean.item_code_otherList}">
+                        <p:column headerText="#">
+                            <h:outputText value="#{rowIndex+1} "/>
+                        </p:column>
+                        <p:column headerText="#{langsys['Code']}">
+                            <h:outputText value="#{ic.item_code}"/>
+                        </p:column>
+                        <p:column headerText="">
+                            <p:commandButton id="cmdbRemoveItemCode" value="-" actionListener="#{itemBean.deleteItem_code_otherCall(ic)}" rendered="#{ic.item_code_other_id gt 0}" update="formMain:tblItemCode formMain:growlIC">
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                    <p:growl id="growlIC"/>
+                </h:panelGrid>
             </p:sidebar>
         </h:form>
     </h:body>

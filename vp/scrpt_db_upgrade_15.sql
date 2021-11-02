@@ -156,3 +156,12 @@ INSERT INTO parameter_list (parameter_list_id, context, parameter_name, paramete
 VALUES (82, 'API', 'API_SMBI_SCOPE', '','Leave empty for all otherwise state comma separted transaction types such as SALES,EXPENSES,INVENTORY,LOYALTY');
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_15',158,Now(),'6.0','');
+
+CREATE TABLE item_code_other (
+  item_code_other_id bigint(20) NOT NULL AUTO_INCREMENT,
+  item_id bigint(20) NOT NULL,
+  item_code varchar(50) NOT NULL,
+  PRIMARY KEY (item_code_other_id)
+);
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_15',166,Now(),'6.0','');

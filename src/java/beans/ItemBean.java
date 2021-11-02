@@ -7,6 +7,7 @@ import connections.DBConnection;
 import entities.Category;
 import entities.GroupRight;
 import entities.Item;
+import entities.Item_code_other;
 import entities.Item_tax_map;
 import entities.Item_unspsc;
 import entities.Location;
@@ -83,6 +84,8 @@ public class ItemBean implements Serializable {
     private ItemTax ItemTaxObj;
     @ManagedProperty("#{menuItemBean}")
     private MenuItemBean menuItemBean;
+    private List<Item_code_other> Item_code_otherList;
+    private Item_code_other Item_code_otherObj;
 
     public void refreshInventoryType(Item aItem, String aItemPurpose) {
         try {
@@ -921,6 +924,33 @@ public class ItemBean implements Serializable {
         }
     }
 
+    public void setItem_code_otherFromResultset(Item_code_other aItem_code_other, ResultSet aResultSet) {
+        try {
+            try {
+                aItem_code_other.setItem_code_other_id(aResultSet.getLong("item_code_other_id"));
+            } catch (Exception e) {
+                aItem_code_other.setItem_code_other_id(0);
+            }
+            try {
+                aItem_code_other.setItem_id(aResultSet.getInt("item_id"));
+            } catch (Exception e) {
+                aItem_code_other.setItem_id(0);
+            }
+            try {
+                aItem_code_other.setItem_code(aResultSet.getString("item_code"));
+            } catch (Exception e) {
+                aItem_code_other.setItem_code("");
+            }
+            try {
+                aItem_code_other.setDescription(aResultSet.getString("description"));
+            } catch (Exception e) {
+                aItem_code_other.setDescription("");
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public Item getItem(long ItemId) {
         String sql = "{call sp_search_item_by_id(?)}";
         ResultSet rs = null;
@@ -1221,6 +1251,32 @@ public class ItemBean implements Serializable {
                         this.Item_tax_mapObj.setTaxRateRemote(this.getVatTaxRatesRemote(it));
                     }
                 }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void displayItemCodes() {
+        try {
+            //clear
+            this.Item_code_otherObj.setItem_code_other_id(0);
+            this.Item_code_otherObj.setDescription("");
+            this.Item_code_otherObj.setItem_id(0);
+            this.Item_code_otherObj.setItem_code("");
+            try {
+                this.Item_code_otherList.clear();
+            } catch (Exception e) {
+                this.Item_code_otherList = new ArrayList<>();
+            }
+            //set detail
+            if (this.ItemObj.getItemId() > 0) {
+                //set Item_code_other
+                this.Item_code_otherObj.setDescription(this.ItemObj.getDescription());
+                this.Item_code_otherObj.setItem_id(this.ItemObj.getItemId());
+                this.Item_code_otherObj.setItem_code_other_id(0);
+                //refresh list
+                this.refreshItem_code_otherList(this.ItemObj);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -2371,6 +2427,16 @@ public class ItemBean implements Serializable {
         }
     }
 
+    public void initItem_code_otherObj() {
+        if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
+            // Skip ajax requests.
+        } else {
+            if (null == this.Item_code_otherObj) {
+                this.Item_code_otherObj = new Item_code_other();
+            }
+        }
+    }
+
     public void initStockLocation() {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -2627,6 +2693,122 @@ public class ItemBean implements Serializable {
                     aItem.setSelectedVatRateds(StringArray);
                 }
             }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void refreshItem_code_otherList(Item aItem) {
+        String sql;
+        sql = "SELECT * FROM item_code_other WHERE item_id=" + aItem.getItemId();
+        ResultSet rs = null;
+        Item_code_other ic = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            //make the parent item code come first but with an ID of -1
+            if (aItem.getItemCode().length() > 0) {
+                ic = new Item_code_other();
+                ic.setItem_code_other_id(-1);
+                ic.setItem_code(aItem.getItemCode());
+                ic.setDescription(aItem.getDescription());
+                this.Item_code_otherList.add(ic);
+            }
+            //load the others
+            while (rs.next()) {
+                ic = new Item_code_other();
+                this.setItem_code_otherFromResultset(ic, rs);
+                this.Item_code_otherList.add(ic);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public int saveItem_code_other(Item_code_other aItem_code_other) {
+        int saved = 0;
+        String sql = "INSERT INTO item_code_other(item_id,item_code) VALUES(?,?)";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            if (null != aItem_code_other) {
+                try {
+                    ps.setLong(1, aItem_code_other.getItem_id());
+                } catch (NullPointerException npe) {
+                    ps.setLong(1, 0);
+                }
+                try {
+                    ps.setString(2, aItem_code_other.getItem_code());
+                } catch (NullPointerException npe) {
+                    ps.setString(2, "");
+                }
+                ps.executeUpdate();
+                saved = 1;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return saved;
+    }
+
+    public void saveItem_code_otherCall(Item_code_other aItem_code_other) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
+        String msg = "";
+        try {
+            String sql1 = "select count(*) as n from item where item_code='" + aItem_code_other.getItem_code() + "'";
+            String sql2 = "select count(*) as n from item_code_other where item_code='" + aItem_code_other.getItem_code() + "'";
+            long count1 = new UtilityBean().getN(sql1);
+            long count2 = new UtilityBean().getN(sql2);
+            long n = count1 + count2;
+            if (n >= 1) {
+                msg = "Code Exists";
+            } else {
+                int i = this.saveItem_code_other(aItem_code_other);
+                if (i == 1) {
+                    msg = "Added Successfully";
+                    try {
+                        aItem_code_other.setItem_code("");
+                        this.Item_code_otherList.clear();
+                    } catch (Exception e) {
+                    }
+                    this.refreshItem_code_otherList(this.getItem(aItem_code_other.getItem_id()));
+                } else {
+                    msg = "Saving Has Failed";
+                }
+            }
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void deleteItem_code_otherCall(Item_code_other aItem_code_other) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
+        String msg = "";
+        String sql = "delete from item_code_other where item_code_other_id=" + aItem_code_other.getItem_code_other_id();
+
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.executeUpdate();
+            try {
+                this.Item_code_otherList.clear();
+            } catch (Exception e) {
+            }
+            this.refreshItem_code_otherList(this.getItem(aItem_code_other.getItem_id()));
+            msg = "Deleted Successfully";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -2952,5 +3134,33 @@ public class ItemBean implements Serializable {
      */
     public void setMenuItemBean(MenuItemBean menuItemBean) {
         this.menuItemBean = menuItemBean;
+    }
+
+    /**
+     * @return the Item_code_otherList
+     */
+    public List<Item_code_other> getItem_code_otherList() {
+        return Item_code_otherList;
+    }
+
+    /**
+     * @param Item_code_otherList the Item_code_otherList to set
+     */
+    public void setItem_code_otherList(List<Item_code_other> Item_code_otherList) {
+        this.Item_code_otherList = Item_code_otherList;
+    }
+
+    /**
+     * @return the Item_code_otherObj
+     */
+    public Item_code_other getItem_code_otherObj() {
+        return Item_code_otherObj;
+    }
+
+    /**
+     * @param Item_code_otherObj the Item_code_otherObj to set
+     */
+    public void setItem_code_otherObj(Item_code_other Item_code_otherObj) {
+        this.Item_code_otherObj = Item_code_otherObj;
     }
 }
