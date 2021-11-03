@@ -15,6 +15,7 @@ import entities.TransactionType;
 import entities.UserDetail;
 import entities.ItemMap;
 import entities.DiscountPackageItem;
+import entities.Item_code_other;
 import entities.Stock_out;
 import entities.Store;
 import entities.SubCategory;
@@ -11120,12 +11121,18 @@ public class TransItemBean implements Serializable {
         aStatusBean.setShowItemNotAddedStatus(0);
 
         StockBean sb = new StockBean();
-        List<Stock> batches = new ArrayList<Stock>();
+        List<Stock> batches = new ArrayList<>();
         //TransItemBean tib = this;
         DiscountPackageItem dpi = null;
         if (aEntryMode.equals("BarCode")) {
             try {
                 aSelectedItem = new ItemBean().findItemByCodeActive(aSelectedTransItem.getItemCode());
+                if (null == aSelectedItem) {
+                    Item_code_other ic = new ItemBean().getItem_code_otherByCode(aSelectedTransItem.getItemCode());
+                    if (null != ic) {
+                        aSelectedItem = new ItemBean().findItemByIdActive(ic.getItem_id());
+                    }
+                }
             } catch (NullPointerException npe) {
                 aSelectedItem = null;
             }

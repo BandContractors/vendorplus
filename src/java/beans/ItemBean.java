@@ -309,7 +309,9 @@ public class ItemBean implements Serializable {
     public String validateItem(Item aItem) {
         String msg = "";
         String sql2 = null;
+        String sql3 = null;
         sql2 = "SELECT * FROM item WHERE (item_code!='' AND item_code='" + aItem.getItemCode() + "') or description='" + aItem.getDescription() + "'";
+        sql3 = "SELECT * FROM item_code_other WHERE item_code='" + aItem.getItemCode() + "'";
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
@@ -343,6 +345,8 @@ public class ItemBean implements Serializable {
             msg = "Cost Price Cannot be Greater Than Wholesale Price";
         } else if ((new CustomValidator().CheckRecords(sql2) > 0 && aItem.getItemId() == 0) || (new CustomValidator().CheckRecords(sql2) > 0 && new CustomValidator().CheckRecords(sql2) != 1 && aItem.getItemId() > 0)) {
             msg = "Item Code or Description Exists";
+        } else if (new CustomValidator().CheckRecords(sql3) > 0) {
+            msg = "Item Code Exists";
         } else if (aItem.getDisplay_alias_name() == 1 && aItem.getAlias_name().length() == 0) {
             msg = "Specify Item Alias Name";
         } else if (aItem.getIsAsset() == 1 && (aItem.getAssetType().length() == 0 || aItem.getAssetAccountCode().length() == 0)) {
@@ -1135,6 +1139,30 @@ public class ItemBean implements Serializable {
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             ps.setString(1, ItemCode);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                Item item = new Item();
+                this.setItemFromResultset(item, rs);
+                return item;
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+            return null;
+        }
+    }
+
+    public Item findItemByIdActive(long aItemId) {
+        if (aItemId == 0) {
+            return null;
+        }
+        String sql = "{call sp_search_item_active_by_id(?)}";
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aItemId);
             rs = ps.executeQuery();
             if (rs.next()) {
                 Item item = new Item();
@@ -2811,6 +2839,26 @@ public class ItemBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public Item_code_other getItem_code_otherByCode(String aItem_code) {
+        String sql = "SELECT * FROM item_code_other WHERE (item_code='" + aItem_code + "' OR item_code=SUBSTRING('" + aItem_code + "',2) OR item_code=SUBSTRING('" + aItem_code + "',3))";
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                Item_code_other ic = new Item_code_other();
+                this.setItem_code_otherFromResultset(ic, rs);
+                return ic;
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+            return null;
         }
     }
 

@@ -2700,34 +2700,23 @@ CREATE PROCEDURE sp_search_item_by_code_desc_purpose
 	IN in_is_sale int
 ) 
 BEGIN  
+		SELECT distinct i.* FROM item i left join item_code_other ic on i.item_id=ic.item_id 
+		WHERE i.is_asset=in_is_asset AND i.is_sale=in_is_sale AND (i.description LIKE concat('%',in_code_desc,'%') OR i.item_code=in_code_desc OR i.alias_name LIKE concat('%',in_code_desc,'%') OR ic.item_code=in_code_desc) 
+		ORDER BY i.description ASC LIMIT 10;
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_item_by_code_desc_purpose_old;
+DELIMITER //
+CREATE PROCEDURE sp_search_item_by_code_desc_purpose_old
+(
+	IN in_code_desc varchar(100),
+	IN in_is_asset int,
+	IN in_is_sale int
+) 
+BEGIN  
 		SELECT * FROM item 
 		WHERE is_asset=in_is_asset AND is_sale=in_is_sale AND (description LIKE concat('%',in_code_desc,'%') OR item_code=in_code_desc OR alias_name LIKE concat('%',in_code_desc,'%')) 
-		ORDER BY description ASC LIMIT 10;
-END//
-DELIMITER ;
-
-DROP PROCEDURE IF EXISTS sp_search_item_active_by_code_desc_very_old;
-DELIMITER //
-CREATE PROCEDURE sp_search_item_active_by_code_desc_very_old
-(
-	IN in_code_desc varchar(100) 
-) 
-BEGIN  
-		SELECT * FROM view_item 
-		WHERE is_suspended='No' AND (description LIKE concat('%',in_code_desc,'%') OR item_code=in_code_desc) 
-		ORDER BY description ASC LIMIT 10;
-END//
-DELIMITER ;
-
-DROP PROCEDURE IF EXISTS sp_search_item_active_by_code_desc_old;
-DELIMITER //
-CREATE PROCEDURE sp_search_item_active_by_code_desc_old
-(
-	IN in_code_desc varchar(100) 
-) 
-BEGIN  
-		SELECT * FROM item 
-		WHERE is_suspended='No' AND (description LIKE concat('%',in_code_desc,'%') OR item_code=in_code_desc) 
 		ORDER BY description ASC LIMIT 10;
 END//
 DELIMITER ;
@@ -2762,9 +2751,9 @@ BEGIN
 END//
 DELIMITER ;
 
-DROP PROCEDURE IF EXISTS sp_search_item_for_sale;
+DROP PROCEDURE IF EXISTS sp_search_item_for_sale_old;
 DELIMITER //
-CREATE PROCEDURE sp_search_item_for_sale
+CREATE PROCEDURE sp_search_item_for_sale_old
 (
 	IN in_code_desc varchar(100)
 ) 
@@ -2776,9 +2765,39 @@ BEGIN
 END//
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS sp_search_item_for_sale;
+DELIMITER //
+CREATE PROCEDURE sp_search_item_for_sale
+(
+	IN in_code_desc varchar(100)
+) 
+BEGIN 
+		SELECT distinct i.* FROM item i left join item_code_other ic on i.item_id=ic.item_id 
+		WHERE i.is_suspended='No' AND i.is_sale=1 AND i.is_asset=0 AND 
+		(i.description LIKE concat('%',in_code_desc,'%') OR i.item_code LIKE concat('%',in_code_desc,'%') OR i.item_code LIKE concat('%',SUBSTRING(in_code_desc,2),'%') OR i.item_code LIKE concat('%',SUBSTRING(in_code_desc,3),'%') OR i.alias_name LIKE concat('%',in_code_desc,'%') 
+        OR ic.item_code LIKE concat('%',in_code_desc,'%') OR ic.item_code LIKE concat('%',SUBSTRING(in_code_desc,2),'%') OR ic.item_code LIKE concat('%',SUBSTRING(in_code_desc,3),'%')) 
+		ORDER BY i.description ASC LIMIT 10;
+END//
+DELIMITER ;
+
 DROP PROCEDURE IF EXISTS sp_search_item_for_sale_limit100;
 DELIMITER //
 CREATE PROCEDURE sp_search_item_for_sale_limit100
+(
+	IN in_code_desc varchar(100)
+) 
+BEGIN  
+		SELECT distinct i.* FROM item i left join item_code_other ic on i.item_id=ic.item_id 
+		WHERE i.is_suspended='No' AND i.is_sale=1 AND i.is_asset=0 AND 
+		(i.description LIKE concat('%',in_code_desc,'%') OR i.item_code LIKE concat('%',in_code_desc,'%') OR i.item_code LIKE concat('%',SUBSTRING(in_code_desc,2),'%') OR i.item_code LIKE concat('%',SUBSTRING(in_code_desc,3),'%') OR i.alias_name LIKE concat('%',in_code_desc,'%') 
+        OR ic.item_code LIKE concat('%',in_code_desc,'%') OR ic.item_code LIKE concat('%',SUBSTRING(in_code_desc,2),'%') OR ic.item_code LIKE concat('%',SUBSTRING(in_code_desc,3),'%')) 
+		ORDER BY description ASC LIMIT 100;
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_item_for_sale_limit100_old;
+DELIMITER //
+CREATE PROCEDURE sp_search_item_for_sale_limit100_old
 (
 	IN in_code_desc varchar(100)
 ) 
@@ -2860,9 +2879,9 @@ BEGIN
 END//
 DELIMITER ;
 
-DROP PROCEDURE IF EXISTS sp_search_item_for_purchase;
+DROP PROCEDURE IF EXISTS sp_search_item_for_purchase_old;
 DELIMITER //
-CREATE PROCEDURE sp_search_item_for_purchase
+CREATE PROCEDURE sp_search_item_for_purchase_old
 (
 	IN in_code_desc varchar(100)
 ) 
@@ -2874,9 +2893,39 @@ BEGIN
 END//
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS sp_search_item_for_purchase;
+DELIMITER //
+CREATE PROCEDURE sp_search_item_for_purchase
+(
+	IN in_code_desc varchar(100)
+) 
+BEGIN  
+		SELECT distinct i.* FROM item i left join item_code_other ic on i.item_id=ic.item_id 
+		WHERE i.is_suspended='No' AND i.is_buy=1 AND 
+		(i.description LIKE concat('%',in_code_desc,'%') OR i.item_code LIKE concat('%',in_code_desc,'%') OR i.alias_name LIKE concat('%',in_code_desc,'%') 
+        OR ic.item_code LIKE concat('%',in_code_desc,'%')) 
+		ORDER BY i.description ASC LIMIT 10;
+END//
+DELIMITER ;
+
 DROP PROCEDURE IF EXISTS sp_search_item_for_purchase_goods;
 DELIMITER //
 CREATE PROCEDURE sp_search_item_for_purchase_goods
+(
+	IN in_code_desc varchar(100)
+) 
+BEGIN  
+		SELECT distinct i.* FROM item i left join item_code_other ic on i.item_id=ic.item_id 
+		WHERE i.is_suspended='No' AND i.is_buy=1 AND i.is_sale=1 AND i.is_asset=0 AND 
+		(i.description LIKE concat('%',in_code_desc,'%') OR i.item_code LIKE concat('%',in_code_desc,'%') OR i.alias_name LIKE concat('%',in_code_desc,'%') 
+        OR ic.item_code LIKE concat('%',in_code_desc,'%')) 
+		ORDER BY i.description ASC LIMIT 10;
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_item_for_purchase_goods_old;
+DELIMITER //
+CREATE PROCEDURE sp_search_item_for_purchase_goods_old
 (
 	IN in_code_desc varchar(100)
 ) 
@@ -2933,6 +2982,21 @@ DELIMITER ;
 DROP PROCEDURE IF EXISTS sp_search_item_for_receive_goods;
 DELIMITER //
 CREATE PROCEDURE sp_search_item_for_receive_goods
+(
+	IN in_code_desc varchar(100)
+) 
+BEGIN  
+		SELECT distinct i.* FROM item i left join item_code_other ic on i.item_id=ic.item_id 
+		WHERE i.is_suspended='No' AND i.is_buy=1 AND i.is_sale=1 AND i.is_asset=0 AND i.is_track=1 AND 
+		(i.description LIKE concat('%',in_code_desc,'%') OR i.item_code LIKE concat('%',in_code_desc,'%') OR i.item_code LIKE concat('%',SUBSTRING(in_code_desc,2),'%') OR i.item_code LIKE concat('%',SUBSTRING(in_code_desc,3),'%') OR i.alias_name LIKE concat('%',in_code_desc,'%') 
+        OR ic.item_code LIKE concat('%',in_code_desc,'%') OR ic.item_code LIKE concat('%',SUBSTRING(in_code_desc,2),'%') OR ic.item_code LIKE concat('%',SUBSTRING(in_code_desc,3),'%')) 
+		ORDER BY i.description ASC LIMIT 10;
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_item_for_receive_goods_old;
+DELIMITER //
+CREATE PROCEDURE sp_search_item_for_receive_goods_old
 (
 	IN in_code_desc varchar(100)
 ) 
@@ -2995,6 +3059,18 @@ BEGIN
 		SELECT * FROM view_item 
 		WHERE (item_code=in_item_code OR item_code=SUBSTRING(in_item_code,2) OR item_code=SUBSTRING(in_item_code,3)) AND is_suspended='No' 
 		ORDER BY description ASC;
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_item_active_by_id;
+DELIMITER //
+CREATE PROCEDURE sp_search_item_active_by_id
+(
+	IN in_item_id bigint
+) 
+BEGIN 
+		SELECT * FROM view_item 
+		WHERE item_id=in_item_id AND is_suspended='No';
 END//
 DELIMITER ;
 
