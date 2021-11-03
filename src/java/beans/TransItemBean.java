@@ -10598,7 +10598,7 @@ public class TransItemBean implements Serializable {
                     aTransItemToUpdate.setDuration_value(0);
                 }
                 //apply recent unit cost
-                if (transtype.getTransactionTypeName().equals("ITEM RECEIVED") || transtype.getTransactionTypeName().equals("PRODUCTION") || transtype.getTransactionTypeName().equals("STOCK ADJUSTMENT") || transtype.getTransactionTypeName().equals("DISPOSE STOCK")) {
+                if (transtype.getTransactionTypeName().equals("ITEM RECEIVED") || transtype.getTransactionTypeName().equals("PRODUCTION") || transtype.getTransactionTypeName().equals("STOCK ADJUSTMENT") || transtype.getTransactionTypeName().equals("DISPOSE STOCK") || transtype.getTransactionTypeName().equals("PURCHASE INVOICE")) {
                     aTransItemToUpdate.setUnitCostPrice(this.getItemLatestUnitCostPrice(aItem.getItemId(), "", "", ""));
                 }
                 if ("EXEMPT SALE INVOICE".equals(aSaleType)) {
@@ -10624,8 +10624,10 @@ public class TransItemBean implements Serializable {
                         aTransItemToUpdate.setUnitTradeDiscount(aItem.getUnit_hire_price() * dpi.getHire_price_discount_amt() / 100);
                     }
                 } else {
-                    if (transtype.getTransactionTypeName().equals("SALE ORDER") || transtype.getTransactionTypeName().equals("SALE QUOTATION") || transtype.getTransactionTypeName().equals("SALE INVOICE") || transtype.getTransactionTypeName().equals("EXPENSE ENTRY") || transtype.getTransactionTypeName().equals("PURCHASE INVOICE") || transtype.getTransactionTypeName().equals("DISPOSE STOCK")) {
+                    if (transtype.getTransactionTypeName().equals("SALE ORDER") || transtype.getTransactionTypeName().equals("SALE QUOTATION") || transtype.getTransactionTypeName().equals("SALE INVOICE") || transtype.getTransactionTypeName().equals("EXPENSE ENTRY") || transtype.getTransactionTypeName().equals("DISPOSE STOCK")) {
                         aTransItemToUpdate.setUnitPrice(aItem.getUnitRetailsalePrice());
+                    } else if (transtype.getTransactionTypeName().equals("PURCHASE INVOICE")) {
+                        aTransItemToUpdate.setUnitPrice(aTransItemToUpdate.getUnitCostPrice());
                     } else {
                         aTransItemToUpdate.setUnitPrice(0);
                     }
@@ -10645,6 +10647,8 @@ public class TransItemBean implements Serializable {
                 aTransItemToUpdate.setItemQty(aDefaultQty);
                 if (transtype.getTransactionTypeName().equals("HIRE INVOICE") || transtype.getTransactionTypeName().equals("HIRE QUOTATION") || transtype.getTransactionTypeName().equals("HIRE RETURN INVOICE")) {
                     aTransItemToUpdate.setAmount(aTransItemToUpdate.getItemQty() * aTransItemToUpdate.getUnitPrice() * aTransItemToUpdate.getDuration_value());
+                } else if (transtype.getTransactionTypeName().equals("PURCHASE INVOICE")) {
+                    aTransItemToUpdate.setAmount(aTransItemToUpdate.getItemQty() * (aTransItemToUpdate.getUnitPrice() + aTransItemToUpdate.getUnitVat() - aTransItemToUpdate.getUnitTradeDiscount()));
                 } else {
                     aTransItemToUpdate.setAmount(aTransItemToUpdate.getItemQty() * aTransItemToUpdate.getUnitPrice());
                 }

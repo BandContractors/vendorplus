@@ -2700,9 +2700,23 @@ CREATE PROCEDURE sp_search_item_by_code_desc_purpose
 	IN in_is_sale int
 ) 
 BEGIN  
-		SELECT distinct i.* FROM item i left join item_code_other ic on i.item_id=ic.item_id 
-		WHERE i.is_asset=in_is_asset AND i.is_sale=in_is_sale AND (i.description LIKE concat('%',in_code_desc,'%') OR i.item_code=in_code_desc OR i.alias_name LIKE concat('%',in_code_desc,'%') OR ic.item_code=in_code_desc) 
-		ORDER BY i.description ASC LIMIT 10;
+		SET @spaces=length(in_code_desc)-length(replace(in_code_desc,' ',''));
+		SET @word1=SUBSTRING_INDEX(in_code_desc, ' ', 1);
+        SET @word2=SUBSTRING_INDEX(in_code_desc, ' ', -1);
+        
+        if (@spaces=1) then 
+			SELECT distinct i.* FROM item i left join item_code_other ic on i.item_id=ic.item_id 
+			WHERE i.is_asset=in_is_asset AND i.is_sale=in_is_sale AND (
+            (i.description LIKE concat('%',@word1,'%') AND i.description LIKE concat('%',@word2,'%')) OR  
+			(i.item_code=in_code_desc OR i.alias_name LIKE concat('%',in_code_desc,'%') OR ic.item_code=in_code_desc)
+            ) 
+			ORDER BY i.description ASC LIMIT 15;
+        else 
+			SELECT distinct i.* FROM item i left join item_code_other ic on i.item_id=ic.item_id 
+			WHERE i.is_asset=in_is_asset AND i.is_sale=in_is_sale AND 
+			(i.description LIKE concat('%',in_code_desc,'%') OR i.item_code=in_code_desc OR i.alias_name LIKE concat('%',in_code_desc,'%') OR ic.item_code=in_code_desc) 
+			ORDER BY i.description ASC LIMIT 15;
+        end if;
 END//
 DELIMITER ;
 
@@ -2772,11 +2786,25 @@ CREATE PROCEDURE sp_search_item_for_sale
 	IN in_code_desc varchar(100)
 ) 
 BEGIN 
-		SELECT distinct i.* FROM item i left join item_code_other ic on i.item_id=ic.item_id 
-		WHERE i.is_suspended='No' AND i.is_sale=1 AND i.is_asset=0 AND 
-		(i.description LIKE concat('%',in_code_desc,'%') OR i.item_code LIKE concat('%',in_code_desc,'%') OR i.item_code LIKE concat('%',SUBSTRING(in_code_desc,2),'%') OR i.item_code LIKE concat('%',SUBSTRING(in_code_desc,3),'%') OR i.alias_name LIKE concat('%',in_code_desc,'%') 
-        OR ic.item_code LIKE concat('%',in_code_desc,'%') OR ic.item_code LIKE concat('%',SUBSTRING(in_code_desc,2),'%') OR ic.item_code LIKE concat('%',SUBSTRING(in_code_desc,3),'%')) 
-		ORDER BY i.description ASC LIMIT 10;
+		SET @spaces=length(in_code_desc)-length(replace(in_code_desc,' ',''));
+		SET @word1=SUBSTRING_INDEX(in_code_desc, ' ', 1);
+        SET @word2=SUBSTRING_INDEX(in_code_desc, ' ', -1);
+        
+        if (@spaces=1) then 
+		    SELECT distinct i.* FROM item i left join item_code_other ic on i.item_id=ic.item_id 
+			WHERE i.is_suspended='No' AND i.is_sale=1 AND i.is_asset=0 AND (
+            (i.description LIKE concat('%',@word1,'%') AND i.description LIKE concat('%',@word2,'%')) OR 
+			(i.item_code LIKE concat('%',in_code_desc,'%') OR i.item_code LIKE concat('%',SUBSTRING(in_code_desc,2),'%') OR i.item_code LIKE concat('%',SUBSTRING(in_code_desc,3),'%') OR i.alias_name LIKE concat('%',in_code_desc,'%') 
+			OR ic.item_code LIKE concat('%',in_code_desc,'%') OR ic.item_code LIKE concat('%',SUBSTRING(in_code_desc,2),'%') OR ic.item_code LIKE concat('%',SUBSTRING(in_code_desc,3),'%'))
+            )
+			ORDER BY i.description ASC LIMIT 15;
+		else 
+			SELECT distinct i.* FROM item i left join item_code_other ic on i.item_id=ic.item_id 
+			WHERE i.is_suspended='No' AND i.is_sale=1 AND i.is_asset=0 AND 
+			(i.description LIKE concat('%',in_code_desc,'%') OR i.item_code LIKE concat('%',in_code_desc,'%') OR i.item_code LIKE concat('%',SUBSTRING(in_code_desc,2),'%') OR i.item_code LIKE concat('%',SUBSTRING(in_code_desc,3),'%') OR i.alias_name LIKE concat('%',in_code_desc,'%') 
+			OR ic.item_code LIKE concat('%',in_code_desc,'%') OR ic.item_code LIKE concat('%',SUBSTRING(in_code_desc,2),'%') OR ic.item_code LIKE concat('%',SUBSTRING(in_code_desc,3),'%')) 
+			ORDER BY i.description ASC LIMIT 15;
+		end if;
 END//
 DELIMITER ;
 
@@ -2787,11 +2815,24 @@ CREATE PROCEDURE sp_search_item_for_sale_limit100
 	IN in_code_desc varchar(100)
 ) 
 BEGIN  
-		SELECT distinct i.* FROM item i left join item_code_other ic on i.item_id=ic.item_id 
-		WHERE i.is_suspended='No' AND i.is_sale=1 AND i.is_asset=0 AND 
-		(i.description LIKE concat('%',in_code_desc,'%') OR i.item_code LIKE concat('%',in_code_desc,'%') OR i.item_code LIKE concat('%',SUBSTRING(in_code_desc,2),'%') OR i.item_code LIKE concat('%',SUBSTRING(in_code_desc,3),'%') OR i.alias_name LIKE concat('%',in_code_desc,'%') 
-        OR ic.item_code LIKE concat('%',in_code_desc,'%') OR ic.item_code LIKE concat('%',SUBSTRING(in_code_desc,2),'%') OR ic.item_code LIKE concat('%',SUBSTRING(in_code_desc,3),'%')) 
-		ORDER BY description ASC LIMIT 100;
+		SET @spaces=length(in_code_desc)-length(replace(in_code_desc,' ',''));
+		SET @word1=SUBSTRING_INDEX(in_code_desc, ' ', 1);
+        SET @word2=SUBSTRING_INDEX(in_code_desc, ' ', -1);
+        if (@spaces=1) then 
+			SELECT distinct i.* FROM item i left join item_code_other ic on i.item_id=ic.item_id 
+			WHERE i.is_suspended='No' AND i.is_sale=1 AND i.is_asset=0  AND (
+            (i.description LIKE concat('%',@word1,'%') AND i.description LIKE concat('%',@word2,'%')) OR  
+			(i.item_code LIKE concat('%',in_code_desc,'%') OR i.item_code LIKE concat('%',SUBSTRING(in_code_desc,2),'%') OR i.item_code LIKE concat('%',SUBSTRING(in_code_desc,3),'%') OR i.alias_name LIKE concat('%',in_code_desc,'%') 
+			OR ic.item_code LIKE concat('%',in_code_desc,'%') OR ic.item_code LIKE concat('%',SUBSTRING(in_code_desc,2),'%') OR ic.item_code LIKE concat('%',SUBSTRING(in_code_desc,3),'%'))
+            ) 
+			ORDER BY description ASC LIMIT 100;
+        else 
+			SELECT distinct i.* FROM item i left join item_code_other ic on i.item_id=ic.item_id 
+			WHERE i.is_suspended='No' AND i.is_sale=1 AND i.is_asset=0 AND 
+			(i.description LIKE concat('%',in_code_desc,'%') OR i.item_code LIKE concat('%',in_code_desc,'%') OR i.item_code LIKE concat('%',SUBSTRING(in_code_desc,2),'%') OR i.item_code LIKE concat('%',SUBSTRING(in_code_desc,3),'%') OR i.alias_name LIKE concat('%',in_code_desc,'%') 
+			OR ic.item_code LIKE concat('%',in_code_desc,'%') OR ic.item_code LIKE concat('%',SUBSTRING(in_code_desc,2),'%') OR ic.item_code LIKE concat('%',SUBSTRING(in_code_desc,3),'%')) 
+			ORDER BY description ASC LIMIT 100;
+        end if;
 END//
 DELIMITER ;
 
@@ -2900,11 +2941,25 @@ CREATE PROCEDURE sp_search_item_for_purchase
 	IN in_code_desc varchar(100)
 ) 
 BEGIN  
-		SELECT distinct i.* FROM item i left join item_code_other ic on i.item_id=ic.item_id 
-		WHERE i.is_suspended='No' AND i.is_buy=1 AND 
-		(i.description LIKE concat('%',in_code_desc,'%') OR i.item_code LIKE concat('%',in_code_desc,'%') OR i.alias_name LIKE concat('%',in_code_desc,'%') 
-        OR ic.item_code LIKE concat('%',in_code_desc,'%')) 
-		ORDER BY i.description ASC LIMIT 10;
+		SET @spaces=length(in_code_desc)-length(replace(in_code_desc,' ',''));
+		SET @word1=SUBSTRING_INDEX(in_code_desc, ' ', 1);
+        SET @word2=SUBSTRING_INDEX(in_code_desc, ' ', -1);
+        
+        if (@spaces=1) then 
+			SELECT distinct i.* FROM item i left join item_code_other ic on i.item_id=ic.item_id 
+			WHERE i.is_suspended='No' AND i.is_buy=1 AND (
+            (i.description LIKE concat('%',@word1,'%') AND i.description LIKE concat('%',@word2,'%')) OR 
+			(i.item_code LIKE concat('%',in_code_desc,'%') OR i.alias_name LIKE concat('%',in_code_desc,'%') 
+			OR ic.item_code LIKE concat('%',in_code_desc,'%'))
+            ) 
+			ORDER BY i.description ASC LIMIT 10;
+        else 
+			SELECT distinct i.* FROM item i left join item_code_other ic on i.item_id=ic.item_id 
+			WHERE i.is_suspended='No' AND i.is_buy=1 AND 
+			(i.description LIKE concat('%',in_code_desc,'%') OR i.item_code LIKE concat('%',in_code_desc,'%') OR i.alias_name LIKE concat('%',in_code_desc,'%') 
+			OR ic.item_code LIKE concat('%',in_code_desc,'%')) 
+			ORDER BY i.description ASC LIMIT 10;
+        end if;
 END//
 DELIMITER ;
 
@@ -2915,11 +2970,25 @@ CREATE PROCEDURE sp_search_item_for_purchase_goods
 	IN in_code_desc varchar(100)
 ) 
 BEGIN  
-		SELECT distinct i.* FROM item i left join item_code_other ic on i.item_id=ic.item_id 
-		WHERE i.is_suspended='No' AND i.is_buy=1 AND i.is_sale=1 AND i.is_asset=0 AND 
-		(i.description LIKE concat('%',in_code_desc,'%') OR i.item_code LIKE concat('%',in_code_desc,'%') OR i.alias_name LIKE concat('%',in_code_desc,'%') 
-        OR ic.item_code LIKE concat('%',in_code_desc,'%')) 
-		ORDER BY i.description ASC LIMIT 10;
+		SET @spaces=length(in_code_desc)-length(replace(in_code_desc,' ',''));
+		SET @word1=SUBSTRING_INDEX(in_code_desc, ' ', 1);
+        SET @word2=SUBSTRING_INDEX(in_code_desc, ' ', -1);
+        
+        if (@spaces=1) then 
+			SELECT distinct i.* FROM item i left join item_code_other ic on i.item_id=ic.item_id 
+			WHERE i.is_suspended='No' AND i.is_buy=1 AND i.is_sale=1 AND i.is_asset=0 AND (
+            (i.description LIKE concat('%',@word1,'%') AND i.description LIKE concat('%',@word2,'%')) OR 
+			(i.item_code LIKE concat('%',in_code_desc,'%') OR i.alias_name LIKE concat('%',in_code_desc,'%') 
+			OR ic.item_code LIKE concat('%',in_code_desc,'%'))
+            ) 
+			ORDER BY i.description ASC LIMIT 15;
+        else 
+			SELECT distinct i.* FROM item i left join item_code_other ic on i.item_id=ic.item_id 
+			WHERE i.is_suspended='No' AND i.is_buy=1 AND i.is_sale=1 AND i.is_asset=0 AND 
+			(i.description LIKE concat('%',in_code_desc,'%') OR i.item_code LIKE concat('%',in_code_desc,'%') OR i.alias_name LIKE concat('%',in_code_desc,'%') 
+			OR ic.item_code LIKE concat('%',in_code_desc,'%')) 
+			ORDER BY i.description ASC LIMIT 15;
+        end if;
 END//
 DELIMITER ;
 
@@ -2986,11 +3055,25 @@ CREATE PROCEDURE sp_search_item_for_receive_goods
 	IN in_code_desc varchar(100)
 ) 
 BEGIN  
-		SELECT distinct i.* FROM item i left join item_code_other ic on i.item_id=ic.item_id 
-		WHERE i.is_suspended='No' AND i.is_buy=1 AND i.is_sale=1 AND i.is_asset=0 AND i.is_track=1 AND 
-		(i.description LIKE concat('%',in_code_desc,'%') OR i.item_code LIKE concat('%',in_code_desc,'%') OR i.item_code LIKE concat('%',SUBSTRING(in_code_desc,2),'%') OR i.item_code LIKE concat('%',SUBSTRING(in_code_desc,3),'%') OR i.alias_name LIKE concat('%',in_code_desc,'%') 
-        OR ic.item_code LIKE concat('%',in_code_desc,'%') OR ic.item_code LIKE concat('%',SUBSTRING(in_code_desc,2),'%') OR ic.item_code LIKE concat('%',SUBSTRING(in_code_desc,3),'%')) 
-		ORDER BY i.description ASC LIMIT 10;
+		SET @spaces=length(in_code_desc)-length(replace(in_code_desc,' ',''));
+		SET @word1=SUBSTRING_INDEX(in_code_desc, ' ', 1);
+        SET @word2=SUBSTRING_INDEX(in_code_desc, ' ', -1);
+        
+        if (@spaces=1) then 
+			SELECT distinct i.* FROM item i left join item_code_other ic on i.item_id=ic.item_id 
+			WHERE i.is_suspended='No' AND i.is_buy=1 AND i.is_sale=1 AND i.is_asset=0 AND i.is_track=1 AND (
+            (i.description LIKE concat('%',@word1,'%') AND i.description LIKE concat('%',@word2,'%')) OR  
+			(i.item_code LIKE concat('%',in_code_desc,'%') OR i.item_code LIKE concat('%',SUBSTRING(in_code_desc,2),'%') OR i.item_code LIKE concat('%',SUBSTRING(in_code_desc,3),'%') OR i.alias_name LIKE concat('%',in_code_desc,'%') 
+			OR ic.item_code LIKE concat('%',in_code_desc,'%') OR ic.item_code LIKE concat('%',SUBSTRING(in_code_desc,2),'%') OR ic.item_code LIKE concat('%',SUBSTRING(in_code_desc,3),'%'))
+            ) 
+			ORDER BY i.description ASC LIMIT 15;
+        else 
+			SELECT distinct i.* FROM item i left join item_code_other ic on i.item_id=ic.item_id 
+			WHERE i.is_suspended='No' AND i.is_buy=1 AND i.is_sale=1 AND i.is_asset=0 AND i.is_track=1 AND 
+			(i.description LIKE concat('%',in_code_desc,'%') OR i.item_code LIKE concat('%',in_code_desc,'%') OR i.item_code LIKE concat('%',SUBSTRING(in_code_desc,2),'%') OR i.item_code LIKE concat('%',SUBSTRING(in_code_desc,3),'%') OR i.alias_name LIKE concat('%',in_code_desc,'%') 
+			OR ic.item_code LIKE concat('%',in_code_desc,'%') OR ic.item_code LIKE concat('%',SUBSTRING(in_code_desc,2),'%') OR ic.item_code LIKE concat('%',SUBSTRING(in_code_desc,3),'%')) 
+			ORDER BY i.description ASC LIMIT 15;
+        end if;
 END//
 DELIMITER ;
 
