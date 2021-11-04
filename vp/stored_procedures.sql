@@ -2871,10 +2871,23 @@ CREATE PROCEDURE sp_search_item_for_stock_dispose
 	IN in_code_desc varchar(100)
 ) 
 BEGIN  
-		SELECT * FROM item 
-		WHERE is_suspended='No' AND is_asset=0 AND is_track=1 AND 
-		(description LIKE concat('%',in_code_desc,'%') OR item_code LIKE concat('%',in_code_desc,'%') OR alias_name LIKE concat('%',in_code_desc,'%')) 
-		ORDER BY description ASC LIMIT 10;
+		SET @spaces=length(in_code_desc)-length(replace(in_code_desc,' ',''));
+		SET @word1=SUBSTRING_INDEX(in_code_desc, ' ', 1);
+        SET @word2=SUBSTRING_INDEX(in_code_desc, ' ', -1);
+        
+        if (@spaces=1) then 
+			SELECT distinct i.* FROM item i left join item_code_other ic on i.item_id=ic.item_id 
+			WHERE i.is_suspended='No' AND i.is_asset=0 AND i.is_track=1 AND (
+            (i.description LIKE concat('%',@word1,'%') AND i.description LIKE concat('%',@word2,'%')) OR  
+			(i.item_code LIKE concat('%',in_code_desc,'%') OR i.alias_name LIKE concat('%',in_code_desc,'%') OR ic.item_code LIKE concat('%',in_code_desc,'%')) 
+            )
+			ORDER BY i.description ASC LIMIT 15;
+        else 
+			SELECT distinct i.* FROM item i left join item_code_other ic on i.item_id=ic.item_id 
+			WHERE i.is_suspended='No' AND i.is_asset=0 AND i.is_track=1 AND 
+			(i.description LIKE concat('%',in_code_desc,'%') OR i.item_code LIKE concat('%',in_code_desc,'%') OR i.alias_name LIKE concat('%',in_code_desc,'%') OR ic.item_code LIKE concat('%',in_code_desc,'%')) 
+			ORDER BY i.description ASC LIMIT 15;
+        end if;
 END//
 DELIMITER ;
 
@@ -2913,10 +2926,23 @@ CREATE PROCEDURE sp_search_item_for_unpack
 	IN in_code_desc varchar(100)
 ) 
 BEGIN  
-		SELECT * FROM item 
-		WHERE is_suspended='No' AND is_track=1 AND is_asset=0 AND 
-		(description LIKE concat('%',in_code_desc,'%') OR item_code LIKE concat('%',in_code_desc,'%') OR alias_name LIKE concat('%',in_code_desc,'%')) 
-		ORDER BY description ASC LIMIT 10;
+		SET @spaces=length(in_code_desc)-length(replace(in_code_desc,' ',''));
+		SET @word1=SUBSTRING_INDEX(in_code_desc, ' ', 1);
+        SET @word2=SUBSTRING_INDEX(in_code_desc, ' ', -1);
+        
+        if (@spaces=1) then 
+			SELECT  distinct i.* FROM item i left join item_code_other ic on i.item_id=ic.item_id 
+			WHERE is_suspended='No' AND is_track=1 AND is_asset=0 AND (
+            (i.description LIKE concat('%',@word1,'%') AND i.description LIKE concat('%',@word2,'%')) OR  
+			(i.item_code LIKE concat('%',in_code_desc,'%') OR i.alias_name LIKE concat('%',in_code_desc,'%') OR ic.item_code LIKE concat('%',in_code_desc,'%')) 
+            ) 
+			ORDER BY i.description ASC LIMIT 10;
+        else 
+			SELECT  distinct i.* FROM item i left join item_code_other ic on i.item_id=ic.item_id 
+			WHERE is_suspended='No' AND is_track=1 AND is_asset=0 AND 
+			(i.description LIKE concat('%',in_code_desc,'%') OR i.item_code LIKE concat('%',in_code_desc,'%') OR i.alias_name LIKE concat('%',in_code_desc,'%') OR ic.item_code LIKE concat('%',in_code_desc,'%')) 
+			ORDER BY i.description ASC LIMIT 10;
+		end if;
 END//
 DELIMITER ;
 

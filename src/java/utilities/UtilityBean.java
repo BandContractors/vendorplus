@@ -733,10 +733,7 @@ public class UtilityBean implements Serializable {
     }
 
 //    public static void main(String[] args) {
-//        String X="EXEMPT,ZERO";
-//        System.out.println(X.contains("STANDARD"));
-//        System.out.println(X.contains("ZERO"));
-//        System.out.println(X.contains("EXEMPT"));
+//        
 //    }
     public List<ThreadClass> getRunningThreads() {
         List<ThreadClass> objs = new ArrayList<>();
@@ -1116,7 +1113,7 @@ public class UtilityBean implements Serializable {
         }
     }
 
-    public void cleanItemTaxRates() {
+    public void cleanLocalItemTaxRatesWithRemote() {
         try {
             Runnable task = new Runnable() {
                 @Override
@@ -1137,8 +1134,43 @@ public class UtilityBean implements Serializable {
                                 itemid = rs.getLong("item_id");
                                 ib.checkRemoteTaxRateAndUpdateLocal(itemid, "");
                                 if (x % 20 == 0) {
-                                    LOGGER.log(Level.ERROR, "Cleaned:" + x);
+                                    LOGGER.log(Level.ERROR, "CleanedLocalRemote:" + x);
                                 }
+                            }
+                        }
+                    } catch (Exception e) {
+                        LOGGER.log(Level.ERROR, e);
+                    }
+                }
+            };
+            Executor e = Executors.newSingleThreadExecutor();
+            e.execute(task);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void reArrangeLocalItemTaxRates() {
+        try {
+            Runnable task = new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        String sql = "SELECT * FROM item";
+                        ResultSet rs = null;
+                        Connection conn = DBConnection.getMySQLConnection();
+                        PreparedStatement ps = conn.prepareStatement(sql);
+                        rs = ps.executeQuery();
+                        int x = 0;
+                        long itemid = 0;
+                        ItemBean ib = new ItemBean();
+                        while (rs.next()) {
+                            x = x + 1;
+                            itemid = 0;
+                            itemid = rs.getLong("item_id");
+                            ib.reArrangeVatRateCall(itemid, "");
+                            if (x % 20 == 0) {
+                                LOGGER.log(Level.ERROR, "ReArrangedLocal:" + x);
                             }
                         }
                     } catch (Exception e) {

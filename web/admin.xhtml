@@ -58,19 +58,25 @@
                     </h:panelGrid>
                 </p:tab>
                 <p:tab title="Update Mapped Items with URA Tax Rates">
-                    <h:panelGrid columns="1">
+                    <h:panelGrid columns="2">
                         <p:commandButton styleClass="clsButtonBig" value="Update Mapped Items" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                             <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                                 <p:graphicImage name="/images/ajax-loader.gif"/>
                             </p:dialog>
-                            <p:ajax listener="#{utilityBean.cleanItemTaxRates()}" process="@form" update="@form" />
+                            <p:ajax listener="#{utilityBean.cleanLocalItemTaxRatesWithRemote()}" process="@form" update="@form" />
+                        </p:commandButton>
+                        <p:commandButton styleClass="clsButtonBig" value="Arrange Local Tax Rates" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                            <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                                <p:graphicImage name="/images/ajax-loader.gif"/>
+                            </p:dialog>
+                            <p:ajax listener="#{utilityBean.reArrangeLocalItemTaxRates()}" process="@form" update="@form" />
                         </p:commandButton>
                     </h:panelGrid>
                 </p:tab>
                 <p:tab title="Running Threads">
                     <h:panelGrid columns="1">
                         <p:dataTable value="#{utilityBean.getRunningThreads()}" var="t" 
-                                      rowIndexVar="rowIndex"
+                                     rowIndexVar="rowIndex"
                                      > 
                             <p:column headerText="#" style="text-align: left;">
                                 #{rowIndex+1}

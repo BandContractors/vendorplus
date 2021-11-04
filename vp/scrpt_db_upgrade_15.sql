@@ -165,3 +165,8 @@ CREATE TABLE item_code_other (
 );
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_15',166,Now(),'6.0','');
+
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (83, 'GENERAL', 'TAX_VAT_RATE_ORDER', 'ZERO,EXEMPT,STANDARD','Order of priority for an item with more that 1 VAT Tax Rate. If not provided, deafult is ZERO,EXEMPT,STANDARD');
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_15',171,Now(),'6.0','');

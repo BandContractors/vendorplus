@@ -195,23 +195,27 @@ public class ItemBean implements Serializable {
                         taxratelocal = taxratelocal + "," + taxrateadd;
                         //re-arrange
                         String taxratelocalNew = "";
-                        if (taxratelocal.contains("ZERO")) {
-                            taxratelocalNew = "ZERO";
-                        }
-                        if (taxratelocal.contains("EXEMPT")) {
-                            if (taxratelocalNew.length() == 0) {
-                                taxratelocalNew = "EXEMPT";
-                            } else {
-                                taxratelocalNew = taxratelocalNew + ",EXEMPT";
-                            }
-                        }
-                        if (taxratelocal.contains("STANDARD")) {
-                            if (taxratelocalNew.length() == 0) {
-                                taxratelocalNew = "STANDARD";
-                            } else {
-                                taxratelocalNew = taxratelocalNew + ",STANDARD";
-                            }
-                        }
+                        /*
+                         if (taxratelocal.contains("ZERO")) {
+                         taxratelocalNew = "ZERO";
+                         }
+                         if (taxratelocal.contains("EXEMPT")) {
+                         if (taxratelocalNew.length() == 0) {
+                         taxratelocalNew = "EXEMPT";
+                         } else {
+                         taxratelocalNew = taxratelocalNew + ",EXEMPT";
+                         }
+                         }
+                         if (taxratelocal.contains("STANDARD")) {
+                         if (taxratelocalNew.length() == 0) {
+                         taxratelocalNew = "STANDARD";
+                         } else {
+                         taxratelocalNew = taxratelocalNew + ",STANDARD";
+                         }
+                         }
+                         */
+                        String TAX_VAT_RATE_ORDER = new Parameter_listBean().getParameter_listByContextName("GENERAL", "TAX_VAT_RATE_ORDER").getParameter_value();
+                        taxratelocalNew = this.reArrangeVatRate(taxratelocal, TAX_VAT_RATE_ORDER);
                         // now update new tax rate
                         if (taxratelocalNew.length() > 0 && taxratelocal.length() > 0) {
                             item.setVatRated(taxratelocalNew);
@@ -223,6 +227,53 @@ public class ItemBean implements Serializable {
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
+    }
+
+    public void reArrangeVatRateCall(long aItemId, String aDescription) {
+        try {
+            Item item = null;
+            if (aItemId > 0) {
+                item = this.getItem(aItemId);
+            } else if (aItemId == 0 && aDescription.length() > 0) {
+                item = this.getItemByDesc(aDescription);
+            }
+            if (null != item) {
+                Item_tax_map im = new Item_tax_mapBean().getItem_tax_mapSynced(item.getItemId());
+                if (null != im) {
+                    String taxratelocal = item.getVatRated();
+                    if (taxratelocal.length() > 0) {
+                        String taxratelocalNew = "";
+                        String TAX_VAT_RATE_ORDER = new Parameter_listBean().getParameter_listByContextName("GENERAL", "TAX_VAT_RATE_ORDER").getParameter_value();
+                        taxratelocalNew = this.reArrangeVatRate(taxratelocal, TAX_VAT_RATE_ORDER);
+                        // now update new tax rate
+                        if (taxratelocalNew.length() > 0 && taxratelocal.length() > 0) {
+                            item.setVatRated(taxratelocalNew);
+                            this.saveValidatedItem(item);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public String reArrangeVatRate(String aNotArrangedVatRated, String aVatRatedOrder) {
+        String ArrangedVatRated = "";
+        if (aVatRatedOrder.isEmpty() || (!aVatRatedOrder.contains("ZERO") && !aVatRatedOrder.contains("EXEMPT") && !aVatRatedOrder.contains("STANDARD"))) {
+            aVatRatedOrder = "ZERO,EXEMPT,STANDARD";
+        }
+        String[] aVatRatedOrderArray = new UtilityBean().getStringArrayFromCommaSeperatedStr(aVatRatedOrder);
+        for (int i = 0; i < aVatRatedOrderArray.length; i++) {
+            if (aNotArrangedVatRated.contains(aVatRatedOrderArray[i])) {
+                if (ArrangedVatRated.length() == 0) {
+                    ArrangedVatRated = aVatRatedOrderArray[i];
+                } else {
+                    ArrangedVatRated = ArrangedVatRated + "," + aVatRatedOrderArray[i];
+                }
+            }
+        }
+        return ArrangedVatRated;
     }
 
     public void saveItem() {
