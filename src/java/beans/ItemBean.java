@@ -238,18 +238,15 @@ public class ItemBean implements Serializable {
                 item = this.getItemByDesc(aDescription);
             }
             if (null != item) {
-                Item_tax_map im = new Item_tax_mapBean().getItem_tax_mapSynced(item.getItemId());
-                if (null != im) {
-                    String taxratelocal = item.getVatRated();
-                    if (taxratelocal.length() > 0) {
-                        String taxratelocalNew = "";
-                        String TAX_VAT_RATE_ORDER = new Parameter_listBean().getParameter_listByContextName("GENERAL", "TAX_VAT_RATE_ORDER").getParameter_value();
-                        taxratelocalNew = this.reArrangeVatRate(taxratelocal, TAX_VAT_RATE_ORDER);
-                        // now update new tax rate
-                        if (taxratelocalNew.length() > 0 && taxratelocal.length() > 0) {
-                            item.setVatRated(taxratelocalNew);
-                            this.saveValidatedItem(item);
-                        }
+                String taxratelocal = item.getVatRated();
+                if (taxratelocal.length() > 0) {
+                    String taxratelocalNew = "";
+                    String TAX_VAT_RATE_ORDER = new Parameter_listBean().getParameter_listByContextName("GENERAL", "TAX_VAT_RATE_ORDER").getParameter_value();
+                    taxratelocalNew = this.reArrangeVatRate(taxratelocal, TAX_VAT_RATE_ORDER);
+                    // now update new tax rate
+                    if (taxratelocalNew.length() > 0 && taxratelocal.length() > 0) {
+                        item.setVatRated(taxratelocalNew);
+                        this.saveValidatedItem(item);
                     }
                 }
             }
