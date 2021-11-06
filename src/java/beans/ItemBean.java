@@ -1533,7 +1533,7 @@ public class ItemBean implements Serializable {
         String sql;
         sql = "{call sp_search_item_by_code_desc(?)}";
         ResultSet rs = null;
-        this.setItemObjectList(new ArrayList<Item>());
+        this.setItemObjectList(new ArrayList<>());
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
