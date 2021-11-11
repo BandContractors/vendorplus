@@ -1153,6 +1153,12 @@ public class TransBean implements Serializable {
             BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         } catch (Exception e) {
         }
+        TransactionType transtype = null;
+        try {
+            transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
+        } catch (Exception e) {
+
+        }
         //reset messages
         this.ActionMessage = "";
         aStatusBean.setItemAddedStatus("");
@@ -1160,7 +1166,7 @@ public class TransBean implements Serializable {
         aStatusBean.setItemNotAddedStatus("");
         aStatusBean.setShowItemNotAddedStatus(0);
         long SavedTransId = 0;
-        int UserCodeNeeded = 1;
+        int UserCodeNeeded = 0;
         int LocationNeeded = 0;
         try {
             UserCodeNeeded = Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("ORDER", "USER_CODE_NEEDED").getParameter_value());
@@ -1179,31 +1185,30 @@ public class TransBean implements Serializable {
         } else if (UserCodeNeeded == 1 && trans.getUser_code().length() == 0) {
             this.ActionMessage = "Enter User Code";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, this.ActionMessage)));
-        } else if (UserCodeNeeded == 2 && trans.getTransactionUserDetailId() == 0) {
-            this.ActionMessage = "Select User or Staff";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, this.ActionMessage)));
         } else {
-            UserDetail ud;
-            if (UserCodeNeeded == 1) {
-                ud = new UserDetailBean().getUserDetailWithTransCode(trans.getUser_code());
-            } else if (UserCodeNeeded == 2) {
-                ud = new UserDetailBean().getUserDetail(trans.getTransactionUserDetailId());
+            if (trans.getUser_code().length() > 0) {
+                UserDetail ud = new UserDetailBean().getUserDetailWithTransCode(trans.getUser_code());
+                if (null != ud) {
+                    trans.setTransactionUserDetailId(ud.getUserDetailId());
+                }
             } else {
-                ud = new GeneralUserSetting().getCurrentUser();
+                if (null != transtype && trans.getTransactionUserDetailId() == 0 && transtype.getIsTransactionUserMandatory().equals("No")) {
+                    trans.setTransactionUserDetailId(new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                }
             }
-            if (null == ud) {
-                this.ActionMessage = "Invalid User";
+            if (trans.getTransactionUserDetailId() == 0) {
+                this.ActionMessage = "Select User or Staff";
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, this.ActionMessage)));
             } else if (trans.getDelivery_mode().length() == 0) {
                 this.ActionMessage = "Specify Delivery Mode";
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, this.ActionMessage)));
             } else {
+                UserDetail ud = new UserDetailBean().getUserDetail(trans.getTransactionUserDetailId());
                 if (aAction.equals("Send")) {
                     trans.setIs_processed(0);
                 } else if (aAction.equals("Process")) {
                     trans.setIs_processed(1);
                 }
-                trans.setTransactionUserDetailId(ud.getUserDetailId());
                 //can first do something here...
                 String CurrentDelivery_mode = trans.getDelivery_mode();
                 long CurrentLocation_id = trans.getLocation_id();
@@ -15585,17 +15590,17 @@ public class TransBean implements Serializable {
         int ListItemIndex = 0;
         int ListItemNo = at.size();
         this.ActionMessage = "";
-        int UserCodeNeeded = 1;
+        int UserCodeNeeded = 0;
         try {
             UserCodeNeeded = Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("ORDER", "USER_CODE_NEEDED").getParameter_value());
         } catch (Exception e) {
             //do nothing
         }
         UserDetail ud;
-        if (UserCodeNeeded == 0) {
-            ud = new GeneralUserSetting().getCurrentUser();
-        } else {
+        if (aTrans.getUser_code().length() > 0) {
             ud = new UserDetailBean().getUserDetailWithTransCode(aTrans.getUser_code());
+        } else {
+            ud = new GeneralUserSetting().getCurrentUser();
         }
         if (UserCodeNeeded == 1 && aTrans.getUser_code().length() == 0) {
             this.ActionMessage = "Enter User Code";
@@ -15604,7 +15609,7 @@ public class TransBean implements Serializable {
             this.ActionMessage = "Invalid User";
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("User", this.ActionMessage));
         } else {
-            this.RefreshCurrentUser(ud, new GeneralUserSetting().getCurrentStore());
+            //this.RefreshCurrentUser(ud, new GeneralUserSetting().getCurrentStore());
             switch (aAction) {
                 case "Process":
                     while (ListItemIndex < ListItemNo) {
