@@ -53,7 +53,8 @@ public class SecurityPKI implements Serializable {
 
     public String AESPublicKey(String TIN, String DeviceNumber) {
         String publickey = "";
-        com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
+        //com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
+        com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create(ClientHelper.configureClient());
         WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_ONLINE").getParameter_value());
         String PostData = GeneralUtilities.PostData_Online("", "", "AP04", "", "9230489223014123", "123", DeviceNumber, "T104", TIN);
         ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
