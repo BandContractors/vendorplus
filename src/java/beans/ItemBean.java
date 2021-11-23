@@ -1181,12 +1181,14 @@ public class ItemBean implements Serializable {
         if (ItemCode.trim().isEmpty()) {
             return null;
         }
-        String sql = "{call sp_search_item_active_by_code(?)}";
+        String sql = "{call sp_search_item_active_by_code(?,?)}";
         ResultSet rs = null;
+        int ItemCodeErrorOn = Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("GENERAL", "ITEM_CODE_ERROR_ON").getParameter_value());
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             ps.setString(1, ItemCode);
+            ps.setInt(2, ItemCodeErrorOn);//menuItemBean.getMenuItemObj().getITEM_CODE_ERROR_ON()
             rs = ps.executeQuery();
             if (rs.next()) {
                 Item item = new Item();
@@ -1606,7 +1608,7 @@ public class ItemBean implements Serializable {
         }
     }
 
-    public List<Item> getItemObjectListForSale(String Query) {
+    public List<Item> getItemObjectListForSale_old(String Query) {
         this.setTypedItemCode(Query);
         String sql;
         sql = "{call sp_search_item_for_sale(?)}";
@@ -1621,6 +1623,63 @@ public class ItemBean implements Serializable {
                 Item item = new Item();
                 this.setItemFromResultset(item, rs);
                 this.updateLookUpsUI(item);
+                this.getItemObjectList().add(item);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return getItemObjectList();
+    }
+
+    public List<Item> getItemObjectListForSale(String Query) {
+        this.setTypedItemCode(Query);
+        String sql, sqlDesc = "", sqlCode = "", sqlCodeOther = "";
+        Item_code_other ico = this.getItem_code_otherByCode(Query);
+        //desc
+        String[] ArrayDesc = new UtilityBean().getStringArrayFromXSeperatedStr(Query, " ");
+        if (menuItemBean.getMenuItemObj().getITEM_FULL_SEARCH_ON() == 1 && ArrayDesc.length > 1) {
+            for (String ArrayDesc1 : ArrayDesc) {
+                if (sqlDesc.length() == 0) {
+                    sqlDesc = " i.description LIKE '%" + ArrayDesc1 + "%' ";
+                } else {
+                    sqlDesc = sqlDesc + " AND i.description LIKE '%" + ArrayDesc1 + "%' ";
+                }
+            }
+        } else {
+            sqlDesc = " i.description LIKE '%" + Query + "%' ";
+        }
+        //code
+        if (menuItemBean.getMenuItemObj().getITEM_CODE_ERROR_ON() == 1) {
+            sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+        } else {
+            sqlCode = " i.item_code='" + Query + "' ";
+        }
+        //code other
+        if (null != ico) {
+            sqlCodeOther = " OR (i.item_id=" + ico.getItem_id() + ") ";
+        } else {
+            sqlCodeOther = "";
+        }
+        sql = "SELECT * FROM item i WHERE i.is_suspended='No' AND i.is_sale=1 AND i.is_asset=0 AND ("
+                + "(" + sqlDesc + ") "
+                + "OR "
+                + "(" + sqlCode + ") "
+                + "OR "
+                + "(i.alias_name LIKE '%" + Query + "%') "
+                + sqlCodeOther
+                + ") ORDER BY i.description ASC LIMIT 15";
+        //System.out.println("SQL:" + sql);
+        ResultSet rs = null;
+        this.setItemObjectList(new ArrayList<>());
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            //ps.setString(1, Query);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Item item = new Item();
+                this.setItemFromResultset(item, rs);
+                //this.updateLookUpsUI(item);
                 this.getItemObjectList().add(item);
             }
         } catch (Exception e) {
@@ -2891,7 +2950,13 @@ public class ItemBean implements Serializable {
     }
 
     public Item_code_other getItem_code_otherByCode(String aItem_code) {
-        String sql = "SELECT * FROM item_code_other WHERE (item_code='" + aItem_code + "' OR item_code=SUBSTRING('" + aItem_code + "',2) OR item_code=SUBSTRING('" + aItem_code + "',3))";
+        String sql;
+        int ItemCodeErrorOn = Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("GENERAL", "ITEM_CODE_ERROR_ON").getParameter_value());
+        if (ItemCodeErrorOn == 0) {
+            sql = "SELECT * FROM item_code_other WHERE item_code='" + aItem_code + "'";
+        } else {
+            sql = "SELECT * FROM item_code_other WHERE (item_code='" + aItem_code + "' OR item_code=SUBSTRING('" + aItem_code + "',2) OR item_code=SUBSTRING('" + aItem_code + "',3))";
+        }
         ResultSet rs = null;
         try (
                 Connection conn = DBConnection.getMySQLConnection();

@@ -178,6 +178,16 @@ public class MenuItemBean implements Serializable {
             } catch (NullPointerException npe) {
                 this.MenuItemObj.setSHOW_DETAIL_BY_DEFAULT(1);
             }
+            try {
+                this.MenuItemObj.setITEM_FULL_SEARCH_ON(Integer.parseInt(pb.getParameter_listByContextNameMemory("GENERAL", "ITEM_FULL_SEARCH_ON").getParameter_value()));
+            } catch (Exception e) {
+                this.MenuItemObj.setITEM_FULL_SEARCH_ON(0);
+            }
+            try {
+                this.MenuItemObj.setITEM_CODE_ERROR_ON(Integer.parseInt(pb.getParameter_listByContextNameMemory("GENERAL", "ITEM_CODE_ERROR_ON").getParameter_value()));
+            } catch (Exception e) {
+                this.MenuItemObj.setITEM_CODE_ERROR_ON(0);
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }

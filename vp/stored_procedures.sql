@@ -3186,6 +3186,26 @@ DROP PROCEDURE IF EXISTS sp_search_item_active_by_code;
 DELIMITER //
 CREATE PROCEDURE sp_search_item_active_by_code
 (
+	IN in_item_code varchar(255),
+    IN in_item_code_error int
+) 
+BEGIN 
+	if(in_item_code_error=0) then
+		SELECT * FROM view_item 
+		WHERE item_code=in_item_code AND is_suspended='No' 
+		ORDER BY description ASC; 
+    else 
+		SELECT * FROM view_item 
+		WHERE (item_code=in_item_code OR item_code=SUBSTRING(in_item_code,2) OR item_code=SUBSTRING(in_item_code,3)) AND is_suspended='No' 
+		ORDER BY description ASC; 
+    end if;
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_item_active_by_code_old;
+DELIMITER //
+CREATE PROCEDURE sp_search_item_active_by_code_old
+(
 	IN in_item_code varchar(255)
 ) 
 BEGIN 

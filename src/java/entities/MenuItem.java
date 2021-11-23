@@ -37,6 +37,8 @@ public class MenuItem implements Serializable {
     private String LANG_BASE_NAME_SYS;
     private String LANG_BASE_NAME_OUT;
     private int SHOW_DETAIL_BY_DEFAULT; 
+    private int ITEM_FULL_SEARCH_ON;
+    private int ITEM_CODE_ERROR_ON;
 
     /**
      * @return the SYSTEM_NAME
@@ -317,5 +319,33 @@ public class MenuItem implements Serializable {
      */
     public void setSHOW_DETAIL_BY_DEFAULT(int SHOW_DETAIL_BY_DEFAULT) {
         this.SHOW_DETAIL_BY_DEFAULT = SHOW_DETAIL_BY_DEFAULT;
+    }
+
+    /**
+     * @return the ITEM_FULL_SEARCH_ON
+     */
+    public int getITEM_FULL_SEARCH_ON() {
+        return ITEM_FULL_SEARCH_ON;
+    }
+
+    /**
+     * @param ITEM_FULL_SEARCH_ON the ITEM_FULL_SEARCH_ON to set
+     */
+    public void setITEM_FULL_SEARCH_ON(int ITEM_FULL_SEARCH_ON) {
+        this.ITEM_FULL_SEARCH_ON = ITEM_FULL_SEARCH_ON;
+    }
+
+    /**
+     * @return the ITEM_CODE_ERROR_ON
+     */
+    public int getITEM_CODE_ERROR_ON() {
+        return ITEM_CODE_ERROR_ON;
+    }
+
+    /**
+     * @param ITEM_CODE_ERROR_ON the ITEM_CODE_ERROR_ON to set
+     */
+    public void setITEM_CODE_ERROR_ON(int ITEM_CODE_ERROR_ON) {
+        this.ITEM_CODE_ERROR_ON = ITEM_CODE_ERROR_ON;
     }
 }

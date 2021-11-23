@@ -14,6 +14,7 @@ import beans.TransactionTypeBean;
 import connections.DBConnection;
 import entities.CompanySetting;
 import entities.Item;
+import entities.Item_code_other;
 import entities.ThreadClass;
 import entities.Trans;
 import entities.TransItem;
@@ -35,6 +36,7 @@ import java.text.Format;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -733,7 +735,8 @@ public class UtilityBean implements Serializable {
     }
 
 //    public static void main(String[] args) {
-//        
+//        String a="123456789";
+//        System.out.println(a.substring(1));//23456789
 //    }
     public List<ThreadClass> getRunningThreads() {
         List<ThreadClass> objs = new ArrayList<>();
@@ -853,6 +856,26 @@ public class UtilityBean implements Serializable {
                         CommaSeperatedStr = aStringArray[i];
                     } else {
                         CommaSeperatedStr = CommaSeperatedStr + "," + aStringArray[i];
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return CommaSeperatedStr;
+    }
+
+    public String getCommaSeperatedItemIdsFromItemCodeOther(List<Item_code_other> aItem_code_others) {
+        String CommaSeperatedStr = "";
+        try {
+            if (aItem_code_others.isEmpty()) {
+                CommaSeperatedStr = "";
+            } else {
+                for (int i = 0; i < aItem_code_others.size(); i++) {
+                    if (CommaSeperatedStr.length() == 0) {
+                        CommaSeperatedStr = Long.toString(aItem_code_others.get(i).getItem_id());
+                    } else {
+                        CommaSeperatedStr = CommaSeperatedStr + "," + Long.toString(aItem_code_others.get(i).getItem_id());
                     }
                 }
             }

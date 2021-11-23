@@ -170,3 +170,10 @@ INSERT INTO parameter_list (parameter_list_id, context, parameter_name, paramete
 VALUES (83, 'GENERAL', 'TAX_VAT_RATE_ORDER', 'ZERO,EXEMPT,STANDARD','Order of priority for an item with more that 1 VAT Tax Rate. If not provided, default is ZERO,EXEMPT,STANDARD');
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_15',171,Now(),'6.0','');
+
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (84, 'GENERAL', 'ITEM_FULL_SEARCH_ON', '0','0 for OFF, 1 for ON. If ON, words are searched without following any order of apperance in the item description');
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (85, 'GENERAL', 'ITEM_CODE_ERROR_ON', '0','0 for OFF, 1 for ON. If ON, the first 1-to-3 characters of the item code are ignored; this applies to certain barcode raeders');
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_15',179,Now(),'6.0','');

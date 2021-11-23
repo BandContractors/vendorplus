@@ -178,12 +178,6 @@
                     <p:column headerText="#{langsys['Item']} #{langsys['Code']}" style="text-align: left" >  
                         #{itm.itemCode} 
                     </p:column>
-                    <p:column headerText="#{langsys['Unit']}" style="text-align: left">  
-                        #{itm.unitSymbol}
-                    </p:column> 
-                    <p:column headerText="#{langsys['Category']}" style="text-align: left">  
-                        #{itm.categoryName}
-                    </p:column>
                     <p:column headerText="#{langsys['Retail']} #{langsys['sale']} #{langsys['Price']}" style="text-align: left">  
                         <h:outputText value="#{itm.unitRetailsalePrice}">
                             <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -202,9 +196,6 @@
                     <p:column headerText="#{langsys['Currency']}" style="text-align: left">
                         <h:outputText value="#{itm.currencyCode}">
                         </h:outputText>
-                    </p:column>
-                    <p:column headerText="#{langsys['Location']}" style="text-align: left">  
-                        #{itm.locationName}
                     </p:column>
                     <p:ajax event="itemSelect" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentSaleType,trans,transItem,itemBean.selectedItem,1.0)}" process="@this menuCurrency" update="menuBatchno,itxtUnit,itxtUnitPrice,itxtQty,itxtAmount,gridItemStatus,pgrdOverrideWarranty,pgrdSpecific"/>
                     <p:ajax event="change" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentSaleType,trans,transItem,itemBean.selectedItem,1.0)}" rendered="#{itemBean.selectedItem!=null}" process="@this menuCurrency" update="menuBatchno,itxtUnit,itxtUnitPrice,itxtQty,itxtAmount,gridItemStatus,pgrdOverrideWarranty,pgrdSpecific"/>
