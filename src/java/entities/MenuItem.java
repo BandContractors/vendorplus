@@ -39,6 +39,7 @@ public class MenuItem implements Serializable {
     private int SHOW_DETAIL_BY_DEFAULT; 
     private int ITEM_FULL_SEARCH_ON;
     private int ITEM_CODE_ERROR_ON;
+    private int SEARCH_ITEMS_LIST_LIMIT;
 
     /**
      * @return the SYSTEM_NAME
@@ -347,5 +348,19 @@ public class MenuItem implements Serializable {
      */
     public void setITEM_CODE_ERROR_ON(int ITEM_CODE_ERROR_ON) {
         this.ITEM_CODE_ERROR_ON = ITEM_CODE_ERROR_ON;
+    }
+
+    /**
+     * @return the SEARCH_ITEMS_LIST_LIMIT
+     */
+    public int getSEARCH_ITEMS_LIST_LIMIT() {
+        return SEARCH_ITEMS_LIST_LIMIT;
+    }
+
+    /**
+     * @param SEARCH_ITEMS_LIST_LIMIT the SEARCH_ITEMS_LIST_LIMIT to set
+     */
+    public void setSEARCH_ITEMS_LIST_LIMIT(int SEARCH_ITEMS_LIST_LIMIT) {
+        this.SEARCH_ITEMS_LIST_LIMIT = SEARCH_ITEMS_LIST_LIMIT;
     }
 }

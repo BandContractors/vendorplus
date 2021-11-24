@@ -188,6 +188,11 @@ public class MenuItemBean implements Serializable {
             } catch (Exception e) {
                 this.MenuItemObj.setITEM_CODE_ERROR_ON(0);
             }
+            try {
+                this.MenuItemObj.setSEARCH_ITEMS_LIST_LIMIT(Integer.parseInt(pb.getParameter_listByContextNameMemory("GENERAL", "SEARCH_ITEMS_LIST_LIMIT").getParameter_value()));
+            } catch (Exception e) {
+                this.MenuItemObj.setSEARCH_ITEMS_LIST_LIMIT(0);
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }

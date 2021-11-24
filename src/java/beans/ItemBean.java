@@ -1667,7 +1667,7 @@ public class ItemBean implements Serializable {
                 + "OR "
                 + "(i.alias_name LIKE '%" + Query + "%') "
                 + sqlCodeOther
-                + ") ORDER BY i.description ASC LIMIT 15";
+                + ") ORDER BY i.description ASC LIMIT " + menuItemBean.getMenuItemObj().getSEARCH_ITEMS_LIST_LIMIT();
         //System.out.println("SQL:" + sql);
         ResultSet rs = null;
         this.setItemObjectList(new ArrayList<>());
