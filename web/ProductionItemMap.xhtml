@@ -49,12 +49,6 @@
                     <p:column headerText="#{langsys['Alias']}" style="text-align: left" >  
                         #{itm.alias_name} 
                     </p:column>
-                    <p:column headerText="#{langsys['Unit']}" style="text-align: left">  
-                        #{itm.unitSymbol}
-                    </p:column> 
-                    <p:column headerText="#{langsys['Category']}" style="text-align: left">  
-                        #{itm.categoryName}
-                    </p:column>
                     <p:ajax event="blur" listener="#{itemProductionMap.setOutputItemId(itemBean.selectedItem.itemId)}" process="@this" update="proItemId"/>
                     <p:ajax event="blur" listener="#{itemProductionMapBean.refreshChildList(itemProductionMap.outputItemId, itemProductionMapBean.itemProductionMapsList)}" process="@this" update="dtblList"/>
                 </p:autoComplete>
@@ -80,12 +74,6 @@
                         <p:column headerText="#{langsys['Item']} #{langsys['Code']}" style="text-align: left" >  
                             #{pro_itm.itemCode} 
                         </p:column> 
-                        <p:column headerText="#{langsys['Unit']}" style="text-align: left">  
-                            #{pro_itm.unitSymbol}
-                        </p:column> 
-                        <p:column headerText="#{langsys['Category']}" style="text-align: left">  
-                            #{pro_itm.categoryName}
-                        </p:column>
                         <p:column headerText="#{langsys['Currency']}" style="text-align: left">
                             <h:outputText value="#{pro_itm.currencyCode}">
                             </h:outputText>

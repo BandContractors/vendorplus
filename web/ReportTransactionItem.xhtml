@@ -171,12 +171,6 @@
                     <p:column headerText="Alias" style="text-align: left" >  
                         #{itm.alias_name} 
                     </p:column>
-                    <p:column headerText="Unit" style="text-align: left">  
-                        #{unitBean.getUnit(itm.unitId).unitSymbol}
-                    </p:column> 
-                    <p:column headerText="Category" style="text-align: left">  
-                        #{categoryBean.getCategory(itm.categoryId).categoryName}
-                    </p:column>
                     <p:column headerText="Unit Retailsale Price" style="text-align: left">  
                         <h:outputText value="#{itm.unitRetailsalePrice}">
                             <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>

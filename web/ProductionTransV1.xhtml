@@ -119,12 +119,6 @@
                                 <p:column headerText="#{langsys['Item']} #{langsys['Code']}" style="text-align: left" >  
                                     #{pro_itm.itemCode} 
                                 </p:column> 
-                                <p:column headerText="#{langsys['Unit']}" style="text-align: left">  
-                                    #{unitBean.getUnit(pro_itm.unitId).unitSymbol}
-                                </p:column> 
-                                <p:column headerText="#{langsys['Category']}" style="text-align: left">  
-                                    #{categoryBean.getCategory(pro_itm.categoryId).categoryName}
-                                </p:column>
                                 <p:column headerText="#{langsys['Currency']}" style="text-align: left">
                                     <h:outputText value="#{pro_itm.currencyCode}">
                                     </h:outputText>
@@ -210,12 +204,6 @@
                                 </p:column>
                                 <p:column headerText="#{langsys['Item']} #{langsys['Code']}" style="text-align: left" >  
                                     #{raw_itm.itemCode} 
-                                </p:column>
-                                <p:column headerText="#{langsys['Unit']}" style="text-align: left">  
-                                    #{unitBean.getUnit(raw_itm.unitId).unitSymbol}
-                                </p:column> 
-                                <p:column headerText="#{langsys['Category']}" style="text-align: left">  
-                                    #{categoryBean.getCategory(raw_itm.categoryId).categoryName}
                                 </p:column>
                                 <p:ajax event="itemSelect" listener="#{itemProductionMapBean.updateModelInput(transProductionBean.itemProductionMapObj,itemBean.selectedItemX,transItem)}" process="@this" update="outsideInputUnit itxtQty3 itxtQty4"/>
                                 <p:ajax event="change" listener="#{itemProductionMapBean.updateModelInput(transProductionBean.itemProductionMapObj,itemBean.selectedItemX,transItem)}" rendered="#{itemBean.selectedItemX!=null}" process="@this" update="outsideInputUnit itxtQty3 itxtQty4"/>

@@ -130,12 +130,6 @@
                     <p:column headerText="#{langsys['Item']} #{langsys['Code']}" style="text-align: left" >  
                         #{itm.itemCode} 
                     </p:column>
-                    <p:column headerText="#{langsys['Unit']}" style="text-align: left">  
-                        #{unitBean.getUnit(itm.unitId).unitSymbol}
-                    </p:column> 
-                    <p:column headerText="#{langsys['Category']}" style="text-align: left">  
-                        #{categoryBean.getCategory(itm.categoryId).categoryName}
-                    </p:column>
                     <p:column headerText="#{langsys['Retail']} #{langsys['Sale']} #{langsys['Price']}" style="text-align: left">  
                         <h:outputText value="#{itm.unitRetailsalePrice}">
                             <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -151,8 +145,8 @@
                             <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
-                    <p:column headerText="VAT #{langsys['Rated']}" style="text-align: left">
-                        <h:outputText value="#{itm.vatRated}">
+                    <p:column headerText="#{langsys['Currency']}" style="text-align: left">
+                        <h:outputText value="#{itm.currencyCode}">
                         </h:outputText>
                     </p:column>
                     <p:ajax event="itemSelect" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentSaleType,trans,transItem,itemBean.selectedItem,1.0)}" process="@this" update="itxtUnit,itxtUnitPrice,itxtQty,itxtAmount,gridItemStatus,pgrdOverrideWarranty,pgrdSpecific"/>

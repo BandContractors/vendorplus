@@ -73,15 +73,9 @@
                     <p:column headerText="#{langsys['Unit']}" style="text-align: left">  
                         #{unitBean.getUnit(itm.unitId).unitSymbol}
                     </p:column> 
-                    <p:column headerText="#{langsys['Unit']} #{langsys['Retail']} #{langsys['Sale']} #{langsys['Price']}" style="text-align: left">  
-                        #{itm.unitRetailsalePrice} 
-                    </p:column>
                     <p:column headerText="#{langsys['Currency']}" style="text-align: left">
                         <h:outputText value="#{itm.currencyCode}">
                         </h:outputText>
-                    </p:column>
-                    <p:column headerText="#{langsys['Category']}" style="text-align: left">  
-                        #{categoryBean.getCategory(itm.categoryId).categoryName}
                     </p:column>
                     <p:ajax event="itemSelect" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,transBean.transTypeObj.transactionTypeId,transBean.transReasonObj.transactionReasonId,'',trans,transItem,itemBean.selectedItem,1.0)}" process="@this" update="menuBatchSpecific itxtUnit pgrdSpecific lblCur itxtUnitCost"/>
                     <p:ajax event="change" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,transBean.transTypeObj.transactionTypeId,transBean.transReasonObj.transactionReasonId,'',trans,transItem,itemBean.selectedItem,1.0)}" rendered="#{itemBean.selectedItem!=null}" process="@this" update="menuBatchSpecific itxtUnit pgrdSpecific lblCur itxtUnitCost"/>

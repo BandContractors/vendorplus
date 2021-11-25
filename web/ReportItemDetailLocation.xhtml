@@ -57,12 +57,6 @@
                     <p:column headerText="#{langsys['Alias']}" style="text-align: left" >  
                         #{itm.alias_name} 
                     </p:column>
-                    <p:column headerText="#{langsys['Unit']}" style="text-align: left">  
-                        #{unitBean.getUnit(itm.unitId).unitSymbol}
-                    </p:column> 
-                    <p:column headerText="#{langsys['Category']}" style="text-align: left">  
-                        #{categoryBean.getCategory(itm.categoryId).categoryName}
-                    </p:column>
                     <p:column headerText="#{langsys['Unit']} #{langsys['Retailsale']} #{langsys['Price']}" style="text-align: left">  
                         <h:outputText value="#{itm.unitRetailsalePrice}">
                             <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>

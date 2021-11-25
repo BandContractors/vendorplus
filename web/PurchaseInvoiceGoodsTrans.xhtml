@@ -141,12 +141,6 @@
                     <p:column headerText="#{langsys['Item']} #{langsys['Code']}" style="text-align: left" >  
                         #{itm.itemCode} 
                     </p:column> 
-                    <p:column headerText="#{langsys['Unit']}" style="text-align: left">  
-                        #{itm.unitSymbol}
-                    </p:column> 
-                    <p:column headerText="#{langsys['Category']}" style="text-align: left">  
-                        #{itm.categoryName}
-                    </p:column>
                     <p:column headerText="#{langsys['Retail']} #{langsys['Sale']} #{langsys['Price']}" style="text-align: left">  
                         <h:outputText value="#{itm.unitRetailsalePrice}">
                             <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>

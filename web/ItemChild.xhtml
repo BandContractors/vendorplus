@@ -307,7 +307,7 @@
                 <h:inputText id="itxtMainSearch" value="#{itemBean.searchItemDesc}" autocomplete="off">
                     <f:ajax event="keyup" listener="#{itemBean.refreshItemsList(itemBean.searchItemDesc)}" render="dtblItem"/>
                 </h:inputText>
-                <h:outputLabel value="#{langsys['Only']}( #{langsys['TOP']} 10 #{langsys['Search']} #{langsys['Results']} #{langsys['to']} #{langsys['be']} #{langsys['displayed']})"/>
+                <h:outputLabel value="#{langsys['Only']}( #{langsys['TOP']} #{menuItemBean.menuItemObj.SEARCH_ITEMS_LIST_LIMIT} #{langsys['Search']} #{langsys['Results']} #{langsys['to']} #{langsys['be']} #{langsys['displayed']})"/>
             </h:panelGrid>
 
             <p:dataTable id="dtblItem" value="#{itemBean.itemsList}" var="itm" 

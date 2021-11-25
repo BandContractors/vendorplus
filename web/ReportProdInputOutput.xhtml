@@ -73,12 +73,6 @@
                         <p:column headerText="#{langsys['Item']} #{langsys['Code']}" style="text-align: left" >  
                             #{raw_itm.itemCode} 
                         </p:column>
-                        <p:column headerText="#{langsys['Unit']}" style="text-align: left">  
-                            #{unitBean.getUnit(raw_itm.unitId).unitSymbol}
-                        </p:column> 
-                        <p:column headerText="#{langsys['Category']}" style="text-align: left">  
-                            #{categoryBean.getCategory(raw_itm.categoryId).categoryName}
-                        </p:column>
                         <p:ajax event="itemSelect" listener="#{transProductionItem.setInputItemId(itemBean.selectedItemX.itemId)}" process="@this"/>
                         <p:ajax event="change" listener="#{transProductionItem.setInputItemId(itemBean.selectedItemX.itemId)}" rendered="#{itemBean.selectedItemX!=null}" process="@this"/>
                     </p:autoComplete>

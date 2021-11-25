@@ -100,7 +100,7 @@
                 <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Unit']} VAT"/>
                 <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Unit']} #{langsys['Item']} #{langsys['Discount']}"/>
                 <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Amount']}"/>
-                
+
                 <p:autoComplete id="autcItem" widgetVar="WautcItem" value="#{itemBean.selectedItem}"  
                                 completeMethod="#{itemBean.getItemObjectListForPurchaseGoods}" 
                                 var="itm" 
@@ -117,12 +117,16 @@
                     </p:column>
                     <p:column headerText="#{langsys['Item']} #{langsys['Code']}" style="text-align: left" >  
                         #{itm.itemCode} 
-                    </p:column> 
-                    <p:column headerText="#{langsys['Unit']}" style="text-align: left">  
-                        #{unitBean.getUnit(itm.unitId).unitSymbol}
-                    </p:column> 
-                    <p:column headerText="#{langsys['Category']}" style="text-align: left">  
-                        #{categoryBean.getCategory(itm.categoryId).categoryName}
+                    </p:column>
+                    <p:column headerText="#{langsys['Retail']} #{langsys['Sale']} #{langsys['Price']}" style="text-align: left">  
+                        <h:outputText value="#{itm.unitRetailsalePrice}">
+                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="#{langsys['Wholesale']} #{langsys['Price']}" style="text-align: left">
+                        <h:outputText value="#{itm.unitWholesalePrice}">
+                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:outputText>
                     </p:column>
                     <p:column headerText="#{langsys['Currency']}" style="text-align: left">
                         <h:outputText value="#{itm.currencyCode}">

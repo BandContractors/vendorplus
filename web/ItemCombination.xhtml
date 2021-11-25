@@ -50,12 +50,6 @@
                         <p:column headerText="#{langsys['Alias']}" style="text-align: left" >  
                             #{itm.alias_name} 
                         </p:column>
-                        <p:column headerText="#{langsys['Unit']}" style="text-align: left">  
-                            #{itm.unitSymbol}
-                        </p:column> 
-                        <p:column headerText="#{langsys['Category']}" style="text-align: left">  
-                            #{itm.categoryName}
-                        </p:column>
                         <p:ajax event="itemSelect" listener="#{item_combination.setParent_item_id(itemBean.selectedItem.itemId)}" process="@this" update="dtblList"/>
                         <p:ajax event="change" listener="#{item_combination.setParent_item_id(itemBean.selectedItem.itemId)}" rendered="#{itemBean.selectedItem!=null}" process="@this"/>
                         <p:ajax event="itemSelect" listener="#{item_combinationBean.refreshChildList(item_combination.parent_item_id, item_combinationBean.item_combinationsList)}" process="@this"/>
@@ -79,12 +73,6 @@
                             <p:column headerText="#{langsys['Item']} #{langsys['Description']}" style="text-align: left" >  
                                 #{itm.description} 
                             </p:column> 
-                            <p:column headerText="#{langsys['Unit']}" style="text-align: left">  
-                                #{itm.unitSymbol}
-                            </p:column> 
-                            <p:column headerText="#{langsys['Category']}" style="text-align: left">  
-                                #{itm.categoryName}
-                            </p:column>
                             <p:ajax event="itemSelect" listener="#{item_combination.setChild_item_id(itemBean.selectedItemX.itemId)}" process="@this" update="dtblList"/>
                             <p:ajax event="change" listener="#{item_combination.setChild_item_id(itemBean.selectedItemX.itemId)}" rendered="#{itemBean.selectedItemX!=null}" process="@this" update="dtblList"/>
                         </p:autoComplete>

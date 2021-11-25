@@ -87,12 +87,6 @@
                     <p:column headerText="#{langsys['Item']} #{langsys['Code']}" style="text-align: left" >  
                         #{itm.itemCode} 
                     </p:column> 
-                    <p:column headerText="#{langsys['Unit']}" style="text-align: left">  
-                        #{unitBean.getUnit(itm.unitId).unitSymbol}
-                    </p:column> 
-                    <p:column headerText="#{langsys['Category']}" style="text-align: left">  
-                        #{categoryBean.getCategory(itm.categoryId).categoryName}
-                    </p:column>
                     <p:column headerText="#{langsys['Currency']}" style="text-align: left">
                         <h:outputText value="#{itm.currencyCode}">
                         </h:outputText>

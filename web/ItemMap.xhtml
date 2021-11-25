@@ -53,12 +53,6 @@
                     <p:column headerText="#{langsys['Alias']}" style="text-align: left" >  
                         #{itm.alias_name} 
                     </p:column>
-                    <p:column headerText="#{langsys['Unit']}" style="text-align: left">  
-                        #{unitBean.getUnit(itm.unitId).unitSymbol}
-                    </p:column> 
-                    <p:column headerText="#{langsys['Category']}" style="text-align: left">  
-                        #{categoryBean.getCategory(itm.categoryId).categoryName}
-                    </p:column>
                     <p:ajax event="itemSelect" listener="#{itemMap.setBigItemId(itemBean.selectedItem.itemId)}" process="@this" update="dtblItemMap"/>
                     <p:ajax event="change" listener="#{itemMap.setBigItemId(itemBean.selectedItem.itemId)}" rendered="#{itemBean.selectedItem!=null}" process="@this" update="dtblItemMap"/>
                 </p:autoComplete>
@@ -77,12 +71,6 @@
                     <p:column headerText="#{langsys['Item']} #{langsys['Description']}" style="text-align: left" >  
                         #{itm.description} 
                     </p:column> 
-                    <p:column headerText="#{langsys['Unit']}" style="text-align: left">  
-                        #{unitBean.getUnit(itm.unitId).unitSymbol}
-                    </p:column> 
-                    <p:column headerText="#{langsys['Category']}" style="text-align: left">  
-                        #{categoryBean.getCategory(itm.categoryId).categoryName}
-                    </p:column>
                     <p:ajax event="itemSelect" listener="#{itemMap.setSmallItemId(itemBean.selectedItemX.itemId)}" process="@this" update="dtblItemMap"/>
                     <p:ajax event="change" listener="#{itemMap.setSmallItemId(itemBean.selectedItemX.itemId)}" rendered="#{itemBean.selectedItemX!=null}" process="@this" update="dtblItemMap"/>
                 </p:autoComplete>
