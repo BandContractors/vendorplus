@@ -38,206 +38,187 @@
                 <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeaderE" value="#{langsys['Items']} #{langsys['for']} #{langsys['Expenditure']}: #{langsys['Raw Materials']}, #{langsys['Consumables']} #{langsys['and']} #{langsys['Services']}" rendered="#{generalUserSetting.currentItemPurpose.equals('Expense')}"/>
                 <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeaderA" value="#{langsys['Asset']} #{langsys['Item']} #{langsys['Detail']}" rendered="#{generalUserSetting.currentItemPurpose.equals('Asset')}"/>
             </h:panelGrid>
-            <div class="ui-fluid">
-                <h:panelGrid id="pnlgItemDetail">
-                    <h:panelGrid columns="4">  
-                        <h:panelGrid>
-                            <p:commandLink value="Bar Code" rendered="#{itemBean.itemObj.itemCode.length()>0}">
-                                <p:printer target="gnlgBarCodeOnly" rendered="false"/>
-                            </p:commandLink>
-                            <h:panelGrid id="gnlgBarCodeOnly" rendered="#{itemBean.itemObj.itemCode.length()>0}">  
-                                <p:barcode id="barcItemCode" value="#{itemBean.itemObj.itemCode}" type="code128" style="width: 176px;height: 128px;"/>
-                            </h:panelGrid>
-                        </h:panelGrid>
-                        <h:panelGrid>  
-                            <p:commandLink value="Tax #{langsys['Code']}" action="#{itemBean.displayUNSPSC()}" oncomplete="PF('sbarUNSPSC').show()" update="formMain:tabvUNSPC:pnlgManage"/>
-                            <h:inputText id="itxtUNSPSC" value="#{itemBean.itemObj.item_code_tax}" autocomplete="off" style="height: 22px;width: 130px;color:#{itemBean.itemObj.is_synced_tax eq 1 ? '#238823':'#d2222d'};"/>
-                        </h:panelGrid>
-                        <h:panelGrid>  
-                            <h:outputLabel value="VAT #{langsys['Rated']}"/>
-                            <p:selectCheckboxMenu id="menuVatRateds" value="#{itemBean.itemObj.selectedVatRateds}" multiple="true" style="width: 200px;height: 28px;">
-                                <f:selectItem itemLabel="#{langsys['STANDARD']}" itemValue="STANDARD"/>
-                                <f:selectItem itemLabel="#{langsys['ZERO']}" itemValue="ZERO"/>
-                                <f:selectItem itemLabel="#{langsys['EXEMPT']}" itemValue="EXEMPT"/>
-                            </p:selectCheckboxMenu>
-                        </h:panelGrid>
-                        <h:panelGrid>  
-                            <h:outputLabel value="VAT #{langsys['Rate']} #{langsys['Order']}"/>
-                            <p:selectOneMenu value="#{itemBean.itemObj.vat_rate_order}" style="width: 220px" editable="false">
-                                <f:selectItem itemLabel="STANDARD,EXEMPT,ZERO" itemValue="STANDARD,EXEMPT,ZERO"/>
-                                <f:selectItem itemLabel="ZERO,EXEMPT,STANDARD" itemValue="ZERO,EXEMPT,STANDARD"/>
-                            </p:selectOneMenu>
-                        </h:panelGrid>
-                    </h:panelGrid>
-                    <h:panelGrid styleClass="clsGridMainInput" columns="6">
-                        <h:outputLabel value="#{langsys['Currency']}:"/>
-                        <h:selectOneMenu id="menuCurrency" value="#{itemBean.itemObj.currencyCode}" style="width: 200px">
-                            <f:selectItems value="#{accCurrencyBean.currencyList}" var="ac" itemLabel="#{ac.currencyCode}" itemValue="#{ac.currencyCode}"/>
-                            <f:ajax event="change" execute="@this" render="@this"/>
-                        </h:selectOneMenu>
-                        <h:outputLabel value="#{langsys['Is']} #{langsys['Suspended']}:"/>
-                        <h:selectOneMenu id="menuIsSuspended" value="#{itemBean.itemObj.isSuspended}" style="width: 200px">
-                            <f:selectItem itemLabel="#{langsys['No']}" itemValue="No"/>
-                            <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="Yes"/>
-                        </h:selectOneMenu>
 
-                        <h:outputLabel value="#{langsys['Asset']} #{langsys['Item']}:"/>
-                        <h:selectOneMenu id="menuIsAsset" value="#{itemBean.itemObj.isAsset}" style="width: 200px;background-color: #{listOptionBean.getColorByItemsNo(listOptionBean.getItemAssetOptions().size())}">
-                            <f:selectItems value="#{listOptionBean.getItemAssetOptions()}" var="sa" itemLabel="#{langsys[sa.strOption2]}" itemValue="#{sa.intOption1}"/>
-                        </h:selectOneMenu>
-                        <h:outputLabel value="#{langsys['Item']} #{langsys['Type']}:"/>
-                        <h:selectOneMenu id="menuItemType" value="#{itemBean.itemObj.itemType}" style="width: 200px">
-                            <f:selectItem itemLabel="" itemValue=""/>
-                            <f:selectItem itemLabel="#{langsys['PRODUCT']}" itemValue="PRODUCT"/>
-                            <f:selectItem itemLabel="#{langsys['SERVICE']}" itemValue="SERVICE"/>
-                        </h:selectOneMenu>
-                        <h:outputLabel value="#{langsys['Is']} #{langsys['General']}:"/>
-                        <h:selectOneMenu id="menuIsGeneral" value="#{itemBean.itemObj.isGeneral}" style="width: 200px">
-                            <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
-                            <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
-                        </h:selectOneMenu>
-                        <h:outputLabel value="#{langsys['Asset']} #{langsys['Type']}:"/>
-                        <h:selectOneMenu id="menuAssetType" value="#{itemBean.itemObj.assetType}" style="width: 200px;background-color: #{listOptionBean.getColorByBoolean(generalUserSetting.currentItemPurpose.equals('Asset'))}" disabled="#{!generalUserSetting.currentItemPurpose.equals('Asset')}">
-                            <f:selectItem itemLabel="" itemValue=""/>
-                            <f:selectItem itemLabel="#{langsys['Land']}" itemValue="LAND"/>
-                            <f:selectItem itemLabel="#{langsys['Building']}" itemValue="BUILDING"/>
-                            <f:selectItem itemLabel="#{langsys['Machinery']} #{langsys['and']} #{langsys['Equipment']}" itemValue="MACHINE"/>
-                            <f:selectItem itemLabel="#{langsys['Vehicle']}" itemValue="VEHICLE"/>
-                            <f:selectItem itemLabel="#{langsys['Furniture']} #{langsys['and']} #{langsys['Fixtures']}" itemValue="FURNITURE"/>
-                            <f:selectItem itemLabel="#{langsys['Computer']} #{langsys['Equipment']}" itemValue="COMPUTER"/>
-                            <f:selectItem itemLabel="#{langsys['Other']} #{langsys['Fixed']} #{langsys['Asset']}" itemValue="OTHER"/>
-                        </h:selectOneMenu>
-                        <p:commandLink value="#{langsys['Item']} #{langsys['Code']}:" action="#{itemBean.displayItemCodes()}" oncomplete="PF('sbarItemCode').show()" update="formMain:pnlgItemCode1 formMain:pnlgItemCode2" disabled="#{itemBean.itemObj.itemId eq 0}"/>
-                        <h:inputText id="itxtCode" value="#{itemBean.itemObj.itemCode}" autocomplete="off" style="width: 193px"/>
-                        <h:outputLabel value="#{langsys['Show']} #{langsys['General']}:" title="Show General Name:"/>
-                        <h:selectOneMenu id="menuOverrideGenName" value="#{itemBean.itemObj.override_gen_name}" style="width: 200px">
-                            <f:selectItem itemLabel="#{langsys['Do']} #{langsys['Not']} #{langsys['Override']}" itemValue="0"/>
-                            <f:selectItem itemLabel="#{langsys['Override']} #{langsys['Show']} #{langsys['Yes']}" itemValue="1"/>
-                            <f:selectItem itemLabel="#{langsys['Override']} #{langsys['Show']} #{langsys['No']}" itemValue="2"/>
-                        </h:selectOneMenu>
-                        <h:outputLabel value="#{langsys['Asset']} #{langsys['Account']} :"/>
-                        <h:selectOneMenu id="menuAssetAccountCode" value="#{itemBean.itemObj.assetAccountCode}" style="width: 200px;background-color: #{listOptionBean.getColorByBoolean(generalUserSetting.currentItemPurpose.equals('Asset'))}" disabled="#{!generalUserSetting.currentItemPurpose.equals('Asset')}">
-                            <f:selectItem itemLabel="" itemValue=""/>
-                            <f:selectItems value="#{accCoaBean.getAccCoaObjectListBeginWith1('1-20-000')}" var="ac" itemLabel="#{ac.accountName}" itemValue="#{ac.accountCode}"/>
-                        </h:selectOneMenu>
-                        <h:outputLabel value="#{langsys['Description']}:"/>
-                        <h:inputText id="itxtDescription" value="#{itemBean.itemObj.description}" autocomplete="off" style="width: 193px"/>
-                        <h:outputLabel value="#{langsys['Alias']} #{langsys['Name']}:"/>
-                        <h:inputText id="itxtAliasName" value="#{itemBean.itemObj.alias_name}" autocomplete="off" style="width: 193px"/>
-                        <h:outputLabel value="#{langsys['Display']} #{langsys['Alias']}:"/>
-                        <h:selectOneMenu id="menuDisplayAliasName" value="#{itemBean.itemObj.display_alias_name}" style="width: 200px">
-                            <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
-                            <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
-                        </h:selectOneMenu>
-                        <h:outputLabel value="#{langsys['Category']}:"/>
-                        <h:selectOneMenu id="menuCategory" value="#{itemBean.itemObj.categoryId}" style="width: 200px">
-                            <f:selectItem itemLabel="" itemValue="0"/>
-                            <f:selectItems value="#{categoryBean.categories}" var="c" itemLabel="#{c.categoryName}" itemValue="#{c.categoryId}"/>
-                            <f:ajax event="change" render="menuSubCategory"/>
-                        </h:selectOneMenu>
-                        <h:outputLabel value="#{langsys['Subcategory']}:"/>
-                        <h:selectOneMenu id="menuSubCategory" value="#{itemBean.itemObj.subCategoryId}" style="width: 200px">
-                            <f:selectItem itemLabel="" itemValue="0"/>
-                            <f:selectItems value="#{subCategoryBean.getSubCategoriesByCategoryId(itemBean.itemObj.categoryId)}" var="s" itemLabel="#{s.subCategoryName}" itemValue="#{s.subCategoryId}"/>
-                        </h:selectOneMenu>
-                        <h:outputLabel value="#{langsys['Account']} #{langsys['Type']}:"/>
-                        <h:selectOneMenu id="menuExpenseType" value="#{itemBean.itemObj.expense_type}" style="width: 200px;background-color: #{listOptionBean.getColorByBoolean(!generalUserSetting.currentItemPurpose.equals('Asset'))}" disabled="#{generalUserSetting.currentItemPurpose.equals('Asset')}">
-                            <f:selectItem itemLabel="" itemValue=""/>
-                            <f:selectItems value="#{itemBean.inventoryTypeList}" var="it" itemLabel="#{langsys[it.categoryName]}" itemValue="#{it.categoryName}"/>
-                            <f:ajax event="change" render="menuExpenseAccountCode"/>
-                        </h:selectOneMenu>                   
-                        <h:outputLabel value="#{langsys['Unit']}:"/>
-                        <h:selectOneMenu id="menuUnit" value="#{itemBean.itemObj.unitId}" style="width: 200px">
-                            <f:selectItem itemLabel="" itemValue="0"/>
-                            <f:selectItems value="#{unitBean.units}" var="u" itemLabel="#{u.unitName}" itemValue="#{u.unitId}"/>
-                        </h:selectOneMenu>
-                        <h:outputLabel value="#{langsys['Reorder']} #{langsys['Level']}:"/>
-                        <h:inputText id="itxtReorderLevel" value="#{itemBean.itemObj.reorderLevel}" autocomplete="off" style="width: 193px"/>
-                        <h:outputLabel value="#{langsys['Account']} #{langsys['Name']}:"/>
-                        <h:selectOneMenu id="menuExpenseAccountCode" value="#{itemBean.itemObj.expenseAccountCode}" style="width: 200px;background-color: #{listOptionBean.getColorByBoolean(!generalUserSetting.currentItemPurpose.equals('Asset'))}" disabled="#{generalUserSetting.currentItemPurpose.equals('Asset')}">
-                            <f:selectItem itemLabel="" itemValue=""/>
-                            <f:selectItems value="#{accCoaBean.getAccCoaObjectListByInventoryType(generalUserSetting.currentItemPurpose,itemBean.itemObj.expense_type)}" var="ea" itemLabel="#{ea.accountName}" itemValue="#{ea.accountCode}"/>
-                        </h:selectOneMenu>
-                        <h:outputLabel value="#{langsys['Retail']} #{langsys['Sale']} #{langsys['Price']}:"/>
-                        <h:inputText id="itxtUnitRetailsalePrice" value="#{itemBean.itemObj.unitRetailsalePrice}" autocomplete="off" style="width: 193px">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                        </h:inputText>
-                        <h:outputLabel value="#{langsys['Unit']} #{langsys['Cost']} #{langsys['Price']}:"/>
-                        <h:inputText id="itxtUnitCostPrice" value="#{itemBean.itemObj.unitCostPrice}" autocomplete="off" style="width: 193px">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                        </h:inputText>
-                        <h:outputLabel value="#{langsys['Is']} #{langsys['Free']}:"/>
-                        <h:selectOneMenu id="menuIsFree" value="#{itemBean.itemObj.is_free}" style="width: 200px">
-                            <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
-                            <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
-                        </h:selectOneMenu>
-                        <h:outputLabel value="#{langsys['Wholesale']} #{langsys['Price']}:"/>
-                        <h:inputText id="itxtUnitWholesalePrice" value="#{itemBean.itemObj.unitWholesalePrice}" autocomplete="off" style="width: 193px">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                        </h:inputText>
-                        <h:outputLabel value="#{langsys['Special']} #{langsys['Price']}:"/>
-                        <h:inputText id="itxtUnitSpecialsalePrice" value="#{itemBean.itemObj.unit_special_price}" autocomplete="off" style="width: 193px">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                        </h:inputText>
-                        <h:outputLabel value="#{langsys['I']} #{langsys['Hire']} #{langsys['this']} #{langsys['Item']}:"/>
-                        <h:selectOneMenu id="menuIsHire" value="#{itemBean.itemObj.is_hire}" style="width: 200px;">
-                            <f:selectItem itemLabel=""/>
-                            <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
-                            <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>  
-                            <f:ajax event="change" execute="@this" render="itxtUnitHirePrice"/> 
-                        </h:selectOneMenu>
-                        <h:outputLabel value="#{langsys['I']} #{langsys['Track']} #{langsys['this']} #{langsys['Item']}:"/>
-                        <h:selectOneMenu id="menuIsTrack" value="#{itemBean.itemObj.isTrack}" style="width: 200px">
-                            <f:selectItem itemLabel=""/>
-                            <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
-                            <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
-                        </h:selectOneMenu>
-                        <h:outputLabel value="#{langsys['Image']} #{langsys['Name']}:"/>
-                        <h:inputText id="itxtImageName" value="#{itemBean.itemObj.itemImgUrl}" autocomplete="off" style="width: 193px"/>
-                        <h:outputLabel value="#{langsys['Unit']} #{langsys['Hire']} #{langsys['Price']}:"/>
-                        <h:inputText id="itxtUnitHirePrice" value="#{itemBean.itemObj.unit_hire_price}" autocomplete="off" style="width: 193px" disabled="#{itemBean.itemObj.is_hire==0}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                        </h:inputText>
-                        <h:outputLabel value="#{langsys['I']} #{langsys['Buy']} #{langsys['this']} #{langsys['Item']}:"/>
-                        <h:selectOneMenu id="menuIsBuy" value="#{itemBean.itemObj.isBuy}" style="width: 200px">
-                            <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
-                            <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
-                        </h:selectOneMenu>
-                        <h:outputLabel value="#{langsys['I']} #{langsys['Sell']} #{langsys['this']} #{langsys['Item']}:"/>
-                        <h:selectOneMenu id="menuIsSale" value="#{itemBean.itemObj.isSale}" style="width: 200px;background-color: #{listOptionBean.getColorByItemsNo(listOptionBean.getItemSaleOptions().size())}">
-                            <f:selectItems value="#{listOptionBean.getItemSaleOptions()}" var="sa" itemLabel="#{langsys[sa.strOption2]}" itemValue="#{sa.intOption1}"/>
-                        </h:selectOneMenu>
-                        <h:outputLabel value="#{langsys['Unit']} #{langsys['Weight']}(#{parameter_listBean.getParameter_listByContextNameMemory('ITEM','DEFAULT_MEASURE_UNIT').parameter_value}):"/>
-                        <h:inputText value="#{itemBean.itemObj.unit_weight}" autocomplete="off" style="width: 193px">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                        </h:inputText>
-                        <h:outputLabel value="#{langsys['Expiry']} #{langsys['Band']} (U,H,M,L):"/>
-                        <p:selectOneMenu id="menuExpiryBand" value="#{itemBean.itemObj.expiry_band}" style="width: 200px" editable="true">
-                            <f:selectItem itemLabel="" itemValue=""/>
-                            <f:selectItem itemLabel="0030,0060,0120,0180" itemValue="0030,0060,0120,0180"/>
-                        </p:selectOneMenu>
-                        <h:outputLabel value="#{langsys['Specify']} #{langsys['Size']}:"/>
-                        <h:selectOneMenu id="menuSpecifySize" value="#{itemBean.itemObj.specify_size}" style="width: 200px">
-                            <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
-                            <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
-                        </h:selectOneMenu>
-                        <h:outputLabel value="#{langsys['Size']} #{langsys['to']} #{langsys['Name']}:"/>
-                        <h:selectOneMenu id="menuSizeToSpecificName" value="#{itemBean.itemObj.size_to_specific_name}" style="width: 200px">
-                            <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
-                            <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
-                        </h:selectOneMenu>
-                        <h:outputLabel value=""/>
-                        <h:outputLabel value=""/>
-                        <h:outputLabel value=""/>
-                        <h:outputLabel value=""/>
-                        <h:outputLabel value="#{langsys['Hide']} #{langsys['Unit']} #{langsys['Price']}:" title="Hide UnitPrice on Invoice?"/>
-                        <h:selectOneMenu id="menuHideUnitPriceInvoice" value="#{itemBean.itemObj.hide_unit_price_invoice}" style="width: 200px">
-                            <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
-                            <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
-                        </h:selectOneMenu>
-                    </h:panelGrid>
+            <h:panelGrid id="pnlgBarCode" columns="2">  
+                <h:panelGrid id="gnlgBarCodeOnly" rendered="#{itemBean.itemObj.itemCode.length()>0}">  
+                    <p:barcode id="barcItemCode" value="#{itemBean.itemObj.itemCode}" type="code128" style="width: 176px;height: 128px;"/>
                 </h:panelGrid>
+                <p:commandLink value="Print.Bar.Code" rendered="#{itemBean.itemObj.itemCode.length()>0}">
+                    <p:printer target="gnlgBarCodeOnly" rendered="false"/>
+                </p:commandLink>
+            </h:panelGrid>
+            <div class="ui-fluid">
+                <h:panelGrid id="pnlgItemDetail" styleClass="clsGridMainInput" columns="6">
+                    <h:outputLabel value="#{langsys['Currency']}:"/>
+                    <h:selectOneMenu id="menuCurrency" value="#{itemBean.itemObj.currencyCode}" style="width: 200px">
+                        <f:selectItems value="#{accCurrencyBean.currencyList}" var="ac" itemLabel="#{ac.currencyCode}" itemValue="#{ac.currencyCode}"/>
+                        <f:ajax event="change" execute="@this" render="@this"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel value="#{langsys['Is']} #{langsys['Suspended']}:"/>
+                    <h:selectOneMenu id="menuIsSuspended" value="#{itemBean.itemObj.isSuspended}" style="width: 200px">
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="No"/>
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="Yes"/>
+                    </h:selectOneMenu>
 
+                    <h:outputLabel value="#{langsys['Asset']} #{langsys['Item']}:"/>
+                    <h:selectOneMenu id="menuIsAsset" value="#{itemBean.itemObj.isAsset}" style="width: 200px;background-color: #{listOptionBean.getColorByItemsNo(listOptionBean.getItemAssetOptions().size())}">
+                        <f:selectItems value="#{listOptionBean.getItemAssetOptions()}" var="sa" itemLabel="#{langsys[sa.strOption2]}" itemValue="#{sa.intOption1}"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel value="#{langsys['Item']} #{langsys['Type']}:"/>
+                    <h:selectOneMenu id="menuItemType" value="#{itemBean.itemObj.itemType}" style="width: 200px">
+                        <f:selectItem itemLabel="" itemValue=""/>
+                        <f:selectItem itemLabel="#{langsys['PRODUCT']}" itemValue="PRODUCT"/>
+                        <f:selectItem itemLabel="#{langsys['SERVICE']}" itemValue="SERVICE"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel value="VAT #{langsys['Rated']}"/>
+                    <p:selectCheckboxMenu id="menuVatRateds" value="#{itemBean.itemObj.selectedVatRateds}" multiple="true" style="width: 200px;">
+                        <f:selectItem itemLabel="#{langsys['STANDARD']}" itemValue="STANDARD"/>
+                        <f:selectItem itemLabel="#{langsys['ZERO']}" itemValue="ZERO"/>
+                        <f:selectItem itemLabel="#{langsys['EXEMPT']}" itemValue="EXEMPT"/>
+                    </p:selectCheckboxMenu>
+                    <h:outputLabel value="#{langsys['Asset']} #{langsys['Type']}:"/>
+                    <h:selectOneMenu id="menuAssetType" value="#{itemBean.itemObj.assetType}" style="width: 200px;background-color: #{listOptionBean.getColorByBoolean(generalUserSetting.currentItemPurpose.equals('Asset'))}" disabled="#{!generalUserSetting.currentItemPurpose.equals('Asset')}">
+                        <f:selectItem itemLabel="" itemValue=""/>
+                        <f:selectItem itemLabel="#{langsys['Land']}" itemValue="LAND"/>
+                        <f:selectItem itemLabel="#{langsys['Building']}" itemValue="BUILDING"/>
+                        <f:selectItem itemLabel="#{langsys['Machinery']} #{langsys['and']} #{langsys['Equipment']}" itemValue="MACHINE"/>
+                        <f:selectItem itemLabel="#{langsys['Vehicle']}" itemValue="VEHICLE"/>
+                        <f:selectItem itemLabel="#{langsys['Furniture']} #{langsys['and']} #{langsys['Fixtures']}" itemValue="FURNITURE"/>
+                        <f:selectItem itemLabel="#{langsys['Computer']} #{langsys['Equipment']}" itemValue="COMPUTER"/>
+                        <f:selectItem itemLabel="#{langsys['Other']} #{langsys['Fixed']} #{langsys['Asset']}" itemValue="OTHER"/>
+                    </h:selectOneMenu>
+                    <p:commandLink value="#{langsys['Item']} #{langsys['Code']}:" action="#{itemBean.displayItemCodes()}" oncomplete="PF('sbarItemCode').show()" update="formMain:pnlgItemCode1 formMain:pnlgItemCode2" disabled="#{itemBean.itemObj.itemId eq 0}"/>
+                    <h:inputText id="itxtCode" value="#{itemBean.itemObj.itemCode}" autocomplete="off" style="width: 193px"/>
+                    <h:outputLabel value="#{langsys['Is']} #{langsys['General']}:"/>
+                    <h:selectOneMenu id="menuIsGeneral" value="#{itemBean.itemObj.isGeneral}" style="width: 200px">
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel value="#{langsys['Asset']} #{langsys['Account']} :"/>
+                    <h:selectOneMenu id="menuAssetAccountCode" value="#{itemBean.itemObj.assetAccountCode}" style="width: 200px;background-color: #{listOptionBean.getColorByBoolean(generalUserSetting.currentItemPurpose.equals('Asset'))}" disabled="#{!generalUserSetting.currentItemPurpose.equals('Asset')}">
+                        <f:selectItem itemLabel="" itemValue=""/>
+                        <f:selectItems value="#{accCoaBean.getAccCoaObjectListBeginWith1('1-20-000')}" var="ac" itemLabel="#{ac.accountName}" itemValue="#{ac.accountCode}"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel value="#{langsys['Description']}:"/>
+                    <h:inputText id="itxtDescription" value="#{itemBean.itemObj.description}" autocomplete="off" style="width: 193px"/>
+                    <h:outputLabel value="#{langsys['Alias']} #{langsys['Name']}:"/>
+                    <h:inputText id="itxtAliasName" value="#{itemBean.itemObj.alias_name}" autocomplete="off" style="width: 193px"/>
+                    <h:outputLabel value="#{langsys['Display']} #{langsys['Alias']}:"/>
+                    <h:selectOneMenu id="menuDisplayAliasName" value="#{itemBean.itemObj.display_alias_name}" style="width: 200px">
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel value="#{langsys['Category']}:"/>
+                    <h:selectOneMenu id="menuCategory" value="#{itemBean.itemObj.categoryId}" style="width: 200px">
+                        <f:selectItem itemLabel="" itemValue="0"/>
+                        <f:selectItems value="#{categoryBean.categories}" var="c" itemLabel="#{c.categoryName}" itemValue="#{c.categoryId}"/>
+                        <f:ajax event="change" render="menuSubCategory"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel value="#{langsys['Subcategory']}:"/>
+                    <h:selectOneMenu id="menuSubCategory" value="#{itemBean.itemObj.subCategoryId}" style="width: 200px">
+                        <f:selectItem itemLabel="" itemValue="0"/>
+                        <f:selectItems value="#{subCategoryBean.getSubCategoriesByCategoryId(itemBean.itemObj.categoryId)}" var="s" itemLabel="#{s.subCategoryName}" itemValue="#{s.subCategoryId}"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel value="#{langsys['Account']} #{langsys['Type']}:"/>
+                    <h:selectOneMenu id="menuExpenseType" value="#{itemBean.itemObj.expense_type}" style="width: 200px;background-color: #{listOptionBean.getColorByBoolean(!generalUserSetting.currentItemPurpose.equals('Asset'))}" disabled="#{generalUserSetting.currentItemPurpose.equals('Asset')}">
+                        <f:selectItem itemLabel="" itemValue=""/>
+                        <f:selectItems value="#{itemBean.inventoryTypeList}" var="it" itemLabel="#{langsys[it.categoryName]}" itemValue="#{it.categoryName}"/>
+                        <f:ajax event="change" render="menuExpenseAccountCode"/>
+                    </h:selectOneMenu>                   
+                    <h:outputLabel value="#{langsys['Unit']}:"/>
+                    <h:selectOneMenu id="menuUnit" value="#{itemBean.itemObj.unitId}" style="width: 200px">
+                        <f:selectItem itemLabel="" itemValue="0"/>
+                        <f:selectItems value="#{unitBean.units}" var="u" itemLabel="#{u.unitName}" itemValue="#{u.unitId}"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel value="#{langsys['Reorder']} #{langsys['Level']}:"/>
+                    <h:inputText id="itxtReorderLevel" value="#{itemBean.itemObj.reorderLevel}" autocomplete="off" style="width: 193px"/>
+                    <h:outputLabel value="#{langsys['Account']} #{langsys['Name']}:"/>
+                    <h:selectOneMenu id="menuExpenseAccountCode" value="#{itemBean.itemObj.expenseAccountCode}" style="width: 200px;background-color: #{listOptionBean.getColorByBoolean(!generalUserSetting.currentItemPurpose.equals('Asset'))}" disabled="#{generalUserSetting.currentItemPurpose.equals('Asset')}">
+                        <f:selectItem itemLabel="" itemValue=""/>
+                        <f:selectItems value="#{accCoaBean.getAccCoaObjectListByInventoryType(generalUserSetting.currentItemPurpose,itemBean.itemObj.expense_type)}" var="ea" itemLabel="#{ea.accountName}" itemValue="#{ea.accountCode}"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel value="#{langsys['Retail']} #{langsys['Sale']} #{langsys['Price']}:"/>
+                    <h:inputText id="itxtUnitRetailsalePrice" value="#{itemBean.itemObj.unitRetailsalePrice}" autocomplete="off" style="width: 193px">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:inputText>
+                    <h:outputLabel value="#{langsys['Unit']} #{langsys['Cost']} #{langsys['Price']}:"/>
+                    <h:inputText id="itxtUnitCostPrice" value="#{itemBean.itemObj.unitCostPrice}" autocomplete="off" style="width: 193px">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:inputText>
+                    <h:outputLabel value="#{langsys['Is']} #{langsys['Free']}:"/>
+                    <h:selectOneMenu id="menuIsFree" value="#{itemBean.itemObj.is_free}" style="width: 200px">
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel value="#{langsys['Wholesale']} #{langsys['Price']}:"/>
+                    <h:inputText id="itxtUnitWholesalePrice" value="#{itemBean.itemObj.unitWholesalePrice}" autocomplete="off" style="width: 193px">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:inputText>
+                    <h:outputLabel value="#{langsys['Special']} #{langsys['Price']}:"/>
+                    <h:inputText id="itxtUnitSpecialsalePrice" value="#{itemBean.itemObj.unit_special_price}" autocomplete="off" style="width: 193px">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:inputText>
+                    <h:outputLabel value="#{langsys['I']} #{langsys['Hire']} #{langsys['this']} #{langsys['Item']}:"/>
+                    <h:selectOneMenu id="menuIsHire" value="#{itemBean.itemObj.is_hire}" style="width: 200px;">
+                        <f:selectItem itemLabel=""/>
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>  
+                        <f:ajax event="change" execute="@this" render="itxtUnitHirePrice"/> 
+                    </h:selectOneMenu>
+                    <h:outputLabel value="#{langsys['I']} #{langsys['Track']} #{langsys['this']} #{langsys['Item']}:"/>
+                    <h:selectOneMenu id="menuIsTrack" value="#{itemBean.itemObj.isTrack}" style="width: 200px">
+                        <f:selectItem itemLabel=""/>
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel value="#{langsys['Image']} #{langsys['Full']} #{langsys['Name']}:"/>
+                    <h:inputText id="itxtImageName" value="#{itemBean.itemObj.itemImgUrl}" autocomplete="off" style="width: 193px"/>
+                    <h:outputLabel value="#{langsys['Unit']} #{langsys['Hire']} #{langsys['Price']}/#{langsys[generalUserSetting.DEFAULT_DURATION_TYPE]}"/>
+                    <h:inputText id="itxtUnitHirePrice" value="#{itemBean.itemObj.unit_hire_price}" autocomplete="off" style="width: 193px" disabled="#{itemBean.itemObj.is_hire==0}">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:inputText>
+                    <h:outputLabel value="#{langsys['I']} #{langsys['Buy']} #{langsys['this']} #{langsys['Item']}:"/>
+                    <h:selectOneMenu id="menuIsBuy" value="#{itemBean.itemObj.isBuy}" style="width: 200px">
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel value="#{langsys['I']} #{langsys['Sell']} #{langsys['this']} #{langsys['Item']}:"/>
+                    <h:selectOneMenu id="menuIsSale" value="#{itemBean.itemObj.isSale}" style="width: 200px;background-color: #{listOptionBean.getColorByItemsNo(listOptionBean.getItemSaleOptions().size())}">
+                        <f:selectItems value="#{listOptionBean.getItemSaleOptions()}" var="sa" itemLabel="#{langsys[sa.strOption2]}" itemValue="#{sa.intOption1}"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel value="#{langsys['Unit']} #{langsys['Weight']}(#{parameter_listBean.getParameter_listByContextNameMemory('ITEM','DEFAULT_MEASURE_UNIT').parameter_value}):"/>
+                    <h:inputText value="#{itemBean.itemObj.unit_weight}" autocomplete="off" style="width: 193px">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:inputText>
+                    <h:outputLabel value="#{langsys['Expiry']} #{langsys['Band']} (U,H,M,L):"/>
+                    <p:selectOneMenu id="menuExpiryBand" value="#{itemBean.itemObj.expiry_band}" style="width: 200px" editable="true">
+                        <f:selectItem itemLabel="" itemValue=""/>
+                        <f:selectItem itemLabel="0030,0060,0120,0180" itemValue="0030,0060,0120,0180"/>
+                    </p:selectOneMenu>
+                    <h:outputLabel value="#{langsys['Specify']} #{langsys['Size']}:"/>
+                    <h:selectOneMenu id="menuSpecifySize" value="#{itemBean.itemObj.specify_size}" style="width: 200px">
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel value="#{langsys['Size']} #{langsys['to']} #{langsys['Name']}:"/>
+                    <h:selectOneMenu id="menuSizeToSpecificName" value="#{itemBean.itemObj.size_to_specific_name}" style="width: 200px">
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
+                    </h:selectOneMenu>
+                    <p:commandLink value="Tax #{langsys['Code']}" action="#{itemBean.displayUNSPSC()}" oncomplete="PF('sbarUNSPSC').show()" update="formMain:tabvUNSPC:pnlgManage"/>
+                    <h:inputText id="itxtUNSPSC" value="#{itemBean.itemObj.item_code_tax}" autocomplete="off" style="width: 193px;color:#{itemBean.itemObj.is_synced_tax eq 1 ? '#238823':'#d2222d'};"/>
+                    <h:outputLabel value="#{langsys['Show']} #{langsys['General']} #{langsys['Name']}:" title="Show General Name:"/>
+                    <h:selectOneMenu id="menuOverrideGenName" value="#{itemBean.itemObj.override_gen_name}" style="width: 200px">
+                        <f:selectItem itemLabel="#{langsys['Do']} #{langsys['Not']} #{langsys['Override']}" itemValue="0"/>
+                        <f:selectItem itemLabel="#{langsys['Override']} #{langsys['Show']} #{langsys['Yes']}" itemValue="1"/>
+                        <f:selectItem itemLabel="#{langsys['Override']} #{langsys['Show']} #{langsys['No']}" itemValue="2"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel value="#{langsys['Hide']} #{langsys['Unit']} #{langsys['Price']} #{langsys['on']} #{langsys['Invoice']}:" title="Hide UnitPrice on Invoice?"/>
+                    <h:selectOneMenu id="menuHideUnitPriceInvoice" value="#{itemBean.itemObj.hide_unit_price_invoice}" style="width: 200px">
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
+                    </h:selectOneMenu>
+                </h:panelGrid>
                 <h:panelGrid id="pnlLocationStock" columns="4" style="width: 980px;">
                     <h:outputLabel value="#{langsys['Located']}:"/>
                     <h:dataTable id="dtblLocation" value="#{itemBean.locationList}" var="loc" 
@@ -299,6 +280,12 @@
                             <h:outputText value="#{utilityBean.formatDate(stck.itemExpDate)}"/>
                         </h:column>
                     </h:dataTable>
+                    <h:outputLabel value="VAT #{langsys['Rate']} #{langsys['Order']}:"/>
+                    <p:selectOneMenu value="#{itemBean.itemObj.vat_rate_order}" style="width: 200px" editable="false">
+                        <f:selectItem itemLabel="" itemValue=""/>
+                        <f:selectItem itemLabel="STANDARD,EXEMPT,ZERO" itemValue="STANDARD,EXEMPT,ZERO"/>
+                        <f:selectItem itemLabel="ZERO,EXEMPT,STANDARD" itemValue="ZERO,EXEMPT,STANDARD"/>
+                    </p:selectOneMenu>
                 </h:panelGrid>
             </div>
             <h:panelGrid styleClass="clsGridMainCommands" columns="1">
@@ -307,10 +294,10 @@
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
-                        <p:ajax listener="#{itemBean.saveItem()}" process="@form" update="@this pnlgItemDetail pnlLocationStock pnlgMessage growl1 pnlgSearch dtblItem" />
+                        <p:ajax listener="#{itemBean.saveItem()}" process="@form" update="@this pnlgBarCode pnlgItemDetail pnlLocationStock pnlgMessage growl1 pnlgSearch dtblItem" />
                     </p:commandButton>
                     <p:commandButton styleClass="clsButtonBig" id="cmdbClear" value="#{langsys['CLEAR']} (ALT+C)" accesskey="c">
-                        <p:ajax listener="#{itemBean.clearItem()}" process="@form" update="pnlgItemDetail pnlLocationStock pnlgMessage growl1 pnlgSearch dtblItem"/>
+                        <p:ajax listener="#{itemBean.clearItem()}" process="@form" update="pnlgBarCode pnlgItemDetail pnlLocationStock pnlgMessage growl1 pnlgSearch dtblItem"/>
                     </p:commandButton>
                 </h:panelGrid>
             </h:panelGrid>
@@ -390,7 +377,7 @@
                     <f:facet name="header">#{langsys['Action']}</f:facet>
                     <!-- row record -->
                     <h:commandLink value="Edit">
-                        <f:ajax listener="#{itemBean.displayItem(itm)}" execute="dtblItem" render="formMain:pnlgItemDetail formMain:pnlLocationStock formMain:pnlgMessage formMain:growl1"/>
+                        <f:ajax listener="#{itemBean.displayItem(itm)}" execute="dtblItem" render="formMain:pnlgBarCode formMain:pnlgItemDetail formMain:pnlLocationStock formMain:pnlgMessage formMain:growl1"/>
                     </h:commandLink>
                     &nbsp;
                 </p:column>

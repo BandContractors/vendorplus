@@ -735,8 +735,8 @@ public class UtilityBean implements Serializable {
     }
 
 //    public static void main(String[] args) {
-//        String a="123456789";
-//        System.out.println(a.substring(1));//23456789
+//        String a = "ZERO,EXEMPT,STANDARD";//STANDARD,EXEMPT,ZERO //ZERO,EXEMPT,STANDARD
+//        System.out.println(a.startsWith("STANDARD"));//23456789
 //    }
     public List<ThreadClass> getRunningThreads() {
         List<ThreadClass> objs = new ArrayList<>();
@@ -1155,7 +1155,7 @@ public class UtilityBean implements Serializable {
                                 x = x + 1;
                                 itemid = 0;
                                 itemid = rs.getLong("item_id");
-                                ib.checkRemoteTaxRateAndUpdateLocal(itemid, "");
+                                ib.checkRemoteTaxRateAndUpdateLocal(itemid, "", "");
                                 if (x % 20 == 0) {
                                     LOGGER.log(Level.ERROR, "CleanedLocalRemote:" + x);
                                 }

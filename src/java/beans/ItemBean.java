@@ -146,7 +146,7 @@ public class ItemBean implements Serializable {
         //System.out.println("OkaY");
     }
 
-    public void checkRemoteTaxRateAndUpdateLocal(long aItemId, String aDescription) {
+    public void checkRemoteTaxRateAndUpdateLocal(long aItemId, String aDescription, String aVatRateOrder) {
         try {
             Item item = null;
             if (aItemId > 0) {
@@ -155,6 +155,11 @@ public class ItemBean implements Serializable {
                 item = this.getItemByDesc(aDescription);
             }
             if (null != item) {
+                if (aVatRateOrder.isEmpty()) {//apply general order
+                    item.setVat_rate_order(this.getVatRateOrder(new Parameter_listBean().getParameter_listByContextName("GENERAL", "TAX_VAT_RATE_ORDER").getParameter_value()));
+                } else {
+                    item.setVat_rate_order(this.getVatRateOrder(item.getVatRated()));
+                }
                 Item_tax_map im = new Item_tax_mapBean().getItem_tax_mapSynced(item.getItemId());
                 if (null != im) {
                     String taxratelocal = item.getVatRated();
@@ -195,26 +200,8 @@ public class ItemBean implements Serializable {
                         taxratelocal = taxratelocal + "," + taxrateadd;
                         //re-arrange
                         String taxratelocalNew = "";
-                        /*
-                         if (taxratelocal.contains("ZERO")) {
-                         taxratelocalNew = "ZERO";
-                         }
-                         if (taxratelocal.contains("EXEMPT")) {
-                         if (taxratelocalNew.length() == 0) {
-                         taxratelocalNew = "EXEMPT";
-                         } else {
-                         taxratelocalNew = taxratelocalNew + ",EXEMPT";
-                         }
-                         }
-                         if (taxratelocal.contains("STANDARD")) {
-                         if (taxratelocalNew.length() == 0) {
-                         taxratelocalNew = "STANDARD";
-                         } else {
-                         taxratelocalNew = taxratelocalNew + ",STANDARD";
-                         }
-                         }
-                         */
-                        String TAX_VAT_RATE_ORDER = new Parameter_listBean().getParameter_listByContextName("GENERAL", "TAX_VAT_RATE_ORDER").getParameter_value();
+
+                        String TAX_VAT_RATE_ORDER = item.getVat_rate_order();
                         taxratelocalNew = this.reArrangeVatRate(taxratelocal, TAX_VAT_RATE_ORDER);
                         // now update new tax rate
                         if (taxratelocalNew.length() > 0 && taxratelocal.length() > 0) {
@@ -273,6 +260,18 @@ public class ItemBean implements Serializable {
         return ArrangedVatRated;
     }
 
+    public String getVatRateOrder(String aVatRated) {
+        String VatRateOrder = "STANDARD,EXEMPT,ZERO";
+        if (aVatRated.length() > 0) {
+            if (aVatRated.startsWith("STANDARD")) {
+                VatRateOrder = "STANDARD,EXEMPT,ZERO";
+            } else if (aVatRated.startsWith("ZERO") || aVatRated.startsWith("EXEMPT")) {
+                VatRateOrder = "ZERO,EXEMPT,STANDARD";
+            }
+        }
+        return VatRateOrder;
+    }
+
     public void saveItem() {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -283,6 +282,9 @@ public class ItemBean implements Serializable {
         String msg = "";
         //first convert vat rated from array to string
         this.ItemObj.setVatRated(new UtilityBean().getVATRateStrFromArray(this.ItemObj.getSelectedVatRateds()));
+        //re-arrange vat rate basing on order
+        this.ItemObj.setVatRated(this.reArrangeVatRate(this.ItemObj.getVatRated(), this.ItemObj.getVat_rate_order()));
+        //validate
         msg = this.validateItem(this.ItemObj);
         if (msg.length() > 0) {
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
@@ -307,7 +309,7 @@ public class ItemBean implements Serializable {
                     }
                     //update local tax rate with remote tax rate
                     if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
-                        this.checkRemoteTaxRateAndUpdateLocal(this.ItemObj.getItemId(), this.ItemObj.getDescription());
+                        this.checkRemoteTaxRateAndUpdateLocal(this.ItemObj.getItemId(), this.ItemObj.getDescription(), this.ItemObj.getVat_rate_order());
                     }
                     this.clearItem();
                     this.refreshStockLocation(0);
@@ -1263,6 +1265,7 @@ public class ItemBean implements Serializable {
             this.ItemObj = this.getItem(ItemFrom.getItemId());
             this.refreshStockLocation(ItemFrom.getItemId());
             this.ItemObj.setSelectedVatRateds(new UtilityBean().getStringArrayFromCommaSeperatedStr(this.ItemObj.getVatRated()));
+            this.ItemObj.setVat_rate_order(this.getVatRateOrder(this.ItemObj.getVatRated()));
             Item_tax_map itmap = new Item_tax_mapBean().getItem_tax_map(this.ItemObj.getItemId());
             if (itmap != null) {
                 this.ItemObj.setItem_code_tax(itmap.getItem_code_tax());
@@ -1432,6 +1435,7 @@ public class ItemBean implements Serializable {
                 this.ItemObj.setItem_code_tax("");
                 this.ItemObj.setIs_synced_tax(0);
                 this.ItemObj.setSelectedVatRateds(null);
+                this.ItemObj.setVat_rate_order(this.getVatRateOrder(new Parameter_listBean().getParameter_listByContextName("GENERAL", "TAX_VAT_RATE_ORDER").getParameter_value()));
                 this.setSearchItemDesc("");
                 this.refreshStockLocation(0);
                 this.refreshItemsList(this.getSearchItemDesc());
@@ -1485,6 +1489,7 @@ public class ItemBean implements Serializable {
                 aItem.setItem_code_tax("");
                 aItem.setIs_synced_tax(0);
                 aItem.setSelectedVatRateds(null);
+                aItem.setVat_rate_order(this.getVatRateOrder(new Parameter_listBean().getParameter_listByContextName("GENERAL", "TAX_VAT_RATE_ORDER").getParameter_value()));
                 this.setSearchItemDesc("");
                 this.refreshStockLocation(0);
             }

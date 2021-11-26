@@ -70,6 +70,7 @@ public class Item implements Serializable {
     private String purpose;
     private String item_code_tax;
     private int is_synced_tax;
+    private String vat_rate_order;
 
     /**
      * @return the ItemId
@@ -831,6 +832,20 @@ public class Item implements Serializable {
      */
     public void setSelectedVatRateds(String[] SelectedVatRateds) {
         this.SelectedVatRateds = SelectedVatRateds;
+    }
+
+    /**
+     * @return the vat_rate_order
+     */
+    public String getVat_rate_order() {
+        return vat_rate_order;
+    }
+
+    /**
+     * @param vat_rate_order the vat_rate_order to set
+     */
+    public void setVat_rate_order(String vat_rate_order) {
+        this.vat_rate_order = vat_rate_order;
     }
 
 }
