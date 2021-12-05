@@ -182,3 +182,39 @@ INSERT INTO parameter_list (parameter_list_id, context, parameter_name, paramete
 VALUES (86, 'GENERAL', 'SEARCH_ITEMS_LIST_LIMIT', '10','Maximum number of search items that will be displayed');
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_15',174,Now(),'6.0','');
+
+DROP TABLE IF EXISTS stock_take;
+
+create table stock_take_session (
+	stock_take_session_id bigint(20) not null auto_increment,store_id int(11) not null,acc_period_id int(11) not null,notes varchar(250),
+    start_time datetime not null, end_time datetime not null, is_closed int(1) DEFAULT '0', stock_items_available double,stock_items_counted double, 
+    add_date datetime not null, add_by varchar(20) not null,last_update_date datetime null, last_update_by varchar(20), primary key (stock_take_session_id)
+);
+
+CREATE TABLE stock_take_session_item (
+  stock_take_session_item_id bigint(20) NOT NULL AUTO_INCREMENT,
+  stock_take_session_id bigint(20) NOT NULL,
+  add_date datetime NOT NULL,
+  add_by varchar(20) not null,
+  item_id bigint(20) NOT NULL,
+  batchno varchar(100) DEFAULT '',
+  code_specific varchar(50) DEFAULT '',
+  desc_specific varchar(100) DEFAULT '',
+  specific_size double DEFAULT '1',
+  qty_system double NOT NULL,
+  qty_physical double NOT NULL,
+  qty_short double NOT NULL,
+  qty_over double NOT NULL,
+  unit_cost double NOT NULL,
+  qty_diff_adjusted int(1) DEFAULT '0',
+  notes varchar(250),
+  PRIMARY KEY (stock_take_session_item_id)
+);
+
+INSERT INTO transaction_type (transaction_type_id, transaction_type_name,transaction_output_label,transaction_number_label,transaction_type_code,trans_number_format,
+transaction_date_label,transaction_ref_label,print_file_name1,print_file_name2,default_print_file) 
+VALUES (84, 'STOCK TAKE','STOCK TAKE','Stock Take No','STTK','CYMDX','Stock Take Date','','','',1);
+
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_15',219,Now(),'6.0','');
+
