@@ -15,7 +15,7 @@ import javax.faces.bean.SessionScoped;
  */
 @ManagedBean
 @SessionScoped
-public class Stock_take_session_item implements Serializable {
+public class Stocktakesessionitem implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private long stock_take_session_item_id;
