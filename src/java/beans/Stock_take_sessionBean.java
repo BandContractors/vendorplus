@@ -1,7 +1,7 @@
 package beans;
 
 import connections.DBConnection;
-import entities.Stock_take_session;
+import entities.Stocktake_session;
 import entities.CompanySetting;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -31,10 +31,10 @@ public class Stock_take_sessionBean implements Serializable {
     static Logger LOGGER = Logger.getLogger(Stock_take_sessionBean.class.getName());
 
     private String ActionMessage = null;
-    private List<Stock_take_session> Stock_take_sessionObjectList;
-    private Stock_take_session Stock_take_sessionObj;
+    private List<Stocktake_session> Stock_take_sessionObjectList;
+    private Stocktake_session Stock_take_sessionObj;
 
-    public void setStock_take_sessionFromResultset(Stock_take_session aStock_take_session, ResultSet aResultSet) {
+    public void setStock_take_sessionFromResultset(Stocktake_session aStock_take_session, ResultSet aResultSet) {
         try {
             try {
                 aStock_take_session.setStock_take_session_id(aResultSet.getLong("stock_take_session_id"));
@@ -126,16 +126,16 @@ public class Stock_take_sessionBean implements Serializable {
         }
     }
 
-    public Stock_take_session getStock_take_session(long aStock_take_session_id) {
+    public Stocktake_session getStock_take_session(long aStock_take_session_id) {
         String sql = "SELECT * FROM stock_take_session WHERE stock_take_session_id=" + aStock_take_session_id;
         ResultSet rs = null;
-        Stock_take_session coa = null;
+        Stocktake_session coa = null;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             rs = ps.executeQuery();
             if (rs.next()) {
-                coa = new Stock_take_session();
+                coa = new Stocktake_session();
                 this.setStock_take_sessionFromResultset(coa, rs);
             }
         } catch (Exception e) {
@@ -144,16 +144,16 @@ public class Stock_take_sessionBean implements Serializable {
         return coa;
     }
 
-    public Stock_take_session getOpenStockSession(int aStore_id) {
+    public Stocktake_session getOpenStockSession(int aStore_id) {
         String sql = "SELECT * FROM stock_take_session WHERE is_closed=0 AND store_id=" + aStore_id;
         ResultSet rs = null;
-        Stock_take_session obj = null;
+        Stocktake_session obj = null;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             rs = ps.executeQuery();
             if (rs.next()) {
-                obj = new Stock_take_session();
+                obj = new Stocktake_session();
                 this.setStock_take_sessionFromResultset(obj, rs);
             }
         } catch (Exception e) {
@@ -165,7 +165,7 @@ public class Stock_take_sessionBean implements Serializable {
     public boolean isOpenSessionFound(int aStore_id) {
         boolean res = false;
         Date today = new CompanySetting().getCURRENT_SERVER_DATE();
-        Stock_take_session obj = this.getOpenStockSession(aStore_id);
+        Stocktake_session obj = this.getOpenStockSession(aStore_id);
         if (null == obj) {
             res = false;
         } else {
@@ -174,7 +174,7 @@ public class Stock_take_sessionBean implements Serializable {
         return res;
     }
 
-    public long insertStock_take_session(Stock_take_session aStock_take_session) {
+    public long insertStock_take_session(Stocktake_session aStock_take_session) {
         long InsertedId = 0;
         String sql = null;
         sql = "INSERT INTO stock_take_session(store_id,acc_period_id,notes,start_time,"
@@ -281,7 +281,7 @@ public class Stock_take_sessionBean implements Serializable {
         return updated;
     }
 
-    public void clearStock_take_session(Stock_take_session aStock_take_session) {
+    public void clearStock_take_session(Stocktake_session aStock_take_session) {
         if (null != aStock_take_session) {
             aStock_take_session.setStock_take_session_id(0);
             aStock_take_session.setStore_id(0);
@@ -316,7 +316,7 @@ public class Stock_take_sessionBean implements Serializable {
     /**
      * @return the Stock_take_sessionObjectList
      */
-    public List<Stock_take_session> getStock_take_sessionObjectList() {
+    public List<Stocktake_session> getStock_take_sessionObjectList() {
         return Stock_take_sessionObjectList;
     }
 
@@ -324,21 +324,21 @@ public class Stock_take_sessionBean implements Serializable {
      * @param Stock_take_sessionObjectList the Stock_take_sessionObjectList to
      * set
      */
-    public void setStock_take_sessionObjectList(List<Stock_take_session> Stock_take_sessionObjectList) {
+    public void setStock_take_sessionObjectList(List<Stocktake_session> Stock_take_sessionObjectList) {
         this.Stock_take_sessionObjectList = Stock_take_sessionObjectList;
     }
 
     /**
      * @return the Stock_take_sessionObj
      */
-    public Stock_take_session getStock_take_sessionObj() {
+    public Stocktake_session getStock_take_sessionObj() {
         return Stock_take_sessionObj;
     }
 
     /**
      * @param Stock_take_sessionObj the Stock_take_sessionObj to set
      */
-    public void setStock_take_sessionObj(Stock_take_session Stock_take_sessionObj) {
+    public void setStock_take_sessionObj(Stocktake_session Stock_take_sessionObj) {
         this.Stock_take_sessionObj = Stock_take_sessionObj;
     }
 }

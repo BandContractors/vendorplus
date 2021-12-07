@@ -1,7 +1,7 @@
 package beans;
 
 import connections.DBConnection;
-import entities.Stock_take_session_item;
+import entities.Stocktake_session_item;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -29,10 +29,10 @@ public class Stock_take_session_itemBean implements Serializable {
     static Logger LOGGER = Logger.getLogger(Stock_take_session_itemBean.class.getName());
 
     private String ActionMessage = null;
-    private List<Stock_take_session_item> Stock_take_session_itemObjectList;
-    private Stock_take_session_item Stock_take_session_itemObj;
+    private List<Stocktake_session_item> Stock_take_session_itemObjectList;
+    private Stocktake_session_item Stock_take_session_itemObj;
 
-    public void setStock_take_session_itemFromResultset(Stock_take_session_item aStock_take_session_item, ResultSet aResultSet) {
+    public void setStock_take_session_itemFromResultset(Stocktake_session_item aStock_take_session_item, ResultSet aResultSet) {
         try {
             try {
                 aStock_take_session_item.setStock_take_session_item_id(aResultSet.getLong("stock_take_session_item_id"));
@@ -119,16 +119,16 @@ public class Stock_take_session_itemBean implements Serializable {
         }
     }
 
-    public Stock_take_session_item getStock_take_session_item(long aStock_take_session_item_id) {
+    public Stocktake_session_item getStock_take_session_item(long aStock_take_session_item_id) {
         String sql = "SELECT * FROM stock_take_session_item WHERE stock_take_session_item_id=" + aStock_take_session_item_id;
         ResultSet rs = null;
-        Stock_take_session_item obj = null;
+        Stocktake_session_item obj = null;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             rs = ps.executeQuery();
             if (rs.next()) {
-                obj = new Stock_take_session_item();
+                obj = new Stocktake_session_item();
                 this.setStock_take_session_itemFromResultset(obj, rs);
             }
         } catch (Exception e) {
@@ -137,7 +137,7 @@ public class Stock_take_session_itemBean implements Serializable {
         return obj;
     }
 
-    public long insertStock_take_session_item(Stock_take_session_item aStock_take_session_item) {
+    public long insertStock_take_session_item(Stocktake_session_item aStock_take_session_item) {
         long InsertedId = 0;
         String sql = null;
         sql = "INSERT INTO stock_take_session_item("
@@ -204,7 +204,7 @@ public class Stock_take_session_itemBean implements Serializable {
 //        }
 //        return updated;
 //    }
-    public void clearStock_take_session_item(Stock_take_session_item aStock_take_session_item) {
+    public void clearStock_take_session_item(Stocktake_session_item aStock_take_session_item) {
         if (null != aStock_take_session_item) {
             aStock_take_session_item.setStock_take_session_item_id(0);
             aStock_take_session_item.setStock_take_session_id(0);
@@ -242,7 +242,7 @@ public class Stock_take_session_itemBean implements Serializable {
     /**
      * @return the Stock_take_session_itemObjectList
      */
-    public List<Stock_take_session_item> getStock_take_session_itemObjectList() {
+    public List<Stocktake_session_item> getStock_take_session_itemObjectList() {
         return Stock_take_session_itemObjectList;
     }
 
@@ -250,21 +250,21 @@ public class Stock_take_session_itemBean implements Serializable {
      * @param Stock_take_session_itemObjectList the
      * Stock_take_session_itemObjectList to set
      */
-    public void setStock_take_session_itemObjectList(List<Stock_take_session_item> Stock_take_session_itemObjectList) {
+    public void setStock_take_session_itemObjectList(List<Stocktake_session_item> Stock_take_session_itemObjectList) {
         this.Stock_take_session_itemObjectList = Stock_take_session_itemObjectList;
     }
 
     /**
      * @return the Stock_take_session_itemObj
      */
-    public Stock_take_session_item getStock_take_session_itemObj() {
+    public Stocktake_session_item getStock_take_session_itemObj() {
         return Stock_take_session_itemObj;
     }
 
     /**
      * @param Stock_take_session_itemObj the Stock_take_session_itemObj to set
      */
-    public void setStock_take_session_itemObj(Stock_take_session_item Stock_take_session_itemObj) {
+    public void setStock_take_session_itemObj(Stocktake_session_item Stock_take_session_itemObj) {
         this.Stock_take_session_itemObj = Stock_take_session_itemObj;
     }
 }
