@@ -224,37 +224,61 @@ public class Stock_take_sessionBean implements Serializable {
         return InsertedId;
     }
 
-    public void updateStock_take_session(Stock_take_session aStock_take_session) {
-//        String sql = null;
-//        if (aStock_take_session.getStock_take_session_id() == 0) {
-//            sql = "INSERT INTO stock_take_session(store_id,acc_period_id,notes,start_time,end_time,is_closed,stock_items_available,stock_items_counted,add_date,add_by,last_update_date,last_update_by) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
-//        } else if (aStock_take_session.getStock_take_session_id() > 0) {
-//            sql = "UPDATE stock_take_session SET notes=?,end_time=?,is_closed,stock_items_available,stock_items_counted,add_date,add_by,last_update_date,last_update_by WHERE stock_take_session_id=?";
-//        }
-//        try (
-//                Connection conn = DBConnection.getMySQLConnection();
-//                PreparedStatement ps = conn.prepareStatement(sql);) {
-//            //update
-//            if (aStock_take_session.getStock_take_session_id() > 0) {
-//                try {
-//                    ps.setTimestamp(1, new java.sql.Timestamp(aStock_take_session.getCdc_end_time().getTime()));
-//                } catch (NullPointerException npe) {
-//                    ps.setTimestamp(1, null);
-//                }
-//                ps.setInt(2, aStock_take_session.getIs_passed());
-//                ps.setDouble(3, aStock_take_session.getRecords_affected());
-//                try {
-//                    ps.setTimestamp(4, new java.sql.Timestamp(aStock_take_session.getLast_update_date().getTime()));
-//                } catch (NullPointerException npe) {
-//                    ps.setTimestamp(4, null);
-//                }
-//                ps.setInt(5, aStock_take_session.getLast_update_by());
-//                ps.setLong(6, aStock_take_session.getStock_take_session_id());
-//            }
-//            ps.executeUpdate();
-//        } catch (Exception e) {
-//            LOGGER.log(Level.ERROR, e);
-//        }
+    public int updateStock_take_session(long aStock_take_session_id, double aStock_items_counted, String aNotes, Date aLast_update_date, String aLast_update_by) {
+        int updated = 0;
+        String sql = null;
+        sql = "UPDATE stock_take_session SET stock_items_counted=?,notes=?,last_update_date=?,last_update_by=? WHERE stock_take_session_id=?";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            if (aStock_take_session_id > 0) {
+                ps.setDouble(1, aStock_items_counted);
+                ps.setString(2, aNotes);
+                try {
+                    ps.setTimestamp(3, new java.sql.Timestamp(aLast_update_date.getTime()));
+                } catch (NullPointerException npe) {
+                    ps.setTimestamp(3, null);
+                }
+                ps.setString(4, aLast_update_by);
+                ps.setLong(5, aStock_take_session_id);
+                ps.executeUpdate();
+                updated = 1;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return updated;
+    }
+
+    public int closeStock_take_session(long aStock_take_session_id, Date aEnd_time, int aIs_closed, String aNotes, Date aLast_update_date, String aLast_update_by) {
+        int updated = 0;
+        String sql = null;
+        sql = "UPDATE stock_take_session SET end_time=?,is_closed=?,notes=?,last_update_date=?,last_update_by=? WHERE stock_take_session_id=?";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            if (aStock_take_session_id > 0) {
+                try {
+                    ps.setTimestamp(1, new java.sql.Timestamp(aEnd_time.getTime()));
+                } catch (NullPointerException npe) {
+                    ps.setTimestamp(1, null);
+                }
+                ps.setInt(2, aIs_closed);
+                ps.setString(3, aNotes);
+                try {
+                    ps.setTimestamp(4, new java.sql.Timestamp(aLast_update_date.getTime()));
+                } catch (NullPointerException npe) {
+                    ps.setTimestamp(4, null);
+                }
+                ps.setString(5, aLast_update_by);
+                ps.setLong(6, aStock_take_session_id);
+                ps.executeUpdate();
+                updated = 1;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return updated;
     }
 
     public void clearStock_take_session(Stock_take_session aStock_take_session) {
@@ -297,7 +321,8 @@ public class Stock_take_sessionBean implements Serializable {
     }
 
     /**
-     * @param Stock_take_sessionObjectList the Stock_take_sessionObjectList to set
+     * @param Stock_take_sessionObjectList the Stock_take_sessionObjectList to
+     * set
      */
     public void setStock_take_sessionObjectList(List<Stock_take_session> Stock_take_sessionObjectList) {
         this.Stock_take_sessionObjectList = Stock_take_sessionObjectList;
