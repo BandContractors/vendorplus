@@ -2,12 +2,10 @@ package beans;
 
 import connections.DBConnection;
 import entities.Stock_take_session_item;
-import entities.CompanySetting;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
