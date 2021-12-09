@@ -187,7 +187,7 @@ DROP TABLE IF EXISTS stock_take;
 
 create table stock_take_session (
 	stock_take_session_id bigint(20) not null auto_increment,store_id int(11) not null,acc_period_id int(11) not null,notes varchar(250),
-    start_time datetime not null, end_time datetime not null, is_closed int(1) DEFAULT '0', stock_items_available double,stock_items_counted double, 
+    start_time datetime not null, end_time datetime null, is_closed int(1) DEFAULT '0', stock_items_available double,stock_items_counted double, 
     add_date datetime not null, add_by varchar(20) not null,last_update_date datetime null, last_update_by varchar(20), primary key (stock_take_session_id)
 );
 

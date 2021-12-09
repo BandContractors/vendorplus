@@ -21,8 +21,8 @@
     </h:head>
     <f:metadata>
         <f:viewAction action="#{transBean.initTransType(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId)}"/>
-        <f:viewAction action="#{discountPackageBean.clearDiscountPackage(discountPackage)}"/>
-        <f:viewAction action="#{discountPackageBean.refreshList('')}"/>
+        <f:viewAction action="#{stock_take_sessionBean.clearStock_take_session(stock_take_session)}"/>
+        <f:viewAction action="#{utilityBean.clearList(stock_take_sessionBean.stock_take_sessionObjectList)}"/>
     </f:metadata>
     <f:event listener="#{navigationBean.checkAccessDenied('128', 'View')}" type="preRenderView" />
     <h:body>
@@ -42,22 +42,21 @@
                 <h:outputLabel  value=""/>
 
                 <h:inputText disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}" style="width: 120px;height: 24px;"/>
-                <h:selectOneMenu id="menuSession" value="#{itemBean.itemObj.categoryId}" style="width: 200px;height: 30px;">
+                <h:selectOneMenu id="menuSession" value="#{stock_take_sessionBean.stock_take_session_id}" style="width: 200px;height: 30px;">
+                    <f:selectItem itemLabel="" itemValue="0"/>
+                    <f:selectItems value="#{stock_take_sessionBean.getOpenStock_take_sessionList()}" var="ss" itemLabel="#{ss.stock_take_session_id} #{ss.start_time} #{ss.notes}" itemValue="#{ss.stock_take_session_id}"/>
+                </h:selectOneMenu>
+                <h:selectOneMenu id="menuCategory" value="#{stock_take_sessionBean.category_id}" style="width: 200px;height: 30px;">
                     <f:selectItem itemLabel="" itemValue="0"/>
                     <f:selectItems value="#{categoryBean.categories}" var="c" itemLabel="#{c.categoryName}" itemValue="#{c.categoryId}"/>
                     <f:ajax event="change" render="menuSubCategory"/>
                 </h:selectOneMenu>
-                <h:selectOneMenu id="menuCategory" value="#{itemBean.itemObj.categoryId}" style="width: 200px;height: 30px;">
+                <h:selectOneMenu id="menuSubCategory" value="#{stock_take_sessionBean.subcategory_id}" style="width: 200px;height: 30px;">
                     <f:selectItem itemLabel="" itemValue="0"/>
-                    <f:selectItems value="#{categoryBean.categories}" var="c" itemLabel="#{c.categoryName}" itemValue="#{c.categoryId}"/>
-                    <f:ajax event="change" render="menuSubCategory"/>
-                </h:selectOneMenu>
-                <h:selectOneMenu id="menuSubCategory" value="#{itemBean.itemObj.subCategoryId}" style="width: 200px;height: 30px;">
-                    <f:selectItem itemLabel="" itemValue="0"/>
-                    <f:selectItems value="#{subCategoryBean.getSubCategoriesByCategoryId(itemBean.itemObj.categoryId)}" var="s" itemLabel="#{s.subCategoryName}" itemValue="#{s.subCategoryId}"/>
+                    <f:selectItems value="#{subCategoryBean.getSubCategoriesByCategoryId(stock_take_sessionBean.category_id)}" var="s" itemLabel="#{s.subCategoryName}" itemValue="#{s.subCategoryId}"/>
                 </h:selectOneMenu>
                 <p:autoComplete id="autcItem" widgetVar="WautcItem" value="#{itemBean.selectedItem}"  
-                                completeMethod="#{itemBean.getItemObjectListForSale}" 
+                                completeMethod="#{itemBean.getItemObjectListActive}" 
                                 var="itm" 
                                 itemLabel="#{itm.description}" 
                                 itemValue="#{itm}" 
@@ -95,6 +94,8 @@
                         <h:outputText value="#{itm.currencyCode}">
                         </h:outputText>
                     </p:column>
+                    <p:ajax event="itemSelect" listener="#{stock_take_sessionBean.setItem_id(itemBean.selectedItem.itemId)}"/>
+                    <p:ajax event="change" listener="#{stock_take_sessionBean.setItem_id(itemBean.selectedItem.itemId)}" rendered="#{itemBean.selectedItem!=null}"/>
                 </p:autoComplete>
                 <p:commandButton id="cbtnAdd" value="#{langsys['Get']}"  icon="ui-icon-arrowrefresh-1-s">
                     <p:ajax listener="#{transItemBean.addTransItemCallCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentSaleType,trans,statusBean,transItemBean.activeTransItems,transItem,itemBean.selectedItem)}" process="@form" update="pnlList growl1"/>
@@ -145,27 +146,32 @@
                 <h:panelGrid id="pnlgSession" columns="1" style="text-align: center;">
                     <h:panelGrid columns="3">
                         <h:outputLabel value="#{langsys['Notes']}:"/>
-                        <h:inputText value="#{itemBean.searchUNSPSC}" style="height: 24px;"/>
-                        <p:commandButton value="Start New Session" icon="ui-icon-disk" actionListener="#{itemBean.refreshItem_unspscList(itemBean.searchUNSPSC)}" update="formMain:tblSession"/>
+                        <h:inputText value="#{stocktake_session.notes}" style="height: 24px;"/>
+                        <p:commandButton value="Start New Stocktake Session" icon="ui-icon-disk" actionListener="#{stock_take_sessionBean.insertStock_take_sessionCall(stocktake_session)}" update="formMain:tblSession formMain:growl2"/>
                     </h:panelGrid>
-                    <p:dataTable id="tblSession" rowIndexVar="rowIndex" tableStyle="width:auto;" var="ssn" value="#{itemBean.item_unspscList}" 
+                    <p:dataTable id="tblSession" rowIndexVar="rowIndex" tableStyle="width:auto;" var="ss" value="#{stock_take_sessionBean.stock_take_sessionObjectList}" 
                                  >
-                        <p:column headerText="Code" style="text-align: left;font-size: 14px;">
+                        <p:column headerText="##" style="text-align: left;font-size: 14px;">
                             <h:outputText value="#{rowIndex+1} "/>
                         </p:column>
-                        <p:column headerText="#{langsys['Commodity']}" style="text-align: left;font-size: 14px;">
-                            <h:outputText value="#{ssn.commodity_name}"/>
+                        <p:column headerText="#{langsys['Notes']}" style="text-align: left;font-size: 14px;">
+                            <h:outputText value="#{ss.notes}"/>
                         </p:column>
-                        <p:column headerText="#{langsys['Class']}" style="text-align: left;font-size: 14px;">
-                            <h:outputText value="#{ssn.class_name}"/>
+                        <p:column headerText="#{langsys['Started']}" style="text-align: left;font-size: 14px;">
+                            <h:outputText value="#{ss.start_time}"/>
                         </p:column>
-                        <p:column headerText="#{langsys['Family']}" style="text-align: left;font-size: 14px;">
-                            <h:outputText value="#{ssn.family_name}"/>
+                        <p:column headerText="#{langsys['Ended']}" style="text-align: left;font-size: 14px;">
+                            <h:outputText value="#{ss.end_time}"/>
                         </p:column>
-                        <p:column headerText="#{langsys['Segment']}" style="text-align: left;font-size: 14px;">
-                            <h:outputText value="#{ssn.segment_name}"/>
+                        <p:column headerText="#{langsys['Available']}" style="text-align: left;font-size: 14px;">
+                            <h:outputText value="#{ss.stock_items_available}"/>
                         </p:column>
-                        <p:column headerText="Tax #{langsys['Rates']}" style="text-align: left;font-size: 14px;">
+                        <p:column headerText="#{langsys['Counted']}" style="text-align: left;font-size: 14px;">
+                            <h:outputText value="#{ss.stock_items_available}"/>
+                        </p:column>
+                        <p:column headerText="#{langsys['Status']}" style="text-align: left;font-size: 14px;">
+                            <h:outputText value="Open" rendered="#{ss.is_closed eq 0}"/>
+                            <h:outputText value="Closed" rendered="#{ss.is_closed eq 1}"/>
                         </p:column>
                     </p:dataTable>
                 </h:panelGrid>

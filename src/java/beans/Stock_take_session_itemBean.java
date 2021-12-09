@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.Date;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
@@ -146,7 +147,7 @@ public class Stock_take_session_itemBean implements Serializable {
                 + "qty_short,qty_over,unit_cost,qty_diff_adjusted,notes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);) {
+                PreparedStatement ps = conn.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);) {
             if (aStock_take_session_item.getStock_take_session_item_id() == 0) {
                 ps.setLong(1, aStock_take_session_item.getStock_take_session_id());
                 try {
