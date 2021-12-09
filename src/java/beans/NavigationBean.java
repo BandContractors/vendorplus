@@ -93,6 +93,17 @@ public class NavigationBean implements Serializable {
         httpSession.setAttribute("TRANSACTION_REASON_ID", 108);
         return "ConsumeStockTrans?faces-redirect=true";
     }
+    
+    public String redirectToStockTake() {
+        //update seesion
+        FacesContext context = FacesContext.getCurrentInstance();
+        HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+        HttpSession httpSession = request.getSession(false);
+        httpSession.setAttribute("TRANSACTION_TYPE_ID", 84);
+        httpSession.setAttribute("TRANSACTION_TYPE_NAME", "STOCK TAKE");
+        httpSession.setAttribute("TRANSACTION_REASON_ID", 128);
+        return "StockTakeTrans?faces-redirect=true";
+    }
 
     public String redirectToGroupDetail() {
         return "GroupDetail?faces-redirect=true";

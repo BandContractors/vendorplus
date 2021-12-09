@@ -214,7 +214,7 @@ CREATE TABLE stock_take_session_item (
 INSERT INTO transaction_type (transaction_type_id, transaction_type_name,transaction_output_label,transaction_number_label,transaction_type_code,trans_number_format,
 transaction_date_label,transaction_ref_label,print_file_name1,print_file_name2,default_print_file) 
 VALUES (84, 'STOCK TAKE','STOCK TAKE','Stock Take No','STTK','CYMDX','Stock Take Date','','','',1);
-
+INSERT INTO transaction_reason (transaction_reason_id, transaction_reason_name, transaction_type_id) VALUES (128, 'STOCK TAKE', 84);
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_15',219,Now(),'6.0','');
 
