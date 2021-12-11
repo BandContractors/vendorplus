@@ -244,6 +244,10 @@
                         <h:outputLabel value="#{langout['Added']} #{langout['by']}" style="border-top-style: dotted;"/>
                         <h:outputLabel value="#{langout['Date']}" style="border-top-style: dotted;"/>
                     </h:panelGrid>
+                    <h:panelGrid style="width: 100%; margin: 0px;background-color: ghostwhite;" columns="1" rendered="#{generalUserSetting.outputDetailParent.trans.termsConditions.length() gt 0}">
+                        <h:outputLabel style="font-size: 14px;font-weight: bold;" value="#{langout['Terms']} #{langout['and']} #{langout['Conditions']}"/>
+                        <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.trans.termsConditions}"/>
+                    </h:panelGrid>
                     <h:panelGrid id="IpgrdvSalesInvoiceFooter2" style="width: 100%; margin: 0px;" columns="1" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getIsShowDeveloper(),'Yes')}">
                         <h:outputLabel style="font-size: 10px;" value="#{langout['System']} #{langout['developed']} #{langout['by']} WINGERsoft Technologies Ltd | #{langout['Email']}:#{companySetting.getDeveloperEmail()} | #{langout['Phone']}:#{companySetting.getDeveloperPhone()}"/>
                     </h:panelGrid>

@@ -34,6 +34,7 @@ public class Stocktake_session_item implements Serializable {
     private double unit_cost;
     private int qty_diff_adjusted;
     private String notes;
+    private String description;
 
     /**
      * @return the stock_take_session_item_id
@@ -257,5 +258,19 @@ public class Stocktake_session_item implements Serializable {
      */
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    /**
+     * @return the description
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * @param description the description to set
+     */
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

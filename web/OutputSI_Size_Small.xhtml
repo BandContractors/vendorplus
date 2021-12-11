@@ -131,11 +131,11 @@
                         </h:panelGrid>
 
                         <h:panelGrid id="IpgrdSalesInvoiceTotals" style="width: 290px; margin: 0px;border-bottom-style: dotted" columns="2">               
-                            <h:outputLabel style="font-size: 16px;" value="#{langout['Subtotal']}:"/>
-                            <h:outputLabel style="font-size: 16px;" id="IolblSalesInvoiceSubTotal" value="#{generalUserSetting.outputDetailParent.trans.subTotal}">
+                            <h:outputLabel style="font-size: 16px;" value="#{langout['Subtotal']}:" rendered="#{companySetting.EShowVatAnalysisInvoice.equals('Yes')}"/>
+                            <h:outputLabel style="font-size: 16px;" id="IolblSalesInvoiceSubTotal" value="#{generalUserSetting.outputDetailParent.trans.subTotal}" rendered="#{companySetting.EShowVatAnalysisInvoice.equals('Yes')}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
-                            <h:outputLabel style="font-size: 16px;" value="#{langout['Discount']}:" rendered="#{generalUserSetting.outputDetailParent.trans.totalTradeDiscount>0}"/>
+                            <h:outputLabel style="font-size: 16px;" value="#{langout['Item']} #{langout['Discount']}:" rendered="#{generalUserSetting.outputDetailParent.trans.totalTradeDiscount>0}"/>
                             <h:outputLabel style="font-size: 16px;" id="IolblSalesInvoiceTotalTradeDiscount" value="#{generalUserSetting.outputDetailParent.trans.totalTradeDiscount}" rendered="#{generalUserSetting.outputDetailParent.trans.totalTradeDiscount>0}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
@@ -147,8 +147,8 @@
                             <h:outputLabel style="font-size: 16px;" value="#{generalUserSetting.outputDetailParent.trans.spendPointsAmount}" rendered="#{generalUserSetting.outputDetailParent.trans.spendPointsAmount>0}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
-                            <h:outputLabel style="font-size: 16px;" value="VAT:" rendered="#{generalUserSetting.outputDetailParent.trans.totalVat>0}"/>
-                            <h:outputLabel style="font-size: 16px;" id="IolblSalesInvoiceTotalVat" value="#{generalUserSetting.outputDetailParent.trans.totalVat}" rendered="#{generalUserSetting.outputDetailParent.trans.totalVat>0}">
+                            <h:outputLabel style="font-size: 16px;" value="VAT:" rendered="#{generalUserSetting.outputDetailParent.trans.totalVat>0 and companySetting.EShowVatAnalysisInvoice.equals('Yes')}"/>
+                            <h:outputLabel style="font-size: 16px;" id="IolblSalesInvoiceTotalVat" value="#{generalUserSetting.outputDetailParent.trans.totalVat}" rendered="#{generalUserSetting.outputDetailParent.trans.totalVat>0 and companySetting.EShowVatAnalysisInvoice.equals('Yes')}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
                             <h:outputLabel style="font-size: 16px; font-weight: bold;" value="#{langout['TOTAL']} (#{generalUserSetting.outputDetailParent.trans.getCurrencyCode()}):"/>
@@ -175,7 +175,7 @@
                                 <h:outputLabel style="font-size: 14px;" value="Vatable #{langout['Amount']}"/>
                                 <h:outputLabel style="font-size: 14px;" value="VAT"/>
 
-                                <h:outputLabel style="font-size: 14px;" value="#{generalUserSetting.outputDetailParent.trans.vatPerc}">
+                                <h:outputLabel style="font-size: 14px;" value="#{langout['Standard']}(#{utilityBean.formatDoubleToString(generalUserSetting.outputDetailParent.trans.vatPerc)})">
                                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputLabel>
                                 <h:outputLabel style="font-size: 14px;" value="#{generalUserSetting.outputDetailParent.trans.totalStdVatableAmount}">
@@ -185,13 +185,13 @@
                                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputLabel>
 
-                                <h:outputLabel style="font-size: 14px;" value="#{langout['Zero']} 0"/>
+                                <h:outputLabel style="font-size: 14px;" value="#{langout['Zero']}(0)"/>
                                 <h:outputLabel style="font-size: 14px;" value="#{generalUserSetting.outputDetailParent.trans.totalZeroVatableAmount}">
                                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputLabel>
                                 <h:outputLabel style="font-size: 14px;" value="0"/>
 
-                                <h:outputLabel style="font-size: 14px;" value="#{langout['Exempt']} n/a"/>
+                                <h:outputLabel style="font-size: 14px;" value="#{langout['Exempt']}(-)"/>
                                 <h:outputLabel style="font-size: 14px;" value="#{generalUserSetting.outputDetailParent.trans.totalExemptVatableAmount}">
                                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputLabel>
@@ -224,6 +224,10 @@
                         </h:panelGrid>
                         <h:panelGrid id="pnlgBarCode" columns="1" style="margin: 0px;border:none;" rendered="#{generalUserSetting.outputDetailParent.trans.qr_code_tax.length() gt 0}">  
                             <p:barcode id="barCODEqr" value="#{generalUserSetting.outputDetailParent.trans.qr_code_tax}" type="qr" style="width: 176px;height: 128px;"/>
+                        </h:panelGrid>
+                        <h:panelGrid style="width: 290px; margin: 0px;background-color: ghostwhite;" columns="1" rendered="#{generalUserSetting.outputDetailParent.trans.termsConditions.length() gt 0}">
+                            <h:outputLabel style="font-size: 14px;font-weight: bold;" value="#{langout['Terms']} #{langout['and']} #{langout['Conditions']}"/>
+                            <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.trans.termsConditions}"/>
                         </h:panelGrid>
                         <h:panelGrid style="width: 290px; margin: 0px;border-bottom-style: dotted;text-align: center;" columns="1" rendered="#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','FOOTER_MESSAGE').parameter_value.length() gt 0}">
                             <h:outputLabel style="font-size: 10px;font-weight: bold;" value="#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','FOOTER_MESSAGE').parameter_value}"/>

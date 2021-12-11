@@ -58,7 +58,7 @@
                 <p:commandLink id="cmdbHeader2" value="#{langsys['Hide']} #{langsys['Detail']}" style="color: blue;text-decoration: none;" rendered="#{transExtBean.showDetail}">
                     <p:ajax listener="#{transExtBean.reverseShowDetail()}" process="@this" update="pnlgCaption pnlHeader"/>
                 </p:commandLink>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Prices']} #{langsys['Include']} VAT:#{companySetting.EIsVatInclusive}"/>
+                <h:outputLabel style="background-color:#00B461;color: white;" value="VAT #{langsys['Inclusive']}:#{companySetting.EIsVatInclusive}"/>
                 <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Stock']}#{generalUserSetting.DEPLETE_SOLD_STOCK_UPON eq '0' ? '↓':':No effect'}"/>
                 <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Ledger']}:#{langsys['Cash']}↑ #{langsys['Sales']}↑ #{langsys['AR']}↑ Tax↑"/>
             </h:panelGrid>
@@ -84,14 +84,15 @@
                 </h:panelGrid>
             </h:panelGrid>
             <h:panelGrid id="pnlHeader" styleClass="clsPanelReportFilter" columns="1">
-                <h:panelGrid columns="7" rendered="#{transExtBean.showDetail}">
+                <h:panelGrid columns="8" rendered="#{transExtBean.showDetail}">
                     <h:outputLabel  value="#{langsys['From']}"/>
                     <h:outputLabel  value="#{langsys[transBean.transTypeObj.transactionDateLabel]}"/>
                     <h:outputLabel  value="#{langsys['Currency']}"/>
                     <p:commandLink actionListener="#{transactorBean.openChildTransactor('CUSTOMER')}" value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}" style="text-decoration: none;"/>
                     <h:outputLabel  value="#{langsys[transBean.transTypeObj.transactionRefLabel]}"/>
-                    <h:outputLabel id="olblDebtCredit" style="color: coral;font-weight: bold;" value="#{langsys['Receivable']} (#{generalUserSetting.LOCAL_CURRENCY.currencyCode})"/>
-                    <h:outputLabel id="olblDeposit" style="color: green;font-weight: bold;" value="#{langsys['Deposit']} (#{trans.currencyCode})"/>
+                    <h:outputLabel id="olblDebtCredit" style="color: coral;font-weight: bold;" value="#{langsys['Receivable']}(#{generalUserSetting.LOCAL_CURRENCY.currencyCode})"/>
+                    <h:outputLabel id="olblDeposit" style="color: green;font-weight: bold;" value="#{langsys['Deposit']}(#{trans.currencyCode})"/>
+                    <h:outputLabel  value=""/>
                     <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}" style="width: 120px;height: 24px;"/>
                     <p:calendar styleClass="clsInput" id="calTransactionDate" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.transactionDate}" pattern="#{companySetting.getDateFormat()}" size="8" disabled="#{generalUserSetting.isAllowedToBackDate==0}"/>
                     <h:selectOneMenu styleClass="clsMenu" id="menuCurrency" value="#{trans.currencyCode}" style="width: 80px;height: 30px;">
@@ -130,12 +131,13 @@
                         <f:selectItems value="#{transBean.transList}" var="stl" itemLabel="#{langsys[stl.transactionNumber]}" itemValue="#{stl.transactionNumber}"/>
                         <p:ajax listener="#{transBean.loadOrderForInvoiceTrans(trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor,transBean.authorisedByUserDetail,transItemBean.selectedAccCoa)}" process="@form" update="pnlHeader gridTransItem pgrdOverrideWarranty pgrdSpecific gridItemStatus dtblTransactionItem pgrdTotals pgrdScheme pgrdPayment pgrdMsgs pgrdApprove growl1"/>
                     </p:selectOneMenu>
-                    <h:inputText disabled="true" style="color: coral;font-weight: bold;width: 155px;;height: 24px;" styleClass="clsInput" id="itxtDebtCredit" value="#{accJournalBean.returnBalanceString(trans.balance_receivable)}">
+                    <h:inputText disabled="true" style="color: coral;font-weight: bold;width: 145px;;height: 24px;" styleClass="clsInput" id="itxtDebtCredit" value="#{accJournalBean.returnBalanceString(trans.balance_receivable)}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
-                    <h:inputText disabled="true" style="color: green;font-weight: bold;width: 155px;;height: 24px;" styleClass="clsInput" id="itxtPrepaidAcc" value="#{accJournalBean.returnBalanceString(trans.deposit_customer)}">
+                    <h:inputText disabled="true" style="color: green;font-weight: bold;width: 130px;;height: 24px;" styleClass="clsInput" id="itxtPrepaidAcc" value="#{accJournalBean.returnBalanceString(trans.deposit_customer)}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
+                    <p:commandLink onclick="PF('dlgTCs').show();" value="TC" style="text-decoration: none;" title="#{langsys['Terms']} #{langsys['and']} #{langsys['Conditions']}"/>
                 </h:panelGrid>
             </h:panelGrid>
             <h:panelGrid id="gridTransItem" styleClass="clsGridMainInput" columns="11">
@@ -493,6 +495,14 @@
                         </p:commandButton>
                         <p:commandButton value="500,000"  oncomplete="PF('dlgAmountTendered').hide()" style="width: 180px;height: 40px;">
                             <p:ajax listener="#{transBean.setAmountTenderedFromDialog(500000,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans, transItemBean.activeTransItems)}" process="@this" update=":TransactionFormSales:itxtAmountTendered :TransactionFormSales:itxtChange"/>
+                        </p:commandButton>
+                    </h:panelGrid>
+                </p:dialog>
+                <p:dialog header="#{langsys['Specify']} #{langsys['Terms']} #{langsys['and']} #{langsys['Conditions']}" widgetVar="dlgTCs" modal="true" height="150">
+                    <h:panelGrid columns="1">
+                        <p:outputLabel value="#{langsys['Terms']} #{langsys['and']} #{langsys['Conditions']}"/>
+                        <h:inputTextarea styleClass="clsInput" id="itxaTermsConditions" rows="3" cols="35" value="#{trans.termsConditions}"/>
+                        <p:commandButton value="OK"  oncomplete="PF('dlgTCs').hide()" style="width: 303px;height: 40px;">
                         </p:commandButton>
                     </h:panelGrid>
                 </p:dialog>

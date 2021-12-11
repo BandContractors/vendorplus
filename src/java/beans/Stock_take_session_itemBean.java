@@ -78,7 +78,7 @@ public class Stock_take_session_itemBean implements Serializable {
             try {
                 aStock_take_session_item.setSpecific_size(aResultSet.getDouble("specific_size"));
             } catch (NullPointerException npe) {
-                aStock_take_session_item.setSpecific_size(0);
+                aStock_take_session_item.setSpecific_size(1);
             }
             try {
                 aStock_take_session_item.setQty_system(aResultSet.getDouble("qty_system"));
@@ -138,6 +138,30 @@ public class Stock_take_session_itemBean implements Serializable {
         return obj;
     }
 
+    public Stocktake_session_item getStock_take_session_item(long aStock_take_session_id, long aItem_id, String aBatchno, String aCode_specific, String aDesc_specific, double aSpecific_size) {
+        String sql = "SELECT * FROM stock_take_session_item WHERE stock_take_session_id=?,item_id=?,batchno=?,code_specific=?,desc_specific=?,specific_size=?";
+        ResultSet rs = null;
+        Stocktake_session_item obj = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aStock_take_session_id);
+            ps.setLong(2, aItem_id);
+            ps.setString(3, aBatchno);
+            ps.setString(4, aCode_specific);
+            ps.setString(5, aDesc_specific);
+            ps.setDouble(5, aSpecific_size);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                obj = new Stocktake_session_item();
+                this.setStock_take_session_itemFromResultset(obj, rs);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return obj;
+    }
+
     public long insertStock_take_session_item(Stocktake_session_item aStock_take_session_item) {
         long InsertedId = 0;
         String sql = null;
@@ -147,7 +171,7 @@ public class Stock_take_session_itemBean implements Serializable {
                 + "qty_short,qty_over,unit_cost,qty_diff_adjusted,notes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
-                PreparedStatement ps = conn.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);) {
+                PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
             if (aStock_take_session_item.getStock_take_session_item_id() == 0) {
                 ps.setLong(1, aStock_take_session_item.getStock_take_session_id());
                 try {

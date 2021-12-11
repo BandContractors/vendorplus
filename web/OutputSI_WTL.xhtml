@@ -216,7 +216,13 @@
                         <h:panelGrid id="pnlgBarCode" columns="1" style="margin: 0px;border:none;" rendered="#{generalUserSetting.outputDetailParent.trans.qr_code_tax.length() gt 0}">  
                             <p:barcode id="barCODEqr" value="#{generalUserSetting.outputDetailParent.trans.qr_code_tax}" type="qr" style="width: 176px;height: 128px;"/>
                         </h:panelGrid>
-                        <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#000000;font-weight: bold;text-decoration: none;">#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','FOOTER_MESSAGE').parameter_value}</h:outputLabel>
+                        <h:panelGrid columns="1" style="margin: 0px;border:none;">  
+                            <h:panelGrid style="width: 100%;margin: 0px;background-color: ghostwhite;" columns="1" rendered="#{generalUserSetting.outputDetailParent.trans.termsConditions.length() gt 0}">
+                                <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 12pt;color:#000000;font-weight: bold;text-decoration: none;" value="#{langout['Terms']} #{langout['and']} #{langout['Conditions']}"/>
+                                <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 11pt;color:#000000;text-decoration: none;" value="#{generalUserSetting.outputDetailParent.trans.termsConditions}"/>
+                            </h:panelGrid>
+                            <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 12pt;color:#000000;font-weight: bold;text-decoration: none;">#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','FOOTER_MESSAGE').parameter_value}</h:outputLabel>
+                        </h:panelGrid>
                     </h:panelGrid>
                 </h:panelGrid>
             </ui:composition>
