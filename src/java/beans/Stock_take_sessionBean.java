@@ -445,7 +445,7 @@ public class Stock_take_sessionBean implements Serializable {
         return ssList;
     }
 
-    public void getStock_take_session_itemList(Stock_take_sessionBean aStock_take_sessionBean, List<Stocktake_session_item> aStocktake_session_itemList) {
+    public void getStock_take_session_itemList(Stock_take_sessionBean aStock_take_sessionBean, List<Stocktake_session_item> aStocktake_session_itemList, int aFlag) {//aFlag:0 All,1:Uncounted,2:Counted
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
         try {
@@ -468,7 +468,7 @@ public class Stock_take_sessionBean implements Serializable {
         if (msg.length() > 0) {
             FacesContext.getCurrentInstance().addMessage("Report", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
-            String sql = "select i.*,ifnull(s.batchno,'') batchno,ifnull(s.code_specific,'') code_specific,ifnull(s.desc_specific,'') desc_specific,ifnull(s.specific_size,1) specific_size,ifnull(s.currentqty,0) currentqty,ifnull(s.unit_cost,i.unit_cost_price) unit_cost from item i left join stock s on i.item_id=s.item_id WHERE i.is_suspended='No' ";
+            String sql = "select i.*,ifnull(s.batchno,'') batchno,ifnull(s.code_specific,'') code_specific,ifnull(s.desc_specific,'') desc_specific,ifnull(s.specific_size,1) specific_size,ifnull(s.currentqty,0) currentqty,ifnull(s.unit_cost,i.unit_cost_price) unit_cost from item i left join stock s on i.item_id=s.item_id AND s.store_id=" + new GeneralUserSetting().getCurrentStore().getStoreId() + " WHERE i.is_track=1 AND i.is_suspended='No' ";
             String wheresql = "";
             String ordersql = "";
             if (aStock_take_sessionBean.getItem_id() > 0) {
@@ -482,6 +482,7 @@ public class Stock_take_sessionBean implements Serializable {
             }
             ordersql = " ORDER BY i.description,batchno,code_specific,desc_specific";
             sql = sql + wheresql + ordersql;
+            //System.out.println("sql:" + sql);
             try (
                     Connection conn = DBConnection.getMySQLConnection();
                     PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -489,7 +490,7 @@ public class Stock_take_sessionBean implements Serializable {
                 Stocktake_session_item obj = null;
                 while (rs.next()) {
                     obj = stB.getStock_take_session_item(aStock_take_sessionBean.getStock_take_session_id(), rs.getLong("item_id"), rs.getString("batchno"), rs.getString("code_specific"), rs.getString("desc_specific"), rs.getDouble("specific_size"));
-                    if (obj == null) {//not stock taken
+                    if (obj == null && (aFlag == 0 || aFlag == 1)) {//not stock taken.
                         obj = new Stocktake_session_item();
                         obj.setStock_take_session_item_id(0);
                         obj.setStock_take_session_id(aStock_take_sessionBean.getStock_take_session_id());
@@ -526,8 +527,11 @@ public class Stock_take_sessionBean implements Serializable {
                             obj.setQty_system(0);
                         }
                         obj.setQty_physical(0);
-                        obj.setQty_short(obj.getQty_system() - obj.getQty_physical());
-                        obj.setQty_over(obj.getQty_physical() - obj.getQty_system());
+                        if (obj.getQty_system() > 0) {
+                            obj.setQty_short(obj.getQty_system() - obj.getQty_physical());
+                        } else {
+                            obj.setQty_over(0);
+                        }
                         try {
                             obj.setUnit_cost(rs.getDouble("unit_cost"));
                         } catch (NullPointerException npe) {
@@ -536,8 +540,10 @@ public class Stock_take_sessionBean implements Serializable {
                         obj.setQty_diff_adjusted(0);
                         obj.setNotes("");
                         obj.setDescription(rs.getString("description"));
-                    } else {//stock taken
+                    } else if (null != obj && (aFlag == 0 || aFlag == 2)) {//stock taken
                         obj.setDescription(rs.getString("description"));
+                    }
+                    if (null != obj) {
                         aStocktake_session_itemList.add(obj);
                     }
                 }

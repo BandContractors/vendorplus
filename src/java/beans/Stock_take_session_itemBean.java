@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
@@ -25,14 +26,14 @@ import org.apache.log4j.Logger;
 @ManagedBean(name = "stock_take_session_itemBean")
 @SessionScoped
 public class Stock_take_session_itemBean implements Serializable {
-
+    
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = Logger.getLogger(Stock_take_session_itemBean.class.getName());
-
+    
     private String ActionMessage = null;
-    private List<Stocktake_session_item> Stock_take_session_itemObjectList;
+    private List<Stocktake_session_item> Stock_take_session_itemObjectList = new ArrayList<>();
     private Stocktake_session_item Stock_take_session_itemObj;
-
+    
     public void setStock_take_session_itemFromResultset(Stocktake_session_item aStock_take_session_item, ResultSet aResultSet) {
         try {
             try {
@@ -119,7 +120,7 @@ public class Stock_take_session_itemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public Stocktake_session_item getStock_take_session_item(long aStock_take_session_item_id) {
         String sql = "SELECT * FROM stock_take_session_item WHERE stock_take_session_item_id=" + aStock_take_session_item_id;
         ResultSet rs = null;
@@ -137,9 +138,9 @@ public class Stock_take_session_itemBean implements Serializable {
         }
         return obj;
     }
-
+    
     public Stocktake_session_item getStock_take_session_item(long aStock_take_session_id, long aItem_id, String aBatchno, String aCode_specific, String aDesc_specific, double aSpecific_size) {
-        String sql = "SELECT * FROM stock_take_session_item WHERE stock_take_session_id=?,item_id=?,batchno=?,code_specific=?,desc_specific=?,specific_size=?";
+        String sql = "SELECT * FROM stock_take_session_item WHERE stock_take_session_id=? AND item_id=? AND batchno=? AND code_specific=? AND desc_specific=? AND specific_size=?";
         ResultSet rs = null;
         Stocktake_session_item obj = null;
         try (
@@ -150,7 +151,7 @@ public class Stock_take_session_itemBean implements Serializable {
             ps.setString(3, aBatchno);
             ps.setString(4, aCode_specific);
             ps.setString(5, aDesc_specific);
-            ps.setDouble(5, aSpecific_size);
+            ps.setDouble(6, aSpecific_size);
             rs = ps.executeQuery();
             if (rs.next()) {
                 obj = new Stocktake_session_item();
@@ -161,7 +162,7 @@ public class Stock_take_session_itemBean implements Serializable {
         }
         return obj;
     }
-
+    
     public long insertStock_take_session_item(Stocktake_session_item aStock_take_session_item) {
         long InsertedId = 0;
         String sql = null;
@@ -247,6 +248,20 @@ public class Stock_take_session_itemBean implements Serializable {
             aStock_take_session_item.setUnit_cost(0);
             aStock_take_session_item.setQty_diff_adjusted(0);
             aStock_take_session_item.setNotes("");
+        }
+    }
+    
+    public void changeQtyCounted(Stocktake_session_item aStocktake_session_item) {
+        try {
+            aStocktake_session_item.setQty_short(0);
+            aStocktake_session_item.setQty_over(0);
+            if (aStocktake_session_item.getQty_system() > aStocktake_session_item.getQty_physical()) {
+                aStocktake_session_item.setQty_short(aStocktake_session_item.getQty_system() - aStocktake_session_item.getQty_physical());
+            } else if (aStocktake_session_item.getQty_physical() > aStocktake_session_item.getQty_system()) {
+                aStocktake_session_item.setQty_over(aStocktake_session_item.getQty_physical() - aStocktake_session_item.getQty_system());
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 

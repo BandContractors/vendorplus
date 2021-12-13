@@ -218,6 +218,26 @@ public class CategoryBean implements Serializable {
         }
         return Categories;
     }
+    
+    public List<Category> getCategoriesStockTake() {
+        String sql;
+        sql = "SELECT c.* FROM category c WHERE c.category_id IN(SELECT distinct i.category_id from item i WHERE i.is_track=1 AND i.is_asset=0) ORDER BY c.category_name ASC";
+        ResultSet rs = null;
+        Categories = new ArrayList<Category>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Category cat = new Category();
+                this.setCategoryFromResultset(cat, rs);
+                Categories.add(cat);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return Categories;
+    }
 
     public List<Category> getCategoriesQuickOrder() {
         String sql;

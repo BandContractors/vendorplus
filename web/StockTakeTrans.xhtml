@@ -28,18 +28,20 @@
     <f:event listener="#{navigationBean.checkAccessDenied('128', 'View')}" type="preRenderView" />
     <h:body>
         <ui:include src="Menu.xhtml"/>
-        <h:form id="formMain" styleClass="clsMainFrom">
+        <h:form id="formMain">
 
-            <h:panelGrid styleClass="clsGridMainHeader" columns="1">
-                <h:outputLabel styleClass="clsLabelTop" id="olbldiscountPackageHeader" value="#{langsys['Stock']} #{langsys['Take']}"/>
+            <h:panelGrid styleClass="clsPanelReportFilterTitle" columns="1">
+                <h:outputLabel styleClass="clsLabelReportFilterTitle" id="olbldiscountPackageHeader" value="#{langsys['Stock']} #{langsys['Take']}"/>
             </h:panelGrid>
 
-            <h:panelGrid id="pnlgInput" styleClass="clsGridMainInput" columns="6">
+            <h:panelGrid id="pnlgInput" styleClass="clsPanelReportFilter" columns="8">
                 <h:outputLabel  value="#{langsys['From']}"/>
                 <p:commandLink value="#{langsys['Session']}" action="#{itemBean.displayUNSPSC()}" oncomplete="PF('sbarSession').show()" update="formMain:pnlgSession"/>
                 <h:outputLabel  value="#{langsys['Category']}"/>
                 <h:outputLabel  value="#{langsys['Subcategory']}"/>
                 <h:outputLabel  value="#{langsys['Item']} #{langsys['Description']}"/>
+                <h:outputLabel  value=""/>
+                <h:outputLabel  value=""/>
                 <h:outputLabel  value=""/>
 
                 <h:inputText disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}" style="width: 120px;height: 24px;"/>
@@ -49,7 +51,7 @@
                 </h:selectOneMenu>
                 <h:selectOneMenu id="menuCategory" value="#{stock_take_sessionBean.category_id}" style="width: 200px;height: 30px;">
                     <f:selectItem itemLabel="" itemValue="0"/>
-                    <f:selectItems value="#{categoryBean.categories}" var="c" itemLabel="#{c.categoryName}" itemValue="#{c.categoryId}"/>
+                    <f:selectItems value="#{categoryBean.categoriesStockTake}" var="c" itemLabel="#{c.categoryName}" itemValue="#{c.categoryId}"/>
                     <f:ajax event="change" render="menuSubCategory"/>
                 </h:selectOneMenu>
                 <h:selectOneMenu id="menuSubCategory" value="#{stock_take_sessionBean.subcategory_id}" style="width: 200px;height: 30px;">
@@ -98,18 +100,32 @@
                     <p:ajax event="itemSelect" listener="#{stock_take_sessionBean.setItem_id(itemBean.selectedItem.itemId)}"/>
                     <p:ajax event="change" listener="#{stock_take_sessionBean.setItem_id(itemBean.selectedItem.itemId)}" rendered="#{itemBean.selectedItem!=null}"/>
                 </p:autoComplete>
-                <p:commandButton id="cbtnGet" value="#{langsys['Get']}"  icon="ui-icon-arrowrefresh-1-s">
-                    <p:ajax listener="#{stock_take_sessionBean.getStock_take_session_itemList(stock_take_sessionBean,stock_take_session_itemBean.stock_take_session_itemObjectList)}" process="@form" update="pnlList growl1"/>
+                <p:commandButton id="cbtnGetA" value="#{langsys['All']}"  icon="ui-icon-arrowrefresh-1-s">
+                    <p:ajax listener="#{stock_take_sessionBean.getStock_take_session_itemList(stock_take_sessionBean,stock_take_session_itemBean.stock_take_session_itemObjectList,0)}" process="@form" update="pnlList growl1"/>
+                </p:commandButton>
+                <p:commandButton id="cbtnGetC" value="#{langsys['Counted']}"  icon="ui-icon-arrowrefresh-1-s">
+                    <p:ajax listener="#{stock_take_sessionBean.getStock_take_session_itemList(stock_take_sessionBean,stock_take_session_itemBean.stock_take_session_itemObjectList,2)}" process="@form" update="pnlList growl1"/>
+                </p:commandButton>
+                <p:commandButton id="cbtnGetU" value="#{langsys['Uncounted']}"  icon="ui-icon-arrowrefresh-1-s">
+                    <p:ajax listener="#{stock_take_sessionBean.getStock_take_session_itemList(stock_take_sessionBean,stock_take_session_itemBean.stock_take_session_itemObjectList,1)}" process="@form" update="pnlList growl1"/>
                 </p:commandButton>
             </h:panelGrid>
             <p:growl id="growl1"/>
             <h:panelGrid id="pnlList" columns="1">
                 <p:dataTable id="dtblList" value="#{stock_take_session_itemBean.stock_take_session_itemObjectList}" var="i" 
-                             styleClass="cls-table" 
-                             > 
+                             tableStyle="width:auto;" rowIndexVar="rowIndex"
+                             >
                     <p:column>
                         <!-- column header -->
-                        <f:facet name="header"> #{langsys['Description']}} </f:facet>
+                        <f:facet name="header">
+                            #
+                        </f:facet>
+                        <!-- row record -->
+                        #{rowIndex+1}
+                    </p:column>
+                    <p:column>
+                        <!-- column header -->
+                        <f:facet name="header"> #{langsys['Description']} </f:facet>
                         <!-- row record -->
                         <h:outputLabel value="#{i.description}"/>
                     </p:column>
@@ -137,34 +153,39 @@
                         <!-- row record -->
                         <h:outputLabel value="#{i.batchno}"/>
                     </p:column>
-                    <p:column>
+                    <p:column style="text-align: right;">
                         <!-- column header -->
                         <f:facet name="header"> #{langsys['Qty']} #{langsys['System']} </f:facet>
                         <!-- row record -->
-                        <h:outputLabel value="#{i.qty_system}"/>
+                        <h:outputLabel value="#{utilityBean.formatDoubleToString(i.qty_system)}"/>
                     </p:column>
-                    <p:column>
+                    <p:column style="text-align: right;">
                         <!-- column header -->
                         <f:facet name="header"> #{langsys['Qty']} #{langsys['Counted']} </f:facet>
                         <!-- row record -->
-                        <h:outputLabel value="#{i.qty_physical}"/>
+                        <h:inputText value="#{i.qty_physical}" style="width: 60px;">
+                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:ajax event="change" listener="#{stock_take_session_itemBean.changeQtyCounted(i)}" execute="dtblList" render="olblShort olblOver"/>
+                        </h:inputText>
                     </p:column>
-                    <p:column>
+                    <p:column style="text-align: right;">
                         <!-- column header -->
                         <f:facet name="header"> #{langsys['Qty']} #{langsys['Short']} </f:facet>
                         <!-- row record -->
-                        <h:outputLabel value="#{i.qty_short}"/>
+                        <h:outputLabel id="olblShort" value="#{utilityBean.formatDoubleToString(i.qty_short)}"/>
                     </p:column>
-                    <p:column>
+                    <p:column style="text-align: right;">
                         <!-- column header -->
                         <f:facet name="header"> #{langsys['Qty']} #{langsys['Over']} </f:facet>
                         <!-- row record -->
-                        <h:outputLabel value="#{i.qty_over}"/>
+                        <h:outputLabel id="olblOver" value="#{utilityBean.formatDoubleToString(i.qty_over)}"/>
                     </p:column>
-                    <p:column>
+                    <p:column exportable="false">
                         <!-- column header -->
-                        <f:facet name="header">#{langsys['Action']}</f:facet>
+                        <f:facet name="header"></f:facet>
                         <!-- row record -->
+                        <p:commandButton id="cmdbView1" icon="ui-icon-closethick" actionListener="#{stock_take_sessionBean.closeStock_take_sessionCall(ss)}" update=":formMain:tblSession :formMain:menuSession :formMain:growl2" title="Close Stock Take Session"/>
+                        <p:commandButton id="cmdbView2" icon="ui-icon-closethick" actionListener="#{stock_take_sessionBean.closeStock_take_sessionCall(ss)}" update=":formMain:tblSession :formMain:menuSession :formMain:growl2" title="Close Stock Take Session"/>
                     </p:column>
                 </p:dataTable>
             </h:panelGrid>
@@ -212,9 +233,7 @@
                             <h:outputText value="Closed" rendered="#{ss.is_closed eq 1}"/>
                         </p:column>
                         <p:column exportable="false" headerText="" style="text-align: left;font-size: 14px;">
-                            <p:column headerText="#{langsys['Close']}" exportable="false" rendered="#{ss.is_closed eq 0}">
-                                <p:commandButton id="cmdbView" icon="ui-icon-closethick" actionListener="#{stock_take_sessionBean.closeStock_take_sessionCall(ss)}" update=":formMain:tblSession :formMain:menuSession :formMain:growl2" title="Close Stock Take Session"/>
-                            </p:column>
+                            <p:commandButton id="cmdbView" icon="ui-icon-closethick" actionListener="#{stock_take_sessionBean.closeStock_take_sessionCall(ss)}" update=":formMain:tblSession :formMain:menuSession :formMain:growl2" title="Close Stock Take Session"  rendered="#{ss.is_closed eq 0}"/>
                         </p:column>
                     </p:dataTable>
                 </h:panelGrid>
