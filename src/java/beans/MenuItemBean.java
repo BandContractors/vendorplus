@@ -193,6 +193,11 @@ public class MenuItemBean implements Serializable {
             } catch (Exception e) {
                 this.MenuItemObj.setSEARCH_ITEMS_LIST_LIMIT(0);
             }
+            try {
+                this.MenuItemObj.setSTOCKTAKE_ACTION(Integer.parseInt(pb.getParameter_listByContextNameMemory("STOCKTAKE", "STOCKTAKE_ACTION").getParameter_value()));
+            } catch (Exception e) {
+                this.MenuItemObj.setSTOCKTAKE_ACTION(0);
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }

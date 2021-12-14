@@ -184,8 +184,10 @@
                         <!-- column header -->
                         <f:facet name="header"></f:facet>
                         <!-- row record -->
-                        <p:commandButton id="cmdbView1" icon="ui-icon-closethick" actionListener="#{stock_take_sessionBean.closeStock_take_sessionCall(ss)}" update=":formMain:tblSession :formMain:menuSession :formMain:growl2" title="Close Stock Take Session"/>
-                        <p:commandButton id="cmdbView2" icon="ui-icon-closethick" actionListener="#{stock_take_sessionBean.closeStock_take_sessionCall(ss)}" update=":formMain:tblSession :formMain:menuSession :formMain:growl2" title="Close Stock Take Session"/>
+                        <p:panelGrid id="pnlAction" style="width: 50px;">
+                            <p:commandButton value="Save Only" id="cmdbAction1" actionListener="#{stock_take_sessionBean.saveStock_take_session_itemCall(ss,2)}" update="pnlAction :formMain:growl1" title="Save Only, Do not Adjust" rendered="#{menuItemBean.menuItemObj.STOCKTAKE_ACTION eq 2 and i.stock_take_session_item_id eq 0}"/>
+                            <p:commandButton value="Save &amp; Adjust" id="cmdbAction2" actionListener="#{stock_take_sessionBean.saveStock_take_session_itemCall(ss,1)}" update="pnlAction :formMain:growl1" title="Save and Adjust" rendered="#{menuItemBean.menuItemObj.STOCKTAKE_ACTION eq 1 and i.stock_take_session_item_id eq 0}"/>
+                        </p:panelGrid>
                     </p:column>
                 </p:dataTable>
             </h:panelGrid>

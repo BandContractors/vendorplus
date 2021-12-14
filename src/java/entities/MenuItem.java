@@ -40,6 +40,7 @@ public class MenuItem implements Serializable {
     private int ITEM_FULL_SEARCH_ON;
     private int ITEM_CODE_ERROR_ON;
     private int SEARCH_ITEMS_LIST_LIMIT;
+    private int STOCKTAKE_ACTION;
 
     /**
      * @return the SYSTEM_NAME
@@ -362,5 +363,19 @@ public class MenuItem implements Serializable {
      */
     public void setSEARCH_ITEMS_LIST_LIMIT(int SEARCH_ITEMS_LIST_LIMIT) {
         this.SEARCH_ITEMS_LIST_LIMIT = SEARCH_ITEMS_LIST_LIMIT;
+    }
+
+    /**
+     * @return the STOCKTAKE_ACTION
+     */
+    public int getSTOCKTAKE_ACTION() {
+        return STOCKTAKE_ACTION;
+    }
+
+    /**
+     * @param STOCKTAKE_ACTION the STOCKTAKE_ACTION to set
+     */
+    public void setSTOCKTAKE_ACTION(int STOCKTAKE_ACTION) {
+        this.STOCKTAKE_ACTION = STOCKTAKE_ACTION;
     }
 }

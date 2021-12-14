@@ -304,6 +304,31 @@ public class Stock_take_sessionBean implements Serializable {
         return updated;
     }
 
+    public int updateAddCounted(long aStock_take_session_id, double aAddStock_items_counted, Date aLast_update_date, String aLast_update_by) {
+        int updated = 0;
+        String sql = null;
+        sql = "UPDATE stock_take_session SET stock_items_counted=stock_items_counted+?,last_update_date=?,last_update_by=? WHERE stock_take_session_id=?";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            if (aStock_take_session_id > 0) {
+                ps.setDouble(1, aAddStock_items_counted);
+                try {
+                    ps.setTimestamp(2, new java.sql.Timestamp(aLast_update_date.getTime()));
+                } catch (NullPointerException npe) {
+                    ps.setTimestamp(2, null);
+                }
+                ps.setString(3, aLast_update_by);
+                ps.setLong(4, aStock_take_session_id);
+                ps.executeUpdate();
+                updated = 1;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return updated;
+    }
+
     public void closeStock_take_sessionCall(Stocktake_session aStocktake_session) {
         String msg = "";
         UtilityBean ub = new UtilityBean();
@@ -363,6 +388,50 @@ public class Stock_take_sessionBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
         return updated;
+    }
+
+    public void saveStock_take_session_itemCall(Stocktake_session_item aStocktake_session_item, int aStocktake_action) {
+        String msg = "";
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
+        try {
+            BaseName = getMenuItemBean().getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
+        try {
+            if (null != aStocktake_session_item) {
+                if (aStocktake_session_item.getStock_take_session_item_id() == 0) {
+                    Date dt = new CompanySetting().getCURRENT_SERVER_DATE();
+                    UserDetail userdetail = new GeneralUserSetting().getCurrentUser();
+                    //long counted = new UtilityBean().getN("select count(*) as n from stock_take_session_item where stock_take_session_id=" + aStocktake_session.getStock_take_session_id());
+                    //int x = this.closeStock_take_session(aStocktake_session.getStock_take_session_id(), dt, 1, dt, userdetail.getUserName(), counted);
+                    long savedid = new Stock_take_session_itemBean().insertStock_take_session_item(aStocktake_session_item);
+                    if (savedid > 0) {
+                        aStocktake_session_item.setStock_take_session_item_id(savedid);
+                        //update counted
+                        int c = this.updateAddCounted(aStocktake_session_item.getStock_take_session_id(), 1, dt, userdetail.getUserName());
+                        //1:Save and Adjust, 2:Save Only
+                        if (aStocktake_action == 1) {
+                            //adjust
+                            int adjusted = 0;
+                            //update adjusted
+                            //pending;
+                            if (adjusted == 1) {
+                                new Stock_take_session_itemBean().updateIsAdjusted(savedid, 1);
+                            }
+                        }
+                        msg = "Saved Successfully";
+                    } else {
+                        msg = "An Error has Occured During the Saving Process";
+                    }
+                    if (msg.length() > 0) {
+                        FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
     }
 
     public void clearStock_take_session(Stocktake_session aStock_take_session) {

@@ -26,14 +26,14 @@ import org.apache.log4j.Logger;
 @ManagedBean(name = "stock_take_session_itemBean")
 @SessionScoped
 public class Stock_take_session_itemBean implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = Logger.getLogger(Stock_take_session_itemBean.class.getName());
-    
+
     private String ActionMessage = null;
     private List<Stocktake_session_item> Stock_take_session_itemObjectList = new ArrayList<>();
     private Stocktake_session_item Stock_take_session_itemObj;
-    
+
     public void setStock_take_session_itemFromResultset(Stocktake_session_item aStock_take_session_item, ResultSet aResultSet) {
         try {
             try {
@@ -120,7 +120,7 @@ public class Stock_take_session_itemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public Stocktake_session_item getStock_take_session_item(long aStock_take_session_item_id) {
         String sql = "SELECT * FROM stock_take_session_item WHERE stock_take_session_item_id=" + aStock_take_session_item_id;
         ResultSet rs = null;
@@ -138,7 +138,7 @@ public class Stock_take_session_itemBean implements Serializable {
         }
         return obj;
     }
-    
+
     public Stocktake_session_item getStock_take_session_item(long aStock_take_session_id, long aItem_id, String aBatchno, String aCode_specific, String aDesc_specific, double aSpecific_size) {
         String sql = "SELECT * FROM stock_take_session_item WHERE stock_take_session_id=? AND item_id=? AND batchno=? AND code_specific=? AND desc_specific=? AND specific_size=?";
         ResultSet rs = null;
@@ -162,7 +162,7 @@ public class Stock_take_session_itemBean implements Serializable {
         }
         return obj;
     }
-    
+
     public long insertStock_take_session_item(Stocktake_session_item aStock_take_session_item) {
         long InsertedId = 0;
         String sql = null;
@@ -230,6 +230,24 @@ public class Stock_take_session_itemBean implements Serializable {
 //        }
 //        return updated;
 //    }
+    public int updateIsAdjusted(long aStock_take_session_item_id, int aQty_diff_adjusted) {
+        int updated = 0;
+        String sql = null;
+        sql = "UPDATE stock_take_session_item SET qty_diff_adjusted=? WHERE stock_take_session_item_id=?";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            if (aStock_take_session_item_id > 0) {
+                ps.setInt(1, aQty_diff_adjusted);
+                ps.executeUpdate();
+                updated = 1;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return updated;
+    }
+
     public void clearStock_take_session_item(Stocktake_session_item aStock_take_session_item) {
         if (null != aStock_take_session_item) {
             aStock_take_session_item.setStock_take_session_item_id(0);
@@ -250,7 +268,7 @@ public class Stock_take_session_itemBean implements Serializable {
             aStock_take_session_item.setNotes("");
         }
     }
-    
+
     public void changeQtyCounted(Stocktake_session_item aStocktake_session_item) {
         try {
             aStocktake_session_item.setQty_short(0);

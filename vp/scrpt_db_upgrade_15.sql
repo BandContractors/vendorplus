@@ -218,3 +218,8 @@ INSERT INTO transaction_reason (transaction_reason_id, transaction_reason_name, 
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_15',219,Now(),'6.0','');
 
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (87, 'STOCKTAKE', 'STOCKTAKE_ACTION', '1','1:Save and Adjust, 2:Save Only');
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_15',223,Now(),'6.0','');
+
