@@ -10853,7 +10853,11 @@ public class TransItemBean implements Serializable {
                     }
                 }
             } else {
-                AccountCode = "";
+                if (aItem.getExpenseAccountCode().length() > 0) {
+                    AccountCode = aItem.getExpenseAccountCode();
+                } else {
+                    AccountCode = "";
+                }
             }
         } catch (Exception e) {
             AccountCode = "";

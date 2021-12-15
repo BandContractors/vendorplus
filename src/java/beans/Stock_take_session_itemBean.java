@@ -1,6 +1,8 @@
 package beans;
 
 import connections.DBConnection;
+import entities.Item;
+import entities.Stock;
 import entities.Stocktake_session_item;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -14,6 +16,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import sessions.GeneralUserSetting;
 
 /*
  * To change this template, choose Tools | Templates
@@ -246,6 +249,86 @@ public class Stock_take_session_itemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
         return updated;
+    }
+
+    public int stockAdjust(Stocktake_session_item aStocktake_session_item, int aStore_id, int aTransTypeId, int aTransReasonId) {
+        int adjusted = 0;
+        try {
+            if (null != aStocktake_session_item) {
+                StockBean stockbean = new StockBean();
+                if (aStocktake_session_item.getQty_over() > 0 || aStocktake_session_item.getQty_short() > 0) {
+                    double UnitCostPrice = 0;
+                    if (stockbean.getStock(aStore_id, aStocktake_session_item.getItem_id(), aStocktake_session_item.getBatchno(), aStocktake_session_item.getCode_specific(), aStocktake_session_item.getDesc_specific()) != null) {
+                        //update
+                        Stock stock = new Stock();
+                        int i = 0;
+                        stock.setStoreId(aStore_id);
+                        stock.setItemId(aStocktake_session_item.getItem_id());
+                        stock.setBatchno(aStocktake_session_item.getBatchno());
+                        stock.setCodeSpecific(aStocktake_session_item.getCode_specific());
+                        stock.setDescSpecific(aStocktake_session_item.getDesc_specific());
+                        UnitCostPrice = aStocktake_session_item.getUnit_cost();
+                        stock.setUnitCost(UnitCostPrice);
+                        stock.setSpecific_size(aStocktake_session_item.getSpecific_size());
+                        String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
+                        if (aStocktake_session_item.getQty_over() > 0) {
+                            i = stockbean.addStock(stock, aStocktake_session_item.getQty_over());
+                            new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, aStocktake_session_item.getQty_over(), "Add", aTransTypeId, aTransReasonId, new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                        } else if (aStocktake_session_item.getQty_short() > 0) {
+                            i = new StockBean().subtractStock(stock, aStocktake_session_item.getQty_short());
+                            new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", stock, aStocktake_session_item.getQty_short(), "Add", aTransTypeId, aTransReasonId, new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                        }
+                        adjusted = 1;
+                    } else {
+                        //insert
+                        Stock stock = new Stock();
+                        int i = 0;
+                        stock.setStoreId(aStore_id);
+                        stock.setItemId(aStocktake_session_item.getItem_id());
+                        stock.setBatchno(aStocktake_session_item.getBatchno());
+                        stock.setCodeSpecific(aStocktake_session_item.getCode_specific());
+                        stock.setDescSpecific(aStocktake_session_item.getDesc_specific());
+                        stock.setDescMore("");
+                        stock.setItemMnfDate(null);
+                        stock.setItemExpDate(null);
+                        UnitCostPrice = aStocktake_session_item.getUnit_cost();
+                        stock.setUnitCost(UnitCostPrice);
+                        stock.setWarrantyDesc("");
+                        stock.setWarrantyExpiryDate(null);
+                        stock.setPurchaseDate(null);
+                        stock.setDepStartDate(null);
+                        stock.setDepMethodId(0);
+                        stock.setDepRate(0);
+                        stock.setAverageMethodId(0);
+                        stock.setEffectiveLife(0);
+                        Item itm = new ItemBean().getItem(aStocktake_session_item.getItem_id());
+                        if (itm.getAssetAccountCode().length() > 0) {
+                            stock.setAccountCode(itm.getAssetAccountCode());
+                        } else {
+                            stock.setAccountCode(itm.getExpenseAccountCode());
+                        }
+                        stock.setResidualValue(0);
+                        stock.setAssetStatusId(1);
+                        stock.setAssetStatusDesc("");
+                        stock.setSpecific_size(1);
+                        String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
+                        if (aStocktake_session_item.getQty_over() > 0) {
+                            stock.setCurrentqty(aStocktake_session_item.getQty_over());
+                            i = new StockBean().saveStock(stock);
+                            new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, aStocktake_session_item.getQty_over(), "Add", aTransTypeId, aTransReasonId, new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                        } else if (aStocktake_session_item.getQty_short() > 0) {
+                            stock.setCurrentqty(0 - aStocktake_session_item.getQty_short());
+                            i = new StockBean().saveStock(stock);
+                            new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", stock, (0 - aStocktake_session_item.getQty_short()), "Add", aTransTypeId, aTransReasonId, new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                        }
+                        adjusted = 1;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return adjusted;
     }
 
     public void clearStock_take_session_item(Stocktake_session_item aStock_take_session_item) {

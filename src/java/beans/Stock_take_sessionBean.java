@@ -400,7 +400,8 @@ public class Stock_take_sessionBean implements Serializable {
         }
         try {
             if (null != aStocktake_session_item) {
-                if (aStocktake_session_item.getStock_take_session_item_id() == 0) {
+                Stocktake_session ss = this.getStock_take_session(aStocktake_session_item.getStock_take_session_id());
+                if (aStocktake_session_item.getStock_take_session_item_id() == 0 && null != ss) {
                     Date dt = new CompanySetting().getCURRENT_SERVER_DATE();
                     UserDetail userdetail = new GeneralUserSetting().getCurrentUser();
                     //long counted = new UtilityBean().getN("select count(*) as n from stock_take_session_item where stock_take_session_id=" + aStocktake_session.getStock_take_session_id());
@@ -415,6 +416,7 @@ public class Stock_take_sessionBean implements Serializable {
                             //adjust
                             int adjusted = 0;
                             //update adjusted
+                            adjusted = new Stock_take_session_itemBean().stockAdjust(aStocktake_session_item, ss.getStore_id(), 84, 128);
                             //pending;
                             if (adjusted == 1) {
                                 new Stock_take_session_itemBean().updateIsAdjusted(savedid, 1);
