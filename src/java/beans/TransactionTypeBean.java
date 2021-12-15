@@ -725,7 +725,7 @@ public class TransactionTypeBean implements Serializable {
         int aTransactionTypeId = 0;
         List<TransactionType> tts;
         Trans t;
-        sql = "SELECT * FROM transaction_type WHERE transaction_type_id IN(1,2,3,4,7,8,9,10,11,12,13,19,63,64,65,66,67,68,70,71,72) ORDER BY transaction_type_id ASC";
+        sql = "SELECT * FROM transaction_type WHERE transaction_type_id IN(1,2,3,4,7,8,9,10,11,12,13,19,63,64,65,66,67,68,70,71,72,84) ORDER BY transaction_type_id ASC";
         ResultSet rs = null;
         tts = new ArrayList<TransactionType>();
         try (

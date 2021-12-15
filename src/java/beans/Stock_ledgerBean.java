@@ -407,6 +407,8 @@ public class Stock_ledgerBean implements Serializable {
                             } catch (Exception e) {
                                 SupplierId = 0;
                             }
+                        } else if (aStock_ledger4Sync.getTransaction_type_id() == 84) {
+                            SupplierId = 0;
                         } else {
                             try {
                                 SupplierId = new TransBean().getTrans(aStock_ledger4Sync.getTransaction_id()).getTransactorId();

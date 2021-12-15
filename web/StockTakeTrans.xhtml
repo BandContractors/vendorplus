@@ -113,7 +113,7 @@
             <p:growl id="growl1"/>
             <h:panelGrid id="pnlList" columns="1">
                 <p:dataTable id="dtblList" value="#{stock_take_session_itemBean.stock_take_session_itemObjectList}" var="i" 
-                             tableStyle="width:auto;" rowIndexVar="rowIndex"
+                             tableStyle="width:auto;" rowIndexVar="rowIndex" rowStyleClass="#{i.stock_take_session_item_id eq 0 ? 'black' : 'amber'}"
                              >
                     <p:column>
                         <!-- column header -->
@@ -163,7 +163,7 @@
                         <!-- column header -->
                         <f:facet name="header"> #{langsys['Qty']} #{langsys['Counted']} </f:facet>
                         <!-- row record -->
-                        <h:inputText value="#{i.qty_physical}" style="width: 60px;">
+                        <h:inputText value="#{i.qty_physical}" style="width: 60px;" disabled="#{i.stock_take_session_item_id gt 0}">
                             <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             <f:ajax event="change" listener="#{stock_take_session_itemBean.changeQtyCounted(i)}" execute="dtblList" render="olblShort olblOver"/>
                         </h:inputText>
@@ -185,8 +185,8 @@
                         <f:facet name="header"></f:facet>
                         <!-- row record -->
                         <p:panelGrid id="pnlAction" style="width: 50px;">
-                            <p:commandButton value="Save Only" id="cmdbAction1" actionListener="#{stock_take_sessionBean.saveStock_take_session_itemCall(ss,2)}" update="pnlAction :formMain:growl1" title="Save Only, Do not Adjust" rendered="#{menuItemBean.menuItemObj.STOCKTAKE_ACTION eq 2 and i.stock_take_session_item_id eq 0}"/>
-                            <p:commandButton value="Save &amp; Adjust" id="cmdbAction2" actionListener="#{stock_take_sessionBean.saveStock_take_session_itemCall(ss,1)}" update="pnlAction :formMain:growl1" title="Save and Adjust" rendered="#{menuItemBean.menuItemObj.STOCKTAKE_ACTION eq 1 and i.stock_take_session_item_id eq 0}"/>
+                            <p:commandButton value="Save Only" id="cmdbAction1" actionListener="#{stock_take_sessionBean.saveStock_take_session_itemCall(i,2)}" process="dtblList" update="dtblList :formMain:growl1" title="Save Only, Do not Adjust" rendered="#{menuItemBean.menuItemObj.STOCKTAKE_ACTION eq 2 and i.stock_take_session_item_id eq 0}"/>
+                            <p:commandButton value="Save &amp; Adjust" id="cmdbAction2" actionListener="#{stock_take_sessionBean.saveStock_take_session_itemCall(i,1)}" process="dtblList" update="dtblList :formMain:growl1" title="Save and Adjust" rendered="#{menuItemBean.menuItemObj.STOCKTAKE_ACTION eq 1 and i.stock_take_session_item_id eq 0}"/>
                         </p:panelGrid>
                     </p:column>
                 </p:dataTable>

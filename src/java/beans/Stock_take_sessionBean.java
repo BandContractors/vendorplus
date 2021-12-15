@@ -404,8 +404,8 @@ public class Stock_take_sessionBean implements Serializable {
                 if (aStocktake_session_item.getStock_take_session_item_id() == 0 && null != ss) {
                     Date dt = new CompanySetting().getCURRENT_SERVER_DATE();
                     UserDetail userdetail = new GeneralUserSetting().getCurrentUser();
-                    //long counted = new UtilityBean().getN("select count(*) as n from stock_take_session_item where stock_take_session_id=" + aStocktake_session.getStock_take_session_id());
-                    //int x = this.closeStock_take_session(aStocktake_session.getStock_take_session_id(), dt, 1, dt, userdetail.getUserName(), counted);
+                    aStocktake_session_item.setAdd_date(dt);
+                    aStocktake_session_item.setAdd_by(userdetail.getUserName());
                     long savedid = new Stock_take_session_itemBean().insertStock_take_session_item(aStocktake_session_item);
                     if (savedid > 0) {
                         aStocktake_session_item.setStock_take_session_item_id(savedid);
@@ -416,7 +416,7 @@ public class Stock_take_sessionBean implements Serializable {
                             //adjust
                             int adjusted = 0;
                             //update adjusted
-                            adjusted = new Stock_take_session_itemBean().stockAdjust(aStocktake_session_item, ss.getStore_id(), 84, 128);
+                            adjusted = new Stock_take_session_itemBean().stockAdjust(aStocktake_session_item, ss.getStore_id(), 84, savedid);
                             //pending;
                             if (adjusted == 1) {
                                 new Stock_take_session_itemBean().updateIsAdjusted(savedid, 1);
@@ -498,6 +498,27 @@ public class Stock_take_sessionBean implements Serializable {
         String sql;
         Store store = new GeneralUserSetting().getCurrentStore();
         sql = "SELECT * FROM stock_take_session WHERE is_closed=0 AND store_id=" + store.getStoreId() + " ORDER BY add_date DESC";
+        ResultSet rs = null;
+        Stocktake_session ss = null;
+        List<Stocktake_session> ssList = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                ss = new Stocktake_session();
+                this.setStock_take_sessionFromResultset(ss, rs);
+                ssList.add(ss);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return ssList;
+    }
+
+    public List<Stocktake_session> getAllStock_take_sessionList() {
+        String sql;
+        sql = "SELECT * FROM stock_take_session ORDER BY add_date DESC LIMIT 100";
         ResultSet rs = null;
         Stocktake_session ss = null;
         List<Stocktake_session> ssList = new ArrayList<>();

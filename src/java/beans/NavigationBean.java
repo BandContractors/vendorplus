@@ -1273,6 +1273,10 @@ public class NavigationBean implements Serializable {
     public String redirectToReportConsumeStockDetail() {
         return "ReportConsumeStockDetail?faces-redirect=true";
     }
+    
+    public String redirectToReportStockTake() {
+        return "ReportStockTake?faces-redirect=true";
+    }
 
     public String redirectToReportCashReceiptDetail() {
         return "ReportCashReceiptDetail?faces-redirect=true";
