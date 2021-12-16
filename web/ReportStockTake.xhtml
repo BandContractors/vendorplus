@@ -38,7 +38,7 @@
                     <p:ajax listener="#{stock_take_session_itemBean.setDateToYesturday()}" process="@this" update="pnlgFilter"/>
                 </p:commandLink>
             </h:panelGrid>
-            <h:panelGrid id="pnlgFilter" columns="3" styleClass="clsPanelReportFilter">
+            <h:panelGrid id="pnlgFilter" columns="4" styleClass="clsPanelReportFilter">
                 <h:panelGrid columns="2">
                     <p:outputLabel value="#{langsys['From']} #{langsys['Date']}:"/>
                     <p:calendar id="calDate1"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{stock_take_session_itemBean.date1}" size="20"/>
@@ -88,7 +88,7 @@
                     <p:outputLabel value="#{langsys['Session']}"/>
                     <p:selectOneMenu value="#{stocktake_session_item.stock_take_session_id}" style="width: 200px;height: 30px;">
                         <f:selectItem itemLabel="" itemValue="0"/>
-                        <f:selectItems value="#{stock_take_sessionBean.getAllStock_take_sessionList()}" var="ss" itemLabel="#{langsys['ID']}:#{ss.stock_take_session_id}, #{langsys['Open']}:#{utilityBean.formatDateTime(ss.start_time)}, #{langsys['By']}:#{ss.add_by}, #{langsys['Notes']}:#{ss.notes}" itemValue="#{ss.stock_take_session_id}"/>
+                        <f:selectItems value="#{stock_take_sessionBean.getAllStock_take_sessionList()}" var="ss" itemLabel="#{ss.add_by} #{utilityBean.formatDateTime(ss.start_time)} #{langsys['Notes']}:#{ss.notes}" itemValue="#{ss.stock_take_session_id}"/>
                     </p:selectOneMenu>
                     <p:outputLabel value="#{langsys['Added']} #{langsys['By']}:"/>
                     <p:selectOneMenu id="menuAddUser" value="#{stocktake_session_item.add_by}" style="width: 200px;">
@@ -97,19 +97,23 @@
                     </p:selectOneMenu>            
                 </h:panelGrid>
                 <h:panelGrid columns="1">
-                    <p:commandButton id="cmdbSearch" value="#{langsys['SEARCH']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" style="width: 150px;">
+                    <p:outputLabel value="#{langsys['Show']} #{langsys['Filter']}"/>
+                    <p:selectOneMenu value="#{stock_take_session_itemBean.showFilter}" style="width: 200px;height: 30px;">
+                        <f:selectItem itemLabel="#{langsys['All']}" itemValue="0"/>
+                        <f:selectItem itemLabel="#{langsys['Stock']} #{langsys['Adjusted']}" itemValue="1"/>
+                        <f:selectItem itemLabel="#{langsys['Stock']} #{langsys['Not']} #{langsys['Adjusted']}" itemValue="2"/>
+                    </p:selectOneMenu>
+                </h:panelGrid>
+                <h:panelGrid columns="1">
+                    <p:commandButton id="cmdbSearch" value="#{langsys['SEARCH']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" style="width: 225px;">
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
                         <p:ajax listener="#{stock_take_session_itemBean.reportStocktake_session_itemCall(stocktake_session_item,stock_take_session_itemBean,itemBean.selectedItem)}" process="pnlgFilter" update="pnlgData growl1"/>
                     </p:commandButton>
-                    <p:commandButton id="cmdbReset" value="#{langsys['RESET']}" style="width: 150px;">
+                    <p:commandButton id="cmdbReset" value="#{langsys['RESET']}" style="width: 225px;">
                         <p:ajax listener="#{stock_take_session_itemBean.resetStockTakeReportDetail(stocktake_session_item,stock_take_session_itemBean,itemBean.selectedItem)}" process="pnlgFilter" update="pnlgFilter pnlgData growl1"/>
                     </p:commandButton>
-                    <h:panelGrid columns="2">
-                        <h:outputLabel value=""/>
-                        <h:outputLabel value=""/>
-                    </h:panelGrid>
                 </h:panelGrid>
             </h:panelGrid>
             <p:growl id="growl1"/>
@@ -170,6 +174,14 @@
                     </p:column>
                     <p:column headerText="#{langsys['Qty']} #{langsys['Over']}" style="text-align: right;">
                         <h:outputLabel id="olblOver" value="#{utilityBean.formatDoubleToString(i.qty_over)}"/>
+                    </p:column>
+                    <p:column headerText="#{langsys['Adjust']} #{langsys['Stock']}" style="text-align: right;">
+                        <p:commandButton id="cmdbAdjust" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" icon="ui-icon-arrowreturnthick-1-n" style="width: 20px;height: 30px;margin: 5px;"  rendered="#{i.qty_diff_adjusted eq 0}">
+                            <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                                <p:graphicImage name="/images/ajax-loader.gif"/>
+                            </p:dialog>
+                            <p:ajax listener="#{stock_take_session_itemBean.stockAdjustCallFromReport(i)}" update="tblDetail growl1"/>
+                        </p:commandButton>
                     </p:column>
                 </p:dataTable>
             </h:panelGrid>

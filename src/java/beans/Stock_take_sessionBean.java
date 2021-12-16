@@ -3,6 +3,7 @@ package beans;
 import connections.DBConnection;
 import entities.Stocktake_session;
 import entities.CompanySetting;
+import entities.Item;
 import entities.Stocktake_session_item;
 import entities.Store;
 import entities.UserDetail;
@@ -537,6 +538,18 @@ public class Stock_take_sessionBean implements Serializable {
         return ssList;
     }
 
+    public void resetStock_take_session(Stock_take_sessionBean aStock_take_sessionBean, Item aItem) {
+        try {
+            aStock_take_sessionBean.setStock_take_session_id(0);
+            aStock_take_sessionBean.setCategory_id(0);
+            aStock_take_sessionBean.setSubcategory_id(0);
+            aStock_take_sessionBean.setItem_id(0);
+            new ItemBean().clearItem(aItem);
+        } catch (Exception e) {
+            //do nothing
+        }
+    }
+
     public void getStock_take_session_itemList(Stock_take_sessionBean aStock_take_sessionBean, List<Stocktake_session_item> aStocktake_session_itemList, int aFlag) {//aFlag:0 All,1:Uncounted,2:Counted
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -579,64 +592,65 @@ public class Stock_take_sessionBean implements Serializable {
                     Connection conn = DBConnection.getMySQLConnection();
                     PreparedStatement ps = conn.prepareStatement(sql);) {
                 rs = ps.executeQuery();
-                Stocktake_session_item obj = null;
+                Stocktake_session_item objCounted = null;
+                Stocktake_session_item objUncounted = null;
                 while (rs.next()) {
-                    obj = stB.getStock_take_session_item(aStock_take_sessionBean.getStock_take_session_id(), rs.getLong("item_id"), rs.getString("batchno"), rs.getString("code_specific"), rs.getString("desc_specific"), rs.getDouble("specific_size"));
-                    if (obj == null && (aFlag == 0 || aFlag == 1)) {//not stock taken.
-                        obj = new Stocktake_session_item();
-                        obj.setStock_take_session_item_id(0);
-                        obj.setStock_take_session_id(aStock_take_sessionBean.getStock_take_session_id());
-                        obj.setAdd_date(null);
-                        obj.setAdd_by("");
+                    objCounted = stB.getStock_take_session_item(aStock_take_sessionBean.getStock_take_session_id(), rs.getLong("item_id"), rs.getString("batchno"), rs.getString("code_specific"), rs.getString("desc_specific"), rs.getDouble("specific_size"));
+                    if (objCounted == null && (aFlag == 0 || aFlag == 1)) {//Uncounted
+                        objUncounted = new Stocktake_session_item();
+                        objUncounted.setStock_take_session_item_id(0);
+                        objUncounted.setStock_take_session_id(aStock_take_sessionBean.getStock_take_session_id());
+                        objUncounted.setAdd_date(null);
+                        objUncounted.setAdd_by("");
                         try {
-                            obj.setItem_id(rs.getLong("item_id"));
+                            objUncounted.setItem_id(rs.getLong("item_id"));
                         } catch (NullPointerException npe) {
-                            obj.setItem_id(0);
+                            objUncounted.setItem_id(0);
                         }
                         try {
-                            obj.setBatchno(rs.getString("batchno"));
+                            objUncounted.setBatchno(rs.getString("batchno"));
                         } catch (NullPointerException npe) {
-                            obj.setBatchno("");
+                            objUncounted.setBatchno("");
                         }
                         try {
-                            obj.setCode_specific(rs.getString("code_specific"));
+                            objUncounted.setCode_specific(rs.getString("code_specific"));
                         } catch (NullPointerException npe) {
-                            obj.setCode_specific("");
+                            objUncounted.setCode_specific("");
                         }
                         try {
-                            obj.setDesc_specific(rs.getString("desc_specific"));
+                            objUncounted.setDesc_specific(rs.getString("desc_specific"));
                         } catch (NullPointerException npe) {
-                            obj.setDesc_specific("");
+                            objUncounted.setDesc_specific("");
                         }
                         try {
-                            obj.setSpecific_size(rs.getDouble("specific_size"));
+                            objUncounted.setSpecific_size(rs.getDouble("specific_size"));
                         } catch (NullPointerException npe) {
-                            obj.setSpecific_size(1);
+                            objUncounted.setSpecific_size(1);
                         }
                         try {
-                            obj.setQty_system(rs.getDouble("currentqty"));
+                            objUncounted.setQty_system(rs.getDouble("currentqty"));
                         } catch (NullPointerException npe) {
-                            obj.setQty_system(0);
+                            objUncounted.setQty_system(0);
                         }
-                        obj.setQty_physical(0);
-                        if (obj.getQty_system() > 0) {
-                            obj.setQty_short(obj.getQty_system() - obj.getQty_physical());
+                        objUncounted.setQty_physical(0);
+                        if (objUncounted.getQty_system() > 0) {
+                            objUncounted.setQty_short(objUncounted.getQty_system() - objUncounted.getQty_physical());
                         } else {
-                            obj.setQty_over(0);
+                            objUncounted.setQty_over(0);
                         }
                         try {
-                            obj.setUnit_cost(rs.getDouble("unit_cost"));
+                            objUncounted.setUnit_cost(rs.getDouble("unit_cost"));
                         } catch (NullPointerException npe) {
-                            obj.setUnit_cost(0);
+                            objUncounted.setUnit_cost(0);
                         }
-                        obj.setQty_diff_adjusted(0);
-                        obj.setNotes("");
-                        obj.setDescription(rs.getString("description"));
-                    } else if (null != obj && (aFlag == 0 || aFlag == 2)) {//stock taken
-                        obj.setDescription(rs.getString("description"));
+                        objUncounted.setQty_diff_adjusted(0);
+                        objUncounted.setNotes("");
+                        objUncounted.setDescription(rs.getString("description"));
+                        aStocktake_session_itemList.add(objUncounted);
                     }
-                    if (null != obj) {
-                        aStocktake_session_itemList.add(obj);
+                    if (null != objCounted && (aFlag == 0 || aFlag == 2)) {//Counted
+                        objCounted.setDescription(rs.getString("description"));
+                        aStocktake_session_itemList.add(objCounted);
                     }
                 }
             } catch (Exception e) {

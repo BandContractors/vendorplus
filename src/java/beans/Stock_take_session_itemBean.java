@@ -4,7 +4,9 @@ import connections.DBConnection;
 import entities.CompanySetting;
 import entities.Item;
 import entities.Stock;
+import entities.Stocktake_session;
 import entities.Stocktake_session_item;
+import entities.UserDetail;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -35,10 +37,10 @@ import utilities.UtilityBean;
 @ManagedBean(name = "stock_take_session_itemBean")
 @SessionScoped
 public class Stock_take_session_itemBean implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = Logger.getLogger(Stock_take_session_itemBean.class.getName());
-    
+
     private String ActionMessage = null;
     private List<Stocktake_session_item> Stock_take_session_itemObjectList = new ArrayList<>();
     private Stocktake_session_item Stock_take_session_itemObj;
@@ -47,7 +49,8 @@ public class Stock_take_session_itemBean implements Serializable {
     private int store_id;
     @ManagedProperty("#{menuItemBean}")
     private MenuItemBean menuItemBean;
-    
+    private int ShowFilter;
+
     public void setStock_take_session_itemFromResultset(Stocktake_session_item aStock_take_session_item, ResultSet aResultSet) {
         try {
             try {
@@ -134,7 +137,7 @@ public class Stock_take_session_itemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public Stocktake_session_item getStock_take_session_item(long aStock_take_session_item_id) {
         String sql = "SELECT * FROM stock_take_session_item WHERE stock_take_session_item_id=" + aStock_take_session_item_id;
         ResultSet rs = null;
@@ -152,7 +155,7 @@ public class Stock_take_session_itemBean implements Serializable {
         }
         return obj;
     }
-    
+
     public Stocktake_session_item getStock_take_session_item(long aStock_take_session_id, long aItem_id, String aBatchno, String aCode_specific, String aDesc_specific, double aSpecific_size) {
         String sql = "SELECT * FROM stock_take_session_item WHERE stock_take_session_id=? AND item_id=? AND batchno=? AND code_specific=? AND desc_specific=? AND specific_size=?";
         ResultSet rs = null;
@@ -176,7 +179,7 @@ public class Stock_take_session_itemBean implements Serializable {
         }
         return obj;
     }
-    
+
     public long insertStock_take_session_item(Stocktake_session_item aStock_take_session_item) {
         long InsertedId = 0;
         String sql = null;
@@ -262,7 +265,39 @@ public class Stock_take_session_itemBean implements Serializable {
         }
         return updated;
     }
-    
+
+    public void stockAdjustCallFromReport(Stocktake_session_item aStocktake_session_item) {
+        String msg = "";
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
+        try {
+            BaseName = getMenuItemBean().getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
+        try {
+            if (null != aStocktake_session_item) {
+                Stocktake_session ss = new Stock_take_sessionBean().getStock_take_session(aStocktake_session_item.getStock_take_session_id());
+                if (null != ss) {
+                    Date dt = new CompanySetting().getCURRENT_SERVER_DATE();
+                    UserDetail userdetail = new GeneralUserSetting().getCurrentUser();
+                    aStocktake_session_item.setAdd_date(dt);
+                    aStocktake_session_item.setAdd_by(userdetail.getUserName());
+                    long savedid = this.stockAdjust(aStocktake_session_item, ss.getStore_id(), 84, aStocktake_session_item.getStock_take_session_item_id());
+                    if (savedid > 0) {
+                        msg = "Stock Adjusted Successfully";
+                    } else {
+                        msg = "An Error has Occured During the Saving Process";
+                    }
+                    if (msg.length() > 0) {
+                        FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public int stockAdjust(Stocktake_session_item aStocktake_session_item, int aStore_id, int aTransTypeId, long aTransId) {
         int adjusted = 0;
         try {
@@ -342,7 +377,7 @@ public class Stock_take_session_itemBean implements Serializable {
         }
         return adjusted;
     }
-    
+
     public void clearStock_take_session_item(Stocktake_session_item aStock_take_session_item) {
         if (null != aStock_take_session_item) {
             aStock_take_session_item.setStock_take_session_item_id(0);
@@ -363,7 +398,7 @@ public class Stock_take_session_itemBean implements Serializable {
             aStock_take_session_item.setNotes("");
         }
     }
-    
+
     public void changeQtyCounted(Stocktake_session_item aStocktake_session_item) {
         try {
             aStocktake_session_item.setQty_short(0);
@@ -377,7 +412,7 @@ public class Stock_take_session_itemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void initResetStockTakeReportDetail(Stocktake_session_item aStocktake_session_item, Stock_take_session_itemBean aSStocktake_session_itemBean, Item aItem) {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -385,7 +420,7 @@ public class Stock_take_session_itemBean implements Serializable {
             this.resetStockTakeReportDetail(aStocktake_session_item, aSStocktake_session_itemBean, aItem);
         }
     }
-    
+
     public void resetStockTakeReportDetail(Stocktake_session_item aStocktake_session_item, Stock_take_session_itemBean aStocktake_session_itemBean, Item aItem) {
         try {
             this.clearStock_take_session_item(aStocktake_session_item);
@@ -403,7 +438,7 @@ public class Stock_take_session_itemBean implements Serializable {
         } catch (NullPointerException npe) {
         }
     }
-    
+
     public void setDateToToday() {
         Date CurrentServerDate = new CompanySetting().getCURRENT_SERVER_DATE();
         this.setDate1(CurrentServerDate);
@@ -415,7 +450,7 @@ public class Stock_take_session_itemBean implements Serializable {
         cal.set(Calendar.MILLISECOND, 0);
         // Put it back in the Date object  
         this.setDate1(cal.getTime());
-        
+
         this.setDate2(CurrentServerDate);
         Calendar cal2 = Calendar.getInstance();
         cal2.setTime(this.getDate2());
@@ -426,10 +461,10 @@ public class Stock_take_session_itemBean implements Serializable {
         // Put it back in the Date object  
         this.setDate2(cal2.getTime());
     }
-    
+
     public void setDateToYesturday() {
         Date CurrentServerDate = new CompanySetting().getCURRENT_SERVER_DATE();
-        
+
         this.setDate1(CurrentServerDate);
         Calendar cal = Calendar.getInstance();
         cal.setTime(this.getDate1());
@@ -440,7 +475,7 @@ public class Stock_take_session_itemBean implements Serializable {
         cal.set(Calendar.MILLISECOND, 0);
         // Put it back in the Date object  
         this.setDate1(cal.getTime());
-        
+
         this.setDate2(CurrentServerDate);
         Calendar cal2 = Calendar.getInstance();
         cal2.setTime(this.getDate2());
@@ -452,7 +487,7 @@ public class Stock_take_session_itemBean implements Serializable {
         // Put it back in the Date object  
         this.setDate2(cal2.getTime());
     }
-    
+
     public void reportStocktake_session_itemCall(Stocktake_session_item aStocktake_session_item, Stock_take_session_itemBean aStock_take_session_itemBean, Item aItem) {
         try {
             UtilityBean ub = new UtilityBean();
@@ -472,7 +507,7 @@ public class Stock_take_session_itemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void reportStocktake_session_item(Stocktake_session_item aStocktake_session_item, Stock_take_session_itemBean aStock_take_session_itemBean, Item aItem) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -499,6 +534,11 @@ public class Stock_take_session_itemBean implements Serializable {
         }
         if (aStocktake_session_item.getAdd_by().length() > 0) {
             wheresql = wheresql + " AND i.add_by='" + aStocktake_session_item.getAdd_by() + "'";
+        }
+        if (aStock_take_session_itemBean.getShowFilter() == 1) {
+            wheresql = wheresql + " AND i.qty_diff_adjusted=1";
+        } else if (aStock_take_session_itemBean.getShowFilter() == 2) {
+            wheresql = wheresql + " AND i.qty_diff_adjusted=0";
         }
         if (aStock_take_session_itemBean.getDate1() != null && aStock_take_session_itemBean.getDate2() != null) {
             wheresql = wheresql + " AND i.add_date BETWEEN '" + new java.sql.Timestamp(aStock_take_session_itemBean.getDate1().getTime()) + "' AND '" + new java.sql.Timestamp(aStock_take_session_itemBean.getDate2().getTime()) + "'";
@@ -618,5 +658,19 @@ public class Stock_take_session_itemBean implements Serializable {
      */
     public void setMenuItemBean(MenuItemBean menuItemBean) {
         this.menuItemBean = menuItemBean;
+    }
+
+    /**
+     * @return the ShowFilter
+     */
+    public int getShowFilter() {
+        return ShowFilter;
+    }
+
+    /**
+     * @param ShowFilter the ShowFilter to set
+     */
+    public void setShowFilter(int ShowFilter) {
+        this.ShowFilter = ShowFilter;
     }
 }
