@@ -118,7 +118,7 @@
             </h:panelGrid>
             <p:growl id="growl1"/>
             <h:panelGrid id="pnlgData" columns="1">
-                <p:dataTable id="tblDetail" tableStyle="width:auto;" var="i" value="#{stock_take_session_itemBean.stock_take_session_itemObjectList}" 
+                <p:dataTable id="tblDetail" rowIndexVar="rowIndex" tableStyle="width:auto;" var="i" value="#{stock_take_session_itemBean.stock_take_session_itemObjectList}" 
                              paginator="true" rows="100" rowStyleClass="#{(i.qty_over+i.qty_short) gt 0 ? 'red' : ''}" 
                              paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
                              rowsPerPageTemplate="100,400,800,1000">
@@ -175,12 +175,12 @@
                     <p:column headerText="#{langsys['Qty']} #{langsys['Over']}" style="text-align: right;">
                         <h:outputLabel id="olblOver" value="#{utilityBean.formatDoubleToString(i.qty_over)}"/>
                     </p:column>
-                    <p:column headerText="#{langsys['Adjust']} #{langsys['Stock']}" style="text-align: right;">
-                        <p:commandButton id="cmdbAdjust" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" icon="ui-icon-arrowreturnthick-1-n" style="width: 20px;height: 30px;margin: 5px;"  rendered="#{i.qty_diff_adjusted eq 0}">
-                            <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                    <p:column headerText="#{langsys['Adjust']} #{langsys['Stock']}" style="text-align: right;" exportable="false">
+                        <p:commandButton id="cmdbAdjust" onclick="PF('statusDialog2').show()" onsuccess="PF('statusDialog2').hide()" icon="ui-icon-arrowreturnthick-1-n" style="width: 20px;height: 30px;margin: 5px;"  rendered="#{i.qty_diff_adjusted eq 0 and (i.qty_short+i.qty_over) gt 0}">
+                            <p:dialog widgetVar="statusDialog2" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                                 <p:graphicImage name="/images/ajax-loader.gif"/>
                             </p:dialog>
-                            <p:ajax listener="#{stock_take_session_itemBean.stockAdjustCallFromReport(i)}" update="tblDetail growl1"/>
+                            <p:ajax listener="#{stock_take_session_itemBean.stockAdjustCallFromReport(i)}" update="tblDetail formReport:growl1"/>
                         </p:commandButton>
                     </p:column>
                 </p:dataTable>

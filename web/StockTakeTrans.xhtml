@@ -158,14 +158,14 @@
                     <h:outputLabel id="olblOver" value="#{utilityBean.formatDoubleToString(i.qty_over)}"/>
                 </p:column>
                 <p:column exportable="false">
-                    <p:commandButton value="#{langsys['Save']} #{langsys['Only']}" id="cmdbAction1" title="Save Only, Do not Adjust" rendered="#{menuItemBean.menuItemObj.STOCKTAKE_ACTION eq 2 and i.stock_take_session_item_id eq 0}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
-                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                    <p:commandButton value="#{langsys['Save']} #{langsys['Only']}" id="cmdbAction1" title="Save Only, Do not Adjust" rendered="#{menuItemBean.menuItemObj.STOCKTAKE_ACTION eq 2 and i.stock_take_session_item_id eq 0}" onclick="PF('statusDialog2').show()" onsuccess="PF('statusDialog2').hide()">
+                        <p:dialog widgetVar="statusDialog2" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
                         <p:ajax listener="#{stock_take_sessionBean.saveStock_take_session_itemCall(i,2)}" update="dtblList :formMain:growl1"/>
                     </p:commandButton>
-                    <p:commandButton value="#{langsys['Save']} &amp; #{langsys['Adjust']}" id="cmdbAction2" title="Save and Adjust" rendered="#{menuItemBean.menuItemObj.STOCKTAKE_ACTION eq 1 and i.stock_take_session_item_id eq 0}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
-                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                    <p:commandButton value="#{langsys['Save']} &amp; #{langsys['Adjust']}" id="cmdbAction2" title="Save and Adjust" rendered="#{menuItemBean.menuItemObj.STOCKTAKE_ACTION eq 1 and i.stock_take_session_item_id eq 0}" onclick="PF('statusDialog3').show()" onsuccess="PF('statusDialog3').hide()">
+                        <p:dialog widgetVar="statusDialog3" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
                         <p:ajax listener="#{stock_take_sessionBean.saveStock_take_session_itemCall(i,1)}" update="dtblList :formMain:growl1"/>
@@ -216,7 +216,7 @@
                             <h:outputText value="Closed" rendered="#{ss.is_closed eq 1}"/>
                         </p:column>
                         <p:column exportable="false" headerText="" style="text-align: left;font-size: 14px;">
-                            <p:commandButton id="cmdbView" icon="ui-icon-closethick" actionListener="#{stock_take_sessionBean.closeStock_take_sessionCall(ss)}" update=":formMain:tblSession :formMain:menuSession :formMain:growl2" title="Close Stock Take Session"  rendered="#{ss.is_closed eq 0}"/>
+                            <p:commandButton icon="ui-icon-closethick" actionListener="#{stock_take_sessionBean.closeStock_take_sessionCall(ss)}" update=":formMain:tblSession :formMain:menuSession :formMain:growl2" title="Close Stock Take Session"  rendered="#{ss.is_closed eq 0}"/>
                         </p:column>
                     </p:dataTable>
                 </h:panelGrid>

@@ -282,8 +282,14 @@ public class Stock_take_session_itemBean implements Serializable {
                     UserDetail userdetail = new GeneralUserSetting().getCurrentUser();
                     aStocktake_session_item.setAdd_date(dt);
                     aStocktake_session_item.setAdd_by(userdetail.getUserName());
-                    long savedid = this.stockAdjust(aStocktake_session_item, ss.getStore_id(), 84, aStocktake_session_item.getStock_take_session_item_id());
-                    if (savedid > 0) {
+                    long saveflag = this.stockAdjust(aStocktake_session_item, ss.getStore_id(), 84, aStocktake_session_item.getStock_take_session_item_id());
+                    if (saveflag > 0) {
+                        //update is adjusted
+                        int adjustflag = this.updateIsAdjusted(aStocktake_session_item.getStock_take_session_item_id(), 1);
+                        //refresh report
+                        if (adjustflag == 1) {
+                            aStocktake_session_item.setQty_diff_adjusted(1);
+                        }
                         msg = "Stock Adjusted Successfully";
                     } else {
                         msg = "An Error has Occured During the Saving Process";
@@ -537,7 +543,8 @@ public class Stock_take_session_itemBean implements Serializable {
         }
         if (aStock_take_session_itemBean.getShowFilter() == 1) {
             wheresql = wheresql + " AND i.qty_diff_adjusted=1";
-        } else if (aStock_take_session_itemBean.getShowFilter() == 2) {
+        }
+        if (aStock_take_session_itemBean.getShowFilter() == 2) {
             wheresql = wheresql + " AND i.qty_diff_adjusted=0";
         }
         if (aStock_take_session_itemBean.getDate1() != null && aStock_take_session_itemBean.getDate2() != null) {
@@ -545,6 +552,7 @@ public class Stock_take_session_itemBean implements Serializable {
         }
         ordersql = " ORDER BY i.add_date DESC,i.stock_take_session_id DESC";
         sql = sql + wheresql + ordersql;
+        //System.out.println("SQL:" + sql);
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
