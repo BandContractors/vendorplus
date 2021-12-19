@@ -4502,6 +4502,12 @@ public class TransBean implements Serializable {
     }
 
     public void saveDraftTrans(Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         String sql = null;
         String msg = "";
         long TransHistId = 0;
@@ -4509,9 +4515,9 @@ public class TransBean implements Serializable {
         boolean isTransItemCopySuccess = false;
         try {
             if (aActiveTransItems.isEmpty()) {
-                msg = "EMPTY TRANSACTION CANNOT BE SAVED AS DRAFT...";
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
-                this.setActionMessage("DRAFT transaction not saved");
+                msg = "Empty Transaction Cannot be Saved";
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+                this.setActionMessage(ub.translateWordsInText(BaseName, "Draft Transaction Not Saved"));
             } else {
                 sql = "{call sp_insert_transaction_hist(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
                 try (
@@ -4688,49 +4694,6 @@ public class TransBean implements Serializable {
                     } catch (NullPointerException npe) {
                         cs.setDouble("in_duration_value", 0);
                     }
-                    //bought in after order module
-                    /*
-                     try {
-                     cs.setLong("in_location_id", trans.getLocation_id());
-                     } catch (Exception e) {
-                     cs.setLong("in_location_id", 0);
-                     }
-                     if (null == trans.getStatus_code()) {
-                     cs.setString("in_status_code", "");
-                     } else {
-                     cs.setString("in_status_code", trans.getStatus_code());
-                     }
-                     if (null == trans.getStatus_date()) {
-                     cs.setTimestamp("in_status_date", null);
-                     } else {
-                     cs.setTimestamp("in_status_date", new java.sql.Timestamp(trans.getStatus_date().getTime()));
-                     }
-                     if (null == trans.getDelivery_mode()) {
-                     cs.setString("in_delivery_mode", "");
-                     } else {
-                     cs.setString("in_delivery_mode", trans.getDelivery_mode());
-                     }
-                     try {
-                     cs.setInt("in_is_processed", trans.getIs_processed());
-                     } catch (Exception npe) {
-                     cs.setInt("in_is_processed", 0);
-                     }
-                     try {
-                     cs.setInt("in_is_paid", trans.getIs_paid());
-                     } catch (Exception npe) {
-                     cs.setInt("in_is_paid", 0);
-                     }
-                     try {
-                     cs.setInt("in_is_cancel", trans.getIs_cancel());
-                     } catch (Exception npe) {
-                     cs.setInt("in_is_cancel", 0);
-                     }
-                     try {
-                     cs.setDouble("in_spent_points_amount", trans.getSpendPointsAmount());
-                     } catch (Exception e) {
-                     cs.setDouble("in_spent_points_amount", 0);
-                     }
-                     */
                     //save
                     cs.executeUpdate();
                     isTransCopySuccess = true;
@@ -4741,18 +4704,18 @@ public class TransBean implements Serializable {
                     tib.saveDraftTransItems(trans, aActiveTransItems, TransHistId);
                     isTransItemCopySuccess = true;
                     if (isTransCopySuccess && isTransItemCopySuccess) {
-                        this.setActionMessage("DRAFT saved successfully");
+                        this.setActionMessage(ub.translateWordsInText(BaseName, "Draft Saved Successfully"));
                         this.clearAll2(trans, aActiveTransItems, null, null, aSelectedTransactor, 2, aSelectedBillTransactor, aTransUserDetail, aSelectedSchemeTransactor, aAuthorisedByUserDetail, aSelectedAccCoa);
                         this.refreshTranssDraft(new GeneralUserSetting().getCurrentStore().getStoreId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), new GeneralUserSetting().getCurrentTransactionTypeId(), new GeneralUserSetting().getCurrentTransactionReasonId());
                     } else {
-                        this.setActionMessage("DRAFT not saved");
+                        this.setActionMessage(ub.translateWordsInText(BaseName, "Draft Not Saved"));
                     }
                 } catch (Exception e) {
                     LOGGER.log(Level.ERROR, e);
                 }
             }
-        } catch (NullPointerException npe) {
-
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -4796,20 +4759,22 @@ public class TransBean implements Serializable {
                 } catch (NullPointerException npe) {
                 }
                 //Customer Display
-                String PortName = new Parameter_listBean().getParameter_listByContextNameMemory("CUSTOMER_DISPLAY", "COM_PORT_NAME").getParameter_value();
-                String ClientPcName = new GeneralUserSetting().getClientComputerName();
-                String SizeStr = new Parameter_listBean().getParameter_listByContextNameMemory("CUSTOMER_DISPLAY", "MAX_CHARACTERS_PER_LINE").getParameter_value();
-                int Size = 0;
-                if (SizeStr.length() > 0) {
-                    Size = Integer.parseInt(SizeStr);
-                }
-                if (PortName.length() > 0 && ClientPcName.length() > 0 && Size > 0 && (new GeneralUserSetting().getCurrentTransactionTypeId() == 2 || new GeneralUserSetting().getCurrentTransactionTypeId() == 11)) {
-                    //UtilityBean ub = new UtilityBean();
-                    ub.invokeLocalCustomerDisplay(ClientPcName, PortName, Size, ub.formatDoubleToString(trans.getGrandTotal()), "");
+                if (new GeneralUserSetting().getCurrentTransactionTypeId() == 2) {
+                    String PortName = new Parameter_listBean().getParameter_listByContextNameMemory("CUSTOMER_DISPLAY", "COM_PORT_NAME").getParameter_value();
+                    String ClientPcName = new GeneralUserSetting().getClientComputerName();
+                    String SizeStr = new Parameter_listBean().getParameter_listByContextNameMemory("CUSTOMER_DISPLAY", "MAX_CHARACTERS_PER_LINE").getParameter_value();
+                    int Size = 0;
+                    if (SizeStr.length() > 0) {
+                        Size = Integer.parseInt(SizeStr);
+                    }
+                    if (PortName.length() > 0 && ClientPcName.length() > 0 && Size > 0 && (new GeneralUserSetting().getCurrentTransactionTypeId() == 2 || new GeneralUserSetting().getCurrentTransactionTypeId() == 11)) {
+                        //UtilityBean ub = new UtilityBean();
+                        ub.invokeLocalCustomerDisplay(ClientPcName, PortName, Size, ub.formatDoubleToString(trans.getGrandTotal()), "");
+                    }
                 }
             } else {
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Select Valid Draft Sale Record")));
-                this.setActionMessage(ub.translateWordsInText(BaseName, "No Draft Sale Record Loaded"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Select Valid Draft Record")));
+                this.setActionMessage(ub.translateWordsInText(BaseName, "No Draft Record Loaded"));
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -8229,7 +8194,7 @@ public class TransBean implements Serializable {
         try {
             this.TranssDraft.clear();
         } catch (NullPointerException npe) {
-            this.TranssDraft = new ArrayList<Trans>();
+            this.TranssDraft = new ArrayList<>();
         }
         String sql;
         sql = "{call sp_search_transaction_hist_draft_by_user_type(?,?,?,?)}";

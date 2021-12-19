@@ -28,6 +28,7 @@
         <f:viewAction action="#{transBean.initCurrencyCode(9, trans)}"/>
         <f:viewAction action="#{transBean.initTransType(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId)}"/>
         <f:viewAction action="#{utilityBean.clearList(alert_generalBean.alertList)}"/>
+        <f:viewAction action="#{transBean.refreshTranssDraft(generalUserSetting.currentStore.storeId,generalUserSetting.currentUser.userDetailId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId)}"/>
     </f:metadata>
     <f:event listener="#{navigationBean.checkCurrentPage('ITEM RECEIVED','','')}" type="preRenderView" />
     <h:body>
@@ -43,6 +44,28 @@
                 </h:inputText>
                 <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Stock']}↑"/>
                 <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Ledger']}:#{langsys['No.']} #{langsys['effect']}"/>
+            </h:panelGrid>
+
+            <h:panelGrid id="pnlDraft">
+                <h:panelGrid styleClass="clsGridMainHeader" columns="4" style="background-color: red;" rendered="#{transBean.transsDraft.size()>0}">
+                    <h:outputLabel  value="#{langsys['Select']} #{langsys['Draft']}:"/>
+                    <h:selectOneMenu styleClass="clsMenu" id="menuDraft" value="#{trans.transactionHistId}">
+                        <f:selectItem itemValue="0" itemLabel=""/>
+                        <f:selectItems value="#{transBean.transsDraft}" var="dr" itemLabel="#{langsys['No']}:#{dr.transactionHistId} #{langsys['Total']}:#{accJournalBean.returnBalanceString(dr.grandTotal)} #{dr.currencyCode}" itemValue="#{dr.transactionHistId}"/>
+                    </h:selectOneMenu>
+                    <p:commandButton id="cmdbLoadDraft" value="#{langsys['Load']} #{langsys['Draft']}" onclick="PF('statusDialog4').show()" onsuccess="PF('statusDialog4').hide()">
+                        <p:dialog widgetVar="statusDialog4" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                        <p:ajax listener="#{transBean.loadDraftTrans(trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor,transBean.authorisedByUserDetail,transItemBean.selectedAccCoa)}" process="@form" update="pnlHeader gridTransItem pgrdSpecific gridItemStatus dtblTransactionItem pgrdMsgs growl1"/>
+                    </p:commandButton>
+                    <p:commandButton id="cmdbDeleteDraft" value="#{langsys['Delete']} #{langsys['Draft']}" onclick="PF('statusDialog3').show()" onsuccess="PF('statusDialog3').hide()">
+                        <p:dialog widgetVar="statusDialog3" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                        <p:ajax listener="#{transBean.deleteTransFromHist(trans.transactionHistId)}" process="@form" update="pnlDraft pnlHeader gridTransItem pgrdSpecific gridItemStatus dtblTransactionItem pgrdMsgs"/>
+                    </p:commandButton>
+                </h:panelGrid>
             </h:panelGrid>
 
             <h:panelGrid columns="3" id="pnlHeader">
@@ -288,10 +311,16 @@
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
-                        <p:ajax listener="#{transBean.saveTransCEC('PARENT',generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,'',trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,null,transBean.transUserDetail,null,null,null)}" process="@form" update="@this pnlHeader gridTransItem pgrdOverrideWarranty pgrdSpecific gridItemStatus dtblTransactionItem pgrdOthers pgrdMsgs pnlgOutput growl1"/>
+                        <p:ajax listener="#{transBean.saveTransCEC('PARENT',generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,'',trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,null,transBean.transUserDetail,null,null,null)}" process="@form" update="@this pnlDraft pnlHeader gridTransItem pgrdOverrideWarranty pgrdSpecific gridItemStatus dtblTransactionItem pgrdOthers pgrdMsgs pnlgOutput growl1"/>
                     </p:commandButton>
                     <p:commandButton styleClass="clsButtonBig" id="cmdbClear" value="#{langsys['CLEAR']} (ALT+C)" accesskey="c">
                         <p:ajax listener="#{transBean.clearAll2(trans,transItemBean.activeTransItems,transItem,itemBean.selectedItem,transactorBean.selectedTransactor,2,null,transBean.transUserDetail,null,null,null)}" process="@form" update="pnlHeader gridTransItem pgrdOverrideWarranty pgrdSpecific gridItemStatus dtblTransactionItem pgrdOthers pgrdMsgs growl1"/>
+                    </p:commandButton>
+                    <p:commandButton styleClass="clsButtonBig" id="cmdbSaveDraft" value="#{langsys['NEW']} #{langsys['DRAFT']}" accesskey="n" onclick="PF('statusDialog2').show()" onsuccess="PF('statusDialog2').hide()">
+                        <p:dialog widgetVar="statusDialog2" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                        <p:ajax listener="#{transBean.saveDraftTrans(trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,null,userDetailBean.selectedUserDetail,null,transBean.authorisedByUserDetail,transItemBean.selectedAccCoa)}" process="@form" update="pnlDraft pnlHeader gridTransItem pgrdSpecific gridItemStatus dtblTransactionItem pgrdMsgs"/>
                     </p:commandButton>
                 </h:panelGrid>
             </h:panelGrid>
