@@ -47,7 +47,7 @@
                 <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Stock']}:#{menuItemBean.menuItemObj.PURCHASE_INVOICE_MODE eq 1 ? '↑':'No effect. '}"/>
                 <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Ledger']}:#{langsys['Cash']}↓ #{langsys['AP']}↑ #{langsys['INV']}↑"/>
             </h:panelGrid>
-            
+
             <h:panelGrid id="pnlDraft">
                 <h:panelGrid styleClass="clsGridMainHeader" columns="4" style="background-color: red;" rendered="#{transBean.transsDraft.size()>0}">
                     <h:outputLabel  value="#{langsys['Select']} #{langsys['Draft']}:"/>

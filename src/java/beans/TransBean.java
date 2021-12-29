@@ -753,7 +753,10 @@ public class TransBean implements Serializable {
                 ItemMessage3 = new TransItemBean().getAnyItemDeliveryTotalGreaterThanBalance(aActiveTransItems, transtype.getTransactionTypeName());
             } catch (NullPointerException npe) {
             }
-
+            int IsNewTransNoUsed = 0;
+            if (transtype.getTransactionTypeId() == 2 && trans.getTransactionId() == 0 && trans.getTransactionNumber().length() > 0) {
+                IsNewTransNoUsed = new Trans_number_controlBean().getIsTrans_number_used(transtype.getTransactionTypeId(), trans.getTransactionNumber());
+            }
             UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
             List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
             GroupRightBean grb = new GroupRightBean();
@@ -762,6 +765,8 @@ public class TransBean implements Serializable {
                 msg = "Invalid Transaction";
             } else if (trans.getTransactionId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, Integer.toString(transreason.getTransactionReasonId()), "Add") == 0) {
                 msg = "Access Denied";
+            } else if (IsNewTransNoUsed == 1) {
+                msg = "Specify New Transaction Number";
             } else if (!ItemMessage.equals("")) {
                 msg = "Insufficient Stock for Item ##" + ItemMessage;
             } else if (!ItemMessage2.equals("") && "HIRE RETURN NOTE".equals(transtype.getTransactionTypeName())) {
