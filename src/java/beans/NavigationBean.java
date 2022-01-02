@@ -93,7 +93,7 @@ public class NavigationBean implements Serializable {
         httpSession.setAttribute("TRANSACTION_REASON_ID", 108);
         return "ConsumeStockTrans?faces-redirect=true";
     }
-    
+
     public String redirectToStockTake() {
         //update seesion
         FacesContext context = FacesContext.getCurrentInstance();
@@ -1273,7 +1273,7 @@ public class NavigationBean implements Serializable {
     public String redirectToReportConsumeStockDetail() {
         return "ReportConsumeStockDetail?faces-redirect=true";
     }
-    
+
     public String redirectToReportStockTake() {
         return "ReportStockTake?faces-redirect=true";
     }
@@ -1803,6 +1803,20 @@ public class NavigationBean implements Serializable {
 
     public String redirectToReportProdInputOutputDetail() {
         return "ReportProdInputOutput?faces-redirect=true";
+    }
+
+    public String redirectToSubscription() {
+        //update seesion
+        FacesContext context = FacesContext.getCurrentInstance();
+        HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+        HttpSession httpSession = request.getSession(false);
+        httpSession.setAttribute("TRANSACTION_REASON_ID", 129);
+        httpSession.setAttribute("TRANSACTION_TYPE_ID", 85);
+        return "Subscription?faces-redirect=true";
+    }
+
+    public String redirectToSubscriptionCategory() {
+        return "SubscriptionCategory?faces-redirect=true";
     }
 
     /**

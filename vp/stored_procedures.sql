@@ -12791,3 +12791,232 @@ BEGIN
 	SELECT ifnull((select group_concat(concat(t2.transaction_id,',',t2.transaction_comment) separator ':') from transaction_cr_dr_note t2 where t2.transaction_ref=in_transaction_number),'') as cr_dr_flag;
 END//
 DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_insert_subscription_category;
+DELIMITER //
+CREATE PROCEDURE sp_insert_subscription_category
+(
+	IN in_category_name varchar(50),
+	IN in_category_code varchar(50)
+) 
+BEGIN 
+	SET @new_id=0;
+	CALL sp_get_new_id("subscription_category","subscription_category_id",@new_id);
+	INSERT INTO subscription_category
+	(
+		subscription_category_id,
+		category_name,
+		category_code
+	) 
+    VALUES
+	(
+		@new_id,
+		in_category_name,
+		in_category_code
+	); 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_update_subscription_category;
+DELIMITER //
+CREATE PROCEDURE sp_update_subscription_category
+(
+	IN in_subscription_category_id int,
+	IN in_category_name varchar(50),
+	IN in_category_code varchar(50)
+) 
+BEGIN 
+	UPDATE subscription_category SET 
+		category_name=in_category_name,
+		category_code=in_category_code
+	WHERE subscription_category_id=in_subscription_category_id; 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_subscription_category_by_id;
+DELIMITER //
+CREATE PROCEDURE sp_search_subscription_category_by_id
+(
+	IN in_subscription_category_id int
+) 
+BEGIN 
+	SELECT * FROM subscription_category 
+	WHERE subscription_category_id=in_subscription_category_id; 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_subscription_category_by_name;
+DELIMITER //
+CREATE PROCEDURE sp_search_subscription_category_by_name
+(
+	IN in_category_name varchar(50)
+) 
+BEGIN 
+	SELECT * FROM subscription_category 
+	WHERE category_name LIKE concat('%',in_category_name,'%') OR category_code LIKE concat('%',in_category_name,'%')  
+	ORDER BY category_name ASC; 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_subscription_category_by_none;
+DELIMITER //
+CREATE PROCEDURE sp_search_subscription_category_by_none() 
+BEGIN 
+	SELECT * FROM subscription_category 
+	ORDER BY category_name ASC; 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_insert_subscription;
+DELIMITER //
+CREATE PROCEDURE sp_insert_subscription
+(
+	IN in_transactor_id bigint,
+	IN in_subscription_category_id int,
+	IN in_item_id bigint,
+	IN in_description varchar(150),
+	IN in_amount double,
+	IN in_is_recurring varchar(10),
+	IN in_current_status varchar(20),
+	IN in_frequency varchar(20),
+	IN in_subscription_date datetime,
+	IN in_renewal_date datetime,
+	IN in_add_date datetime,
+	IN in_added_by varchar(50),
+	IN in_last_edit_date datetime,
+	IN in_last_edited_by varchar(50),
+	OUT out_subscription_id int
+) 
+BEGIN 
+	SET @new_id=0;
+	CALL sp_get_new_id("subscription","subscription_id",@new_id);
+	set out_subscription_id=@new_id;
+	INSERT INTO subscription
+	(
+		subscription_id,
+		transactor_id,
+		subscription_category_id,
+		item_id,
+		description,
+		amount,
+		is_recurring,
+		current_status,
+		frequency,
+		subscription_date,
+		renewal_date,
+		add_date,
+		added_by,
+		last_edit_date,
+		last_edited_by
+	) 
+    VALUES
+	(
+		@new_id,
+		in_transactor_id,
+		in_subscription_category_id,
+		in_item_id,
+		in_description,
+		in_amount,
+		in_is_recurring,
+		in_current_status,
+		in_frequency,
+		in_subscription_date,
+		in_renewal_date,
+		in_add_date,
+		in_added_by,
+		in_last_edit_date,
+		in_last_edited_by
+	); 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_update_subscription;
+DELIMITER //
+CREATE PROCEDURE sp_update_subscription
+(
+	IN in_subscription_id int,
+	IN in_transactor_id bigint,
+	IN in_subscription_category_id int,
+	IN in_item_id bigint,
+	IN in_description varchar(150),
+	IN in_amount double,
+	IN in_is_recurring varchar(10),
+	IN in_current_status varchar(20),
+	IN in_frequency varchar(20),
+	IN in_subscription_date datetime,
+	IN in_renewal_date datetime,
+	IN in_add_date datetime,
+	IN in_added_by varchar(50),
+	IN in_last_edit_date datetime,
+	IN in_last_edited_by varchar(50)
+) 
+BEGIN 
+	UPDATE subscription SET 
+		transactor_id=in_transactor_id,
+		subscription_category_id=in_subscription_category_id,
+		item_id=in_item_id,
+		description=in_description,
+		amount=in_amount,
+		is_recurring=in_is_recurring,
+		current_status=in_current_status,
+		frequency=in_frequency,
+		subscription_date=in_subscription_date,
+		renewal_date=in_renewal_date,
+		add_date=in_add_date,
+		added_by=in_added_by,
+		last_edit_date=in_last_edit_date,
+		last_edited_by=in_last_edited_by
+	WHERE subscription_id=in_subscription_id; 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_subscription_by_id;
+DELIMITER //
+CREATE PROCEDURE sp_search_subscription_by_id
+(
+	IN in_subscription_id int
+) 
+BEGIN 
+	SELECT * FROM subscription 
+	WHERE subscription_id=in_subscription_id; 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_subscription_by_description_currenstatus_frequency;
+DELIMITER //
+CREATE PROCEDURE sp_search_subscription_by_description_currenstatus_frequency
+(
+	IN in_text varchar(100)
+) 
+BEGIN 
+	SELECT * FROM subscription s 
+	WHERE s.description LIKE concat('%',in_text,'%') OR s.current_status LIKE concat('%',in_text,'%') OR s.frequency LIKE concat('%',in_text,'%') 
+	ORDER BY s.subscription_id ASC LIMIT 20; 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_subscription_by_status_category_renewalrange_recurring;
+DELIMITER //
+CREATE PROCEDURE sp_search_subscription_by_status_category_renewalrange_recurring
+(
+	IN in_current_status varchar(20),
+	IN in_subscription_category_id int,
+	IN in_renewal_date_range int,
+	IN in_is_recurring varchar(10)
+) 
+BEGIN 
+	SELECT * FROM subscription s 
+	WHERE s.current_status=in_current_status AND s.subscription_category_id=in_subscription_category_id AND timestampdiff(MONTH, NOW(),s.renewal_date)=in_renewal_date_range AND s.is_recurring=in_is_recurring 
+	ORDER BY s.subscription_id ASC LIMIT 20; 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_subscription_by_none;
+DELIMITER //
+CREATE PROCEDURE sp_search_subscription_by_none() 
+BEGIN 
+	SELECT * FROM subscription 
+	ORDER BY subscription_id ASC; 
+END//
+DELIMITER ;
+
