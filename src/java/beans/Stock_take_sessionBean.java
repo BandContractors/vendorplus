@@ -3,6 +3,7 @@ package beans;
 import connections.DBConnection;
 import entities.Stocktake_session;
 import entities.CompanySetting;
+import entities.GroupRight;
 import entities.Item;
 import entities.Stocktake_session_item;
 import entities.Store;
@@ -401,34 +402,41 @@ public class Stock_take_sessionBean implements Serializable {
         }
         try {
             if (null != aStocktake_session_item) {
-                Stocktake_session ss = this.getStock_take_session(aStocktake_session_item.getStock_take_session_id());
-                if (aStocktake_session_item.getStock_take_session_item_id() == 0 && null != ss) {
-                    Date dt = new CompanySetting().getCURRENT_SERVER_DATE();
-                    UserDetail userdetail = new GeneralUserSetting().getCurrentUser();
-                    aStocktake_session_item.setAdd_date(dt);
-                    aStocktake_session_item.setAdd_by(userdetail.getUserName());
-                    long savedid = new Stock_take_session_itemBean().insertStock_take_session_item(aStocktake_session_item);
-                    if (savedid > 0) {
-                        aStocktake_session_item.setStock_take_session_item_id(savedid);
-                        //update counted
-                        int c = this.updateAddCounted(aStocktake_session_item.getStock_take_session_id(), 1, dt, userdetail.getUserName());
-                        //1:Save and Adjust, 2:Save Only
-                        if (aStocktake_action == 1) {
-                            //adjust
-                            int adjusted = 0;
-                            //update adjusted
-                            adjusted = new Stock_take_session_itemBean().stockAdjust(aStocktake_session_item, ss.getStore_id(), 84, savedid);
-                            //pending;
-                            if (adjusted == 1) {
-                                new Stock_take_session_itemBean().updateIsAdjusted(savedid, 1);
+                UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
+                List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
+                GroupRightBean grb = new GroupRightBean();
+                if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "128", "Add") == 0) {
+                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Not Allowed to Access this Function")));
+                } else {
+                    Stocktake_session ss = this.getStock_take_session(aStocktake_session_item.getStock_take_session_id());
+                    if (aStocktake_session_item.getStock_take_session_item_id() == 0 && null != ss) {
+                        Date dt = new CompanySetting().getCURRENT_SERVER_DATE();
+                        UserDetail userdetail = new GeneralUserSetting().getCurrentUser();
+                        aStocktake_session_item.setAdd_date(dt);
+                        aStocktake_session_item.setAdd_by(userdetail.getUserName());
+                        long savedid = new Stock_take_session_itemBean().insertStock_take_session_item(aStocktake_session_item);
+                        if (savedid > 0) {
+                            aStocktake_session_item.setStock_take_session_item_id(savedid);
+                            //update counted
+                            int c = this.updateAddCounted(aStocktake_session_item.getStock_take_session_id(), 1, dt, userdetail.getUserName());
+                            //1:Save and Adjust, 2:Save Only
+                            if (aStocktake_action == 1) {
+                                //adjust
+                                int adjusted = 0;
+                                //update adjusted
+                                adjusted = new Stock_take_session_itemBean().stockAdjust(aStocktake_session_item, ss.getStore_id(), 84, savedid);
+                                //pending;
+                                if (adjusted == 1) {
+                                    new Stock_take_session_itemBean().updateIsAdjusted(savedid, 1);
+                                }
                             }
+                            msg = "Saved Successfully";
+                        } else {
+                            msg = "An Error has Occured During the Saving Process";
                         }
-                        msg = "Saved Successfully";
-                    } else {
-                        msg = "An Error has Occured During the Saving Process";
-                    }
-                    if (msg.length() > 0) {
-                        FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+                        if (msg.length() > 0) {
+                            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+                        }
                     }
                 }
             }

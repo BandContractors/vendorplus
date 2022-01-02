@@ -1,11 +1,13 @@
 package beans;
 
 import connections.DBConnection;
+import entities.GroupRight;
 import entities.Item;
 import entities.Subscription;
 import entities.Subscription_category;
 import entities.Subscription_log;
 import entities.Transactor;
+import entities.UserDetail;
 import java.io.Serializable;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -16,11 +18,13 @@ import java.util.Date;
 import java.util.List;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import sessions.GeneralUserSetting;
+import utilities.UtilityBean;
 
 /*
  * To change this template, choose Tools | Templates
@@ -52,6 +56,8 @@ public class SubscriptionBean implements Serializable {
     private int filterRenewalDateRange = 0;
     private String filterRecurring = "";
     private Transactor filterTransactor;
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     public void setSubscriptionFromResultset(Subscription aSubscription, ResultSet aResultSet) {
         try {
@@ -207,25 +213,42 @@ public class SubscriptionBean implements Serializable {
     }
 
     public void saveSubscription(Subscription aSubscription) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
         try {
-            //long status = 0;
-            long status;
-            try {
-                status = this.insertUpdateSubscription(aSubscription);
-            } catch (Exception e) {
-                status = 0;
+            BaseName = getMenuItemBean().getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
+        try {
+            UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
+            List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
+            GroupRightBean grb = new GroupRightBean();
+            String msgV = "";
+            String msgS = "";
+            long status = 0;
+
+            if (aSubscription.getSubscription_id() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "129", "Add") == 0) {
+                msgV = "Not Allowed to Access this Function";
+            } else if (aSubscription.getSubscription_id() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "129", "Edit") == 0) {
+                msgV = "Not Allowed to Access this Function";
             }
-            if (status > 0) {
-                this.setActionMessage("Saved Successfully");
-                this.clearSubscription(aSubscription);
-                this.getFilteredSubscriptions();
+            if (msgV.length() > 0) {
+                this.setActionMessage(ub.translateWordsInText(BaseName, msgV));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msgV)));
             } else {
-                this.setActionMessage("Subscription NOT saved");
+                status = this.insertUpdateSubscription(aSubscription);
+                if (status > 0) {
+                    msgS = "Saved Successfully";
+                    this.clearSubscription(aSubscription);
+                    this.getFilteredSubscriptions();
+                } else {
+                    msgS = "Subscription Not Saved";
+                }
+                this.setActionMessage(ub.translateWordsInText(BaseName, msgS));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msgS)));
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
-            this.setActionMessage("Subscription NOT saved");
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("Subscription NOT saved!"));
         }
     }
 
@@ -242,26 +265,18 @@ public class SubscriptionBean implements Serializable {
                 Connection conn = DBConnection.getMySQLConnection();
                 CallableStatement cs = conn.prepareCall(sql);) {
             if (aSubscription.getSubscription_id() == 0) {
-                //cs.setLong(1, aSubscription.getTransactor_id());
                 cs.setLong(1, this.selectedTransactor.getTransactorId());
-                //cs.setInt(2, aSubscription.getSubscription_category_id());
                 cs.setInt(2, this.selectedSubscriptionCategory.getSubscription_category_id());
-                //cs.setLong(3, aSubscription.getItem_id());
                 cs.setLong(3, this.selectedItem.getItemId());
                 cs.setString(4, aSubscription.getDescription());
                 cs.setDouble(5, aSubscription.getAmount());
                 cs.setString(6, aSubscription.getIs_recurring());
                 cs.setString(7, aSubscription.getCurrent_status());
                 cs.setString(8, aSubscription.getFrequency());
-                //cs.setDate(9, new java.sql.Date(aSubscription.getSubscription_date().getTime()));
                 cs.setTimestamp(9, new java.sql.Timestamp(aSubscription.getSubscription_date().getTime()));
-                //cs.setDate(10, new java.sql.Date(aSubscription.getRenewal_date().getTime()));
                 cs.setTimestamp(10, new java.sql.Timestamp(aSubscription.getRenewal_date().getTime()));
-                //cs.setDate(11, new java.sql.Date(aSubscription.getAdd_date().getTime()));
                 cs.setTimestamp(11, new java.sql.Timestamp(new java.util.Date().getTime()));
-                //cs.setString(12, aSubscription.getAdded_by());
                 cs.setString(12, new GeneralUserSetting().getCurrentUser().getUserName());
-                //cs.setDate(13, new java.sql.Date(aSubscription.getLast_edit_date().getTime()));
                 cs.setDate(13, null);
                 cs.setString(14, aSubscription.getLast_edited_by());
                 cs.setInt(15, returnedSubscriptionId);
@@ -276,25 +291,18 @@ public class SubscriptionBean implements Serializable {
 
             } else if (aSubscription.getSubscription_id() > 0) {
                 cs.setInt(1, aSubscription.getSubscription_id());
-                //cs.setLong(2, aSubscription.getTransactor_id());
                 cs.setLong(2, this.selectedTransactor.getTransactorId());
-                //cs.setInt(3, aSubscription.getSubscription_category_id());
                 cs.setInt(3, this.selectedSubscriptionCategory.getSubscription_category_id());
-                //cs.setLong(4, aSubscription.getItem_id());
                 cs.setLong(4, this.selectedItem.getItemId());
                 cs.setString(5, aSubscription.getDescription());
                 cs.setDouble(6, aSubscription.getAmount());
                 cs.setString(7, aSubscription.getIs_recurring());
                 cs.setString(8, aSubscription.getCurrent_status());
                 cs.setString(9, aSubscription.getFrequency());
-                //cs.setDate(10, new java.sql.Date(aSubscription.getSubscription_date().getTime()));
                 cs.setTimestamp(10, new java.sql.Timestamp(aSubscription.getSubscription_date().getTime()));
-                //cs.setDate(11, new java.sql.Date(aSubscription.getRenewal_date().getTime()));
                 cs.setTimestamp(11, new java.sql.Timestamp(aSubscription.getRenewal_date().getTime()));
-                //cs.setDate(12, new java.sql.Date(aSubscription.getAdd_date().getTime()));
                 cs.setTimestamp(12, new java.sql.Timestamp(new java.util.Date().getTime()));
                 cs.setString(13, aSubscription.getAdded_by());
-                //cs.setDate(14, new java.sql.Date(aSubscription.getLast_edit_date().getTime()));
                 cs.setTimestamp(14, new java.sql.Timestamp(new java.util.Date().getTime()));
                 cs.setString(15, new GeneralUserSetting().getCurrentUser().getUserName());
                 cs.executeUpdate();
@@ -772,5 +780,19 @@ public class SubscriptionBean implements Serializable {
      */
     public void setSubscriptionsSummary(List<Subscription> subscriptionsSummary) {
         this.subscriptionsSummary = subscriptionsSummary;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 }

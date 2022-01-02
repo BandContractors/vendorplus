@@ -82,6 +82,8 @@
                             <f:facet name="header">#{langout['Item']} #{langout['Description']}</f:facet>
                             <!-- row record -->
                             <h:outputLabel value="#{transItemBean.showItemDescriptionCEC(ti2)}" escape="false" />
+                            <h:outputLabel style="font-size: 10px;" value=" BN:#{ti.batchno}" escape="false" rendered="#{ti.batchno.length() gt 0 and parameter_listBean.getParameter_listByContextNameMemory('INVOICE','SHOW_BATCH_ON_PRINTOUT').parameter_value eq '1'}"/>
+                            <h:outputLabel style="font-size: 10px;" value=" ED:#{utilityBean.formatDate(ti.itemExpryDate)}" escape="false" rendered="#{ti.itemExpryDate.toString().length() gt 0 and parameter_listBean.getParameter_listByContextNameMemory('INVOICE','SHOW_BATCH_ON_PRINTOUT').parameter_value eq '1'}"/>
                         </p:column>
 
                         <p:column>

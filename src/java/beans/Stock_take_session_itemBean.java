@@ -2,6 +2,7 @@ package beans;
 
 import connections.DBConnection;
 import entities.CompanySetting;
+import entities.GroupRight;
 import entities.Item;
 import entities.Stock;
 import entities.Stocktake_session;
@@ -276,26 +277,33 @@ public class Stock_take_session_itemBean implements Serializable {
         }
         try {
             if (null != aStocktake_session_item) {
-                Stocktake_session ss = new Stock_take_sessionBean().getStock_take_session(aStocktake_session_item.getStock_take_session_id());
-                if (null != ss) {
-                    Date dt = new CompanySetting().getCURRENT_SERVER_DATE();
-                    UserDetail userdetail = new GeneralUserSetting().getCurrentUser();
-                    aStocktake_session_item.setAdd_date(dt);
-                    aStocktake_session_item.setAdd_by(userdetail.getUserName());
-                    long saveflag = this.stockAdjust(aStocktake_session_item, ss.getStore_id(), 84, aStocktake_session_item.getStock_take_session_item_id());
-                    if (saveflag > 0) {
-                        //update is adjusted
-                        int adjustflag = this.updateIsAdjusted(aStocktake_session_item.getStock_take_session_item_id(), 1);
-                        //refresh report
-                        if (adjustflag == 1) {
-                            aStocktake_session_item.setQty_diff_adjusted(1);
+                UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
+                List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
+                GroupRightBean grb = new GroupRightBean();
+                if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "128", "Add") == 0) {
+                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Not Allowed to Access this Function")));
+                } else {
+                    Stocktake_session ss = new Stock_take_sessionBean().getStock_take_session(aStocktake_session_item.getStock_take_session_id());
+                    if (null != ss) {
+                        Date dt = new CompanySetting().getCURRENT_SERVER_DATE();
+                        UserDetail userdetail = new GeneralUserSetting().getCurrentUser();
+                        aStocktake_session_item.setAdd_date(dt);
+                        aStocktake_session_item.setAdd_by(userdetail.getUserName());
+                        long saveflag = this.stockAdjust(aStocktake_session_item, ss.getStore_id(), 84, aStocktake_session_item.getStock_take_session_item_id());
+                        if (saveflag > 0) {
+                            //update is adjusted
+                            int adjustflag = this.updateIsAdjusted(aStocktake_session_item.getStock_take_session_item_id(), 1);
+                            //refresh report
+                            if (adjustflag == 1) {
+                                aStocktake_session_item.setQty_diff_adjusted(1);
+                            }
+                            msg = "Stock Adjusted Successfully";
+                        } else {
+                            msg = "An Error has Occured During the Saving Process";
                         }
-                        msg = "Stock Adjusted Successfully";
-                    } else {
-                        msg = "An Error has Occured During the Saving Process";
-                    }
-                    if (msg.length() > 0) {
-                        FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+                        if (msg.length() > 0) {
+                            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+                        }
                     }
                 }
             }

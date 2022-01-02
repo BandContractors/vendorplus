@@ -181,7 +181,7 @@
                 </p:column>
 
             </p:dataTable>
-            <p:dialog rendered="true" dynamic="true" header="Subscription Form" widgetVar="dlgSubscription" id="modalSubscription" modal="true" height="425px">
+            <p:dialog rendered="true" dynamic="true" header="#{langsys['Subscription']} #{langsys['Detail']}" widgetVar="dlgSubscription" id="modalSubscription" modal="true" height="425px">
                 <h:panelGroup id="popup">
                     <!--<h:outputText value="This is a Modal Dialog." />-->
                     <h:panelGrid columns="4">
@@ -303,7 +303,7 @@
 
                     <h:panelGrid styleClass="clsGridMainCommands" columns="1">
                         <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
-                            <p:commandButton update="tblSummary form:popup form:dtblSubscription" actionListener="#{subscriptionBean.saveSubscription(subscription)}" styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['SAVE']}" style="color: white; background-color: #00B259" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                            <p:commandButton update="tblSummary form:popup form:dtblSubscription form:growl1" actionListener="#{subscriptionBean.saveSubscription(subscription)}" styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['SAVE']}" style="color: white; background-color: #00B259" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                                 <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                                     <p:graphicImage name="/images/ajax-loader.gif"/>
                                 </p:dialog>
@@ -317,7 +317,7 @@
                         <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{subscriptionBean.actionMessage}"/>
                         <h:messages id="msgsMainMessage" style="color: red"/><br/>
                     </h:panelGrid>
-                    <p:growl/>
+                    <p:growl id="growl1"/>
 
                 </h:panelGroup>
             </p:dialog>

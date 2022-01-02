@@ -9,3 +9,8 @@ create table subscription_log (subscription_log_id bigint(20) not null auto_incr
 
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_16',10,Now(),'6.0','');
+
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (88, 'INVOICE', 'SHOW_BATCH_ON_PRINTOUT', '1','1:Shows Batch Number (BN) and Expiry Date (ED) for the item on the sales invoice print out, 0:Do not show');
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_16',15,Now(),'6.0','');
