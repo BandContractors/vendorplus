@@ -226,7 +226,13 @@ public class InvoiceBean implements Serializable {
             //Leave empty if raising an invoice/receipt. For debit notes, populate the invoiceId that was returned against the original invoice/receipt.
             basicInformation.setInvoiceType(Integer.toString(1));//1:invoice 4: debit note
             basicInformation.setInvoiceKind(Integer.toString(1));//1:invoice 2: receipt
-            basicInformation.setDataSource(Integer.toString(103));//101:EFD 102:Windows Client APP 103:WebService API 104:Mis 105:Webportal 106:Offline Mode Enabler
+            String APIMode = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_MODE").getParameter_value();
+            //101:EFD, 102:Windows Client APP, 103:WebService API, 104:Mis, 105:Webportal, 106:Offline Mode Enabler
+            if (APIMode.equals("OFFLINE")) {
+                basicInformation.setDataSource(Integer.toString(106));
+            } else {
+                basicInformation.setDataSource(Integer.toString(103));
+            }
             //basicInformation.setIssuedDate(new UtilityBean().formatDateServer(trans.getTransactionDate()));
             basicInformation.setIssuedDate(new UtilityBean().formatDateTimeServer(trans.getAddDate()));
             try {
@@ -540,6 +546,7 @@ public class InvoiceBean implements Serializable {
             String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", basicInformation.getDeviceNo(), "T109", sellerDetails.getTin());
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             output = response.getEntity(String.class);
+            //System.out.println("PostData:" + PostData);
             //System.out.println("output:" + output);
 
             JSONObject parentjsonObject = new JSONObject(output);
@@ -1205,7 +1212,12 @@ public class InvoiceBean implements Serializable {
             //basicInformation.setInvoiceNo(trans.getTransactionNumber()); //Leave empty if raising an invoice/receipt. For debit notes, populate the invoiceId that was returned against the original invoice/receipt.
             basicInformation.setInvoiceType(Integer.toString(4));//1:invoice 4: debit note
             basicInformation.setInvoiceKind(Integer.toString(1));//1:invoice 2: receipt
-            basicInformation.setDataSource(Integer.toString(103));//101:EFD 102:Windows Client APP 103:WebService API
+            //101:EFD, 102:Windows Client APP, 103:WebService API, 104:Mis, 105:Webportal, 106:Offline Mode Enabler
+            if (APIMode.equals("OFFLINE")) {
+                basicInformation.setDataSource(Integer.toString(106));
+            } else {
+                basicInformation.setDataSource(Integer.toString(103));
+            }
             basicInformation.setIssuedDate(new UtilityBean().formatDateTimeServer(trans.getAddDate()));
             try {
                 basicInformation.setOperator(new UserDetailBean().getUserDetail(trans.getTransactionUserDetailId()).getUserName());
