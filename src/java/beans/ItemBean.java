@@ -1730,7 +1730,7 @@ public class ItemBean implements Serializable {
     public List<Item> getItemObjectListForSale_old(String Query) {
         this.setTypedItemCode(Query);
         String sql;
-        sql = "{call sp_search_item_for_sale(?)}";
+        sql = "{call sp_search_item_for_sale_old(?)}";
         ResultSet rs = null;
         this.setItemObjectList(new ArrayList<>());
         try (

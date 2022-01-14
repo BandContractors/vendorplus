@@ -18,6 +18,9 @@ public class Subscription implements Serializable {
     private String is_recurring;
     private String current_status;
     private String frequency;
+    private double unit_price;
+    private double qty;
+    private String agent;
     private Date subscription_date;
     private Date renewal_date;
     private Date add_date;
@@ -233,5 +236,47 @@ public class Subscription implements Serializable {
      */
     public void setLast_edited_by(String last_edited_by) {
         this.last_edited_by = last_edited_by;
+    }
+
+    /**
+     * @return the unit_price
+     */
+    public double getUnit_price() {
+        return unit_price;
+    }
+
+    /**
+     * @param unit_price the unit_price to set
+     */
+    public void setUnit_price(double unit_price) {
+        this.unit_price = unit_price;
+    }
+
+    /**
+     * @return the qty
+     */
+    public double getQty() {
+        return qty;
+    }
+
+    /**
+     * @param qty the qty to set
+     */
+    public void setQty(double qty) {
+        this.qty = qty;
+    }
+
+    /**
+     * @return the agent
+     */
+    public String getAgent() {
+        return agent;
+    }
+
+    /**
+     * @param agent the agent to set
+     */
+    public void setAgent(String agent) {
+        this.agent = agent;
     }
 }

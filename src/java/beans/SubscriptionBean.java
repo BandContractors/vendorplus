@@ -14,6 +14,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.faces.application.FacesMessage;
@@ -107,6 +108,21 @@ public class SubscriptionBean implements Serializable {
                 aSubscription.setFrequency("");
             }
             try {
+                aSubscription.setUnit_price(aResultSet.getDouble("unit_price"));
+            } catch (Exception e) {
+                aSubscription.setUnit_price(0);
+            }
+            try {
+                aSubscription.setQty(aResultSet.getDouble("qty"));
+            } catch (Exception e) {
+                aSubscription.setQty(0);
+            }
+            try {
+                aSubscription.setAgent(aResultSet.getString("agent"));
+            } catch (Exception e) {
+                aSubscription.setAgent("");
+            }
+            try {
                 //aSubscription.setSubscription_date(aResultSet.getDate("subscription_date"));
                 aSubscription.setSubscription_date(new Date(aResultSet.getTimestamp("subscription_date").getTime()));
             } catch (Exception e) {
@@ -155,8 +171,22 @@ public class SubscriptionBean implements Serializable {
             SubscriptionTo.setDescription(SubscriptionFrom.getDescription());
             SubscriptionTo.setAmount(SubscriptionFrom.getAmount());
             SubscriptionTo.setIs_recurring(SubscriptionFrom.getIs_recurring());
-            SubscriptionTo.setCurrent_status(SubscriptionFrom.getCurrent_status());
+            if ("Opted Out".equals(SubscriptionFrom.getCurrent_status())) {
+                SubscriptionTo.setCurrent_status(SubscriptionFrom.getCurrent_status());
+            } else if (SubscriptionFrom.getRenewal_date() == null) {
+                SubscriptionTo.setCurrent_status("Active");
+            } else {
+                if (SubscriptionFrom.getRenewal_date().after(new Date()) || SubscriptionFrom.getRenewal_date().equals(new Date())) {
+                    SubscriptionTo.setCurrent_status("Active");
+                } else {
+                    SubscriptionTo.setCurrent_status("Expired");
+                }
+            }
+            //SubscriptionTo.setCurrent_status(SubscriptionFrom.getCurrent_status());
             SubscriptionTo.setFrequency(SubscriptionFrom.getFrequency());
+            SubscriptionTo.setUnit_price(SubscriptionFrom.getUnit_price());
+            SubscriptionTo.setQty(SubscriptionFrom.getQty());
+            SubscriptionTo.setAgent(SubscriptionFrom.getAgent());
             SubscriptionTo.setSubscription_date(SubscriptionFrom.getSubscription_date());
             SubscriptionTo.setRenewal_date(SubscriptionFrom.getRenewal_date());
             SubscriptionTo.setAdd_date(SubscriptionFrom.getAdd_date());
@@ -183,6 +213,9 @@ public class SubscriptionBean implements Serializable {
                 aSubscription.setIs_recurring("");
                 aSubscription.setCurrent_status("");
                 aSubscription.setFrequency("");
+                aSubscription.setUnit_price(0);
+                aSubscription.setQty(0);
+                aSubscription.setAgent("");
                 aSubscription.setSubscription_date(null);
                 aSubscription.setRenewal_date(null);
                 aSubscription.setAdd_date(null);
@@ -207,6 +240,50 @@ public class SubscriptionBean implements Serializable {
             this.setFilterRecurring("");
             //this.getSubscriptionsByDescriptionCurrentStatusFrequency(this.SearchSubscriptionNames);
             this.getFilteredSubscriptions();
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void setExpiryDate(Subscription aSubscription) {
+        try {
+            if (aSubscription.getSubscription_date() != null) {
+                Calendar c = Calendar.getInstance();
+                c.setTime(aSubscription.getSubscription_date());
+                if ("No".equals(aSubscription.getIs_recurring())) {
+                    aSubscription.setRenewal_date(null);
+                } else if ("Weekly".equals(aSubscription.getFrequency())) {
+                    c.add(Calendar.DAY_OF_MONTH, 7);
+                    aSubscription.setRenewal_date(c.getTime());
+                } else if ("Monthly".equals(aSubscription.getFrequency())) {
+                    c.add(Calendar.MONTH, 1);
+                    aSubscription.setRenewal_date(c.getTime());
+                } else if ("Yearly".equals(aSubscription.getFrequency())) {
+                    c.add(Calendar.YEAR, 1);
+                    aSubscription.setRenewal_date(c.getTime());
+                } else {
+                    c.add(Calendar.DAY_OF_MONTH, 7);
+                    aSubscription.setRenewal_date(c.getTime());
+                }
+                //aSubscription.setRenewal_date(c.getTime());
+                this.setCurrentStatus(aSubscription);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void setCurrentStatus(Subscription aSubscription) {
+        try {
+            if (aSubscription.getRenewal_date() == null) {
+                aSubscription.setCurrent_status("Active");
+            } else {
+                if (aSubscription.getRenewal_date().after(new Date()) || aSubscription.getRenewal_date().equals(new Date())) {
+                    aSubscription.setCurrent_status("Active");
+                } else {
+                    aSubscription.setCurrent_status("Expired");
+                }
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -252,14 +329,58 @@ public class SubscriptionBean implements Serializable {
         }
     }
 
+    public void optOut(Subscription aSubscription) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
+        try {
+            BaseName = getMenuItemBean().getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
+        try {
+            UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
+            List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
+            GroupRightBean grb = new GroupRightBean();
+            String msgV = "";
+            String msgS = "";
+            long status = 0;
+
+            if (aSubscription.getSubscription_id() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "129", "Add") == 0) {
+                msgV = "Not Allowed to Access this Function";
+            } else if (aSubscription.getSubscription_id() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "129", "Edit") == 0) {
+                msgV = "Not Allowed to Access this Function";
+            }
+            if (msgV.length() > 0) {
+                this.setActionMessage(ub.translateWordsInText(BaseName, msgV));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msgV)));
+            } else {
+                aSubscription.setCurrent_status("Opted Out");
+                this.selectedTransactor = new TransactorBean().findTransactor(aSubscription.getTransactor_id());
+                this.selectedSubscriptionCategory = new SubscriptionCategoryBean().getSubscriptionCategory(aSubscription.getSubscription_category_id());
+                this.selectedItem = new ItemBean().findItem(aSubscription.getItem_id());
+                status = this.insertUpdateSubscription(aSubscription);
+                if (status > 0) {
+                    msgS = "Saved Successfully";
+                    this.clearSubscription(aSubscription);
+                    this.getFilteredSubscriptions();
+                } else {
+                    msgS = "Subscription Not Saved";
+                }
+                this.setActionMessage(ub.translateWordsInText(BaseName, msgS));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msgS)));
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public long insertUpdateSubscription(Subscription aSubscription) {
         String sql = null;
         long status = 0;
         int returnedSubscriptionId = 0;
         if (aSubscription.getSubscription_id() == 0) {
-            sql = "{call sp_insert_subscription(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_insert_subscription(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         } else if (aSubscription.getSubscription_id() > 0) {
-            sql = "{call sp_update_subscription(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_update_subscription(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         }
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -272,19 +393,30 @@ public class SubscriptionBean implements Serializable {
                 cs.setDouble(5, aSubscription.getAmount());
                 cs.setString(6, aSubscription.getIs_recurring());
                 cs.setString(7, aSubscription.getCurrent_status());
-                cs.setString(8, aSubscription.getFrequency());
-                cs.setTimestamp(9, new java.sql.Timestamp(aSubscription.getSubscription_date().getTime()));
-                cs.setTimestamp(10, new java.sql.Timestamp(aSubscription.getRenewal_date().getTime()));
-                cs.setTimestamp(11, new java.sql.Timestamp(new java.util.Date().getTime()));
-                cs.setString(12, new GeneralUserSetting().getCurrentUser().getUserName());
-                cs.setDate(13, null);
-                cs.setString(14, aSubscription.getLast_edited_by());
-                cs.setInt(15, returnedSubscriptionId);
+                if ("No".equals(aSubscription.getIs_recurring())) {
+                    cs.setString(8, null);
+                } else {
+                    cs.setString(8, aSubscription.getFrequency());
+                }
+                cs.setDouble(9, aSubscription.getUnit_price());
+                cs.setDouble(10, aSubscription.getQty());
+                cs.setString(11, aSubscription.getAgent());
+                cs.setTimestamp(12, new java.sql.Timestamp(aSubscription.getSubscription_date().getTime()));
+                if ("No".equals(aSubscription.getIs_recurring())) {
+                    cs.setTimestamp(13, null);
+                } else {
+                    cs.setTimestamp(13, new java.sql.Timestamp(aSubscription.getRenewal_date().getTime()));
+                }
+                cs.setTimestamp(14, new java.sql.Timestamp(new java.util.Date().getTime()));
+                cs.setString(15, new GeneralUserSetting().getCurrentUser().getUserName());
+                cs.setDate(16, null);
+                cs.setString(17, aSubscription.getLast_edited_by());
+                cs.setInt(18, returnedSubscriptionId);
 
                 cs.executeUpdate();
                 status = 1;
                 //get Id of newly inserted subscription
-                returnedSubscriptionId = cs.getInt(15);
+                returnedSubscriptionId = cs.getInt(18);
 
                 //save subscription log
                 this.saveSubscriptionLog(returnedSubscriptionId, "Subscribed");
@@ -298,13 +430,24 @@ public class SubscriptionBean implements Serializable {
                 cs.setDouble(6, aSubscription.getAmount());
                 cs.setString(7, aSubscription.getIs_recurring());
                 cs.setString(8, aSubscription.getCurrent_status());
-                cs.setString(9, aSubscription.getFrequency());
-                cs.setTimestamp(10, new java.sql.Timestamp(aSubscription.getSubscription_date().getTime()));
-                cs.setTimestamp(11, new java.sql.Timestamp(aSubscription.getRenewal_date().getTime()));
-                cs.setTimestamp(12, new java.sql.Timestamp(new java.util.Date().getTime()));
-                cs.setString(13, aSubscription.getAdded_by());
-                cs.setTimestamp(14, new java.sql.Timestamp(new java.util.Date().getTime()));
-                cs.setString(15, new GeneralUserSetting().getCurrentUser().getUserName());
+                if ("No".equals(aSubscription.getIs_recurring())) {
+                    cs.setString(9, null);
+                } else {
+                    cs.setString(9, aSubscription.getFrequency());
+                }
+                cs.setDouble(10, aSubscription.getUnit_price());
+                cs.setDouble(11, aSubscription.getQty());
+                cs.setString(12, aSubscription.getAgent());
+                cs.setTimestamp(13, new java.sql.Timestamp(aSubscription.getSubscription_date().getTime()));
+                if ("No".equals(aSubscription.getIs_recurring())) {
+                    cs.setTimestamp(14, null);
+                } else {
+                    cs.setTimestamp(14, new java.sql.Timestamp(aSubscription.getRenewal_date().getTime()));
+                }
+                cs.setTimestamp(15, new java.sql.Timestamp(new java.util.Date().getTime()));
+                cs.setString(16, aSubscription.getAdded_by());
+                cs.setTimestamp(17, new java.sql.Timestamp(new java.util.Date().getTime()));
+                cs.setString(18, new GeneralUserSetting().getCurrentUser().getUserName());
                 cs.executeUpdate();
                 status = 1;
 
