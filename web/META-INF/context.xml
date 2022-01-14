@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context antiJARLocking="true" path="/SM">
     <Resource auth="Container" driverClassName="com.mysql.jdbc.Driver" initialSize="5" logAbandoned="false" 
-        maxActive="100" maxIdle="30" maxWait="10000" minEvictableIdleTimeMillis="60000" minIdle="5" 
-        name="jdbc/BranchPool" password="WTLura456" poolPreparedStatements="true" removeAbandoned="true" 
-        removeAbandonedTimeout="300" testOnBorrow="true" testOnReturn="false" testWhileIdle="true" timeBetweenEvictionRunsMillis="30000" 
-        type="javax.sql.DataSource" url="jdbc:mysql://localhost:3306/wingerso_sm_branch?autoReconnect=true" 
-        username="root" validationQuery="SELECT 1" validationQueryTimeout="5"
-        jmxEnabled="true" jdbcInterceptors="org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer"
+              maxActive="100" maxIdle="30" maxWait="10000" minEvictableIdleTimeMillis="60000" minIdle="5" 
+              name="jdbc/BranchPool" password="WTLura456" poolPreparedStatements="true" removeAbandoned="true" 
+              removeAbandonedTimeout="300" testOnBorrow="true" testOnReturn="false" testWhileIdle="true" timeBetweenEvictionRunsMillis="30000" 
+              type="javax.sql.DataSource" url="jdbc:mysql://localhost:3306/wingerso_sm_branch?autoReconnect=true" 
+              username="root" validationQuery="SELECT 1" validationQueryTimeout="5"
+              jmxEnabled="true" jdbcInterceptors="org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer"
     />
 </Context>

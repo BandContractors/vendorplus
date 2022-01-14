@@ -93,6 +93,10 @@
                             <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.trans.deliveryAddress}" rendered="#{generalUserSetting.outputDetailParent.trans.deliveryAddress.length()>0}"/>
                         </h:panelGrid>
 
+                        <h:panelGrid style="width: 290px; margin: 0px;" columns="2" rendered="#{generalUserSetting.outputDetailParent.trans.transactor_rep.length() gt 0}">
+                            <h:outputLabel style="font-size: 12px;" value="#{langsys['Attention']}: #{generalUserSetting.outputDetailParent.trans.transactor_rep}"/>
+                        </h:panelGrid>
+
                         <h:panelGrid id="IpgrdSalesInvoiceItems">
                             <h:dataTable id="IdtblSalesInvoiceItems" value="#{generalUserSetting.outputDetailParent.trans_items}" var="ti" 
                                          styleClass="cls-table-SalesInvoice-very-small" 

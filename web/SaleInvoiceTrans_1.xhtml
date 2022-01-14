@@ -92,7 +92,7 @@
                     <h:outputLabel  value="#{langsys[transBean.transTypeObj.transactionRefLabel]}"/>
                     <h:outputLabel id="olblDebtCredit" style="color: coral;font-weight: bold;" value="#{langsys['Receivable']}(#{generalUserSetting.LOCAL_CURRENCY.currencyCode})"/>
                     <h:outputLabel id="olblDeposit" style="color: green;font-weight: bold;" value="#{langsys['Deposit']}(#{trans.currencyCode})"/>
-                    <h:outputLabel value=""/>
+                    <p:commandLink onclick="PF('dlgTransNo').show();" value="TN" title="#{langsys['Transaction']} #{langsys['Number']}"/>
                     <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}" style="width: 120px;height: 24px;"/>
                     <p:calendar styleClass="clsInput" id="calTransactionDate" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.transactionDate}" pattern="#{companySetting.getDateFormat()}" size="8" disabled="#{generalUserSetting.isAllowedToBackDate==0}"/>
                     <h:selectOneMenu styleClass="clsMenu" id="menuCurrency" value="#{trans.currencyCode}" style="width: 80px;height: 30px;">
@@ -137,7 +137,7 @@
                     <h:inputText disabled="true" style="color: green;font-weight: bold;width: 130px;;height: 24px;" styleClass="clsInput" id="itxtPrepaidAcc" value="#{accJournalBean.returnBalanceString(trans.deposit_customer)}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
-                    <p:commandLink onclick="PF('dlgMore').show();" value="M" title="#{langsys['More']} #{langsys['Detail']} (#{langsys['Representative']}, #{langsys[transBean.transTypeObj.transactionNumberLabel]}, #{langsys['Terms']} #{langsys['and']} #{langsys['Conditions']})"/>
+                    <p:commandLink onclick="PF('dlgTCs').show();" value="TC" title="#{langsys['Terms']} #{langsys['and']} #{langsys['Conditions']}"/>
                 </h:panelGrid>
             </h:panelGrid>
             <h:panelGrid id="gridTransItem" styleClass="clsGridMainInput" columns="11">
@@ -498,16 +498,19 @@
                         </p:commandButton>
                     </h:panelGrid>
                 </p:dialog>
-                <p:dialog header="#{langsys['More']} #{langsys['Detail']}" widgetVar="dlgMore" modal="true" height="180">
-                    <h:panelGrid columns="2">
-                        <p:outputLabel value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]} #{langsys['Representative']} (#{langsys['Attention']})"/>
-                        <p:inputText id="itxtRep" value="#{trans.transactor_rep}" autocomplete="off" style="width: 220px;height: 25px;"/>
-                        <p:outputLabel value="#{langsys[transBean.transTypeObj.transactionNumberLabel]}"/>
-                        <p:inputText id="itxtTransNo" value="#{trans.transactionNumber}" autocomplete="off" style="width: 220px;height: 25px;"/>
+                <p:dialog header="#{langsys['Specify']} #{langsys['Terms']} #{langsys['and']} #{langsys['Conditions']}" widgetVar="dlgTCs" modal="true" height="150">
+                    <h:panelGrid columns="1">
                         <p:outputLabel value="#{langsys['Terms']} #{langsys['and']} #{langsys['Conditions']}"/>
-                        <h:inputTextarea styleClass="clsInput" id="itxaTermsConditions" rows="2" cols="26" value="#{trans.termsConditions}"/>
-                        <p:outputLabel value=""/>
-                        <p:commandButton value="OK"  oncomplete="PF('dlgMore').hide()" style="width: 230px;height: 40px;">
+                        <h:inputTextarea styleClass="clsInput" id="itxaTermsConditions" rows="3" cols="35" value="#{trans.termsConditions}"/>
+                        <p:commandButton value="OK"  oncomplete="PF('dlgTCs').hide()" style="width: 303px;height: 40px;">
+                        </p:commandButton>
+                    </h:panelGrid>
+                </p:dialog>
+                <p:dialog header="#{langsys['Specify']} #{langsys['Transaction']} #{langsys['Number']}" widgetVar="dlgTransNo" modal="true" height="150">
+                    <h:panelGrid columns="1">
+                        <p:outputLabel value="#{langsys[transBean.transTypeObj.transactionNumberLabel]}"/>
+                        <p:inputText id="itxtTransNo" value="#{trans.transactionNumber}" autocomplete="off" style="width: 200px;height: 25px;"/>
+                        <p:commandButton value="OK"  oncomplete="PF('dlgTransNo').hide()" style="width: 210px;height: 40px;">
                         </p:commandButton>
                     </h:panelGrid>
                 </p:dialog>
