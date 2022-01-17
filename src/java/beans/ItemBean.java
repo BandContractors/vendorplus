@@ -1577,7 +1577,12 @@ public class ItemBean implements Serializable {
         }
         //code
         if (menuItemBean.getMenuItemObj().getITEM_CODE_ERROR_ON() == 1) {
-            sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            //sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            if (Query.length() > 1) {
+                sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            } else {
+                sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' ";
+            }
         } else {
             sqlCode = " i.item_code='" + Query + "' ";
         }
@@ -1656,7 +1661,12 @@ public class ItemBean implements Serializable {
         }
         //code
         if (menuItemBean.getMenuItemObj().getITEM_CODE_ERROR_ON() == 1) {
-            sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            //sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            if (Query.length() > 1) {
+                sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            } else {
+                sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' ";
+            }
         } else {
             sqlCode = " i.item_code='" + Query + "' ";
         }
@@ -1769,7 +1779,12 @@ public class ItemBean implements Serializable {
         }
         //code
         if (menuItemBean.getMenuItemObj().getITEM_CODE_ERROR_ON() == 1) {
-            sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            //sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            if (Query.length() > 1) {
+                sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            } else {
+                sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' ";
+            }
         } else {
             sqlCode = " i.item_code='" + Query + "' ";
         }
@@ -1869,7 +1884,12 @@ public class ItemBean implements Serializable {
         }
         //code
         if (menuItemBean.getMenuItemObj().getITEM_CODE_ERROR_ON() == 1) {
-            sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            //sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            if (Query.length() > 1) {
+                sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            } else {
+                sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' ";
+            }
         } else {
             sqlCode = " i.item_code='" + Query + "' ";
         }
@@ -1970,7 +1990,12 @@ public class ItemBean implements Serializable {
         }
         //code
         if (menuItemBean.getMenuItemObj().getITEM_CODE_ERROR_ON() == 1) {
-            sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            //sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            if (Query.length() > 1) {
+                sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            } else {
+                sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' ";
+            }
         } else {
             sqlCode = " i.item_code='" + Query + "' ";
         }
@@ -2115,7 +2140,12 @@ public class ItemBean implements Serializable {
         }
         //code
         if (menuItemBean.getMenuItemObj().getITEM_CODE_ERROR_ON() == 1) {
-            sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            //sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            if (Query.length() > 1) {
+                sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            } else {
+                sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' ";
+            }
         } else {
             sqlCode = " i.item_code='" + Query + "' ";
         }
@@ -2194,7 +2224,12 @@ public class ItemBean implements Serializable {
         }
         //code
         if (menuItemBean.getMenuItemObj().getITEM_CODE_ERROR_ON() == 1) {
-            sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            //sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            if (Query.length() > 1) {
+                sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            } else {
+                sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' ";
+            }
         } else {
             sqlCode = " i.item_code='" + Query + "' ";
         }
@@ -2318,7 +2353,12 @@ public class ItemBean implements Serializable {
         }
         //code
         if (menuItemBean.getMenuItemObj().getITEM_CODE_ERROR_ON() == 1) {
-            sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            //sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            if (Query.length() > 1) {
+                sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            } else {
+                sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' ";
+            }
         } else {
             sqlCode = " i.item_code='" + Query + "' ";
         }
@@ -2398,7 +2438,12 @@ public class ItemBean implements Serializable {
         }
         //code
         if (menuItemBean.getMenuItemObj().getITEM_CODE_ERROR_ON() == 1) {
-            sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            //sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            if (Query.length() > 1) {
+                sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            } else {
+                sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' ";
+            }
         } else {
             sqlCode = " i.item_code='" + Query + "' ";
         }
@@ -2508,7 +2553,12 @@ public class ItemBean implements Serializable {
         }
         //code
         if (menuItemBean.getMenuItemObj().getITEM_CODE_ERROR_ON() == 1) {
-            sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            //sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            if (Query.length() > 1) {
+                sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            } else {
+                sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' ";
+            }
         } else {
             sqlCode = " i.item_code='" + Query + "' ";
         }
@@ -2660,7 +2710,12 @@ public class ItemBean implements Serializable {
             }
             //code
             if (menuItemBean.getMenuItemObj().getITEM_CODE_ERROR_ON() == 1) {
-                sqlCode = " i.item_code LIKE '%" + aNameOrCode + "%' OR i.item_code LIKE '%" + aNameOrCode.substring(1) + "%' OR i.item_code LIKE '%" + aNameOrCode.substring(2) + "%' ";
+                //sqlCode = " i.item_code LIKE '%" + aNameOrCode + "%' OR i.item_code LIKE '%" + aNameOrCode.substring(1) + "%' OR i.item_code LIKE '%" + aNameOrCode.substring(2) + "%' ";
+                if (aNameOrCode.length() > 1) {
+                    sqlCode = " i.item_code LIKE '%" + aNameOrCode + "%' OR i.item_code LIKE '%" + aNameOrCode.substring(1) + "%' OR i.item_code LIKE '%" + aNameOrCode.substring(2) + "%' ";
+                } else {
+                    sqlCode = " i.item_code LIKE '%" + aNameOrCode + "%' OR i.item_code LIKE '%" + aNameOrCode.substring(1) + "%' ";
+                }
             } else {
                 sqlCode = " i.item_code='" + aNameOrCode + "' ";
             }
@@ -3295,7 +3350,12 @@ public class ItemBean implements Serializable {
         }
         //code
         if (menuItemBean.getMenuItemObj().getITEM_CODE_ERROR_ON() == 1) {
-            sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            //sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            if (Query.length() > 1) {
+                sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            } else {
+                sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' ";
+            }
         } else {
             sqlCode = " i.item_code='" + Query + "' ";
         }
@@ -3375,7 +3435,12 @@ public class ItemBean implements Serializable {
         }
         //code
         if (menuItemBean.getMenuItemObj().getITEM_CODE_ERROR_ON() == 1) {
-            sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            //sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            if (Query.length() > 1) {
+                sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            } else {
+                sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' ";
+            }
         } else {
             sqlCode = " i.item_code='" + Query + "' ";
         }
@@ -3484,7 +3549,12 @@ public class ItemBean implements Serializable {
         }
         //code
         if (menuItemBean.getMenuItemObj().getITEM_CODE_ERROR_ON() == 1) {
-            sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            //sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            if (Query.length() > 1) {
+                sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' OR i.item_code LIKE '%" + Query.substring(2) + "%' ";
+            } else {
+                sqlCode = " i.item_code LIKE '%" + Query + "%' OR i.item_code LIKE '%" + Query.substring(1) + "%' ";
+            }
         } else {
             sqlCode = " i.item_code='" + Query + "' ";
         }
