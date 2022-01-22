@@ -23,6 +23,7 @@ public class Subscription implements Serializable {
     private String agent;
     private Date subscription_date;
     private Date renewal_date;
+    private Date expiry_date;
     private Date add_date;
     private String added_by;
     private Date last_edit_date;
@@ -278,5 +279,19 @@ public class Subscription implements Serializable {
      */
     public void setAgent(String agent) {
         this.agent = agent;
+    }
+
+    /**
+     * @return the expiry_date
+     */
+    public Date getExpiry_date() {
+        return expiry_date;
+    }
+
+    /**
+     * @param expiry_date the expiry_date to set
+     */
+    public void setExpiry_date(Date expiry_date) {
+        this.expiry_date = expiry_date;
     }
 }

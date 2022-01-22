@@ -40,12 +40,14 @@
 
             <!--Filter-->
             <h:panelGrid id="pnlgFilter" columns="2" styleClass="clsPanelReportFilter">
-                <h:panelGrid id="filter" columns="5">
+                <h:panelGrid id="filter" columns="7">
                     <p:outputLabel value="#{langsys['Customer']}"/>
                     <p:outputLabel value="#{langsys['Status']}"/>
                     <p:outputLabel value="#{langsys['Category']}"/>
                     <p:outputLabel value="#{langsys['Days']} #{langsys['To']} #{langsys['Expiry']}"/>
                     <p:outputLabel value="#{langsys['Recurring']}"/>
+                    <p:outputLabel value="#{langsys['Item']}"/>
+                    <p:outputLabel value="#{langsys['Agent']}"/>
                     <p:autoComplete value="#{subscriptionBean.filterTransactor}" 
                                     completeMethod="#{transactorBean.getTransactorActiveObjectList}" 
                                     var="trct" 
@@ -71,7 +73,7 @@
                         <f:selectItem itemLabel="" itemValue="0"/>
                         <f:selectItems value="#{subscriptionCategoryBean.getSubscriptionCategory()}" var="sc" itemLabel="#{sc.category_name}" itemValue="#{sc.subscription_category_id}"/>
                     </p:selectOneMenu>
-                    <p:selectOneMenu value="#{subscriptionBean.filterRenewalDateRange}" style="width: 150px">
+                    <p:selectOneMenu value="#{subscriptionBean.filterExpiryDateRange}" style="width: 150px">
                         <f:selectItem itemLabel="" itemValue="0"/>
                         <f:selectItem itemLabel="0-30 days" itemValue="30"/>
                         <f:selectItem itemLabel="31-60 days" itemValue="60"/>
@@ -82,6 +84,56 @@
                         <f:selectItem itemLabel="" itemValue=""/>
                         <f:selectItem itemLabel="Yes" itemValue="Yes"/>
                         <f:selectItem itemLabel="No" itemValue="No"/>
+                    </p:selectOneMenu>
+                    <p:autoComplete value="#{subscriptionBean.filterItem}"  
+                                    completeMethod="#{itemBean.getItemObjectListForSale_old}" 
+                                    var="itm" 
+                                    itemLabel="#{itm.description}" 
+                                    itemValue="#{itm}" 
+                                    converter="ItemConverter" style="text-align: left" 
+                                    forceSelection="true" queryDelay="0"
+                                    onkeypress="if (event.keyCode == 13) {
+                                                doAddClick();
+                                                return false;
+                                            }" >
+                        <p:column headerText="#{langsys['Item']} #{langsys['Description']}" style="text-align: left" >  
+                            #{itm.description} 
+                        </p:column>
+                        <p:column headerText="#{langsys['Alias']}" style="text-align: left" >  
+                            #{itm.alias_name} 
+                        </p:column>
+                        <p:column headerText="#{langsys['Item']} #{langsys['Code']}" style="text-align: left" >  
+                            #{itm.itemCode} 
+                        </p:column>
+                        <p:column headerText="#{langsys['Unit']}" style="text-align: left">  
+                            #{itm.unitSymbol}
+                        </p:column> 
+                        <p:column headerText="#{langsys['Category']}" style="text-align: left">  
+                            #{itm.categoryName}
+                        </p:column>
+                        <p:column headerText="#{langsys['Retail']} #{langsys['sale']} #{langsys['Price']}" style="text-align: left">  
+                            <h:outputText value="#{itm.unitRetailsalePrice}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{langsys['Wholesale']} #{langsys['Price']}" style="text-align: left" rendered="#{generalUserSetting.currentTransactionReasonId==2 or generalUserSetting.currentTransactionReasonId==10}">
+                            <h:outputText value="#{itm.unitWholesalePrice}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{langsys['Special']} #{langsys['Price']}" style="text-align: left" rendered="#{generalUserSetting.currentTransactionReasonId==103}">
+                            <h:outputText value="#{itm.unit_special_price}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{langsys['Currency']}" style="text-align: left">
+                            <h:outputText value="#{itm.currencyCode}">
+                            </h:outputText>
+                        </p:column>
+                    </p:autoComplete>
+                    <p:selectOneMenu value="#{subscriptionBean.filterAgent}" style="width: 150px">
+                        <f:selectItem itemLabel="" itemValue=""/>
+                        <f:selectItems value="#{subscriptionBean.getUniqueSubscriptionAgents()}" var="a" itemLabel="#{a}" itemValue="#{a}"/>
                     </p:selectOneMenu>
                     <p:commandButton value="#{langsys['OK']}" style="color: white; background-color: #00B259">
                         <f:ajax listener="#{subscriptionBean.getFilteredSubscriptions()}" execute="@form" render="@form"/>
@@ -168,7 +220,7 @@
                     <h:outputText value="#{utilityBean.formatDate(s.subscription_date)}"/>
                 </p:column>
                 <p:column headerText="#{langsys['Expiry']} #{langsys['Date']}">
-                    <h:outputText value="#{utilityBean.formatDate(s.renewal_date)}"/>
+                    <h:outputText value="#{utilityBean.formatDate(s.expiry_date)}"/>
                 </p:column>
 
                 <p:column headerText="#{langsys['Action']}" exportable="false" style="min-width: 125px">
@@ -176,6 +228,9 @@
                     </p:commandButton>
                     &nbsp;
                     <p:commandButton update="form:tblSummary form:dtblSubscription form:growl1" actionListener="#{subscriptionBean.optOut(s)}" icon="ui-icon-arrowreturnthick-1-n" title="Opt Out" style="color: white; background-color: red !important" >
+                    </p:commandButton>
+                    &nbsp;
+                    <p:commandButton update="form:tblSummary form:dtblSubscription form:growl1" actionListener="#{subscriptionBean.renew(s)}" icon="ui-icon-seek-next" title="Renew" style="color: white; background-color: blueviolet !important" >
                     </p:commandButton>
                     &nbsp;
                     <p:commandButton update="modalSubscriptionLog" actionListener="#{subscriptionBean.getSubscriptionLogSubscriptionById(s.subscription_id)}" oncomplete="PF('dlgSubscriptionLog').show();" icon="ui-icon-info" title="View Subscription Logs" style="color: white; background-color: yellow !important" >
@@ -235,10 +290,7 @@
                                         itemValue="#{itm}" 
                                         converter="ItemConverter" style="text-align: left" 
                                         forceSelection="true" queryDelay="0" inputStyle="width: 320px"
-                                        onkeypress="if (event.keyCode == 13) {
-                                                    doAddClick();
-                                                    return false;
-                                                }" >
+                                        >
                             <p:column headerText="#{langsys['Item']} #{langsys['Description']}" style="text-align: left" >  
                                 #{itm.description} 
                             </p:column>
@@ -276,15 +328,23 @@
                             <p:column headerText="#{langsys['Location']}" style="text-align: left">  
                                 #{itm.locationName}
                             </p:column>
+                            <f:attribute name="subs" value="#{subscription}" />
+                            <p:ajax event="itemSelect" listener="#{subscriptionBean.setItemPrice}" process="@form" update="form:unitPrice form:itemAmount"/>
+                            <!--<p:ajax event="change" listener=""/>-->
+                            <p:ajax event="change" listener="#{subscriptionBean.setItemPrice}" process="@form" update="form:unitPrice form:itemAmount" onstart="if(PF('WautcItem').panel.is(':visible')) return false;" />
                         </p:autoComplete>
                         <h:outputLabel  value="#{langsys['Description']}:"/>
                         <p:inputText style="width: 320px" value="#{subscription.description}" autocomplete="off" />
                         <h:outputLabel value="#{langsys['Qty']}:"/>
-                        <p:inputNumber inputStyle="width: 320px" value="#{subscription.qty}" autocomplete="off" />
-                        <h:outputLabel  value="#{langsys['Unit']} #{langsys['Price']}:"/>
-                        <p:inputNumber inputStyle="width: 320px" value="#{subscription.unit_price}" autocomplete="off" />
-                        <h:outputLabel  value="#{langsys['Amount']}:"/>
-                        <p:inputText style="width: 320px" value="#{subscription.amount}" autocomplete="off" />
+                        <p:inputNumber inputStyle="width: 320px" value="#{subscription.qty}" autocomplete="off">
+                            <p:ajax event="blur" listener="#{subscriptionBean.setItemAmount(subscription)}" update="form:itemAmount"/>
+                        </p:inputNumber>
+                        <h:outputLabel value="#{langsys['Unit']} #{langsys['Price']}:"/>
+                        <p:inputNumber id="unitPrice" inputStyle="width: 320px" value="#{subscriptionBean.itemUnitPrice}" autocomplete="off">
+                            <p:ajax event="blur" listener="#{subscriptionBean.setItemAmount(subscription)}" update="form:itemAmount"/>
+                        </p:inputNumber>
+                        <h:outputLabel value="#{langsys['Amount']}:"/>
+                        <p:inputText id="itemAmount" style="width: 320px" value="#{subscription.amount}" readonly="True" disabled="True" autocomplete="off" />
                         <h:outputLabel  value="#{langsys['Recurring']}:"/>
                         <p:selectOneMenu value="#{subscription.is_recurring}" style="width: 305px">
                             <f:selectItem itemLabel="Yes" itemValue="Yes"/>
@@ -301,11 +361,11 @@
                             <f:ajax event="change" listener="#{subscriptionBean.setExpiryDate(subscription)}" render="form:expiryDate form:currentStatus"/>
                         </p:selectOneMenu>
                         <h:outputLabel  value="#{langsys['Subscription']} #{langsys['Date']}:"/>
-                        <p:datePicker value="#{subscription.subscription_date}" pattern="#{companySetting.getDateFormat()}" inputStyle="width: 320px" style="width: 350px">
+                        <p:calendar value="#{subscription.subscription_date}" pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" inputStyle="width: 320px" style="width: 350px">
                             <f:ajax event="dateSelect" listener="#{subscriptionBean.setExpiryDate(subscription)}" render="form:expiryDate form:currentStatus"/>
-                        </p:datePicker>
+                        </p:calendar>
                         <h:outputLabel  value="#{langsys['Expiry']} #{langsys['Date']}:"/>
-                        <p:datePicker id="expiryDate" value="#{subscription.renewal_date}" pattern="#{companySetting.getDateFormat()}" disabled="True" inputStyle="width: 320px" style="width: 350px" />
+                        <p:datePicker id="expiryDate" value="#{subscription.expiry_date}" pattern="#{companySetting.getDateFormat()}" disabled="True" inputStyle="width: 320px" style="width: 350px" />
                         <h:outputLabel  value="#{langsys['Agent']}:"/>
                         <p:inputText style="width: 320px" value="#{subscription.agent}" autocomplete="off" />
                     </h:panelGrid>

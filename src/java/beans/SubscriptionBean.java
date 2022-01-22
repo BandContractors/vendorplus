@@ -21,9 +21,12 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
+import javax.faces.component.UIInput;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.primefaces.event.SelectEvent;
 import sessions.GeneralUserSetting;
 import utilities.UtilityBean;
 
@@ -54,9 +57,13 @@ public class SubscriptionBean implements Serializable {
     private Subscription_category selectedSubscriptionCategory;
     private String filterStatus = "";
     private int filterSubscriptionCategoryId = 0;
-    private int filterRenewalDateRange = 0;
+    private int filterExpiryDateRange = 0;
     private String filterRecurring = "";
     private Transactor filterTransactor;
+    private Item filterItem;
+    private String filterAgent = "";
+    private List<String> uniqueAgentList;
+    private double itemUnitPrice = 0;
     @ManagedProperty("#{menuItemBean}")
     private MenuItemBean menuItemBean;
 
@@ -135,6 +142,11 @@ public class SubscriptionBean implements Serializable {
                 aSubscription.setRenewal_date(null);
             }
             try {
+                aSubscription.setExpiry_date(new Date(aResultSet.getTimestamp("expiry_date").getTime()));
+            } catch (Exception e) {
+                aSubscription.setExpiry_date(null);
+            }
+            try {
                 //aSubscription.setAdd_date(aResultSet.getDate("add_date"));
                 aSubscription.setAdd_date(new Date(aResultSet.getTimestamp("add_date").getTime()));
             } catch (Exception e) {
@@ -173,10 +185,10 @@ public class SubscriptionBean implements Serializable {
             SubscriptionTo.setIs_recurring(SubscriptionFrom.getIs_recurring());
             if ("Opted Out".equals(SubscriptionFrom.getCurrent_status())) {
                 SubscriptionTo.setCurrent_status(SubscriptionFrom.getCurrent_status());
-            } else if (SubscriptionFrom.getRenewal_date() == null) {
+            } else if (SubscriptionFrom.getExpiry_date() == null) {
                 SubscriptionTo.setCurrent_status("Active");
             } else {
-                if (SubscriptionFrom.getRenewal_date().after(new Date()) || SubscriptionFrom.getRenewal_date().equals(new Date())) {
+                if (SubscriptionFrom.getExpiry_date().after(new Date()) || SubscriptionFrom.getExpiry_date().equals(new Date())) {
                     SubscriptionTo.setCurrent_status("Active");
                 } else {
                     SubscriptionTo.setCurrent_status("Expired");
@@ -189,6 +201,7 @@ public class SubscriptionBean implements Serializable {
             SubscriptionTo.setAgent(SubscriptionFrom.getAgent());
             SubscriptionTo.setSubscription_date(SubscriptionFrom.getSubscription_date());
             SubscriptionTo.setRenewal_date(SubscriptionFrom.getRenewal_date());
+            SubscriptionTo.setExpiry_date(SubscriptionFrom.getExpiry_date());
             SubscriptionTo.setAdd_date(SubscriptionFrom.getAdd_date());
             SubscriptionTo.setAdded_by(SubscriptionFrom.getAdded_by());
             SubscriptionTo.setLast_edit_date(SubscriptionFrom.getLast_edit_date());
@@ -196,6 +209,7 @@ public class SubscriptionBean implements Serializable {
             this.setSelectedTransactor(new TransactorBean().findTransactor(SubscriptionFrom.getTransactor_id()));
             this.setSelectedSubscriptionCategory(new SubscriptionCategoryBean().getSubscriptionCategory(SubscriptionFrom.getSubscription_category_id()));
             this.setSelectedItem(new ItemBean().findItem(SubscriptionFrom.getItem_id()));
+            this.setItemUnitPrice(SubscriptionFrom.getUnit_price());
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -218,6 +232,7 @@ public class SubscriptionBean implements Serializable {
                 aSubscription.setAgent("");
                 aSubscription.setSubscription_date(null);
                 aSubscription.setRenewal_date(null);
+                aSubscription.setExpiry_date(null);
                 aSubscription.setAdd_date(null);
                 aSubscription.setAdded_by("");
                 aSubscription.setLast_edit_date(null);
@@ -225,6 +240,7 @@ public class SubscriptionBean implements Serializable {
                 this.setSelectedTransactor(null);
                 this.setSelectedSubscriptionCategory(null);
                 this.setSelectedItem(null);
+                this.setItemUnitPrice(0);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -236,9 +252,10 @@ public class SubscriptionBean implements Serializable {
             this.setFilterTransactor(null);
             this.setFilterStatus("");
             this.setFilterSubscriptionCategoryId(0);
-            this.setFilterRenewalDateRange(0);
+            this.setFilterExpiryDateRange(0);
             this.setFilterRecurring("");
-            //this.getSubscriptionsByDescriptionCurrentStatusFrequency(this.SearchSubscriptionNames);
+            this.setFilterItem(null);
+            this.setFilterAgent("");
             this.getFilteredSubscriptions();
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -251,19 +268,19 @@ public class SubscriptionBean implements Serializable {
                 Calendar c = Calendar.getInstance();
                 c.setTime(aSubscription.getSubscription_date());
                 if ("No".equals(aSubscription.getIs_recurring())) {
-                    aSubscription.setRenewal_date(null);
+                    aSubscription.setExpiry_date(null);
                 } else if ("Weekly".equals(aSubscription.getFrequency())) {
                     c.add(Calendar.DAY_OF_MONTH, 7);
-                    aSubscription.setRenewal_date(c.getTime());
+                    aSubscription.setExpiry_date(c.getTime());
                 } else if ("Monthly".equals(aSubscription.getFrequency())) {
                     c.add(Calendar.MONTH, 1);
-                    aSubscription.setRenewal_date(c.getTime());
+                    aSubscription.setExpiry_date(c.getTime());
                 } else if ("Yearly".equals(aSubscription.getFrequency())) {
                     c.add(Calendar.YEAR, 1);
-                    aSubscription.setRenewal_date(c.getTime());
+                    aSubscription.setExpiry_date(c.getTime());
                 } else {
                     c.add(Calendar.DAY_OF_MONTH, 7);
-                    aSubscription.setRenewal_date(c.getTime());
+                    aSubscription.setExpiry_date(c.getTime());
                 }
                 //aSubscription.setRenewal_date(c.getTime());
                 this.setCurrentStatus(aSubscription);
@@ -273,12 +290,47 @@ public class SubscriptionBean implements Serializable {
         }
     }
 
+    public void setItemPrice(SelectEvent event) {
+        try {
+            Item aItem = (Item) event.getObject();
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void setItemPrice(AjaxBehaviorEvent event) {
+        try {
+            Subscription subs = (Subscription) event.getComponent().getAttributes().get("subs");
+            //Item aItem = ((Item)event.getSource());
+            Object val = ((UIInput) event.getSource()).getValue();
+            if (val != null) {
+                Item aItem = (Item) val;
+                this.itemUnitPrice = aItem.getUnitRetailsalePrice();
+            } else {
+                this.itemUnitPrice = 0;
+            }
+            //set the amount
+            this.setItemAmount(subs);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void setItemAmount(Subscription aSubscription) {
+        try {
+            double amount = aSubscription.getQty() * itemUnitPrice;
+            aSubscription.setAmount(amount);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public void setCurrentStatus(Subscription aSubscription) {
         try {
-            if (aSubscription.getRenewal_date() == null) {
+            if (aSubscription.getExpiry_date() == null) {
                 aSubscription.setCurrent_status("Active");
             } else {
-                if (aSubscription.getRenewal_date().after(new Date()) || aSubscription.getRenewal_date().equals(new Date())) {
+                if (aSubscription.getExpiry_date().after(new Date()) || aSubscription.getExpiry_date().equals(new Date())) {
                     aSubscription.setCurrent_status("Active");
                 } else {
                     aSubscription.setCurrent_status("Expired");
@@ -357,6 +409,71 @@ public class SubscriptionBean implements Serializable {
                 this.selectedTransactor = new TransactorBean().findTransactor(aSubscription.getTransactor_id());
                 this.selectedSubscriptionCategory = new SubscriptionCategoryBean().getSubscriptionCategory(aSubscription.getSubscription_category_id());
                 this.selectedItem = new ItemBean().findItem(aSubscription.getItem_id());
+                this.itemUnitPrice = aSubscription.getUnit_price();
+                status = this.insertUpdateSubscription(aSubscription);
+                if (status > 0) {
+                    msgS = "Saved Successfully";
+                    this.clearSubscription(aSubscription);
+                    this.getFilteredSubscriptions();
+                } else {
+                    msgS = "Subscription Not Saved";
+                }
+                this.setActionMessage(ub.translateWordsInText(BaseName, msgS));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msgS)));
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void renew(Subscription aSubscription) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
+        try {
+            BaseName = getMenuItemBean().getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
+        try {
+            UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
+            List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
+            GroupRightBean grb = new GroupRightBean();
+            String msgV = "";
+            String msgS = "";
+            long status = 0;
+
+            if (aSubscription.getSubscription_id() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "129", "Add") == 0) {
+                msgV = "Not Allowed to Access this Function";
+            } else if (aSubscription.getSubscription_id() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "129", "Edit") == 0) {
+                msgV = "Not Allowed to Access this Function";
+            }
+            if (msgV.length() > 0) {
+                this.setActionMessage(ub.translateWordsInText(BaseName, msgV));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msgV)));
+            } else {
+                Calendar c = Calendar.getInstance();
+                c.setTime(aSubscription.getExpiry_date());
+                if ("No".equals(aSubscription.getIs_recurring())) {
+                    aSubscription.setExpiry_date(null);
+                } else if ("Weekly".equals(aSubscription.getFrequency())) {
+                    c.add(Calendar.DAY_OF_MONTH, 7);
+                    aSubscription.setExpiry_date(c.getTime());
+                } else if ("Monthly".equals(aSubscription.getFrequency())) {
+                    c.add(Calendar.MONTH, 1);
+                    aSubscription.setExpiry_date(c.getTime());
+                } else if ("Yearly".equals(aSubscription.getFrequency())) {
+                    c.add(Calendar.YEAR, 1);
+                    aSubscription.setExpiry_date(c.getTime());
+                } else {
+                    c.add(Calendar.DAY_OF_MONTH, 7);
+                    aSubscription.setExpiry_date(c.getTime());
+                }
+
+                aSubscription.setCurrent_status("Active");
+                aSubscription.setRenewal_date(new Date());
+                this.selectedTransactor = new TransactorBean().findTransactor(aSubscription.getTransactor_id());
+                this.selectedSubscriptionCategory = new SubscriptionCategoryBean().getSubscriptionCategory(aSubscription.getSubscription_category_id());
+                this.selectedItem = new ItemBean().findItem(aSubscription.getItem_id());
+                this.itemUnitPrice = aSubscription.getUnit_price();
                 status = this.insertUpdateSubscription(aSubscription);
                 if (status > 0) {
                     msgS = "Saved Successfully";
@@ -378,9 +495,9 @@ public class SubscriptionBean implements Serializable {
         long status = 0;
         int returnedSubscriptionId = 0;
         if (aSubscription.getSubscription_id() == 0) {
-            sql = "{call sp_insert_subscription(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_insert_subscription(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         } else if (aSubscription.getSubscription_id() > 0) {
-            sql = "{call sp_update_subscription(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_update_subscription(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         }
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -398,25 +515,27 @@ public class SubscriptionBean implements Serializable {
                 } else {
                     cs.setString(8, aSubscription.getFrequency());
                 }
-                cs.setDouble(9, aSubscription.getUnit_price());
+                //cs.setDouble(9, aSubscription.getUnit_price());
+                cs.setDouble(9, this.itemUnitPrice);
                 cs.setDouble(10, aSubscription.getQty());
                 cs.setString(11, aSubscription.getAgent());
                 cs.setTimestamp(12, new java.sql.Timestamp(aSubscription.getSubscription_date().getTime()));
+                cs.setTimestamp(13, null);
                 if ("No".equals(aSubscription.getIs_recurring())) {
-                    cs.setTimestamp(13, null);
+                    cs.setTimestamp(14, null);
                 } else {
-                    cs.setTimestamp(13, new java.sql.Timestamp(aSubscription.getRenewal_date().getTime()));
+                    cs.setTimestamp(14, new java.sql.Timestamp(aSubscription.getExpiry_date().getTime()));
                 }
-                cs.setTimestamp(14, new java.sql.Timestamp(new java.util.Date().getTime()));
-                cs.setString(15, new GeneralUserSetting().getCurrentUser().getUserName());
-                cs.setDate(16, null);
-                cs.setString(17, aSubscription.getLast_edited_by());
-                cs.setInt(18, returnedSubscriptionId);
+                cs.setTimestamp(15, new java.sql.Timestamp(new java.util.Date().getTime()));
+                cs.setString(16, new GeneralUserSetting().getCurrentUser().getUserName());
+                cs.setDate(17, null);
+                cs.setString(18, aSubscription.getLast_edited_by());
+                cs.setInt(19, returnedSubscriptionId);
 
                 cs.executeUpdate();
                 status = 1;
                 //get Id of newly inserted subscription
-                returnedSubscriptionId = cs.getInt(18);
+                returnedSubscriptionId = cs.getInt(19);
 
                 //save subscription log
                 this.saveSubscriptionLog(returnedSubscriptionId, "Subscribed");
@@ -435,19 +554,25 @@ public class SubscriptionBean implements Serializable {
                 } else {
                     cs.setString(9, aSubscription.getFrequency());
                 }
-                cs.setDouble(10, aSubscription.getUnit_price());
+                //cs.setDouble(10, aSubscription.getUnit_price());
+                cs.setDouble(10, this.itemUnitPrice);
                 cs.setDouble(11, aSubscription.getQty());
                 cs.setString(12, aSubscription.getAgent());
                 cs.setTimestamp(13, new java.sql.Timestamp(aSubscription.getSubscription_date().getTime()));
-                if ("No".equals(aSubscription.getIs_recurring())) {
-                    cs.setTimestamp(14, null);
-                } else {
+                if (aSubscription.getRenewal_date() != null) {
                     cs.setTimestamp(14, new java.sql.Timestamp(aSubscription.getRenewal_date().getTime()));
+                } else {
+                    cs.setTimestamp(14, null);
                 }
-                cs.setTimestamp(15, new java.sql.Timestamp(new java.util.Date().getTime()));
-                cs.setString(16, aSubscription.getAdded_by());
-                cs.setTimestamp(17, new java.sql.Timestamp(new java.util.Date().getTime()));
-                cs.setString(18, new GeneralUserSetting().getCurrentUser().getUserName());
+                if ("No".equals(aSubscription.getIs_recurring())) {
+                    cs.setTimestamp(15, null);
+                } else {
+                    cs.setTimestamp(15, new java.sql.Timestamp(aSubscription.getExpiry_date().getTime()));
+                }
+                cs.setTimestamp(16, new java.sql.Timestamp(new java.util.Date().getTime()));
+                cs.setString(17, aSubscription.getAdded_by());
+                cs.setTimestamp(18, new java.sql.Timestamp(new java.util.Date().getTime()));
+                cs.setString(19, new GeneralUserSetting().getCurrentUser().getUserName());
                 cs.executeUpdate();
                 status = 1;
 
@@ -529,10 +654,9 @@ public class SubscriptionBean implements Serializable {
         return subscriptionList;
     }
 
-    public List<Subscription> getSubscriptionsByStatusCategoryRenewalDateRangeRecurring() {
+    public List<Subscription> getSubscriptionsByStatusCategoryExpiryDateRangeRecurring() {
         String sql;
-        sql = "{call sp_search_subscription_by_status_category_renewalrange_recurring(?,?,?,?)}";
-        //sql = "select * from subscription where current_status = ? AND subscription_category_id = ? AND timestampdiff(MONTH, NOW(),renewal_date) = ? AND is_recurring = ?";
+        sql = "{call sp_search_subscription_by_status_category_expiryrange_recurring(?,?,?,?)}";
         ResultSet rs;
         Subscriptions = new ArrayList<>();
         try (
@@ -540,7 +664,7 @@ public class SubscriptionBean implements Serializable {
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             ps.setString(1, this.filterStatus);
             ps.setInt(2, this.filterSubscriptionCategoryId);
-            ps.setInt(3, this.filterRenewalDateRange);
+            ps.setInt(3, this.filterExpiryDateRange);
             ps.setString(4, this.filterRecurring);
             rs = ps.executeQuery();
             while (rs.next()) {
@@ -554,11 +678,35 @@ public class SubscriptionBean implements Serializable {
         return getSubscriptions();
     }
 
+    public List<String> getUniqueSubscriptionAgents() {
+        String sql;
+        sql = "SELECT DISTINCT agent from subscription where agent != ''";
+        ResultSet rs;
+        uniqueAgentList = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                String agent;
+                try {
+                    agent = rs.getString("agent");
+                } catch (Exception e) {
+                    agent = "";
+                }
+                uniqueAgentList.add(agent);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return uniqueAgentList;
+    }
+
     public void getFilteredSubscriptions() {
         String sql;
         sql = "select * from subscription where subscription_id > 0";
-        //String sqlsum = "SELECT current_status, count(*) as numbers, sum(amount) as amount FROM subscription where subscription_id > 0";
         String wheresql = "";
+        String ordersql = " ORDER BY subscription_id DESC";
         if (this.filterTransactor != null) {
             wheresql = wheresql + " AND transactor_id=" + this.filterTransactor.getTransactorId();
         }
@@ -568,25 +716,31 @@ public class SubscriptionBean implements Serializable {
         if (this.filterSubscriptionCategoryId > 0) {
             wheresql = wheresql + " AND subscription_category_id=" + this.filterSubscriptionCategoryId;
         }
-        if (this.filterRenewalDateRange > 0) {
-            //wheresql = wheresql + " AND timestampdiff(MONTH, NOW(),renewal_date) =" + this.filterRenewalDateRange;
-            if (this.filterRenewalDateRange == 30) {
-                wheresql = wheresql + " AND datediff(renewal_date,NOW()) >" + 0;
-                wheresql = wheresql + " AND datediff(renewal_date,NOW()) <=" + this.filterRenewalDateRange;
-            } else if (this.filterRenewalDateRange == 60) {
-                wheresql = wheresql + " AND datediff(renewal_date,NOW()) >" + 30;
-                wheresql = wheresql + " AND datediff(renewal_date,NOW()) <=" + this.filterRenewalDateRange;
-            } else if (this.filterRenewalDateRange == 90) {
-                wheresql = wheresql + " AND datediff(renewal_date,NOW()) >" + 60;
-                wheresql = wheresql + " AND datediff(renewal_date,NOW()) <=" + this.filterRenewalDateRange;
+        if (this.filterExpiryDateRange > 0) {
+            //wheresql = wheresql + " AND timestampdiff(MONTH, NOW(),expiry_date) =" + this.filterExpiryDateRange;
+            if (this.filterExpiryDateRange == 30) {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 0;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
+            } else if (this.filterExpiryDateRange == 60) {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 30;
+                wheresql = wheresql + " AND datediff(renewal_date,NOW()) <=" + this.filterExpiryDateRange;
+            } else if (this.filterExpiryDateRange == 90) {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 60;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
             } else {
-                wheresql = wheresql + " AND datediff(renewal_date,NOW()) > " + this.filterRenewalDateRange;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) > " + this.filterExpiryDateRange;
             }
         }
         if (this.filterRecurring.length() > 0) {
             wheresql = wheresql + " AND is_recurring='" + this.filterRecurring + "'";
         }
-        sql = sql + wheresql;
+        if (this.filterItem != null) {
+            wheresql = wheresql + " AND item_id=" + this.filterItem.getItemId();
+        }
+        if (this.filterAgent.length() > 0) {
+            wheresql = wheresql + " AND agent='" + this.filterAgent + "'";
+        }
+        sql = sql + wheresql + ordersql;
         ResultSet rs;
         Subscriptions = new ArrayList<>();
         try (
@@ -619,23 +773,28 @@ public class SubscriptionBean implements Serializable {
         if (this.filterSubscriptionCategoryId > 0) {
             wheresql = wheresql + " AND subscription_category_id=" + this.filterSubscriptionCategoryId;
         }
-        if (this.filterRenewalDateRange > 0) {
-            //wheresql = wheresql + " AND timestampdiff(MONTH, NOW(),renewal_date) =" + this.filterRenewalDateRange;
-            if (this.filterRenewalDateRange == 30) {
-                wheresql = wheresql + " AND datediff(renewal_date,NOW()) >" + 0;
-                wheresql = wheresql + " AND datediff(renewal_date,NOW()) <=" + this.filterRenewalDateRange;
-            } else if (this.filterRenewalDateRange == 60) {
-                wheresql = wheresql + " AND datediff(renewal_date,NOW()) >" + 30;
-                wheresql = wheresql + " AND datediff(renewal_date,NOW()) <=" + this.filterRenewalDateRange;
-            } else if (this.filterRenewalDateRange == 90) {
-                wheresql = wheresql + " AND datediff(renewal_date,NOW()) >" + 60;
-                wheresql = wheresql + " AND datediff(renewal_date,NOW()) <=" + this.filterRenewalDateRange;
+        if (this.filterExpiryDateRange > 0) {
+            if (this.filterExpiryDateRange == 30) {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 0;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
+            } else if (this.filterExpiryDateRange == 60) {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 30;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
+            } else if (this.filterExpiryDateRange == 90) {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 60;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
             } else {
-                wheresql = wheresql + " AND datediff(renewal_date,NOW()) > " + this.filterRenewalDateRange;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) > " + this.filterExpiryDateRange;
             }
         }
         if (!this.filterRecurring.isEmpty()) {
             wheresql = wheresql + " AND is_recurring='" + this.filterRecurring + "'";
+        }
+        if (this.filterItem != null) {
+            wheresql = wheresql + " AND item_id=" + this.filterItem.getItemId();
+        }
+        if (this.filterAgent.length() > 0) {
+            wheresql = wheresql + " AND agent='" + this.filterAgent + "'";
         }
         sql = sql + wheresql + groupbysum;
         ResultSet rs;
@@ -856,17 +1015,17 @@ public class SubscriptionBean implements Serializable {
     }
 
     /**
-     * @return the filterRenewalDateRange
+     * @return the filterExpiryDateRange
      */
-    public int getFilterRenewalDateRange() {
-        return filterRenewalDateRange;
+    public int getFilterExpiryDateRange() {
+        return filterExpiryDateRange;
     }
 
     /**
-     * @param filterRenewalDateRange the filterRenewalDateRange to set
+     * @param filterExpiryDateRange the filterExpiryDateRange to set
      */
-    public void setFilterRenewalDateRange(int filterRenewalDateRange) {
-        this.filterRenewalDateRange = filterRenewalDateRange;
+    public void setFilterExpiryDateRange(int filterExpiryDateRange) {
+        this.filterExpiryDateRange = filterExpiryDateRange;
     }
 
     /**
@@ -937,5 +1096,61 @@ public class SubscriptionBean implements Serializable {
      */
     public void setMenuItemBean(MenuItemBean menuItemBean) {
         this.menuItemBean = menuItemBean;
+    }
+
+    /**
+     * @return the filterItem
+     */
+    public Item getFilterItem() {
+        return filterItem;
+    }
+
+    /**
+     * @param filterItem the filterItem to set
+     */
+    public void setFilterItem(Item filterItem) {
+        this.filterItem = filterItem;
+    }
+
+    /**
+     * @return the filterAgents
+     */
+    public String getFilterAgent() {
+        return filterAgent;
+    }
+
+    /**
+     * @param filterAgent the filterAgents to set
+     */
+    public void setFilterAgent(String filterAgent) {
+        this.filterAgent = filterAgent;
+    }
+
+    /**
+     * @return the uniqueAgentList
+     */
+    public List<String> getUniqueAgentList() {
+        return uniqueAgentList;
+    }
+
+    /**
+     * @param uniqueAgentList the uniqueAgentList to set
+     */
+    public void setUniqueAgentList(List<String> uniqueAgentList) {
+        this.uniqueAgentList = uniqueAgentList;
+    }
+
+    /**
+     * @return the itemUnitPrice
+     */
+    public double getItemUnitPrice() {
+        return itemUnitPrice;
+    }
+
+    /**
+     * @param itemUnitPrice the itemUnitPrice to set
+     */
+    public void setItemUnitPrice(double itemUnitPrice) {
+        this.itemUnitPrice = itemUnitPrice;
     }
 }
