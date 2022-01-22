@@ -12884,6 +12884,7 @@ CREATE PROCEDURE sp_insert_subscription
 	IN in_agent varchar(50),
 	IN in_subscription_date datetime,
 	IN in_renewal_date datetime,
+	IN in_expiry_date datetime,
 	IN in_add_date datetime,
 	IN in_added_by varchar(50),
 	IN in_last_edit_date datetime,
@@ -12910,6 +12911,7 @@ BEGIN
 		agent,
 		subscription_date,
 		renewal_date,
+		expiry_date,
 		add_date,
 		added_by,
 		last_edit_date,
@@ -12931,6 +12933,7 @@ BEGIN
 		in_agent,
 		in_subscription_date,
 		in_renewal_date,
+		in_expiry_date,
 		in_add_date,
 		in_added_by,
 		in_last_edit_date,
@@ -12957,6 +12960,7 @@ CREATE PROCEDURE sp_update_subscription
 	IN in_agent varchar(50),
 	IN in_subscription_date datetime,
 	IN in_renewal_date datetime,
+	IN in_expiry_date datetime,
 	IN in_add_date datetime,
 	IN in_added_by varchar(50),
 	IN in_last_edit_date datetime,
@@ -12977,6 +12981,7 @@ BEGIN
 		agent=in_agent,
 		subscription_date=in_subscription_date,
 		renewal_date=in_renewal_date,
+		expiry_date=in_expiry_date,
 		add_date=in_add_date,
 		added_by=in_added_by,
 		last_edit_date=in_last_edit_date,
@@ -13010,9 +13015,9 @@ BEGIN
 END//
 DELIMITER ;
 
-DROP PROCEDURE IF EXISTS sp_search_subscription_by_status_category_renewalrange_recurring;
+DROP PROCEDURE IF EXISTS sp_search_subscription_by_status_category_expiryrange_recurring;
 DELIMITER //
-CREATE PROCEDURE sp_search_subscription_by_status_category_renewalrange_recurring
+CREATE PROCEDURE sp_search_subscription_by_status_category_expiryrange_recurring
 (
 	IN in_current_status varchar(20),
 	IN in_subscription_category_id int,
