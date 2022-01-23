@@ -36,7 +36,7 @@ import utilities.UtilityBean;
  */
 /**
  *
- * @author btwesigye
+ * @author emuwonge
  */
 @ManagedBean(name = "subscriptionBean")
 @SessionScoped
@@ -64,6 +64,9 @@ public class SubscriptionBean implements Serializable {
     private String filterAgent = "";
     private List<String> uniqueAgentList;
     private double itemUnitPrice = 0;
+    private Date oldExpiryDate = null;
+    private Date subscriptionDateRenewal = null;
+    private Subscription subscriptionRenewal;
     @ManagedProperty("#{menuItemBean}")
     private MenuItemBean menuItemBean;
 
@@ -122,7 +125,7 @@ public class SubscriptionBean implements Serializable {
             try {
                 aSubscription.setQty(aResultSet.getDouble("qty"));
             } catch (Exception e) {
-                aSubscription.setQty(0);
+                aSubscription.setQty(1);
             }
             try {
                 aSubscription.setAgent(aResultSet.getString("agent"));
@@ -215,6 +218,102 @@ public class SubscriptionBean implements Serializable {
         }
     }
 
+    public void displaySubscriptionRenewal(Subscription SubscriptionFrom, Subscription SubscriptionTo) {
+        try {
+            this.clearSubscription(SubscriptionTo);
+            SubscriptionTo.setSubscription_id(SubscriptionFrom.getSubscription_id());
+            SubscriptionTo.setTransactor_id(SubscriptionFrom.getTransactor_id());
+            SubscriptionTo.setSubscription_category_id(SubscriptionFrom.getSubscription_category_id());
+            SubscriptionTo.setItem_id(SubscriptionFrom.getItem_id());
+            SubscriptionTo.setDescription(SubscriptionFrom.getDescription());
+            SubscriptionTo.setAmount(SubscriptionFrom.getAmount());
+            SubscriptionTo.setIs_recurring(SubscriptionFrom.getIs_recurring());
+            if ("Opted Out".equals(SubscriptionFrom.getCurrent_status())) {
+                SubscriptionTo.setCurrent_status(SubscriptionFrom.getCurrent_status());
+            } else if (SubscriptionFrom.getExpiry_date() == null) {
+                SubscriptionTo.setCurrent_status("Active");
+            } else {
+                if (SubscriptionFrom.getExpiry_date().after(new Date()) || SubscriptionFrom.getExpiry_date().equals(new Date())) {
+                    SubscriptionTo.setCurrent_status("Active");
+                } else {
+                    SubscriptionTo.setCurrent_status("Expired");
+                }
+            }
+            //SubscriptionTo.setCurrent_status(SubscriptionFrom.getCurrent_status());
+            SubscriptionTo.setFrequency(SubscriptionFrom.getFrequency());
+            SubscriptionTo.setUnit_price(SubscriptionFrom.getUnit_price());
+            SubscriptionTo.setQty(SubscriptionFrom.getQty());
+            SubscriptionTo.setAgent(SubscriptionFrom.getAgent());
+            SubscriptionTo.setSubscription_date(SubscriptionFrom.getSubscription_date());
+            SubscriptionTo.setRenewal_date(SubscriptionFrom.getRenewal_date());
+            //SubscriptionTo.setExpiry_date(SubscriptionFrom.getExpiry_date());
+            SubscriptionTo.setAdd_date(SubscriptionFrom.getAdd_date());
+            SubscriptionTo.setAdded_by(SubscriptionFrom.getAdded_by());
+            SubscriptionTo.setLast_edit_date(SubscriptionFrom.getLast_edit_date());
+            SubscriptionTo.setLast_edited_by(SubscriptionFrom.getLast_edited_by());
+            this.setSelectedTransactor(new TransactorBean().findTransactor(SubscriptionFrom.getTransactor_id()));
+            this.setSelectedSubscriptionCategory(new SubscriptionCategoryBean().getSubscriptionCategory(SubscriptionFrom.getSubscription_category_id()));
+            this.setSelectedItem(new ItemBean().findItem(SubscriptionFrom.getItem_id()));
+            this.setItemUnitPrice(SubscriptionFrom.getUnit_price());
+            this.setOldExpiryDate(SubscriptionFrom.getExpiry_date());
+            this.setSubscriptionDateRenewal(SubscriptionFrom.getSubscription_date());
+            
+            this.setSubscriptionRenewal(SubscriptionFrom);
+            
+            //set new expiry date
+            this.setExpiryDateRenewal(SubscriptionTo);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void displaySubscriptionRenewal(Subscription SubscriptionFrom) {
+        try {
+            this.clearSubscription(this.subscriptionRenewal);
+            this.subscriptionRenewal.setSubscription_id(SubscriptionFrom.getSubscription_id());
+            this.subscriptionRenewal.setTransactor_id(SubscriptionFrom.getTransactor_id());
+            this.subscriptionRenewal.setSubscription_category_id(SubscriptionFrom.getSubscription_category_id());
+            this.subscriptionRenewal.setItem_id(SubscriptionFrom.getItem_id());
+            this.subscriptionRenewal.setDescription(SubscriptionFrom.getDescription());
+            this.subscriptionRenewal.setAmount(SubscriptionFrom.getAmount());
+            this.subscriptionRenewal.setIs_recurring(SubscriptionFrom.getIs_recurring());
+            if ("Opted Out".equals(SubscriptionFrom.getCurrent_status())) {
+                this.subscriptionRenewal.setCurrent_status(SubscriptionFrom.getCurrent_status());
+            } else if (SubscriptionFrom.getExpiry_date() == null) {
+                this.subscriptionRenewal.setCurrent_status("Active");
+            } else {
+                if (SubscriptionFrom.getExpiry_date().after(new Date()) || SubscriptionFrom.getExpiry_date().equals(new Date())) {
+                    this.subscriptionRenewal.setCurrent_status("Active");
+                } else {
+                    this.subscriptionRenewal.setCurrent_status("Expired");
+                }
+            }
+            //this.subscriptionRenewal.setCurrent_status(SubscriptionFrom.getCurrent_status());
+            this.subscriptionRenewal.setFrequency(SubscriptionFrom.getFrequency());
+            this.subscriptionRenewal.setUnit_price(SubscriptionFrom.getUnit_price());
+            this.subscriptionRenewal.setQty(SubscriptionFrom.getQty());
+            this.subscriptionRenewal.setAgent(SubscriptionFrom.getAgent());
+            this.subscriptionRenewal.setSubscription_date(SubscriptionFrom.getSubscription_date());
+            this.subscriptionRenewal.setRenewal_date(SubscriptionFrom.getRenewal_date());
+            //this.subscriptionRenewal.setExpiry_date(SubscriptionFrom.getExpiry_date());
+            this.subscriptionRenewal.setAdd_date(SubscriptionFrom.getAdd_date());
+            this.subscriptionRenewal.setAdded_by(SubscriptionFrom.getAdded_by());
+            this.subscriptionRenewal.setLast_edit_date(SubscriptionFrom.getLast_edit_date());
+            this.subscriptionRenewal.setLast_edited_by(SubscriptionFrom.getLast_edited_by());
+            this.setSelectedTransactor(new TransactorBean().findTransactor(SubscriptionFrom.getTransactor_id()));
+            this.setSelectedSubscriptionCategory(new SubscriptionCategoryBean().getSubscriptionCategory(SubscriptionFrom.getSubscription_category_id()));
+            this.setSelectedItem(new ItemBean().findItem(SubscriptionFrom.getItem_id()));
+            this.setItemUnitPrice(SubscriptionFrom.getUnit_price());
+            this.setOldExpiryDate(SubscriptionFrom.getExpiry_date());
+            this.setSubscriptionDateRenewal(SubscriptionFrom.getSubscription_date());
+            
+            //set new expiry date
+            this.setExpiryDateRenewal(this.subscriptionRenewal);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public void clearSubscription(Subscription aSubscription) {
         try {
             if (aSubscription != null) {
@@ -228,7 +327,7 @@ public class SubscriptionBean implements Serializable {
                 aSubscription.setCurrent_status("");
                 aSubscription.setFrequency("");
                 aSubscription.setUnit_price(0);
-                aSubscription.setQty(0);
+                aSubscription.setQty(1);
                 aSubscription.setAgent("");
                 aSubscription.setSubscription_date(null);
                 aSubscription.setRenewal_date(null);
@@ -241,6 +340,9 @@ public class SubscriptionBean implements Serializable {
                 this.setSelectedSubscriptionCategory(null);
                 this.setSelectedItem(null);
                 this.setItemUnitPrice(0);
+                this.setOldExpiryDate(null);
+                this.setSubscriptionDateRenewal(null);
+                this.setSubscriptionRenewal(null);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -265,24 +367,61 @@ public class SubscriptionBean implements Serializable {
     public void setExpiryDate(Subscription aSubscription) {
         try {
             if (aSubscription.getSubscription_date() != null) {
+                //get qty
+                int qty = 1;
+                if (aSubscription.getQty() > 0) {
+                    qty = (int) aSubscription.getQty();
+                }
                 Calendar c = Calendar.getInstance();
                 c.setTime(aSubscription.getSubscription_date());
                 if ("No".equals(aSubscription.getIs_recurring())) {
                     aSubscription.setExpiry_date(null);
                 } else if ("Weekly".equals(aSubscription.getFrequency())) {
-                    c.add(Calendar.DAY_OF_MONTH, 7);
+                    c.add(Calendar.DAY_OF_MONTH, 7 * qty);
                     aSubscription.setExpiry_date(c.getTime());
                 } else if ("Monthly".equals(aSubscription.getFrequency())) {
-                    c.add(Calendar.MONTH, 1);
+                    c.add(Calendar.MONTH, 1 * qty);
                     aSubscription.setExpiry_date(c.getTime());
                 } else if ("Yearly".equals(aSubscription.getFrequency())) {
-                    c.add(Calendar.YEAR, 1);
+                    c.add(Calendar.YEAR, 1 * qty);
                     aSubscription.setExpiry_date(c.getTime());
                 } else {
-                    c.add(Calendar.DAY_OF_MONTH, 7);
+                    c.add(Calendar.DAY_OF_MONTH, 7 * qty);
                     aSubscription.setExpiry_date(c.getTime());
                 }
                 //aSubscription.setRenewal_date(c.getTime());
+                this.setCurrentStatus(aSubscription);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void setExpiryDateRenewal(Subscription aSubscription) {
+        try {
+            if (this.getOldExpiryDate() != null) {
+                //get qty
+                int qty = 1;
+                if (aSubscription.getQty() > 0) {
+                    qty = (int) aSubscription.getQty();
+                }
+                Calendar c = Calendar.getInstance();
+                c.setTime(this.getOldExpiryDate());
+                if ("No".equals(aSubscription.getIs_recurring())) {
+                    aSubscription.setExpiry_date(null);
+                } else if ("Weekly".equals(aSubscription.getFrequency())) {
+                    c.add(Calendar.DAY_OF_MONTH, 7 * qty);
+                    aSubscription.setExpiry_date(c.getTime());
+                } else if ("Monthly".equals(aSubscription.getFrequency())) {
+                    c.add(Calendar.MONTH, 1 * qty);
+                    aSubscription.setExpiry_date(c.getTime());
+                } else if ("Yearly".equals(aSubscription.getFrequency())) {
+                    c.add(Calendar.YEAR, 1 * qty);
+                    aSubscription.setExpiry_date(c.getTime());
+                } else {
+                    c.add(Calendar.DAY_OF_MONTH, 7 * qty);
+                    aSubscription.setExpiry_date(c.getTime());
+                }
                 this.setCurrentStatus(aSubscription);
             }
         } catch (Exception e) {
@@ -450,31 +589,19 @@ public class SubscriptionBean implements Serializable {
                 this.setActionMessage(ub.translateWordsInText(BaseName, msgV));
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msgV)));
             } else {
-                Calendar c = Calendar.getInstance();
-                c.setTime(aSubscription.getExpiry_date());
-                if ("No".equals(aSubscription.getIs_recurring())) {
-                    aSubscription.setExpiry_date(null);
-                } else if ("Weekly".equals(aSubscription.getFrequency())) {
-                    c.add(Calendar.DAY_OF_MONTH, 7);
-                    aSubscription.setExpiry_date(c.getTime());
-                } else if ("Monthly".equals(aSubscription.getFrequency())) {
-                    c.add(Calendar.MONTH, 1);
-                    aSubscription.setExpiry_date(c.getTime());
-                } else if ("Yearly".equals(aSubscription.getFrequency())) {
-                    c.add(Calendar.YEAR, 1);
-                    aSubscription.setExpiry_date(c.getTime());
-                } else {
-                    c.add(Calendar.DAY_OF_MONTH, 7);
-                    aSubscription.setExpiry_date(c.getTime());
-                }
-
-                aSubscription.setCurrent_status("Active");
-                aSubscription.setRenewal_date(new Date());
-                this.selectedTransactor = new TransactorBean().findTransactor(aSubscription.getTransactor_id());
-                this.selectedSubscriptionCategory = new SubscriptionCategoryBean().getSubscriptionCategory(aSubscription.getSubscription_category_id());
-                this.selectedItem = new ItemBean().findItem(aSubscription.getItem_id());
+                this.subscriptionRenewal.setQty(aSubscription.getQty());
+                this.subscriptionRenewal.setUnit_price(aSubscription.getUnit_price());
+                this.subscriptionRenewal.setAmount(aSubscription.getAmount());
+                this.subscriptionRenewal.setRenewal_date(new Date());
+                this.subscriptionRenewal.setExpiry_date(aSubscription.getExpiry_date());
+                this.subscriptionRenewal.setCurrent_status("Active");
+                //aSubscription.setRenewal_date(new Date());
+                //aSubscription.setSubscription_date(this.getSubscriptionDateRenewal());
+                this.selectedTransactor = new TransactorBean().findTransactor(this.subscriptionRenewal.getTransactor_id());
+                this.selectedSubscriptionCategory = new SubscriptionCategoryBean().getSubscriptionCategory(this.subscriptionRenewal.getSubscription_category_id());
+                this.selectedItem = new ItemBean().findItem(this.subscriptionRenewal.getItem_id());
                 this.itemUnitPrice = aSubscription.getUnit_price();
-                status = this.insertUpdateSubscription(aSubscription);
+                status = this.insertUpdateSubscription(this.subscriptionRenewal);
                 if (status > 0) {
                     msgS = "Saved Successfully";
                     this.clearSubscription(aSubscription);
@@ -569,7 +696,7 @@ public class SubscriptionBean implements Serializable {
                 } else {
                     cs.setTimestamp(15, new java.sql.Timestamp(aSubscription.getExpiry_date().getTime()));
                 }
-                cs.setTimestamp(16, new java.sql.Timestamp(new java.util.Date().getTime()));
+                cs.setTimestamp(16, new java.sql.Timestamp(aSubscription.getAdd_date().getTime()));
                 cs.setString(17, aSubscription.getAdded_by());
                 cs.setTimestamp(18, new java.sql.Timestamp(new java.util.Date().getTime()));
                 cs.setString(19, new GeneralUserSetting().getCurrentUser().getUserName());
@@ -1152,5 +1279,47 @@ public class SubscriptionBean implements Serializable {
      */
     public void setItemUnitPrice(double itemUnitPrice) {
         this.itemUnitPrice = itemUnitPrice;
+    }
+
+    /**
+     * @return the oldExpiryDate
+     */
+    public Date getOldExpiryDate() {
+        return oldExpiryDate;
+    }
+
+    /**
+     * @param oldExpiryDate the oldExpiryDate to set
+     */
+    public void setOldExpiryDate(Date oldExpiryDate) {
+        this.oldExpiryDate = oldExpiryDate;
+    }
+
+    /**
+     * @return the subscriptionDateRenewal
+     */
+    public Date getSubscriptionDateRenewal() {
+        return subscriptionDateRenewal;
+    }
+
+    /**
+     * @param subscriptionDateRenewal the subscriptionDateRenewal to set
+     */
+    public void setSubscriptionDateRenewal(Date subscriptionDateRenewal) {
+        this.subscriptionDateRenewal = subscriptionDateRenewal;
+    }
+
+    /**
+     * @return the subscriptionRenewal
+     */
+    public Subscription getSubscriptionRenewal() {
+        return subscriptionRenewal;
+    }
+
+    /**
+     * @param subscriptionRenewal the subscriptionRenewal to set
+     */
+    public void setSubscriptionRenewal(Subscription subscriptionRenewal) {
+        this.subscriptionRenewal = subscriptionRenewal;
     }
 }

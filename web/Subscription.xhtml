@@ -230,7 +230,7 @@
                     <p:commandButton update="form:tblSummary form:dtblSubscription form:growl1" actionListener="#{subscriptionBean.optOut(s)}" icon="ui-icon-arrowreturnthick-1-n" title="Opt Out" style="color: white; background-color: red !important" >
                     </p:commandButton>
                     &nbsp;
-                    <p:commandButton update="form:tblSummary form:dtblSubscription form:growl1" actionListener="#{subscriptionBean.renew(s)}" icon="ui-icon-seek-next" title="Renew" style="color: white; background-color: blueviolet !important" >
+                    <p:commandButton update="form:modalSubscriptionRenewal" actionListener="#{subscriptionBean.displaySubscriptionRenewal(s,subscription)}" oncomplete="PF('dlgSubscriptionRenewal').show();" icon="ui-icon-seek-next" title="Renew" style="color: white; background-color: blueviolet !important" >
                     </p:commandButton>
                     &nbsp;
                     <p:commandButton update="modalSubscriptionLog" actionListener="#{subscriptionBean.getSubscriptionLogSubscriptionById(s.subscription_id)}" oncomplete="PF('dlgSubscriptionLog').show();" icon="ui-icon-info" title="View Subscription Logs" style="color: white; background-color: yellow !important" >
@@ -239,6 +239,54 @@
                 </p:column>
 
             </p:dataTable>
+            <p:dialog rendered="true" dynamic="true" header="#{langsys['Subscription']} #{langsys['Renewal']}" widgetVar="dlgSubscriptionRenewal" id="modalSubscriptionRenewal" modal="true">
+                <h:panelGroup id="popupRenewal">
+                    <h:panelGrid columns="4">
+                        <h:outputLabel value="#{langsys['Qty']}:"/>
+                        <p:inputNumber inputStyle="width: 320px" value="#{subscription.qty}" minValue="1" autocomplete="off">
+                            <p:ajax event="blur" listener="#{subscriptionBean.setItemAmount(subscription)}" update="form:itemAmountRenewal"/>
+                            <p:ajax event="blur" listener="#{subscriptionBean.setExpiryDateRenewal(subscription)}" update="form:expiryDateRenewal form:currentStatusRenewal form:cmdbSaveRenewal"/>
+                        </p:inputNumber>
+                        <h:outputLabel value="#{langsys['Unit']} #{langsys['Price']}:"/>
+                        <p:inputNumber id="unitPriceRenewal" inputStyle="width: 320px" value="#{subscriptionBean.itemUnitPrice}" autocomplete="off">
+                            <p:ajax event="blur" listener="#{subscriptionBean.setItemAmount(subscription)}" update="form:itemAmountRenewal"/>
+                        </p:inputNumber>
+                        <h:outputLabel value="#{langsys['Amount']}:"/>
+                        <p:inputText id="itemAmountRenewal" style="width: 320px" value="#{subscription.amount}" readonly="True" disabled="True" autocomplete="off" />
+                        <h:outputLabel  value="#{langsys['Current']} #{langsys['Status']}:"/>
+                        <p:inputText id="currentStatusRenewal" style="width: 320px" value="#{subscription.current_status}" readonly="True" disabled="True" autocomplete="off" />
+                        <h:outputLabel  value="#{langsys['Subscription']} #{langsys['Date']}:"/>
+                        <p:calendar value="#{subscriptionBean.subscriptionDateRenewal}" pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" inputStyle="width: 320px" style="width: 350px">
+                            <f:ajax event="dateSelect" listener="#{subscriptionBean.setExpiryDate(subscription)}" render="form:expiryDate form:currentStatus"/>
+                        </p:calendar>
+                        <h:outputLabel  value="#{langsys['Frequency']}:"/>
+                        <p:inputText id="frequencyRenewal" style="width: 320px" value="#{subscription.frequency}" readonly="True" disabled="True" autocomplete="off" />
+                        <h:outputLabel  value="#{langsys['New']} #{langsys['Expiry']} #{langsys['Date']}:"/>
+                        <p:datePicker id="expiryDateRenewal" value="#{subscription.expiry_date}" pattern="#{companySetting.getDateFormat()}" disabled="True" inputStyle="width: 320px" style="width: 350px" />
+                        <h:outputLabel  value="#{langsys['Old']} #{langsys['Date']}:"/>
+                        <p:datePicker id="oldExpiryDate" value="#{subscriptionBean.oldExpiryDate}" pattern="#{companySetting.getDateFormat()}" disabled="True" inputStyle="width: 320px" style="width: 350px" />
+                    </h:panelGrid>
+
+                    <h:panelGrid styleClass="clsGridMainCommands" columns="1">
+                        <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
+                            <p:commandButton update="tblSummary form:popupRenewal form:dtblSubscription form:growl1Renewal" actionListener="#{subscriptionBean.renew(subscription)}" styleClass="clsButtonBig" id="cmdbSaveRenewal" value="#{langsys['RENEW']}" disabled="#{subscription.current_status eq 'Expired'}" style="color: white; background-color: #00B259" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                                <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                                    <p:graphicImage name="/images/ajax-loader.gif"/>
+                                </p:dialog>
+                            </p:commandButton>
+                            <p:commandButton update="form:popupRenewal" actionListener="#{subscriptionBean.clearSubscription(subscription)}" styleClass="clsButtonBig" id="cmdbClearRenewal" value="#{langsys['CLEAR']}" style="color: white; background-color: #FF0000">
+                            </p:commandButton>
+                        </h:panelGrid>
+                    </h:panelGrid>
+
+                    <h:panelGrid styleClass="clsGridMainMessages" columns="1">
+                        <h:outputLabel styleClass="clsActionMessage" id="olblActionMessageRenewal" value="#{subscriptionBean.actionMessage}"/>
+                        <h:messages id="msgsMainMessageRenewal" style="color: red"/><br/>
+                    </h:panelGrid>
+                    <p:growl id="growl1Renewal"/>
+
+                </h:panelGroup>
+            </p:dialog>
             <p:dialog rendered="true" dynamic="true" header="#{langsys['Subscription']} #{langsys['Detail']}" widgetVar="dlgSubscription" id="modalSubscription" modal="true" height="425px">
                 <h:panelGroup id="popup">
                     <!--<h:outputText value="This is a Modal Dialog." />-->
@@ -336,8 +384,9 @@
                         <h:outputLabel  value="#{langsys['Description']}:"/>
                         <p:inputText style="width: 320px" value="#{subscription.description}" autocomplete="off" />
                         <h:outputLabel value="#{langsys['Qty']}:"/>
-                        <p:inputNumber inputStyle="width: 320px" value="#{subscription.qty}" autocomplete="off">
+                        <p:inputNumber inputStyle="width: 320px" value="#{subscription.qty}" minValue="1" autocomplete="off">
                             <p:ajax event="blur" listener="#{subscriptionBean.setItemAmount(subscription)}" update="form:itemAmount"/>
+                            <p:ajax event="blur" listener="#{subscriptionBean.setExpiryDate(subscription)}" update="form:expiryDate form:currentStatus"/>
                         </p:inputNumber>
                         <h:outputLabel value="#{langsys['Unit']} #{langsys['Price']}:"/>
                         <p:inputNumber id="unitPrice" inputStyle="width: 320px" value="#{subscriptionBean.itemUnitPrice}" autocomplete="off">
