@@ -216,7 +216,7 @@
                 <p:column headerText="#{langsys['Frequency']}">
                     <h:outputText value="#{s.frequency}"/>
                 </p:column>
-                <p:column headerText="#{langsys['Subscription']} #{langsys['Date']}">
+                <p:column headerText="#{langsys['Registration']} #{langsys['Date']}">
                     <h:outputText value="#{utilityBean.formatDate(s.subscription_date)}"/>
                 </p:column>
                 <p:column headerText="#{langsys['Expiry']} #{langsys['Date']}">
@@ -255,7 +255,7 @@
                         <p:inputText id="itemAmountRenewal" style="width: 320px" value="#{subscription.amount}" readonly="True" disabled="True" autocomplete="off" />
                         <h:outputLabel  value="#{langsys['Current']} #{langsys['Status']}:"/>
                         <p:inputText id="currentStatusRenewal" style="width: 320px" value="#{subscription.current_status}" readonly="True" disabled="True" autocomplete="off" />
-                        <h:outputLabel  value="#{langsys['Subscription']} #{langsys['Date']}:"/>
+                        <h:outputLabel  value="#{langsys['Registration']} #{langsys['Date']}:"/>
                         <p:calendar value="#{subscriptionBean.subscriptionDateRenewal}" pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" inputStyle="width: 320px" style="width: 350px">
                             <f:ajax event="dateSelect" listener="#{subscriptionBean.setExpiryDate(subscription)}" render="form:expiryDate form:currentStatus"/>
                         </p:calendar>
@@ -263,7 +263,7 @@
                         <p:inputText id="frequencyRenewal" style="width: 320px" value="#{subscription.frequency}" readonly="True" disabled="True" autocomplete="off" />
                         <h:outputLabel  value="#{langsys['New']} #{langsys['Expiry']} #{langsys['Date']}:"/>
                         <p:datePicker id="expiryDateRenewal" value="#{subscription.expiry_date}" pattern="#{companySetting.getDateFormat()}" disabled="True" inputStyle="width: 320px" style="width: 350px" />
-                        <h:outputLabel  value="#{langsys['Old']} #{langsys['Date']}:"/>
+                        <h:outputLabel  value="#{langsys['Old']} #{langsys['Expiry']} #{langsys['Date']}:"/>
                         <p:datePicker id="oldExpiryDate" value="#{subscriptionBean.oldExpiryDate}" pattern="#{companySetting.getDateFormat()}" disabled="True" inputStyle="width: 320px" style="width: 350px" />
                     </h:panelGrid>
 
@@ -409,7 +409,7 @@
                             <f:selectItem itemLabel="Yearly" itemValue="Yearly"/>
                             <f:ajax event="change" listener="#{subscriptionBean.setExpiryDate(subscription)}" render="form:expiryDate form:currentStatus"/>
                         </p:selectOneMenu>
-                        <h:outputLabel  value="#{langsys['Subscription']} #{langsys['Date']}:"/>
+                        <h:outputLabel  value="#{langsys['Registration']} #{langsys['Date']}:"/>
                         <p:calendar value="#{subscription.subscription_date}" pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" inputStyle="width: 320px" style="width: 350px">
                             <f:ajax event="dateSelect" listener="#{subscriptionBean.setExpiryDate(subscription)}" render="form:expiryDate form:currentStatus"/>
                         </p:calendar>

@@ -257,9 +257,9 @@ public class SubscriptionBean implements Serializable {
             this.setItemUnitPrice(SubscriptionFrom.getUnit_price());
             this.setOldExpiryDate(SubscriptionFrom.getExpiry_date());
             this.setSubscriptionDateRenewal(SubscriptionFrom.getSubscription_date());
-            
+
             this.setSubscriptionRenewal(SubscriptionFrom);
-            
+
             //set new expiry date
             this.setExpiryDateRenewal(SubscriptionTo);
         } catch (Exception e) {
@@ -306,7 +306,7 @@ public class SubscriptionBean implements Serializable {
             this.setItemUnitPrice(SubscriptionFrom.getUnit_price());
             this.setOldExpiryDate(SubscriptionFrom.getExpiry_date());
             this.setSubscriptionDateRenewal(SubscriptionFrom.getSubscription_date());
-            
+
             //set new expiry date
             this.setExpiryDateRenewal(this.subscriptionRenewal);
         } catch (Exception e) {
@@ -406,7 +406,19 @@ public class SubscriptionBean implements Serializable {
                     qty = (int) aSubscription.getQty();
                 }
                 Calendar c = Calendar.getInstance();
-                c.setTime(this.getOldExpiryDate());
+                
+                //logic determing next expiry date
+                if ("Opted Out".equals(aSubscription.getCurrent_status())) {
+                    c.setTime(new Date());
+                } else {
+                    if (this.getOldExpiryDate().before(new Date())) {
+                        c.setTime(new Date());
+                    } else {
+                        c.setTime(this.getOldExpiryDate());
+                    }
+                }
+                //end of logic
+                
                 if ("No".equals(aSubscription.getIs_recurring())) {
                     aSubscription.setExpiry_date(null);
                 } else if ("Weekly".equals(aSubscription.getFrequency())) {
