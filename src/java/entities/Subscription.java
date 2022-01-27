@@ -21,6 +21,7 @@ public class Subscription implements Serializable {
     private double unit_price;
     private double qty;
     private String agent;
+    private String account_manager;
     private Date subscription_date;
     private Date renewal_date;
     private Date expiry_date;
@@ -293,5 +294,19 @@ public class Subscription implements Serializable {
      */
     public void setExpiry_date(Date expiry_date) {
         this.expiry_date = expiry_date;
+    }
+
+    /**
+     * @return the account_manager
+     */
+    public String getAccount_manager() {
+        return account_manager;
+    }
+
+    /**
+     * @param account_manager the account_manager to set
+     */
+    public void setAccount_manager(String account_manager) {
+        this.account_manager = account_manager;
     }
 }

@@ -23,3 +23,7 @@ VALUES('scrpt_db_upgrade_16',20,Now(),'6.0','');
 ALTER TABLE subscription ADD expiry_date datetime null;
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_16',24,Now(),'6.0','');
+
+ALTER TABLE subscription ADD account_manager varchar(50) null;
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_16',28,Now(),'6.0','');
