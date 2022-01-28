@@ -213,6 +213,10 @@ public class Trans_number_controlBean implements Serializable {
         if (null == S || S.length() == 0) {
             S = "";
         }
+        String I = Integer.toString(aTransType.getTransactionTypeId());
+        if (null == I) {
+            I = "";
+        }
         String TransNumberFormat = aTransType.getTrans_number_format();
         for (int i = 0; i < TransNumberFormat.length(); i++) {
             if (TransNumberFormat.charAt(i) == 'C') {
@@ -229,6 +233,8 @@ public class Trans_number_controlBean implements Serializable {
                 transno = transno + S;
             } else if (TransNumberFormat.charAt(i) == 'U') {
                 transno = transno + U;
+            } else if (TransNumberFormat.charAt(i) == 'I') {
+                transno = transno + I;
             }
         }
         return transno;
