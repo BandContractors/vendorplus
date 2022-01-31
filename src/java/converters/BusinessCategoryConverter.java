@@ -1,15 +1,15 @@
 package converters;
 
-import beans.SubscriptionCategoryBean;
-import entities.Subscription_category;
+import beans.BusinessCategoryBean;
+import entities.Business_category;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.ConverterException;
 import javax.faces.convert.FacesConverter;
 
-@FacesConverter("SubscriptionCategoryConverter")
-public class SubscriptionCategoryConverter implements Converter {
+@FacesConverter("BusinessCategoryConverter")
+public class BusinessCategoryConverter implements Converter {
 
     @Override
     public Object getAsObject(FacesContext context, UIComponent component, String value) {
@@ -23,7 +23,7 @@ public class SubscriptionCategoryConverter implements Converter {
         } catch (NumberFormatException nfe) {
             return null;
         }
-        return new SubscriptionCategoryBean().getSubscriptionCategory(id);
+        return new BusinessCategoryBean().getBusinessCategory(id);
 
     }
 
@@ -32,11 +32,11 @@ public class SubscriptionCategoryConverter implements Converter {
         if (value == null || value == "") {
             return null;
         }
-        if (!(value instanceof Subscription_category)) {
-            throw new ConverterException("The value is not a valid SubscriptionCategory: " + value);
+        if (!(value instanceof Business_category)) {
+            throw new ConverterException("The value is not a valid BusinessCategory: " + value);
         }
 
-        Integer gID = ((Subscription_category) value).getSubscription_category_id();
+        Integer gID = ((Business_category) value).getBusiness_category_id();
         return (gID != null) ? String.valueOf(gID) : null;
     }
 

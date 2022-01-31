@@ -12,6 +12,7 @@ public class Subscription implements Serializable {
     private int subscription_id;
     private long transactor_id;
     private int subscription_category_id;
+    private int business_category_id;
     private long item_id;
     private String description;
     private double amount;
@@ -308,5 +309,19 @@ public class Subscription implements Serializable {
      */
     public void setAccount_manager(String account_manager) {
         this.account_manager = account_manager;
+    }
+
+    /**
+     * @return the business_category_id
+     */
+    public int getBusiness_category_id() {
+        return business_category_id;
+    }
+
+    /**
+     * @param business_category_id the business_category_id to set
+     */
+    public void setBusiness_category_id(int business_category_id) {
+        this.business_category_id = business_category_id;
     }
 }

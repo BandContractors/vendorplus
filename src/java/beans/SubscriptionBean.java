@@ -1,6 +1,7 @@
 package beans;
 
 import connections.DBConnection;
+import entities.Business_category;
 import entities.GroupRight;
 import entities.Item;
 import entities.Subscription;
@@ -55,8 +56,10 @@ public class SubscriptionBean implements Serializable {
     private Transactor selectedTransactor;
     private Item selectedItem;
     private Subscription_category selectedSubscriptionCategory;
+    private Business_category selectedBusinessCategory;
     private String filterStatus = "";
     private int filterSubscriptionCategoryId = 0;
+    private int filterBusinessCategoryId = 0;
     private int filterExpiryDateRange = 0;
     private String filterRecurring = "";
     private Transactor filterTransactor;
@@ -69,6 +72,7 @@ public class SubscriptionBean implements Serializable {
     private Date oldExpiryDate = null;
     private Date subscriptionDateRenewal = null;
     private Subscription subscriptionRenewal;
+    private String subscriptionLogMessage = "";
     @ManagedProperty("#{menuItemBean}")
     private MenuItemBean menuItemBean;
 
@@ -88,6 +92,11 @@ public class SubscriptionBean implements Serializable {
                 aSubscription.setSubscription_category_id(aResultSet.getInt("subscription_category_id"));
             } catch (Exception e) {
                 aSubscription.setSubscription_category_id(0);
+            }
+            try {
+                aSubscription.setBusiness_category_id(aResultSet.getInt("business_category_id"));
+            } catch (Exception e) {
+                aSubscription.setBusiness_category_id(0);
             }
             try {
                 aSubscription.setItem_id(aResultSet.getLong("item_id"));
@@ -189,6 +198,7 @@ public class SubscriptionBean implements Serializable {
             SubscriptionTo.setSubscription_id(SubscriptionFrom.getSubscription_id());
             SubscriptionTo.setTransactor_id(SubscriptionFrom.getTransactor_id());
             SubscriptionTo.setSubscription_category_id(SubscriptionFrom.getSubscription_category_id());
+            SubscriptionTo.setBusiness_category_id(SubscriptionFrom.getBusiness_category_id());
             SubscriptionTo.setItem_id(SubscriptionFrom.getItem_id());
             SubscriptionTo.setDescription(SubscriptionFrom.getDescription());
             SubscriptionTo.setAmount(SubscriptionFrom.getAmount());
@@ -219,6 +229,7 @@ public class SubscriptionBean implements Serializable {
             SubscriptionTo.setLast_edited_by(SubscriptionFrom.getLast_edited_by());
             this.setSelectedTransactor(new TransactorBean().findTransactor(SubscriptionFrom.getTransactor_id()));
             this.setSelectedSubscriptionCategory(new SubscriptionCategoryBean().getSubscriptionCategory(SubscriptionFrom.getSubscription_category_id()));
+            this.setSelectedBusinessCategory(new BusinessCategoryBean().getBusinessCategory(SubscriptionFrom.getBusiness_category_id()));
             this.setSelectedItem(new ItemBean().findItem(SubscriptionFrom.getItem_id()));
             this.setItemUnitPrice(SubscriptionFrom.getUnit_price());
         } catch (Exception e) {
@@ -232,6 +243,7 @@ public class SubscriptionBean implements Serializable {
             SubscriptionTo.setSubscription_id(SubscriptionFrom.getSubscription_id());
             SubscriptionTo.setTransactor_id(SubscriptionFrom.getTransactor_id());
             SubscriptionTo.setSubscription_category_id(SubscriptionFrom.getSubscription_category_id());
+            SubscriptionTo.setBusiness_category_id(SubscriptionFrom.getBusiness_category_id());
             SubscriptionTo.setItem_id(SubscriptionFrom.getItem_id());
             SubscriptionTo.setDescription(SubscriptionFrom.getDescription());
             SubscriptionTo.setAmount(SubscriptionFrom.getAmount());
@@ -264,6 +276,7 @@ public class SubscriptionBean implements Serializable {
             SubscriptionTo.setLast_edited_by(SubscriptionFrom.getLast_edited_by());
             this.setSelectedTransactor(new TransactorBean().findTransactor(SubscriptionFrom.getTransactor_id()));
             this.setSelectedSubscriptionCategory(new SubscriptionCategoryBean().getSubscriptionCategory(SubscriptionFrom.getSubscription_category_id()));
+            this.setSelectedBusinessCategory(new BusinessCategoryBean().getBusinessCategory(SubscriptionFrom.getBusiness_category_id()));
             this.setSelectedItem(new ItemBean().findItem(SubscriptionFrom.getItem_id()));
             this.setItemUnitPrice(SubscriptionFrom.getUnit_price());
             this.setOldExpiryDate(SubscriptionFrom.getExpiry_date());
@@ -284,6 +297,7 @@ public class SubscriptionBean implements Serializable {
             this.subscriptionRenewal.setSubscription_id(SubscriptionFrom.getSubscription_id());
             this.subscriptionRenewal.setTransactor_id(SubscriptionFrom.getTransactor_id());
             this.subscriptionRenewal.setSubscription_category_id(SubscriptionFrom.getSubscription_category_id());
+            this.subscriptionRenewal.setBusiness_category_id(SubscriptionFrom.getBusiness_category_id());
             this.subscriptionRenewal.setItem_id(SubscriptionFrom.getItem_id());
             this.subscriptionRenewal.setDescription(SubscriptionFrom.getDescription());
             this.subscriptionRenewal.setAmount(SubscriptionFrom.getAmount());
@@ -314,6 +328,7 @@ public class SubscriptionBean implements Serializable {
             this.subscriptionRenewal.setLast_edited_by(SubscriptionFrom.getLast_edited_by());
             this.setSelectedTransactor(new TransactorBean().findTransactor(SubscriptionFrom.getTransactor_id()));
             this.setSelectedSubscriptionCategory(new SubscriptionCategoryBean().getSubscriptionCategory(SubscriptionFrom.getSubscription_category_id()));
+            this.setSelectedBusinessCategory(new BusinessCategoryBean().getBusinessCategory(SubscriptionFrom.getBusiness_category_id()));
             this.setSelectedItem(new ItemBean().findItem(SubscriptionFrom.getItem_id()));
             this.setItemUnitPrice(SubscriptionFrom.getUnit_price());
             this.setOldExpiryDate(SubscriptionFrom.getExpiry_date());
@@ -332,6 +347,7 @@ public class SubscriptionBean implements Serializable {
                 aSubscription.setSubscription_id(0);
                 aSubscription.setTransactor_id(0);
                 aSubscription.setSubscription_category_id(0);
+                aSubscription.setBusiness_category_id(0);
                 aSubscription.setItem_id(0);
                 aSubscription.setDescription("");
                 aSubscription.setAmount(0);
@@ -351,6 +367,7 @@ public class SubscriptionBean implements Serializable {
                 aSubscription.setLast_edited_by("");
                 this.setSelectedTransactor(null);
                 this.setSelectedSubscriptionCategory(null);
+                this.setSelectedBusinessCategory(null);
                 this.setSelectedItem(null);
                 this.setItemUnitPrice(0);
                 this.setOldExpiryDate(null);
@@ -367,6 +384,7 @@ public class SubscriptionBean implements Serializable {
             this.setFilterTransactor(null);
             this.setFilterStatus("");
             this.setFilterSubscriptionCategoryId(0);
+            this.setFilterBusinessCategoryId(0);
             this.setFilterExpiryDateRange(0);
             this.setFilterRecurring("");
             this.setFilterItem(null);
@@ -532,6 +550,13 @@ public class SubscriptionBean implements Serializable {
                 this.setActionMessage(ub.translateWordsInText(BaseName, msgV));
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msgV)));
             } else {
+                //set subscription log message
+                if(aSubscription.getSubscription_id() == 0){
+                    this.setSubscriptionLogMessage("Subscribed");
+                } else{
+                    this.setSubscriptionLogMessage("Edited");                    
+                }
+                //save subscription
                 status = this.insertUpdateSubscription(aSubscription);
                 if (status > 0) {
                     msgS = "Saved Successfully";
@@ -575,8 +600,13 @@ public class SubscriptionBean implements Serializable {
                 aSubscription.setCurrent_status("Opted Out");
                 this.selectedTransactor = new TransactorBean().findTransactor(aSubscription.getTransactor_id());
                 this.selectedSubscriptionCategory = new SubscriptionCategoryBean().getSubscriptionCategory(aSubscription.getSubscription_category_id());
+                this.selectedBusinessCategory = new BusinessCategoryBean().getBusinessCategory(aSubscription.getBusiness_category_id());
                 this.selectedItem = new ItemBean().findItem(aSubscription.getItem_id());
                 this.itemUnitPrice = aSubscription.getUnit_price();
+                
+                //set subscription log message
+                this.setSubscriptionLogMessage("Opted Out");
+                //save subscription
                 status = this.insertUpdateSubscription(aSubscription);
                 if (status > 0) {
                     msgS = "Saved Successfully";
@@ -627,8 +657,13 @@ public class SubscriptionBean implements Serializable {
                 //aSubscription.setSubscription_date(this.getSubscriptionDateRenewal());
                 this.selectedTransactor = new TransactorBean().findTransactor(this.subscriptionRenewal.getTransactor_id());
                 this.selectedSubscriptionCategory = new SubscriptionCategoryBean().getSubscriptionCategory(this.subscriptionRenewal.getSubscription_category_id());
+                this.selectedBusinessCategory = new BusinessCategoryBean().getBusinessCategory(aSubscription.getBusiness_category_id());
                 this.selectedItem = new ItemBean().findItem(this.subscriptionRenewal.getItem_id());
                 this.itemUnitPrice = aSubscription.getUnit_price();
+                
+                //set subscription log message
+                this.setSubscriptionLogMessage("Renewed");
+                //save subscription
                 status = this.insertUpdateSubscription(this.subscriptionRenewal);
                 if (status > 0) {
                     msgS = "Saved Successfully";
@@ -650,9 +685,9 @@ public class SubscriptionBean implements Serializable {
         long status = 0;
         int returnedSubscriptionId = 0;
         if (aSubscription.getSubscription_id() == 0) {
-            sql = "{call sp_insert_subscription(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_insert_subscription(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         } else if (aSubscription.getSubscription_id() > 0) {
-            sql = "{call sp_update_subscription(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_update_subscription(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         }
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -660,46 +695,7 @@ public class SubscriptionBean implements Serializable {
             if (aSubscription.getSubscription_id() == 0) {
                 cs.setLong(1, this.selectedTransactor.getTransactorId());
                 cs.setInt(2, this.selectedSubscriptionCategory.getSubscription_category_id());
-                cs.setLong(3, this.selectedItem.getItemId());
-                cs.setString(4, aSubscription.getDescription());
-                cs.setDouble(5, aSubscription.getAmount());
-                cs.setString(6, aSubscription.getIs_recurring());
-                cs.setString(7, aSubscription.getCurrent_status());
-                if ("No".equals(aSubscription.getIs_recurring())) {
-                    cs.setString(8, null);
-                } else {
-                    cs.setString(8, aSubscription.getFrequency());
-                }
-                //cs.setDouble(9, aSubscription.getUnit_price());
-                cs.setDouble(9, this.itemUnitPrice);
-                cs.setDouble(10, aSubscription.getQty());
-                cs.setString(11, aSubscription.getAgent());
-                cs.setString(12, aSubscription.getAccount_manager());
-                cs.setTimestamp(13, new java.sql.Timestamp(aSubscription.getSubscription_date().getTime()));
-                cs.setTimestamp(14, null);
-                if ("No".equals(aSubscription.getIs_recurring())) {
-                    cs.setTimestamp(15, null);
-                } else {
-                    cs.setTimestamp(15, new java.sql.Timestamp(aSubscription.getExpiry_date().getTime()));
-                }
-                cs.setTimestamp(16, new java.sql.Timestamp(new java.util.Date().getTime()));
-                cs.setString(17, new GeneralUserSetting().getCurrentUser().getUserName());
-                cs.setDate(18, null);
-                cs.setString(19, aSubscription.getLast_edited_by());
-                cs.setInt(20, returnedSubscriptionId);
-
-                cs.executeUpdate();
-                status = 1;
-                //get Id of newly inserted subscription
-                returnedSubscriptionId = cs.getInt(20);
-
-                //save subscription log
-                this.saveSubscriptionLog(returnedSubscriptionId, "Subscribed");
-
-            } else if (aSubscription.getSubscription_id() > 0) {
-                cs.setInt(1, aSubscription.getSubscription_id());
-                cs.setLong(2, this.selectedTransactor.getTransactorId());
-                cs.setInt(3, this.selectedSubscriptionCategory.getSubscription_category_id());
+                cs.setInt(3, this.selectedBusinessCategory.getBusiness_category_id());
                 cs.setLong(4, this.selectedItem.getItemId());
                 cs.setString(5, aSubscription.getDescription());
                 cs.setDouble(6, aSubscription.getAmount());
@@ -716,26 +712,70 @@ public class SubscriptionBean implements Serializable {
                 cs.setString(12, aSubscription.getAgent());
                 cs.setString(13, aSubscription.getAccount_manager());
                 cs.setTimestamp(14, new java.sql.Timestamp(aSubscription.getSubscription_date().getTime()));
-                if (aSubscription.getRenewal_date() != null) {
-                    cs.setTimestamp(15, new java.sql.Timestamp(aSubscription.getRenewal_date().getTime()));
-                } else {
-                    cs.setTimestamp(15, null);
-                }
+                cs.setTimestamp(15, null);
                 if ("No".equals(aSubscription.getIs_recurring())) {
                     cs.setTimestamp(16, null);
                 } else {
                     cs.setTimestamp(16, new java.sql.Timestamp(aSubscription.getExpiry_date().getTime()));
                 }
-                cs.setTimestamp(17, new java.sql.Timestamp(aSubscription.getAdd_date().getTime()));
-                cs.setString(18, aSubscription.getAdded_by());
-                cs.setTimestamp(19, new java.sql.Timestamp(new java.util.Date().getTime()));
-                cs.setString(20, new GeneralUserSetting().getCurrentUser().getUserName());
+                cs.setTimestamp(17, new java.sql.Timestamp(new java.util.Date().getTime()));
+                cs.setString(18, new GeneralUserSetting().getCurrentUser().getUserName());
+                cs.setDate(19, null);
+                cs.setString(20, aSubscription.getLast_edited_by());
+                cs.setInt(21, returnedSubscriptionId);
+
+                cs.executeUpdate();
+                status = 1;
+                //get Id of newly inserted subscription
+                returnedSubscriptionId = cs.getInt(21);
+
+                //save subscription log
+                this.saveSubscriptionLog(returnedSubscriptionId, this.getSubscriptionLogMessage());
+                this.setSubscriptionLogMessage("");
+                //this.saveSubscriptionLog(returnedSubscriptionId, "Subscribed");
+
+            } else if (aSubscription.getSubscription_id() > 0) {
+                cs.setInt(1, aSubscription.getSubscription_id());
+                cs.setLong(2, this.selectedTransactor.getTransactorId());
+                cs.setInt(3, this.selectedSubscriptionCategory.getSubscription_category_id());
+                cs.setInt(4, this.selectedBusinessCategory.getBusiness_category_id());
+                cs.setLong(5, this.selectedItem.getItemId());
+                cs.setString(6, aSubscription.getDescription());
+                cs.setDouble(7, aSubscription.getAmount());
+                cs.setString(8, aSubscription.getIs_recurring());
+                cs.setString(9, aSubscription.getCurrent_status());
+                if ("No".equals(aSubscription.getIs_recurring())) {
+                    cs.setString(10, null);
+                } else {
+                    cs.setString(10, aSubscription.getFrequency());
+                }
+                //cs.setDouble(11, aSubscription.getUnit_price());
+                cs.setDouble(11, this.itemUnitPrice);
+                cs.setDouble(12, aSubscription.getQty());
+                cs.setString(13, aSubscription.getAgent());
+                cs.setString(14, aSubscription.getAccount_manager());
+                cs.setTimestamp(15, new java.sql.Timestamp(aSubscription.getSubscription_date().getTime()));
+                if (aSubscription.getRenewal_date() != null) {
+                    cs.setTimestamp(16, new java.sql.Timestamp(aSubscription.getRenewal_date().getTime()));
+                } else {
+                    cs.setTimestamp(16, null);
+                }
+                if ("No".equals(aSubscription.getIs_recurring())) {
+                    cs.setTimestamp(17, null);
+                } else {
+                    cs.setTimestamp(17, new java.sql.Timestamp(aSubscription.getExpiry_date().getTime()));
+                }
+                cs.setTimestamp(18, new java.sql.Timestamp(aSubscription.getAdd_date().getTime()));
+                cs.setString(19, aSubscription.getAdded_by());
+                cs.setTimestamp(20, new java.sql.Timestamp(new java.util.Date().getTime()));
+                cs.setString(21, new GeneralUserSetting().getCurrentUser().getUserName());
                 cs.executeUpdate();
                 status = 1;
 
                 //save subscription log                
-                String action = aSubscription.getCurrent_status().equals("Opted Out") || aSubscription.getCurrent_status().equals("Expired") ? aSubscription.getCurrent_status() : "Renewed";
-                this.saveSubscriptionLog(aSubscription.getSubscription_id(), action);
+                //String action = aSubscription.getCurrent_status().equals("Opted Out") || aSubscription.getCurrent_status().equals("Expired") ? aSubscription.getCurrent_status() : "Renewed";
+                this.saveSubscriptionLog(aSubscription.getSubscription_id(), this.getSubscriptionLogMessage());
+                this.setSubscriptionLogMessage("");
             }
         } catch (Exception e) {
             status = 0;
@@ -897,6 +937,9 @@ public class SubscriptionBean implements Serializable {
         if (this.filterSubscriptionCategoryId > 0) {
             wheresql = wheresql + " AND subscription_category_id=" + this.filterSubscriptionCategoryId;
         }
+        if (this.filterBusinessCategoryId > 0) {
+            wheresql = wheresql + " AND business_category_id=" + this.filterBusinessCategoryId;
+        }
         if (this.filterExpiryDateRange > 0) {
             //wheresql = wheresql + " AND timestampdiff(MONTH, NOW(),expiry_date) =" + this.filterExpiryDateRange;
             if (this.filterExpiryDateRange == 30) {
@@ -956,6 +999,9 @@ public class SubscriptionBean implements Serializable {
         }
         if (this.filterSubscriptionCategoryId > 0) {
             wheresql = wheresql + " AND subscription_category_id=" + this.filterSubscriptionCategoryId;
+        }
+        if (this.filterBusinessCategoryId > 0) {
+            wheresql = wheresql + " AND business_category_id=" + this.filterBusinessCategoryId;
         }
         if (this.filterExpiryDateRange > 0) {
             if (this.filterExpiryDateRange == 30) {
@@ -1409,5 +1455,47 @@ public class SubscriptionBean implements Serializable {
      */
     public void setUniqueAccount_managerList(List<String> uniqueAccount_managerList) {
         this.uniqueAccount_managerList = uniqueAccount_managerList;
+    }
+
+    /**
+     * @return the selectedBusinessCategory
+     */
+    public Business_category getSelectedBusinessCategory() {
+        return selectedBusinessCategory;
+    }
+
+    /**
+     * @param selectedBusinessCategory the selectedBusinessCategory to set
+     */
+    public void setSelectedBusinessCategory(Business_category selectedBusinessCategory) {
+        this.selectedBusinessCategory = selectedBusinessCategory;
+    }
+
+    /**
+     * @return the filterBusinessCategoryId
+     */
+    public int getFilterBusinessCategoryId() {
+        return filterBusinessCategoryId;
+    }
+
+    /**
+     * @param filterBusinessCategoryId the filterBusinessCategoryId to set
+     */
+    public void setFilterBusinessCategoryId(int filterBusinessCategoryId) {
+        this.filterBusinessCategoryId = filterBusinessCategoryId;
+    }
+
+    /**
+     * @return the subscriptionLogMessage
+     */
+    public String getSubscriptionLogMessage() {
+        return subscriptionLogMessage;
+    }
+
+    /**
+     * @param subscriptionLogMessage the subscriptionLogMessage to set
+     */
+    public void setSubscriptionLogMessage(String subscriptionLogMessage) {
+        this.subscriptionLogMessage = subscriptionLogMessage;
     }
 }

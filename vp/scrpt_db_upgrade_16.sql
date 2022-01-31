@@ -27,3 +27,8 @@ VALUES('scrpt_db_upgrade_16',24,Now(),'6.0','');
 ALTER TABLE subscription ADD account_manager varchar(50) null;
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_16',28,Now(),'6.0','');
+
+create table business_category (business_category_id int(11) not null auto_increment, category_name varchar(50) not null, primary key (business_category_id));
+ALTER TABLE subscription ADD business_category_id int(11) not null;
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_16',33,Now(),'6.0','');

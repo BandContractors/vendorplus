@@ -27,11 +27,12 @@
     <h:body>
         <ui:include src="Menu.xhtml"/>
         <h:form id="form">
-            <h:panelGrid styleClass="clsPanelReportFilterTitle" columns="2">
-                <p:commandButton actionListener="#{subscriptionBean.clearSubscription(subscription)}" value="Subscription" onsuccess="PF('dlgSubscription').show();" icon="ui-icon-circle-plus" style="float: left">
+            <h:panelGrid styleClass="clsPanelReportFilterTitle" columns="3">
+                <p:commandButton actionListener="#{subscriptionBean.clearSubscription(subscription)}" value="Subscription" onsuccess="PF('dlgSubscription').show();" icon="ui-icon-circle-plus" style="float: none">
                     <f:ajax render="form:modalSubscription"/>
                 </p:commandButton>
-                <p:commandButton value="#{langsys['Subscription']} #{langsys['Category']}" action="#{navigationBean.redirectToSubscriptionCategory()}" style="background-color: yellow !important; float: right" />
+                <p:commandButton value="#{langsys['Subscription']} #{langsys['Category']}" action="#{navigationBean.redirectToSubscriptionCategory()}" style="background-color: yellow !important; float: none" />
+                <p:commandButton value="#{langsys['Business']} #{langsys['Category']}" action="#{navigationBean.redirectToBusinessCategory()}" style="background-color: red !important; float: none" />
             </h:panelGrid>
 
             <h:panelGrid columns="1">
@@ -40,7 +41,7 @@
 
             <!--Filter-->
             <h:panelGrid id="pnlgFilter" columns="2" styleClass="clsPanelReportFilter">
-                <h:panelGrid id="filter" columns="8">
+                <h:panelGrid id="filter" columns="6">
                     <p:outputLabel value="#{langsys['Customer']}"/>
                     <p:autoComplete value="#{subscriptionBean.filterTransactor}" 
                                     completeMethod="#{transactorBean.getTransactorActiveObjectList}" 
@@ -64,10 +65,15 @@
                         <f:selectItem itemLabel="Expired" itemValue="Expired"/>
                         <f:selectItem itemLabel="Opted Out" itemValue="Opted Out"/>
                     </p:selectOneMenu>
-                    <p:outputLabel value="#{langsys['Category']}"/>
+                    <p:outputLabel value="#{langsys['Subscription']} #{langsys['Category']}"/>
                     <p:selectOneMenu value="#{subscriptionBean.filterSubscriptionCategoryId}" style="width: 150px">
                         <f:selectItem itemLabel="" itemValue="0"/>
                         <f:selectItems value="#{subscriptionCategoryBean.getSubscriptionCategory()}" var="sc" itemLabel="#{sc.category_name}" itemValue="#{sc.subscription_category_id}"/>
+                    </p:selectOneMenu>
+                    <p:outputLabel value="#{langsys['Business']} #{langsys['Category']}"/>
+                    <p:selectOneMenu value="#{subscriptionBean.filterBusinessCategoryId}" style="width: 150px">
+                        <f:selectItem itemLabel="" itemValue="0"/>
+                        <f:selectItems value="#{businessCategoryBean.getBusinessCategory()}" var="bc" itemLabel="#{bc.category_name}" itemValue="#{bc.business_category_id}"/>
                     </p:selectOneMenu>
                     <p:outputLabel value="#{langsys['Days']} #{langsys['To']} #{langsys['Expiry']}"/>
                     <p:selectOneMenu value="#{subscriptionBean.filterExpiryDateRange}" style="width: 150px">
@@ -198,8 +204,11 @@
                 <p:column headerText="#{langsys['Customer']}">
                     <h:outputText value="#{transactorBean.findTransactor(s.transactor_id).getTransactorNames()}"/>
                 </p:column>
-                <p:column headerText="#{langsys['Category']}">
+                <p:column headerText="#{langsys['Subscription']} #{langsys['Category']}">
                     <h:outputText value="#{subscriptionCategoryBean.getSubscriptionCategory(s.subscription_category_id).getCategory_name()}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Business']} #{langsys['Category']}">
+                    <h:outputText value="#{businessCategoryBean.getBusinessCategory(s.business_category_id).getCategory_name()}"/>
                 </p:column>
                 <p:column headerText="#{langsys['Item']}">
                     <h:outputText value="#{itemBean.findItem(s.item_id).getDescription()}"/>
@@ -211,9 +220,6 @@
                     <h:outputText value="#{s.amount}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
-                </p:column>
-                <p:column headerText="#{langsys['Recurring']}">
-                    <h:outputText value="#{s.is_recurring}"/>
                 </p:column>
                 <p:column headerText="#{langsys['Status']}">
                     <h:outputText value="#{s.current_status}"/>
@@ -338,6 +344,21 @@
                                 #{sc.category_code} 
                             </p:column>
                         </p:autoComplete>
+                        <h:outputLabel  value="#{langsys['Business']} #{langsys['Category']}:"/>
+                        <p:autoComplete id="autcBusinessCategory" value="#{subscriptionBean.selectedBusinessCategory}" 
+                                        completeMethod="#{businessCategoryBean.getBusinessCategoryByBusinessCategoryName}" 
+                                        var="bc" 
+                                        itemLabel="#{bc.category_name}" 
+                                        itemValue="#{bc}" 
+                                        converter="BusinessCategoryConverter"
+                                        style="text-align: left;" 
+                                        forceSelection="true" queryDelay="0" inputStyle="width: 320px" 
+                                        >
+                            <p:column headerText="#{langsys['Name']}" style="text-align: left" >  
+                                #{bc.category_name} 
+                            </p:column>
+                            <p:ajax event="blur" update="form:cmdbSave"/>
+                        </p:autoComplete>
                         <h:outputLabel  value="#{langsys['Item']}:"/>
                         <p:autoComplete id="autcItem" widgetVar="WautcItem" value="#{subscriptionBean.selectedItem}"  
                                         completeMethod="#{itemBean.getItemObjectListForSale_old}" 
@@ -431,7 +452,7 @@
 
                     <h:panelGrid styleClass="clsGridMainCommands" columns="1">
                         <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
-                            <p:commandButton update="tblSummary form:popup form:dtblSubscription form:growl1" actionListener="#{subscriptionBean.saveSubscription(subscription)}" styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['SAVE']}" style="color: white; background-color: #00B259" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                            <p:commandButton update="pnlgFilter tblSummary form:popup form:dtblSubscription form:growl1" actionListener="#{subscriptionBean.saveSubscription(subscription)}" styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['SAVE']}" disabled="#{subscriptionBean.selectedBusinessCategory eq null}" style="color: white; background-color: #00B259" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                                 <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                                     <p:graphicImage name="/images/ajax-loader.gif"/>
                                 </p:dialog>

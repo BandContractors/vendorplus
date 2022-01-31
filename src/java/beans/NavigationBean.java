@@ -1819,6 +1819,10 @@ public class NavigationBean implements Serializable {
         return "SubscriptionCategory?faces-redirect=true";
     }
 
+    public String redirectToBusinessCategory() {
+        return "BusinessCategory?faces-redirect=true";
+    }
+
     /**
      * @return the menuItemBean
      */

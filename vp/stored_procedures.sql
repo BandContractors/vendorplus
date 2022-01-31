@@ -12867,12 +12867,83 @@ BEGIN
 END//
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS sp_insert_business_category;
+DELIMITER //
+CREATE PROCEDURE sp_insert_business_category
+(
+	IN in_category_name varchar(50)
+) 
+BEGIN 
+	SET @new_id=0;
+	CALL sp_get_new_id("business_category","business_category_id",@new_id);
+	INSERT INTO business_category
+	(
+		business_category_id,
+		category_name
+	) 
+    VALUES
+	(
+		@new_id,
+		in_category_name
+	); 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_update_business_category;
+DELIMITER //
+CREATE PROCEDURE sp_update_business_category
+(
+	IN in_business_category_id int,
+	IN in_category_name varchar(50)
+) 
+BEGIN 
+	UPDATE business_category SET 
+		category_name=in_category_name
+	WHERE business_category_id=in_business_category_id; 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_business_category_by_id;
+DELIMITER //
+CREATE PROCEDURE sp_search_business_category_by_id
+(
+	IN in_business_category_id int
+) 
+BEGIN 
+	SELECT * FROM business_category 
+	WHERE business_category_id=in_business_category_id; 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_business_category_by_name;
+DELIMITER //
+CREATE PROCEDURE sp_search_business_category_by_name
+(
+	IN in_category_name varchar(50)
+) 
+BEGIN 
+	SELECT * FROM business_category 
+	WHERE category_name LIKE concat('%',in_category_name,'%')  
+	ORDER BY category_name ASC; 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_business_category_by_none;
+DELIMITER //
+CREATE PROCEDURE sp_search_business_category_by_none() 
+BEGIN 
+	SELECT * FROM business_category 
+	ORDER BY category_name ASC; 
+END//
+DELIMITER ;
+
 DROP PROCEDURE IF EXISTS sp_insert_subscription;
 DELIMITER //
 CREATE PROCEDURE sp_insert_subscription
 (
 	IN in_transactor_id bigint,
 	IN in_subscription_category_id int,
+	IN in_business_category_id int,
 	IN in_item_id bigint,
 	IN in_description varchar(150),
 	IN in_amount double,
@@ -12901,6 +12972,7 @@ BEGIN
 		subscription_id,
 		transactor_id,
 		subscription_category_id,
+		business_category_id,
 		item_id,
 		description,
 		amount,
@@ -12924,6 +12996,7 @@ BEGIN
 		@new_id,
 		in_transactor_id,
 		in_subscription_category_id,
+		in_business_category_id,
 		in_item_id,
 		in_description,
 		in_amount,
@@ -12952,6 +13025,7 @@ CREATE PROCEDURE sp_update_subscription
 	IN in_subscription_id int,
 	IN in_transactor_id bigint,
 	IN in_subscription_category_id int,
+	IN in_business_category_id int,
 	IN in_item_id bigint,
 	IN in_description varchar(150),
 	IN in_amount double,
@@ -12974,6 +13048,7 @@ BEGIN
 	UPDATE subscription SET 
 		transactor_id=in_transactor_id,
 		subscription_category_id=in_subscription_category_id,
+		business_category_id=in_business_category_id,
 		item_id=in_item_id,
 		description=in_description,
 		amount=in_amount,
@@ -13044,4 +13119,3 @@ BEGIN
 	ORDER BY subscription_id ASC; 
 END//
 DELIMITER ;
-
