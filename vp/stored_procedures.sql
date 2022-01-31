@@ -1482,6 +1482,210 @@ CREATE PROCEDURE sp_insert_transaction_item
 	IN in_specific_size double
 ) 
 BEGIN 
+	-- SET @new_id=0;
+	-- CALL sp_get_new_id("transaction_item","transaction_item_id",@new_id);
+
+	SET @item_expiry_date=NULL;
+	if (in_item_expiry_date is not null) then
+		set @item_expiry_date=in_item_expiry_date;
+	end if;
+
+	SET @item_mnf_date=NULL;
+	if (in_item_mnf_date is not null) then
+		set @item_mnf_date=in_item_mnf_date;
+	end if;
+
+	SET @in_batchno='';
+	if (in_batchno is not null) then
+		set @in_batchno=in_batchno;
+	end if;
+	SET @code_specific='';
+	if (in_code_specific is not null) then
+		set @code_specific=in_code_specific;
+	end if;
+	SET @desc_specific='';
+	if (in_desc_specific is not null) then
+		set @desc_specific=in_desc_specific;
+	end if;
+	SET @desc_more=null;
+	if (in_desc_more!='' and in_desc_more is not null) then
+		set @desc_more=in_desc_more;
+	end if;
+	SET @warranty_desc=null;
+	if (in_warranty_desc!="" and in_warranty_desc is not null) then
+		set @warranty_desc=in_warranty_desc;
+	end if;
+	SET @warranty_expiry_date=NULL;
+	if (in_warranty_expiry_date is not null) then
+		set @warranty_expiry_date=in_warranty_expiry_date;
+	end if;
+	SET @account_code=null;
+	if (in_account_code!='' and in_account_code is not null) then
+		set @account_code=in_account_code;
+	end if;
+		SET @in_purchase_date=NULL;
+		if (in_purchase_date is not null) then
+			set @in_purchase_date=in_purchase_date;
+		end if;
+		SET @in_dep_start_date=NULL;
+		if (in_dep_start_date is not null) then
+			set @in_dep_start_date=in_dep_start_date;
+		end if;
+		SET @in_dep_method_id=NULL;
+		if (in_dep_method_id!=0) then
+			set @in_dep_method_id=in_dep_method_id;
+		end if;
+		SET @in_average_method_id=NULL;
+		if (in_average_method_id!=0) then
+			set @in_average_method_id=in_average_method_id;
+		end if;
+		SET @in_item_id=NULL;
+		if (in_item_id!=0) then
+			set @in_item_id=in_item_id;
+		end if;
+		SET @in_specific_size=1;
+		if (in_specific_size!=0) then
+			set @in_specific_size=in_specific_size;
+		end if;
+
+	INSERT INTO transaction_item
+	(
+		transaction_id,
+		item_id,
+		batchno,
+		item_qty,
+		unit_price,
+		unit_trade_discount,
+		unit_vat,
+		amount,
+		item_expiry_date,
+		item_mnf_date,
+		vat_rated,
+		vat_perc,
+		unit_price_inc_vat,
+		unit_price_exc_vat,
+		amount_inc_vat,
+		amount_exc_vat,
+		stock_effect,
+		is_trade_discount_vat_liable,
+		unit_cost_price,
+		unit_profit_margin,
+		earn_perc,
+		earn_amount,
+		code_specific,
+		desc_specific,
+		desc_more,
+		warranty_desc,
+		warranty_expiry_date,
+		account_code,
+		purchase_date,
+		dep_start_date,
+		dep_method_id,
+		dep_rate,
+		average_method_id,
+		effective_life,
+		residual_value,
+		narration,
+		qty_balance,
+		duration_value,
+		qty_damage,
+		duration_passed,
+		specific_size
+	) 
+    VALUES
+	(
+		in_transaction_id,
+		@in_item_id,
+		@in_batchno,
+		in_item_qty,
+		in_unit_price,
+		in_unit_trade_discount,
+		in_unit_vat,
+		in_amount,
+		@item_expiry_date,
+		@item_mnf_date,
+		in_vat_rated,
+		in_vat_perc,
+		in_unit_price_inc_vat,
+		in_unit_price_exc_vat,
+		in_amount_inc_vat,
+		in_amount_exc_vat,
+		in_stock_effect,
+		in_is_trade_discount_vat_liable,
+		in_unit_cost_price,
+		in_unit_profit_margin,
+		in_earn_perc,
+		in_earn_amount,
+		@code_specific,
+		@desc_specific,
+		@desc_more,
+		@warranty_desc,
+		@warranty_expiry_date,
+		@account_code,
+		@in_purchase_date,
+		@in_dep_start_date,
+		@in_dep_method_id,
+		in_dep_rate,
+		@in_average_method_id,
+		in_effective_life,
+		in_residual_value,
+		in_narration,
+		in_qty_balance,
+		in_duration_value,
+		in_qty_damage,
+		in_duration_passed,
+		@in_specific_size
+	); 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_insert_transaction_item_old;
+DELIMITER //
+CREATE PROCEDURE sp_insert_transaction_item_old
+(
+	IN in_transaction_id bigint,
+	IN in_item_id bigint,
+	IN in_batchno varchar(100),
+	IN in_item_qty double,
+	IN in_unit_price double,
+	IN in_unit_trade_discount double,
+	IN in_unit_vat double,
+	IN in_amount double,
+	IN in_item_expiry_date date,
+	IN in_item_mnf_date date,
+	IN in_vat_rated varchar(50),
+	IN in_vat_perc double,
+	IN in_unit_price_inc_vat double,
+	IN in_unit_price_exc_vat double,
+	IN in_amount_inc_vat double,
+	IN in_amount_exc_vat double,
+	IN in_stock_effect varchar(1),
+	IN in_is_trade_discount_vat_liable varchar(3),
+	IN in_unit_cost_price double,
+	IN in_unit_profit_margin double,
+	IN in_earn_perc double,
+	IN in_earn_amount double,
+	IN in_code_specific varchar(250),
+	IN in_desc_specific varchar(250),
+	IN in_desc_more varchar(250),
+	IN in_warranty_desc varchar(150),
+	IN in_warranty_expiry_date date,
+	IN in_account_code varchar(20),
+	IN in_purchase_date date,
+	IN in_dep_start_date date,
+	IN in_dep_method_id int,
+	IN in_dep_rate double,
+	IN in_average_method_id int,
+	IN in_effective_life int,
+	IN in_residual_value double,
+	IN in_narration varchar(100),
+	IN in_qty_balance double,
+	IN in_duration_value double,
+	IN in_qty_damage double,
+	IN in_duration_passed double,
+	IN in_specific_size double
+) 
+BEGIN 
 	SET @new_id=0;
 	CALL sp_get_new_id("transaction_item","transaction_item_id",@new_id);
 
@@ -2070,6 +2274,264 @@ DELIMITER ;
 DROP PROCEDURE IF EXISTS sp_insert_transaction;
 DELIMITER //
 CREATE PROCEDURE sp_insert_transaction
+(
+	IN in_transaction_date date,
+	IN in_store_id int,
+	IN in_store2_id int,
+	IN in_transactor_id bigint,
+	IN in_transaction_type_id int,
+	IN in_transaction_reason_id int,
+	IN in_cash_discount double,
+	IN in_total_vat double,
+	IN in_transaction_comment varchar(255),
+	IN in_add_user_detail_id int,
+	IN in_add_date datetime,
+	IN in_edit_user_detail_id int,
+	IN in_edit_date datetime,
+	IN in_transaction_ref varchar(100),
+	OUT out_transaction_id bigint,
+	IN in_sub_total double,
+	IN in_grand_total double,
+	IN in_total_trade_discount double,
+	IN in_points_awarded double,
+	IN in_card_number varchar(10),
+	IN in_total_std_vatable_amount double,
+	IN in_total_zero_vatable_amount double,
+	IN in_total_exempt_vatable_amount double,
+	IN in_vat_perc double,
+	IN in_amount_tendered double,
+	IN in_change_amount double,
+	IN in_is_cash_discount_vat_liable varchar(3),
+	IN in_total_profit_margin double,
+	IN in_transaction_user_detail_id int,
+	IN in_bill_transactor_id bigint,
+	IN in_scheme_transactor_id bigint,
+	IN in_princ_scheme_member varchar(100),
+	IN in_scheme_card_number varchar(100),
+	IN in_transaction_number varchar(50),
+	IN in_delivery_date date,
+	IN in_delivery_address varchar(250),
+	IN in_pay_terms varchar(250),
+	IN in_terms_conditions varchar(250),
+	IN in_authorised_by_user_detail_id int,
+	IN in_authorise_date date,
+	IN in_pay_due_date date,
+	IN in_expiry_date date,
+	IN in_acc_child_account_id int,
+	IN in_currency_code varchar(10),
+	IN in_xrate double,
+	IN in_from_date date,
+	IN in_to_date date,
+	IN in_duration_type  varchar(20),
+	IN in_site_id bigint,
+	IN in_transactor_rep  varchar(50),
+	IN in_transactor_vehicle  varchar(20),
+	IN in_transactor_driver  varchar(50),
+	IN in_duration_value double,
+	IN in_location_id bigint,
+	IN in_status_code  varchar(20),
+	IN in_status_date datetime,
+	IN in_delivery_mode varchar(20),
+	IN in_is_processed int,
+	IN in_is_paid int,
+	IN in_is_cancel int,
+	IN in_spent_points_amount double
+) 
+BEGIN 
+	-- SET @new_id=0;
+	-- CALL sp_get_new_id("transaction","transaction_id",@new_id);
+	
+	SET @cur_sys_datetime=null;
+	CALL sp_get_current_system_datetime(@cur_sys_datetime);
+
+	SET @edit_datetime=null;
+	SET @edit_user_detail_id=null;
+	
+	SET @store2_id=NULL;
+	if (in_store2_id!=0) then
+		set @store2_id=in_store2_id;
+	end if;
+
+	SET @transactor_id=NULL;
+	if (in_transactor_id!=0) then
+		set @transactor_id=in_transactor_id;
+	end if;
+
+	SET @transaction_user_detail_id=NULL;
+	if (in_transaction_user_detail_id!=0) then
+		set @transaction_user_detail_id=in_transaction_user_detail_id;
+	end if;
+
+	SET @bill_transactor_id=NULL;
+	if (in_bill_transactor_id!=0) then
+		set @bill_transactor_id=in_bill_transactor_id;
+	end if;
+
+	SET @scheme_transactor_id=NULL;
+	if (in_scheme_transactor_id!=0) then
+		set @scheme_transactor_id=in_scheme_transactor_id;
+	end if;
+
+	SET @scheme_transactor_id=NULL;
+	if (in_scheme_transactor_id!=0) then
+		set @scheme_transactor_id=in_scheme_transactor_id;
+	end if;
+
+	SET @authorised_by_user_detail_id=NULL;
+	if (in_authorised_by_user_detail_id!=0) then
+		set @authorised_by_user_detail_id=in_authorised_by_user_detail_id;
+	end if;
+	/*
+	SET @transaction_number=@new_id;
+	if (in_transaction_number!='') then
+		set @transaction_number=in_transaction_number;
+	end if;
+    */
+    set @transaction_number=in_transaction_number;
+
+	SET @acc_child_account_id=NULL;
+	if (in_acc_child_account_id!=0) then
+		set @acc_child_account_id=in_acc_child_account_id;
+	end if;
+
+	SET @location_id=NULL;
+	if (in_location_id!=0) then
+		set @location_id=in_location_id;
+	end if;
+
+	INSERT INTO transaction
+	(
+		transaction_date,
+		store_id,
+		store2_id,
+		transactor_id,
+		transaction_type_id,
+		transaction_reason_id,
+		cash_discount,
+		total_vat,
+		transaction_comment,
+		add_user_detail_id,
+		add_date,
+		edit_user_detail_id,
+		edit_date,
+		transaction_ref,
+		sub_total,
+		grand_total,
+		total_trade_discount,
+		points_awarded,
+		card_number,
+		total_std_vatable_amount,
+		total_zero_vatable_amount,
+		total_exempt_vatable_amount,
+		vat_perc,
+		amount_tendered,
+		change_amount,
+		is_cash_discount_vat_liable,
+		total_profit_margin,
+		transaction_user_detail_id,
+		bill_transactor_id,
+		scheme_transactor_id,
+		princ_scheme_member,
+		scheme_card_number,
+		transaction_number,
+		delivery_date,
+		delivery_address,
+		pay_terms,
+		terms_conditions,
+		authorised_by_user_detail_id,
+		authorise_date,
+		pay_due_date,
+		expiry_date,
+		acc_child_account_id,
+		currency_code,
+		xrate,
+		from_date,
+		to_date,
+		duration_type,
+		site_id,
+		transactor_rep,
+		transactor_vehicle,
+		transactor_driver,
+		duration_value,
+		location_id,
+		status_code,
+		status_date,
+		delivery_mode,
+		is_processed,
+		is_paid,
+		is_cancel,
+        spent_points_amount
+	) 
+    VALUES
+	(
+		in_transaction_date,
+		in_store_id,
+		@store2_id,
+		@transactor_id,
+		in_transaction_type_id,
+		in_transaction_reason_id,
+		in_cash_discount,
+		in_total_vat,
+		in_transaction_comment,
+		in_add_user_detail_id,
+		@cur_sys_datetime,
+		@edit_user_detail_id,
+		@edit_datetime,
+		in_transaction_ref,
+		in_sub_total,
+		in_grand_total,
+		in_total_trade_discount,
+		in_points_awarded,
+		in_card_number,
+		in_total_std_vatable_amount,
+		in_total_zero_vatable_amount,
+		in_total_exempt_vatable_amount,
+		in_vat_perc,
+		in_amount_tendered,
+		in_change_amount,
+		in_is_cash_discount_vat_liable,
+		in_total_profit_margin,
+		@transaction_user_detail_id,
+		@bill_transactor_id,
+		@scheme_transactor_id,
+		in_princ_scheme_member,
+		in_scheme_card_number,
+		@transaction_number,
+		in_delivery_date,
+		in_delivery_address,
+		in_pay_terms,
+		in_terms_conditions,
+		@authorised_by_user_detail_id,
+		in_authorise_date,
+		in_pay_due_date,
+		in_expiry_date,
+		@acc_child_account_id,
+		in_currency_code,
+		in_xrate,
+		in_from_date,
+		in_to_date,
+		in_duration_type,
+		in_site_id,
+		in_transactor_rep,
+		in_transactor_vehicle,
+		in_transactor_driver,
+		in_duration_value,
+		@location_id,
+		in_status_code,
+		in_status_date,
+		in_delivery_mode,
+		in_is_processed,
+		in_is_paid,
+		in_is_cancel,
+        in_spent_points_amount
+	); 
+SET out_transaction_id=LAST_INSERT_ID();
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_insert_transaction_old;
+DELIMITER //
+CREATE PROCEDURE sp_insert_transaction_old
 (
 	IN in_transaction_date date,
 	IN in_store_id int,

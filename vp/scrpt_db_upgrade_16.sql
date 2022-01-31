@@ -28,7 +28,16 @@ ALTER TABLE subscription ADD account_manager varchar(50) null;
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_16',28,Now(),'6.0','');
 
+SET FOREIGN_KEY_CHECKS=0;
+DROP INDEX  Trans_to_TransItem_on_TransId ON transaction_item;
+ALTER TABLE transaction CHANGE COLUMN transaction_id transaction_id BIGINT(20) NOT NULL AUTO_INCREMENT ;
+ALTER TABLE transaction_item CHANGE COLUMN transaction_item_id transaction_item_id BIGINT(20) NOT NULL AUTO_INCREMENT ;
+SET FOREIGN_KEY_CHECKS=1;
+UPDATE transaction_type SET trans_number_format='IYMW' WHERE transaction_type_id>0 AND length(ifnull(trans_number_format,''))=0;
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_16',37,Now(),'6.0','');
+
 create table business_category (business_category_id int(11) not null auto_increment, category_name varchar(50) not null, primary key (business_category_id));
 ALTER TABLE subscription ADD business_category_id int(11) not null;
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
-VALUES('scrpt_db_upgrade_16',33,Now(),'6.0','');
+VALUES('scrpt_db_upgrade_16',42,Now(),'6.0','');
