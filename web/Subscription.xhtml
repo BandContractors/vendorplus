@@ -244,7 +244,7 @@
                     <p:commandButton update="form:modalSubscriptionRenewal" actionListener="#{subscriptionBean.displaySubscriptionRenewal(s,subscription)}" oncomplete="PF('dlgSubscriptionRenewal').show();" icon="ui-icon-seek-next" title="Renew" style="color: white; background-color: blueviolet !important" >
                     </p:commandButton>
                     &nbsp;
-                    <p:commandButton update="modalSubscriptionLog" actionListener="#{subscriptionBean.getSubscriptionLogSubscriptionById(s.subscription_id)}" oncomplete="PF('dlgSubscriptionLog').show();" icon="ui-icon-info" title="View Subscription Logs" style="color: white; background-color: yellow !important" >
+                    <p:commandButton update="modalSubscriptionLog" actionListener="#{subscriptionBean.getSubscriptionLogBySubscriptionId(s.subscription_id)}" oncomplete="PF('dlgSubscriptionLog').show();" icon="ui-icon-info" title="View Subscription Logs" style="color: white; background-color: yellow !important" >
                     </p:commandButton>
                     &nbsp;
                 </p:column>
@@ -478,7 +478,7 @@
                 <h:dataTable id="dtblSubscriptionLog" value="#{subscriptionBean.subscriptionsLogList}" var="sl" styleClass="cls-table" 
                              headerClass="cls-table-header" 
                              rowClasses="cls-table-odd-row,cls-table-even-row" 
-                             columnClasses="cls-table-col1,cls-table-col2,cls-table-col3"                         
+                             columnClasses="cls-table-col1,cls-table-col2,cls-table-col3,cls-table-col4,cls-table-col5,cls-table-col6"                         
                              > 
                     <p:column>
                         <!-- column header -->
@@ -499,6 +499,27 @@
                         <f:facet name="header">#{langsys['Action']}</f:facet>
                         <!-- row record -->
                         #{sl.action}
+                    </p:column>
+
+                    <p:column>
+                        <!-- column header -->
+                        <f:facet name="header">#{langsys['Registration']} #{langsys['Date']}</f:facet>
+                        <!-- row record -->
+                        #{utilityBean.formatDate(sl.subscription_date)}
+                    </p:column>
+
+                    <p:column>
+                        <!-- column header -->
+                        <f:facet name="header">#{langsys['Amount']}</f:facet>
+                        <!-- row record -->
+                        #{sl.amount}
+                    </p:column>
+
+                    <p:column>
+                        <!-- column header -->
+                        <f:facet name="header">#{langsys['Status']}</f:facet>
+                        <!-- row record -->
+                        #{sl.current_status}
                     </p:column>
 
                 </h:dataTable>

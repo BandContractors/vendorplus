@@ -551,10 +551,10 @@ public class SubscriptionBean implements Serializable {
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msgV)));
             } else {
                 //set subscription log message
-                if(aSubscription.getSubscription_id() == 0){
+                if (aSubscription.getSubscription_id() == 0) {
                     this.setSubscriptionLogMessage("Subscribed");
-                } else{
-                    this.setSubscriptionLogMessage("Edited");                    
+                } else {
+                    this.setSubscriptionLogMessage("Edited");
                 }
                 //save subscription
                 status = this.insertUpdateSubscription(aSubscription);
@@ -603,7 +603,7 @@ public class SubscriptionBean implements Serializable {
                 this.selectedBusinessCategory = new BusinessCategoryBean().getBusinessCategory(aSubscription.getBusiness_category_id());
                 this.selectedItem = new ItemBean().findItem(aSubscription.getItem_id());
                 this.itemUnitPrice = aSubscription.getUnit_price();
-                
+
                 //set subscription log message
                 this.setSubscriptionLogMessage("Opted Out");
                 //save subscription
@@ -660,7 +660,7 @@ public class SubscriptionBean implements Serializable {
                 this.selectedBusinessCategory = new BusinessCategoryBean().getBusinessCategory(aSubscription.getBusiness_category_id());
                 this.selectedItem = new ItemBean().findItem(this.subscriptionRenewal.getItem_id());
                 this.itemUnitPrice = aSubscription.getUnit_price();
-                
+
                 //set subscription log message
                 this.setSubscriptionLogMessage("Renewed");
                 //save subscription
@@ -730,9 +730,10 @@ public class SubscriptionBean implements Serializable {
                 returnedSubscriptionId = cs.getInt(21);
 
                 //save subscription log
-                this.saveSubscriptionLog(returnedSubscriptionId, this.getSubscriptionLogMessage());
+                aSubscription.setSubscription_id(returnedSubscriptionId);
+                //this.saveSubscriptionLog(returnedSubscriptionId, this.getSubscriptionLogMessage());
+                this.saveSubscriptionLog(aSubscription);
                 this.setSubscriptionLogMessage("");
-                //this.saveSubscriptionLog(returnedSubscriptionId, "Subscribed");
 
             } else if (aSubscription.getSubscription_id() > 0) {
                 cs.setInt(1, aSubscription.getSubscription_id());
@@ -773,8 +774,8 @@ public class SubscriptionBean implements Serializable {
                 status = 1;
 
                 //save subscription log                
-                //String action = aSubscription.getCurrent_status().equals("Opted Out") || aSubscription.getCurrent_status().equals("Expired") ? aSubscription.getCurrent_status() : "Renewed";
-                this.saveSubscriptionLog(aSubscription.getSubscription_id(), this.getSubscriptionLogMessage());
+                //this.saveSubscriptionLog(aSubscription.getSubscription_id(), this.getSubscriptionLogMessage());
+                this.saveSubscriptionLog(aSubscription);
                 this.setSubscriptionLogMessage("");
             }
         } catch (Exception e) {
@@ -1109,7 +1110,49 @@ public class SubscriptionBean implements Serializable {
         }
     }
 
-    public List<Subscription_log> getSubscriptionLogSubscriptionById(int aSubscriptionId) {
+    public void saveSubscriptionLog(Subscription aSubscription) {
+        try {
+            Subscription_log subscriptionLog = new Subscription_log();
+            subscriptionLog.setSubscription_id(aSubscription.getSubscription_id());
+            subscriptionLog.setTransactor_id(this.selectedTransactor.getTransactorId());
+            subscriptionLog.setSubscription_category_id(this.selectedSubscriptionCategory.getSubscription_category_id());
+            subscriptionLog.setBusiness_category_id(this.selectedBusinessCategory.getBusiness_category_id());
+            subscriptionLog.setItem_id(this.selectedItem.getItemId());
+            subscriptionLog.setDescription(aSubscription.getDescription());
+            subscriptionLog.setAmount(aSubscription.getAmount());
+            subscriptionLog.setIs_recurring(aSubscription.getIs_recurring());
+            subscriptionLog.setCurrent_status(aSubscription.getCurrent_status());
+            if ("No".equals(aSubscription.getIs_recurring())) {
+                subscriptionLog.setFrequency(null);
+            } else {
+                subscriptionLog.setFrequency(aSubscription.getFrequency());
+            }
+            subscriptionLog.setUnit_price(this.itemUnitPrice);
+            subscriptionLog.setQty(aSubscription.getQty());
+            subscriptionLog.setAgent(aSubscription.getAgent());
+            subscriptionLog.setAccount_manager(aSubscription.getAccount_manager());
+            subscriptionLog.setSubscription_date(aSubscription.getSubscription_date());
+            if (aSubscription.getRenewal_date() != null) {
+                subscriptionLog.setRenewal_date(aSubscription.getRenewal_date());
+            } else {
+                subscriptionLog.setRenewal_date(null);
+            }
+            if ("No".equals(aSubscription.getIs_recurring())) {
+                subscriptionLog.setExpiry_date(null);
+            } else {
+                subscriptionLog.setExpiry_date(aSubscription.getExpiry_date());
+            }            
+            subscriptionLog.setAction(this.getSubscriptionLogMessage());
+            subscriptionLog.setAdd_date(aSubscription.getAdd_date());
+            subscriptionLog.setAdded_by(aSubscription.getAdded_by());
+
+            new SubscriptionLogBean().insertSubscription_log(subscriptionLog);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public List<Subscription_log> getSubscriptionLogBySubscriptionId(int aSubscriptionId) {
         try {
             this.SubscriptionsLogList = new SubscriptionLogBean().getSubscriptionlogBySubscriptionId(aSubscriptionId);
 

@@ -13581,3 +13581,167 @@ BEGIN
 	ORDER BY subscription_id ASC; 
 END//
 DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_insert_subscription_log;
+DELIMITER //
+CREATE PROCEDURE sp_insert_subscription_log
+(
+	IN in_subscription_id int,
+	IN in_transactor_id bigint,
+	IN in_subscription_category_id int,
+	IN in_business_category_id int,
+	IN in_item_id bigint,
+	IN in_description varchar(150),
+	IN in_amount double,
+	IN in_is_recurring varchar(10),
+	IN in_current_status varchar(20),
+	IN in_frequency varchar(20),
+	IN in_unit_price double,
+	IN in_qty double,
+	IN in_agent varchar(50),
+	IN in_account_manager varchar(50),
+	IN in_subscription_date datetime,
+	IN in_renewal_date datetime,
+	IN in_expiry_date datetime,
+	IN in_action varchar(20),
+	IN in_add_date datetime,
+	IN in_added_by varchar(50)
+) 
+BEGIN 
+	SET @new_id=0;
+	CALL sp_get_new_id("subscription_log","subscription_log_id",@new_id);
+	INSERT INTO subscription_log
+	(
+		subscription_log_id,
+		subscription_id,
+		transactor_id,
+		subscription_category_id,
+		business_category_id,
+		item_id,
+		description,
+		amount,
+		is_recurring,
+		current_status,
+		frequency,
+		unit_price,
+		qty,
+		agent,
+		account_manager,
+		subscription_date,
+		renewal_date,
+		expiry_date,
+		action,
+		add_date,
+		added_by
+	) 
+    VALUES
+	(
+		@new_id,
+		in_subscription_id,
+		in_transactor_id,
+		in_subscription_category_id,
+		in_business_category_id,
+		in_item_id,
+		in_description,
+		in_amount,
+		in_is_recurring,
+		in_current_status,
+		in_frequency,
+		in_unit_price,
+		in_qty,
+		in_agent,
+		in_account_manager,
+		in_subscription_date,
+		in_renewal_date,
+		in_expiry_date,
+		in_action,
+		in_add_date,
+		in_added_by
+	); 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_update_subscription_log;
+DELIMITER //
+CREATE PROCEDURE sp_update_subscription_log
+(
+	IN in_subscription_log_id bigint,
+	IN in_subscription_id int,
+	IN in_transactor_id bigint,
+	IN in_subscription_category_id int,
+	IN in_business_category_id int,
+	IN in_item_id bigint,
+	IN in_description varchar(150),
+	IN in_amount double,
+	IN in_is_recurring varchar(10),
+	IN in_current_status varchar(20),
+	IN in_frequency varchar(20),
+	IN in_unit_price double,
+	IN in_qty double,
+	IN in_agent varchar(50),
+	IN in_account_manager varchar(50),
+	IN in_subscription_date datetime,
+	IN in_renewal_date datetime,
+	IN in_expiry_date datetime,
+	IN in_action varchar(20),
+	IN in_add_date datetime,
+	IN in_added_by varchar(50)
+) 
+BEGIN 
+	UPDATE subscription_log SET 
+		subscription_id=in_subscription_id,
+		transactor_id=in_transactor_id,
+		subscription_category_id=in_subscription_category_id,
+		business_category_id=in_business_category_id,
+		item_id=in_item_id,
+		description=in_description,
+		amount=in_amount,
+		is_recurring=in_is_recurring,
+		current_status=in_current_status,
+		frequency=in_frequency,
+		unit_price=in_unit_price,
+		qty=in_qty,
+		agent=in_agent,
+		account_manager=in_account_manager,
+		subscription_date=in_subscription_date,
+		renewal_date=in_renewal_date,
+		expiry_date=in_expiry_date,
+		action=in_action,
+		add_date=in_add_date,
+		added_by=in_added_by
+	WHERE subscription_log_id=in_subscription_log_id; 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_subscription_log_by_id;
+DELIMITER //
+CREATE PROCEDURE sp_search_subscription_log_by_id
+(
+	IN in_subscription_log_id bigint
+) 
+BEGIN 
+	SELECT * FROM subscription_log
+	WHERE subscription_log_id=in_subscription_log_id; 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_subscription_log_by_subscription_id;
+DELIMITER //
+CREATE PROCEDURE sp_search_subscription_log_by_subscription_id
+(
+	IN in_subscription_id int
+) 
+BEGIN 
+	SELECT * FROM subscription_log
+	WHERE subscription_id=in_subscription_id; 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_subscription_log_by_none;
+DELIMITER //
+CREATE PROCEDURE sp_search_subscription_log_by_none() 
+BEGIN 
+	SELECT * FROM subscription_log 
+	ORDER BY subscription_log_id ASC; 
+END//
+DELIMITER ;

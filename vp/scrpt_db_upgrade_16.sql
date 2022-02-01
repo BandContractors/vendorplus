@@ -41,3 +41,7 @@ create table business_category (business_category_id int(11) not null auto_incre
 ALTER TABLE subscription ADD business_category_id int(11) not null;
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_16',42,Now(),'6.0','');
+
+ALTER TABLE subscription_log ADD transactor_id bigint(20) not null, ADD subscription_category_id int(11) not null, ADD item_id bigint(20) not null, ADD description varchar(150) not null, ADD amount double not null, ADD  is_recurring varchar(10) not null, ADD current_status varchar(20) not null, ADD frequency varchar(20) null, ADD subscription_date datetime not null, ADD renewal_date datetime null,  ADD qty double not null, ADD unit_price double not null, ADD agent varchar(50) null, ADD expiry_date datetime null, ADD account_manager varchar(50) null, ADD business_category_id int(11) not null;
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_16',46,Now(),'6.0','');
