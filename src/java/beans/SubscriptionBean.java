@@ -929,44 +929,48 @@ public class SubscriptionBean implements Serializable {
         sql = "select * from subscription where subscription_id > 0";
         String wheresql = "";
         String ordersql = " ORDER BY subscription_id DESC";
-        if (this.filterTransactor != null) {
-            wheresql = wheresql + " AND transactor_id=" + this.filterTransactor.getTransactorId();
-        }
-        if (this.filterStatus.length() > 0) {
-            wheresql = wheresql + " AND current_status='" + this.filterStatus + "'";
-        }
-        if (this.filterSubscriptionCategoryId > 0) {
-            wheresql = wheresql + " AND subscription_category_id=" + this.filterSubscriptionCategoryId;
-        }
-        if (this.filterBusinessCategoryId > 0) {
-            wheresql = wheresql + " AND business_category_id=" + this.filterBusinessCategoryId;
-        }
-        if (this.filterExpiryDateRange > 0) {
-            //wheresql = wheresql + " AND timestampdiff(MONTH, NOW(),expiry_date) =" + this.filterExpiryDateRange;
-            if (this.filterExpiryDateRange == 30) {
-                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 0;
-                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
-            } else if (this.filterExpiryDateRange == 60) {
-                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 30;
-                wheresql = wheresql + " AND datediff(renewal_date,NOW()) <=" + this.filterExpiryDateRange;
-            } else if (this.filterExpiryDateRange == 90) {
-                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 60;
-                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
-            } else {
-                wheresql = wheresql + " AND datediff(expiry_date,NOW()) > " + this.filterExpiryDateRange;
+        try {
+            if (this.filterTransactor != null) {
+                wheresql = wheresql + " AND transactor_id=" + this.filterTransactor.getTransactorId();
             }
-        }
-        if (this.filterRecurring.length() > 0) {
-            wheresql = wheresql + " AND is_recurring='" + this.filterRecurring + "'";
-        }
-        if (this.filterItem != null) {
-            wheresql = wheresql + " AND item_id=" + this.filterItem.getItemId();
-        }
-        if (this.filterAgent.length() > 0) {
-            wheresql = wheresql + " AND agent='" + this.filterAgent + "'";
-        }
-        if (this.filterAccountManager.length() > 0) {
-            wheresql = wheresql + " AND account_manager='" + this.filterAccountManager + "'";
+            if (this.filterStatus.length() > 0) {
+                wheresql = wheresql + " AND current_status='" + this.filterStatus + "'";
+            }
+            if (this.filterSubscriptionCategoryId > 0) {
+                wheresql = wheresql + " AND subscription_category_id=" + this.filterSubscriptionCategoryId;
+            }
+            if (this.filterBusinessCategoryId > 0) {
+                wheresql = wheresql + " AND business_category_id=" + this.filterBusinessCategoryId;
+            }
+            if (this.filterExpiryDateRange > 0) {
+                //wheresql = wheresql + " AND timestampdiff(MONTH, NOW(),expiry_date) =" + this.filterExpiryDateRange;
+                if (this.filterExpiryDateRange == 30) {
+                    wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 0;
+                    wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
+                } else if (this.filterExpiryDateRange == 60) {
+                    wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 30;
+                    wheresql = wheresql + " AND datediff(renewal_date,NOW()) <=" + this.filterExpiryDateRange;
+                } else if (this.filterExpiryDateRange == 90) {
+                    wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 60;
+                    wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
+                } else {
+                    wheresql = wheresql + " AND datediff(expiry_date,NOW()) > " + this.filterExpiryDateRange;
+                }
+            }
+            if (this.filterRecurring.length() > 0) {
+                wheresql = wheresql + " AND is_recurring='" + this.filterRecurring + "'";
+            }
+            if (this.filterItem != null) {
+                wheresql = wheresql + " AND item_id=" + this.filterItem.getItemId();
+            }
+            if (this.filterAgent.length() > 0) {
+                wheresql = wheresql + " AND agent='" + this.filterAgent + "'";
+            }
+            if (this.filterAccountManager.length() > 0) {
+                wheresql = wheresql + " AND account_manager='" + this.filterAccountManager + "'";
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         sql = sql + wheresql + ordersql;
         ResultSet rs;
@@ -1141,7 +1145,7 @@ public class SubscriptionBean implements Serializable {
                 subscriptionLog.setExpiry_date(null);
             } else {
                 subscriptionLog.setExpiry_date(aSubscription.getExpiry_date());
-            }            
+            }
             subscriptionLog.setAction(this.getSubscriptionLogMessage());
             subscriptionLog.setAdd_date(aSubscription.getAdd_date());
             subscriptionLog.setAdded_by(aSubscription.getAdded_by());

@@ -512,7 +512,9 @@
                         <!-- column header -->
                         <f:facet name="header">#{langsys['Amount']}</f:facet>
                         <!-- row record -->
-                        #{sl.amount}
+                        <h:outputText value="#{sl.amount}">
+                            <f:convertNumber pattern="###,###.#" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:outputText>
                     </p:column>
 
                     <p:column>
