@@ -7514,6 +7514,36 @@ public class TransItemBean implements Serializable {
         }
     }
 
+    public void checkAndAutoUnpack(List<TransItem> aActiveTransItems) {
+        try {
+            StockBean sb = new StockBean();
+            Stock st = new Stock();
+            Item itm = new Item();
+            ItemBean itmBean = new ItemBean();
+            for (int i = 0; i < aActiveTransItems.size(); i++) {
+                st = sb.getStock(new GeneralUserSetting().getCurrentStore().getStoreId(), aActiveTransItems.get(i).getItemId(), aActiveTransItems.get(i).getBatchno(), aActiveTransItems.get(i).getCodeSpecific(), aActiveTransItems.get(i).getDescSpecific());
+                itm = itmBean.getItem(aActiveTransItems.get(i).getItemId());
+                if (itm.getIsTrack() == 1) {
+                    double SmallItemQtyNeeded = 0;
+                    try {
+                        if (st == null) {
+                            SmallItemQtyNeeded = aActiveTransItems.get(i).getItemQty();
+                        } else {
+                            SmallItemQtyNeeded = aActiveTransItems.get(i).getItemQty() - st.getCurrentqty();
+                        }
+                    } catch (NullPointerException npe) {
+                    }
+                    //Unpackaging if needed
+                    if (SmallItemQtyNeeded > 0) {
+                        int x = this.autoUnpackItem(aActiveTransItems.get(i), SmallItemQtyNeeded);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public int autoUnpackItem(TransItem aSmallTransItem, double aSmallItemQtyNeeded) {
         long aBigItemQtyToUnpack = 0;
         try {
@@ -11971,7 +12001,12 @@ public class TransItemBean implements Serializable {
                 } catch (NullPointerException npe) {
                 }
             } else {
-                unitcostprice = 0;
+                //unitcostprice = 0;
+                try {
+                    unitcostprice = new ItemBean().getItem(aItemId).getUnitCostPrice();
+                } catch (Exception e) {
+
+                }
             }
         }
 

@@ -962,8 +962,12 @@ public class TransProductionBean implements Serializable {
         }
         String msg = "";
         try {
+            //unpack if needed
+            if("Yes".equals(CompanySetting.getIsAllowAutoUnpack())){
+                new TransProductionItemBean().checkAndAutoUnpack(aActiveTransItems);
+            }
+            //validate
             String ValidationMessage = this.validateTransProduction(aStoreId, aTransTypeId, aTransReasonId, transItem, aActiveTransItems, aTransUserDetail, trans, aOrderProducedList);
-
             if (ValidationMessage.length() > 0) {
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ValidationMessage));
             } else {

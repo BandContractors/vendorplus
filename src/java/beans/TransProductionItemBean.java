@@ -8,6 +8,7 @@ import entities.TransProductionItem;
 import entities.Item;
 import entities.ItemProductionMap;
 import entities.SubCategory;
+import entities.TransItem;
 import entities.TransProduction;
 import java.io.Serializable;
 import java.sql.CallableStatement;
@@ -401,6 +402,25 @@ public class TransProductionItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
         return ItemProductionMaps;
+    }
+
+    public void checkAndAutoUnpack(List<ItemProductionMap> aActiveTransItems) {
+        try {
+            List<TransItem> aTransItems = new ArrayList<>();
+            TransItem ti = new TransItem();
+            for (int i = 0; i < aActiveTransItems.size(); i++) {
+                ti = new TransItem();
+                ti.setItemId(aActiveTransItems.get(i).getInputItemId());
+                ti.setBatchno(aActiveTransItems.get(i).getBatchno());
+                ti.setCodeSpecific(aActiveTransItems.get(i).getCodeSpecific());
+                ti.setDescSpecific(aActiveTransItems.get(i).getDescSpecific());
+                ti.setItemQty(aActiveTransItems.get(i).getInputQtyTotal());
+                aTransItems.add(ti);
+            }
+            new TransItemBean().checkAndAutoUnpack(aTransItems);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
     }
 
     /**
