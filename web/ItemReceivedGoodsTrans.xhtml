@@ -307,7 +307,7 @@
 
             <h:panelGrid styleClass="clsGridMainCommands" columns="1">
                 <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
-                    <p:commandButton styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['SAVE']} (ALT+S)" accesskey="s" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                    <p:commandButton styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['SAVE']} (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
