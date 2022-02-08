@@ -10900,11 +10900,15 @@ BEGIN
 		if (in_desc_specific!='' and in_desc_specific is not null) then 
 			set @in_desc_specific=concat(" AND desc_specific='",in_desc_specific,"'");
 		end if;
+        SET @in_transaction_reason_id='';
+		if (in_transaction_reason_id!=0 and in_transaction_reason_id is not null) then 
+			set @in_transaction_reason_id=concat(" AND t.transaction_reason_id=",in_transaction_reason_id);
+		end if;
 
-		SET @in_where=concat(@in_batchno,@in_code_specific,@in_desc_specific);
+		SET @in_where=concat(@in_transaction_reason_id,@in_batchno,@in_code_specific,@in_desc_specific);
 
 		SELECT max(transaction_item_id) AS transaction_item_id FROM transaction_item ti,transaction t WHERE ti.transaction_id=t.transaction_id 
-		AND t.transaction_type_id=in_transaction_type_id AND t.transaction_reason_id=in_transaction_reason_id 
+		AND t.transaction_type_id=in_transaction_type_id 
 		AND ti.item_id=in_item_id AND ti.unit_cost_price>0 AND concat(' 1=1 ',@in_where);
 END//
 DELIMITER ;

@@ -2827,7 +2827,16 @@ public class TransItemBean implements Serializable {
                         AddObj.setItemExpDate(null);
                         AddObj.setItemMnfDate(null);
                     }
-                    AddObj.setUnitCost(this.findItemLatestUnitCostPrice(new GeneralUserSetting().getCurrentStore().getStoreId(), transitem.getItemId2(), 9, 13));
+                    int PurInvMode = 0;
+                    try {
+                        PurInvMode = Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "PURCHASE_INVOICE_MODE").getParameter_value());
+                    } catch (NullPointerException npe) {
+                    }
+                    if (PurInvMode == 0) {
+                        AddObj.setUnitCost(this.findItemLatestUnitCostPrice(new GeneralUserSetting().getCurrentStore().getStoreId(), transitem.getItemId2(), 9, 0));//Item received
+                    } else {
+                        AddObj.setUnitCost(this.findItemLatestUnitCostPrice(new GeneralUserSetting().getCurrentStore().getStoreId(), transitem.getItemId2(), 1, 0));//Pucrhase Invoice
+                    }
                     //temp fix -- start
                     Item aItem = new ItemBean().getItem(transitem.getItemId2());
                     AddObj.setDescMore("");
@@ -7517,8 +7526,8 @@ public class TransItemBean implements Serializable {
     public void checkAndAutoUnpack(List<TransItem> aActiveTransItems) {
         try {
             StockBean sb = new StockBean();
-            Stock st = new Stock();
-            Item itm = new Item();
+            Stock st;
+            Item itm;
             ItemBean itmBean = new ItemBean();
             for (int i = 0; i < aActiveTransItems.size(); i++) {
                 st = sb.getStock(new GeneralUserSetting().getCurrentStore().getStoreId(), aActiveTransItems.get(i).getItemId(), aActiveTransItems.get(i).getBatchno(), aActiveTransItems.get(i).getCodeSpecific(), aActiveTransItems.get(i).getDescSpecific());
@@ -11974,6 +11983,7 @@ public class TransItemBean implements Serializable {
 
     public double findItemLatestUnitCostPrice(int aStoreId, long aItemId, int aTransTypeId, int aTransReasId) {//used when not available in Stock
         double unitcostprice = 0;
+        //1. first get from latest transaction such as Item Received, Purchase Invoice, etc.
         long LatestTransItemId = 0;
         try {
             LatestTransItemId = this.getItemUnitCostPriceLatestTransItemId2(aTransTypeId, aTransReasId, aStoreId, aItemId, "", "", "");
@@ -11985,27 +11995,37 @@ public class TransItemBean implements Serializable {
                 unitcostprice = new TransItemBean().getTransItem(LatestTransItemId).getUnitCostPrice();
             } catch (NullPointerException npe) {
             }
-        } else {//use mapping logic
-            ItemMap MappedItem = new ItemMapBean().getItemMapBySmallItemId(aItemId);
-            long LatestTransItemIdBig = 0;
+        } else {
+            //2. unitcostprice of small item
             try {
-                LatestTransItemIdBig = this.getItemUnitCostPriceLatestTransItemId2(aTransTypeId, aTransReasId, aStoreId, MappedItem.getBigItemId(), "", "", "");
-            } catch (NullPointerException npe) {
-                LatestTransItemIdBig = 0;
-            }
-            if (LatestTransItemIdBig > 0) {
-                try {
-                    if (MappedItem.getFractionQty() > 0) {
-                        unitcostprice = new TransItemBean().getTransItem(LatestTransItemIdBig).getUnitCostPrice() / MappedItem.getFractionQty();
-                    }
-                } catch (NullPointerException npe) {
-                }
-            } else {
-                //unitcostprice = 0;
-                try {
-                    unitcostprice = new ItemBean().getItem(aItemId).getUnitCostPrice();
-                } catch (Exception e) {
+                unitcostprice = new ItemBean().getItem(aItemId).getUnitCostPrice();
+            } catch (Exception e) {
 
+            }
+            //3. Get mapping logic
+            if (unitcostprice == 0) {
+                ItemMap MappedItem = new ItemMapBean().getItemMapBySmallItemId(aItemId);
+                if (null != MappedItem) {
+                    long LatestTransItemIdBig = 0;
+                    try {
+                        LatestTransItemIdBig = this.getItemUnitCostPriceLatestTransItemId2(aTransTypeId, aTransReasId, aStoreId, MappedItem.getBigItemId(), "", "", "");
+                    } catch (NullPointerException npe) {
+                        LatestTransItemIdBig = 0;
+                    }
+                    if (LatestTransItemIdBig > 0) {
+                        try {
+                            if (MappedItem.getFractionQty() > 0) {
+                                unitcostprice = new TransItemBean().getTransItem(LatestTransItemIdBig).getUnitCostPrice() / MappedItem.getFractionQty();
+                            }
+                        } catch (NullPointerException npe) {
+                        }
+                    } else {
+                        //unitcostprice of big item
+                        try {
+                            unitcostprice = new ItemBean().getItem(MappedItem.getBigItemId()).getUnitCostPrice() / MappedItem.getFractionQty();
+                        } catch (Exception e) {
+                        }
+                    }
                 }
             }
         }

@@ -407,7 +407,7 @@ public class TransProductionItemBean implements Serializable {
     public void checkAndAutoUnpack(List<ItemProductionMap> aActiveTransItems) {
         try {
             List<TransItem> aTransItems = new ArrayList<>();
-            TransItem ti = new TransItem();
+            TransItem ti;
             for (int i = 0; i < aActiveTransItems.size(); i++) {
                 ti = new TransItem();
                 ti.setItemId(aActiveTransItems.get(i).getInputItemId());
