@@ -231,7 +231,7 @@ public class Login implements Serializable {
                         } catch (Exception e) {
                         }
                         //first delete all un-logged out sessions of this user that are older than 12 hours
-                        new LoginSessionBean().deleteOldUnloggedOutSessions();
+                        //new LoginSessionBean().deleteOldUnloggedOutSessions();
 
                         //---------------add login session to the session database---
                         LoginSession ls = new LoginSession();

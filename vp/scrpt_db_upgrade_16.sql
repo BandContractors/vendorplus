@@ -45,3 +45,24 @@ VALUES('scrpt_db_upgrade_16',42,Now(),'6.0','');
 ALTER TABLE subscription_log ADD transactor_id bigint(20) not null, ADD subscription_category_id int(11) not null, ADD item_id bigint(20) not null, ADD description varchar(150) not null, ADD amount double not null, ADD  is_recurring varchar(10) not null, ADD current_status varchar(20) not null, ADD frequency varchar(20) null, ADD subscription_date datetime not null, ADD renewal_date datetime null,  ADD qty double not null, ADD unit_price double not null, ADD agent varchar(50) null, ADD expiry_date datetime null, ADD account_manager varchar(50) null, ADD business_category_id int(11) not null;
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_16',46,Now(),'6.0','');
+
+SET FOREIGN_KEY_CHECKS=0;
+DROP INDEX TransType_to_Trans_on_TransTypeId  ON transaction;
+DROP INDEX TransReas_to_Trans_on_TransReasId  ON transaction;
+DROP INDEX Transactor_to_Trans_on_TransactorId  ON transaction;
+DROP INDEX UserD_to_Trans_on_AddUserId  ON transaction;
+DROP INDEX UserD_to_Trans_on_EditUserId  ON transaction;
+DROP INDEX Store_to_Trans_on_StoreId  ON transaction;
+DROP INDEX Store_to_Trans_on_Store2Id  ON transaction;
+DROP INDEX transactor_trans_bill  ON transaction;
+DROP INDEX tractor_traction_scheme  ON transaction;
+DROP INDEX user_trans_aauthorisedby  ON transaction;
+DROP INDEX Item_to_TransItem_on_ItemId  ON transaction_item;
+DROP INDEX PayMeth_to_Pay_on_PayMethId ON pay;
+DROP INDEX UserD_to_Pay_on_AddUserId ON pay;
+DROP INDEX UserD_to_Pay_on_EditUserId ON pay;
+DROP INDEX FKpay_trans264324 ON pay_trans;
+CREATE INDEX idx_trans_number ON transaction(transaction_number);
+SET FOREIGN_KEY_CHECKS=1;
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_16',67,Now(),'6.0','');

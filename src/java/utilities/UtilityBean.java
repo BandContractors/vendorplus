@@ -734,6 +734,26 @@ public class UtilityBean implements Serializable {
         return n;
     }
 
+    public double getD(String aSQL) {
+        ResultSet rs = null;
+        double d = 0;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(aSQL);) {
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                try {
+                    d = rs.getDouble("d");
+                } catch (Exception e) {
+                    d = 0;
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return d;
+    }
+
 //    public static void main(String[] args) {
 //        String a = "ZERO,EXEMPT,STANDARD";//STANDARD,EXEMPT,ZERO //ZERO,EXEMPT,STANDARD
 //        System.out.println(a.startsWith("STANDARD"));//23456789

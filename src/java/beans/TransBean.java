@@ -2260,19 +2260,20 @@ public class TransBean implements Serializable {
 
     public double checkTrans(long aTransactionId, Trans aTrans, List<TransItem> aTransItems) {
         double value = 0;
-        int CountItems = 0;
-        double CountQty = 0;
+        //int CountItems = 0;
+        //double CountQty = 0;
         try {
             if (aTransactionId == 0) {
-                CountItems = aTransItems.size();
-                CountQty = new TransItemBean().getTransItemsTotalQty(aTransItems);
+                //CountItems = aTransItems.size();
+                //CountQty = new TransItemBean().getTransItemsTotalQty(aTransItems);
+                value = aTransItems.size() + new TransItemBean().getTransItemsTotalQty(aTransItems);
             } else if (aTransactionId > 0) {
-                //Trans t = new TransBean().getTrans(aTransactionId);
-                List<TransItem> tis = new TransItemBean().getTransItemsByTransactionId(aTransactionId);
-                CountItems = tis.size();
-                CountQty = new TransItemBean().getTransItemsTotalQty(tis);
+                //List<TransItem> tis = new TransItemBean().getTransItemsByTransactionId(aTransactionId);
+                //CountItems = tis.size();
+                //CountQty = new TransItemBean().getTransItemsTotalQty(tis);
+                value = new UtilityBean().getD("SELECT (count(*)+sum(item_qty)) as d FROM transaction_item ti WHERE ti.transaction_id=" + aTransactionId);
             }
-            value = CountQty + CountItems;
+            //value = CountQty + CountItems;
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -7758,7 +7759,8 @@ public class TransBean implements Serializable {
                     this.ActionMessageChild = "";
                 }
             }
-            new OutputDetailBean().refreshOutput(aLevel, "");
+            //new OutputDetailBean().refreshOutput(aLevel, "");
+            new OutputDetailBean().clearOutput(aLevel, "");
         }
     }
 

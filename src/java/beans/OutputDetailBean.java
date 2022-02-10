@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
@@ -16,12 +17,15 @@ import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import utilities.ConvertNumToWordBean;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 @ManagedBean
 @SessionScoped
 public class OutputDetailBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    static Logger LOGGER = Logger.getLogger(OutputDetailBean.class.getName());
 
     public OutputDetailBean() {
     }
@@ -254,7 +258,51 @@ public class OutputDetailBean implements Serializable {
                     break;
             }
         } catch (Exception e) {
-            System.err.println("refreshOutput:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void clearOutput(String aLevel, String aSource) {
+        try {
+            OutputDetail aOutputDetail = new OutputDetail();
+            /*
+             aOutputDetail.setTrans(null);
+             aOutputDetail.setPay(null);
+             aOutputDetail.setAdd_user_detail(null);
+             aOutputDetail.setEdit_user_detail(null);
+             aOutputDetail.setEdit_user_detail(null);
+             aOutputDetail.setTrans_user_detail(null);
+             aOutputDetail.setAuthorised_by_user_detail(null);
+             aOutputDetail.setTransactor(null);
+             aOutputDetail.setBill_transactor(null);
+             aOutputDetail.setScheme_transactor(null);
+             aOutputDetail.setTrans_items(null);
+             aOutputDetail.setStore(null);
+             aOutputDetail.setStore2(null);
+             aOutputDetail.setTransaction_type(null);
+             aOutputDetail.setTransaction_reason(null);
+             aOutputDetail.setPay_method(null);
+             aOutputDetail.setTotal_items(0);
+             aOutputDetail.setTotal_items_list(null);
+             aOutputDetail.setAcc_child_account(null);
+             aOutputDetail.setAcc_child_account2(null);
+             aOutputDetail.setTransAmountInWords("");
+             aOutputDetail.setPay_reason("");
+             aOutputDetail.setPay_reason2("");
+             */
+            FacesContext context = FacesContext.getCurrentInstance();
+            HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+            HttpSession httpSession = request.getSession(false);
+            switch (aLevel) {
+                case "PARENT":
+                    httpSession.setAttribute("OUTPUT_DETAIL_PARENT", aOutputDetail);
+                    break;
+                case "CHILD":
+                    httpSession.setAttribute("OUTPUT_DETAIL_CHILD", aOutputDetail);
+                    break;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -359,7 +407,7 @@ public class OutputDetailBean implements Serializable {
                     break;
             }
         } catch (Exception e) {
-            System.err.println("refreshOutputCrDr:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -394,7 +442,7 @@ public class OutputDetailBean implements Serializable {
                 good_or_service = "Goods/Services";
             }
         } catch (Exception e) {
-            System.err.println("getGoodOrService:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return good_or_service;
     }
@@ -472,7 +520,7 @@ public class OutputDetailBean implements Serializable {
                     break;
             }
         } catch (Exception e) {
-            System.err.println("refreshOutputProduction:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 

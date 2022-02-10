@@ -8013,7 +8013,7 @@ DROP PROCEDURE IF EXISTS sp_search_login_session;
 DELIMITER //
 CREATE PROCEDURE sp_search_login_session() 
 BEGIN 
-	SELECT * FROM login_session ORDER BY user_detail_id,store_id;
+	SELECT * FROM login_session ORDER BY add_date DESC LIMIT 100;
 END//
 DELIMITER ;
 

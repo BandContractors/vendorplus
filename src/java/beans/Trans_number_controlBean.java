@@ -8,7 +8,6 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -16,6 +15,8 @@ import java.util.GregorianCalendar;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import sessions.GeneralUserSetting;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 /*
  * To change this template, choose Tools | Templates
@@ -30,6 +31,7 @@ import sessions.GeneralUserSetting;
 public class Trans_number_controlBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    static Logger LOGGER = Logger.getLogger(Trans_number_controlBean.class.getName());
 
     public void setTrans_number_controlFromResultset(Trans_number_control aTrans_number_control, ResultSet aResultSet) {
         try {
@@ -73,8 +75,8 @@ public class Trans_number_controlBean implements Serializable {
             } catch (NullPointerException npe) {
                 aTrans_number_control.setYear_count(0);
             }
-        } catch (SQLException se) {
-            System.err.println("setTrans_number_controlFromResultset:" + se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -102,8 +104,8 @@ public class Trans_number_controlBean implements Serializable {
             //ps.setInt(3, m);
             //ps.setInt(4, d);
             ps.executeUpdate();
-        } catch (SQLException se) {
-            System.err.println("updateTrans_number_control:" + se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -136,7 +138,7 @@ public class Trans_number_controlBean implements Serializable {
                     this.setTrans_number_controlFromResultset(obj, rs);
                 }
             } catch (Exception e) {
-                System.err.println("getTrans_number_controlUnique:" + e.getMessage());
+                LOGGER.log(Level.ERROR, e);
             }
         }
         return obj;
@@ -361,7 +363,7 @@ public class Trans_number_controlBean implements Serializable {
                 }
             }
         } catch (Exception e) {
-            System.err.println("countTrans_number_control:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return TotalRecords;
     }
@@ -383,7 +385,7 @@ public class Trans_number_controlBean implements Serializable {
                 //ps.setInt(5, 0);
                 ps.executeUpdate();
             } catch (Exception e) {
-                System.err.println("initDayTransNumber:" + e.getMessage());
+                LOGGER.log(Level.ERROR, e);
             }
         }
     }
@@ -392,10 +394,7 @@ public class Trans_number_controlBean implements Serializable {
         int TransNoUsed = 0;
         String sql = "";
         ResultSet rs = null;
-        TransactionType TransType = new TransactionTypeBean().getTransactionType(aTransTypeId);
-        if (null == TransType) {
-            //do nothing
-        } else {
+        if (aTransTypeId > 0) {
             if (aTransTypeId == 70) {//production
                 sql = "SELECT * FROM trans_production WHERE transaction_number='" + aTransNumber + "'";
             } else {
@@ -411,7 +410,7 @@ public class Trans_number_controlBean implements Serializable {
                     TransNoUsed = 0;
                 }
             } catch (Exception e) {
-                System.err.println("getIsTrans_number_used:" + e.getMessage());
+                LOGGER.log(Level.ERROR, e);
             }
         }
         return TransNoUsed;
