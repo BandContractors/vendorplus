@@ -51,7 +51,10 @@ public class SubscriptionBean implements Serializable {
     //private int CountList;
     private String SearchSubscriptionNames = "";
     private List<Subscription> Subscriptions;
-    private List<Subscription> subscriptionsSummary;
+    private List<Subscription> subscriptionsSummary_status;
+    private List<Subscription> subscriptionsSummary_recurring;
+    private List<Subscription> subscriptionsSummary_subscriptionCategory;
+    private List<Subscription> subscriptionsSummary_businessCategory;
     private List<Subscription_log> SubscriptionsLogList;
     private Transactor selectedTransactor;
     private Item selectedItem;
@@ -928,7 +931,7 @@ public class SubscriptionBean implements Serializable {
         String sql;
         sql = "select * from subscription where subscription_id > 0";
         String wheresql = "";
-        String ordersql = " ORDER BY subscription_id DESC";
+        String ordersql = " ORDER BY subscription_date DESC";
         try {
             if (this.filterTransactor != null) {
                 wheresql = wheresql + " AND transactor_id=" + this.filterTransactor.getTransactorId();
@@ -992,6 +995,18 @@ public class SubscriptionBean implements Serializable {
     }
 
     public void getFilteredSubscriptionsSummary() {
+        try {
+            //summarise status
+            this.getFilteredSubscriptionsSummary_status();
+            this.getFilteredSubscriptionsSummary_recurring();
+            this.getFilteredSubscriptionsSummary_subscriptionCategory();
+            this.getFilteredSubscriptionsSummary_businessCategory();
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void getFilteredSubscriptionsSummary_status() {
         String sql;
         sql = "SELECT current_status, count(*) as numbers, sum(amount) as amount FROM subscription where subscription_id > 0";
         String wheresql = "";
@@ -1036,7 +1051,7 @@ public class SubscriptionBean implements Serializable {
         }
         sql = sql + wheresql + groupbysum;
         ResultSet rs;
-        subscriptionsSummary = new ArrayList<>();
+        subscriptionsSummary_status = new ArrayList<>();
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -1058,7 +1073,229 @@ public class SubscriptionBean implements Serializable {
                 } catch (Exception e) {
                     summary.setAmount(0);
                 }
-                getSubscriptionsSummary().add(summary);
+                getSubscriptionsSummary_status().add(summary);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void getFilteredSubscriptionsSummary_recurring() {
+        String sql;
+        sql = "SELECT is_recurring, count(*) as numbers, sum(amount) as amount FROM subscription where subscription_id > 0";
+        String wheresql = "";
+        String groupbysum = " GROUP BY is_recurring";
+        if (this.filterTransactor != null) {
+            wheresql = wheresql + " AND transactor_id=" + this.filterTransactor.getTransactorId();
+        }
+        if (!this.filterStatus.isEmpty()) {
+            wheresql = wheresql + " AND current_status='" + this.filterStatus + "'";
+        }
+        if (this.filterSubscriptionCategoryId > 0) {
+            wheresql = wheresql + " AND subscription_category_id=" + this.filterSubscriptionCategoryId;
+        }
+        if (this.filterBusinessCategoryId > 0) {
+            wheresql = wheresql + " AND business_category_id=" + this.filterBusinessCategoryId;
+        }
+        if (this.filterExpiryDateRange > 0) {
+            if (this.filterExpiryDateRange == 30) {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 0;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
+            } else if (this.filterExpiryDateRange == 60) {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 30;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
+            } else if (this.filterExpiryDateRange == 90) {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 60;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
+            } else {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) > " + this.filterExpiryDateRange;
+            }
+        }
+        if (!this.filterRecurring.isEmpty()) {
+            wheresql = wheresql + " AND is_recurring='" + this.filterRecurring + "'";
+        }
+        if (this.filterItem != null) {
+            wheresql = wheresql + " AND item_id=" + this.filterItem.getItemId();
+        }
+        if (this.filterAgent.length() > 0) {
+            wheresql = wheresql + " AND agent='" + this.filterAgent + "'";
+        }
+        if (this.filterAccountManager.length() > 0) {
+            wheresql = wheresql + " AND account_manager='" + this.filterAccountManager + "'";
+        }
+        sql = sql + wheresql + groupbysum;
+        ResultSet rs;
+        subscriptionsSummary_recurring = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Subscription summary = new Subscription();
+                try {
+                    summary.setIs_recurring(rs.getString("is_recurring"));
+                } catch (Exception e) {
+                    summary.setIs_recurring("");
+                }
+                try {
+                    summary.setDescription(rs.getString("numbers"));
+                } catch (Exception e) {
+                    summary.setDescription("");
+                }
+                try {
+                    summary.setAmount(rs.getDouble("amount"));
+                } catch (Exception e) {
+                    summary.setAmount(0);
+                }
+                getSubscriptionsSummary_recurring().add(summary);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void getFilteredSubscriptionsSummary_subscriptionCategory() {
+        String sql;
+        sql = "SELECT subscription_category_id, count(*) as numbers, sum(amount) as amount FROM subscription where subscription_id > 0";
+        String wheresql = "";
+        String groupbysum = " GROUP BY subscription_category_id";
+        if (this.filterTransactor != null) {
+            wheresql = wheresql + " AND transactor_id=" + this.filterTransactor.getTransactorId();
+        }
+        if (!this.filterStatus.isEmpty()) {
+            wheresql = wheresql + " AND current_status='" + this.filterStatus + "'";
+        }
+        if (this.filterSubscriptionCategoryId > 0) {
+            wheresql = wheresql + " AND subscription_category_id=" + this.filterSubscriptionCategoryId;
+        }
+        if (this.filterBusinessCategoryId > 0) {
+            wheresql = wheresql + " AND business_category_id=" + this.filterBusinessCategoryId;
+        }
+        if (this.filterExpiryDateRange > 0) {
+            if (this.filterExpiryDateRange == 30) {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 0;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
+            } else if (this.filterExpiryDateRange == 60) {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 30;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
+            } else if (this.filterExpiryDateRange == 90) {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 60;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
+            } else {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) > " + this.filterExpiryDateRange;
+            }
+        }
+        if (!this.filterRecurring.isEmpty()) {
+            wheresql = wheresql + " AND is_recurring='" + this.filterRecurring + "'";
+        }
+        if (this.filterItem != null) {
+            wheresql = wheresql + " AND item_id=" + this.filterItem.getItemId();
+        }
+        if (this.filterAgent.length() > 0) {
+            wheresql = wheresql + " AND agent='" + this.filterAgent + "'";
+        }
+        if (this.filterAccountManager.length() > 0) {
+            wheresql = wheresql + " AND account_manager='" + this.filterAccountManager + "'";
+        }
+        sql = sql + wheresql + groupbysum;
+        ResultSet rs;
+        subscriptionsSummary_subscriptionCategory = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Subscription summary = new Subscription();
+                try {
+                    summary.setSubscription_category_id(rs.getInt("subscription_category_id"));
+                } catch (Exception e) {
+                    summary.setSubscription_category_id(0);
+                }
+                try {
+                    summary.setDescription(rs.getString("numbers"));
+                } catch (Exception e) {
+                    summary.setDescription("");
+                }
+                try {
+                    summary.setAmount(rs.getDouble("amount"));
+                } catch (Exception e) {
+                    summary.setAmount(0);
+                }
+                getSubscriptionsSummary_subscriptionCategory().add(summary);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void getFilteredSubscriptionsSummary_businessCategory() {
+        String sql;
+        sql = "SELECT business_category_id, count(*) as numbers, sum(amount) as amount FROM subscription where subscription_id > 0";
+        String wheresql = "";
+        String groupbysum = " GROUP BY business_category_id";
+        if (this.filterTransactor != null) {
+            wheresql = wheresql + " AND transactor_id=" + this.filterTransactor.getTransactorId();
+        }
+        if (!this.filterStatus.isEmpty()) {
+            wheresql = wheresql + " AND current_status='" + this.filterStatus + "'";
+        }
+        if (this.filterSubscriptionCategoryId > 0) {
+            wheresql = wheresql + " AND subscription_category_id=" + this.filterSubscriptionCategoryId;
+        }
+        if (this.filterBusinessCategoryId > 0) {
+            wheresql = wheresql + " AND business_category_id=" + this.filterBusinessCategoryId;
+        }
+        if (this.filterExpiryDateRange > 0) {
+            if (this.filterExpiryDateRange == 30) {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 0;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
+            } else if (this.filterExpiryDateRange == 60) {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 30;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
+            } else if (this.filterExpiryDateRange == 90) {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 60;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
+            } else {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) > " + this.filterExpiryDateRange;
+            }
+        }
+        if (!this.filterRecurring.isEmpty()) {
+            wheresql = wheresql + " AND is_recurring='" + this.filterRecurring + "'";
+        }
+        if (this.filterItem != null) {
+            wheresql = wheresql + " AND item_id=" + this.filterItem.getItemId();
+        }
+        if (this.filterAgent.length() > 0) {
+            wheresql = wheresql + " AND agent='" + this.filterAgent + "'";
+        }
+        if (this.filterAccountManager.length() > 0) {
+            wheresql = wheresql + " AND account_manager='" + this.filterAccountManager + "'";
+        }
+        sql = sql + wheresql + groupbysum;
+        ResultSet rs;
+        subscriptionsSummary_businessCategory = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Subscription summary = new Subscription();
+                try {
+                    summary.setBusiness_category_id(rs.getInt("business_category_id"));
+                } catch (Exception e) {
+                    summary.setBusiness_category_id(0);
+                }
+                try {
+                    summary.setDescription(rs.getString("numbers"));
+                } catch (Exception e) {
+                    summary.setDescription("");
+                }
+                try {
+                    summary.setAmount(rs.getDouble("amount"));
+                } catch (Exception e) {
+                    summary.setAmount(0);
+                }
+                getSubscriptionsSummary_businessCategory().add(summary);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -1351,17 +1588,17 @@ public class SubscriptionBean implements Serializable {
     }
 
     /**
-     * @return the subscriptionsSummary
+     * @return the subscriptionsSummary_status
      */
-    public List<Subscription> getSubscriptionsSummary() {
-        return subscriptionsSummary;
+    public List<Subscription> getSubscriptionsSummary_status() {
+        return subscriptionsSummary_status;
     }
 
     /**
-     * @param subscriptionsSummary the subscriptionsSummary to set
+     * @param subscriptionsSummary_status the subscriptionsSummary to set
      */
-    public void setSubscriptionsSummary(List<Subscription> subscriptionsSummary) {
-        this.subscriptionsSummary = subscriptionsSummary;
+    public void setSubscriptionsSummary(List<Subscription> subscriptionsSummary_status) {
+        this.subscriptionsSummary_status = subscriptionsSummary_status;
     }
 
     /**
@@ -1544,5 +1781,47 @@ public class SubscriptionBean implements Serializable {
      */
     public void setSubscriptionLogMessage(String subscriptionLogMessage) {
         this.subscriptionLogMessage = subscriptionLogMessage;
+    }
+
+    /**
+     * @return the subscriptionsSummary_recurring
+     */
+    public List<Subscription> getSubscriptionsSummary_recurring() {
+        return subscriptionsSummary_recurring;
+    }
+
+    /**
+     * @param subscriptionsSummary_recurring the subscriptionsSummary_recurring to set
+     */
+    public void setSubscriptionsSummary_recurring(List<Subscription> subscriptionsSummary_recurring) {
+        this.subscriptionsSummary_recurring = subscriptionsSummary_recurring;
+    }
+
+    /**
+     * @return the subscriptionsSummary_subscriptionCategory
+     */
+    public List<Subscription> getSubscriptionsSummary_subscriptionCategory() {
+        return subscriptionsSummary_subscriptionCategory;
+    }
+
+    /**
+     * @param subscriptionsSummary_subscriptionCategory the subscriptionsSummary_subscriptionCategory to set
+     */
+    public void setSubscriptionsSummary_subscriptionCategory(List<Subscription> subscriptionsSummary_subscriptionCategory) {
+        this.subscriptionsSummary_subscriptionCategory = subscriptionsSummary_subscriptionCategory;
+    }
+
+    /**
+     * @return the subscriptionsSummary_businessCategory
+     */
+    public List<Subscription> getSubscriptionsSummary_businessCategory() {
+        return subscriptionsSummary_businessCategory;
+    }
+
+    /**
+     * @param subscriptionsSummary_businessCategory the subscriptionsSummary_businessCategory to set
+     */
+    public void setSubscriptionsSummary_businessCategory(List<Subscription> subscriptionsSummary_businessCategory) {
+        this.subscriptionsSummary_businessCategory = subscriptionsSummary_businessCategory;
     }
 }

@@ -40,8 +40,8 @@
             </h:panelGrid>
 
             <!--Filter-->
-            <h:panelGrid id="pnlgFilter" columns="2" styleClass="clsPanelReportFilter">
-                <h:panelGrid id="filter" columns="6">
+            <h:panelGrid id="pnlgFilter" columns="1" styleClass="clsPanelReportFilter">
+                <h:panelGrid id="filter" columns="10">
                     <p:outputLabel value="#{langsys['Customer']}"/>
                     <p:autoComplete value="#{subscriptionBean.filterTransactor}" 
                                     completeMethod="#{transactorBean.getTransactorActiveObjectList}" 
@@ -70,10 +70,10 @@
                         <f:selectItem itemLabel="" itemValue="0"/>
                         <f:selectItems value="#{subscriptionCategoryBean.getSubscriptionCategory()}" var="sc" itemLabel="#{sc.category_name}" itemValue="#{sc.subscription_category_id}"/>
                     </p:selectOneMenu>
-                    <p:outputLabel value="#{langsys['Business']} #{langsys['Category']}"/>
-                    <p:selectOneMenu value="#{subscriptionBean.filterBusinessCategoryId}" style="width: 150px">
-                        <f:selectItem itemLabel="" itemValue="0"/>
-                        <f:selectItems value="#{businessCategoryBean.getBusinessCategory()}" var="bc" itemLabel="#{bc.category_name}" itemValue="#{bc.business_category_id}"/>
+                    <p:outputLabel value="#{langsys['Account']} #{langsys['Manager']}"/>
+                    <p:selectOneMenu value="#{subscriptionBean.filterAccountManager}" style="width: 150px">
+                        <f:selectItem itemLabel="" itemValue=""/>
+                        <f:selectItems value="#{subscriptionBean.getUniqueSubscriptionAccountManagers()}" var="a" itemLabel="#{a}" itemValue="#{a}"/>
                     </p:selectOneMenu>
                     <p:outputLabel value="#{langsys['Days']} #{langsys['To']} #{langsys['Expiry']}"/>
                     <p:selectOneMenu value="#{subscriptionBean.filterExpiryDateRange}" style="width: 150px">
@@ -136,15 +136,15 @@
                             </h:outputText>
                         </p:column>
                     </p:autoComplete>
+                    <p:outputLabel value="#{langsys['Business']} #{langsys['Category']}"/>
+                    <p:selectOneMenu value="#{subscriptionBean.filterBusinessCategoryId}" style="width: 150px">
+                        <f:selectItem itemLabel="" itemValue="0"/>
+                        <f:selectItems value="#{businessCategoryBean.getBusinessCategory()}" var="bc" itemLabel="#{bc.category_name}" itemValue="#{bc.business_category_id}"/>
+                    </p:selectOneMenu>
                     <p:outputLabel value="#{langsys['Agent']}"/>
                     <p:selectOneMenu value="#{subscriptionBean.filterAgent}" style="width: 150px">
                         <f:selectItem itemLabel="" itemValue=""/>
                         <f:selectItems value="#{subscriptionBean.getUniqueSubscriptionAgents()}" var="a" itemLabel="#{a}" itemValue="#{a}"/>
-                    </p:selectOneMenu>
-                    <p:outputLabel value="#{langsys['Account']} #{langsys['Manager']}"/>
-                    <p:selectOneMenu value="#{subscriptionBean.filterAccountManager}" style="width: 150px">
-                        <f:selectItem itemLabel="" itemValue=""/>
-                        <f:selectItems value="#{subscriptionBean.getUniqueSubscriptionAccountManagers()}" var="a" itemLabel="#{a}" itemValue="#{a}"/>
                     </p:selectOneMenu>
                     <p:commandButton value="#{langsys['OK']}" style="color: white; background-color: #00B259; width: 80px">
                         <f:ajax listener="#{subscriptionBean.getFilteredSubscriptions()}" execute="@form" render="@form"/>
@@ -153,7 +153,10 @@
                         <f:ajax listener="#{subscriptionBean.clearFilter()}" execute="@form" render="@form"/>
                     </p:commandButton>
                 </h:panelGrid>
-                <p:dataTable id="tblSummary" tableStyle="width:auto;" var="sum" value="#{subscriptionBean.subscriptionsSummary}" 
+            </h:panelGrid>
+
+            <h:panelGrid id="pnlgSummary" columns="4" styleClass="clsPanelSummary">
+                <p:dataTable id="tblSummaryStatus" tableStyle="width:auto;" var="sum" value="#{subscriptionBean.subscriptionsSummary_status}" 
                              rowStyleClass="#{sum.current_status eq 'Active' ? 'green' : sum.current_status eq 'Opted Out' ? 'red' : 'amber'}">
                     <p:column headerText="#{langsys['Status']}">
                         <h:outputLabel value="#{sum.current_status} "/>
@@ -169,7 +172,56 @@
                         </h:outputText>
                     </p:column>
                 </p:dataTable>
-
+                <p:dataTable sortBy="#{1}" id="tblSummaryRecurring" tableStyle="width:auto;" var="sum" value="#{subscriptionBean.subscriptionsSummary_recurring}">
+                    <p:column headerText="#{langsys['Recurring']}">
+                        <h:outputLabel value="#{sum.is_recurring} "/>
+                    </p:column>
+                    <p:column headerText="#{langsys['No']}" style="text-align: right;">
+                        <h:outputText value="#{sum.description}">
+                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="#{langsys['Amount']}" style="text-align: right;">
+                        <h:outputText value="#{sum.amount}">
+                            <f:convertNumber pattern="###,###.#" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="#{langsys['Average']}" style="text-align: right;">
+                        <h:outputText value="#{sum.amount/sum.description}">
+                            <f:convertNumber pattern="###,###.#" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
+                <p:dataTable id="tblSummarySubscriptionCategory" tableStyle="width:auto;" var="sum" value="#{subscriptionBean.subscriptionsSummary_subscriptionCategory}">
+                    <p:column headerText="#{langsys['Subscription']} #{langsys['Category']}">
+                        <h:outputLabel value="#{subscriptionCategoryBean.getSubscriptionCategory(sum.subscription_category_id).getCategory_name()}"/>
+                    </p:column>
+                    <p:column headerText="#{langsys['No']}" style="text-align: right;">
+                        <h:outputText value="#{sum.description}">
+                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="#{langsys['Amount']}" style="text-align: right;">
+                        <h:outputText value="#{sum.amount}">
+                            <f:convertNumber pattern="###,###.#" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
+                <p:dataTable id="tblSummaryBusinessCategory" tableStyle="width:auto;" var="sum" value="#{subscriptionBean.subscriptionsSummary_businessCategory}">
+                    <p:column headerText="#{langsys['Business']} #{langsys['Category']}">
+                        <h:outputLabel value="#{businessCategoryBean.getBusinessCategory(sum.business_category_id).getCategory_name()}"/>
+                    </p:column>
+                    <p:column headerText="#{langsys['No']}" style="text-align: right;">
+                        <h:outputText value="#{sum.description}">
+                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="#{langsys['Amount']}" style="text-align: right;">
+                        <h:outputText value="#{sum.amount}">
+                            <f:convertNumber pattern="###,###.#" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
             </h:panelGrid>
             <!--Form was here-->
 
@@ -238,7 +290,7 @@
                     <p:commandButton update="form:modalSubscription" actionListener="#{subscriptionBean.displaySubscription(s,subscription)}" oncomplete="PF('dlgSubscription').show();" icon="ui-icon-pencil" title="Edit Subscription" style="color: white; background-color: #00B259" >
                     </p:commandButton>
                     &nbsp;
-                    <p:commandButton update="form:tblSummary form:dtblSubscription form:growl1" actionListener="#{subscriptionBean.optOut(s)}" icon="ui-icon-arrowreturnthick-1-n" title="Opt Out" style="color: white; background-color: red !important" >
+                    <p:commandButton update="form:pnlgSummary form:dtblSubscription form:growl1" actionListener="#{subscriptionBean.optOut(s)}" icon="ui-icon-arrowreturnthick-1-n" title="Opt Out" style="color: white; background-color: red !important" >
                     </p:commandButton>
                     &nbsp;
                     <p:commandButton update="form:modalSubscriptionRenewal" actionListener="#{subscriptionBean.displaySubscriptionRenewal(s,subscription)}" oncomplete="PF('dlgSubscriptionRenewal').show();" icon="ui-icon-seek-next" title="Renew" style="color: white; background-color: blueviolet !important" >
@@ -283,7 +335,7 @@
 
                     <h:panelGrid styleClass="clsGridMainCommands" columns="1">
                         <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
-                            <p:commandButton update="tblSummary form:popupRenewal form:dtblSubscription form:growl1Renewal" actionListener="#{subscriptionBean.renew(subscription)}" styleClass="clsButtonBig" id="cmdbSaveRenewal" value="#{langsys['RENEW']}" disabled="#{subscription.current_status eq 'Expired'}" style="color: white; background-color: #00B259" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                            <p:commandButton update="pnlgSummary form:popupRenewal form:dtblSubscription form:growl1Renewal" actionListener="#{subscriptionBean.renew(subscription)}" styleClass="clsButtonBig" id="cmdbSaveRenewal" value="#{langsys['RENEW']}" disabled="#{subscription.current_status eq 'Expired'}" style="color: white; background-color: #00B259" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                                 <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                                     <p:graphicImage name="/images/ajax-loader.gif"/>
                                 </p:dialog>
@@ -452,7 +504,7 @@
 
                     <h:panelGrid styleClass="clsGridMainCommands" columns="1">
                         <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
-                            <p:commandButton update="pnlgFilter tblSummary form:popup form:dtblSubscription form:growl1" actionListener="#{subscriptionBean.saveSubscription(subscription)}" styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['SAVE']}" disabled="#{subscriptionBean.selectedBusinessCategory eq null}" style="color: white; background-color: #00B259" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                            <p:commandButton update="pnlgFilter pnlgSummary form:popup form:dtblSubscription form:growl1" actionListener="#{subscriptionBean.saveSubscription(subscription)}" styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['SAVE']}" disabled="#{subscriptionBean.selectedBusinessCategory eq null}" style="color: white; background-color: #00B259" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                                 <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                                     <p:graphicImage name="/images/ajax-loader.gif"/>
                                 </p:dialog>

@@ -254,6 +254,11 @@ tr {
     text-align: center;
     background-color: #00B461;
 }
+.clsPanelSummary{
+    width: 100%;
+    text-align: center;
+    background-color: #00B461;
+}
 .clsLabelReportFilter{
     float: right;
 }
