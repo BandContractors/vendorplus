@@ -199,7 +199,8 @@ public class InvoiceBean implements Serializable {
                 //
             }
             try {
-                transitems = new TransItemBean().getTransItemsByTransactionId(aTransId);
+                //transitems = new TransItemBean().getTransItemsByTransactionId(aTransId);
+                transitems = new TransItemBean().getTransItemsByTransIdNoLookup(aTransId);
             } catch (Exception e) {
                 //
             }

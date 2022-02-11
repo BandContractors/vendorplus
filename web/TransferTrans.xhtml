@@ -110,9 +110,7 @@
                 </h:inputText>
                 <h:inputText id="itxtUnit" styleClass="clsInputTransItem" value="#{unitBean.getUnit(itemBean.getItem(transItem.itemId).getUnitId()).unitSymbol}" style="width: 50px" disabled="true"/>
                 <h:selectOneMenu id="menuBatchSpecific" styleClass="clsMenu" value="#{transItem.stockId}" style="width: 500px;">
-                    <c:if test="#{stockBean.specificList.size()>1}" >
-                        <f:selectItem itemLabel="#{langsys['Select']}"/>
-                    </c:if>
+                    <f:selectItem itemLabel="" itemValue=""/>
                     <f:selectItems value="#{stockBean.specificList}" var="ic" itemLabel="#{ic.batchno} #{ic.codeSpecific} #{ic.descSpecific}" itemValue="#{ic.stockId}"/>
                 </h:selectOneMenu>
             </h:panelGrid>
@@ -182,6 +180,7 @@
                     <f:facet name="header">#{langsys['Specify']} #{langsys['Item']}</f:facet>
                     <!-- row record -->
                     <h:selectOneMenu id="menuBatchSpecific2" styleClass="clsMenu" value="#{ati.stockId}" style="width: 200px;">
+                        <f:selectItem itemLabel="" itemValue=""/>
                         <f:selectItems value="#{stockBean.getStocks(generalUserSetting.getCurrentStore().getStoreId(),ati.itemId)}" var="ic2" itemLabel="#{ic2.batchno} #{ic2.codeSpecific} #{ic2.descSpecific}" itemValue="#{ic2.stockId}"/>
                         <f:ajax event="change" listener="#{transItemBean.updateTransItemBatchSpecific(ati,ati.stockId)}" render="dtblTransactionItem"/>
                         <f:ajax event="change" listener="#{transItemBean.refreshCurrentStock(transItemBean.activeTransItems)}" render="dtblTransactionItem"/>

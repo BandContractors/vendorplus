@@ -1049,7 +1049,7 @@ public class SubscriptionBean implements Serializable {
         if (this.filterAccountManager.length() > 0) {
             wheresql = wheresql + " AND account_manager='" + this.filterAccountManager + "'";
         }
-        sql = sql + wheresql + groupbysum;
+        sql = sql + wheresql + groupbysum + " ORDER BY amount DESC";
         ResultSet rs;
         subscriptionsSummary_status = new ArrayList<>();
         try (
@@ -1123,7 +1123,7 @@ public class SubscriptionBean implements Serializable {
         if (this.filterAccountManager.length() > 0) {
             wheresql = wheresql + " AND account_manager='" + this.filterAccountManager + "'";
         }
-        sql = sql + wheresql + groupbysum;
+        sql = sql + wheresql + groupbysum + " ORDER BY amount DESC";
         ResultSet rs;
         subscriptionsSummary_recurring = new ArrayList<>();
         try (
@@ -1197,7 +1197,7 @@ public class SubscriptionBean implements Serializable {
         if (this.filterAccountManager.length() > 0) {
             wheresql = wheresql + " AND account_manager='" + this.filterAccountManager + "'";
         }
-        sql = sql + wheresql + groupbysum;
+        sql = sql + wheresql + groupbysum + " ORDER BY amount DESC";
         ResultSet rs;
         subscriptionsSummary_subscriptionCategory = new ArrayList<>();
         try (
@@ -1271,7 +1271,7 @@ public class SubscriptionBean implements Serializable {
         if (this.filterAccountManager.length() > 0) {
             wheresql = wheresql + " AND account_manager='" + this.filterAccountManager + "'";
         }
-        sql = sql + wheresql + groupbysum;
+        sql = sql + wheresql + groupbysum + " ORDER BY amount DESC";
         ResultSet rs;
         subscriptionsSummary_businessCategory = new ArrayList<>();
         try (
@@ -1791,7 +1791,8 @@ public class SubscriptionBean implements Serializable {
     }
 
     /**
-     * @param subscriptionsSummary_recurring the subscriptionsSummary_recurring to set
+     * @param subscriptionsSummary_recurring the subscriptionsSummary_recurring
+     * to set
      */
     public void setSubscriptionsSummary_recurring(List<Subscription> subscriptionsSummary_recurring) {
         this.subscriptionsSummary_recurring = subscriptionsSummary_recurring;
@@ -1805,7 +1806,8 @@ public class SubscriptionBean implements Serializable {
     }
 
     /**
-     * @param subscriptionsSummary_subscriptionCategory the subscriptionsSummary_subscriptionCategory to set
+     * @param subscriptionsSummary_subscriptionCategory the
+     * subscriptionsSummary_subscriptionCategory to set
      */
     public void setSubscriptionsSummary_subscriptionCategory(List<Subscription> subscriptionsSummary_subscriptionCategory) {
         this.subscriptionsSummary_subscriptionCategory = subscriptionsSummary_subscriptionCategory;
@@ -1819,7 +1821,8 @@ public class SubscriptionBean implements Serializable {
     }
 
     /**
-     * @param subscriptionsSummary_businessCategory the subscriptionsSummary_businessCategory to set
+     * @param subscriptionsSummary_businessCategory the
+     * subscriptionsSummary_businessCategory to set
      */
     public void setSubscriptionsSummary_businessCategory(List<Subscription> subscriptionsSummary_businessCategory) {
         this.subscriptionsSummary_businessCategory = subscriptionsSummary_businessCategory;

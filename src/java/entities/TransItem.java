@@ -121,6 +121,7 @@ public class TransItem implements Serializable {
     private String transaction_number; 
     private int is_tax_synced=1;
     private double discount_amount;//cash discount + loyalty discount
+    private int hide_unit_price_invoice;
     /**
      * @return the TransactionItemId
      */
@@ -1463,6 +1464,20 @@ public class TransItem implements Serializable {
      */
     public void setDiscount_amount(double discount_amount) {
         this.discount_amount = discount_amount;
+    }
+
+    /**
+     * @return the hide_unit_price_invoice
+     */
+    public int getHide_unit_price_invoice() {
+        return hide_unit_price_invoice;
+    }
+
+    /**
+     * @param hide_unit_price_invoice the hide_unit_price_invoice to set
+     */
+    public void setHide_unit_price_invoice(int hide_unit_price_invoice) {
+        this.hide_unit_price_invoice = hide_unit_price_invoice;
     }
 
 }

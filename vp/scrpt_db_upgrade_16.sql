@@ -72,3 +72,10 @@ CREATE INDEX idx_trans_id ON transaction_item(transaction_id);
 SET FOREIGN_KEY_CHECKS=1;
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_16',73,Now(),'6.0','');
+
+UPDATE transaction_type SET print_file_name1='OutputSTR_Size_A4' WHERE transaction_type_id>0 AND print_file_name1='OutputSTR_General';
+UPDATE transaction_type SET print_file_name2='OutputSTR_Size_A4' WHERE transaction_type_id>0 AND print_file_name2='OutputSTR_General';
+UPDATE transaction_type SET print_file_name1='OutputST_Size_A4' WHERE transaction_type_id>0 AND print_file_name1='OutputST_General';
+UPDATE transaction_type SET print_file_name2='OutputST_Size_A4' WHERE transaction_type_id>0 AND print_file_name2='OutputST_General';
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_16',81,Now(),'6.0','');

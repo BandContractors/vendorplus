@@ -4154,7 +4154,6 @@ public class TransItemBean implements Serializable {
             } catch (NullPointerException npe) {
                 transitem.setDuration_value(0);
             }
-
             try {
                 transitem.setQty_damage(aResultSet.getDouble("qty_damage"));
             } catch (NullPointerException | SQLException npe) {
@@ -5148,6 +5147,28 @@ public class TransItemBean implements Serializable {
         return getTransItems();
     }
 
+    public List<TransItem> getTransItemsByTransIdNoLookup(long aTransactionId) {
+        String sql;
+        sql = "{call sp_search_transaction_item_by_transaction_id(?)}";
+        ResultSet rs = null;
+        setTransItems(new ArrayList<TransItem>());
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aTransactionId);
+            rs = ps.executeQuery();
+            TransItem ti = null;
+            while (rs.next()) {
+                ti = this.getTransItemFromResultSet(rs);
+                //this.updateLookUpsUI(ti);
+                getTransItems().add(ti);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return getTransItems();
+    }
+
     public List<TransItem> getTransItemsFromHist(long aTransactionHistId) {
         String sql;
         sql = "{call sp_search_transaction_item_hist_by_hist_id(?)}";
@@ -5529,6 +5550,26 @@ public class TransItemBean implements Serializable {
                 i = i + 1;
                 TransItem ti = this.getTransItemFromResultSet(rs);
                 ti.setItem_no(i);
+                try {
+                    ti.setAlias_name(rs.getString("alias_name"));
+                } catch (NullPointerException | SQLException npe) {
+                    ti.setAlias_name("");
+                }
+                try {
+                    ti.setDisplay_alias_name(rs.getInt("display_alias_name"));
+                } catch (NullPointerException | SQLException npe) {
+                    ti.setDisplay_alias_name(0);
+                }
+                try {
+                    ti.setOverride_gen_name(rs.getInt("override_gen_name"));
+                } catch (NullPointerException | SQLException npe) {
+                    ti.setOverride_gen_name(0);
+                }
+                try {
+                    ti.setHide_unit_price_invoice(rs.getInt("hide_unit_price_invoice"));
+                } catch (NullPointerException | SQLException npe) {
+                    ti.setHide_unit_price_invoice(0);
+                }
                 tis.add(ti);
             }
         } catch (Exception e) {
