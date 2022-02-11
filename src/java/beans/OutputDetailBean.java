@@ -3,6 +3,7 @@ package beans;
 import connections.DBConnection;
 import entities.Pay;
 import entities.PayTrans;
+import entities.Transaction_tax_map;
 import sessions.GeneralUserSetting;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -11,6 +12,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
@@ -19,6 +21,7 @@ import javax.servlet.http.HttpSession;
 import utilities.ConvertNumToWordBean;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import utilities.UtilityBean;
 
 @ManagedBean
 @SessionScoped
@@ -58,7 +61,19 @@ public class OutputDetailBean implements Serializable {
                     }
                     break;
             }
-            tb.updateLookup(aOutputDetail.getTrans());
+            //tb.updateLookup(aOutputDetail.getTrans());
+            //get tax invoice number
+            String DeviceNo = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value();
+            if (DeviceNo.length() > 0 && (aOutputDetail.getTrans().getTransactionTypeId() == 2 || aOutputDetail.getTrans().getTransactionTypeId() == 82 || aOutputDetail.getTrans().getTransactionTypeId() == 83)) {
+                Transaction_tax_map ttm = new Transaction_tax_mapBean().getTransaction_tax_map(aOutputDetail.getTrans().getTransactionId(), aOutputDetail.getTrans().getTransactionTypeId());
+                if (null != ttm) {
+                    aOutputDetail.getTrans().setReference_number_tax(ttm.getReference_number_tax());
+                    aOutputDetail.getTrans().setTransaction_number_tax(ttm.getTransaction_number_tax());
+                    aOutputDetail.getTrans().setVerification_code_tax(ttm.getVerification_code_tax());
+                    aOutputDetail.getTrans().setQr_code_tax(ttm.getQr_code_tax());
+                    aOutputDetail.getTrans().setFdn_ref(ttm.getFdn_ref());
+                }
+            }
             try {
                 if (aSource.equals("SOURCE-PAY")) {
                     aOutputDetail.setAdd_user_detail(new UserDetailBean().getUserDetail(aOutputDetail.getPay().getAddUserDetailId()));
@@ -112,7 +127,8 @@ public class OutputDetailBean implements Serializable {
             } catch (Exception e) {
             }
             try {
-                aOutputDetail.setTrans_items(new TransItemBean().getTransItemsByTransactionIdCEC(aOutputDetail.getTrans().getTransactionId()));
+                //aOutputDetail.setTrans_items(new TransItemBean().getTransItemsByTransactionIdCEC(aOutputDetail.getTrans().getTransactionId()));
+                aOutputDetail.setTrans_items(new TransItemBean().getTransItemsOutput(aOutputDetail.getTrans().getTransactionId()));
             } catch (Exception e) {
             }
             try {

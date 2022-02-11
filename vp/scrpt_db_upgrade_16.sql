@@ -66,3 +66,9 @@ CREATE INDEX idx_trans_number ON transaction(transaction_number);
 SET FOREIGN_KEY_CHECKS=1;
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_16',67,Now(),'6.0','');
+
+SET FOREIGN_KEY_CHECKS=0;
+CREATE INDEX idx_trans_id ON transaction_item(transaction_id);
+SET FOREIGN_KEY_CHECKS=1;
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_16',73,Now(),'6.0','');

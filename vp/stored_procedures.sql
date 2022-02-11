@@ -2271,6 +2271,19 @@ BEGIN
 END//
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS sp_search_transaction_item_by_transaction_id4;
+DELIMITER //
+CREATE PROCEDURE sp_search_transaction_item_by_transaction_id4
+(
+	IN in_transaction_id bigint 
+) 
+BEGIN 
+		SELECT ti.*,i.description,u.unit_symbol FROM transaction_item ti INNER JOIN item i ON ti.item_id=i.item_id INNER JOIN unit u ON u.unit_id=i.unit_id 
+		WHERE ti.transaction_id=in_transaction_id 
+		ORDER BY ti.transaction_item_id ASC;
+END//
+DELIMITER ;
+
 DROP PROCEDURE IF EXISTS sp_insert_transaction;
 DELIMITER //
 CREATE PROCEDURE sp_insert_transaction
