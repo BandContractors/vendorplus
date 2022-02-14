@@ -183,16 +183,36 @@
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="#{langsys['Reorder']} #{langsys['Level']}">
+                <p:column headerText="#{langsys['Retail']} #{langsys['Sale']} #{langsys['Price']}">
+                    <h:outputText value="#{itm.unitRetailsalePrice}">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['Retail']} #{langsys['Margin']}">
+                    <h:outputText value="#{itm.unitRetailsalePrice-itm.unitCost}">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['Wholesale']} #{langsys['Price']}">
+                    <h:outputText value="#{itm.unitWholesalePrice}">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['Wholesale']} #{langsys['Margin']}">
+                    <h:outputText value="#{itm.unitWholesalePrice-itm.unitCost}">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['Reorder']} #{langsys['Level']}" visible="false">
                     <h:outputText value="#{itm.reorderLevel}"/>
                 </p:column>
-                <p:column headerText="#{langsys['Currency']}">
+                <p:column headerText="#{langsys['Currency']}" visible="false">
                     <h:outputText value="#{itm.currencyCode}"/>
                 </p:column>
-                <p:column headerText="#{langsys['Manuf']} #{langsys['Date']}">
+                <p:column headerText="#{langsys['Manuf']} #{langsys['Date']}" visible="false">
                     <h:outputText value="#{utilityBean.formatDate(itm.itemMnfDate)}"/>
                 </p:column>
-                <p:column headerText="#{langsys['Expiry']} #{langsys['Date']}">
+                <p:column headerText="#{langsys['Expiry']} #{langsys['Date']}" visible="false">
                     <h:outputText value="#{utilityBean.formatDate(itm.itemExpDate)}"/>
                 </p:column>
             </p:dataTable>

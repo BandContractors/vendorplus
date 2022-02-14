@@ -672,7 +672,11 @@ public class ItemBean implements Serializable {
                 aItem.setIsAsset(0);
             }
             try {
-                aItem.setAssetAccountCode(aResultSet.getString("asset_account_code"));
+                if (null == aResultSet.getString("asset_account_code")) {
+                    aItem.setAssetAccountCode("");
+                } else {
+                    aItem.setAssetAccountCode(aResultSet.getString("asset_account_code"));
+                }
             } catch (NullPointerException npe) {
                 aItem.setAssetAccountCode("");
             }
