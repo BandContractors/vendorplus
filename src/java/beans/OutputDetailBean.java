@@ -64,14 +64,16 @@ public class OutputDetailBean implements Serializable {
             //tb.updateLookup(aOutputDetail.getTrans());
             //get tax invoice number
             String DeviceNo = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value();
-            if (DeviceNo.length() > 0 && (aOutputDetail.getTrans().getTransactionTypeId() == 2 || aOutputDetail.getTrans().getTransactionTypeId() == 82 || aOutputDetail.getTrans().getTransactionTypeId() == 83)) {
-                Transaction_tax_map ttm = new Transaction_tax_mapBean().getTransaction_tax_map(aOutputDetail.getTrans().getTransactionId(), aOutputDetail.getTrans().getTransactionTypeId());
-                if (null != ttm) {
-                    aOutputDetail.getTrans().setReference_number_tax(ttm.getReference_number_tax());
-                    aOutputDetail.getTrans().setTransaction_number_tax(ttm.getTransaction_number_tax());
-                    aOutputDetail.getTrans().setVerification_code_tax(ttm.getVerification_code_tax());
-                    aOutputDetail.getTrans().setQr_code_tax(ttm.getQr_code_tax());
-                    aOutputDetail.getTrans().setFdn_ref(ttm.getFdn_ref());
+            if (null != aOutputDetail.getTrans()) {
+                if (DeviceNo.length() > 0 && (aOutputDetail.getTrans().getTransactionTypeId() == 2 || aOutputDetail.getTrans().getTransactionTypeId() == 82 || aOutputDetail.getTrans().getTransactionTypeId() == 83)) {
+                    Transaction_tax_map ttm = new Transaction_tax_mapBean().getTransaction_tax_map(aOutputDetail.getTrans().getTransactionId(), aOutputDetail.getTrans().getTransactionTypeId());
+                    if (null != ttm) {
+                        aOutputDetail.getTrans().setReference_number_tax(ttm.getReference_number_tax());
+                        aOutputDetail.getTrans().setTransaction_number_tax(ttm.getTransaction_number_tax());
+                        aOutputDetail.getTrans().setVerification_code_tax(ttm.getVerification_code_tax());
+                        aOutputDetail.getTrans().setQr_code_tax(ttm.getQr_code_tax());
+                        aOutputDetail.getTrans().setFdn_ref(ttm.getFdn_ref());
+                    }
                 }
             }
             try {
