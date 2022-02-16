@@ -79,3 +79,21 @@ UPDATE transaction_type SET print_file_name1='OutputST_Size_A4' WHERE transactio
 UPDATE transaction_type SET print_file_name2='OutputST_Size_A4' WHERE transaction_type_id>0 AND print_file_name2='OutputST_General';
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_16',81,Now(),'6.0','');
+
+ALTER TABLE subscription ADD COLUMN free_at_reg INT(1) NOT NULL DEFAULT 0;
+ALTER TABLE subscription_log ADD COLUMN free_at_reg INT(1) NOT NULL DEFAULT 0;
+CREATE TABLE transaction_approval (
+  transaction_approval_id bigint(20) NOT NULL AUTO_INCREMENT,
+  transaction_hist_id bigint(20) NOT NULL,
+  transaction_type_id int(11) NOT NULL,
+  transaction_reason_id int(11) NOT NULL,
+  request_date timestamp NOT NULL,
+  request_by_id int(11) NOT NULL,
+  approval_status int(1) DEFAULT '0',
+  status_date timestamp NULL DEFAULT NULL,
+  status_desc varchar(100) DEFAULT NULL,
+  status_by_id int(11) NULL DEFAULT NULL,
+  PRIMARY KEY (transaction_approval_id)
+);
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_16',98,Now(),'6.0','');
