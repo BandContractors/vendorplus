@@ -55,19 +55,23 @@ public class SubscriptionBean implements Serializable {
     private List<Subscription> subscriptionsSummary_recurring;
     private List<Subscription> subscriptionsSummary_subscriptionCategory;
     private List<Subscription> subscriptionsSummary_businessCategory;
+    private List<Subscription> subscriptionsSummary_location;
     private List<Subscription_log> SubscriptionsLogList;
     private Transactor selectedTransactor;
     private Item selectedItem;
-    private Subscription_category selectedSubscriptionCategory;
-    private Business_category selectedBusinessCategory;
+    //private Subscription_category selectedSubscriptionCategory;
+    //private Business_category selectedBusinessCategory;
     private String filterStatus = "";
     private int filterSubscriptionCategoryId = 0;
+    private String[] filterSubscriptionCategoryIds = null;
     private int filterBusinessCategoryId = 0;
+    private String[] filterBusinessCategoryIds = null;
     private int filterExpiryDateRange = 0;
     private String filterRecurring = "";
     private Transactor filterTransactor;
     private Item filterItem;
     private String filterAgent = "";
+    private String[] filterAgents = null;
     private String filterAccountManager = "";
     private List<String> uniqueAgentList;
     private List<String> uniqueAccount_managerList;
@@ -231,8 +235,8 @@ public class SubscriptionBean implements Serializable {
             SubscriptionTo.setLast_edit_date(SubscriptionFrom.getLast_edit_date());
             SubscriptionTo.setLast_edited_by(SubscriptionFrom.getLast_edited_by());
             this.setSelectedTransactor(new TransactorBean().findTransactor(SubscriptionFrom.getTransactor_id()));
-            this.setSelectedSubscriptionCategory(new SubscriptionCategoryBean().getSubscriptionCategory(SubscriptionFrom.getSubscription_category_id()));
-            this.setSelectedBusinessCategory(new BusinessCategoryBean().getBusinessCategory(SubscriptionFrom.getBusiness_category_id()));
+            //this.setSelectedSubscriptionCategory(new SubscriptionCategoryBean().getSubscriptionCategory(SubscriptionFrom.getSubscription_category_id()));
+            //this.setSelectedBusinessCategory(new BusinessCategoryBean().getBusinessCategory(SubscriptionFrom.getBusiness_category_id()));
             this.setSelectedItem(new ItemBean().findItem(SubscriptionFrom.getItem_id()));
             this.setItemUnitPrice(SubscriptionFrom.getUnit_price());
         } catch (Exception e) {
@@ -278,8 +282,8 @@ public class SubscriptionBean implements Serializable {
             SubscriptionTo.setLast_edit_date(SubscriptionFrom.getLast_edit_date());
             SubscriptionTo.setLast_edited_by(SubscriptionFrom.getLast_edited_by());
             this.setSelectedTransactor(new TransactorBean().findTransactor(SubscriptionFrom.getTransactor_id()));
-            this.setSelectedSubscriptionCategory(new SubscriptionCategoryBean().getSubscriptionCategory(SubscriptionFrom.getSubscription_category_id()));
-            this.setSelectedBusinessCategory(new BusinessCategoryBean().getBusinessCategory(SubscriptionFrom.getBusiness_category_id()));
+            //this.setSelectedSubscriptionCategory(new SubscriptionCategoryBean().getSubscriptionCategory(SubscriptionFrom.getSubscription_category_id()));
+            //this.setSelectedBusinessCategory(new BusinessCategoryBean().getBusinessCategory(SubscriptionFrom.getBusiness_category_id()));
             this.setSelectedItem(new ItemBean().findItem(SubscriptionFrom.getItem_id()));
             this.setItemUnitPrice(SubscriptionFrom.getUnit_price());
             this.setOldExpiryDate(SubscriptionFrom.getExpiry_date());
@@ -330,8 +334,8 @@ public class SubscriptionBean implements Serializable {
             this.subscriptionRenewal.setLast_edit_date(SubscriptionFrom.getLast_edit_date());
             this.subscriptionRenewal.setLast_edited_by(SubscriptionFrom.getLast_edited_by());
             this.setSelectedTransactor(new TransactorBean().findTransactor(SubscriptionFrom.getTransactor_id()));
-            this.setSelectedSubscriptionCategory(new SubscriptionCategoryBean().getSubscriptionCategory(SubscriptionFrom.getSubscription_category_id()));
-            this.setSelectedBusinessCategory(new BusinessCategoryBean().getBusinessCategory(SubscriptionFrom.getBusiness_category_id()));
+            //this.setSelectedSubscriptionCategory(new SubscriptionCategoryBean().getSubscriptionCategory(SubscriptionFrom.getSubscription_category_id()));
+            //this.setSelectedBusinessCategory(new BusinessCategoryBean().getBusinessCategory(SubscriptionFrom.getBusiness_category_id()));
             this.setSelectedItem(new ItemBean().findItem(SubscriptionFrom.getItem_id()));
             this.setItemUnitPrice(SubscriptionFrom.getUnit_price());
             this.setOldExpiryDate(SubscriptionFrom.getExpiry_date());
@@ -369,8 +373,8 @@ public class SubscriptionBean implements Serializable {
                 aSubscription.setLast_edit_date(null);
                 aSubscription.setLast_edited_by("");
                 this.setSelectedTransactor(null);
-                this.setSelectedSubscriptionCategory(null);
-                this.setSelectedBusinessCategory(null);
+                //this.setSelectedSubscriptionCategory(null);
+                //this.setSelectedBusinessCategory(null);
                 this.setSelectedItem(null);
                 this.setItemUnitPrice(0);
                 this.setOldExpiryDate(null);
@@ -387,11 +391,14 @@ public class SubscriptionBean implements Serializable {
             this.setFilterTransactor(null);
             this.setFilterStatus("");
             this.setFilterSubscriptionCategoryId(0);
+            this.setFilterSubscriptionCategoryIds(null);
             this.setFilterBusinessCategoryId(0);
+            this.setFilterBusinessCategoryIds(null);
             this.setFilterExpiryDateRange(0);
             this.setFilterRecurring("");
             this.setFilterItem(null);
             this.setFilterAgent("");
+            this.setFilterAgents(null);
             this.setFilterAccountManager("");
             this.getFilteredSubscriptions();
         } catch (Exception e) {
@@ -602,8 +609,8 @@ public class SubscriptionBean implements Serializable {
             } else {
                 aSubscription.setCurrent_status("Opted Out");
                 this.selectedTransactor = new TransactorBean().findTransactor(aSubscription.getTransactor_id());
-                this.selectedSubscriptionCategory = new SubscriptionCategoryBean().getSubscriptionCategory(aSubscription.getSubscription_category_id());
-                this.selectedBusinessCategory = new BusinessCategoryBean().getBusinessCategory(aSubscription.getBusiness_category_id());
+                //this.selectedSubscriptionCategory = new SubscriptionCategoryBean().getSubscriptionCategory(aSubscription.getSubscription_category_id());
+                //this.selectedBusinessCategory = new BusinessCategoryBean().getBusinessCategory(aSubscription.getBusiness_category_id());
                 this.selectedItem = new ItemBean().findItem(aSubscription.getItem_id());
                 this.itemUnitPrice = aSubscription.getUnit_price();
 
@@ -659,8 +666,8 @@ public class SubscriptionBean implements Serializable {
                 //aSubscription.setRenewal_date(new Date());
                 //aSubscription.setSubscription_date(this.getSubscriptionDateRenewal());
                 this.selectedTransactor = new TransactorBean().findTransactor(this.subscriptionRenewal.getTransactor_id());
-                this.selectedSubscriptionCategory = new SubscriptionCategoryBean().getSubscriptionCategory(this.subscriptionRenewal.getSubscription_category_id());
-                this.selectedBusinessCategory = new BusinessCategoryBean().getBusinessCategory(aSubscription.getBusiness_category_id());
+                //this.selectedSubscriptionCategory = new SubscriptionCategoryBean().getSubscriptionCategory(this.subscriptionRenewal.getSubscription_category_id());
+                //this.selectedBusinessCategory = new BusinessCategoryBean().getBusinessCategory(aSubscription.getBusiness_category_id());
                 this.selectedItem = new ItemBean().findItem(this.subscriptionRenewal.getItem_id());
                 this.itemUnitPrice = aSubscription.getUnit_price();
 
@@ -697,8 +704,10 @@ public class SubscriptionBean implements Serializable {
                 CallableStatement cs = conn.prepareCall(sql);) {
             if (aSubscription.getSubscription_id() == 0) {
                 cs.setLong(1, this.selectedTransactor.getTransactorId());
-                cs.setInt(2, this.selectedSubscriptionCategory.getSubscription_category_id());
-                cs.setInt(3, this.selectedBusinessCategory.getBusiness_category_id());
+                cs.setInt(2, aSubscription.getSubscription_category_id());
+                cs.setInt(3, aSubscription.getBusiness_category_id());
+                //cs.setInt(2, this.selectedSubscriptionCategory.getSubscription_category_id());
+                //cs.setInt(3, this.selectedBusinessCategory.getBusiness_category_id());
                 cs.setLong(4, this.selectedItem.getItemId());
                 cs.setString(5, aSubscription.getDescription());
                 cs.setDouble(6, aSubscription.getAmount());
@@ -741,8 +750,10 @@ public class SubscriptionBean implements Serializable {
             } else if (aSubscription.getSubscription_id() > 0) {
                 cs.setInt(1, aSubscription.getSubscription_id());
                 cs.setLong(2, this.selectedTransactor.getTransactorId());
-                cs.setInt(3, this.selectedSubscriptionCategory.getSubscription_category_id());
-                cs.setInt(4, this.selectedBusinessCategory.getBusiness_category_id());
+                cs.setInt(3, aSubscription.getSubscription_category_id());
+                cs.setInt(4, aSubscription.getBusiness_category_id());
+                //cs.setInt(3, this.selectedSubscriptionCategory.getSubscription_category_id());
+                //cs.setInt(4, this.selectedBusinessCategory.getBusiness_category_id());
                 cs.setLong(5, this.selectedItem.getItemId());
                 cs.setString(6, aSubscription.getDescription());
                 cs.setDouble(7, aSubscription.getAmount());
@@ -939,14 +950,21 @@ public class SubscriptionBean implements Serializable {
             if (this.filterStatus.length() > 0) {
                 wheresql = wheresql + " AND current_status='" + this.filterStatus + "'";
             }
-            if (this.filterSubscriptionCategoryId > 0) {
-                wheresql = wheresql + " AND subscription_category_id=" + this.filterSubscriptionCategoryId;
+            if (this.filterSubscriptionCategoryIds != null) {
+                if (this.filterSubscriptionCategoryIds.length > 0) {
+                    //wheresql = wheresql + " AND subscription_category_id=" + this.filterSubscriptionCategoryId;
+                    String commaSepString = String.join(",", this.filterSubscriptionCategoryIds);
+                    wheresql = wheresql + " AND subscription_category_id IN (" + commaSepString + ")";
+                }
             }
-            if (this.filterBusinessCategoryId > 0) {
-                wheresql = wheresql + " AND business_category_id=" + this.filterBusinessCategoryId;
+            if (this.filterBusinessCategoryIds != null) {
+                if (this.filterBusinessCategoryIds.length > 0) {
+                    //wheresql = wheresql + " AND business_category_id=" + this.filterBusinessCategoryId;
+                    String commaSepString = String.join(",", this.filterBusinessCategoryIds);
+                    wheresql = wheresql + " AND business_category_id IN (" + commaSepString + ")";
+                }
             }
             if (this.filterExpiryDateRange > 0) {
-                //wheresql = wheresql + " AND timestampdiff(MONTH, NOW(),expiry_date) =" + this.filterExpiryDateRange;
                 if (this.filterExpiryDateRange == 30) {
                     wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 0;
                     wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
@@ -966,8 +984,12 @@ public class SubscriptionBean implements Serializable {
             if (this.filterItem != null) {
                 wheresql = wheresql + " AND item_id=" + this.filterItem.getItemId();
             }
-            if (this.filterAgent.length() > 0) {
-                wheresql = wheresql + " AND agent='" + this.filterAgent + "'";
+            if (this.filterAgents != null) {
+                if (this.filterAgents.length > 0) {
+                    //wheresql = wheresql + " AND agent='" + this.filterAgent + "'";
+                    String commaSepString = String.join(",", this.filterAgents);
+                    wheresql = wheresql + " AND agent IN (" + commaSepString + ")";
+                }
             }
             if (this.filterAccountManager.length() > 0) {
                 wheresql = wheresql + " AND account_manager='" + this.filterAccountManager + "'";
@@ -1001,6 +1023,7 @@ public class SubscriptionBean implements Serializable {
             this.getFilteredSubscriptionsSummary_recurring();
             this.getFilteredSubscriptionsSummary_subscriptionCategory();
             this.getFilteredSubscriptionsSummary_businessCategory();
+            this.getFilteredSubscriptionsSummary_location();
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -1017,11 +1040,17 @@ public class SubscriptionBean implements Serializable {
         if (!this.filterStatus.isEmpty()) {
             wheresql = wheresql + " AND current_status='" + this.filterStatus + "'";
         }
-        if (this.filterSubscriptionCategoryId > 0) {
-            wheresql = wheresql + " AND subscription_category_id=" + this.filterSubscriptionCategoryId;
+        if (this.filterSubscriptionCategoryIds != null) {
+            if (this.filterSubscriptionCategoryIds.length > 0) {
+                String commaSepString = String.join(",", this.filterSubscriptionCategoryIds);
+                wheresql = wheresql + " AND subscription_category_id IN (" + commaSepString + ")";
+            }
         }
-        if (this.filterBusinessCategoryId > 0) {
-            wheresql = wheresql + " AND business_category_id=" + this.filterBusinessCategoryId;
+        if (this.filterBusinessCategoryIds != null) {
+            if (this.filterBusinessCategoryIds.length > 0) {
+                String commaSepString = String.join(",", this.filterBusinessCategoryIds);
+                wheresql = wheresql + " AND business_category_id IN (" + commaSepString + ")";
+            }
         }
         if (this.filterExpiryDateRange > 0) {
             if (this.filterExpiryDateRange == 30) {
@@ -1043,8 +1072,11 @@ public class SubscriptionBean implements Serializable {
         if (this.filterItem != null) {
             wheresql = wheresql + " AND item_id=" + this.filterItem.getItemId();
         }
-        if (this.filterAgent.length() > 0) {
-            wheresql = wheresql + " AND agent='" + this.filterAgent + "'";
+        if (this.filterAgents != null) {
+            if (this.filterAgents.length > 0) {
+                String commaSepString = String.join(",", this.filterAgents);
+                wheresql = wheresql + " AND agent IN (" + commaSepString + ")";
+            }
         }
         if (this.filterAccountManager.length() > 0) {
             wheresql = wheresql + " AND account_manager='" + this.filterAccountManager + "'";
@@ -1091,11 +1123,17 @@ public class SubscriptionBean implements Serializable {
         if (!this.filterStatus.isEmpty()) {
             wheresql = wheresql + " AND current_status='" + this.filterStatus + "'";
         }
-        if (this.filterSubscriptionCategoryId > 0) {
-            wheresql = wheresql + " AND subscription_category_id=" + this.filterSubscriptionCategoryId;
+        if (this.filterSubscriptionCategoryIds != null) {
+            if (this.filterSubscriptionCategoryIds.length > 0) {
+                String commaSepString = String.join(",", this.filterSubscriptionCategoryIds);
+                wheresql = wheresql + " AND subscription_category_id IN (" + commaSepString + ")";
+            }
         }
-        if (this.filterBusinessCategoryId > 0) {
-            wheresql = wheresql + " AND business_category_id=" + this.filterBusinessCategoryId;
+        if (this.filterBusinessCategoryIds != null) {
+            if (this.filterBusinessCategoryIds.length > 0) {
+                String commaSepString = String.join(",", this.filterBusinessCategoryIds);
+                wheresql = wheresql + " AND business_category_id IN (" + commaSepString + ")";
+            }
         }
         if (this.filterExpiryDateRange > 0) {
             if (this.filterExpiryDateRange == 30) {
@@ -1117,8 +1155,11 @@ public class SubscriptionBean implements Serializable {
         if (this.filterItem != null) {
             wheresql = wheresql + " AND item_id=" + this.filterItem.getItemId();
         }
-        if (this.filterAgent.length() > 0) {
-            wheresql = wheresql + " AND agent='" + this.filterAgent + "'";
+        if (this.filterAgents != null) {
+            if (this.filterAgents.length > 0) {
+                String commaSepString = String.join(",", this.filterAgents);
+                wheresql = wheresql + " AND agent IN (" + commaSepString + ")";
+            }
         }
         if (this.filterAccountManager.length() > 0) {
             wheresql = wheresql + " AND account_manager='" + this.filterAccountManager + "'";
@@ -1165,11 +1206,17 @@ public class SubscriptionBean implements Serializable {
         if (!this.filterStatus.isEmpty()) {
             wheresql = wheresql + " AND current_status='" + this.filterStatus + "'";
         }
-        if (this.filterSubscriptionCategoryId > 0) {
-            wheresql = wheresql + " AND subscription_category_id=" + this.filterSubscriptionCategoryId;
+        if (this.filterSubscriptionCategoryIds != null) {
+            if (this.filterSubscriptionCategoryIds.length > 0) {
+                String commaSepString = String.join(",", this.filterSubscriptionCategoryIds);
+                wheresql = wheresql + " AND subscription_category_id IN (" + commaSepString + ")";
+            }
         }
-        if (this.filterBusinessCategoryId > 0) {
-            wheresql = wheresql + " AND business_category_id=" + this.filterBusinessCategoryId;
+        if (this.filterBusinessCategoryIds != null) {
+            if (this.filterBusinessCategoryIds.length > 0) {
+                String commaSepString = String.join(",", this.filterBusinessCategoryIds);
+                wheresql = wheresql + " AND business_category_id IN (" + commaSepString + ")";
+            }
         }
         if (this.filterExpiryDateRange > 0) {
             if (this.filterExpiryDateRange == 30) {
@@ -1191,8 +1238,11 @@ public class SubscriptionBean implements Serializable {
         if (this.filterItem != null) {
             wheresql = wheresql + " AND item_id=" + this.filterItem.getItemId();
         }
-        if (this.filterAgent.length() > 0) {
-            wheresql = wheresql + " AND agent='" + this.filterAgent + "'";
+        if (this.filterAgents != null) {
+            if (this.filterAgents.length > 0) {
+                String commaSepString = String.join(",", this.filterAgents);
+                wheresql = wheresql + " AND agent IN (" + commaSepString + ")";
+            }
         }
         if (this.filterAccountManager.length() > 0) {
             wheresql = wheresql + " AND account_manager='" + this.filterAccountManager + "'";
@@ -1239,11 +1289,17 @@ public class SubscriptionBean implements Serializable {
         if (!this.filterStatus.isEmpty()) {
             wheresql = wheresql + " AND current_status='" + this.filterStatus + "'";
         }
-        if (this.filterSubscriptionCategoryId > 0) {
-            wheresql = wheresql + " AND subscription_category_id=" + this.filterSubscriptionCategoryId;
+        if (this.filterSubscriptionCategoryIds != null) {
+            if (this.filterSubscriptionCategoryIds.length > 0) {
+                String commaSepString = String.join(",", this.filterSubscriptionCategoryIds);
+                wheresql = wheresql + " AND subscription_category_id IN (" + commaSepString + ")";
+            }
         }
-        if (this.filterBusinessCategoryId > 0) {
-            wheresql = wheresql + " AND business_category_id=" + this.filterBusinessCategoryId;
+        if (this.filterBusinessCategoryIds != null) {
+            if (this.filterBusinessCategoryIds.length > 0) {
+                String commaSepString = String.join(",", this.filterBusinessCategoryIds);
+                wheresql = wheresql + " AND business_category_id IN (" + commaSepString + ")";
+            }
         }
         if (this.filterExpiryDateRange > 0) {
             if (this.filterExpiryDateRange == 30) {
@@ -1265,8 +1321,11 @@ public class SubscriptionBean implements Serializable {
         if (this.filterItem != null) {
             wheresql = wheresql + " AND item_id=" + this.filterItem.getItemId();
         }
-        if (this.filterAgent.length() > 0) {
-            wheresql = wheresql + " AND agent='" + this.filterAgent + "'";
+        if (this.filterAgents != null) {
+            if (this.filterAgents.length > 0) {
+                String commaSepString = String.join(",", this.filterAgents);
+                wheresql = wheresql + " AND agent IN (" + commaSepString + ")";
+            }
         }
         if (this.filterAccountManager.length() > 0) {
             wheresql = wheresql + " AND account_manager='" + this.filterAccountManager + "'";
@@ -1300,6 +1359,113 @@ public class SubscriptionBean implements Serializable {
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
+    }
+
+    public void getFilteredSubscriptionsSummary_location() {
+        String sql;
+        sql = "SELECT ifnull(t.loc_district,'Unknown') as loc_district, count(distinct s.transactor_id) as numbers, sum(amount) as amount from subscription s INNER JOIN transactor t ON s.transactor_id = t.transactor_id where s.subscription_id > 0";
+        String wheresql = "";
+        String groupbysum = " GROUP BY ifnull(t.loc_district,'Unknown')";
+        if (this.filterTransactor != null) {
+            wheresql = wheresql + " AND s.transactor_id=" + this.filterTransactor.getTransactorId();
+        }
+        if (!this.filterStatus.isEmpty()) {
+            wheresql = wheresql + " AND s.current_status='" + this.filterStatus + "'";
+        }
+        if (this.filterSubscriptionCategoryIds != null) {
+            if (this.filterSubscriptionCategoryIds.length > 0) {
+                String commaSepString = String.join(",", this.filterSubscriptionCategoryIds);
+                wheresql = wheresql + " AND s.subscription_category_id IN (" + commaSepString + ")";
+            }
+        }
+        if (this.filterBusinessCategoryIds != null) {
+            if (this.filterBusinessCategoryIds.length > 0) {
+                String commaSepString = String.join(",", this.filterBusinessCategoryIds);
+                wheresql = wheresql + " AND s.business_category_id IN (" + commaSepString + ")";
+            }
+        }
+        if (this.filterExpiryDateRange > 0) {
+            if (this.filterExpiryDateRange == 30) {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 0;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
+            } else if (this.filterExpiryDateRange == 60) {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 30;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
+            } else if (this.filterExpiryDateRange == 90) {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 60;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
+            } else {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) > " + this.filterExpiryDateRange;
+            }
+        }
+        if (!this.filterRecurring.isEmpty()) {
+            wheresql = wheresql + " AND s.is_recurring='" + this.filterRecurring + "'";
+        }
+        if (this.filterItem != null) {
+            wheresql = wheresql + " AND s.item_id=" + this.filterItem.getItemId();
+        }
+        if (this.filterAgents != null) {
+            if (this.filterAgents.length > 0) {
+                String commaSepString = String.join(",", this.filterAgents);
+                wheresql = wheresql + " AND s.agent IN (" + commaSepString + ")";
+            }
+        }
+        if (this.filterAccountManager.length() > 0) {
+            wheresql = wheresql + " AND s.account_manager='" + this.filterAccountManager + "'";
+        }
+        sql = sql + wheresql + groupbysum + " ORDER BY amount DESC";
+        ResultSet rs;
+        subscriptionsSummary_location = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Subscription summary = new Subscription();
+                try {
+                    summary.setAgent(rs.getString("loc_district"));
+                } catch (Exception e) {
+                    summary.setAgent("");
+                }
+                try {
+                    summary.setDescription(rs.getString("numbers"));
+                } catch (Exception e) {
+                    summary.setDescription("");
+                }
+                try {
+                    summary.setAmount(rs.getDouble("amount"));
+                } catch (Exception e) {
+                    summary.setAmount(0);
+                }
+                getSubscriptionsSummary_location().add(summary);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public int getTotalNo(List<Subscription> subscription) {
+        int totalNumber = 0;
+        for(Subscription s : subscription) {
+            totalNumber += Integer.parseInt(s.getDescription());
+        }
+        return totalNumber;
+    }
+
+    public int getTotalAmount(List<Subscription> subscription) {
+        int totalAmount = 0;
+        for(Subscription s : subscription) {
+            totalAmount += s.getAmount();
+        }
+        return totalAmount;
+    }
+
+    public int getTotalAverageAmount(List<Subscription> subscription) {
+        int totalAverage = 0;
+        for(Subscription s : subscription) {
+            totalAverage += s.getAmount() / Integer.parseInt(s.getDescription());
+        }
+        return totalAverage;
     }
 
     public List<Subscription> getSubscriptionsByDescriptionCurrentStatusFrequency(String aSearchName) {
@@ -1356,8 +1522,10 @@ public class SubscriptionBean implements Serializable {
             Subscription_log subscriptionLog = new Subscription_log();
             subscriptionLog.setSubscription_id(aSubscription.getSubscription_id());
             subscriptionLog.setTransactor_id(this.selectedTransactor.getTransactorId());
-            subscriptionLog.setSubscription_category_id(this.selectedSubscriptionCategory.getSubscription_category_id());
-            subscriptionLog.setBusiness_category_id(this.selectedBusinessCategory.getBusiness_category_id());
+            subscriptionLog.setSubscription_category_id(aSubscription.getSubscription_category_id());
+            subscriptionLog.setBusiness_category_id(aSubscription.getBusiness_category_id());
+            //subscriptionLog.setSubscription_category_id(this.selectedSubscriptionCategory.getSubscription_category_id());
+            //subscriptionLog.setBusiness_category_id(this.selectedBusinessCategory.getBusiness_category_id());
             subscriptionLog.setItem_id(this.selectedItem.getItemId());
             subscriptionLog.setDescription(aSubscription.getDescription());
             subscriptionLog.setAmount(aSubscription.getAmount());
@@ -1487,21 +1655,20 @@ public class SubscriptionBean implements Serializable {
         this.selectedItem = selectedItem;
     }
 
-    /**
-     * @return the selectedSubscriptionCategory
-     */
-    public Subscription_category getSelectedSubscriptionCategory() {
-        return selectedSubscriptionCategory;
-    }
-
-    /**
-     * @param selectedSubscriptionCategory the selectedSubscriptionCategory to
-     * set
-     */
-    public void setSelectedSubscriptionCategory(Subscription_category selectedSubscriptionCategory) {
-        this.selectedSubscriptionCategory = selectedSubscriptionCategory;
-    }
-
+//    /**
+//     * @return the selectedSubscriptionCategory
+//     */
+//    public Subscription_category getSelectedSubscriptionCategory() {
+//        return selectedSubscriptionCategory;
+//    }
+//
+//    /**
+//     * @param selectedSubscriptionCategory the selectedSubscriptionCategory to
+//     * set
+//     */
+//    public void setSelectedSubscriptionCategory(Subscription_category selectedSubscriptionCategory) {
+//        this.selectedSubscriptionCategory = selectedSubscriptionCategory;
+//    }
     /**
      * @return the filterStatus
      */
@@ -1741,20 +1908,19 @@ public class SubscriptionBean implements Serializable {
         this.uniqueAccount_managerList = uniqueAccount_managerList;
     }
 
-    /**
-     * @return the selectedBusinessCategory
-     */
-    public Business_category getSelectedBusinessCategory() {
-        return selectedBusinessCategory;
-    }
-
-    /**
-     * @param selectedBusinessCategory the selectedBusinessCategory to set
-     */
-    public void setSelectedBusinessCategory(Business_category selectedBusinessCategory) {
-        this.selectedBusinessCategory = selectedBusinessCategory;
-    }
-
+//    /**
+//     * @return the selectedBusinessCategory
+//     */
+//    public Business_category getSelectedBusinessCategory() {
+//        return selectedBusinessCategory;
+//    }
+//
+//    /**
+//     * @param selectedBusinessCategory the selectedBusinessCategory to set
+//     */
+//    public void setSelectedBusinessCategory(Business_category selectedBusinessCategory) {
+//        this.selectedBusinessCategory = selectedBusinessCategory;
+//    }
     /**
      * @return the filterBusinessCategoryId
      */
@@ -1826,5 +1992,63 @@ public class SubscriptionBean implements Serializable {
      */
     public void setSubscriptionsSummary_businessCategory(List<Subscription> subscriptionsSummary_businessCategory) {
         this.subscriptionsSummary_businessCategory = subscriptionsSummary_businessCategory;
+    }
+
+    /**
+     * @return the filterSubscriptionCategoryIds
+     */
+    public String[] getFilterSubscriptionCategoryIds() {
+        return filterSubscriptionCategoryIds;
+    }
+
+    /**
+     * @param filterSubscriptionCategoryIds the filterSubscriptionCategoryIds to
+     * set
+     */
+    public void setFilterSubscriptionCategoryIds(String[] filterSubscriptionCategoryIds) {
+        this.filterSubscriptionCategoryIds = filterSubscriptionCategoryIds;
+    }
+
+    /**
+     * @return the filterBusinessCategoryIds
+     */
+    public String[] getFilterBusinessCategoryIds() {
+        return filterBusinessCategoryIds;
+    }
+
+    /**
+     * @param filterBusinessCategoryIds the filterBusinessCategoryIds to set
+     */
+    public void setFilterBusinessCategoryIds(String[] filterBusinessCategoryIds) {
+        this.filterBusinessCategoryIds = filterBusinessCategoryIds;
+    }
+
+    /**
+     * @return the filterAgents
+     */
+    public String[] getFilterAgents() {
+        return filterAgents;
+    }
+
+    /**
+     * @param filterAgents the filterAgents to set
+     */
+    public void setFilterAgents(String[] filterAgents) {
+        this.filterAgents = filterAgents;
+    }
+
+    /**
+     * @return the subscriptionsSummary_location
+     */
+    public List<Subscription> getSubscriptionsSummary_location() {
+        return subscriptionsSummary_location;
+    }
+
+    /**
+     * @param subscriptionsSummary_location the subscriptionsSummary_location to
+     * set
+     */
+    public void setSubscriptionsSummary_location(List<Subscription> subscriptionsSummary_location) {
+        this.subscriptionsSummary_location = subscriptionsSummary_location;
     }
 }
