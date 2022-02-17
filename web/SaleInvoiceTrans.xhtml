@@ -83,6 +83,21 @@
                     </p:commandButton>
                 </h:panelGrid>
             </h:panelGrid>
+            <h:panelGrid id="pnlApproval">
+                <h:panelGrid styleClass="clsGridMainHeader" columns="3" style="background-color: red;" rendered="#{transaction_approvalBean.transaction_approvalList.size()>0}">
+                    <h:outputLabel  value="#{langsys['Sent']} #{langsys['for']} #{langsys['Approval']}:"/>
+                    <h:selectOneMenu styleClass="clsMenu" id="menuApproval" value="#{trans.transactionHistId}">
+                        <f:selectItem itemValue="0" itemLabel=""/>
+                        <f:selectItems value="#{transaction_approvalBean.transaction_approvalList}" var="apr" itemLabel="#{langsys['No']}:#{apr.transaction_approval_id} #{langsys['Total']}:#{accJournalBean.returnBalanceString(apr.grand_total)} #{apr.currency_code}" itemValue="#{apr.transaction_approval_id}"/>
+                    </h:selectOneMenu>
+                    <p:commandButton id="cmdbLoadApproval" value="#{langsys['Load']} #{langsys['Approval']}" onclick="PF('statusDialog5').show()" onsuccess="PF('statusDialog5').hide()">
+                        <p:dialog widgetVar="statusDialog5" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                        <p:ajax listener="#{transBean.loadDraftTrans(trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor,transBean.authorisedByUserDetail,transItemBean.selectedAccCoa)}" process="@form" update="pnlHeader gridTransItem pgrdOverrideWarranty pgrdSpecific gridItemStatus dtblTransactionItem pgrdTotals pgrdScheme pgrdPayment pgrdMsgs pgrdApprove growl1"/>
+                    </p:commandButton>
+                </h:panelGrid>
+            </h:panelGrid>
             <h:panelGrid id="pnlHeader" styleClass="clsPanelReportFilter" columns="1">
                 <h:panelGrid columns="8" rendered="#{transExtBean.showDetail}">
                     <h:outputLabel  value="#{langsys['From']}"/>
@@ -638,7 +653,7 @@
                 </h:panelGrid>
             </h:panelGrid>
             <h:panelGrid id="pgrdCommands" styleClass="clsGridMainCommands" columns="1">
-                <h:panelGrid styleClass="clsGridMainCommands1" columns="6">
+                <h:panelGrid styleClass="clsGridMainCommands1" columns="7">
                     <h:selectBooleanCheckbox value="#{transBean.autoPrintAfterSave}"/>
                     <h:outputLabel value="#{langsys['Print']}#{langsys['After']}#{langsys['Save']}" style="color: white"/>
                     <p:commandButton styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['SAVE']} (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
@@ -650,7 +665,13 @@
                     <p:commandButton id="cmdbClear" styleClass="clsButtonBig" value="#{langsys['CLEAR']} (ALT+C)" accesskey="c">
                         <p:ajax listener="#{transBean.clearAll2(trans,transItemBean.activeTransItems,transItem,itemBean.selectedItem,transactorBean.selectedTransactor,2,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor,null,null)}" process="@form" update="pnlHeader gridTransItem pgrdOverrideWarranty pgrdSpecific gridItemStatus dtblTransactionItem pgrdTotals pgrdScheme pgrdPayment pgrdMsgs pgrdApprove"/>
                     </p:commandButton>
-                    <p:commandButton styleClass="clsButtonBig" id="cmdbSaveDraft" value="#{langsys['NEW']} #{langsys['DRAFT']}" accesskey="n" onclick="PF('statusDialog2').show()" onsuccess="PF('statusDialog2').hide()">
+                    <p:commandButton styleClass="clsButtonBig" id="cmdbSaveDraft" value="#{langsys['NEW']} #{langsys['DRAFT']}" onclick="PF('statusDialog2').show()" onsuccess="PF('statusDialog2').hide()">
+                        <p:dialog widgetVar="statusDialog2" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                        <p:ajax listener="#{transBean.saveDraftTrans(trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor,transBean.authorisedByUserDetail,transItemBean.selectedAccCoa)}" process="@form" update="pnlDraft pnlHeader gridTransItem pgrdOverrideWarranty pgrdSpecific gridItemStatus dtblTransactionItem pgrdTotals pgrdScheme pgrdPayment pgrdMsgs pgrdApprove"/>
+                    </p:commandButton>
+                    <p:commandButton  rendered="false" styleClass="clsButtonBig" id="cmdbReqApproval" value="#{langsys['SEND']} #{langsys['FOR']} #{langsys['APPROVAL']}" onclick="PF('statusDialog2').show()" onsuccess="PF('statusDialog2').hide()">
                         <p:dialog widgetVar="statusDialog2" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
