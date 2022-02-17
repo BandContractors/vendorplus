@@ -80,6 +80,7 @@ public class SubscriptionBean implements Serializable {
     private Date subscriptionDateRenewal = null;
     private Subscription subscriptionRenewal;
     private String subscriptionLogMessage = "";
+    private boolean freeAtReg = false;
     @ManagedProperty("#{menuItemBean}")
     private MenuItemBean menuItemBean;
 
@@ -194,6 +195,11 @@ public class SubscriptionBean implements Serializable {
             } catch (Exception e) {
                 aSubscription.setLast_edited_by("");
             }
+            try {
+                aSubscription.setFree_at_reg(aResultSet.getInt("free_at_reg"));
+            } catch (Exception e) {
+                aSubscription.setFree_at_reg(0);
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -234,11 +240,17 @@ public class SubscriptionBean implements Serializable {
             SubscriptionTo.setAdded_by(SubscriptionFrom.getAdded_by());
             SubscriptionTo.setLast_edit_date(SubscriptionFrom.getLast_edit_date());
             SubscriptionTo.setLast_edited_by(SubscriptionFrom.getLast_edited_by());
+            SubscriptionTo.setFree_at_reg(SubscriptionFrom.getFree_at_reg());
             this.setSelectedTransactor(new TransactorBean().findTransactor(SubscriptionFrom.getTransactor_id()));
             //this.setSelectedSubscriptionCategory(new SubscriptionCategoryBean().getSubscriptionCategory(SubscriptionFrom.getSubscription_category_id()));
             //this.setSelectedBusinessCategory(new BusinessCategoryBean().getBusinessCategory(SubscriptionFrom.getBusiness_category_id()));
             this.setSelectedItem(new ItemBean().findItem(SubscriptionFrom.getItem_id()));
             this.setItemUnitPrice(SubscriptionFrom.getUnit_price());
+            if (SubscriptionFrom.getFree_at_reg() == 1) {
+                this.setFreeAtReg(true);
+            } else {
+                this.setFreeAtReg(false);
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -281,6 +293,7 @@ public class SubscriptionBean implements Serializable {
             SubscriptionTo.setAdded_by(SubscriptionFrom.getAdded_by());
             SubscriptionTo.setLast_edit_date(SubscriptionFrom.getLast_edit_date());
             SubscriptionTo.setLast_edited_by(SubscriptionFrom.getLast_edited_by());
+            SubscriptionTo.setFree_at_reg(SubscriptionFrom.getFree_at_reg());
             this.setSelectedTransactor(new TransactorBean().findTransactor(SubscriptionFrom.getTransactor_id()));
             //this.setSelectedSubscriptionCategory(new SubscriptionCategoryBean().getSubscriptionCategory(SubscriptionFrom.getSubscription_category_id()));
             //this.setSelectedBusinessCategory(new BusinessCategoryBean().getBusinessCategory(SubscriptionFrom.getBusiness_category_id()));
@@ -333,6 +346,7 @@ public class SubscriptionBean implements Serializable {
             this.subscriptionRenewal.setAdded_by(SubscriptionFrom.getAdded_by());
             this.subscriptionRenewal.setLast_edit_date(SubscriptionFrom.getLast_edit_date());
             this.subscriptionRenewal.setLast_edited_by(SubscriptionFrom.getLast_edited_by());
+            this.subscriptionRenewal.setFree_at_reg(SubscriptionFrom.getFree_at_reg());
             this.setSelectedTransactor(new TransactorBean().findTransactor(SubscriptionFrom.getTransactor_id()));
             //this.setSelectedSubscriptionCategory(new SubscriptionCategoryBean().getSubscriptionCategory(SubscriptionFrom.getSubscription_category_id()));
             //this.setSelectedBusinessCategory(new BusinessCategoryBean().getBusinessCategory(SubscriptionFrom.getBusiness_category_id()));
@@ -372,12 +386,14 @@ public class SubscriptionBean implements Serializable {
                 aSubscription.setAdded_by("");
                 aSubscription.setLast_edit_date(null);
                 aSubscription.setLast_edited_by("");
+                aSubscription.setFree_at_reg(0);
                 this.setSelectedTransactor(null);
                 //this.setSelectedSubscriptionCategory(null);
                 //this.setSelectedBusinessCategory(null);
                 this.setSelectedItem(null);
                 this.setItemUnitPrice(0);
                 this.setOldExpiryDate(null);
+                this.setFreeAtReg(false);
                 this.setSubscriptionDateRenewal(null);
                 this.setSubscriptionRenewal(null);
             }
@@ -566,6 +582,11 @@ public class SubscriptionBean implements Serializable {
                 } else {
                     this.setSubscriptionLogMessage("Edited");
                 }
+                if (this.freeAtReg == false) {
+                    aSubscription.setFree_at_reg(0);
+                } else {
+                    aSubscription.setFree_at_reg(1);
+                }
                 //save subscription
                 status = this.insertUpdateSubscription(aSubscription);
                 if (status > 0) {
@@ -695,9 +716,9 @@ public class SubscriptionBean implements Serializable {
         long status = 0;
         int returnedSubscriptionId = 0;
         if (aSubscription.getSubscription_id() == 0) {
-            sql = "{call sp_insert_subscription(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_insert_subscription(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         } else if (aSubscription.getSubscription_id() > 0) {
-            sql = "{call sp_update_subscription(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_update_subscription(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         }
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -734,12 +755,13 @@ public class SubscriptionBean implements Serializable {
                 cs.setString(18, new GeneralUserSetting().getCurrentUser().getUserName());
                 cs.setDate(19, null);
                 cs.setString(20, aSubscription.getLast_edited_by());
-                cs.setInt(21, returnedSubscriptionId);
+                cs.setInt(21, aSubscription.getFree_at_reg());
+                cs.setInt(22, returnedSubscriptionId);
 
                 cs.executeUpdate();
                 status = 1;
                 //get Id of newly inserted subscription
-                returnedSubscriptionId = cs.getInt(21);
+                returnedSubscriptionId = cs.getInt(22);
 
                 //save subscription log
                 aSubscription.setSubscription_id(returnedSubscriptionId);
@@ -784,6 +806,7 @@ public class SubscriptionBean implements Serializable {
                 cs.setString(19, aSubscription.getAdded_by());
                 cs.setTimestamp(20, new java.sql.Timestamp(new java.util.Date().getTime()));
                 cs.setString(21, new GeneralUserSetting().getCurrentUser().getUserName());
+                cs.setInt(22, aSubscription.getFree_at_reg());
                 cs.executeUpdate();
                 status = 1;
 
@@ -1446,7 +1469,7 @@ public class SubscriptionBean implements Serializable {
 
     public int getTotalNo(List<Subscription> subscription) {
         int totalNumber = 0;
-        for(Subscription s : subscription) {
+        for (Subscription s : subscription) {
             totalNumber += Integer.parseInt(s.getDescription());
         }
         return totalNumber;
@@ -1454,7 +1477,7 @@ public class SubscriptionBean implements Serializable {
 
     public int getTotalAmount(List<Subscription> subscription) {
         int totalAmount = 0;
-        for(Subscription s : subscription) {
+        for (Subscription s : subscription) {
             totalAmount += s.getAmount();
         }
         return totalAmount;
@@ -1462,7 +1485,7 @@ public class SubscriptionBean implements Serializable {
 
     public int getTotalAverageAmount(List<Subscription> subscription) {
         int totalAverage = 0;
-        for(Subscription s : subscription) {
+        for (Subscription s : subscription) {
             totalAverage += s.getAmount() / Integer.parseInt(s.getDescription());
         }
         return totalAverage;
@@ -1551,6 +1574,7 @@ public class SubscriptionBean implements Serializable {
             } else {
                 subscriptionLog.setExpiry_date(aSubscription.getExpiry_date());
             }
+            subscriptionLog.setFree_at_reg(aSubscription.getFree_at_reg());
             subscriptionLog.setAction(this.getSubscriptionLogMessage());
             subscriptionLog.setAdd_date(aSubscription.getAdd_date());
             subscriptionLog.setAdded_by(aSubscription.getAdded_by());
@@ -2050,5 +2074,19 @@ public class SubscriptionBean implements Serializable {
      */
     public void setSubscriptionsSummary_location(List<Subscription> subscriptionsSummary_location) {
         this.subscriptionsSummary_location = subscriptionsSummary_location;
+    }
+
+    /**
+     * @return the freeAtReg
+     */
+    public boolean isFreeAtReg() {
+        return freeAtReg;
+    }
+
+    /**
+     * @param freeAtReg the freeAtReg to set
+     */
+    public void setFreeAtReg(boolean freeAtReg) {
+        this.freeAtReg = freeAtReg;
     }
 }

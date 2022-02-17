@@ -27,6 +27,7 @@ public class Subscription_log implements Serializable {
     private Date subscription_date;
     private Date renewal_date;
     private Date expiry_date;
+    private int free_at_reg;
     private String action;
     private Date add_date;
     private String added_by;
@@ -323,5 +324,19 @@ public class Subscription_log implements Serializable {
      */
     public void setExpiry_date(Date expiry_date) {
         this.expiry_date = expiry_date;
+    }
+
+    /**
+     * @return the free_at_reg
+     */
+    public int getFree_at_reg() {
+        return free_at_reg;
+    }
+
+    /**
+     * @param free_at_reg the free_at_reg to set
+     */
+    public void setFree_at_reg(int free_at_reg) {
+        this.free_at_reg = free_at_reg;
     }
 }

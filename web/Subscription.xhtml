@@ -66,7 +66,7 @@
                         <f:selectItem itemLabel="Opted Out" itemValue="Opted Out"/>
                     </p:selectOneMenu>
                     <p:outputLabel value="#{langsys['Subscription']} #{langsys['Category']}"/>
-                    <p:selectCheckboxMenu id="filterSubscriptionCategory" value="#{subscriptionBean.filterSubscriptionCategoryIds}" dynamic="true" label="multi select.." filter="true" filterMatchMode="startsWith" style="width: 170px;height: 28px; background-color: white" panelStyle="width:250px">
+                    <p:selectCheckboxMenu id="filterSubscriptionCategory" value="#{subscriptionBean.filterSubscriptionCategoryIds}" dynamic="true" label=" " filter="true" filterMatchMode="startsWith" style="width: 170px;height: 28px; background-color: white" panelStyle="width:250px">
                         <f:selectItems value="#{subscriptionCategoryBean.getSubscriptionCategory()}" var="sc" itemLabel="#{sc.category_name}" itemValue="#{sc.subscription_category_id}"/>
                     </p:selectCheckboxMenu>
                     <p:outputLabel value="#{langsys['Account']} #{langsys['Manager']}"/>
@@ -136,11 +136,11 @@
                         </p:column>
                     </p:autoComplete>
                     <p:outputLabel value="#{langsys['Business']} #{langsys['Category']}"/>
-                    <p:selectCheckboxMenu id="filterBusinessCategory" value="#{subscriptionBean.filterBusinessCategoryIds}" dynamic="true" label="multi select.." filter="true" filterMatchMode="startsWith" style="width: 170px;height: 28px; background-color: white" panelStyle="width:250px">
+                    <p:selectCheckboxMenu id="filterBusinessCategory" value="#{subscriptionBean.filterBusinessCategoryIds}" dynamic="true" label=" " filter="true" filterMatchMode="startsWith" style="width: 170px;height: 28px; background-color: white" panelStyle="width:250px">
                         <f:selectItems value="#{businessCategoryBean.getBusinessCategory()}" var="bc" itemLabel="#{bc.category_name}" itemValue="#{bc.business_category_id}"/>
                     </p:selectCheckboxMenu>
                     <p:outputLabel value="#{langsys['Agent']}"/>
-                    <p:selectCheckboxMenu id="filterAgents" value="#{subscriptionBean.filterAgents}" dynamic="true" label="multi select.." filter="true" filterMatchMode="startsWith" style="width: 170px;height: 28px; background-color: white" panelStyle="width:250px">
+                    <p:selectCheckboxMenu id="filterAgents" value="#{subscriptionBean.filterAgents}" dynamic="true" label=" " filter="true" filterMatchMode="startsWith" style="width: 170px;height: 28px; background-color: white" panelStyle="width:250px">
                         <f:selectItems value="#{subscriptionBean.getUniqueSubscriptionAgents()}" var="a" itemLabel="#{a}" itemValue="'#{a}'"/>
                     </p:selectCheckboxMenu>
                     <p:commandButton value="#{langsys['OK']}" style="color: white; background-color: #00B259; width: 80px">
@@ -153,14 +153,14 @@
             </h:panelGrid>
 
             <h:panelGrid id="pnlgSummary" columns="4" styleClass="clsPanelSummary">
-                <p:dataTable id="tblSummaryBusinessCategory" tableStyle="width:auto;" var="sum" value="#{subscriptionBean.subscriptionsSummary_businessCategory}">
+                <p:dataTable id="tblSummaryBusinessCategory" tableStyle="width:100%;" var="sum" value="#{subscriptionBean.subscriptionsSummary_businessCategory}">
                     <p:column headerText="#{langsys['Business']} #{langsys['Category']}">
                         <h:outputLabel value="#{businessCategoryBean.getBusinessCategory(sum.business_category_id).getCategory_name()}"/>
                             <f:facet name="footer">
                                 <h:outputText value="Total" />
                             </f:facet>
                     </p:column>
-                    <p:column headerText="#{langsys['No']}" style="text-align: right;">
+                    <p:column headerText="#{langsys['No']}" width="10%" style="text-align: right;">
                         <h:outputText value="#{sum.description}">
                             <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
@@ -182,7 +182,7 @@
                     </p:column>
                 </p:dataTable>
                 <h:panelGrid>
-                    <p:dataTable id="tblSummaryStatus" tableStyle="width:auto;" var="sum" value="#{subscriptionBean.subscriptionsSummary_status}" 
+                    <p:dataTable id="tblSummaryStatus" tableStyle="width:100%;" var="sum" value="#{subscriptionBean.subscriptionsSummary_status}" 
                                  rowStyleClass="#{sum.current_status eq 'Active' ? 'green' : sum.current_status eq 'Opted Out' ? 'red' : 'amber'}">
                         <p:column headerText="#{langsys['Status']}">
                             <h:outputLabel value="#{sum.current_status} "/>
@@ -190,7 +190,7 @@
                                 <h:outputText value="Total" />
                             </f:facet>
                         </p:column>
-                        <p:column headerText="#{langsys['No']}" style="text-align: right;">
+                        <p:column headerText="#{langsys['No']}" width="10%" style="text-align: right;">
                             <h:outputText value="#{sum.description}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
@@ -211,14 +211,14 @@
                             </f:facet>
                         </p:column>
                     </p:dataTable>
-                    <p:dataTable sortBy="#{1}" id="tblSummaryRecurring" tableStyle="width:auto;" var="sum" value="#{subscriptionBean.subscriptionsSummary_recurring}">
+                    <p:dataTable sortBy="#{1}" id="tblSummaryRecurring" tableStyle="width:100%;" var="sum" value="#{subscriptionBean.subscriptionsSummary_recurring}">
                         <p:column headerText="#{langsys['Recurring']}">
                             <h:outputLabel value="#{sum.is_recurring} "/>
                             <f:facet name="footer">
                                 <h:outputText value="Total" />
                             </f:facet>
                         </p:column>
-                        <p:column headerText="#{langsys['No']}" style="text-align: right;">
+                        <p:column headerText="#{langsys['No']}" width="10%" style="text-align: right;">
                             <h:outputText value="#{sum.description}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
@@ -242,22 +242,17 @@
                             <h:outputText value="#{sum.amount/sum.description}">
                                 <f:convertNumber pattern="###,###.#" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
-                            <f:facet name="footer">
-                                <h:outputText value="#{subscriptionBean.getTotalAverageAmount(subscriptionBean.subscriptionsSummary_recurring)}">
-                                    <f:convertNumber pattern="###,###.#" locale="#{utilityBean.convertLocaleToString()}"/>
-                                </h:outputText>
-                            </f:facet>
                         </p:column>
                     </p:dataTable>
                 </h:panelGrid>
-                <p:dataTable id="tblSummarySubscriptionCategory" tableStyle="width:auto;" var="sum" value="#{subscriptionBean.subscriptionsSummary_subscriptionCategory}">
+                <p:dataTable id="tblSummarySubscriptionCategory" tableStyle="width:100%;" var="sum" value="#{subscriptionBean.subscriptionsSummary_subscriptionCategory}">
                     <p:column headerText="#{langsys['Subscription']} #{langsys['Category']}">
                         <h:outputLabel value="#{subscriptionCategoryBean.getSubscriptionCategory(sum.subscription_category_id).getCategory_name()}"/>
                         <f:facet name="footer">
                             <h:outputText value="Total" />
                         </f:facet>
                     </p:column>
-                    <p:column headerText="#{langsys['No']}" style="text-align: right;">
+                    <p:column headerText="#{langsys['No']}" style="text-align: right;" width="10%">
                         <h:outputText value="#{sum.description}">
                             <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
@@ -349,7 +344,7 @@
                 <p:column headerText="#{langsys['Item']}">
                     <h:outputText value="#{itemBean.findItem(s.item_id).getDescription()}"/>
                 </p:column>
-                <p:column headerText="#{langsys['Description']}">
+                <p:column headerText="#{langsys['Description']}" visible="false">
                     <h:outputText value="#{s.description}"/>
                 </p:column>
                 <p:column headerText="#{langsys['Amount']}" style="text-align: right;">
@@ -357,17 +352,51 @@
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="#{langsys['Status']}">
+                <p:column headerText="#{langsys['Recurring']}">
+                    <h:outputText value="#{s.is_recurring}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Status']}" visible="false">
                     <h:outputText value="#{s.current_status}"/>
                 </p:column>
                 <p:column headerText="#{langsys['Frequency']}">
                     <h:outputText value="#{s.frequency}"/>
                 </p:column>
-                <p:column headerText="#{langsys['Registration']} #{langsys['Date']}">
+                <p:column headerText="#{langsys['Unit']} #{langsys['Price']}" style="text-align: right;" visible="false">
+                    <h:outputText value="#{s.unit_price}">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['Qty']}" style="text-align: right;" visible="false">
+                    <h:outputText value="#{s.qty}">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['Agent']}" visible="false">
+                    <h:outputText value="#{s.agent}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Account']} #{langsys['Manager']}" visible="false">
+                    <h:outputText value="#{s.account_manager}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Registration']} #{langsys['Date']}" visible="false">
                     <h:outputText value="#{utilityBean.formatDate(s.subscription_date)}"/>
                 </p:column>
-                <p:column headerText="#{langsys['Expiry']} #{langsys['Date']}">
+                <p:column headerText="#{langsys['Renewal']} #{langsys['Date']}" visible="false">
+                    <h:outputText value="#{utilityBean.formatDate(s.renewal_date)}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Expiry']} #{langsys['Date']}" visible="false">
                     <h:outputText value="#{utilityBean.formatDate(s.expiry_date)}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Add']} #{langsys['Date']}" visible="false">
+                    <h:outputText value="#{utilityBean.formatDate(s.add_date)}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Added']} #{langsys['By']}" visible="false">
+                    <h:outputText value="#{s.added_by}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Edit']} #{langsys['Date']}" visible="false">
+                    <h:outputText value="#{utilityBean.formatDate(s.last_edit_date)}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Edited']} #{langsys['By']}" visible="false">
+                    <h:outputText value="#{s.last_edited_by}"/>
                 </p:column>
 
                 <p:column headerText="#{langsys['Action']}" exportable="false" style="min-width: 125px">
@@ -563,6 +592,8 @@
                         <p:datePicker id="expiryDate" value="#{subscription.expiry_date}" pattern="#{companySetting.getDateFormat()}" disabled="True" inputStyle="width: 320px" style="width: 350px" />
                         <h:outputLabel  value="#{langsys['Account']} #{langsys['Manager']}:"/>
                         <p:inputText style="width: 320px" value="#{subscription.account_manager}" autocomplete="off" />
+                        <h:outputLabel  value="#{langsys['Free']} #{langsys['at']} #{langsys['Registration']}:"/>
+                        <h:selectBooleanCheckbox value="#{subscriptionBean.freeAtReg}" />
                     </h:panelGrid>
 
                     <h:panelGrid styleClass="clsGridMainCommands" columns="1">

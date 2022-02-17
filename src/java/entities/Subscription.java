@@ -30,6 +30,7 @@ public class Subscription implements Serializable {
     private String added_by;
     private Date last_edit_date;
     private String last_edited_by;
+    private int free_at_reg;
 
     /**
      * @return the subscription_id
@@ -323,5 +324,19 @@ public class Subscription implements Serializable {
      */
     public void setBusiness_category_id(int business_category_id) {
         this.business_category_id = business_category_id;
+    }
+
+    /**
+     * @return the free_at_reg
+     */
+    public int getFree_at_reg() {
+        return free_at_reg;
+    }
+
+    /**
+     * @param free_at_reg the free_at_reg to set
+     */
+    public void setFree_at_reg(int free_at_reg) {
+        this.free_at_reg = free_at_reg;
     }
 }

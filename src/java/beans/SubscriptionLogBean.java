@@ -127,6 +127,11 @@ public class SubscriptionLogBean implements Serializable {
                 aSubscription_log.setExpiry_date(null);
             }
             try {
+                aSubscription_log.setFree_at_reg(aResultSet.getInt("free_at_reg"));
+            } catch (Exception e) {
+                aSubscription_log.setFree_at_reg(0);
+            }
+            try {
                 aSubscription_log.setAction(aResultSet.getString("action"));
             } catch (Exception e) {
                 aSubscription_log.setAction("");
@@ -181,7 +186,7 @@ public class SubscriptionLogBean implements Serializable {
 
     public int insertSubscription_log(Subscription_log aSubscription_log) {
         int saved = 0;
-        String sql = "{call sp_insert_subscription_log(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+        String sql = "{call sp_insert_subscription_log(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 CallableStatement cs = conn.prepareCall(sql);) {
@@ -210,11 +215,12 @@ public class SubscriptionLogBean implements Serializable {
             } else {
                 cs.setTimestamp(17, new java.sql.Timestamp(aSubscription_log.getExpiry_date().getTime()));
             }
+            cs.setInt(18, aSubscription_log.getFree_at_reg());
             //cs.setTimestamp(16, new java.sql.Timestamp(aSubscription_log.getRenewal_date().getTime()));
             //cs.setTimestamp(17, new java.sql.Timestamp(aSubscription_log.getExpiry_date().getTime()));
-            cs.setString(18, aSubscription_log.getAction());
-            cs.setTimestamp(19, new java.sql.Timestamp(new java.util.Date().getTime()));
-            cs.setString(20, new GeneralUserSetting().getCurrentUser().getUserName());
+            cs.setString(19, aSubscription_log.getAction());
+            cs.setTimestamp(20, new java.sql.Timestamp(new java.util.Date().getTime()));
+            cs.setString(21, new GeneralUserSetting().getCurrentUser().getUserName());
 
             cs.executeUpdate();
             saved = 1;
@@ -411,7 +417,7 @@ public class SubscriptionLogBean implements Serializable {
 
     public int updateSubscription_log(Subscription_log aSubscription_log) {
         int status = 0;
-        String sql = "{call sp_update_subscription_log(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+        String sql = "{call sp_update_subscription_log(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 CallableStatement cs = conn.prepareCall(sql);) {
@@ -433,9 +439,10 @@ public class SubscriptionLogBean implements Serializable {
             cs.setTimestamp(16, new java.sql.Timestamp(aSubscription_log.getSubscription_date().getTime()));
             cs.setTimestamp(17, new java.sql.Timestamp(aSubscription_log.getRenewal_date().getTime()));
             cs.setTimestamp(18, new java.sql.Timestamp(aSubscription_log.getExpiry_date().getTime()));
-            cs.setString(19, aSubscription_log.getAction());
-            cs.setTimestamp(20, new java.sql.Timestamp(new java.util.Date().getTime()));
-            cs.setString(21, new GeneralUserSetting().getCurrentUser().getUserName());
+            cs.setInt(19, aSubscription_log.getFree_at_reg());
+            cs.setString(20, aSubscription_log.getAction());
+            cs.setTimestamp(21, new java.sql.Timestamp(new java.util.Date().getTime()));
+            cs.setString(22, new GeneralUserSetting().getCurrentUser().getUserName());
 
             cs.executeUpdate();
             status = 1;
