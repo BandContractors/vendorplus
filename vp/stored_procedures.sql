@@ -13441,6 +13441,7 @@ CREATE PROCEDURE sp_insert_subscription
 	IN in_added_by varchar(50),
 	IN in_last_edit_date datetime,
 	IN in_last_edited_by varchar(50),
+	IN in_free_at_reg int,
 	OUT out_subscription_id int
 ) 
 BEGIN 
@@ -13469,7 +13470,8 @@ BEGIN
 		add_date,
 		added_by,
 		last_edit_date,
-		last_edited_by
+		last_edited_by,
+		free_at_reg
 	) 
     VALUES
 	(
@@ -13493,7 +13495,8 @@ BEGIN
 		in_add_date,
 		in_added_by,
 		in_last_edit_date,
-		in_last_edited_by
+		in_last_edited_by,
+		in_free_at_reg
 	); 
 END//
 DELIMITER ;
@@ -13522,7 +13525,8 @@ CREATE PROCEDURE sp_update_subscription
 	IN in_add_date datetime,
 	IN in_added_by varchar(50),
 	IN in_last_edit_date datetime,
-	IN in_last_edited_by varchar(50)
+	IN in_last_edited_by varchar(50),
+	IN in_free_at_reg int
 ) 
 BEGIN 
 	UPDATE subscription SET 
@@ -13545,7 +13549,8 @@ BEGIN
 		add_date=in_add_date,
 		added_by=in_added_by,
 		last_edit_date=in_last_edit_date,
-		last_edited_by=in_last_edited_by
+		last_edited_by=in_last_edited_by,
+		free_at_reg=in_free_at_reg
 	WHERE subscription_id=in_subscription_id; 
 END//
 DELIMITER ;
@@ -13621,6 +13626,7 @@ CREATE PROCEDURE sp_insert_subscription_log
 	IN in_subscription_date datetime,
 	IN in_renewal_date datetime,
 	IN in_expiry_date datetime,
+	IN in_free_at_reg int,
 	IN in_action varchar(20),
 	IN in_add_date datetime,
 	IN in_added_by varchar(50)
@@ -13648,6 +13654,7 @@ BEGIN
 		subscription_date,
 		renewal_date,
 		expiry_date,
+		free_at_reg,
 		action,
 		add_date,
 		added_by
@@ -13672,6 +13679,7 @@ BEGIN
 		in_subscription_date,
 		in_renewal_date,
 		in_expiry_date,
+		in_free_at_reg,
 		in_action,
 		in_add_date,
 		in_added_by
@@ -13701,6 +13709,7 @@ CREATE PROCEDURE sp_update_subscription_log
 	IN in_subscription_date datetime,
 	IN in_renewal_date datetime,
 	IN in_expiry_date datetime,
+	IN in_free_at_reg int,
 	IN in_action varchar(20),
 	IN in_add_date datetime,
 	IN in_added_by varchar(50)
@@ -13724,6 +13733,7 @@ BEGIN
 		subscription_date=in_subscription_date,
 		renewal_date=in_renewal_date,
 		expiry_date=in_expiry_date,
+		free_at_reg=in_free_at_reg,
 		action=in_action,
 		add_date=in_add_date,
 		added_by=in_added_by
