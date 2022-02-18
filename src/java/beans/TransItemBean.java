@@ -5570,6 +5570,11 @@ public class TransItemBean implements Serializable {
                 } catch (NullPointerException | SQLException npe) {
                     ti.setHide_unit_price_invoice(0);
                 }
+                try {
+                    ti.setItemCode(rs.getString("item_code"));
+                } catch (NullPointerException | SQLException npe) {
+                    ti.setItemCode("");
+                }
                 tis.add(ti);
             }
         } catch (Exception e) {

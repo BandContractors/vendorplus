@@ -114,9 +114,20 @@
                         <h:messages id="msgsMainMessage" style="color: red"/><br/>
                     </h:panelGrid>
                 </p:panel>
+                <h:panelGrid columns="2">
+                    <h:outputLabel value="#{langsys['Print']} #{langsys['File']}" style="color: black;"/>
+                    <h:selectOneMenu styleClass="clsMenu" value="#{transBean.overridePrintVersion}">
+                        <f:selectItem itemLabel="" itemValue="0"/>
+                        <f:selectItem itemLabel="#{langsys['Print']} #{langsys['File']} 1" itemValue="1"/>
+                        <f:selectItem itemLabel="#{langsys['Print']} #{langsys['File']} 2" itemValue="2"/>
+                        <f:ajax event="change" render="pnlgOutput"/>
+                    </h:selectOneMenu>
+                </h:panelGrid>
                 <p:growl/>
                 <!-- INVOICE STARTS HERE -->
-                <ui:include src="#{transBean.getPrintFileName('PARENT',transactionTypeBean.getTransactionType(13),0)}"/>
+                <h:panelGrid id="pnlgOutput" style="width: 100%">
+                    <ui:include src="#{transBean.getPrintFileName('PARENT',transactionTypeBean.getTransactionType(13),transBean.overridePrintVersion)}"/>
+                </h:panelGrid>
                 <!-- INVOICE ENDS HERE -->
             </h:form>
         </p:dialog>

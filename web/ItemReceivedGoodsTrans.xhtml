@@ -320,7 +320,7 @@
                         <p:dialog widgetVar="statusDialog2" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
-                        <p:ajax listener="#{transBean.saveDraftTrans(trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,null,userDetailBean.selectedUserDetail,null,transBean.authorisedByUserDetail,transItemBean.selectedAccCoa)}" process="@form" update="pnlDraft pnlHeader gridTransItem pgrdSpecific gridItemStatus dtblTransactionItem pgrdMsgs"/>
+                        <p:ajax listener="#{transBean.saveDraftTrans('Draft',trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,null,userDetailBean.selectedUserDetail,null,transBean.authorisedByUserDetail,transItemBean.selectedAccCoa)}" process="@form" update="pnlDraft pnlHeader gridTransItem pgrdSpecific gridItemStatus dtblTransactionItem pgrdMsgs"/>
                     </p:commandButton>
                 </h:panelGrid>
             </h:panelGrid>

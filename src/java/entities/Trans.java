@@ -23,6 +23,7 @@ public class Trans implements Serializable {
     private long TransactionId2;
     private long TransactionId3;
     private long TransactionHistId;
+    private long Transaction_approval_id;
     private Date TransactionDate;
     private int StoreId;
     private String StoreName;
@@ -1901,6 +1902,20 @@ public class Trans implements Serializable {
      */
     public void setFdn_ref(String fdn_ref) {
         this.fdn_ref = fdn_ref;
+    }
+
+    /**
+     * @return the Transaction_approval_id
+     */
+    public long getTransaction_approval_id() {
+        return Transaction_approval_id;
+    }
+
+    /**
+     * @param Transaction_approval_id the Transaction_approval_id to set
+     */
+    public void setTransaction_approval_id(long Transaction_approval_id) {
+        this.Transaction_approval_id = Transaction_approval_id;
     }
 
 }

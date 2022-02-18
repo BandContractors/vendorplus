@@ -3,12 +3,12 @@ package beans;
 import connections.DBConnection;
 import entities.Trans;
 import entities.Transaction_approval;
-import entities.Transaction_tax_map;
 import java.io.Serializable;
-import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
@@ -32,321 +32,258 @@ public class Transaction_approvalBean implements Serializable {
     static Logger LOGGER = Logger.getLogger(Transaction_approvalBean.class.getName());
     private List<Transaction_approval> Transaction_approvalList;
 
-    public void setTransaction_tax_mapFromResultset(Transaction_tax_map aTransaction_tax_map, ResultSet aResultSet) {
+    public void setTransaction_approvalFromResultset(Transaction_approval aTransaction_approval, ResultSet aResultSet) {
         try {
             try {
-                aTransaction_tax_map.setTransaction_tax_map_id(aResultSet.getLong("transaction_tax_map_id"));
+                aTransaction_approval.setTransaction_approval_id(aResultSet.getLong("transaction_approval_id"));
             } catch (NullPointerException npe) {
-                aTransaction_tax_map.setTransaction_tax_map_id(0);
+                aTransaction_approval.setTransaction_approval_id(0);
             }
             try {
-                aTransaction_tax_map.setTransaction_id(aResultSet.getLong("transaction_id"));
+                aTransaction_approval.setTransaction_hist_id(aResultSet.getLong("transaction_hist_id"));
             } catch (NullPointerException npe) {
-                aTransaction_tax_map.setTransaction_id(0);
+                aTransaction_approval.setTransaction_hist_id(0);
             }
             try {
-                aTransaction_tax_map.setTransaction_type_id(aResultSet.getInt("transaction_type_id"));
+                aTransaction_approval.setTransaction_type_id(aResultSet.getInt("transaction_type_id"));
             } catch (NullPointerException npe) {
-                aTransaction_tax_map.setTransaction_type_id(0);
+                aTransaction_approval.setTransaction_type_id(0);
             }
             try {
-                aTransaction_tax_map.setTransaction_reason_id(aResultSet.getInt("transaction_reason_id"));
+                aTransaction_approval.setTransaction_reason_id(aResultSet.getInt("transaction_reason_id"));
             } catch (NullPointerException npe) {
-                aTransaction_tax_map.setTransaction_reason_id(0);
+                aTransaction_approval.setTransaction_reason_id(0);
             }
             try {
-                aTransaction_tax_map.setTransaction_number(aResultSet.getString("transaction_number"));
+                aTransaction_approval.setRequest_date(new Date(aResultSet.getTimestamp("request_date").getTime()));
             } catch (NullPointerException npe) {
-                aTransaction_tax_map.setTransaction_number("");
+                aTransaction_approval.setRequest_date(null);
             }
             try {
-                aTransaction_tax_map.setReference_number_tax(aResultSet.getString("reference_number_tax"));
+                aTransaction_approval.setRequest_by_id(aResultSet.getInt("request_by_id"));
             } catch (NullPointerException npe) {
-                aTransaction_tax_map.setReference_number_tax("");
+                aTransaction_approval.setRequest_by_id(0);
             }
             try {
-                aTransaction_tax_map.setTransaction_number_tax(aResultSet.getString("transaction_number_tax"));
+                aTransaction_approval.setApproval_status(aResultSet.getInt("approval_status"));
             } catch (NullPointerException npe) {
-                aTransaction_tax_map.setTransaction_number_tax("");
+                aTransaction_approval.setApproval_status(0);
             }
             try {
-                aTransaction_tax_map.setVerification_code_tax(aResultSet.getString("verification_code_tax"));
+                aTransaction_approval.setStatus_date(new Date(aResultSet.getTimestamp("status_date").getTime()));
             } catch (NullPointerException npe) {
-                aTransaction_tax_map.setVerification_code_tax("");
+                aTransaction_approval.setStatus_date(null);
             }
             try {
-                aTransaction_tax_map.setQr_code_tax(aResultSet.getString("qr_code_tax"));
+                aTransaction_approval.setStatus_desc(aResultSet.getString("status_desc"));
             } catch (NullPointerException npe) {
-                aTransaction_tax_map.setQr_code_tax("");
+                aTransaction_approval.setStatus_desc("");
             }
             try {
-                aTransaction_tax_map.setAdd_date(new Date(aResultSet.getTimestamp("add_date").getTime()));
+                aTransaction_approval.setStatus_by_id(aResultSet.getInt("status_by_id"));
             } catch (NullPointerException npe) {
-                aTransaction_tax_map.setAdd_date(null);
+                aTransaction_approval.setStatus_by_id(0);
             }
             try {
-                aTransaction_tax_map.setIs_updated_more_than_once(aResultSet.getInt("is_updated_more_than_once"));
-            } catch (NullPointerException npe) {
-                aTransaction_tax_map.setIs_updated_more_than_once(0);
+                aTransaction_approval.setGrand_total(aResultSet.getDouble("grand_total"));
+            } catch (Exception e) {
+                aTransaction_approval.setGrand_total(0);
             }
             try {
-                aTransaction_tax_map.setMore_than_once_update_reconsiled(aResultSet.getInt("more_than_once_update_reconsiled"));
-            } catch (NullPointerException npe) {
-                aTransaction_tax_map.setMore_than_once_update_reconsiled(0);
+                aTransaction_approval.setTransactor_names(aResultSet.getString("transactor_names"));
+            } catch (Exception e) {
+                aTransaction_approval.setTransactor_names("");
             }
             try {
-                aTransaction_tax_map.setFdn_ref(aResultSet.getString("fdn_ref"));
-            } catch (NullPointerException npe) {
-                aTransaction_tax_map.setFdn_ref("");
+                aTransaction_approval.setCurrency_code(aResultSet.getString("currency_code"));
+            } catch (Exception e) {
+                aTransaction_approval.setCurrency_code("");
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
     }
 
-    public int saveTransaction_tax_map(Transaction_tax_map aTransaction_tax_map) {
-        int saved = 0;
-        String sql = "{call sp_save_transaction_tax_map(?,?,?,?,?,?,?,?,?,?,?,?)}";
+    public long insertTransaction_approval(Transaction_approval aTransaction_approval) {
+        long InsertedId = 0;
+        String sql = "INSERT INTO transaction_approval "
+                + "(transaction_hist_id,transaction_type_id,transaction_reason_id,"
+                + "request_date,request_by_id,approval_status,status_date,status_desc,status_by_id) "
+                + "VALUES (?,?,?,?,?,?,?,?,?)";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
-                CallableStatement cs = conn.prepareCall(sql);) {
-            if (null != aTransaction_tax_map) {
+                PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            if (null != aTransaction_approval) {
                 try {
-                    cs.setLong("in_transaction_tax_map_id", aTransaction_tax_map.getTransaction_tax_map_id());
-                } catch (NullPointerException npe) {
-                    cs.setLong("in_transaction_tax_map_id", 0);
+                    ps.setLong(1, aTransaction_approval.getTransaction_hist_id());
+                } catch (Exception e) {
+                    ps.setLong(1, 0);
                 }
                 try {
-                    cs.setLong("in_transaction_id", aTransaction_tax_map.getTransaction_id());
-                } catch (NullPointerException npe) {
-                    cs.setLong("in_transaction_id", 0);
+                    ps.setInt(2, aTransaction_approval.getTransaction_type_id());
+                } catch (Exception e) {
+                    ps.setInt(2, 0);
                 }
                 try {
-                    cs.setInt("in_transaction_type_id", aTransaction_tax_map.getTransaction_type_id());
-                } catch (NullPointerException npe) {
-                    cs.setInt("in_transaction_type_id", 0);
+                    ps.setInt(3, aTransaction_approval.getTransaction_reason_id());
+                } catch (Exception e) {
+                    ps.setInt(3, 0);
                 }
                 try {
-                    cs.setInt("in_transaction_reason_id", aTransaction_tax_map.getTransaction_reason_id());
-                } catch (NullPointerException npe) {
-                    cs.setInt("in_transaction_reason_id", 0);
+                    ps.setTimestamp(4, new java.sql.Timestamp(aTransaction_approval.getRequest_date().getTime()));
+                } catch (Exception e) {
+                    ps.setTimestamp(4, null);
                 }
                 try {
-                    cs.setString("in_transaction_number", aTransaction_tax_map.getTransaction_number());
-                } catch (NullPointerException npe) {
-                    cs.setString("in_transaction_number", "");
+                    ps.setInt(5, aTransaction_approval.getRequest_by_id());
+                } catch (Exception e) {
+                    ps.setInt(5, 0);
                 }
                 try {
-                    cs.setString("in_reference_number_tax", aTransaction_tax_map.getReference_number_tax());
-                } catch (NullPointerException npe) {
-                    cs.setString("in_reference_number_tax", "");
+                    ps.setInt(6, aTransaction_approval.getApproval_status());
+                } catch (Exception e) {
+                    ps.setInt(6, 0);
                 }
                 try {
-                    cs.setString("in_transaction_number_tax", aTransaction_tax_map.getTransaction_number_tax());
-                } catch (NullPointerException npe) {
-                    cs.setString("in_transaction_number_tax", "");
+                    ps.setTimestamp(7, new java.sql.Timestamp(aTransaction_approval.getStatus_date().getTime()));
+                } catch (Exception e) {
+                    ps.setTimestamp(7, null);
                 }
                 try {
-                    cs.setString("in_verification_code_tax", aTransaction_tax_map.getVerification_code_tax());
-                } catch (NullPointerException npe) {
-                    cs.setString("in_verification_code_tax", "");
-                }
-                String Qcode = aTransaction_tax_map.getQr_code_tax();
-                try {
-                    if (aTransaction_tax_map.getQr_code_tax().length() > 1000) {
-                        Qcode = aTransaction_tax_map.getQr_code_tax().substring(0, 999);
-                    }
-                    cs.setString("in_qr_code_tax", Qcode);
-                } catch (NullPointerException npe) {
-                    cs.setString("in_qr_code_tax", "");
+                    ps.setString(8, aTransaction_approval.getStatus_desc());
+                } catch (Exception e) {
+                    ps.setString(8, "");
                 }
                 try {
-                    cs.setInt("in_is_updated_more_than_once", aTransaction_tax_map.getIs_updated_more_than_once());
-                } catch (NullPointerException npe) {
-                    cs.setInt("in_is_updated_more_than_once", 0);
+                    ps.setInt(9, aTransaction_approval.getStatus_by_id());
+                } catch (Exception e) {
+                    ps.setInt(9, 0);
                 }
-                try {
-                    cs.setInt("in_more_than_once_update_reconsiled", aTransaction_tax_map.getMore_than_once_update_reconsiled());
-                } catch (NullPointerException npe) {
-                    cs.setInt("in_more_than_once_update_reconsiled", 0);
+                ps.executeUpdate();
+                ResultSet rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    InsertedId = rs.getLong(1);
                 }
-                try {
-                    if (null == aTransaction_tax_map.getFdn_ref()) {
-                        cs.setString("in_fdn_ref", "");
-                    } else {
-                        cs.setString("in_fdn_ref", aTransaction_tax_map.getFdn_ref());
-                    }
-                } catch (NullPointerException npe) {
-                    cs.setString("in_fdn_ref", "");
-                }
-                cs.executeUpdate();
-                saved = 1;
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-        return saved;
+        return InsertedId;
     }
 
-    public void saveTransaction_tax_map(long aTransId, String aTransNoTax, String aVerCodeTax, String aQrCodeTax) {
+    public long updateTransaction_approval(Transaction_approval aTransaction_approval) {
+        int Updated = 0;
+        String sql = "UPDATE transaction_approval SET "
+                + "approval_status=?,status_date=?,status_desc=?,status_by_id=? "
+                + "WHERE transaction_approval_id=" + aTransaction_approval.getTransaction_approval_id();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            if (null != aTransaction_approval) {
+                try {
+                    ps.setInt(1, aTransaction_approval.getApproval_status());
+                } catch (Exception e) {
+                    ps.setInt(1, 0);
+                }
+                try {
+                    ps.setTimestamp(2, new java.sql.Timestamp(aTransaction_approval.getStatus_date().getTime()));
+                } catch (Exception e) {
+                    ps.setTimestamp(2, null);
+                }
+                try {
+                    ps.setString(3, aTransaction_approval.getStatus_desc());
+                } catch (Exception e) {
+                    ps.setString(3, "");
+                }
+                try {
+                    ps.setInt(4, aTransaction_approval.getStatus_by_id());
+                } catch (Exception e) {
+                    ps.setInt(4, 0);
+                }
+                ps.executeUpdate();
+                Updated = 1;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return Updated;
+    }
+
+    public void insertTransaction_approvalCall(long aTransHistId) {
         try {
-            Trans trans = new Trans();
-            Transaction_tax_map transtaxmap = new Transaction_tax_map();
+            Trans transhist = new Trans();
+            Transaction_approval transapp = new Transaction_approval();
             try {
-                trans = new TransBean().getTrans(aTransId);
+                transhist = new TransBean().getTransFromHist(aTransHistId);
             } catch (Exception e) {
                 //
             }
-            if (null != trans) {
-                transtaxmap.setTransaction_id(aTransId);
-                transtaxmap.setTransaction_number(trans.getTransactionNumber());
-                transtaxmap.setTransaction_type_id(trans.getTransactionTypeId());
-                transtaxmap.setTransaction_reason_id(trans.getTransactionReasonId());
-                transtaxmap.setTransaction_number_tax(aTransNoTax);
-                transtaxmap.setVerification_code_tax(aVerCodeTax);
-                transtaxmap.setQr_code_tax(aQrCodeTax);
-                transtaxmap.setReference_number_tax("");
-                transtaxmap.setIs_updated_more_than_once(0);
-                transtaxmap.setMore_than_once_update_reconsiled(0);
-                transtaxmap.setFdn_ref("");
-                int x = this.saveTransaction_tax_map(transtaxmap);
+            if (null != transhist) {
+                transapp.setTransaction_hist_id(transhist.getTransactionHistId());
+                transapp.setTransaction_type_id(transhist.getTransactionTypeId());
+                transapp.setTransaction_reason_id(transhist.getTransactionReasonId());
+                transapp.setRequest_date(transhist.getAddDate());
+                transapp.setRequest_by_id(transhist.getAddUserDetailId());
+                transapp.setApproval_status(0);
+                transapp.setStatus_date(transhist.getAddDate());
+                //approval_status: 0 Submitted, 1 Approved, 2 Processed, 3 Rejected, 4 Recalled
+                transapp.setStatus_desc("Submitted");
+                transapp.setStatus_by_id(transhist.getAddUserDetailId());
+                long x = this.insertTransaction_approval(transapp);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
     }
 
-    public void saveTransaction_tax_map_cr_dr_note(Trans aCrDrNoteTrans, String aTransNoTax, String aVerCodeTax, String aQrCodeTax, String aRefNo) {
+    public Transaction_approval getTransaction_approval(long aTransAppId) {
+        String sql = "SELECT * FROM transaction_approval WHERE transaction_approval_id=" + aTransAppId;
+        ResultSet rs = null;
+        Transaction_approval ta = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                ta = new Transaction_approval();
+                this.setTransaction_approvalFromResultset(ta, rs);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return ta;
+    }
+
+    public void refreshTransaction_approvalList(int aStoreId, int aRequestById, int aTransTypeId, int aTransReasonId) {
         try {
-            Transaction_tax_map transtaxmap = new Transaction_tax_map();
-            if (null != aCrDrNoteTrans) {
-                //first get ref fdn
-                String RefFDN = "";
-                try {
-                    RefFDN = this.getTransaction_tax_map(aCrDrNoteTrans.getTransactionRef(), 2).getTransaction_number_tax();
-                } catch (Exception e) {
-                    //do nothing
-                }
-                transtaxmap.setTransaction_id(aCrDrNoteTrans.getTransactionId());
-                transtaxmap.setTransaction_number(aCrDrNoteTrans.getTransactionNumber());
-                transtaxmap.setTransaction_type_id(aCrDrNoteTrans.getTransactionTypeId());
-                transtaxmap.setTransaction_reason_id(aCrDrNoteTrans.getTransactionReasonId());
-                transtaxmap.setReference_number_tax(aRefNo);
-                transtaxmap.setTransaction_number_tax(aTransNoTax);
-                transtaxmap.setVerification_code_tax(aVerCodeTax);
-                transtaxmap.setQr_code_tax(aQrCodeTax);
-                transtaxmap.setIs_updated_more_than_once(0);
-                transtaxmap.setMore_than_once_update_reconsiled(0);
-                transtaxmap.setFdn_ref(RefFDN);
-                int x = this.saveTransaction_tax_map(transtaxmap);
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.ERROR, e);
+            this.Transaction_approvalList.clear();
+        } catch (NullPointerException npe) {
+            this.Transaction_approvalList = new ArrayList<>();
         }
-    }
-
-    public void updateCreditNoteByRefNo(String aTransNoTax, String aVerCodeTax, String aQrCodeTax, String aRefNo) {
-        String sql = "UPDATE transaction_tax_map SET verification_code_tax=?,qr_code_tax=?,transaction_number_tax=? "
-                + "WHERE transaction_tax_map_id>0 AND transaction_type_id=82 AND reference_number_tax='" + aRefNo + "'";
-        try (
-                Connection conn = DBConnection.getMySQLConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);) {
-            if (aQrCodeTax.length() > 1000) {
-                aQrCodeTax = aQrCodeTax.substring(0, 999);
-            }
-            ps.setString(1, aVerCodeTax);
-            ps.setString(2, aQrCodeTax);
-            ps.setString(3, aTransNoTax);
-            ps.executeUpdate();
-        } catch (Exception e) {
-            LOGGER.log(Level.ERROR, e);
-        }
-    }
-
-    public void markTransaction_tax_mapUpdated_more_than_once(Transaction_tax_map aTransaction_tax_map) {
-        String sql = "UPDATE transaction_tax_map SET is_updated_more_than_once=?,more_than_once_update_reconsiled=? "
-                + "WHERE transaction_tax_map_id=" + aTransaction_tax_map.getTransaction_tax_map_id();
-        try (
-                Connection conn = DBConnection.getMySQLConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);) {
-            ps.setInt(1, 1);
-            ps.setInt(2, 0);
-            ps.executeUpdate();
-        } catch (Exception e) {
-            LOGGER.log(Level.ERROR, e);
-        }
-    }
-
-    public void markTransaction_tax_mapMore_than_once_update_reconsiled(Transaction_tax_map aTransaction_tax_map) {
-        String sql = "UPDATE transaction_tax_map SET more_than_once_update_reconsiled=? "
-                + "WHERE transaction_tax_map_id=" + aTransaction_tax_map.getTransaction_tax_map_id();
-        try (
-                Connection conn = DBConnection.getMySQLConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);) {
-            ps.setInt(1, 1);
-            ps.executeUpdate();
-        } catch (Exception e) {
-            LOGGER.log(Level.ERROR, e);
-        }
-    }
-
-    public Transaction_tax_map getTransaction_tax_map(long aTransId, int aTransTypeId) {
-        String sql = "SELECT * FROM transaction_tax_map WHERE transaction_id=? AND transaction_type_id=?";
-        ResultSet rs = null;
-        Transaction_tax_map ttm = null;
-        try (
-                Connection conn = DBConnection.getMySQLConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);) {
-            ps.setLong(1, aTransId);
-            ps.setInt(2, aTransTypeId);
-            rs = ps.executeQuery();
-            if (rs.next()) {
-                ttm = new Transaction_tax_map();
-                this.setTransaction_tax_mapFromResultset(ttm, rs);
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.ERROR, e);
-        }
-        return ttm;
-    }
-
-    public Transaction_tax_map getTransaction_tax_map(String aTransNo, int aTransTypeId) {
-        String sql = "SELECT * FROM transaction_tax_map WHERE transaction_number=? AND transaction_type_id=?";
-        ResultSet rs = null;
-        Transaction_tax_map ttm = null;
-        try (
-                Connection conn = DBConnection.getMySQLConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);) {
-            ps.setString(1, aTransNo);
-            ps.setInt(2, aTransTypeId);
-            rs = ps.executeQuery();
-            if (rs.next()) {
-                ttm = new Transaction_tax_map();
-                this.setTransaction_tax_mapFromResultset(ttm, rs);
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.ERROR, e);
-        }
-        return ttm;
-    }
-
-    public String getTaxInvoiceNo(long aTransId, int aTransTypeId) {
-        String TaxIN = "";
-        String sql = "SELECT * FROM transaction_tax_map WHERE transaction_id=? AND transaction_type_id=?";
+        //approval_status: 0 Submitted, 1 Approved, 2 Processed, 3 Rejected, 4 Recalled
+        String sql;
+        sql = "SELECT ta.*,th.grand_total,'' AS transactor_names,th.currency_code FROM transaction_approval ta INNER JOIN transaction_hist th ON ta.transaction_hist_id=th.transaction_hist_id "
+                + "WHERE ta.approval_status IN(0,1,3) AND ta.transaction_type_id=? AND ta.transaction_reason_id=? AND "
+                + "th.store_id=? AND ta.request_by_id=? AND th.hist_flag='Approval'  "
+                + "ORDER BY transaction_approval_id DESC LIMIT 10";
         ResultSet rs = null;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
-            ps.setLong(1, aTransId);
-            ps.setInt(2, aTransTypeId);
+            ps.setInt(1, aTransTypeId);
+            ps.setInt(2, aTransReasonId);
+            ps.setInt(3, aStoreId);
+            ps.setInt(4, aRequestById);
             rs = ps.executeQuery();
-            if (rs.next()) {
-                TaxIN = rs.getString("transaction_number_tax");
+            Transaction_approval ta = null;
+            while (rs.next()) {
+                ta = new Transaction_approval();
+                this.setTransaction_approvalFromResultset(ta, rs);
+                this.Transaction_approvalList.add(ta);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-        return TaxIN;
     }
 
     /**

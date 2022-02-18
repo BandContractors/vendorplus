@@ -4507,7 +4507,7 @@ public class TransBean implements Serializable {
         return pay;
     }
 
-    public void saveDraftTrans(Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
+    public void saveDraftTrans(String aHistFlag, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
         try {
@@ -4521,15 +4521,15 @@ public class TransBean implements Serializable {
         boolean isTransItemCopySuccess = false;
         try {
             if (aActiveTransItems.isEmpty()) {
-                msg = "Empty Transaction Cannot be Saved";
+                msg = aHistFlag + " Empty Transaction Cannot be Saved";
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
-                this.setActionMessage(ub.translateWordsInText(BaseName, "Draft Transaction Not Saved"));
+                this.setActionMessage(ub.translateWordsInText(BaseName, aHistFlag + " Transaction Not Saved"));
             } else {
                 sql = "{call sp_insert_transaction_hist(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
                 try (
                         Connection conn = DBConnection.getMySQLConnection();
                         CallableStatement cs = conn.prepareCall(sql);) {
-                    cs.setString("in_hist_flag", "Draft");
+                    cs.setString("in_hist_flag", aHistFlag);//Draft, Approval,Edit,etc.
                     cs.setDate("in_transaction_date", new java.sql.Date(trans.getTransactionDate().getTime()));
                     cs.setInt("in_store_id", new GeneralUserSetting().getCurrentStore().getStoreId());
                     trans.setStoreId(new GeneralUserSetting().getCurrentStore().getStoreId());
@@ -4710,11 +4710,18 @@ public class TransBean implements Serializable {
                     tib.saveDraftTransItems(trans, aActiveTransItems, TransHistId);
                     isTransItemCopySuccess = true;
                     if (isTransCopySuccess && isTransItemCopySuccess) {
-                        this.setActionMessage(ub.translateWordsInText(BaseName, "Draft Saved Successfully"));
+                        if (aHistFlag.equals("Approval")) {
+                            new Transaction_approvalBean().insertTransaction_approvalCall(TransHistId);
+                        }
+                        this.setActionMessage(ub.translateWordsInText(BaseName, aHistFlag + " Saved Successfully"));
                         this.clearAll2(trans, aActiveTransItems, null, null, aSelectedTransactor, 2, aSelectedBillTransactor, aTransUserDetail, aSelectedSchemeTransactor, aAuthorisedByUserDetail, aSelectedAccCoa);
-                        this.refreshTranssDraft(new GeneralUserSetting().getCurrentStore().getStoreId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), new GeneralUserSetting().getCurrentTransactionTypeId(), new GeneralUserSetting().getCurrentTransactionReasonId());
+                        if (aHistFlag.equals("Approval")) {
+                            new Transaction_approvalBean().refreshTransaction_approvalList(new GeneralUserSetting().getCurrentStore().getStoreId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), new GeneralUserSetting().getCurrentTransactionTypeId(), new GeneralUserSetting().getCurrentTransactionReasonId());
+                        } else if (aHistFlag.equals("Draft")) {
+                            this.refreshTranssDraft(new GeneralUserSetting().getCurrentStore().getStoreId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), new GeneralUserSetting().getCurrentTransactionTypeId(), new GeneralUserSetting().getCurrentTransactionReasonId());
+                        }
                     } else {
-                        this.setActionMessage(ub.translateWordsInText(BaseName, "Draft Not Saved"));
+                        this.setActionMessage(ub.translateWordsInText(BaseName, aHistFlag + " Not Saved"));
                     }
                 } catch (Exception e) {
                     LOGGER.log(Level.ERROR, e);
