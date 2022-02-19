@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -57,11 +58,11 @@ public class TransactorBean implements Serializable {
     private Transactor SelectedBillTransactor;
     private Transactor SelectedSchemeTransactor;
     private List<Transactor> TransactorObjectList;
-    private List<Transactor> ReportTransactors = new ArrayList<Transactor>();
+    private List<Transactor> ReportTransactors = new ArrayList<>();
     private List<SalaryDeduction> SalaryDeductions;
-    private List<Transactor> TransactorList = new ArrayList<Transactor>();
+    private List<Transactor> TransactorList = new ArrayList<>();
     private Transactor TransactorObj;
-    private List<Transactor> TransactorListSimilar = new ArrayList<Transactor>();
+    private List<Transactor> TransactorListSimilar = new ArrayList<>();
     private Transactor ParentTransactor;
     @ManagedProperty("#{menuItemBean}")
     private MenuItemBean menuItemBean;

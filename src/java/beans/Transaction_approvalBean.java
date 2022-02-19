@@ -30,7 +30,6 @@ public class Transaction_approvalBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = Logger.getLogger(Transaction_approvalBean.class.getName());
-    private List<Transaction_approval> Transaction_approvalList;
 
     public void setTransaction_approvalFromResultset(Transaction_approval aTransaction_approval, ResultSet aResultSet) {
         try {
@@ -254,11 +253,44 @@ public class Transaction_approvalBean implements Serializable {
         return ta;
     }
 
-    public void refreshTransaction_approvalList(int aStoreId, int aRequestById, int aTransTypeId, int aTransReasonId) {
+    /*
+     public void refreshTransaction_approvalList(int aStoreId, int aRequestById, int aTransTypeId, int aTransReasonId) {
+     try {
+     this.Transaction_approvalList.clear();
+     } catch (NullPointerException npe) {
+     this.Transaction_approvalList = new ArrayList<>();
+     }
+     //approval_status: 0 Submitted, 1 Approved, 2 Processed, 3 Rejected, 4 Recalled
+     String sql;
+     sql = "SELECT ta.*,th.grand_total,'' AS transactor_names,th.currency_code FROM transaction_approval ta INNER JOIN transaction_hist th ON ta.transaction_hist_id=th.transaction_hist_id "
+     + "WHERE ta.approval_status IN(0,1,3) AND ta.transaction_type_id=? AND ta.transaction_reason_id=? AND "
+     + "th.store_id=? AND ta.request_by_id=? AND th.hist_flag='Approval'  "
+     + "ORDER BY transaction_approval_id DESC LIMIT 10";
+     ResultSet rs = null;
+     try (
+     Connection conn = DBConnection.getMySQLConnection();
+     PreparedStatement ps = conn.prepareStatement(sql);) {
+     ps.setInt(1, aTransTypeId);
+     ps.setInt(2, aTransReasonId);
+     ps.setInt(3, aStoreId);
+     ps.setInt(4, aRequestById);
+     rs = ps.executeQuery();
+     Transaction_approval ta = null;
+     while (rs.next()) {
+     ta = new Transaction_approval();
+     this.setTransaction_approvalFromResultset(ta, rs);
+     this.Transaction_approvalList.add(ta);
+     }
+     } catch (Exception e) {
+     LOGGER.log(Level.ERROR, e);
+     }
+     }
+     */
+    public void refreshTransaction_approvalList(List<Transaction_approval> aList, int aStoreId, int aRequestById, int aTransTypeId, int aTransReasonId) {
         try {
-            this.Transaction_approvalList.clear();
+            aList.clear();
         } catch (NullPointerException npe) {
-            this.Transaction_approvalList = new ArrayList<>();
+            aList = new ArrayList<>();
         }
         //approval_status: 0 Submitted, 1 Approved, 2 Processed, 3 Rejected, 4 Recalled
         String sql;
@@ -279,24 +311,10 @@ public class Transaction_approvalBean implements Serializable {
             while (rs.next()) {
                 ta = new Transaction_approval();
                 this.setTransaction_approvalFromResultset(ta, rs);
-                this.Transaction_approvalList.add(ta);
+                aList.add(ta);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-    }
-
-    /**
-     * @return the Transaction_approvalList
-     */
-    public List<Transaction_approval> getTransaction_approvalList() {
-        return Transaction_approvalList;
-    }
-
-    /**
-     * @param Transaction_approvalList the Transaction_approvalList to set
-     */
-    public void setTransaction_approvalList(List<Transaction_approval> Transaction_approvalList) {
-        this.Transaction_approvalList = Transaction_approvalList;
     }
 }

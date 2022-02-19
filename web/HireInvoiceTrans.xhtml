@@ -60,7 +60,7 @@
                     <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                         <p:graphicImage name="/images/ajax-loader.gif"/>
                     </p:dialog>
-                    <p:ajax listener="#{transBean.loadDraftTrans(trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor,transBean.authorisedByUserDetail,transItemBean.selectedAccCoa)}" process="@form" update="pnlHeader pnlHeader2 gridTransItem pgrdOverrideWarranty pgrdSpecific gridItemStatus dtblTransactionItem pgrdTotals pgrdScheme pgrdPayment pgrdMsgs pgrdTransUser pgrdApprove"/>
+                    <p:ajax listener="#{transBean.loadDraftTrans('Draft',trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor,transBean.authorisedByUserDetail,transItemBean.selectedAccCoa)}" process="@form" update="pnlHeader pnlHeader2 gridTransItem pgrdOverrideWarranty pgrdSpecific gridItemStatus dtblTransactionItem pgrdTotals pgrdScheme pgrdPayment pgrdMsgs pgrdTransUser pgrdApprove"/>
                 </p:commandButton>
                 <p:commandButton id="cmdbDeleteDraft" value="Delete Draft Hire" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                     <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
