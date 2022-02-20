@@ -1381,6 +1381,19 @@ BEGIN
 END//
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS sp_search_transactor_by_loc_district;
+DELIMITER //
+CREATE PROCEDURE sp_search_transactor_by_loc_district
+(
+	IN in_loc_district varchar(100) 
+) 
+BEGIN 
+	SELECT * FROM transactor t 
+	WHERE t.loc_district = in_loc_district
+	ORDER BY t.loc_district ASC LIMIT 10; 
+END//
+DELIMITER ;
+
 DROP PROCEDURE IF EXISTS sp_search_transactor_active_by_name;
 DELIMITER //
 CREATE PROCEDURE sp_search_transactor_active_by_name
