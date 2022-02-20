@@ -185,6 +185,15 @@
                     <p:commandButton styleClass="clsButtonBig" id="cmdbClear" value="#{langsys['CLEAR']} (ALT+C)" accesskey="c">
                         <p:ajax listener="#{transBean.clearAll2(trans,transItemBean.activeTransItems,transItem,itemBean.selectedItem,null,2,null,null,null,transBean.authorisedByUserDetail,null)}" process="@form" update="@this pnlgHeader gridTransItem gridItemStatus dtblTransactionItem pgrdTermsConditions pnlgMessage growl1 pnlgOutput"/>
                     </p:commandButton>
+                    <h:panelGrid columns="1">
+                        <h:outputLabel value="#{langsys['Print']}.#{langsys['File']}" style="color: white;"/>
+                        <h:selectOneMenu styleClass="clsMenu" value="#{transBean.overridePrintVersion}">
+                            <f:selectItem itemLabel="" itemValue="0"/>
+                            <f:selectItem itemLabel="#{langsys['Print']} #{langsys['File']} 1" itemValue="1"/>
+                            <f:selectItem itemLabel="#{langsys['Print']} #{langsys['File']} 2" itemValue="2"/>
+                            <f:ajax event="change" render="pnlgOutput"/>
+                        </h:selectOneMenu>
+                    </h:panelGrid>
                 </h:panelGrid>
             </h:panelGrid>
 
@@ -195,7 +204,7 @@
             <p:growl id="growl1"/>
             <!-- INVOICE STARTS HERE -->
             <h:panelGrid id="pnlgOutput" style="width: 100%">
-                <ui:include src="#{transBean.getPrintFileName('PARENT',transBean.transTypeObj,0)}"/>
+                <ui:include src="#{transBean.getPrintFileName('PARENT',transBean.transTypeObj,transBean.overridePrintVersion)}"/>
             </h:panelGrid>
             <!-- INVOICE ENDS HERE -->
         </h:form>

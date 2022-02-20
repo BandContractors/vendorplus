@@ -30,6 +30,7 @@ import entities.Stock_out;
 import entities.Store;
 import entities.Trans;
 import entities.TransactionReason;
+import entities.Transaction_approval;
 import entities.Transaction_tax_map;
 import java.io.Serializable;
 import java.sql.CallableStatement;
@@ -80,6 +81,7 @@ public class TransBean implements Serializable {
     static Logger LOGGER = Logger.getLogger(TransBean.class.getName());
     private List<Trans> Transs;
     private List<Trans> TranssDraft;
+    private List<Transaction_approval> TransListApproval = new ArrayList<>();
     private String ActionMessage = null;
     private Trans SelectedTrans = null;
     private long SelectedTransactionId;
@@ -4507,7 +4509,7 @@ public class TransBean implements Serializable {
         return pay;
     }
 
-    public void saveDraftTrans(Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
+    public void saveDraftTrans(String aHistFlag, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
         try {
@@ -4521,15 +4523,15 @@ public class TransBean implements Serializable {
         boolean isTransItemCopySuccess = false;
         try {
             if (aActiveTransItems.isEmpty()) {
-                msg = "Empty Transaction Cannot be Saved";
+                msg = aHistFlag + " Empty Transaction Cannot be Saved";
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
-                this.setActionMessage(ub.translateWordsInText(BaseName, "Draft Transaction Not Saved"));
+                this.setActionMessage(ub.translateWordsInText(BaseName, aHistFlag + " Transaction Not Saved"));
             } else {
                 sql = "{call sp_insert_transaction_hist(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
                 try (
                         Connection conn = DBConnection.getMySQLConnection();
                         CallableStatement cs = conn.prepareCall(sql);) {
-                    cs.setString("in_hist_flag", "Draft");
+                    cs.setString("in_hist_flag", aHistFlag);//Draft, Approval,Edit,etc.
                     cs.setDate("in_transaction_date", new java.sql.Date(trans.getTransactionDate().getTime()));
                     cs.setInt("in_store_id", new GeneralUserSetting().getCurrentStore().getStoreId());
                     trans.setStoreId(new GeneralUserSetting().getCurrentStore().getStoreId());
@@ -4710,11 +4712,18 @@ public class TransBean implements Serializable {
                     tib.saveDraftTransItems(trans, aActiveTransItems, TransHistId);
                     isTransItemCopySuccess = true;
                     if (isTransCopySuccess && isTransItemCopySuccess) {
-                        this.setActionMessage(ub.translateWordsInText(BaseName, "Draft Saved Successfully"));
+                        if (aHistFlag.equals("Approval")) {
+                            new Transaction_approvalBean().insertTransaction_approvalCall(TransHistId);
+                        }
+                        this.setActionMessage(ub.translateWordsInText(BaseName, aHistFlag + " Saved Successfully"));
                         this.clearAll2(trans, aActiveTransItems, null, null, aSelectedTransactor, 2, aSelectedBillTransactor, aTransUserDetail, aSelectedSchemeTransactor, aAuthorisedByUserDetail, aSelectedAccCoa);
-                        this.refreshTranssDraft(new GeneralUserSetting().getCurrentStore().getStoreId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), new GeneralUserSetting().getCurrentTransactionTypeId(), new GeneralUserSetting().getCurrentTransactionReasonId());
+                        if (aHistFlag.equals("Approval")) {
+                            new Transaction_approvalBean().refreshTransaction_approvalList(this.TransListApproval, new GeneralUserSetting().getCurrentStore().getStoreId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), new GeneralUserSetting().getCurrentTransactionTypeId(), new GeneralUserSetting().getCurrentTransactionReasonId());
+                        } else if (aHistFlag.equals("Draft")) {
+                            this.refreshTranssDraft(new GeneralUserSetting().getCurrentStore().getStoreId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), new GeneralUserSetting().getCurrentTransactionTypeId(), new GeneralUserSetting().getCurrentTransactionReasonId());
+                        }
                     } else {
-                        this.setActionMessage(ub.translateWordsInText(BaseName, "Draft Not Saved"));
+                        this.setActionMessage(ub.translateWordsInText(BaseName, aHistFlag + " Not Saved"));
                     }
                 } catch (Exception e) {
                     LOGGER.log(Level.ERROR, e);
@@ -4725,7 +4734,7 @@ public class TransBean implements Serializable {
         }
     }
 
-    public void loadDraftTrans(Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
+    public void loadDraftTrans(String aHistFlag, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
         try {
@@ -4735,7 +4744,14 @@ public class TransBean implements Serializable {
         String msg = "";
         String sql = null;
         long TransHistId = 0;
-        TransHistId = trans.getTransactionHistId();
+        if (aHistFlag.equals("Draft")) {
+            TransHistId = trans.getTransactionHistId();
+        } else if (aHistFlag.equals("Approval")) {
+            Transaction_approval transapp = new Transaction_approvalBean().getTransaction_approval(trans.getTransaction_approval_id());
+            if (null != transapp) {
+                TransHistId = transapp.getTransaction_hist_id();
+            }
+        }
         try {
             if (TransHistId > 0) {
                 this.setTransFromHist(trans, TransHistId);
@@ -4743,6 +4759,7 @@ public class TransBean implements Serializable {
                 try {
                     if (trans.getTransactorId() > 0) {
                         new TransactorBean().setTransactor(aSelectedTransactor, trans.getTransactorId());
+                        //aSelectedTransactor = new TransactorBean().getTransactor(trans.getTransactorId());
                     }
                 } catch (NullPointerException npe) {
                 }
@@ -4779,8 +4796,8 @@ public class TransBean implements Serializable {
                     }
                 }
             } else {
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Select Valid Draft Record")));
-                this.setActionMessage(ub.translateWordsInText(BaseName, "No Draft Record Loaded"));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Select Valid " + aHistFlag + " Record")));
+                this.setActionMessage(ub.translateWordsInText(BaseName, aHistFlag + " Not Loaded"));
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -16867,6 +16884,20 @@ public class TransBean implements Serializable {
      */
     public void setTransItemSummary2(List<TransItem> TransItemSummary2) {
         this.TransItemSummary2 = TransItemSummary2;
+    }
+
+    /**
+     * @return the TransListApproval
+     */
+    public List<Transaction_approval> getTransListApproval() {
+        return TransListApproval;
+    }
+
+    /**
+     * @param TransListApproval the TransListApproval to set
+     */
+    public void setTransListApproval(List<Transaction_approval> TransListApproval) {
+        this.TransListApproval = TransListApproval;
     }
 
 }
