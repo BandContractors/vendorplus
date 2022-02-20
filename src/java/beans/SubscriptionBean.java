@@ -1,11 +1,10 @@
 package beans;
 
 import connections.DBConnection;
-import entities.Business_category;
 import entities.GroupRight;
 import entities.Item;
 import entities.Subscription;
-import entities.Subscription_category;
+import entities.Subscription_freq_amount;
 import entities.Subscription_log;
 import entities.Transactor;
 import entities.UserDetail;
@@ -56,6 +55,7 @@ public class SubscriptionBean implements Serializable {
     private List<Subscription> subscriptionsSummary_subscriptionCategory;
     private List<Subscription> subscriptionsSummary_businessCategory;
     private List<Subscription> subscriptionsSummary_location;
+    private List<Subscription_freq_amount> subscriptionsSummary_freq_amount;
     private List<Subscription_log> SubscriptionsLogList;
     private Transactor selectedTransactor;
     private Item selectedItem;
@@ -73,6 +73,7 @@ public class SubscriptionBean implements Serializable {
     private String filterAgent = "";
     private String[] filterAgents = null;
     private String filterAccountManager = "";
+    private String filterLocDistrict = "";
     private List<String> uniqueAgentList;
     private List<String> uniqueAccount_managerList;
     private double itemUnitPrice = 0;
@@ -416,6 +417,7 @@ public class SubscriptionBean implements Serializable {
             this.setFilterAgent("");
             this.setFilterAgents(null);
             this.setFilterAccountManager("");
+            this.setFilterLocDistrict("");
             this.getFilteredSubscriptions();
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -975,14 +977,14 @@ public class SubscriptionBean implements Serializable {
             }
             if (this.filterSubscriptionCategoryIds != null) {
                 if (this.filterSubscriptionCategoryIds.length > 0) {
-                    //wheresql = wheresql + " AND subscription_category_id=" + this.filterSubscriptionCategoryId;
+                    //array to comma seperated string
                     String commaSepString = String.join(",", this.filterSubscriptionCategoryIds);
                     wheresql = wheresql + " AND subscription_category_id IN (" + commaSepString + ")";
                 }
             }
             if (this.filterBusinessCategoryIds != null) {
                 if (this.filterBusinessCategoryIds.length > 0) {
-                    //wheresql = wheresql + " AND business_category_id=" + this.filterBusinessCategoryId;
+                    //array to comma seperated string
                     String commaSepString = String.join(",", this.filterBusinessCategoryIds);
                     wheresql = wheresql + " AND business_category_id IN (" + commaSepString + ")";
                 }
@@ -1009,13 +1011,28 @@ public class SubscriptionBean implements Serializable {
             }
             if (this.filterAgents != null) {
                 if (this.filterAgents.length > 0) {
-                    //wheresql = wheresql + " AND agent='" + this.filterAgent + "'";
+                    //array to comma seperated string
                     String commaSepString = String.join(",", this.filterAgents);
                     wheresql = wheresql + " AND agent IN (" + commaSepString + ")";
                 }
             }
             if (this.filterAccountManager.length() > 0) {
                 wheresql = wheresql + " AND account_manager='" + this.filterAccountManager + "'";
+            }
+            if (this.filterLocDistrict.length() > 0) {
+                List<Transactor> transactors;
+                if (this.filterLocDistrict.equals("Unknown")) {
+                    transactors = new TransactorBean().getTransactorsBy_loc_district("");
+                } else {
+                    transactors = new TransactorBean().getTransactorsBy_loc_district(filterLocDistrict);
+                }
+                String[] transactor_ids = new String[transactors.size()];
+                for (int i = 0; i < transactors.size(); i++) {
+                    transactor_ids[i] = Long.toString(transactors.get(i).getTransactorId());
+                }
+                //array to comma seperated string
+                String commaSepString = String.join(",", transactor_ids);
+                wheresql = wheresql + " AND transactor_id IN (" + commaSepString + ")";
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -1047,6 +1064,7 @@ public class SubscriptionBean implements Serializable {
             this.getFilteredSubscriptionsSummary_subscriptionCategory();
             this.getFilteredSubscriptionsSummary_businessCategory();
             this.getFilteredSubscriptionsSummary_location();
+            this.getFilteredSubscriptionsSummary_freq_amount();
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -1103,6 +1121,21 @@ public class SubscriptionBean implements Serializable {
         }
         if (this.filterAccountManager.length() > 0) {
             wheresql = wheresql + " AND account_manager='" + this.filterAccountManager + "'";
+        }
+        if (this.filterLocDistrict.length() > 0) {
+            List<Transactor> transactors;
+            if (this.filterLocDistrict.equals("Unknown")) {
+                transactors = new TransactorBean().getTransactorsBy_loc_district("");
+            } else {
+                transactors = new TransactorBean().getTransactorsBy_loc_district(filterLocDistrict);
+            }
+            String[] transactor_ids = new String[transactors.size()];
+            for (int i = 0; i < transactors.size(); i++) {
+                transactor_ids[i] = Long.toString(transactors.get(i).getTransactorId());
+            }
+            //array to comma seperated string
+            String commaSepString = String.join(",", transactor_ids);
+            wheresql = wheresql + " AND transactor_id IN (" + commaSepString + ")";
         }
         sql = sql + wheresql + groupbysum + " ORDER BY amount DESC";
         ResultSet rs;
@@ -1187,6 +1220,21 @@ public class SubscriptionBean implements Serializable {
         if (this.filterAccountManager.length() > 0) {
             wheresql = wheresql + " AND account_manager='" + this.filterAccountManager + "'";
         }
+        if (this.filterLocDistrict.length() > 0) {
+            List<Transactor> transactors;
+            if (this.filterLocDistrict.equals("Unknown")) {
+                transactors = new TransactorBean().getTransactorsBy_loc_district("");
+            } else {
+                transactors = new TransactorBean().getTransactorsBy_loc_district(filterLocDistrict);
+            }
+            String[] transactor_ids = new String[transactors.size()];
+            for (int i = 0; i < transactors.size(); i++) {
+                transactor_ids[i] = Long.toString(transactors.get(i).getTransactorId());
+            }
+            //array to comma seperated string
+            String commaSepString = String.join(",", transactor_ids);
+            wheresql = wheresql + " AND transactor_id IN (" + commaSepString + ")";
+        }
         sql = sql + wheresql + groupbysum + " ORDER BY amount DESC";
         ResultSet rs;
         subscriptionsSummary_recurring = new ArrayList<>();
@@ -1269,6 +1317,21 @@ public class SubscriptionBean implements Serializable {
         }
         if (this.filterAccountManager.length() > 0) {
             wheresql = wheresql + " AND account_manager='" + this.filterAccountManager + "'";
+        }
+        if (this.filterLocDistrict.length() > 0) {
+            List<Transactor> transactors;
+            if (this.filterLocDistrict.equals("Unknown")) {
+                transactors = new TransactorBean().getTransactorsBy_loc_district("");
+            } else {
+                transactors = new TransactorBean().getTransactorsBy_loc_district(filterLocDistrict);
+            }
+            String[] transactor_ids = new String[transactors.size()];
+            for (int i = 0; i < transactors.size(); i++) {
+                transactor_ids[i] = Long.toString(transactors.get(i).getTransactorId());
+            }
+            //array to comma seperated string
+            String commaSepString = String.join(",", transactor_ids);
+            wheresql = wheresql + " AND transactor_id IN (" + commaSepString + ")";
         }
         sql = sql + wheresql + groupbysum + " ORDER BY amount DESC";
         ResultSet rs;
@@ -1353,6 +1416,21 @@ public class SubscriptionBean implements Serializable {
         if (this.filterAccountManager.length() > 0) {
             wheresql = wheresql + " AND account_manager='" + this.filterAccountManager + "'";
         }
+        if (this.filterLocDistrict.length() > 0) {
+            List<Transactor> transactors;
+            if (this.filterLocDistrict.equals("Unknown")) {
+                transactors = new TransactorBean().getTransactorsBy_loc_district("");
+            } else {
+                transactors = new TransactorBean().getTransactorsBy_loc_district(filterLocDistrict);
+            }
+            String[] transactor_ids = new String[transactors.size()];
+            for (int i = 0; i < transactors.size(); i++) {
+                transactor_ids[i] = Long.toString(transactors.get(i).getTransactorId());
+            }
+            //array to comma seperated string
+            String commaSepString = String.join(",", transactor_ids);
+            wheresql = wheresql + " AND transactor_id IN (" + commaSepString + ")";
+        }
         sql = sql + wheresql + groupbysum + " ORDER BY amount DESC";
         ResultSet rs;
         subscriptionsSummary_businessCategory = new ArrayList<>();
@@ -1386,9 +1464,9 @@ public class SubscriptionBean implements Serializable {
 
     public void getFilteredSubscriptionsSummary_location() {
         String sql;
-        sql = "SELECT ifnull(t.loc_district,'Unknown') as loc_district, count(distinct s.transactor_id) as numbers, sum(amount) as amount from subscription s INNER JOIN transactor t ON s.transactor_id = t.transactor_id where s.subscription_id > 0";
+        sql = "SELECT ifnull(nullif(t.loc_district,''),'Unknown') as loc_district, count(distinct s.transactor_id) as numbers, sum(amount) as amount from subscription s INNER JOIN transactor t ON s.transactor_id = t.transactor_id where s.subscription_id > 0";
         String wheresql = "";
-        String groupbysum = " GROUP BY ifnull(t.loc_district,'Unknown')";
+        String groupbysum = " GROUP BY ifnull(nullif(t.loc_district,''),'Unknown')";
         if (this.filterTransactor != null) {
             wheresql = wheresql + " AND s.transactor_id=" + this.filterTransactor.getTransactorId();
         }
@@ -1436,6 +1514,13 @@ public class SubscriptionBean implements Serializable {
         if (this.filterAccountManager.length() > 0) {
             wheresql = wheresql + " AND s.account_manager='" + this.filterAccountManager + "'";
         }
+        if (this.filterLocDistrict.length() > 0) {
+            if (this.filterLocDistrict.equals("Unknown")) {
+                wheresql = wheresql + " AND t.loc_district=''";
+            } else {
+                wheresql = wheresql + " AND t.loc_district='" + this.filterLocDistrict + "'";
+            }
+        }
         sql = sql + wheresql + groupbysum + " ORDER BY amount DESC";
         ResultSet rs;
         subscriptionsSummary_location = new ArrayList<>();
@@ -1461,6 +1546,104 @@ public class SubscriptionBean implements Serializable {
                     summary.setAmount(0);
                 }
                 getSubscriptionsSummary_location().add(summary);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void getFilteredSubscriptionsSummary_freq_amount() {
+        String sql;
+        sql = "SELECT frequency, sum(case when free_at_reg=0 then amount else 0 end) as amount_at_reg, sum(amount) as amount_at_renewal from subscription where subscription_id > 0 AND is_recurring='Yes'";
+        String wheresql = "";
+        String groupbysum = " GROUP BY frequency";
+        if (this.filterTransactor != null) {
+            wheresql = wheresql + " AND transactor_id=" + this.filterTransactor.getTransactorId();
+        }
+        if (!this.filterStatus.isEmpty()) {
+            wheresql = wheresql + " AND current_status='" + this.filterStatus + "'";
+        }
+        if (this.filterSubscriptionCategoryIds != null) {
+            if (this.filterSubscriptionCategoryIds.length > 0) {
+                String commaSepString = String.join(",", this.filterSubscriptionCategoryIds);
+                wheresql = wheresql + " AND subscription_category_id IN (" + commaSepString + ")";
+            }
+        }
+        if (this.filterBusinessCategoryIds != null) {
+            if (this.filterBusinessCategoryIds.length > 0) {
+                String commaSepString = String.join(",", this.filterBusinessCategoryIds);
+                wheresql = wheresql + " AND business_category_id IN (" + commaSepString + ")";
+            }
+        }
+        if (this.filterExpiryDateRange > 0) {
+            if (this.filterExpiryDateRange == 30) {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 0;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
+            } else if (this.filterExpiryDateRange == 60) {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 30;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
+            } else if (this.filterExpiryDateRange == 90) {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 60;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
+            } else {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) > " + this.filterExpiryDateRange;
+            }
+        }
+        if (!this.filterRecurring.isEmpty()) {
+            wheresql = wheresql + " AND is_recurring='" + this.filterRecurring + "'";
+        }
+        if (this.filterItem != null) {
+            wheresql = wheresql + " AND item_id=" + this.filterItem.getItemId();
+        }
+        if (this.filterAgents != null) {
+            if (this.filterAgents.length > 0) {
+                String commaSepString = String.join(",", this.filterAgents);
+                wheresql = wheresql + " AND agent IN (" + commaSepString + ")";
+            }
+        }
+        if (this.filterAccountManager.length() > 0) {
+            wheresql = wheresql + " AND account_manager='" + this.filterAccountManager + "'";
+        }
+        if (this.filterLocDistrict.length() > 0) {
+            List<Transactor> transactors;
+            if (this.filterLocDistrict.equals("Unknown")) {
+                transactors = new TransactorBean().getTransactorsBy_loc_district("");
+            } else {
+                transactors = new TransactorBean().getTransactorsBy_loc_district(filterLocDistrict);
+            }
+            String[] transactor_ids = new String[transactors.size()];
+            for (int i = 0; i < transactors.size(); i++) {
+                transactor_ids[i] = Long.toString(transactors.get(i).getTransactorId());
+            }
+            //array to comma seperated string
+            String commaSepString = String.join(",", transactor_ids);
+            wheresql = wheresql + " AND transactor_id IN (" + commaSepString + ")";
+        }
+        sql = sql + wheresql + groupbysum + " ORDER BY amount_at_reg DESC";
+        ResultSet rs;
+        this.subscriptionsSummary_freq_amount = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Subscription_freq_amount summary = new Subscription_freq_amount();
+                try {
+                    summary.setFrequency(rs.getString("frequency"));
+                } catch (Exception e) {
+                    summary.setFrequency("");
+                }
+                try {
+                    summary.setAmount_at_reg(rs.getDouble("amount_at_reg"));
+                } catch (Exception e) {
+                    summary.setAmount_at_reg(0);
+                }
+                try {
+                    summary.setAmount_at_renewal(rs.getDouble("amount_at_renewal"));
+                } catch (Exception e) {
+                    summary.setAmount_at_renewal(0);
+                }
+                getSubscriptionsSummary_freq_amount().add(summary);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -2088,5 +2271,33 @@ public class SubscriptionBean implements Serializable {
      */
     public void setFreeAtReg(boolean freeAtReg) {
         this.freeAtReg = freeAtReg;
+    }
+
+    /**
+     * @return the filterLocDistrict
+     */
+    public String getFilterLocDistrict() {
+        return filterLocDistrict;
+    }
+
+    /**
+     * @param filterLocDistrict the filterLocDistrict to set
+     */
+    public void setFilterLocDistrict(String filterLocDistrict) {
+        this.filterLocDistrict = filterLocDistrict;
+    }
+
+    /**
+     * @return the subscriptionsSummary_freq_amount
+     */
+    public List<Subscription_freq_amount> getSubscriptionsSummary_freq_amount() {
+        return subscriptionsSummary_freq_amount;
+    }
+
+    /**
+     * @param subscriptionsSummary_freq_amount the subscriptionsSummary_freq_amount to set
+     */
+    public void setSubscriptionsSummary_freq_amount(List<Subscription_freq_amount> subscriptionsSummary_freq_amount) {
+        this.subscriptionsSummary_freq_amount = subscriptionsSummary_freq_amount;
     }
 }

@@ -1318,6 +1318,25 @@ public class TransactorBean implements Serializable {
         return NewTransactors;
     }
 
+    public List<Transactor> getTransactorsBy_loc_district(String aloc_district) {
+        String sql;
+        sql = "{call sp_search_transactor_by_loc_district(?)}";
+        ResultSet rs;
+        Transactors = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setString(1, aloc_district);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Transactors.add(this.getTransactorFromResultSet(rs));
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return Transactors;
+    }
+
     public void setTransactors(List<Transactor> Transactors) {
         this.Transactors = Transactors;
     }
@@ -1624,6 +1643,30 @@ public class TransactorBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
         return Transactors;
+    }
+
+    public List<String> getUniqueTransactor_loc_district() {
+        String sql;
+        sql = "SELECT DISTINCT coalesce(nullif(loc_district,''), 'Unknown') as loc_district from transactor";
+        ResultSet rs;
+        List<String> uniqueLocDistrictList = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                String LocDistrict;
+                try {
+                    LocDistrict = rs.getString("loc_district");
+                } catch (Exception e) {
+                    LocDistrict = "";
+                }
+                uniqueLocDistrictList.add(LocDistrict);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return uniqueLocDistrictList;
     }
 
     public void refreshTotalSalaryDeductions(Transactor aTransactor) {
