@@ -1823,6 +1823,10 @@ public class NavigationBean implements Serializable {
         return "BusinessCategory?faces-redirect=true";
     }
 
+    public String redirectToTransactionApproval() {
+        return "TransactionApproval?faces-redirect=true";
+    }
+
     /**
      * @return the menuItemBean
      */

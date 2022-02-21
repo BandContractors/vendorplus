@@ -162,6 +162,7 @@
                         <p:menuitem value="#{langsys['Receive']} #{langsys['Other']} #{langsys['Revenue']}" action="#{navigationBean.redirectToCashReceiptRevenue()}" />  
                         <p:separator />
                     </p:submenu>
+                    <p:separator />
                     <p:submenu label="#{langsys['Cash']} #{langsys['Payments']}">  
                         <p:separator />
                         <p:menuitem value="#{langsys['Credit']} #{langsys['Purchase']} #{langsys['Payment']}" action="#{navigationBean.redirectToCashPaymentPI()}" />  
@@ -175,6 +176,8 @@
                         <p:menuitem value="#{langsys['Payment']} #{langsys['against']} #{langsys['Liability']}" action="#{navigationBean.redirectToCashPaymentLIABILITY()}" />  
                         <p:separator />
                     </p:submenu>
+                    <p:separator />
+                    <p:menuitem value="#{langsys['Approval']}" action="#{navigationBean.redirectToTransactionApproval()}" />
                     <p:separator />
                 </p:submenu>  
                 <p:submenu label="#{langsys['Item']}" icon="ui-icon-pencil">  

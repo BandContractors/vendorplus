@@ -30,6 +30,12 @@ public class Transaction_approvalBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = Logger.getLogger(Transaction_approvalBean.class.getName());
+    
+    private int filterStore;
+    private int filterTransactionType;
+    private int filterRequestedBy;
+    private Date filterRequestDate;
+    private int filterApprovalStatus;
 
     public void setTransaction_approvalFromResultset(Transaction_approval aTransaction_approval, ResultSet aResultSet) {
         try {
