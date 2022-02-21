@@ -2185,9 +2185,17 @@ public class TransBean implements Serializable {
                         if (("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) && trans.getSpendPointsAmount() > 0 && new GeneralUserSetting().getIsApprovePointsNeeded() == 1 && "APPROVED".equals(new GeneralUserSetting().getCurrentApprovePointsStatus())) {
                             this.insertApproveTrans(new GeneralUserSetting().getCurrentTransactionId(), "SPEND POINT", new GeneralUserSetting().getCurrentApproveUserId());
                         }
-                        //delete if any draft trans was used
+                        //delete if any draft trans was used and refresh
                         if (trans.getTransactionHistId() > 0) {
                             this.deleteTransFromHist(trans.getTransactionHistId());
+                            this.refreshTranssDraft(aStoreId, new GeneralUserSetting().getCurrentUser().getUserDetailId(), aTransTypeId, aTransReasonId);
+                        }
+                        //update status of the approval and refresh
+                        if (trans.getTransaction_approval_id() > 0) {
+                            //mark processed
+                            new Transaction_approvalBean().markProcessed(trans.getTransaction_approval_id());
+                            //refresh list
+                            new Transaction_approvalBean().refreshTransaction_approvalList(this.TransListApproval, new GeneralUserSetting().getCurrentStore().getStoreId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), new GeneralUserSetting().getCurrentTransactionTypeId(), new GeneralUserSetting().getCurrentTransactionReasonId());
                         }
                         //TAX API
                         if (aTransTypeId == 2 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0 && new Item_tax_mapBean().countItemsNotMappedSynced(aActiveTransItems) == 0) {//SALES INVOICE
@@ -2223,9 +2231,11 @@ public class TransBean implements Serializable {
                         //Refresh Print output
                         new OutputDetailBean().refreshOutput(aLevel, "");
                         //refresh draft
-                        if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) {
-                            this.refreshTranssDraft(aStoreId, new GeneralUserSetting().getCurrentUser().getUserDetailId(), aTransTypeId, aTransReasonId);
-                        }
+                        /*
+                         if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) {
+                         this.refreshTranssDraft(aStoreId, new GeneralUserSetting().getCurrentUser().getUserDetailId(), aTransTypeId, aTransReasonId);
+                         }
+                         */
                         //Auto Printing Invoice
                         if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) {
                             //1. Update Invoice
@@ -4759,7 +4769,6 @@ public class TransBean implements Serializable {
                 try {
                     if (trans.getTransactorId() > 0) {
                         new TransactorBean().setTransactor(aSelectedTransactor, trans.getTransactorId());
-                        //aSelectedTransactor = new TransactorBean().getTransactor(trans.getTransactorId());
                     }
                 } catch (NullPointerException npe) {
                 }
@@ -4793,6 +4802,84 @@ public class TransBean implements Serializable {
                     if (PortName.length() > 0 && ClientPcName.length() > 0 && Size > 0 && (new GeneralUserSetting().getCurrentTransactionTypeId() == 2 || new GeneralUserSetting().getCurrentTransactionTypeId() == 11)) {
                         //UtilityBean ub = new UtilityBean();
                         ub.invokeLocalCustomerDisplay(ClientPcName, PortName, Size, ub.formatDoubleToString(trans.getGrandTotal()), "");
+                    }
+                }
+            } else {
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Select Valid " + aHistFlag + " Record")));
+                this.setActionMessage(ub.translateWordsInText(BaseName, aHistFlag + " Not Loaded"));
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void loadDraftTrans(String aHistFlag, Trans aTrans, List<TransItem> aActiveTransItems, TransactorBean aTransactorBean, UserDetailBean aUserDetailBean, TransBean aTransBean) {
+        //Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
+        String msg = "";
+        String sql = null;
+        long TransHistId = 0;
+        if (aHistFlag.equals("Draft")) {
+            TransHistId = aTrans.getTransactionHistId();
+        } else if (aHistFlag.equals("Approval")) {
+            Transaction_approval transapp = new Transaction_approvalBean().getTransaction_approval(aTrans.getTransaction_approval_id());
+            if (null != transapp) {
+                TransHistId = transapp.getTransaction_hist_id();
+            }
+        }
+        try {
+            if (TransHistId > 0) {
+                this.setTransFromHist(aTrans, TransHistId);
+                new TransItemBean().setTransItemsFromHist(aActiveTransItems, TransHistId);
+                try {
+                    if (aTrans.getTransactorId() > 0) {
+                        aTransactorBean.setSelectedTransactor(new TransactorBean().getTransactor(aTrans.getTransactorId()));
+                    } else {
+                        aTransactorBean.setSelectedTransactor(null);
+                    }
+                } catch (NullPointerException npe) {
+                }
+                try {
+                    if (aTrans.getBillTransactorId() > 0) {
+                        aTransactorBean.setSelectedBillTransactor(new TransactorBean().getTransactor(aTrans.getBillTransactorId()));
+                    } else {
+                        aTransactorBean.setSelectedBillTransactor(null);
+                    }
+                } catch (NullPointerException npe) {
+                }
+                try {
+                    if (aTrans.getSchemeTransactorId() > 0) {
+                        aTransactorBean.setSelectedSchemeTransactor(new TransactorBean().getTransactor(aTrans.getSchemeTransactorId()));
+                    } else {
+                        aTransactorBean.setSelectedSchemeTransactor(null);
+                    }
+                } catch (NullPointerException npe) {
+                }
+                try {
+                    if (aTrans.getTransactionUserDetailId() > 0) {
+                        aUserDetailBean.setSelectedUserDetail(new UserDetailBean().getUserDetail(aTrans.getTransactionUserDetailId()));
+                    } else {
+                        aUserDetailBean.setSelectedUserDetail(null);
+                    }
+                } catch (NullPointerException npe) {
+                }
+                //Customer Display
+                if (new GeneralUserSetting().getCurrentTransactionTypeId() == 2) {
+                    String PortName = new Parameter_listBean().getParameter_listByContextNameMemory("CUSTOMER_DISPLAY", "COM_PORT_NAME").getParameter_value();
+                    String ClientPcName = new GeneralUserSetting().getClientComputerName();
+                    String SizeStr = new Parameter_listBean().getParameter_listByContextNameMemory("CUSTOMER_DISPLAY", "MAX_CHARACTERS_PER_LINE").getParameter_value();
+                    int Size = 0;
+                    if (SizeStr.length() > 0) {
+                        Size = Integer.parseInt(SizeStr);
+                    }
+                    if (PortName.length() > 0 && ClientPcName.length() > 0 && Size > 0 && (new GeneralUserSetting().getCurrentTransactionTypeId() == 2 || new GeneralUserSetting().getCurrentTransactionTypeId() == 11)) {
+                        //UtilityBean ub = new UtilityBean();
+                        ub.invokeLocalCustomerDisplay(ClientPcName, PortName, Size, ub.formatDoubleToString(aTrans.getGrandTotal()), "");
                     }
                 }
             } else {
@@ -7275,6 +7362,7 @@ public class TransBean implements Serializable {
         if (null != trans) {
             trans.setTransactionId(0);
             trans.setTransactionHistId(0);
+            trans.setTransaction_approval_id(0);
             try {
                 trans.setTransactionDate(new CompanySetting().getCURRENT_SERVER_DATE());
             } catch (NullPointerException npe) {

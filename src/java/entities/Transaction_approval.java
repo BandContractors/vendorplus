@@ -23,6 +23,10 @@ public class Transaction_approval implements Serializable {
     private double grand_total;
     private String transactor_names;
     private String currency_code;
+    private long transactor_id;
+    private int store_id;
+    private double amount_tendered;
+    private long transaction_id;
 
     /**
      * @return the transaction_approval_id
@@ -204,5 +208,61 @@ public class Transaction_approval implements Serializable {
      */
     public void setCurrency_code(String currency_code) {
         this.currency_code = currency_code;
+    }
+
+    /**
+     * @return the transactor_id
+     */
+    public long getTransactor_id() {
+        return transactor_id;
+    }
+
+    /**
+     * @param transactor_id the transactor_id to set
+     */
+    public void setTransactor_id(long transactor_id) {
+        this.transactor_id = transactor_id;
+    }
+
+    /**
+     * @return the store_id
+     */
+    public int getStore_id() {
+        return store_id;
+    }
+
+    /**
+     * @param store_id the store_id to set
+     */
+    public void setStore_id(int store_id) {
+        this.store_id = store_id;
+    }
+
+    /**
+     * @return the amount_tendered
+     */
+    public double getAmount_tendered() {
+        return amount_tendered;
+    }
+
+    /**
+     * @param amount_tendered the amount_tendered to set
+     */
+    public void setAmount_tendered(double amount_tendered) {
+        this.amount_tendered = amount_tendered;
+    }
+
+    /**
+     * @return the transaction_id
+     */
+    public long getTransaction_id() {
+        return transaction_id;
+    }
+
+    /**
+     * @param transaction_id the transaction_id to set
+     */
+    public void setTransaction_id(long transaction_id) {
+        this.transaction_id = transaction_id;
     }
 }

@@ -74,7 +74,7 @@
                         <p:dialog widgetVar="statusDialog4" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
-                        <p:ajax listener="#{transBean.loadDraftTrans('Draft',trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor,transBean.authorisedByUserDetail,transItemBean.selectedAccCoa)}" process="@form" update="pnlHeader gridTransItem pgrdOverrideWarranty pgrdSpecific gridItemStatus dtblTransactionItem pgrdTotals pgrdScheme pgrdPayment pgrdMsgs pgrdApprove growl1"/>
+                        <p:ajax listener="#{transBean.loadDraftTrans('Draft',trans,transItemBean.activeTransItems,transactorBean,userDetailBean,transBean)}" process="@form" update="pnlHeader gridTransItem pgrdOverrideWarranty pgrdSpecific gridItemStatus dtblTransactionItem pgrdTotals pgrdScheme pgrdPayment pgrdMsgs pgrdApprove growl1"/>
                     </p:commandButton>
                     <p:commandButton id="cmdbDeleteDraft" value="#{langsys['Delete']} #{langsys['Draft']} #{langsys['Sale']}" onclick="PF('statusDialog3').show()" onsuccess="PF('statusDialog3').hide()">
                         <p:dialog widgetVar="statusDialog3" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
@@ -87,15 +87,15 @@
             <h:panelGrid id="pnlApproval">
                 <h:panelGrid styleClass="clsGridMainHeader" columns="4" style="background-color: red;" rendered="#{transBean.transListApproval.size()>0}">
                     <h:outputLabel  value="#{langsys['Sent']} #{langsys['for']} #{langsys['Approval']}:"/>
-                    <h:selectOneMenu styleClass="clsMenu" id="menuApproval" value="#{trans.transaction_approval_id}" style="width: 220px;">
+                    <h:selectOneMenu styleClass="clsMenu" id="menuApproval" value="#{trans.transaction_approval_id}" style="width: 280px;">
                         <f:selectItem itemValue="0" itemLabel=""/>
-                        <f:selectItems value="#{transBean.transListApproval}" var="apr" itemLabel="#{langsys['No']}:#{apr.transaction_approval_id} #{langsys['Total']}:#{accJournalBean.returnBalanceString(apr.grand_total)} #{apr.currency_code}" itemValue="#{apr.transaction_approval_id}"/>
+                        <f:selectItems value="#{transBean.transListApproval}" var="apr" itemLabel="#{langsys['No']}:#{apr.transaction_approval_id} #{langsys['Total']}:#{accJournalBean.returnBalanceString(apr.grand_total)} (#{apr.approval_status eq 0 ? 'Submitted' :apr.approval_status eq 1 ? 'Approved' :apr.approval_status eq 2 ? 'Processed' :apr.approval_status eq 3 ? 'Rejected' : 'Recalled'})" itemValue="#{apr.transaction_approval_id}"/>
                     </h:selectOneMenu>
                     <p:commandButton id="cmdbLoadApproval" value="#{langsys['Load']} #{langsys['Approval']}" onclick="PF('statusDialog5').show()" onsuccess="PF('statusDialog5').hide()">
                         <p:dialog widgetVar="statusDialog5" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
-                        <p:ajax listener="#{transBean.loadDraftTrans('Approval',trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor,transBean.authorisedByUserDetail,transItemBean.selectedAccCoa)}" process="@form" update="pnlHeader gridTransItem pgrdOverrideWarranty pgrdSpecific gridItemStatus dtblTransactionItem pgrdTotals pgrdScheme pgrdPayment pgrdMsgs pgrdApprove growl1"/>
+                        <p:ajax listener="#{transBean.loadDraftTrans('Approval',trans,transItemBean.activeTransItems,transactorBean,userDetailBean,transBean)}" process="@form" update="pnlHeader gridTransItem pgrdOverrideWarranty pgrdSpecific gridItemStatus dtblTransactionItem pgrdTotals pgrdScheme pgrdPayment pgrdMsgs pgrdApprove growl1"/>
                     </p:commandButton>
                     <p:commandButton id="cmdbRecallApproval" value="#{langsys['Recall']} #{langsys['Approval']}" onclick="PF('statusDialog6').show()" onsuccess="PF('statusDialog6').hide()">
                         <p:dialog widgetVar="statusDialog6" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
