@@ -38,6 +38,7 @@ public class Transaction_approvalBean implements Serializable {
     private int filterRequestedBy;
     private Date filterRequestDate;
     private int filterApprovalStatus;
+    private List<Transaction_approval> transaction_approvalList;
 
     public void setTransaction_approvalFromResultset(Transaction_approval aTransaction_approval, ResultSet aResultSet) {
         try {
@@ -485,5 +486,193 @@ public class Transaction_approvalBean implements Serializable {
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
+    }
+
+    public void displayTransactionApproval(Transaction_approval Transaction_approvalFrom, Transaction_approval Transaction_approvalTo) {
+        try {
+            this.clearTransaction_approval(Transaction_approvalTo);
+            Transaction_approvalTo.setTransaction_approval_id(Transaction_approvalFrom.getTransaction_approval_id());
+            Transaction_approvalTo.setTransaction_hist_id(Transaction_approvalFrom.getTransaction_hist_id());
+            Transaction_approvalTo.setTransaction_type_id(Transaction_approvalFrom.getTransaction_type_id());
+            Transaction_approvalTo.setTransaction_reason_id(Transaction_approvalFrom.getTransaction_reason_id());
+            Transaction_approvalTo.setRequest_date(Transaction_approvalFrom.getRequest_date());
+            Transaction_approvalTo.setRequest_by_id(Transaction_approvalFrom.getRequest_by_id());
+            Transaction_approvalTo.setApproval_status(Transaction_approvalFrom.getApproval_status());
+            Transaction_approvalTo.setStatus_date(Transaction_approvalFrom.getStatus_date());
+            Transaction_approvalTo.setStatus_desc(Transaction_approvalFrom.getStatus_desc());
+            Transaction_approvalTo.setStatus_by_id(Transaction_approvalFrom.getStatus_by_id());
+            Transaction_approvalTo.setGrand_total(Transaction_approvalFrom.getGrand_total());
+            Transaction_approvalTo.setTransactor_names(Transaction_approvalFrom.getTransactor_names());
+            Transaction_approvalTo.setCurrency_code(Transaction_approvalFrom.getCurrency_code());
+            Transaction_approvalTo.setTransactor_id(Transaction_approvalFrom.getTransactor_id());
+            Transaction_approvalTo.setStore_id(Transaction_approvalFrom.getStore_id());
+            Transaction_approvalTo.setAmount_tendered(Transaction_approvalFrom.getAmount_tendered());
+            Transaction_approvalTo.setTransaction_id(Transaction_approvalFrom.getTransaction_id());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void clearTransaction_approval(Transaction_approval aTransaction_approval) {
+        try {
+            if (aTransaction_approval != null) {
+            aTransaction_approval.setTransaction_approval_id(0);
+            aTransaction_approval.setTransaction_hist_id(0);
+            aTransaction_approval.setTransaction_type_id(0);
+            aTransaction_approval.setTransaction_reason_id(0);
+            aTransaction_approval.setRequest_date(null);
+            aTransaction_approval.setRequest_by_id(0);
+            aTransaction_approval.setApproval_status(0);
+            aTransaction_approval.setStatus_date(null);
+            aTransaction_approval.setStatus_desc("");
+            aTransaction_approval.setStatus_by_id(0);
+            aTransaction_approval.setGrand_total(0);
+            aTransaction_approval.setTransactor_names("");
+            aTransaction_approval.setCurrency_code("");
+            aTransaction_approval.setTransactor_id(0);
+            aTransaction_approval.setStore_id(0);
+            aTransaction_approval.setAmount_tendered(0);
+            aTransaction_approval.setTransaction_id(0);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void clearFilter() {
+        try {
+            this.setFilterStore(0);
+            this.setFilterTransactionType(0);
+            this.setFilterRequestedBy(0);
+            this.setFilterRequestDate(null);
+            this.setFilterApprovalStatus(0);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void getFilteredTransactionApprovals() {
+        String sql;
+        sql = "select * from transaction_approval where transaction_approval_id > 0";
+        String wheresql = "";
+        String ordersql = " ORDER BY request_date DESC";
+        try {
+            if (this.filterStore > 0) {
+                wheresql = wheresql + " AND store_id=" + this.filterStore;
+            }
+            if (this.filterTransactionType > 0) {
+                wheresql = wheresql + " AND transaction_type_id=" + this.filterTransactionType;
+            }
+            if (this.filterRequestedBy > 0) {
+                wheresql = wheresql + " AND request_by_id=" + this.filterRequestedBy;
+            }
+            if (this.filterRequestDate != null) {
+                wheresql = wheresql + " AND request_date=" + this.filterRequestDate;
+            }
+            if (this.filterApprovalStatus >= 0) {
+                wheresql = wheresql + " AND approval_status=" + this.filterApprovalStatus;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        sql = sql + wheresql + ordersql;
+        ResultSet rs;
+        transaction_approvalList = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Transaction_approval aTransaction_approval = new Transaction_approval();
+                this.setTransaction_approvalFromResultset(aTransaction_approval, rs);
+                getTransaction_approvalList().add(aTransaction_approval);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    /**
+     * @return the filterStore
+     */
+    public int getFilterStore() {
+        return filterStore;
+    }
+
+    /**
+     * @param filterStore the filterStore to set
+     */
+    public void setFilterStore(int filterStore) {
+        this.filterStore = filterStore;
+    }
+
+    /**
+     * @return the filterTransactionType
+     */
+    public int getFilterTransactionType() {
+        return filterTransactionType;
+    }
+
+    /**
+     * @param filterTransactionType the filterTransactionType to set
+     */
+    public void setFilterTransactionType(int filterTransactionType) {
+        this.filterTransactionType = filterTransactionType;
+    }
+
+    /**
+     * @return the filterRequestedBy
+     */
+    public int getFilterRequestedBy() {
+        return filterRequestedBy;
+    }
+
+    /**
+     * @param filterRequestedBy the filterRequestedBy to set
+     */
+    public void setFilterRequestedBy(int filterRequestedBy) {
+        this.filterRequestedBy = filterRequestedBy;
+    }
+
+    /**
+     * @return the filterRequestDate
+     */
+    public Date getFilterRequestDate() {
+        return filterRequestDate;
+    }
+
+    /**
+     * @param filterRequestDate the filterRequestDate to set
+     */
+    public void setFilterRequestDate(Date filterRequestDate) {
+        this.filterRequestDate = filterRequestDate;
+    }
+
+    /**
+     * @return the filterApprovalStatus
+     */
+    public int getFilterApprovalStatus() {
+        return filterApprovalStatus;
+    }
+
+    /**
+     * @param filterApprovalStatus the filterApprovalStatus to set
+     */
+    public void setFilterApprovalStatus(int filterApprovalStatus) {
+        this.filterApprovalStatus = filterApprovalStatus;
+    }
+
+    /**
+     * @return the transaction_approvalList
+     */
+    public List<Transaction_approval> getTransaction_approvalList() {
+        return transaction_approvalList;
+    }
+
+    /**
+     * @param transaction_approvalList the transaction_approvalList to set
+     */
+    public void setTransaction_approvalList(List<Transaction_approval> transaction_approvalList) {
+        this.transaction_approvalList = transaction_approvalList;
     }
 }

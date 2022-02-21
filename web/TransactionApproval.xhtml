@@ -22,7 +22,7 @@
     </h:head>
     <f:metadata>
         <f:viewAction action="#{navigationBean.checkAccessDenied(utilityBean.convertIntAsString(generalUserSetting.currentTransactionReasonId), 'View')}"/>
-        <f:viewAction action="#{transaction_approvalBean.getFilteredSubscriptions()}"/>
+        <f:viewAction action="#{transaction_approvalBean.getFilteredTransactionApprovals()}"/>
     </f:metadata> 
     <h:body>
         <ui:include src="Menu.xhtml"/>
@@ -33,19 +33,16 @@
                     <p:outputLabel value="#{langsys['Store']}"/>
                     <p:selectOneMenu value="#{transaction_approvalBean.filterStore}" style="width: 150px">
                         <f:selectItem itemLabel="" itemValue=""/>
-                        <f:selectItem itemLabel="Active" itemValue="Active"/>
-                        <f:selectItem itemLabel="Expired" itemValue="Expired"/>
-                        <f:selectItem itemLabel="Opted Out" itemValue="Opted Out"/>
+                        <f:selectItems value="#{storeBean.getStores()}" var="s" itemLabel="#{s.storeName}" itemValue="#{s.storeId}"/>
                     </p:selectOneMenu>
                     <p:outputLabel value="#{langsys['Transaction']} #{langsys['Type']}"/>
                     <p:selectOneMenu value="#{transaction_approvalBean.filterTransactionType}" style="width: 150px">
                         <f:selectItem itemLabel="" itemValue=""/>
-                        <f:selectItems value="#{transaction_approvalBean.getUniqueSubscriptionAccountManagers()}" var="tt" itemLabel="#{tt}" itemValue="#{tt}"/>
+                        <f:selectItems value="#{transactionTypeBean.getTransactionTypes()}" var="tt" itemLabel="#{tt.transactionTypeName}" itemValue="#{tt.transactionTypeId}"/>
                     </p:selectOneMenu>
                     <p:outputLabel value="#{langsys['Requested']} #{langsys['By']}"/>
                     <p:selectOneMenu value="#{transaction_approvalBean.filterRequestedBy}" style="width: 150px">
                         <f:selectItem itemLabel="" itemValue=""/>
-                        <f:selectItems value="#{transaction_approvalBean.getUniqueSubscriptionAccountManagers()}" var="r" itemLabel="#{r}" itemValue="#{r}"/>
                     </p:selectOneMenu>
                     <h:outputLabel  value="#{langsys['Request']} #{langsys['Date']}:"/>
                         <p:calendar value="#{transaction_approvalBean.filterRequestDate}" pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" inputStyle="width: 150px" style="width: 350px" />
@@ -59,7 +56,7 @@
                         <f:selectItem itemLabel="Recalled" itemValue="4"/>
                     </p:selectOneMenu>
                     <p:commandButton value="#{langsys['OK']}" style="color: white; background-color: #00B259; width: 80px">
-                        <f:ajax listener="#{transaction_approvalBean.getFilteredSubscriptions()}" execute="@form" render="@form"/>
+                        <f:ajax listener="#{transaction_approvalBean.getFilteredTransactionApprovals()}" execute="@form" render="@form"/>
                     </p:commandButton>
                     <p:commandButton value="#{langsys['Clear']}" style="color: white; background-color: #FF0000; width: 80px" >
                         <f:ajax listener="#{transaction_approvalBean.clearFilter()}" execute="@form" render="@form"/>
@@ -67,359 +64,126 @@
                 </h:panelGrid>
             </h:panelGrid>
 
-            <p:dataTable id="dtblSubscription" tableStyle="width:auto;" value="#{transaction_approvalBean.transaction_approvals}" var="s"                           
+            <p:dataTable id="dtblTransactionApproval" tableStyle="width:auto;" value="#{transaction_approvalBean.transaction_approvalList}" var="ta"                           
                          paginator="true" rows="50" 
                          paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
-                         rowsPerPageTemplate="50,100,400,800,1000,2000"
-                         rowStyleClass="#{s.current_status eq 'Active' ? 'green' : s.current_status eq 'Opted Out' ? 'red' : 'amber'}">
+                         rowsPerPageTemplate="50,100,400,800,1000,2000">
                 <f:facet name="header">
                     #{itemBean.itemsList.size()} #{langsys['Records']} #{langsys['Found']}
                     <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
-                    <p:columnToggler datasource="dtblSubscription" trigger="toggler" />
+                    <p:columnToggler datasource="dtblTransactionApproval" trigger="toggler" />
                 </f:facet>
                 <f:facet name="{Exporters}">
                     <h:commandLink>
                         <p:graphicImage name="images/excel.png" width="24"/>
-                        <p:dataExporter type="xls" target="dtblSubscription" fileName="Subscription" />
+                        <p:dataExporter type="xls" target="dtblTransactionApproval" fileName="TransactionApproval" />
                     </h:commandLink>
                     <h:commandLink>
                         <p:graphicImage name="images/pdf.png" width="24"/>
-                        <p:dataExporter type="pdf" target="dtblSubscription" fileName="Subscription"/>
+                        <p:dataExporter type="pdf" target="dtblTransactionApproval" fileName="TransactionApproval"/>
                     </h:commandLink>
                     <h:commandLink>
                         <p:graphicImage name="images/csv.png" width="24"/>
-                        <p:dataExporter type="csv" target="dtblSubscription" fileName="Subscription" />
+                        <p:dataExporter type="csv" target="dtblTransactionApproval" fileName="TransactionApproval" />
                     </h:commandLink>
                     <h:commandLink>
                         <p:graphicImage name="images/xml.png" width="24"/>
-                        <p:dataExporter type="xml" target="dtblSubscription" fileName="Subscription" />
+                        <p:dataExporter type="xml" target="dtblTransactionApproval" fileName="TransactionApproval" />
                     </h:commandLink>
                 </f:facet>
-                <p:column headerText="#{langsys['Customer']}">
-                    <h:outputText value="#{transactorBean.findTransactor(s.transactor_id).getTransactorNames()}"/>
+                <p:column headerText="#{langsys['Transaction']} #{langsys['Type']}">
+                    <h:outputText value="#{transactionTypeBean.getTransactionType(ta.transaction_type_id).getTransactionTypeName()}"/>
                 </p:column>
-                <p:column headerText="#{langsys['Subscription']} #{langsys['Category']}">
-                    <h:outputText value="#{transaction_approvalCategoryBean.getSubscriptionCategory(s.transaction_approval_category_id).getCategory_name()}"/>
+                <p:column headerText="#{langsys['Transaction']} #{langsys['Reason']}">
+                    <h:outputText value="#{transactionReasonBean.getTransactionReason(ta.transaction_reason_id).getDescription()}"/>
                 </p:column>
-                <p:column headerText="#{langsys['Business']} #{langsys['Category']}">
-                    <h:outputText value="#{businessCategoryBean.getBusinessCategory(s.business_category_id).getCategory_name()}"/>
+                <p:column headerText="#{langsys['Request']} #{langsys['Date']}">
+                    <h:outputText value="#{utilityBean.formatDate(ta.request_date)}"/>
                 </p:column>
-                <p:column headerText="#{langsys['Item']}">
-                    <h:outputText value="#{itemBean.findItem(s.item_id).getDescription()}"/>
+                <p:column headerText="#{langsys['Request']} #{langsys['By']}" visible="false">
+                    <h:outputText value="#{ta.request_by_id}"/>
                 </p:column>
-                <p:column headerText="#{langsys['Description']}" visible="false">
-                    <h:outputText value="#{s.description}"/>
+                <p:column headerText="#{langsys['Approval']} #{langsys['Status']}">
+                    <h:outputText value="#{ta.approval_status eq 0 ? 'Submitted' : ta.approval_status eq 1 ? 'Approved' : ta.approval_status eq 2 ? 'Processed' : ta.approval_status eq 3 ? 'Rejected' : 'Recalled'}" />
                 </p:column>
-                <p:column headerText="#{langsys['Amount']}" style="text-align: right;">
-                    <h:outputText value="#{s.amount}">
+                <p:column headerText="#{langsys['Status']} #{langsys['Date']}">
+                    <h:outputText value="#{utilityBean.formatDate(ta.status_date)}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Status']} #{langsys['Description']}">
+                    <h:outputText value="#{ta.status_desc}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Status']} #{langsys['By']}" visible="false">
+                    <h:outputText value="#{ta.status_by_id}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Grand']} #{langsys['Total']}" style="text-align: right;">
+                    <h:outputText value="#{ta.grand_total}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="#{langsys['Recurring']}">
-                    <h:outputText value="#{s.is_recurring}"/>
+                <p:column headerText="#{langsys['Transactor']}">
+                    <h:outputText value="#{ta.transactor_names}"/>
                 </p:column>
-                <p:column headerText="#{langsys['Status']}" visible="false">
-                    <h:outputText value="#{s.current_status}"/>
+                <p:column headerText="#{langsys['Currency']}">
+                    <h:outputText value="#{ta.currency_code}"/>
                 </p:column>
-                <p:column headerText="#{langsys['Frequency']}">
-                    <h:outputText value="#{s.frequency}"/>
+                <p:column headerText="#{langsys['Transactor']}" visible="false">
+                    <h:outputText value="#{transactorBean.findTransactor(ta.transactor_id).getTransactorNames()}"/>
                 </p:column>
-                <p:column headerText="#{langsys['Unit']} #{langsys['Price']}" style="text-align: right;" visible="false">
-                    <h:outputText value="#{s.unit_price}">
+                <p:column headerText="#{langsys['Store']}">
+                    <h:outputText value="#{storeBean.getStore(ta.store_id).getStoreName()}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Amount']}" style="text-align: right;" visible="false">
+                    <h:outputText value="#{ta.amount_tendered}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="#{langsys['Qty']}" style="text-align: right;">
-                    <h:outputText value="#{s.qty}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                    </h:outputText>
-                </p:column>
-                <p:column headerText="#{langsys['Agent']}" visible="false">
-                    <h:outputText value="#{s.agent}"/>
-                </p:column>
-                <p:column headerText="#{langsys['Account']} #{langsys['Manager']}" visible="false">
-                    <h:outputText value="#{s.account_manager}"/>
-                </p:column>
-                <p:column headerText="#{langsys['Registration']} #{langsys['Date']}" visible="false">
-                    <h:outputText value="#{utilityBean.formatDate(s.transaction_approval_date)}"/>
-                </p:column>
-                <p:column headerText="#{langsys['Renewal']} #{langsys['Date']}" visible="false">
-                    <h:outputText value="#{utilityBean.formatDate(s.renewal_date)}"/>
-                </p:column>
-                <p:column headerText="#{langsys['Expiry']} #{langsys['Date']}" visible="false">
-                    <h:outputText value="#{utilityBean.formatDate(s.expiry_date)}"/>
-                </p:column>
-                <p:column headerText="#{langsys['Add']} #{langsys['Date']}" visible="false">
-                    <h:outputText value="#{utilityBean.formatDate(s.add_date)}"/>
-                </p:column>
-                <p:column headerText="#{langsys['Added']} #{langsys['By']}" visible="false">
-                    <h:outputText value="#{s.added_by}"/>
-                </p:column>
-                <p:column headerText="#{langsys['Edit']} #{langsys['Date']}" visible="false">
-                    <h:outputText value="#{utilityBean.formatDate(s.last_edit_date)}"/>
-                </p:column>
-                <p:column headerText="#{langsys['Edited']} #{langsys['By']}" visible="false">
-                    <h:outputText value="#{s.last_edited_by}"/>
-                </p:column>
-
                 <p:column headerText="#{langsys['Action']}" exportable="false" style="min-width: 125px">
-                    <p:commandButton update="form:modalSubscriptionDetail" actionListener="#{transaction_approvalBean.displaySubscription(s,transaction_approval)}" oncomplete="PF('dlgSubscriptionDetail').show();" icon="ui-icon-note" title="View Request" style="color: white;" >
+                    <p:commandButton update="form:modalTransactionApprovalDetail" actionListener="#{transaction_approvalBean.displayTransactionApproval(ta,transaction_approval)}" oncomplete="PF('dlgTransactionApprovalDetail').show();" icon="ui-icon-note" title="View Request" style="color: white;" >
                     </p:commandButton>
                     &nbsp;
-                    <p:commandButton update="form:modalSubscription" actionListener="#{transaction_approvalBean.displaySubscription(s,transaction_approval)}" oncomplete="PF('dlgSubscription').show();" icon="ui-icon-star" title="Approve Request" style="color: white; background-color: #00B259" >
+                    <p:commandButton update="form:dtblTransactionApproval form:growl1" actionListener="#{transaction_approvalBean.markApproved(ta.transaction_approval_id)}" icon="ui-icon-star" title="Approve Request" style="color: white; background-color: #00B259" >
                     </p:commandButton>
                     &nbsp;
-                    <p:commandButton update="form:dtblSubscription form:growl1" actionListener="#{transaction_approvalBean.optOut(s)}" icon="ui-icon-cancel" title="Cancel Request" style="color: white; background-color: red !important" >
+                    <p:commandButton update="form:dtblTransactionApproval form:growl1" actionListener="#{transaction_approvalBean.markRejected(ta.transaction_approval_id)}" icon="ui-icon-cancel" title="Cancel Request" style="color: white; background-color: red !important" >
                     </p:commandButton>
                     &nbsp;
                 </p:column>
 
             </p:dataTable>
-            <p:dialog rendered="true" dynamic="true" header="#{langsys['Subscription']} #{langsys['Renewal']}" widgetVar="dlgSubscriptionRenewal" id="modalSubscriptionRenewal" modal="true">
-                <h:panelGroup id="popupRenewal">
-                    <h:panelGrid columns="4">
-                        <h:outputLabel value="#{langsys['Qty']}:"/>
-                        <p:inputNumber inputStyle="width: 320px" value="#{transaction_approval.qty}" minValue="1" autocomplete="off">
-                            <p:ajax event="blur" listener="#{transaction_approvalBean.setItemAmount(transaction_approval)}" update="form:itemAmountRenewal"/>
-                            <p:ajax event="blur" listener="#{transaction_approvalBean.setExpiryDateRenewal(transaction_approval)}" update="form:expiryDateRenewal form:currentStatusRenewal form:cmdbSaveRenewal"/>
-                        </p:inputNumber>
-                        <h:outputLabel value="#{langsys['Unit']} #{langsys['Price']}:"/>
-                        <p:inputNumber id="unitPriceRenewal" inputStyle="width: 320px" value="#{transaction_approvalBean.itemUnitPrice}" autocomplete="off">
-                            <p:ajax event="blur" listener="#{transaction_approvalBean.setItemAmount(transaction_approval)}" update="form:itemAmountRenewal"/>
-                        </p:inputNumber>
-                        <h:outputLabel value="#{langsys['Amount']}:"/>
-                        <p:inputText id="itemAmountRenewal" style="width: 320px" value="#{transaction_approval.amount}" readonly="True" disabled="True" autocomplete="off" />
-                        <h:outputLabel  value="#{langsys['Current']} #{langsys['Status']}:"/>
-                        <p:inputText id="currentStatusRenewal" style="width: 320px" value="#{transaction_approval.current_status}" readonly="True" disabled="True" autocomplete="off" />
-                        <h:outputLabel  value="#{langsys['Registration']} #{langsys['Date']}:"/>
-                        <p:calendar value="#{transaction_approvalBean.transaction_approvalDateRenewal}" pattern="#{companySetting.getDateFormat()}" disabled="True" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" inputStyle="width: 320px" style="width: 350px">
-                        </p:calendar>
-                        <h:outputLabel  value="#{langsys['Frequency']}:"/>
-                        <p:inputText id="frequencyRenewal" style="width: 320px" value="#{transaction_approval.frequency}" readonly="True" disabled="True" autocomplete="off" />
-                        <h:outputLabel  value="#{langsys['Renewal']} #{langsys['Date']}:"/>
-                        <p:calendar value="#{transaction_approval.renewal_date}" pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" inputStyle="width: 320px" style="width: 350px">
-                            <f:ajax event="dateSelect" listener="#{transaction_approvalBean.setExpiryDateRenewal(transaction_approval)}" render="form:expiryDateRenewal form:currentStatusRenewal"/>
-                        </p:calendar>
-                        <h:outputLabel  value="#{langsys['New']} #{langsys['Expiry']} #{langsys['Date']}:"/>
-                        <p:datePicker id="expiryDateRenewal" value="#{transaction_approval.expiry_date}" pattern="#{companySetting.getDateFormat()}" disabled="True" inputStyle="width: 320px" style="width: 350px" />
-                        <h:outputLabel  value="#{langsys['Old']} #{langsys['Expiry']} #{langsys['Date']}:"/>
-                        <p:datePicker id="oldExpiryDate" value="#{transaction_approvalBean.oldExpiryDate}" pattern="#{companySetting.getDateFormat()}" disabled="True" inputStyle="width: 320px" style="width: 350px" />
-                    </h:panelGrid>
-
-                    <h:panelGrid styleClass="clsGridMainCommands" columns="1">
-                        <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
-                            <p:commandButton update="pnlgSummary form:popupRenewal form:dtblSubscription form:growl1Renewal" actionListener="#{transaction_approvalBean.renew(transaction_approval)}" styleClass="clsButtonBig" id="cmdbSaveRenewal" value="#{langsys['RENEW']}" disabled="#{transaction_approval.current_status eq 'Expired'}" style="color: white; background-color: #00B259" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
-                                <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
-                                    <p:graphicImage name="/images/ajax-loader.gif"/>
-                                </p:dialog>
-                            </p:commandButton>
-                            <p:commandButton update="form:popupRenewal" actionListener="#{transaction_approvalBean.clearSubscription(transaction_approval)}" styleClass="clsButtonBig" id="cmdbClearRenewal" value="#{langsys['CLEAR']}" style="color: white; background-color: #FF0000">
-                            </p:commandButton>
-                        </h:panelGrid>
-                    </h:panelGrid>
-
-                    <h:panelGrid styleClass="clsGridMainMessages" columns="1">
-                        <h:outputLabel styleClass="clsActionMessage" id="olblActionMessageRenewal" value="#{transaction_approvalBean.actionMessage}"/>
-                        <h:messages id="msgsMainMessageRenewal" style="color: red"/><br/>
-                    </h:panelGrid>
-                    <p:growl id="growl1Renewal"/>
-
-                </h:panelGroup>
-            </p:dialog>
-            <p:dialog rendered="true" dynamic="true" header="#{langsys['Subscription']} #{langsys['Detail']}" widgetVar="dlgSubscription" id="modalSubscription" modal="true" height="425px">
-                <h:panelGroup id="popup">
-                    <!--<h:outputText value="This is a Modal Dialog." />-->
-                    <h:panelGrid columns="4">
-                        <h:outputLabel  value="#{langsys['Customer']}:"/>
-                        <p:autoComplete id="autcTransactor" value="#{transaction_approvalBean.selectedTransactor}" 
-                                        completeMethod="#{transactorBean.getTransactorActiveObjectList}" 
-                                        var="trct" 
-                                        itemLabel="#{trct.transactorNames}" 
-                                        itemValue="#{trct}" 
-                                        converter="TransactorConverter" style="text-align: left;" 
-                                        forceSelection="true" queryDelay="0" inputStyle="width: 320px" 
-                                        >
-                            <p:column headerText="#{langsys['Names']}" style="text-align: left" >  
-                                #{trct.transactorNames} 
-                            </p:column>
-                            <p:column headerText="#{langsys['Reference']} #{langsys['No']}" style="text-align: left" >  
-                                #{trct.transactorRef} 
-                            </p:column>
-                            <p:column headerText="#{langsys['Type']}" style="text-align: left" >  
-                                #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)}
-                            </p:column> 
-                            <p:column headerText="#{langsys['Contact']} #{langsys['Person']}" style="text-align: left">  
-                                #{trct.cpName} 
-                            </p:column>
-                        </p:autoComplete>
-                        <h:outputLabel  value="#{langsys['Item']}:"/>
-                        <p:autoComplete id="autcItem" widgetVar="WautcItem" value="#{transaction_approvalBean.selectedItem}"  
-                                        completeMethod="#{itemBean.getItemObjectListForSale_old}" 
-                                        var="itm" 
-                                        itemLabel="#{itm.description}" 
-                                        itemValue="#{itm}" 
-                                        converter="ItemConverter" style="text-align: left" 
-                                        forceSelection="true" queryDelay="0" inputStyle="width: 320px"
-                                        >
-                            <p:column headerText="#{langsys['Item']} #{langsys['Description']}" style="text-align: left" >  
-                                #{itm.description} 
-                            </p:column>
-                            <p:column headerText="#{langsys['Alias']}" style="text-align: left" >  
-                                #{itm.alias_name} 
-                            </p:column>
-                            <p:column headerText="#{langsys['Item']} #{langsys['Code']}" style="text-align: left" >  
-                                #{itm.itemCode} 
-                            </p:column>
-                            <p:column headerText="#{langsys['Unit']}" style="text-align: left">  
-                                #{itm.unitSymbol}
-                            </p:column> 
-                            <p:column headerText="#{langsys['Category']}" style="text-align: left">  
-                                #{itm.categoryName}
-                            </p:column>
-                            <p:column headerText="#{langsys['Retail']} #{langsys['sale']} #{langsys['Price']}" style="text-align: left">  
-                                <h:outputText value="#{itm.unitRetailsalePrice}">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                                </h:outputText>
-                            </p:column>
-                            <p:column headerText="#{langsys['Wholesale']} #{langsys['Price']}" style="text-align: left" rendered="#{generalUserSetting.currentTransactionReasonId==2 or generalUserSetting.currentTransactionReasonId==10}">
-                                <h:outputText value="#{itm.unitWholesalePrice}">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                                </h:outputText>
-                            </p:column>
-                            <p:column headerText="#{langsys['Special']} #{langsys['Price']}" style="text-align: left" rendered="#{generalUserSetting.currentTransactionReasonId==103}">
-                                <h:outputText value="#{itm.unit_special_price}">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                                </h:outputText>
-                            </p:column>
-                            <p:column headerText="#{langsys['Currency']}" style="text-align: left">
-                                <h:outputText value="#{itm.currencyCode}">
-                                </h:outputText>
-                            </p:column>
-                            <p:column headerText="#{langsys['Location']}" style="text-align: left">  
-                                #{itm.locationName}
-                            </p:column>
-                            <f:attribute name="subs" value="#{transaction_approval}" />
-                            <p:ajax event="itemSelect" listener="#{transaction_approvalBean.setItemPrice}" process="@form" update="form:unitPrice form:itemAmount"/>
-                            <!--<p:ajax event="change" listener=""/>-->
-                            <p:ajax event="change" listener="#{transaction_approvalBean.setItemPrice}" process="@form" update="form:unitPrice form:itemAmount" onstart="if(PF('WautcItem').panel.is(':visible')) return false;" />
-                        </p:autoComplete>
-                        <h:outputLabel  value="#{langsys['Business']} #{langsys['Category']}:"/>
-                        <p:selectOneMenu value="#{transaction_approval.business_category_id}" style="width: 305px">
-                            <f:selectItem itemLabel="" itemValue="0"/>
-                            <f:selectItems value="#{businessCategoryBean.getBusinessCategory()}" var="bc" itemLabel="#{bc.category_name}" itemValue="#{bc.business_category_id}"/>
-                            <p:ajax event="change" update="form:cmdbSave"/>
-                        </p:selectOneMenu>
-                        <h:outputLabel value="#{langsys['Unit']} #{langsys['Price']}:"/>
-                        <p:inputNumber id="unitPrice" inputStyle="width: 320px" value="#{transaction_approvalBean.itemUnitPrice}" autocomplete="off">
-                            <p:ajax event="blur" listener="#{transaction_approvalBean.setItemAmount(transaction_approval)}" update="form:itemAmount"/>
-                        </p:inputNumber>
-                        <h:outputLabel  value="#{langsys['Subscription']} #{langsys['Category']}:"/>
-                        <p:selectOneMenu value="#{transaction_approval.transaction_approval_category_id}" style="width: 305px">
-                            <f:selectItem itemLabel="" itemValue="0"/>
-                            <f:selectItems value="#{transaction_approvalCategoryBean.getSubscriptionCategory()}" var="sc" itemLabel="#{sc.category_name}" itemValue="#{sc.transaction_approval_category_id}"/>
-                        </p:selectOneMenu>
-                        <h:outputLabel value="#{langsys['Qty']}:"/>
-                        <p:inputNumber inputStyle="width: 320px" value="#{transaction_approval.qty}" minValue="1" autocomplete="off">
-                            <p:ajax event="blur" listener="#{transaction_approvalBean.setItemAmount(transaction_approval)}" update="form:itemAmount"/>
-                            <p:ajax event="blur" listener="#{transaction_approvalBean.setExpiryDate(transaction_approval)}" update="form:expiryDate form:currentStatus"/>
-                        </p:inputNumber>
-                        <h:outputLabel  value="#{langsys['Description']}:"/>
-                        <p:inputText style="width: 320px" value="#{transaction_approval.description}" autocomplete="off" />
-                        <h:outputLabel value="#{langsys['Amount']}:"/>
-                        <p:inputText id="itemAmount" style="width: 320px" value="#{transaction_approval.amount}" readonly="True" disabled="True" autocomplete="off" />
-                        <h:outputLabel  value="#{langsys['Recurring']}:"/>
-                        <p:selectOneMenu value="#{transaction_approval.is_recurring}" style="width: 305px">
-                            <f:selectItem itemLabel="Yes" itemValue="Yes"/>
-                            <f:selectItem itemLabel="No" itemValue="No"/>
-                            <f:ajax event="change" listener="#{transaction_approvalBean.setExpiryDate(transaction_approval)}" render="form:expiryDate form:frequency form:currentStatus"/>
-                        </p:selectOneMenu>
-                        <h:outputLabel  value="#{langsys['Registration']} #{langsys['Date']}:"/>
-                        <p:calendar value="#{transaction_approval.transaction_approval_date}" pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" inputStyle="width: 320px" style="width: 350px">
-                            <f:ajax event="dateSelect" listener="#{transaction_approvalBean.setExpiryDate(transaction_approval)}" render="form:expiryDate form:currentStatus"/>
-                        </p:calendar>
-                        <h:outputLabel  value="#{langsys['Frequency']}:"/>
-                        <p:selectOneMenu id="frequency" value="#{transaction_approval.frequency}" disabled="#{transaction_approval.is_recurring eq 'No'}" style="width: 305px">
-                            <f:selectItem itemLabel="Weekly" itemValue="Weekly"/>
-                            <f:selectItem itemLabel="Monthly" itemValue="Monthly"/>
-                            <f:selectItem itemLabel="Yearly" itemValue="Yearly"/>
-                            <f:ajax event="change" listener="#{transaction_approvalBean.setExpiryDate(transaction_approval)}" render="form:expiryDate form:currentStatus"/>
-                        </p:selectOneMenu>
-                        <h:outputLabel  value="#{langsys['Current']} #{langsys['Status']}:"/>
-                        <p:inputText id="currentStatus" style="width: 320px" value="#{transaction_approval.current_status}" readonly="True" disabled="True" autocomplete="off" />
-                        <h:outputLabel  value="#{langsys['Agent']}:"/>
-                        <p:inputText style="width: 320px" value="#{transaction_approval.agent}" autocomplete="off" />
-                        <h:outputLabel  value="#{langsys['Expiry']} #{langsys['Date']}:"/>
-                        <p:datePicker id="expiryDate" value="#{transaction_approval.expiry_date}" pattern="#{companySetting.getDateFormat()}" disabled="True" inputStyle="width: 320px" style="width: 350px" />
-                        <h:outputLabel  value="#{langsys['Account']} #{langsys['Manager']}:"/>
-                        <p:inputText style="width: 320px" value="#{transaction_approval.account_manager}" autocomplete="off" />
-                        <h:outputLabel  value="#{langsys['Free']} #{langsys['at']} #{langsys['Registration']}:"/>
-                        <h:selectBooleanCheckbox value="#{transaction_approvalBean.freeAtReg}" />
-                    </h:panelGrid>
-
-                    <h:panelGrid styleClass="clsGridMainCommands" columns="1">
-                        <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
-                            <p:commandButton update="pnlgFilter pnlgSummary form:popup form:dtblSubscription form:growl1" actionListener="#{transaction_approvalBean.saveSubscription(transaction_approval)}" styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['SAVE']}" disabled="#{transaction_approval.business_category_id eq 0}" style="color: white; background-color: #00B259" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
-                                <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
-                                    <p:graphicImage name="/images/ajax-loader.gif"/>
-                                </p:dialog>
-                            </p:commandButton>
-                            <p:commandButton update="form:popup" actionListener="#{transaction_approvalBean.clearSubscription(transaction_approval)}" styleClass="clsButtonBig" id="cmdbClear" value="#{langsys['CLEAR']}" style="color: white; background-color: #FF0000">
-                            </p:commandButton>
-                        </h:panelGrid>
-                    </h:panelGrid>
-
-                    <h:panelGrid styleClass="clsGridMainMessages" columns="1">
-                        <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{transaction_approvalBean.actionMessage}"/>
-                        <h:messages id="msgsMainMessage" style="color: red"/><br/>
-                    </h:panelGrid>
-                    <p:growl id="growl1"/>
-
-                </h:panelGroup>
-            </p:dialog>
-            <p:dialog rendered="true" dynamic="true" header="#{langsys['Subscription']} #{langsys['Detail']}" widgetVar="dlgSubscriptionDetail" id="modalSubscriptionDetail" modal="true">
+            <p:dialog rendered="true" dynamic="true" header="#{langsys['TransactionApproval']} #{langsys['Detail']}" widgetVar="dlgTransactionApprovalDetail" id="modalTransactionApprovalDetail" modal="true">
                 <h:panelGroup id="popupDetail">
                     <!--<h:outputText value="This is a Modal Dialog." />-->
                     <h:panelGrid columns="2">
-                        <h:outputLabel  value="#{langsys['Customer']}:"/>
-                        <h:outputLabel  value="#{transaction_approvalBean.selectedTransactor.transactorNames}"/>
-                        <h:outputLabel  value="#{langsys['Item']}:"/>
-                        <h:outputText  value="#{transaction_approvalBean.selectedItem.description}"/>
-                        <h:outputLabel  value="#{langsys['Business']} #{langsys['Category']}:"/>
-                        <h:outputText  value="#{businessCategoryBean.getBusinessCategory(transaction_approval.business_category_id).getCategory_name()}"/>
-                        <h:outputLabel  value="#{langsys['Subscription']} #{langsys['Category']}:"/>
-                        <h:outputText  value="#{transaction_approvalCategoryBean.getSubscriptionCategory(transaction_approval.transaction_approval_category_id).getCategory_name()}"/>
-                        <h:outputLabel value="#{langsys['Unit']} #{langsys['Price']}:"/>
-                        <h:outputText  value="#{transaction_approvalBean.itemUnitPrice}">
+                        <h:outputLabel  value="#{langsys['Transaction']} #{langsys['Type']}:"/>
+                    <h:outputText value="#{transactionTypeBean.getTransactionType(transaction_approval.transaction_type_id).getTransactionTypeName()}"/>
+                        <h:outputLabel  value="#{langsys['Transaction']} #{langsys['Reason']}:"/>
+                    <h:outputText value="#{transactionReasonBean.getTransactionReason(transaction_approval.transaction_reason_id).getDescription()}"/>
+                        <h:outputLabel  value="#{langsys['Request']} #{langsys['Date']}:"/>
+                        <h:outputText  value="#{utilityBean.formatDate(transaction_approval.request_date)}"/>
+                        <h:outputLabel  value="#{langsys['Approval']} #{langsys['Status']}:"/>
+                    <h:outputText value="#{transaction_approval.approval_status eq 0 ? 'Submitted' : transaction_approval.approval_status eq 1 ? 'Approved' : transaction_approval.approval_status eq 2 ? 'Processed' : transaction_approval.approval_status eq 3 ? 'Rejected' : 'Recalled'}" />
+                        <h:outputLabel value="#{langsys['Status']} #{langsys['Date']}:"/>
+                        <h:outputText  value="#{utilityBean.formatDate(transaction_approval.status_date)}"/>
+                        <h:outputLabel value="#{langsys['Status']} #{langsys['Description']}:"/>
+                        <h:outputText  value="#{transaction_approval.status_desc}"/>
+                        <h:outputLabel  value="#{langsys['Status']} #{langsys['By']}:"/>
+                        <h:outputText  value="#{transaction_approval.status_by_id}"/>
+                        <h:outputLabel value="#{langsys['Grand']} #{langsys['Total']}:"/>
+                        <h:outputText  value="#{transaction_approval.grand_total}">
                             <f:convertNumber pattern="###,###.#" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
-                        <h:outputLabel value="#{langsys['Qty']}:"/>
-                        <h:outputText  value="#{transaction_approval.qty}">
+                        <h:outputLabel  value="#{langsys['Transactor']}:"/>
+                        <h:outputText  value="#{transaction_approval.transactor_names}"/>
+                        <h:outputLabel  value="#{langsys['Currency']}:"/>
+                        <h:outputText  value="#{transaction_approval.currency_code}"/>
+                        <h:outputLabel  value="#{langsys['Transactor']}:"/>
+                        <h:outputText  value="#{transactorBean.findTransactor(ta.transactor_id).getTransactorNames()}"/>
+                        <h:outputLabel  value="#{langsys['Store']} #{langsys['Date']}:"/>
+                        <h:outputText  value="#{storeBean.getStore(ta.store_id).getStoreName()}"/>
+                        <h:outputLabel value="#{langsys['Amount']} #{langsys['Tendered']}:"/>
+                        <h:outputText  value="#{transaction_approval.amount_tendered}">
                             <f:convertNumber pattern="###,###.#" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
-                        <h:outputLabel value="#{langsys['Amount']}:"/>
-                        <h:outputText  value="#{transaction_approval.amount}">
-                            <f:convertNumber pattern="###,###.#" locale="#{utilityBean.convertLocaleToString()}"/>
-                        </h:outputText>
-                        <h:outputLabel  value="#{langsys['Description']}:"/>
-                        <h:outputText  value="#{transaction_approval.description}"/>
-                        <h:outputLabel  value="#{langsys['Recurring']}:"/>
-                        <h:outputText  value="#{transaction_approval.is_recurring}"/>
-                        <h:outputLabel  value="#{langsys['Registration']} #{langsys['Date']}:"/>
-                        <h:outputText  value="#{utilityBean.formatDate(transaction_approval.transaction_approval_date)}"/>
-                        <h:outputLabel  value="#{langsys['Frequency']}:"/>
-                        <h:outputText  value="#{transaction_approval.frequency}"/>
-                        <h:outputLabel  value="#{langsys['Renewal']} #{langsys['Date']}:"/>
-                        <h:outputText  value="#{utilityBean.formatDate(transaction_approval.renewal_date)}"/>
-                        <h:outputLabel  value="#{langsys['Current']} #{langsys['Status']}:"/>
-                        <h:outputText  value="#{transaction_approval.current_status}"/>
-                        <h:outputLabel  value="#{langsys['Expiry']} #{langsys['Date']}:"/>
-                        <h:outputText  value="#{utilityBean.formatDate(transaction_approval.expiry_date)}"/>
-                        <h:outputLabel  value="#{langsys['Agent']}:"/>
-                        <h:outputText  value="#{transaction_approval.agent}"/>
-                        <h:outputLabel  value="#{langsys['Account']} #{langsys['Manager']}:"/>
-                        <h:outputText  value="#{transaction_approval.account_manager}"/>
-                        <h:outputLabel  value="#{langsys['Free']} #{langsys['at']} #{langsys['Registration']}:"/>
-                        <h:outputText  value="#{transaction_approvalBean.freeAtReg eq true ? 'Yes' : 'No'}"/>
                     </h:panelGrid>
 
                 </h:panelGroup>
