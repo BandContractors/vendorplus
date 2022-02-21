@@ -97,3 +97,12 @@ CREATE TABLE transaction_approval (
 );
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_16',98,Now(),'6.0','');
+
+ALTER TABLE transaction_approval 
+ADD COLUMN transactor_id bigint(20) NULL,
+ADD COLUMN store_id int(11) NULL,
+ADD COLUMN amount_tendered double NULL,
+ADD COLUMN transaction_id bigint(20) NULL,
+ADD COLUMN grand_total double NULL;
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_16',107,Now(),'6.0','');

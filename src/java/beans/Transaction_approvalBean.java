@@ -1,6 +1,7 @@
 package beans;
 
 import connections.DBConnection;
+import entities.CompanySetting;
 import entities.Trans;
 import entities.Transaction_approval;
 import java.io.Serializable;
@@ -15,6 +16,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import sessions.GeneralUserSetting;
 
 /*
  * To change this template, choose Tools | Templates
@@ -104,6 +106,26 @@ public class Transaction_approvalBean implements Serializable {
             } catch (Exception e) {
                 aTransaction_approval.setCurrency_code("");
             }
+            try {
+                aTransaction_approval.setStore_id(aResultSet.getInt("store_id"));
+            } catch (NullPointerException npe) {
+                aTransaction_approval.setStore_id(0);
+            }
+            try {
+                aTransaction_approval.setTransactor_id(aResultSet.getLong("transactor_id"));
+            } catch (NullPointerException npe) {
+                aTransaction_approval.setTransactor_id(0);
+            }
+            try {
+                aTransaction_approval.setTransaction_id(aResultSet.getLong("transaction_id"));
+            } catch (NullPointerException npe) {
+                aTransaction_approval.setTransaction_id(0);
+            }
+            try {
+                aTransaction_approval.setAmount_tendered(aResultSet.getDouble("amount_tendered"));
+            } catch (Exception e) {
+                aTransaction_approval.setAmount_tendered(0);
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -113,8 +135,9 @@ public class Transaction_approvalBean implements Serializable {
         long InsertedId = 0;
         String sql = "INSERT INTO transaction_approval "
                 + "(transaction_hist_id,transaction_type_id,transaction_reason_id,"
-                + "request_date,request_by_id,approval_status,status_date,status_desc,status_by_id) "
-                + "VALUES (?,?,?,?,?,?,?,?,?)";
+                + "request_date,request_by_id,approval_status,status_date,status_desc,status_by_id,"
+                + "transactor_id,store_id,amount_tendered,grand_total) "
+                + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -164,6 +187,27 @@ public class Transaction_approvalBean implements Serializable {
                 } catch (Exception e) {
                     ps.setInt(9, 0);
                 }
+                //transactor_id,store_id,amount_tendered,grand_total
+                try {
+                    ps.setLong(10, aTransaction_approval.getTransactor_id());
+                } catch (Exception e) {
+                    ps.setLong(10, 0);
+                }
+                try {
+                    ps.setInt(11, aTransaction_approval.getStore_id());
+                } catch (Exception e) {
+                    ps.setInt(11, 0);
+                }
+                try {
+                    ps.setDouble(12, aTransaction_approval.getAmount_tendered());
+                } catch (Exception e) {
+                    ps.setDouble(12, 0);
+                }
+                try {
+                    ps.setDouble(13, aTransaction_approval.getGrand_total());
+                } catch (Exception e) {
+                    ps.setDouble(13, 0);
+                }
                 ps.executeUpdate();
                 ResultSet rs = ps.getGeneratedKeys();
                 if (rs.next()) {
@@ -176,7 +220,7 @@ public class Transaction_approvalBean implements Serializable {
         return InsertedId;
     }
 
-    public long updateTransaction_approval(Transaction_approval aTransaction_approval) {
+    public int updateTransaction_approval(Transaction_approval aTransaction_approval) {
         int Updated = 0;
         String sql = "UPDATE transaction_approval SET "
                 + "approval_status=?,status_date=?,status_desc=?,status_by_id=? "
@@ -214,6 +258,121 @@ public class Transaction_approvalBean implements Serializable {
         return Updated;
     }
 
+    public int updateTransaction_approval(Transaction_approval aTransaction_approval, double aTransaction_id) {
+        int Updated = 0;
+        String sql = "UPDATE transaction_approval SET "
+                + "approval_status=?,status_date=?,status_desc=?,status_by_id=?,transaction_id=? "
+                + "WHERE transaction_approval_id=" + aTransaction_approval.getTransaction_approval_id();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            if (null != aTransaction_approval) {
+                try {
+                    ps.setInt(1, aTransaction_approval.getApproval_status());
+                } catch (Exception e) {
+                    ps.setInt(1, 0);
+                }
+                try {
+                    ps.setTimestamp(2, new java.sql.Timestamp(aTransaction_approval.getStatus_date().getTime()));
+                } catch (Exception e) {
+                    ps.setTimestamp(2, null);
+                }
+                try {
+                    ps.setString(3, aTransaction_approval.getStatus_desc());
+                } catch (Exception e) {
+                    ps.setString(3, "");
+                }
+                try {
+                    ps.setInt(4, aTransaction_approval.getStatus_by_id());
+                } catch (Exception e) {
+                    ps.setInt(4, 0);
+                }
+                try {
+                    ps.setLong(5, aTransaction_approval.getTransaction_id());
+                } catch (Exception e) {
+                    ps.setLong(5, 0);
+                }
+                ps.executeUpdate();
+                Updated = 1;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return Updated;
+    }
+
+    public int markProcessed(long aTransaction_approval_id) {
+        int Updated = 0;
+
+        try {
+            Transaction_approval ta = new Transaction_approval();
+            ta.setTransaction_approval_id(aTransaction_approval_id);
+            //approval_status: 0 Submitted, 1 Approved, 2 Processed, 3 Rejected, 4 Recalled
+            ta.setApproval_status(2);
+            ta.setStatus_by_id(new GeneralUserSetting().getCurrentUser().getUserDetailId());
+            ta.setStatus_date(new java.sql.Timestamp(new CompanySetting().getCURRENT_SERVER_DATE().getTime()));
+            ta.setStatus_desc("Processed");
+            Updated = this.updateTransaction_approval(ta);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return Updated;
+    }
+
+    public int markApproved(long aTransaction_approval_id) {
+        int Updated = 0;
+
+        try {
+            Transaction_approval ta = new Transaction_approval();
+            ta.setTransaction_approval_id(aTransaction_approval_id);
+            //approval_status: 0 Submitted, 1 Approved, 2 Processed, 3 Rejected, 4 Recalled
+            ta.setApproval_status(1);
+            ta.setStatus_by_id(new GeneralUserSetting().getCurrentUser().getUserDetailId());
+            ta.setStatus_date(new java.sql.Timestamp(new CompanySetting().getCURRENT_SERVER_DATE().getTime()));
+            ta.setStatus_desc("Approved");
+            Updated = this.updateTransaction_approval(ta);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return Updated;
+    }
+
+    public int markRejected(long aTransaction_approval_id) {
+        int Updated = 0;
+
+        try {
+            Transaction_approval ta = new Transaction_approval();
+            ta.setTransaction_approval_id(aTransaction_approval_id);
+            //approval_status: 0 Submitted, 1 Approved, 2 Processed, 3 Rejected, 4 Recalled
+            ta.setApproval_status(3);
+            ta.setStatus_by_id(new GeneralUserSetting().getCurrentUser().getUserDetailId());
+            ta.setStatus_date(new java.sql.Timestamp(new CompanySetting().getCURRENT_SERVER_DATE().getTime()));
+            ta.setStatus_desc("Rejected");
+            Updated = this.updateTransaction_approval(ta);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return Updated;
+    }
+
+    public int markRecalled(long aTransaction_approval_id) {
+        int Updated = 0;
+
+        try {
+            Transaction_approval ta = new Transaction_approval();
+            ta.setTransaction_approval_id(aTransaction_approval_id);
+            //approval_status: 0 Submitted, 1 Approved, 2 Processed, 3 Rejected, 4 Recalled
+            ta.setApproval_status(4);
+            ta.setStatus_by_id(new GeneralUserSetting().getCurrentUser().getUserDetailId());
+            ta.setStatus_date(new java.sql.Timestamp(new CompanySetting().getCURRENT_SERVER_DATE().getTime()));
+            ta.setStatus_desc("Recalled");
+            Updated = this.updateTransaction_approval(ta);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return Updated;
+    }
+
     public void insertTransaction_approvalCall(long aTransHistId) {
         try {
             Trans transhist = new Trans();
@@ -234,6 +393,10 @@ public class Transaction_approvalBean implements Serializable {
                 //approval_status: 0 Submitted, 1 Approved, 2 Processed, 3 Rejected, 4 Recalled
                 transapp.setStatus_desc("Submitted");
                 transapp.setStatus_by_id(transhist.getAddUserDetailId());
+                transapp.setGrand_total(transhist.getGrandTotal());
+                transapp.setAmount_tendered(transhist.getAmountTendered());
+                transapp.setStore_id(transhist.getStoreId());
+                transapp.setTransactor_id(transhist.getTransactorId());
                 long x = this.insertTransaction_approval(transapp);
             }
         } catch (Exception e) {
@@ -300,9 +463,9 @@ public class Transaction_approvalBean implements Serializable {
         }
         //approval_status: 0 Submitted, 1 Approved, 2 Processed, 3 Rejected, 4 Recalled
         String sql;
-        sql = "SELECT ta.*,th.grand_total,'' AS transactor_names,th.currency_code FROM transaction_approval ta INNER JOIN transaction_hist th ON ta.transaction_hist_id=th.transaction_hist_id "
+        sql = "SELECT ta.*,'' AS transactor_names,'' AS currency_code FROM transaction_approval ta "
                 + "WHERE ta.approval_status IN(0,1,3) AND ta.transaction_type_id=? AND ta.transaction_reason_id=? AND "
-                + "th.store_id=? AND ta.request_by_id=? AND th.hist_flag='Approval'  "
+                + "ta.store_id=? AND ta.request_by_id=? "
                 + "ORDER BY transaction_approval_id DESC LIMIT 10";
         ResultSet rs = null;
         try (

@@ -57,7 +57,7 @@
                         <p:dialog widgetVar="statusDialog4" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
-                        <p:ajax listener="#{transBean.loadDraftTrans('Draft',trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor,transBean.authorisedByUserDetail,transItemBean.selectedAccCoa)}" process="@form" update="pnlHeader gridTransItem pgrdSpecific gridItemStatus dtblTransactionItem pgrdMsgs growl1"/>
+                        <p:ajax listener="#{transBean.loadDraftTrans('Draft',trans,transItemBean.activeTransItems,transactorBean,userDetailBean,transBean)}" process="@form" update="pnlHeader gridTransItem pgrdSpecific gridItemStatus dtblTransactionItem pgrdMsgs growl1"/>
                     </p:commandButton>
                     <p:commandButton id="cmdbDeleteDraft" value="#{langsys['Delete']} #{langsys['Draft']}" onclick="PF('statusDialog3').show()" onsuccess="PF('statusDialog3').hide()">
                         <p:dialog widgetVar="statusDialog3" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
