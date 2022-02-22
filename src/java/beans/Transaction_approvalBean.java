@@ -35,11 +35,11 @@ public class Transaction_approvalBean implements Serializable {
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = Logger.getLogger(Transaction_approvalBean.class.getName());
 
-    private int filterStore;
-    private int filterTransactionType;
-    private int filterRequestedBy;
-    private Date filterRequestDate;
-    private int filterApprovalStatus;
+    private int filterStore = 0;
+    private int filterTransactionType = 0;
+    private int filterRequestedBy = 0;
+    private Date filterRequestDate = new CompanySetting().getCURRENT_SERVER_DATE();
+    private int filterApprovalStatus = -1;
     private List<Transaction_approval> transaction_approvalList;
 
     public void setTransaction_approvalFromResultset(Transaction_approval aTransaction_approval, ResultSet aResultSet) {
@@ -363,6 +363,29 @@ public class Transaction_approvalBean implements Serializable {
         return Updated;
     }
 
+    public void markRejectedCall(Transaction_approval aTransaction_approval) {
+        try {
+            UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
+            List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
+            GroupRightBean grb = new GroupRightBean();
+            int CanRejectSalesInvoice = 0;
+            String Msg = "";
+            if (aTransaction_approval.getTransaction_type_id() == 2) {
+                CanRejectSalesInvoice = grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, Integer.toString(130), "Add");
+            }
+            if (CanRejectSalesInvoice == 1) {
+                int x = this.markRejected(aTransaction_approval.getTransaction_approval_id());
+                if (x == 1) {
+                    Msg = "Rejected Successfully";
+                }
+            } else {
+                Msg = "Access Denied";
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public int markRejected(long aTransaction_approval_id) {
         int Updated = 0;
 
@@ -545,8 +568,8 @@ public class Transaction_approvalBean implements Serializable {
             this.setFilterStore(0);
             this.setFilterTransactionType(0);
             this.setFilterRequestedBy(0);
-            this.setFilterRequestDate(null);
-            this.setFilterApprovalStatus(0);
+            this.setFilterRequestDate(new CompanySetting().getCURRENT_SERVER_DATE());
+            this.setFilterApprovalStatus(-1);
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }

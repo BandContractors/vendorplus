@@ -43,12 +43,13 @@
                     <p:outputLabel value="#{langsys['Requested']} #{langsys['By']}"/>
                     <p:selectOneMenu value="#{transaction_approvalBean.filterRequestedBy}" style="width: 150px">
                         <f:selectItem itemLabel="" itemValue=""/>
+                        <f:selectItems value="#{userDetailBean.getUserDetails()}" var="ud" itemLabel="#{ud.userName}" itemValue="#{ud.userDetailId}"/>
                     </p:selectOneMenu>
                     <h:outputLabel  value="#{langsys['Request']} #{langsys['Date']}:"/>
-                        <p:calendar value="#{transaction_approvalBean.filterRequestDate}" pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" inputStyle="width: 150px" style="width: 350px" />
+                    <p:calendar value="#{transaction_approvalBean.filterRequestDate}" pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" inputStyle="width: 150px" style="width: 350px" />
                     <p:outputLabel value="#{langsys['Approval']} #{langsys['Status']}"/>
                     <p:selectOneMenu value="#{transaction_approvalBean.filterApprovalStatus}" style="width: 150px">
-                        <f:selectItem itemLabel="" itemValue="99"/>
+                        <f:selectItem itemLabel="" itemValue="-1"/>
                         <f:selectItem itemLabel="Submitted" itemValue="0"/>
                         <f:selectItem itemLabel="Approved" itemValue="1"/>
                         <f:selectItem itemLabel="Processed" itemValue="2"/>
@@ -67,7 +68,8 @@
             <p:dataTable id="dtblTransactionApproval" tableStyle="width:auto;" value="#{transaction_approvalBean.transaction_approvalList}" var="ta"                           
                          paginator="true" rows="50" 
                          paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
-                         rowsPerPageTemplate="50,100,400,800,1000,2000">
+                         rowsPerPageTemplate="50,100,400,800,1000,2000"
+                         rowStyleClass="#{ta.approval_status eq 1 ? 'amber' : ta.approval_status eq 2 ? 'green' : ta.approval_status eq 3 ? 'red' : ta.approval_status eq 4 ? 'blue' : 'none' }">
                 <f:facet name="header">
                     #{itemBean.itemsList.size()} #{langsys['Records']} #{langsys['Found']}
                     <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
@@ -138,27 +140,27 @@
                     <p:commandButton update="form:modalTransactionApprovalDetail" actionListener="#{transaction_approvalBean.displayTransactionApproval(ta,transaction_approval)}" oncomplete="PF('dlgTransactionApprovalDetail').show();" icon="ui-icon-note" title="View Request" style="color: white;" >
                     </p:commandButton>
                     &nbsp;
-                    <p:commandButton update="form:dtblTransactionApproval form:growl1" actionListener="#{transaction_approvalBean.markApprovedCall(ta)}" icon="ui-icon-star" title="Approve Request" style="color: white; background-color: #00B259" >
+                    <p:commandButton rendered="#{ta.approval_status=0}" update="form:dtblTransactionApproval form:growl1" actionListener="#{transaction_approvalBean.markApprovedCall(ta)}" icon="ui-icon-check" title="Approve Request" style="color: white; background-color: #00B259" >
                     </p:commandButton>
                     &nbsp;
-                    <p:commandButton update="form:dtblTransactionApproval form:growl1" actionListener="#{transaction_approvalBean.markRejected(ta.transaction_approval_id)}" icon="ui-icon-cancel" title="Cancel Request" style="color: white; background-color: red !important" >
+                    <p:commandButton rendered="#{ta.approval_status=0}" update="form:dtblTransactionApproval form:growl1" actionListener="#{transaction_approvalBean.markRejectedCall(ta)}" icon="ui-icon-close" title="Cancel Request" style="color: white; background-color: red !important" >
                     </p:commandButton>
                     &nbsp;
                 </p:column>
 
             </p:dataTable>
-            <p:dialog rendered="true" dynamic="true" header="#{langsys['TransactionApproval']} #{langsys['Detail']}" widgetVar="dlgTransactionApprovalDetail" id="modalTransactionApprovalDetail" modal="true">
+            <p:dialog rendered="true" dynamic="true" header="#{langsys['Transaction']} #{langsys['Approval']} #{langsys['Detail']}" widgetVar="dlgTransactionApprovalDetail" id="modalTransactionApprovalDetail" modal="true">
                 <h:panelGroup id="popupDetail">
                     <!--<h:outputText value="This is a Modal Dialog." />-->
                     <h:panelGrid columns="2">
                         <h:outputLabel  value="#{langsys['Transaction']} #{langsys['Type']}:"/>
-                    <h:outputText value="#{transactionTypeBean.getTransactionType(transaction_approval.transaction_type_id).getTransactionTypeName()}"/>
+                        <h:outputText value="#{transactionTypeBean.getTransactionType(transaction_approval.transaction_type_id).getTransactionTypeName()}"/>
                         <h:outputLabel  value="#{langsys['Transaction']} #{langsys['Reason']}:"/>
-                    <h:outputText value="#{transactionReasonBean.getTransactionReason(transaction_approval.transaction_reason_id).getDescription()}"/>
+                        <h:outputText value="#{transactionReasonBean.getTransactionReason(transaction_approval.transaction_reason_id).getDescription()}"/>
                         <h:outputLabel  value="#{langsys['Request']} #{langsys['Date']}:"/>
                         <h:outputText  value="#{utilityBean.formatDate(transaction_approval.request_date)}"/>
                         <h:outputLabel  value="#{langsys['Approval']} #{langsys['Status']}:"/>
-                    <h:outputText value="#{transaction_approval.approval_status eq 0 ? 'Submitted' : transaction_approval.approval_status eq 1 ? 'Approved' : transaction_approval.approval_status eq 2 ? 'Processed' : transaction_approval.approval_status eq 3 ? 'Rejected' : 'Recalled'}" />
+                        <h:outputText value="#{transaction_approval.approval_status eq 0 ? 'Submitted' : transaction_approval.approval_status eq 1 ? 'Approved' : transaction_approval.approval_status eq 2 ? 'Processed' : transaction_approval.approval_status eq 3 ? 'Rejected' : 'Recalled'}" />
                         <h:outputLabel value="#{langsys['Status']} #{langsys['Date']}:"/>
                         <h:outputText  value="#{utilityBean.formatDate(transaction_approval.status_date)}"/>
                         <h:outputLabel value="#{langsys['Status']} #{langsys['Description']}:"/>
