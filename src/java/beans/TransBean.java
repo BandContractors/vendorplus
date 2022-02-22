@@ -759,6 +759,20 @@ public class TransBean implements Serializable {
             if (transtype.getTransactionTypeId() == 2 && trans.getTransactionId() == 0 && trans.getTransactionNumber().length() > 0) {
                 IsNewTransNoUsed = new Trans_number_controlBean().getIsTrans_number_used(transtype.getTransactionTypeId(), trans.getTransactionNumber());
             }
+            String MsgCkeckApproval = "";
+            if (trans.getTransaction_approval_id() > 0) {
+                Transaction_approval apprtrans = new Transaction_approvalBean().getTransaction_approval(trans.getTransaction_approval_id());
+                if (null == apprtrans) {
+                    MsgCkeckApproval = "Invalid Approval Transaction Reference";
+                } else {
+                    if (apprtrans.getGrand_total() != trans.getGrandTotal() || apprtrans.getAmount_tendered() != trans.getAmountTendered() || apprtrans.getTransactor_id() != trans.getTransactorId()) {
+                        MsgCkeckApproval = "Approved and Transaction to Save  are Different";
+                    }
+                    if (apprtrans.getApproval_status() != 1) {
+                        MsgCkeckApproval = "Transaction is Not Approved for Processing";
+                    }
+                }
+            }
             UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
             List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
             GroupRightBean grb = new GroupRightBean();
@@ -886,6 +900,8 @@ public class TransBean implements Serializable {
                 msg = "Paid Amount cannot Exceed New Total";
             } else if (trans.getTransactionId() > 0 && new TransItemBean().getAnyItemMixAddSubtractQty(new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans), transtype.getTransactionTypeName()) == 1) {
                 msg = "You Cannot Add or Debit and Subtract or Credit different items in the same Update";
+            } else if (MsgCkeckApproval.length() > 0) {
+                msg = MsgCkeckApproval;
             }
             /*else if (trans.getTransactionId() > 0 && new TransItemBean().countItemsWithQtyChanged(new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans), transtype.getTransactionTypeName()) == 0) {
              msg = "Cannot Save where Item Qty has Not Changed";
@@ -2193,7 +2209,7 @@ public class TransBean implements Serializable {
                         //update status of the approval and refresh
                         if (trans.getTransaction_approval_id() > 0) {
                             //mark processed
-                            new Transaction_approvalBean().markProcessed(trans.getTransaction_approval_id());
+                            new Transaction_approvalBean().markProcessed(trans.getTransaction_approval_id(), trans.getTransactionId());
                             //refresh list
                             new Transaction_approvalBean().refreshTransaction_approvalList(this.TransListApproval, new GeneralUserSetting().getCurrentStore().getStoreId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), new GeneralUserSetting().getCurrentTransactionTypeId(), new GeneralUserSetting().getCurrentTransactionReasonId());
                         }

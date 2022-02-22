@@ -32,7 +32,7 @@ public class Transaction_approvalBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = Logger.getLogger(Transaction_approvalBean.class.getName());
-    
+
     private int filterStore;
     private int filterTransactionType;
     private int filterRequestedBy;
@@ -259,7 +259,7 @@ public class Transaction_approvalBean implements Serializable {
         return Updated;
     }
 
-    public int updateTransaction_approval(Transaction_approval aTransaction_approval, double aTransaction_id) {
+    public int updateTransaction_approval(Transaction_approval aTransaction_approval, long aTransaction_id) {
         int Updated = 0;
         String sql = "UPDATE transaction_approval SET "
                 + "approval_status=?,status_date=?,status_desc=?,status_by_id=?,transaction_id=? "
@@ -289,7 +289,7 @@ public class Transaction_approvalBean implements Serializable {
                     ps.setInt(4, 0);
                 }
                 try {
-                    ps.setLong(5, aTransaction_approval.getTransaction_id());
+                    ps.setLong(5, aTransaction_id);
                 } catch (Exception e) {
                     ps.setLong(5, 0);
                 }
@@ -302,7 +302,7 @@ public class Transaction_approvalBean implements Serializable {
         return Updated;
     }
 
-    public int markProcessed(long aTransaction_approval_id) {
+    public int markProcessed(long aTransaction_approval_id, long aTransaction_id) {
         int Updated = 0;
 
         try {
@@ -313,7 +313,7 @@ public class Transaction_approvalBean implements Serializable {
             ta.setStatus_by_id(new GeneralUserSetting().getCurrentUser().getUserDetailId());
             ta.setStatus_date(new java.sql.Timestamp(new CompanySetting().getCURRENT_SERVER_DATE().getTime()));
             ta.setStatus_desc("Processed");
-            Updated = this.updateTransaction_approval(ta);
+            Updated = this.updateTransaction_approval(ta, aTransaction_id);
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -423,39 +423,15 @@ public class Transaction_approvalBean implements Serializable {
         return ta;
     }
 
-    /*
-     public void refreshTransaction_approvalList(int aStoreId, int aRequestById, int aTransTypeId, int aTransReasonId) {
-     try {
-     this.Transaction_approvalList.clear();
-     } catch (NullPointerException npe) {
-     this.Transaction_approvalList = new ArrayList<>();
-     }
-     //approval_status: 0 Submitted, 1 Approved, 2 Processed, 3 Rejected, 4 Recalled
-     String sql;
-     sql = "SELECT ta.*,th.grand_total,'' AS transactor_names,th.currency_code FROM transaction_approval ta INNER JOIN transaction_hist th ON ta.transaction_hist_id=th.transaction_hist_id "
-     + "WHERE ta.approval_status IN(0,1,3) AND ta.transaction_type_id=? AND ta.transaction_reason_id=? AND "
-     + "th.store_id=? AND ta.request_by_id=? AND th.hist_flag='Approval'  "
-     + "ORDER BY transaction_approval_id DESC LIMIT 10";
-     ResultSet rs = null;
-     try (
-     Connection conn = DBConnection.getMySQLConnection();
-     PreparedStatement ps = conn.prepareStatement(sql);) {
-     ps.setInt(1, aTransTypeId);
-     ps.setInt(2, aTransReasonId);
-     ps.setInt(3, aStoreId);
-     ps.setInt(4, aRequestById);
-     rs = ps.executeQuery();
-     Transaction_approval ta = null;
-     while (rs.next()) {
-     ta = new Transaction_approval();
-     this.setTransaction_approvalFromResultset(ta, rs);
-     this.Transaction_approvalList.add(ta);
-     }
-     } catch (Exception e) {
-     LOGGER.log(Level.ERROR, e);
-     }
-     }
-     */
+    public void recallApprovalCall(List<Transaction_approval> aList, int aStoreId, int aRequestById, int aTransTypeId, int aTransReasonId, long aTransaction_approval_id) {
+        try {
+            int x = this.markRecalled(aTransaction_approval_id);
+            this.refreshTransaction_approvalList(aList, aStoreId, aRequestById, aTransTypeId, aTransReasonId);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public void refreshTransaction_approvalList(List<Transaction_approval> aList, int aStoreId, int aRequestById, int aTransTypeId, int aTransReasonId) {
         try {
             aList.clear();
@@ -516,23 +492,23 @@ public class Transaction_approvalBean implements Serializable {
     public void clearTransaction_approval(Transaction_approval aTransaction_approval) {
         try {
             if (aTransaction_approval != null) {
-            aTransaction_approval.setTransaction_approval_id(0);
-            aTransaction_approval.setTransaction_hist_id(0);
-            aTransaction_approval.setTransaction_type_id(0);
-            aTransaction_approval.setTransaction_reason_id(0);
-            aTransaction_approval.setRequest_date(null);
-            aTransaction_approval.setRequest_by_id(0);
-            aTransaction_approval.setApproval_status(0);
-            aTransaction_approval.setStatus_date(null);
-            aTransaction_approval.setStatus_desc("");
-            aTransaction_approval.setStatus_by_id(0);
-            aTransaction_approval.setGrand_total(0);
-            aTransaction_approval.setTransactor_names("");
-            aTransaction_approval.setCurrency_code("");
-            aTransaction_approval.setTransactor_id(0);
-            aTransaction_approval.setStore_id(0);
-            aTransaction_approval.setAmount_tendered(0);
-            aTransaction_approval.setTransaction_id(0);
+                aTransaction_approval.setTransaction_approval_id(0);
+                aTransaction_approval.setTransaction_hist_id(0);
+                aTransaction_approval.setTransaction_type_id(0);
+                aTransaction_approval.setTransaction_reason_id(0);
+                aTransaction_approval.setRequest_date(null);
+                aTransaction_approval.setRequest_by_id(0);
+                aTransaction_approval.setApproval_status(0);
+                aTransaction_approval.setStatus_date(null);
+                aTransaction_approval.setStatus_desc("");
+                aTransaction_approval.setStatus_by_id(0);
+                aTransaction_approval.setGrand_total(0);
+                aTransaction_approval.setTransactor_names("");
+                aTransaction_approval.setCurrency_code("");
+                aTransaction_approval.setTransactor_id(0);
+                aTransaction_approval.setStore_id(0);
+                aTransaction_approval.setAmount_tendered(0);
+                aTransaction_approval.setTransaction_id(0);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
