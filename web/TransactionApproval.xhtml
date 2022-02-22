@@ -48,7 +48,7 @@
                         <p:calendar value="#{transaction_approvalBean.filterRequestDate}" pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" inputStyle="width: 150px" style="width: 350px" />
                     <p:outputLabel value="#{langsys['Approval']} #{langsys['Status']}"/>
                     <p:selectOneMenu value="#{transaction_approvalBean.filterApprovalStatus}" style="width: 150px">
-                        <f:selectItem itemLabel="" itemValue=""/>
+                        <f:selectItem itemLabel="" itemValue="99"/>
                         <f:selectItem itemLabel="Submitted" itemValue="0"/>
                         <f:selectItem itemLabel="Approved" itemValue="1"/>
                         <f:selectItem itemLabel="Processed" itemValue="2"/>
@@ -91,11 +91,14 @@
                         <p:dataExporter type="xml" target="dtblTransactionApproval" fileName="TransactionApproval" />
                     </h:commandLink>
                 </f:facet>
-                <p:column headerText="#{langsys['Transaction']} #{langsys['Type']}">
-                    <h:outputText value="#{transactionTypeBean.getTransactionType(ta.transaction_type_id).getTransactionTypeName()}"/>
+                <p:column headerText="#{langsys['Id']}">
+                    <h:outputText value="#{ta.transaction_approval_id}"/>
                 </p:column>
-                <p:column headerText="#{langsys['Transaction']} #{langsys['Reason']}">
-                    <h:outputText value="#{transactionReasonBean.getTransactionReason(ta.transaction_reason_id).getDescription()}"/>
+                <p:column headerText="#{langsys['Store']}">
+                    <h:outputText value="#{storeBean.getStore(ta.store_id).getStoreName()}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Transaction']} #{langsys['Type']}">
+                    <h:outputText value="#{transactionTypeBean.getTransactionType(ta.transaction_type_id).getTransactionTypeName()} / #{transactionReasonBean.getTransactionReason(ta.transaction_reason_id).getTransactionReasonName()}"/>
                 </p:column>
                 <p:column headerText="#{langsys['Request']} #{langsys['Date']}">
                     <h:outputText value="#{utilityBean.formatDate(ta.request_date)}"/>
@@ -103,36 +106,30 @@
                 <p:column headerText="#{langsys['Request']} #{langsys['By']}" visible="false">
                     <h:outputText value="#{ta.request_by_id}"/>
                 </p:column>
-                <p:column headerText="#{langsys['Approval']} #{langsys['Status']}">
+                <p:column headerText="#{langsys['Status']}">
                     <h:outputText value="#{ta.approval_status eq 0 ? 'Submitted' : ta.approval_status eq 1 ? 'Approved' : ta.approval_status eq 2 ? 'Processed' : ta.approval_status eq 3 ? 'Rejected' : 'Recalled'}" />
                 </p:column>
-                <p:column headerText="#{langsys['Status']} #{langsys['Date']}">
+                <p:column headerText="#{langsys['Status']} #{langsys['Date']}" visible="false">
                     <h:outputText value="#{utilityBean.formatDate(ta.status_date)}"/>
                 </p:column>
-                <p:column headerText="#{langsys['Status']} #{langsys['Description']}">
+                <p:column headerText="#{langsys['Status']} #{langsys['Description']}" visible="false">
                     <h:outputText value="#{ta.status_desc}"/>
                 </p:column>
                 <p:column headerText="#{langsys['Status']} #{langsys['By']}" visible="false">
                     <h:outputText value="#{ta.status_by_id}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Currency']}" visible="false">
+                    <h:outputText value="#{ta.currency_code}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Partner']}">
+                    <h:outputText value="#{transactorBean.getTransactor(ta.transactor_id).getTransactorNames()}"/>
                 </p:column>
                 <p:column headerText="#{langsys['Grand']} #{langsys['Total']}" style="text-align: right;">
                     <h:outputText value="#{ta.grand_total}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="#{langsys['Transactor']}">
-                    <h:outputText value="#{ta.transactor_names}"/>
-                </p:column>
-                <p:column headerText="#{langsys['Currency']}">
-                    <h:outputText value="#{ta.currency_code}"/>
-                </p:column>
-                <p:column headerText="#{langsys['Transactor']}" visible="false">
-                    <h:outputText value="#{transactorBean.findTransactor(ta.transactor_id).getTransactorNames()}"/>
-                </p:column>
-                <p:column headerText="#{langsys['Store']}">
-                    <h:outputText value="#{storeBean.getStore(ta.store_id).getStoreName()}"/>
-                </p:column>
-                <p:column headerText="#{langsys['Amount']}" style="text-align: right;" visible="false">
+                <p:column headerText="#{langsys['Amount']} #{langsys['Tendered']}" style="text-align: right;">
                     <h:outputText value="#{ta.amount_tendered}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
@@ -141,7 +138,7 @@
                     <p:commandButton update="form:modalTransactionApprovalDetail" actionListener="#{transaction_approvalBean.displayTransactionApproval(ta,transaction_approval)}" oncomplete="PF('dlgTransactionApprovalDetail').show();" icon="ui-icon-note" title="View Request" style="color: white;" >
                     </p:commandButton>
                     &nbsp;
-                    <p:commandButton update="form:dtblTransactionApproval form:growl1" actionListener="#{transaction_approvalBean.markApproved(ta.transaction_approval_id)}" icon="ui-icon-star" title="Approve Request" style="color: white; background-color: #00B259" >
+                    <p:commandButton update="form:dtblTransactionApproval form:growl1" actionListener="#{transaction_approvalBean.markApprovedCall(ta)}" icon="ui-icon-star" title="Approve Request" style="color: white; background-color: #00B259" >
                     </p:commandButton>
                     &nbsp;
                     <p:commandButton update="form:dtblTransactionApproval form:growl1" actionListener="#{transaction_approvalBean.markRejected(ta.transaction_approval_id)}" icon="ui-icon-cancel" title="Cancel Request" style="color: white; background-color: red !important" >
@@ -188,7 +185,7 @@
 
                 </h:panelGroup>
             </p:dialog>
-
+            <p:growl id="growl1"/>
         </h:form>
     </h:body>
 </html>

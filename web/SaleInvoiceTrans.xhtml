@@ -684,7 +684,7 @@
                         </p:dialog>
                         <p:ajax listener="#{transBean.saveDraftTrans('Draft',trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor,transBean.authorisedByUserDetail,transItemBean.selectedAccCoa)}" process="@form" update="pnlApproval pnlDraft pnlHeader gridTransItem pgrdOverrideWarranty pgrdSpecific gridItemStatus dtblTransactionItem pgrdTotals pgrdScheme pgrdPayment pgrdMsgs pgrdApprove"/>
                     </p:commandButton>
-                    <p:commandButton  rendered="true" styleClass="clsButtonBig" id="cmdbReqApproval" value="#{langsys['SEND']} #{langsys['FOR']} #{langsys['APPROVAL']}" onclick="PF('statusDialog2').show()" onsuccess="PF('statusDialog2').hide()">
+                    <p:commandButton  rendered="#{menuItemBean.menuItemObj.TRANSACTIONS_FOR_APPROVAL.contains('1') or menuItemBean.menuItemObj.TRANSACTIONS_FOR_APPROVAL.contains('2')}" styleClass="clsButtonBig" id="cmdbReqApproval" value="#{langsys['SEND']} #{langsys['FOR']} #{langsys['APPROVAL']}" onclick="PF('statusDialog2').show()" onsuccess="PF('statusDialog2').hide()">
                         <p:dialog widgetVar="statusDialog2" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>

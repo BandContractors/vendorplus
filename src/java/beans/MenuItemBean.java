@@ -198,6 +198,11 @@ public class MenuItemBean implements Serializable {
             } catch (Exception e) {
                 this.MenuItemObj.setSTOCKTAKE_ACTION(0);
             }
+            try {
+                this.MenuItemObj.setTRANSACTIONS_FOR_APPROVAL(pb.getParameter_listByContextNameMemory("GENERAL", "TRANSACTIONS_FOR_APPROVAL").getParameter_value());
+            } catch (Exception e) {
+                this.MenuItemObj.setTRANSACTIONS_FOR_APPROVAL("");
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }

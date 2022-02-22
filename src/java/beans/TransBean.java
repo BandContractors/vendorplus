@@ -902,6 +902,8 @@ public class TransBean implements Serializable {
                 msg = "You Cannot Add or Debit and Subtract or Credit different items in the same Update";
             } else if (MsgCkeckApproval.length() > 0) {
                 msg = MsgCkeckApproval;
+            } else if (new Transaction_approvalBean().approvalRequiredTrans(trans) == 1) {
+                msg = "Send this Transaction for Approval";
             }
             /*else if (trans.getTransactionId() > 0 && new TransItemBean().countItemsWithQtyChanged(new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans), transtype.getTransactionTypeName()) == 0) {
              msg = "Cannot Save where Item Qty has Not Changed";

@@ -41,6 +41,7 @@ public class MenuItem implements Serializable {
     private int ITEM_CODE_ERROR_ON;
     private int SEARCH_ITEMS_LIST_LIMIT;
     private int STOCKTAKE_ACTION;
+    private String TRANSACTIONS_FOR_APPROVAL;
 
     /**
      * @return the SYSTEM_NAME
@@ -377,5 +378,19 @@ public class MenuItem implements Serializable {
      */
     public void setSTOCKTAKE_ACTION(int STOCKTAKE_ACTION) {
         this.STOCKTAKE_ACTION = STOCKTAKE_ACTION;
+    }
+
+    /**
+     * @return the TRANSACTIONS_FOR_APPROVAL
+     */
+    public String getTRANSACTIONS_FOR_APPROVAL() {
+        return TRANSACTIONS_FOR_APPROVAL;
+    }
+
+    /**
+     * @param TRANSACTIONS_FOR_APPROVAL the TRANSACTIONS_FOR_APPROVAL to set
+     */
+    public void setTRANSACTIONS_FOR_APPROVAL(String TRANSACTIONS_FOR_APPROVAL) {
+        this.TRANSACTIONS_FOR_APPROVAL = TRANSACTIONS_FOR_APPROVAL;
     }
 }

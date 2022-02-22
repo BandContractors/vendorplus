@@ -2,8 +2,10 @@ package beans;
 
 import connections.DBConnection;
 import entities.CompanySetting;
+import entities.GroupRight;
 import entities.Trans;
 import entities.Transaction_approval;
+import entities.UserDetail;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -320,6 +322,29 @@ public class Transaction_approvalBean implements Serializable {
         return Updated;
     }
 
+    public void markApprovedCall(Transaction_approval aTransaction_approval) {
+        try {
+            UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
+            List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
+            GroupRightBean grb = new GroupRightBean();
+            int CanApproveSalesInvoice = 0;
+            String Msg = "";
+            if (aTransaction_approval.getTransaction_type_id() == 2) {
+                CanApproveSalesInvoice = grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, Integer.toString(130), "Add");
+            }
+            if (CanApproveSalesInvoice == 1) {
+                int x = this.markApproved(aTransaction_approval.getTransaction_approval_id());
+                if (x == 1) {
+                    Msg = "Approved Successfully";
+                }
+            } else {
+                Msg = "Access Denied";
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public int markApproved(long aTransaction_approval_id) {
         int Updated = 0;
 
@@ -566,6 +591,25 @@ public class Transaction_approvalBean implements Serializable {
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
+    }
+
+    public int approvalRequiredTrans(Trans aTrans) {
+        int x = 0;
+        try {
+            String TransactionsForApproval = new Parameter_listBean().getParameter_listByContextNameMemory("GENERAL", "TRANSACTIONS_FOR_APPROVAL").getParameter_value();
+            if (TransactionsForApproval.length() == 0 || TransactionsForApproval.contains("0")) {
+                x = 0;
+            } else {
+                if (aTrans.getTransactionTypeId() == 2 && TransactionsForApproval.contains("2") && aTrans.getTransaction_approval_id() == 0) {
+                    x = 1;
+                } else if (aTrans.getTransactionTypeId() == 2 && TransactionsForApproval.contains("1") && aTrans.getTransaction_approval_id() == 0 && aTrans.getGrandTotal() > aTrans.getAmountTendered()) {
+                    x = 1;
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return x;
     }
 
     /**
