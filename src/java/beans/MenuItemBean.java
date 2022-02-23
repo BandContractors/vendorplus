@@ -203,6 +203,15 @@ public class MenuItemBean implements Serializable {
             } catch (Exception e) {
                 this.MenuItemObj.setTRANSACTIONS_FOR_APPROVAL("");
             }
+            try {
+                if (null == pb.getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value()) {
+                    this.MenuItemObj.setTAX_BRANCH_NO("");
+                } else {
+                    this.MenuItemObj.setTAX_BRANCH_NO(pb.getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value());
+                }
+            } catch (Exception e) {
+                this.MenuItemObj.setTAX_BRANCH_NO("");
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }

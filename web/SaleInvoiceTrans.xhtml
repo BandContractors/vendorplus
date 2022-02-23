@@ -101,7 +101,7 @@
                         <p:dialog widgetVar="statusDialog6" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
-                        <p:ajax listener="#{transaction_approvalBean.recallApprovalCall(transBean.transListApproval,generalUserSetting.currentStore.storeId,generalUserSetting.currentUser.userDetailId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans.transaction_approval_id)}" process="@form" update="pnlApproval"/>
+                        <p:ajax listener="#{transaction_approvalBean.recallApprovalCall(transBean.transListApproval,generalUserSetting.currentStore.storeId,generalUserSetting.currentUser.userDetailId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans.transaction_approval_id)}" process="@form" update="pnlApproval growl1"/>
                     </p:commandButton>
                     <p:commandButton id="cmdbRefreshApproval" value="#{langsys['Refresh']} #{langsys['List']}" onclick="PF('statusDialog7').show()" onsuccess="PF('statusDialog7').hide()">
                         <p:dialog widgetVar="statusDialog7" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">

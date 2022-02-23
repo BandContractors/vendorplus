@@ -902,7 +902,7 @@ public class TransBean implements Serializable {
                 msg = "You Cannot Add or Debit and Subtract or Credit different items in the same Update";
             } else if (MsgCkeckApproval.length() > 0) {
                 msg = MsgCkeckApproval;
-            } else if (new Transaction_approvalBean().approvalRequiredTrans(trans) == 1) {
+            } else if (new Transaction_approvalBean().approvalRequiredTrans(trans, aTransTypeId, aTransReasonId) == 1) {
                 msg = "Send this Transaction for Approval";
             }
             /*else if (trans.getTransactionId() > 0 && new TransItemBean().countItemsWithQtyChanged(new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans), transtype.getTransactionTypeName()) == 0) {
@@ -2259,7 +2259,10 @@ public class TransBean implements Serializable {
                             //1. Update Invoice
                             //2. Auto Printing Invoice
                             if (this.AutoPrintAfterSave) {
+                                try{
                                 org.primefaces.PrimeFaces.current().executeScript("doPrintHiddenClick()");
+                                }catch(Exception e){
+                                }
                             }
                         }
                         //check need for child dialogue
@@ -11080,9 +11083,8 @@ public class TransBean implements Serializable {
                     }
                     break;
             }
-
-        } catch (NullPointerException npe) {
-            System.err.println("getPrintFileName:" + npe.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return the_file + ".xhtml";
     }

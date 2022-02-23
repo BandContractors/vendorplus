@@ -116,7 +116,7 @@ INSERT INTO transaction_reason (transaction_reason_id, transaction_reason_name, 
 INSERT INTO transaction_reason (transaction_reason_id, transaction_reason_name, transaction_type_id) VALUES (133, 'CASH RECEIPT APPROVAL', 86);
 
 INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
-VALUES (89, 'GENERAL', 'TRANSACTIONS_FOR_APPROVAL', '0','Seperate with comma. 0:None 1:Credit Sale 2:Cash Sale 3:Credit Purchase 4:Cash Purchase 5:Cash Receipt 6:Cash Payement');
+VALUES (89, 'GENERAL', 'TRANSACTIONS_FOR_APPROVAL', '0','Seperate with comma. 0:None 1:Credit Sale 2:Cash Sale 3:Credit Purchase 4:Cash Purchase 5:Cash Receipt 6:Cash Payment');
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_16',120,Now(),'6.0','');
 

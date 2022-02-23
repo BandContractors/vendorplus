@@ -42,6 +42,7 @@ public class MenuItem implements Serializable {
     private int SEARCH_ITEMS_LIST_LIMIT;
     private int STOCKTAKE_ACTION;
     private String TRANSACTIONS_FOR_APPROVAL;
+    private String TAX_BRANCH_NO;
 
     /**
      * @return the SYSTEM_NAME
@@ -392,5 +393,19 @@ public class MenuItem implements Serializable {
      */
     public void setTRANSACTIONS_FOR_APPROVAL(String TRANSACTIONS_FOR_APPROVAL) {
         this.TRANSACTIONS_FOR_APPROVAL = TRANSACTIONS_FOR_APPROVAL;
+    }
+
+    /**
+     * @return the TAX_BRANCH_NO
+     */
+    public String getTAX_BRANCH_NO() {
+        return TAX_BRANCH_NO;
+    }
+
+    /**
+     * @param TAX_BRANCH_NO the TAX_BRANCH_NO to set
+     */
+    public void setTAX_BRANCH_NO(String TAX_BRANCH_NO) {
+        this.TAX_BRANCH_NO = TAX_BRANCH_NO;
     }
 }

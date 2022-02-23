@@ -11,14 +11,19 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import sessions.GeneralUserSetting;
+import utilities.UtilityBean;
 
 /*
  * To change this template, choose Tools | Templates
@@ -41,6 +46,8 @@ public class Transaction_approvalBean implements Serializable {
     private Date filterRequestDate = new CompanySetting().getCURRENT_SERVER_DATE();
     private int filterApprovalStatus = -1;
     private List<Transaction_approval> transaction_approvalList;
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     public void setTransaction_approvalFromResultset(Transaction_approval aTransaction_approval, ResultSet aResultSet) {
         try {
@@ -323,23 +330,36 @@ public class Transaction_approvalBean implements Serializable {
     }
 
     public void markApprovedCall(Transaction_approval aTransaction_approval) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
+        try {
+            BaseName = getMenuItemBean().getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         try {
             UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
             List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
             GroupRightBean grb = new GroupRightBean();
             int CanApproveSalesInvoice = 0;
-            String Msg = "";
+            String msg = "";
             if (aTransaction_approval.getTransaction_type_id() == 2) {
                 CanApproveSalesInvoice = grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, Integer.toString(130), "Add");
             }
             if (CanApproveSalesInvoice == 1) {
-                int x = this.markApproved(aTransaction_approval.getTransaction_approval_id());
-                if (x == 1) {
-                    Msg = "Approved Successfully";
+                Transaction_approval ta = this.getTransaction_approval(aTransaction_approval.getTransaction_approval_id());
+                if (null != ta && ta.getApproval_status() != 0) {
+                    msg = "Transaction Cannot be Approved";
+                } else {
+                    int x = this.markApproved(aTransaction_approval.getTransaction_approval_id());
+                    if (x == 1) {
+                        msg = "Approved Successfully";
+                        this.getFilteredTransactionApprovals();
+                    }
                 }
             } else {
-                Msg = "Access Denied";
+                msg = "Access Denied";
             }
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -364,23 +384,36 @@ public class Transaction_approvalBean implements Serializable {
     }
 
     public void markRejectedCall(Transaction_approval aTransaction_approval) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
+        try {
+            BaseName = getMenuItemBean().getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         try {
             UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
             List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
             GroupRightBean grb = new GroupRightBean();
             int CanRejectSalesInvoice = 0;
-            String Msg = "";
+            String msg = "";
             if (aTransaction_approval.getTransaction_type_id() == 2) {
                 CanRejectSalesInvoice = grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, Integer.toString(130), "Add");
             }
             if (CanRejectSalesInvoice == 1) {
-                int x = this.markRejected(aTransaction_approval.getTransaction_approval_id());
-                if (x == 1) {
-                    Msg = "Rejected Successfully";
+                Transaction_approval ta = this.getTransaction_approval(aTransaction_approval.getTransaction_approval_id());
+                if (null != ta && ta.getApproval_status() != 0) {
+                    msg = "Transaction Cannot be Rejected";
+                } else {
+                    int x = this.markRejected(aTransaction_approval.getTransaction_approval_id());
+                    if (x == 1) {
+                        msg = "Rejected Successfully";
+                        this.getFilteredTransactionApprovals();
+                    }
                 }
             } else {
-                Msg = "Access Denied";
+                msg = "Access Denied";
             }
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -472,9 +505,20 @@ public class Transaction_approvalBean implements Serializable {
     }
 
     public void recallApprovalCall(List<Transaction_approval> aList, int aStoreId, int aRequestById, int aTransTypeId, int aTransReasonId, long aTransaction_approval_id) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
         try {
-            int x = this.markRecalled(aTransaction_approval_id);
-            this.refreshTransaction_approvalList(aList, aStoreId, aRequestById, aTransTypeId, aTransReasonId);
+            BaseName = getMenuItemBean().getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
+        try {
+            Transaction_approval ta = this.getTransaction_approval(aTransaction_approval_id);
+            if (null != ta && ta.getApproval_status() != 0) {
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "This Transaction Cannot be Recalled")));
+            } else {
+                int x = this.markRecalled(aTransaction_approval_id);
+                this.refreshTransaction_approvalList(aList, aStoreId, aRequestById, aTransTypeId, aTransReasonId);
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -591,7 +635,7 @@ public class Transaction_approvalBean implements Serializable {
                 wheresql = wheresql + " AND request_by_id=" + this.filterRequestedBy;
             }
             if (this.filterRequestDate != null) {
-                wheresql = wheresql + " AND request_date=" + this.filterRequestDate;
+                wheresql = wheresql + " AND DATE_FORMAT(request_date,'%Y-%m-%d')='" + new SimpleDateFormat("yyyy-MM-dd").format(new java.sql.Date(this.filterRequestDate.getTime())) + "'";
             }
             if (this.filterApprovalStatus >= 0) {
                 wheresql = wheresql + " AND approval_status=" + this.filterApprovalStatus;
@@ -616,16 +660,16 @@ public class Transaction_approvalBean implements Serializable {
         }
     }
 
-    public int approvalRequiredTrans(Trans aTrans) {
+    public int approvalRequiredTrans(Trans aTrans, int aTransTypeId, int aTransReasId) {
         int x = 0;
         try {
             String TransactionsForApproval = new Parameter_listBean().getParameter_listByContextNameMemory("GENERAL", "TRANSACTIONS_FOR_APPROVAL").getParameter_value();
             if (TransactionsForApproval.length() == 0 || TransactionsForApproval.contains("0")) {
                 x = 0;
             } else {
-                if (aTrans.getTransactionTypeId() == 2 && TransactionsForApproval.contains("2") && aTrans.getTransaction_approval_id() == 0) {
+                if (aTransTypeId == 2 && TransactionsForApproval.contains("2") && aTrans.getTransaction_approval_id() == 0) {
                     x = 1;
-                } else if (aTrans.getTransactionTypeId() == 2 && TransactionsForApproval.contains("1") && aTrans.getTransaction_approval_id() == 0 && aTrans.getGrandTotal() > aTrans.getAmountTendered()) {
+                } else if (aTransTypeId == 2 && TransactionsForApproval.contains("1") && aTrans.getTransaction_approval_id() == 0 && aTrans.getGrandTotal() > aTrans.getAmountTendered()) {
                     x = 1;
                 }
             }
@@ -717,5 +761,19 @@ public class Transaction_approvalBean implements Serializable {
      */
     public void setTransaction_approvalList(List<Transaction_approval> transaction_approvalList) {
         this.transaction_approvalList = transaction_approvalList;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 }
