@@ -120,3 +120,8 @@ VALUES (89, 'GENERAL', 'TRANSACTIONS_FOR_APPROVAL', '0','Seperate with comma. 0:
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_16',120,Now(),'6.0','');
 
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (90, 'INVOICE', 'NO_PRINT_IF_NO_F', '0','0:No and 1:Yes');
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_16',125,Now(),'6.0','');
+

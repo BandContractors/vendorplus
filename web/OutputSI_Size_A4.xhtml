@@ -15,7 +15,7 @@
         <h:form>
             <ui:composition>
                 <p:panel style="text-align: center;">
-                    <p:commandButton id="cmdbvPrint" value="#{langout['PRINT']}" icon="ui-icon-print" type="button" rendered="#{(menuItemBean.menuItemObj.TAX_BRANCH_NO.length() eq 0) or (menuItemBean.menuItemObj.TAX_BRANCH_NO.length() gt 0 and generalUserSetting.outputDetailParent.trans.transaction_number_tax.length() gt 0)}">
+                    <p:commandButton id="cmdbvPrint" value="#{langout['PRINT']}" icon="ui-icon-print" type="button" rendered="#{menuItemBean.menuItemObj.NO_PRINT_IF_NO_F eq 0 or (menuItemBean.menuItemObj.NO_PRINT_IF_NO_F eq 1 and generalUserSetting.outputDetailParent.trans.transaction_number_tax.length() gt 0)}">
                         <p:printer target="vTransactionGrid" rendered="false"/>
                     </p:commandButton>
                 </p:panel>

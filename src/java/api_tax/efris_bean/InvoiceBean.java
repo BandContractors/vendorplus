@@ -269,7 +269,11 @@ public class InvoiceBean implements Serializable {
                 buyerDetails.setBuyerType(Integer.toString(1));
             }
             if (null == transactor) {
-                buyerDetails.setBuyerLegalName("Walk-In Customer");
+                if (null != trans.getTransactor_rep() && trans.getTransactor_rep().length() > 0) {
+                    buyerDetails.setBuyerLegalName(trans.getTransactor_rep());
+                } else {
+                    buyerDetails.setBuyerLegalName("Walk-In Customer");
+                }
             } else {
                 if (transactor.getTransactorId() > 0) {
                     if (transactor.getTransactorNames().length() > 0) {
@@ -286,7 +290,11 @@ public class InvoiceBean implements Serializable {
                         buyerDetails.setBuyerNinBrn(transactor.getIdNumber());
                     }
                 } else {
-                    buyerDetails.setBuyerLegalName("Walk-In Customer");
+                    if (null != trans.getTransactor_rep() && trans.getTransactor_rep().length() > 0) {
+                        buyerDetails.setBuyerLegalName(trans.getTransactor_rep());
+                    } else {
+                        buyerDetails.setBuyerLegalName("Walk-In Customer");
+                    }
                 }
             }
 

@@ -212,6 +212,11 @@ public class MenuItemBean implements Serializable {
             } catch (Exception e) {
                 this.MenuItemObj.setTAX_BRANCH_NO("");
             }
+            try {
+                this.MenuItemObj.setNO_PRINT_IF_NO_F(Integer.parseInt(pb.getParameter_listByContextNameMemory("INVOICE", "NO_PRINT_IF_NO_F").getParameter_value()));
+            } catch (Exception e) {
+                this.MenuItemObj.setNO_PRINT_IF_NO_F(0);
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }

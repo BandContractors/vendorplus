@@ -43,6 +43,7 @@ public class MenuItem implements Serializable {
     private int STOCKTAKE_ACTION;
     private String TRANSACTIONS_FOR_APPROVAL;
     private String TAX_BRANCH_NO;
+    private int NO_PRINT_IF_NO_F;
 
     /**
      * @return the SYSTEM_NAME
@@ -407,5 +408,19 @@ public class MenuItem implements Serializable {
      */
     public void setTAX_BRANCH_NO(String TAX_BRANCH_NO) {
         this.TAX_BRANCH_NO = TAX_BRANCH_NO;
+    }
+
+    /**
+     * @return the NO_PRINT_IF_NO_F
+     */
+    public int getNO_PRINT_IF_NO_F() {
+        return NO_PRINT_IF_NO_F;
+    }
+
+    /**
+     * @param NO_PRINT_IF_NO_F the NO_PRINT_IF_NO_F to set
+     */
+    public void setNO_PRINT_IF_NO_F(int NO_PRINT_IF_NO_F) {
+        this.NO_PRINT_IF_NO_F = NO_PRINT_IF_NO_F;
     }
 }
