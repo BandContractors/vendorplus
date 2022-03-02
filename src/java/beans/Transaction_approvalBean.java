@@ -4,6 +4,7 @@ import connections.DBConnection;
 import entities.CompanySetting;
 import entities.GroupRight;
 import entities.Trans;
+import entities.TransItem;
 import entities.Transaction_approval;
 import entities.UserDetail;
 import java.io.Serializable;
@@ -46,6 +47,7 @@ public class Transaction_approvalBean implements Serializable {
     private Date filterRequestDate = new CompanySetting().getCURRENT_SERVER_DATE();
     private int filterApprovalStatus = -1;
     private List<Transaction_approval> transaction_approvalList;
+    private List<TransItem> transItemList;
     @ManagedProperty("#{menuItemBean}")
     private MenuItemBean menuItemBean;
 
@@ -143,6 +145,7 @@ public class Transaction_approvalBean implements Serializable {
 
     public long insertTransaction_approval(Transaction_approval aTransaction_approval) {
         long InsertedId = 0;
+        System.out.println("Currency:" + aTransaction_approval.getCurrency_code());
         String sql = "INSERT INTO transaction_approval "
                 + "(transaction_hist_id,transaction_type_id,transaction_reason_id,"
                 + "request_date,request_by_id,approval_status,status_date,status_desc,status_by_id,"
@@ -576,6 +579,9 @@ public class Transaction_approvalBean implements Serializable {
             Transaction_approvalTo.setStore_id(Transaction_approvalFrom.getStore_id());
             Transaction_approvalTo.setAmount_tendered(Transaction_approvalFrom.getAmount_tendered());
             Transaction_approvalTo.setTransaction_id(Transaction_approvalFrom.getTransaction_id());
+            
+            //get trans Items
+            this.getTransItemsByTransactionHistId(Transaction_approvalFrom.getTransaction_hist_id());
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -617,6 +623,15 @@ public class Transaction_approvalBean implements Serializable {
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
+    }
+
+    public List<TransItem> getTransItemsByTransactionHistId(long aTransactionHistId) {
+        try {
+            this.transItemList = new TransItemBean().getTransItemsFromHist(aTransactionHistId);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return this.transItemList;
     }
 
     public void getFilteredTransactionApprovals() {
@@ -775,5 +790,19 @@ public class Transaction_approvalBean implements Serializable {
      */
     public void setMenuItemBean(MenuItemBean menuItemBean) {
         this.menuItemBean = menuItemBean;
+    }
+
+    /**
+     * @return the transItemList
+     */
+    public List<TransItem> getTransItemList() {
+        return transItemList;
+    }
+
+    /**
+     * @param transItemList the transItemList to set
+     */
+    public void setTransItemList(List<TransItem> transItemList) {
+        this.transItemList = transItemList;
     }
 }

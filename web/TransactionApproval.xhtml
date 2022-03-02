@@ -150,38 +150,83 @@
             </p:dataTable>
             <p:dialog rendered="true" dynamic="true" header="#{langsys['Transaction']} #{langsys['Approval']} #{langsys['Detail']}" widgetVar="dlgTransactionApprovalDetail" id="modalTransactionApprovalDetail" modal="true">
                 <h:panelGroup id="popupDetail">
-                    <!--<h:outputText value="This is a Modal Dialog." />-->
-                    <h:panelGrid columns="2">
-                        <h:outputLabel  value="#{langsys['Transaction']} #{langsys['Type']}:"/>
-                        <h:outputText value="#{transactionTypeBean.getTransactionType(transaction_approval.transaction_type_id).getTransactionTypeName()}"/>
-                        <h:outputLabel  value="#{langsys['Transaction']} #{langsys['Reason']}:"/>
-                        <h:outputText value="#{transactionReasonBean.getTransactionReason(transaction_approval.transaction_reason_id).getDescription()}"/>
-                        <h:outputLabel  value="#{langsys['Request']} #{langsys['Date']}:"/>
-                        <h:outputText  value="#{utilityBean.formatDate(transaction_approval.request_date)}"/>
-                        <h:outputLabel  value="#{langsys['Approval']} #{langsys['Status']}:"/>
-                        <h:outputText value="#{transaction_approval.approval_status eq 0 ? 'Submitted' : transaction_approval.approval_status eq 1 ? 'Approved' : transaction_approval.approval_status eq 2 ? 'Processed' : transaction_approval.approval_status eq 3 ? 'Rejected' : 'Recalled'}" />
-                        <h:outputLabel value="#{langsys['Status']} #{langsys['Date']}:"/>
-                        <h:outputText  value="#{utilityBean.formatDate(transaction_approval.status_date)}"/>
-                        <h:outputLabel value="#{langsys['Status']} #{langsys['Description']}:"/>
-                        <h:outputText  value="#{transaction_approval.status_desc}"/>
-                        <h:outputLabel  value="#{langsys['Status']} #{langsys['By']}:"/>
-                        <h:outputText  value="#{transaction_approval.status_by_id}"/>
-                        <h:outputLabel value="#{langsys['Grand']} #{langsys['Total']}:"/>
-                        <h:outputText  value="#{transaction_approval.grand_total}">
-                            <f:convertNumber pattern="###,###.#" locale="#{utilityBean.convertLocaleToString()}"/>
-                        </h:outputText>
-                        <h:outputLabel  value="#{langsys['Transactor']}:"/>
-                        <h:outputText  value="#{transaction_approval.transactor_names}"/>
-                        <h:outputLabel  value="#{langsys['Currency']}:"/>
-                        <h:outputText  value="#{transaction_approval.currency_code}"/>
-                        <h:outputLabel  value="#{langsys['Transactor']}:"/>
-                        <h:outputText  value="#{transactorBean.findTransactor(ta.transactor_id).getTransactorNames()}"/>
-                        <h:outputLabel  value="#{langsys['Store']} #{langsys['Date']}:"/>
-                        <h:outputText  value="#{storeBean.getStore(ta.store_id).getStoreName()}"/>
-                        <h:outputLabel value="#{langsys['Amount']} #{langsys['Tendered']}:"/>
-                        <h:outputText  value="#{transaction_approval.amount_tendered}">
-                            <f:convertNumber pattern="###,###.#" locale="#{utilityBean.convertLocaleToString()}"/>
-                        </h:outputText>
+
+                    <!--items-->
+                    <h:panelGrid id="vTransactionGrid">
+                        <h:panelGrid id="IpgrdSalesInvoice" columns="1">
+                            <h:panelGrid columns="1" style=" margin: 0px;background-color: gray;text-align: center;-webkit-print-color-adjust: exact;">
+                                <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 18pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">#{langout[transactionTypeBean.getTransactionType(transaction_approval.transaction_type_id).getTransactionOutputLabel()]}</h:outputLabel>
+                            </h:panelGrid>
+
+                            <h:panelGrid id="IpgrdSalesInvoiceStatus" style="margin: 0px;" bgcolor="#{transaction_approval.approval_status eq 1 ? 'amber' : transaction_approval.approval_status eq 2 ? 'green' : transaction_approval.approval_status eq 3 ? 'red' : transaction_approval.approval_status eq 4 ? 'blue' : 'grey' }" columns="2">
+                                <h:outputLabel style="font-size: 12px; font-weight: bold;" value="#{langsys['Approval']} #{langsys['Status']}:"/>
+                                <h:outputLabel style="font-size: 12px; font-weight: bold;" value="#{transaction_approval.approval_status eq 0 ? 'Submitted' : transaction_approval.approval_status eq 1 ? 'Approved' : transaction_approval.approval_status eq 2 ? 'Processed' : transaction_approval.approval_status eq 3 ? 'Rejected' : 'Recalled'}" />
+                            </h:panelGrid>
+
+                            <h:panelGrid style=" margin: 0px;" columns="2" rendered="#{transaction_approval.transactor_id>0}">
+                                <h:outputLabel style="font-size: 12px;" value="#{langout[menuItemBean.menuItemObj.CUSTOMER_NAME]}:"/>
+                                <h:outputLabel style="font-size: 12px;" value="#{transactorBean.findTransactor(transaction_approval.transactor_id).getTransactorNames()}"/>
+                                <h:outputLabel style="font-size: 12px;" value="#{langout['Tax']} #{langout['Id']} #{langout['No.']}:" rendered="#{transactorBean.findTransactor(transaction_approval.transactor_id).taxIdentity.length()>0}"/>
+                                <h:outputLabel style="font-size: 12px;" value="#{transactorBean.findTransactor(transaction_approval.transactor_id).taxIdentity}" rendered="#{transactorBean.findTransactor(transaction_approval.transactor_id).taxIdentity.length()>0}"/>
+                                <h:outputLabel style="font-size: 12px;" value="#{langout['Phone']}:" rendered="#{transactorBean.findTransactor(transaction_approval.transactor_id).phone.length()>0}"/>
+                                <h:outputLabel style="font-size: 12px;" value="#{transactorBean.findTransactor(transaction_approval.transactor_id).phone}" rendered="#{transactorBean.findTransactor(transaction_approval.transactor_id).phone.length()>0}"/>
+                            </h:panelGrid>
+
+                            <h:panelGrid id="IpgrdSalesInvoiceItems">
+                                <p:dataTable id="IdtblSalesInvoiceItems" tableStyle="width:auto;"  value="#{transaction_approvalBean.transItemList}" var="ti"                                                                  
+                                             paginator="false" 
+                                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
+                                             rowsPerPageTemplate="50,100,400,800,1000,2000"> 
+                                    <p:column>
+                                        <!-- column header -->
+                                        <f:facet name="header">#{langout['ITEMS']}(#{transaction_approvalBean.transItemList.size()})</f:facet>
+                                        <!-- row record -->
+                                        <h:outputLabel style="font-size: 12px;" value="#{itemBean.findItem(ti.itemId).getDescription()}" escape="false" />
+                                        <h:outputLabel style="font-size: 10px;" value=" BN:#{ti.batchno}" escape="false" rendered="#{ti.batchno.length() gt 0 and parameter_listBean.getParameter_listByContextNameMemory('INVOICE','SHOW_BATCH_ON_PRINTOUT').parameter_value eq '1'}"/>
+                                        <h:outputLabel style="font-size: 10px;" value=" ED:#{utilityBean.formatDate(ti.itemExpryDate)}" escape="false" rendered="#{ti.itemExpryDate.toString().length() gt 0 and parameter_listBean.getParameter_listByContextNameMemory('INVOICE','SHOW_BATCH_ON_PRINTOUT').parameter_value eq '1'}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <!-- column header -->
+                                        <f:facet name="header">#{langout['QTY']}(#{utilityBean.formatNumber('###,###.###',transItemBean.getTransItemsTotalQty(transaction_approvalBean.transItemList))})</f:facet>
+                                        <!-- row record -->
+                                        <h:outputLabel style="font-size: 10px;" value="#{ti.itemQty}">
+                                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                        </h:outputLabel> 
+                                        <h:outputLabel style="font-size: 10px;" value="#{ti.unitSymbol}"/>
+                                        <h:outputLabel style="font-size: 10px;" value="@" rendered="#{ti.hide_unit_price_invoice eq 0}"/>
+                                        <h:outputLabel style="font-size: 10px;" value="#{ti.unitPriceIncVat}" rendered="#{ti.hide_unit_price_invoice eq 0}">
+                                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                        </h:outputLabel>
+                                    </p:column>
+                                    <p:column>
+                                        <!-- column header -->
+                                        <f:facet name="header">#{langout['AMOUNT']}</f:facet>
+                                        <!-- row record -->
+                                        <h:outputLabel style="font-size: 12px;" value="#{ti.amountIncVat}">
+                                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                        </h:outputLabel>
+                                    </p:column>
+                                </p:dataTable>
+                            </h:panelGrid>
+
+                            <h:panelGrid id="IpgrdSalesInvoiceTotals" style=" margin: 0px;" columns="2">
+                                <h:outputLabel style="font-size: 12px; font-weight: bold;" value="#{langout['TOTAL']} (#{transBean.getTransFromHist(transaction_approval.transaction_hist_id).currencyCode}):"/>
+                                <h:outputLabel style="font-size: 12px; font-weight: bold;" id="IolblSalesInvoiceGrandTotal" value="#{transaction_approval.grand_total}">
+                                    <f:convertNumber pattern="#{accCurrencyBean.getNumberFormatByCurrency(transBean.getTransFromHist(transaction_approval.transaction_hist_id).currencyCode)}" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputLabel>
+                                <h:outputLabel style="font-size: 12px; font-weight: bold;" value="#{langout['TENDERED']} #{langout['AMOUNT']}:"/>
+                                <h:outputLabel style="font-size: 12px; font-weight: bold;" id="IolblSalesInvoiceAmountTendered" value="#{transaction_approval.amount_tendered}">
+                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputLabel>
+                            </h:panelGrid>
+
+                            <h:panelGrid id="IpgrdSalesInvoiceFooter12" style=" margin: 0px;" columns="2">
+                                <h:outputLabel value="#{langout['Added']} #{langout['by']}: "/>
+                                <h:outputLabel value="#{userDetailBean.getUserDetail(transaction_approval.request_by_id).firstName} #{userDetailBean.getUserDetail(transaction_approval.request_by_id).secondName}"/>
+                                <h:outputLabel style="font-size: 12px;" value="#{langout['Add']} #{langout['Date']}:"/>
+                                <h:outputLabel style="font-size: 12px;" value="#{utilityBean.formatDateTime(transaction_approval.request_date)}"/>
+                            </h:panelGrid>
+                        </h:panelGrid>
                     </h:panelGrid>
 
                 </h:panelGroup>
