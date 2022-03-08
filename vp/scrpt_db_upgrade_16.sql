@@ -30,9 +30,29 @@ VALUES('scrpt_db_upgrade_16',28,Now(),'6.0','');
 
 SET FOREIGN_KEY_CHECKS=0;
 DROP INDEX  Trans_to_TransItem_on_TransId ON transaction_item;
+CREATE TABLE transaction_back AS SELECT * FROM transaction;
+CREATE TABLE transaction_item_back AS SELECT * FROM transaction_item;
+CREATE TABLE pay_back AS SELECT * FROM pay;
+CREATE TABLE pay_trans_back AS SELECT * FROM pay_trans;
 ALTER TABLE transaction CHANGE COLUMN transaction_id transaction_id BIGINT(20) NOT NULL AUTO_INCREMENT ;
 ALTER TABLE transaction_item CHANGE COLUMN transaction_item_id transaction_item_id BIGINT(20) NOT NULL AUTO_INCREMENT ;
 SET FOREIGN_KEY_CHECKS=1;
+-- A) Check if tables has been altered successfully
+-- SELECT COUNT(*) FROM transaction;
+-- SELECT COUNT(*) FROM transaction_item;
+-- SELECT COUNT(*) FROM pay;
+-- SELECT COUNT(*) FROM pay_trans;
+-- B) Delete backup tables if tables has been altered successfully
+-- DROP TABLE IF EXISTS transaction_back;
+-- DROP TABLE IF EXISTS transaction_item_back;
+-- DROP TABLE IF EXISTS pay_back;
+-- DROP TABLE IF EXISTS pay_trans_back;
+-- C) Restore tables if alter statement deleted the tables AND MANUALLY SET THE AUTO_INCREMENT FOR transaction and transaction_item IN WORKBENCH.
+-- CREATE TABLE transaction AS SELECT * FROM transaction_back;
+-- CREATE TABLE transaction_item AS SELECT * FROM transaction_item_back;
+-- CREATE TABLE pay AS SELECT * FROM pay_back;
+-- CREATE TABLE pay_trans AS SELECT * FROM pay_trans_back;
+
 UPDATE transaction_type SET trans_number_format='IYMW' WHERE transaction_type_id>0 AND length(ifnull(trans_number_format,''))=0;
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_16',37,Now(),'6.0','');

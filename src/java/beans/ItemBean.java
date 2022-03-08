@@ -432,7 +432,7 @@ public class ItemBean implements Serializable {
             cs.setInt("in_category_id", aItem.getCategoryId());
             cs.setInt("in_sub_category_id", aItem.getSubCategoryId());
             cs.setInt("in_unit_id", aItem.getUnitId());
-            cs.setInt("in_reorder_level", aItem.getReorderLevel());
+            cs.setDouble("in_reorder_level", aItem.getReorderLevel());
             cs.setDouble("in_unit_cost_price", aItem.getUnitCostPrice());
             cs.setDouble("in_unit_retailsale_price", aItem.getUnitRetailsalePrice());
             cs.setDouble("in_unit_wholesale_price", aItem.getUnitWholesalePrice());
@@ -597,7 +597,7 @@ public class ItemBean implements Serializable {
                 aItem.setUnitId(0);
             }
             try {
-                aItem.setReorderLevel(aResultSet.getInt("reorder_level"));
+                aItem.setReorderLevel(aResultSet.getDouble("reorder_level"));
             } catch (NullPointerException npe) {
                 aItem.setReorderLevel(0);
             }
@@ -808,7 +808,7 @@ public class ItemBean implements Serializable {
                 aItem.setUnitSymbol("");
             }
             try {
-                aItem.setReorderLevel(aResultSet.getInt("reorder_level"));
+                aItem.setReorderLevel(aResultSet.getDouble("reorder_level"));
             } catch (NullPointerException npe) {
                 aItem.setReorderLevel(0);
             }

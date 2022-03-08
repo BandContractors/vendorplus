@@ -1,0 +1,17 @@
+UPDATE item SET add_date=Now() WHERE item_id>0 AND YEAR(add_date)=0;
+UPDATE item SET edit_date=Now() WHERE item_id>0 AND YEAR(edit_date)=0;
+CREATE TABLE item_back AS SELECT * FROM item;
+ALTER TABLE item CHANGE COLUMN reorder_level reorder_level DOUBLE NOT NULL ;
+-- A) Check if tables has been altered successfully
+-- SELECT COUNT(*) FROM item;
+-- B) Delete backup tables if tables has been altered successfully
+-- DROP TABLE IF EXISTS item_back;
+-- C) Restore tables if alter statement deleted the tables AND MANUALLY SET THE DOUBLE as the datatype for reorder_level IN WORKBENCH.
+-- CREATE TABLE item AS SELECT * FROM item_back;
+
+create table item_store_reorder 
+(item_store_reorder_id BIGINT(20) not null auto_increment,store_id INT(11),reorder_level DOUBLE, primary key (item_store_reorder_id));
+
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_17',15,Now(),'6.0','');
+

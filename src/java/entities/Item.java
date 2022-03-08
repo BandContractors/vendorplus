@@ -27,7 +27,7 @@ public class Item implements Serializable {
     private int UnitId;
     private String UnitSymbol;
     private String Unit_symbol_tax;
-    private int ReorderLevel;
+    private double ReorderLevel;
     private double UnitCostPrice;
     private double UnitRetailsalePrice;
     private double UnitWholesalePrice;
@@ -187,14 +187,14 @@ public class Item implements Serializable {
     /**
      * @return the ReorderLevel
      */
-    public int getReorderLevel() {
+    public double getReorderLevel() {
         return ReorderLevel;
     }
 
     /**
      * @param ReorderLevel the ReorderLevel to set
      */
-    public void setReorderLevel(int ReorderLevel) {
+    public void setReorderLevel(double ReorderLevel) {
         this.ReorderLevel = ReorderLevel;
     }
 
