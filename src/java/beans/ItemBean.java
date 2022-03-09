@@ -8,6 +8,7 @@ import entities.Category;
 import entities.GroupRight;
 import entities.Item;
 import entities.Item_code_other;
+import entities.Item_store_reorder;
 import entities.Item_tax_map;
 import entities.Item_unspsc;
 import entities.Location;
@@ -86,6 +87,8 @@ public class ItemBean implements Serializable {
     private MenuItemBean menuItemBean;
     private List<Item_code_other> Item_code_otherList;
     private Item_code_other Item_code_otherObj;
+    private Item_store_reorder Item_store_reorderObj;
+    private List<Item_store_reorder> Item_store_reorderList;
 
     public void refreshInventoryType(Item aItem, String aItemPurpose) {
         try {
@@ -1343,6 +1346,32 @@ public class ItemBean implements Serializable {
     }
 
     public void displayItemCodes() {
+        try {
+            //clear
+            this.Item_code_otherObj.setItem_code_other_id(0);
+            this.Item_code_otherObj.setDescription("");
+            this.Item_code_otherObj.setItem_id(0);
+            this.Item_code_otherObj.setItem_code("");
+            try {
+                this.Item_code_otherList.clear();
+            } catch (Exception e) {
+                this.Item_code_otherList = new ArrayList<>();
+            }
+            //set detail
+            if (this.ItemObj.getItemId() > 0) {
+                //set Item_code_other
+                this.Item_code_otherObj.setDescription(this.ItemObj.getDescription());
+                this.Item_code_otherObj.setItem_id(this.ItemObj.getItemId());
+                this.Item_code_otherObj.setItem_code_other_id(0);
+                //refresh list
+                this.refreshItem_code_otherList(this.ItemObj);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+    
+    public void displayItemReorderLevels() {
         try {
             //clear
             this.Item_code_otherObj.setItem_code_other_id(0);
@@ -3219,6 +3248,16 @@ public class ItemBean implements Serializable {
         }
     }
 
+    public void initItem_store_reorderObj() {
+        if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
+            // Skip ajax requests.
+        } else {
+            if (null == this.Item_store_reorderObj) {
+                this.Item_store_reorderObj = new Item_store_reorder();
+            }
+        }
+    }
+
     public void initStockLocation() {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -4155,5 +4194,33 @@ public class ItemBean implements Serializable {
      */
     public void setItem_code_otherObj(Item_code_other Item_code_otherObj) {
         this.Item_code_otherObj = Item_code_otherObj;
+    }
+
+    /**
+     * @return the Item_store_reorderObj
+     */
+    public Item_store_reorder getItem_store_reorderObj() {
+        return Item_store_reorderObj;
+    }
+
+    /**
+     * @param Item_store_reorderObj the Item_store_reorderObj to set
+     */
+    public void setItem_store_reorderObj(Item_store_reorder Item_store_reorderObj) {
+        this.Item_store_reorderObj = Item_store_reorderObj;
+    }
+
+    /**
+     * @return the Item_store_reorderList
+     */
+    public List<Item_store_reorder> getItem_store_reorderList() {
+        return Item_store_reorderList;
+    }
+
+    /**
+     * @param Item_store_reorderList the Item_store_reorderList to set
+     */
+    public void setItem_store_reorderList(List<Item_store_reorder> Item_store_reorderList) {
+        this.Item_store_reorderList = Item_store_reorderList;
     }
 }

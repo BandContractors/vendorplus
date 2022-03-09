@@ -10,7 +10,7 @@ ALTER TABLE item CHANGE COLUMN reorder_level reorder_level DOUBLE NOT NULL ;
 -- CREATE TABLE item AS SELECT * FROM item_back;
 
 create table item_store_reorder 
-(item_store_reorder_id BIGINT(20) not null auto_increment,store_id INT(11),reorder_level DOUBLE, primary key (item_store_reorder_id));
+(item_store_reorder_id BIGINT(20) not null auto_increment,item_id bigint(20),store_id INT(11),reorder_level DOUBLE, primary key (item_store_reorder_id));
 
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_17',15,Now(),'6.0','');
