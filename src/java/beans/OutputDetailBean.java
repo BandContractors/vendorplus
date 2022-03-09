@@ -3,6 +3,7 @@ package beans;
 import connections.DBConnection;
 import entities.Pay;
 import entities.PayTrans;
+import entities.Transaction_approval;
 import entities.Transaction_tax_map;
 import sessions.GeneralUserSetting;
 import java.io.Serializable;
@@ -97,6 +98,15 @@ public class OutputDetailBean implements Serializable {
                     aOutputDetail.setTrans_user_detail(new UserDetailBean().getUserDetail(aOutputDetail.getPay().getAddUserDetailId()));
                 } else {
                     aOutputDetail.setTrans_user_detail(new UserDetailBean().getUserDetail(aOutputDetail.getTrans().getTransactionUserDetailId()));
+                }
+            } catch (Exception e) {
+            }
+            try {
+                if (aOutputDetail.getTrans().getTransactionTypeId() == 2) {
+                    Transaction_approval ta = new Transaction_approvalBean().getTransaction_approval(aOutputDetail.getTrans().getTransactionId(), aOutputDetail.getTrans().getTransactionTypeId(), aOutputDetail.getTrans().getTransactionReasonId());
+                    if (null != ta) {
+                        aOutputDetail.setApprove_user_detail(new UserDetailBean().getUserDetail(ta.getStatus_by_id()));
+                    }
                 }
             } catch (Exception e) {
             }

@@ -50,6 +50,7 @@ public class OutputDetail implements Serializable {
     private List<TransProductionItem> trans_prod_items = new ArrayList<>();
     private String TransAmountInWords;
     private String PayAmountInWords;
+    private UserDetail approve_user_detail;
 
     public OutputDetail() {
     }
@@ -402,5 +403,19 @@ public class OutputDetail implements Serializable {
      */
     public void setPayAmountInWords(String PayAmountInWords) {
         this.PayAmountInWords = PayAmountInWords;
+    }
+
+    /**
+     * @return the approve_user_detail
+     */
+    public UserDetail getApprove_user_detail() {
+        return approve_user_detail;
+    }
+
+    /**
+     * @param approve_user_detail the approve_user_detail to set
+     */
+    public void setApprove_user_detail(UserDetail approve_user_detail) {
+        this.approve_user_detail = approve_user_detail;
     }
 }

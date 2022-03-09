@@ -220,13 +220,13 @@
                             </h:panelGrid>
                         </h:panelGrid>
 
-                        <h:panelGrid id="IpgrdSalesInvoiceFooter1" style="width: 290px; margin: 0px;border-bottom-style: dotted" columns="2">
-                            <h:outputLabel value="#{generalUserSetting.outputDetailParent.transaction_type.transactionUserLabel}: "/>
-                            <h:outputLabel value="#{generalUserSetting.outputDetailParent.trans_user_detail.firstName} #{generalUserSetting.outputDetailParent.trans_user_detail.secondName}"/>
-                        </h:panelGrid>
-                        <h:panelGrid id="IpgrdSalesInvoiceFooter12" style="width: 290px; margin: 0px;border-bottom-style: dotted" columns="2" rendered="#{generalUserSetting.outputDetailParent.trans.transactionUserDetailId!=generalUserSetting.outputDetailParent.trans.addUserDetailId}">
-                            <h:outputLabel value="#{langout['Added']} #{langout['by']}: "/>
-                            <h:outputLabel value="#{generalUserSetting.outputDetailParent.add_user_detail.firstName} #{generalUserSetting.outputDetailParent.add_user_detail.secondName}"/>
+                        <h:panelGrid id="IpgrdSalesInvoiceFooter1" style="width: 290px; margin: 0px;border-bottom-style: none;" columns="2">
+                            <h:outputLabel value="#{generalUserSetting.outputDetailParent.transaction_type.transactionUserLabel}: " style="font-size: 12px;"/>
+                            <h:outputLabel value="#{generalUserSetting.outputDetailParent.trans_user_detail.firstName} #{generalUserSetting.outputDetailParent.trans_user_detail.secondName}" style="font-size: 12px;"/>
+                            <h:outputLabel value="#{langout['Approved']} #{langout['By']}: " style="font-size: 12px;" rendered="#{generalUserSetting.outputDetailParent.approve_user_detail.userDetailId gt 0}"/>
+                            <h:outputLabel value="#{generalUserSetting.outputDetailParent.approve_user_detail.firstName} #{generalUserSetting.outputDetailParent.approve_user_detail.secondName}" style="font-size: 12px;" rendered="#{generalUserSetting.outputDetailParent.approve_user_detail.userDetailId gt 0}"/>
+                            <h:outputLabel value="#{langout['Added']} #{langout['By']}: " style="font-size: 12px;" rendered="#{generalUserSetting.outputDetailParent.trans.transactionUserDetailId!=generalUserSetting.outputDetailParent.trans.addUserDetailId}"/>
+                            <h:outputLabel value="#{generalUserSetting.outputDetailParent.add_user_detail.firstName} #{generalUserSetting.outputDetailParent.add_user_detail.secondName}" style="font-size: 12px;" rendered="#{generalUserSetting.outputDetailParent.trans.transactionUserDetailId!=generalUserSetting.outputDetailParent.trans.addUserDetailId}"/>
                         </h:panelGrid>
                         <h:panelGrid id="pnlgBarCode" columns="1" style="margin: 0px;border:none;" rendered="#{generalUserSetting.outputDetailParent.trans.qr_code_tax.length() gt 0}">  
                             <p:barcode id="barCODEqr" value="#{generalUserSetting.outputDetailParent.trans.qr_code_tax}" type="qr" style="width: 176px;height: 128px;"/>

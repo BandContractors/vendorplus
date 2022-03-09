@@ -507,6 +507,24 @@ public class Transaction_approvalBean implements Serializable {
         return ta;
     }
 
+    public Transaction_approval getTransaction_approval(long aTransId, int aTransTypeId, int aTransReasId) {
+        String sql = "SELECT * FROM transaction_approval WHERE transaction_id=" + aTransId + " AND transaction_type_id=" + aTransTypeId + " AND transaction_reason_id=" + aTransReasId;
+        ResultSet rs = null;
+        Transaction_approval ta = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                ta = new Transaction_approval();
+                this.setTransaction_approvalFromResultset(ta, rs);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return ta;
+    }
+
     public void recallApprovalCall(List<Transaction_approval> aList, int aStoreId, int aRequestById, int aTransTypeId, int aTransReasonId, long aTransaction_approval_id) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -579,7 +597,7 @@ public class Transaction_approvalBean implements Serializable {
             Transaction_approvalTo.setStore_id(Transaction_approvalFrom.getStore_id());
             Transaction_approvalTo.setAmount_tendered(Transaction_approvalFrom.getAmount_tendered());
             Transaction_approvalTo.setTransaction_id(Transaction_approvalFrom.getTransaction_id());
-            
+
             //get trans Items
             this.getTransItemsByTransactionHistId(Transaction_approvalFrom.getTransaction_hist_id());
         } catch (Exception e) {
