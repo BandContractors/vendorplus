@@ -14,6 +14,7 @@ public class Item_store_reorder implements Serializable {
     private int store_id;
     private double reorder_level;
     private String description;
+    private String store_name;
 
     /**
      * @return the item_store_reorder_id
@@ -84,5 +85,19 @@ public class Item_store_reorder implements Serializable {
     public void setDescription(String description) {
         this.description = description;
     }
-    
+
+    /**
+     * @return the store_name
+     */
+    public String getStore_name() {
+        return store_name;
+    }
+
+    /**
+     * @param store_name the store_name to set
+     */
+    public void setStore_name(String store_name) {
+        this.store_name = store_name;
+    }
+
 }

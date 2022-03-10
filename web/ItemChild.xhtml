@@ -152,7 +152,7 @@
                             <f:selectItem itemLabel="" itemValue="0"/>
                             <f:selectItems value="#{unitBean.units}" var="u" itemLabel="#{u.unitName}" itemValue="#{u.unitId}"/>
                         </h:selectOneMenu>
-                        <p:commandLink value="#{langsys['Reorder']} #{langsys['Level']}:" action="#{itemBean.displayItemReorderLevels()}" oncomplete="PF('sbarItemReorder').show()" update="formMain:pnlgItemReorder1 formMain:pnlgItemReorder2" disabled="#{itemBean.itemObj.itemId eq 0}"/>
+                        <p:commandLink value="#{langsys['Reorder']} #{langsys['Level']}:" action="#{itemBean.displayItemReorderLevels()}" oncomplete="PF('sbarItemReorder').show()" update="formMain:pnlgItemReorder1 formMain:pnlgItemReorder2"/>
                         <h:inputText id="itxtReorderLevel" value="#{itemBean.itemObj.reorderLevel}" autocomplete="off" style="width: 193px"/>
                         <h:outputLabel value="#{langsys['Account']} #{langsys['Name']}:"/>
                         <h:selectOneMenu id="menuExpenseAccountCode" value="#{itemBean.itemObj.expenseAccountCode}" style="width: 200px;background-color: #{listOptionBean.getColorByBoolean(!generalUserSetting.currentItemPurpose.equals('Asset'))}" disabled="#{generalUserSetting.currentItemPurpose.equals('Asset')}">
@@ -507,25 +507,25 @@
                 </h:panelGrid>
             </p:sidebar>
             <p:sidebar widgetVar="sbarItemReorder" position="bottom" baseZIndex="10000" style="height: 600px;">
-                <h:panelGrid id="pnlgItemReorder1" columns="1">
-                    <h:outputLabel value="#{langsys['Reorder']} #{langsys['Level']} #{langsys['for']} : #{itemBean.item_store_reorderObj.description}" style="font-weight: bold;"/>
+                <h:panelGrid id="pnlgItemReorder1" columns="1" style="text-align: center;">
+                    <h:outputLabel value="#{langsys['Reorder']} #{langsys['Level']} #{langsys['For']}" style="font-weight: bold;"/>
+                    <h:outputLabel value="#{itemBean.item_store_reorderObj.description}"/>
                 </h:panelGrid>
                 <h:panelGrid id="pnlgItemReorder2" columns="1" style="text-align: center;">
                     <p:dataTable id="tblItemReorder" rowIndexVar="rowIndex" tableStyle="width:auto;" var="ro" value="#{itemBean.item_store_reorderList}">
                         <p:column headerText="#">
                             <h:outputText value="#{rowIndex+1} "/>
                         </p:column>
-                        <p:column headerText="#{langsys['Store']}" style="text-align: left;">
-                            <h:outputText value="#{ro.store_id}"/>
+                        <p:column headerText="#{langsys[companySetting.getStoreEquivName()]}" style="text-align: left;">
+                            <h:outputText value="#{ro.store_name}"/>
                         </p:column>
                         <p:column headerText="#{langsys['Reorder']} #{langsys['Level']}" style="text-align: left;">
-                            <h:outputText value="#{ro.reorder_level}"/>
+                            <h:inputText value="#{ro.reorder_level}" autocomplete="off" style="width: 100px;">
+                                <f:ajax event="keyup" listener="#{itemBean.setReorderLevelEdited(1)}"/>
+                            </h:inputText>
                         </p:column>
                     </p:dataTable>
-                    <h:panelGrid columns="3">
-                        <p:commandButton disabled="true" id="cmdbtnItemReorder" value="Save" actionListener="#{itemBean.saveItem_code_otherCall(itemBean.item_code_otherObj)}" update="formMain:tblItemReorder formMain:growlIRL"/>
-                    </h:panelGrid>
-                    <p:growl id="growlIRL"/>
+                    <p:commandButton value="#{langsys['CLOSE']}" oncomplete="PF('sbarItemReorder').hide()" style="height: 60px;width: 220px;"/>
                 </h:panelGrid>
             </p:sidebar>
         </h:form>

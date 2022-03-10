@@ -89,6 +89,7 @@ public class ItemBean implements Serializable {
     private Item_code_other Item_code_otherObj;
     private Item_store_reorder Item_store_reorderObj;
     private List<Item_store_reorder> Item_store_reorderList;
+    private int ReorderLevelEdited;
 
     public void refreshInventoryType(Item aItem, String aItemPurpose) {
         try {
@@ -294,6 +295,18 @@ public class ItemBean implements Serializable {
         } else {
             try {
                 if (this.saveValidatedItem(this.ItemObj) == 1) {
+                    //REORDER LEVELS
+                    if (this.ReorderLevelEdited == 1) {
+                        if (this.ItemObj.getItemId() > 0) {
+                            this.saveItem_store_reorderCall(this.ItemObj.getItemId());
+                        } else if (this.ItemObj.getItemId() == 0 && this.ItemObj.getDescription().length() > 0) {
+                            Item item = this.getItemByDesc(this.ItemObj.getDescription());
+                            if (null != item) {
+                                this.saveItem_store_reorderCall(item.getItemId());
+                            }
+                        }
+                    }
+                    //ITEM TAX MAPPING
                     new Item_tax_mapBean().saveItem_tax_mapCall(this.ItemObj.getDescription(), this.ItemObj.getItem_code_tax(), "");
                     //check sync status
                     String SyncStatus = "";
@@ -993,7 +1006,7 @@ public class ItemBean implements Serializable {
                 aItem_code_other.setItem_code_other_id(0);
             }
             try {
-                aItem_code_other.setItem_id(aResultSet.getInt("item_id"));
+                aItem_code_other.setItem_id(aResultSet.getLong("item_id"));
             } catch (Exception e) {
                 aItem_code_other.setItem_id(0);
             }
@@ -1006,6 +1019,38 @@ public class ItemBean implements Serializable {
                 aItem_code_other.setDescription(aResultSet.getString("description"));
             } catch (Exception e) {
                 aItem_code_other.setDescription("");
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void setItem_store_reorderFromResultset(Item_store_reorder aItem_store_reorder, ResultSet aResultSet) {
+        try {
+            try {
+                aItem_store_reorder.setItem_store_reorder_id(aResultSet.getLong("item_store_reorder_id"));
+            } catch (Exception e) {
+                aItem_store_reorder.setItem_store_reorder_id(0);
+            }
+            try {
+                aItem_store_reorder.setItem_id(aResultSet.getLong("item_id"));
+            } catch (Exception e) {
+                aItem_store_reorder.setItem_id(0);
+            }
+            try {
+                aItem_store_reorder.setStore_id(aResultSet.getInt("store_id"));
+                if (aItem_store_reorder.getStore_id() > 0) {
+                    aItem_store_reorder.setStore_name(new StoreBean().getStore(aItem_store_reorder.getStore_id()).getStoreName());
+                } else {
+                    aItem_store_reorder.setStore_name("");
+                }
+            } catch (Exception e) {
+                aItem_store_reorder.setStore_id(0);
+            }
+            try {
+                aItem_store_reorder.setReorder_level(aResultSet.getDouble("reorder_level"));
+            } catch (Exception e) {
+                aItem_store_reorder.setReorder_level(0);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -1278,6 +1323,7 @@ public class ItemBean implements Serializable {
                 this.ItemObj.setItem_code_tax(itmap.getItem_code_tax());
                 this.ItemObj.setIs_synced_tax(itmap.getIs_synced());
             }
+            this.setReorderLevelEdited(0);
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -1370,27 +1416,27 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void displayItemReorderLevels() {
         try {
-            //clear
-            this.Item_code_otherObj.setItem_code_other_id(0);
-            this.Item_code_otherObj.setDescription("");
-            this.Item_code_otherObj.setItem_id(0);
-            this.Item_code_otherObj.setItem_code("");
-            try {
-                this.Item_code_otherList.clear();
-            } catch (Exception e) {
-                this.Item_code_otherList = new ArrayList<>();
-            }
-            //set detail
-            if (this.ItemObj.getItemId() > 0) {
-                //set Item_code_other
-                this.Item_code_otherObj.setDescription(this.ItemObj.getDescription());
-                this.Item_code_otherObj.setItem_id(this.ItemObj.getItemId());
-                this.Item_code_otherObj.setItem_code_other_id(0);
+            if (this.ReorderLevelEdited == 0) {
+                //clear
+                /*
+                 this.Item_store_reorderObj.setItem_store_reorder_id(0);
+                 this.Item_store_reorderObj.setDescription("");
+                 this.Item_store_reorderObj.setItem_id(0);
+                 this.Item_store_reorderObj.setReorder_level(0);
+                 this.Item_store_reorderObj.setStore_id(0);
+                 */
+                try {
+                    this.Item_store_reorderList.clear();
+                } catch (Exception e) {
+                    this.Item_store_reorderList = new ArrayList<>();
+                }
+                //set object
+                this.Item_store_reorderObj.setDescription(this.ItemObj.getDescription());
                 //refresh list
-                this.refreshItem_code_otherList(this.ItemObj);
+                this.refreshItem_store_reorderList(this.ItemObj);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -1472,6 +1518,7 @@ public class ItemBean implements Serializable {
                 this.setSearchItemDesc("");
                 this.refreshStockLocation(0);
                 this.refreshItemsList(this.getSearchItemDesc());
+                this.setReorderLevelEdited(0);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -1525,6 +1572,7 @@ public class ItemBean implements Serializable {
                 aItem.setVat_rate_order(this.getVatRateOrder(new Parameter_listBean().getParameter_listByContextName("GENERAL", "TAX_VAT_RATE_ORDER").getParameter_value()));
                 this.setSearchItemDesc("");
                 this.refreshStockLocation(0);
+                this.setReorderLevelEdited(0);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -3732,6 +3780,28 @@ public class ItemBean implements Serializable {
         }
     }
 
+    public void refreshItem_store_reorderList(Item aItem) {
+        String sql;
+        sql = "select "
+                + "ifnull(r.item_store_reorder_id,0) as item_store_reorder_id,"
+                + "ifnull(r.store_id,s.store_id) as store_id,ifnull(r.item_id," + aItem.getItemId() + ") as item_id,ifnull(r.reorder_level,0) as reorder_level "
+                + "from store s left join item_store_reorder r on s.store_id=r.store_id and r.item_id=" + aItem.getItemId();
+        ResultSet rs = null;
+        Item_store_reorder ro = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                ro = new Item_store_reorder();
+                this.setItem_store_reorderFromResultset(ro, rs);
+                this.Item_store_reorderList.add(ro);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public int saveItem_code_other(Item_code_other aItem_code_other) {
         int saved = 0;
         String sql = "INSERT INTO item_code_other(item_id,item_code) VALUES(?,?)";
@@ -3748,6 +3818,48 @@ public class ItemBean implements Serializable {
                     ps.setString(2, aItem_code_other.getItem_code());
                 } catch (NullPointerException npe) {
                     ps.setString(2, "");
+                }
+                ps.executeUpdate();
+                saved = 1;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return saved;
+    }
+
+    public int saveItem_store_reorder(Item_store_reorder aItem_store_reorder) {
+        int saved = 0;
+        String sql = "";
+        try {
+            if (null != aItem_store_reorder) {
+                if (aItem_store_reorder.getItem_store_reorder_id() == 0) {
+                    sql = "INSERT INTO item_store_reorder(item_id,store_id,reorder_level) VALUES(?,?,?)";
+                } else if (aItem_store_reorder.getItem_store_reorder_id() > 0) {
+                    sql = "UPDATE item_store_reorder SET item_id=?,store_id=?,reorder_level=? WHERE item_store_reorder_id=" + aItem_store_reorder.getItem_store_reorder_id();
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            if (null != aItem_store_reorder) {
+                try {
+                    ps.setLong(1, aItem_store_reorder.getItem_id());
+                } catch (NullPointerException npe) {
+                    ps.setLong(1, 0);
+                }
+                try {
+                    ps.setInt(2, aItem_store_reorder.getStore_id());
+                } catch (NullPointerException npe) {
+                    ps.setInt(2, 0);
+                }
+                try {
+                    ps.setDouble(3, aItem_store_reorder.getReorder_level());
+                } catch (NullPointerException npe) {
+                    ps.setDouble(3, 0);
                 }
                 ps.executeUpdate();
                 saved = 1;
@@ -3792,6 +3904,30 @@ public class ItemBean implements Serializable {
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
+    }
+
+    public int saveItem_store_reorderCall(long aItem_id) {
+        int saved = 0;
+        try {
+            //this.Item_store_reorderObj;
+            int savedN = 0;
+            for (int i = 0; i < this.Item_store_reorderList.size(); i++) {
+                if (this.Item_store_reorderList.get(i).getItem_store_reorder_id() == 0) {
+                    //Insert
+                    this.Item_store_reorderList.get(i).setItem_id(aItem_id);
+                    savedN = savedN + this.saveItem_store_reorder(this.Item_store_reorderList.get(i));
+                } else if (this.Item_store_reorderList.get(i).getItem_store_reorder_id() > 0) {
+                    //Update
+                    savedN = savedN + this.saveItem_store_reorder(this.Item_store_reorderList.get(i));
+                }
+            }
+            if (savedN == this.Item_store_reorderList.size()) {
+                saved = 1;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return saved;
     }
 
     public void deleteItem_code_otherCall(Item_code_other aItem_code_other) {
@@ -4222,5 +4358,19 @@ public class ItemBean implements Serializable {
      */
     public void setItem_store_reorderList(List<Item_store_reorder> Item_store_reorderList) {
         this.Item_store_reorderList = Item_store_reorderList;
+    }
+
+    /**
+     * @return the ReorderLevelEdited
+     */
+    public int getReorderLevelEdited() {
+        return ReorderLevelEdited;
+    }
+
+    /**
+     * @param ReorderLevelEdited the ReorderLevelEdited to set
+     */
+    public void setReorderLevelEdited(int ReorderLevelEdited) {
+        this.ReorderLevelEdited = ReorderLevelEdited;
     }
 }
