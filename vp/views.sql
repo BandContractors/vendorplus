@@ -316,6 +316,29 @@ CREATE OR REPLACE VIEW view_inventory_low_out_vw AS
 	END as stock_status 
 FROM view_inventory_low_out v;
 
+CREATE OR REPLACE VIEW view_inventory_low_out_per_store AS 
+	SELECT (CASE WHEN i.is_sale=1 THEN 1 ELSE 2 END) as stock_type_order,i.expense_type as stock_type,i.*,
+	(select ifnull(sum(s.currentqty),0) from stock s where s.item_id=i.item_id and s.store_id=ro.store_id) as qty_total,
+	c.category_name,u.unit_symbol,sc.sub_category_name,ro.reorder_level as reorder_level_ro,ro.store_id as store_id_ro  
+	FROM item i  
+    INNER JOIN item_store_reorder ro ON i.item_id=ro.item_id 
+    INNER JOIN store st on ro.store_id=st.store_id 
+	INNER JOIN category c ON i.category_id=c.category_id 
+	INNER JOIN unit u ON i.unit_id=u.unit_id 
+	LEFT JOIN sub_category sc ON i.sub_category_id=sc.sub_category_id 
+	WHERE i.is_asset=0 AND i.is_track=1;
+
+CREATE OR REPLACE VIEW view_inventory_low_out_per_store_vw AS 
+	SELECT v.*,
+	CASE
+		WHEN v.reorder_level_ro=0 THEN 'No Reorder Level' 
+		WHEN v.reorder_level_ro>0 and v.qty_total<=0 THEN 'Out of Stock' 
+		WHEN v.reorder_level_ro>0 and v.qty_total<=v.reorder_level_ro THEN 'Low Stock'  
+		WHEN v.reorder_level_ro>0 and v.qty_total>v.reorder_level_ro THEN 'Stocked'  
+		ELSE ''
+	END as stock_status 
+	FROM view_inventory_low_out_per_store v;
+
 CREATE OR REPLACE VIEW view_item_detail AS
 	SELECT i.*,c.category_name,sc.sub_category_name,u.unit_symbol,
 	CASE

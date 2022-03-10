@@ -79,7 +79,7 @@
                     </p:autoComplete>
                 </h:panelGrid>
                 <h:panelGrid columns="2">
-                    <p:outputLabel value="#{companySetting.getStoreEquivName()}:"/>
+                    <p:outputLabel value="#{langsys[companySetting.getStoreEquivName()]}"/>
                     <p:selectOneMenu id="menuFromStore" value="#{stock_ledger.store_id}" style="width: 200px;" >
                         <f:selectItem itemLabel="#{langsys['Select']}" itemValue="0"/>
                         <f:selectItems value="#{storeBean.stores}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>

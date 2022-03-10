@@ -33,7 +33,7 @@
             </h:panelGrid>
             <h:panelGrid id="pnlgFilter" columns="6" styleClass="clsPanelReportFilter">
                 <p:outputLabel value="#{langsys['Stock']} #{langsys['Type']}"/>
-                <p:outputLabel value="#{companySetting.getStoreEquivName()}"/>
+                <p:outputLabel value="#{langsys[companySetting.getStoreEquivName()]}"/>
                 <p:outputLabel value="#{langsys['Category']}"/>
                 <p:outputLabel value="#{langsys['From']} #{langsys['Expiry']} #{langsys['Date']}" id="lblDate1"/>
                 <p:outputLabel value="#{langsys['To']} #{langsys['Expiry']} #{langsys['Date']}" id="lblDate2"/>

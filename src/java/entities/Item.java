@@ -71,6 +71,7 @@ public class Item implements Serializable {
     private String item_code_tax;
     private int is_synced_tax;
     private String vat_rate_order;
+    private int store_id;
 
     /**
      * @return the ItemId
@@ -846,6 +847,20 @@ public class Item implements Serializable {
      */
     public void setVat_rate_order(String vat_rate_order) {
         this.vat_rate_order = vat_rate_order;
+    }
+
+    /**
+     * @return the store_id
+     */
+    public int getStore_id() {
+        return store_id;
+    }
+
+    /**
+     * @param store_id the store_id to set
+     */
+    public void setStore_id(int store_id) {
+        this.store_id = store_id;
     }
 
 }

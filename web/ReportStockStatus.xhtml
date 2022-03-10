@@ -34,6 +34,11 @@
             </h:panelGrid>
             <h:panelGrid id="pnlgFilter" columns="2" styleClass="clsPanelReportFilter">
                 <h:panelGrid columns="4">
+                    <p:outputLabel value="#{langsys[companySetting.getStoreEquivName()]}"/>
+                    <h:selectOneMenu id="menuFromStore" value="#{item.store_id}" style="width: 200px;">
+                        <f:selectItem itemLabel="" itemValue="0"/>
+                        <f:selectItems value="#{storeBean.stores}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
+                    </h:selectOneMenu>
                     <p:outputLabel value="#{langsys['Stock']} #{langsys['Type']}:"/>
                     <h:selectOneMenu id="menuStockType" value="#{item.expense_type}" style="width: 200px;" >
                         <f:selectItem itemLabel="" itemValue=""/>
@@ -42,12 +47,6 @@
                         <f:selectItem itemLabel="#{langsys['Raw Material']}" itemValue="Raw Material"/>
                         <f:selectItem itemLabel="#{langsys['Consumption']}" itemValue="Consumption"/>
                         <f:selectItem itemLabel="#{langsys['Services']}" itemValue="Services"/>
-                    </h:selectOneMenu>
-                    <p:outputLabel value="#{langsys['Item']} #{langsys['Type']}:"/>
-                    <h:selectOneMenu id="menuItemType" value="#{item.itemType}" style="width: 200px;">
-                        <f:selectItem itemLabel="" itemValue=""/>
-                        <f:selectItem itemLabel="#{langsys['PRODUCT']}" itemValue="PRODUCT"/>
-                        <f:selectItem itemLabel="#{langsys['SERVICE']}" itemValue="SERVICE"/>
                     </h:selectOneMenu>
 
                     <p:outputLabel value="#{langsys['Category']}:"/>
@@ -62,12 +61,19 @@
                         <f:selectItems value="#{subCategoryBean.getSubCategoriesByCategoryId(item.categoryId)}" var="s" itemLabel="#{s.subCategoryName}" itemValue="#{s.subCategoryId}"/>
                     </h:selectOneMenu>
 
+                    <p:outputLabel value="#{langsys['Item']} #{langsys['Type']}:"/>
+                    <h:selectOneMenu id="menuItemType" value="#{item.itemType}" style="width: 200px;">
+                        <f:selectItem itemLabel="" itemValue=""/>
+                        <f:selectItem itemLabel="#{langsys['PRODUCT']}" itemValue="PRODUCT"/>
+                        <f:selectItem itemLabel="#{langsys['SERVICE']}" itemValue="SERVICE"/>
+                    </h:selectOneMenu>
                     <p:outputLabel value="#{langsys['Currency']}:"/>
                     <h:selectOneMenu id="menuCurrency" value="#{item.currencyCode}" style="width: 200px;">
                         <f:selectItem itemLabel="" itemValue=""/>
                         <f:selectItems value="#{accCurrencyBean.accCurrenciesAll}" var="ac" itemLabel="#{ac.currencyCode}" itemValue="#{ac.currencyCode}"/>
                         <f:ajax event="change" execute="@this" render="@this"/>
                     </h:selectOneMenu>
+
                     <p:outputLabel value="#{langsys['General']}:"/>
                     <h:selectOneMenu id="menuIsGeneral" value="#{item.isGeneral}" style="width: 200px;">
                         <f:selectItem itemLabel=""/>
@@ -82,12 +88,13 @@
                         <f:selectItem itemLabel="#{langsys['Stocked']}" itemValue="Stocked"/>
                         <f:selectItem itemLabel="#{langsys['No']} #{langsys['Reorder']} #{langsys['Level']}" itemValue="No Reorder Level"/>
                     </h:selectOneMenu>
+
                     <p:outputLabel value=""/>
-                    <p:commandButton id="cmdbSearch" value="#{langsys['SEARCH']} (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                    <p:commandButton id="cmdbSearch" value="#{langsys['SEARCH']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" style="width: 200px;">
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
-                        <p:ajax listener="#{itemBean.reportItemStockLowOut(item.itemType,item.categoryId,item.subCategoryId,item.currencyCode,item.isGeneral,item.expense_type,item.stock_status)}" process="pnlgFilter" update="pnlgMessage tblDetail tblSummary"/>
+                        <p:ajax listener="#{itemBean.reportItemStockLowOut(item.itemType,item.categoryId,item.subCategoryId,item.currencyCode,item.isGeneral,item.expense_type,item.stock_status,item.store_id)}" process="pnlgFilter" update="pnlgMessage tblDetail tblSummary"/>
                     </p:commandButton>
                 </h:panelGrid>
                 <p:dataTable id="tblSummary" tableStyle="width:auto;" var="itms" value="#{itemBean.itemsSummary}" 
@@ -110,7 +117,7 @@
             <h:panelGrid id="pnlgMessage">
                 <p:outputLabel value="#{itemBean.actionMessage}" style="color: red;" rendered="false"/>
             </h:panelGrid>
-            <p:dataTable id="tblDetail" tableStyle="width:auto;" var="itm" value="#{itemBean.itemsList}" 
+            <p:dataTable id="tblDetail" tableStyle="table-layout: auto;" var="itm" value="#{itemBean.itemsList}" 
                          paginator="true" rows="50" 
                          paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
                          rowsPerPageTemplate="50,100,400,800,1000,2000" 
@@ -166,10 +173,10 @@
                 <p:column headerText="#{langsys['Status']}">
                     <h:outputText value="#{itm.stock_status}"/>
                 </p:column>
-                <p:column headerText="#{langsys['Category']}">
+                <p:column headerText="#{langsys['Category']}" visible="false">
                     <h:outputText value="#{itm.categoryName}"/>
                 </p:column>
-                <p:column headerText="#{langsys['Subcategory']}">
+                <p:column headerText="#{langsys['Subcategory']}" visible="false">
                     <h:outputText value="#{itm.subCategoryName}"/>
                 </p:column>
             </p:dataTable>
