@@ -15,3 +15,7 @@ create table item_store_reorder
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_17',15,Now(),'6.0','');
 
+ALTER TABLE transaction_approval
+ADD COLUMN status_comment varchar(150) NULL after status_desc;
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_17',20,Now(),'6.0','');
