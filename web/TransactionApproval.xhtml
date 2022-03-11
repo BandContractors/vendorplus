@@ -116,6 +116,9 @@
                 <p:column headerText="#{langsys['Status']} #{langsys['Description']}" visible="false">
                     <h:outputText value="#{ta.status_desc}"/>
                 </p:column>
+                <p:column headerText="#{langsys['Comment']}">
+                    <h:outputText value="#{ta.status_comment}"/>
+                </p:column>
                 <p:column headerText="#{langsys['Status']} #{langsys['By']}" visible="false">
                     <h:outputText value="#{userDetailBean.getUserDetail(ta.status_by_id).userName}"/>
                 </p:column>
@@ -139,10 +142,10 @@
                     <p:commandButton update="form:modalTransactionApprovalDetail" actionListener="#{transaction_approvalBean.displayTransactionApproval(ta,transaction_approval)}" oncomplete="PF('dlgTransactionApprovalDetail').show();" icon="ui-icon-note" title="View Request" style="color: white;" >
                     </p:commandButton>
                     &nbsp;
-                    <p:commandButton rendered="#{ta.approval_status eq 0}" update="form:dtblTransactionApproval form:growl1" actionListener="#{transaction_approvalBean.markApprovedCall(ta)}" icon="ui-icon-check" title="Approve Request" style="color: white; background-color: #00B259" >
+                    <p:commandButton rendered="#{ta.approval_status eq 0}" update="form:modalTransactionApprovalComment" actionListener="#{transaction_approvalBean.displayTransactionApprovalCall(ta,transaction_approval,0)}" oncomplete="PF('dlgTransactionApprovalComment').show();" icon="ui-icon-check" title="Approve Request" style="color: white; background-color: #00B259" >
                     </p:commandButton>
                     &nbsp;
-                    <p:commandButton rendered="#{ta.approval_status eq 0}" update="form:dtblTransactionApproval form:growl1" actionListener="#{transaction_approvalBean.markRejectedCall(ta)}" icon="ui-icon-close" title="Cancel Request" style="color: white; background-color: red !important" >
+                    <p:commandButton rendered="#{ta.approval_status eq 0}" update="form:modalTransactionApprovalComment" actionListener="#{transaction_approvalBean.displayTransactionApprovalCall(ta,transaction_approval,1)}" oncomplete="PF('dlgTransactionApprovalComment').show();" icon="ui-icon-close" title="Cancel Request" style="color: white; background-color: red !important" >
                     </p:commandButton>
                     &nbsp;
                 </p:column>
@@ -158,9 +161,20 @@
                                 <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 18pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">#{langout[transactionTypeBean.getTransactionType(transaction_approval.transaction_type_id).getTransactionOutputLabel()]}</h:outputLabel>
                             </h:panelGrid>
 
-                            <h:panelGrid id="IpgrdSalesInvoiceStatus" style="margin: 0px;" bgcolor="#{transaction_approval.approval_status eq 1 ? 'amber' : transaction_approval.approval_status eq 2 ? 'green' : transaction_approval.approval_status eq 3 ? 'red' : transaction_approval.approval_status eq 4 ? 'blue' : 'grey' }" columns="2">
+                            <h:panelGrid id="IpgrdSalesInvoiceStatus" style="margin: 0px;" columns="2">
                                 <h:outputLabel style="font-size: 12px; font-weight: bold;" value="#{langsys['Approval']} #{langsys['Status']}:"/>
                                 <h:outputLabel style="font-size: 12px; font-weight: bold;" value="#{transaction_approval.approval_status eq 0 ? 'Submitted' : transaction_approval.approval_status eq 1 ? 'Approved' : transaction_approval.approval_status eq 2 ? 'Processed' : transaction_approval.approval_status eq 3 ? 'Rejected' : 'Recalled'}" />
+                                <h:outputLabel style="font-size: 12px;" value="#{langsys['Comment']}:" rendered="#{transaction_approval.status_comment.length()>0}"/>
+                                <h:outputLabel style="font-size: 12px;" value="#{transaction_approval.status_comment}" rendered="#{transaction_approval.status_comment.length()>0}" />
+                            </h:panelGrid>
+                            
+                            <h:panelGrid style="width: 290px; margin: 0px;" columns="2" rendered="#{transaction_approval.transaction_id>0}">
+                                <h:outputLabel style="font-size: 12px;" value="#{langout[transactionTypeBean.getTransactionType(transaction_approval.transaction_type_id).getTransactionNumberLabel()]}:"/>
+                                <h:outputLabel style="font-size: 20px;font-weight: bold;" value="#{transBean.getTrans(transaction_approval.transaction_id).getTransactionNumber()}"/>
+                                <h:outputLabel style="font-size: 12px;" value="#{langout[transactionTypeBean.getTransactionType(transaction_approval.transaction_type_id).getTransactionRefLabel()]}:" rendered="#{transBean.getTrans(transaction_approval.transaction_id).getTransactionRef().length()>0}"/>
+                                <h:outputLabel style="font-size: 12px;font-weight: bold;" value="#{transBean.getTrans(transaction_approval.transaction_id).getTransactionRef()}" rendered="#{transBean.getTrans(transaction_approval.transaction_id).getTransactionRef().length()>0}"/>
+                                <h:outputLabel style="font-size: 12px;" value="#{langout[transactionTypeBean.getTransactionType(transaction_approval.transaction_type_id).getTransactionDateLabel()]}:"/>
+                                <h:outputLabel style="font-size: 12px;" value="#{utilityBean.formatDateTime(transBean.getTrans(transaction_approval.transaction_id).getAddDate())}"/>
                             </h:panelGrid>
 
                             <h:panelGrid style=" margin: 0px;" columns="2" rendered="#{transaction_approval.transactor_id>0}">
@@ -230,6 +244,23 @@
                     </h:panelGrid>
 
                 </h:panelGroup>
+            </p:dialog>
+            <p:dialog rendered="true" dynamic="true" header="#{langsys['Transaction']} #{langsys['Approval']}" widgetVar="dlgTransactionApprovalComment" id="modalTransactionApprovalComment" modal="true">
+                <h:panelGrid id="popupComment">
+                    <p:outputLabel value="#{langsys['Comment']}" style=""/>
+                    <p:inputTextarea value="#{transaction_approval.status_comment}" style="width: 400px" />
+                </h:panelGrid>
+
+                <h:panelGrid columns="1">
+                    <h:panelGrid  columns="2">
+                        <p:commandButton rendered="#{transaction_approvalBean.approveOrRejectButton==0}" update="form:dtblTransactionApproval form:growl1" actionListener="#{transaction_approvalBean.markApprovedCall(transaction_approval)}" value="#{langsys['Approve']}" style="color: white; background-color: #00B259" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                        </p:commandButton>
+                        <p:commandButton rendered="#{transaction_approvalBean.approveOrRejectButton==1}" update="form:dtblTransactionApproval form:growl1" actionListener="#{transaction_approvalBean.markRejectedCall(transaction_approval)}" value="#{langsys['Reject']}" style="color: white; background-color: #00B259" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                        </p:commandButton>
+                        <p:commandButton value="#{langsys['CANCEL']}" style="color: white; background-color: #FF0000" onsuccess="PF('dlgTransactionApprovalComment').hide()">
+                        </p:commandButton>
+                    </h:panelGrid>
+                </h:panelGrid>
             </p:dialog>
             <p:growl id="growl1"/>
         </h:form>

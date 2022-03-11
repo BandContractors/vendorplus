@@ -19,6 +19,7 @@ public class Transaction_approval implements Serializable {
     private int approval_status;
     private Date status_date;
     private String status_desc;
+    private String status_comment;
     private int status_by_id;
     private double grand_total;
     private String transactor_names;
@@ -264,5 +265,19 @@ public class Transaction_approval implements Serializable {
      */
     public void setTransaction_id(long transaction_id) {
         this.transaction_id = transaction_id;
+    }
+
+    /**
+     * @return the status_comment
+     */
+    public String getStatus_comment() {
+        return status_comment;
+    }
+
+    /**
+     * @param status_comment the status_comment to set
+     */
+    public void setStatus_comment(String status_comment) {
+        this.status_comment = status_comment;
     }
 }
