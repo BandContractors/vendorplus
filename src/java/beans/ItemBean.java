@@ -1329,6 +1329,16 @@ public class ItemBean implements Serializable {
         }
     }
 
+    public void clearItemSearch() {
+        try {
+            this.clearItem(this.ItemObj);
+            this.setSearchItemDesc("");
+            this.ItemsList.clear();
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public void onUNSPSCTabChange(TabChangeEvent event) {
         if (event.getTab().getTitle().equals("Manage")) {
             this.displayUNSPSC();
@@ -1443,6 +1453,31 @@ public class ItemBean implements Serializable {
         }
     }
 
+    public void copyItemReorderLevels() {
+        try {
+            try {
+                this.Item_store_reorderList.clear();
+            } catch (Exception e) {
+                this.Item_store_reorderList = new ArrayList<>();
+            }
+            this.refreshItem_store_reorderList(this.ItemObj);
+            int records = 0;
+            try {
+                records = this.Item_store_reorderList.size();
+            } catch (Exception e) {
+            }
+            if (records > 0) {
+                this.ReorderLevelEdited = 1;
+                for (int i = 0; i < this.Item_store_reorderList.size(); i++) {
+                    this.Item_store_reorderList.get(i).setItem_store_reorder_id(0);
+                    this.Item_store_reorderList.get(i).setItem_id(0);
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public String getVatTaxRatesRemote(ItemTax aItemTax) {
         String str = "";
         if (Double.parseDouble(aItemTax.getTaxRate()) > 0) {
@@ -1517,8 +1552,41 @@ public class ItemBean implements Serializable {
                 this.ItemObj.setVat_rate_order(this.getVatRateOrder(new Parameter_listBean().getParameter_listByContextName("GENERAL", "TAX_VAT_RATE_ORDER").getParameter_value()));
                 this.setSearchItemDesc("");
                 this.refreshStockLocation(0);
-                this.refreshItemsList(this.getSearchItemDesc());
+                this.refreshItemsList(this.getSearchItemDesc(), 1);
                 this.setReorderLevelEdited(0);
+                //Default for (Yes, Track, Buy, and Account Type)
+                String ItemPurpose = "";
+                ItemPurpose = new GeneralUserSetting().getCurrentItemPurpose();
+                if (ItemPurpose.equals("Stock")) {
+                    this.ItemObj.setItemType("PRODUCT");
+                    this.ItemObj.setIsBuy(1);
+                    this.ItemObj.setIsSale(1);
+                    this.ItemObj.setIsTrack(1);
+                    this.ItemObj.setExpense_type("Merchandise");
+                    this.ItemObj.setExpenseAccountCode("1-00-020-010");
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void copyToNew() {
+        try {
+            if (null == this.ItemObj) {
+                //do nothing
+            } else {
+                this.copyItemReorderLevels();
+                this.ItemObj.setItemId(0);
+                this.ItemObj.setDescription(this.ItemObj.getDescription() + " Copy");
+                this.ItemObj.setItemCode("");
+                this.ItemObj.setIs_synced_tax(0);
+                this.refreshStockLocation(0);
+                try {
+                    this.Item_code_otherList.clear();
+                } catch (Exception e) {
+
+                }
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -1574,6 +1642,17 @@ public class ItemBean implements Serializable {
                 this.refreshStockLocation(0);
                 this.setReorderLevelEdited(0);
                 aItem.setStore_id(0);
+                //Default for (Yes, Track, Buy, and Account Type)
+                String ItemPurpose = "";
+                ItemPurpose = new GeneralUserSetting().getCurrentItemPurpose();
+                if (ItemPurpose.equals("Stock")) {
+                    aItem.setItemType("PRODUCT");
+                    aItem.setIsBuy(1);
+                    aItem.setIsSale(1);
+                    aItem.setIsTrack(1);
+                    aItem.setExpense_type("Merchandise");
+                    aItem.setExpenseAccountCode("1-00-020-010");
+                }
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -2754,7 +2833,15 @@ public class ItemBean implements Serializable {
         }
     }
 
-    public void refreshItemsList(String aNameOrCode) {
+    public void setRetailToWhole() {
+        try {
+            this.ItemObj.setUnitWholesalePrice(this.ItemObj.getUnitRetailsalePrice());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void refreshItemsList(String aNameOrCode, int aLimitFlag) {//aLimitFlag: 0 No Limit, 1 Use Set Limit
         this.ItemsList = new ArrayList<>();
         if (aNameOrCode.replace(" ", "").length() <= 0) {
             this.ItemsList.clear();
@@ -2807,6 +2894,10 @@ public class ItemBean implements Serializable {
             } else {
                 sqlCodeOther = "";
             }
+            String LimitStr = "";
+            if (aLimitFlag == 1) {
+                LimitStr = " LIMIT " + menuItemBean.getMenuItemObj().getSEARCH_ITEMS_LIST_LIMIT();
+            }
             sql = "SELECT * FROM item i WHERE i.is_asset=" + IsAsset + " AND i.is_sale=" + IsSale + " AND ("
                     + "(" + sqlDesc + ") "
                     + "OR "
@@ -2814,7 +2905,7 @@ public class ItemBean implements Serializable {
                     + "OR "
                     + "(i.alias_name LIKE '%" + aNameOrCode + "%') "
                     + sqlCodeOther
-                    + ") ORDER BY i.description ASC LIMIT " + menuItemBean.getMenuItemObj().getSEARCH_ITEMS_LIST_LIMIT();
+                    + ") ORDER BY i.description ASC " + LimitStr;
             ResultSet rs = null;
             try (
                     Connection conn = DBConnection.getMySQLConnection();

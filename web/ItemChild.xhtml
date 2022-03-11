@@ -160,7 +160,10 @@
                             <f:selectItems value="#{accCoaBean.getAccCoaObjectListByInventoryType(generalUserSetting.currentItemPurpose,itemBean.itemObj.expense_type)}" var="ea" itemLabel="#{ea.accountName}" itemValue="#{ea.accountCode}"/>
                         </h:selectOneMenu>
                         <h:outputLabel value="#{langsys['Retail']} #{langsys['Sale']} #{langsys['Price']}:"/>
-                        <h:inputText id="itxtUnitRetailsalePrice" value="#{itemBean.itemObj.unitRetailsalePrice}" autocomplete="off" style="width: 193px">
+                        <h:inputText id="itxtUnitRetailsalePrice" value="#{itemBean.itemObj.unitRetailsalePrice}" autocomplete="off" style="width: 193px" onkeypress="if (event.keyCode == 13) {
+                                    rcmdCopyRetailWhole();
+                                    return false;
+                                }">
                             <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
                         <h:outputLabel value="#{langsys['Unit']} #{langsys['Cost']} #{langsys['Price']}:"/>
@@ -230,7 +233,7 @@
                         <h:outputLabel value=""/>
                         <h:outputLabel value=""/>
                         <h:outputLabel value=""/>
-                        <h:outputLabel value=""/>
+                        <p:remoteCommand name="rcmdCopyRetailWhole" actionListener="#{itemBean.setRetailToWhole()}" update="itxtUnitWholesalePrice"/>
                         <h:outputLabel value="#{langsys['Hide']} #{langsys['Unit']} #{langsys['Price']}:" title="Hide UnitPrice on Invoice?"/>
                         <h:selectOneMenu id="menuHideUnitPriceInvoice" value="#{itemBean.itemObj.hide_unit_price_invoice}" style="width: 200px">
                             <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
@@ -302,17 +305,24 @@
                     </h:dataTable>
                 </h:panelGrid>
             </div>
-            <h:panelGrid styleClass="clsGridMainCommands" columns="1">
-                <h:panelGrid styleClass="clsGridMainCommands1" columns="3">
-                    <p:commandButton styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['SAVE']} (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+            <h:panelGrid id="pnlgCommands" styleClass="clsGridMainCommands" columns="1">
+                <h:panelGrid styleClass="clsGridMainCommands1" columns="5">
+                    <p:commandButton styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['SAVE']} (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" icon=" ui-icon-disk">
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
-                        <p:ajax listener="#{itemBean.saveItem()}" process="@form" update="@this pnlgItemDetail pnlLocationStock pnlgMessage growl1 pnlgSearch dtblItem" />
+                        <p:ajax listener="#{itemBean.saveItem()}" process="@form" update="@this pnlgItemDetail pnlLocationStock pnlgMessage growl1 pnlgSearch dtblItem pnlgCommands" />
                     </p:commandButton>
-                    <p:commandButton styleClass="clsButtonBig" id="cmdbClear" value="#{langsys['CLEAR']} (ALT+C)" accesskey="c">
-                        <p:ajax listener="#{itemBean.clearItem()}" process="@form" update="pnlgItemDetail pnlLocationStock pnlgMessage growl1 pnlgSearch dtblItem"/>
+                    <p:commandButton styleClass="clsButtonBig" id="cmdbClear" value="#{langsys['CLEAR']} (ALT+C)" accesskey="c" icon=" ui-icon-plus">
+                        <p:ajax listener="#{itemBean.clearItem()}" process="@form" update="pnlgItemDetail pnlLocationStock pnlgMessage growl1 pnlgSearch dtblItem pnlgCommands"/>
                     </p:commandButton>
+                    <p:commandButton styleClass="clsButtonBig" id="cmdbNew" value="#{langsys['NEW']}" rendered="#{itemBean.itemObj.itemId gt 0}" icon=" ui-icon-plus">
+                        <p:ajax listener="#{itemBean.clearItem()}" process="@form" update="pnlgItemDetail pnlLocationStock pnlgMessage growl1 pnlgSearch dtblItem pnlgCommands"/>
+                    </p:commandButton>
+                    <p:commandButton styleClass="clsButtonBig" id="cmdbCopyNew" value="#{langsys['COPY']} #{langsys['TO']} #{langsys['NEW']}" rendered="#{itemBean.itemObj.itemId gt 0}" icon=" ui-icon-copy">
+                        <p:ajax listener="#{itemBean.copyToNew()}" process="@form" update="pnlgItemDetail pnlLocationStock pnlgMessage growl1 pnlgSearch dtblItem pnlgCommands"/>
+                    </p:commandButton>
+                    <p:commandButton styleClass="clsButtonBig" id="cmdbSearch" value="#{langsys['SEARCH']}" action="#{itemBean.clearItemSearch()}" oncomplete="PF('sbarItemSearch').show()" update="formMain:pnlgItemSearch formMain:dtblItemSearch" icon=" ui-icon-search"/>
                 </h:panelGrid>
             </h:panelGrid>
 
@@ -325,13 +335,13 @@
             <h:panelGrid id="pnlgSearch" styleClass="clsGridMainSearch" columns="3">
                 <h:outputLabel id="olblMainSearch" value="#{langsys['Type']} #{langsys['Description']} #{langsys['or']} #{langsys['Code']} #{langsys['to']} #{langsys['Search']} #{langsys[generalUserSetting.currentItemPurpose]} #{langsys['Item']}"/>
                 <h:inputText id="itxtMainSearch" value="#{itemBean.searchItemDesc}" autocomplete="off">
-                    <f:ajax event="keyup" listener="#{itemBean.refreshItemsList(itemBean.searchItemDesc)}" render="dtblItem"/>
+                    <f:ajax event="keyup" listener="#{itemBean.refreshItemsList(itemBean.searchItemDesc,1)}" render="dtblItem"/>
                 </h:inputText>
                 <h:outputLabel value="#{langsys['Only']}( #{langsys['TOP']} #{menuItemBean.menuItemObj.SEARCH_ITEMS_LIST_LIMIT} #{langsys['Search']} #{langsys['Results']} #{langsys['to']} #{langsys['be']} #{langsys['displayed']})"/>
             </h:panelGrid>
 
             <p:dataTable id="dtblItem" value="#{itemBean.itemsList}" var="itm" 
-                         tableStyle="width:auto;">
+                         tableStyle="table-layout: auto;">
                 <p:column>
                     <!-- column header -->
                     <f:facet name="header">#{langsys['ID']}</f:facet>
@@ -348,7 +358,9 @@
                     <!-- column header -->
                     <f:facet name="header">#{langsys['Description']}</f:facet>
                     <!-- row record -->
-                    #{itm.description}
+                    <p:commandLink value="#{itm.description}" style="color: blue;text-decoration: none;">
+                        <p:ajax listener="#{itemBean.displayItem(itm)}" process="dtblItem" update="formMain:pnlgItemDetail formMain:pnlLocationStock formMain:pnlgMessage formMain:growl1 formMain:pnlgCommands"/>
+                    </p:commandLink>
                 </p:column>
                 <p:column>  
                     <!-- column header -->
@@ -373,27 +385,6 @@
                     <f:facet name="header">#{langsys['Category']}</f:facet>
                     <!-- row record -->
                     #{categoryBean.getCategory(itm.categoryId).categoryName}
-                </p:column>
-                <p:column>
-                    <!-- column header -->
-                    <f:facet name="header">#{langsys['Currency']}</f:facet>
-                    <!-- row record -->
-                    #{itm.currencyCode}
-                </p:column>
-                <p:column>
-                    <!-- column header -->
-                    <f:facet name="header">#{langsys['General']}</f:facet>
-                    <!-- row record -->
-                    #{utilityBean.returnYesNoString(itm.isGeneral)}
-                </p:column>
-                <p:column>
-                    <!-- column header -->
-                    <f:facet name="header">#{langsys['Action']}</f:facet>
-                    <!-- row record -->
-                    <h:commandLink value="Edit">
-                        <f:ajax listener="#{itemBean.displayItem(itm)}" execute="dtblItem" render="formMain:pnlgItemDetail formMain:pnlLocationStock formMain:pnlgMessage formMain:growl1"/>
-                    </h:commandLink>
-                    &nbsp;
                 </p:column>
             </p:dataTable>
             <p:sidebar widgetVar="sbarUNSPSC" position="bottom" baseZIndex="10000" style="height: 600px;">
@@ -527,6 +518,75 @@
                     </p:dataTable>
                     <p:commandButton value="#{langsys['CLOSE']}" oncomplete="PF('sbarItemReorder').hide()" style="height: 60px;width: 220px;"/>
                 </h:panelGrid>
+            </p:sidebar>
+            <p:sidebar widgetVar="sbarItemSearch" position="bottom" baseZIndex="10000" style="height: 600px;">
+                <h:panelGrid id="pnlgItemSearch" styleClass="clsGridMainSearch" columns="3">
+                    <h:outputLabel value="#{langsys['Type']} #{langsys['Description']} #{langsys['or']} #{langsys['Code']} #{langsys['to']} #{langsys['Search']} #{langsys[generalUserSetting.currentItemPurpose]} #{langsys['Item']}"/>
+                    <h:inputText value="#{itemBean.searchItemDesc}" autocomplete="off">
+                        <f:ajax event="keyup" listener="#{itemBean.refreshItemsList(itemBean.searchItemDesc,0)}" render="dtblItemSearch"/>
+                    </h:inputText>
+                </h:panelGrid>
+                <p:dataTable id="dtblItemSearch" tableStyle="table-layout: auto;" var="itm2" value="#{itemBean.itemsList}" 
+                             paginator="true" rows="10" 
+                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}" 
+                             rowsPerPageTemplate="5,10,15,20">
+                    <p:column style="text-align: left;">
+                        <!-- column header -->
+                        <f:facet name="header">#{langsys['ID']}</f:facet>
+                        <!-- row record -->
+                        #{itm2.itemId}
+                    </p:column>
+                    <p:column>
+                        <!-- column header -->
+                        <f:facet name="header">#{langsys['Type']}</f:facet>
+                        <!-- row record -->
+                        #{itm2.itemType}
+                    </p:column>
+                    <p:column>
+                        <!-- column header -->
+                        <f:facet name="header">#{langsys['Description']}</f:facet>
+                        <!-- row record -->
+                        <p:commandLink value="#{itm2.description}"  oncomplete="PF('sbarItemSearch').hide()" style="color: blue;text-decoration: none;">
+                            <p:ajax listener="#{itemBean.displayItem(itm2)}" process="formMain:dtblItemSearch" update="formMain:pnlgItemDetail formMain:pnlLocationStock formMain:pnlgMessage formMain:growl1 formMain:pnlgCommands"/>
+                        </p:commandLink>
+                    </p:column>
+                    <p:column>  
+                        <!-- column header -->
+                        <f:facet name="header">#{langsys['Alias']}</f:facet>
+                        <!-- row record -->
+                        #{itm2.alias_name} 
+                    </p:column>
+                    <p:column>
+                        <!-- column header -->
+                        <f:facet name="header">#{langsys['Code']}</f:facet>
+                        <!-- row record -->
+                        #{itm2.itemCode}
+                    </p:column>
+                    <p:column>
+                        <!-- column header -->
+                        <f:facet name="header">#{langsys['Unit']}</f:facet>
+                        <!-- row record -->
+                        #{unitBean.getUnit(itm2.unitId).unitSymbol}
+                    </p:column>
+                    <p:column>
+                        <!-- column header -->
+                        <f:facet name="header">#{langsys['Category']}</f:facet>
+                        <!-- row record -->
+                        #{categoryBean.getCategory(itm2.categoryId).categoryName}
+                    </p:column>
+                    <p:column>
+                        <!-- column header -->
+                        <f:facet name="header">#{langsys['Currency']}</f:facet>
+                        <!-- row record -->
+                        #{itm2.currencyCode}
+                    </p:column>
+                    <p:column>
+                        <!-- column header -->
+                        <f:facet name="header">#{langsys['General']}</f:facet>
+                        <!-- row record -->
+                        #{utilityBean.returnYesNoString(itm2.isGeneral)}
+                    </p:column>
+                </p:dataTable>
             </p:sidebar>
         </h:form>
     </h:body>
