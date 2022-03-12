@@ -1560,7 +1560,6 @@ public class ItemBean implements Serializable {
                 if (ItemPurpose.equals("Stock")) {
                     this.ItemObj.setItemType("PRODUCT");
                     this.ItemObj.setIsBuy(1);
-                    this.ItemObj.setIsSale(1);
                     this.ItemObj.setIsTrack(1);
                     this.ItemObj.setExpense_type("Merchandise");
                     this.ItemObj.setExpenseAccountCode("1-00-020-010");
@@ -1648,7 +1647,6 @@ public class ItemBean implements Serializable {
                 if (ItemPurpose.equals("Stock")) {
                     aItem.setItemType("PRODUCT");
                     aItem.setIsBuy(1);
-                    aItem.setIsSale(1);
                     aItem.setIsTrack(1);
                     aItem.setExpense_type("Merchandise");
                     aItem.setExpenseAccountCode("1-00-020-010");
