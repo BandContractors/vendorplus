@@ -11440,6 +11440,20 @@ public class TransItemBean implements Serializable {
         }
     }
 
+    public void updateModelTransItemAutoAddCECCall(int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aTrans, TransItem aTransItemToUpdate, StatusBean aStatusBean, List<TransItem> aActiveTransItems, TransItem aSelectedTransItem, Item aSelectedItem, String aEntryMode) {//auto=1 for itemCode, auto=0 is for desc/code    ,2 is for other
+        try {
+            String ItemCode = aSelectedTransItem.getItemCode();
+            if (ItemCode.startsWith("ST")) {
+                aTrans.setTransactionRef(ItemCode);
+                new TransBean().loadTransferForInvoiceTrans(aTrans, aActiveTransItems, aSelectedTransItem);
+            } else {
+                this.updateModelTransItemAutoAddCEC(aStoreId, aTransTypeId, aTransReasonId, aSaleType, aTrans, aTransItemToUpdate, aStatusBean, aActiveTransItems, aSelectedTransItem, aSelectedItem, aEntryMode);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public void updateModelTransItemAutoAddCEC(int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aTrans, TransItem aTransItemToUpdate, StatusBean aStatusBean, List<TransItem> aActiveTransItems, TransItem aSelectedTransItem, Item aSelectedItem, String aEntryMode) {//auto=1 for itemCode, auto=0 is for desc/code    ,2 is for other
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -11645,6 +11659,88 @@ public class TransItemBean implements Serializable {
                 }
             }
         }
+    }
+
+    public int updateModelTransItemAutoAddFrmTransfer(Store aStore, TransactionType aTransType, TransactionReason aTransReason, String aSaleType, Trans aTrans, StatusBean aStatusBean, List<TransItem> aActiveTransItems, TransItem aSelectedTransItem, Item aSelectedItem) {
+        int success = 0;
+        try {
+            StockBean sb = new StockBean();
+            DiscountPackageItem dpi = null;
+            if (aSelectedItem != null) {
+                //for where item currency is different from trans currency, we first get the factor to convert to trans currency
+                double xrate = 1;
+                double XrateMultiply = 1;
+                AccCurrency LocalCurrency = null;
+                LocalCurrency = new AccCurrencyBean().getLocalCurrency();
+                xrate = new AccXrateBean().getXrate(aSelectedItem.getCurrencyCode(), aTrans.getCurrencyCode());
+                if (aSelectedItem.getCurrencyCode().equals(LocalCurrency.getCurrencyCode()) && !aTrans.getCurrencyCode().equals(LocalCurrency.getCurrencyCode())) {
+                    XrateMultiply = 1 / xrate;
+                } else {
+                    XrateMultiply = xrate;
+                }
+                aSelectedItem.setUnitRetailsalePrice(aSelectedItem.getUnitRetailsalePrice() * XrateMultiply);
+                aSelectedItem.setUnitWholesalePrice(aSelectedItem.getUnitWholesalePrice() * XrateMultiply);
+                aSelectedItem.setUnit_special_price(aSelectedItem.getUnit_special_price() * XrateMultiply);
+                //aSelectedTransItem.setItemId(aSelectedItem.getItemId());
+                //aSelectedTransItem.setItemQty(1);
+                aSelectedTransItem.setIsTradeDiscountVatLiable(CompanySetting.getIsTradeDiscountVatLiable());
+                if (aTransType.getTransactionTypeName().equals("SALE INVOICE") || aTransType.getTransactionTypeName().equals("SALE ORDER")) {
+                    dpi = new DiscountPackageItemBean().getActiveDiscountPackageItem(aStore.getStoreId(), aSelectedItem.getItemId(), aSelectedTransItem.getItemQty(), aTrans.getTransactorId(), aSelectedItem.getCategoryId(), aSelectedItem.getSubCategoryId());
+                } else {
+                    dpi = null;
+                }
+                if (dpi != null) {
+                }
+                //get account code for the item
+                aSelectedTransItem.setAccountCode(this.getTransItemInventCostAccount(aTransType, aTransReason, aSelectedItem));
+                if ("EXEMPT SALE INVOICE".equals(aSaleType)) {
+                    aSelectedTransItem.setUnitPrice(0);
+                    aSelectedTransItem.setUnitTradeDiscount(0);
+                } else if ("COST-PRICE SALE INVOICE".equals(aSaleType)) {
+                    aSelectedTransItem.setUnitTradeDiscount(0);
+                } else if ("WHOLE SALE INVOICE".equals(aSaleType)) {
+                    aSelectedTransItem.setUnitPrice(aSelectedItem.getUnitWholesalePrice());
+                    if (dpi != null) {
+                        aSelectedTransItem.setUnitTradeDiscount(aSelectedItem.getUnitWholesalePrice() * dpi.getWholesaleDiscountAmt() / 100);
+                    }
+                } else if ("SPECIAL SALE INVOICE".equals(aSaleType)) {
+                    aSelectedTransItem.setUnitPrice(aSelectedItem.getUnit_special_price());
+                    if (dpi != null) {
+                        aSelectedTransItem.setUnitTradeDiscount(0);
+                    }
+                } else {
+                    if (aTransType.getTransactionTypeName().equals("SALE INVOICE") || aTransType.getTransactionTypeName().equals("PURCHASE INVOICE") || aTransType.getTransactionTypeName().equals("DISPOSE STOCK") || aTransType.getTransactionTypeName().equals("SALE ORDER")) {
+                        aSelectedTransItem.setUnitPrice(aSelectedItem.getUnitRetailsalePrice());
+                    } else {
+                        aSelectedTransItem.setUnitPrice(0);
+                    }
+                    if (dpi != null) {
+                        aSelectedTransItem.setUnitTradeDiscount(aSelectedItem.getUnitRetailsalePrice() * dpi.getRetailsaleDiscountAmt() / 100);
+                    }
+                }
+                aSelectedTransItem.setVatRated(new UtilityBean().getFirstStringFromCommaSeperatedStr(aSelectedItem.getVatRated()));
+                aSelectedTransItem.setItemCode(aSelectedItem.getItemCode());
+
+                //for profit margin
+                if ("SALE INVOICE".equals(aTransType.getTransactionTypeName())) {
+                    if (aSelectedItem.getIsTrack() == 1) {
+                        aSelectedTransItem.setUnitCostPrice(new StockBean().getItemUnitCostPrice(aStore.getStoreId(), aSelectedTransItem.getItemId(), aSelectedTransItem.getBatchno(), aSelectedTransItem.getCodeSpecific(), aSelectedTransItem.getDescSpecific()));
+                    } else {
+                        aSelectedTransItem.setUnitCostPrice(aSelectedItem.getUnitCostPrice());
+                    }
+                    aSelectedTransItem.setUnitProfitMargin((aSelectedTransItem.getUnitPriceExcVat() - aSelectedTransItem.getUnitTradeDiscount()) - aSelectedTransItem.getUnitCostPrice());
+                } else {
+                    aSelectedTransItem.setUnitCostPrice(0);
+                    aSelectedTransItem.setUnitProfitMargin(0);
+                }
+                aSelectedTransItem.setAmount(aSelectedTransItem.getItemQty() * aSelectedTransItem.getUnitPrice());
+                this.addTransItemAutoAdd(aTrans, aStatusBean, aActiveTransItems, aSelectedTransItem, aSelectedItem, "");
+                success = 1;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return success;
     }
 
     public void calUnpackedQty(TransItem aTransItem) {

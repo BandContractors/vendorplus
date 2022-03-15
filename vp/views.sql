@@ -326,7 +326,7 @@ CREATE OR REPLACE VIEW view_inventory_low_out_per_store AS
 	INNER JOIN category c ON i.category_id=c.category_id 
 	INNER JOIN unit u ON i.unit_id=u.unit_id 
 	LEFT JOIN sub_category sc ON i.sub_category_id=sc.sub_category_id 
-	WHERE i.is_asset=0 AND i.is_track=1;
+	WHERE i.is_asset=0 AND i.is_track=1 AND ro.reorder_level>0;
 
 CREATE OR REPLACE VIEW view_inventory_low_out_per_store_vw AS 
 	SELECT v.*,

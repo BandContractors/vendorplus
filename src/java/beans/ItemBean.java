@@ -1594,7 +1594,7 @@ public class ItemBean implements Serializable {
 
     public void clearItem(Item aItem) {
         try {
-            if (aItem != null) {
+            if (null != aItem) {
                 aItem.setItemId(0);
                 aItem.setItemCode("");
                 aItem.setDescription("");

@@ -122,10 +122,15 @@
                     </p:dataTable>
 
                     <h:panelGrid styleClass="clsGridMainInput" columns="2" style="width: 100%">
-                        <h:outputLabel styleClass="clsInput" value="#{generalUserSetting.outputDetailParent.authorised_by_user_detail.firstName} #{generalUserSetting.outputDetailParent.authorised_by_user_detail.secondName}"/>
-                        <h:outputText styleClass="clsInput" value="#{utilityBean.formatDate(generalUserSetting.outputDetailParent.trans.authoriseDate)}"/>
-                        <h:outputLabel styleClass="clsLabelTransItem" style="border-top-style: solid;" value="#{langout['Authorised']} #{langout['By']}"/>
-                        <h:outputLabel styleClass="clsLabelTransItem" style="border-top-style: solid;" value="#{langout['Authorised']} #{langout['Date']}"/>
+                        <h:panelGrid id="gnlgBarCodeOnly" rendered="#{generalUserSetting.outputDetailParent.trans.transactionNumber.length()>0}">  
+                            <p:barcode id="barcItemCode" value="#{generalUserSetting.outputDetailParent.trans.transactionNumber}" type="code128" style="width: 176px;height: 128px;"/>
+                        </h:panelGrid>
+                        <h:panelGrid columns="2">
+                            <h:outputLabel styleClass="clsInput" value="#{generalUserSetting.outputDetailParent.authorised_by_user_detail.firstName} #{generalUserSetting.outputDetailParent.authorised_by_user_detail.secondName}"/>
+                            <h:outputText styleClass="clsInput" value="#{utilityBean.formatDate(generalUserSetting.outputDetailParent.trans.authoriseDate)}"/>
+                            <h:outputLabel styleClass="clsLabelTransItem" style="border-top-style: solid;" value="#{langout['Authorised']} #{langout['By']}"/>
+                            <h:outputLabel styleClass="clsLabelTransItem" style="border-top-style: solid;" value="#{langout['Authorised']} #{langout['Date']}"/>
+                        </h:panelGrid>
                     </h:panelGrid>
                 </h:panelGrid>
             </ui:composition>
