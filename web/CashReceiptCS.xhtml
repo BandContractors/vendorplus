@@ -86,7 +86,12 @@
                             <p:ajax event="itemSelect" listener="#{pay.setBillTransactorId(payBean.selectedBillTransactor.transactorId)}" update="pnlInput pnlButtons" />
                             <p:ajax event="change" listener="#{pay.setBillTransactorId(payBean.selectedBillTransactor.transactorId)}" rendered="#{payBean.selectedBillTransactor!=null}" update="pnlInput pnlButtons" />
                             <p:ajax event="change" listener="#{payTransBean.clearPayTranss(payTransBean.payTranss, pay)}" update="pnlInput"/>
+                            <p:ajax event="blur" listener="#{transBean.refreshCustomerBalances3(trans,payBean.selectedBillTransactor.transactorId,pay.currencyCode)}" update="itxtPrepaidAcc"/>
                         </p:autoComplete>
+                        <h:outputLabel id="olblDeposit" value="#{langsys['Deposit']}(#{pay.currencyCode})"/>
+                        <h:inputText disabled="true" style="color: green;font-weight: bold;width: 155px;;height: 24px;" styleClass="clsInput" id="itxtPrepaidAcc" value="#{accJournalBean.returnBalanceString(trans.deposit_customer)}">
+                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:inputText>
                         <h:outputLabel  value="#{langsys['Transaction']} #{langsys['No.']}:"/>
                         <h:inputText id="itxtTransactionNumber2" value="#{trans.transactionNumber2}" autocomplete="off" style="width: 155px;">
                             <f:ajax event="change" listener="#{pay.setBillTransactorId(transBean.getTransByTransNumber(trans.transactionNumber2).billTransactorId)}" render="pnlInput pnlButtons" />
@@ -94,7 +99,7 @@
                         </h:inputText>
                     </h:panelGrid>
                     <h:panelGrid columns="1">
-                        <p:commandButton id="cbtnSearch" value="#{langsys['Search']}" style="background-color: black;color: white;font-weight: bold;" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" >
+                        <p:commandButton id="cbtnSearch" value="#{langsys['Search']}" style="background-color: black;color: white;font-weight: bold;height: 50px;" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" >
                             <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                                 <p:graphicImage name="/images/ajax-loader.gif"/>
                             </p:dialog>
@@ -114,7 +119,7 @@
                     </p:column>
                     <p:column>
                         <f:facet name="header">#{langsys['Transaction']}</f:facet>
-                        <h:outputLabel value="#{transactionTypeBean.getTransactionType(pts.transactionTypeId).transactionTypeName}:#{pts.transactionNumber}"/>
+                        <h:outputLabel value="#{transactionTypeBean.getTransactionType(pts.transactionTypeId).transactionTypeName} : #{pts.transactionNumber}"/>
                     </p:column>
                     <p:column>
                         <f:facet name="header">#{langsys['Date']}</f:facet>
@@ -149,45 +154,52 @@
                     <p:column>
                         <f:facet name="header">
                             #{langsys['Receive']} #{langsys['Amount']}
-                            <h:selectBooleanCheckbox value="#{payBean.payAll}">
-                                <f:ajax listener="#{payBean.doPayAll(payTransBean.payTranss, payBean.payAll,pay)}" execute="dtblPayTranss" render="dtblPayTranss formPay:itxtPaidAmount"/>
-                            </h:selectBooleanCheckbox>
                         </f:facet>
-                        <h:inputText value="#{pts.transPaidAmount}">
+                        <h:inputText value="#{pts.transPaidAmount}" style="width: 120px;">
                             <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             <f:ajax event="change" listener="#{payTransBean.editPayTrans(payTransBean.payTranss,pts,pay)}" execute="dtblPayTranss" render="dtblPayTranss formPay:itxtPaidAmount"/>
                         </h:inputText>
                     </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:selectBooleanCheckbox value="#{payBean.payAll}" title="Pay ALL Balanace">
+                                <f:ajax listener="#{payBean.doPayAll(payTransBean.payTranss, payBean.payAll,pay)}" execute="dtblPayTranss" render="dtblPayTranss formPay:itxtPaidAmount"/>
+                            </h:selectBooleanCheckbox>
+                        </f:facet>
+                        <p:commandButton icon="ui-icon-check" title="Pay Transaction Balance">
+                            <p:ajax listener="#{payBean.doPayAllTrans(payTransBean.payTranss,pay,pts)}" process="dtblPayTranss" update="dtblPayTranss formPay:itxtPaidAmount"/>
+                        </p:commandButton>
+                    </p:column>
                 </p:dataTable>
                 <h:panelGrid id="pnlInputDetails" styleClass="clsGridMainInput" columns="4">
                     <h:outputLabel  value="#{langsys['Amount']} #{langsys['Received']}:"/>
-                    <h:inputText id="itxtPaidAmount" value="#{pay.paidAmount}" disabled="true" style="width: 250px;">
+                    <h:inputText id="itxtPaidAmount" value="#{pay.paidAmount}" disabled="true" style="width: 233px;">
                         <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
                     <h:outputLabel  style="width: 250px;" value="#{langsys['Receipt']} #{langsys['Date']}:"/>
-                    <p:calendar styleClass="clsInput" style="width: 250px;" id="calPaymentDate"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{pay.payDate}" disabled="#{generalUserSetting.isAllowedToBackDate==0}"/>
+                    <p:calendar styleClass="clsInput" id="calPaymentDate"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{pay.payDate}" disabled="#{generalUserSetting.isAllowedToBackDate==0}" size="20"/>
                     <h:outputLabel  style="width: 250px;" value="#{langsys['Payment']} #{langsys['Method']}:"/>
-                    <h:selectOneMenu styleClass="clsMenu" style="width: 250px;" id="menuPayMethod" value="#{pay.payMethodId}">
+                    <h:selectOneMenu styleClass="clsMenu" style="width: 240px;" id="menuPayMethod" value="#{pay.payMethodId}">
                         <f:selectItem itemValue="" itemLabel=""/>
                         <f:selectItems value="#{payMethodBean.getPayMethodsActiveIn('1,2,3,4,5,6,8')}" var="pm" itemLabel="#{pm.payMethodName}" itemValue="#{pm.payMethodId}"/>
                         <f:ajax event="change" execute="@this menuCurrency" render="menuAccount"/>
                     </h:selectOneMenu>
                     <h:outputLabel  value="#{langsys['Received']} #{langsys['on']} #{langsys['Account']}:"/>
-                    <h:selectOneMenu styleClass="clsMenu" style="width: 250px;" id="menuAccount" value="#{pay.accChildAccountId}">
+                    <h:selectOneMenu styleClass="clsMenu" style="width: 240px;" id="menuAccount" value="#{pay.accChildAccountId}">
                         <f:selectItem itemValue="" itemLabel=""/>
                         <f:selectItems value="#{accChildAccountBean.getAccChildAccountsForCashReceipt(pay.currencyCode, pay.payMethodId,generalUserSetting.getCurrentStore().storeId,generalUserSetting.getCurrentUser().userDetailId)}" var="ca" itemLabel="#{ca.childAccountCode} (#{ca.childAccountName})" itemValue="#{ca.accChildAccountId}"/>
                     </h:selectOneMenu>
                     <h:outputLabel  style="width: 250px;" value="#{langsys['Reference']} #{langsys['No']}:"/>
-                    <h:inputText id="itxtPayRefNo" style="width: 250px;" value="#{pay.payRefNo}" styleClass="clsInputTransItem"/>
+                    <h:inputText id="itxtPayRefNo" style="width: 233px;" value="#{pay.payRefNo}" styleClass="clsInputTransItem"/>
                     <h:outputLabel  style="width: 250px;" value="#{langsys['Status']}:"/>
-                    <h:selectOneMenu styleClass="clsMenu" style="width: 250px;" id="menuStatus" value="#{pay.status}">
+                    <h:selectOneMenu styleClass="clsMenu" style="width: 240px;" id="menuStatus" value="#{pay.status}">
                         <f:selectItem itemLabel="#{langsys['Cleared']}" itemValue="1"/>
                         <f:selectItem itemLabel="#{langsys['Not']} #{langsys['Cleared']}" itemValue="0"/>
                     </h:selectOneMenu>
                     <h:outputLabel  style="width: 250px;" value="#{langsys['Status']} #{langsys['Description']}:"/>
-                    <h:inputText id="itxtStatusDesc" style="width: 250px;" value="#{pay.statusDesc}" styleClass="clsInputTransItem"/>
+                    <h:inputText id="itxtStatusDesc" style="width: 233px;" value="#{pay.statusDesc}" styleClass="clsInputTransItem"/>
                     <h:outputLabel  style="width: 250px;" value="#{langsys['Points']} #{langsys['Spent']} #{langsys['Amount']}:"/>
-                    <h:inputText id="itxtSpendPointsAmount" style="width: 250px;" value="#{pay.pointsSpentAmount}" styleClass="clsInputTransItem" disabled="true">
+                    <h:inputText id="itxtSpendPointsAmount" style="width: 233px;" value="#{pay.pointsSpentAmount}" styleClass="clsInputTransItem" disabled="true">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
                 </h:panelGrid>

@@ -2011,7 +2011,7 @@ public class TransBean implements Serializable {
                     //TimeStr = TimeStr + " RDraft:" + ms;
                     //Auto Printing Invoice
                     //dt1 = new Date();
-                    if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName())) {
+                    if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName()) || "TRANSFER".equals(transtype.getTransactionTypeName())) {
                         //1. Update Invoice
                         //---SalesInvoiceBean.initSalesInvoiceBean();
                         //2. Auto Printing Invoice
@@ -2259,9 +2259,9 @@ public class TransBean implements Serializable {
                             //1. Update Invoice
                             //2. Auto Printing Invoice
                             if (this.AutoPrintAfterSave) {
-                                try{
-                                org.primefaces.PrimeFaces.current().executeScript("doPrintHiddenClick()");
-                                }catch(Exception e){
+                                try {
+                                    org.primefaces.PrimeFaces.current().executeScript("doPrintHiddenClick()");
+                                } catch (Exception e) {
                                 }
                             }
                         }
@@ -5062,6 +5062,86 @@ public class TransBean implements Serializable {
         }
     }
 
+    public void loadTransferForInvoiceTrans(Trans aTrans, List<TransItem> aActiveTransItems, TransItem aTransItem) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
+        String msg = "";
+        long TransferId = 0;
+        String TransferNumber = aTransItem.getItemCode();
+        try {
+            TransactionType transtype = new TransactionTypeBean().getTransactionType(new GeneralUserSetting().getCurrentTransactionTypeId());
+            TransactionReason transreason = new TransactionReasonBean().getTransactionReason(new GeneralUserSetting().getCurrentTransactionReasonId());
+            Store store = new StoreBean().getStore(new GeneralUserSetting().getCurrentStore().getStoreId());
+            if (TransferNumber.length() > 0) {
+                Trans TransferTrans = new Trans();
+                List<TransItem> TransferItems = new ArrayList<>();
+                this.setTransFromTransfer(TransferTrans, TransferNumber, store.getStoreId());
+                TransferId = TransferTrans.getTransactionId();
+                if (TransferId > 0) {
+                    new TransItemBean().setTransItemsByTransactionId(TransferItems, TransferId);
+                }
+                if (TransferId > 0 && TransferItems.size() > 0) {
+                    //some cleanups and reset
+                    //1. for trans
+                    //trans.setTransactionNumber("");
+                    //trans.setTransactionRef(TransferNumber);
+                    //2. for trans items
+                    TransItemBean tib = new TransItemBean();
+                    ItemBean ib = new ItemBean();
+                    Item item = null;
+                    TransItem transitem = null;
+                    for (int i = 0; i < TransferItems.size(); i++) {
+                        item = new ItemBean().getItem(TransferItems.get(i).getItemId());
+                        transitem = new TransItem();
+                        transitem.setItemId(item.getItemId());
+                        transitem.setItemQty(TransferItems.get(i).getItemQty());
+                        try {
+                            if (null == TransferItems.get(i).getBatchno()) {
+                                transitem.setBatchno("");
+                            } else {
+                                transitem.setBatchno(TransferItems.get(i).getBatchno());
+                            }
+                        } catch (NullPointerException npe) {
+                            transitem.setBatchno("");
+                        }
+                        try {
+                            if (null == TransferItems.get(i).getCodeSpecific()) {
+                                transitem.setCodeSpecific("");
+                            } else {
+                                transitem.setCodeSpecific(TransferItems.get(i).getCodeSpecific());
+                            }
+                        } catch (NullPointerException npe) {
+                            transitem.setCodeSpecific("");
+                        }
+                        try {
+                            if (null == TransferItems.get(i).getDescSpecific()) {
+                                transitem.setDescSpecific("");
+                            } else {
+                                transitem.setDescSpecific(TransferItems.get(i).getDescSpecific());
+                            }
+                        } catch (NullPointerException npe) {
+                            transitem.setDescSpecific("");
+                        }
+                        transitem.setAccountCode(tib.getTransItemInventCostAccount(transtype, transreason, item));
+                        tib.updateModelTransItemAutoAddFrmTransfer(store, transtype, transreason, new GeneralUserSetting().getCurrentSaleType(), aTrans, new StatusBean(), aActiveTransItems, transitem, item);
+                    }
+                    tib.clearTransItem(aTransItem);
+                } else {
+                    msg = "Select Valid Transfer Number";
+                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+                    this.setActionMessage(ub.translateWordsInText(BaseName, msg));
+                }
+            } else {
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public void deleteDraftTrans(Trans trans) {
         String sql = null;
         String msg = "";
@@ -5160,6 +5240,23 @@ public class TransBean implements Serializable {
         } else {
             sql = "SELECT * FROM transaction WHERE transaction_number='" + aTransOrderNumber + "'";
         }
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            //ps.setLong(1, aTransactionHistId);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                this.setTransFromResultset(aTrans, rs);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void setTransFromTransfer(Trans aTrans, String aTransTransferNumber, int aStore2Id) {
+        String sql = "";
+        sql = "SELECT * FROM transaction WHERE transaction_type_id=4 AND transaction_number='" + aTransTransferNumber + "' and store2_id=" + aStore2Id;
         ResultSet rs = null;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -15411,6 +15508,40 @@ public class TransBean implements Serializable {
             aTrans.setDeposit_customer2(new AccLedgerBean().getPrepaidIncomeAccBalanceTrade(aTrans.getBillTransactorId(), aTrans.getCurrencyCode()));
         } catch (Exception e) {
             aTrans.setDeposit_customer2(0);
+        }
+    }
+
+    public void refreshCustomerBalances3(Trans aTrans, long aTransactorId, String aCurrencyCode) {
+        //receivable balances
+        try {
+            aTrans.setBalance_receivable(0);
+            //aTrans.setBalance_receivable(new AccLedgerBean().getReceivableAccBalanceTrade(aTransId));
+        } catch (Exception e) {
+            aTrans.setBalance_receivable(0);
+        }
+        //prepaid income
+        try {
+            aTrans.setDeposit_customer(0);
+            aTrans.setDeposit_customer(new AccLedgerBean().getPrepaidIncomeAccBalanceTrade(aTransactorId, aCurrencyCode));
+        } catch (Exception e) {
+            aTrans.setDeposit_customer(0);
+        }
+    }
+    
+    public void refreshCustomerBalances4(Pay aPay, long aTransactorId, String aCurrencyCode) {
+        //receivable balances
+//        try {
+//            aTrans.setBalance_receivable(0);
+//            //aTrans.setBalance_receivable(new AccLedgerBean().getReceivableAccBalanceTrade(aTransId));
+//        } catch (Exception e) {
+//            aTrans.setBalance_receivable(0);
+//        }
+        //prepaid income
+        try {
+            aPay.setCustomerDeposit(0);
+            aPay.setCustomerDeposit(new AccLedgerBean().getPrepaidIncomeAccBalanceTrade(aTransactorId, aCurrencyCode));
+        } catch (Exception e) {
+            aPay.setCustomerDeposit(0);
         }
     }
 

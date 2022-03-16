@@ -67,23 +67,23 @@
             <h:panelGrid id="pnlInput" columns="1">
                 <h:panelGrid id="pnlInputDetails" styleClass="clsGridMainInput" columns="6">
                     <h:outputLabel  value="#{langsys['Principal']} #{langsys['Amount']}:"/>
-                    <h:inputText value="#{pay.principalAmount}" style="width: 150px;">
+                    <h:inputText value="#{pay.principalAmount}" style="width: 156px;">
                         <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         <f:ajax event="change" listener="#{pay.setPaidAmount(pay.principalAmount+pay.interestAmount)}" execute="@this" render="@this itxtPaidAmount"/>
                     </h:inputText>
                     <h:outputLabel  value="#{langsys['Interest']} #{langsys['Amount']}:"/>
-                    <h:inputText value="#{pay.interestAmount}" style="width: 150px;">
+                    <h:inputText value="#{pay.interestAmount}" style="width: 143px;">
                         <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         <f:ajax event="change" listener="#{pay.setPaidAmount(pay.principalAmount+pay.interestAmount)}" execute="@this" render="@this itxtPaidAmount"/>
                     </h:inputText>
                     <h:outputLabel  value="#{langsys['Amount']} #{langsys['Paid']}:"/>
-                    <h:inputText id="itxtPaidAmount" value="#{pay.paidAmount}" disabled="true" style="width: 250px;">
+                    <h:inputText id="itxtPaidAmount" value="#{pay.paidAmount}" disabled="true" style="width: 233px;">
                         <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         <f:ajax event="change" execute="@form" render="@form"/>
                     </h:inputText>
 
                     <h:outputLabel  value="#{langsys['Payment']} #{langsys['Date']}:"/>
-                    <p:calendar styleClass="clsInput" id="calPaymentDate"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{pay.payDate}" size="11" disabled="#{generalUserSetting.isAllowedToBackDate==0}"/>
+                    <p:calendar styleClass="clsInput" id="calPaymentDate"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{pay.payDate}" size="12" disabled="#{generalUserSetting.isAllowedToBackDate==0}"/>
                     <h:outputLabel  value="#{langsys['Payment']} #{langsys['Method']}:"/>
                     <h:selectOneMenu styleClass="clsMenu" id="menuPayMethod" value="#{pay.payMethodId}" style="width: 150px;">
                         <f:selectItem itemValue="" itemLabel=""/>
@@ -91,20 +91,20 @@
                         <f:ajax event="change" execute="@this menuCurrency" render="menuAccount"/>
                     </h:selectOneMenu>
                     <h:outputLabel  value="#{langsys['Paid']} #{langsys['from']} #{langsys['Account']}:"/>
-                    <h:selectOneMenu styleClass="clsMenu" style="width: 250px;" id="menuAccount" value="#{pay.accChildAccountId}">
+                    <h:selectOneMenu styleClass="clsMenu" style="width: 240px;" id="menuAccount" value="#{pay.accChildAccountId}">
                         <f:selectItem itemValue="" itemLabel=""/>
                         <f:selectItems value="#{accChildAccountBean.getAccChildAccountsForCashPayment(pay.currencyCode, pay.payMethodId,generalUserSetting.getCurrentStore().storeId,generalUserSetting.getCurrentUser().userDetailId)}" var="ca" itemLabel="#{ca.childAccountCode} (#{ca.childAccountName})" itemValue="#{ca.accChildAccountId}"/>
                     </h:selectOneMenu>
 
                     <h:outputLabel  value="#{langsys['Reference']} #{langsys['No.']}:"/>
-                    <h:inputText id="itxtPayRefNo" value="#{pay.payRefNo}" styleClass="clsInputTransItem" style="width: 150px;"/>
+                    <h:inputText id="itxtPayRefNo" value="#{pay.payRefNo}" styleClass="clsInputTransItem" style="width: 156px;"/>
                     <h:outputLabel  value="#{langsys['Status']}:"/>
                     <h:selectOneMenu styleClass="clsMenu" id="menuStatus" value="#{pay.status}" style="width: 150px;">
                         <f:selectItem itemLabel="#{langsys['Cleared']}" itemValue="1"/>
                         <f:selectItem itemLabel="#{langsys['Not']} #{langsys['Cleared']}" itemValue="0"/>
                     </h:selectOneMenu>
                     <h:outputLabel  value="#{langsys['Status']} #{langsys['Description']}:"/>
-                    <h:inputText id="itxtStatusDesc" value="#{pay.statusDesc}" styleClass="clsInputTransItem" style="width: 250px;"/>
+                    <h:inputText id="itxtStatusDesc" value="#{pay.statusDesc}" styleClass="clsInputTransItem" style="width: 233px;"/>
                 </h:panelGrid>
             </h:panelGrid>
             <h:panelGrid id="pnlButtons" styleClass="clsGridMainCommands" columns="1">

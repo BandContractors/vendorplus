@@ -155,8 +155,8 @@
                         <p:ajax event="blur" listener="#{transBean.refreshTransList(11,transactorBean.selectedTransactor.transactorId,20,'is_invoiced','0,2')}" update="menuTransRefNumber" />
                     </p:autoComplete>
                     <p:selectOneMenu id="menuTransRefNumber" value="#{trans.transactionRef}" editable="true" dynamic="true" style="width: 140px;">
-                        <f:selectItem itemLabel="#{langsys['Select']} #{langsys['or']} #{langsys['Type']}" itemValue="0"/>
-                        <f:selectItems value="#{transBean.transList}" var="stl" itemLabel="#{langsys[stl.transactionNumber]}" itemValue="#{stl.transactionNumber}"/>
+                        <f:selectItem itemLabel="" itemValue=""/>
+                        <f:selectItems value="#{transBean.transList}" var="stl" itemLabel="#{stl.transactionNumber}" itemValue="#{stl.transactionNumber}"/>
                         <p:ajax listener="#{transBean.loadOrderForInvoiceTrans(trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor,transBean.authorisedByUserDetail,transItemBean.selectedAccCoa)}" process="@form" update="pnlHeader gridTransItem pgrdOverrideWarranty pgrdSpecific gridItemStatus dtblTransactionItem pgrdTotals pgrdScheme pgrdPayment pgrdMsgs pgrdApprove growl1"/>
                     </p:selectOneMenu>
                     <h:inputText disabled="true" style="color: coral;font-weight: bold;width: 145px;height: 24px;" styleClass="clsInput" id="itxtDebtCredit" value="#{accJournalBean.returnBalanceString(trans.balance_receivable)}">
@@ -263,7 +263,7 @@
                     <p:ajax listener="#{transItemBean.addTransItemCallCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentSaleType,trans,statusBean,transItemBean.activeTransItems,transItem,itemBean.selectedItem)}" process="@form" update="gridTransItem pgrdOverrideWarranty pgrdSpecific gridItemStatus dtblTransactionItem pgrdTotals pgrdScheme pgrdPayment pgrdMsgs"/>
                 </p:commandButton>
                 <p:focus for="#{menuItemBean.menuItemObj.DEFAULT_FOCUS_CONTROL_ID}" rendered="#{menuItemBean.menuItemObj.DEFAULT_FOCUS_CONTROL_ID.length()>0}"/>
-                <p:remoteCommand name="barcode" actionListener="#{transItemBean.updateModelTransItemAutoAddCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentSaleType,trans,transItem,statusBean,transItemBean.activeTransItems,transItem,itemBean.selectedItem,'BarCode')}" process="@this itxtItemCode" update="gridTransItem gridItemStatus dtblTransactionItem pgrdTotals pgrdPayment">
+                <p:remoteCommand name="barcode" actionListener="#{transItemBean.updateModelTransItemAutoAddCECCall(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentSaleType,trans,transItem,statusBean,transItemBean.activeTransItems,transItem,itemBean.selectedItem,'BarCode')}" process="@this itxtItemCode" update="gridTransItem gridItemStatus dtblTransactionItem pgrdTotals pgrdPayment">
                 </p:remoteCommand>
             </h:panelGrid>
             <h:panelGrid id="pgrdOverrideWarranty" columns="2">

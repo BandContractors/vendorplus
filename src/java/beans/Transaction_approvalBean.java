@@ -559,7 +559,8 @@ public class Transaction_approvalBean implements Serializable {
         }
         try {
             Transaction_approval ta = this.getTransaction_approval(aTransaction_approval_id);
-            if (null != ta && ta.getApproval_status() != 0) {
+            //approval_status: 0 Submitted, 1 Approved, 2 Processed, 3 Rejected, 4 Recalled
+            if (null != ta && ta.getApproval_status() != 0 && ta.getApproval_status() != 1) {
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "This Transaction Cannot be Recalled")));
             } else {
                 int x = this.markRecalled(aTransaction_approval_id);

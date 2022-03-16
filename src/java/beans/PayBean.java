@@ -1591,6 +1591,8 @@ public class PayBean implements Serializable {
             pay.setInterestAmount(0);
             pay.setPay_number("");
             pay.setAccountBalance(0);
+            pay.setCustomerDeposit(0);
+            pay.setSupplierDeposit(0);
         }
         if (aPayTranss != null) {
             aPayTranss.clear();
@@ -1598,7 +1600,7 @@ public class PayBean implements Serializable {
     }
 
     public void clearPayPayTranss(Pay pay, List<PayTrans> aPayTranss, PayBean aPayBean, Trans aTrans) {
-        if (pay != null) {
+        if (null != pay) {
             pay.setPayId(0);
             pay.setPayDate(new CompanySetting().getCURRENT_SERVER_DATE());
             pay.setPaidAmount(0);
@@ -1630,7 +1632,7 @@ public class PayBean implements Serializable {
             pay.setPay_number("");
             pay.setAccountBalance(0);
         }
-        if (aPayTranss != null) {
+        if (null != aPayTranss) {
             aPayTranss.clear();
         }
         if (null != aPayBean) {
@@ -1639,6 +1641,7 @@ public class PayBean implements Serializable {
         }
         if (null != aTrans) {
             aTrans.setTransactionNumber2("");
+            aTrans.setDeposit_customer(0);
         }
     }
 
@@ -1677,6 +1680,8 @@ public class PayBean implements Serializable {
                 pay.setInterestAmount(0);
                 pay.setPay_number("");
                 pay.setAccountBalance(0);
+                pay.setCustomerDeposit(0);
+                pay.setSupplierDeposit(0);
             }
             new TransactorBean().clearTransactor(transactor);
             if (aPayTranss != null) {
@@ -1774,6 +1779,7 @@ public class PayBean implements Serializable {
             }
             if (null != aTrans) {
                 aTrans.setTransactionNumber2("");
+                aTrans.setDeposit_customer(0);
             }
         }
     }
@@ -2832,6 +2838,32 @@ public class PayBean implements Serializable {
             } else {
                 aPayTranss.get(ListItemIndex).setTransPaidAmount(0);
             }
+            GTotal = GTotal + (aPayTranss.get(ListItemIndex).getTransPaidAmount());
+            ListItemIndex = ListItemIndex + 1;
+        }
+        aPay.setPaidAmount(GTotal);
+    }
+
+    public void doPayAllTrans(List<PayTrans> aPayTranss, Pay aPay, PayTrans aPayTrans) {
+        double bal = aPayTrans.getGrandTotal() - aPayTrans.getSumTransPaidAmount();
+        if (aPayTrans.getTransPaidAmount() == bal) {
+            aPayTrans.setTransPaidAmount(0);
+        } else {
+            aPayTrans.setTransPaidAmount(bal);
+        }
+        this.refreshTotalPay(aPayTranss, aPay);
+    }
+
+    public void refreshTotalPay(List<PayTrans> aPayTranss, Pay aPay) {
+        int ListItemIndex = 0;
+        int ListItemNo = 0;
+        double GTotal = 0;
+        try {
+            ListItemNo = aPayTranss.size();
+        } catch (NullPointerException npe) {
+            ListItemNo = 0;
+        }
+        while (ListItemIndex < ListItemNo) {
             GTotal = GTotal + (aPayTranss.get(ListItemIndex).getTransPaidAmount());
             ListItemIndex = ListItemIndex + 1;
         }
