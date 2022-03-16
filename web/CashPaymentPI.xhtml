@@ -52,7 +52,7 @@
                 <h:panelGrid id="pnlSearch" styleClass="clsGridMainInput" columns="2" style="background-color: #b3f2b3;width: 100%;">
                     <h:panelGrid id="pnlSearch1" styleClass="clsGridMainInput" columns="6">
                         <h:outputLabel  value="#{langsys['Currency']}:"/>
-                        <h:selectOneMenu styleClass="clsMenu" id="menuCurrency" value="#{pay.currencyCode}">
+                        <h:selectOneMenu styleClass="clsMenu" id="menuCurrency" value="#{pay.currencyCode}" style="width: 240px;height: 30px">
                             <f:selectItems value="#{accCurrencyBean.currencyList}" var="ac" itemLabel="#{ac.currencyCode}" itemValue="#{ac.currencyCode}"/>
                             <f:ajax event="change" execute="@this" render="pnlInput pnlButtons"/>
                             <f:ajax event="change" listener="#{payTransBean.clearPayTranss(payTransBean.payTranss, pay)}" render="pnlInput"/>
@@ -87,14 +87,14 @@
                             <p:ajax event="change" listener="#{payTransBean.clearPayTranss(payTransBean.payTranss, pay)}" update="pnlInput"/>
                         </p:autoComplete>
                         <h:outputLabel  value="#{langsys[transactionTypeBean.getTransactionType(1).transactionNumberLabel]}:"/>
-                        <h:inputText id="itxtTransactionNumber2" value="#{trans.transactionNumber2}" autocomplete="off">
+                        <h:inputText id="itxtTransactionNumber2" value="#{trans.transactionNumber2}" autocomplete="off" style="width:155px">
                             <f:ajax event="change" listener="#{pay.setBillTransactorId(transBean.getTransByTransNumber(trans.transactionNumber2).billTransactorId)}" render="pnlInput pnlButtons" />
                             <f:ajax event="change" listener="#{payTransBean.clearPayTranss(payTransBean.payTranss, pay)}" render="pnlInput"/>
                         </h:inputText>
                     </h:panelGrid>
                     <h:panelGrid columns="1">
-                        <p:commandButton id="cbtnSearch" value="#{langsys['Search']}" style="background-color: black;color: white;font-weight: bold;" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" >
-                            <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:commandButton id="cbtnSearch" value="#{langsys['Search']}" style="background-color: black;color: white;font-weight: bold;height: 50px;" onclick="PF('statusDialog1').show()" onsuccess="PF('statusDialog1').hide()" >
+                            <p:dialog widgetVar="statusDialog1" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                                 <p:graphicImage name="/images/ajax-loader.gif"/>
                             </p:dialog>
                             <p:ajax listener="#{payTransBean.refreshPayTranssByBillTrPayCatTransNo2(trans.transactionNumber2,payBean.selectedBillTransactor.transactorId,generalUserSetting.getCurrentPayCategory(),pay.currencyCode,payBean.date1,payBean.date2)}" process="pnlSearch" update="pnlInput pnlButtons"/>
@@ -152,44 +152,51 @@
                     <p:column>
                         <f:facet name="header">
                             #{langsys['Pay']} #{langsys['Amount']}
-                            <h:selectBooleanCheckbox value="#{payBean.payAll}">
-                                <f:ajax listener="#{payBean.doPayAll(payTransBean.payTranss, payBean.payAll,pay)}" execute="dtblPayTranss" render="dtblPayTranss formPay:itxtPaidAmount"/>
-                            </h:selectBooleanCheckbox>
                         </f:facet>
-                        <h:inputText value="#{pts.transPaidAmount}">
+                        <h:inputText value="#{pts.transPaidAmount}" style="width: 100px;">
                             <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             <f:ajax event="change" listener="#{payTransBean.editPayTrans(payTransBean.payTranss,pts,pay)}" execute="dtblPayTranss" render="dtblPayTranss formPay:itxtPaidAmount"/>
                         </h:inputText>
                     </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:selectBooleanCheckbox value="#{payBean.payAll}">
+                                <f:ajax listener="#{payBean.doPayAll(payTransBean.payTranss, payBean.payAll,pay)}" execute="dtblPayTranss" render="dtblPayTranss formPay:itxtPaidAmount"/>
+                            </h:selectBooleanCheckbox>
+                        </f:facet>
+                        <p:commandButton icon="ui-icon-check" title="Pay Transaction Balance">
+                            <p:ajax listener="#{payBean.doPayAllTrans(payTransBean.payTranss,pay,pts)}" process="dtblPayTranss" update="dtblPayTranss formPay:itxtPaidAmount"/>
+                        </p:commandButton>
+                    </p:column>
                 </p:dataTable>
                 <h:panelGrid id="pnlInputDetails" styleClass="clsGridMainInput" columns="4">
                     <h:outputLabel  value="#{langsys['Amount']} #{langsys['Paid']}:"/>
-                    <h:inputText id="itxtPaidAmount" value="#{pay.paidAmount}" disabled="true" style="width: 250px;">
+                    <h:inputText id="itxtPaidAmount" value="#{pay.paidAmount}" disabled="true" style="width: 233px;">
                         <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
                     <h:outputLabel  style="width: 250px;" value="#{langsys['Pay']} #{langsys['Date']}:"/>
-                    <p:calendar styleClass="clsInput" style="width: 250px;" id="calPaymentDate"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{pay.payDate}" disabled="#{generalUserSetting.isAllowedToBackDate==0}">
+                    <p:calendar styleClass="clsInput" size="20" id="calPaymentDate"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{pay.payDate}" disabled="#{generalUserSetting.isAllowedToBackDate==0}">
                     </p:calendar>
                     <h:outputLabel  style="width: 250px;" value="#{langsys['Payment']} #{langsys['Method']}:"/>
-                    <h:selectOneMenu styleClass="clsMenu" style="width: 250px;" id="menuPayMethod" value="#{pay.payMethodId}">
+                    <h:selectOneMenu styleClass="clsMenu" style="width: 240px;" id="menuPayMethod" value="#{pay.payMethodId}">
                         <f:selectItem itemValue="" itemLabel=""/>
                         <f:selectItems value="#{payMethodBean.getPayMethodsActiveIn('1,2,3,4,5,7,11')}" var="pm" itemLabel="#{pm.payMethodName}" itemValue="#{pm.payMethodId}"/>
                         <f:ajax event="change" execute="@this menuCurrency" render="menuAccount"/>
                     </h:selectOneMenu>
                     <h:outputLabel  value="#{langsys['Paid']} #{langsys['from']} #{langsys['Account']}:"/>
-                    <h:selectOneMenu styleClass="clsMenu" style="width: 250px;" id="menuAccount" value="#{pay.accChildAccountId}">
+                    <h:selectOneMenu styleClass="clsMenu" style="width: 240px;" id="menuAccount" value="#{pay.accChildAccountId}">
                         <f:selectItem itemValue="" itemLabel=""/>
                         <f:selectItems value="#{accChildAccountBean.getAccChildAccountsForCashPayment(pay.currencyCode, pay.payMethodId,generalUserSetting.getCurrentStore().storeId,generalUserSetting.getCurrentUser().userDetailId)}" var="ca" itemLabel="#{ca.childAccountCode} (#{ca.childAccountName})" itemValue="#{ca.accChildAccountId}"/>
                     </h:selectOneMenu>
                     <h:outputLabel  style="width: 250px;" value="#{langsys['Reference']} #{langsys['No.']}:"/>
-                    <h:inputText id="itxtPayRefNo" style="width: 250px;" value="#{pay.payRefNo}" styleClass="clsInputTransItem"/>
+                    <h:inputText id="itxtPayRefNo" style="width: 233px;" value="#{pay.payRefNo}" styleClass="clsInputTransItem"/>
                     <h:outputLabel  style="width: 250px;" value="#{langsys['Status']}:"/>
-                    <h:selectOneMenu styleClass="clsMenu" style="width: 250px;" id="menuStatus" value="#{pay.status}">
+                    <h:selectOneMenu styleClass="clsMenu" style="width: 240px;" id="menuStatus" value="#{pay.status}">
                         <f:selectItem itemLabel="#{langsys['Cleared']}" itemValue="1"/>
                         <f:selectItem itemLabel="#{langsys['Not']} #{langsys['Cleared']}" itemValue="0"/>
                     </h:selectOneMenu>
                     <h:outputLabel  style="width: 250px;" value="#{langsys['Status']} #{langsys['Description']}:"/>
-                    <h:inputText id="itxtStatusDesc" style="width: 250px;" value="#{pay.statusDesc}" styleClass="clsInputTransItem"/>
+                    <h:inputText id="itxtStatusDesc" style="width: 233px;" value="#{pay.statusDesc}" styleClass="clsInputTransItem"/>
                 </h:panelGrid>
             </h:panelGrid>
             <h:panelGrid id="pnlButtons" styleClass="clsGridMainCommands" columns="1">
@@ -201,8 +208,8 @@
                         <p:ajax listener="#{payBean.saveCashPayment(pay,payTransBean.payTranss,15,25)}" process="@form" update="@this pnlSearch pnlInput msgPanel pnlReceipt"/>
                     </p:commandButton>
                     <p:commandButton styleClass="clsButtonBig" value="#{langsys['CLEAR']} (ALT+C)" accesskey="c">
+                        <p:ajax listener="#{payBean.setPayAll(false)}" process="pnlInput"/>
                         <p:ajax listener="#{payBean.clearPayPayTranss(pay,payTransBean.payTranss,payBean,trans)}" process="@form" update="pnlSearch pnlInput msgPanel pnlReceipt"/>
-                        <p:ajax listener="#{payBean.setPayAll(false)}" process="pnlInput" update="pnlInput"/>
                     </p:commandButton>
                 </h:panelGrid>
             </h:panelGrid>

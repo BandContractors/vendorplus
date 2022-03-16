@@ -11444,7 +11444,7 @@ public class TransItemBean implements Serializable {
         try {
             String ItemCode = aSelectedTransItem.getItemCode();
             if (ItemCode.startsWith("ST")) {
-                aTrans.setTransactionRef(ItemCode);
+                //aTrans.setTransactionRef(ItemCode);
                 new TransBean().loadTransferForInvoiceTrans(aTrans, aActiveTransItems, aSelectedTransItem);
             } else {
                 this.updateModelTransItemAutoAddCEC(aStoreId, aTransTypeId, aTransReasonId, aSaleType, aTrans, aTransItemToUpdate, aStatusBean, aActiveTransItems, aSelectedTransItem, aSelectedItem, aEntryMode);

@@ -95,7 +95,7 @@
             <h:panelGrid id="pnlInput" columns="1">
                 <h:panelGrid id="pnlInputDetails" styleClass="clsGridMainInput" columns="6">
                     <h:outputLabel  value="#{langsys['Amount']} #{langsys['Paid']}:"/>
-                    <h:inputText id="itxtPaidAmount" value="#{pay.paidAmount}" style="width: 250px;">
+                    <h:inputText id="itxtPaidAmount" value="#{pay.paidAmount}" style="width: 233px;">
                         <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         <f:ajax event="change" execute="@form" render="@form"/>
                     </h:inputText>
@@ -109,7 +109,7 @@
                     </h:selectOneMenu>
 
                     <h:outputLabel  value="#{langsys['Paid']} #{langsys['from']} #{langsys['Account']}:"/>
-                    <h:selectOneMenu styleClass="clsMenu" style="width: 250px;" id="menuAccount" value="#{pay.accChildAccountId}">
+                    <h:selectOneMenu styleClass="clsMenu" style="width: 240px;" id="menuAccount" value="#{pay.accChildAccountId}">
                         <f:selectItem itemValue="" itemLabel=""/>
                         <f:selectItems value="#{accChildAccountBean.getAccChildAccountsForCashPayment(pay.currencyCode, pay.payMethodId,generalUserSetting.getCurrentStore().storeId,generalUserSetting.getCurrentUser().userDetailId)}" var="ca" itemLabel="#{ca.childAccountCode} (#{ca.childAccountName})" itemValue="#{ca.accChildAccountId}"/>
                     </h:selectOneMenu>
@@ -121,7 +121,7 @@
                         <f:selectItem itemLabel="#{langsys['Not']} #{langsys['Cleared']}" itemValue="0"/>
                     </h:selectOneMenu>
                     <h:outputLabel  value="#{langsys['Status']} #{langsys['Description']}:"/>
-                    <h:inputText id="itxtStatusDesc" value="#{pay.statusDesc}" styleClass="clsInputTransItem" style="width: 250px;"/>
+                    <h:inputText id="itxtStatusDesc" value="#{pay.statusDesc}" styleClass="clsInputTransItem" style="width: 233px;"/>
                 </h:panelGrid>
             </h:panelGrid>
             <h:panelGrid id="pnlButtons" styleClass="clsGridMainCommands" columns="1">

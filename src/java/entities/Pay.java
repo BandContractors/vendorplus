@@ -1,6 +1,5 @@
 package entities;
 
-
 import java.io.Serializable;
 import java.util.Date;
 import javax.faces.bean.ManagedBean;
@@ -10,7 +9,6 @@ import javax.faces.bean.SessionScoped;
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author btwesigye
@@ -35,7 +33,7 @@ public class Pay implements Serializable {
     private String PayCategory;
     private long BillTransactorId;
     private int StoreId;
-    
+
     private int AccChildAccountId;
     private String CurrencyCode;
     private double XRate;
@@ -50,13 +48,15 @@ public class Pay implements Serializable {
     private Date PayDate2;
     private Date AddDate2;
     private Date EditDate2;
-    
+
     private String pay_number;
     private String PaidForSummary;
     private String PayReasonName;
     private String ChildAccountName;
-    
+
     private double AccountBalance;
+    private double SupplierDeposit;
+    private double CustomerDeposit;
 
     /**
      * @return the PayId
@@ -518,5 +518,33 @@ public class Pay implements Serializable {
      */
     public void setAccountBalance(double AccountBalance) {
         this.AccountBalance = AccountBalance;
+    }
+
+    /**
+     * @return the SupplierDeposit
+     */
+    public double getSupplierDeposit() {
+        return SupplierDeposit;
+    }
+
+    /**
+     * @param SupplierDeposit the SupplierDeposit to set
+     */
+    public void setSupplierDeposit(double SupplierDeposit) {
+        this.SupplierDeposit = SupplierDeposit;
+    }
+
+    /**
+     * @return the CustomerDeposit
+     */
+    public double getCustomerDeposit() {
+        return CustomerDeposit;
+    }
+
+    /**
+     * @param CustomerDeposit the CustomerDeposit to set
+     */
+    public void setCustomerDeposit(double CustomerDeposit) {
+        this.CustomerDeposit = CustomerDeposit;
     }
 }
