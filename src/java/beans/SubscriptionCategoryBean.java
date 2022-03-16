@@ -35,7 +35,7 @@ public class SubscriptionCategoryBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = Logger.getLogger(SubscriptionCategoryBean.class.getName());
-    
+
     private List<Subscription_category> SubscriptionCategorys;
     private String ActionMessage = null;
     private Subscription_category SelectedSubscriptionCategory = null;
@@ -188,14 +188,18 @@ public class SubscriptionCategoryBean implements Serializable {
             SubscriptionCategoryTo.setCategory_name(SubscriptionCategoryFrom.getCategory_name());
             SubscriptionCategoryTo.setCategory_code(SubscriptionCategoryFrom.getCategory_code());
         } catch (Exception e) {
-            System.out.println("displaySubscriptionCategory-a:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
     public void clearSubscriptionCategory(Subscription_category subscription_category) {
-        subscription_category.setSubscription_category_id(0);
-        subscription_category.setCategory_name("");
-        subscription_category.setCategory_code("");
+        try {
+            subscription_category.setSubscription_category_id(0);
+            subscription_category.setCategory_name("");
+            subscription_category.setCategory_code("");
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
     }
 
     public List<Subscription_category> getSubscriptionCategory() {
@@ -272,7 +276,8 @@ public class SubscriptionCategoryBean implements Serializable {
     }
 
     /**
-     * @param SelectedSubscriptionCategory the SelectedSubscriptionCategory to set
+     * @param SelectedSubscriptionCategory the SelectedSubscriptionCategory to
+     * set
      */
     public void setSelectedSubscriptionCategory(Subscription_category SelectedSubscriptionCategory) {
         this.SelectedSubscriptionCategory = SelectedSubscriptionCategory;
@@ -286,7 +291,8 @@ public class SubscriptionCategoryBean implements Serializable {
     }
 
     /**
-     * @param SelectedSubscriptionCategoryId the SelectedSubscriptionCategoryId to set
+     * @param SelectedSubscriptionCategoryId the SelectedSubscriptionCategoryId
+     * to set
      */
     public void setSelectedSubscriptionCategoryId(int SelectedSubscriptionCategoryId) {
         this.SelectedSubscriptionCategoryId = SelectedSubscriptionCategoryId;
@@ -300,7 +306,8 @@ public class SubscriptionCategoryBean implements Serializable {
     }
 
     /**
-     * @param SearchSubscriptionCategoryName the SearchSubscriptionCategoryName to set
+     * @param SearchSubscriptionCategoryName the SearchSubscriptionCategoryName
+     * to set
      */
     public void setSearchSubscriptionCategoryName(String SearchSubscriptionCategoryName) {
         this.SearchSubscriptionCategoryName = SearchSubscriptionCategoryName;

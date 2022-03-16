@@ -1827,6 +1827,10 @@ public class NavigationBean implements Serializable {
         return "TransactionApproval?faces-redirect=true";
     }
 
+    public String redirectToShift() {
+        return "Shift?faces-redirect=true";
+    }
+
     /**
      * @return the menuItemBean
      */
