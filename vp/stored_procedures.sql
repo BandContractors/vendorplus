@@ -13867,3 +13867,58 @@ BEGIN
 	ORDER BY shift_name ASC; 
 END//
 DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_insert_transaction_shift;
+DELIMITER //
+CREATE PROCEDURE sp_insert_transaction_shift
+(
+	IN in_transaction_id bigint,
+	IN in_shift_id int
+) 
+BEGIN
+	INSERT INTO transaction_shift
+	(
+		transaction_id,
+		shift_id
+	) 
+    VALUES
+	(
+		in_transaction_id,
+		in_shift_id
+	); 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_update_transaction_shift;
+DELIMITER //
+CREATE PROCEDURE sp_update_transaction_shift
+(
+	IN in_transaction_shift_id bigint,
+	IN in_transaction_id bigint,
+	IN in_shift_id int
+) 
+BEGIN 
+	UPDATE transaction_shift SET transaction_id=in_transaction_id,shift_id=in_shift_id 
+	WHERE transaction_shift_id=in_transaction_shift_id; 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_transaction_shift_by_id;
+DELIMITER //
+CREATE PROCEDURE sp_search_transaction_shift_by_id
+(
+	IN in_transaction_shift_id bigint
+) 
+BEGIN 
+	SELECT * FROM transaction_shift 
+	WHERE transaction_shift_id=in_transaction_shift_id; 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_transaction_shift_by_none;
+DELIMITER //
+CREATE PROCEDURE sp_search_transaction_shift_by_none() 
+BEGIN 
+	SELECT * FROM transaction_shift ORDER BY transaction_shift_id ASC; 
+END//
+DELIMITER ;
