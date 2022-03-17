@@ -19,3 +19,7 @@ ALTER TABLE transaction_approval
 ADD COLUMN status_comment varchar(150) NULL after status_desc;
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_17',20,Now(),'6.0','');
+
+create table shift (shift_id int(11) not null auto_increment, shift_name varchar(50) not null, description varchar(150) not null, start_time time not null, end_time time not null, primary key (shift_id));
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_17',24,Now(),'6.0','');
