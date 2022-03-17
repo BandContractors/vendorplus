@@ -14,7 +14,6 @@ import java.sql.Time;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
@@ -179,12 +178,16 @@ public class ShiftBean implements Serializable {
     }
 
     public void deleteShiftByObject(Shift shift) {
-        this.deleteShiftById(shift.getShift_id());
+        int deleteStatus = this.deleteShiftById(shift.getShift_id());
+        if (deleteStatus == 1) {
+            this.clearShift(shift);
+        }
     }
 
-    public void deleteShiftById(int ShiftId) {
+    public int deleteShiftById(int ShiftId) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
+        int status = 0;
         try {
             BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         } catch (Exception e) {
@@ -204,12 +207,14 @@ public class ShiftBean implements Serializable {
                     PreparedStatement ps = conn.prepareStatement(sql);) {
                 ps.setInt(1, ShiftId);
                 ps.executeUpdate();
+                status = 1;
                 this.setActionMessage(ub.translateWordsInText(BaseName, "Deleted Successfully"));
             } catch (Exception e) {
                 LOGGER.log(Level.ERROR, e);
                 this.setActionMessage(ub.translateWordsInText(BaseName, "Shift Not Deleted"));
             }
         }
+        return status;
     }
 
     public void displayShift(Shift ShiftFrom, Shift ShiftTo) {

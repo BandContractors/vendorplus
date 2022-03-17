@@ -2,7 +2,6 @@ package entities;
 
 import java.io.Serializable;
 import java.time.LocalTime;
-import java.util.Date;
 import javax.faces.bean.*;
 
 @ManagedBean
