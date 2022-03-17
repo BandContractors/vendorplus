@@ -24,10 +24,10 @@
 
                         <h:panelGrid id="IpgrdSalesInvoiceHeader1" style="width: 290px;text-align: center;border-bottom-style: dotted;" columns="1">
                             <h:outputLabel id="IolblSalesInvoiceCompany" style="font-size: 20px;font-weight: bold;" value="#{companySetting.getLICENSE_CLIENT_NAME()}" rendered="#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','OUTPUT_SHOW_CO_NAME').parameter_value.equals('1')}"/>
-                            <p:panel style="width: 290px;text-align: center; border-style: none !important;">
+                            <p:panelGrid style="width: 290px;text-align: center; border-style: none !important;">
                                 <h:outputLabel id="IolblSalesInvoiceBranch" value="#{companySetting.getBranchCode()} " rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowBranchInvoice(),'Yes')}"/>
                                 <h:outputLabel id="IolblSalesInvoiceStore" value="#{generalUserSetting.outputDetailParent.store.storeName}" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowStoreInvoice(),'Yes')}"/>
-                            </p:panel>
+                            </p:panelGrid>
                         </h:panelGrid>
                         <h:panelGrid style="width: 290px;" columns="1" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowLogoInvoice(),'Yes') and companySetting.getLogoUrl().length()>1}">
                             <p:graphicImage value="#{companySetting.getLogoUrl()}" style="display: block;margin-left: auto;margin-right: auto;"/>
@@ -45,7 +45,7 @@
                             <h:outputLabel id="IolblSalesInvoiceEmail" value="#{langout['Email']}: #{companySetting.getEmail()}" rendered="#{companySetting.getEmail().length()>0}"/>
                         </h:panelGrid>
 
-                        <h:panelGrid columns="1" style="width: 290px; margin: 0px;background-color: gray;text-align: center;-webkit-print-color-adjust: exact;">
+                        <h:panelGrid columns="1" style="width: 290px; margin: 0px;background-color: black;text-align: center;-webkit-print-color-adjust: exact;">
                             <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 18pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">#{langout[generalUserSetting.outputDetailParent.transaction_type.transactionOutputLabel]}</h:outputLabel>
                         </h:panelGrid>
                         <h:panelGrid style="width: 290px; margin: 0px;" columns="2" rendered="#{utilityBean.isDatesEqual(generalUserSetting.outputDetailParent.trans.transactionDate, generalUserSetting.outputDetailParent.trans.addDate)==1}">
@@ -96,10 +96,10 @@
                         <h:panelGrid style="width: 290px; margin: 0px;" columns="2" rendered="#{generalUserSetting.outputDetailParent.trans.transactor_rep.length() gt 0}">
                             <h:outputLabel style="font-size: 12px;" value="#{langsys['Attention']}: #{generalUserSetting.outputDetailParent.trans.transactor_rep}"/>
                         </h:panelGrid>
-
+                        
                         <h:panelGrid id="IpgrdSalesInvoiceItems">
                             <h:dataTable id="IdtblSalesInvoiceItems" value="#{generalUserSetting.outputDetailParent.trans_items}" var="ti" 
-                                         styleClass="cls-table-SalesInvoice-very-small" 
+                                         styleClass="cls-table-SalesInvoice-very-small"   
                                          headerClass="cls-table-header-SalesInvoice" 
                                          rowClasses="cls-table-odd-row-SalesInvoice,cls-table-even-row-SalesInvoice" 
                                          columnClasses="cls-table-col1-SalesInvoice,cls-table-col2-SalesInvoice,cls-table-col3-SalesInvoice"
@@ -129,14 +129,14 @@
                                     <!-- column header -->
                                     <f:facet name="header">#{langout['AMOUNT']}</f:facet>
                                     <!-- row record -->
-                                    <h:outputLabel style="font-size: 12px;" value="#{ti.amountIncVat}">
+                                    <h:outputLabel style="font-size: 12px;float: right;" value="#{ti.amountIncVat}">
                                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                     </h:outputLabel>
                                 </h:column>
                             </h:dataTable>
                         </h:panelGrid>
 
-                        <h:panelGrid id="IpgrdSalesInvoiceTotals" style="width: 290px; margin: 0px;border-bottom-style: dotted" columns="2">               
+                        <h:panelGrid id="IpgrdSalesInvoiceTotals" style="width: 290px; margin: 0px;border-bottom-style: dotted;" columns="2">               
                             <h:outputLabel style="font-size: 16px;" value="#{langout['Subtotal']}:" rendered="#{companySetting.EShowVatAnalysisInvoice.equals('Yes')}"/>
                             <h:outputLabel style="font-size: 16px;" id="IolblSalesInvoiceSubTotal" value="#{generalUserSetting.outputDetailParent.trans.subTotal}" rendered="#{companySetting.EShowVatAnalysisInvoice.equals('Yes')}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
