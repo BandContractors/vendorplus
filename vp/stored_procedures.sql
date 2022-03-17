@@ -13786,3 +13786,84 @@ BEGIN
 	ORDER BY subscription_log_id ASC; 
 END//
 DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_insert_shift;
+DELIMITER //
+CREATE PROCEDURE sp_insert_shift
+(
+	IN in_shift_name varchar(50),
+	IN in_description varchar(150),
+	IN in_start_time time,
+	IN in_end_time time
+) 
+BEGIN
+	INSERT INTO shift
+	(
+		shift_name,
+		description,
+		start_time,
+		end_time
+	) 
+    VALUES
+	(
+		in_shift_name,
+		in_description,
+		in_start_time,
+		in_end_time
+	); 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_update_shift;
+DELIMITER //
+CREATE PROCEDURE sp_update_shift
+(
+	IN in_shift_id int,
+	IN in_shift_name varchar(50),
+	IN in_description varchar(150),
+	IN in_start_time time,
+	IN in_end_time time
+) 
+BEGIN 
+	UPDATE shift SET 
+		shift_name=in_shift_name,
+		description=in_description,
+		start_time=in_start_time,
+		end_time=in_end_time
+	WHERE shift_id=in_shift_id; 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_shift_by_id;
+DELIMITER //
+CREATE PROCEDURE sp_search_shift_by_id
+(
+	IN in_shift_id int
+) 
+BEGIN 
+	SELECT * FROM shift 
+	WHERE shift_id=in_shift_id; 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_shift_by_name;
+DELIMITER //
+CREATE PROCEDURE sp_search_shift_by_name
+(
+	IN in_shift_name varchar(50)
+) 
+BEGIN 
+	SELECT * FROM shift 
+	WHERE shift_name LIKE concat('%',in_shift_name,'%') OR description LIKE concat('%',in_shift_name,'%')  
+	ORDER BY shift_name ASC; 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_shift_by_none;
+DELIMITER //
+CREATE PROCEDURE sp_search_shift_by_none() 
+BEGIN 
+	SELECT * FROM shift 
+	ORDER BY shift_name ASC; 
+END//
+DELIMITER ;
