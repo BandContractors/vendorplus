@@ -27,3 +27,24 @@ VALUES('scrpt_db_upgrade_17',24,Now(),'6.0','');
 create table transaction_shift (transaction_shift_id bigint(20) not null auto_increment, transaction_id bigint(20) not null, shift_id int(11) not null, primary key (transaction_shift_id));
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_17',28,Now(),'6.0','');
+
+create table mode_activity (mode_activity_id int primary key auto_increment,mode_name varchar(25) not null unique  )ENGINE=InnoDB;
+create table staff (staff_id int primary key auto_increment,first_name varchar(50) not null,last_name varchar(50) not null  )ENGINE=InnoDB;
+create table category_activity (category_activity_id int primary key auto_increment,category_name varchar(50) not null unique )ENGINE=InnoDB;
+create table subcategory_activity (subcategory_activity_id int primary key auto_increment,category_activity_id int,category_name varchar(50) not null unique )ENGINE=InnoDB;
+create table timesheet (
+                        timesheet_id bigint(20) primary key auto_increment,
+                        activity_status varchar(20),
+                        transactor_id bigint(20),
+                        mode_activity_id int,
+                        staff_id int,
+                        category_activity_id int,
+                        subcategory_activity_id int,
+                        time_taken double,
+                        activity_name varchar(255) not null,
+                        activity_date date not null, 
+                        submission_date datetime not null,
+                        unit_of_time varchar(15) not null
+                        )ENGINE=InnoDB;
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_17',49,Now(),'6.0','');
