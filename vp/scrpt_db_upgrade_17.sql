@@ -29,9 +29,9 @@ INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_
 VALUES('scrpt_db_upgrade_17',28,Now(),'6.0','');
 
 create table mode_activity (mode_activity_id int primary key auto_increment,mode_name varchar(25) not null unique  )ENGINE=InnoDB;
-create table staff (staff_id int primary key auto_increment,first_name varchar(50) not null,last_name varchar(50) not null  )ENGINE=InnoDB;
+create table staff (staff_id int primary key auto_increment,first_name varchar(50) not null,second_name varchar(50) not null,third_name varchar(50))ENGINE=InnoDB;
 create table category_activity (category_activity_id int primary key auto_increment,category_name varchar(50) not null unique )ENGINE=InnoDB;
-create table subcategory_activity (subcategory_activity_id int primary key auto_increment,category_activity_id int,category_name varchar(50) not null unique )ENGINE=InnoDB;
+create table subcategory_activity (subcategory_activity_id int primary key auto_increment,category_activity_id int,subcategory_name varchar(50) not null unique )ENGINE=InnoDB;
 create table timesheet (
                         timesheet_id bigint(20) primary key auto_increment,
                         activity_status varchar(20),

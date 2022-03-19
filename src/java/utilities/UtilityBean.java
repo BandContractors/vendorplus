@@ -5,6 +5,7 @@ import beans.AccCurrencyBean;
 import beans.AccJournalBean;
 import beans.Alert_generalBean;
 import beans.ItemBean;
+import beans.Mode_activityBean;
 import beans.Parameter_listBean;
 import beans.PayTransBean;
 import beans.TransBean;
@@ -15,12 +16,12 @@ import connections.DBConnection;
 import entities.CompanySetting;
 import entities.Item;
 import entities.Item_code_other;
+import entities.Mode_activity;
 import entities.ThreadClass;
 import entities.Trans;
 import entities.TransItem;
 import entities.TransactionReason;
 import entities.TransactionType;
-import entities.Transactor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
@@ -755,9 +756,12 @@ public class UtilityBean implements Serializable {
     }
 
 //    public static void main(String[] args) {
-//        String a = "ZERO,EXEMPT,STANDARD";//STANDARD,EXEMPT,ZERO //ZERO,EXEMPT,STANDARD
-//        System.out.println(a.startsWith("STANDARD"));//23456789
+//        Mode_activity ma=new Mode_activity();
+//        ma.setMode_name("Physical");
+//        int x=new Mode_activityBean().insertMode_activity(ma);
+//        System.out.println("Inserted:" + x);
 //    }
+    
     public List<ThreadClass> getRunningThreads() {
         List<ThreadClass> objs = new ArrayList<>();
         Set<Thread> threads = Thread.getAllStackTraces().keySet();

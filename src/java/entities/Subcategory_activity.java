@@ -20,7 +20,7 @@ public class Subcategory_activity implements Serializable {
     private static final long serialVersionUID = 1L;
     private int subcategory_activity_id;
     private int category_activity_id;
-    private String category_name;
+    private String subcategory_name;
 
     /**
      * @return the subcategory_activity_id
@@ -51,17 +51,17 @@ public class Subcategory_activity implements Serializable {
     }
 
     /**
-     * @return the category_name
+     * @return the subcategory_name
      */
-    public String getCategory_name() {
-        return category_name;
+    public String getSubcategory_name() {
+        return subcategory_name;
     }
 
     /**
-     * @param category_name the category_name to set
+     * @param subcategory_name the subcategory_name to set
      */
-    public void setCategory_name(String category_name) {
-        this.category_name = category_name;
+    public void setSubcategory_name(String subcategory_name) {
+        this.subcategory_name = subcategory_name;
     }
 
 }
