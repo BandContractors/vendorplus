@@ -7,6 +7,7 @@ import entities.CompanySetting;
 import entities.Pay;
 import entities.GroupRight;
 import entities.PayTrans;
+import entities.Subscription;
 import entities.Transactor;
 import entities.UserDetail;
 import entities.TransactorLedger;
@@ -2868,6 +2869,22 @@ public class PayBean implements Serializable {
             ListItemIndex = ListItemIndex + 1;
         }
         aPay.setPaidAmount(GTotal);
+    }
+
+    public double getTotalAmountRecieved(List<Pay> pay) {
+        int totalRecievedAmount = 0;
+        for (Pay s : pay) {
+            totalRecievedAmount += s.getPaidAmount();
+        }
+        return totalRecievedAmount;
+    }
+
+    public double getTotalAmountPaid(List<Pay> pay) {
+        int totalRecievedAmount = 0;
+        for (Pay s : pay) {
+            totalRecievedAmount += s.getPaidAmount();
+        }
+        return totalRecievedAmount;
     }
 
     /**

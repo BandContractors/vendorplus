@@ -161,29 +161,29 @@
                 <p:dataTable id="tblSummaryBusinessCategory" tableStyle="width:100%;" var="sum" value="#{subscriptionBean.subscriptionsSummary_businessCategory}">
                     <p:column headerText="#{langsys['Business']} #{langsys['Category']}">
                         <h:outputLabel value="#{businessCategoryBean.getBusinessCategory(sum.business_category_id).getCategory_name()}"/>
-                            <f:facet name="footer">
-                                <h:outputText value="Total" />
-                            </f:facet>
+                        <f:facet name="footer">
+                            <h:outputText value="Total" />
+                        </f:facet>
                     </p:column>
                     <p:column headerText="#{langsys['No']}" width="10%" style="text-align: right;">
                         <h:outputText value="#{sum.description}">
                             <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
-                            <f:facet name="footer">
-                                <h:outputText value="#{subscriptionBean.getTotalNo(subscriptionBean.subscriptionsSummary_businessCategory)}">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                                </h:outputText>
-                            </f:facet>
+                        <f:facet name="footer">
+                            <h:outputText value="#{subscriptionBean.getTotalNo(subscriptionBean.subscriptionsSummary_businessCategory)}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </f:facet>
                     </p:column>
                     <p:column headerText="#{langsys['Amount']}" style="text-align: right;">
                         <h:outputText value="#{sum.amount}">
                             <f:convertNumber pattern="###,###.#" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
-                            <f:facet name="footer">
-                                <h:outputText value="#{subscriptionBean.getTotalAmount(subscriptionBean.subscriptionsSummary_businessCategory)}">
-                                    <f:convertNumber pattern="###,###.#" locale="#{utilityBean.convertLocaleToString()}"/>
-                                </h:outputText>
-                            </f:facet>
+                        <f:facet name="footer">
+                            <h:outputText value="#{subscriptionBean.getTotalAmount(subscriptionBean.subscriptionsSummary_businessCategory)}">
+                                <f:convertNumber pattern="###,###.#" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </f:facet>
                     </p:column>
                 </p:dataTable>
                 <h:panelGrid>
