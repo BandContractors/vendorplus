@@ -22,6 +22,7 @@ public class Store implements Serializable {
     private int StoreId;
     private String StoreName;
     private String store_code;
+    private int shift_id;
 
     /**
      * @return the StoreId
@@ -63,6 +64,20 @@ public class Store implements Serializable {
      */
     public void setStore_code(String store_code) {
         this.store_code = store_code;
+    }
+
+    /**
+     * @return the shift_id
+     */
+    public int getShift_id() {
+        return shift_id;
+    }
+
+    /**
+     * @param shift_id the shift_id to set
+     */
+    public void setShift_id(int shift_id) {
+        this.shift_id = shift_id;
     }
 
     

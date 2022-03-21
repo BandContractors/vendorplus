@@ -45,6 +45,33 @@ public class StoreBean implements Serializable {
     @ManagedProperty("#{menuItemBean}")
     private MenuItemBean menuItemBean;
 
+    public void setStoreFromResultset(Store aStore, ResultSet aResultSet) {
+        try {
+            try {
+                aStore.setStoreId(aResultSet.getInt("store_id"));
+            } catch (Exception e) {
+                aStore.setStoreId(0);
+            }
+            try {
+                aStore.setStoreName(aResultSet.getString("store_name"));
+            } catch (Exception e) {
+                aStore.setStoreName("");
+            }
+            try {
+                aStore.setStore_code(aResultSet.getString("store_code"));
+            } catch (Exception e) {
+                aStore.setStore_code("");
+            }
+            try {
+                aStore.setShift_id(aResultSet.getInt("shift_id"));
+            } catch (Exception e) {
+                aStore.setShift_id(0);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public void refreshStoresList() {
         String sql;
         sql = "{call sp_search_store_by_none()}";
@@ -60,9 +87,7 @@ public class StoreBean implements Serializable {
             rs = ps.executeQuery();
             while (rs.next()) {
                 Store store = new Store();
-                store.setStoreId(rs.getInt("store_id"));
-                store.setStoreName(rs.getString("store_name"));
-                store.setStore_code(rs.getString("store_code"));
+                this.setStoreFromResultset(store, rs);
                 this.StoresList.add(store);
             }
         } catch (Exception e) {
@@ -130,9 +155,7 @@ public class StoreBean implements Serializable {
             rs = ps.executeQuery();
             if (rs.next()) {
                 Store store = new Store();
-                store.setStoreId(rs.getInt("store_id"));
-                store.setStoreName(rs.getString("store_name"));
-                store.setStore_code(rs.getString("store_code"));
+                this.setStoreFromResultset(store, rs);
                 return store;
             } else {
                 return null;
@@ -153,9 +176,7 @@ public class StoreBean implements Serializable {
             rs = ps.executeQuery();
             if (rs.next()) {
                 Store store = new Store();
-                store.setStoreId(rs.getInt("store_id"));
-                store.setStoreName(rs.getString("store_name"));
-                store.setStore_code(rs.getString("store_code"));
+                this.setStoreFromResultset(store, rs);
                 return store;
             } else {
                 return null;
@@ -207,6 +228,7 @@ public class StoreBean implements Serializable {
         StoreTo.setStoreId(StoreFrom.getStoreId());
         StoreTo.setStoreName(StoreFrom.getStoreName());
         StoreTo.setStore_code(StoreFrom.getStore_code());
+        StoreTo.setShift_id(StoreFrom.getShift_id());
     }
 
     public void clearStore(Store store) {
@@ -214,6 +236,7 @@ public class StoreBean implements Serializable {
             store.setStoreId(0);
             store.setStoreName("");
             store.setStore_code("");
+            store.setShift_id(0);
         } catch (NullPointerException npe) {
 
         }
@@ -226,16 +249,14 @@ public class StoreBean implements Serializable {
         String sql;
         sql = "{call sp_search_store_by_none()}";
         ResultSet rs = null;
-        Stores = new ArrayList<Store>();
+        Stores = new ArrayList<>();
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             rs = ps.executeQuery();
             while (rs.next()) {
                 Store store = new Store();
-                store.setStoreId(rs.getInt("store_id"));
-                store.setStoreName(rs.getString("store_name"));
-                store.setStore_code(rs.getString("store_code"));
+                this.setStoreFromResultset(store, rs);
                 Stores.add(store);
             }
         } catch (Exception e) {
@@ -248,7 +269,7 @@ public class StoreBean implements Serializable {
         String sql;
         sql = "{call sp_search_store_by_name(?)}";
         ResultSet rs = null;
-        Stores = new ArrayList<Store>();
+        Stores = new ArrayList<>();
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -256,9 +277,7 @@ public class StoreBean implements Serializable {
             rs = ps.executeQuery();
             while (rs.next()) {
                 Store store = new Store();
-                store.setStoreId(rs.getInt("store_id"));
-                store.setStoreName(rs.getString("store_name"));
-                store.setStore_code(rs.getString("store_code"));
+                this.setStoreFromResultset(store, rs);
                 Stores.add(store);
             }
         } catch (Exception e) {
@@ -278,7 +297,7 @@ public class StoreBean implements Serializable {
         String sql;
         sql = "{call sp_search_store_by_user_detail(?)}";
         ResultSet rs = null;
-        Stores = new ArrayList<Store>();
+        Stores = new ArrayList<>();
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -286,9 +305,7 @@ public class StoreBean implements Serializable {
             rs = ps.executeQuery();
             while (rs.next()) {
                 Store store = new Store();
-                store.setStoreId(rs.getInt("store_id"));
-                store.setStoreName(rs.getString("store_name"));
-                store.setStore_code(rs.getString("store_code"));
+                this.setStoreFromResultset(store, rs);
                 Stores.add(store);
             }
         } catch (Exception e) {
@@ -301,16 +318,14 @@ public class StoreBean implements Serializable {
         String sql;
         sql = "{call sp_search_store_by_none()}";
         ResultSet rs = null;
-        Stores = new ArrayList<Store>();
+        Stores = new ArrayList<>();
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             rs = ps.executeQuery();
             while (rs.next()) {
                 Store store = new Store();
-                store.setStoreId(rs.getInt("store_id"));
-                store.setStoreName(rs.getString("store_name"));
-                store.setStore_code(rs.getString("store_code"));
+                this.setStoreFromResultset(store, rs);
                 Stores.add(store);
             }
         } catch (Exception e) {
@@ -322,7 +337,7 @@ public class StoreBean implements Serializable {
     public List<Store> getWeekDaysList() {
         String sql;
         ResultSet rs = null;
-        List<Store> stores = new ArrayList<Store>();
+        List<Store> stores = new ArrayList<>();
         try {
             for (int d = 1; d <= 7; d++) {
                 Store store = new Store();
