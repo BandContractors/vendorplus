@@ -48,3 +48,11 @@ create table timesheet (
                         )ENGINE=InnoDB;
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_17',49,Now(),'6.0','');
+
+ALTER TABLE store ADD COLUMN shift_mode INT(1) NOT NULL DEFAULT 0 AFTER store_code;
+ALTER TABLE transaction_shift ADD COLUMN transaction_type_id INT(11) NULL AFTER shift_id;
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_17',54,Now(),'6.0','');
+
+
+

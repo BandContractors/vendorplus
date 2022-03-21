@@ -2233,6 +2233,11 @@ public class TransBean implements Serializable {
                         if (new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_SMBI_URL").getParameter_value().length() > 0) {
                             new Transaction_smbi_mapBean().insertTransaction_smbi_mapCallThread(trans.getTransactionId(), trans.getTransactionTypeId());
                         }
+                        //Insert Work Shift
+                        if (new GeneralUserSetting().getCurrentStore().getShift_mode() > 0 && trans.getTransactionTypeId() == 2) {
+                            //1. define shift
+                            //2. invoke save
+                        }
                         //clear
                         this.clearAll2(trans, aActiveTransItems, null, null, aSelectedTransactor, 2, aSelectedBillTransactor, aTransUserDetail, aSelectedSchemeTransactor, aAuthorisedByUserDetail, aSelectedAccCoa);
                         TransItemBean = null;
@@ -7623,6 +7628,8 @@ public class TransBean implements Serializable {
             this.AccChildAccountList = new AccChildAccountBean().getAccChildAccountsForCashReceipt(trans.getCurrencyCode(), trans.getPayMethod(), new GeneralUserSetting().getCurrentStore().getStoreId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
             //Customer Display
             new UtilityBean().clearCustomerDisplay();
+            //others
+            trans.setShift_id(0);
         }
     }
 
@@ -15527,7 +15534,7 @@ public class TransBean implements Serializable {
             aTrans.setDeposit_customer(0);
         }
     }
-    
+
     public void refreshCustomerBalances4(Pay aPay, long aTransactorId, String aCurrencyCode) {
         //receivable balances
 //        try {

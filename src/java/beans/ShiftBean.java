@@ -14,6 +14,7 @@ import java.sql.Time;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
@@ -173,6 +174,28 @@ public class ShiftBean implements Serializable {
         }
     }
 
+    public Shift getShiftByDate(Date aDate) {
+        LocalTime time = null;
+        String sql = "{call sp_search_shift_by_time(?)}";
+        ResultSet rs;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setTime(1, Time.valueOf(time));
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                Shift shift = new Shift();
+                this.setShiftFromResultset(shift, rs);
+                return shift;
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+            return null;
+        }
+    }
+
     public void deleteShift() {
         this.deleteShiftById(this.SelectedShiftId);
     }
@@ -249,7 +272,7 @@ public class ShiftBean implements Serializable {
         }
     }
 
-    public List<Shift> getShift() {
+    public List<Shift> getShiftsAll() {
         String sql;
         sql = "{call sp_search_shift_by_none()}";
         ResultSet rs;
