@@ -153,6 +153,7 @@ public class Trans implements Serializable {
     private long transaction_id_cr_dr;
     private String cr_dr_flag;
     private String fdn_ref;
+    private int shift_id;
 
     /**
      * @return the TransactionId
@@ -1916,6 +1917,20 @@ public class Trans implements Serializable {
      */
     public void setTransaction_approval_id(long Transaction_approval_id) {
         this.Transaction_approval_id = Transaction_approval_id;
+    }
+
+    /**
+     * @return the shift_id
+     */
+    public int getShift_id() {
+        return shift_id;
+    }
+
+    /**
+     * @param shift_id the shift_id to set
+     */
+    public void setShift_id(int shift_id) {
+        this.shift_id = shift_id;
     }
 
 }

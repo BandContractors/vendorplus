@@ -304,7 +304,8 @@ DELIMITER //
 CREATE PROCEDURE sp_insert_store
 (
 	IN in_store_name varchar(20),
-	IN in_store_code varchar(10)
+	IN in_store_code varchar(10),
+    IN in_shift_mode int
 ) 
 BEGIN 
 	SET @new_id=0;
@@ -313,13 +314,15 @@ BEGIN
 	(
 		store_id,
 		store_name,
-		store_code
+		store_code,
+        shift_mode
 	) 
     VALUES
 	(
 		@new_id,
 		in_store_name,
-		in_store_code
+		in_store_code,
+        in_shift_mode
 	); 
 END//
 DELIMITER ;
@@ -330,10 +333,11 @@ CREATE PROCEDURE sp_update_store
 (
 	IN in_store_id int,
 	IN in_store_name varchar(20),
-	In in_store_code varchar(10)
+	IN in_store_code varchar(10),
+    IN in_shift_mode int
 ) 
 BEGIN 
-	UPDATE store SET store_name=in_store_name,store_code=in_store_code 
+	UPDATE store SET store_name=in_store_name,store_code=in_store_code,shift_mode=in_shift_mode 
 	WHERE store_id=in_store_id; 
 END//
 DELIMITER ;
@@ -13865,6 +13869,17 @@ CREATE PROCEDURE sp_search_shift_by_none()
 BEGIN 
 	SELECT * FROM shift 
 	ORDER BY shift_name ASC; 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_shift_by_time;
+DELIMITER //
+CREATE PROCEDURE sp_search_shift_by_time
+(
+	IN in_time time
+) 
+BEGIN 
+	SELECT * FROM shift WHERE in_time between start_time and end_time; 
 END//
 DELIMITER ;
 

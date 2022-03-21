@@ -276,7 +276,8 @@ public class Transaction_shiftBean implements Serializable {
     }
 
     /**
-     * @param SelectedTransaction_shift_id the SelectedTransaction_shift_id to set
+     * @param SelectedTransaction_shift_id the SelectedTransaction_shift_id to
+     * set
      */
     public void setSelectedTransaction_shift_id(int SelectedTransaction_shift_id) {
         this.SelectedTransaction_shift_id = SelectedTransaction_shift_id;

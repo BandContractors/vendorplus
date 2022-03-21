@@ -526,7 +526,7 @@
                         </p:commandButton>
                     </h:panelGrid>
                 </p:dialog>
-                <p:dialog header="#{langsys['More']} #{langsys['Detail']}" widgetVar="dlgMore" modal="true" height="180">
+                <p:dialog header="#{langsys['More']} #{langsys['Detail']}" widgetVar="dlgMore" modal="true" height="220">
                     <h:panelGrid columns="2">
                         <p:outputLabel value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]} #{langsys['Representative']} (#{langsys['Attention']})"/>
                         <p:inputText id="itxtRep" value="#{trans.transactor_rep}" autocomplete="off" style="width: 220px;height: 25px;"/>
@@ -534,6 +534,11 @@
                         <p:inputText id="itxtTransNo" value="#{trans.transactionNumber}" autocomplete="off" style="width: 220px;height: 25px;"/>
                         <p:outputLabel value="#{langsys['Terms']} #{langsys['and']} #{langsys['Conditions']}"/>
                         <h:inputTextarea styleClass="clsInput" id="itxaTermsConditions" rows="2" cols="26" value="#{trans.termsConditions}"/>
+                        <p:outputLabel value="#{langsys['Work']} #{langsys['Shift']}"/>
+                        <h:selectOneMenu styleClass="clsMenu" id="menuShift" value="#{trans.shift_id}" style="height: 30px;width: 230px;">
+                            <f:selectItem itemValue="0" itemLabel="None"/>
+                            <f:selectItems value="#{shiftBean.shiftsAll}" var="sh" itemLabel="#{sh.shift_name}" itemValue="#{sh.shift_id}"/>
+                        </h:selectOneMenu>
                         <p:outputLabel value=""/>
                         <p:commandButton value="OK"  oncomplete="PF('dlgMore').hide()" style="width: 230px;height: 40px;">
                         </p:commandButton>

@@ -53,19 +53,29 @@ public class StoreBean implements Serializable {
                 aStore.setStoreId(0);
             }
             try {
-                aStore.setStoreName(aResultSet.getString("store_name"));
+                String store_name = aResultSet.getString("store_name");
+                if (null == store_name) {
+                    aStore.setStoreName("");
+                } else {
+                    aStore.setStoreName(store_name);
+                }
             } catch (Exception e) {
                 aStore.setStoreName("");
             }
             try {
-                aStore.setStore_code(aResultSet.getString("store_code"));
+                String store_code = aResultSet.getString("store_code");
+                if (null == store_code) {
+                    aStore.setStore_code("");
+                } else {
+                    aStore.setStore_code(store_code);
+                }
             } catch (Exception e) {
                 aStore.setStore_code("");
             }
             try {
-                aStore.setShift_id(aResultSet.getInt("shift_id"));
+                aStore.setShift_mode(aResultSet.getInt("shift_mode"));
             } catch (Exception e) {
-                aStore.setShift_id(0);
+                aStore.setShift_mode(0);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -116,9 +126,9 @@ public class StoreBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
             if (store.getStoreId() == 0) {
-                sql = "{call sp_insert_store(?,?)}";
+                sql = "{call sp_insert_store(?,?,?)}";
             } else if (store.getStoreId() > 0) {
-                sql = "{call sp_update_store(?,?,?)}";
+                sql = "{call sp_update_store(?,?,?,?)}";
             }
 
             try (
@@ -127,6 +137,7 @@ public class StoreBean implements Serializable {
                 if (store.getStoreId() == 0) {
                     cs.setString(1, store.getStoreName());
                     cs.setString(2, store.getStore_code());
+                    cs.setInt(3, store.getShift_mode());
                     cs.executeUpdate();
                     this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
                     this.clearStore(store);
@@ -134,6 +145,7 @@ public class StoreBean implements Serializable {
                     cs.setInt(1, store.getStoreId());
                     cs.setString(2, store.getStoreName());
                     cs.setString(3, store.getStore_code());
+                    cs.setInt(4, store.getShift_mode());
                     cs.executeUpdate();
                     this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
                     this.clearStore(store);
@@ -228,7 +240,7 @@ public class StoreBean implements Serializable {
         StoreTo.setStoreId(StoreFrom.getStoreId());
         StoreTo.setStoreName(StoreFrom.getStoreName());
         StoreTo.setStore_code(StoreFrom.getStore_code());
-        StoreTo.setShift_id(StoreFrom.getShift_id());
+        StoreTo.setShift_mode(StoreFrom.getShift_mode());
     }
 
     public void clearStore(Store store) {
@@ -236,7 +248,7 @@ public class StoreBean implements Serializable {
             store.setStoreId(0);
             store.setStoreName("");
             store.setStore_code("");
-            store.setShift_id(0);
+            store.setShift_mode(0);
         } catch (NullPointerException npe) {
 
         }

@@ -1,6 +1,5 @@
 package entities;
 
-
 import java.io.Serializable;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
@@ -9,7 +8,6 @@ import javax.faces.bean.SessionScoped;
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author btwesigye
@@ -22,7 +20,7 @@ public class Store implements Serializable {
     private int StoreId;
     private String StoreName;
     private String store_code;
-    private int shift_id;
+    private int shift_mode;
 
     /**
      * @return the StoreId
@@ -67,18 +65,16 @@ public class Store implements Serializable {
     }
 
     /**
-     * @return the shift_id
+     * @return the shift_mode
      */
-    public int getShift_id() {
-        return shift_id;
+    public int getShift_mode() {
+        return shift_mode;
     }
 
     /**
-     * @param shift_id the shift_id to set
+     * @param shift_mode the shift_mode to set
      */
-    public void setShift_id(int shift_id) {
-        this.shift_id = shift_id;
+    public void setShift_mode(int shift_mode) {
+        this.shift_mode = shift_mode;
     }
-
-    
 }

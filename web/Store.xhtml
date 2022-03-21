@@ -30,12 +30,18 @@
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainInput" columns="2">
-                <h:outputLabel  value="#{companySetting.getStoreEquivName()}#{langsys['Id']} :"/>
+                <h:outputLabel  value="#{langsys[companySetting.getStoreEquivName()]} #{langsys['Id']} :"/>
                 <h:inputText styleClass="clsInput" id="itxtStoreId" value="#{store.storeId}" disabled="true"/>
-                <h:outputLabel  value="#{companySetting.getStoreEquivName()} #{langsys['Name']}:"/>
+                <h:outputLabel  value="#{langsys[companySetting.getStoreEquivName()]} #{langsys['Name']}:"/>
                 <h:inputText styleClass="clsInput" id="itxtStoreName" value="#{store.storeName}"/>
-                <h:outputLabel  value="#{companySetting.getStoreEquivName()} #{langsys['Code']} (Max 10 #{langsys['Characters']}):"/>
+                <h:outputLabel  value="#{langsys[companySetting.getStoreEquivName()]} #{langsys['Code']} (Max 10 #{langsys['Characters']}):"/>
                 <h:inputText styleClass="clsInput" id="itxtStoreCode" value="#{store.store_code}"/> 
+                <h:outputLabel  value="#{langsys['Work']} #{langsys['Shift']} #{langsys['Mode']}:"/>
+                <h:selectOneMenu styleClass="clsMenu" style="width: 222px;" id="menuShiftMode" value="#{store.shift_mode}">
+                    <f:selectItem itemLabel="None" itemValue="0"/>
+                    <f:selectItem itemLabel="Auto Selected" itemValue="1"/>
+                    <f:selectItem itemLabel="Manually Selected" itemValue="2"/>
+                </h:selectOneMenu>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainCommands" columns="1">
@@ -71,21 +77,27 @@
                          > 
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">#{companySetting.getStoreEquivName()} #{langsys['ID']}</f:facet>
+                    <f:facet name="header">#{langsys[companySetting.getStoreEquivName()]} #{langsys['ID']}</f:facet>
                     <!-- row record -->
                     #{s.storeId}
                 </p:column>
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">#{companySetting.getStoreEquivName()} #{langsys['Name']}</f:facet>
+                    <f:facet name="header">#{langsys[companySetting.getStoreEquivName()]} #{langsys['Name']}</f:facet>
                     <!-- row record -->
                     #{s.storeName}
                 </p:column>
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">#{companySetting.getStoreEquivName()} #{langsys['Code']}</f:facet>
+                    <f:facet name="header">#{langsys[companySetting.getStoreEquivName()]} #{langsys['Code']}</f:facet>
                     <!-- row record -->
                     #{s.store_code}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Work']} #{langsys['Shift']} #{langsys['Mode']}</f:facet>
+                    <!-- row record -->
+                    #{s.shift_mode eq 1 ? 'Auto Selected':s.shift_mode eq 2 ? 'Manually Selected':'None'}
                 </p:column>
                 <p:column>
                     <!-- column header -->
