@@ -22,6 +22,7 @@ public class Transaction_shift implements Serializable {
     private long transaction_shift_id;
     private long transaction_id;
     private int shift_id;
+    private int transaction_type_id;
 
     /**
      * @return the transaction_shift_id
@@ -63,5 +64,19 @@ public class Transaction_shift implements Serializable {
      */
     public void setShift_id(int shift_id) {
         this.shift_id = shift_id;
+    }
+
+    /**
+     * @return the transaction_type_id
+     */
+    public int getTransaction_type_id() {
+        return transaction_type_id;
+    }
+
+    /**
+     * @param transaction_type_id the transaction_type_id to set
+     */
+    public void setTransaction_type_id(int transaction_type_id) {
+        this.transaction_type_id = transaction_type_id;
     }
 }

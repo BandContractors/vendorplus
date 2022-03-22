@@ -31,17 +31,15 @@
                 <h:outputLabel styleClass="clsLabelTop" id="olblUnitHeader" value="#{langsys['Shift']}"/>
             </h:panelGrid>
 
-            <h:panelGrid styleClass="clsGridMainInput" columns="6">
+            <h:panelGrid styleClass="clsGridMainInput" columns="8">
                 <h:outputLabel  value="#{langsys['Shift']} #{langsys['Name']}:"/>
                 <h:inputText styleClass="clsInput" id="shiftName" value="#{shift.shift_name}" autocomplete="off" />
                 <h:outputLabel  value="#{langsys['Description']}:"/>
-                <h:inputText styleClass="clsInput" id="description" value="#{shift.description}" autocomplete="off" />
+                <h:inputText styleClass="clsInput" id="description" value="#{shift.description}" autocomplete="off" style="width: 300px" />
                 <h:outputLabel value="#{langsys['Start']} #{langsys['Time']}:"/>
-                <p:calendar showHour="true" showMinute="true" timeOnly="true" pattern="HH:mm" styleClass="clsInput" id="calStartDate" navigator="true" showButtonPanel="true" value="#{shiftBean.startTime}">
-                    <!--<f:convertDateTime type="time" pattern="HH:mm"/>-->
-                </p:calendar>
+                <p:calendar showHour="true" showMinute="true" timeOnly="true" pattern="HH:mm" styleClass="clsInput" id="calStartDate" navigator="true" showButtonPanel="true" value="#{shiftBean.startTime}" autocomplete="off" size="4" />
                 <h:outputLabel  value="#{langsys['End']} #{langsys['Time']}:"/>
-                <p:calendar showHour="true" showMinute="true" timeOnly="true" pattern="HH:mm" styleClass="clsInput" id="calEndDate" navigator="true" showButtonPanel="true" value="#{shiftBean.endTime}"/>
+                <p:calendar showHour="true" showMinute="true" timeOnly="true" pattern="HH:mm" styleClass="clsInput" id="calEndDate" navigator="true" showButtonPanel="true" value="#{shiftBean.endTime}" autocomplete="off" size="4" />
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainCommands" columns="1">

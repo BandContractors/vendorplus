@@ -176,6 +176,9 @@ public class ShiftBean implements Serializable {
 
     public Shift getShiftByDate(Date aDate) {
         LocalTime time = null;
+        if (aDate != null) {
+            time = LocalDateTime.ofInstant(aDate.toInstant(), ZoneId.systemDefault()).toLocalTime();
+        }
         String sql = "{call sp_search_shift_by_time(?)}";
         ResultSet rs;
         try (

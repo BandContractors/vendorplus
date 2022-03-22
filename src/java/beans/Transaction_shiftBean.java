@@ -61,6 +61,11 @@ public class Transaction_shiftBean implements Serializable {
             } catch (Exception e) {
                 aTransaction_shift.setShift_id(0);
             }
+            try {
+                aTransaction_shift.setTransaction_type_id(aResultSet.getInt("transaction_type_id"));
+            } catch (Exception e) {
+                aTransaction_shift.setTransaction_type_id(0);
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -121,6 +126,7 @@ public class Transaction_shiftBean implements Serializable {
                 if (transaction_shift.getTransaction_shift_id() == 0) {
                     cs.setLong(1, transaction_shift.getTransaction_id());
                     cs.setInt(2, transaction_shift.getShift_id());
+                    cs.setInt(3, transaction_shift.getTransaction_type_id());
                     cs.executeUpdate();
                     this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
                     this.clearTransaction_shift(transaction_shift);
@@ -128,6 +134,7 @@ public class Transaction_shiftBean implements Serializable {
                     cs.setLong(1, transaction_shift.getTransaction_shift_id());
                     cs.setLong(2, transaction_shift.getTransaction_id());
                     cs.setInt(3, transaction_shift.getShift_id());
+                    cs.setInt(4, transaction_shift.getTransaction_type_id());
                     cs.executeUpdate();
                     this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
                     this.clearTransaction_shift(transaction_shift);

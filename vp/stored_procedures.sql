@@ -13888,18 +13888,21 @@ DELIMITER //
 CREATE PROCEDURE sp_insert_transaction_shift
 (
 	IN in_transaction_id bigint,
-	IN in_shift_id int
+	IN in_shift_id int,
+	IN in_transaction_type_id int
 ) 
 BEGIN
 	INSERT INTO transaction_shift
 	(
 		transaction_id,
-		shift_id
+		shift_id,
+		transaction_type_id
 	) 
     VALUES
 	(
 		in_transaction_id,
-		in_shift_id
+		in_shift_id,
+		in_transaction_type_id
 	); 
 END//
 DELIMITER ;
@@ -13910,10 +13913,11 @@ CREATE PROCEDURE sp_update_transaction_shift
 (
 	IN in_transaction_shift_id bigint,
 	IN in_transaction_id bigint,
-	IN in_shift_id int
+	IN in_shift_id int,
+	IN in_transaction_type_id int
 ) 
 BEGIN 
-	UPDATE transaction_shift SET transaction_id=in_transaction_id,shift_id=in_shift_id 
+	UPDATE transaction_shift SET transaction_id=in_transaction_id,shift_id=in_shift_id,transaction_type_id=in_transaction_type_id 
 	WHERE transaction_shift_id=in_transaction_shift_id; 
 END//
 DELIMITER ;
