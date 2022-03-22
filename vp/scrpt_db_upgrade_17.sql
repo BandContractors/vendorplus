@@ -54,5 +54,9 @@ ALTER TABLE transaction_shift ADD COLUMN transaction_type_id INT(11) NULL AFTER 
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_17',54,Now(),'6.0','');
 
+ALTER TABLE transaction_cr_dr_note ADD COLUMN mode_code INT(1) NOT NULL DEFAULT 0 AFTER spent_points_amount;
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_17',58,Now(),'6.0','');
+
 
 
