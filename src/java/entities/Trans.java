@@ -154,6 +154,7 @@ public class Trans implements Serializable {
     private String cr_dr_flag;
     private String fdn_ref;
     private int shift_id;
+    private int mode_code;
 
     /**
      * @return the TransactionId
@@ -1931,6 +1932,20 @@ public class Trans implements Serializable {
      */
     public void setShift_id(int shift_id) {
         this.shift_id = shift_id;
+    }
+
+    /**
+     * @return the mode_code
+     */
+    public int getMode_code() {
+        return mode_code;
+    }
+
+    /**
+     * @param mode_code the mode_code to set
+     */
+    public void setMode_code(int mode_code) {
+        this.mode_code = mode_code;
     }
 
 }
