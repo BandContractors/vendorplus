@@ -31,6 +31,7 @@ public class Subscription implements Serializable {
     private Date last_edit_date;
     private String last_edited_by;
     private int free_at_reg;
+    private double commission_amount;
 
     /**
      * @return the subscription_id
@@ -338,5 +339,19 @@ public class Subscription implements Serializable {
      */
     public void setFree_at_reg(int free_at_reg) {
         this.free_at_reg = free_at_reg;
+    }
+
+    /**
+     * @return the commission_amount
+     */
+    public double getCommission_amount() {
+        return commission_amount;
+    }
+
+    /**
+     * @param commission_amount the commission_amount to set
+     */
+    public void setCommission_amount(double commission_amount) {
+        this.commission_amount = commission_amount;
     }
 }

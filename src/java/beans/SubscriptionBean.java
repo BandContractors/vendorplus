@@ -201,6 +201,11 @@ public class SubscriptionBean implements Serializable {
             } catch (Exception e) {
                 aSubscription.setFree_at_reg(0);
             }
+            try {
+                aSubscription.setCommission_amount(aResultSet.getDouble("commission_amount"));
+            } catch (Exception e) {
+                aSubscription.setCommission_amount(0);
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -242,6 +247,7 @@ public class SubscriptionBean implements Serializable {
             SubscriptionTo.setLast_edit_date(SubscriptionFrom.getLast_edit_date());
             SubscriptionTo.setLast_edited_by(SubscriptionFrom.getLast_edited_by());
             SubscriptionTo.setFree_at_reg(SubscriptionFrom.getFree_at_reg());
+            SubscriptionTo.setCommission_amount(SubscriptionFrom.getCommission_amount());
             this.setSelectedTransactor(new TransactorBean().findTransactor(SubscriptionFrom.getTransactor_id()));
             //this.setSelectedSubscriptionCategory(new SubscriptionCategoryBean().getSubscriptionCategory(SubscriptionFrom.getSubscription_category_id()));
             //this.setSelectedBusinessCategory(new BusinessCategoryBean().getBusinessCategory(SubscriptionFrom.getBusiness_category_id()));
@@ -295,6 +301,9 @@ public class SubscriptionBean implements Serializable {
             SubscriptionTo.setLast_edit_date(SubscriptionFrom.getLast_edit_date());
             SubscriptionTo.setLast_edited_by(SubscriptionFrom.getLast_edited_by());
             SubscriptionTo.setFree_at_reg(SubscriptionFrom.getFree_at_reg());
+            //set commission amount to 0 on renewal
+            //SubscriptionTo.setCommission_amount(SubscriptionFrom.getCommission_amount());
+            SubscriptionTo.setCommission_amount(0);
             this.setSelectedTransactor(new TransactorBean().findTransactor(SubscriptionFrom.getTransactor_id()));
             //this.setSelectedSubscriptionCategory(new SubscriptionCategoryBean().getSubscriptionCategory(SubscriptionFrom.getSubscription_category_id()));
             //this.setSelectedBusinessCategory(new BusinessCategoryBean().getBusinessCategory(SubscriptionFrom.getBusiness_category_id()));
@@ -348,6 +357,7 @@ public class SubscriptionBean implements Serializable {
             this.subscriptionRenewal.setLast_edit_date(SubscriptionFrom.getLast_edit_date());
             this.subscriptionRenewal.setLast_edited_by(SubscriptionFrom.getLast_edited_by());
             this.subscriptionRenewal.setFree_at_reg(SubscriptionFrom.getFree_at_reg());
+            this.subscriptionRenewal.setCommission_amount(SubscriptionFrom.getCommission_amount());
             this.setSelectedTransactor(new TransactorBean().findTransactor(SubscriptionFrom.getTransactor_id()));
             //this.setSelectedSubscriptionCategory(new SubscriptionCategoryBean().getSubscriptionCategory(SubscriptionFrom.getSubscription_category_id()));
             //this.setSelectedBusinessCategory(new BusinessCategoryBean().getBusinessCategory(SubscriptionFrom.getBusiness_category_id()));
@@ -388,6 +398,7 @@ public class SubscriptionBean implements Serializable {
                 aSubscription.setLast_edit_date(null);
                 aSubscription.setLast_edited_by("");
                 aSubscription.setFree_at_reg(0);
+                aSubscription.setCommission_amount(0);
                 this.setSelectedTransactor(null);
                 //this.setSelectedSubscriptionCategory(null);
                 //this.setSelectedBusinessCategory(null);
@@ -686,6 +697,7 @@ public class SubscriptionBean implements Serializable {
                 this.subscriptionRenewal.setRenewal_date(new Date());
                 this.subscriptionRenewal.setExpiry_date(aSubscription.getExpiry_date());
                 this.subscriptionRenewal.setCurrent_status("Active");
+                this.subscriptionRenewal.setCommission_amount(aSubscription.getCommission_amount());
                 //aSubscription.setRenewal_date(new Date());
                 //aSubscription.setSubscription_date(this.getSubscriptionDateRenewal());
                 this.selectedTransactor = new TransactorBean().findTransactor(this.subscriptionRenewal.getTransactor_id());
@@ -718,9 +730,9 @@ public class SubscriptionBean implements Serializable {
         long status = 0;
         int returnedSubscriptionId = 0;
         if (aSubscription.getSubscription_id() == 0) {
-            sql = "{call sp_insert_subscription(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_insert_subscription(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         } else if (aSubscription.getSubscription_id() > 0) {
-            sql = "{call sp_update_subscription(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_update_subscription(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         }
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -758,12 +770,13 @@ public class SubscriptionBean implements Serializable {
                 cs.setDate(19, null);
                 cs.setString(20, aSubscription.getLast_edited_by());
                 cs.setInt(21, aSubscription.getFree_at_reg());
-                cs.setInt(22, returnedSubscriptionId);
+                cs.setDouble(22, aSubscription.getCommission_amount());
+                cs.setInt(23, returnedSubscriptionId);
 
                 cs.executeUpdate();
                 status = 1;
                 //get Id of newly inserted subscription
-                returnedSubscriptionId = cs.getInt(22);
+                returnedSubscriptionId = cs.getInt(23);
 
                 //save subscription log
                 aSubscription.setSubscription_id(returnedSubscriptionId);
@@ -809,6 +822,7 @@ public class SubscriptionBean implements Serializable {
                 cs.setTimestamp(20, new java.sql.Timestamp(new java.util.Date().getTime()));
                 cs.setString(21, new GeneralUserSetting().getCurrentUser().getUserName());
                 cs.setInt(22, aSubscription.getFree_at_reg());
+                cs.setDouble(23, aSubscription.getCommission_amount());
                 cs.executeUpdate();
                 status = 1;
 
@@ -1758,6 +1772,7 @@ public class SubscriptionBean implements Serializable {
                 subscriptionLog.setExpiry_date(aSubscription.getExpiry_date());
             }
             subscriptionLog.setFree_at_reg(aSubscription.getFree_at_reg());
+            subscriptionLog.setCommission_amount(aSubscription.getCommission_amount());
             subscriptionLog.setAction(this.getSubscriptionLogMessage());
             subscriptionLog.setAdd_date(aSubscription.getAdd_date());
             subscriptionLog.setAdded_by(aSubscription.getAdded_by());

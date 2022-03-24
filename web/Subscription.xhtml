@@ -394,6 +394,12 @@
                 <p:column headerText="#{langsys['Agent']}" visible="false">
                     <h:outputText value="#{s.agent}"/>
                 </p:column>
+                <p:column headerText="#{langsys['Free']} #{langsys['at']} #{langsys['Registration']}" visible="false">
+                    <h:outputText value="#{s.free_at_reg eq 1 ? 'Yes' : 'No'}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Commission']} #{langsys['Amount']}" visible="false">
+                    <h:outputText value="#{s.commission_amount}"/>
+                </p:column>
                 <p:column headerText="#{langsys['Account']} #{langsys['Manager']}" visible="false">
                     <h:outputText value="#{s.account_manager}"/>
                 </p:column>
@@ -467,6 +473,9 @@
                         <p:datePicker id="expiryDateRenewal" value="#{subscription.expiry_date}" pattern="#{companySetting.getDateFormat()}" disabled="True" inputStyle="width: 320px" style="width: 350px" />
                         <h:outputLabel  value="#{langsys['Old']} #{langsys['Expiry']} #{langsys['Date']}:"/>
                         <p:datePicker id="oldExpiryDate" value="#{subscriptionBean.oldExpiryDate}" pattern="#{companySetting.getDateFormat()}" disabled="True" inputStyle="width: 320px" style="width: 350px" />
+                        <h:outputLabel value="#{langsys['Commission']} #{langsys['Amount']}:"/>
+                        <p:inputNumber id="commissionAmountRenewal" inputStyle="width: 320px" value="#{subscription.commission_amount}" autocomplete="off">
+                        </p:inputNumber>
                     </h:panelGrid>
 
                     <h:panelGrid styleClass="clsGridMainCommands" columns="1">
@@ -615,6 +624,9 @@
                         <p:datePicker id="expiryDate" value="#{subscription.expiry_date}" pattern="#{companySetting.getDateFormat()}" disabled="True" inputStyle="width: 320px" style="width: 350px" />
                         <h:outputLabel  value="#{langsys['Account']} #{langsys['Manager']}:"/>
                         <p:inputText style="width: 320px" value="#{subscription.account_manager}" autocomplete="off" />
+                        <h:outputLabel value="#{langsys['Commission']} #{langsys['Amount']}:"/>
+                        <p:inputNumber inputStyle="width: 320px" value="#{subscription.commission_amount}" minValue="0" autocomplete="off">
+                        </p:inputNumber>
                         <h:outputLabel  value="#{langsys['Free']} #{langsys['at']} #{langsys['Registration']}:"/>
                         <h:selectBooleanCheckbox value="#{subscriptionBean.freeAtReg}" />
                     </h:panelGrid>
@@ -683,6 +695,8 @@
                         <h:outputText  value="#{subscription.account_manager}"/>
                         <h:outputLabel  value="#{langsys['Free']} #{langsys['at']} #{langsys['Registration']}:"/>
                         <h:outputText  value="#{subscriptionBean.freeAtReg eq true ? 'Yes' : 'No'}"/>
+                        <h:outputLabel  value="#{langsys['Commission']} #{langsys['Amount']}:"/>
+                        <h:outputText  value="#{subscription.commission_amount}"/>
                     </h:panelGrid>
 
                 </h:panelGroup>

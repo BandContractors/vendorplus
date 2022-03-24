@@ -58,5 +58,10 @@ ALTER TABLE transaction_cr_dr_note ADD COLUMN mode_code INT(1) NOT NULL DEFAULT 
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_17',58,Now(),'6.0','');
 
+ALTER TABLE subscription ADD COLUMN commission_amount DOUBLE NOT NULL DEFAULT 0;
+ALTER TABLE subscription_log ADD COLUMN commission_amount DOUBLE NOT NULL DEFAULT 0;
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_17',63,Now(),'6.0','');
+
 
 
