@@ -372,7 +372,7 @@
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="#{langsys['Recurring']}">
+                <p:column headerText="#{langsys['Recurring']}" visible="false">
                     <h:outputText value="#{s.is_recurring}"/>
                 </p:column>
                 <p:column headerText="#{langsys['Status']}" visible="false">
@@ -409,7 +409,7 @@
                 <p:column headerText="#{langsys['Renewal']} #{langsys['Date']}" visible="false">
                     <h:outputText value="#{utilityBean.formatDate(s.renewal_date)}"/>
                 </p:column>
-                <p:column headerText="#{langsys['Expiry']} #{langsys['Date']}" visible="false">
+                <p:column headerText="#{langsys['Expiry']} #{langsys['Date']}">
                     <h:outputText value="#{utilityBean.formatDate(s.expiry_date)}"/>
                 </p:column>
                 <p:column headerText="#{langsys['Add']} #{langsys['Date']}" visible="false">
@@ -474,15 +474,16 @@
                         <h:outputLabel  value="#{langsys['Old']} #{langsys['Expiry']} #{langsys['Date']}:"/>
                         <p:datePicker id="oldExpiryDate" value="#{subscriptionBean.oldExpiryDate}" pattern="#{companySetting.getDateFormat()}" disabled="True" inputStyle="width: 320px" style="width: 350px" />
                         <h:outputLabel value="#{langsys['Commission']} #{langsys['Amount']}:"/>
-                        <p:inputNumber id="commissionAmountRenewal" inputStyle="width: 320px" value="#{subscription.commission_amount}" autocomplete="off">
+                        <p:inputNumber id="commissionAmountRenewal" inputStyle="width: 320px" value="#{subscription.commission_amount}" minValue="0" decimalPlaces="0" autocomplete="off">
+                            <p:ajax event="change" update="form:cmdbSaveRenewal"/>
                         </p:inputNumber>
                     </h:panelGrid>
 
                     <h:panelGrid styleClass="clsGridMainCommands" columns="1">
                         <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
-                            <p:commandButton update="pnlgSummary form:popupRenewal form:dtblSubscription form:growl1Renewal" actionListener="#{subscriptionBean.renew(subscription)}" styleClass="clsButtonBig" id="cmdbSaveRenewal" value="#{langsys['RENEW']}" disabled="#{subscription.current_status eq 'Expired'}" style="color: white; background-color: #00B259" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
-                                <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
-                                    <p:graphicImage name="/images/ajax-loader.gif"/>
+                            <p:commandButton id="cmdbSaveRenewal" actionListener="#{subscriptionBean.renew(subscription)}" update="pnlgSummary form:popupRenewal form:dtblSubscription form:growl1Renewal" styleClass="clsButtonBig" value="#{langsys['RENEW']}" disabled="#{subscription.current_status eq 'Expired' or subscription.amount lt subscription.commission_amount}" style="color: white; background-color: #00B259" onclick="PF('statusDialogRenewal').show()" onsuccess="PF('statusDialogRenewal').hide()">
+                                <p:dialog widgetVar="statusDialogRenewal" height="100" position="left" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                                    <p:graphicImage id="emma" name="/images/ajax-loader.gif"/>
                                 </p:dialog>
                             </p:commandButton>
                             <p:commandButton update="form:popupRenewal" actionListener="#{subscriptionBean.clearSubscription(subscription)}" styleClass="clsButtonBig" id="cmdbClearRenewal" value="#{langsys['CLEAR']}" style="color: white; background-color: #FF0000">
@@ -625,7 +626,8 @@
                         <h:outputLabel  value="#{langsys['Account']} #{langsys['Manager']}:"/>
                         <p:inputText style="width: 320px" value="#{subscription.account_manager}" autocomplete="off" />
                         <h:outputLabel value="#{langsys['Commission']} #{langsys['Amount']}:"/>
-                        <p:inputNumber inputStyle="width: 320px" value="#{subscription.commission_amount}" minValue="0" autocomplete="off">
+                        <p:inputNumber id="commissionAmount" inputStyle="width: 320px" value="#{subscription.commission_amount}" minValue="0" decimalPlaces="0" autocomplete="off">
+                            <p:ajax event="change" update="form:cmdbSave"/>
                         </p:inputNumber>
                         <h:outputLabel  value="#{langsys['Free']} #{langsys['at']} #{langsys['Registration']}:"/>
                         <h:selectBooleanCheckbox value="#{subscriptionBean.freeAtReg}" />
@@ -633,7 +635,7 @@
 
                     <h:panelGrid styleClass="clsGridMainCommands" columns="1">
                         <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
-                            <p:commandButton update="pnlgFilter pnlgSummary form:popup form:dtblSubscription form:growl1" actionListener="#{subscriptionBean.saveSubscription(subscription)}" styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['SAVE']}" disabled="#{subscription.business_category_id eq 0}" style="color: white; background-color: #00B259" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                            <p:commandButton update="pnlgFilter pnlgSummary form:popup form:dtblSubscription form:growl1" actionListener="#{subscriptionBean.saveSubscription(subscription)}" styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['SAVE']}" disabled="#{subscription.business_category_id eq 0 or subscription.amount lt subscription.commission_amount}" style="color: white; background-color: #00B259" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                                 <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                                     <p:graphicImage name="/images/ajax-loader.gif"/>
                                 </p:dialog>

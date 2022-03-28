@@ -303,6 +303,27 @@ public class AccChildAccountBean implements Serializable {
         }
     }
 
+    public List<AccChildAccount> getAccChildAccounts() {
+        String sql;
+        sql = "SELECT * FROM acc_child_account WHERE is_deleted=0 order by acc_coa_account_code ASC";
+        ResultSet rs;
+        this.AccChildAccountList = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                AccChildAccount ca = new AccChildAccount();
+                this.setAccChildAccountFromResultset(ca, rs);
+                this.AccChildAccountList.add(ca);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+            this.AccChildAccountList = null;
+        }
+        return this.AccChildAccountList;
+    }
+
     public List<AccChildAccount> getAccChildAccounts(String aParentAccCode, int aStoredId, int aUserDetailId) {
         String sql;
         sql = "SELECT * FROM acc_child_account WHERE acc_coa_account_code='" + aParentAccCode + "' AND is_active=1 AND is_deleted=0";

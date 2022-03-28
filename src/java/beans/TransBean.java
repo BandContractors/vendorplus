@@ -16356,6 +16356,14 @@ public class TransBean implements Serializable {
         }
     }
 
+    public double getItemSummaryTotalAmount(List<TransItem> transItem) {
+        int totalAmount = 0;
+        for (TransItem ti : transItem) {
+            totalAmount += ti.getAmountIncVat();
+        }
+        return totalAmount;
+    }
+
     /**
      * @param SRCInvoice the SRCInvoice to set
      */

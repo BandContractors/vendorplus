@@ -81,15 +81,15 @@
                     <p:ajax event="itemSelect" listener="#{pay.setBillTransactorId(transactorBean.selectedTransactor.transactorId)}"/>
                     <p:ajax event="change" listener="#{pay.setBillTransactorId(transactorBean.selectedTransactor.transactorId)}" rendered="#{transactorBean.selectedTransactor!=null}"/>
                 </p:autoComplete>
-                <p:inputText id="itxtInvoiceNo" value="#{trans.transactionNumber}" style="width: 150px;"/>
+                <p:inputText id="itxtInvoiceNo" value="#{trans.transactionNumber}" style="width: 240px;"/>
 
                 <h:outputLabel value="#{langsys['Pay']} #{langsys['Method']}"/>
                 <p:outputLabel value="#{langsys['Added']} #{langsys['By']}"/>
                 <h:outputLabel value="#{langsys['Paid']} #{langsys['By']}"/>
                 <p:outputLabel value="#{langsys['Cash']} #{langsys['Payment']} #{langsys['Type']}"/>
-                <p:outputLabel value="#{langsys['Shareholder']}/#{langsys['Loan']} #{langsys['Account']}"/>  
+                <p:outputLabel value="#{langsys['Shareholder']}/#{langsys['Loan']} #{langsys['Account']}"/>
+                <h:outputLabel value="#{langsys['Payment']} #{langsys['Account']}"/>  
                 <h:outputLabel value="#{langsys['SUMMARIZE']} #{langsys['RESULTS']} #{langsys['BY']}"/>
-                <h:outputLabel value=""/>
 
                 <p:selectOneMenu id="menuPayMethod" value="#{pay.payMethodId}" style="width: 120px;">
                     <f:selectItem itemLabel="#{langsys['Select']}" itemValue="0"/>
@@ -112,6 +112,10 @@
                     <f:selectItem itemValue="" itemLabel=""/>
                     <f:selectItems value="#{accChildAccountBean.getChildAccountsByPayReason('3-10-000-010','2-00-000-050','2-10-000-010',pay.payReasonId)}" var="ca" itemLabel="#{ca.childAccountCode} (#{ca.childAccountName})" itemValue="#{ca.accChildAccountId}"/>
                 </p:selectOneMenu>
+                <p:selectOneMenu id="menuFromAccount" value="#{pay.accChildAccountId}" style="width: 185px;">
+                    <f:selectItem itemLabel="#{langsys['Select']}" itemValue="0"/>
+                    <f:selectItems value="#{accChildAccountBean.getAccChildAccounts()}" var="aca" itemLabel="#{aca.childAccountName}" itemValue="#{aca.accChildAccountId}"/>
+                </p:selectOneMenu>
                 <p:selectOneMenu id="menuSummariseBy" value="#{payBean.fieldName}" style="width: 226px;">
                     <f:selectItem itemLabel="#{langsys['Select']}" itemValue=""/>
                     <f:selectItem itemLabel="#{langsys['Paid']} #{langsys['By']}" itemValue="add_user_detail_id"/>
@@ -120,29 +124,27 @@
                     <f:selectItem itemLabel="#{langsys['Pay']} #{langsys['Date']}" itemValue="pay_date"/>
                     <f:selectItem itemLabel="#{langsys['Cash']} #{langsys['Payment']} #{langsys['Type']}" itemValue="pay_reason_id"/>
                     <f:selectItem itemLabel="#{langsys['Pay']} #{langsys['Method']}" itemValue="pay_method_id"/>
-                </p:selectOneMenu> 
-                <h:outputLabel value=""/>
-                <h:outputLabel value=""/>
+                </p:selectOneMenu>
             </h:panelGrid>
             <h:panelGrid id="pnlgFilterButton" columns="6" styleClass="clsPanelReportFilter">
-                <h:outputLabel value=""/>
-                <h:outputLabel value=""/>
+                <h:outputLabel value="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/>
+                <h:outputLabel value="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/>
                 <p:commandButton id="cmdbSearch" value="#{langsys['SEARCH']} (ALT+S)" accesskey="s" style="width: 200px;" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                     <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                         <p:graphicImage name="/images/ajax-loader.gif"/>
                     </p:dialog>
-                    <p:ajax listener="#{payBean.reportCashPaymentDetail(trans,pay,payBean)}" process="@this pnlgFilter1" update="pnlgFilter1 pnlgMessage tblDetail"/>
+                    <p:ajax listener="#{payBean.reportCashPaymentDetail(trans,pay,payBean)}" process="@this pnlgFilter1" update="pnlgFilter1 pnlgMessage tblDetail cmdbPrint"/>
                 </p:commandButton>
                 <p:commandButton id="cmdbReset" value="#{langsys['RESET']} (ALT+R)" accesskey="r" style="width: 200px;">
-                    <p:ajax listener="#{payBean.resetPayReportDetail(trans,pay,payBean,transactorBean.selectedBillTransactor)}" process="@this pnlgFilter1" update="pnlgFilter1 pnlgMessage tblDetail"/>
+                    <p:ajax listener="#{payBean.resetPayReportDetail(trans,pay,payBean,transactorBean.selectedBillTransactor)}" process="@this pnlgFilter1" update="pnlgFilter1 pnlgMessage tblDetail cmdbPrint"/>
                 </p:commandButton>
-                <h:outputLabel value=""/>
-                <h:outputLabel value=""/>
+                <h:outputLabel value="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/>
+                <h:outputLabel value="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/>
             </h:panelGrid>
             <h:panelGrid id="pnlgMessage">
                 <p:outputLabel value="#{payBean.actionMessage}" style="color: red;"/>
             </h:panelGrid>
-            <p:commandButton id="cmdbPrint" value="#{langsys['Print']} #{langsys['Cash']} #{langsys['Paid']} #{langsys['Detail']} (ALT+P)" icon="ui-icon-print" type="button" accesskey="p"  rendered="#{payBean.payListSummary != null}">
+            <p:commandButton id="cmdbPrint" value="#{langsys['Print']} #{langsys['Cash']} #{langsys['Paid']} #{langsys['Detail']} (ALT+P)" icon="ui-icon-print" type="button" accesskey="p">
                 <p:printer target="pnlCashAmountPaidDetail" rendered="false"/>
             </p:commandButton>
             <p:panel id="pnlCashAmountPaidDetail" style="border: none;">

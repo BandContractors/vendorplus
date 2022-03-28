@@ -2442,6 +2442,9 @@ public class PayBean implements Serializable {
         if (aPay.getAccChildAccountId2() > 0) {
             wheresql = wheresql + " AND acc_child_account_id2=" + aPay.getAccChildAccountId2();
         }
+        if (aPay.getAccChildAccountId() > 0) {
+            wheresql = wheresql + " AND acc_child_account_id=" + aPay.getAccChildAccountId();
+        }
         if (aPayBean.getDateType().length() > 0 && aPayBean.getDate1() != null && aPayBean.getDate2() != null) {
             switch (aPayBean.getDateType()) {
                 case "Receipt Date":
@@ -2597,6 +2600,9 @@ public class PayBean implements Serializable {
         }
         if (aPay.getAccChildAccountId2() > 0) {
             wheresql = wheresql + " AND acc_child_account_id2=" + aPay.getAccChildAccountId2();
+        }
+        if (aPay.getAccChildAccountId() > 0) {
+            wheresql = wheresql + " AND acc_child_account_id=" + aPay.getAccChildAccountId();
         }
         if (aPayBean.getDateType().length() > 0 && aPayBean.getDate1() != null && aPayBean.getDate2() != null) {
             switch (aPayBean.getDateType()) {
