@@ -32,6 +32,8 @@ public class Subscription_log implements Serializable {
     private String action;
     private Date add_date;
     private String added_by;
+    private String converted_by;
+    private String referred_by;
 
     /**
      * @return the subscription_log_id
@@ -353,5 +355,33 @@ public class Subscription_log implements Serializable {
      */
     public void setCommission_amount(double commission_amount) {
         this.commission_amount = commission_amount;
+    }
+
+    /**
+     * @return the converted_by
+     */
+    public String getConverted_by() {
+        return converted_by;
+    }
+
+    /**
+     * @param converted_by the converted_by to set
+     */
+    public void setConverted_by(String converted_by) {
+        this.converted_by = converted_by;
+    }
+
+    /**
+     * @return the referred_by
+     */
+    public String getReferred_by() {
+        return referred_by;
+    }
+
+    /**
+     * @param referred_by the referred_by to set
+     */
+    public void setReferred_by(String referred_by) {
+        this.referred_by = referred_by;
     }
 }

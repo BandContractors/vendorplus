@@ -63,5 +63,7 @@ ALTER TABLE subscription_log ADD COLUMN commission_amount DOUBLE NOT NULL DEFAUL
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_17',63,Now(),'6.0','');
 
-
-
+ALTER TABLE subscription ADD converted_by varchar(50) null, ADD referred_by varchar(50) null;
+ALTER TABLE subscription_log ADD converted_by varchar(50) null, ADD referred_by varchar(50) null;
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_17',68,Now(),'6.0','');

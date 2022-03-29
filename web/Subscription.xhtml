@@ -148,10 +148,20 @@
                         <f:selectItem itemLabel="" itemValue=""/>
                         <f:selectItems value="#{transactorBean.getUniqueTransactor_loc_district()}" var="ld" itemLabel="#{ld}" itemValue="#{ld}"/>
                     </p:selectOneMenu>
-                    <p:commandButton value="#{langsys['OK']}" style="color: white; background-color: #00B259; width: 80px">
+                    <p:outputLabel value="#{langsys['Converted']} #{langsys['By']}"/>
+                    <p:selectOneMenu value="#{subscriptionBean.filterConvertedBy}" style="width: 150px">
+                        <f:selectItem itemLabel="" itemValue=""/>
+                        <f:selectItems value="#{subscriptionBean.getUniqueSubscriptionConvertedBys()}" var="c" itemLabel="#{c}" itemValue="#{c}"/>
+                    </p:selectOneMenu>
+                    <p:outputLabel value="#{langsys['Referred']} #{langsys['By']}"/>
+                    <p:selectOneMenu value="#{subscriptionBean.filterReferredBy}" style="width: 150px">
+                        <f:selectItem itemLabel="" itemValue=""/>
+                        <f:selectItems value="#{subscriptionBean.getUniqueSubscriptionReferredBys()}" var="r" itemLabel="#{r}" itemValue="#{r}"/>
+                    </p:selectOneMenu>
+                    <p:commandButton value="#{langsys['OK']}" style="color: white; background-color: #00B259; width: 180px">
                         <f:ajax listener="#{subscriptionBean.getFilteredSubscriptions()}" execute="@form" render="@form"/>
                     </p:commandButton>
-                    <p:commandButton value="#{langsys['Clear']}" style="color: white; background-color: #FF0000; width: 80px" >
+                    <p:commandButton value="#{langsys['Clear']}" style="color: white; background-color: #FF0000; width: 180px" >
                         <f:ajax listener="#{subscriptionBean.clearFilter()}" execute="@form" render="@form"/>
                     </p:commandButton>
                 </h:panelGrid>
@@ -403,6 +413,12 @@
                 <p:column headerText="#{langsys['Account']} #{langsys['Manager']}" visible="false">
                     <h:outputText value="#{s.account_manager}"/>
                 </p:column>
+                <p:column headerText="#{langsys['Converted']} #{langsys['By']}" visible="false">
+                    <h:outputText value="#{s.converted_by}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Referred']} #{langsys['By']}" visible="false">
+                    <h:outputText value="#{s.referred_by}"/>
+                </p:column>
                 <p:column headerText="#{langsys['Registration']} #{langsys['Date']}" visible="false">
                     <h:outputText value="#{utilityBean.formatDate(s.subscription_date)}"/>
                 </p:column>
@@ -482,7 +498,7 @@
                     <h:panelGrid styleClass="clsGridMainCommands" columns="1">
                         <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
                             <p:commandButton id="cmdbSaveRenewal" actionListener="#{subscriptionBean.renew(subscription)}" update="pnlgSummary form:popupRenewal form:dtblSubscription form:growl1Renewal" styleClass="clsButtonBig" value="#{langsys['RENEW']}" disabled="#{subscription.current_status eq 'Expired' or subscription.amount lt subscription.commission_amount}" style="color: white; background-color: #00B259" onclick="PF('statusDialogRenewal').show()" onsuccess="PF('statusDialogRenewal').hide()">
-                                <p:dialog widgetVar="statusDialogRenewal" height="100" position="left" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                                <p:dialog widgetVar="statusDialogRenewal" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                                     <p:graphicImage id="emma" name="/images/ajax-loader.gif"/>
                                 </p:dialog>
                             </p:commandButton>
@@ -573,7 +589,6 @@
                             </p:column>
                             <f:attribute name="subs" value="#{subscription}" />
                             <p:ajax event="itemSelect" listener="#{subscriptionBean.setItemPrice}" process="@form" update="form:unitPrice form:itemAmount"/>
-                            <!--<p:ajax event="change" listener=""/>-->
                             <p:ajax event="change" listener="#{subscriptionBean.setItemPrice}" process="@form" update="form:unitPrice form:itemAmount" onstart="if(PF('WautcItem').panel.is(':visible')) return false;" />
                         </p:autoComplete>
                         <h:outputLabel  value="#{langsys['Business']} #{langsys['Category']}:"/>
@@ -629,8 +644,12 @@
                         <p:inputNumber id="commissionAmount" inputStyle="width: 320px" value="#{subscription.commission_amount}" minValue="0" decimalPlaces="0" autocomplete="off">
                             <p:ajax event="change" update="form:cmdbSave"/>
                         </p:inputNumber>
+                        <h:outputLabel  value="#{langsys['Converted']} #{langsys['By']}:"/>
+                        <p:inputText style="width: 320px" value="#{subscription.converted_by}" autocomplete="off" />
                         <h:outputLabel  value="#{langsys['Free']} #{langsys['at']} #{langsys['Registration']}:"/>
                         <h:selectBooleanCheckbox value="#{subscriptionBean.freeAtReg}" />
+                        <h:outputLabel  value="#{langsys['Referred']} #{langsys['By']}:"/>
+                        <p:inputText style="width: 320px" value="#{subscription.referred_by}" autocomplete="off" />
                     </h:panelGrid>
 
                     <h:panelGrid styleClass="clsGridMainCommands" columns="1">
@@ -695,6 +714,10 @@
                         <h:outputText  value="#{subscription.agent}"/>
                         <h:outputLabel  value="#{langsys['Account']} #{langsys['Manager']}:"/>
                         <h:outputText  value="#{subscription.account_manager}"/>
+                        <h:outputLabel  value="#{langsys['Converted']} #{langsys['By']}:"/>
+                        <h:outputText  value="#{subscription.converted_by}"/>
+                        <h:outputLabel  value="#{langsys['Referred']} #{langsys['By']}:"/>
+                        <h:outputText  value="#{subscription.referred_by}"/>
                         <h:outputLabel  value="#{langsys['Free']} #{langsys['at']} #{langsys['Registration']}:"/>
                         <h:outputText  value="#{subscriptionBean.freeAtReg eq true ? 'Yes' : 'No'}"/>
                         <h:outputLabel  value="#{langsys['Commission']} #{langsys['Amount']}:"/>

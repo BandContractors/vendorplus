@@ -151,6 +151,16 @@ public class SubscriptionLogBean implements Serializable {
             } catch (Exception e) {
                 aSubscription_log.setAdded_by("");
             }
+            try {
+                aSubscription_log.setConverted_by(aResultSet.getString("converted_by"));
+            } catch (Exception e) {
+                aSubscription_log.setConverted_by("");
+            }
+            try {
+                aSubscription_log.setReferred_by(aResultSet.getString("referred_by"));
+            } catch (Exception e) {
+                aSubscription_log.setReferred_by("");
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -191,7 +201,7 @@ public class SubscriptionLogBean implements Serializable {
 
     public int insertSubscription_log(Subscription_log aSubscription_log) {
         int saved = 0;
-        String sql = "{call sp_insert_subscription_log(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+        String sql = "{call sp_insert_subscription_log(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 CallableStatement cs = conn.prepareCall(sql);) {
@@ -227,6 +237,8 @@ public class SubscriptionLogBean implements Serializable {
             cs.setString(20, aSubscription_log.getAction());
             cs.setTimestamp(21, new java.sql.Timestamp(new java.util.Date().getTime()));
             cs.setString(22, new GeneralUserSetting().getCurrentUser().getUserName());
+            cs.setString(23, aSubscription_log.getConverted_by());
+            cs.setString(24, aSubscription_log.getReferred_by());
 
             cs.executeUpdate();
             saved = 1;
@@ -423,7 +435,7 @@ public class SubscriptionLogBean implements Serializable {
 
     public int updateSubscription_log(Subscription_log aSubscription_log) {
         int status = 0;
-        String sql = "{call sp_update_subscription_log(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+        String sql = "{call sp_update_subscription_log(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 CallableStatement cs = conn.prepareCall(sql);) {
@@ -450,6 +462,8 @@ public class SubscriptionLogBean implements Serializable {
             cs.setString(21, aSubscription_log.getAction());
             cs.setTimestamp(22, new java.sql.Timestamp(new java.util.Date().getTime()));
             cs.setString(23, new GeneralUserSetting().getCurrentUser().getUserName());
+            cs.setString(24, aSubscription_log.getConverted_by());
+            cs.setString(25, aSubscription_log.getReferred_by());
 
             cs.executeUpdate();
             status = 1;

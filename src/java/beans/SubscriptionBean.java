@@ -74,8 +74,12 @@ public class SubscriptionBean implements Serializable {
     private String[] filterAgents = null;
     private String filterAccountManager = "";
     private String filterLocDistrict = "";
+    private String filterConvertedBy = "";
+    private String filterReferredBy = "";
     private List<String> uniqueAgentList;
     private List<String> uniqueAccount_managerList;
+    private List<String> uniqueConverted_byList;
+    private List<String> uniqueReferred_byList;
     private double itemUnitPrice = 0;
     private Date oldExpiryDate = null;
     private Date subscriptionDateRenewal = null;
@@ -206,6 +210,16 @@ public class SubscriptionBean implements Serializable {
             } catch (Exception e) {
                 aSubscription.setCommission_amount(0);
             }
+            try {
+                aSubscription.setConverted_by(aResultSet.getString("converted_by"));
+            } catch (Exception e) {
+                aSubscription.setConverted_by("");
+            }
+            try {
+                aSubscription.setReferred_by(aResultSet.getString("referred_by"));
+            } catch (Exception e) {
+                aSubscription.setReferred_by("");
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -247,7 +261,8 @@ public class SubscriptionBean implements Serializable {
             SubscriptionTo.setLast_edit_date(SubscriptionFrom.getLast_edit_date());
             SubscriptionTo.setLast_edited_by(SubscriptionFrom.getLast_edited_by());
             SubscriptionTo.setFree_at_reg(SubscriptionFrom.getFree_at_reg());
-            SubscriptionTo.setCommission_amount(SubscriptionFrom.getCommission_amount());
+            SubscriptionTo.setConverted_by(SubscriptionFrom.getConverted_by());
+            SubscriptionTo.setReferred_by(SubscriptionFrom.getReferred_by());
             this.setSelectedTransactor(new TransactorBean().findTransactor(SubscriptionFrom.getTransactor_id()));
             //this.setSelectedSubscriptionCategory(new SubscriptionCategoryBean().getSubscriptionCategory(SubscriptionFrom.getSubscription_category_id()));
             //this.setSelectedBusinessCategory(new BusinessCategoryBean().getBusinessCategory(SubscriptionFrom.getBusiness_category_id()));
@@ -304,6 +319,8 @@ public class SubscriptionBean implements Serializable {
             //set commission amount to 0 on renewal
             //SubscriptionTo.setCommission_amount(SubscriptionFrom.getCommission_amount());
             SubscriptionTo.setCommission_amount(0);
+            SubscriptionTo.setConverted_by(SubscriptionFrom.getConverted_by());
+            SubscriptionTo.setReferred_by(SubscriptionFrom.getReferred_by());
             this.setSelectedTransactor(new TransactorBean().findTransactor(SubscriptionFrom.getTransactor_id()));
             //this.setSelectedSubscriptionCategory(new SubscriptionCategoryBean().getSubscriptionCategory(SubscriptionFrom.getSubscription_category_id()));
             //this.setSelectedBusinessCategory(new BusinessCategoryBean().getBusinessCategory(SubscriptionFrom.getBusiness_category_id()));
@@ -358,6 +375,8 @@ public class SubscriptionBean implements Serializable {
             this.subscriptionRenewal.setLast_edited_by(SubscriptionFrom.getLast_edited_by());
             this.subscriptionRenewal.setFree_at_reg(SubscriptionFrom.getFree_at_reg());
             this.subscriptionRenewal.setCommission_amount(SubscriptionFrom.getCommission_amount());
+            this.subscriptionRenewal.setConverted_by(SubscriptionFrom.getConverted_by());
+            this.subscriptionRenewal.setReferred_by(SubscriptionFrom.getReferred_by());
             this.setSelectedTransactor(new TransactorBean().findTransactor(SubscriptionFrom.getTransactor_id()));
             //this.setSelectedSubscriptionCategory(new SubscriptionCategoryBean().getSubscriptionCategory(SubscriptionFrom.getSubscription_category_id()));
             //this.setSelectedBusinessCategory(new BusinessCategoryBean().getBusinessCategory(SubscriptionFrom.getBusiness_category_id()));
@@ -399,6 +418,8 @@ public class SubscriptionBean implements Serializable {
                 aSubscription.setLast_edited_by("");
                 aSubscription.setFree_at_reg(0);
                 aSubscription.setCommission_amount(0);
+                aSubscription.setConverted_by("");
+                aSubscription.setReferred_by("");
                 this.setSelectedTransactor(null);
                 //this.setSelectedSubscriptionCategory(null);
                 //this.setSelectedBusinessCategory(null);
@@ -429,6 +450,8 @@ public class SubscriptionBean implements Serializable {
             this.setFilterAgents(null);
             this.setFilterAccountManager("");
             this.setFilterLocDistrict("");
+            this.setFilterConvertedBy("");
+            this.setFilterReferredBy("");
             this.getFilteredSubscriptions();
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -668,6 +691,7 @@ public class SubscriptionBean implements Serializable {
     }
 
     public void renew(Subscription aSubscription) {
+        System.out.println("Com: " + aSubscription.getCommission_amount());
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
         try {
@@ -730,9 +754,9 @@ public class SubscriptionBean implements Serializable {
         long status = 0;
         int returnedSubscriptionId = 0;
         if (aSubscription.getSubscription_id() == 0) {
-            sql = "{call sp_insert_subscription(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_insert_subscription(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         } else if (aSubscription.getSubscription_id() > 0) {
-            sql = "{call sp_update_subscription(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_update_subscription(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         }
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -771,12 +795,14 @@ public class SubscriptionBean implements Serializable {
                 cs.setString(20, aSubscription.getLast_edited_by());
                 cs.setInt(21, aSubscription.getFree_at_reg());
                 cs.setDouble(22, aSubscription.getCommission_amount());
-                cs.setInt(23, returnedSubscriptionId);
+                cs.setString(23, aSubscription.getConverted_by());
+                cs.setString(24, aSubscription.getReferred_by());
+                cs.setInt(25, returnedSubscriptionId);
 
                 cs.executeUpdate();
                 status = 1;
                 //get Id of newly inserted subscription
-                returnedSubscriptionId = cs.getInt(23);
+                returnedSubscriptionId = cs.getInt(25);
 
                 //save subscription log
                 aSubscription.setSubscription_id(returnedSubscriptionId);
@@ -823,6 +849,8 @@ public class SubscriptionBean implements Serializable {
                 cs.setString(21, new GeneralUserSetting().getCurrentUser().getUserName());
                 cs.setInt(22, aSubscription.getFree_at_reg());
                 cs.setDouble(23, aSubscription.getCommission_amount());
+                cs.setString(24, aSubscription.getConverted_by());
+                cs.setString(25, aSubscription.getReferred_by());
                 cs.executeUpdate();
                 status = 1;
 
@@ -977,6 +1005,54 @@ public class SubscriptionBean implements Serializable {
         return uniqueAccount_managerList;
     }
 
+    public List<String> getUniqueSubscriptionConvertedBys() {
+        String sql;
+        sql = "SELECT DISTINCT converted_by from subscription where converted_by != ''";
+        ResultSet rs;
+        uniqueConverted_byList = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                String account_manager;
+                try {
+                    account_manager = rs.getString("converted_by");
+                } catch (Exception e) {
+                    account_manager = "";
+                }
+                uniqueConverted_byList.add(account_manager);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return uniqueConverted_byList;
+    }
+
+    public List<String> getUniqueSubscriptionReferredBys() {
+        String sql;
+        sql = "SELECT DISTINCT referred_by from subscription where referred_by != ''";
+        ResultSet rs;
+        uniqueReferred_byList = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                String account_manager;
+                try {
+                    account_manager = rs.getString("referred_by");
+                } catch (Exception e) {
+                    account_manager = "";
+                }
+                uniqueReferred_byList.add(account_manager);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return uniqueReferred_byList;
+    }
+
     public void getFilteredSubscriptions() {
         String sql;
         sql = "select * from subscription where subscription_id > 0";
@@ -1047,6 +1123,12 @@ public class SubscriptionBean implements Serializable {
                 //array to comma seperated string
                 String commaSepString = String.join(",", transactor_ids);
                 wheresql = wheresql + " AND transactor_id IN (" + commaSepString + ")";
+            }
+            if (this.filterConvertedBy.length() > 0) {
+                wheresql = wheresql + " AND converted_by='" + this.filterConvertedBy + "'";
+            }
+            if (this.filterReferredBy.length() > 0) {
+                wheresql = wheresql + " AND referred_by='" + this.filterReferredBy + "'";
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -1151,6 +1233,12 @@ public class SubscriptionBean implements Serializable {
             String commaSepString = String.join(",", transactor_ids);
             wheresql = wheresql + " AND transactor_id IN (" + commaSepString + ")";
         }
+        if (this.filterConvertedBy.length() > 0) {
+            wheresql = wheresql + " AND converted_by='" + this.filterConvertedBy + "'";
+        }
+        if (this.filterReferredBy.length() > 0) {
+            wheresql = wheresql + " AND referred_by='" + this.filterReferredBy + "'";
+        }
         sql = sql + wheresql + groupbysum + " ORDER BY amount DESC";
         ResultSet rs;
         subscriptionsSummary_status = new ArrayList<>();
@@ -1248,6 +1336,12 @@ public class SubscriptionBean implements Serializable {
             //array to comma seperated string
             String commaSepString = String.join(",", transactor_ids);
             wheresql = wheresql + " AND transactor_id IN (" + commaSepString + ")";
+        }
+        if (this.filterConvertedBy.length() > 0) {
+            wheresql = wheresql + " AND converted_by='" + this.filterConvertedBy + "'";
+        }
+        if (this.filterReferredBy.length() > 0) {
+            wheresql = wheresql + " AND referred_by='" + this.filterReferredBy + "'";
         }
         sql = sql + wheresql + groupbysum + " ORDER BY amount DESC";
         ResultSet rs;
@@ -1347,6 +1441,12 @@ public class SubscriptionBean implements Serializable {
             String commaSepString = String.join(",", transactor_ids);
             wheresql = wheresql + " AND transactor_id IN (" + commaSepString + ")";
         }
+        if (this.filterConvertedBy.length() > 0) {
+            wheresql = wheresql + " AND converted_by='" + this.filterConvertedBy + "'";
+        }
+        if (this.filterReferredBy.length() > 0) {
+            wheresql = wheresql + " AND referred_by='" + this.filterReferredBy + "'";
+        }
         sql = sql + wheresql + groupbysum + " ORDER BY amount DESC";
         ResultSet rs;
         subscriptionsSummary_subscriptionCategory = new ArrayList<>();
@@ -1445,6 +1545,12 @@ public class SubscriptionBean implements Serializable {
             String commaSepString = String.join(",", transactor_ids);
             wheresql = wheresql + " AND transactor_id IN (" + commaSepString + ")";
         }
+        if (this.filterConvertedBy.length() > 0) {
+            wheresql = wheresql + " AND converted_by='" + this.filterConvertedBy + "'";
+        }
+        if (this.filterReferredBy.length() > 0) {
+            wheresql = wheresql + " AND referred_by='" + this.filterReferredBy + "'";
+        }
         sql = sql + wheresql + groupbysum + " ORDER BY amount DESC";
         ResultSet rs;
         subscriptionsSummary_businessCategory = new ArrayList<>();
@@ -1534,6 +1640,12 @@ public class SubscriptionBean implements Serializable {
             } else {
                 wheresql = wheresql + " AND t.loc_district='" + this.filterLocDistrict + "'";
             }
+        }
+        if (this.filterConvertedBy.length() > 0) {
+            wheresql = wheresql + " AND converted_by='" + this.filterConvertedBy + "'";
+        }
+        if (this.filterReferredBy.length() > 0) {
+            wheresql = wheresql + " AND referred_by='" + this.filterReferredBy + "'";
         }
         sql = sql + wheresql + groupbysum + " ORDER BY amount DESC";
         ResultSet rs;
@@ -1632,6 +1744,12 @@ public class SubscriptionBean implements Serializable {
             //array to comma seperated string
             String commaSepString = String.join(",", transactor_ids);
             wheresql = wheresql + " AND transactor_id IN (" + commaSepString + ")";
+        }
+        if (this.filterConvertedBy.length() > 0) {
+            wheresql = wheresql + " AND converted_by='" + this.filterConvertedBy + "'";
+        }
+        if (this.filterReferredBy.length() > 0) {
+            wheresql = wheresql + " AND referred_by='" + this.filterReferredBy + "'";
         }
         sql = sql + wheresql + groupbysum + " ORDER BY amount_at_reg DESC";
         ResultSet rs;
@@ -1776,6 +1894,8 @@ public class SubscriptionBean implements Serializable {
             subscriptionLog.setAction(this.getSubscriptionLogMessage());
             subscriptionLog.setAdd_date(aSubscription.getAdd_date());
             subscriptionLog.setAdded_by(aSubscription.getAdded_by());
+            subscriptionLog.setConverted_by(aSubscription.getConverted_by());
+            subscriptionLog.setReferred_by(aSubscription.getReferred_by());
 
             new SubscriptionLogBean().insertSubscription_log(subscriptionLog);
         } catch (Exception e) {
@@ -2310,9 +2430,66 @@ public class SubscriptionBean implements Serializable {
     }
 
     /**
-     * @param subscriptionsSummary_freq_amount the subscriptionsSummary_freq_amount to set
+     * @param subscriptionsSummary_freq_amount the
+     * subscriptionsSummary_freq_amount to set
      */
     public void setSubscriptionsSummary_freq_amount(List<Subscription_freq_amount> subscriptionsSummary_freq_amount) {
         this.subscriptionsSummary_freq_amount = subscriptionsSummary_freq_amount;
+    }
+
+    /**
+     * @return the filterConvertedBy
+     */
+    public String getFilterConvertedBy() {
+        return filterConvertedBy;
+    }
+
+    /**
+     * @param filterConvertedBy the filterConvertedBy to set
+     */
+    public void setFilterConvertedBy(String filterConvertedBy) {
+        this.filterConvertedBy = filterConvertedBy;
+    }
+
+    /**
+     * @return the filterReferredBy
+     */
+    public String getFilterReferredBy() {
+        return filterReferredBy;
+    }
+
+    /**
+     * @param filterReferredBy the filterReferredBy to set
+     */
+    public void setFilterReferredBy(String filterReferredBy) {
+        this.filterReferredBy = filterReferredBy;
+    }
+
+    /**
+     * @return the uniqueConverted_byList
+     */
+    public List<String> getUniqueConverted_byList() {
+        return uniqueConverted_byList;
+    }
+
+    /**
+     * @param uniqueConverted_byList the uniqueConverted_byList to set
+     */
+    public void setUniqueConverted_byList(List<String> uniqueConverted_byList) {
+        this.uniqueConverted_byList = uniqueConverted_byList;
+    }
+
+    /**
+     * @return the uniqueReferred_byList
+     */
+    public List<String> getUniqueReferred_byList() {
+        return uniqueReferred_byList;
+    }
+
+    /**
+     * @param uniqueReferred_byList the uniqueReferred_byList to set
+     */
+    public void setUniqueReferred_byList(List<String> uniqueReferred_byList) {
+        this.uniqueReferred_byList = uniqueReferred_byList;
     }
 }

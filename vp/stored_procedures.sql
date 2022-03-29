@@ -13460,6 +13460,8 @@ CREATE PROCEDURE sp_insert_subscription
 	IN in_last_edited_by varchar(50),
 	IN in_free_at_reg int,
 	IN in_commission_amount double,
+	IN in_converted_by varchar(50),
+	IN in_referred_by varchar(50),
 	OUT out_subscription_id int
 ) 
 BEGIN 
@@ -13490,7 +13492,9 @@ BEGIN
 		last_edit_date,
 		last_edited_by,
 		free_at_reg,
-		commission_amount
+		commission_amount,
+		converted_by,
+		referred_by
 	) 
     VALUES
 	(
@@ -13516,7 +13520,9 @@ BEGIN
 		in_last_edit_date,
 		in_last_edited_by,
 		in_free_at_reg,
-		in_commission_amount
+		in_commission_amount,
+		in_converted_by,
+		in_referred_by
 	); 
 END//
 DELIMITER ;
@@ -13547,7 +13553,9 @@ CREATE PROCEDURE sp_update_subscription
 	IN in_last_edit_date datetime,
 	IN in_last_edited_by varchar(50),
 	IN in_free_at_reg int,
-	IN in_commission_amount double
+	IN in_commission_amount double,
+	IN in_converted_by varchar(50),
+	IN in_referred_by varchar(50)
 ) 
 BEGIN 
 	UPDATE subscription SET 
@@ -13572,7 +13580,9 @@ BEGIN
 		last_edit_date=in_last_edit_date,
 		last_edited_by=in_last_edited_by,
 		free_at_reg=in_free_at_reg,
-		commission_amount=in_commission_amount
+		commission_amount=in_commission_amount,
+		converted_by=in_converted_by,
+		referred_by=in_referred_by
 	WHERE subscription_id=in_subscription_id; 
 END//
 DELIMITER ;
@@ -13652,7 +13662,9 @@ CREATE PROCEDURE sp_insert_subscription_log
 	IN in_commission_amount double,
 	IN in_action varchar(20),
 	IN in_add_date datetime,
-	IN in_added_by varchar(50)
+	IN in_added_by varchar(50),
+	IN in_converted_by varchar(50),
+	IN in_referred_by varchar(50)
 ) 
 BEGIN 
 	SET @new_id=0;
@@ -13681,7 +13693,9 @@ BEGIN
 		commission_amount,
 		action,
 		add_date,
-		added_by
+		added_by,
+		converted_by,
+		referred_by
 	) 
     VALUES
 	(
@@ -13707,7 +13721,9 @@ BEGIN
 		in_commission_amount,
 		in_action,
 		in_add_date,
-		in_added_by
+		in_added_by,
+		in_converted_by,
+		in_referred_by
 	); 
 END//
 DELIMITER ;
@@ -13738,7 +13754,9 @@ CREATE PROCEDURE sp_update_subscription_log
 	IN in_commission_amount double,
 	IN in_action varchar(20),
 	IN in_add_date datetime,
-	IN in_added_by varchar(50)
+	IN in_added_by varchar(50),
+	IN in_converted_by varchar(50),
+	IN in_referred_by varchar(50)
 ) 
 BEGIN 
 	UPDATE subscription_log SET 
@@ -13763,7 +13781,9 @@ BEGIN
 		commission_amount=in_commission_amount,
 		action=in_action,
 		add_date=in_add_date,
-		added_by=in_added_by
+		added_by=in_added_by,
+		converted_by=in_converted_by,
+		referred_by=in_referred_by
 	WHERE subscription_log_id=in_subscription_log_id; 
 END//
 DELIMITER ;
