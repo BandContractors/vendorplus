@@ -89,7 +89,7 @@
                     <h:outputLabel  value="#{langsys['Sent']} #{langsys['for']} #{langsys['Approval']}:"/>
                     <h:selectOneMenu styleClass="clsMenu" id="menuApproval" value="#{trans.transaction_approval_id}" style="width: 280px;">
                         <f:selectItem itemValue="0" itemLabel=""/>
-                        <f:selectItems value="#{transBean.transListApproval}" var="apr" itemLabel="#{langsys['No']}:#{apr.transaction_approval_id} #{langsys['Total']}:#{accJournalBean.returnBalanceString(apr.grand_total)} (#{apr.approval_status eq 0 ? 'Submitted' :apr.approval_status eq 1 ? 'Approved' :apr.approval_status eq 2 ? 'Processed' :apr.approval_status eq 3 ? 'Rejected' : 'Recalled'})" itemValue="#{apr.transaction_approval_id}"/>
+                        <f:selectItems value="#{transBean.transListApproval}" var="apr" itemLabel="#{langsys['No']}:#{apr.transaction_approval_id} #{langsys['Total']}:#{accJournalBean.returnBalanceString(apr.grand_total)} (#{apr.approval_status eq 0 ? 'Submitted' :apr.approval_status eq 1 ? 'Approved' :apr.approval_status eq 2 ? 'Processed' :apr.approval_status eq 3 ? 'Rejected' : 'Recalled'}) #{apr.status_comment.length() gt 0 ? apr.status_comment :''}" itemValue="#{apr.transaction_approval_id}"/>
                     </h:selectOneMenu>
                     <p:commandButton id="cmdbLoadApproval" value="#{langsys['Load']} #{langsys['Approval']}" onclick="PF('statusDialog5').show()" onsuccess="PF('statusDialog5').hide()">
                         <p:dialog widgetVar="statusDialog5" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">

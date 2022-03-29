@@ -761,7 +761,6 @@ public class UtilityBean implements Serializable {
 //        int x=new Mode_activityBean().insertMode_activity(ma);
 //        System.out.println("Inserted:" + x);
 //    }
-    
     public List<ThreadClass> getRunningThreads() {
         List<ThreadClass> objs = new ArrayList<>();
         Set<Thread> threads = Thread.getAllStackTraces().keySet();

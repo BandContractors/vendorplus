@@ -2877,10 +2877,12 @@ public class PayBean implements Serializable {
         aPay.setPaidAmount(GTotal);
     }
 
-    public double getTotalAmountRecieved(List<Pay> pay) {
-        int totalRecievedAmount = 0;
+    public double getTotalAmountRecieved(List<Pay> pay, String aCurrencyCode) {
+        double totalRecievedAmount = 0;
         for (Pay s : pay) {
-            totalRecievedAmount += s.getPaidAmount();
+            if (s.getCurrencyCode().equals(aCurrencyCode)) {
+                totalRecievedAmount += s.getPaidAmount();
+            }
         }
         return totalRecievedAmount;
     }
