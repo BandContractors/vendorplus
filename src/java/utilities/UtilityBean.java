@@ -756,11 +756,10 @@ public class UtilityBean implements Serializable {
     }
 
 //    public static void main(String[] args) {
-//        Mode_activity ma=new Mode_activity();
-//        ma.setMode_name("Physical");
-//        int x=new Mode_activityBean().insertMode_activity(ma);
-//        System.out.println("Inserted:" + x);
+//        java.util.Date du=new java.util.Date;
+//        java.sql.Date ds=new java.sql.Timestamp
 //    }
+    
     public List<ThreadClass> getRunningThreads() {
         List<ThreadClass> objs = new ArrayList<>();
         Set<Thread> threads = Thread.getAllStackTraces().keySet();

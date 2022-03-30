@@ -67,3 +67,8 @@ ALTER TABLE subscription ADD converted_by varchar(50) null, ADD referred_by varc
 ALTER TABLE subscription_log ADD converted_by varchar(50) null, ADD referred_by varchar(50) null;
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_17',68,Now(),'6.0','');
+
+create table project (project_id int primary key auto_increment,project_name varchar(25) not null unique  );
+ALTER TABLE timesheet ADD COLUMN project_id INT(11) NULL;
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_17',73,Now(),'6.0','');

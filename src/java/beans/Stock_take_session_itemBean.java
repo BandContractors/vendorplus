@@ -363,7 +363,7 @@ public class Stock_take_session_itemBean implements Serializable {
                         stock.setAverageMethodId(0);
                         stock.setEffectiveLife(0);
                         Item itm = new ItemBean().getItem(aStocktake_session_item.getItem_id());
-                        if (null!=itm.getAssetAccountCode() && itm.getAssetAccountCode().length() > 0) {
+                        if (null != itm.getAssetAccountCode() && itm.getAssetAccountCode().length() > 0) {
                             stock.setAccountCode(itm.getAssetAccountCode());
                         } else {
                             stock.setAccountCode(itm.getExpenseAccountCode());
