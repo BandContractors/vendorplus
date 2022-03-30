@@ -72,3 +72,7 @@ create table project (project_id int primary key auto_increment,project_name var
 ALTER TABLE timesheet ADD COLUMN project_id INT(11) NULL;
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_17',73,Now(),'6.0','');
+
+create table pay_shift (pay_shift_id bigint(20) not null auto_increment, pay_id bigint(20) not null, shift_id int(11) not null, pay_type_id int(11) null, primary key (pay_shift_id));
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_17',77,Now(),'6.0','');

@@ -13971,3 +13971,62 @@ BEGIN
 	SELECT * FROM transaction_shift ORDER BY transaction_shift_id ASC; 
 END//
 DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_insert_pay_shift;
+DELIMITER //
+CREATE PROCEDURE sp_insert_pay_shift
+(
+	IN in_pay_id bigint,
+	IN in_shift_id int,
+	IN in_pay_type_id int
+) 
+BEGIN
+	INSERT INTO pay_shift
+	(
+		pay_id,
+		shift_id,
+		pay_type_id
+	) 
+    VALUES
+	(
+		in_pay_id,
+		in_shift_id,
+		in_pay_type_id
+	); 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_update_pay_shift;
+DELIMITER //
+CREATE PROCEDURE sp_update_pay_shift
+(
+	IN in_pay_shift_id bigint,
+	IN in_pay_id bigint,
+	IN in_shift_id int,
+	IN in_pay_type_id int
+) 
+BEGIN 
+	UPDATE pay_shift SET pay_id=in_pay_id,shift_id=in_shift_id,pay_type_id=in_pay_type_id 
+	WHERE pay_shift_id=in_pay_shift_id; 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_pay_shift_by_id;
+DELIMITER //
+CREATE PROCEDURE sp_search_pay_shift_by_id
+(
+	IN in_pay_shift_id bigint
+) 
+BEGIN 
+	SELECT * FROM pay_shift 
+	WHERE pay_shift_id=in_pay_shift_id; 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_pay_shift_by_none;
+DELIMITER //
+CREATE PROCEDURE sp_search_pay_shift_by_none() 
+BEGIN 
+	SELECT * FROM pay_shift ORDER BY pay_shift_id ASC; 
+END//
+DELIMITER ;

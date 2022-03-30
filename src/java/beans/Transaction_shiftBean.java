@@ -115,9 +115,9 @@ public class Transaction_shiftBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
             if (transaction_shift.getTransaction_shift_id() == 0) {
-                sql = "{call sp_insert_transaction_shift(?,?)}";
+                sql = "{call sp_insert_transaction_shift(?,?,?)}";
             } else if (transaction_shift.getTransaction_shift_id() > 0) {
-                sql = "{call sp_update_transaction_shift(?,?,?)}";
+                sql = "{call sp_update_transaction_shift(?,?,?,?)}";
             }
 
             try (
@@ -205,16 +205,22 @@ public class Transaction_shiftBean implements Serializable {
     }
 
     public void displayTransaction_shift(Transaction_shift Transaction_shiftFrom, Transaction_shift Transaction_shiftTo) {
-        Transaction_shiftTo.setTransaction_shift_id(Transaction_shiftFrom.getTransaction_shift_id());
-        Transaction_shiftTo.setTransaction_id(Transaction_shiftFrom.getTransaction_id());
-        Transaction_shiftTo.setShift_id(Transaction_shiftFrom.getShift_id());
+        try {
+            Transaction_shiftTo.setTransaction_shift_id(Transaction_shiftFrom.getTransaction_shift_id());
+            Transaction_shiftTo.setTransaction_id(Transaction_shiftFrom.getTransaction_id());
+            Transaction_shiftTo.setShift_id(Transaction_shiftFrom.getShift_id());
+            Transaction_shiftTo.setTransaction_type_id(Transaction_shiftFrom.getTransaction_type_id());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
     }
 
-    public void clearTransaction_shift(Transaction_shift transaction_shift) {
+    public void clearTransaction_shift(Transaction_shift aTransaction_shift) {
         try {
-            transaction_shift.setTransaction_shift_id(0);
-            transaction_shift.setTransaction_id(0);
-            transaction_shift.setShift_id(0);
+            aTransaction_shift.setTransaction_shift_id(0);
+            aTransaction_shift.setTransaction_id(0);
+            aTransaction_shift.setShift_id(0);
+            aTransaction_shift.setTransaction_type_id(0);
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
