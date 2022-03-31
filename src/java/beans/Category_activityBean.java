@@ -7,16 +7,23 @@ package beans;
 
 import connections.DBConnection;
 import entities.Category_activity;
+import entities.GroupRight;
+import entities.UserDetail;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
+import javax.faces.context.FacesContext;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import sessions.GeneralUserSetting;
+import utilities.UtilityBean;
 
 /**
  *
@@ -28,14 +35,15 @@ public class Category_activityBean {
 
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = Logger.getLogger(Category_activityBean.class.getName());
-    
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 //    public void test() {
 //        Category_activity obj=new Category_activity();
 //        obj.setCategory_name("Deployment");
 //        int x=this.insertCategory_activity(obj);
 //        System.out.println("Inserted:" + x);
 //    }
-    
+
     public void setCategory_activityFromResultset(Category_activity aCategory_activity, ResultSet aResultSet) {
         try {
             try {
@@ -52,6 +60,54 @@ public class Category_activityBean {
                 }
             } catch (Exception e) {
                 aCategory_activity.setCategory_name("");
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void saveCategoryActivity(Category_activity aCategory_activity) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
+        String msg;
+        String sql = null;
+        try {
+            try {
+                BaseName = getMenuItemBean().getMenuItemObj().getLANG_BASE_NAME_SYS();
+            } catch (Exception e) {
+            }
+            UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
+            List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
+            GroupRightBean grb = new GroupRightBean();
+
+            String sql1 = "SELECT count(*) as n FROM category_activity WHERE category_name='" + aCategory_activity.getCategory_name() + "'";
+
+            if (aCategory_activity.getCategory_activity_id() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Add") == 0) {
+                msg = "Not Allowed to Access this Function";
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (aCategory_activity.getCategory_activity_id() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Edit") == 0) {
+                msg = "Not Allowed to Access this Function";
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (aCategory_activity.getCategory_name().length() <= 0) {
+                msg = "Activity Category Cannot be Empty";
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (aCategory_activity.getCategory_activity_id() == 0 && ub.getN(sql1) > 0) {
+                msg = "Activity Category Already Exists ##: " + aCategory_activity.getCategory_name();
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else {
+                int saved = 0;
+                if (aCategory_activity.getCategory_activity_id() == 0) {
+                    saved = this.insertCategory_activity(aCategory_activity);
+                } else if (aCategory_activity.getCategory_activity_id() > 0) {
+                    saved = this.updateCategory_activity(aCategory_activity);
+                }
+                if (saved > 0) {
+                    msg = "Activity Category Saved Successfully";
+                    this.clear(aCategory_activity);
+                } else {
+                    msg = "Activity Category NOT Saved";
+                }
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -145,5 +201,30 @@ public class Category_activityBean {
             LOGGER.log(Level.ERROR, e);
         }
         return maList;
+    }
+
+    public void clear(Category_activity aCategory_activity) {
+        try {
+            if (null != aCategory_activity) {
+                aCategory_activity.setCategory_activity_id(0);
+                aCategory_activity.setCategory_name("");
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 }

@@ -261,7 +261,9 @@
                     <p:separator />
                     <p:submenu label="#{langsys['Human']} #{langsys['Resource']}">   
                         <p:separator />
-                        <p:menuitem value="#{langsys['Employee']} #{langsys['Details']}" action="#{navigationBean.redirectToTransactorEmployee()}" /> 
+                        <p:menuitem value="#{langsys['Employee']} #{langsys['Details']}" action="#" /> 
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Time']} #{langsys['Sheet']}" action="Timesheet?faces-redirect=true" /> 
                         <p:separator />
                     </p:submenu> 
                     <p:separator />
