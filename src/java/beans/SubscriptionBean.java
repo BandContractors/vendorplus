@@ -3,6 +3,7 @@ package beans;
 import connections.DBConnection;
 import entities.GroupRight;
 import entities.Item;
+import entities.Subs_summary_year_month_amount;
 import entities.Subscription;
 import entities.Subscription_freq_amount;
 import entities.Subscription_log;
@@ -56,6 +57,10 @@ public class SubscriptionBean implements Serializable {
     private List<Subscription> subscriptionsSummary_businessCategory;
     private List<Subscription> subscriptionsSummary_location;
     private List<Subscription_freq_amount> subscriptionsSummary_freq_amount;
+    private List<Subscription> subscriptionsSummary_account_manager;
+    private List<Subs_summary_year_month_amount> subscriptionsSummary_converted_by;
+    private List<Subs_summary_year_month_amount> subscriptionsSummary_referred_by;
+    private List<Subs_summary_year_month_amount> subscriptionsSummary_agent;
     private List<Subscription_log> SubscriptionsLogList;
     private Transactor selectedTransactor;
     private Item selectedItem;
@@ -1161,6 +1166,10 @@ public class SubscriptionBean implements Serializable {
             this.getFilteredSubscriptionsSummary_businessCategory();
             this.getFilteredSubscriptionsSummary_location();
             this.getFilteredSubscriptionsSummary_freq_amount();
+            this.getFilteredSubscriptionsSummary_converted_by();
+            this.getFilteredSubscriptionsSummary_referred_by();
+            this.getFilteredSubscriptionsSummary_agent();
+            this.getFilteredSubscriptionsSummary_account_manager();
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -1780,6 +1789,472 @@ public class SubscriptionBean implements Serializable {
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
+    }
+
+    public void getFilteredSubscriptionsSummary_account_manager() {
+        String sql;
+        sql = "SELECT account_manager, count(distinct s.transactor_id) as numbers, sum(amount) as amount from subscription s INNER JOIN transactor t ON s.transactor_id = t.transactor_id where s.subscription_id > 0";
+        String wheresql = "";
+        String groupbysum = " GROUP BY account_manager";
+        if (this.filterTransactor != null) {
+            wheresql = wheresql + " AND s.transactor_id=" + this.filterTransactor.getTransactorId();
+        }
+        if (!this.filterStatus.isEmpty()) {
+            wheresql = wheresql + " AND s.current_status='" + this.filterStatus + "'";
+        }
+        if (this.filterSubscriptionCategoryIds != null) {
+            if (this.filterSubscriptionCategoryIds.length > 0) {
+                String commaSepString = String.join(",", this.filterSubscriptionCategoryIds);
+                wheresql = wheresql + " AND s.subscription_category_id IN (" + commaSepString + ")";
+            }
+        }
+        if (this.filterBusinessCategoryIds != null) {
+            if (this.filterBusinessCategoryIds.length > 0) {
+                String commaSepString = String.join(",", this.filterBusinessCategoryIds);
+                wheresql = wheresql + " AND s.business_category_id IN (" + commaSepString + ")";
+            }
+        }
+        if (this.filterExpiryDateRange > 0) {
+            if (this.filterExpiryDateRange == 30) {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 0;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
+            } else if (this.filterExpiryDateRange == 60) {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 30;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
+            } else if (this.filterExpiryDateRange == 90) {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 60;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
+            } else {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) > " + this.filterExpiryDateRange;
+            }
+        }
+        if (!this.filterRecurring.isEmpty()) {
+            wheresql = wheresql + " AND s.is_recurring='" + this.filterRecurring + "'";
+        }
+        if (this.filterItem != null) {
+            wheresql = wheresql + " AND s.item_id=" + this.filterItem.getItemId();
+        }
+        if (this.filterAgents != null) {
+            if (this.filterAgents.length > 0) {
+                String commaSepString = String.join(",", this.filterAgents);
+                wheresql = wheresql + " AND s.agent IN (" + commaSepString + ")";
+            }
+        }
+        if (this.filterAccountManager.length() > 0) {
+            wheresql = wheresql + " AND account_manager='" + this.filterAccountManager + "'";
+        }
+        if (this.filterLocDistrict.length() > 0) {
+            List<Transactor> transactors;
+            if (this.filterLocDistrict.equals("Unknown")) {
+                transactors = new TransactorBean().getTransactorsBy_loc_district("");
+            } else {
+                transactors = new TransactorBean().getTransactorsBy_loc_district(filterLocDistrict);
+            }
+            String[] transactor_ids = new String[transactors.size()];
+            for (int i = 0; i < transactors.size(); i++) {
+                transactor_ids[i] = Long.toString(transactors.get(i).getTransactorId());
+            }
+            //array to comma seperated string
+            String commaSepString = String.join(",", transactor_ids);
+            wheresql = wheresql + " AND s.transactor_id IN (" + commaSepString + ")";
+        }
+        if (this.filterConvertedBy.length() > 0) {
+            wheresql = wheresql + " AND s.converted_by='" + this.filterConvertedBy + "'";
+        }
+        if (this.filterReferredBy.length() > 0) {
+            wheresql = wheresql + " AND s.referred_by='" + this.filterReferredBy + "'";
+        }
+        sql = sql + wheresql + groupbysum + " ORDER BY amount DESC";
+        ResultSet rs;
+        subscriptionsSummary_account_manager = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Subscription summary = new Subscription();
+                try {
+                    summary.setAccount_manager(rs.getString("account_manager"));
+                } catch (Exception e) {
+                    summary.setAccount_manager("");
+                }
+                try {
+                    summary.setDescription(rs.getString("numbers"));
+                } catch (Exception e) {
+                    summary.setDescription("");
+                }
+                try {
+                    summary.setAmount(rs.getDouble("amount"));
+                } catch (Exception e) {
+                    summary.setAmount(0);
+                }
+                getSubscriptionsSummary_account_manager().add(summary);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void getFilteredSubscriptionsSummary_converted_by() {
+        String sql;
+        sql = "SELECT converted_by, year(subscription_date) as year, monthname(subscription_date) as month, count(*) as no, sum(amount) as amount FROM subscription where subscription_id > 0";
+        String wheresql = "";
+        String groupbysum = " GROUP BY converted_by, year(subscription_date),monthname(subscription_date)";
+        if (this.filterTransactor != null) {
+            wheresql = wheresql + " AND transactor_id=" + this.filterTransactor.getTransactorId();
+        }
+        if (!this.filterStatus.isEmpty()) {
+            wheresql = wheresql + " AND current_status='" + this.filterStatus + "'";
+        }
+        if (this.filterSubscriptionCategoryIds != null) {
+            if (this.filterSubscriptionCategoryIds.length > 0) {
+                String commaSepString = String.join(",", this.filterSubscriptionCategoryIds);
+                wheresql = wheresql + " AND subscription_category_id IN (" + commaSepString + ")";
+            }
+        }
+        if (this.filterBusinessCategoryIds != null) {
+            if (this.filterBusinessCategoryIds.length > 0) {
+                String commaSepString = String.join(",", this.filterBusinessCategoryIds);
+                wheresql = wheresql + " AND business_category_id IN (" + commaSepString + ")";
+            }
+        }
+        if (this.filterExpiryDateRange > 0) {
+            if (this.filterExpiryDateRange == 30) {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 0;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
+            } else if (this.filterExpiryDateRange == 60) {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 30;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
+            } else if (this.filterExpiryDateRange == 90) {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 60;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
+            } else {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) > " + this.filterExpiryDateRange;
+            }
+        }
+        if (!this.filterRecurring.isEmpty()) {
+            wheresql = wheresql + " AND is_recurring='" + this.filterRecurring + "'";
+        }
+        if (this.filterItem != null) {
+            wheresql = wheresql + " AND item_id=" + this.filterItem.getItemId();
+        }
+        if (this.filterAgents != null) {
+            if (this.filterAgents.length > 0) {
+                String commaSepString = String.join(",", this.filterAgents);
+                wheresql = wheresql + " AND agent IN (" + commaSepString + ")";
+            }
+        }
+        if (this.filterAccountManager.length() > 0) {
+            wheresql = wheresql + " AND account_manager='" + this.filterAccountManager + "'";
+        }
+        if (this.filterLocDistrict.length() > 0) {
+            List<Transactor> transactors;
+            if (this.filterLocDistrict.equals("Unknown")) {
+                transactors = new TransactorBean().getTransactorsBy_loc_district("");
+            } else {
+                transactors = new TransactorBean().getTransactorsBy_loc_district(filterLocDistrict);
+            }
+            String[] transactor_ids = new String[transactors.size()];
+            for (int i = 0; i < transactors.size(); i++) {
+                transactor_ids[i] = Long.toString(transactors.get(i).getTransactorId());
+            }
+            //array to comma seperated string
+            String commaSepString = String.join(",", transactor_ids);
+            wheresql = wheresql + " AND transactor_id IN (" + commaSepString + ")";
+        }
+        if (this.filterConvertedBy.length() > 0) {
+            wheresql = wheresql + " AND converted_by='" + this.filterConvertedBy + "'";
+        }
+        if (this.filterReferredBy.length() > 0) {
+            wheresql = wheresql + " AND referred_by='" + this.filterReferredBy + "'";
+        }
+        sql = sql + wheresql + groupbysum + " ORDER BY year desc, month desc, no desc";
+        ResultSet rs;
+        this.subscriptionsSummary_converted_by = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Subs_summary_year_month_amount summary = new Subs_summary_year_month_amount();
+                try {
+                    summary.setAttribute(rs.getString("converted_by"));
+                } catch (Exception e) {
+                    summary.setAttribute("");
+                }
+                try {
+                    summary.setYear(rs.getString("year"));
+                } catch (Exception e) {
+                    summary.setYear("");
+                }
+                try {
+                    summary.setMonth(rs.getString("month"));
+                } catch (Exception e) {
+                    summary.setMonth("");
+                }
+                try {
+                    summary.setNo(rs.getInt("no"));
+                } catch (Exception e) {
+                    summary.setNo(0);
+                }
+                try {
+                    summary.setAmount(rs.getDouble("amount"));
+                } catch (Exception e) {
+                    summary.setAmount(0);
+                }
+                getSubscriptionsSummary_converted_by().add(summary);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void getFilteredSubscriptionsSummary_referred_by() {
+        String sql;
+        sql = "SELECT referred_by, year(subscription_date) as year, monthname(subscription_date) as month, count(*) as no, sum(amount) as amount FROM subscription where subscription_id > 0";
+        String wheresql = "";
+        String groupbysum = " GROUP BY referred_by, year(subscription_date),monthname(subscription_date)";
+        if (this.filterTransactor != null) {
+            wheresql = wheresql + " AND transactor_id=" + this.filterTransactor.getTransactorId();
+        }
+        if (!this.filterStatus.isEmpty()) {
+            wheresql = wheresql + " AND current_status='" + this.filterStatus + "'";
+        }
+        if (this.filterSubscriptionCategoryIds != null) {
+            if (this.filterSubscriptionCategoryIds.length > 0) {
+                String commaSepString = String.join(",", this.filterSubscriptionCategoryIds);
+                wheresql = wheresql + " AND subscription_category_id IN (" + commaSepString + ")";
+            }
+        }
+        if (this.filterBusinessCategoryIds != null) {
+            if (this.filterBusinessCategoryIds.length > 0) {
+                String commaSepString = String.join(",", this.filterBusinessCategoryIds);
+                wheresql = wheresql + " AND business_category_id IN (" + commaSepString + ")";
+            }
+        }
+        if (this.filterExpiryDateRange > 0) {
+            if (this.filterExpiryDateRange == 30) {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 0;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
+            } else if (this.filterExpiryDateRange == 60) {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 30;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
+            } else if (this.filterExpiryDateRange == 90) {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 60;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
+            } else {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) > " + this.filterExpiryDateRange;
+            }
+        }
+        if (!this.filterRecurring.isEmpty()) {
+            wheresql = wheresql + " AND is_recurring='" + this.filterRecurring + "'";
+        }
+        if (this.filterItem != null) {
+            wheresql = wheresql + " AND item_id=" + this.filterItem.getItemId();
+        }
+        if (this.filterAgents != null) {
+            if (this.filterAgents.length > 0) {
+                String commaSepString = String.join(",", this.filterAgents);
+                wheresql = wheresql + " AND agent IN (" + commaSepString + ")";
+            }
+        }
+        if (this.filterAccountManager.length() > 0) {
+            wheresql = wheresql + " AND account_manager='" + this.filterAccountManager + "'";
+        }
+        if (this.filterLocDistrict.length() > 0) {
+            List<Transactor> transactors;
+            if (this.filterLocDistrict.equals("Unknown")) {
+                transactors = new TransactorBean().getTransactorsBy_loc_district("");
+            } else {
+                transactors = new TransactorBean().getTransactorsBy_loc_district(filterLocDistrict);
+            }
+            String[] transactor_ids = new String[transactors.size()];
+            for (int i = 0; i < transactors.size(); i++) {
+                transactor_ids[i] = Long.toString(transactors.get(i).getTransactorId());
+            }
+            //array to comma seperated string
+            String commaSepString = String.join(",", transactor_ids);
+            wheresql = wheresql + " AND transactor_id IN (" + commaSepString + ")";
+        }
+        if (this.filterConvertedBy.length() > 0) {
+            wheresql = wheresql + " AND converted_by='" + this.filterConvertedBy + "'";
+        }
+        if (this.filterReferredBy.length() > 0) {
+            wheresql = wheresql + " AND referred_by='" + this.filterReferredBy + "'";
+        }
+        sql = sql + wheresql + groupbysum + " ORDER BY year desc, month desc, no desc";
+        ResultSet rs;
+        this.subscriptionsSummary_referred_by = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Subs_summary_year_month_amount summary = new Subs_summary_year_month_amount();
+                try {
+                    summary.setAttribute(rs.getString("referred_by"));
+                } catch (Exception e) {
+                    summary.setAttribute("");
+                }
+                try {
+                    summary.setYear(rs.getString("year"));
+                } catch (Exception e) {
+                    summary.setYear("");
+                }
+                try {
+                    summary.setMonth(rs.getString("month"));
+                } catch (Exception e) {
+                    summary.setMonth("");
+                }
+                try {
+                    summary.setNo(rs.getInt("no"));
+                } catch (Exception e) {
+                    summary.setNo(0);
+                }
+                try {
+                    summary.setAmount(rs.getDouble("amount"));
+                } catch (Exception e) {
+                    summary.setAmount(0);
+                }
+                getSubscriptionsSummary_referred_by().add(summary);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void getFilteredSubscriptionsSummary_agent() {
+        String sql;
+        sql = "SELECT agent, year(subscription_date) as year, monthname(subscription_date) as month, count(*) as no, sum(amount) as amount FROM subscription where subscription_id > 0";
+        String wheresql = "";
+        String groupbysum = " GROUP BY agent, year(subscription_date),monthname(subscription_date)";
+        if (this.filterTransactor != null) {
+            wheresql = wheresql + " AND transactor_id=" + this.filterTransactor.getTransactorId();
+        }
+        if (!this.filterStatus.isEmpty()) {
+            wheresql = wheresql + " AND current_status='" + this.filterStatus + "'";
+        }
+        if (this.filterSubscriptionCategoryIds != null) {
+            if (this.filterSubscriptionCategoryIds.length > 0) {
+                String commaSepString = String.join(",", this.filterSubscriptionCategoryIds);
+                wheresql = wheresql + " AND subscription_category_id IN (" + commaSepString + ")";
+            }
+        }
+        if (this.filterBusinessCategoryIds != null) {
+            if (this.filterBusinessCategoryIds.length > 0) {
+                String commaSepString = String.join(",", this.filterBusinessCategoryIds);
+                wheresql = wheresql + " AND business_category_id IN (" + commaSepString + ")";
+            }
+        }
+        if (this.filterExpiryDateRange > 0) {
+            if (this.filterExpiryDateRange == 30) {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 0;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
+            } else if (this.filterExpiryDateRange == 60) {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 30;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
+            } else if (this.filterExpiryDateRange == 90) {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) >" + 60;
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) <=" + this.filterExpiryDateRange;
+            } else {
+                wheresql = wheresql + " AND datediff(expiry_date,NOW()) > " + this.filterExpiryDateRange;
+            }
+        }
+        if (!this.filterRecurring.isEmpty()) {
+            wheresql = wheresql + " AND is_recurring='" + this.filterRecurring + "'";
+        }
+        if (this.filterItem != null) {
+            wheresql = wheresql + " AND item_id=" + this.filterItem.getItemId();
+        }
+        if (this.filterAgents != null) {
+            if (this.filterAgents.length > 0) {
+                String commaSepString = String.join(",", this.filterAgents);
+                wheresql = wheresql + " AND agent IN (" + commaSepString + ")";
+            }
+        }
+        if (this.filterAccountManager.length() > 0) {
+            wheresql = wheresql + " AND account_manager='" + this.filterAccountManager + "'";
+        }
+        if (this.filterLocDistrict.length() > 0) {
+            List<Transactor> transactors;
+            if (this.filterLocDistrict.equals("Unknown")) {
+                transactors = new TransactorBean().getTransactorsBy_loc_district("");
+            } else {
+                transactors = new TransactorBean().getTransactorsBy_loc_district(filterLocDistrict);
+            }
+            String[] transactor_ids = new String[transactors.size()];
+            for (int i = 0; i < transactors.size(); i++) {
+                transactor_ids[i] = Long.toString(transactors.get(i).getTransactorId());
+            }
+            //array to comma seperated string
+            String commaSepString = String.join(",", transactor_ids);
+            wheresql = wheresql + " AND transactor_id IN (" + commaSepString + ")";
+        }
+        if (this.filterConvertedBy.length() > 0) {
+            wheresql = wheresql + " AND converted_by='" + this.filterConvertedBy + "'";
+        }
+        if (this.filterReferredBy.length() > 0) {
+            wheresql = wheresql + " AND referred_by='" + this.filterReferredBy + "'";
+        }
+        sql = sql + wheresql + groupbysum + " ORDER BY year desc, month desc, no desc";
+        ResultSet rs;
+        this.setSubscriptionsSummary_agent(new ArrayList<>());
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Subs_summary_year_month_amount summary = new Subs_summary_year_month_amount();
+                try {
+                    summary.setAttribute(rs.getString("agent"));
+                } catch (Exception e) {
+                    summary.setAttribute("");
+                }
+                try {
+                    summary.setYear(rs.getString("year"));
+                } catch (Exception e) {
+                    summary.setYear("");
+                }
+                try {
+                    summary.setMonth(rs.getString("month"));
+                } catch (Exception e) {
+                    summary.setMonth("");
+                }
+                try {
+                    summary.setNo(rs.getInt("no"));
+                } catch (Exception e) {
+                    summary.setNo(0);
+                }
+                try {
+                    summary.setAmount(rs.getDouble("amount"));
+                } catch (Exception e) {
+                    summary.setAmount(0);
+                }
+                getSubscriptionsSummary_agent().add(summary);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public double getTotalGroupedNo(List<Subs_summary_year_month_amount> sum, String attribute) {
+        double totalGroupedNo = 0;
+        for (Subs_summary_year_month_amount s : sum) {
+            if (s.getAttribute().equals(attribute)) {
+                totalGroupedNo += s.getNo();
+            }
+        }
+        return totalGroupedNo;
+    }
+
+    public double getTotalGroupedAmount(List<Subs_summary_year_month_amount> sum, String attribute) {
+        double totalGroupedAmount = 0;
+        for (Subs_summary_year_month_amount s : sum) {
+            if (s.getAttribute().equals(attribute)) {
+                totalGroupedAmount += s.getAmount();
+            }
+        }
+        return totalGroupedAmount;
     }
 
     public int getTotalNo(List<Subscription> subscription) {
@@ -2491,5 +2966,62 @@ public class SubscriptionBean implements Serializable {
      */
     public void setUniqueReferred_byList(List<String> uniqueReferred_byList) {
         this.uniqueReferred_byList = uniqueReferred_byList;
+    }
+
+    /**
+     * @return the subscriptionsSummary_converted_by
+     */
+    public List<Subs_summary_year_month_amount> getSubscriptionsSummary_converted_by() {
+        return subscriptionsSummary_converted_by;
+    }
+
+    /**
+     * @param subscriptionsSummary_converted_by the
+     * subscriptionsSummary_converted_by to set
+     */
+    public void setSubscriptionsSummary_converted_by(List<Subs_summary_year_month_amount> subscriptionsSummary_converted_by) {
+        this.subscriptionsSummary_converted_by = subscriptionsSummary_converted_by;
+    }
+
+    /**
+     * @return the subscriptionsSummary_referred_by
+     */
+    public List<Subs_summary_year_month_amount> getSubscriptionsSummary_referred_by() {
+        return subscriptionsSummary_referred_by;
+    }
+
+    /**
+     * @param subscriptionsSummary_referred_by the subscriptionsSummary_referred_by to set
+     */
+    public void setSubscriptionsSummary_referred_by(List<Subs_summary_year_month_amount> subscriptionsSummary_referred_by) {
+        this.subscriptionsSummary_referred_by = subscriptionsSummary_referred_by;
+    }
+
+    /**
+     * @return the subscriptionsSummary_agent
+     */
+    public List<Subs_summary_year_month_amount> getSubscriptionsSummary_agent() {
+        return subscriptionsSummary_agent;
+    }
+
+    /**
+     * @param subscriptionsSummary_agent the subscriptionsSummary_agent to set
+     */
+    public void setSubscriptionsSummary_agent(List<Subs_summary_year_month_amount> subscriptionsSummary_agent) {
+        this.subscriptionsSummary_agent = subscriptionsSummary_agent;
+    }
+
+    /**
+     * @return the subscriptionsSummary_account_manager
+     */
+    public List<Subscription> getSubscriptionsSummary_account_manager() {
+        return subscriptionsSummary_account_manager;
+    }
+
+    /**
+     * @param subscriptionsSummary_account_manager the subscriptionsSummary_account_manager to set
+     */
+    public void setSubscriptionsSummary_account_manager(List<Subscription> subscriptionsSummary_account_manager) {
+        this.subscriptionsSummary_account_manager = subscriptionsSummary_account_manager;
     }
 }
