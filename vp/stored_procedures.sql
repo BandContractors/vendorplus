@@ -13355,6 +13355,32 @@ BEGIN
 END//
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS sp_search_subscription_category_by_exact_name;
+DELIMITER //
+CREATE PROCEDURE sp_search_subscription_category_by_exact_name
+(
+	IN in_category_name varchar(50)
+) 
+BEGIN 
+	SELECT * FROM subscription_category 
+	WHERE category_name = in_category_name 
+	ORDER BY category_name ASC; 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_subscription_category_by_code;
+DELIMITER //
+CREATE PROCEDURE sp_search_subscription_category_by_code
+(
+	IN in_category_code varchar(50)
+) 
+BEGIN 
+	SELECT * FROM subscription_category 
+	WHERE category_code = in_category_code  
+	ORDER BY category_name ASC; 
+END//
+DELIMITER ;
+
 DROP PROCEDURE IF EXISTS sp_search_subscription_category_by_none;
 DELIMITER //
 CREATE PROCEDURE sp_search_subscription_category_by_none() 
@@ -13421,6 +13447,19 @@ CREATE PROCEDURE sp_search_business_category_by_name
 BEGIN 
 	SELECT * FROM business_category 
 	WHERE category_name LIKE concat('%',in_category_name,'%')  
+	ORDER BY category_name ASC; 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_business_category_by_exact_name;
+DELIMITER //
+CREATE PROCEDURE sp_search_business_category_by_exact_name
+(
+	IN in_category_name varchar(50)
+) 
+BEGIN 
+	SELECT * FROM business_category 
+	WHERE category_name = in_category_name  
 	ORDER BY category_name ASC; 
 END//
 DELIMITER ;

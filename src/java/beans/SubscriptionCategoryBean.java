@@ -86,7 +86,13 @@ public class SubscriptionCategoryBean implements Serializable {
             msg = "Not Allowed to Access this Function";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if (aSubscription_category.getCategory_name().length() <= 0 || aSubscription_category.getCategory_code().length() <= 0) {
-            msg = "SubscriptionCategory Name and Code Cannot be Empty";
+            msg = "Subscription Category Name and Code Cannot be Empty";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+        } else if (aSubscription_category.getSubscription_category_id() == 0 && this.getSubscriptionCategoryByExactSubscriptionCategoryName(aSubscription_category.getCategory_name()).size() > 0) {
+            msg = "Subscription Category Name Already Exist";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+        } else if (aSubscription_category.getSubscription_category_id() == 0 && this.getSubscriptionCategoryBySubscriptionCategoryCode(aSubscription_category.getCategory_code()).size() > 0) {
+            msg = "Subscription Code Already Exist";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
             if (aSubscription_category.getSubscription_category_id() == 0) {
@@ -235,6 +241,48 @@ public class SubscriptionCategoryBean implements Serializable {
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             ps.setString(1, aSubscriptionCategoryName);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Subscription_category subscription_category = new Subscription_category();
+                this.setSubscriptionCategoryFromResultset(subscription_category, rs);
+                SubscriptionCategorys.add(subscription_category);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return SubscriptionCategorys;
+    }
+
+    public List<Subscription_category> getSubscriptionCategoryByExactSubscriptionCategoryName(String aSubscriptionCategoryName) {
+        String sql;
+        sql = "{call sp_search_subscription_category_by_exact_name(?)}";
+        ResultSet rs;
+        SubscriptionCategorys = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setString(1, aSubscriptionCategoryName);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Subscription_category subscription_category = new Subscription_category();
+                this.setSubscriptionCategoryFromResultset(subscription_category, rs);
+                SubscriptionCategorys.add(subscription_category);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return SubscriptionCategorys;
+    }
+
+    public List<Subscription_category> getSubscriptionCategoryBySubscriptionCategoryCode(String aSubscriptionCategoryCode) {
+        String sql;
+        sql = "{call sp_search_subscription_category_by_code(?)}";
+        ResultSet rs;
+        SubscriptionCategorys = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setString(1, aSubscriptionCategoryCode);
             rs = ps.executeQuery();
             while (rs.next()) {
                 Subscription_category subscription_category = new Subscription_category();
