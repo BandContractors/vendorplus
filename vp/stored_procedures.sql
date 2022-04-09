@@ -12455,7 +12455,8 @@ CREATE PROCEDURE sp_insert_transaction_cr_dr_note
 	IN in_is_processed int,
 	IN in_is_paid int,
 	IN in_is_cancel int,
-    In in_spent_points_amount double
+    In in_spent_points_amount double,
+	IN in_mode_code int
 ) 
 BEGIN 
 	SET @new_id=0;
@@ -12579,7 +12580,8 @@ BEGIN
 		is_processed,
 		is_paid,
 		is_cancel,
-        spent_points_amount
+        spent_points_amount,
+        mode_code
 	) 
     VALUES
 	(
@@ -12643,7 +12645,8 @@ BEGIN
 		in_is_processed,
 		in_is_paid,
 		in_is_cancel,
-        in_spent_points_amount
+        in_spent_points_amount,
+        in_mode_code
 	); 
 SET out_transaction_id=@new_id;
 END//
@@ -12707,7 +12710,8 @@ CREATE PROCEDURE sp_update_transaction_cr_dr_note
 	IN in_is_processed int,
 	IN in_is_paid int,
 	IN in_is_cancel int,
-    In in_spent_points_amount double
+    IN in_spent_points_amount double,
+    IN in_mode_code int
 ) 
 BEGIN 
 
@@ -12804,7 +12808,8 @@ BEGIN
 		is_processed=in_is_processed,
 		is_paid=in_is_paid,
 		is_cancel=in_is_cancel,
-        spent_points_amount=in_spent_points_amount 
+        spent_points_amount=in_spent_points_amount,
+        mode_code=in_mode_code 
 	WHERE transaction_id=in_transaction_id; 
 END//
 DELIMITER ;

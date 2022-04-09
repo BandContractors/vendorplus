@@ -2994,6 +2994,52 @@ public class TransItemBean implements Serializable {
         }
     }
 
+    public boolean reverseTransItemsCEC(Trans aOldTrans, Trans aNewTrans, List<TransItem> aOldTransItems, List<TransItem> aNewTransItems) {
+        try {
+            //1. Reverse and update all trans items whoose qty has changed
+            int NewListItemIndex = 0;
+            int HistListItemIndex = 0;
+            int NewListItemNo = aNewTransItems.size();
+            int HistListItemNo = aOldTransItems.size();
+            double aDiffHistNewQty = 0;
+            double aDiffHistNewQty_damage = 0;
+            TransItem nti = new TransItem();
+            TransItem hti = new TransItem();
+            while (NewListItemIndex < NewListItemNo) {
+                HistListItemIndex = 0;
+                aDiffHistNewQty = 0;
+                aDiffHistNewQty_damage = 0;
+                //hti = aOldTransItems.get(HistListItemIndex);
+                nti = aNewTransItems.get(NewListItemIndex);
+                while (HistListItemIndex < HistListItemNo) {
+                    //nti = aNewTransItems.get(NewListItemIndex);
+                    hti = aOldTransItems.get(HistListItemIndex);
+                    if (nti.getItemId() == hti.getItemId() && nti.getBatchno().equals(hti.getBatchno()) && (nti.getCodeSpecific() == null ? hti.getCodeSpecific() == null : nti.getCodeSpecific().equals(hti.getCodeSpecific())) && (nti.getDescSpecific() == null ? hti.getDescSpecific() == null : nti.getDescSpecific().equals(hti.getDescSpecific()))) {
+                        aDiffHistNewQty = hti.getItemQty() - nti.getItemQty();
+                        aDiffHistNewQty_damage = hti.getQty_damage() - nti.getQty_damage();
+                        break;
+                    }
+                    HistListItemIndex = HistListItemIndex + 1;
+                }
+                //2. Reverse and update individual trans item whoose qty has changed
+                if (aDiffHistNewQty > 0 || aDiffHistNewQty < 0 || aDiffHistNewQty_damage > 0 || aDiffHistNewQty_damage < 0) {
+                    //Trans t = new TransBean().getTrans(aTransactionId);
+                    if (aOldTrans.getTransactionTypeId() == 2 && aOldTrans.getStore2Id() > 0) {//Invoice with Store2Id -- for order sent to
+                        this.reverseTransItemCEC(aOldTrans.getStore2Id(), aOldTrans.getTransactionTypeId(), aOldTrans.getTransactionReasonId(), "", nti, aDiffHistNewQty, aDiffHistNewQty_damage);
+                    } else {
+                        this.reverseTransItemCEC(aOldTrans.getStoreId(), aOldTrans.getTransactionTypeId(), aOldTrans.getTransactionReasonId(), "", nti, aDiffHistNewQty, aDiffHistNewQty_damage);
+                    }
+                    //this.updateTransItemCEC(nti);
+                }
+                NewListItemIndex = NewListItemIndex + 1;
+            }
+            return true;
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+            return false;
+        }
+    }
+
     public void reverseTransItem(TransItem transitem, double aDiffHistNewQty) {
         String sql = null;
         String sql2 = null;
@@ -4192,6 +4238,15 @@ public class TransItemBean implements Serializable {
                 transitem.setTransactionId(aResultSet.getLong("transaction_id"));
             } catch (NullPointerException npe) {
                 transitem.setTransactionId(0);
+            }
+            try {
+                if (null == aResultSet.getString("transaction_number")) {
+                    transitem.setTransaction_number("");
+                } else {
+                    transitem.setTransaction_number(aResultSet.getString("transaction_number"));
+                }
+            } catch (Exception e) {
+                transitem.setTransaction_number("");
             }
             try {
                 transitem.setItemId(aResultSet.getLong("item_id"));
@@ -12574,6 +12629,16 @@ public class TransItemBean implements Serializable {
             }
         }
         return lst;
+    }
+
+    public double getTotalAmount(List<TransItem> aList, String aCurrencyCode) {
+        double ta = 0;
+        for (TransItem o : aList) {
+            if (o.getCurrency_code().equals(aCurrencyCode)) {
+                ta += o.getAmountIncVat();
+            }
+        }
+        return ta;
     }
 
     /**

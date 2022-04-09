@@ -147,7 +147,7 @@
             <p:growl id="growl1"/>
             <p:tabView id="tabvReport">
                 <p:tab title="#{langsys['Detail']}">
-                    <p:dataTable id="tblDetail" tableStyle="width:auto;" var="itm" value="#{transBean.transItemList}" 
+                    <p:dataTable id="tblDetail" tableStyle="table-layout: auto;" var="itm" value="#{transBean.transItemList}" 
                                  paginator="true" rows="50" 
                                  paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
                                  rowsPerPageTemplate="50,100,200,400">
@@ -214,16 +214,16 @@
                         <p:column headerText="#{langsys['Currency']}">
                             <h:outputLabel value="#{itm.currency_code}"/>
                         </p:column>
-                        <p:column headerText="#{langsys['Add']} #{langsys['Date']}">
+                        <p:column headerText="#{langsys['Add']} #{langsys['Date']}" visible="false">
                             <h:outputText value="#{utilityBean.formatDate(itm.addDate)}"/>
                         </p:column>
-                        <p:column headerText="#{langsys['Added']} #{langsys['By']}">
+                        <p:column headerText="#{langsys['Added']} #{langsys['By']}" visible="false">
                             <h:outputText value="#{itm.addUserDetailName}"/>
                         </p:column>
                     </p:dataTable>
                 </p:tab>
                 <p:tab title="#{langsys['Category']} #{langsys['Summary']}">
-                    <p:dataTable id="tblSummary" tableStyle="width:auto;" var="itm" value="#{transBean.transItemSummary}" 
+                    <p:dataTable sortBy="#{itm.currency_code}" expandableRowGroups="true" id="tblSummary" tableStyle="table-layout: auto;" var="itm" value="#{transBean.transItemSummary}" 
                                  paginator="true" rows="50" 
                                  paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
                                  rowsPerPageTemplate="50,100,200,400">
@@ -258,24 +258,26 @@
                         </p:column>
                         <p:column headerText="#{langsys['Currency']}">
                             <h:outputLabel value="#{itm.currency_code}"/>
-                            <f:facet name="footer">
-                                <h:outputText value="Total" />
-                            </f:facet>
                         </p:column>
                         <p:column headerText="#{langsys['Amount']}" style="text-align: right;">
                             <h:outputText value="#{itm.amountIncVat}">
                                 <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
-                            <f:facet name="footer">
-                                <h:outputText value="#{transBean.getItemSummaryTotalAmount(transBean.transItemSummary)}" rendered="#{transBean.transItemSummary != null}">
+                        </p:column>
+                        <p:summaryRow>
+                            <p:column colspan="3" style="text-align:right">
+                                <h:outputText value="#{langsys['Total']}" />
+                            </p:column>
+                            <p:column style="text-align:right">
+                                <h:outputText value="#{transItemBean.getTotalAmount(transBean.transItemSummary,itm.currency_code)}">
                                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputText>
-                            </f:facet>
-                        </p:column>
+                            </p:column>
+                        </p:summaryRow>
                     </p:dataTable>
                 </p:tab>
                 <p:tab title="#{langsys['Item']} #{langsys['Summary']}">
-                    <p:dataTable id="tblSummary2" tableStyle="width:auto;" var="itm2" value="#{transBean.transItemSummary2}" 
+                    <p:dataTable sortBy="#{itm2.currency_code}" expandableRowGroups="true" id="tblSummary2" tableStyle="table-layout: auto;" var="itm2" value="#{transBean.transItemSummary2}" 
                                  paginator="true" rows="50" 
                                  paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
                                  rowsPerPageTemplate="50,100,200,400">
@@ -315,20 +317,22 @@
                         </p:column>
                         <p:column headerText="#{langsys['Currency']}">
                             <h:outputLabel value="#{itm2.currency_code}"/>
-                            <f:facet name="footer">
-                                <h:outputText value="Total" />
-                            </f:facet>
                         </p:column>
                         <p:column headerText="#{langsys['Total']} #{langsys['Amount']}" style="text-align: right;">
                             <h:outputText value="#{itm2.amountIncVat}">
                                 <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
-                            <f:facet name="footer">
-                                <h:outputText value="#{transBean.getItemSummaryTotalAmount(transBean.transItemSummary2)}" rendered="#{transBean.transItemSummary2 != null}">
+                        </p:column>
+                        <p:summaryRow>
+                            <p:column colspan="4" style="text-align:right">
+                                <h:outputText value="#{langsys['Total']}" />
+                            </p:column>
+                            <p:column style="text-align:right">
+                                <h:outputText value="#{transItemBean.getTotalAmount(transBean.transItemSummary2,itm2.currency_code)}">
                                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputText>
-                            </f:facet>
-                        </p:column>
+                            </p:column>
+                        </p:summaryRow>
                     </p:dataTable>
                 </p:tab>
             </p:tabView>

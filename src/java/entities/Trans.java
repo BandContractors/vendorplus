@@ -1947,5 +1947,4 @@ public class Trans implements Serializable {
     public void setMode_code(int mode_code) {
         this.mode_code = mode_code;
     }
-
 }

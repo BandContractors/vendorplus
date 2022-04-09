@@ -129,7 +129,7 @@ public class CreditDebitNoteBean implements Serializable {
         return ti;
     }
 
-    public long saveCreditDebitNote(Trans aOldTrans, Trans aNewTrans, List<TransItem> aOldTransItems, List<TransItem> aNewTransItems) {
+    public long saveCreditDebitNote(Trans aOldTrans, Trans aNewTrans, List<TransItem> aOldTransItems, List<TransItem> aNewTransItems, int aMode_code) {
         long SavedNoteId = 0;
         String CreditOrDebitNote = "";
         int TransTypeId = 0;
@@ -195,6 +195,7 @@ public class CreditDebitNoteBean implements Serializable {
             CreditDebitTrans.setChangeAmount(aNewTrans.getChangeAmount() - aOldTrans.getChangeAmount());
             CreditDebitTrans.setTransactionRef(aNewTrans.getTransactionNumber());
             CreditDebitTrans.setTransactionComment(CreditOrDebitNote);
+            CreditDebitTrans.setMode_code(aMode_code);
             //save trans credit/debit note
             SavedNoteId = this.insertTrans_cr_dr_note(aNewTrans.getStoreId(), TransTypeId, TransReasId, CreditDebitTrans);
             if (SavedNoteId > 0) {
@@ -209,7 +210,7 @@ public class CreditDebitNoteBean implements Serializable {
 
     public long insertTrans_cr_dr_note(int aStoreId, int aTransTypeId, int aTransReasonId, Trans trans) {
         long InsertedTransId = 0;
-        String sql = "{call sp_insert_transaction_cr_dr_note(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+        String sql = "{call sp_insert_transaction_cr_dr_note(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 CallableStatement cs = conn.prepareCall(sql);) {
@@ -434,6 +435,11 @@ public class CreditDebitNoteBean implements Serializable {
             } catch (Exception e) {
                 cs.setDouble("in_spent_points_amount", 0);
             }
+            try {
+                cs.setInt("in_mode_code", trans.getMode_code());
+            } catch (NullPointerException npe) {
+                cs.setInt("in_mode_code", 0);
+            }
             //save
             cs.executeUpdate();
             InsertedTransId = cs.getLong("out_transaction_id");
@@ -637,7 +643,7 @@ public class CreditDebitNoteBean implements Serializable {
     public int getCountDebitAndCreditNotes(String aTransactionNumber) {
         int n = 0;
         String sql;
-        sql = "SELECT COUNT(*) as ncount FROM transaction_cr_dr_note WHERE transaction_ref=?";
+        sql = "SELECT COUNT(*) as ncount FROM transaction_cr_dr_note WHERE transaction_ref=? AND is_cancel=0";
         ResultSet rs = null;
         List<TransItem> tis = new ArrayList<>();
         try (
