@@ -12175,7 +12175,7 @@ public class TransBean implements Serializable {
                 }
             }
             String sql = "SELECT  "
-                    + "		t.*,"
+                    + "		t.*,0 as mode_code,"
                     + "		ifnull(t2.reference_number_tax,'') as reference_number_tax,ifnull(t2.transaction_number_tax,'') as transaction_number_tax,"
                     + "		ifnull(t2.verification_code_tax,'') as verification_code_tax,ifnull(t2.qr_code_tax,'') as qr_code_tax,"
                     + "		case when ifnull(t2.transaction_tax_map_id,0)>0 then 1 else 0 end as tax_synced,"
