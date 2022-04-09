@@ -83,6 +83,9 @@ public class BusinessCategoryBean implements Serializable {
         } else if (aBusiness_category.getCategory_name().length() <= 0) {
             msg = "Business Category Name Cannot be Empty";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+        } else if (aBusiness_category.getBusiness_category_id() == 0 && this.getBusinessCategoryByExacttBusinessCategoryName(aBusiness_category.getCategory_name()).size() > 0) {
+            msg = "Business Category Name Already Exist";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
             if (aBusiness_category.getBusiness_category_id() == 0) {
                 sql = "{call sp_insert_business_category(?)}";
@@ -216,6 +219,27 @@ public class BusinessCategoryBean implements Serializable {
     public List<Business_category> getBusinessCategoryByBusinessCategoryName(String aBusinessCategoryName) {
         String sql;
         sql = "{call sp_search_business_category_by_name(?)}";
+        ResultSet rs;
+        BusinessCategorys = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setString(1, aBusinessCategoryName);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Business_category business_category = new Business_category();
+                this.setBusinessCategoryFromResultset(business_category, rs);
+                BusinessCategorys.add(business_category);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return BusinessCategorys;
+    }
+    
+    public List<Business_category> getBusinessCategoryByExacttBusinessCategoryName(String aBusinessCategoryName) {
+        String sql;
+        sql = "{call sp_search_business_category_by_exact_name(?)}";
         ResultSet rs;
         BusinessCategorys = new ArrayList<>();
         try (
