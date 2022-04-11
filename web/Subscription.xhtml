@@ -158,10 +158,10 @@
                         <f:selectItem itemLabel="" itemValue=""/>
                         <f:selectItems value="#{subscriptionBean.getUniqueSubscriptionReferredBys()}" var="r" itemLabel="#{r}" itemValue="#{r}"/>
                     </p:selectOneMenu>
-                    <p:commandButton value="#{langsys['OK']}" style="color: white; background-color: #00B259; width: 180px">
+                    <p:commandButton value="#{langsys['OK']}" style="color: white; background-color: #00B259; width: 120px">
                         <f:ajax listener="#{subscriptionBean.getFilteredSubscriptions()}" execute="@form" render="@form"/>
                     </p:commandButton>
-                    <p:commandButton value="#{langsys['Clear']}" style="color: white; background-color: #FF0000; width: 180px" >
+                    <p:commandButton value="#{langsys['Clear']}" style="color: white; background-color: #FF0000; width: 120px" >
                         <f:ajax listener="#{subscriptionBean.clearFilter()}" execute="@form" render="@form"/>
                     </p:commandButton>
                 </h:panelGrid>
@@ -235,7 +235,7 @@
                     </p:dataTable>
                 </h:panelGrid>
                 <h:panelGrid>
-                    <p:dataTable id="tblSummaryStatus" tableStyle="width:100%;" var="sum" value="#{subscriptionBean.subscriptionsSummary_status}" 
+                    <p:dataTable id="tblSummaryStatus" tableStyle="width:auto;" var="sum" value="#{subscriptionBean.subscriptionsSummary_status}" 
                                  rowStyleClass="#{sum.current_status eq 'Active' ? 'green' : sum.current_status eq 'Opted Out' ? 'red' : 'amber'}">
                         <p:column headerText="#{langsys['Status']}">
                             <h:outputLabel value="#{sum.current_status} "/>
@@ -264,7 +264,7 @@
                             </f:facet>
                         </p:column>
                     </p:dataTable>
-                    <p:dataTable sortBy="#{1}" id="tblSummaryRecurring" tableStyle="width:100%;" var="sum" value="#{subscriptionBean.subscriptionsSummary_recurring}">
+                    <p:dataTable sortBy="#{1}" id="tblSummaryRecurring" tableStyle="width:auto;" var="sum" value="#{subscriptionBean.subscriptionsSummary_recurring}">
                         <p:column headerText="#{langsys['Recurring']}">
                             <h:outputLabel value="#{sum.is_recurring} "/>
                             <f:facet name="footer">
@@ -297,7 +297,7 @@
                             </h:outputText>
                         </p:column>
                     </p:dataTable>
-                    <p:dataTable id="tblSummaryAmount" tableStyle="width:100%;" var="sfa" value="#{subscriptionBean.subscriptionsSummary_freq_amount}">
+                    <p:dataTable id="tblSummaryAmount" tableStyle="width:auto;" var="sfa" value="#{subscriptionBean.subscriptionsSummary_freq_amount}">
                         <p:column headerText="#{langsys['Frequency']}">
                             <h:outputLabel value="#{sfa.frequency} "/>
                         </p:column>
@@ -387,7 +387,7 @@
                                 <h:outputText value="Total" />
                             </f:facet>
                         </p:column>
-                        <p:column headerText="#{langsys['No']}" style="text-align: right;">
+                        <p:column headerText="#{langsys['No']}" width="10%" style="text-align: right;">
                             <h:outputText value="#{sum.description}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
@@ -448,7 +448,7 @@
                         <p:column headerText="#{langsys['Account']} #{langsys['Manager']}">
                             <h:outputLabel value="#{sum.account_manager}"/>
                         </p:column>
-                        <p:column headerText="#{langsys['No']}" style="text-align: right;">
+                        <p:column headerText="#{langsys['No']}" width="10%" style="text-align: right;">
                             <h:outputText value="#{sum.description}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
