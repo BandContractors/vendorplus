@@ -11789,7 +11789,7 @@ public class TransItemBean implements Serializable {
                     aSelectedTransItem.setUnitProfitMargin(0);
                 }
                 aSelectedTransItem.setAmount(aSelectedTransItem.getItemQty() * aSelectedTransItem.getUnitPrice());
-                this.addTransItemAutoAdd(aTrans, aStatusBean, aActiveTransItems, aSelectedTransItem, aSelectedItem, "");
+                this.addTransItemAutoAdd(aTrans, aStatusBean, aActiveTransItems, aSelectedTransItem, aSelectedItem, "BarCode");
                 success = 1;
             }
         } catch (Exception e) {

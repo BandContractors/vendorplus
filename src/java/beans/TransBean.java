@@ -10443,31 +10443,35 @@ public class TransBean implements Serializable {
     }
 
     public void setTransTotalsAndUpdate(Trans aTrans, List<TransItem> aActiveTransItems) {
-        aTrans.setTotalTradeDiscount(this.getTotalTradeDiscount(aActiveTransItems));
-        aTrans.setTotalVat(this.getTotalVat(aActiveTransItems));
-        aTrans.setSubTotal(this.getSubTotal(aActiveTransItems));
-        aTrans.setGrandTotal(this.getGrandTotal(aTrans, aActiveTransItems));
-        aTrans.setTotalStdVatableAmount(this.getTotalStdVatableAmount(aActiveTransItems));
-        aTrans.setTotalZeroVatableAmount(this.getTotalZeroVatableAmount(aActiveTransItems));
-        aTrans.setTotalExemptVatableAmount(this.getTotalExemptVatableAmount(aActiveTransItems));
-        if ("EXPENSE ENTRY".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {//EXPENSE ENTRY
-            aTrans.setAmountTendered(aTrans.getGrandTotal());
-        }
-        aTrans.setChangeAmount(this.getChangeAmount(aTrans));
-        aTrans.setPointsAwarded(this.getPointsAwarded(aTrans));
-        aTrans.setSpendPoints(this.getSpendPoints(aTrans));
-        aTrans.setTotalProfitMargin(this.getTotalProfitMargin(aActiveTransItems));
-        //Customer Display
-        String PortName = new Parameter_listBean().getParameter_listByContextNameMemory("CUSTOMER_DISPLAY", "COM_PORT_NAME").getParameter_value();
-        String ClientPcName = new GeneralUserSetting().getClientComputerName();
-        String SizeStr = new Parameter_listBean().getParameter_listByContextNameMemory("CUSTOMER_DISPLAY", "MAX_CHARACTERS_PER_LINE").getParameter_value();
-        int Size = 0;
-        if (SizeStr.length() > 0) {
-            Size = Integer.parseInt(SizeStr);
-        }
-        if (PortName.length() > 0 && ClientPcName.length() > 0 && Size > 0 && (new GeneralUserSetting().getCurrentTransactionTypeId() == 2 || new GeneralUserSetting().getCurrentTransactionTypeId() == 11)) {
-            UtilityBean ub = new UtilityBean();
-            ub.invokeLocalCustomerDisplay(ClientPcName, PortName, Size, ub.formatDoubleToString(aTrans.getGrandTotal()), "");
+        try {
+            aTrans.setTotalTradeDiscount(this.getTotalTradeDiscount(aActiveTransItems));
+            aTrans.setTotalVat(this.getTotalVat(aActiveTransItems));
+            aTrans.setSubTotal(this.getSubTotal(aActiveTransItems));
+            aTrans.setGrandTotal(this.getGrandTotal(aTrans, aActiveTransItems));
+            aTrans.setTotalStdVatableAmount(this.getTotalStdVatableAmount(aActiveTransItems));
+            aTrans.setTotalZeroVatableAmount(this.getTotalZeroVatableAmount(aActiveTransItems));
+            aTrans.setTotalExemptVatableAmount(this.getTotalExemptVatableAmount(aActiveTransItems));
+            if ("EXPENSE ENTRY".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {//EXPENSE ENTRY
+                aTrans.setAmountTendered(aTrans.getGrandTotal());
+            }
+            aTrans.setChangeAmount(this.getChangeAmount(aTrans));
+            aTrans.setPointsAwarded(this.getPointsAwarded(aTrans));
+            aTrans.setSpendPoints(this.getSpendPoints(aTrans));
+            aTrans.setTotalProfitMargin(this.getTotalProfitMargin(aActiveTransItems));
+            //Customer Display
+            String PortName = new Parameter_listBean().getParameter_listByContextNameMemory("CUSTOMER_DISPLAY", "COM_PORT_NAME").getParameter_value();
+            String ClientPcName = new GeneralUserSetting().getClientComputerName();
+            String SizeStr = new Parameter_listBean().getParameter_listByContextNameMemory("CUSTOMER_DISPLAY", "MAX_CHARACTERS_PER_LINE").getParameter_value();
+            int Size = 0;
+            if (SizeStr.length() > 0) {
+                Size = Integer.parseInt(SizeStr);
+            }
+            if (PortName.length() > 0 && ClientPcName.length() > 0 && Size > 0 && (new GeneralUserSetting().getCurrentTransactionTypeId() == 2 || new GeneralUserSetting().getCurrentTransactionTypeId() == 11)) {
+                UtilityBean ub = new UtilityBean();
+                ub.invokeLocalCustomerDisplay(ClientPcName, PortName, Size, ub.formatDoubleToString(aTrans.getGrandTotal()), "");
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
