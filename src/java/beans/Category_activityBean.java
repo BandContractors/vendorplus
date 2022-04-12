@@ -35,14 +35,11 @@ public class Category_activityBean {
 
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = Logger.getLogger(Category_activityBean.class.getName());
+
+    private String SearchCategoryActivityName = "";
+
     @ManagedProperty("#{menuItemBean}")
     private MenuItemBean menuItemBean;
-//    public void test() {
-//        Category_activity obj=new Category_activity();
-//        obj.setCategory_name("Deployment");
-//        int x=this.insertCategory_activity(obj);
-//        System.out.println("Inserted:" + x);
-//    }
 
     public void setCategory_activityFromResultset(Category_activity aCategory_activity, ResultSet aResultSet) {
         try {
@@ -103,7 +100,7 @@ public class Category_activityBean {
                 }
                 if (saved > 0) {
                     msg = "Activity Category Saved Successfully";
-                    this.clear(aCategory_activity);
+                    this.clearCategory_activity(aCategory_activity);
                 } else {
                     msg = "Activity Category NOT Saved";
                 }
@@ -149,16 +146,37 @@ public class Category_activityBean {
     }
 
     public int deleteCategory_activity(Category_activity aCategory_activity) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
+        String msg;
         int IsDeleted = 0;
-        String sql = "DELETE FROM category_activity WHERE category_activity_id=?";
-        try (
-                Connection conn = DBConnection.getMySQLConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);) {
-            ps.setInt(1, aCategory_activity.getCategory_activity_id());
-            ps.executeUpdate();
-            IsDeleted = 1;
+        long N = 0;
+        try {
+            String sqlFind = "SELECT COUNT(*) AS n FROM timesheet WHERE category_activity_id=" + aCategory_activity.getCategory_activity_id();
+            N = N + new UtilityBean().getN(sqlFind);
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
+        }
+        try {
+            String sqlFind = "SELECT COUNT(*) AS n FROM subcategory_activity WHERE category_activity_id=" + aCategory_activity.getCategory_activity_id();
+            N = N + new UtilityBean().getN(sqlFind);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        if (N > 0) {
+            msg = "Activity Category has been used and cannot be deleted";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+        } else {
+            String sql = "DELETE FROM category_activity WHERE category_activity_id=?";
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                ps.setInt(1, aCategory_activity.getCategory_activity_id());
+                ps.executeUpdate();
+                IsDeleted = 1;
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
+            }
         }
         return IsDeleted;
     }
@@ -184,7 +202,28 @@ public class Category_activityBean {
         }
     }
 
-    public List<Category_activity> getCategory_activityAll() {
+    public void displayCategory_activity(Category_activity Category_activityFrom, Category_activity Category_activityTo) {
+        try {
+            this.clearCategory_activity(Category_activityTo);
+            Category_activityTo.setCategory_activity_id(Category_activityFrom.getCategory_activity_id());
+            Category_activityTo.setCategory_name(Category_activityFrom.getCategory_name());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void clearCategory_activity(Category_activity aCategory_activity) {
+        try {
+            if (null != aCategory_activity) {
+                aCategory_activity.setCategory_activity_id(0);
+                aCategory_activity.setCategory_name("");
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public List<Category_activity> getCategory_activities() {
         String sql = "SELECT * FROM category_activity";
         ResultSet rs;
         List<Category_activity> maList = new ArrayList<>();
@@ -203,15 +242,26 @@ public class Category_activityBean {
         return maList;
     }
 
-    public void clear(Category_activity aCategory_activity) {
-        try {
-            if (null != aCategory_activity) {
-                aCategory_activity.setCategory_activity_id(0);
-                aCategory_activity.setCategory_name("");
+    public List<Category_activity> getCategory_activityByCategory_activityName(String aCategory_activityName) {
+        String sql;
+        sql = "SELECT * FROM category_activity WHERE category_name LIKE CONCAT('%',?,'%')";
+        ResultSet rs;
+        List<Category_activity> Category_activityList = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setString(1, aCategory_activityName);
+
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Category_activity category_activity = new Category_activity();
+                this.setCategory_activityFromResultset(category_activity, rs);
+                Category_activityList.add(category_activity);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
+        return Category_activityList;
     }
 
     /**
@@ -226,5 +276,19 @@ public class Category_activityBean {
      */
     public void setMenuItemBean(MenuItemBean menuItemBean) {
         this.menuItemBean = menuItemBean;
+    }
+
+    /**
+     * @return the SearchCategoryActivityName
+     */
+    public String getSearchCategoryActivityName() {
+        return SearchCategoryActivityName;
+    }
+
+    /**
+     * @param SearchCategoryActivityName the SearchCategoryActivityName to set
+     */
+    public void setSearchCategoryActivityName(String SearchCategoryActivityName) {
+        this.SearchCategoryActivityName = SearchCategoryActivityName;
     }
 }

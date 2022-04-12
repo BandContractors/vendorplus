@@ -6,7 +6,9 @@
 package beans;
 
 import connections.DBConnection;
+import entities.GroupRight;
 import entities.Project;
+import entities.UserDetail;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,10 +16,15 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
+import javax.faces.context.FacesContext;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import sessions.GeneralUserSetting;
+import utilities.UtilityBean;
 
 /**
  *
@@ -29,6 +36,11 @@ public class ProjectBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = Logger.getLogger(ProjectBean.class.getName());
+
+    private String SearchProjectName = "";
+
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
 //    public void test() {
 //        List<Project> maList = this.getProjectAll();
@@ -51,6 +63,64 @@ public class ProjectBean implements Serializable {
             } catch (Exception e) {
                 aProject.setProject_name("");
             }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void saveProject(Project aProject) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
+        String msg;
+        String sql = null;
+        try {
+            try {
+                BaseName = getMenuItemBean().getMenuItemObj().getLANG_BASE_NAME_SYS();
+            } catch (Exception e) {
+            }
+            UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
+            List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
+            GroupRightBean grb = new GroupRightBean();
+
+            String sql1 = "SELECT count(*) as n FROM project WHERE project_name='" + aProject.getProject_name() + "'";
+
+            if (aProject.getProject_id() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Add") == 0) {
+                msg = "Not Allowed to Access this Function";
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (aProject.getProject_id() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Edit") == 0) {
+                msg = "Not Allowed to Access this Function";
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (aProject.getProject_name().length() <= 0) {
+                msg = "Project Cannot be Empty";
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (aProject.getProject_id() == 0 && ub.getN(sql1) > 0) {
+                msg = "Project Already Exists ##: " + aProject.getProject_name();
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else {
+                int saved = 0;
+                if (aProject.getProject_id() == 0) {
+                    saved = this.insertProject(aProject);
+                } else if (aProject.getProject_id() > 0) {
+                    saved = this.updateProject(aProject);
+                }
+                if (saved > 0) {
+                    msg = "Project Saved Successfully";
+                    this.clearProject(aProject);
+                } else {
+                    msg = "Activity Status NOT Saved";
+                }
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void displayProject(Project ProjectFrom, Project ProjectTo) {
+        try {
+            this.clearProject(ProjectTo);
+            ProjectTo.setProject_id(ProjectFrom.getProject_id());
+            ProjectTo.setProject_name(ProjectFrom.getProject_name());
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -143,5 +213,66 @@ public class ProjectBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
         return list;
+    }
+
+    public void clearProject(Project aProject) {
+        try {
+            if (null != aProject) {
+                aProject.setProject_id(0);
+                aProject.setProject_name("");
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public List<Project> getProjectByProjectName(String aProjectName) {
+        String sql;
+        sql = "SELECT * FROM project WHERE project_name LIKE CONCAT('%',?,'%')";
+        ResultSet rs;
+        List<Project> ProjectList = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setString(1, aProjectName);
+
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Project project = new Project();
+                this.setProjectFromResultset(project, rs);
+                ProjectList.add(project);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return ProjectList;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
+    }
+
+    /**
+     * @return the SearchProjectName
+     */
+    public String getSearchProjectName() {
+        return SearchProjectName;
+    }
+
+    /**
+     * @param SearchProjectName the SearchProjectName to set
+     */
+    public void setSearchProjectName(String SearchProjectName) {
+        this.SearchProjectName = SearchProjectName;
     }
 }

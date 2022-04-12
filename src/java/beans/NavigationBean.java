@@ -1814,7 +1814,7 @@ public class NavigationBean implements Serializable {
         httpSession.setAttribute("TRANSACTION_TYPE_ID", 85);
         return "Subscription?faces-redirect=true";
     }
-    
+
     public String redirectToTimesheet() {
         //update seesion
 //        FacesContext context = FacesContext.getCurrentInstance();
@@ -1825,11 +1825,59 @@ public class NavigationBean implements Serializable {
         return "Timesheet?faces-redirect=true";
     }
 
+    public String redirectToSourceXhtmlFile() {
+        String SourceXhtmlFile = "";
+        try {
+            FacesContext context = FacesContext.getCurrentInstance();
+            HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+            HttpSession httpSession = request.getSession(false);
+            SourceXhtmlFile = (String) httpSession.getAttribute("SOURCE_XHTML");
+            if (null == SourceXhtmlFile || SourceXhtmlFile.isEmpty()) {
+                SourceXhtmlFile = "Home";
+            }
+        } catch (NullPointerException | ClassCastException npe) {
+            SourceXhtmlFile = "Home";
+        }
+        return SourceXhtmlFile + "?faces-redirect=true";
+    }
+
+    public String redirectToSubActivityCategory(String aXhtmlFile) {
+        //set session
+        FacesContext context = FacesContext.getCurrentInstance();
+        HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+        HttpSession httpSession = request.getSession(false);
+        httpSession.setAttribute("SOURCE_XHTML", aXhtmlFile);
+        //redirect
+        return "SubCategoryActivity?faces-redirect=true";
+    }
+
+    public String redirectToStaff() {
+        return "Staff?faces-redirect=true";
+    }
+
+    public String redirectToActivityStatus() {
+        return "ActivityStatus?faces-redirect=true";
+    }
+
+    public String redirectToMode_activity() {
+        return "Mode_activity?faces-redirect=true";
+    }
+
+    public String redirectToProject() {
+        return "Project?faces-redirect=true";
+    }
+
     public String redirectToSubscriptionCategory() {
         return "SubscriptionCategory?faces-redirect=true";
     }
     
-    public String redirectToCategoryActivity() {
+    public String redirectToCategoryActivity(String aXhtmlFile) {
+        //set session
+        FacesContext context = FacesContext.getCurrentInstance();
+        HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+        HttpSession httpSession = request.getSession(false);
+        httpSession.setAttribute("SOURCE_XHTML", aXhtmlFile);
+        //redirect
         return "CategoryActivity?faces-redirect=true";
     }
 

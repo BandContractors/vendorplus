@@ -6,8 +6,8 @@
 package beans;
 
 import connections.DBConnection;
+import entities.ActivityStatus;
 import entities.GroupRight;
-import entities.Mode_activity;
 import entities.UserDetail;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -31,43 +31,45 @@ import utilities.UtilityBean;
  */
 @ManagedBean
 @RequestScoped
-public class Mode_activityBean {
+public class ActivityStatusBean {
 
     private static final long serialVersionUID = 1L;
-    static Logger LOGGER = Logger.getLogger(Mode_activityBean.class.getName());
+    static Logger LOGGER = Logger.getLogger(ActivityStatusBean.class.getName());
 
-    private String SearchModeName = "";
+    private String SearchActivityStatusName = "";
 
     @ManagedProperty("#{menuItemBean}")
     private MenuItemBean menuItemBean;
-
 //    public void test() {
-//        List<Mode_activity> maList = this.getMode_activityAll();
-//        System.out.println("Found:" + maList.size());
+//        Category_activity obj=new Category_activity();
+//        obj.setCategory_name("Deployment");
+//        int x=this.insertCategory_activity(obj);
+//        System.out.println("Inserted:" + x);
 //    }
-    public void setMode_activityFromResultset(Mode_activity aMode_activity, ResultSet aResultSet) {
+
+    public void setActivityStatusFromResultset(ActivityStatus aActivity_status, ResultSet aResultSet) {
         try {
             try {
-                aMode_activity.setMode_activity_id(aResultSet.getInt("mode_activity_id"));
+                aActivity_status.setActivity_status_id(aResultSet.getInt("activity_status_id"));
             } catch (Exception e) {
-                aMode_activity.setMode_activity_id(0);
+                aActivity_status.setActivity_status_id(0);
             }
             try {
-                String mode_name = aResultSet.getString("mode_name");
-                if (null == mode_name) {
-                    aMode_activity.setMode_name("");
+                String activity_status_name = aResultSet.getString("activity_status_name");
+                if (null == activity_status_name) {
+                    aActivity_status.setActivity_status_name("");
                 } else {
-                    aMode_activity.setMode_name(mode_name);
+                    aActivity_status.setActivity_status_name(activity_status_name);
                 }
             } catch (Exception e) {
-                aMode_activity.setMode_name("");
+                aActivity_status.setActivity_status_name("");
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
     }
 
-    public void saveMode_activity(Mode_activity aMode_activity) {
+    public void saveActivityStatus(ActivityStatus aActivity_status) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
         String msg;
@@ -81,32 +83,32 @@ public class Mode_activityBean {
             List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
             GroupRightBean grb = new GroupRightBean();
 
-            String sql1 = "SELECT count(*) as n FROM mode_activity WHERE mode_name='" + aMode_activity.getMode_name() + "'";
+            String sql1 = "SELECT count(*) as n FROM activity_status WHERE activity_status_name='" + aActivity_status.getActivity_status_name() + "'";
 
-            if (aMode_activity.getMode_activity_id() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Add") == 0) {
+            if (aActivity_status.getActivity_status_id() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Add") == 0) {
                 msg = "Not Allowed to Access this Function";
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
-            } else if (aMode_activity.getMode_activity_id() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Edit") == 0) {
+            } else if (aActivity_status.getActivity_status_id() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Edit") == 0) {
                 msg = "Not Allowed to Access this Function";
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
-            } else if (aMode_activity.getMode_name().length() <= 0) {
-                msg = "Mode Activity Cannot be Empty";
+            } else if (aActivity_status.getActivity_status_name().length() <= 0) {
+                msg = "Activity Status Cannot be Empty";
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
-            } else if (aMode_activity.getMode_activity_id() == 0 && ub.getN(sql1) > 0) {
-                msg = "Mode Activity Already Exists ##: " + aMode_activity.getMode_name();
+            } else if (aActivity_status.getActivity_status_id() == 0 && ub.getN(sql1) > 0) {
+                msg = "Activity Status Already Exists ##: " + aActivity_status.getActivity_status_name();
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else {
                 int saved = 0;
-                if (aMode_activity.getMode_activity_id() == 0) {
-                    saved = this.insertMode_activity(aMode_activity);
-                } else if (aMode_activity.getMode_activity_id() > 0) {
-                    saved = this.updateMode_activity(aMode_activity);
+                if (aActivity_status.getActivity_status_id() == 0) {
+                    saved = this.insertActivity_status(aActivity_status);
+                } else if (aActivity_status.getActivity_status_id() > 0) {
+                    saved = this.updateActivityStatus(aActivity_status);
                 }
                 if (saved > 0) {
-                    msg = "Mode Activity Saved Successfully";
-                    this.clearMode_activity(aMode_activity);
+                    msg = "Activity Status Saved Successfully";
+                    this.clearActivityStatus(aActivity_status);
                 } else {
-                    msg = "Mode Activity NOT Saved";
+                    msg = "Activity Status NOT Saved";
                 }
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             }
@@ -115,34 +117,23 @@ public class Mode_activityBean {
         }
     }
 
-    public void displayMode_activity(Mode_activity Mode_activityFrom, Mode_activity Mode_activityTo) {
+    public void displayActivityStatus(ActivityStatus ActivityStatusFrom, ActivityStatus ActivityStatusTo) {
         try {
-            this.clearMode_activity(Mode_activityTo);
-            Mode_activityTo.setMode_activity_id(Mode_activityFrom.getMode_activity_id());
-            Mode_activityTo.setMode_name(Mode_activityFrom.getMode_name());
+            this.clearActivityStatus(ActivityStatusTo);
+            ActivityStatusTo.setActivity_status_id(ActivityStatusFrom.getActivity_status_id());
+            ActivityStatusTo.setActivity_status_name(ActivityStatusFrom.getActivity_status_name());
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
     }
 
-    public void clearMode_activity(Mode_activity aMode_activity) {
-        try {
-            if (null != aMode_activity) {
-                aMode_activity.setMode_activity_id(0);
-                aMode_activity.setMode_name("");
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.ERROR, e);
-        }
-    }
-
-    public int insertMode_activity(Mode_activity aMode_activity) {
+    public int insertActivity_status(ActivityStatus aActivity_status) {
         int InsertedId = 0;
-        String sql = "INSERT INTO mode_activity(mode_name) VALUES(?)";
+        String sql = "INSERT INTO activity_status(activity_status_name) VALUES(?)";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
-            ps.setString(1, aMode_activity.getMode_name());
+            ps.setString(1, aActivity_status.getActivity_status_name());
             ps.executeUpdate();
             ResultSet rs = ps.getGeneratedKeys();
             if (rs.next()) {
@@ -154,14 +145,14 @@ public class Mode_activityBean {
         return InsertedId;
     }
 
-    public int updateMode_activity(Mode_activity aMode_activity) {
+    public int updateActivityStatus(ActivityStatus aActivity_status) {
         int IsUpdated = 0;
-        String sql = "UPDATE mode_activity SET mode_name=? WHERE mode_activity_id=?";
+        String sql = "UPDATE activity_status SET activity_status_name=? WHERE activity_status_id=?";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
-            ps.setString(1, aMode_activity.getMode_name());
-            ps.setInt(2, aMode_activity.getMode_activity_id());
+            ps.setString(1, aActivity_status.getActivity_status_name());
+            ps.setInt(2, aActivity_status.getActivity_status_id());
             ps.executeUpdate();
             IsUpdated = 1;
         } catch (Exception e) {
@@ -170,13 +161,13 @@ public class Mode_activityBean {
         return IsUpdated;
     }
 
-    public int deleteMode_activity(Mode_activity aMode_activity) {
-        int IsDeleted = 0;
-        String sql = "DELETE FROM mode_activity WHERE mode_activity_id=?";
+    public int deleteActivityStatus(ActivityStatus aActivity_status) {
+        int IsDeleted = 0; 
+        String sql = "DELETE FROM activity_status WHERE activity_status_id=?";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
-            ps.setInt(1, aMode_activity.getMode_activity_id());
+            ps.setInt(1, aActivity_status.getActivity_status_id());
             ps.executeUpdate();
             IsDeleted = 1;
         } catch (Exception e) {
@@ -185,17 +176,17 @@ public class Mode_activityBean {
         return IsDeleted;
     }
 
-    public Mode_activity getMode_activity(int aMode_activity_id) {
-        String sql = "SELECT * FROM mode_activity WHERE mode_activity_id=?";
+    public ActivityStatus getActivity_status(int aActivity_status_id) {
+        String sql = "SELECT * FROM activity_status WHERE activity_status_id=?";
         ResultSet rs;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
-            ps.setInt(1, aMode_activity_id);
+            ps.setInt(1, aActivity_status_id);
             rs = ps.executeQuery();
             if (rs.next()) {
-                Mode_activity obj = new Mode_activity();
-                this.setMode_activityFromResultset(obj, rs);
+                ActivityStatus obj = new ActivityStatus();
+                this.setActivityStatusFromResultset(obj, rs);
                 return obj;
             } else {
                 return null;
@@ -206,49 +197,65 @@ public class Mode_activityBean {
         }
     }
 
-    public List<Mode_activity> getMode_activityAll() {
-        String sql = "SELECT * FROM mode_activity";
+    public List<ActivityStatus> getActivityStatusAll() {
+        String sql = "SELECT * FROM activity_status";
         ResultSet rs;
-        List<Mode_activity> list = new ArrayList<>();
+        List<ActivityStatus> maList = new ArrayList<>();
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             rs = ps.executeQuery();
             while (rs.next()) {
-                Mode_activity obj = new Mode_activity();
-                this.setMode_activityFromResultset(obj, rs);
-                list.add(obj);
+                ActivityStatus obj = new ActivityStatus();
+                this.setActivityStatusFromResultset(obj, rs);
+                maList.add(obj);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-        return list;
+        return maList;
     }
-    
-    
-     public List<Mode_activity> getMode_activityByMode_activityName(String aMode_activityName) {
+
+    public void clearActivityStatus(ActivityStatus aActivity_status) {
+        try {
+            if (null != aActivity_status) {
+                aActivity_status.setActivity_status_id(0);
+                aActivity_status.setActivity_status_name("");
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public List<ActivityStatus> getActivityStatusByActivityStatusName(String aActivityStatusName) {
         String sql;
-        sql = "SELECT * FROM mode_activity WHERE mode_name LIKE CONCAT('%',?,'%')";
+        sql = "SELECT * FROM activity_status WHERE activity_status_name LIKE CONCAT('%',?,'%')";
         ResultSet rs;
-        List<Mode_activity> Mode_activityList = new ArrayList<>();
+        List<ActivityStatus> ActivityStatusList = new ArrayList<>();
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
-            ps.setString(1, aMode_activityName);
+            ps.setString(1, aActivityStatusName);
 
             rs = ps.executeQuery();
             while (rs.next()) {
-                Mode_activity mode_activity = new Mode_activity();
-                this.setMode_activityFromResultset(mode_activity, rs);
-                Mode_activityList.add(mode_activity);
+                ActivityStatus activityStatus = new ActivityStatus();
+                this.setActivityStatusFromResultset(activityStatus, rs);
+                ActivityStatusList.add(activityStatus);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-        return Mode_activityList;
+        return ActivityStatusList;
     }
 
-   
+    public String getSearchActivityStatusName() {
+        return SearchActivityStatusName;
+    }
+
+    public void setSearchActivityStatusName(String SearchActivityStatusName) {
+        this.SearchActivityStatusName = SearchActivityStatusName;
+    }
 
     /**
      * @return the menuItemBean
@@ -262,19 +269,5 @@ public class Mode_activityBean {
      */
     public void setMenuItemBean(MenuItemBean menuItemBean) {
         this.menuItemBean = menuItemBean;
-    }
-
-    /**
-     * @return the SearchModeName
-     */
-    public String getSearchModeName() {
-        return SearchModeName;
-    }
-
-    /**
-     * @param SearchModeName the SearchModeName to set
-     */
-    public void setSearchModeName(String SearchModeName) {
-        this.SearchModeName = SearchModeName;
     }
 }

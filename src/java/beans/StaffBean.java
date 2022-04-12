@@ -6,17 +6,24 @@
 package beans;
 
 import connections.DBConnection;
+import entities.GroupRight;
 import entities.Staff;
+import entities.UserDetail;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
+import javax.faces.context.FacesContext;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import sessions.GeneralUserSetting;
+import utilities.UtilityBean;
 
 /**
  *
@@ -28,6 +35,10 @@ public class StaffBean {
 
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = Logger.getLogger(StaffBean.class.getName());
+    private String SearchStaffName = "";
+
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
 //    public void test() {
 //        List<Staff> maList = this.getStaffAll();
@@ -75,8 +86,82 @@ public class StaffBean {
         }
     }
 
+    public void saveStaff(Staff aStaff) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
+        String msg;
+        String sql = null;
+        try {
+            try {
+                BaseName = getMenuItemBean().getMenuItemObj().getLANG_BASE_NAME_SYS();
+            } catch (Exception e) {
+            }
+            UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
+            List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
+            GroupRightBean grb = new GroupRightBean();
+
+            //String sql1 = "SELECT count(*) as n FROM staff WHERE first_name='" + aStaff.getFirst_name() + "'";
+            if (aStaff.getStaff_id() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Add") == 0) {
+                msg = "Not Allowed to Access this Function";
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (aStaff.getStaff_id() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Edit") == 0) {
+                msg = "Not Allowed to Access this Function";
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (aStaff.getFirst_name().length() == 0) {
+                msg = "First name Cannot be Empty";
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (aStaff.getSecond_name().length() == 0) {
+                msg = "Second name Cannot be Empty";
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else {
+                int saved = 0;
+                if (aStaff.getStaff_id() == 0) {
+                    saved = this.insertStaff(aStaff);
+                } else if (aStaff.getStaff_id() > 0) {
+                    saved = this.updateStaff(aStaff);
+                }
+                if (saved > 0) {
+                    msg = "Staff Saved Successfully";
+                    this.clearStaff(aStaff);
+                } else {
+                    msg = "Staff NOT Saved";
+                }
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void clearStaff(Staff astaff) {
+        try {
+            if (null != astaff) {
+                astaff.setStaff_id(0);
+                astaff.setFirst_name("");
+                astaff.setSecond_name("");
+                astaff.setThird_name("");
+
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void displayStaff(Staff StaffFrom, Staff StaffTo) {
+        try {
+            this.clearStaff(StaffTo);
+            StaffTo.setStaff_id(StaffFrom.getStaff_id());
+            StaffTo.setFirst_name(StaffFrom.getFirst_name());
+            StaffTo.setSecond_name(StaffFrom.getSecond_name());
+            StaffTo.setThird_name(StaffFrom.getThird_name());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public int insertStaff(Staff aStaff) {
         int InsertedId = 0;
+        //sql code to insert
         String sql = "INSERT INTO staff(first_name,second_name,third_name) VALUES(?,?,?)";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -167,4 +252,50 @@ public class StaffBean {
         }
         return list;
     }
+    
+    public List<Staff> getStaffByStaffName(String aStaffName) {
+        String sql;
+        sql = "SELECT * FROM staff WHERE first_name LIKE CONCAT('%',?,'%') OR second_name LIKE CONCAT('%',?,'%') OR third_name LIKE CONCAT('%',?,'%')";
+        ResultSet rs;
+        List<Staff> staffList = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setString(1, aStaffName);
+            ps.setString(2, aStaffName);
+            ps.setString(3, aStaffName);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Staff staff = new Staff();
+                this.setStaffFromResultset(staff, rs);
+                staffList.add(staff);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return staffList;
+    }
+
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
+    }
+
+    /**
+     * @return the SearchStaffName
+     */
+    public String getSearchStaffName() {
+        return SearchStaffName;
+    }
+
+    /**
+     * @param SearchStaffName the SearchStaffName to set
+     */
+    public void setSearchStaffName(String SearchStaffName) {
+        this.SearchStaffName = SearchStaffName;
+    }
+
 }

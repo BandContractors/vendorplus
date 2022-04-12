@@ -1,8 +1,11 @@
 package beans;
 
 import connections.DBConnection;
+import entities.Item;
+import entities.Project;
 
 import entities.Timesheet;
+import entities.Transactor;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -25,12 +29,23 @@ import org.apache.log4j.Logger;
 public class TimesheetBean implements Serializable {
 
     static Logger LOGGER = Logger.getLogger(TimesheetBean.class.getName());
+    private Transactor filterTransactor;
+    private String filterActivityStatus = "";
+    private int filterSubCategoryActivityId = 0;
+    private String[] filterSubCategoryActivityIds = null;
+    private int filterCategoryActivityId = 0;
+    private String[] filterCategoryActivityIds = null;
+    private long filterProjectId = 0;
+    private String filterTimeTaken = "";
+    private int filterModeActivityId = 0;
+    private String filterActivityName = "";
+    private String filterActivityDate = "";
+    private String filterSubmissionDate = "";
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
-//    public void test() {
-//        List<Timesheet> List = this.getTimesheetAll();
-//        System.out.println("Found:" + List.size());
-//    }
     public void setTimesheetFromResultset(Timesheet aTimesheet, ResultSet aResultSet) {
+
         try {
             try {
                 aTimesheet.setTimesheet_id(aResultSet.getLong("timesheet_id"));
@@ -213,6 +228,189 @@ public class TimesheetBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
         return list;
+    }
+
+    /**
+     * @return the filterTransactor
+     */
+    public Transactor getFilterTransactor() {
+        return filterTransactor;
+    }
+
+    /**
+     * @param filterTransactor the filterTransactor to set
+     */
+    public void setFilterTransactor(Transactor filterTransactor) {
+        this.filterTransactor = filterTransactor;
+    }
+
+    /**
+     * @return the filterActivityStatus
+     */
+    public String getFilterActivityStatus() {
+        return filterActivityStatus;
+    }
+
+    /**
+     * @param filterActivityStatus the filterActivityStatus to set
+     */
+    public void setFilterActivityStatus(String filterActivityStatus) {
+        this.filterActivityStatus = filterActivityStatus;
+    }
+
+    /**
+     * @return the filterSubCategoryActivityId
+     */
+    public int getFilterSubCategoryActivityId() {
+        return filterSubCategoryActivityId;
+    }
+
+    /**
+     * @param filterSubCategoryActivityId the filterSubCategoryActivityId to set
+     */
+    public void setFilterSubCategoryActivityId(int filterSubCategoryActivityId) {
+        this.filterSubCategoryActivityId = filterSubCategoryActivityId;
+    }
+
+    /**
+     * @return the filterSubCategoryActivityIds
+     */
+    public String[] getFilterSubCategoryActivityIds() {
+        return filterSubCategoryActivityIds;
+    }
+
+    /**
+     * @param filterSubCategoryActivityIds the filterSubCategoryActivityIds to
+     * set
+     */
+    public void setFilterSubCategoryActivityIds(String[] filterSubCategoryActivityIds) {
+        this.filterSubCategoryActivityIds = filterSubCategoryActivityIds;
+    }
+
+    /**
+     * @return the filterCategoryActivityId
+     */
+    public int getFilterCategoryActivityId() {
+        return filterCategoryActivityId;
+    }
+
+    /**
+     * @param filterCategoryActivityId the filterCategoryActivityId to set
+     */
+    public void setFilterCategoryActivityId(int filterCategoryActivityId) {
+        this.filterCategoryActivityId = filterCategoryActivityId;
+    }
+
+    /**
+     * @return the filterCategoryActivityIds
+     */
+    public String[] getFilterCategoryActivityIds() {
+        return filterCategoryActivityIds;
+    }
+
+    /**
+     * @param filterCategoryActivityIds the filterCategoryActivityIds to set
+     */
+    public void setFilterCategoryActivityIds(String[] filterCategoryActivityIds) {
+        this.filterCategoryActivityIds = filterCategoryActivityIds;
+    }
+
+    /**
+     * @return the filterProjectId
+     */
+    public long getFilterProjectId() {
+        return filterProjectId;
+    }
+
+    /**
+     * @param filterProjectId the filterProjectId to set
+     */
+    public void setFilterProjectId(long filterProjectId) {
+        this.filterProjectId = filterProjectId;
+    }
+
+    /**
+     * @return the filterTimeTaken
+     */
+    public String getFilterTimeTaken() {
+        return filterTimeTaken;
+    }
+
+    /**
+     * @param filterTimeTaken the filterTimeTaken to set
+     */
+    public void setFilterTimeTaken(String filterTimeTaken) {
+        this.filterTimeTaken = filterTimeTaken;
+    }
+
+    /**
+     * @return the filterModeActivityId
+     */
+    public int getFilterModeActivityId() {
+        return filterModeActivityId;
+    }
+
+    /**
+     * @param filterModeActivityId the filterModeActivityId to set
+     */
+    public void setFilterModeActivityId(int filterModeActivityId) {
+        this.filterModeActivityId = filterModeActivityId;
+    }
+
+    /**
+     * @return the filterActivityName
+     */
+    public String getFilterActivityName() {
+        return filterActivityName;
+    }
+
+    /**
+     * @param filterActivityName the filterActivityName to set
+     */
+    public void setFilterActivityName(String filterActivityName) {
+        this.filterActivityName = filterActivityName;
+    }
+
+    /**
+     * @return the filterActivityDate
+     */
+    public String getFilterActivityDate() {
+        return filterActivityDate;
+    }
+
+    /**
+     * @param filterActivityDate the filterActivityDate to set
+     */
+    public void setFilterActivityDate(String filterActivityDate) {
+        this.filterActivityDate = filterActivityDate;
+    }
+
+    /**
+     * @return the filterSubmissionDate
+     */
+    public String getFilterSubmissionDate() {
+        return filterSubmissionDate;
+    }
+
+    /**
+     * @param filterSubmissionDate the filterSubmissionDate to set
+     */
+    public void setFilterSubmissionDate(String filterSubmissionDate) {
+        this.filterSubmissionDate = filterSubmissionDate;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 
 }

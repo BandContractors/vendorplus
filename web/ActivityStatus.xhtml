@@ -6,7 +6,7 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:p="http://primefaces.org/ui">
     <h:head>
-        <title>Category Activity</title>
+        <title>Activity Status</title>
         <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
         <script  language="javascript">
@@ -28,52 +28,53 @@
         <h:form id="form" styleClass="clsMainFrom">
 
             <h:panelGrid styleClass="clsGridMainHeader" columns="2">
-                <h:outputLabel styleClass="clsLabelTop" id="olblUnitHeader" value="#{langsys['Activity']} #{langsys['Category']}"/>
-                <p:commandButton icon="fa fa-fw fa-arrow-left" style="width: 120px;height: 40px;color: white;background-color: black;" id="cmdbNew" value="#{langsys['BACK']}"  action="#{navigationBean.redirectToSourceXhtmlFile()}" />
+                <h:outputLabel styleClass="clsLabelTop" id="olblUnitHeader" value="#{langsys['Activity']} #{langsys['Status']}"/>
+                <p:commandButton value="#{langsys['Time']} #{langsys['Sheet']}" action="#{navigationBean.redirectToTimesheet()}" icon="ui-icon-circle-plus" style="background-color: yellow !important" />
             </h:panelGrid>
 
             <h:panelGrid id="pnlInput" styleClass="clsGridMainInput" columns="6">
-                <h:outputLabel  value="#{langsys['Activity']} #{langsys['Category']}:"/>
-                <h:inputText styleClass="clsInput" id="itxtUnitName" value="#{category_activity.category_name}" autocomplete="false" style="width: 250px;"> 
+                <h:outputLabel  value="#{langsys['Activity']} #{langsys['Status']} #{langsys['Name']}:"/>
+                <h:inputText styleClass="clsInput" id="activityStatus" value="#{activityStatus.activity_status_name}" autocomplete="false" style="width: 250px;"> 
                 </h:inputText>
+
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainCommands" columns="1">
                 <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
                     <h:commandButton styleClass="clsButton" id="cmdbSave" value="#{langsys['Save']}">
-                        <f:ajax listener="#{category_activityBean.saveCategoryActivity(category_activity)}" execute="pnlInput" render="growl1 pnlInput dtblDetail" />
+                        <f:ajax listener="#{activityStatusBean.saveActivityStatus(activityStatus)}" execute="@form" render="growl1 pnlInput dtblActivityStatus" />
                     </h:commandButton>
                     <h:commandButton styleClass="clsButton" id="cmdbClear" value="#{langsys['Clear']}">
-                        <f:ajax listener="#{category_activityBean.clearCategory_activity(category_activity)}" execute="pnlInput" render="pnlInput" />
+                        <f:ajax listener="#{activityStatusBean.clearActivityStatus(activityStatus)}" execute="@form" render="growl1 pnlInput" />
                     </h:commandButton>
                     <h:commandButton styleClass="clsButton" id="cmdbDelete" value="#{langsys['Delete']}" onclick="return confirmDelete();">
-                        <f:ajax listener="#{category_activityBean.deleteCategory_activity(category_activity)}" execute="@form" render="@form" />
+                        <f:ajax listener="#{activityStatusBean.deleteActivityStatus(activityStatus)}" execute="@form" render="@form" />
                     </h:commandButton>
                 </h:panelGrid>
             </h:panelGrid>
             <p:growl id="growl1"/>
             <h:panelGrid styleClass="clsGridMainSearch" columns="1">
-                <h:outputLabel id="olblMainSearch" value="#{langsys['Search']} #{langsys['Category']} #{langsys['Activity']}"/>
-                <h:inputText id="itxtMainSearch" value="#{category_activityBean.searchCategoryActivityName}" autocomplete="false">
-                    <f:ajax event="keyup" render="dtblDetail"/>
+                <h:outputLabel id="olblMainSearch" value="#{langsys['Search']} #{langsys['Activity']} #{langsys['Status']}"/>
+                <h:inputText id="itxtMainSearch" value="#{activityStatusBean.searchActivityStatusName}" autocomplete="false">
+                    <f:ajax event="keyup" render="dtblActivityStatus"/>
                 </h:inputText>
             </h:panelGrid>
 
-            <p:dataTable id="dtblDetail" value="#{category_activityBean.getCategory_activityByCategory_activityName(category_activityBean.searchCategoryActivityName)}" var="sc" 
-                         > 
+            <p:dataTable id="dtblActivityStatus" value="#{activityStatusBean.getActivityStatusByActivityStatusName(activityStatusBean.searchActivityStatusName)}" var="as"> 
                 <p:column>
                     <!-- column header -->
-                    <f:facet name="header">#{langsys['Category']} #{langsys['Activity']} #{langsys['Name']}</f:facet>
+                    <f:facet name="header">#{langsys['Activity']} #{langsys['Status']}  #{langsys['Name']}</f:facet>
                     <!-- row record -->
-                    #{sc.category_name}
+                    #{as.activity_status_name}
                 </p:column>
+
 
                 <p:column>
                     <!-- column header -->
                     <f:facet name="header">#{langsys['Action']}</f:facet>
                     <!-- row record -->
                     <h:commandLink value="#{langsys['Edit']}">
-                        <f:ajax listener="#{category_activityBean.displayCategory_activity(sc, category_activity)}" execute="@form" render="@form"/>
+                        <f:ajax listener="#{activityStatusBean.displayActivityStatus(as, activityStatus)}" execute="@form" render="@form"/>
                     </h:commandLink>
                     &nbsp;
                 </p:column>
