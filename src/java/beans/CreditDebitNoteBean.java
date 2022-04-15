@@ -43,7 +43,7 @@ import utilities.UtilityBean;
 @ManagedBean
 @SessionScoped
 public class CreditDebitNoteBean implements Serializable {
-
+    
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = Logger.getLogger(CreditDebitNoteBean.class.getName());
     private String DateType;
@@ -59,7 +59,7 @@ public class CreditDebitNoteBean implements Serializable {
     private List<TransItem> TransItemList;
     private Pay PayObj;
     private String ActionType;
-
+    
     public Trans getTrans_cr_dr_note(long aTransactionId) {
         String sql = "{call sp_search_transaction_by_id_cr_dr_note(?)}";
         ResultSet rs = null;
@@ -78,7 +78,7 @@ public class CreditDebitNoteBean implements Serializable {
             return null;
         }
     }
-
+    
     public List<Trans> getTrans_cr_dr_notes(String aTransNumberRef) {
         List<Trans> aList = new ArrayList<>();
         String sql = "SELECT * FROM transaction_cr_dr_note WHERE transaction_ref=?";
@@ -96,7 +96,7 @@ public class CreditDebitNoteBean implements Serializable {
         }
         return aList;
     }
-
+    
     public void refreshTrans_cr_dr_notes(String aTransNumberRef, List<Trans> aList) {
         String sql = "SELECT * FROM transaction_cr_dr_note WHERE transaction_ref=?";
         ResultSet rs = null;
@@ -113,7 +113,7 @@ public class CreditDebitNoteBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public TransItem getTransItemFromList(String aItemCode, List<TransItem> aTransItems) {
         TransItem ti = new TransItem();
         for (int i = 0; i < aTransItems.size(); i++) {
@@ -128,7 +128,7 @@ public class CreditDebitNoteBean implements Serializable {
         }
         return ti;
     }
-
+    
     public long saveCreditDebitNote(Trans aOldTrans, Trans aNewTrans, List<TransItem> aOldTransItems, List<TransItem> aNewTransItems, int aMode_code) {
         long SavedNoteId = 0;
         String CreditOrDebitNote = "";
@@ -196,6 +196,7 @@ public class CreditDebitNoteBean implements Serializable {
             CreditDebitTrans.setTransactionRef(aNewTrans.getTransactionNumber());
             CreditDebitTrans.setTransactionComment(CreditOrDebitNote);
             CreditDebitTrans.setMode_code(aMode_code);
+            CreditDebitTrans.setTransactionUserDetailId(new GeneralUserSetting().getCurrentUser().getUserDetailId());
             //save trans credit/debit note
             SavedNoteId = this.insertTrans_cr_dr_note(aNewTrans.getStoreId(), TransTypeId, TransReasId, CreditDebitTrans);
             if (SavedNoteId > 0) {
@@ -207,7 +208,7 @@ public class CreditDebitNoteBean implements Serializable {
         }
         return SavedNoteId;
     }
-
+    
     public long insertTrans_cr_dr_note(int aStoreId, int aTransTypeId, int aTransReasonId, Trans trans) {
         long InsertedTransId = 0;
         String sql = "{call sp_insert_transaction_cr_dr_note(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
@@ -448,7 +449,7 @@ public class CreditDebitNoteBean implements Serializable {
         }
         return InsertedTransId;
     }
-
+    
     public void saveTransItems_cr_dr_note(int aStoreId, int aTransTypeId, int aTransReasonId, Trans aTrans, List<TransItem> aActiveTransItems, long TransactionId) {
         try {
             List<TransItem> ati = aActiveTransItems;
@@ -463,7 +464,7 @@ public class CreditDebitNoteBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void saveTransItem_cr_dr_note(int aStoreId, int aTransTypeId, int aTransReasonId, Trans aTrans, TransItem transitem) {
         String sql = null;
         if (transitem.getTransactionItemId() == 0) {
@@ -617,7 +618,7 @@ public class CreditDebitNoteBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public List<TransItem> getTransItemsByTransactionId_cr_dr_note(long aTransactionId) {
         String sql;
         sql = "{call sp_search_transaction_item_by_transaction_id_cr_dr_note(?)}";
@@ -639,7 +640,7 @@ public class CreditDebitNoteBean implements Serializable {
         }
         return tis;
     }
-
+    
     public int getCountDebitAndCreditNotes(String aTransactionNumber) {
         int n = 0;
         String sql;
@@ -660,7 +661,7 @@ public class CreditDebitNoteBean implements Serializable {
         }
         return n;
     }
-
+    
     public void initResetSalesCrDrNoteDetail(Trans aTrans, CreditDebitNoteBean aCreditDebitNoteBean, Transactor aBillTransactor, Transactor aTransactor) {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -668,7 +669,7 @@ public class CreditDebitNoteBean implements Serializable {
             this.resetSalesCrDrNoteDetail(aTrans, aCreditDebitNoteBean, aBillTransactor, aTransactor);
         }
     }
-
+    
     public void resetSalesCrDrNoteDetail(Trans aTrans, CreditDebitNoteBean aCreditDebitNoteBean, Transactor aBillTransactor, Transactor aTransactor) {
         aCreditDebitNoteBean.setActionMessage("");
         try {
@@ -695,7 +696,7 @@ public class CreditDebitNoteBean implements Serializable {
         } catch (NullPointerException npe) {
         }
     }
-
+    
     public void setDateToToday() {
         Date CurrentServerDate = new CompanySetting().getCURRENT_SERVER_DATE();
         this.setDate1(CurrentServerDate);
@@ -707,7 +708,7 @@ public class CreditDebitNoteBean implements Serializable {
         cal.set(Calendar.MILLISECOND, 0);
         // Put it back in the Date object  
         this.setDate1(cal.getTime());
-
+        
         this.setDate2(CurrentServerDate);
         Calendar cal2 = Calendar.getInstance();
         cal2.setTime(this.getDate2());
@@ -718,10 +719,10 @@ public class CreditDebitNoteBean implements Serializable {
         // Put it back in the Date object  
         this.setDate2(cal2.getTime());
     }
-
+    
     public void setDateToYesturday() {
         Date CurrentServerDate = new CompanySetting().getCURRENT_SERVER_DATE();
-
+        
         this.setDate1(CurrentServerDate);
         Calendar cal = Calendar.getInstance();
         cal.setTime(this.getDate1());
@@ -732,7 +733,7 @@ public class CreditDebitNoteBean implements Serializable {
         cal.set(Calendar.MILLISECOND, 0);
         // Put it back in the Date object  
         this.setDate1(cal.getTime());
-
+        
         this.setDate2(CurrentServerDate);
         Calendar cal2 = Calendar.getInstance();
         cal2.setTime(this.getDate2());
@@ -744,7 +745,7 @@ public class CreditDebitNoteBean implements Serializable {
         // Put it back in the Date object  
         this.setDate2(cal2.getTime());
     }
-
+    
     public void reportSalesCrDrNoteDetail(Trans aTrans, CreditDebitNoteBean aCreditDebitNoteBean) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -842,7 +843,7 @@ public class CreditDebitNoteBean implements Serializable {
             } catch (Exception e) {
                 LOGGER.log(Level.ERROR, e);
             }
-
+            
             try (
                     Connection conn = DBConnection.getMySQLConnection();
                     PreparedStatement ps = conn.prepareStatement(sqlsum);) {
@@ -935,7 +936,7 @@ public class CreditDebitNoteBean implements Serializable {
             }
         }
     }
-
+    
     public void initCreditDebitNoteSession(long aTransId, String aAction) {
         try {
             long TransId = aTransId;
@@ -1123,5 +1124,5 @@ public class CreditDebitNoteBean implements Serializable {
     public void setActionType(String ActionType) {
         this.ActionType = ActionType;
     }
-
+    
 }

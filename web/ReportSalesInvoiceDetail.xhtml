@@ -272,6 +272,12 @@
                 <p:column headerText="#{langsys['Added']} #{langsys['By']}" visible="false">
                     <h:outputText value="#{userDetailBean.getUserDetail(itm.addUserDetailId).userName}"/>
                 </p:column>
+                <p:column headerText="#{langsys['Last']} #{langsys['Edit']} #{langsys['Date']}" visible="false">
+                    <h:outputText value="#{utilityBean.formatDateTime(itm.editDate)}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Last']} #{langsys['Edit']} #{langsys['By']}" visible="false">
+                    <h:outputText value="#{userDetailBean.getUserDetail(itm.editUserDetailId).userName}"/>
+                </p:column>
             </p:dataTable>
         </h:form>
         <ui:include src="ViewSaleInvoiceTrans.xhtml"/>

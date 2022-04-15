@@ -902,7 +902,7 @@ public class TransBean implements Serializable {
                 msg = "You Cannot Add or Debit and Subtract or Credit different items in the same Update";
             } else if (MsgCkeckApproval.length() > 0) {
                 msg = MsgCkeckApproval;
-            } else if (new Transaction_approvalBean().approvalRequiredTrans(trans, aTransTypeId, aTransReasonId) == 1) {
+            } else if (trans.getTransactionId() == 0 && new Transaction_approvalBean().approvalRequiredTrans(trans, aTransTypeId, aTransReasonId) == 1) {
                 msg = "Send this Transaction for Approval";
             }
             /*else if (trans.getTransactionId() > 0 && new TransItemBean().countItemsWithQtyChanged(new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans), transtype.getTransactionTypeName()) == 0) {

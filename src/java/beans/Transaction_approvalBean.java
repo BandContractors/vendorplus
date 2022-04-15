@@ -634,7 +634,7 @@ public class Transaction_approvalBean implements Serializable {
 
     public void displayTransactionApprovalCall(Transaction_approval Transaction_approvalFrom, Transaction_approval Transaction_approvalTo, int approve_or_reject_button_flag) {
         try {
-            this.displayTransactionApproval(Transaction_approvalFrom, Transaction_approvalTo);            
+            this.displayTransactionApproval(Transaction_approvalFrom, Transaction_approvalTo);
             //display approve or reject button flag
             this.displayApproveOrRejectButton(approve_or_reject_button_flag);
         } catch (Exception e) {

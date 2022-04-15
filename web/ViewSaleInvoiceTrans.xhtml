@@ -39,24 +39,28 @@
                         <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Stock']}#{generalUserSetting.DEPLETE_SOLD_STOCK_UPON eq '0' ? '↓↑':':No effect'}"/>
                         <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Ledger']}:#{langsys['Cash']}↑ #{langsys['Sales']}↑ AR↑ #{langsys['Tax']}↑"/>
                     </h:panelGrid>
-                    <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="8">
+                    <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="6">
                         <h:outputLabel  value="#{companySetting.getStoreEquivName()}"/>
                         <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{storeBean.getStore(transBean.transObj.storeId).storeName}" style="width: 140px;"/>
                         <h:outputLabel  value="#{langsys['Currency']}"/>
                         <h:inputText styleClass="clsInput" id="itxtCurrency" disabled="true" value="#{transBean.transObj.currencyCode}" style="width: 170px;"/>
                         <h:outputLabel  value="#{langsys[transactionTypeBean.getTransactionType(2).transactionDateLabel]}"/>
                         <h:inputText id="itxtTransactionDate" value="#{utilityBean.formatDate(transBean.transObj.transactionDate)}" style="width:100px;" disabled="true"/>
-                        <h:outputLabel value="#{langsys['Loyalty']} #{langsys['Card']}"/>
-                        <h:inputText value="#{transBean.transObj.cardNumber}" style="width: 100px;" disabled="true"/>
 
                         <h:outputLabel  value="#{langsys[transactionTypeBean.getTransactionType(2).transactionRefLabel]}"/>
                         <h:inputText styleClass="clsInput" id="itxtTransactionRef" value="#{transBean.transObj.transactionRef}" autocomplete="off" style="width: 140px;" disabled="true"/>
                         <h:outputLabel  value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}"/>
                         <h:inputText styleClass="clsInput" id="itxtTransactor" value="#{transactorBean.getTransactor(transBean.transObj.transactorId).transactorNames}" autocomplete="off" style="width: 170px;" disabled="true"/>
-                        <h:outputLabel  value="#{langsys['Last']} #{langsys['Edit']} #{langsys['Date']}"/>
-                        <h:inputText value="#{utilityBean.formatDateTime(transBean.transObj.editDate)}" style="width:100px;" disabled="true"/>
+
                         <h:outputLabel value="#{langsys[transactionTypeBean.getTransactionType(2).transactionUserLabel]}"/>
                         <h:inputText value="#{userDetailBean.getUserDetail(transBean.transObj.transactionUserDetailId).userName}" style="width: 100px;" disabled="true"/>
+
+                        <h:outputLabel  value="#{langsys['Last']} #{langsys['Edit']} #{langsys['Date']}"/>
+                        <h:inputText value="#{utilityBean.formatDateTime(transBean.transObj.editDate)}" style="width:140px;" disabled="true"/>
+                        <h:outputLabel value="#{langsys['Last']} #{langsys['Edit']} #{langsys['By']}"/>
+                        <h:inputText value="#{userDetailBean.getUserDetail(transBean.transObj.editUserDetailId).userName}" style="width: 170px;" disabled="true"/>
+                        <h:outputLabel value="#{langsys['Loyalty']} #{langsys['Card']}"/>
+                        <h:inputText value="#{transBean.transObj.cardNumber}" style="width: 100px;" disabled="true"/>
                     </h:panelGrid>
                     <p:dataTable rowIndexVar="rowIndex" id="dtblTransactionItem" value="#{transBean.transItemList}" var="ati" 
                                  styleClass="cls-table" tableStyle="width:auto;" 
