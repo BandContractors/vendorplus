@@ -583,6 +583,55 @@ public class PayBean implements Serializable {
         }
     }
 
+    public int saveCustomerDepositFrmCrNote(long aCreditNodeId, Pay aPay, int aUserDetailId, double aDepositAmount) {
+        int saved = 0;
+        try {
+            //PayMethodId, PointsSpent, PointsSpentAmount, BillTransactorId, 
+            //AccChildAccountId, AccChildAccountId2,
+            String CreditNodeNo = "";
+            try {
+                CreditNodeNo = new CreditDebitNoteBean().getTrans_cr_dr_note(aCreditNodeId).getTransactionNumber();
+            } catch (Exception e) {
+                CreditNodeNo = "";
+            }
+            aPay.setPayId(0);
+            aPay.setPaidAmount(aDepositAmount);
+            aPay.setPayDate(new CompanySetting().getCURRENT_SERVER_DATE());
+            aPay.setAddUserDetailId(aUserDetailId);
+            aPay.setEditUserDetailId(aUserDetailId);//will be made null by the SP
+            aPay.setPayCategory("IN");//IN or OUT
+            aPay.setStoreId(aPay.getStoreId());
+            aPay.setDeletePayId(0);
+            AccCurrency LocalCurrency = null;
+            LocalCurrency = new AccCurrencyBean().getLocalCurrency();
+            aPay.setXRate(new AccXrateBean().getXrate(aPay.getCurrencyCode(), LocalCurrency.getCurrencyCode()));
+            aPay.setPayTypeId(14);//CASH RECEIPT
+            aPay.setPayReasonId(90);//PREPAID INCOME
+            aPay.setStatus(1);
+            aPay.setStatusDesc("");
+            aPay.setPayRefNo("");
+            long SavedPayId = this.payInsertUpdate(aPay);
+            //save pay trans
+            if (SavedPayId > 0) {
+                PayTrans paytrans = new PayTrans();
+                paytrans.setPayTransId(0);
+                paytrans.setPayId(SavedPayId);
+                paytrans.setTransactionId(aCreditNodeId);
+                paytrans.setTransactionNumber(CreditNodeNo);
+                paytrans.setTransPaidAmount(aDepositAmount);
+                paytrans.setTransactionTypeId(14);
+                paytrans.setTransactionReasonId(90);
+                new PayTransBean().savePayTrans(paytrans);
+                saved = 1;
+            }
+            //insert Journal
+            new AccJournalBean().postJournalCashReceiptPrepaidIncome(aPay, new AccPeriodBean().getAccPeriod(aPay.getPayDate()).getAccPeriodId());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return saved;
+    }
+
     public void saveCashPaymentLIABILITY(Pay pay, List<PayTrans> aPayTranss, int aPayTypeId, int aPayReasId, PayTrans aPayTrans) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";

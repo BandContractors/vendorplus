@@ -3524,11 +3524,11 @@ public class TransBean implements Serializable {
         }
     }
 
-    public void raiseCrDrNoteCall(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aNewTrans, List<TransItem> aNewTransItems, Pay aPay) {
+    public void raiseCreditNoteCall(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aNewTrans, List<TransItem> aNewTransItems, Pay aPay) {
         //get some details
         String OrderTransNo = aNewTrans.getTransactionRef();
         //save
-        this.raiseCrDrNote(aLevel, aStoreId, aTransTypeId, aTransReasonId, aSaleType, aNewTrans, aNewTransItems, aPay);
+        this.raiseCreditNote(aLevel, aStoreId, aTransTypeId, aTransReasonId, aSaleType, aNewTrans, aNewTransItems, aPay);
         //update a few things needed after sales invoice saving
         if (OrderTransNo.length() > 0) {
             Trans OrderTrans = this.getTransByNumberType(OrderTransNo, 11);
@@ -4032,7 +4032,7 @@ public class TransBean implements Serializable {
         }
     }
 
-    public void raiseCrDrNote(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aNewTrans, List<TransItem> aNewTransItems, Pay aPay) {
+    public void raiseCreditNote(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aNewTrans, List<TransItem> aNewTransItems, Pay aPay) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
         try {
@@ -4105,138 +4105,6 @@ public class TransBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, ValidationMessage)));
         } else {
             /*
-             //Copy Trans
-             sql = "{call sp_copy_transaction(?,?,?)}";
-             try (
-             Connection conn = DBConnection.getMySQLConnection();
-             CallableStatement cs = conn.prepareCall(sql);) {
-             cs.setLong("in_transaction_id", aNewTrans.getTransactionId());
-             cs.setString("in_hist_flag", "Edit");
-             cs.registerOutParameter("out_transaction_hist_id", VARCHAR);
-             cs.executeUpdate();
-             TransHistId = cs.getLong("out_transaction_hist_id");
-             isTransCopySuccess = true;
-             } catch (Exception e) {
-             isTransCopySuccess = false;
-             LOGGER.log(Level.ERROR, e);
-             }
-             //Copy TransItem
-             if (isTransCopySuccess) {
-             List<TransItem> TransItemsToCopy = new ArrayList<>();
-             TransItemsToCopy = new TransItemBean().getTransItemsByTransactionId(aNewTrans.getTransactionId());
-             int i = 0;
-             int n = TransItemsToCopy.size();
-             //now copy item by item
-             sql = "{call sp_copy_transaction_item(?,?,?)}";
-             try (
-             Connection conn = DBConnection.getMySQLConnection();
-             CallableStatement cs = conn.prepareCall(sql);) {
-             while (i < n) {
-             cs.setLong("in_transaction_id", aNewTrans.getTransactionId());
-             cs.setLong("in_transaction_hist_id", TransHistId);
-             cs.setLong("in_transaction_item_id", TransItemsToCopy.get(i).getTransactionItemId());
-             cs.executeUpdate();
-             i = i + 1;
-             }
-             isTransItemCopySuccess = true;
-             } catch (Exception e) {
-             isTransItemCopySuccess = false;
-             LOGGER.log(Level.ERROR, e);
-             }
-             }
-             */
-
-            /*
-             //update trans
-             if (isTransCopySuccess && isTransItemCopySuccess && isTransItemReverseSuccess) {
-             isTransUpdateSuccess = this.updateTransactionTable(aNewTrans);
-             switch (aLevel) {
-             case "PARENT":
-             httpSession.setAttribute("CURRENT_TRANSACTION_ID", aNewTrans.getTransactionId());
-             break;
-             case "CHILD":
-             httpSession.setAttribute("CURRENT_TRANSACTION_ID_CHILD", aNewTrans.getTransactionId());
-             break;
-             }
-             }
-             */
-
-            /*
-             //Update the first Payment
-             if (transtype.getTransactionTypeName().equals("SALE INVOICE") || transtype.getTransactionTypeName().equals("PURCHASE INVOICE") || transtype.getTransactionTypeName().equals("EXPENSE ENTRY") || "HIRE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE RETURN INVOICE".equals(transtype.getTransactionTypeName())) {
-             oldPay = new PayBean().getTransactionFirstPayByTransNo(aNewTrans.getTransactionNumber());
-             newPay = new PayBean().getTransactionFirstPayByTransNo(aNewTrans.getTransactionNumber());
-             if (null != newPay) {
-             //copy pay and pay trans
-             //copy pay
-             sql = "{call sp_copy_pay(?,?,?)}";
-             try (
-             Connection conn = DBConnection.getMySQLConnection();
-             CallableStatement cs = conn.prepareCall(sql);) {
-             cs.setLong("in_pay_id", newPay.getPayId());
-             cs.setString("in_hist_flag", "Edit");
-             cs.registerOutParameter("out_pay_hist_id", VARCHAR);
-             cs.executeUpdate();
-             PayHistId = cs.getLong("out_pay_hist_id");
-             isPayCopySuccess = true;
-             } catch (Exception e) {
-             isPayCopySuccess = false;
-             LOGGER.log(Level.ERROR, e);
-             }
-             //copy pay trans
-             if (isPayCopySuccess) {
-             List<PayTrans> PayTranssToCopy = new ArrayList<>();
-             PayTranssToCopy = new PayTransBean().getPayTranssByPayId(newPay.getPayId());
-             int i = 0;
-             int n = PayTranssToCopy.size();
-             //now copy item by item
-             sql = "{call sp_copy_pay_trans(?,?,?)}";
-             try (
-             Connection conn = DBConnection.getMySQLConnection();
-             CallableStatement cs = conn.prepareCall(sql);) {
-             while (i < n) {
-             cs.setLong("in_pay_id", newPay.getPayId());
-             cs.setLong("in_pay_hist_id", PayHistId);
-             cs.setLong("in_pay_trans_id", PayTranssToCopy.get(i).getPayTransId());
-             cs.executeUpdate();
-             i = i + 1;
-             }
-             isPayTransCopySuccess = true;
-             } catch (Exception e) {
-             isPayTransCopySuccess = false;
-             LOGGER.log(Level.ERROR, e);
-             }
-             }
-             if (isTransCopySuccess && isTransItemCopySuccess && isTransItemReverseSuccess && isTransUpdateSuccess && isPayCopySuccess && isPayTransCopySuccess) {
-             newPay.setPaidAmount(aNewTrans.getAmountTendered());
-             newPay.setPointsSpentAmount(0);//aNewTrans.getSpendPointsAmount()
-             newPay.setPointsSpent(0);//aNewTrans.getSpendPoints()
-             newPay.setEditUserDetailId(new GeneralUserSetting().getCurrentUser().getUserDetailId());
-             newPayId = new PayBean().payInsertUpdate(newPay);
-             switch (aLevel) {
-             case "PARENT":
-             httpSession.setAttribute("CURRENT_PAY_ID", newPayId);
-             break;
-             case "CHILD":
-             httpSession.setAttribute("CURRENT_PAY_ID_CHILD", newPayId);
-             break;
-             }
-             //insert PayTrans
-             PayTrans paytrans = null;
-             try {
-             paytrans = new PayTransBean().getPayTranssByPayId(newPayId).get(0);
-             } catch (NullPointerException | IndexOutOfBoundsException npe) {
-             paytrans = null;
-             }
-             if (null != paytrans) {
-             paytrans.setTransPaidAmount(newPay.getPaidAmount());
-             new PayTransBean().savePayTrans(paytrans);
-             }
-             }
-             }
-             }
-             */
-            /*
              //Reverse and Insert Journal
              if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE RETURN INVOICE".equals(transtype.getTransactionTypeName())) {
              savedpay = null;
@@ -4263,6 +4131,42 @@ public class TransBean implements Serializable {
             if (SavedCrDrNoteTransId > 0) {
                 TransItemBean tib = new TransItemBean();
                 isTransItemReverseSuccess = tib.reverseTransItemsCEC(OldTrans, aNewTrans, OldTransItems, aNewTransItems);
+            }
+
+            if (SavedCrDrNoteTransId > 0 && isTransItemReverseSuccess) {
+                //session
+                switch (aLevel) {
+                    case "PARENT":
+                        httpSession.setAttribute("CURRENT_TRANSACTION_ID", SavedCrDrNoteTransId);
+                        break;
+                    case "CHILD":
+                        httpSession.setAttribute("CURRENT_TRANSACTION_ID_CHILD", SavedCrDrNoteTransId);
+                        break;
+                }
+                //Deposit refund as deposit
+                if (null != newPay) {
+                    double refundAmt = 0, oldPaid = 0, newPaid = 0;
+                    if (OldTrans.getAmountTendered() <= OldTrans.getGrandTotal()) {
+                        oldPaid = OldTrans.getAmountTendered();
+                    } else {
+                        oldPaid = OldTrans.getGrandTotal();
+                    }
+                    if (aNewTrans.getAmountTendered() <= aNewTrans.getGrandTotal()) {
+                        newPaid = aNewTrans.getAmountTendered();
+                    } else {
+                        newPaid = aNewTrans.getGrandTotal();
+                    }
+                    refundAmt = newPaid - oldPaid;
+                    newPayId = new PayBean().saveCustomerDepositFrmCrNote(SavedCrDrNoteTransId, newPay, new GeneralUserSetting().getCurrentUser().getUserDetailId(), refundAmt);
+                    switch (aLevel) {
+                        case "PARENT":
+                            httpSession.setAttribute("CURRENT_PAY_ID", newPayId);
+                            break;
+                        case "CHILD":
+                            httpSession.setAttribute("CURRENT_PAY_ID_CHILD", newPayId);
+                            break;
+                    }
+                }
             }
 
             //SMbi API insert loyalty transaction for the note

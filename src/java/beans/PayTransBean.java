@@ -76,8 +76,12 @@ public class PayTransBean implements Serializable {
                 cs.setInt("in_transaction_type_id", aPayTrans.getTransactionTypeId());
                 cs.setInt("in_transaction_reason_id", aPayTrans.getTransactionReasonId());
                 try {
-                    cs.setString("in_account_code", aPayTrans.getAccount_code());
-                } catch (NullPointerException npe) {
+                    if (null == aPayTrans.getAccount_code()) {
+                        cs.setString("in_account_code", "");
+                    } else {
+                        cs.setString("in_account_code", aPayTrans.getAccount_code());
+                    }
+                } catch (Exception e) {
                     cs.setString("in_account_code", "");
                 }
                 cs.executeUpdate();
