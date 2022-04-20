@@ -1644,12 +1644,14 @@ public class ItemBean implements Serializable {
                 //Default for (Yes, Track, Buy, and Account Type)
                 String ItemPurpose = "";
                 ItemPurpose = new GeneralUserSetting().getCurrentItemPurpose();
-                if (ItemPurpose.equals("Stock")) {
-                    aItem.setItemType("PRODUCT");
-                    aItem.setIsBuy(1);
-                    aItem.setIsTrack(1);
-                    aItem.setExpense_type("Merchandise");
-                    aItem.setExpenseAccountCode("1-00-020-010");
+                if (null != ItemPurpose) {
+                    if (ItemPurpose.equals("Stock")) {
+                        aItem.setItemType("PRODUCT");
+                        aItem.setIsBuy(1);
+                        aItem.setIsTrack(1);
+                        aItem.setExpense_type("Merchandise");
+                        aItem.setExpenseAccountCode("1-00-020-010");
+                    }
                 }
             }
         } catch (Exception e) {

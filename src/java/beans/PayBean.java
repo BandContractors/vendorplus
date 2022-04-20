@@ -7,7 +7,6 @@ import entities.CompanySetting;
 import entities.Pay;
 import entities.GroupRight;
 import entities.PayTrans;
-import entities.Subscription;
 import entities.Transactor;
 import entities.UserDetail;
 import entities.TransactorLedger;

@@ -11107,19 +11107,21 @@ public class TransItemBean implements Serializable {
                 aTransItem.setDescSpecific("");
                 aTransItem.setUnitCostPrice(0);
                 aTransItem.setQty_total(0);
-            }
-            aTransItem.setStockId(0);
-            aTransItem.setBatchno("");
-            aTransItem.setCodeSpecific("");
-            aTransItem.setDescSpecific("");
-            aTransItem.setUnitCostPrice(this.getItemLatestUnitCostPrice(aTransItem.getItemId(), aTransItem.getBatchno(), aTransItem.getCodeSpecific(), aTransItem.getDescSpecific()));
-            Stock st = new StockBean().getStock(new GeneralUserSetting().getCurrentStore().getStoreId(), aTransItem.getItemId(), aTransItem.getBatchno(), aTransItem.getCodeSpecific(), aTransItem.getDescSpecific());
-            if (null != st) {
-                aTransItem.setStockId(st.getStockId());
-                aTransItem.setQty_total(st.getCurrentqty());
+
+                aTransItem.setStockId(0);
+                aTransItem.setBatchno("");
+                aTransItem.setCodeSpecific("");
+                aTransItem.setDescSpecific("");
+                aTransItem.setUnitCostPrice(this.getItemLatestUnitCostPrice(aTransItem.getItemId(), aTransItem.getBatchno(), aTransItem.getCodeSpecific(), aTransItem.getDescSpecific()));
+                Stock st = new StockBean().getStock(new GeneralUserSetting().getCurrentStore().getStoreId(), aTransItem.getItemId(), aTransItem.getBatchno(), aTransItem.getCodeSpecific(), aTransItem.getDescSpecific());
+                //Stock st = new StockBean().getCurrentStockIdQty(new GeneralUserSetting().getCurrentStore().getStoreId(), aTransItem.getItemId(), aTransItem.getBatchno(), aTransItem.getCodeSpecific(), aTransItem.getDescSpecific());
+                if (null != st) {
+                    aTransItem.setStockId(st.getStockId());
+                    aTransItem.setQty_total(st.getCurrentqty());
+                }
             }
         } catch (Exception e) {
-            //do nothing
+            LOGGER.log(Level.ERROR, e);
         }
     }
 

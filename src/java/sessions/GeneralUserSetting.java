@@ -448,6 +448,9 @@ public class GeneralUserSetting implements Serializable {
             HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
             HttpSession httpSession = request.getSession(false);
             StringResponse = (String) httpSession.getAttribute("ITEM_PURPOSE");
+            if (null == StringResponse) {
+                StringResponse = "";
+            }
         } catch (NullPointerException | ClassCastException npe) {
             StringResponse = "";
         }

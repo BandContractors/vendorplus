@@ -787,6 +787,44 @@ public class StockBean implements Serializable {
         }
     }
 
+    public Stock getCurrentStockIdQty(int aStoreId, long aItemId, String aBatchNo, String aCodeSpecific, String aDescSpecific) {
+        Stock st = null;
+        String sql = "SELECT stock_id,currentqty as currentqty  FROM stock s "
+                + "WHERE s.store_id=? AND s.item_id=? AND s.batchno=? "
+                + "AND s.code_specific=? AND s.desc_specific=?";
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setInt(1, aStoreId);
+            ps.setLong(2, aItemId);
+            if (null == aBatchNo) {
+                ps.setString(3, "");
+            } else {
+                ps.setString(3, aBatchNo);
+            }
+            if (null == aCodeSpecific) {
+                ps.setString(4, "");
+            } else {
+                ps.setString(4, aCodeSpecific);
+            }
+            if (null == aDescSpecific) {
+                ps.setString(5, "");
+            } else {
+                ps.setString(5, aDescSpecific);
+            }
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                st=new Stock();
+                st.setStockId(rs.getLong("stock_id"));
+                st.setCurrentqty(rs.getDouble("currentqty"));
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return st;
+    }
+
     public double getStockAtHand(long aItemId) {
         double qty_total = 0;
         String sql = "SELECT * FROM view_inventory_low_out_vw WHERE item_id=?";
