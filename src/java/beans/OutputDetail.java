@@ -32,7 +32,7 @@ public class OutputDetail implements Serializable {
     private Transactor transactor;
     private Transactor bill_transactor;
     private UserDetail edit_user_detail;
-    private List<TransItem> trans_items = new ArrayList<TransItem>();
+    private List<TransItem> trans_items = new ArrayList<>();
     private int total_items;
     private List<Integer> total_items_list;
     private Store store;

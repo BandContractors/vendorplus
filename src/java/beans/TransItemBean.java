@@ -10914,6 +10914,18 @@ public class TransItemBean implements Serializable {
         }
     }
 
+    public void updateModelTransItemCallAdjust(int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aTrans, TransItem aTransItemToUpdate, Item aItem, double aDefaultQty) {
+        try {
+            this.updateModelTransItemCEC(aStoreId, aTransTypeId, aTransReasonId, aSaleType, aTrans, aTransItemToUpdate, aItem, aDefaultQty);
+            if (null != aTransItemToUpdate) {
+                new StockBean().refreshSpecificList(aStoreId, aTransItemToUpdate.getItemId());
+                this.refreshAdjustUponItemChange(aTransItemToUpdate);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public void updateModelTransItemCEC(int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aTrans, TransItem aTransItemToUpdate, Item aItem, double aDefaultQty) {
         try {
             TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
@@ -11108,10 +11120,6 @@ public class TransItemBean implements Serializable {
                 aTransItem.setUnitCostPrice(0);
                 aTransItem.setQty_total(0);
 
-                aTransItem.setStockId(0);
-                aTransItem.setBatchno("");
-                aTransItem.setCodeSpecific("");
-                aTransItem.setDescSpecific("");
                 aTransItem.setUnitCostPrice(this.getItemLatestUnitCostPrice(aTransItem.getItemId(), aTransItem.getBatchno(), aTransItem.getCodeSpecific(), aTransItem.getDescSpecific()));
                 Stock st = new StockBean().getStock(new GeneralUserSetting().getCurrentStore().getStoreId(), aTransItem.getItemId(), aTransItem.getBatchno(), aTransItem.getCodeSpecific(), aTransItem.getDescSpecific());
                 //Stock st = new StockBean().getCurrentStockIdQty(new GeneralUserSetting().getCurrentStore().getStoreId(), aTransItem.getItemId(), aTransItem.getBatchno(), aTransItem.getCodeSpecific(), aTransItem.getDescSpecific());

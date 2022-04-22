@@ -11,9 +11,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
@@ -22,7 +20,6 @@ import javax.servlet.http.HttpSession;
 import utilities.ConvertNumToWordBean;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import utilities.UtilityBean;
 
 @ManagedBean
 @SessionScoped
@@ -63,6 +60,16 @@ public class OutputDetailBean implements Serializable {
                     break;
             }
             //tb.updateLookup(aOutputDetail.getTrans());
+            //get location name
+            if (null != aOutputDetail.getTrans()) {
+                if (aOutputDetail.getTrans().getLocation_id() > 0) {
+                    try {
+                        aOutputDetail.getTrans().setLocation_name(new LocationBean().getLocation(aOutputDetail.getTrans().getLocation_id()).getLocationName());
+                    } catch (Exception e) {
+                        aOutputDetail.getTrans().setLocation_name("");
+                    }
+                }
+            }
             //get tax invoice number
             String DeviceNo = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value();
             if (null != aOutputDetail.getTrans()) {

@@ -815,7 +815,7 @@ public class StockBean implements Serializable {
             }
             rs = ps.executeQuery();
             if (rs.next()) {
-                st=new Stock();
+                st = new Stock();
                 st.setStockId(rs.getLong("stock_id"));
                 st.setCurrentqty(rs.getDouble("currentqty"));
             }

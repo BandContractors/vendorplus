@@ -34,7 +34,7 @@
                         </h:panelGrid>
                         <h:panelGrid style="width: 290px; margin: 0px; text-align: center;" columns="1">
                             <h:outputLabel value="#{companySetting.getPhysicalAddress()}"/>
-                            <h:panelGrid id="IpgrdSalesInvoiceHeader3" style="margin: 0px;" columns="1">
+                            <h:panelGrid id="IpgrdSalesInvoiceHeader3" style="margin: 0px; text-align: left;" columns="1">
                                 <h:outputLabel id="IolblSalesInvoiceTel" value="#{langout['Telephone']}:#{companySetting.getPhone()}" rendered="#{companySetting.getPhone().length()>0}"/>
                                 <h:outputLabel id="IolblSalesInvoiceMob" value="#{langout['Mobile']}:#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','MOBILE_NUMBER').parameter_value}" rendered="#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','MOBILE_NUMBER').parameter_value.length()>0}"/>
                                 <h:outputLabel id="IolblSalesInvoiceTIN" value="TIN:#{companySetting.getTaxIdentity()}" rendered="#{companySetting.getTaxIdentity().length()>0}"/>
@@ -96,7 +96,7 @@
                         <h:panelGrid style="width: 290px; margin: 0px;" columns="2" rendered="#{generalUserSetting.outputDetailParent.trans.transactor_rep.length() gt 0}">
                             <h:outputLabel style="font-size: 12px;" value="#{langsys['Attention']}: #{generalUserSetting.outputDetailParent.trans.transactor_rep}"/>
                         </h:panelGrid>
-                        
+
                         <h:panelGrid id="IpgrdSalesInvoiceItems">
                             <h:dataTable id="IdtblSalesInvoiceItems" value="#{generalUserSetting.outputDetailParent.trans_items}" var="ti" 
                                          styleClass="cls-table-SalesInvoice-very-small"   

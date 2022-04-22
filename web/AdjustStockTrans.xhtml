@@ -80,9 +80,7 @@
                         <h:outputText value="#{itm.currencyCode}">
                         </h:outputText>
                     </p:column>
-                    <p:ajax event="itemSelect" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,transBean.transTypeObj.transactionTypeId,transBean.transReasonObj.transactionReasonId,'',trans,transItem,itemBean.selectedItem,1.0)}" process="@this" update="menuBatchSpecific itxtUnit pgrdSpecific lblCur itxtUnitCost"/>
-                    <p:ajax event="itemSelect" listener="#{stockBean.refreshSpecificList(generalUserSetting.currentStore.storeId,transItem.itemId)}" process="@this" update="menuBatchSpecific itxtUnit"/>
-                    <p:ajax event="itemSelect" listener="#{transItemBean.refreshAdjustUponItemChange(transItem)}" process="@this" update="itxtQtyCurrent itxtUnitCost itxtBatch pgrdSpecific menuBatchSpecific"/>
+                    <p:ajax event="itemSelect" listener="#{transItemBean.updateModelTransItemCallAdjust(generalUserSetting.currentStore.storeId,transBean.transTypeObj.transactionTypeId,transBean.transReasonObj.transactionReasonId,'',trans,transItem,itemBean.selectedItem,1.0)}" process="@this" update="menuBatchSpecific itxtUnit pgrdSpecific lblCur itxtUnitCost itxtQtyCurrent itxtBatch pgrdSpecific"/>
                     <!--
                     <p:ajax event="itemSelect" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,transBean.transTypeObj.transactionTypeId,transBean.transReasonObj.transactionReasonId,'',trans,transItem,itemBean.selectedItem,1.0)}" process="@this" update="menuBatchSpecific itxtUnit pgrdSpecific lblCur itxtUnitCost"/>
                     <p:ajax event="change" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,transBean.transTypeObj.transactionTypeId,transBean.transReasonObj.transactionReasonId,'',trans,transItem,itemBean.selectedItem,1.0)}" rendered="#{itemBean.selectedItem!=null}" process="@this" update="menuBatchSpecific itxtUnit pgrdSpecific lblCur itxtUnitCost"/>

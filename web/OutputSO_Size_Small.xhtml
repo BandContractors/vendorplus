@@ -29,21 +29,25 @@
                                 <h:outputLabel id="IolblSalesInvoiceStore" value="#{generalUserSetting.outputDetailParent.store.storeName}" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowStoreInvoice(),'Yes')}"/>
                             </p:panel>
                         </h:panelGrid>
-                        <h:panelGrid style="width: 290px; margin: 0px;text-align: center;-webkit-print-color-adjust: exact; ">
-                            <h:outputLabel style="font-size: 20px;background-color: gray;color: white;font-weight: bold;text-align: center;" value="#{langout[generalUserSetting.outputDetailParent.transaction_type.transactionOutputLabel]}"/>
+
+                        <h:panelGrid style="width: 290px;" columns="1" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowLogoInvoice(),'Yes') and companySetting.getLogoUrl().length()>1}">
+                            <p:graphicImage value="#{companySetting.getLogoUrl()}" style="display: block;margin-left: auto;margin-right: auto;"/>
                         </h:panelGrid>
-                        <h:panelGrid style="width: 290px; margin: 0px;float:left;" columns="2">
+                        <h:panelGrid style="width: 290px; margin: 0px; text-align: center;" columns="1">
                             <h:outputLabel value="#{companySetting.getPhysicalAddress()}"/>
-                            <h:panelGrid id="IpgrdSalesInvoiceHeader3" style="margin: 0px;float: right;" columns="1">
+                            <h:panelGrid id="IpgrdSalesInvoiceHeader3" style="margin: 0px;text-align: left;" columns="1">
                                 <h:outputLabel id="IolblSalesInvoiceTel" value="#{langout['Telephone']}:#{companySetting.getPhone()}" rendered="#{companySetting.getPhone().length()>0}"/>
                                 <h:outputLabel id="IolblSalesInvoiceMob" value="#{langout['Mobile']}:#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','MOBILE_NUMBER').parameter_value}" rendered="#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','MOBILE_NUMBER').parameter_value.length()>0}"/>
                                 <h:outputLabel id="IolblSalesInvoiceTIN" value="TIN:#{companySetting.getTaxIdentity()}" rendered="#{companySetting.getTaxIdentity().length()>0}"/>
                             </h:panelGrid>
                         </h:panelGrid>
-
-                        <h:panelGrid id="IpgrdSalesInvoiceHeader34" style="width: 290px; margin: 0px;border-bottom-style: dotted;" columns="1">
+                        <h:panelGrid id="IpgrdSalesInvoiceHeader34" style="width: 290px; margin: 0px;border-bottom-style: none;" columns="1">
                             <h:outputLabel id="IolblSalesInvoiceWebsite" value="#{langout['Website']}: #{companySetting.getWebsite()}" rendered="#{companySetting.getWebsite().length()>0}"/>
                             <h:outputLabel id="IolblSalesInvoiceEmail" value="#{langout['Email']}: #{companySetting.getEmail()}" rendered="#{companySetting.getEmail().length()>0}"/>
+                        </h:panelGrid>
+
+                        <h:panelGrid columns="1" style="width: 290px; margin: 0px;background-color: black;text-align: center;-webkit-print-color-adjust: exact;">
+                            <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 18pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">#{langout[generalUserSetting.outputDetailParent.transaction_type.transactionOutputLabel]}</h:outputLabel>
                         </h:panelGrid>
 
                         <h:panelGrid id="IpgrdSalesInvoiceHeader4" style="width: 290px; margin: 0px;" columns="2">
@@ -57,7 +61,8 @@
                             <h:outputLabel style="font-size: 12px;" value="#{langout[generalUserSetting.outputDetailParent.transaction_type.transactionRefLabel]}:" rendered="#{generalUserSetting.outputDetailParent.trans.transactionRef.length()>0}"/>
                             <h:outputLabel style="font-size: 14px;font-weight: bold;" value="#{generalUserSetting.outputDetailParent.trans.transactionRef}" rendered="#{generalUserSetting.outputDetailParent.trans.transactionRef.length()>0}"/>
                             <h:outputLabel style="font-size: 12px;" value="#{langout[menuItemBean.menuItemObj.CUSTOMER_NAME]}:"/>
-                            <h:outputLabel id="IolblSalesInvoiceCustomer" style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transactor.transactorNames} #{generalUserSetting.outputDetailParent.trans.location_name}"/>
+                            <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transactor.transactorNames}" rendered="#{generalUserSetting.outputDetailParent.trans.location_name.length() eq 0}"/>
+                            <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transactor.transactorNames} (#{generalUserSetting.outputDetailParent.trans.location_name})" rendered="#{generalUserSetting.outputDetailParent.trans.location_name.length() gt 0}"/>
                             <h:outputLabel style="font-size: 12px;" value="#{langout['Bill']} #{langout['For']}:" rendered="#{generalUserSetting.outputDetailParent.bill_transactor.transactorId!=generalUserSetting.outputDetailParent.transactor.transactorId}"/>
                             <h:outputLabel id="IolblSalesInvoiceBillCustomer" style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.bill_transactor.transactorNames}" rendered="#{generalUserSetting.outputDetailParent.bill_transactor.transactorId!=generalUserSetting.outputDetailParent.transactor.transactorId}"/>
                             <h:outputLabel style="font-size: 12px;" value="#{langout['Phone']}:" rendered="#{generalUserSetting.outputDetailParent.transactor.phone.length()>0}"/>
