@@ -562,7 +562,7 @@ public class PayBean implements Serializable {
                 } else if (aPayReasId == 24) {//LOAN
                     new AccJournalBean().postJournalCashReceiptLoan(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId());
                 } else if (aPayReasId == 90) {//CUSTOMER DEPOSIT (Prepaid Income)
-                    new AccJournalBean().postJournalCashReceiptPrepaidIncome(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId());
+                    new AccJournalBean().postJournalCashReceiptPrepaidIncome(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId(),0,0);
                 } else if (aPayReasId == 115) {//OTHER REVENUE
                     new AccJournalBean().postJournalCashReceiptOtherRevenue(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId(), aPayTranss);
                 }
@@ -588,6 +588,7 @@ public class PayBean implements Serializable {
             //PayMethodId, PointsSpent, PointsSpentAmount, BillTransactorId, 
             //AccChildAccountId, AccChildAccountId2,
             String CreditNodeNo = "";
+            PayTrans paytrans=new PayTrans();
             try {
                 CreditNodeNo = new CreditDebitNoteBean().getTrans_cr_dr_note(aCreditNodeId).getTransactionNumber();
             } catch (Exception e) {
@@ -612,19 +613,18 @@ public class PayBean implements Serializable {
             long SavedPayId = this.payInsertUpdate(aPay);
             //save pay trans
             if (SavedPayId > 0) {
-                PayTrans paytrans = new PayTrans();
                 paytrans.setPayTransId(0);
                 paytrans.setPayId(SavedPayId);
                 paytrans.setTransactionId(aCreditNodeId);
                 paytrans.setTransactionNumber(CreditNodeNo);
                 paytrans.setTransPaidAmount(aDepositAmount);
-                paytrans.setTransactionTypeId(14);
-                paytrans.setTransactionReasonId(90);
+                paytrans.setTransactionTypeId(82);//CREDIT NOTE
+                paytrans.setTransactionReasonId(126);//CREDIT NOTE
                 new PayTransBean().savePayTrans(paytrans);
                 saved = 1;
             }
             //insert Journal
-            new AccJournalBean().postJournalCashReceiptPrepaidIncome(aPay, new AccPeriodBean().getAccPeriod(aPay.getPayDate()).getAccPeriodId());
+            new AccJournalBean().postJournalCashReceiptPrepaidIncome(aPay, new AccPeriodBean().getAccPeriod(aPay.getPayDate()).getAccPeriodId(),paytrans.getTransactionTypeId(),paytrans.getTransactionReasonId());
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }

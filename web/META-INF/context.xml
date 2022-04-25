@@ -4,7 +4,7 @@
               maxActive="100" maxIdle="30" maxWait="10000" minEvictableIdleTimeMillis="60000" minIdle="5" 
               name="jdbc/BranchPool" password="WTLura456" poolPreparedStatements="true" removeAbandoned="true" 
               removeAbandonedTimeout="300" testOnBorrow="true" testOnReturn="false" testWhileIdle="true" timeBetweenEvictionRunsMillis="30000" 
-              type="javax.sql.DataSource" url="jdbc:mysql://localhost:3306/day_sm_branch?autoReconnect=true" 
+              type="javax.sql.DataSource" url="jdbc:mysql://localhost:3306/daytoday_sm_branch?autoReconnect=true" 
               username="root" validationQuery="SELECT 1" validationQueryTimeout="5"
               jmxEnabled="true" jdbcInterceptors="org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer"
     />

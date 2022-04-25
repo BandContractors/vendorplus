@@ -731,6 +731,264 @@ public class AccJournalBean implements Serializable {
         }
     }
 
+    public void postJournalDebitNote(long aDrNoteTransId, int aAccPeriodId) {
+        long JobId = 0;
+        try {
+//            Trans trans = new Trans();
+//            List<TransItem> transitems = new ArrayList<>();
+//            try {
+//                trans = new CreditDebitNoteBean().getTrans_cr_dr_note(aDrNoteTransId);
+//            } catch (Exception e) {
+//                //
+//            }
+//            try {
+//                transitems = new CreditDebitNoteBean().getTransItemsByTransactionId_cr_dr_note(aDrNoteTransId);
+//            } catch (Exception e) {
+//                //
+//            }
+//            //Cash account money paid to
+//            int CashAccountId = 0;
+//            String CashAccountCode = "";
+//            try {
+//                CashAccountCode = new AccChildAccountBean().getParentAccCodeByChildAccId(aTrans.getAccChildAccountId());
+//                CashAccountId = new AccCoaBean().getAccCoaByCodeOrId(CashAccountCode, 0).getAccCoaId();
+//            } catch (NullPointerException npe) {
+//                CashAccountId = 0;
+//                CashAccountCode = "";
+//            }
+//            //Customer deposit acc
+//            int DepositAccountId = 0;
+//            String DepositAccountCode = "2-00-000-070";//Customer Advances and Deposits Payable
+//            try {
+//                DepositAccountId = new AccCoaBean().getAccCoaByCodeOrId(DepositAccountCode, 0).getAccCoaId();
+//            } catch (NullPointerException npe) {
+//                DepositAccountId = 0;
+//            }
+//            //loyalty acc
+//            int LoyaltyAccountId = 0;
+//            String LoyaltyAccountCode = "5-20-430-010";//Expense Loyalty
+//            try {
+//                LoyaltyAccountId = new AccCoaBean().getAccCoaByCodeOrId(LoyaltyAccountCode, 0).getAccCoaId();
+//            } catch (NullPointerException npe) {
+//                LoyaltyAccountId = 0;
+//            }
+//            int ARAccountId = 0;
+//            String ARAccountCode = "1-00-010-010";//AR Trade
+//            try {
+//                ARAccountId = new AccCoaBean().getAccCoaByCodeOrId(ARAccountCode, 0).getAccCoaId();
+//            } catch (NullPointerException npe) {
+//                ARAccountId = 0;
+//            }
+//            int SalesVatOutputTaxAccountId = 0;
+//            String SalesVatOutputTaxAccountCode = "2-00-000-090";//Sales VAT Output Payable
+//            try {
+//                SalesVatOutputTaxAccountId = new AccCoaBean().getAccCoaByCodeOrId(SalesVatOutputTaxAccountCode, 0).getAccCoaId();
+//            } catch (NullPointerException npe) {
+//                SalesVatOutputTaxAccountId = 0;
+//            }
+//            int SalesDiscAccountId = 0;
+//            String SalesDiscAccountCode = "4-10-000-030";//SALES Discounts (Contra-Revenue Acc)
+//            try {
+//                SalesDiscAccountId = new AccCoaBean().getAccCoaByCodeOrId(SalesDiscAccountCode, 0).getAccCoaId();
+//            } catch (NullPointerException npe) {
+//                SalesDiscAccountId = 0;
+//            }
+//            double GrossSalesAmount = 0;
+//            double NetSalesAmount = 0;
+//            double PaidCashAmount = 0;
+//            double LoyaltyAmountExpense = 0;
+//            double ReceivableAmount = 0;
+//            double VatOutputTaxAmount = 0;
+//            double CashDiscountAmount = 0;
+//
+//            GrossSalesAmount = aTrans.getGrandTotal();
+//            LoyaltyAmountExpense = aTrans.getSpendPointsAmount();
+//            if ((aTrans.getChangeAmount() > 0)) {
+//                PaidCashAmount = aTrans.getGrandTotal();// - aTrans.getSpendPointsAmount();
+//            } else {
+//                PaidCashAmount = aTrans.getAmountTendered();
+//            }
+//            ReceivableAmount = aTrans.getGrandTotal() - PaidCashAmount;// + PaidLoyaltyAmount);
+//            VatOutputTaxAmount = aTrans.getTotalVat();
+//            CashDiscountAmount = aTrans.getCashDiscount();
+//            NetSalesAmount = GrossSalesAmount - VatOutputTaxAmount;//-CashDiscountAmount;
+//
+//            AccJournal accjournal = new AccJournal();
+//            //get job Id
+//            try {
+//                JobId = new UtilityBean().getNewTableColumnSeqNumber("acc_journal", "job_id");
+//            } catch (NullPointerException npe) {
+//                JobId = 0;
+//            }
+//            accjournal.setJobId(JobId);
+//            accjournal.setAccJournalId(0);
+//            accjournal.setJournalDate(trans.getTransactionDate());
+//            accjournal.setTransactionId(trans.getTransactionId());
+//            accjournal.setTransactionTypeId(trans.getTransactionTypeId());
+//            accjournal.setTransactionReasonId(trans.getTransactionReasonId());
+//            accjournal.setPayId(0);//aPay.getPayId()
+//            accjournal.setPayTypeId(0);//aPay.getPayTypeId()
+//            accjournal.setPayReasonId(0);//aPay.getPayReasonId()
+//            accjournal.setStoreId(trans.getStoreId());
+//            accjournal.setLedgerFolio("");
+//            accjournal.setAccPeriodId(aAccPeriodId);
+//            accjournal.setCurrencyCode(trans.getCurrencyCode());
+//            accjournal.setXrate(trans.getXrate());
+//            accjournal.setAddBy(trans.getAddUserDetailId());
+//            Transactor aBillTransactor = null;
+//            try {
+//                aBillTransactor = new TransactorBean().getTransactor(trans.getBillTransactorId());
+//            } catch (NullPointerException npe) {
+//                aBillTransactor = null;
+//            }
+//            //CREDIT MADE
+//            if (ReceivableAmount > 0) {
+//                //Debit cash account
+//                accjournal.setAccChildAccountId(0);
+//                if (aBillTransactor != null) {
+//                    accjournal.setBillTransactorId(aBillTransactor.getTransactorId());
+//                }
+//                accjournal.setAccCoaId(ARAccountId);
+//                accjournal.setAccountCode(ARAccountCode);
+//                accjournal.setDebitAmount(ReceivableAmount);
+//                accjournal.setCreditAmount(0);
+//                accjournal.setNarration("CREDIT RECEIVABLE FROM CLIENT");
+//                this.saveAccJournal(accjournal);
+//            }
+//            //VAT OUTPUT
+//            if (VatOutputTaxAmount > 0) {
+//                //accjournal.setAccChildAccountId(aTrans.getAccChildAccountId());
+//                accjournal.setAccChildAccountId(0);
+//                accjournal.setBillTransactorId(0);
+//                accjournal.setAccCoaId(SalesVatOutputTaxAccountId);
+//                accjournal.setAccountCode(SalesVatOutputTaxAccountCode);
+//                accjournal.setDebitAmount(0);
+//                accjournal.setCreditAmount(VatOutputTaxAmount);
+//                accjournal.setNarration("VAT OUTPUT PAYABLE");
+//                this.saveAccJournal(accjournal);
+//            }
+//            //SALES DISCOUNT (DISCOUNT ALLOWED) - Cash Discount
+//            if ((CashDiscountAmount + LoyaltyAmountExpense) > 0) {
+//                //Debit Disc Allowed
+//                accjournal.setAccChildAccountId(0);
+//                if (aBillTransactor != null) {
+//                    accjournal.setBillTransactorId(aBillTransactor.getTransactorId());
+//                }
+//                accjournal.setAccCoaId(SalesDiscAccountId);
+//                accjournal.setAccountCode(SalesDiscAccountCode);
+//                accjournal.setDebitAmount((CashDiscountAmount + LoyaltyAmountExpense));
+//                accjournal.setCreditAmount(0);
+//                accjournal.setNarration("SALES DISCOUNT TO CLIENT");
+//                this.saveAccJournal(accjournal);
+//            }
+//            //SALES REVENUE
+//            //1. Sales revues per Sales Account
+//            List<TransItem> ati = new TransItemBean().getTransItemsSummaryByItemType(aTrans.getTransactionId());
+//            //2. post account sales revenue
+//            int ListItemIndex = 0;
+//            int ListItemNo = ati.size();
+//            String ItemSalesAccountCode = "";
+//            int ItemSalesAccountId = 0;
+//            double ItemNetSalesAmount = 0;//Amt exc VAT
+//            while (ListItemIndex < ListItemNo) {
+//                accjournal.setAccChildAccountId(0);
+//                if (aBillTransactor != null) {
+//                    accjournal.setBillTransactorId(aBillTransactor.getTransactorId());
+//                }
+//                if (ati.get(ListItemIndex).getItem_type().equals("PRODUCT")) {//4-10-000-010 - SALES Products
+//                    ItemSalesAccountCode = "4-10-000-010";
+//                } else if (ati.get(ListItemIndex).getItem_type().equals("SERVICE")) {//4-10-000-020 - SALES Services	
+//                    ItemSalesAccountCode = "4-10-000-020";
+//                }
+//                ItemNetSalesAmount = ati.get(ListItemIndex).getAmountExcVat();
+//                try {
+//                    ItemSalesAccountId = new AccCoaBean().getAccCoaByCodeOrId(ItemSalesAccountCode, 0).getAccCoaId();
+//                } catch (NullPointerException npe) {
+//                    ItemSalesAccountId = 0;
+//                }
+//                if (ItemSalesAccountId > 0 && ItemNetSalesAmount > 0) {
+//                    accjournal.setAccCoaId(ItemSalesAccountId);
+//                    accjournal.setAccountCode(ItemSalesAccountCode);
+//                    accjournal.setDebitAmount(0);
+//                    accjournal.setCreditAmount(ItemNetSalesAmount);
+//                    accjournal.setNarration("ITEM SALES REVENUE");
+//                    this.saveAccJournal(accjournal);
+//                }
+//                ListItemIndex = ListItemIndex + 1;
+//            }
+//
+//            //CREDIT COS - InventoryAcc
+//            //1. Cost by InventoryAcc
+//            List<TransItem> ati2 = new TransItemBean().getInventoryCostByTrans(aTrans.getTransactionId());
+//            //2. Credit inventory account
+//            int ListItemIndex2 = 0;
+//            int ListItemNo2 = ati2.size();
+//            String ItemInventoryAccountCode = "";
+//            int ItemInventoryAccountId = 0;
+//            double ItemInventoryCostAmount = 0;
+//            while (ListItemIndex2 < ListItemNo2) {
+//                accjournal.setAccChildAccountId(0);
+//                if (aBillTransactor != null) {
+//                    accjournal.setBillTransactorId(0);
+//                }
+//                ItemInventoryAccountCode = ati2.get(ListItemIndex2).getAccountCode();
+//                ItemInventoryCostAmount = ati2.get(ListItemIndex2).getUnitCostPrice();
+//                try {
+//                    ItemInventoryAccountId = new AccCoaBean().getAccCoaByCodeOrId(ItemInventoryAccountCode, 0).getAccCoaId();
+//                } catch (NullPointerException npe) {
+//                    ItemInventoryAccountId = 0;
+//                }
+//                if (ItemInventoryAccountId > 0 && ItemInventoryCostAmount > 0) {
+//                    accjournal.setAccCoaId(ItemInventoryAccountId);
+//                    accjournal.setAccountCode(ItemInventoryAccountCode);
+//                    accjournal.setDebitAmount(0);
+//                    accjournal.setCreditAmount(ItemInventoryCostAmount);
+//                    accjournal.setNarration("INVENTORY COST OF SALE");
+//                    this.saveAccJournal(accjournal);
+//                }
+//                ListItemIndex2 = ListItemIndex2 + 1;
+//            }
+//
+//            //DEBIT COS - COS ACC
+//            //1. Cost by ItemType
+//            List<TransItem> ati3 = new TransItemBean().getInventoryItemTypeCostByTrans(aTrans.getTransactionId());
+//            //2. Debit COS
+//            int ListItemIndex3 = 0;
+//            int ListItemNo3 = ati3.size();
+//            String ItemInventoryItemTypeAccountCode = "";
+//            int ItemInventoryItemTypeAccountId = 0;
+//            double ItemInventoryItemTypeCostAmount = 0;
+//            while (ListItemIndex3 < ListItemNo3) {
+//                accjournal.setAccChildAccountId(0);
+//                if (aBillTransactor != null) {
+//                    accjournal.setBillTransactorId(0);
+//                }
+//                if (ati3.get(ListItemIndex3).getItem_type().equals("PRODUCT")) {//Cost of Purchase - Products	5-10-000-010
+//                    ItemInventoryItemTypeAccountCode = "5-10-000-010";
+//                } else if (ati3.get(ListItemIndex3).getItem_type().equals("SERVICE")) {//Cost of Purchase - Services	5-10-000-020	
+//                    ItemInventoryItemTypeAccountCode = "5-10-000-020";
+//                }
+//                ItemInventoryItemTypeCostAmount = ati3.get(ListItemIndex3).getUnitCostPrice();
+//                try {
+//                    ItemInventoryItemTypeAccountId = new AccCoaBean().getAccCoaByCodeOrId(ItemInventoryItemTypeAccountCode, 0).getAccCoaId();
+//                } catch (NullPointerException npe) {
+//                    ItemInventoryItemTypeAccountId = 0;
+//                }
+//                if (ItemInventoryItemTypeAccountId > 0 && ItemInventoryItemTypeCostAmount > 0) {
+//                    accjournal.setAccCoaId(ItemInventoryItemTypeAccountId);
+//                    accjournal.setAccountCode(ItemInventoryItemTypeAccountCode);
+//                    accjournal.setDebitAmount(ItemInventoryItemTypeCostAmount);
+//                    accjournal.setCreditAmount(0);
+//                    accjournal.setNarration("INVENTORY COST OF SALE");
+//                    this.saveAccJournal(accjournal);
+//                }
+//                ListItemIndex3 = ListItemIndex3 + 1;
+//            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public void postJournalStockConsumption(Trans aTrans, int aAccPeriodId) {
         long JobId = 0;
         try {
@@ -2496,7 +2754,7 @@ public class AccJournalBean implements Serializable {
         }
     }
 
-    public void postJournalCashReceiptPrepaidIncome(Pay aPay, int aAccPeriodId) {
+    public void postJournalCashReceiptPrepaidIncome(Pay aPay, int aAccPeriodId, int aTransTypeId, int aTransReasId) {
         long JobId = 0;
         if (aPay != null) {
             int CashAccountId = 0;
@@ -2530,8 +2788,16 @@ public class AccJournalBean implements Serializable {
             accjournal.setAccJournalId(0);
             accjournal.setJournalDate(aPay.getPayDate());
             accjournal.setTransactionId(0);
-            accjournal.setTransactionTypeId(0);
-            accjournal.setTransactionReasonId(0);
+            if (aTransTypeId == 0) {
+                accjournal.setTransactionTypeId(0);
+            } else {
+                accjournal.setTransactionTypeId(aTransTypeId);
+            }
+            if (aTransReasId == 0) {
+                accjournal.setTransactionReasonId(0);
+            } else {
+                accjournal.setTransactionReasonId(aTransReasId);
+            }
             accjournal.setPayId(aPay.getPayId());
             accjournal.setPayTypeId(aPay.getPayTypeId());
             accjournal.setPayReasonId(aPay.getPayReasonId());
@@ -4966,7 +5232,7 @@ public class AccJournalBean implements Serializable {
         } catch (NullPointerException npe) {
         }
     }
-    
+
     public void initReportSupplierInvoiceAge(InvoiceAge aInvoiceAge, List<InvoiceAge> aInvoiceAgeList, List<InvoiceAge> aInvoiceAgeListSummary) {
         String AgeBand = "";
         try {
@@ -5130,7 +5396,7 @@ public class AccJournalBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void reportSupplierInvoiceAge(String aDays_category) {
         String sql = "SELECT * FROM view_supplier_invoice_age WHERE 1=1";
         String sqlsum = "SELECT days_category,currency_code,sum(balance) as balance,count(*) as n from view_supplier_invoice_age WHERE 1=1 ";

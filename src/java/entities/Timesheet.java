@@ -27,6 +27,7 @@ public class Timesheet implements Serializable {
     private Date submission_date;
     private String unit_of_time;
     private long project_id;
+    private Transactor transactor;
 
     public long getTimesheet_id() {
         return timesheet_id;
@@ -138,4 +139,17 @@ public class Timesheet implements Serializable {
         this.project_id = project_id;
     }
 
+    /**
+     * @return the transactor
+     */
+    public Transactor getTransactor() {
+        return transactor;
+    }
+
+    /**
+     * @param transactor the transactor to set
+     */
+    public void setTransactor(Transactor transactor) {
+        this.transactor = transactor;
+    }
 }

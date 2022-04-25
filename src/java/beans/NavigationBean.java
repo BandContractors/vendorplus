@@ -1870,7 +1870,7 @@ public class NavigationBean implements Serializable {
     public String redirectToSubscriptionCategory() {
         return "SubscriptionCategory?faces-redirect=true";
     }
-    
+
     public String redirectToCategoryActivity(String aXhtmlFile) {
         //set session
         FacesContext context = FacesContext.getCurrentInstance();
@@ -1898,6 +1898,46 @@ public class NavigationBean implements Serializable {
      */
     public MenuItemBean getMenuItemBean() {
         return menuItemBean;
+    }
+
+    public String redirectToStaff(String aXhtmlFile) {
+        //set session
+        FacesContext context = FacesContext.getCurrentInstance();
+        HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+        HttpSession httpSession = request.getSession(false);
+        httpSession.setAttribute("SOURCE_XHTML", aXhtmlFile);
+        //redirect
+        return "Staff?faces-redirect=true";
+    }
+
+    public String redirectToActivityStatus(String aXhtmlFile) {
+        //set session
+        FacesContext context = FacesContext.getCurrentInstance();
+        HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+        HttpSession httpSession = request.getSession(false);
+        httpSession.setAttribute("SOURCE_XHTML", aXhtmlFile);
+        //redirect
+        return "ActivityStatus?faces-redirect=true";
+    }
+
+    public String redirectToMode_activity(String aXhtmlFile) {
+        //set session
+        FacesContext context = FacesContext.getCurrentInstance();
+        HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+        HttpSession httpSession = request.getSession(false);
+        httpSession.setAttribute("SOURCE_XHTML", aXhtmlFile);
+        //redirect
+        return "Mode_activity?faces-redirect=true";
+    }
+
+    public String redirectToProject(String aXhtmlFile) {
+        //set session
+        FacesContext context = FacesContext.getCurrentInstance();
+        HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+        HttpSession httpSession = request.getSession(false);
+        httpSession.setAttribute("SOURCE_XHTML", aXhtmlFile);
+        //redirect
+        return "Project?faces-redirect=true";
     }
 
     /**

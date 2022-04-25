@@ -28,10 +28,9 @@
         <h:form id="form" styleClass="clsMainFrom">
 
             <h:panelGrid styleClass="clsGridMainHeader" columns="2">
-                <h:outputLabel styleClass="clsLabelTop" id="olblUnitHeader" value="#{langsys['Project']}"/>
-                <p:commandButton value="#{langsys['Time']} #{langsys['Sheet']}" action="#{navigationBean.redirectToTimesheet()}" icon="ui-icon-circle-plus" style="background-color: yellow !important" />
+                <h:outputLabel styleClass="clsLabelTop" id="olblUnitHeader" value="#{langsys['Activity']} #{langsys['Category']}"/>
+                <p:commandButton icon="fa fa-fw fa-arrow-left" style="width: 120px;height: 40px;color: white;background-color: black;" id="cmdbNew" value="#{langsys['BACK']}"  action="#{navigationBean.redirectToSourceXhtmlFile()}" />
             </h:panelGrid>
-
             <h:panelGrid id="pnlInput" styleClass="clsGridMainInput" columns="6">
                 <h:outputLabel  value="#{langsys['Project']} #{langsys['Name']}:"/>
                 <h:inputText styleClass="clsInput" id="project" value="#{project.project_name}" autocomplete="false" style="width: 250px;"> 
