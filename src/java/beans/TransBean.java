@@ -4129,7 +4129,7 @@ public class TransBean implements Serializable {
 
             if (SavedCrDrNoteTransId > 0 && isTransItemReverseSuccess) {
                 //HERE
-                //new AccJournalBean().postJournalSaleInvoice(savedtrans, transitems, savedpay, new AccPeriodBean().getAccPeriod(savedtrans.getTransactionDate()).getAccPeriodId());
+                new AccJournalBean().postJournalCreditNote(SavedCrDrNoteTransId, new AccPeriodBean().getAccPeriod(savedtrans.getTransactionDate()).getAccPeriodId(), 0);
                 //session
                 switch (aLevel) {
                     case "PARENT":
