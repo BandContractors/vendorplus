@@ -22,7 +22,7 @@
     </h:head>
     <f:metadata>
         <f:viewAction action="#{navigationBean.checkAccessDenied(utilityBean.convertIntAsString(generalUserSetting.currentTransactionReasonId), 'View')}"/>
-        <!--<f:viewAction action=""/>-->
+        <f:viewAction action="#{timesheetBean.getFilteredTimesheets()}"/>
     </f:metadata> 
     <h:body>
         <ui:include src="Menu.xhtml"/>
@@ -40,55 +40,21 @@
             </h:panelGrid>
 
             <!--Filter-->
-            <h:panelGrid id="pnlgFilter" columns="2" styleClass="clsPanelReportFilter">
+            <h:panelGrid id="pnlgFilter" columns="1" styleClass="clsPanelReportFilter">
                 <h:panelGrid id="filter" columns="10">
-                    <p:outputLabel value="#{langsys['Transactor']}"/>
-                    <p:autoComplete value="#{timesheetBean.filterTransactor}" 
-                                    completeMethod="#{transactorBean.getTransactorActiveObjectList}" 
-                                    var="trct" 
-                                    itemLabel="#{trct.transactorNames}" 
-                                    itemValue="#{trct}" 
-                                    converter="TransactorConverter" style="text-align: left;" 
-                                    forceSelection="true" queryDelay="0" inputStyle="width: 165px"
-                                    >
-                        <p:column headerText="#{langsys['Names']}" style="text-align: left" >  
-                            #{trct.transactorNames} 
-                        </p:column>
-                    </p:autoComplete>
-                    <p:outputLabel value="#{langsys['Activity']} #{langsys['Status']}"/>
-                    <p:selectOneMenu value="#{timesheetBean.filterActivityStatus}" style="width: 150px">
-                        <f:selectItem itemLabel="" itemValue=""/>
-                        <f:selectItem itemLabel="Ongoing" itemValue="Ongoing"/>
-                        <f:selectItem itemLabel="Completed" itemValue="Completed"/>
-                        <f:selectItem itemLabel="Pending" itemValue="Pending"/>
-                    </p:selectOneMenu>
-                    <p:outputLabel value="#{langsys['Sub']} #{langsys['Category']} #{langsys['Activity']}"/>
-                    <p:selectCheckboxMenu id="filterSubCategoryActivity" value="#{timesheetBean.filterSubCategoryActivityIds}" dynamic="true" label=" " filter="true" filterMatchMode="startsWith" style="width: 170px;height: 28px; background-color: white" panelStyle="width:250px">
-                        <f:selectItems value="#{subcategory_activityBean.getSubcategory_activity(timesheet.subcategory_activity_id)}" var="sc" itemLabel="#{sc.subcategory_name}" itemValue="#{sc.subcategory_activity_id}"/>
-                    </p:selectCheckboxMenu>
-                    <p:outputLabel value="#{langsys['Activity']} #{langsys['Date']}"/>
-                    <p:calendar id="activityDate" value="#{timesheet.activity_date}" label=" " style="width: 150px;height: 28px; background-color: white"/>
-                    <p:outputLabel value="#{langsys['Mode']} #{langsys['Activity']}"/>
-                    <p:selectOneMenu value="#{timesheet.mode_activity_id}" style="width: 150px">
+                    <p:outputLabel value="#{langsys['From']} #{langsys['Date']}"/>
+                    <p:calendar id="fromDate" value="#{timesheetBean.filterFromActivityDate}" style="width: 150px;height: 28px; background-color: white"/>
+                    <p:outputLabel value="#{langsys['To']} #{langsys['Date']}"/>
+                    <p:calendar id="toDate" value="#{timesheetBean.filterToActivityDate}" style="width: 150px;height: 28px; background-color: white"/>
+                    <h:outputLabel  value="#{langsys['Category']} #{langsys['Activity']}:"/>
+                    <p:selectOneMenu value="#{timesheetBean.filterCategoryActivityId}" style="width: 150px">
                         <f:selectItem itemLabel="" itemValue="0"/>
-                        <f:selectItems value="#{mode_activityBean.getMode_activityAll()}" var="ma" itemLabel="#{ma.mode_name}" itemValue="#{ma.mode_activity_id}"/>
+                        <f:selectItems value="#{category_activityBean.getCategory_activities()}" var="ca" itemLabel="#{ca.category_name}" itemValue="#{ca.category_activity_id}"/>
                     </p:selectOneMenu>
-                    <p:outputLabel value="#{langsys['Category']} #{langsys['Activity']}"/>
-                    <p:selectCheckboxMenu id="filterCategoryActivity" value="#{timesheetBean.filterCategoryActivityIds}" dynamic="true" label=" " filter="true" filterMatchMode="startsWith" style="width: 170px;height: 28px; background-color: white" panelStyle="width:250px">
-                        <f:selectItems value="#{timesheetBean}" var="bc" itemLabel="#{bc.category_name}" itemValue="#{bc.category_activty_id}"/>
-                    </p:selectCheckboxMenu>
-                    <p:outputLabel value="#{langsys['Project']}"/>
-                    <p:selectOneMenu value="#{timesheetBean.filterProject_id}" style="width: 150px">
-                        <f:selectItem itemLabel="" itemValue=""/>
-                        <f:selectItems value="#{projectBean.getProject(project.project_id)}" var="c" itemLabel="#{c}" itemValue="#{c}"/>
-                    </p:selectOneMenu>
-                    <p:outputLabel value="#{langsys['Time']} #{langsys['Taken']}"/>
-                    <p:selectOneMenu value="#{timesheetBean.filterTime_Taken}" style="width: 150px">
-                        <f:selectItem itemLabel="" itemValue=""/>
-                    </p:selectOneMenu>
-                    <p:outputLabel value="#{langsys['Unit']} #{langsys['Of']} #{langsys['Time']}"/>
-                    <p:selectOneMenu value="#{timesheetBean.filterUnit_Of_Time}" style="width: 150px">
-                        <f:selectItem itemLabel="" itemValue=""/>
+                    <p:outputLabel value="#{langsys['Staff']}"/>
+                    <p:selectOneMenu value="#{timesheetBean.filterStaffId}" style="width: 150px">
+                        <f:selectItem itemLabel="" itemValue="0"/>
+                        <f:selectItems value="#{staffBean.getStaffAll()}" var="s" itemLabel="#{s.first_name} #{s.second_name} #{s.third_name}" itemValue="#{s.staff_id}"/>
                     </p:selectOneMenu>
                     <p:commandButton value="#{langsys['OK']}" style="color: white; background-color: #00B259; width: 120px">
                         <f:ajax listener="#{timesheetBean.getFilteredTimesheets()}" execute="@form" render="@form"/>
@@ -108,53 +74,6 @@
                         </f:facet>
                     </p:column>
                 </p:dataTable>
-                <h:panelGrid>
-                    <p:dataTable id="tblSummaryStatus" tableStyle="width:100%;" var="sum" value="#{subscriptionBean.subscriptionsSummary_status}" >
-                        <p:column headerText="#{langsys['Staff']}">
-                            <h:outputLabel value="#{sum.current_status}"/>
-                            <f:facet name="footer">
-                                <h:outputText value="" />
-                            </f:facet>
-                        </p:column>
-                        <p:column headerText="#{langsys['Activity']} #{langsys['Status']}">
-                            <h:outputLabel value="#{sum.current_status} "/>
-                            <f:facet name="footer">
-                                <h:outputText value="" />
-                            </f:facet>
-                        </p:column>
-                        <p:column>
-                            <f:facet name="footer">
-                                <h:outputText value="">
-                                    <f:convertNumber />
-                                </h:outputText>
-                            </f:facet>
-                        </p:column>
-                    </p:dataTable>
-                    <p:dataTable sortBy="#{1}" id="tblSummaryRecurring" tableStyle="width:100%;" var="sum" value="#{t}">
-                        <p:column headerText="#{langsys['No']}" width="10%" style="text-align: right;">
-                            <h:outputText value="#{sum}">
-                                <f:convertNumber />
-                            </h:outputText>
-                            <f:facet name="footer">
-                                <h:outputText value="">
-                                    <f:convertNumber />
-                                </h:outputText>
-                            </f:facet>
-                        </p:column>
-                        <p:column>
-                            <f:facet name="footer">
-                                <h:outputText value="">
-                                    <f:convertNumber />
-                                </h:outputText>
-                            </f:facet>
-                        </p:column>
-                        <p:column headerText="#{langsys['Average']}" style="text-align: right;">
-                            <h:outputText value="#{sum.amount/sum.description}">
-                                <f:convertNumber />
-                            </h:outputText>
-                        </p:column>
-                    </p:dataTable>
-                </h:panelGrid>
                 <p:dataTable id="tblSummaryTimesheetCategory" tableStyle="width:100%;" var="sum" value="#{subscriptionBean.subscriptionsSummary_subscriptionCategory}">
                     <p:column headerText="#{langsys['Activity']} #{langsys['Status']}" style="text-align: right;" width="10%">
                         <h:outputText value="#{sum.description}">
@@ -234,7 +153,7 @@
                         </h:outputText>
                     </f:facet>
                     <p:column headerText="#{langsys[Mode]} #{langsys[Activity]}" style="text-align: right;">
-                        <h:outputText value="#{sum}">
+                        <h:outputText value="#{sum.description}">
                             <f:convertNumber/>
                         </h:outputText>
                         <f:facet name="footer">
@@ -243,7 +162,7 @@
                         </f:facet>
                     </p:column>
                     <p:column headerText="#{langsys[Mode]} #{langsys[Activity]}" style="text-align: right;">
-                        <h:outputText value="#{sum}">
+                        <h:outputText value="#{sum.amount}">
                             <f:convertNumber/>
                         </h:outputText>
                         <f:facet name="footer">
@@ -254,7 +173,7 @@
                 </p:dataTable>
             </h:panelGrid>
 
-            <p:dataTable id="dtblTimesheet" tableStyle="width:auto;" value="#{timesheetBean.getTimesheetAll()}" var="ts"                           
+            <p:dataTable id="dtblTimesheet" tableStyle="width:auto;" value="#{timesheetBean.filteredTimesheetList}" var="ts"                           
                          paginator="true" rows="50" 
                          paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink}
                          {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
@@ -330,24 +249,22 @@
                     <!--<h:outputText value="This is a Modal Dialog." />-->
                     <h:panelGrid columns="4">
                         <h:outputLabel  value="#{langsys['Staff']}:"/>
-                        <p:selectOneMenu value="#{timesheet.staff_id}" required="True" requiredMessage="Staff Cannot be empty" >
+                        <p:selectOneMenu value="#{timesheet.staff_id}" style="width: 305px">
                             <f:selectItem itemLabel="" itemValue="0"/>
                             <f:selectItems value="#{staffBean.getStaffAll()}" var="s" itemLabel="#{s.first_name} #{s.second_name} #{s.third_name}" itemValue="#{s.staff_id}"/>
-                            <p:ajax event="change" update="form:cmdbSave"/>
                         </p:selectOneMenu>
                         <h:outputLabel  value="#{langsys['Activity']} #{langsys['Name']}:"/>
-                        <p:inputText id="activityname" style="width: 300px" value="#{timesheet.activity_name}" autocomplete="off" required="True" requiredMessage="Activity Name Cannot be empty"/>
+                        <p:inputText id="activityname" style="width: 320px" value="#{timesheet.activity_name}" autocomplete="off" required="True" requiredMessage="Activity Name Cannot be empty"/>
                         <h:outputLabel value="#{langsys['Time']} #{langsys['Taken']}:"/>
-                        <p:inputNumber id="itemAmount" style="width: 800px" value="#{timesheet.time_taken}" decimalPlaces="0" autocomplete="off" />
+                        <p:inputNumber id="itemAmount" inputStyle="width:320px" style="width: 80000px" value="#{timesheet.time_taken}" decimalPlaces="0" autocomplete="off" />
                         <h:outputLabel  value="#{langsys['Unit']} #{langsys['Of']} #{langsys['Time']}:"/>
-                        <p:selectOneMenu value="#{timesheet.unit_of_time}" style="width: 300px">
+                        <p:selectOneMenu value="#{timesheet.unit_of_time}" style="width: 305px">
                             <f:selectItem itemLabel="" itemValue=""/>
                             <f:selectItem itemLabel="Hours" itemValue="Hours"/>
                             <f:selectItem itemLabel="Hour" itemValue="Hour"/>
                             <f:selectItem itemLabel="Minutes" itemValue="Minutes"/>
                             <f:selectItem itemLabel="Days" itemValue="Days"/>
                             <f:selectItem itemLabel="Day" itemValue="Day"/>
-                            <p:ajax event="change" update="form:cmdbSave"/>
                         </p:selectOneMenu>
                         <h:outputLabel  value="#{langsys['Activity']} #{langsys['Status']}:"/>
                         <p:selectOneMenu value="#{timesheet.activity_status}" style="width: 305px">
@@ -355,7 +272,6 @@
                             <f:selectItem itemLabel="Ongoing" itemValue="Ongoing"/>
                             <f:selectItem itemLabel="Completed" itemValue="Ongoing"/>
                             <f:selectItem itemLabel="Pending" itemValue="Pending"/>
-                            <p:ajax event="change" update="form:cmdbSave"/>
                         </p:selectOneMenu>
                         <h:outputLabel  value="#{langsys['Mode']} #{langsys['Activity']}:"/>
                         <p:selectOneMenu value="#{timesheet.mode_activity_id}" style="width: 305px">
@@ -366,13 +282,11 @@
                         <p:selectOneMenu value="#{timesheet.category_activity_id}" style="width: 305px">
                             <f:selectItem itemLabel="" itemValue="0"/>
                             <f:selectItems value="#{category_activityBean.getCategory_activities()}" var="ca" itemLabel="#{ca.category_name}" itemValue="#{ca.category_activity_id}"/>
-                            <p:ajax event="change" update="form:cmdbSave"/>
                         </p:selectOneMenu>
                         <h:outputLabel  value="#{langsys['Sub']} #{langsys['Category']} #{langsys['Activity']}:"/>
-                        <p:selectOneMenu value="#{timesheet.subcategory_activity_id}" style="width: 305px" required="true" requiredMessage="Please Select a sub category">
+                        <p:selectOneMenu value="#{timesheet.subcategory_activity_id}" style="width: 305px">
                             <f:selectItem itemLabel="" itemValue="0"/>
                             <f:selectItems value="#{subcategory_activityBean.getSubcategory_activityAll()}" var="ca" itemLabel="#{ca.subcategory_name}" itemValue="#{ca.subcategory_activity_id}"/>
-                            <p:ajax event="change" update="form:cmdbSave"/>
                         </p:selectOneMenu>  
                         <h:outputLabel  value="#{langsys['Project']}:"/>
                         <p:selectOneMenu value="#{timesheet.project_id}" style="width: 305px">
