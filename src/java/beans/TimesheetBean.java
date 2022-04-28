@@ -3,6 +3,8 @@ package beans;
 import connections.DBConnection;
 import entities.GroupRight;
 import entities.Timesheet;
+import entities.Timesheet_summary_ARH;
+import entities.Timesheet_summary_total_time;
 import entities.UserDetail;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -33,6 +35,9 @@ public class TimesheetBean implements Serializable {
     static Logger LOGGER = Logger.getLogger(TimesheetBean.class.getName());
 
     private List<Timesheet> filteredTimesheetList;
+    private List<Timesheet_summary_total_time> timesheetSummary_totalTime;
+    //Average Reporting Hour
+    private List<Timesheet_summary_ARH> timesheetSummary_ARH;
     private String ActionMessage = null;
     private int filterCategoryActivityId = 0;
     private Date filterFromActivityDate;
@@ -375,7 +380,143 @@ public class TimesheetBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
         //summary
-        //this.getFilteredSubscriptionsSummary();
+        this.getFilteredTimesheetSummary();
+    }
+
+    public void getFilteredTimesheetSummary() {
+        try {
+            //summarise status
+            this.getFilteredTimesheetSummary_totalTime();
+            this.getFilteredTimesheetSummary_ARH();
+            //this.getFilteredTimesheetSummary_activityCategory();
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void getFilteredTimesheetSummary_totalTime() {
+        String sql;
+        sql = "SELECT s.first_name, s.second_name, s.third_name, sum(t.time_taken) as time_taken, t.unit_of_time from timesheet t inner join staff s on t.staff_id = s.staff_id  where t.timesheet_id > 0";
+        String wheresql = "";
+        String groupbysum = " GROUP BY t.unit_of_time, t.staff_id";
+        String ordersql = " ORDER BY t.unit_of_time, time_taken DESC";
+        try {
+            if (this.filterCategoryActivityId > 0) {
+                wheresql = wheresql + " AND category_activity_id=" + this.filterCategoryActivityId;
+            }
+            if (this.getFilterStaffId() > 0) {
+                wheresql = wheresql + " AND t.staff_id=" + this.getFilterStaffId();
+            }
+            if (this.getFilterFromActivityDate() != null && this.getFilterToActivityDate() != null) {
+                //convert java.util date to sql date
+                java.sql.Date from = new java.sql.Date(this.getFilterFromActivityDate().getTime());
+                java.sql.Date to = new java.sql.Date(this.getFilterToActivityDate().getTime());
+                
+                wheresql = wheresql + " AND activity_date between '" + from + "' and '" + to + "'";
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        sql = sql + wheresql + groupbysum + ordersql;
+        ResultSet rs;
+        this.timesheetSummary_totalTime = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Timesheet_summary_total_time summary = new Timesheet_summary_total_time();
+                //this.setTimesheetFromResultset(aTimesheet, rs);
+                try {
+                    summary.setFirst_name(rs.getString("first_name"));
+                } catch (Exception e) {
+                    summary.setFirst_name("");
+                }
+                try {
+                    summary.setSecond_name(rs.getString("second_name"));
+                } catch (Exception e) {
+                    summary.setSecond_name("");
+                }
+                try {
+                    summary.setThird_name(rs.getString("third_name"));
+                } catch (Exception e) {
+                    summary.setThird_name("");
+                }
+                try {
+                    summary.setTime_taken(rs.getDouble("time_taken"));
+                } catch (Exception e) {
+                    summary.setTime_taken(0);
+                }
+                try {
+                    summary.setUnit_of_time(rs.getString("unit_of_time"));
+                } catch (Exception e) {
+                    summary.setUnit_of_time("");
+                }
+                this.getTimesheetSummary_totalTime().add(summary);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void getFilteredTimesheetSummary_ARH() {
+        String sql;
+        sql = "SELECT s.first_name, s.second_name, s.third_name, round(avg(hour(t.submission_date)),0) as arh from timesheet t inner join staff s on t.staff_id = s.staff_id  where t.timesheet_id > 0";
+        String wheresql = "";
+        String groupbysum = " GROUP BY t.staff_id";
+        String ordersql = " ORDER BY arh ASC";
+        try {
+            if (this.filterCategoryActivityId > 0) {
+                wheresql = wheresql + " AND category_activity_id=" + this.filterCategoryActivityId;
+            }
+            if (this.getFilterStaffId() > 0) {
+                wheresql = wheresql + " AND t.staff_id=" + this.getFilterStaffId();
+            }
+            if (this.getFilterFromActivityDate() != null && this.getFilterToActivityDate() != null) {
+                //convert java.util date to sql date
+                java.sql.Date from = new java.sql.Date(this.getFilterFromActivityDate().getTime());
+                java.sql.Date to = new java.sql.Date(this.getFilterToActivityDate().getTime());
+                
+                wheresql = wheresql + " AND activity_date between '" + from + "' and '" + to + "'";
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        sql = sql + wheresql + groupbysum + ordersql;
+        ResultSet rs;
+        this.timesheetSummary_ARH = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Timesheet_summary_ARH summary = new Timesheet_summary_ARH();
+                //this.setTimesheetFromResultset(aTimesheet, rs);
+                try {
+                    summary.setFirst_name(rs.getString("first_name"));
+                } catch (Exception e) {
+                    summary.setFirst_name("");
+                }
+                try {
+                    summary.setSecond_name(rs.getString("second_name"));
+                } catch (Exception e) {
+                    summary.setSecond_name("");
+                }
+                try {
+                    summary.setThird_name(rs.getString("third_name"));
+                } catch (Exception e) {
+                    summary.setThird_name("");
+                }
+                try {
+                    summary.setArh(rs.getDouble("arh"));
+                } catch (Exception e) {
+                    summary.setArh(0);
+                }
+                this.getTimesheetSummary_ARH().add(summary);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
     }
 
     /**
@@ -474,6 +615,34 @@ public class TimesheetBean implements Serializable {
      */
     public void setFilterToActivityDate(Date filterToActivityDate) {
         this.filterToActivityDate = filterToActivityDate;
+    }
+
+    /**
+     * @return the timesheetSummary_totalTime
+     */
+    public List<Timesheet_summary_total_time> getTimesheetSummary_totalTime() {
+        return timesheetSummary_totalTime;
+    }
+
+    /**
+     * @param timesheetSummary_totalTime the timesheetSummary_totalTime to set
+     */
+    public void setTimesheetSummary_totalTime(List<Timesheet_summary_total_time> timesheetSummary_totalTime) {
+        this.timesheetSummary_totalTime = timesheetSummary_totalTime;
+    }
+
+    /**
+     * @return the timesheetSummary_ARH
+     */
+    public List<Timesheet_summary_ARH> getTimesheetSummary_ARH() {
+        return timesheetSummary_ARH;
+    }
+
+    /**
+     * @param timesheetSummary_ARH the timesheetSummary_ARH to set
+     */
+    public void setTimesheetSummary_ARH(List<Timesheet_summary_ARH> timesheetSummary_ARH) {
+        this.timesheetSummary_ARH = timesheetSummary_ARH;
     }
 
 }

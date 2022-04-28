@@ -65,110 +65,28 @@
                 </h:panelGrid>
             </h:panelGrid>
 
-            <h:panelGrid id="pnlgSummary" columns="4" styleClass="clsPanelSummary">
-                <p:dataTable id="tblSummaryActivityCategory" tableStyle="width:100%;" var="sum" value="#{subscriptionBean.subscriptionsSummary_businessCategory}">
-                    <p:column headerText="#{langsys['Activity']} #{langsys['Category']}">
-                        <h:outputLabel value="#{businessCategoryBean.getBusinessCategory(sum.business_category_id).getCategory_name()}"/>
-                        <f:facet name="footer">
-                            <h:outputText value=""/>
-                        </f:facet>
+            <h:panelGrid id="pnlgSummary" columns="3" styleClass="clsPanelSummary">
+                <p:dataTable id="tblSummaryTimesheetTotalTime" tableStyle="width:100%;" var="sum" value="#{timesheetBean.timesheetSummary_totalTime}">
+                    <p:column headerText="#{langsys['Staff']}" width="auto">
+                        <h:outputText value="#{sum.first_name} #{sum.second_name}">
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="#{langsys['Time']} #{langsys['Taken']}" style="text-align: right;" width="auto">
+                        <h:outputText value="#{sum.time_taken}">
+                            <f:convertNumber/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="#{langsys['Unit']} #{langsys['Of']} #{langsys['Time']}" width="auto">
+                        <h:outputText value="#{sum.unit_of_time}">
+                        </h:outputText>
                     </p:column>
                 </p:dataTable>
-                <p:dataTable id="tblSummaryTimesheetCategory" tableStyle="width:100%;" var="sum" value="#{subscriptionBean.subscriptionsSummary_subscriptionCategory}">
-                    <p:column headerText="#{langsys['Activity']} #{langsys['Status']}" style="text-align: right;" width="10%">
-                        <h:outputText value="#{sum.description}">
-                            <f:convertNumber/>
-                        </h:outputText>
-                        <f:facet name="footer">
-                            <h:outputText value="">
-                                <f:convertNumber/>
-                            </h:outputText>
-                        </f:facet>
+                <p:dataTable id="tblSummaryARH" tableStyle="width:100%;" var="su" value="#{timesheetBean.timesheetSummary_ARH}">
+                    <p:column headerText="#{langsys['Staff']}">
+                        <h:outputLabel value="#{su.first_name} #{su.second_name}"/>
                     </p:column>
-                    <p:column headerText="#{langsys['Sub']} #{langsys['Category']} #{langsys['Activity']}" style="text-align: right;" width="10%">
-                        <h:outputText value="#{sum.description}">
-                            <f:convertNumber/>
-                        </h:outputText>
-                        <f:facet name="footer">
-                            <h:outputText value="">
-                                <f:convertNumber />
-                            </h:outputText>
-                        </f:facet>
-                    </p:column>
-                    <p:column headerText="#{langsys['Unit']} #{langsys['Of']} #{langsys['Time']}" style="text-align: right;" width="10%">
-                        <h:outputText value="#{sum.description}">
-                            <f:convertNumber/>
-                        </h:outputText>
-                        <f:facet name="footer">
-                            <h:outputText value="">
-                                <f:convertNumber/>
-                            </h:outputText>
-                        </f:facet>
-                    </p:column>
-                    <p:column headerText="#{langsys['Time']} #{langsys['Taken']}" style="text-align: right;" width="10%">
-                        <h:outputText value="#{sum.description}">
-                            <f:convertNumber/>
-                        </h:outputText>
-                        <f:facet name="footer">
-                            <h:outputText value="">
-                                <f:convertNumber/>
-                            </h:outputText>
-                        </f:facet>
-                    </p:column>
-                    <p:column headerText="#{langsys['Project']}" style="text-align: right;" width="10%">
-                        <h:outputText value="#{sum.description}">
-                            <f:convertNumber/>
-                        </h:outputText>
-                        <f:facet name="footer">
-                            <h:outputText value="">
-                                <f:convertNumber/>
-                            </h:outputText>
-                        </f:facet>
-                    </p:column>
-                    <p:column headerText="#{langsys['Staff']}" style="text-align: right;" width="10%">
-                        <h:outputText value="#{sum.description}">
-                            <f:convertNumber/>
-                        </h:outputText>
-                        <f:facet name="footer">
-                            <h:outputText value="">
-                                <f:convertNumber/>
-                            </h:outputText>
-                        </f:facet>
-                    </p:column>
-                    <p:column headerText="#{langsys['Mode']} #{langsys['Activity']}" style="text-align: right;">
-                        <h:outputText value="#{sum.amount}">
-                            <f:convertNumber/>
-                        </h:outputText>
-                        <f:facet name="footer">
-                            <h:outputText value="">
-                                <f:convertNumber />
-                            </h:outputText>
-                        </f:facet>
-                    </p:column>
-                </p:dataTable>
-                <p:dataTable id="tblLocation" tableStyle="width:auto;" var="sum" value="#{subscriptionBean.subscriptionsSummary_location}">
-                    <f:facet name="footer">
-                        <h:outputText value="">
-                            <f:convertNumber/>
-                        </h:outputText>
-                    </f:facet>
-                    <p:column headerText="#{langsys[Mode]} #{langsys[Activity]}" style="text-align: right;">
-                        <h:outputText value="#{sum.description}">
-                            <f:convertNumber/>
-                        </h:outputText>
-                        <f:facet name="footer">
-                            <h:outputText value="">
-                            </h:outputText>
-                        </f:facet>
-                    </p:column>
-                    <p:column headerText="#{langsys[Mode]} #{langsys[Activity]}" style="text-align: right;">
-                        <h:outputText value="#{sum.amount}">
-                            <f:convertNumber/>
-                        </h:outputText>
-                        <f:facet name="footer">
-                            <h:outputText value="">
-                            </h:outputText>
-                        </f:facet>
+                    <p:column headerText="#{langsys['ARH']}">
+                        <h:outputLabel value="#{su.arh}"/>
                     </p:column>
                 </p:dataTable>
             </h:panelGrid>
@@ -261,10 +179,8 @@
                         <p:selectOneMenu value="#{timesheet.unit_of_time}" style="width: 305px">
                             <f:selectItem itemLabel="" itemValue=""/>
                             <f:selectItem itemLabel="Hours" itemValue="Hours"/>
-                            <f:selectItem itemLabel="Hour" itemValue="Hour"/>
                             <f:selectItem itemLabel="Minutes" itemValue="Minutes"/>
                             <f:selectItem itemLabel="Days" itemValue="Days"/>
-                            <f:selectItem itemLabel="Day" itemValue="Day"/>
                         </p:selectOneMenu>
                         <h:outputLabel  value="#{langsys['Activity']} #{langsys['Status']}:"/>
                         <p:selectOneMenu value="#{timesheet.activity_status}" style="width: 305px">
