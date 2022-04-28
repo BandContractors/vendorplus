@@ -38,8 +38,7 @@
 
     <h:body>
         <ui:include src="Menu.xhtml"/>
-        <h:form id="TransactionFormSales" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
-                    return false;">  
+        <h:form id="TransactionFormSales" styleClass="clsMainFrom">  
             <h:panelGrid styleClass="clsGridMainHeader" columns="4">
                 <h:selectOneMenu styleClass="clsMenu" id="menuTransactionReason" value="#{trans.transactionReasonId}">
                     <f:selectItem itemValue="#{transBean.transReasonObj.transactionReasonId}" itemLabel="#{transBean.transReasonObj.transactionReasonName}"/>
