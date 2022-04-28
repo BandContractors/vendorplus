@@ -9,7 +9,6 @@ import connections.DBConnection;
 import entities.GroupRight;
 import entities.Subcategory_activity;
 import entities.UserDetail;
-import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,7 +18,6 @@ import java.util.List;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
-import javax.faces.bean.RequestScoped;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import org.apache.log4j.Level;
@@ -45,10 +43,7 @@ public class Subcategory_activityBean {
     @ManagedProperty("#{menuItemBean}")
     private MenuItemBean menuItemBean;
 
-//    public void test() {
-//        List<Subcategory_activity> maList = this.getSubcategory_activityAll();
-//        System.out.println("Found:" + maList.size());
-//    }
+
     public void setSubcategory_activityFromResultset(Subcategory_activity aSubcategory_activity, ResultSet aResultSet) {
         try {
             try {

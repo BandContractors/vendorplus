@@ -2,9 +2,7 @@ package beans;
 
 import connections.DBConnection;
 import entities.GroupRight;
-import entities.Staff;
 import entities.Timesheet;
-import entities.Transactor;
 import entities.UserDetail;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -34,32 +32,12 @@ public class TimesheetBean implements Serializable {
 
     static Logger LOGGER = Logger.getLogger(TimesheetBean.class.getName());
 
-    private List<Timesheet> Timesheets;
-    private List<Timesheet> TimesheetsSummary__activitystatus;
-    private List<Timesheet> TimesheetsSummary_subcategory_activity;
-    private List<Timesheet> TimesheetsSummary_category_activity;
-    private List<Timesheet> TimesheetsSummary_project;
-    private List<Timesheet> timesheetsSummary_staff;
-
+    private List<Timesheet> filteredTimesheetList;
     private String ActionMessage = null;
-    private Transactor filterTransactor;
-    private String filterActivityStatus = "";
-    private int filterSubCategoryActivityId = 0;
-    private String[] filterSubCategoryActivityIds = null;
     private int filterCategoryActivityId = 0;
-    private String[] filterCategoryActivityIds = null;
-    private long filterProject_id = 0;
-    private String filterUnit_Of_Time = "";
-    private double filterTime_Taken = 0;
-    private int filterModeActivityId = 0;
-    private String filterActivityName = "";
-    private Date filterActivityDate;
-    private Staff selectStaff;
-    private String filterStaff;
-    private int filterStaffId;
-    private String filterProject_name;
-    private Transactor selectedTransactor;
-    private Transactor selectedStaff;
+    private Date filterFromActivityDate;
+    private Date filterToActivityDate;
+    private int filterStaffId = 0;
 
     @ManagedProperty("#{menuItemBean}")
     private MenuItemBean menuItemBean;
@@ -76,6 +54,11 @@ public class TimesheetBean implements Serializable {
                 aTimesheet.setTransactor_id(aResultSet.getLong("transactor_id"));
             } catch (Exception e) {
                 aTimesheet.setTransactor_id(0);
+            }
+            try {
+                aTimesheet.setActivity_status(aResultSet.getString("activity_status"));
+            } catch (Exception e) {
+                aTimesheet.setActivity_status("");
             }
             try {
                 aTimesheet.setMode_activity_id(aResultSet.getInt("mode_activity_id"));
@@ -181,8 +164,8 @@ public class TimesheetBean implements Serializable {
         try {
             this.clearTimesheet(TimesheetTo);
             TimesheetTo.setTimesheet_id(TimesheetFrom.getTimesheet_id());
-//            TimesheetTo.setTransactor(TimesheetFrom.getTransactor());
             TimesheetTo.setTransactor_id(TimesheetFrom.getTransactor_id());
+            TimesheetTo.setTransactor(new TransactorBean().findTransactor(TimesheetFrom.getTransactor_id()));
             TimesheetTo.setActivity_date(TimesheetFrom.getActivity_date());
             TimesheetTo.setActivity_name(TimesheetFrom.getActivity_name());
             TimesheetTo.setActivity_status(TimesheetFrom.getActivity_status());
@@ -233,7 +216,7 @@ public class TimesheetBean implements Serializable {
     public int updateTimesheet(Timesheet aTimesheet) {
         int IsUpdated = 0;
         String sql = "UPDATE timesheet SET activity_status=?,transactor_id=?,mode_activity_id=? ,staff_id=?,category_activity_id=?,"
-                + " time_taken=?,activity_name=?,activity_date=?,unit_of_time=?,subcategory_activity_id=?,project_id=? WHERE timesheet_id=?";
+                + " time_taken=?,submission_date=?,activity_name=?,activity_date=?,unit_of_time=?,subcategory_activity_id=?,project_id=? WHERE timesheet_id=?";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -245,13 +228,14 @@ public class TimesheetBean implements Serializable {
             ps.setInt(4, aTimesheet.getStaff_id());
             ps.setInt(5, aTimesheet.getCategory_activity_id());
             ps.setDouble(6, aTimesheet.getTime_taken());
+            //ps.setDate(7, new java.sql.Date(aTimesheet.getSubmission_date().getTime()));
             ps.setTimestamp(7, new java.sql.Timestamp(new Date().getTime()));
             ps.setString(8, aTimesheet.getActivity_name());
             ps.setDate(9, new java.sql.Date(aTimesheet.getActivity_date().getTime()));
             ps.setString(10, aTimesheet.getUnit_of_time());
             ps.setInt(11, aTimesheet.getSubcategory_activity_id());
-            ps.setLong(13, aTimesheet.getProject_id());
-            ps.setLong(14, aTimesheet.getTimesheet_id());
+            ps.setLong(12, aTimesheet.getProject_id());
+            ps.setLong(13, aTimesheet.getTimesheet_id());
 
             ps.executeUpdate();
             IsUpdated = 1;
@@ -343,19 +327,11 @@ public class TimesheetBean implements Serializable {
 
     public void clearFilter() {
         try {
-            this.setFilterActivityDate(new Date());
-            this.setFilterActivityName("");
-            this.setFilterActivityStatus("");
-            this.setFilterModeActivityId(0);
-            this.setFilterProject_id(0);
-            this.setFilterStaffId(0);
-            this.setFilterSubCategoryActivityId(0);
+            this.setFilterFromActivityDate(new Date());
+            this.setFilterToActivityDate(new Date());
             this.setFilterCategoryActivityId(0);
-            this.setFilterCategoryActivityIds(null);
-            this.setFilterUnit_Of_Time("");
-            this.setFilterTime_Taken(0);
-            this.setFilterTransactor(null);
-            this.setFilterSubCategoryActivityIds(null);
+            this.setFilterStaffId(0);
+            this.getFilteredTimesheets();
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -367,128 +343,39 @@ public class TimesheetBean implements Serializable {
         String wheresql = "";
         String ordersql = " ORDER BY activity_date DESC";
         try {
-            if (this.filterTransactor != null) {
-                wheresql = wheresql + " AND transactor_id=" + this.filterTransactor.getTransactorId();
+            if (this.filterCategoryActivityId > 0) {
+                wheresql = wheresql + " AND category_activity_id=" + this.filterCategoryActivityId;
             }
-            if (this.filterActivityStatus.length() > 0) {
-                wheresql = wheresql + " AND current_status='" + this.filterActivityStatus + "'";
+            if (this.getFilterStaffId() > 0) {
+                wheresql = wheresql + " AND staff_id=" + this.getFilterStaffId();
             }
-            if (this.filterSubCategoryActivityIds != null) {
-                if (this.filterSubCategoryActivityIds.length > 0) {
-                    //array to comma seperated string
-                    String commaSepString = String.join(",", this.filterSubCategoryActivityIds);
-                    wheresql = wheresql + " AND subcategory_activity_id IN (" + commaSepString + ")";
-                }
-            }
-//           if (this.filterActivityDate!=0){
-           
-           
-           
-            if (this.filterCategoryActivityIds != null) {
-                if (this.filterCategoryActivityIds.length > 0) {
-                    //array to comma seperated string
-                    String commaSepString = String.join(",", this.filterCategoryActivityIds);
-                    wheresql = wheresql + " AND category_activity_id IN (" + commaSepString + ")";
-                }
-            }
-            if (this.filterUnit_Of_Time.length() > 0) {
-                wheresql = wheresql + "AND unit_of_time='" + this.filterUnit_Of_Time + "'";
-            }
-            if (this.filterProject_name.length() > 0) {
-                wheresql = wheresql + "AND project='" + this.filterProject_id + "'";
-            }
-            if (this.filterUnit_Of_Time != null) {
-                wheresql = wheresql + "AND unit_of_time='" + this.filterUnit_Of_Time + "'";
+            if (this.getFilterFromActivityDate() != null && this.getFilterToActivityDate() != null) {
+                //convert java.util date to sql date
+                java.sql.Date from = new java.sql.Date(this.getFilterFromActivityDate().getTime());
+                java.sql.Date to = new java.sql.Date(this.getFilterToActivityDate().getTime());
+                
+                wheresql = wheresql + " AND activity_date between '" + from + "' and '" + to + "'";
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-    }
-
-//     public void getFilteredTimesheetsSummary_CategoryActivity() {
-//        String sql;
-//        sql = "SELECT subcategory_activity_id, count(*) as numbers, sum(unit_of_time) as unit_of_time FROM timesheet where timesheet_id > 0";
-//        String wheresql = "";
-//        String groupbysum = " GROUP BY subcategory_activity_id";
-//        if (this.filterTransactor != null) {
-//            wheresql = wheresql + " AND transactor_id=" + this.filterTransactor.getTransactorId();
-//        }
-//        if (!this.filterActivityStatus.isEmpty()) {
-//            wheresql = wheresql + " AND activity_status='" + this.filterActivityStatus + "'";
-//        }
-//        if (this.filterSubCategoryActivityIds != null) {
-//            if (this.filterSubCategoryActivityIds.length > 0) {
-//                String commaSepString = String.join(",", this.filterSubCategoryActivityIds);
-//                wheresql = wheresql + " AND subcategory_activity_id IN (" + commaSepString + ")";
-//            }
-//        }
-//        if (!this.filterActivityStatus.isEmpty()) {
-//            wheresql = wheresql + " AND activity_status='" + this.filterActivityStatus + "'";
-//        }
-//          if (this.filterCategoryActivityIds!=null){
-//          wheresql = wheresql + "AND category_activity'" + this.filterCategoryActivityId+"'";
-//          
-//          }
-//            }  
-//        catch (Exception e) {
-//            LOGGER.log(Level.ERROR, e);
-//        }
-//    }
-    /**
-     * @return the filterTransactor
-     */
-    public Transactor getFilterTransactor() {
-        return filterTransactor;
-    }
-
-    /**
-     * @param filterTransactor the filterTransactor to set
-     */
-    public void setFilterTransactor(Transactor filterTransactor) {
-        this.filterTransactor = filterTransactor;
-    }
-
-    /**
-     * @return the filterActivityStatus
-     */
-    public String getFilterActivityStatus() {
-        return filterActivityStatus;
-    }
-
-    /**
-     * @param filterActivityStatus the filterActivityStatus to set
-     */
-    public void setFilterActivityStatus(String filterActivityStatus) {
-        this.filterActivityStatus = filterActivityStatus;
-    }
-
-    /**
-     * @return the filterSubCategoryActivityId
-     */
-    public int getFilterSubCategoryActivityId() {
-        return filterSubCategoryActivityId;
-    }
-
-    /**
-     * @param filterSubCategoryActivityId the filterSubCategoryActivityId to set
-     */
-    public void setFilterSubCategoryActivityId(int filterSubCategoryActivityId) {
-        this.filterSubCategoryActivityId = filterSubCategoryActivityId;
-    }
-
-    /**
-     * @return the filterSubCategoryActivityIds
-     */
-    public String[] getFilterSubCategoryActivityIds() {
-        return filterSubCategoryActivityIds;
-    }
-
-    /**
-     * @param filterSubCategoryActivityIds the filterSubCategoryActivityIds to
-     * set
-     */
-    public void setFilterSubCategoryActivityIds(String[] filterSubCategoryActivityIds) {
-        this.filterSubCategoryActivityIds = filterSubCategoryActivityIds;
+        sql = sql + wheresql + ordersql;
+        ResultSet rs;
+        filteredTimesheetList = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Timesheet aTimesheet = new Timesheet();
+                this.setTimesheetFromResultset(aTimesheet, rs);
+                getFilteredTimesheetList().add(aTimesheet);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        //summary
+        //this.getFilteredSubscriptionsSummary();
     }
 
     /**
@@ -506,63 +393,6 @@ public class TimesheetBean implements Serializable {
     }
 
     /**
-     * @return the filterCategoryActivityIds
-     */
-    public String[] getFilterCategoryActivityIds() {
-        return filterCategoryActivityIds;
-    }
-
-    /**
-     * @param filterCategoryActivityIds the filterCategoryActivityIds to set
-     */
-    public void setFilterCategoryActivityIds(String[] filterCategoryActivityIds) {
-        this.filterCategoryActivityIds = filterCategoryActivityIds;
-    }
-
-    /**
-     * @return the filterProject_id
-     */
-    public long getFilterProject_id() {
-        return filterProject_id;
-    }
-
-    /**
-     * @param filterProject_id the filterProject_id to set
-     */
-    public void setFilterProject_id(long filterProject_id) {
-        this.filterProject_id = filterProject_id;
-    }
-
-    /**
-     * @return the filterModeActivityId
-     */
-    public int getFilterModeActivityId() {
-        return filterModeActivityId;
-    }
-
-    /**
-     * @param filterModeActivityId the filterModeActivityId to set
-     */
-    public void setFilterModeActivityId(int filterModeActivityId) {
-        this.filterModeActivityId = filterModeActivityId;
-    }
-
-    /**
-     * @return the filterActivityName
-     */
-    public String getFilterActivityName() {
-        return filterActivityName;
-    }
-
-    /**
-     * @param filterActivityName the filterActivityName to set
-     */
-    public void setFilterActivityName(String filterActivityName) {
-        this.filterActivityName = filterActivityName;
-    }
-
-
-    /**
      * @return the menuItemBean
      */
     public MenuItemBean getMenuItemBean() {
@@ -574,90 +404,6 @@ public class TimesheetBean implements Serializable {
      */
     public void setMenuItemBean(MenuItemBean menuItemBean) {
         this.menuItemBean = menuItemBean;
-    }
-
-    /**
-     * @return the selectStaff
-     */
-    public Staff getSelectStaff() {
-        return selectStaff;
-    }
-
-    /**
-     * @param selectStaff the selectStaff to set
-     */
-    public void setSelectStaff(Staff selectStaff) {
-        this.selectStaff = selectStaff;
-    }
-
-    /**
-     * @return the selectedStaff
-     */
-    public Transactor getSelectedStaff() {
-        return selectedStaff;
-    }
-
-    /**
-     * @param selectedStaff the selectedStaff to set
-     */
-    public void setSelectedStaff(Transactor selectedStaff) {
-        this.selectedStaff = selectedStaff;
-    }
-
-    /**
-     * @return the selectedTransactor
-     */
-    public Transactor getSelectedTransactor() {
-        return selectedTransactor;
-    }
-
-    /**
-     * @param selectedTransactor the selectedTransactor to set
-     */
-    public void setSelectedTransactor(Transactor selectedTransactor) {
-        this.selectedTransactor = selectedTransactor;
-    }
-
-    /**
-     * @return the filterStaffId
-     */
-    public int getFilterStaffId() {
-        return filterStaffId;
-    }
-
-    /**
-     * @param filterStaffId the filterStaffId to set
-     */
-    public void setFilterStaffId(int filterStaffId) {
-        this.filterStaffId = filterStaffId;
-    }
-
-    /**
-     * @return the filterUnit_Of_Time
-     */
-    public String getFilterUnit_Of_Time() {
-        return filterUnit_Of_Time;
-    }
-
-    /**
-     * @param filterUnit_Of_Time the filterUnit_Of_Time to set
-     */
-    public void setFilterUnit_Of_Time(String filterUnit_Of_Time) {
-        this.filterUnit_Of_Time = filterUnit_Of_Time;
-    }
-
-    /**
-     * @return the filterTime_Taken
-     */
-    public double getFilterTime_Taken() {
-        return filterTime_Taken;
-    }
-
-    /**
-     * @param filterTime_Taken the filterTime_Taken to set
-     */
-    public void setFilterTime_Taken(double filterTime_Taken) {
-        this.filterTime_Taken = filterTime_Taken;
     }
 
     /**
@@ -675,132 +421,59 @@ public class TimesheetBean implements Serializable {
     }
 
     /**
-     * @return the filterStaff
+     * @return the filterStaffId
      */
-    public String getFilterStaff() {
-        return filterStaff;
+    public int getFilterStaffId() {
+        return filterStaffId;
     }
 
     /**
-     * @param filterStaff the filterStaff to set
+     * @param filterStaffId the filterStaffId to set
      */
-    public void setFilterStaff(String filterStaff) {
-        this.filterStaff = filterStaff;
+    public void setFilterStaffId(int filterStaffId) {
+        this.filterStaffId = filterStaffId;
     }
 
     /**
-     * @return the Timesheets
+     * @return the filteredTimesheetList
      */
-    public List<Timesheet> getTimesheets() {
-        return Timesheets;
+    public List<Timesheet> getFilteredTimesheetList() {
+        return filteredTimesheetList;
     }
 
     /**
-     * @param Timesheets the Timesheets to set
+     * @param filteredTimesheetList the filteredTimesheetList to set
      */
-    public void setTimesheets(List<Timesheet> Timesheets) {
-        this.Timesheets = Timesheets;
+    public void setFilteredTimesheetList(List<Timesheet> filteredTimesheetList) {
+        this.filteredTimesheetList = filteredTimesheetList;
     }
 
     /**
-     * @return the TimesheetsSummary__activitystatus
+     * @return the filterFromActivityDate
      */
-    public List<Timesheet> getTimesheetsSummary__activitystatus() {
-        return TimesheetsSummary__activitystatus;
+    public Date getFilterFromActivityDate() {
+        return filterFromActivityDate;
     }
 
     /**
-     * @param TimesheetsSummary__activitystatus the
-     * TimesheetsSummary__activitystatus to set
+     * @param filterFromActivityDate the filterFromActivityDate to set
      */
-    public void setTimesheetsSummary__activitystatus(List<Timesheet> TimesheetsSummary__activitystatus) {
-        this.TimesheetsSummary__activitystatus = TimesheetsSummary__activitystatus;
+    public void setFilterFromActivityDate(Date filterFromActivityDate) {
+        this.filterFromActivityDate = filterFromActivityDate;
     }
 
     /**
-     * @return the TimesheetsSummary_subcategory_activity
+     * @return the filterToActivityDate
      */
-    public List<Timesheet> getTimesheetsSummary_subcategory_activity() {
-        return TimesheetsSummary_subcategory_activity;
+    public Date getFilterToActivityDate() {
+        return filterToActivityDate;
     }
 
     /**
-     * @param TimesheetsSummary_subcategory_activity the
-     * TimesheetsSummary_subcategory_activity to set
+     * @param filterToActivityDate the filterToActivityDate to set
      */
-    public void setTimesheetsSummary_subcategory_activity(List<Timesheet> TimesheetsSummary_subcategory_activity) {
-        this.TimesheetsSummary_subcategory_activity = TimesheetsSummary_subcategory_activity;
-    }
-
-    /**
-     * @return the TimesheetsSummary_category_activity
-     */
-    public List<Timesheet> getTimesheetsSummary_category_activity() {
-        return TimesheetsSummary_category_activity;
-    }
-
-    /**
-     * @param TimesheetsSummary_category_activity the
-     * TimesheetsSummary_category_activity to set
-     */
-    public void setTimesheetsSummary_category_activity(List<Timesheet> TimesheetsSummary_category_activity) {
-        this.TimesheetsSummary_category_activity = TimesheetsSummary_category_activity;
-    }
-
-    /**
-     * @return the TimesheetsSummary_project
-     */
-    public List<Timesheet> getTimesheetsSummary_project() {
-        return TimesheetsSummary_project;
-    }
-
-    /**
-     * @param TimesheetsSummary_project the TimesheetsSummary_project to set
-     */
-    public void setTimesheetsSummary_project(List<Timesheet> TimesheetsSummary_project) {
-        this.TimesheetsSummary_project = TimesheetsSummary_project;
-    }
-
-    /**
-     * @return the timesheetsSummary_staff
-     */
-    public List<Timesheet> getTimesheetsSummary_staff() {
-        return timesheetsSummary_staff;
-    }
-
-    /**
-     * @param timesheetsSummary_staff the timesheetsSummary_staff to set
-     */
-    public void setTimesheetsSummary_staff(List<Timesheet> timesheetsSummary_staff) {
-        this.timesheetsSummary_staff = timesheetsSummary_staff;
-    }
-
-    /**
-     * @return the filterProject_name
-     */
-    public String getFilterProject_name() {
-        return filterProject_name;
-    }
-
-    /**
-     * @param filterProject_name the filterProject_name to set
-     */
-    public void setFilterProject_name(String filterProject_name) {
-        this.filterProject_name = filterProject_name;
-    }
-
-    /**
-     * @return the filterActivityDate
-     */
-    public Date getFilterActivityDate() {
-        return filterActivityDate;
-    }
-
-    /**
-     * @param filterActivityDate the filterActivityDate to set
-     */
-    public void setFilterActivityDate(Date filterActivityDate) {
-        this.filterActivityDate = filterActivityDate;
+    public void setFilterToActivityDate(Date filterToActivityDate) {
+        this.filterToActivityDate = filterToActivityDate;
     }
 
 }
