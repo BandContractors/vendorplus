@@ -43,7 +43,6 @@ public class Subcategory_activityBean {
     @ManagedProperty("#{menuItemBean}")
     private MenuItemBean menuItemBean;
 
-
     public void setSubcategory_activityFromResultset(Subcategory_activity aSubcategory_activity, ResultSet aResultSet) {
         try {
             try {
@@ -127,7 +126,7 @@ public class Subcategory_activityBean {
                 }
                 if (saved > 0) {
                     msg = "Sub Activity Category Saved Successfully";
-                    this.clearSubCategoryActivity(aSubcategory_activity);
+                    this.clearSubcategory_activity(aSubcategory_activity);
                 } else {
                     msg = "Sub Activity Category NOT Saved";
                 }
@@ -137,7 +136,6 @@ public class Subcategory_activityBean {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
 
     public void displaySubcategory_activity(Subcategory_activity Subcategory_activityFrom, Subcategory_activity Subcategory_activityTo) {
         Subcategory_activityTo.setCategory_activity_id(Subcategory_activityFrom.getCategory_activity_id());
@@ -181,22 +179,6 @@ public class Subcategory_activityBean {
         return IsUpdated;
     }
 
-//    public int deleteSubcategory_activity(Subcategory_activity aSubcategory_activity) {
-//        int IsDeleted = 0;
-//        String sql = "DELETE FROM subcategory_activity WHERE subcategory_activity_id=?";
-//        try (
-//                Connection conn = DBConnection.getMySQLConnection();
-//                PreparedStatement ps = conn.prepareStatement(sql);) {
-////            ps.setInt(1, aSubcategory_activity.getCategory_activity_id());
-//            ps.setInt(1, aSubcategory_activity.getSubcategory_activity_id());
-//            ps.executeUpdate();
-//            IsDeleted = 1;
-//        } catch (Exception e) {
-//            LOGGER.log(Level.ERROR, e);
-//        }
-//        return IsDeleted;
-//    }
-
     public void clearSubcategory_activity(Subcategory_activity aSubcategory_activity) {
         try {
             if (null != aSubcategory_activity) {
@@ -210,23 +192,19 @@ public class Subcategory_activityBean {
         }
     }
 
-    public void clearSubCategoryActivity(Subcategory_activity aSubcategory_activity) {
-        aSubcategory_activity.setCategory_activity_id(0);
-        aSubcategory_activity.setSubcategory_activity_id(0);
-        aSubcategory_activity.setSubcategory_name("");
-    }
-    
-        public void deleteSubCategoryActivity() {
+    public void deleteSubCategoryActivity() {
         this.deleteSubCategoryActivityById(this.getSelectedSubCategoryActivityId());
     }
 
-    
-      public void deleteSubCategoryActivityByObject(Subcategory_activity aSubcategory_activity) {
-        this.deleteSubCategoryActivityById(aSubcategory_activity.getSubcategory_activity_id());
+    public void deleteSubCategoryActivityByObject(Subcategory_activity aSubcategory_activity) {
+        int status = this.deleteSubCategoryActivityById(aSubcategory_activity.getSubcategory_activity_id());
+        if (status == 1) {
+            this.clearSubcategory_activity(aSubcategory_activity);
+        }
     }
 
-    
-      public void deleteSubCategoryActivityById(int aSubCategoryActivityId) {
+    public int deleteSubCategoryActivityById(int aSubCategoryActivityId) {
+        int deleteStatus = 0;
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
         try {
@@ -240,23 +218,24 @@ public class Subcategory_activityBean {
 
         if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Delete") == 0) {
             msg = "Not Allowed to Access this Function";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
-        String sql = "DELETE FROM subcategory_activity WHERE subcategory_activity_id=?";
+            String sql = "DELETE FROM subcategory_activity WHERE subcategory_activity_id=?";
             try (
                     Connection conn = DBConnection.getMySQLConnection();
                     PreparedStatement ps = conn.prepareStatement(sql);) {
                 ps.setInt(1, aSubCategoryActivityId);
                 ps.executeUpdate();
-                this.setActionMessage(ub.translateWordsInText(BaseName, "Deleted Successfully!"));
+                msg = "Subcategory Activity Deleted Successfully";
+                deleteStatus = 1;
             } catch (Exception e) {
                 LOGGER.log(Level.ERROR, e);
-                this.setActionMessage(ub.translateWordsInText(BaseName, "Category Activity Not Deleted"));
+                msg = "Subcategory Activity Not Deleted";
             }
         }
+        FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+        return deleteStatus;
     }
 
-           
     public Subcategory_activity getSubcategory_activity(int aSubcategory_activity_id) {
         String sql = "SELECT * FROM subcategory_activity WHERE subcategory_activity_id=?";
         ResultSet rs;
@@ -276,6 +255,26 @@ public class Subcategory_activityBean {
             LOGGER.log(Level.ERROR, e);
             return null;
         }
+    }
+
+    public List<Subcategory_activity> getSubcategory_activityByCategoryActivityId(int aCategory_activity_id) {
+        String sql = "SELECT * FROM subcategory_activity WHERE category_activity_id=?";
+        ResultSet rs;
+        List<Subcategory_activity> Subcategory_activityList = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setInt(1, aCategory_activity_id);
+            rs = ps.executeQuery();
+            while(rs.next()) {
+                Subcategory_activity subcategory_activity = new Subcategory_activity();
+                this.setSubcategory_activityFromResultset(subcategory_activity, rs);
+                Subcategory_activityList.add(subcategory_activity);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return Subcategory_activityList;
     }
 
     public List<Subcategory_activity> getSubcategory_activityBySubcategory_activityName(String aSubcategory_activityName) {
@@ -347,7 +346,8 @@ public class Subcategory_activityBean {
     }
 
     /**
-     * @param SelectedSubCategoryActivityId the SelectedSubCategoryActivityId to set
+     * @param SelectedSubCategoryActivityId the SelectedSubCategoryActivityId to
+     * set
      */
     public void setSelectedSubCategoryActivityId(int SelectedSubCategoryActivityId) {
         this.SelectedSubCategoryActivityId = SelectedSubCategoryActivityId;

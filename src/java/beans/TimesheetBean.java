@@ -145,6 +145,30 @@ public class TimesheetBean implements Serializable {
             } else if (aTimesheet.getTimesheet_id() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Edit") == 0) {
                 msg = "Not Allowed to Access this Function";
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (aTimesheet.getStaff_id() == 0) {
+                msg = "Staff Cannot be Empty";
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (aTimesheet.getActivity_name().length() == 0) {
+                msg = "Activity Name Cannot be Empty";
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (aTimesheet.getTime_taken() == 0) {
+                msg = "Time Taken Cannot be Zero";
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (aTimesheet.getUnit_of_time().length() == 0) {
+                msg = "Unit of Time Cannot be Empty";
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (aTimesheet.getActivity_status().length() == 0) {
+                msg = "Activity Status Cannot be Empty";
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (aTimesheet.getMode_activity_id() == 0) {
+                msg = "Mode Activity Cannot be Empty";
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (aTimesheet.getCategory_activity_id() == 0) {
+                msg = "Category Activity Cannot be Empty";
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (aTimesheet.getActivity_date() == null) {
+                msg = "Activity Date Cannot be Empty";
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else {
                 int saved = 0;
                 if (aTimesheet.getTimesheet_id() == 0) {
@@ -195,8 +219,11 @@ public class TimesheetBean implements Serializable {
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
             ps.setString(1, aTimesheet.getActivity_status());
-            ps.setLong(2, aTimesheet.getTransactor().getTransactorId());
-//            ps.setLong(2, aTimesheet.getTransactor_id());
+            if (aTimesheet.getTransactor() != null) {
+                ps.setLong(2, aTimesheet.getTransactor().getTransactorId());
+            } else {
+                ps.setLong(2, 0);
+            }
             ps.setInt(3, aTimesheet.getMode_activity_id());
             ps.setInt(4, aTimesheet.getStaff_id());
             ps.setInt(5, aTimesheet.getCategory_activity_id());
@@ -227,8 +254,11 @@ public class TimesheetBean implements Serializable {
                 PreparedStatement ps = conn.prepareStatement(sql);) {
 
             ps.setString(1, aTimesheet.getActivity_status());
-            ps.setLong(2, aTimesheet.getTransactor().getTransactorId());
-//            ps.setLong(2, aTimesheet.getTransactor_id());
+            if (aTimesheet.getTransactor() != null) {
+                ps.setLong(2, aTimesheet.getTransactor().getTransactorId());
+            } else {
+                ps.setLong(2, 0);
+            }
             ps.setInt(3, aTimesheet.getMode_activity_id());
             ps.setInt(4, aTimesheet.getStaff_id());
             ps.setInt(5, aTimesheet.getCategory_activity_id());
@@ -358,7 +388,7 @@ public class TimesheetBean implements Serializable {
                 //convert java.util date to sql date
                 java.sql.Date from = new java.sql.Date(this.getFilterFromActivityDate().getTime());
                 java.sql.Date to = new java.sql.Date(this.getFilterToActivityDate().getTime());
-                
+
                 wheresql = wheresql + " AND activity_date between '" + from + "' and '" + to + "'";
             }
         } catch (Exception e) {
@@ -411,7 +441,7 @@ public class TimesheetBean implements Serializable {
                 //convert java.util date to sql date
                 java.sql.Date from = new java.sql.Date(this.getFilterFromActivityDate().getTime());
                 java.sql.Date to = new java.sql.Date(this.getFilterToActivityDate().getTime());
-                
+
                 wheresql = wheresql + " AND activity_date between '" + from + "' and '" + to + "'";
             }
         } catch (Exception e) {
@@ -476,7 +506,7 @@ public class TimesheetBean implements Serializable {
                 //convert java.util date to sql date
                 java.sql.Date from = new java.sql.Date(this.getFilterFromActivityDate().getTime());
                 java.sql.Date to = new java.sql.Date(this.getFilterToActivityDate().getTime());
-                
+
                 wheresql = wheresql + " AND activity_date between '" + from + "' and '" + to + "'";
             }
         } catch (Exception e) {

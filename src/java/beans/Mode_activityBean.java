@@ -172,6 +172,13 @@ public class Mode_activityBean {
 
     public int deleteMode_activity(Mode_activity aMode_activity) {
         int IsDeleted = 0;
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
+        String msg = "";
         String sql = "DELETE FROM mode_activity WHERE mode_activity_id=?";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -179,9 +186,13 @@ public class Mode_activityBean {
             ps.setInt(1, aMode_activity.getMode_activity_id());
             ps.executeUpdate();
             IsDeleted = 1;
+            this.clearMode_activity(aMode_activity);
+            msg = "Mode Activity Deleted Successfully";
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
+            msg = "Mode Activity NOT Deleted";
         }
+        FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         return IsDeleted;
     }
 

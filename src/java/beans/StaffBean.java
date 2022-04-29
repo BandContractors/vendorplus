@@ -200,6 +200,13 @@ public class StaffBean {
 
     public int deleteStaff(Staff aStaff) {
         int IsDeleted = 0;
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
+        String msg = "";
         String sql = "DELETE FROM staff WHERE staff_id=?";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -207,9 +214,13 @@ public class StaffBean {
             ps.setInt(1, aStaff.getStaff_id());
             ps.executeUpdate();
             IsDeleted = 1;
+            this.clearStaff(aStaff);
+            msg = "Staff Deleted Successfully";
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
+            msg = "Staff NOT Deleted";
         }
+        FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         return IsDeleted;
     }
 
@@ -252,7 +263,7 @@ public class StaffBean {
         }
         return list;
     }
-    
+
     public List<Staff> getStaffByStaffName(String aStaffName) {
         String sql;
         sql = "SELECT * FROM staff WHERE first_name LIKE CONCAT('%',?,'%') OR second_name LIKE CONCAT('%',?,'%') OR third_name LIKE CONCAT('%',?,'%')";

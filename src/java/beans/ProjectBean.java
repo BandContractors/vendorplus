@@ -162,6 +162,13 @@ public class ProjectBean implements Serializable {
 
     public int deleteProject(Project aProject) {
         int IsDeleted = 0;
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
+        String msg = "";
         String sql = "DELETE FROM project WHERE project_id=?";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -169,9 +176,13 @@ public class ProjectBean implements Serializable {
             ps.setInt(1, aProject.getProject_id());
             ps.executeUpdate();
             IsDeleted = 1;
+            this.clearProject(aProject);
+            msg = "Project Deleted Successfully";
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
+            msg = "Project NOT Deleted";
         }
+        FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         return IsDeleted;
     }
 

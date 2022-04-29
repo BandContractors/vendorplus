@@ -148,7 +148,7 @@ public class Category_activityBean {
     public int deleteCategory_activity(Category_activity aCategory_activity) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
-        String msg;
+        String msg = "";
         int IsDeleted = 0;
         long N = 0;
         try {
@@ -164,8 +164,7 @@ public class Category_activityBean {
             LOGGER.log(Level.ERROR, e);
         }
         if (N > 0) {
-            msg = "Activity Category has been used and cannot be deleted";
-            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            msg = "Activity Category has been used and cannot be Deleted";
         } else {
             String sql = "DELETE FROM category_activity WHERE category_activity_id=?";
             try (
@@ -174,10 +173,13 @@ public class Category_activityBean {
                 ps.setInt(1, aCategory_activity.getCategory_activity_id());
                 ps.executeUpdate();
                 IsDeleted = 1;
+                msg = "Activity Category has been Deleted";
+                this.clearCategory_activity(aCategory_activity);
             } catch (Exception e) {
                 LOGGER.log(Level.ERROR, e);
             }
         }
+        FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         return IsDeleted;
     }
 

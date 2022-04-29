@@ -162,7 +162,14 @@ public class ActivityStatusBean {
     }
 
     public int deleteActivityStatus(ActivityStatus aActivity_status) {
-        int IsDeleted = 0; 
+        int IsDeleted = 0;
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
+        String msg = "";
         String sql = "DELETE FROM activity_status WHERE activity_status_id=?";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -170,9 +177,13 @@ public class ActivityStatusBean {
             ps.setInt(1, aActivity_status.getActivity_status_id());
             ps.executeUpdate();
             IsDeleted = 1;
+            this.clearActivityStatus(aActivity_status);
+            msg = "Activity Status Deleted Successfully";
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
+            msg = "Activity Status NOT Deleted";
         }
+        FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         return IsDeleted;
     }
 
