@@ -27,14 +27,13 @@
     <h:body>
         <ui:include src="Menu.xhtml"/>
         <h:form id="form">
-            <h:panelGrid styleClass="clsPanelReportFilterTitle" columns="4" style="height: 140px">
+            <h:panelGrid styleClass="clsPanelReportFilterTitle" columns="6">
                 <p:commandButton actionListener="#{timesheetBean.clearTimesheet(timesheet)}" value="Timesheet" onsuccess="PF('dlgTimesheet').show();" icon="ui-icon-circle-plus" style="float: none; height: 50px; width: 190px">
                     <f:ajax render="form:modalTimesheet"/>
                 </p:commandButton>
                 <p:commandButton value="#{langsys['Category']} #{langsys['Activity']}" action="#{navigationBean.redirectToCategoryActivity('Timesheet')}" style="background-color: yellow !important; height: 50px; float: none; width: 190px" />
                 <p:commandButton value="#{langsys['Sub']} #{langsys['Activity']} #{langsys['Category']}" action="#{navigationBean.redirectToSubActivityCategory('Timesheet')}" style="background-color: red !important; height: 50px; float: none; width: 190px" />
-                <p:commandButton value="#{langsys['Staff']}" action="#{navigationBean.redirectToStaff('Timesheet')}" style="background-color: red !important; float: none; height: 50px; width: 190px" />
-                <p:commandButton value="#{langsys['Activity']} #{langsys['Status']}" action="#{navigationBean.redirectToActivityStatus('Timesheet')}" style="background-color: yellow !important; float: none; height: 50px; width: 190px" />
+                <p:commandButton value="#{langsys['Staff']}" action="#{navigationBean.redirectToStaff('Timesheet')}" style="background-color: yellow !important; float: none; height: 50px; width: 190px" />
                 <p:commandButton value="#{langsys['Project']}" action="#{navigationBean.redirectToProject('Timesheet')}" style="background-color: red !important; float: none; height: 50px; width: 190px;" />
                 <p:commandButton value="#{langsys['Mode']} #{langsys['Activity']}" action="#{navigationBean.redirectToMode_activity('Timesheet')}" style="background-color: yellow !important; float: none; height: 50px; width: 190px" />
             </h:panelGrid>
@@ -65,6 +64,7 @@
                 </h:panelGrid>
             </h:panelGrid>
 
+            <!--Summary Tables-->
             <h:panelGrid id="pnlgSummary" columns="3" styleClass="clsPanelSummary">
                 <p:dataTable id="tblSummaryTimesheetTotalTime" tableStyle="width:100%;" var="sum" value="#{timesheetBean.timesheetSummary_totalTime}">
                     <p:column headerText="#{langsys['Staff']}" width="auto">
@@ -86,7 +86,10 @@
                         <h:outputLabel value="#{su.first_name} #{su.second_name}"/>
                     </p:column>
                     <p:column headerText="#{langsys['ARH']}">
-                        <h:outputLabel value="#{su.arh}"/>
+                        <h:outputLabel value="#{su.arh}">
+                            <f:convertNumber/>
+                        </h:outputLabel>
+                        <h:outputLabel value=":00 Hrs" />
                     </p:column>
                 </p:dataTable>
             </h:panelGrid>
