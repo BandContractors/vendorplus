@@ -79,10 +79,10 @@ public class Category_activityBean {
 
             String sql1 = "SELECT count(*) as n FROM category_activity WHERE category_name='" + aCategory_activity.getCategory_name() + "'";
 
-            if (aCategory_activity.getCategory_activity_id() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Add") == 0) {
+            if (aCategory_activity.getCategory_activity_id() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Add") == 0) {
                 msg = "Not Allowed to Access this Function";
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
-            } else if (aCategory_activity.getCategory_activity_id() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Edit") == 0) {
+            } else if (aCategory_activity.getCategory_activity_id() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Edit") == 0) {
                 msg = "Not Allowed to Access this Function";
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else if (aCategory_activity.getCategory_name().length() <= 0) {
@@ -163,7 +163,13 @@ public class Category_activityBean {
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-        if (N > 0) {
+        UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
+        List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
+        GroupRightBean grb = new GroupRightBean();
+
+        if (aCategory_activity.getCategory_activity_id() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Delete") == 0) {
+            msg = "Not Allowed to Access this Function";
+        } else if (N > 0) {
             msg = "Activity Category has been used and cannot be Deleted";
         } else {
             String sql = "DELETE FROM category_activity WHERE category_activity_id=?";

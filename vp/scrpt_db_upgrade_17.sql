@@ -76,3 +76,11 @@ VALUES('scrpt_db_upgrade_17',73,Now(),'6.0','');
 create table pay_shift (pay_shift_id bigint(20) not null auto_increment, pay_id bigint(20) not null, shift_id int(11) not null, pay_type_id int(11) null, primary key (pay_shift_id));
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_17',77,Now(),'6.0','');
+
+INSERT INTO transaction_type (transaction_type_id, transaction_type_name,transaction_output_label,transaction_number_label,transaction_type_code,trans_number_format,
+transaction_date_label,transaction_ref_label,print_file_name1,print_file_name2,default_print_file) 
+VALUES (87, 'TIME SHEET','TIME SHEET','Time Sheet No','TMS','CYMDX','Time Sheet Date','','','',1);
+INSERT INTO transaction_reason (transaction_reason_id, transaction_reason_name, transaction_type_id) VALUES (134, 'TIME SHEET', 87);
+ALTER TABLE transaction_approval ADD COLUMN hide_from_view INT(1) NULL DEFAULT 0;
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_17',85,Now(),'6.0','');

@@ -145,6 +145,11 @@ public class Transaction_approvalBean implements Serializable {
             } catch (Exception e) {
                 aTransaction_approval.setAmount_tendered(0);
             }
+            try {
+                aTransaction_approval.setHide_from_view(aResultSet.getInt("hide_from_view"));
+            } catch (Exception e) {
+                aTransaction_approval.setHide_from_view(0);
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -277,6 +282,29 @@ public class Transaction_approvalBean implements Serializable {
                     ps.setInt(5, aTransaction_approval.getStatus_by_id());
                 } catch (Exception e) {
                     ps.setInt(5, 0);
+                }
+                ps.executeUpdate();
+                Updated = 1;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return Updated;
+    }
+
+    public int updateTransaction_approval_hide(Transaction_approval aTransaction_approval, int aHide_from_view) {
+        int Updated = 0;
+        String sql = "UPDATE transaction_approval SET "
+                + "hide_from_view=? "
+                + "WHERE transaction_approval_id=" + aTransaction_approval.getTransaction_approval_id();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            if (null != aTransaction_approval) {
+                try {
+                    ps.setInt(1, aHide_from_view);
+                } catch (Exception e) {
+                    ps.setInt(1, 0);
                 }
                 ps.executeUpdate();
                 Updated = 1;
@@ -467,7 +495,6 @@ public class Transaction_approvalBean implements Serializable {
 
     public int markRecalled(long aTransaction_approval_id) {
         int Updated = 0;
-
         try {
             Transaction_approval ta = new Transaction_approval();
             ta.setTransaction_approval_id(aTransaction_approval_id);
@@ -477,6 +504,19 @@ public class Transaction_approvalBean implements Serializable {
             ta.setStatus_date(new java.sql.Timestamp(new CompanySetting().getCURRENT_SERVER_DATE().getTime()));
             ta.setStatus_desc("Recalled");
             Updated = this.updateTransaction_approval(ta);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return Updated;
+    }
+
+    public int markHidden(long aTransaction_approval_id) {
+        int Updated = 0;
+        try {
+            Transaction_approval ta = new Transaction_approval();
+            ta.setTransaction_approval_id(aTransaction_approval_id);
+            ta.setHide_from_view(1);
+            Updated = this.updateTransaction_approval_hide(ta, 1);
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -571,6 +611,27 @@ public class Transaction_approvalBean implements Serializable {
         }
     }
 
+    public void hideApprovalCall(List<Transaction_approval> aList, int aStoreId, int aRequestById, int aTransTypeId, int aTransReasonId, long aTransaction_approval_id) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
+        try {
+            BaseName = getMenuItemBean().getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
+        try {
+//            Transaction_approval ta = this.getTransaction_approval(aTransaction_approval_id);
+            //approval_status: 0 Submitted, 1 Approved, 2 Processed, 3 Rejected, 4 Recalled
+//            if (null != ta && ta.getApproval_status() != 0 && ta.getApproval_status() != 1) {
+//                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "This Transaction Cannot be Recalled")));
+//            } else {
+            int x = this.markHidden(aTransaction_approval_id);
+            this.refreshTransaction_approvalList(aList, aStoreId, aRequestById, aTransTypeId, aTransReasonId);
+//            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public void refreshTransaction_approvalList(List<Transaction_approval> aList, int aStoreId, int aRequestById, int aTransTypeId, int aTransReasonId) {
         try {
             aList.clear();
@@ -581,7 +642,7 @@ public class Transaction_approvalBean implements Serializable {
         String sql;
         sql = "SELECT ta.*,'' AS transactor_names,'' AS currency_code FROM transaction_approval ta "
                 + "WHERE ta.approval_status IN(0,1,3) AND ta.transaction_type_id=? AND ta.transaction_reason_id=? AND "
-                + "ta.store_id=? AND ta.request_by_id=? "
+                + "ta.store_id=? AND ta.request_by_id=? AND hide_from_view=0 "
                 + "ORDER BY transaction_approval_id DESC LIMIT 10";
         ResultSet rs = null;
         try (

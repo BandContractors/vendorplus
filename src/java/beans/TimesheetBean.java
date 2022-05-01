@@ -139,10 +139,10 @@ public class TimesheetBean implements Serializable {
             List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
             GroupRightBean grb = new GroupRightBean();
 
-            if (aTimesheet.getTimesheet_id() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Add") == 0) {
+            if (aTimesheet.getTimesheet_id() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "134", "Add") == 0) {
                 msg = "Not Allowed to Access this Function";
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
-            } else if (aTimesheet.getTimesheet_id() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Edit") == 0) {
+            } else if (aTimesheet.getTimesheet_id() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "134", "Edit") == 0) {
                 msg = "Not Allowed to Access this Function";
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else if (aTimesheet.getStaff_id() == 0) {

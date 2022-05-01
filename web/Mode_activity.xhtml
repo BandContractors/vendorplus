@@ -21,7 +21,7 @@
         </script> 
     </h:head>
     <f:metadata>
-        <f:viewAction action="#{navigationBean.checkAccessDenied(utilityBean.convertIntAsString(generalUserSetting.currentTransactionReasonId), 'View')}"/>
+        <f:viewAction action="#{navigationBean.checkAccessDenied(utilityBean.convertIntAsString(88), 'View')}"/>
     </f:metadata> 
     <h:body>
         <ui:include src="Menu.xhtml"/>
@@ -32,7 +32,7 @@
                 <p:commandButton icon="fa fa-fw fa-arrow-left" style="width: 120px;height: 40px;color: white;background-color: black;" id="cmdbNew" value="#{langsys['BACK']}"  action="#{navigationBean.redirectToSourceXhtmlFile()}" />
             </h:panelGrid>
             <h:panelGrid id="pnlInput" styleClass="clsGridMainInput" columns="6">
-                <h:outputLabel  value="#{langsys['Mode']}#{langsys['Activity']} #{langsys['Name']}:"/>
+                <h:outputLabel  value="#{langsys['Mode']} #{langsys['Activity']} #{langsys['Name']}:"/>
                 <h:inputText styleClass="clsInput" id="mode_activity" value="#{mode_activity.mode_name}" autocomplete="off" style="width: 250px;"> 
                 </h:inputText>
 

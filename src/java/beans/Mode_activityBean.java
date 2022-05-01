@@ -83,10 +83,10 @@ public class Mode_activityBean {
 
             String sql1 = "SELECT count(*) as n FROM mode_activity WHERE mode_name='" + aMode_activity.getMode_name() + "'";
 
-            if (aMode_activity.getMode_activity_id() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Add") == 0) {
+            if (aMode_activity.getMode_activity_id() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Add") == 0) {
                 msg = "Not Allowed to Access this Function";
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
-            } else if (aMode_activity.getMode_activity_id() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Edit") == 0) {
+            } else if (aMode_activity.getMode_activity_id() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Edit") == 0) {
                 msg = "Not Allowed to Access this Function";
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else if (aMode_activity.getMode_name().length() <= 0) {
@@ -169,28 +169,40 @@ public class Mode_activityBean {
         }
         return IsUpdated;
     }
-
+    
     public int deleteMode_activity(Mode_activity aMode_activity) {
-        int IsDeleted = 0;
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
-        try {
-            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
-        } catch (Exception e) {
-        }
         String msg = "";
-        String sql = "DELETE FROM mode_activity WHERE mode_activity_id=?";
-        try (
-                Connection conn = DBConnection.getMySQLConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);) {
-            ps.setInt(1, aMode_activity.getMode_activity_id());
-            ps.executeUpdate();
-            IsDeleted = 1;
-            this.clearMode_activity(aMode_activity);
-            msg = "Mode Activity Deleted Successfully";
+        int IsDeleted = 0;
+        long N = 0;
+        try {
+            String sqlFind = "SELECT COUNT(*) AS n FROM timesheet WHERE mode_activity_id=" + aMode_activity.getMode_activity_id();
+            N = N + new UtilityBean().getN(sqlFind);
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
-            msg = "Mode Activity NOT Deleted";
+        }
+        UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
+        List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
+        GroupRightBean grb = new GroupRightBean();
+
+        if (aMode_activity.getMode_activity_id() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Delete") == 0) {
+            msg = "Not Allowed to Access this Function";
+        } else if (N > 0) {
+            msg = "Mode Activity has been used and cannot be Deleted";
+        } else {
+            String sql = "DELETE FROM mode_activity WHERE mode_activity_id=?";
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                ps.setInt(1, aMode_activity.getMode_activity_id());
+                ps.executeUpdate();
+                IsDeleted = 1;
+                msg = "Activity Mode has been Deleted";
+                this.clearMode_activity(aMode_activity);
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
+            }
         }
         FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         return IsDeleted;

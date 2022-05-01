@@ -46,6 +46,28 @@ public class Login implements Serializable {
     private MenuItemBean menuItemBean;
     private long LICENSE_DAYS_LEFT;
     private long LICENSE_TYPE;
+    private List<String> Warnings;
+
+    public void refreshWarnings() {
+        try {
+            UtilityBean ub = new UtilityBean();
+            Warnings = new ArrayList<>();
+            String sql1 = "select user_detail_id as n from user_detail where ucase(user_name)='ADMIN'";
+            if (ub.getN(sql1) == 1) {
+                Warnings.add("Rename default username 'Admin'");
+            }
+            String sql2 = "select count(*) as n from user_detail where is_user_gen_admin='Yes' and user_name<>'system' and is_user_locked='No'";
+            if (ub.getN(sql2) == 0) {
+                Warnings.add("Complete configurations: add a user of Administrator type");
+            }
+            String ConnPoolPassword = "XXX";
+            if (ConnPoolPassword.isEmpty()) {
+                Warnings.add("Complete configurations: secure database with a password");
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
 
     public void refreshLicenseDaysLeft() {
         this.setLICENSE_DAYS_LEFT(CompanySetting.getLicenseDaysLeft());
@@ -521,5 +543,19 @@ public class Login implements Serializable {
      */
     public void setLICENSE_TYPE(long LICENSE_TYPE) {
         this.LICENSE_TYPE = LICENSE_TYPE;
+    }
+
+    /**
+     * @return the Warnings
+     */
+    public List<String> getWarnings() {
+        return Warnings;
+    }
+
+    /**
+     * @param Warnings the Warnings to set
+     */
+    public void setWarnings(List<String> Warnings) {
+        this.Warnings = Warnings;
     }
 }

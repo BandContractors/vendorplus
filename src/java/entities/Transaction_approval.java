@@ -28,6 +28,7 @@ public class Transaction_approval implements Serializable {
     private int store_id;
     private double amount_tendered;
     private long transaction_id;
+    private int hide_from_view;
 
     /**
      * @return the transaction_approval_id
@@ -279,5 +280,19 @@ public class Transaction_approval implements Serializable {
      */
     public void setStatus_comment(String status_comment) {
         this.status_comment = status_comment;
+    }
+
+    /**
+     * @return the hide_from_view
+     */
+    public int getHide_from_view() {
+        return hide_from_view;
+    }
+
+    /**
+     * @param hide_from_view the hide_from_view to set
+     */
+    public void setHide_from_view(int hide_from_view) {
+        this.hide_from_view = hide_from_view;
     }
 }

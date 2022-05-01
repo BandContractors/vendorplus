@@ -6,7 +6,7 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
     <h:head>
-        <title>Timesheet</title>
+        <title>Time Sheet</title>
         <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
         <script  language="javascript">
@@ -21,7 +21,7 @@
         </script>
     </h:head>
     <f:metadata>
-        <f:viewAction action="#{navigationBean.checkAccessDenied(utilityBean.convertIntAsString(generalUserSetting.currentTransactionReasonId), 'View')}"/>
+        <f:viewAction action="#{navigationBean.checkAccessDenied(utilityBean.convertIntAsString(134), 'View')}"/>
         <f:viewAction action="#{timesheetBean.getFilteredTimesheets()}"/>
     </f:metadata> 
     <h:body>
@@ -31,11 +31,11 @@
                 <p:commandButton actionListener="#{timesheetBean.clearTimesheet(timesheet)}" value="Timesheet" onsuccess="PF('dlgTimesheet').show();" icon="ui-icon-circle-plus" style="float: none; height: 50px; width: 190px">
                     <f:ajax render="form:modalTimesheet"/>
                 </p:commandButton>
-                <p:commandButton value="#{langsys['Category']} #{langsys['Activity']}" action="#{navigationBean.redirectToCategoryActivity('Timesheet')}" style="background-color: yellow !important; height: 50px; float: none; width: 190px" />
-                <p:commandButton value="#{langsys['Sub']} #{langsys['Activity']} #{langsys['Category']}" action="#{navigationBean.redirectToSubActivityCategory('Timesheet')}" style="background-color: red !important; height: 50px; float: none; width: 190px" />
+                <p:commandButton value="#{langsys['Activity']} #{langsys['Category']}" action="#{navigationBean.redirectToCategoryActivity('Timesheet')}" style="background-color: yellow !important; height: 50px; float: none; width: 190px" />
+                <p:commandButton value="#{langsys['Activity']} #{langsys['Subcategory']}" action="#{navigationBean.redirectToSubActivityCategory('Timesheet')}" style="background-color: red !important; height: 50px; float: none; width: 190px" />
                 <p:commandButton value="#{langsys['Staff']}" action="#{navigationBean.redirectToStaff('Timesheet')}" style="background-color: yellow !important; float: none; height: 50px; width: 190px" />
                 <p:commandButton value="#{langsys['Project']}" action="#{navigationBean.redirectToProject('Timesheet')}" style="background-color: red !important; float: none; height: 50px; width: 190px;" />
-                <p:commandButton value="#{langsys['Mode']} #{langsys['Activity']}" action="#{navigationBean.redirectToMode_activity('Timesheet')}" style="background-color: yellow !important; float: none; height: 50px; width: 190px" />
+                <p:commandButton value="#{langsys['Activity']} #{langsys['Mode']}" action="#{navigationBean.redirectToMode_activity('Timesheet')}" style="background-color: yellow !important; float: none; height: 50px; width: 190px" />
             </h:panelGrid>
 
             <!--Filter-->
@@ -45,7 +45,7 @@
                     <p:calendar id="fromDate" value="#{timesheetBean.filterFromActivityDate}" style="width: 150px;height: 28px; background-color: white"/>
                     <p:outputLabel value="#{langsys['To']} #{langsys['Date']}"/>
                     <p:calendar id="toDate" value="#{timesheetBean.filterToActivityDate}" style="width: 150px;height: 28px; background-color: white"/>
-                    <h:outputLabel  value="#{langsys['Category']} #{langsys['Activity']}:"/>
+                    <h:outputLabel  value="#{langsys['Activity']} #{langsys['Category']}:"/>
                     <p:selectOneMenu value="#{timesheetBean.filterCategoryActivityId}" style="width: 150px">
                         <f:selectItem itemLabel="" itemValue="0"/>
                         <f:selectItems value="#{category_activityBean.getCategory_activities()}" var="ca" itemLabel="#{ca.category_name}" itemValue="#{ca.category_activity_id}"/>
@@ -71,12 +71,12 @@
                         <h:outputText value="#{sum.first_name} #{sum.second_name}">
                         </h:outputText>
                     </p:column>
-                    <p:column headerText="#{langsys['Time']} #{langsys['Taken']}" style="text-align: right;" width="auto">
+                    <p:column headerText="#{langsys['Time']} #{langsys['Quantity']}" style="text-align: right;" width="auto">
                         <h:outputText value="#{sum.time_taken}">
                             <f:convertNumber/>
                         </h:outputText>
                     </p:column>
-                    <p:column headerText="#{langsys['Unit']} #{langsys['Of']} #{langsys['Time']}" width="auto">
+                    <p:column headerText="#{langsys['Time']} #{langsys['Unit']}" width="auto">
                         <h:outputText value="#{sum.unit_of_time}">
                         </h:outputText>
                     </p:column>
@@ -85,7 +85,7 @@
                     <p:column headerText="#{langsys['Staff']}">
                         <h:outputLabel value="#{su.first_name} #{su.second_name}"/>
                     </p:column>
-                    <p:column headerText="#{langsys['ARH']}">
+                    <p:column headerText="#{langsys['Average']} #{langsys['Submission']} #{langsys['Time']}">
                         <h:outputLabel value="#{su.arh}">
                             <f:convertNumber/>
                         </h:outputLabel>
@@ -122,13 +122,13 @@
                     </h:commandLink>
                 </f:facet>
 
-                <p:column headerText="#{langsys['Transactor']}">
+                <p:column headerText="#{langsys['Client']}">
                     <h:outputText value="#{transactorBean.findTransactor(ts.transactor_id).getTransactorNames()}"/>
                 </p:column>
                 <p:column headerText="#{langsys['Activity']} #{langsys['Category']}">
                     <h:outputText value="#{category_activityBean.getCategory_activity(ts.category_activity_id).getCategory_name()}"/>
                 </p:column>
-                <p:column headerText="#{langsys['Sub']} #{langsys['Category']} #{langsys['Activity']}">
+                <p:column headerText="#{langsys['Activity']} #{langsys['Subcategory']}">
                     <h:outputText value="#{subcategory_activityBean.getSubcategory_activity(ts.subcategory_activity_id).getSubcategory_name()}"/>
                 </p:column>
                 <p:column headerText="#{langsys['Staff']}">
@@ -140,13 +140,13 @@
                 <p:column headerText="#{langsys['Activity']} #{langsys['Name']}">
                     <h:outputText value="#{ts.activity_name}"/>
                 </p:column>
-                <p:column headerText="#{langsys['Unit']} #{langsys['Of']} #{langsys['Time']}" style="text-align: right;">
+                <p:column headerText="#{langsys['Time']} #{langsys['Unit']}" style="text-align: right;">
                     <h:outputText value="#{ts.unit_of_time}" />
                 </p:column>
                 <p:column headerText="#{langsys['Activity']} #{langsys['Date']}">
                     <h:outputText value="#{utilityBean.formatDate(ts.activity_date)}"/>
                 </p:column>
-                <p:column headerText="#{langsys['Time']} #{langsys['Taken']}">
+                <p:column headerText="#{langsys['Time']} #{langsys['Quantity']}">
                     <h:outputText value="#{ts.time_taken}">                    
                         <f:convertNumber />
                     </h:outputText>
@@ -174,9 +174,9 @@
                         </p:selectOneMenu>
                         <h:outputLabel  value="#{langsys['Activity']} #{langsys['Name']}:"/>
                         <p:inputText id="activityname" style="width: 320px" value="#{timesheet.activity_name}" autocomplete="off" required="true" requiredMessage="Activity Name Cannot be empty"/>
-                        <h:outputLabel value="#{langsys['Time']} #{langsys['Taken']}:"/>
+                        <h:outputLabel value="#{langsys['Time']} #{langsys['Quantity']}:"/>
                         <p:inputNumber id="itemAmount" inputStyle="width:320px" style="width: 80000px" value="#{timesheet.time_taken}" decimalPlaces="0" autocomplete="off" required="true" requiredMessage="Time taken Cannot be empty" />
-                        <h:outputLabel  value="#{langsys['Unit']} #{langsys['Of']} #{langsys['Time']}:"/>
+                        <h:outputLabel  value="#{langsys['Time']} #{langsys['Unit']}:"/>
                         <p:selectOneMenu value="#{timesheet.unit_of_time}" style="width: 305px">
                             <f:selectItem itemLabel="" itemValue=""/>
                             <f:selectItem itemLabel="Hours" itemValue="Hours"/>
@@ -195,13 +195,13 @@
                             <f:selectItem itemLabel="" itemValue="0"/>
                             <f:selectItems value="#{mode_activityBean.getMode_activityAll()}" var="ma" itemLabel="#{ma.mode_name}" itemValue="#{ma.mode_activity_id}"/>
                         </p:selectOneMenu>
-                        <h:outputLabel  value="#{langsys['Category']} #{langsys['Activity']}:"/>
+                        <h:outputLabel  value="#{langsys['Activity']} #{langsys['Category']}:"/>
                         <p:selectOneMenu value="#{timesheet.category_activity_id}" style="width: 305px">
                             <f:selectItem itemLabel="" itemValue="0"/>
                             <f:selectItems value="#{category_activityBean.getCategory_activities()}" var="ca" itemLabel="#{ca.category_name}" itemValue="#{ca.category_activity_id}"/>
                             <f:ajax event="change" render="subCategoryActivity"/>
                         </p:selectOneMenu>
-                        <h:outputLabel  value="#{langsys['Sub']} #{langsys['Category']} #{langsys['Activity']}:"/>
+                        <h:outputLabel  value="#{langsys['Activity']} #{langsys['Subcategory']}:"/>
                         <p:selectOneMenu id="subCategoryActivity" value="#{timesheet.subcategory_activity_id}" style="width: 305px">
                             <f:selectItem itemLabel="" itemValue="0"/>
                             <f:selectItems value="#{subcategory_activityBean.getSubcategory_activityByCategoryActivityId(timesheet.category_activity_id)}" var="sca" itemLabel="#{sca.subcategory_name}" itemValue="#{sca.subcategory_activity_id}"/>
@@ -211,7 +211,7 @@
                             <f:selectItem itemLabel="" itemValue="0"/>
                             <f:selectItems value="#{projectBean.getProjectAll()}" var="pn" itemLabel="#{pn.project_name}" itemValue="#{pn.project_id}"/>
                         </p:selectOneMenu>
-                        <h:outputLabel  value="#{langsys['Transactor']}:"/>
+                        <h:outputLabel  value="#{langsys['Client']}:"/>
                         <p:autoComplete id="autcTransactor" value="#{timesheet.transactor}" 
                                         completeMethod="#{transactorBean.getTransactorActiveObjectList}" 
                                         var="trct" 
@@ -253,11 +253,11 @@
                 <h:panelGroup id="popupDetail">
                     <!--<h:outputText value="This is a Modal Dialog." />-->
                     <h:panelGrid columns="2">
-                        <h:outputLabel  value="#{langsys['Transactor']}:"/>
+                        <h:outputLabel  value="#{langsys['Client']}:"/>
                         <h:outputLabel  value="#{subscriptionBean.selectedTransactor.transactorNames}"/>
-                        <h:outputLabel  value="#{langsys['Category']} #{langsys['Activity']}:"/>
+                        <h:outputLabel  value="#{langsys['Activity']} #{langsys['Category']}:"/>
                         <h:outputText  value="#{category_activityBean.getCategory_activity(timesheet.category_activity_id).getCategory_name()}"/>
-                        <h:outputLabel  value="#{langsys['Sub']} #{langsys['Category']} #{langsys['Activity']}:"/>
+                        <h:outputLabel  value="#{langsys['Activity']} #{langsys['Subcategory']}:"/>
                         <h:outputText  value="#{subcategory_activityBean.getSubcategory_activity(timesheet.subcategory_activity_id).getSubcategory_name()}"/>
                         <h:outputLabel  value="#{langsys['Staff']}:"/>
                         <h:outputText value="#{staffBean.getStaff(staff.staff_id).getFirst_name()}"/>
@@ -265,12 +265,12 @@
                         <h:outputText  value="#{mode_activityBean.getMode_activity(timesheet.mode_activity_id).getMode_name()}"/>
                         <h:outputLabel  value="#{langsys['Activity']} #{langsys['Name']}:"/>
                         <h:outputText  value="#{timesheet.activity_name}"/>
-                        <h:outputLabel value="#{langsys['Unit']} #{langsys['Of']}  #{langsys['Time']}:"/>
+                        <h:outputLabel value="#{langsys['Time']} #{langsys['Unit']}:"/>
                         <h:outputText  value="#{timesheet.unit_of_time}">
                         </h:outputText>
                         <h:outputLabel  value="#{langsys['Activity']} #{langsys['Date']}:"/>
                         <h:outputText  value="#{timesheet.activity_date}"/>
-                        <h:outputLabel value="#{langsys['Time']} #{langsys['Taken']}:"/>
+                        <h:outputLabel value="#{langsys['Time']} #{langsys['Quantity']}:"/>
                         <h:outputText  value="#{timesheet.time_taken}">
                         </h:outputText>
                     </h:panelGrid>

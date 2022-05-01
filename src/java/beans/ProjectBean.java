@@ -84,10 +84,10 @@ public class ProjectBean implements Serializable {
 
             String sql1 = "SELECT count(*) as n FROM project WHERE project_name='" + aProject.getProject_name() + "'";
 
-            if (aProject.getProject_id() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Add") == 0) {
+            if (aProject.getProject_id() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Add") == 0) {
                 msg = "Not Allowed to Access this Function";
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
-            } else if (aProject.getProject_id() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Edit") == 0) {
+            } else if (aProject.getProject_id() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Edit") == 0) {
                 msg = "Not Allowed to Access this Function";
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else if (aProject.getProject_name().length() <= 0) {
@@ -159,28 +159,40 @@ public class ProjectBean implements Serializable {
         }
         return IsUpdated;
     }
-
+    
     public int deleteProject(Project aProject) {
-        int IsDeleted = 0;
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
-        try {
-            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
-        } catch (Exception e) {
-        }
         String msg = "";
-        String sql = "DELETE FROM project WHERE project_id=?";
-        try (
-                Connection conn = DBConnection.getMySQLConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);) {
-            ps.setInt(1, aProject.getProject_id());
-            ps.executeUpdate();
-            IsDeleted = 1;
-            this.clearProject(aProject);
-            msg = "Project Deleted Successfully";
+        int IsDeleted = 0;
+        long N = 0;
+        try {
+            String sqlFind = "SELECT COUNT(*) AS n FROM timesheet WHERE project_id=" + aProject.getProject_id();
+            N = N + new UtilityBean().getN(sqlFind);
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
-            msg = "Project NOT Deleted";
+        }
+        UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
+        List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
+        GroupRightBean grb = new GroupRightBean();
+
+        if (aProject.getProject_id() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Delete") == 0) {
+            msg = "Not Allowed to Access this Function";
+        } else if (N > 0) {
+            msg = "Project has been used and cannot be Deleted";
+        } else {
+            String sql = "DELETE FROM project WHERE project_id=?";
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                ps.setInt(1, aProject.getProject_id());
+                ps.executeUpdate();
+                IsDeleted = 1;
+                msg = "Project has been Deleted";
+                this.clearProject(aProject);
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
+            }
         }
         FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         return IsDeleted;

@@ -21,7 +21,7 @@
         </script> 
     </h:head>
     <f:metadata>
-        <f:viewAction action="#{navigationBean.checkAccessDenied(utilityBean.convertIntAsString(generalUserSetting.currentTransactionReasonId), 'View')}"/>
+        <f:viewAction action="#{navigationBean.checkAccessDenied(utilityBean.convertIntAsString(88), 'View')}"/>
     </f:metadata> 
     <h:body>
         <ui:include src="Menu.xhtml"/>
@@ -48,7 +48,7 @@
                         <f:ajax listener="#{subcategory_activityBean.saveSubCategoryActivity(subcategory_activity)}" execute="@form" render="growl1 pnlInput dtblSubCategory" />
                     </h:commandButton>
                     <h:commandButton styleClass="clsButton" id="cmdbClear" value="#{langsys['Clear']}">
-                        <f:ajax listener="#{subcategory_activityBean.clearSubCategoryActivity(subcategory_activity)}" execute="@form" render="@form" />
+                        <f:ajax listener="#{subcategory_activityBean.clearSubcategory_activity(subcategory_activity)}" execute="@form" render="@form" />
                     </h:commandButton>
                     <h:commandButton styleClass="clsButton" id="cmdbDelete" value="#{langsys['Delete']}" onclick="return confirmDelete();">
                         <f:ajax listener="#{subcategory_activityBean.deleteSubCategoryActivityByObject(subcategory_activity)}" execute="@form" render="@form" />

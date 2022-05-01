@@ -511,7 +511,12 @@ public class GroupRightBean implements Serializable {
             return 0;
         }
         if ("Yes".equals(aUserDetail.getIsUserGenAdmin()) && "No".equals(aUserDetail.getIsUserLocked()) && "system".equals(aUserDetail.getUserName()) && "88".equals(aFunctionName)) {
-            return 1;
+            String sql = "select count(*) as n from user_detail where is_user_gen_admin='Yes' and user_name<>'system' and is_user_locked='No'";
+            if (new UtilityBean().getN(sql) > 0) {
+                return 0;
+            } else {
+                return 1;
+            }
         }
         if ("Yes".equals(aUserDetail.getIsUserGenAdmin()) && "No".equals(aUserDetail.getIsUserLocked()) && !"system".equals(aUserDetail.getUserName())) {
             return 1;

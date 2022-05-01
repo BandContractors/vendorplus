@@ -105,10 +105,10 @@ public class Subcategory_activityBean {
 
             String sql1 = "SELECT count(*) as n FROM subcategory_activity WHERE subcategory_name='" + aSubcategory_activity.getSubcategory_name() + "'";
 
-            if (aSubcategory_activity.getSubcategory_activity_id() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Add") == 0) {
+            if (aSubcategory_activity.getSubcategory_activity_id() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Add") == 0) {
                 msg = "Not Allowed to Access this Function";
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
-            } else if (aSubcategory_activity.getSubcategory_activity_id() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Edit") == 0) {
+            } else if (aSubcategory_activity.getSubcategory_activity_id() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Edit") == 0) {
                 msg = "Not Allowed to Access this Function";
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else if (aSubcategory_activity.getSubcategory_name().length() <= 0) {
@@ -216,7 +216,7 @@ public class Subcategory_activityBean {
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
 
-        if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Delete") == 0) {
+        if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "88", "Delete") == 0) {
             msg = "Not Allowed to Access this Function";
         } else {
             String sql = "DELETE FROM subcategory_activity WHERE subcategory_activity_id=?";
@@ -266,7 +266,7 @@ public class Subcategory_activityBean {
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             ps.setInt(1, aCategory_activity_id);
             rs = ps.executeQuery();
-            while(rs.next()) {
+            while (rs.next()) {
                 Subcategory_activity subcategory_activity = new Subcategory_activity();
                 this.setSubcategory_activityFromResultset(subcategory_activity, rs);
                 Subcategory_activityList.add(subcategory_activity);
