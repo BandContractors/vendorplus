@@ -152,7 +152,7 @@ public class TimesheetBean implements Serializable {
                 msg = "Activity Name Cannot be Empty";
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else if (aTimesheet.getTime_taken() == 0) {
-                msg = "Time Taken Cannot be Zero";
+                msg = "Time Quantity Cannot be Zero";
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else if (aTimesheet.getUnit_of_time().length() == 0) {
                 msg = "Unit of Time Cannot be Empty";
@@ -346,7 +346,11 @@ public class TimesheetBean implements Serializable {
                 aTimesheet.setSubcategory_activity_id(0);
                 aTimesheet.getUnit_of_time();
                 aTimesheet.setTime_taken(0);
-                aTimesheet.setUnit_of_time("");
+                try {
+                    aTimesheet.setUnit_of_time(new Parameter_listBean().getParameter_listByContextNameMemory("TIME_SHEET", "TIME_UNIT").getParameter_value());
+                } catch (Exception e) {
+                    aTimesheet.setUnit_of_time("");
+                }
                 aTimesheet.setCategory_activity_id(0);
                 aTimesheet.setTransactor_id(0);
                 aTimesheet.setActivity_date(new Date());

@@ -179,9 +179,7 @@
                         <h:outputLabel  value="#{langsys['Time']} #{langsys['Unit']}:"/>
                         <p:selectOneMenu value="#{timesheet.unit_of_time}" style="width: 305px">
                             <f:selectItem itemLabel="" itemValue=""/>
-                            <f:selectItem itemLabel="Hours" itemValue="Hours"/>
-                            <f:selectItem itemLabel="Minutes" itemValue="Minutes"/>
-                            <f:selectItem itemLabel="Days" itemValue="Days"/>
+                            <f:selectItem itemLabel="#{parameter_listBean.getParameter_listByContextNameMemory('TIME_SHEET','TIME_UNIT').parameter_value}" itemValue="#{parameter_listBean.getParameter_listByContextNameMemory('TIME_SHEET','TIME_UNIT').parameter_value}"/>
                         </p:selectOneMenu>
                         <h:outputLabel  value="#{langsys['Activity']} #{langsys['Status']}:"/>
                         <p:selectOneMenu value="#{timesheet.activity_status}" style="width: 305px">

@@ -58,11 +58,11 @@ public class Login implements Serializable {
             }
             String sql2 = "select count(*) as n from user_detail where is_user_gen_admin='Yes' and user_name<>'system' and is_user_locked='No'";
             if (ub.getN(sql2) == 0) {
-                Warnings.add("Complete configurations: add a user of Administrator type");
+                Warnings.add("Complete configurations: add a system user of Administrator type");
             }
-            String ConnPoolPassword = "XXX";
-            if (ConnPoolPassword.isEmpty()) {
-                Warnings.add("Complete configurations: secure database with a password");
+            String sql3 = "SELECT count(*) as n FROM mysql.user where authentication_string=''";
+            if (ub.getN(sql3) > 0) {
+                Warnings.add("Complete configurations: secure all database users with a password");
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);

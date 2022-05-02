@@ -84,3 +84,8 @@ INSERT INTO transaction_reason (transaction_reason_id, transaction_reason_name, 
 ALTER TABLE transaction_approval ADD COLUMN hide_from_view INT(1) NULL DEFAULT 0;
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_17',85,Now(),'6.0','');
+
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (91, 'TIME_SHEET', 'TIME_UNIT', 'Hours','Minutes,Hours,Days');
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_17',90,Now(),'6.0','');
