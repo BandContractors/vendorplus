@@ -21,6 +21,7 @@
         </script>
     </h:head>
     <f:metadata>
+        <f:viewAction action="#{navigationBean.checkAccessDenied(utilityBean.convertIntAsString(130), 'View')}"/>
         <f:viewAction action="#{transaction_approvalBean.getFilteredTransactionApprovals()}"/>
     </f:metadata> 
     <h:body>
@@ -58,7 +59,7 @@
                     <p:commandButton value="#{langsys['OK']}" style="color: white; background-color: #00B259; width: 80px">
                         <f:ajax listener="#{transaction_approvalBean.getFilteredTransactionApprovals()}" execute="@form" render="@form"/>
                     </p:commandButton>
-                    <p:commandButton value="#{langsys['Clear']}" style="color: white; background-color: #FF0000; width: 80px" >
+                    <p:commandButton value="#{langsys['CLEAR']}" style="color: white; background-color: #FF0000; width: 80px" >
                         <f:ajax listener="#{transaction_approvalBean.clearFilter()}" execute="@form" render="@form"/>
                     </p:commandButton>
                 </h:panelGrid>

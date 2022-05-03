@@ -177,10 +177,10 @@ public class TimesheetBean implements Serializable {
                     saved = this.updateTimesheet(aTimesheet);
                 }
                 if (saved > 0) {
-                    msg = " Timesheet Saved Successfully";
+                    msg = " Time Sheet Saved Successfully";
                     this.clearTimesheet(aTimesheet);
                 } else {
-                    msg = "Timesheet NOT Saved";
+                    msg = "Time Sheet NOT Saved";
                 }
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             }

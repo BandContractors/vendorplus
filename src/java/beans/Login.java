@@ -60,7 +60,7 @@ public class Login implements Serializable {
             if (ub.getN(sql2) == 0) {
                 Warnings.add("Complete configurations: add a system user of Administrator type");
             }
-            String sql3 = "SELECT count(*) as n FROM mysql.user where authentication_string=''";
+            String sql3 = "SELECT count(*) as n FROM mysql.user where authentication_string='' AND user NOT IN('mariadb.sys')";
             if (ub.getN(sql3) > 0) {
                 Warnings.add("Complete configurations: secure all database users with a password");
             }
