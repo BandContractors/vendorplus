@@ -1897,7 +1897,7 @@ public class SubscriptionBean implements Serializable {
 
     public void getFilteredSubscriptionsSummary_converted_by() {
         String sql;
-        sql = "SELECT converted_by, year(subscription_date) as year, monthname(subscription_date) as month, count(*) as no, sum(amount) as amount FROM subscription where subscription_id > 0";
+        sql = "SELECT coalesce(nullif(converted_by,''), 'None') as converted_by, year(subscription_date) as year, monthname(subscription_date) as month, count(*) as no, sum(amount) as amount FROM subscription where subscription_id > 0";
         String wheresql = "";
         String groupbysum = " GROUP BY converted_by, year(subscription_date),monthname(subscription_date)";
         if (this.filterTransactor != null) {
@@ -2011,7 +2011,7 @@ public class SubscriptionBean implements Serializable {
 
     public void getFilteredSubscriptionsSummary_referred_by() {
         String sql;
-        sql = "SELECT referred_by, year(subscription_date) as year, monthname(subscription_date) as month, count(*) as no, sum(amount) as amount FROM subscription where subscription_id > 0";
+        sql = "SELECT coalesce(nullif(referred_by,''), 'None') as referred_by, year(subscription_date) as year, monthname(subscription_date) as month, count(*) as no, sum(amount) as amount FROM subscription where subscription_id > 0";
         String wheresql = "";
         String groupbysum = " GROUP BY referred_by, year(subscription_date),monthname(subscription_date)";
         if (this.filterTransactor != null) {
@@ -2125,7 +2125,7 @@ public class SubscriptionBean implements Serializable {
 
     public void getFilteredSubscriptionsSummary_agent() {
         String sql;
-        sql = "SELECT agent, year(subscription_date) as year, monthname(subscription_date) as month, count(*) as no, sum(amount) as amount FROM subscription where subscription_id > 0";
+        sql = "SELECT coalesce(nullif(agent,''), 'None') as agent, year(subscription_date) as year, monthname(subscription_date) as month, count(*) as no, sum(amount) as amount FROM subscription where subscription_id > 0";
         String wheresql = "";
         String groupbysum = " GROUP BY agent, year(subscription_date),monthname(subscription_date)";
         if (this.filterTransactor != null) {
@@ -2239,44 +2239,64 @@ public class SubscriptionBean implements Serializable {
 
     public double getTotalGroupedNo(List<Subs_summary_year_month_amount> sum, String attribute) {
         double totalGroupedNo = 0;
-        for (Subs_summary_year_month_amount s : sum) {
-            if (s.getAttribute().equals(attribute)) {
-                totalGroupedNo += s.getNo();
+        try {
+            for (Subs_summary_year_month_amount s : sum) {
+                if (s.getAttribute().equals(attribute)) {
+                    totalGroupedNo += s.getNo();
+                }
             }
+        } catch (Exception e) {
+            totalGroupedNo = 0;
         }
         return totalGroupedNo;
     }
 
     public double getTotalGroupedAmount(List<Subs_summary_year_month_amount> sum, String attribute) {
         double totalGroupedAmount = 0;
-        for (Subs_summary_year_month_amount s : sum) {
-            if (s.getAttribute().equals(attribute)) {
-                totalGroupedAmount += s.getAmount();
+        try {
+            for (Subs_summary_year_month_amount s : sum) {
+                if (s.getAttribute().equals(attribute)) {
+                    totalGroupedAmount += s.getAmount();
+                }
             }
+        } catch (Exception e) {
+            totalGroupedAmount = 0;
         }
         return totalGroupedAmount;
     }
 
     public int getTotalNo(List<Subscription> subscription) {
         int totalNumber = 0;
-        for (Subscription s : subscription) {
-            totalNumber += Integer.parseInt(s.getDescription());
+        try {
+            for (Subscription s : subscription) {
+                totalNumber += Integer.parseInt(s.getDescription());
+            }
+        } catch (Exception e) {
+            totalNumber = 0;
         }
         return totalNumber;
     }
 
     public int getTotalAmount(List<Subscription> subscription) {
         int totalAmount = 0;
-        for (Subscription s : subscription) {
-            totalAmount += s.getAmount();
+        try {
+            for (Subscription s : subscription) {
+                totalAmount += s.getAmount();
+            }
+        } catch (Exception e) {
+            totalAmount = 0;
         }
         return totalAmount;
     }
 
     public int getTotalAverageAmount(List<Subscription> subscription) {
         int totalAverage = 0;
-        for (Subscription s : subscription) {
-            totalAverage += s.getAmount() / Integer.parseInt(s.getDescription());
+        try {
+            for (Subscription s : subscription) {
+                totalAverage += s.getAmount() / Integer.parseInt(s.getDescription());
+            }
+        } catch (Exception e) {
+            totalAverage = 0;
         }
         return totalAverage;
     }
@@ -2991,7 +3011,8 @@ public class SubscriptionBean implements Serializable {
     }
 
     /**
-     * @param subscriptionsSummary_referred_by the subscriptionsSummary_referred_by to set
+     * @param subscriptionsSummary_referred_by the
+     * subscriptionsSummary_referred_by to set
      */
     public void setSubscriptionsSummary_referred_by(List<Subs_summary_year_month_amount> subscriptionsSummary_referred_by) {
         this.subscriptionsSummary_referred_by = subscriptionsSummary_referred_by;
@@ -3019,7 +3040,8 @@ public class SubscriptionBean implements Serializable {
     }
 
     /**
-     * @param subscriptionsSummary_account_manager the subscriptionsSummary_account_manager to set
+     * @param subscriptionsSummary_account_manager the
+     * subscriptionsSummary_account_manager to set
      */
     public void setSubscriptionsSummary_account_manager(List<Subscription> subscriptionsSummary_account_manager) {
         this.subscriptionsSummary_account_manager = subscriptionsSummary_account_manager;
