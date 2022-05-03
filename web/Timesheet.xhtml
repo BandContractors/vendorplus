@@ -175,7 +175,7 @@
                         <h:outputLabel  value="#{langsys['Activity']} #{langsys['Name']}:"/>
                         <p:inputText id="activityname" style="width: 320px" value="#{timesheet.activity_name}" autocomplete="off" required="true" requiredMessage="Activity Name Cannot be empty"/>
                         <h:outputLabel value="#{langsys['Time']} #{langsys['Quantity']}:"/>
-                        <p:inputNumber id="itemAmount" inputStyle="width:320px" style="width: 80000px" value="#{timesheet.time_taken}" decimalPlaces="0" autocomplete="off" required="true" requiredMessage="Time taken Cannot be empty" />
+                        <p:inputNumber id="itemAmount" inputStyle="width:320px" style="width: 80000px" value="#{timesheet.time_taken}" decimalPlaces="3" autocomplete="off" required="true" requiredMessage="Time taken Cannot be empty" />
                         <h:outputLabel  value="#{langsys['Time']} #{langsys['Unit']}:"/>
                         <p:selectOneMenu value="#{timesheet.unit_of_time}" style="width: 305px">
                             <f:selectItem itemLabel="" itemValue=""/>

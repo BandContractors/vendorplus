@@ -166,6 +166,9 @@ public class TimesheetBean implements Serializable {
             } else if (aTimesheet.getCategory_activity_id() == 0) {
                 msg = "Category Activity Cannot be Empty";
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (aTimesheet.getSubcategory_activity_id() == 0) {
+                msg = "Subcategory Activity Cannot be Empty";
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else if (aTimesheet.getActivity_date() == null) {
                 msg = "Activity Date Cannot be Empty";
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
@@ -179,6 +182,7 @@ public class TimesheetBean implements Serializable {
                 if (saved > 0) {
                     msg = " Time Sheet Saved Successfully";
                     this.clearTimesheet(aTimesheet);
+                    this.getFilteredTimesheets();
                 } else {
                     msg = "Time Sheet NOT Saved";
                 }
@@ -498,7 +502,7 @@ public class TimesheetBean implements Serializable {
         sql = "SELECT s.first_name, s.second_name, s.third_name, round(avg(hour(t.submission_date)),0) as arh from timesheet t inner join staff s on t.staff_id = s.staff_id  where t.timesheet_id > 0";
         String wheresql = "";
         String groupbysum = " GROUP BY t.staff_id";
-        String ordersql = " ORDER BY arh ASC";
+        String ordersql = " ORDER BY arh DESC";
         try {
             if (this.filterCategoryActivityId > 0) {
                 wheresql = wheresql + " AND category_activity_id=" + this.filterCategoryActivityId;
