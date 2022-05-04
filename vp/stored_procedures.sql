@@ -1168,7 +1168,8 @@ CREATE PROCEDURE sp_insert_transactor
 	IN in_transactor_segment_id int,
     IN in_is_credit_limit int(1),
 	IN in_credit_limit double,
-	OUT out_transactor_id bigint
+	OUT out_transactor_id bigint,
+    IN in_trade_name varchar(100)
 ) 
 BEGIN 
 	SET @new_id=0;
@@ -1227,7 +1228,8 @@ BEGIN
 		store_id,
 		transactor_segment_id,
         is_credit_limit,
-		credit_limit
+		credit_limit,
+        trade_name
 	) 
     VALUES
 	(
@@ -1269,7 +1271,8 @@ BEGIN
 		in_store_id,
 		in_transactor_segment_id,
         in_is_credit_limit,
-		in_credit_limit
+		in_credit_limit,
+        in_trade_name
 	); 
 SET out_transactor_id=@new_id;
 END//
@@ -1314,7 +1317,8 @@ CREATE PROCEDURE sp_update_transactor
 	IN in_month_net_pay double,
 	IN in_transactor_segment_id int,
     IN in_is_credit_limit int(1),
-	IN in_credit_limit double
+	IN in_credit_limit double,
+    IN in_trade_name varchar(100)
 ) 
 BEGIN 
 
@@ -1367,7 +1371,8 @@ BEGIN
 		month_net_pay=in_month_net_pay,
 		transactor_segment_id=in_transactor_segment_id,
         is_credit_limit=in_is_credit_limit,
-		credit_limit=in_credit_limit 
+		credit_limit=in_credit_limit,
+        trade_name=in_trade_name 
 	WHERE transactor_id=in_transactor_id; 
 END//
 DELIMITER ;
@@ -1406,7 +1411,7 @@ CREATE PROCEDURE sp_search_transactor_active_by_name
 ) 
 BEGIN 
 	SELECT * FROM transactor t 
-	WHERE t.is_suspended='No' AND (t.transactor_names LIKE concat('%',in_transactor_names,'%') OR t.transactor_ref LIKE concat('%',in_transactor_names,'%') OR t.file_reference LIKE concat('%',in_transactor_names,'%')) 
+	WHERE t.is_suspended='No' AND (t.transactor_names LIKE concat('%',in_transactor_names,'%') OR t.trade_name LIKE concat('%',in_transactor_names,'%') OR t.transactor_ref LIKE concat('%',in_transactor_names,'%') OR t.file_reference LIKE concat('%',in_transactor_names,'%')) 
 	ORDER BY t.transactor_names ASC LIMIT 10; 
 END//
 DELIMITER ;
@@ -1420,7 +1425,7 @@ CREATE PROCEDURE sp_search_transactor_by_name_ref_file
 ) 
 BEGIN 
 	SELECT * FROM transactor t 
-	WHERE t.transactor_type=in_type and (t.transactor_names LIKE concat('%',in_text,'%') OR t.transactor_ref LIKE concat('%',in_text,'%') OR t.file_reference LIKE concat('%',in_text,'%')) 
+	WHERE t.transactor_type=in_type and (t.transactor_names LIKE concat('%',in_text,'%') OR t.trade_name LIKE concat('%',in_text,'%') OR t.transactor_ref LIKE concat('%',in_text,'%') OR t.file_reference LIKE concat('%',in_text,'%')) 
 	ORDER BY t.transactor_names ASC LIMIT 10; 
 END//
 DELIMITER ;

@@ -5,7 +5,6 @@ import api_tax.efris_bean.TaxpayerBean;
 import sessions.GeneralUserSetting;
 import connections.DBConnection;
 import entities.AccCurrency;
-import entities.CompanySetting;
 import entities.GroupRight;
 import entities.MenuItem;
 import entities.SalaryDeduction;
@@ -24,7 +23,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -124,6 +122,9 @@ public class TransactorBean implements Serializable {
                 if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
                     //first clear
                     aTransactor.setTransactorNames("");
+                    if (aTransactor.getTransactorId() == 0) {
+                        aTransactor.setTrade_name("");
+                    }
                     aTransactor.setPhysicalAddress("");
                     aTransactor.setEmail("");
                     aTransactor.setPhone("");
@@ -141,6 +142,9 @@ public class TransactorBean implements Serializable {
                     } else {
                         if (taxpayer.getLegalName().length() > 0) {
                             aTransactor.setTransactorNames(taxpayer.getLegalName());
+                            if (aTransactor.getTransactorId() == 0) {
+                                aTransactor.setTrade_name("");
+                            }
                             aTransactor.setPhysicalAddress(taxpayer.getAddress());
                             aTransactor.setEmail(taxpayer.getContactEmail());
                             aTransactor.setPhone(taxpayer.getContactNumber());
@@ -227,7 +231,9 @@ public class TransactorBean implements Serializable {
         } else if (new CustomValidator().TextSize(transactor.getCategory(), 1, 20).equals("FAIL")) {
             msg = "Category Must be Between 1 and 20 Characters";
         } else if (new CustomValidator().TextSize(transactor.getTransactorNames(), 3, 100).equals("FAIL")) {
-            msg = "Names Must be Between 3 and 100 Characters";
+            msg = "Business Name Must be Between 3 and 100 Characters";
+        } else if (new CustomValidator().TextSize(transactor.getTrade_name(), 0, 100).equals("FAIL")) {
+            msg = "Trade Name Must be Between 3 and 100 Characters";
         } else if (new CustomValidator().TextSize(transactor.getPhone(), 0, 100).equals("FAIL")) {
             msg = "Phone Must be Between 1 and 100 Characters";
         } else if (new CustomValidator().TextSize(transactor.getEmail(), 0, 100).equals("FAIL")) {
@@ -313,9 +319,9 @@ public class TransactorBean implements Serializable {
         String sql = null;
         long status = 0;
         if (transactor.getTransactorId() == 0) {
-            sql = "{call sp_insert_transactor(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_insert_transactor(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         } else if (transactor.getTransactorId() > 0) {
-            sql = "{call sp_update_transactor(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_update_transactor(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         }
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -406,6 +412,15 @@ public class TransactorBean implements Serializable {
                 cs.setDouble("in_credit_limit", transactor.getCredit_limit());
             } catch (Exception e) {
                 cs.setDouble("in_credit_limit", 0);
+            }
+            try {
+                if (null == transactor.getTrade_name()) {
+                    cs.setString("in_trade_name", "");
+                } else {
+                    cs.setString("in_trade_name", transactor.getTrade_name());
+                }
+            } catch (Exception e) {
+                cs.setString("in_trade_name", "");
             }
             cs.executeUpdate();
             if (transactor.getTransactorId() == 0) {
@@ -604,6 +619,11 @@ public class TransactorBean implements Serializable {
             } catch (Exception e) {
                 transactor.setCredit_limit(0);
             }
+            try {
+                transactor.setTrade_name(rs.getString("trade_name"));
+            } catch (Exception e) {
+                transactor.setTrade_name("");
+            }
             return transactor;
         } catch (Exception e) {
             return null;
@@ -733,7 +753,6 @@ public class TransactorBean implements Serializable {
             } catch (NullPointerException npe) {
                 transactor.setFirstDate(null);
             }
-
             try {
                 transactor.setFileReference(rs.getString("file_reference"));
             } catch (NullPointerException npe) {
@@ -798,6 +817,11 @@ public class TransactorBean implements Serializable {
                 transactor.setCredit_limit(rs.getDouble("credit_limit"));
             } catch (Exception e) {
                 transactor.setCredit_limit(0);
+            }
+            try {
+                transactor.setTrade_name(rs.getString("trade_name"));
+            } catch (Exception e) {
+                transactor.setTrade_name("");
             }
         } catch (Exception e) {
         }
@@ -1024,6 +1048,7 @@ public class TransactorBean implements Serializable {
         this.SalaryDeductions = new SalaryDeductionBean().getSalaryDeductions(TransactorFrom.getTransactorId());
         TransactorTo.setIs_credit_limit(TransactorFrom.getIs_credit_limit());
         TransactorTo.setCredit_limit(TransactorFrom.getCredit_limit());
+        TransactorTo.setTrade_name(TransactorFrom.getTrade_name());
     }
 
     public void clearTransactor(Transactor transactor) {
@@ -1066,6 +1091,7 @@ public class TransactorBean implements Serializable {
             transactor.setLocCountry(new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "COUNTRY_CODE").getParameter_value());
             transactor.setIs_credit_limit(0);
             transactor.setCredit_limit(0);
+            transactor.setTrade_name("");
         }
     }
 
@@ -1121,6 +1147,7 @@ public class TransactorBean implements Serializable {
             transactor.setLocCountry(new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "COUNTRY_CODE").getParameter_value());
             transactor.setIs_credit_limit(0);
             transactor.setCredit_limit(0);
+            transactor.setTrade_name("");
         }
     }
 
@@ -1167,6 +1194,7 @@ public class TransactorBean implements Serializable {
                 this.setSearchTransactorNames("");
                 transactor.setIs_credit_limit(0);
                 transactor.setCredit_limit(0);
+                transactor.setTrade_name("");
             }
         }
     }
@@ -1218,6 +1246,7 @@ public class TransactorBean implements Serializable {
                 this.TransactorList = null;
                 transactor.setIs_credit_limit(0);
                 transactor.setCredit_limit(0);
+                transactor.setTrade_name("");
             }
         }
     }

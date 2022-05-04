@@ -89,3 +89,7 @@ INSERT INTO parameter_list (parameter_list_id, context, parameter_name, paramete
 VALUES (91, 'TIME_SHEET', 'TIME_UNIT', 'Hours','Minutes,Hours,Days');
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_17',90,Now(),'6.0','');
+
+ALTER TABLE transactor ADD COLUMN trade_name VARCHAR(100) NULL DEFAULT '';
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_17',94,Now(),'6.0','');

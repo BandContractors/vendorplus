@@ -56,6 +56,7 @@ public class Transactor implements Serializable {
     private int transactor_segment_id;
     private int is_credit_limit;
     private double credit_limit;
+    private String trade_name;
 
     /**
      * @return the TransactorId
@@ -587,6 +588,20 @@ public class Transactor implements Serializable {
      */
     public void setCredit_limit(double credit_limit) {
         this.credit_limit = credit_limit;
+    }
+
+    /**
+     * @return the trade_name
+     */
+    public String getTrade_name() {
+        return trade_name;
+    }
+
+    /**
+     * @param trade_name the trade_name to set
+     */
+    public void setTrade_name(String trade_name) {
+        this.trade_name = trade_name;
     }
 
 }

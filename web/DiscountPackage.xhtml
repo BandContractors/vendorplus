@@ -71,20 +71,14 @@
                                     itemLabel="#{trct.transactorNames}" 
                                     itemValue="#{trct}" 
                                     converter="TransactorConverter" style="text-align: left;" 
-                                    forceSelection="true" queryDelay="0" 
+                                    forceSelection="true" queryDelay="0" scrollHeight="200" 
                                     >
-                        <p:column headerText="#{langsys['Names']}" style="text-align: left" >  
+                        <p:column headerText="#{langsys['Business']} #{langsys['Name']}" style="text-align: left" >  
                             #{trct.transactorNames} 
                         </p:column>
-                        <p:column headerText="#{langsys['Reference']} #{langsys['No.']}" style="text-align: left" >  
-                            #{trct.transactorRef} 
+                        <p:column headerText="#{langsys['Trade']} #{langsys['Name']}" style="text-align: left" >  
+                            #{trct.trade_name} 
                         </p:column>
-                        <p:column headerText="#{langsys['Type']}" style="text-align: left" >  
-                            #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)}
-                        </p:column> 
-                        <p:column headerText="#{langsys['Contact']} #{langsys['Person']}" style="text-align: left">  
-                            #{trct.cpName} 
-                        </p:column> 
                     </p:autoComplete>
                 </h:panelGrid>
             </h:panelGrid>

@@ -79,8 +79,11 @@
                                 converter="TransactorConverter" style="text-align: left" 
                                 forceSelection="true" queryDelay="0" 
                                 >
-                    <p:column headerText="#{langsys['Names']}" style="text-align: left" >  
+                    <p:column headerText="#{langsys['Business']} #{langsys['Name']}" style="text-align: left" >  
                         #{trct.transactorNames} 
+                    </p:column>
+                    <p:column headerText="#{langsys['Trade']} #{langsys['Name']}" style="text-align: left" >  
+                        #{trct.trade_name} 
                     </p:column>
                     <p:column headerText="#{langsys['Reference']} #{langsys['No.']}" style="text-align: left" >  
                         #{trct.transactorRef} 

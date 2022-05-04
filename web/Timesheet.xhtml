@@ -219,7 +219,7 @@
                                         forceSelection="true" queryDelay="0" inputStyle="width: 320px" 
                                         >
                             <p:column headerText="#{langsys['Names']}" style="text-align: left" >  
-                                #{trct.transactorNames} 
+                                <h:outputText value="#{trct.transactorNames}"/> <h:outputText value=" (#{trct.trade_name})" rendered="#{trct.trade_name.length() gt 0}"/>
                             </p:column>
                         </p:autoComplete>
                         <h:outputLabel  value="#{langsys['Activity']} #{langsys['Date']}:"/>

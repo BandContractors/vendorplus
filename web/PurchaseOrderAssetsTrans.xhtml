@@ -52,7 +52,7 @@
                 <h:outputLabel  value="#{langsys[transBean.transTypeObj.transactionDateLabel]}:"/>
                 <h:outputLabel id="olblDebtCredit" style="color: coral;font-weight: bold;" value="#{langsys['Payable']} (#{generalUserSetting.LOCAL_CURRENCY.currencyCode})"/>
                 <h:outputLabel id="olblDeposit" style="color: green;font-weight: bold;" value="#{langsys['Prepaid']} (#{trans.currencyCode})"/>
-                
+
                 <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}" style="width: 120px;"/>
                 <h:inputText styleClass="clsInput" id="itxtTransactionRef" value="#{trans.transactionRef}" autocomplete="off" style="width: 120px;"/>
                 <h:selectOneMenu styleClass="clsMenu" id="menuCurrency" value="#{trans.currencyCode}" style="width: 80px;">
@@ -68,8 +68,11 @@
                                 converter="TransactorConverter" style="text-align: left" 
                                 forceSelection="true" queryDelay="0" 
                                 >
-                    <p:column headerText="#{langsys['Names']}" style="text-align: left" >  
+                    <p:column headerText="#{langsys['Business']} #{langsys['Name']}" style="text-align: left" >  
                         #{trct.transactorNames} 
+                    </p:column>
+                    <p:column headerText="#{langsys['Trade']} #{langsys['Name']}" style="text-align: left" >  
+                        #{trct.trade_name} 
                     </p:column> 
                     <p:column headerText="#{langsys['Reference']} #{langsys['No.']}" style="text-align: left" >  
                         #{trct.transactorRef} 
@@ -359,7 +362,7 @@
             <p:growl id="growl1"/>
             <!-- INVOICE STARTS HERE -->
             <h:panelGrid id="pnlgOutput" style="width: 100%">
-            <ui:include src="#{transBean.getPrintFileName('PARENT',transBean.transTypeObj,0)}"/>
+                <ui:include src="#{transBean.getPrintFileName('PARENT',transBean.transTypeObj,0)}"/>
             </h:panelGrid>
             <!-- INVOICE ENDS HERE -->
         </h:form>

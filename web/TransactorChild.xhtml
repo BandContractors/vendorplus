@@ -86,8 +86,11 @@
                     </p:commandLink>
                     <h:inputText styleClass="clsInput" id="itxtTaxIdentity" value="#{transactorBean.transactorObj.taxIdentity}" autocomplete="off" style="width: 203px;">
                     </h:inputText>
-                    <h:outputLabel  value="#{langsys['Names']}:"/>
+                    <h:outputLabel  value="#{langsys['Business']} #{langsys['Name']}:" title="#{langsys['Legal']} #{langsys['Business']} #{langsys['Name']}"/>
                     <h:inputText styleClass="clsInput" id="itxtTransactorNames" value="#{transactorBean.transactorObj.transactorNames}" autocomplete="off" style="width: 203px;">
+                    </h:inputText>
+                    <h:outputLabel  value="#{langsys['Trade']} #{langsys['Name']}:" title="#{langsys['Publicity']} #{langsys['Name']}, #{langsys['Nickname']}"/>
+                    <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.trade_name}" autocomplete="off" style="width: 203px;">
                     </h:inputText>
                     <h:outputLabel  value="#{langsys['Title']}:"/>
                     <h:inputText styleClass="clsInput" id="itxtTitle" value="#{transactorBean.transactorObj.title}" autocomplete="off" style="width: 203px;">
