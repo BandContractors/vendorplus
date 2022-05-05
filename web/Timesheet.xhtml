@@ -67,29 +67,117 @@
             <!--Summary Tables-->
             <h:panelGrid id="pnlgSummary" columns="3" styleClass="clsPanelSummary">
                 <p:dataTable id="tblSummaryTimesheetTotalTime" tableStyle="width:100%;" var="sum" value="#{timesheetBean.timesheetSummary_totalTime}">
-                    <p:column headerText="#{langsys['Staff']}" width="auto">
-                        <h:outputText value="#{sum.first_name} #{sum.second_name}">
+                    <p:column headerText="#{langsys['Staff']}">
+                        <h:outputText value="#{sum.first_name}">
                         </h:outputText>
                     </p:column>
-                    <p:column headerText="#{langsys['Time']} #{langsys['Quantity']}" style="text-align: right;" width="auto">
+                    <p:column headerText="#{langsys['Time']} #{langsys['Quantity']}" style="text-align: right;">
                         <h:outputText value="#{sum.time_taken}">
                             <f:convertNumber/>
                         </h:outputText>
                     </p:column>
-                    <p:column headerText="#{langsys['Time']} #{langsys['Unit']}" width="auto">
+                    <p:column headerText="#{langsys['Time']} #{langsys['Unit']}">
                         <h:outputText value="#{sum.unit_of_time}">
                         </h:outputText>
                     </p:column>
                 </p:dataTable>
-                <p:dataTable id="tblSummaryARH" tableStyle="width:100%;" var="su" value="#{timesheetBean.timesheetSummary_ARH}">
+                <p:dataTable id="tblSummaryARH" tableStyle="width:auto" var="su" value="#{timesheetBean.timesheetSummary_ARH}">
                     <p:column headerText="#{langsys['Staff']}">
-                        <h:outputLabel value="#{su.first_name} #{su.second_name}"/>
+                        <h:outputLabel value="#{su.first_name}"/>
                     </p:column>
                     <p:column headerText="#{langsys['Average']} #{langsys['Submission']} #{langsys['Time']}">
                         <h:outputLabel value="#{su.arh}">
                             <f:convertNumber/>
                         </h:outputLabel>
                         <h:outputLabel value=":00 Hrs" />
+                    </p:column>
+                </p:dataTable>
+                <p:dataTable id="tblSummaryTimesheetLastSevenDays" tableStyle="width:100%" var="lsd" value="#{timesheetBean.timesheetSummary_lastSevenDays}">
+                    <p:column headerText="#{langsys['Staff']}">
+                        <h:outputText value="#{staffBean.getStaff(lsd.staff_id).getFirst_name()}" />
+                        <f:facet name="footer">
+                            <h:outputText value="Total" />
+                        </f:facet>
+                    </p:column>
+                    <p:column headerText="#{langsys[timesheetBean.getDay(6)]}" >
+                        <h:outputText value="#{lsd.day7}">
+                            <f:convertNumber/>
+                        </h:outputText>
+                        <f:facet name="footer">
+                            <h:outputText value="#{timesheetBean.getTotalTime(timesheetBean.timesheetSummary_lastSevenDays, 'day7')}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </f:facet>
+                    </p:column>
+                    <p:column headerText="#{langsys[timesheetBean.getDay(5)]}">
+                        <h:outputText value="#{lsd.day6}">
+                            <f:convertNumber/>
+                        </h:outputText>
+                        <f:facet name="footer">
+                            <h:outputText value="#{timesheetBean.getTotalTime(timesheetBean.timesheetSummary_lastSevenDays, 'day6')}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </f:facet>
+                    </p:column>
+                    <p:column headerText="#{langsys[timesheetBean.getDay(4)]}">
+                        <h:outputText value="#{lsd.day5}">
+                            <f:convertNumber/>
+                        </h:outputText>
+                        <f:facet name="footer">
+                            <h:outputText value="#{timesheetBean.getTotalTime(timesheetBean.timesheetSummary_lastSevenDays, 'day5')}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </f:facet>
+                    </p:column>
+                    <p:column headerText="#{langsys[timesheetBean.getDay(3)]}">
+                        <h:outputText value="#{lsd.day4}">
+                            <f:convertNumber/>
+                        </h:outputText>
+                        <f:facet name="footer">
+                            <h:outputText value="#{timesheetBean.getTotalTime(timesheetBean.timesheetSummary_lastSevenDays, 'day4')}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </f:facet>
+                    </p:column>
+                    <p:column headerText="#{langsys[timesheetBean.getDay(2)]}">
+                        <h:outputText value="#{lsd.day3}">
+                            <f:convertNumber/>
+                        </h:outputText>
+                        <f:facet name="footer">
+                            <h:outputText value="#{timesheetBean.getTotalTime(timesheetBean.timesheetSummary_lastSevenDays, 'day3')}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </f:facet>
+                    </p:column>
+                    <p:column headerText="#{langsys[timesheetBean.getDay(1)]}">
+                        <h:outputText value="#{lsd.day2}">
+                            <f:convertNumber/>
+                        </h:outputText>
+                        <f:facet name="footer">
+                            <h:outputText value="#{timesheetBean.getTotalTime(timesheetBean.timesheetSummary_lastSevenDays, 'day2')}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </f:facet>
+                    </p:column>
+                    <p:column headerText="#{langsys[timesheetBean.getDay(0)]}">
+                        <h:outputText value="#{lsd.day1}">
+                            <f:convertNumber/>
+                        </h:outputText>
+                        <f:facet name="footer">
+                            <h:outputText value="#{timesheetBean.getTotalTime(timesheetBean.timesheetSummary_lastSevenDays, 'day1')}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </f:facet>
+                    </p:column>
+                    <p:column headerText="#{langsys['Total']}">
+                        <h:outputText value="#{lsd.total}">
+                            <f:convertNumber/>
+                        </h:outputText>
+                        <f:facet name="footer">
+                            <h:outputText value="#{timesheetBean.getTotalTime(timesheetBean.timesheetSummary_lastSevenDays, 'total')}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </f:facet>
                     </p:column>
                 </p:dataTable>
             </h:panelGrid>

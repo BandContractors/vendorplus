@@ -4,6 +4,7 @@ import connections.DBConnection;
 import entities.GroupRight;
 import entities.Timesheet;
 import entities.Timesheet_summary_ARH;
+import entities.Timesheet_summary_last_seven_days;
 import entities.Timesheet_summary_total_time;
 import entities.UserDetail;
 import java.io.Serializable;
@@ -11,7 +12,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.faces.application.FacesMessage;
@@ -38,6 +41,7 @@ public class TimesheetBean implements Serializable {
     private List<Timesheet_summary_total_time> timesheetSummary_totalTime;
     //Average Reporting Hour
     private List<Timesheet_summary_ARH> timesheetSummary_ARH;
+    private List<Timesheet_summary_last_seven_days> timesheetSummary_lastSevenDays;
     private String ActionMessage = null;
     private int filterCategoryActivityId = 0;
     private Date filterFromActivityDate;
@@ -426,7 +430,7 @@ public class TimesheetBean implements Serializable {
             //summarise status
             this.getFilteredTimesheetSummary_totalTime();
             this.getFilteredTimesheetSummary_ARH();
-            //this.getFilteredTimesheetSummary_activityCategory();
+            this.getFilteredTimesheetSummary_lastSevenDays();
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -464,7 +468,6 @@ public class TimesheetBean implements Serializable {
             rs = ps.executeQuery();
             while (rs.next()) {
                 Timesheet_summary_total_time summary = new Timesheet_summary_total_time();
-                //this.setTimesheetFromResultset(aTimesheet, rs);
                 try {
                     summary.setFirst_name(rs.getString("first_name"));
                 } catch (Exception e) {
@@ -529,7 +532,6 @@ public class TimesheetBean implements Serializable {
             rs = ps.executeQuery();
             while (rs.next()) {
                 Timesheet_summary_ARH summary = new Timesheet_summary_ARH();
-                //this.setTimesheetFromResultset(aTimesheet, rs);
                 try {
                     summary.setFirst_name(rs.getString("first_name"));
                 } catch (Exception e) {
@@ -555,6 +557,139 @@ public class TimesheetBean implements Serializable {
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
+    }
+
+    public void getFilteredTimesheetSummary_lastSevenDays() {
+        String sql;
+        sql = "SELECT staff_id, sum(if(date(activity_date) = date(now()), time_taken, 0)) as day1, "
+                + "sum(if(date(activity_date) = date(date_sub(now(), interval 1 day)), time_taken, 0)) as day2, "
+                + "sum(if(date(activity_date) = date(date_sub(now(), interval 2 day)), time_taken, 0)) as day3, "
+                + "sum(if(date(activity_date) = date(date_sub(now(), interval 3 day)), time_taken, 0)) as day4, "
+                + "sum(if(date(activity_date) = date(date_sub(now(), interval 4 day)), time_taken, 0)) as day5, "
+                + "sum(if(date(activity_date) = date(date_sub(now(), interval 5 day)), time_taken, 0)) as day6, "
+                + "sum(if(date(activity_date) = date(date_sub(now(), interval 6 day)), time_taken, 0)) as day7, "
+                + "sum(if(date(activity_date) between date(date_sub(now(), interval 6 day)) and date(now()), time_taken, 0)) as total "
+                + "from timesheet  where timesheet_id > 0";
+        String wheresql = "";
+        String groupbysum = " GROUP BY staff_id";
+        String ordersql = " ORDER BY total DESC";
+        try {
+            if (this.filterCategoryActivityId > 0) {
+                wheresql = wheresql + " AND category_activity_id=" + this.filterCategoryActivityId;
+            }
+            if (this.getFilterStaffId() > 0) {
+                wheresql = wheresql + " AND t.staff_id=" + this.getFilterStaffId();
+            }
+            if (this.getFilterFromActivityDate() != null && this.getFilterToActivityDate() != null) {
+                //convert java.util date to sql date
+                java.sql.Date from = new java.sql.Date(this.getFilterFromActivityDate().getTime());
+                java.sql.Date to = new java.sql.Date(this.getFilterToActivityDate().getTime());
+
+                wheresql = wheresql + " AND activity_date between '" + from + "' and '" + to + "'";
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        sql = sql + wheresql + groupbysum + ordersql;
+        ResultSet rs;
+        this.timesheetSummary_lastSevenDays = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Timesheet_summary_last_seven_days summary = new Timesheet_summary_last_seven_days();
+                try {
+                    summary.setStaff_id(rs.getInt("staff_id"));
+                } catch (Exception e) {
+                    summary.setStaff_id(0);
+                }
+                try {
+                    summary.setDay1(rs.getDouble("day1"));
+                } catch (Exception e) {
+                    summary.setDay1(0);
+                }
+                try {
+                    summary.setDay2(rs.getDouble("day2"));
+                } catch (Exception e) {
+                    summary.setDay2(0);
+                }
+                try {
+                    summary.setDay3(rs.getDouble("day3"));
+                } catch (Exception e) {
+                    summary.setDay3(0);
+                }
+                try {
+                    summary.setDay4(rs.getDouble("day4"));
+                } catch (Exception e) {
+                    summary.setDay4(0);
+                }
+                try {
+                    summary.setDay5(rs.getDouble("day5"));
+                } catch (Exception e) {
+                    summary.setDay5(0);
+                }
+                try {
+                    summary.setDay6(rs.getDouble("day6"));
+                } catch (Exception e) {
+                    summary.setDay6(0);
+                }
+                try {
+                    summary.setDay7(rs.getDouble("day7"));
+                } catch (Exception e) {
+                    summary.setDay7(0);
+                }
+                try {
+                    summary.setTotal(rs.getDouble("total"));
+                } catch (Exception e) {
+                    summary.setTotal(0);
+                }
+                this.getTimesheetSummary_lastSevenDays().add(summary);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public String getDay(int offset) {
+        String dayWeekText = "";
+        Calendar c = Calendar.getInstance();
+        c.setTime(new Date());
+        c.add(Calendar.DAY_OF_MONTH, -offset);
+        
+        Date offsetDate = c.getTime();
+        //dayWeekText = new SimpleDateFormat("EEEE").format(offsetDate);
+        dayWeekText = new SimpleDateFormat("EE").format(offsetDate);
+        
+        return dayWeekText;
+    }
+
+    public Double getTotalTime(List<Timesheet_summary_last_seven_days> aTimesheet_summary_last_seven_days, String day) {
+        Double totalTime = 0.0;
+        try {
+            for (Timesheet_summary_last_seven_days t : aTimesheet_summary_last_seven_days) {
+                if (day.equals("day1")) {
+                    totalTime += t.getDay1();
+                } else if (day.equals("day2")) {
+                    totalTime += t.getDay2();
+                } else if (day.equals("day3")) {
+                    totalTime += t.getDay3();
+                } else if (day.equals("day4")) {
+                    totalTime += t.getDay4();
+                } else if (day.equals("day5")) {
+                    totalTime += t.getDay5();
+                } else if (day.equals("day6")) {
+                    totalTime += t.getDay6();
+                } else if (day.equals("day7")) {
+                    totalTime += t.getDay7();
+                } else if (day.equals("total")) {
+                    totalTime += t.getTotal();
+                }
+            }
+        } catch (Exception e) {
+            totalTime = 0.0;
+        }
+        return totalTime;
     }
 
     /**
@@ -681,6 +816,21 @@ public class TimesheetBean implements Serializable {
      */
     public void setTimesheetSummary_ARH(List<Timesheet_summary_ARH> timesheetSummary_ARH) {
         this.timesheetSummary_ARH = timesheetSummary_ARH;
+    }
+
+    /**
+     * @return the timesheetSummary_lastSevenDays
+     */
+    public List<Timesheet_summary_last_seven_days> getTimesheetSummary_lastSevenDays() {
+        return timesheetSummary_lastSevenDays;
+    }
+
+    /**
+     * @param timesheetSummary_lastSevenDays the timesheetSummary_lastSevenDays
+     * to set
+     */
+    public void setTimesheetSummary_lastSevenDays(List<Timesheet_summary_last_seven_days> timesheetSummary_lastSevenDays) {
+        this.timesheetSummary_lastSevenDays = timesheetSummary_lastSevenDays;
     }
 
 }
