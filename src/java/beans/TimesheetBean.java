@@ -502,7 +502,7 @@ public class TimesheetBean implements Serializable {
         sql = "SELECT s.first_name, s.second_name, s.third_name, round(avg(hour(t.submission_date)),0) as arh from timesheet t inner join staff s on t.staff_id = s.staff_id  where t.timesheet_id > 0";
         String wheresql = "";
         String groupbysum = " GROUP BY t.staff_id";
-        String ordersql = " ORDER BY arh DESC";
+        String ordersql = " ORDER BY arh ASC";
         try {
             if (this.filterCategoryActivityId > 0) {
                 wheresql = wheresql + " AND category_activity_id=" + this.filterCategoryActivityId;
