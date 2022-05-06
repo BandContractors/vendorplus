@@ -375,8 +375,10 @@ public class TimesheetBean implements Serializable {
 
     public void clearFilter() {
         try {
-            this.setFilterFromActivityDate(new Date());
-            this.setFilterToActivityDate(new Date());
+            //this.setFilterFromActivityDate(new Date());
+            this.setFilterFromActivityDate(null);
+            //this.setFilterToActivityDate(new Date());
+            this.setFilterToActivityDate(null);
             this.setFilterCategoryActivityId(0);
             this.setFilterStaffId(0);
             this.getFilteredTimesheets();
