@@ -1,6 +1,7 @@
 package beans;
 
 import connections.DBConnection;
+import entities.CompanySetting;
 import entities.GroupRight;
 import entities.Timesheet;
 import entities.Timesheet_summary_ARH;
@@ -361,7 +362,7 @@ public class TimesheetBean implements Serializable {
                 }
                 aTimesheet.setCategory_activity_id(0);
                 aTimesheet.setTransactor_id(0);
-                aTimesheet.setActivity_date(new Date());
+                aTimesheet.setActivity_date(new CompanySetting().getCURRENT_SERVER_DATE());
                 aTimesheet.setMode_activity_id(0);
                 aTimesheet.setStaff_id(0);
                 aTimesheet.setTransactor(null);
@@ -656,11 +657,11 @@ public class TimesheetBean implements Serializable {
         Calendar c = Calendar.getInstance();
         c.setTime(new Date());
         c.add(Calendar.DAY_OF_MONTH, -offset);
-        
+
         Date offsetDate = c.getTime();
         //dayWeekText = new SimpleDateFormat("EEEE").format(offsetDate);
         dayWeekText = new SimpleDateFormat("EE").format(offsetDate);
-        
+
         return dayWeekText;
     }
 

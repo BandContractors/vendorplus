@@ -141,7 +141,7 @@
             <h:panelGrid id="pnlgMessage">
                 <p:outputLabel value="#{transBean.actionMessage}" style="color: red;"/>
             </h:panelGrid>
-            <p:dataTable id="tblDetail" tableStyle="width:auto;" var="itm" value="#{transBean.transList}" 
+            <p:dataTable id="tblDetail" tableStyle="table-layout: auto;" var="itm" value="#{transBean.transList}" 
                          paginator="true" rows="50" 
                          paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
                          rowsPerPageTemplate="50,100,200,400">

@@ -93,3 +93,29 @@ VALUES('scrpt_db_upgrade_17',90,Now(),'6.0','');
 ALTER TABLE transactor ADD COLUMN trade_name VARCHAR(100) NULL DEFAULT '';
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_17',94,Now(),'6.0','');
+
+ALTER TABLE timesheet ADD COLUMN submission_by VARCHAR(20) NULL DEFAULT '';
+ALTER TABLE timesheet ADD COLUMN last_edit_date datetime null;
+ALTER TABLE timesheet ADD COLUMN last_edit_by VARCHAR(20) NULL DEFAULT '';
+CREATE TABLE timesheet_log (
+  timesheet_log_id bigint(20) NOT NULL AUTO_INCREMENT,
+  timesheet_id bigint(20) NOT NULL,
+  activity_status varchar(20) DEFAULT NULL,
+  transactor_id bigint(20) DEFAULT NULL,
+  mode_activity_id int(11) DEFAULT NULL,
+  staff_id int(11) DEFAULT NULL,
+  category_activity_id int(11) DEFAULT NULL,
+  subcategory_activity_id int(11) DEFAULT NULL,
+  time_taken double DEFAULT NULL,
+  activity_name varchar(255) NOT NULL,
+  activity_date date NOT NULL,
+  submission_date datetime NOT NULL,
+  unit_of_time varchar(15) NOT NULL,
+  project_id int(11) DEFAULT NULL,
+  submission_by varchar(20) DEFAULT '',
+  last_edit_date datetime DEFAULT NULL,
+  last_edit_by varchar(20) DEFAULT '',
+  PRIMARY KEY (timesheet_log_id)
+);
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_17',120,Now(),'6.0','');

@@ -108,10 +108,10 @@ public class StaffBean {
                 msg = "Not Allowed to Access this Function";
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else if (aStaff.getFirst_name().length() == 0) {
-                msg = "First name Cannot be Empty";
+                msg = "First Name Cannot be Empty";
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else if (aStaff.getSecond_name().length() == 0) {
-                msg = "Second name Cannot be Empty";
+                msg = "Second Name Cannot be Empty";
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else {
                 int saved = 0;
@@ -197,7 +197,7 @@ public class StaffBean {
         }
         return IsUpdated;
     }
-    
+
     public int deleteStaff(Staff aStaff) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
