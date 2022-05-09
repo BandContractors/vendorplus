@@ -121,9 +121,29 @@ public class TimesheetBean implements Serializable {
                 aTimesheet.setActivity_date(null);
             }
             try {
+                aTimesheet.setSubmission_date(new java.sql.Date(aResultSet.getDate("submission_date").getTime()));
+            } catch (Exception e) {
+                aTimesheet.setSubmission_date(null);
+            }
+            try {
                 aTimesheet.setProject_id(aResultSet.getInt("project_id"));
             } catch (Exception e) {
                 aTimesheet.setProject_id(0);
+            }
+            try {
+                aTimesheet.setSubmission_by(aResultSet.getString("submission_by"));
+            } catch (Exception e) {
+                aTimesheet.setSubmission_by("");
+            }
+            try {
+                aTimesheet.setLast_edit_date(new java.sql.Date(aResultSet.getDate("last_edit_date").getTime()));
+            } catch (Exception e) {
+                aTimesheet.setLast_edit_date(null);
+            }
+            try {
+                aTimesheet.setLast_edit_by(aResultSet.getString("last_edit_by"));
+            } catch (Exception e) {
+                aTimesheet.setLast_edit_by("");
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -215,7 +235,57 @@ public class TimesheetBean implements Serializable {
             TimesheetTo.setSubmission_date(TimesheetFrom.getSubmission_date());
             TimesheetTo.setTime_taken(TimesheetFrom.getTime_taken());
             TimesheetTo.setUnit_of_time(TimesheetFrom.getUnit_of_time());
+            TimesheetTo.setSubmission_by(TimesheetFrom.getSubmission_by());
+            TimesheetTo.setLast_edit_date(TimesheetFrom.getLast_edit_date());
+            TimesheetTo.setLast_edit_by(TimesheetFrom.getLast_edit_by());
 
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void clearTimesheet(Timesheet aTimesheet) {
+        try {
+            if (aTimesheet != null) {
+                aTimesheet.setTimesheet_id(0);
+                aTimesheet.setActivity_name("");
+                aTimesheet.setActivity_status("");
+                aTimesheet.setProject_id(0);
+                aTimesheet.setStaff_id(0);
+                aTimesheet.setSubcategory_activity_id(0);
+                aTimesheet.getUnit_of_time();
+                aTimesheet.setTime_taken(0);
+                try {
+                    aTimesheet.setUnit_of_time(new Parameter_listBean().getParameter_listByContextNameMemory("TIME_SHEET", "TIME_UNIT").getParameter_value());
+                } catch (Exception e) {
+                    aTimesheet.setUnit_of_time("");
+                }
+                aTimesheet.setCategory_activity_id(0);
+                aTimesheet.setTransactor_id(0);
+                aTimesheet.setActivity_date(new CompanySetting().getCURRENT_SERVER_DATE());
+                aTimesheet.setSubmission_date(null);
+                aTimesheet.setMode_activity_id(0);
+                aTimesheet.setStaff_id(0);
+                aTimesheet.setTransactor(null);
+                aTimesheet.setSubmission_by("");
+                aTimesheet.setLast_edit_date(null);
+                aTimesheet.setLast_edit_by("");
+
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void clearFilter() {
+        try {
+            //this.setFilterFromActivityDate(new Date());
+            this.setFilterFromActivityDate(null);
+            //this.setFilterToActivityDate(new Date());
+            this.setFilterToActivityDate(null);
+            this.setFilterCategoryActivityId(0);
+            this.setFilterStaffId(0);
+            this.getFilteredTimesheets();
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -223,7 +293,9 @@ public class TimesheetBean implements Serializable {
 
     public int insertTimesheet(Timesheet aTimesheet) {
         int InsertedId = 0;
-        String sql = "INSERT INTO timesheet (activity_status,transactor_id,mode_activity_id ,staff_id,category_activity_id, time_taken,submission_date,activity_name,activity_date,unit_of_time,subcategory_activity_id,project_id) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO timesheet (activity_status,transactor_id,mode_activity_id ,staff_id,category_activity_id, time_taken,"
+                + "submission_date,activity_name,activity_date,unit_of_time,subcategory_activity_id,project_id,submission_by,last_edit_date,last_edit_by) "
+                + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
@@ -243,6 +315,9 @@ public class TimesheetBean implements Serializable {
             ps.setString(10, aTimesheet.getUnit_of_time());
             ps.setInt(11, aTimesheet.getSubcategory_activity_id());
             ps.setLong(12, aTimesheet.getProject_id());
+            ps.setString(13, new GeneralUserSetting().getCurrentUser().getUserName());
+            ps.setDate(14, null);
+            ps.setString(15, aTimesheet.getLast_edit_by());
             ps.executeUpdate();
             ResultSet rs = ps.getGeneratedKeys();
             if (rs.next()) {
@@ -257,7 +332,8 @@ public class TimesheetBean implements Serializable {
     public int updateTimesheet(Timesheet aTimesheet) {
         int IsUpdated = 0;
         String sql = "UPDATE timesheet SET activity_status=?,transactor_id=?,mode_activity_id=? ,staff_id=?,category_activity_id=?,"
-                + " time_taken=?,submission_date=?,activity_name=?,activity_date=?,unit_of_time=?,subcategory_activity_id=?,project_id=? WHERE timesheet_id=?";
+                + " time_taken=?,submission_date=?,activity_name=?,activity_date=?,unit_of_time=?,subcategory_activity_id=?,"
+                + "project_id=?,submission_by=?,last_edit_date=?,last_edit_by=? WHERE timesheet_id=?";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -279,7 +355,10 @@ public class TimesheetBean implements Serializable {
             ps.setString(10, aTimesheet.getUnit_of_time());
             ps.setInt(11, aTimesheet.getSubcategory_activity_id());
             ps.setLong(12, aTimesheet.getProject_id());
-            ps.setLong(13, aTimesheet.getTimesheet_id());
+            ps.setString(13, aTimesheet.getSubmission_by());
+            ps.setTimestamp(14, new java.sql.Timestamp(new java.util.Date().getTime()));
+            ps.setString(15, new GeneralUserSetting().getCurrentUser().getUserName());
+            ps.setLong(16, aTimesheet.getTimesheet_id());
 
             ps.executeUpdate();
             IsUpdated = 1;
@@ -342,49 +421,6 @@ public class TimesheetBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
         return list;
-    }
-
-    public void clearTimesheet(Timesheet aTimesheet) {
-        try {
-            if (aTimesheet != null) {
-                aTimesheet.setTimesheet_id(0);
-                aTimesheet.setActivity_name("");
-                aTimesheet.setActivity_status("");
-                aTimesheet.setProject_id(0);
-                aTimesheet.setStaff_id(0);
-                aTimesheet.setSubcategory_activity_id(0);
-                aTimesheet.getUnit_of_time();
-                aTimesheet.setTime_taken(0);
-                try {
-                    aTimesheet.setUnit_of_time(new Parameter_listBean().getParameter_listByContextNameMemory("TIME_SHEET", "TIME_UNIT").getParameter_value());
-                } catch (Exception e) {
-                    aTimesheet.setUnit_of_time("");
-                }
-                aTimesheet.setCategory_activity_id(0);
-                aTimesheet.setTransactor_id(0);
-                aTimesheet.setActivity_date(new CompanySetting().getCURRENT_SERVER_DATE());
-                aTimesheet.setMode_activity_id(0);
-                aTimesheet.setStaff_id(0);
-                aTimesheet.setTransactor(null);
-
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.ERROR, e);
-        }
-    }
-
-    public void clearFilter() {
-        try {
-            //this.setFilterFromActivityDate(new Date());
-            this.setFilterFromActivityDate(null);
-            //this.setFilterToActivityDate(new Date());
-            this.setFilterToActivityDate(null);
-            this.setFilterCategoryActivityId(0);
-            this.setFilterStaffId(0);
-            this.getFilteredTimesheets();
-        } catch (Exception e) {
-            LOGGER.log(Level.ERROR, e);
-        }
     }
 
     public void getFilteredTimesheets() {

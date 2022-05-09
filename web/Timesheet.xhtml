@@ -241,7 +241,7 @@
                 </p:column>
                 <p:column headerText="#{langsys['Action']}" exportable="false" style="min-width: 125px">
                     <p:commandButton update="form:popupDetail" actionListener="#{timesheetBean.displayTimesheet(ts,timesheet)}" oncomplete="PF('dlgTimesheetDetail').show();"
-                                     icon="ui-icon-note" title="#{langsys['Time']} #{langsys['Sheet']} #{langsys['Detail']}" style="color: white;" >
+                                     icon="ui-icon-note" title="#{langsys['View']} #{langsys['Time']} #{langsys['Sheet']} #{langsys['Detail']}" style="color: white;" >
                     </p:commandButton>
                     &nbsp;
                     <p:commandButton update="form:modalTimesheet" actionListener="#{timesheetBean.displayTimesheet(ts, timesheet)}" 
@@ -252,34 +252,13 @@
             </p:dataTable>
 
             <!--this is the form-->
-            <p:dialog rendered="true" dynamic="true" header="#{langsys['Time']} #{langsys['Sheet']} #{langsys['Detail']}" widgetVar="dlgTimesheet" id="modalTimesheet" modal="true" height="475px">
+            <p:dialog rendered="true" dynamic="true" header="#{langsys['Time']} #{langsys['Sheet']} #{langsys['Detail']}" widgetVar="dlgTimesheet" id="modalTimesheet" modal="true" height="530px">
                 <h:panelGroup id="popup">
-                    <h:panelGrid columns="4">
+                    <h:panelGrid columns="2">
                         <h:outputLabel  value="#{langsys['Staff']}:"/>
                         <p:selectOneMenu value="#{timesheet.staff_id}" style="width: 305px">
                             <f:selectItem itemLabel="" itemValue="0"/>
                             <f:selectItems value="#{staffBean.getStaffAll()}" var="s" itemLabel="#{s.first_name} #{s.second_name} #{s.third_name}" itemValue="#{s.staff_id}"/>
-                        </p:selectOneMenu>
-                        <h:outputLabel  value="#{langsys['Activity']} #{langsys['Name']}:"/>
-                        <p:inputText id="activityname" style="width: 320px" value="#{timesheet.activity_name}" autocomplete="off" required="true" requiredMessage="Activity Name Cannot be empty"/>
-                        <h:outputLabel value="#{langsys['Time']} #{langsys['Quantity']}:"/>
-                        <p:inputNumber id="itemAmount" inputStyle="width:320px" style="width: 80000px" value="#{timesheet.time_taken}" decimalPlaces="3" autocomplete="off" required="true" requiredMessage="Time taken Cannot be empty" />
-                        <h:outputLabel  value="#{langsys['Time']} #{langsys['Unit']}:"/>
-                        <p:selectOneMenu value="#{timesheet.unit_of_time}" style="width: 305px">
-                            <f:selectItem itemLabel="" itemValue=""/>
-                            <f:selectItem itemLabel="#{parameter_listBean.getParameter_listByContextNameMemory('TIME_SHEET','TIME_UNIT').parameter_value}" itemValue="#{parameter_listBean.getParameter_listByContextNameMemory('TIME_SHEET','TIME_UNIT').parameter_value}"/>
-                        </p:selectOneMenu>
-                        <h:outputLabel  value="#{langsys['Activity']} #{langsys['Status']}:"/>
-                        <p:selectOneMenu value="#{timesheet.activity_status}" style="width: 305px">
-                            <f:selectItem itemLabel="" itemValue=""/>
-                            <f:selectItem itemLabel="Ongoing" itemValue="Ongoing"/>
-                            <f:selectItem itemLabel="Completed" itemValue="Completed"/>
-                            <f:selectItem itemLabel="Pending" itemValue="Pending"/>
-                        </p:selectOneMenu>
-                        <h:outputLabel  value="#{langsys['Mode']} #{langsys['Activity']}:"/>
-                        <p:selectOneMenu value="#{timesheet.mode_activity_id}" style="width: 305px">
-                            <f:selectItem itemLabel="" itemValue="0"/>
-                            <f:selectItems value="#{mode_activityBean.getMode_activityAll()}" var="ma" itemLabel="#{ma.mode_name}" itemValue="#{ma.mode_activity_id}"/>
                         </p:selectOneMenu>
                         <h:outputLabel  value="#{langsys['Activity']} #{langsys['Category']}:"/>
                         <p:selectOneMenu value="#{timesheet.category_activity_id}" style="width: 305px">
@@ -291,11 +270,27 @@
                         <p:selectOneMenu id="subCategoryActivity" value="#{timesheet.subcategory_activity_id}" style="width: 305px">
                             <f:selectItem itemLabel="" itemValue="0"/>
                             <f:selectItems value="#{subcategory_activityBean.getSubcategory_activityByCategoryActivityId(timesheet.category_activity_id)}" var="sca" itemLabel="#{sca.subcategory_name}" itemValue="#{sca.subcategory_activity_id}"/>
-                        </p:selectOneMenu>  
-                        <h:outputLabel  value="#{langsys['Project']}:"/>
-                        <p:selectOneMenu value="#{timesheet.project_id}" style="width: 305px">
+                        </p:selectOneMenu>
+                        <h:outputLabel  value="#{langsys['Activity']} #{langsys['Name']}:"/>
+                        <p:inputText id="activityname" style="width: 320px" value="#{timesheet.activity_name}" autocomplete="off" required="true" requiredMessage="Activity Name Cannot be empty"/>
+                        <h:outputLabel  value="#{langsys['Time']} #{langsys['Unit']}:"/>
+                        <p:selectOneMenu value="#{timesheet.unit_of_time}" style="width: 305px">
+                            <f:selectItem itemLabel="" itemValue=""/>
+                            <f:selectItem itemLabel="#{parameter_listBean.getParameter_listByContextNameMemory('TIME_SHEET','TIME_UNIT').parameter_value}" itemValue="#{parameter_listBean.getParameter_listByContextNameMemory('TIME_SHEET','TIME_UNIT').parameter_value}"/>
+                        </p:selectOneMenu>
+                        <h:outputLabel value="#{langsys['Time']} #{langsys['Quantity']}:"/>
+                        <p:inputNumber id="itemAmount" inputStyle="width:320px" style="width: 80000px" value="#{timesheet.time_taken}" decimalPlaces="3" autocomplete="off" required="true" requiredMessage="Time taken Cannot be empty" />
+                        <h:outputLabel  value="#{langsys['Activity']} #{langsys['Status']}:"/>
+                        <p:selectOneMenu value="#{timesheet.activity_status}" style="width: 305px">
+                            <f:selectItem itemLabel="" itemValue=""/>
+                            <f:selectItem itemLabel="Ongoing" itemValue="Ongoing"/>
+                            <f:selectItem itemLabel="Completed" itemValue="Completed"/>
+                            <f:selectItem itemLabel="Pending" itemValue="Pending"/>
+                        </p:selectOneMenu>
+                        <h:outputLabel  value="#{langsys['Mode']} #{langsys['Activity']}:"/>
+                        <p:selectOneMenu value="#{timesheet.mode_activity_id}" style="width: 305px">
                             <f:selectItem itemLabel="" itemValue="0"/>
-                            <f:selectItems value="#{projectBean.getProjectAll()}" var="pn" itemLabel="#{pn.project_name}" itemValue="#{pn.project_id}"/>
+                            <f:selectItems value="#{mode_activityBean.getMode_activityAll()}" var="ma" itemLabel="#{ma.mode_name}" itemValue="#{ma.mode_activity_id}"/>
                         </p:selectOneMenu>
                         <h:outputLabel  value="#{langsys['Client']}:"/>
                         <p:autoComplete id="autcTransactor" value="#{timesheet.transactor}" 
@@ -310,12 +305,17 @@
                                 <h:outputText value="#{trct.transactorNames}"/> <h:outputText value=" (#{trct.trade_name})" rendered="#{trct.trade_name.length() gt 0}"/>
                             </p:column>
                         </p:autoComplete>
+                        <h:outputLabel  value="#{langsys['Project']}:"/>
+                        <p:selectOneMenu value="#{timesheet.project_id}" style="width: 305px">
+                            <f:selectItem itemLabel="" itemValue="0"/>
+                            <f:selectItems value="#{projectBean.getProjectAll()}" var="pn" itemLabel="#{pn.project_name}" itemValue="#{pn.project_id}"/>
+                        </p:selectOneMenu>
                         <h:outputLabel  value="#{langsys['Activity']} #{langsys['Date']}:"/>
                         <p:calendar value="#{timesheet.activity_date}" pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" autocomplete="off" inputStyle="width: 320px" style="width: 350px" disabled="#{generalUserSetting.isAllowedToBackDate==0}">
                         </p:calendar>
                     </h:panelGrid>
 
-                    <h:panelGrid styleClass="clsGridMainCommands" columns="1">
+                    <h:panelGrid style="background-color: #00B461" width="100%" columns="1">
                         <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
                             <p:commandButton update="pnlgFilter pnlgSummary form:popup form:dtblTimesheet form:growl1" actionListener="#{timesheetBean.saveTimesheet(timesheet)}" styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['SAVE']}" style="color: white; background-color: #00B259" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                                 <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
@@ -340,7 +340,7 @@
                     <!--<h:outputText value="This is a Modal Dialog." />-->
                     <h:panelGrid columns="2">
                         <h:outputLabel  value="#{langsys['Client']}:"/>
-                        <h:outputLabel  value="#{transactorBean.getTransactor(timesheet.transactor_id).transactorNames}"/>
+                        <h:outputLabel  value="#{timesheet.transactor.transactorNames}"/>
                         <h:outputLabel  value="#{langsys['Activity']} #{langsys['Category']}:"/>
                         <h:outputText  value="#{category_activityBean.getCategory_activity(timesheet.category_activity_id).getCategory_name()}"/>
                         <h:outputLabel  value="#{langsys['Activity']} #{langsys['Subcategory']}:"/>
@@ -352,15 +352,19 @@
                         <h:outputLabel  value="#{langsys['Activity']} #{langsys['Name']}:"/>
                         <h:outputText  value="#{timesheet.activity_name}"/>
                         <h:outputLabel value="#{langsys['Time']} #{langsys['Unit']}:"/>
-                        <h:outputText  value="#{timesheet.unit_of_time}">
-                        </h:outputText>
+                        <h:outputText  value="#{timesheet.unit_of_time}"/>
+                        <h:outputLabel value="#{langsys['Time']} #{langsys['Quantity']}:"/>
+                        <h:outputText  value="#{utilityBean.formatDoubleToString(timesheet.time_taken)}"/>
                         <h:outputLabel  value="#{langsys['Activity']} #{langsys['Date']}:"/>
                         <h:outputText  value="#{utilityBean.formatDate(timesheet.activity_date)}"/>
-                        <h:outputLabel value="#{langsys['Time']} #{langsys['Quantity']}:"/>
-                        <h:outputText  value="#{utilityBean.formatDoubleToString(timesheet.time_taken)}">
-                        </h:outputText>
                         <h:outputLabel  value="#{langsys['Submission']} #{langsys['Date']}:"/>
                         <h:outputText  value="#{utilityBean.formatDateTime(timesheet.submission_date)}"/>
+                        <h:outputLabel  value="#{langsys['Submission']} #{langsys['By']}:"/>
+                        <h:outputText  value="#{timesheet.submission_by}"/>
+                        <h:outputLabel  value="#{langsys['Last']} #{langsys['Edit']} #{langsys['Date']}:"/>
+                        <h:outputText  value="#{utilityBean.formatDateTime(timesheet.last_edit_date)}"/>
+                        <h:outputLabel  value="#{langsys['Last']} #{langsys['Edit']} #{langsys['By']}:"/>
+                        <h:outputText  value="#{timesheet.last_edit_by}"/>
                     </h:panelGrid>
                 </h:panelGroup>
             </p:dialog>

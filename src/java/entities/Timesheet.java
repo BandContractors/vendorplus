@@ -28,6 +28,9 @@ public class Timesheet implements Serializable {
     private String unit_of_time;
     private long project_id;
     private Transactor transactor;
+    private String submission_by;
+    private Date last_edit_date;
+    private String last_edit_by;
 
     public long getTimesheet_id() {
         return timesheet_id;
@@ -151,5 +154,47 @@ public class Timesheet implements Serializable {
      */
     public void setTransactor(Transactor transactor) {
         this.transactor = transactor;
+    }
+
+    /**
+     * @return the submission_by
+     */
+    public String getSubmission_by() {
+        return submission_by;
+    }
+
+    /**
+     * @param submission_by the submission_by to set
+     */
+    public void setSubmission_by(String submission_by) {
+        this.submission_by = submission_by;
+    }
+
+    /**
+     * @return the last_edit_date
+     */
+    public Date getLast_edit_date() {
+        return last_edit_date;
+    }
+
+    /**
+     * @param last_edit_date the last_edit_date to set
+     */
+    public void setLast_edit_date(Date last_edit_date) {
+        this.last_edit_date = last_edit_date;
+    }
+
+    /**
+     * @return the last_edit_by
+     */
+    public String getLast_edit_by() {
+        return last_edit_by;
+    }
+
+    /**
+     * @param last_edit_by the last_edit_by to set
+     */
+    public void setLast_edit_by(String last_edit_by) {
+        this.last_edit_by = last_edit_by;
     }
 }
