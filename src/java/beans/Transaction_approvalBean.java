@@ -362,10 +362,42 @@ public class Transaction_approvalBean implements Serializable {
         }
         return Updated;
     }
+    
+    public int updateTransaction_approval_processed(Transaction_approval aTransaction_approval, long aTransaction_id) {
+        int Updated = 0;
+        String sql = "UPDATE transaction_approval SET "
+                + "approval_status=?,status_desc=?,transaction_id=? "
+                + "WHERE transaction_approval_id=" + aTransaction_approval.getTransaction_approval_id();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            if (null != aTransaction_approval) {
+                try {
+                    ps.setInt(1, aTransaction_approval.getApproval_status());
+                } catch (Exception e) {
+                    ps.setInt(1, 0);
+                }
+                try {
+                    ps.setString(2, aTransaction_approval.getStatus_desc());
+                } catch (Exception e) {
+                    ps.setString(2, "");
+                }
+                try {
+                    ps.setLong(3, aTransaction_id);
+                } catch (Exception e) {
+                    ps.setLong(3, 0);
+                }
+                ps.executeUpdate();
+                Updated = 1;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return Updated;
+    }
 
     public int markProcessed(long aTransaction_approval_id, long aTransaction_id) {
         int Updated = 0;
-
         try {
             Transaction_approval ta = new Transaction_approval();
             ta.setTransaction_approval_id(aTransaction_approval_id);
@@ -374,7 +406,8 @@ public class Transaction_approvalBean implements Serializable {
             ta.setStatus_by_id(new GeneralUserSetting().getCurrentUser().getUserDetailId());
             ta.setStatus_date(new java.sql.Timestamp(new CompanySetting().getCURRENT_SERVER_DATE().getTime()));
             ta.setStatus_desc("Processed");
-            Updated = this.updateTransaction_approval(ta, aTransaction_id);
+            //Updated = this.updateTransaction_approval(ta, aTransaction_id);
+            Updated = this.updateTransaction_approval_processed(ta, aTransaction_id);
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -503,6 +536,7 @@ public class Transaction_approvalBean implements Serializable {
             ta.setStatus_by_id(new GeneralUserSetting().getCurrentUser().getUserDetailId());
             ta.setStatus_date(new java.sql.Timestamp(new CompanySetting().getCURRENT_SERVER_DATE().getTime()));
             ta.setStatus_desc("Recalled");
+            //Updated = this.updateTransaction_approval(ta);
             Updated = this.updateTransaction_approval(ta);
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -619,14 +653,8 @@ public class Transaction_approvalBean implements Serializable {
         } catch (Exception e) {
         }
         try {
-//            Transaction_approval ta = this.getTransaction_approval(aTransaction_approval_id);
-            //approval_status: 0 Submitted, 1 Approved, 2 Processed, 3 Rejected, 4 Recalled
-//            if (null != ta && ta.getApproval_status() != 0 && ta.getApproval_status() != 1) {
-//                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "This Transaction Cannot be Recalled")));
-//            } else {
             int x = this.markHidden(aTransaction_approval_id);
             this.refreshTransaction_approvalList(aList, aStoreId, aRequestById, aTransTypeId, aTransReasonId);
-//            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
