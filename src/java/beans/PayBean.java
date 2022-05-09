@@ -485,7 +485,7 @@ public class PayBean implements Serializable {
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else if (pay.getPayDate() == null) {
                 msg = "Select Receipt Date";
-                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                this.setActionMessage(ub.translateWordsInText(BaseName, msg));
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else if (pay.getBillTransactorId() == 0 && (aPayReasId == 21 || aPayReasId == 22 || aPayReasId == 90)) {
                 msg = "Specify Customer";
@@ -493,7 +493,7 @@ public class PayBean implements Serializable {
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else if (pay.getAccChildAccountId2() == 0 && aPayReasId == 23) {
                 msg = "Specify the Shareholder";
-                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                this.setActionMessage(ub.translateWordsInText(BaseName, msg));
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else if (pay.getAccChildAccountId2() == 0 && aPayReasId == 24) {
                 msg = "Specify Loan Account";
@@ -501,32 +501,36 @@ public class PayBean implements Serializable {
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else if (pay.getPayMethodId() == 0) {
                 msg = "Invalid Payment Method";
-                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                this.setActionMessage(ub.translateWordsInText(BaseName, msg));
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else if (pay.getAccChildAccountId() == 0) {
                 msg = "Invalid Cash Receipt Account";
-                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                this.setActionMessage(ub.translateWordsInText(BaseName, msg));
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else if (pay.getCurrencyCode().length() <= 0) {
                 msg = "Specify Currency Code";
-                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                this.setActionMessage(ub.translateWordsInText(BaseName, msg));
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else if (pay.getPaidAmount() <= 0) {
                 msg = "Invalid Recipt Amount";
-                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                this.setActionMessage(ub.translateWordsInText(BaseName, msg));
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else if (aPayReasId == 22 && new PayTransBean().getRecGreaterBalStr(aPayTranss).length() > 0) {
                 msg = "Amount Cannot be Greater Than Receivable Balance ## " + new PayTransBean().getRecGreaterBalStr(aPayTranss);
-                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                this.setActionMessage(ub.translateWordsInText(BaseName, msg));
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else if (null == new AccPeriodBean().getAccPeriod(pay.getPayDate())) {
                 this.setActionMessage("");
                 msg = "Date Selected Does Not Match any Accounting Period";
-                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                this.setActionMessage(ub.translateWordsInText(BaseName, msg));
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else if (pay.getPayRefNo().length() > 100 || pay.getStatusDesc().length() > 100) {
                 msg = "Reference Numner and Status Description Cannot Exceed 100 Characters";
-                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                this.setActionMessage(ub.translateWordsInText(BaseName, msg));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (pay.getPayMethodId() == 6 && pay.getPaidAmount() > new AccLedgerBean().getPrepaidIncomeAccBalanceTrade(pay.getBillTransactorId(), pay.getCurrencyCode())) {
+                msg = "Insufficient Funds on the Customer Deposit Account";
+                this.setActionMessage(ub.translateWordsInText(BaseName, msg));
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else {
                 pay.setAddUserDetailId(new GeneralUserSetting().getCurrentUser().getUserDetailId());
@@ -562,7 +566,7 @@ public class PayBean implements Serializable {
                 } else if (aPayReasId == 24) {//LOAN
                     new AccJournalBean().postJournalCashReceiptLoan(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId());
                 } else if (aPayReasId == 90) {//CUSTOMER DEPOSIT (Prepaid Income)
-                    new AccJournalBean().postJournalCashReceiptPrepaidIncome(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId(),0,0);
+                    new AccJournalBean().postJournalCashReceiptPrepaidIncome(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId(), 0, 0);
                 } else if (aPayReasId == 115) {//OTHER REVENUE
                     new AccJournalBean().postJournalCashReceiptOtherRevenue(pay, new AccPeriodBean().getAccPeriod(pay.getPayDate()).getAccPeriodId(), aPayTranss);
                 }
@@ -588,7 +592,7 @@ public class PayBean implements Serializable {
             //PayMethodId, PointsSpent, PointsSpentAmount, BillTransactorId, 
             //AccChildAccountId, AccChildAccountId2,
             String CreditNodeNo = "";
-            PayTrans paytrans=new PayTrans();
+            PayTrans paytrans = new PayTrans();
             try {
                 CreditNodeNo = new CreditDebitNoteBean().getTrans_cr_dr_note(aCreditNodeId).getTransactionNumber();
             } catch (Exception e) {
@@ -624,7 +628,7 @@ public class PayBean implements Serializable {
                 saved = 1;
             }
             //insert Journal
-            new AccJournalBean().postJournalCashReceiptPrepaidIncome(aPay, new AccPeriodBean().getAccPeriod(aPay.getPayDate()).getAccPeriodId(),paytrans.getTransactionTypeId(),paytrans.getTransactionReasonId());
+            new AccJournalBean().postJournalCashReceiptPrepaidIncome(aPay, new AccPeriodBean().getAccPeriod(aPay.getPayDate()).getAccPeriodId(), paytrans.getTransactionTypeId(), paytrans.getTransactionReasonId());
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -687,52 +691,56 @@ public class PayBean implements Serializable {
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else if (pay.getPayDate() == null) {
                 msg = "Select Pay Date";
-                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                this.setActionMessage(ub.translateWordsInText(BaseName, msg));
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else if (pay.getBillTransactorId() == 0 && (aPayReasId == 25 || aPayReasId == 26 || aPayReasId == 91)) {
                 msg = "Specify Client or Supplier";
-                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                this.setActionMessage(ub.translateWordsInText(BaseName, msg));
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else if (pay.getPayMethodId() == 0) {
                 msg = "Invalid Payment Method";
-                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                this.setActionMessage(ub.translateWordsInText(BaseName, msg));
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else if (pay.getAccChildAccountId() == 0) {
                 msg = "Invalid Cash Paid Account";
-                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                this.setActionMessage(ub.translateWordsInText(BaseName, msg));
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else if (pay.getAccChildAccountId2() == 0 && aPayReasId == 33) {
                 msg = "Select Loan Acccount";
-                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                this.setActionMessage(ub.translateWordsInText(BaseName, msg));
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else if (pay.getAccChildAccountId2() == 0 && aPayReasId == 34) {
                 msg = "Select Shareholder Acccount";
-                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                this.setActionMessage(ub.translateWordsInText(BaseName, msg));
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else if (pay.getCurrencyCode().length() <= 0) {
                 msg = "Specify Currency Code";
-                this.setActionMessage("Payment Not Saved");
+                this.setActionMessage(ub.translateWordsInText(BaseName, msg));
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
             } else if (pay.getPaidAmount() <= 0) {
                 msg = "Invalid Amount Paid";
-                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                this.setActionMessage(ub.translateWordsInText(BaseName, msg));
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else if (aPayReasId == 25 && new PayTransBean().getRecGreaterBalStr(aPayTranss).length() > 0) {
                 msg = "Amount Cannot be Greater Than Payable Balance ## " + new PayTransBean().getRecGreaterBalStr(aPayTranss);
-                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                this.setActionMessage(ub.translateWordsInText(BaseName, msg));
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else if (null == new AccPeriodBean().getAccPeriod(pay.getPayDate())) {
                 this.setActionMessage("");
                 msg = "Date Selected Does Not Match any Accounting Period";
-                this.setActionMessage(ub.translateWordsInText(BaseName, "Transaction NOT saved"));
+                this.setActionMessage(ub.translateWordsInText(BaseName, msg));
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else if (!new AccLedgerBean().checkerBalancePass(pay.getPayMethodId(), pay.getAccChildAccountId(), pay.getCurrencyCode(), pay.getPaidAmount(), aPayTypeId, 0, 0, 0)) {
                 msg = "Paying Account is Out of Funds";
-                this.setActionMessage(ub.translateWordsInText(BaseName, "Transaction NOT saved"));
+                this.setActionMessage(ub.translateWordsInText(BaseName, msg));
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else if (pay.getPayRefNo().length() > 100 || pay.getStatusDesc().length() > 100) {
                 msg = "Reference Number and Status Description Cannot Exceed 100 Characters";
-                this.setActionMessage(ub.translateWordsInText(BaseName, "Payment Not Saved"));
+                this.setActionMessage(ub.translateWordsInText(BaseName, msg));
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            } else if (pay.getPayMethodId() == 7 && pay.getPaidAmount() > new AccLedgerBean().getPrepaidExpenseAccBalanceTrade(pay.getBillTransactorId(), pay.getCurrencyCode())) {
+                msg = "Insufficient Funds on the Supplier Advance Expense Account";
+                this.setActionMessage(ub.translateWordsInText(BaseName, msg));
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else {
                 pay.setAddUserDetailId(new GeneralUserSetting().getCurrentUser().getUserDetailId());
