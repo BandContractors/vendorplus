@@ -279,9 +279,7 @@ public class TimesheetBean implements Serializable {
 
     public void clearFilter() {
         try {
-            //this.setFilterFromActivityDate(new Date());
             this.setFilterFromActivityDate(null);
-            //this.setFilterToActivityDate(new Date());
             this.setFilterToActivityDate(null);
             this.setFilterCategoryActivityId(0);
             this.setFilterStaffId(0);
@@ -617,7 +615,7 @@ public class TimesheetBean implements Serializable {
                 wheresql = wheresql + " AND category_activity_id=" + this.filterCategoryActivityId;
             }
             if (this.getFilterStaffId() > 0) {
-                wheresql = wheresql + " AND t.staff_id=" + this.getFilterStaffId();
+                wheresql = wheresql + " AND staff_id=" + this.getFilterStaffId();
             }
             if (this.getFilterFromActivityDate() != null && this.getFilterToActivityDate() != null) {
                 //convert java.util date to sql date

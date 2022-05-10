@@ -22,7 +22,7 @@
     </h:head>
     <f:metadata>
         <f:viewAction action="#{navigationBean.checkAccessDenied(utilityBean.convertIntAsString(134), 'View')}"/>
-        <f:viewAction action="#{timesheetBean.getFilteredTimesheets()}"/>
+        <f:viewAction action="#{timesheetBean.clearFilter()}"/>
     </f:metadata> 
     <h:body>
         <ui:include src="Menu.xhtml"/>
@@ -272,7 +272,7 @@
                             <f:selectItems value="#{subcategory_activityBean.getSubcategory_activityByCategoryActivityId(timesheet.category_activity_id)}" var="sca" itemLabel="#{sca.subcategory_name}" itemValue="#{sca.subcategory_activity_id}"/>
                         </p:selectOneMenu>
                         <h:outputLabel  value="#{langsys['Activity']} #{langsys['Name']}:"/>
-                        <p:inputText id="activityname" style="width: 320px" value="#{timesheet.activity_name}" autocomplete="off" required="true" requiredMessage="Activity Name Cannot be empty"/>
+                        <p:inputText id="activityname" style="width: 320px" value="#{timesheet.activity_name}" autocomplete="off"/>
                         <h:outputLabel  value="#{langsys['Time']} #{langsys['Unit']}:"/>
                         <p:selectOneMenu value="#{timesheet.unit_of_time}" style="width: 305px">
                             <f:selectItem itemLabel="" itemValue=""/>
@@ -339,32 +339,32 @@
                 <h:panelGroup id="popupDetail">
                     <!--<h:outputText value="This is a Modal Dialog." />-->
                     <h:panelGrid columns="2">
-                        <h:outputLabel  value="#{langsys['Client']}:"/>
-                        <h:outputLabel  value="#{timesheet.transactor.transactorNames}"/>
-                        <h:outputLabel  value="#{langsys['Activity']} #{langsys['Category']}:"/>
-                        <h:outputText  value="#{category_activityBean.getCategory_activity(timesheet.category_activity_id).getCategory_name()}"/>
-                        <h:outputLabel  value="#{langsys['Activity']} #{langsys['Subcategory']}:"/>
-                        <h:outputText  value="#{subcategory_activityBean.getSubcategory_activity(timesheet.subcategory_activity_id).getSubcategory_name()}"/>
-                        <h:outputLabel  value="#{langsys['Staff']}:"/>
-                        <h:outputText value="#{staffBean.getStaff(timesheet.staff_id).getFirst_name()}"/>
-                        <h:outputLabel  value="#{langsys['Mode']} #{langsys['Activity']}:"/>
-                        <h:outputText  value="#{mode_activityBean.getMode_activity(timesheet.mode_activity_id).getMode_name()}"/>
-                        <h:outputLabel  value="#{langsys['Activity']} #{langsys['Name']}:"/>
-                        <h:outputText  value="#{timesheet.activity_name}"/>
-                        <h:outputLabel value="#{langsys['Time']} #{langsys['Unit']}:"/>
-                        <h:outputText  value="#{timesheet.unit_of_time}"/>
+                        <h:outputLabel value="#{langsys['Client']}:" rendered="#{timesheet.transactor.transactorNames.length() gt 0}"/>
+                        <h:outputLabel value="#{timesheet.transactor.transactorNames}" rendered="#{timesheet.transactor.transactorNames.length() gt 0}"/>
+                        <h:outputLabel value="#{langsys['Activity']} #{langsys['Category']}:" rendered="#{timesheet.category_activity_id gt 0}"/>
+                        <h:outputText value="#{category_activityBean.getCategory_activity(timesheet.category_activity_id).getCategory_name()}" rendered="#{timesheet.category_activity_id gt 0}"/>
+                        <h:outputLabel value="#{langsys['Activity']} #{langsys['Subcategory']}:" rendered="#{timesheet.subcategory_activity_id gt 0}"/>
+                        <h:outputText value="#{subcategory_activityBean.getSubcategory_activity(timesheet.subcategory_activity_id).getSubcategory_name()}" rendered="#{timesheet.subcategory_activity_id gt 0}"/>
+                        <h:outputLabel value="#{langsys['Staff']}:" rendered="#{timesheet.staff_id gt 0}"/>
+                        <h:outputText value="#{staffBean.getStaff(timesheet.staff_id).getFirst_name()}" rendered="#{timesheet.staff_id gt 0}"/>
+                        <h:outputLabel value="#{langsys['Mode']} #{langsys['Activity']}:" rendered="#{timesheet.mode_activity_id gt 0}"/>
+                        <h:outputText value="#{mode_activityBean.getMode_activity(timesheet.mode_activity_id).getMode_name()}" rendered="#{timesheet.mode_activity_id gt 0}"/>
+                        <h:outputLabel value="#{langsys['Activity']} #{langsys['Name']}:" rendered="#{timesheet.activity_name.length() gt 0}"/>
+                        <h:outputText value="#{timesheet.activity_name}" rendered="#{timesheet.activity_name.length() gt 0}"/>
+                        <h:outputLabel value="#{langsys['Time']} #{langsys['Unit']}:" rendered="#{timesheet.unit_of_time.length() gt 0}"/>
+                        <h:outputText value="#{timesheet.unit_of_time}" rendered="#{timesheet.unit_of_time.length() gt 0}"/>
                         <h:outputLabel value="#{langsys['Time']} #{langsys['Quantity']}:"/>
-                        <h:outputText  value="#{utilityBean.formatDoubleToString(timesheet.time_taken)}"/>
-                        <h:outputLabel  value="#{langsys['Activity']} #{langsys['Date']}:"/>
-                        <h:outputText  value="#{utilityBean.formatDate(timesheet.activity_date)}"/>
-                        <h:outputLabel  value="#{langsys['Submission']} #{langsys['Date']}:"/>
-                        <h:outputText  value="#{utilityBean.formatDateTime(timesheet.submission_date)}"/>
-                        <h:outputLabel  value="#{langsys['Submission']} #{langsys['By']}:"/>
-                        <h:outputText  value="#{timesheet.submission_by}"/>
-                        <h:outputLabel  value="#{langsys['Last']} #{langsys['Edit']} #{langsys['Date']}:"/>
-                        <h:outputText  value="#{utilityBean.formatDateTime(timesheet.last_edit_date)}"/>
-                        <h:outputLabel  value="#{langsys['Last']} #{langsys['Edit']} #{langsys['By']}:"/>
-                        <h:outputText  value="#{timesheet.last_edit_by}"/>
+                        <h:outputText value="#{utilityBean.formatDoubleToString(timesheet.time_taken)}"/>
+                        <h:outputLabel value="#{langsys['Activity']} #{langsys['Date']}:"/>
+                        <h:outputText value="#{utilityBean.formatDate(timesheet.activity_date)}"/>
+                        <h:outputLabel value="#{langsys['Submission']} #{langsys['Date']}:"/>
+                        <h:outputText value="#{utilityBean.formatDate(timesheet.submission_date)}"/>
+                        <h:outputLabel value="#{langsys['Submission']} #{langsys['By']}:"/>
+                        <h:outputText value="#{timesheet.submission_by}"/>
+                        <h:outputLabel value="#{langsys['Last']} #{langsys['Edit']} #{langsys['Date']}:" rendered="#{timesheet.last_edit_date != null}"/>
+                        <h:outputText value="#{utilityBean.formatDate(timesheet.last_edit_date)}" rendered="#{timesheet.last_edit_date != null}"/>
+                        <h:outputLabel value="#{langsys['Last']} #{langsys['Edit']} #{langsys['By']}:" rendered="#{timesheet.last_edit_by.length() gt 0}"/>
+                        <h:outputText value="#{timesheet.last_edit_by}" rendered="#{timesheet.last_edit_by.length() gt 0}"/>
                     </h:panelGrid>
                 </h:panelGroup>
             </p:dialog>

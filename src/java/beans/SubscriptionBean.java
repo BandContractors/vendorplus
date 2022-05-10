@@ -612,6 +612,8 @@ public class SubscriptionBean implements Serializable {
                 msgV = "Not Allowed to Access this Function";
             } else if (aSubscription.getSubscription_id() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "129", "Edit") == 0) {
                 msgV = "Not Allowed to Access this Function";
+            } else if (aSubscription.getAccount_manager().length() == 0) {
+                msgV = "Account Manager Cannot be Empty";
             }
             if (msgV.length() > 0) {
                 this.setActionMessage(ub.translateWordsInText(BaseName, msgV));
