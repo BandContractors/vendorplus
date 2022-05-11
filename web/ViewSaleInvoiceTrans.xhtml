@@ -33,8 +33,10 @@
                         return false;"> 
                 <p:panel id="pnlTransaction">
                     <h:panelGrid styleClass="clsGridMainHeader" columns="4" style="width: 100%">
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['VIEW']}" rendered="#{transBean.actionType.equals('View')}"/>
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['EDIT']}" rendered="#{transBean.actionType.equals('Edit')}"/>
+                        <h:outputLabel style="background-color:#d2222d;color: white;" value="#{langsys['VIEW']}" rendered="#{transBean.actionType.equals('View')}"/>
+                        <h:outputLabel style="background-color:#d2222d;color: white;" value="#{langsys['EDIT']}" rendered="#{transBean.actionType.equals('Edit')}"/>
+                        <h:outputLabel style="background-color:#d2222d;color: white;" value="#{langsys['CREDIT']} #{langsys['NOTE']}" rendered="#{transBean.actionType.equals('Cr')}"/>
+                        <h:outputLabel style="background-color:#d2222d;color: white;" value="#{langsys['DEBIT']} #{langsys['NOTE']}" rendered="#{transBean.actionType.equals('Dr')}"/>
                         <h:outputLabel style="background-color:#00B461;color: white;" value="#{transactionReasonBean.getTransactionReason(transBean.transObj.transactionReasonId).transactionReasonName} : #{transBean.transObj.transactionNumber}"/>
                         <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Stock']}#{generalUserSetting.DEPLETE_SOLD_STOCK_UPON eq '0' ? '↓↑':':No effect'}"/>
                         <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Ledger']}:#{langsys['Cash']}↑ #{langsys['Sales']}↑ AR↑ #{langsys['Tax']}↑"/>

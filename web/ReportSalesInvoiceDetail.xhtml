@@ -219,6 +219,14 @@
                 <p:column headerText="#{langsys['Edit']}" exportable="false">
                     <p:commandButton id="cmdbEdit" icon="ui-icon-pencil" oncomplete="PF('dlgSalesInvoice').show();" actionListener="#{transBean.initSalesInvoiceSession(itm.transactionId,'Edit')}" update=":formTransaction"/>
                 </p:column>
+                <p:column headerText="#{langsys['Action']}" exportable="false" visible="false">
+                    <p:splitButton value="#{langsys['Select']}" icon="ui-icon-pencil">
+                        <p:menuitem value="#{langsys['View']}" icon="ui-icon-search" oncomplete="PF('dlgSalesInvoice').show();" actionListener="#{transBean.initSalesInvoiceSession(itm.transactionId,'View')}" update=":formTransaction"/>
+                        <p:menuitem value="#{langsys['Edit']}" icon="ui-icon-pencil" oncomplete="PF('dlgSalesInvoice').show();" actionListener="#{transBean.initSalesInvoiceSession(itm.transactionId,'Edit')}" update=":formTransaction"/>
+                        <p:menuitem value="#{langsys['Credit']} #{langsys['Note']}" icon="ui-icon-note" oncomplete="PF('dlgSalesInvoice').show();" actionListener="#{transBean.initSalesInvoiceSession(itm.transactionId,'Cr')}" update=":formTransaction"/>
+                        <p:menuitem value="#{langsys['Debit']} #{langsys['Note']}" icon="ui-icon-note" oncomplete="PF('dlgSalesInvoice').show();" actionListener="#{transBean.initSalesInvoiceSession(itm.transactionId,'Dr')}" update=":formTransaction"/>
+                    </p:splitButton>
+                </p:column>
                 <p:column headerText="#{langsys['Sales']} #{langsys['Type']}">
                     <h:outputLabel value="#{transactionReasonBean.getTransactionReason(itm.transactionReasonId).transactionReasonName} "/>
                     <h:outputLabel value="#{itm.transactionNumber}"/>
@@ -235,7 +243,7 @@
                 <p:column headerText="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}">
                     <h:outputText value="#{transactorBean.getTransactor(itm.transactorId).transactorNames}"/>
                 </p:column>
-                <p:column headerText="Tax #{langsys['Identity']}">
+                <p:column headerText="Tax #{langsys['Identity']}" visible="false">
                     <h:outputText value="#{transactorBean.getTransactor(itm.billTransactorId).taxIdentity}"/>
                 </p:column>
                 <p:column headerText="#{langsys['Currency']}">
