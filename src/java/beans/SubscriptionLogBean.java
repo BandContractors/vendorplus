@@ -1,15 +1,12 @@
 package beans;
 
-import static beans.SubscriptionBean.LOGGER;
 import connections.DBConnection;
-import entities.Subscription;
 import entities.Subscription_log;
 import java.io.Serializable;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

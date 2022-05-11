@@ -119,3 +119,7 @@ CREATE TABLE timesheet_log (
 );
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_17',120,Now(),'6.0','');
+
+ALTER TABLE timesheet_log ADD COLUMN action varchar(20) default '1' not null;
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_17',124,Now(),'6.0','');

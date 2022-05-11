@@ -248,6 +248,10 @@
                                      oncomplete="PF('dlgTimesheet').show();" icon="ui-icon-pencil" title="#{langsys['Edit']} #{langsys['Time']} #{langsys['Sheet']}" style="color: white; background-color: #00B259" >
                     </p:commandButton>
                     &nbsp;
+                    <p:commandButton update="form:modalTimesheetLog" actionListener="#{timesheetBean.getTimesheetLogByTimesheetId(ts.timesheet_id)}"
+                                     oncomplete="PF('dlgTimesheetLog').show();" icon="ui-icon-info" title="View Timesheet Logs" style="color: white; background-color: yellow !important" >
+                    </p:commandButton>
+                    &nbsp;
                 </p:column>  
             </p:dataTable>
 
@@ -334,7 +338,8 @@
                     <p:growl id="growl1"/>
                 </h:panelGroup>
             </p:dialog>
-
+            
+            <!--this is the Timesheet detail-->
             <p:dialog rendered="true" dynamic="true" header="#{langsys['Time']} #{langsys['Sheet']} #{langsys['Detail']}" widgetVar="dlgTimesheetDetail" id="modalTimesheetDetail" modal="true">
                 <h:panelGroup id="popupDetail">
                     <!--<h:outputText value="This is a Modal Dialog." />-->
@@ -366,6 +371,64 @@
                         <h:outputLabel value="#{langsys['Last']} #{langsys['Edit']} #{langsys['By']}:" rendered="#{timesheet.last_edit_by.length() gt 0}"/>
                         <h:outputText value="#{timesheet.last_edit_by}" rendered="#{timesheet.last_edit_by.length() gt 0}"/>
                     </h:panelGrid>
+                </h:panelGroup>
+            </p:dialog>
+            
+            <!--this is the Timesheet Log-->
+            <p:dialog header="Timesheet Log" widgetVar="dlgTimesheetLog" id="modalTimesheetLog" modal="true">
+                <h:panelGroup id="logPopup">
+
+                    <h:dataTable id="dtblSubscriptionLog" value="#{timesheetBean.timesheetLogList}" var="tl" styleClass="cls-table" 
+                                 headerClass="cls-table-header" 
+                                 rowClasses="cls-table-odd-row,cls-table-even-row" 
+                                 columnClasses="cls-table-col1,cls-table-col2,cls-table-col3,cls-table-col4,cls-table-col5,cls-table-col6"                         
+                                 > 
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langsys['Submission']} #{langsys['Date']}</f:facet>
+                            <!-- row record -->
+                            #{utilityBean.formatDate(tl.submission_date)}
+                        </p:column>
+
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langsys['Submission']} #{langsys['By']}</f:facet>
+                            <!-- row record -->
+                            #{tl.submission_by}
+                        </p:column>
+
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langsys['Action']}</f:facet>
+                            <!-- row record -->
+                            #{tl.action}
+                        </p:column>
+
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langsys['Time']} #{langsys['Unit']}</f:facet>
+                            <!-- row record -->
+                            #{tl.unit_of_time}
+                        </p:column>
+
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langsys['Time']} #{langsys['Quantity']}</f:facet>
+                            <!-- row record -->
+                            <h:outputText value="#{tl.time_taken}">
+                                <f:convertNumber pattern="###,###.#" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langsys['Staff']}</f:facet>
+                            <!-- row record -->
+                            #{staffBean.getStaff(tl.staff_id).getFirst_name()}
+                        </p:column>
+
+                    </h:dataTable>
+
                 </h:panelGroup>
             </p:dialog>
         </h:form>

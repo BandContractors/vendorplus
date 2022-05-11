@@ -4,6 +4,7 @@ import connections.DBConnection;
 import entities.CompanySetting;
 import entities.GroupRight;
 import entities.Timesheet;
+import entities.Timesheet_log;
 import entities.Timesheet_summary_ARH;
 import entities.Timesheet_summary_last_seven_days;
 import entities.Timesheet_summary_total_time;
@@ -43,6 +44,7 @@ public class TimesheetBean implements Serializable {
     //Average Reporting Hour
     private List<Timesheet_summary_ARH> timesheetSummary_ARH;
     private List<Timesheet_summary_last_seven_days> timesheetSummary_lastSevenDays;
+    private List<Timesheet_log> TimesheetLogList;
     private String ActionMessage = null;
     private int filterCategoryActivityId = 0;
     private Date filterFromActivityDate;
@@ -198,7 +200,7 @@ public class TimesheetBean implements Serializable {
                 msg = "Activity Date Cannot be Empty";
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
             } else {
-                int saved = 0;
+                long saved = 0;
                 if (aTimesheet.getTimesheet_id() == 0) {
                     saved = this.insertTimesheet(aTimesheet);
                 } else if (aTimesheet.getTimesheet_id() > 0) {
@@ -279,8 +281,10 @@ public class TimesheetBean implements Serializable {
 
     public void clearFilter() {
         try {
-            this.setFilterFromActivityDate(null);
-            this.setFilterToActivityDate(null);
+            //this.setFilterFromActivityDate(null);
+            this.setFilterFromActivityDate(new CompanySetting().getCURRENT_SERVER_DATE());
+            //this.setFilterToActivityDate(null);
+            this.setFilterToActivityDate(new CompanySetting().getCURRENT_SERVER_DATE());
             this.setFilterCategoryActivityId(0);
             this.setFilterStaffId(0);
             this.getFilteredTimesheets();
@@ -289,8 +293,8 @@ public class TimesheetBean implements Serializable {
         }
     }
 
-    public int insertTimesheet(Timesheet aTimesheet) {
-        int InsertedId = 0;
+    public long insertTimesheet(Timesheet aTimesheet) {
+        long InsertedId = 0;
         String sql = "INSERT INTO timesheet (activity_status,transactor_id,mode_activity_id ,staff_id,category_activity_id, time_taken,"
                 + "submission_date,activity_name,activity_date,unit_of_time,subcategory_activity_id,project_id,submission_by,last_edit_date,last_edit_by) "
                 + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
@@ -316,11 +320,16 @@ public class TimesheetBean implements Serializable {
             ps.setString(13, new GeneralUserSetting().getCurrentUser().getUserName());
             ps.setDate(14, null);
             ps.setString(15, aTimesheet.getLast_edit_by());
+
             ps.executeUpdate();
             ResultSet rs = ps.getGeneratedKeys();
             if (rs.next()) {
                 InsertedId = rs.getInt(1);
             }
+
+            //save timesheet log
+            aTimesheet.setTimesheet_id(InsertedId);
+            this.saveTimesheetLog(aTimesheet, "Added");
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -360,6 +369,11 @@ public class TimesheetBean implements Serializable {
 
             ps.executeUpdate();
             IsUpdated = 1;
+
+            //save timesheet log
+            aTimesheet.setLast_edit_date(new CompanySetting().getCURRENT_SERVER_DATE());
+            aTimesheet.setLast_edit_by(new GeneralUserSetting().getCurrentUser().getUserName());
+            this.saveTimesheetLog(aTimesheet, "Edited");
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -382,7 +396,7 @@ public class TimesheetBean implements Serializable {
     }
 
     public Timesheet getTimesheet(long aTimesheet_id) {
-        String sql = "SELECT * FROM timesheet WHERE timesheet=?";
+        String sql = "SELECT * FROM timesheet WHERE timesheet_id=?";
         ResultSet rs;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -597,15 +611,24 @@ public class TimesheetBean implements Serializable {
     }
 
     public void getFilteredTimesheetSummary_lastSevenDays() {
+        //the begining date of the last 7 days
+        java.sql.Date beginDate;
+        if (this.getFilterToActivityDate() != null) {
+            //convert java.util date to sql date
+            beginDate = new java.sql.Date(this.getFilterToActivityDate().getTime());
+        } else {
+            beginDate = new java.sql.Date(new CompanySetting().getCURRENT_SERVER_DATE().getTime());
+            //this.setFilterToActivityDate(new CompanySetting().getCURRENT_SERVER_DATE());
+        }
         String sql;
-        sql = "SELECT staff_id, sum(if(date(activity_date) = date(now()), time_taken, 0)) as day1, "
-                + "sum(if(date(activity_date) = date(date_sub(now(), interval 1 day)), time_taken, 0)) as day2, "
-                + "sum(if(date(activity_date) = date(date_sub(now(), interval 2 day)), time_taken, 0)) as day3, "
-                + "sum(if(date(activity_date) = date(date_sub(now(), interval 3 day)), time_taken, 0)) as day4, "
-                + "sum(if(date(activity_date) = date(date_sub(now(), interval 4 day)), time_taken, 0)) as day5, "
-                + "sum(if(date(activity_date) = date(date_sub(now(), interval 5 day)), time_taken, 0)) as day6, "
-                + "sum(if(date(activity_date) = date(date_sub(now(), interval 6 day)), time_taken, 0)) as day7, "
-                + "sum(if(date(activity_date) between date(date_sub(now(), interval 6 day)) and date(now()), time_taken, 0)) as total "
+        sql = "SELECT staff_id, sum(if(date(activity_date) = date('" + beginDate + "'), time_taken, 0)) as day1, "
+                + "sum(if(date(activity_date) = date(date_sub('" + beginDate + "', interval 1 day)), time_taken, 0)) as day2, "
+                + "sum(if(date(activity_date) = date(date_sub('" + beginDate + "', interval 2 day)), time_taken, 0)) as day3, "
+                + "sum(if(date(activity_date) = date(date_sub('" + beginDate + "', interval 3 day)), time_taken, 0)) as day4, "
+                + "sum(if(date(activity_date) = date(date_sub('" + beginDate + "', interval 4 day)), time_taken, 0)) as day5, "
+                + "sum(if(date(activity_date) = date(date_sub('" + beginDate + "', interval 5 day)), time_taken, 0)) as day6, "
+                + "sum(if(date(activity_date) = date(date_sub('" + beginDate + "', interval 6 day)), time_taken, 0)) as day7, "
+                + "sum(if(date(activity_date) between date(date_sub('" + beginDate + "', interval 6 day)) and date('" + beginDate + "'), time_taken, 0)) as total "
                 + "from timesheet  where timesheet_id > 0";
         String wheresql = "";
         String groupbysum = " GROUP BY staff_id";
@@ -622,7 +645,7 @@ public class TimesheetBean implements Serializable {
                 java.sql.Date from = new java.sql.Date(this.getFilterFromActivityDate().getTime());
                 java.sql.Date to = new java.sql.Date(this.getFilterToActivityDate().getTime());
 
-                wheresql = wheresql + " AND activity_date between '" + from + "' and '" + to + "'";
+                //wheresql = wheresql + " AND activity_date between '" + from + "' and '" + to + "'";
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -691,7 +714,12 @@ public class TimesheetBean implements Serializable {
     public String getDay(int offset) {
         String dayWeekText = "";
         Calendar c = Calendar.getInstance();
-        c.setTime(new Date());
+        if (this.getFilterToActivityDate() != null) {
+            c.setTime(this.getFilterToActivityDate());
+        } else {
+            c.setTime(new CompanySetting().getCURRENT_SERVER_DATE());
+        }
+        //c.setTime(new Date());
         c.add(Calendar.DAY_OF_MONTH, -offset);
 
         Date offsetDate = c.getTime();
@@ -727,6 +755,45 @@ public class TimesheetBean implements Serializable {
             totalTime = 0.0;
         }
         return totalTime;
+    }
+
+    public void saveTimesheetLog(Timesheet aTimesheet, String aAction) {
+        try {
+            Timesheet_log timesheetLog = new Timesheet_log();
+
+            timesheetLog.setTimesheet_id(aTimesheet.getTimesheet_id());
+            timesheetLog.setTransactor_id(aTimesheet.getTransactor_id());
+            timesheetLog.setTransactor(new TransactorBean().findTransactor(aTimesheet.getTransactor_id()));
+            timesheetLog.setActivity_date(aTimesheet.getActivity_date());
+            timesheetLog.setActivity_name(aTimesheet.getActivity_name());
+            timesheetLog.setActivity_status(aTimesheet.getActivity_status());
+            timesheetLog.setCategory_activity_id(aTimesheet.getCategory_activity_id());
+            timesheetLog.setMode_activity_id(aTimesheet.getMode_activity_id());
+            timesheetLog.setProject_id(aTimesheet.getProject_id());
+            timesheetLog.setStaff_id(aTimesheet.getStaff_id());
+            timesheetLog.setSubcategory_activity_id(aTimesheet.getSubcategory_activity_id());
+            timesheetLog.setSubmission_date(aTimesheet.getSubmission_date());
+            timesheetLog.setTime_taken(aTimesheet.getTime_taken());
+            timesheetLog.setUnit_of_time(aTimesheet.getUnit_of_time());
+            timesheetLog.setSubmission_by(aTimesheet.getSubmission_by());
+            timesheetLog.setLast_edit_date(aTimesheet.getLast_edit_date());
+            timesheetLog.setLast_edit_by(aTimesheet.getLast_edit_by());
+            timesheetLog.setAction(aAction);
+
+            new Timesheet_logBean().insertTimesheet_log(timesheetLog);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public List<Timesheet_log> getTimesheetLogByTimesheetId(int aTimesheetId) {
+        try {
+            this.setTimesheetLogList(new Timesheet_logBean().getTimesheetLogByTimesheetId(aTimesheetId));
+
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return this.getTimesheetLogList();
     }
 
     /**
@@ -868,6 +935,20 @@ public class TimesheetBean implements Serializable {
      */
     public void setTimesheetSummary_lastSevenDays(List<Timesheet_summary_last_seven_days> timesheetSummary_lastSevenDays) {
         this.timesheetSummary_lastSevenDays = timesheetSummary_lastSevenDays;
+    }
+
+    /**
+     * @return the TimesheetLogList
+     */
+    public List<Timesheet_log> getTimesheetLogList() {
+        return TimesheetLogList;
+    }
+
+    /**
+     * @param TimesheetLogList the TimesheetLogList to set
+     */
+    public void setTimesheetLogList(List<Timesheet_log> TimesheetLogList) {
+        this.TimesheetLogList = TimesheetLogList;
     }
 
 }
