@@ -421,8 +421,8 @@ public class UserDetailBean implements Serializable {
     public boolean isLicensePackageViolated(UserDetail aUserDetail, long PackageUsers) {
         long TotalActiveUsers = this.getCountTotalActiveUserDetail();
         if (aUserDetail.getUserDetailId() == 0) {//for new addition
-            if (aUserDetail.getIsUserLocked().equals("Yes") && TotalActiveUsers > PackageUsers) {
-                return true;
+            if (aUserDetail.getIsUserLocked().equals("Yes")) {
+                return false;
             } else if (aUserDetail.getIsUserLocked().equals("No") && (TotalActiveUsers + 1) > PackageUsers) {
                 return true;
             } else {
