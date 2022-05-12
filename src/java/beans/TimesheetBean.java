@@ -123,7 +123,7 @@ public class TimesheetBean implements Serializable {
                 aTimesheet.setActivity_date(null);
             }
             try {
-                aTimesheet.setSubmission_date(new java.sql.Date(aResultSet.getDate("submission_date").getTime()));
+                aTimesheet.setSubmission_date(new java.sql.Timestamp(aResultSet.getTimestamp("submission_date").getTime()));
             } catch (Exception e) {
                 aTimesheet.setSubmission_date(null);
             }
@@ -138,7 +138,7 @@ public class TimesheetBean implements Serializable {
                 aTimesheet.setSubmission_by("");
             }
             try {
-                aTimesheet.setLast_edit_date(new java.sql.Date(aResultSet.getDate("last_edit_date").getTime()));
+                aTimesheet.setLast_edit_date(new java.sql.Timestamp(aResultSet.getTimestamp("last_edit_date").getTime()));
             } catch (Exception e) {
                 aTimesheet.setLast_edit_date(null);
             }
@@ -355,8 +355,7 @@ public class TimesheetBean implements Serializable {
             ps.setInt(4, aTimesheet.getStaff_id());
             ps.setInt(5, aTimesheet.getCategory_activity_id());
             ps.setDouble(6, aTimesheet.getTime_taken());
-            //ps.setDate(7, new java.sql.Date(aTimesheet.getSubmission_date().getTime()));
-            ps.setTimestamp(7, new java.sql.Timestamp(new Date().getTime()));
+            ps.setTimestamp(7, new java.sql.Timestamp(aTimesheet.getSubmission_date().getTime()));
             ps.setString(8, aTimesheet.getActivity_name());
             ps.setDate(9, new java.sql.Date(aTimesheet.getActivity_date().getTime()));
             ps.setString(10, aTimesheet.getUnit_of_time());

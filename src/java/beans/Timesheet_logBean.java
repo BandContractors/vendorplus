@@ -158,7 +158,11 @@ public class Timesheet_logBean implements Serializable {
             ps.setInt(5, aTimesheet_log.getStaff_id());
             ps.setInt(6, aTimesheet_log.getCategory_activity_id());
             ps.setDouble(7, aTimesheet_log.getTime_taken());
-            ps.setTimestamp(8, new java.sql.Timestamp(new Date().getTime()));
+            if (aTimesheet_log.getSubmission_date() != null) {
+                ps.setTimestamp(8, new java.sql.Timestamp(aTimesheet_log.getSubmission_date().getTime()));
+            } else {
+                ps.setTimestamp(8, new java.sql.Timestamp(new Date().getTime()));
+            }
             ps.setString(9, aTimesheet_log.getActivity_name());
             ps.setDate(10, new java.sql.Date(aTimesheet_log.getActivity_date().getTime()));
             ps.setString(11, aTimesheet_log.getUnit_of_time());
@@ -166,9 +170,9 @@ public class Timesheet_logBean implements Serializable {
             ps.setLong(13, aTimesheet_log.getProject_id());
             ps.setString(14, new GeneralUserSetting().getCurrentUser().getUserName());
             if (aTimesheet_log.getLast_edit_date() != null) {
-                ps.setDate(15, new java.sql.Date(aTimesheet_log.getLast_edit_date().getTime()));
+                ps.setTimestamp(15, new java.sql.Timestamp(aTimesheet_log.getLast_edit_date().getTime()));
             } else {
-                ps.setDate(15, null);
+                ps.setTimestamp(15, null);
             }
             ps.setString(16, aTimesheet_log.getLast_edit_by());
             ps.setString(17, aTimesheet_log.getAction());
@@ -196,8 +200,7 @@ public class Timesheet_logBean implements Serializable {
             ps.setInt(5, aTimesheet_log.getStaff_id());
             ps.setInt(6, aTimesheet_log.getCategory_activity_id());
             ps.setDouble(7, aTimesheet_log.getTime_taken());
-            //ps.setDate(7, new java.sql.Date(aTimesheet_log.getSubmission_date().getTime()));
-            ps.setTimestamp(8, new java.sql.Timestamp(new Date().getTime()));
+            ps.setTimestamp(8, new java.sql.Timestamp(aTimesheet_log.getSubmission_date().getTime()));
             ps.setString(9, aTimesheet_log.getActivity_name());
             ps.setDate(10, new java.sql.Date(aTimesheet_log.getActivity_date().getTime()));
             ps.setString(11, aTimesheet_log.getUnit_of_time());

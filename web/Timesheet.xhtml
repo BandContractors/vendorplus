@@ -241,15 +241,15 @@
                 </p:column>
                 <p:column headerText="#{langsys['Action']}" exportable="false" style="min-width: 125px">
                     <p:commandButton update="form:popupDetail" actionListener="#{timesheetBean.displayTimesheet(ts,timesheet)}" oncomplete="PF('dlgTimesheetDetail').show();"
-                                     icon="ui-icon-note" title="#{langsys['View']} #{langsys['Time']} #{langsys['Sheet']} #{langsys['Detail']}" style="color: white;" >
+                                     icon="ui-icon-note" title="#{langsys['View']}" style="color: white;" >
                     </p:commandButton>
                     &nbsp;
                     <p:commandButton update="form:modalTimesheet" actionListener="#{timesheetBean.displayTimesheet(ts, timesheet)}" 
-                                     oncomplete="PF('dlgTimesheet').show();" icon="ui-icon-pencil" title="#{langsys['Edit']} #{langsys['Time']} #{langsys['Sheet']}" style="color: white; background-color: #00B259" >
+                                     oncomplete="PF('dlgTimesheet').show();" icon="ui-icon-pencil" title="#{langsys['Edit']}" style="color: white; background-color: #00B259" >
                     </p:commandButton>
                     &nbsp;
                     <p:commandButton update="form:modalTimesheetLog" actionListener="#{timesheetBean.getTimesheetLogByTimesheetId(ts.timesheet_id)}"
-                                     oncomplete="PF('dlgTimesheetLog').show();" icon="ui-icon-info" title="View Timesheet Logs" style="color: white; background-color: yellow !important" >
+                                     oncomplete="PF('dlgTimesheetLog').show();" icon="ui-icon-info" title="#{langsys['View']} #{langsys['Log']}" style="color: white; background-color: yellow !important" >
                     </p:commandButton>
                     &nbsp;
                 </p:column>  
@@ -363,11 +363,11 @@
                         <h:outputLabel value="#{langsys['Activity']} #{langsys['Date']}:"/>
                         <h:outputText value="#{utilityBean.formatDate(timesheet.activity_date)}"/>
                         <h:outputLabel value="#{langsys['Submission']} #{langsys['Date']}:"/>
-                        <h:outputText value="#{utilityBean.formatDate(timesheet.submission_date)}"/>
+                        <h:outputText value="#{utilityBean.formatDateTime(timesheet.submission_date)}"/>
                         <h:outputLabel value="#{langsys['Submission']} #{langsys['By']}:"/>
                         <h:outputText value="#{timesheet.submission_by}"/>
                         <h:outputLabel value="#{langsys['Last']} #{langsys['Edit']} #{langsys['Date']}:" rendered="#{timesheet.last_edit_date != null}"/>
-                        <h:outputText value="#{utilityBean.formatDate(timesheet.last_edit_date)}" rendered="#{timesheet.last_edit_date != null}"/>
+                        <h:outputText value="#{utilityBean.formatDateTime(timesheet.last_edit_date)}" rendered="#{timesheet.last_edit_date != null}"/>
                         <h:outputLabel value="#{langsys['Last']} #{langsys['Edit']} #{langsys['By']}:" rendered="#{timesheet.last_edit_by.length() gt 0}"/>
                         <h:outputText value="#{timesheet.last_edit_by}" rendered="#{timesheet.last_edit_by.length() gt 0}"/>
                     </h:panelGrid>
@@ -375,7 +375,7 @@
             </p:dialog>
             
             <!--this is the Timesheet Log-->
-            <p:dialog header="Timesheet Log" widgetVar="dlgTimesheetLog" id="modalTimesheetLog" modal="true">
+            <p:dialog header="#{langsys['Time']} #{langsys['Sheet']} #{langsys['Log']}" widgetVar="dlgTimesheetLog" id="modalTimesheetLog" modal="true">
                 <h:panelGroup id="logPopup">
 
                     <h:dataTable id="dtblSubscriptionLog" value="#{timesheetBean.timesheetLogList}" var="tl" styleClass="cls-table" 
