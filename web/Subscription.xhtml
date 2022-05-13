@@ -170,9 +170,9 @@
                 </h:panelGrid>
             </h:panelGrid>
 
-            <h:panelGrid id="pnlgSummary" columns="4" styleClass="clsPanelSummary">
+            <h:panelGrid id="pnlgSummary" columns="3" styleClass="clsPanelSummary" bgcolor="white">
                 <h:panelGrid>
-                    <p:dataTable id="tblSummaryBusinessCategory" tableStyle="width:auto;" var="sum" value="#{subscriptionBean.subscriptionsSummary_businessCategory}">
+                    <p:dataTable id="tblSummaryBusinessCategory" tableStyle="width:auto;" var="sum" value="#{subscriptionBean.subscriptionsSummary_businessCategory}" scrollable="true" scrollHeight="250">
                         <p:column headerText="#{langsys['Business']} #{langsys['Category']}">
                             <h:outputLabel value="#{businessCategoryBean.getBusinessCategory(sum.business_category_id).getCategory_name()}"/>
                             <f:facet name="footer">
@@ -200,7 +200,7 @@
                             </f:facet>
                         </p:column>
                     </p:dataTable>
-                    <p:dataTable id="tblSummaryConvertedBy" sortBy="#{sum.attribute}" expandableRowGroups="true" tableStyle="width: auto;" var="sum" value="#{subscriptionBean.subscriptionsSummary_converted_by}">
+                    <p:dataTable id="tblSummaryConvertedBy" sortBy="#{sum.attribute}" expandableRowGroups="true" tableStyle="width:auto;" var="sum" value="#{subscriptionBean.subscriptionsSummary_converted_by}" scrollable="true" scrollHeight="250">
                         <p:column headerText="#{langsys['Converted']} #{langsys['By']}">
                             <h:outputLabel value="#{sum.attribute}"/>
                         </p:column>
@@ -235,7 +235,116 @@
                                 </h:outputText>
                             </p:column>
                         </p:summaryRow>
+                    </p:dataTable> 
+                    <p:dataTable id="tblLocation" tableStyle="width:auto;" var="sum" value="#{subscriptionBean.subscriptionsSummary_location}" scrollable="true" scrollHeight="250">
+                        <p:column headerText="#{langsys[menuItemBean.menuItemObj.LOC_LEVEL_2_LABEL]}">
+                            <h:outputLabel value="#{sum.agent}"/>
+                            <f:facet name="footer">
+                                <h:outputText value="Total" />
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="#{langsys['No']}" width="10%" style="text-align: right;">
+                            <h:outputText value="#{sum.description}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                            <f:facet name="footer">
+                                <h:outputText value="#{subscriptionBean.getTotalNo(subscriptionBean.subscriptionsSummary_location)}">
+                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputText>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="#{langsys['Amount']}" style="text-align: right;">
+                            <h:outputText value="#{sum.amount}">
+                                <f:convertNumber pattern="###,###.#" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                            <f:facet name="footer">
+                                <h:outputText value="#{subscriptionBean.getTotalAmount(subscriptionBean.subscriptionsSummary_location)}">
+                                    <f:convertNumber pattern="###,###.#" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputText>
+                            </f:facet>
+                        </p:column>
                     </p:dataTable>
+                </h:panelGrid>
+                <h:panelGrid>
+                    <p:dataTable id="tblSummarySubscriptionCategory" tableStyle="width:auto;" var="sum" value="#{subscriptionBean.subscriptionsSummary_subscriptionCategory}" scrollable="true" scrollHeight="250">
+                        <p:column headerText="#{langsys['Subscription']} #{langsys['Category']}">
+                            <h:outputLabel value="#{subscriptionCategoryBean.getSubscriptionCategory(sum.subscription_category_id).getCategory_name()}"/>
+                            <f:facet name="footer">
+                                <h:outputText value="Total" />
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="#{langsys['No']}" style="text-align: right;" width="10%">
+                            <h:outputText value="#{sum.description}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                            <f:facet name="footer">
+                                <h:outputText value="#{subscriptionBean.getTotalNo(subscriptionBean.subscriptionsSummary_subscriptionCategory)}">
+                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputText>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="#{langsys['Amount']}" style="text-align: right;">
+                            <h:outputText value="#{sum.amount}">
+                                <f:convertNumber pattern="###,###.#" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                            <f:facet name="footer">
+                                <h:outputText value="#{subscriptionBean.getTotalAmount(subscriptionBean.subscriptionsSummary_subscriptionCategory)}">
+                                    <f:convertNumber pattern="###,###.#" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputText>
+                            </f:facet>
+                        </p:column>
+                    </p:dataTable>
+                    <p:dataTable id="tblSummaryReferredBy" sortBy="#{sum.attribute}" expandableRowGroups="true" tableStyle="width:auto;" var="sum" value="#{subscriptionBean.subscriptionsSummary_referred_by}" scrollable="true" scrollHeight="250">
+                        <p:column headerText="#{langsys['Referred']} #{langsys['By']}">
+                            <h:outputLabel value="#{sum.attribute}"/>
+                        </p:column>
+                        <p:column headerText="#{langsys['Year']}">
+                            <h:outputLabel value="#{sum.year}"/>
+                        </p:column>
+                        <p:column headerText="#{langsys['Month']}">
+                            <h:outputLabel value="#{sum.month}"/>
+                        </p:column>
+                        <p:column headerText="#{langsys['No']}" style="text-align: right;">
+                            <h:outputText value="#{sum.no}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{langsys['Amount']}" style="text-align: right;">
+                            <h:outputText value="#{sum.amount}">
+                                <f:convertNumber pattern="###,###.#" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:summaryRow>
+                            <p:column colspan="3" style="text-align:right">
+                                <h:outputText value="#{langsys['Total']} #{langsys['For']} #{sum.attribute}" />
+                            </p:column>
+                            <p:column style="text-align:right">
+                                <h:outputText value="#{subscriptionBean.getTotalGroupedNo(subscriptionBean.subscriptionsSummary_referred_by, sum.attribute)}">
+                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column style="text-align:right">
+                                <h:outputText value="#{subscriptionBean.getTotalGroupedAmount(subscriptionBean.subscriptionsSummary_referred_by, sum.attribute)}">
+                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputText>
+                            </p:column>
+                        </p:summaryRow>
+                    </p:dataTable>
+                    <p:dataTable id="tblSummaryAccountManger" sortBy="#{sum.account_manager}" expandableRowGroups="true" tableStyle="width:auto;" var="sum" value="#{subscriptionBean.subscriptionsSummary_account_manager}" scrollable="true" scrollHeight="250">
+                        <p:column headerText="#{langsys['Account']} #{langsys['Manager']}">
+                            <h:outputLabel value="#{sum.account_manager}"/>
+                        </p:column>
+                        <p:column headerText="#{langsys['No']}" width="10%" style="text-align: right;">
+                            <h:outputText value="#{sum.description}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{langsys['Amount']}" style="text-align: right;">
+                            <h:outputText value="#{sum.amount}">
+                                <f:convertNumber pattern="###,###.#" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </p:column>
+                    </p:dataTable>        
                 </h:panelGrid>
                 <h:panelGrid>
                     <p:dataTable id="tblSummaryStatus" tableStyle="width:auto;" var="sum" value="#{subscriptionBean.subscriptionsSummary_status}" 
@@ -314,104 +423,8 @@
                                 <f:convertNumber pattern="###,###.#" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
-                    </p:dataTable>
-                </h:panelGrid>
-                <h:panelGrid>
-                    <p:dataTable id="tblSummarySubscriptionCategory" tableStyle="width:auto;" var="sum" value="#{subscriptionBean.subscriptionsSummary_subscriptionCategory}">
-                        <p:column headerText="#{langsys['Subscription']} #{langsys['Category']}">
-                            <h:outputLabel value="#{subscriptionCategoryBean.getSubscriptionCategory(sum.subscription_category_id).getCategory_name()}"/>
-                            <f:facet name="footer">
-                                <h:outputText value="Total" />
-                            </f:facet>
-                        </p:column>
-                        <p:column headerText="#{langsys['No']}" style="text-align: right;" width="10%">
-                            <h:outputText value="#{sum.description}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                            </h:outputText>
-                            <f:facet name="footer">
-                                <h:outputText value="#{subscriptionBean.getTotalNo(subscriptionBean.subscriptionsSummary_subscriptionCategory)}">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                                </h:outputText>
-                            </f:facet>
-                        </p:column>
-                        <p:column headerText="#{langsys['Amount']}" style="text-align: right;">
-                            <h:outputText value="#{sum.amount}">
-                                <f:convertNumber pattern="###,###.#" locale="#{utilityBean.convertLocaleToString()}"/>
-                            </h:outputText>
-                            <f:facet name="footer">
-                                <h:outputText value="#{subscriptionBean.getTotalAmount(subscriptionBean.subscriptionsSummary_subscriptionCategory)}">
-                                    <f:convertNumber pattern="###,###.#" locale="#{utilityBean.convertLocaleToString()}"/>
-                                </h:outputText>
-                            </f:facet>
-                        </p:column>
-                    </p:dataTable>
-                    <p:dataTable id="tblSummaryReferredBy" sortBy="#{sum.attribute}" expandableRowGroups="true" tableStyle="width: auto;" var="sum" value="#{subscriptionBean.subscriptionsSummary_referred_by}">
-                        <p:column headerText="#{langsys['Referred']} #{langsys['By']}">
-                            <h:outputLabel value="#{sum.attribute}"/>
-                        </p:column>
-                        <p:column headerText="#{langsys['Year']}">
-                            <h:outputLabel value="#{sum.year}"/>
-                        </p:column>
-                        <p:column headerText="#{langsys['Month']}">
-                            <h:outputLabel value="#{sum.month}"/>
-                        </p:column>
-                        <p:column headerText="#{langsys['No']}" style="text-align: right;">
-                            <h:outputText value="#{sum.no}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                            </h:outputText>
-                        </p:column>
-                        <p:column headerText="#{langsys['Amount']}" style="text-align: right;">
-                            <h:outputText value="#{sum.amount}">
-                                <f:convertNumber pattern="###,###.#" locale="#{utilityBean.convertLocaleToString()}"/>
-                            </h:outputText>
-                        </p:column>
-                        <p:summaryRow>
-                            <p:column colspan="3" style="text-align:right">
-                                <h:outputText value="#{langsys['Total']} #{langsys['For']} #{sum.attribute}" />
-                            </p:column>
-                            <p:column style="text-align:right">
-                                <h:outputText value="#{subscriptionBean.getTotalGroupedNo(subscriptionBean.subscriptionsSummary_referred_by, sum.attribute)}">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                                </h:outputText>
-                            </p:column>
-                            <p:column style="text-align:right">
-                                <h:outputText value="#{subscriptionBean.getTotalGroupedAmount(subscriptionBean.subscriptionsSummary_referred_by, sum.attribute)}">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                                </h:outputText>
-                            </p:column>
-                        </p:summaryRow>
-                    </p:dataTable>            
-                </h:panelGrid>
-                <h:panelGrid>
-                    <p:dataTable id="tblLocation" tableStyle="width:auto;" var="sum" value="#{subscriptionBean.subscriptionsSummary_location}">
-                        <p:column headerText="#{langsys[menuItemBean.menuItemObj.LOC_LEVEL_2_LABEL]}">
-                            <h:outputLabel value="#{sum.agent}"/>
-                            <f:facet name="footer">
-                                <h:outputText value="Total" />
-                            </f:facet>
-                        </p:column>
-                        <p:column headerText="#{langsys['No']}" width="10%" style="text-align: right;">
-                            <h:outputText value="#{sum.description}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                            </h:outputText>
-                            <f:facet name="footer">
-                                <h:outputText value="#{subscriptionBean.getTotalNo(subscriptionBean.subscriptionsSummary_location)}">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                                </h:outputText>
-                            </f:facet>
-                        </p:column>
-                        <p:column headerText="#{langsys['Amount']}" style="text-align: right;">
-                            <h:outputText value="#{sum.amount}">
-                                <f:convertNumber pattern="###,###.#" locale="#{utilityBean.convertLocaleToString()}"/>
-                            </h:outputText>
-                            <f:facet name="footer">
-                                <h:outputText value="#{subscriptionBean.getTotalAmount(subscriptionBean.subscriptionsSummary_location)}">
-                                    <f:convertNumber pattern="###,###.#" locale="#{utilityBean.convertLocaleToString()}"/>
-                                </h:outputText>
-                            </f:facet>
-                        </p:column>
-                    </p:dataTable>
-                    <p:dataTable id="tblSummaryAgent" sortBy="#{sum.attribute}" expandableRowGroups="true" tableStyle="width: auto;" var="sum" value="#{subscriptionBean.subscriptionsSummary_agent}">
+                    </p:dataTable>  
+                    <p:dataTable id="tblSummaryAgent" sortBy="#{sum.attribute}" expandableRowGroups="true" tableStyle="width:auto;" var="sum" value="#{subscriptionBean.subscriptionsSummary_agent}" scrollable="true" scrollHeight="485">
                         <p:column headerText="#{langsys['Agent']}">
                             <h:outputLabel value="#{sum.attribute}"/>
                         </p:column>
@@ -421,7 +434,7 @@
                         <p:column headerText="#{langsys['Month']}">
                             <h:outputLabel value="#{sum.month}"/>
                         </p:column>
-                        <p:column headerText="#{langsys['No']}" style="text-align: right;">
+                        <p:column headerText="#{langsys['No']}" width="10%" style="text-align: right;">
                             <h:outputText value="#{sum.no}">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
@@ -446,22 +459,9 @@
                                 </h:outputText>
                             </p:column>
                         </p:summaryRow>
-                    </p:dataTable>
-                    <p:dataTable id="tblSummaryAccountManger" sortBy="#{sum.account_manager}" expandableRowGroups="true" tableStyle="width: auto;" var="sum" value="#{subscriptionBean.subscriptionsSummary_account_manager}">
-                        <p:column headerText="#{langsys['Account']} #{langsys['Manager']}">
-                            <h:outputLabel value="#{sum.account_manager}"/>
-                        </p:column>
-                        <p:column headerText="#{langsys['No']}" width="10%" style="text-align: right;">
-                            <h:outputText value="#{sum.description}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                            </h:outputText>
-                        </p:column>
-                        <p:column headerText="#{langsys['Amount']}" style="text-align: right;">
-                            <h:outputText value="#{sum.amount}">
-                                <f:convertNumber pattern="###,###.#" locale="#{utilityBean.convertLocaleToString()}"/>
-                            </h:outputText>
-                        </p:column>
-                    </p:dataTable>
+                    </p:dataTable> 
+                </h:panelGrid>
+                <h:panelGrid>
                 </h:panelGrid>
             </h:panelGrid>
             <!--Form was here-->
