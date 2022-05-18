@@ -223,7 +223,7 @@
                     <p:splitButton value="#{langsys['Select']}" icon="ui-icon-pencil">
                         <p:menuitem value="#{langsys['View']}" icon="ui-icon-search" oncomplete="PF('dlgSalesInvoice').show();" actionListener="#{transBean.initSalesInvoiceSession(itm.transactionId,'View')}" update=":formTransaction"/>
                         <p:menuitem value="#{langsys['Edit']}" icon="ui-icon-pencil" oncomplete="PF('dlgSalesInvoice').show();" actionListener="#{transBean.initSalesInvoiceSession(itm.transactionId,'Edit')}" update=":formTransaction"/>
-                        <p:menuitem value="#{langsys['Credit']} #{langsys['Note']}" icon="ui-icon-note" oncomplete="PF('dlgSalesInvoice').show();" actionListener="#{transBean.initSalesInvoiceSession(itm.transactionId,'Cr')}" update=":formTransaction"/>
+                        <p:menuitem value="#{langsys['Credit']} #{langsys['Note']}" icon="ui-icon-note" oncomplete="PF('dlgCreditNote').show();" actionListener="#{transBean.initSalesInvoiceSession(itm.transactionId,'Cr')}" update=":formCreditNote"/>
                         <p:menuitem value="#{langsys['Debit']} #{langsys['Note']}" icon="ui-icon-note" oncomplete="PF('dlgSalesInvoice').show();" actionListener="#{transBean.initSalesInvoiceSession(itm.transactionId,'Dr')}" update=":formTransaction"/>
                     </p:splitButton>
                 </p:column>
@@ -289,6 +289,7 @@
             </p:dataTable>
         </h:form>
         <ui:include src="ViewSaleInvoiceTrans.xhtml"/>
+        <ui:include src="CreditNoteTrans.xhtml"/>
     </h:body>
 
 </html>

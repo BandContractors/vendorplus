@@ -7339,6 +7339,27 @@ public class TransItemBean implements Serializable {
         }
     }
 
+    public void editTransItemCr(int aTransTypeId, int aTransReasonId, String aSaleType, Trans aTrans, List<TransItem> aActiveTransItems, TransItem ti) {
+        try {
+            TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
+            TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
+            if (ti.getItemQty() < 0) {
+                ti.setItemQty(0);
+            }
+            ti.setAmount(ti.getUnitPrice() * ti.getItemQty());
+            ti.setAmountIncVat((ti.getUnitPriceIncVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+            ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+            //round off amounts basing on currency rules
+            this.roundTransItemsAmount(aTrans, ti);
+            //update totals
+            new TransBean().setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems);
+            //update refund amount
+            new TransBean().setRefundAmount(aTrans);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public void editTransItemQuickOrder(int aTransTypeId, int aTransReasonId, String aSaleType, Trans aTrans, List<TransItem> aActiveTransItems, TransItem ti) {
         TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
         TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);

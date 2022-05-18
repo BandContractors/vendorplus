@@ -10462,6 +10462,19 @@ public class TransBean implements Serializable {
         }
     }
 
+    public void setRefundAmount(Trans aNewTrans) {
+        try {
+            Trans OldTrans = this.getTrans(aNewTrans.getTransactionId());
+            if (null != OldTrans) {
+                double InvoicePaidAmount = 0;
+                InvoicePaidAmount = new PayTransBean().getTotalPaidByTransId(aNewTrans.getTransactionId());
+                aNewTrans.setDeposit_customer(InvoicePaidAmount);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public void setCashDiscountPercAndUpdateCEC(int aTransTypeId, int aTransReasonId, Trans aTrans, List<TransItem> aActiveTransItems) {
         if (aTrans.getCash_dicsount_perc() > 0) {
             aTrans.setCashDiscount(((aTrans.getSubTotal() - aTrans.getTotalTradeDiscount()) * aTrans.getCash_dicsount_perc()) / 100);
