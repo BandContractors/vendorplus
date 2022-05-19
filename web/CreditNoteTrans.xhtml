@@ -23,7 +23,7 @@
                 return confirm('Are you sure you want to UPDATE this Transaction?');
             }
             function doPrintHiddenClick() {
-                document.getElementById("formTransaction:cmdbvPrint").click();
+                document.getElementById("formCreditNote:cmdbvPrint").click();
             }
         </script> 
     </h:head>
@@ -97,7 +97,7 @@
                             <!-- column header -->
                             <f:facet name="header">#{langsys['Qty']}</f:facet>
                             <!-- row record -->
-                            <h:inputText value="#{ati.itemQty}" style="width: 50px;" disabled="#{transBean.actionType.equals('View') or generalUserSetting.currentStore.storeId!=transBean.transObj.storeId}" autocomplete="off">
+                            <h:inputText value="#{ati.itemQty}" style="width: 50px;" autocomplete="off">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                 <f:ajax event="blur" listener="#{transItemBean.editTransItemCr(transBean.transObj.transactionTypeId,transBean.transObj.transactionReasonId,'',transBean.transObj, transBean.transItemList,ati)}" execute="dtblTransactionItem" render="@form"/>
                             </h:inputText>
@@ -159,18 +159,17 @@
                         </h:inputText>
                         <h:inputText id="itxtCashDiscount" value="#{transBean.transObj.cashDiscount}" styleClass="clsInputTransItem" style="width: 180px;" autocomplete="off" disabled="#{companySetting.getBoolIsAllowDiscount() or transBean.actionType.equals('View') or generalUserSetting.currentStore.storeId!=transBean.transObj.storeId}">
                             <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                            <f:ajax event="blur" listener="#{transBean.setCashDiscountAmtAndUpdateCEC(transBean.transObj.transactionTypeId,transBean.transObj.transactionReasonId,transBean.transObj, transBean.transItemList)}" render="itxtTotalVat cmdlCashDiscount itxtGrandTotal itxtChange pgrdApprove"/>
+                            <f:ajax event="blur" listener="#{transBean.setCashDiscountAmtAndUpdateCEC(transBean.transObj.transactionTypeId,transBean.transObj.transactionReasonId,transBean.transObj, transBean.transItemList)}" render="itxtTotalVat cmdlCashDiscount itxtGrandTotal itxtRefundAmount itxtCreditAmount"/>
                         </h:inputText>
                         <h:inputText id="itxtLoyaltyDiscount" value="#{transBean.transObj.spendPointsAmount}" styleClass="clsInputTransItem" style="width: 150px;" autocomplete="off" disabled="#{transBean.actionType.equals('View') or generalUserSetting.currentStore.storeId!=transBean.transObj.storeId or transBean.transObj.cardNumber.length() eq 0}">
                             <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                            <f:ajax event="blur" listener="#{transBean.setCashDiscountAmtAndUpdateCEC(transBean.transObj.transactionTypeId,transBean.transObj.transactionReasonId,transBean.transObj, transBean.transItemList)}" render="itxtTotalVat cmdlCashDiscount itxtGrandTotal itxtChange pgrdApprove"/>
+                            <f:ajax event="blur" listener="#{transBean.setCashDiscountAmtAndUpdateCEC(transBean.transObj.transactionTypeId,transBean.transObj.transactionReasonId,transBean.transObj, transBean.transItemList)}" render="itxtTotalVat cmdlCashDiscount itxtGrandTotal itxtRefundAmount itxtCreditAmount"/>
                         </h:inputText>
                         <h:inputText id="itxtTotalVat" value="#{transBean.transObj.totalVat}" styleClass="clsInputTransItem" style="width: 150px" disabled="true">
                             <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
                         <h:inputText id="itxtGrandTotal" value="#{transBean.transObj.grandTotal}" styleClass="clsInputTransItem" style="width: 180px;background-color: yellow;font-weight: bold;font-size: 20px;" disabled="true">
                             <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                            <f:ajax event="change" render="itxtChange"/>
                         </h:inputText>
                         <h:outputLabel value=""/>
                         <p:dialog header="#{langsys['Cash']} #{langsys['Discount']}" widgetVar="dlgCashDiscount" modal="true" height="100">
@@ -182,8 +181,8 @@
                                 <p:outputLabel value="#{langsys['Cash']} #{langsys['Discount']}(%):"/>
                                 <p:inputText value="#{transBean.transObj.cash_dicsount_perc}" autocomplete="off">
                                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                                    <p:ajax event="change" listener="#{transBean.setCashDiscountPercAndUpdateCEC(transBean.transObj.transactionTypeId,transBean.transObj.transactionReasonId,transBean.transObj, transBean.transItemList)}" update="itxtCashDiscountAmount :formTransaction:cmdlCashDiscount :formTransaction:itxtCashDiscount :formTransaction:itxtGrandTotal :formTransaction:itxtChange :formTransaction:pgrdApprove"/>
-                                    <p:ajax event="keyup" listener="#{transBean.setCashDiscountPercAndUpdateCEC(transBean.transObj.transactionTypeId,transBean.transObj.transactionReasonId,transBean.transObj, transBean.transItemList)}" update="itxtCashDiscountAmount :formTransaction:cmdlCashDiscount :formTransaction:itxtCashDiscount :formTransaction:itxtGrandTotal :formTransaction:itxtChange :formTransaction:pgrdApprove"/>
+                                    <p:ajax event="change" listener="#{transBean.setCashDiscountPercAndUpdateCEC(transBean.transObj.transactionTypeId,transBean.transObj.transactionReasonId,transBean.transObj, transBean.transItemList)}" update="itxtCashDiscountAmount :formCreditNote:cmdlCashDiscount :formCreditNote:itxtCashDiscount :formCreditNote:itxtGrandTotal :formCreditNote:itxtRefundAmount :formCreditNote:itxtCreditAmount"/>
+                                    <p:ajax event="keyup" listener="#{transBean.setCashDiscountPercAndUpdateCEC(transBean.transObj.transactionTypeId,transBean.transObj.transactionReasonId,transBean.transObj, transBean.transItemList)}" update="itxtCashDiscountAmount :formCreditNote:cmdlCashDiscount :formCreditNote:itxtCashDiscount :formCreditNote:itxtGrandTotal :formCreditNote:itxtRefundAmount :formCreditNote:itxtCreditAmount"/>
                                 </p:inputText>
                                 <p:outputLabel value="#{langsys['Cash']} #{langsys['Discount']}(#{langsys['Amount']}):"/>
                                 <p:inputText id="itxtCashDiscountAmount" value="#{transBean.transObj.cashDiscount}" readonly="true" style="background-color: #E5E5E5">
@@ -205,24 +204,26 @@
                         </h:panelGrid>
                     </h:panelGrid>
                     <h:panelGrid id="pgrdPayment" styleClass="clsGridMainInput" columns="1">
-                        <h:panelGrid styleClass="clsGridMainInput" columns="5">
-                            <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Amount']} #{langsys['Tendered']}"/>
-                            <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Balance']}"/>
+                        <h:panelGrid styleClass="clsGridMainInput" columns="6">
+                            <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['First']} #{langsys['Payment']}"/>
                             <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Payment']} #{langsys['Method']}"/>
                             <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Receipt']} #{langsys['Account']}"/>
-                            <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px;color: red;" value="#{langsys['Refund']} #{langsys['Amount']} #{langsys['to']} #{langsys['be']} #{langsys['Credited']} #{langsys['on']} #{langsys['Deposit']} #{langsys['A/C']}"/>
+                            <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Total']} #{langsys['Paid']}"/>
+                            <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Credit']} #{langsys['Amount']}"/>
+                            <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px;color: red;" value="#{langsys['Paid']} #{langsys['Amount']} #{langsys['Refund']} #{langsys['to']} #{langsys['Deposit']} #{langsys['A/C']}"/>
 
-                            <h:inputText id="itxtAmountTendered" value="#{transBean.transObj.amountTendered}" styleClass="clsInputTransItem" style="width: 150px;background-color: yellow;font-weight: bold;font-size: 20px;" autocomplete="off" disabled="#{transBean.actionType.equals('View') or generalUserSetting.currentStore.storeId!=transBean.transObj.storeId}">
+                            <h:inputText id="itxtFirstPay" value="#{transBean.transObj.amountTendered ge transBean.transObj.grandTotal ? transBean.transObj.grandTotal:transBean.transObj.amountTendered}" styleClass="clsInputTransItem" style="width: 150px;background-color: yellow;font-weight: bold;font-size: 20px;" autocomplete="off" disabled="true">
                                 <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                                <f:ajax event="change" listener="#{transBean.setTransTotalsAndUpdateCEC(transBean.transObj.transactionTypeId,transBean.transObj.transactionReasonId,transBean.transObj, transBean.transItemList)}" render="itxtChange"/>
-                                <f:ajax event="keyup" listener="#{transBean.setTransTotalsAndUpdateCEC(transBean.transObj.transactionTypeId,transBean.transObj.transactionReasonId,transBean.transObj, transBean.transItemList)}" render="itxtChange"/>
-                            </h:inputText>
-                            <h:inputText id="itxtChange" value="#{transBean.transObj.changeAmount}" styleClass="clsInputTransItem" style="width: 150px;background-color: red;color: white" disabled="true">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:inputText>
                             <h:inputText id="itxtPayMethod" disabled="true" style="width: 150px;" value="#{payMethodBean.getPayMethod(transBean.payObj.payMethodId).payMethodName}"/>
-                            <h:inputText id="itxtAccount" disabled="true" style="width: 330px;" value="#{accChildAccountBean.getAccChildAccById(transBean.transObj.accChildAccountId).childAccountName}"/>
-                            <h:inputText id="itxtRefundAmount" value="#{transBean.transObj.deposit_customer}" styleClass="clsInputTransItem" style="width: 150px;background-color: red;color: white" disabled="true">
+                            <h:inputText id="itxtAccount" disabled="true" style="width: 180px;" value="#{accChildAccountBean.getAccChildAccById(transBean.transObj.accChildAccountId).childAccountName}"/>
+                            <h:inputText id="itxtTotalPaid" value="#{transBean.transObj.totalPaid}" styleClass="clsInputTransItem" style="width: 150px;background-color: yellow;" disabled="true">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:inputText>
+                            <h:inputText id="itxtCreditAmount" value="#{transBean.getTrans(transBean.transObj.transactionId).grandTotal-transBean.transObj.grandTotal}" styleClass="clsInputTransItem" style="width: 150px;background-color: red;color: white" disabled="true">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:inputText>
+                            <h:inputText id="itxtRefundAmount" value="#{transBean.transObj.totalPaid gt transBean.transObj.grandTotal ? (transBean.transObj.totalPaid-transBean.transObj.grandTotal):0}" styleClass="clsInputTransItem" style="width: 180px;background-color: red;color: white" disabled="true">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:inputText>
                         </h:panelGrid>

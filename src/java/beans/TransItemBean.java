@@ -7354,7 +7354,7 @@ public class TransItemBean implements Serializable {
             //update totals
             new TransBean().setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems);
             //update refund amount
-            new TransBean().setRefundAmount(aTrans);
+            //new TransBean().setRefundAmount(aTrans);
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
