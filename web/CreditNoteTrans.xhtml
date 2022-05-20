@@ -32,7 +32,7 @@
             <h:form id="formCreditNote" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
                         return false;"> 
                 <p:panel id="pnlTransaction">
-                    <h:panelGrid styleClass="clsGridMainHeader" columns="4" style="width: 100%">
+                    <h:panelGrid styleClass="clsGridMainHeader" columns="4" style="width: 100%" rendered="#{transBean.actionType ne 'None'}">
                         <h:outputLabel style="background-color:#d2222d;color: white;" value="#{langsys['VIEW']}" rendered="#{transBean.actionType.equals('View')}"/>
                         <h:outputLabel style="background-color:#d2222d;color: white;" value="#{langsys['EDIT']}" rendered="#{transBean.actionType.equals('Edit')}"/>
                         <h:outputLabel style="background-color:#d2222d;color: white;" value="#{langsys['CREDIT']} #{langsys['NOTE']}" rendered="#{transBean.actionType.equals('Cr')}"/>
@@ -41,7 +41,7 @@
                         <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Stock']}#{generalUserSetting.DEPLETE_SOLD_STOCK_UPON eq '0' ? '↓↑':':No effect'}"/>
                         <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Ledger']}:#{langsys['Cash']}↑ #{langsys['Sales']}↑ AR↑ #{langsys['Tax']}↑"/>
                     </h:panelGrid>
-                    <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="6">
+                    <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="6" rendered="#{transBean.actionType ne 'None'}">
                         <h:outputLabel  value="#{companySetting.getStoreEquivName()}"/>
                         <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{storeBean.getStore(transBean.transObj.storeId).storeName}" style="width: 140px;"/>
                         <h:outputLabel  value="#{langsys['Currency']}"/>
@@ -66,7 +66,7 @@
                     </h:panelGrid>
                     <p:dataTable rowIndexVar="rowIndex" id="dtblTransactionItem" value="#{transBean.transItemList}" var="ati" 
                                  styleClass="cls-table" tableStyle="width:auto;" 
-                                 rowStyleClass="#{ati.is_tax_synced eq 0 ? 'red' : null}"
+                                 rowStyleClass="#{ati.is_tax_synced eq 0 ? 'red' : null}" rendered="#{transBean.actionType ne 'None'}"
                                  >  
                         <p:column>
                             <!-- column header -->
@@ -142,7 +142,7 @@
                             <h:outputLabel value="#{utilityBean.formatDate(ati.itemExpryDate)}"/>
                         </p:column>
                     </p:dataTable>
-                    <h:panelGrid id="pgrdTotals" styleClass="clsGridMainInput" columns="7">
+                    <h:panelGrid id="pgrdTotals" styleClass="clsGridMainInput" columns="7" rendered="#{transBean.actionType ne 'None'}">
                         <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Subtotal']}"/>
                         <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Item']} #{langsys['Discount']}"/>
                         <h:outputLabel id="cmdlCashDiscount" styleClass="clsLabelTransItem" value="#{langsys['Cash']} #{langsys['Discount']} (#{utilityBean.formatDoubleToString(transBean.transObj.cash_dicsount_perc)}%)"/>
@@ -192,7 +192,7 @@
                         </p:dialog>
                     </h:panelGrid>
                     <h:panelGrid id="pgrdScheme" style="background-color: yellow;width: 100%">
-                        <h:panelGrid id="pgrdScheme2" columns="4" rendered="#{transBean.transObj.transactorId!=transBean.transObj.billTransactorId}">
+                        <h:panelGrid id="pgrdScheme2" columns="4" rendered="#{transBean.transObj.transactorId!=transBean.transObj.billTransactorId and transBean.actionType ne 'None'}">
                             <h:outputLabel  value="#{langsys['Bill']} #{langsys['For']}:"/>
                             <h:inputText styleClass="clsInput" id="itxtBillTransactor" value="#{transactorBean.getTransactor(transBean.transObj.billTransactorId).transactorNames}" autocomplete="off" style="width: 200px;" disabled="true"/>
                             <h:outputLabel  value="#{langsys['Scheme']} #{langsys['Name']}:"/>
@@ -203,14 +203,14 @@
                             <h:inputText styleClass="clsInput" id="itxtPrincSchemeMember" value="#{transBean.transObj.princSchemeMember}" disabled="true" style="width: 200px;"/>
                         </h:panelGrid>
                     </h:panelGrid>
-                    <h:panelGrid id="pgrdPayment" styleClass="clsGridMainInput" columns="1">
+                    <h:panelGrid id="pgrdPayment" styleClass="clsGridMainInput" columns="1" rendered="#{transBean.actionType ne 'None'}">
                         <h:panelGrid styleClass="clsGridMainInput" columns="6">
                             <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['First']} #{langsys['Payment']}"/>
                             <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Payment']} #{langsys['Method']}"/>
                             <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Receipt']} #{langsys['Account']}"/>
                             <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Total']} #{langsys['Paid']}"/>
                             <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Credit']} #{langsys['Amount']}"/>
-                            <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px;color: red;" value="#{langsys['Paid']} #{langsys['Amount']} #{langsys['Refund']} #{langsys['to']} #{langsys['Deposit']} #{langsys['A/C']}"/>
+                            <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px;color: red;" value="#{langsys['Paid']} #{langsys['Amount']} #{langsys['to']} #{langsys['be']} #{langsys['Refunded']} #{langsys['on']} #{langsys['Deposit']} #{langsys['A/C']}"/>
 
                             <h:inputText id="itxtFirstPay" value="#{transBean.transObj.amountTendered ge transBean.transObj.grandTotal ? transBean.transObj.grandTotal:transBean.transObj.amountTendered}" styleClass="clsInputTransItem" style="width: 150px;background-color: yellow;font-weight: bold;font-size: 20px;" autocomplete="off" disabled="true">
                                 <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -229,15 +229,12 @@
                         </h:panelGrid>
                     </h:panelGrid>
                     <h:panelGrid styleClass="clsGridMainCommands" columns="2" style="width: 100%">
-                        <h:panelGrid styleClass="clsGridMainCommands1" columns="3">
-                            <h:commandButton styleClass="clsButtonVeryBig" id="cmdbUpdate" value="#{langsys['UPDATE']} (ALT+U)" onclick="return confirmUpdate();" accesskey="u" rendered="#{transBean.actionType.equals('Edit') and generalUserSetting.currentStore.storeId==transBean.transObj.storeId}">
-                                <f:ajax listener="#{transBean.updateTransCECcallFromSI('PARENT',transBean.transObj.storeId,transBean.transObj.transactionTypeId,transBean.transObj.transactionReasonId,'',transBean.transObj,transBean.transItemList,transBean.payObj)}" execute="pnlTransaction" render="pnlTransaction pnlgOutput"/>
-                            </h:commandButton>
-                            <p:commandButton styleClass="clsButtonBig" id="cmdbRaiseCrDr" value="Raise Cr" onclick="PF('statusDialog1').show()" onsuccess="PF('statusDialog1').hide()" rendered="true">
+                        <h:panelGrid styleClass="clsGridMainCommands1" columns="3" rendered="#{transBean.actionType ne 'None'}">
+                            <p:commandButton styleClass="clsButtonBig" id="cmdbRaiseCrDr" value="#{langsys['CREATE']} #{langsys['CREDIT']} #{langsys['NOTE']}" onclick="PF('statusDialog1').show()" onsuccess="PF('statusDialog1').hide()" rendered="true">
                                 <p:dialog widgetVar="statusDialog1" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                                     <p:graphicImage name="/images/ajax-loader.gif"/>
                                 </p:dialog>
-                                <p:ajax listener="#{transBean.raiseCreditNoteCall('PARENT',transBean.transObj.storeId,transBean.transObj.transactionTypeId,transBean.transObj.transactionReasonId,'',transBean.transObj,transBean.transItemList,transBean.payObj)}" process="pnlTransaction" update="pnlTransaction pnlgOutput"/>
+                                <p:ajax listener="#{transBean.raiseCreditNoteCall('PARENT',transBean.transObj.storeId,transBean.transObj.transactionTypeId,transBean.transObj.transactionReasonId,'',transBean.transObj,transBean.transItemList,transBean.payObj,(transBean.transObj.totalPaid gt transBean.transObj.grandTotal ? (transBean.transObj.totalPaid-transBean.transObj.grandTotal):0))}" process="pnlTransaction" update="pnlTransaction pnlgOutput"/>
                             </p:commandButton>
                         </h:panelGrid>
                         <h:panelGrid columns="1">
@@ -259,7 +256,7 @@
                 <p:growl/>
                 <!-- INVOICE STARTS HERE -->
                 <h:panelGrid id="pnlgOutput" style="width: 100%">
-                    <ui:include src="#{transBean.getPrintFileName('PARENT',transactionTypeBean.getTransactionType(2),transBean.overridePrintVersion)}"/>
+                    <ui:include src="#{transBean.getPrintFileName('PARENT',transactionTypeBean.getTransactionType(82),transBean.overridePrintVersion)}"/>
                 </h:panelGrid>
                 <!-- INVOICE ENDS HERE -->
             </h:form>

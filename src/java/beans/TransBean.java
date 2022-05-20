@@ -3524,11 +3524,11 @@ public class TransBean implements Serializable {
         }
     }
 
-    public void raiseCreditNoteCall(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aNewTrans, List<TransItem> aNewTransItems, Pay aPay) {
+    public void raiseCreditNoteCall(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aNewTrans, List<TransItem> aNewTransItems, Pay aPay, double aRefundAmount) {
         //get some details
         String OrderTransNo = aNewTrans.getTransactionRef();
         //save
-        this.raiseCreditNote(aLevel, aStoreId, aTransTypeId, aTransReasonId, aSaleType, aNewTrans, aNewTransItems, aPay);
+        this.raiseCreditNote(aLevel, aStoreId, aTransTypeId, aTransReasonId, aSaleType, aNewTrans, aNewTransItems, aPay, aRefundAmount);
         //update a few things needed after sales invoice saving
         if (OrderTransNo.length() > 0) {
             Trans OrderTrans = this.getTransByNumberType(OrderTransNo, 11);
@@ -4032,18 +4032,13 @@ public class TransBean implements Serializable {
         }
     }
 
-    public void raiseCreditNote(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aNewTrans, List<TransItem> aNewTransItems, Pay aPay) {
+    public void raiseCreditNote(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aNewTrans, List<TransItem> aNewTransItems, Pay aPay, double aRefundAmount) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
         try {
             BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         } catch (Exception e) {
         }
-        //1. copy
-        //2. reverse stock(for TIs)
-        //3. update trans item
-        //4. reverse Tra(for ledgers, etc)
-        //5. update trans
         TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
         TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
         Store store = new StoreBean().getStore(aStoreId);
@@ -4055,10 +4050,10 @@ public class TransBean implements Serializable {
         long PayHistId = 0;
         long newPayId = 0;
         boolean isTransItemReverseSuccess = false;
-        Pay oldPay = new Pay();
-        Pay newPay = new Pay();
-        Pay savedpay = null;
-        Trans savedtrans = null;
+        //Pay oldPay = new Pay();
+        //Pay newPay = new Pay();
+        //Pay savedpay = null;
+        //Trans SavedCrNote = null;
         int hasReversed = 0;
         long SavedCrDrNoteTransId = 0;
 
@@ -4086,7 +4081,6 @@ public class TransBean implements Serializable {
                 httpSession.setAttribute("CURRENT_PAY_ID_CHILD", 0);
                 break;
         }
-
         if (ValidationMessage.length() > 0) {
             switch (aLevel) {
                 case "PARENT":
@@ -4098,38 +4092,17 @@ public class TransBean implements Serializable {
             }
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, ValidationMessage)));
         } else {
-            /*
-             //Reverse and Insert Journal
-             if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE RETURN INVOICE".equals(transtype.getTransactionTypeName())) {
-             savedpay = null;
-             savedtrans = null;
-             hasReversed = 0;
-             List<TransItem> transitems = null;
-             if (newPayId > 0) {
-             savedpay = new PayBean().getPay(newPayId);
-             }
-             savedtrans = new TransBean().getTrans(aNewTrans.getTransactionId());
-             transitems = new TransItemBean().getTransItemsByTransactionId(aNewTrans.getTransactionId());
-             hasReversed = new AccJournalBean().postJournalReverse(OldTrans, oldPay);
-             if (hasReversed == 1) {
-             savedtrans.setTransactionDate(new CompanySetting().getCURRENT_SERVER_DATE());
-             new AccJournalBean().postJournalSaleInvoice(savedtrans, transitems, savedpay, new AccPeriodBean().getAccPeriod(savedtrans.getTransactionDate()).getAccPeriodId());
-             }
-             }
-             */
             int ExistCountDrCrNotes = new CreditDebitNoteBean().getCountDebitAndCreditNotes(OldTrans.getTransactionNumber());
             //insert note
             SavedCrDrNoteTransId = new CreditDebitNoteBean().saveCreditDebitNote(OldTrans, aNewTrans, OldTransItems, aNewTransItems, 1);
-
             //reverse stock
             if (SavedCrDrNoteTransId > 0) {
                 TransItemBean tib = new TransItemBean();
                 isTransItemReverseSuccess = tib.reverseTransItemsCEC(OldTrans, aNewTrans, OldTransItems, aNewTransItems);
             }
-
+            //journal
             if (SavedCrDrNoteTransId > 0 && isTransItemReverseSuccess) {
-                //HERE
-                new AccJournalBean().postJournalCreditNote(SavedCrDrNoteTransId, new AccPeriodBean().getAccPeriod(savedtrans.getTransactionDate()).getAccPeriodId(), 0);
+                new AccJournalBean().postJournalCreditNote(SavedCrDrNoteTransId, new AccPeriodBean().getAccPeriod(new CompanySetting().getCURRENT_SERVER_DATE()).getAccPeriodId(), 0);
                 //session
                 switch (aLevel) {
                     case "PARENT":
@@ -4140,20 +4113,8 @@ public class TransBean implements Serializable {
                         break;
                 }
                 //Deposit refund as deposit
-                if (null != newPay) {
-                    double refundAmt = 0, oldPaid = 0, newPaid = 0;
-                    if (OldTrans.getAmountTendered() <= OldTrans.getGrandTotal()) {
-                        oldPaid = OldTrans.getAmountTendered();
-                    } else {
-                        oldPaid = OldTrans.getGrandTotal();
-                    }
-                    if (aNewTrans.getAmountTendered() <= aNewTrans.getGrandTotal()) {
-                        newPaid = aNewTrans.getAmountTendered();
-                    } else {
-                        newPaid = aNewTrans.getGrandTotal();
-                    }
-                    refundAmt = newPaid - oldPaid;
-                    newPayId = new PayBean().saveCustomerDepositFrmCrNote(SavedCrDrNoteTransId, newPay, new GeneralUserSetting().getCurrentUser().getUserDetailId(), refundAmt);
+                if (null != aPay && aRefundAmount > 0) {
+                    newPayId = new PayBean().saveCustomerDepositFrmCrNote(SavedCrDrNoteTransId, aPay, new GeneralUserSetting().getCurrentUser().getUserDetailId(), aRefundAmount);
                     switch (aLevel) {
                         case "PARENT":
                             httpSession.setAttribute("CURRENT_PAY_ID", newPayId);
@@ -4163,13 +4124,11 @@ public class TransBean implements Serializable {
                             break;
                     }
                 }
-
                 //SMbi API insert loyalty transaction for the note
                 String scope = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_SMBI_SCOPE").getParameter_value();
                 if (SavedCrDrNoteTransId > 0 && aNewTrans.getCardNumber().length() > 0 && (scope.isEmpty() || scope.contains("LOYALTY"))) {
                     int x = new Loyalty_transactionBean().insertLoyalty_transaction_cr_dr(SavedCrDrNoteTransId);
                 }
-
                 TransItemBean = null;
                 //clean stock
                 StockBean.deleteZeroQtyStock();
@@ -14571,6 +14530,64 @@ public class TransBean implements Serializable {
         new OutputDetailBean().refreshOutput("PARENT", "");
         //refresh history
         this.TransListHist = new ReportBean().getTransHistory(aTransId);
+    }
+
+    public void initCheckCreditNoteSession(String aTransNo, long aTransId, String aAction) {
+        //first set current selection in session
+        FacesContext context = FacesContext.getCurrentInstance();
+        HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+        HttpSession httpSession = request.getSession(true);
+        List<Trans> aList = new CreditDebitNoteBean().getTrans_cr_dr_notes(aTransNo);
+        if (aList.isEmpty()) {
+            this.ActionType = aAction;
+            httpSession.setAttribute("CURRENT_TRANSACTION_ID", 0);
+            httpSession.setAttribute("CURRENT_TRANSACTION_ACTION", aAction);
+            httpSession.setAttribute("CURRENT_PAY_ID", 0);
+            this.TransObj = new TransBean().getTrans(aTransId);
+            this.updateLookup(this.TransObj);
+            this.TransItemList = new TransItemBean().getTransItemsByTransactionId(aTransId);
+            try {
+                this.PayObj = new PayBean().getTransactionFirstPayByTransNo(TransObj.getTransactionNumber());//first payment
+                httpSession.setAttribute("CURRENT_PAY_ID", this.PayObj.getPayId());
+            } catch (NullPointerException npe) {
+                this.PayObj = null;
+            }
+            //refresh output
+            new OutputDetailBean().refreshOutput("PARENT", "");
+        } else if (aList.size() == 1) {
+            this.ActionType = "None";
+            Trans CrNote = aList.get(0);
+            httpSession.setAttribute("CURRENT_TRANSACTION_ID", CrNote.getTransactionId());
+            httpSession.setAttribute("CURRENT_TRANSACTION_ACTION", "None");//aAction
+            httpSession.setAttribute("CURRENT_PAY_ID", 0);
+            this.clearTrans(this.TransObj);
+            try {
+                this.TransItemList.clear();
+            } catch (NullPointerException npe) {
+            }
+            try {
+                new PayBean().clearPay(this.PayObj);
+            } catch (NullPointerException npe) {
+            }
+            //refresh output
+            new OutputDetailBean().refreshOutputCrDr("PARENT", "");
+        } else {
+            this.ActionType = "None";
+            httpSession.setAttribute("CURRENT_TRANSACTION_ID", 0);
+            httpSession.setAttribute("CURRENT_TRANSACTION_ACTION", "None");//aAction
+            httpSession.setAttribute("CURRENT_PAY_ID", 0);
+            this.clearTrans(this.TransObj);
+            try {
+                this.TransItemList.clear();
+            } catch (NullPointerException npe) {
+            }
+            try {
+                new PayBean().clearPay(this.PayObj);
+            } catch (NullPointerException npe) {
+            }
+            //refresh output
+            new OutputDetailBean().refreshOutputCrDr("PARENT", "");
+        }
     }
 
     public void initCreditDebitNoteSession(String aHasTransId, String aAction) {
