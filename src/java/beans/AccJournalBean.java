@@ -960,6 +960,27 @@ public class AccJournalBean implements Serializable {
                 }
                 ListItemIndex3 = ListItemIndex3 + 1;
             }
+
+            int DepositAccountId = 0;
+            String DepositAccountCode = "2-00-000-070";//Customer Advances and Deposits Payable
+            try {
+                DepositAccountId = new AccCoaBean().getAccCoaByCodeOrId(DepositAccountCode, 0).getAccCoaId();
+            } catch (NullPointerException npe) {
+                DepositAccountId = 0;
+            }
+            //Credit Deposit
+            if (aRefundAmount > 0) {
+                if (aBillTransactor != null) {
+                    accjournal.setBillTransactorId(aBillTransactor.getTransactorId());
+                }
+                accjournal.setAccChildAccountId(0);
+                accjournal.setAccCoaId(DepositAccountId);
+                accjournal.setAccountCode(DepositAccountCode);
+                accjournal.setDebitAmount(0);
+                accjournal.setCreditAmount(aRefundAmount);
+                accjournal.setNarration("PREPAID INCOME");
+                this.saveAccJournal(accjournal);
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }

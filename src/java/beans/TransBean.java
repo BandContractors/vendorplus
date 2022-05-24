@@ -4042,8 +4042,7 @@ public class TransBean implements Serializable {
         TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
         TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
         Store store = new StoreBean().getStore(aStoreId);
-        String ValidationMessage = this.validateTransCEC(aStoreId, aTransTypeId, aTransReasonId, aSaleType, aNewTrans, aNewTransItems, null, null);
-
+        String ValidationMessage = new CreditDebitNoteBean().validateCreditNote(aStoreId, aNewTrans, aNewTransItems);
         String sql = null;
         String msg = "";
         long TransHistId = 0;
@@ -4102,7 +4101,7 @@ public class TransBean implements Serializable {
             }
             //journal
             if (SavedCrDrNoteTransId > 0 && isTransItemReverseSuccess) {
-                new AccJournalBean().postJournalCreditNote(SavedCrDrNoteTransId, new AccPeriodBean().getAccPeriod(new CompanySetting().getCURRENT_SERVER_DATE()).getAccPeriodId(), 0);
+                new AccJournalBean().postJournalCreditNote(SavedCrDrNoteTransId, new AccPeriodBean().getAccPeriod(new CompanySetting().getCURRENT_SERVER_DATE()).getAccPeriodId(), aRefundAmount);
                 //session
                 switch (aLevel) {
                     case "PARENT":
@@ -4113,17 +4112,19 @@ public class TransBean implements Serializable {
                         break;
                 }
                 //Deposit refund as deposit
-                if (null != aPay && aRefundAmount > 0) {
-                    newPayId = new PayBean().saveCustomerDepositFrmCrNote(SavedCrDrNoteTransId, aPay, new GeneralUserSetting().getCurrentUser().getUserDetailId(), aRefundAmount);
-                    switch (aLevel) {
-                        case "PARENT":
-                            httpSession.setAttribute("CURRENT_PAY_ID", newPayId);
-                            break;
-                        case "CHILD":
-                            httpSession.setAttribute("CURRENT_PAY_ID_CHILD", newPayId);
-                            break;
-                    }
-                }
+                /*
+                 if (null != aPay && aRefundAmount > 0) {
+                 newPayId = new PayBean().saveCustomerDepositFrmCrNote(SavedCrDrNoteTransId, aPay, new GeneralUserSetting().getCurrentUser().getUserDetailId(), aRefundAmount);
+                 switch (aLevel) {
+                 case "PARENT":
+                 httpSession.setAttribute("CURRENT_PAY_ID", newPayId);
+                 break;
+                 case "CHILD":
+                 httpSession.setAttribute("CURRENT_PAY_ID_CHILD", newPayId);
+                 break;
+                 }
+                 }
+                 */
                 //SMbi API insert loyalty transaction for the note
                 String scope = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_SMBI_SCOPE").getParameter_value();
                 if (SavedCrDrNoteTransId > 0 && aNewTrans.getCardNumber().length() > 0 && (scope.isEmpty() || scope.contains("LOYALTY"))) {

@@ -2,13 +2,16 @@ package beans;
 
 import connections.DBConnection;
 import entities.CompanySetting;
+import entities.GroupRight;
 import entities.Pay;
 import entities.Store;
 import entities.Trans;
 import entities.TransItem;
 import entities.TransactionReason;
 import entities.TransactionType;
+import entities.Transaction_approval;
 import entities.Transactor;
+import entities.UserDetail;
 import java.io.Serializable;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -955,6 +958,72 @@ public class CreditDebitNoteBean implements Serializable {
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
+    }
+
+    public String validateCreditNote(int aStoreId, Trans trans, List<TransItem> aActiveTransItems) {
+        //CREDIT NOTE; CreditOrDebitNote = "Credit Note"; TransTypeId = 82; TransReasId = 126;
+        String msg = "";
+        try {
+            TransactionType transtype = new TransactionTypeBean().getTransactionType(82);
+            TransactionReason transreason = new TransactionReasonBean().getTransactionReason(126);
+            Store store = new StoreBean().getStore(aStoreId);
+
+            String ItemMessage = "";
+            try {
+                //ItemMessage = new TransItemBean().getAnyItemTotalQtyGreaterThanCurrentQty(new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans), store.getStoreId(), transtype.getTransactionTypeName());
+            } catch (NullPointerException npe) {
+            }
+            UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
+            List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
+            GroupRightBean grb = new GroupRightBean();
+
+            if (null == transtype) {
+                msg = "Invalid Transaction";
+            } else if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, Integer.toString(transreason.getTransactionReasonId()), "Add") == 0) {
+                msg = "Access Denied";
+            } else if (trans.getTransactionDate() == null) {
+                msg = "Select " + transtype.getTransactionDateLabel();
+            } else if ((new GeneralUserSetting().getDaysFromDateToLicenseExpiryDate(trans.getTransactionDate()) <= 0 || new GeneralUserSetting().getDaysFromDateToLicenseExpiryDate(new CompanySetting().getCURRENT_SERVER_DATE()) <= 0) && CompanySetting.getLicenseType() != 9) {
+                msg = "Server Date is Wrong or Lincese is Expired";
+            } else if (aActiveTransItems.size() < 1) {
+                msg = "Item not Found for " + transtype.getTransactionOutputLabel();
+            } else if (trans.getGrandTotal() < 0) {
+                msg = "Invalid Credit Note Amount";
+            } else if (null == new AccPeriodBean().getAccPeriod(new CompanySetting().getCURRENT_SERVER_DATE())) {
+                msg = "Selected Date does not Match Accounting Period";
+            } else if (new AccPeriodBean().getAccPeriod(new CompanySetting().getCURRENT_SERVER_DATE()).getIsClosed() == 1) {
+                msg = "Selected Date is for a Closed Accounting Period";
+            } else if (this.countItemsWithQtyChange("Adds",new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans)) > 0) {
+                msg = "You Cannot Add Quantity for Credit Note";
+            } else if (this.countItemsWithQtyChange("Subs",new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans)) == 0) {
+                msg = "Atleast One Item Quantity has to Change";
+            }
+        } catch (Exception e) {
+            msg = "An Error has Occured During the Validation Process";
+            //System.err.println("--:validateTransCEC:--" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
+        }
+        return msg;
+    }
+
+    public int countItemsWithQtyChange(String aChange, List<TransItem> aTransItemsListCurLessPrevQty) {
+        int Found = 0;
+        try {
+            List<TransItem> ati = aTransItemsListCurLessPrevQty;
+            int ListItemIndex = 0;
+            int ListItemNo = ati.size();
+            while (ListItemIndex < ListItemNo) {
+                if (aChange.equals("Adds") && ati.get(ListItemIndex).getItemQty() > 0) {
+                    Found = Found + 1;
+                } else if (aChange.equals("Subs") && ati.get(ListItemIndex).getItemQty() < 0) {
+                    Found = Found + 1;
+                }
+                ListItemIndex = ListItemIndex + 1;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return Found;
     }
 
     /**
