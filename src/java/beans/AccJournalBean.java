@@ -675,6 +675,7 @@ public class AccJournalBean implements Serializable {
                 }
                 ItemInventoryAccountCode = ati2.get(ListItemIndex2).getAccountCode();
                 ItemInventoryCostAmount = ati2.get(ListItemIndex2).getUnitCostPrice();
+                ItemInventoryCostAmount = new AccCurrencyBean().roundAmount(accjournal.getCurrencyCode(), ItemInventoryCostAmount);
                 try {
                     ItemInventoryAccountId = new AccCoaBean().getAccCoaByCodeOrId(ItemInventoryAccountCode, 0).getAccCoaId();
                 } catch (NullPointerException npe) {
@@ -711,6 +712,7 @@ public class AccJournalBean implements Serializable {
                     ItemInventoryItemTypeAccountCode = "5-10-000-020";
                 }
                 ItemInventoryItemTypeCostAmount = ati3.get(ListItemIndex3).getUnitCostPrice();
+                ItemInventoryItemTypeCostAmount = new AccCurrencyBean().roundAmount(accjournal.getCurrencyCode(), ItemInventoryItemTypeCostAmount);
                 try {
                     ItemInventoryItemTypeAccountId = new AccCoaBean().getAccCoaByCodeOrId(ItemInventoryItemTypeAccountCode, 0).getAccCoaId();
                 } catch (NullPointerException npe) {
