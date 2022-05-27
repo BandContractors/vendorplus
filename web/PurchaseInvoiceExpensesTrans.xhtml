@@ -123,7 +123,9 @@
                 <h:outputLabel styleClass="clsLabelTransItem" style="width: 100px" value="#{langsys['Unit']}"/>
                 <h:outputLabel styleClass="clsLabelTransItem" style="width: 100px" value="#{langsys['Qty']}"/>
                 <h:outputLabel styleClass="clsLabelTransItem" style="width: 100px" value="#{langsys['Unit']} #{langsys['Price']}"/>
-                <h:outputLabel styleClass="clsLabelTransItem" style="width: 100px" value="#{langsys['Unit']} VAT"/>
+                <p:commandLink value="#{langsys['Unit']} VAT" style="text-decoration: none;" title="#{langsys['Calculate']} VAT #{langsys['from']} #{langsys['Unit']} #{langsys['Price']}">
+                    <p:ajax listener="#{transItemExtBean.calVatFromAmountAtPurchase(transItem,trans.currencyCode)}" process="@this" update="itxtUnitPrice itxtUnitVat"/>
+                </p:commandLink>
                 <h:outputLabel styleClass="clsLabelTransItem" style="width: 100px;back" value="#{langsys['Unit']} #{langsys['Item']} #{langsys['Discount']}"/>
                 <h:outputLabel styleClass="clsLabelTransItem" style="width: 100px" value="#{langsys['Amount']}"/>
 

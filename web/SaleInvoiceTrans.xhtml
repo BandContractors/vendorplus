@@ -186,7 +186,7 @@
                 <h:outputLabel value=""/>
                 <h:outputLabel styleClass="clsLabelTransItem" style="width: 50px" value="#{langsys['Qty']}"/>
                 <h:outputLabel value=""/>
-                <p:commandLink value="#{langsys['Unit Price']}" style="text-decoration: none;">
+                <p:commandLink value="#{langsys['Unit']} #{langsys['Price']}" style="text-decoration: none;">
                     <p:ajax listener="#{transExtBean.reverseOverridePrices(transItem)}" process="@this" update="pgrdOverrideWarranty"/>
                 </p:commandLink>
                 <h:outputLabel styleClass="clsLabelTransItem" style="width: 100px" value="#{langsys['Amount']}"/>
@@ -468,7 +468,7 @@
                         </p:commandButton>
                     </h:panelGrid>
                 </p:dialog>
-                <p:dialog header="#{langsys['Loyalty']}" widgetVar="dlgLoyalty" modal="true" height="170" closable="false">
+                <p:dialog header="#{langsys['Loyalty']}" widgetVar="dlgLoyalty" modal="true" height="180" closable="false">
                     <h:panelGrid id="pnlgFilterLoyalty" columns="2">
                         <h:outputLabel value="#{langsys['Loyalty']} #{langsys['Card']} #{langsys['No']}:"/>
                         <h:inputText id="itxtCardNumber" value="#{trans.cardNumber}" styleClass="clsInputTransItem" style="width: 170px; height: 25px;" autocomplete="off" onkeypress="if (event.keyCode == 13) {
