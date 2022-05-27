@@ -2164,7 +2164,7 @@ CREATE PROCEDURE sp_search_inventory_cost_by_trans
 	IN in_transaction_id bigint 
 ) 
 BEGIN 
-		SELECT IFNULL(ti.account_code,'') as account_code,sum(ti.item_qty*(ti.unit_cost_price/(1 + (ti.vat_perc/100)))) as unit_cost_price FROM transaction_item ti 
+		SELECT IFNULL(ti.account_code,'') as account_code,sum(ti.item_qty*(CASE WHEN ti.unit_vat>0 THEN (ti.unit_cost_price/(1 + (ti.vat_perc/100))) ELSE ti.unit_cost_price END)) as unit_cost_price FROM transaction_item ti 
 		WHERE ti.transaction_id=in_transaction_id AND IFNULL(ti.account_code,'')<>'' AND IFNULL(ti.account_code,'') NOT LIKE '5%'  
 		GROUP BY IFNULL(ti.account_code,'');
 END//
@@ -2177,7 +2177,7 @@ CREATE PROCEDURE sp_search_inventory_item_type_cost_by_trans
 	IN in_transaction_id bigint 
 ) 
 BEGIN 
-		SELECT i.item_type,sum(ti.item_qty*(ti.unit_cost_price/(1 + (ti.vat_perc/100)))) as unit_cost_price FROM transaction_item ti 
+		SELECT i.item_type,sum(ti.item_qty*(CASE WHEN ti.unit_vat>0 THEN (ti.unit_cost_price/(1 + (ti.vat_perc/100))) ELSE ti.unit_cost_price END)) as unit_cost_price FROM transaction_item ti 
 		INNER JOIN item i ON ti.item_id=i.item_id 
 		WHERE ti.transaction_id=in_transaction_id AND IFNULL(ti.account_code,'')<>'' AND IFNULL(ti.account_code,'') NOT LIKE '5%'  
 		GROUP BY i.item_type;

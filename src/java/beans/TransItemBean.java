@@ -6278,6 +6278,8 @@ public class TransItemBean implements Serializable {
                     double UnitCostExcVat = 0;
                     if (ti.getUnitVat() > 0) {
                         UnitCostExcVat = ti.getUnitCostPrice() / (1 + (ti.getVatPerc() / 100));
+                    } else {
+                        UnitCostExcVat = ti.getUnitCostPrice();
                     }
                     ti.setUnitProfitMargin((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) - UnitCostExcVat);
                 } else if ("STOCK ADJUSTMENT".equals(transtype.getTransactionTypeName()) || "DISPOSE STOCK".equals(transtype.getTransactionTypeName()) || "STOCK CONSUMPTION".equals(transtype.getTransactionTypeName())) {
@@ -7647,6 +7649,8 @@ public class TransItemBean implements Serializable {
                     double UnitCostExcVat = 0;
                     if (ti.getUnitVat() > 0) {
                         UnitCostExcVat = ti.getUnitCostPrice() / (1 + (ti.getVatPerc() / 100));
+                    } else {
+                        UnitCostExcVat = ti.getUnitCostPrice();
                     }
                     ti.setUnitProfitMargin((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) - UnitCostExcVat);
                 } else {
@@ -11830,6 +11834,8 @@ public class TransItemBean implements Serializable {
                     double UnitCostExcVat = 0;
                     if (aSelectedTransItem.getUnitVat() > 0) {
                         UnitCostExcVat = aSelectedTransItem.getUnitCostPrice() / (1 + (aSelectedTransItem.getVatPerc() / 100));
+                    } else {
+                        UnitCostExcVat = aSelectedTransItem.getUnitCostPrice();
                     }
                     aSelectedTransItem.setUnitProfitMargin((aSelectedTransItem.getUnitPriceExcVat() - aSelectedTransItem.getUnitTradeDiscount()) - UnitCostExcVat);
                 } else {
