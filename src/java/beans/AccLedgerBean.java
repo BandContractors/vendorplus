@@ -2380,20 +2380,9 @@ public class AccLedgerBean implements Serializable {
     }
 
     public void initViewCategoryIncomeStatement(AccIncomeStatement aAccIncomeStatement, String aCategoryHeader, String aCategory) {
-        String sql = "SELECT y.transaction_type_name,t.transaction_id,t.transaction_number,a.account_name,j.currency_code,j.journal_date,j.debit_amount,j.credit_amount,j.xrate "
-                + "FROM acc_journal j "
-                + "INNER JOIN transaction t ON j.transaction_id=t.transaction_id "
-                + "INNER JOIN transaction_type y ON j.transaction_type_id=y.transaction_type_id "
-                + "INNER JOIN acc_coa a ON j.acc_coa_id=a.acc_coa_id  "
-                + "WHERE j.acc_period_id=" + aAccIncomeStatement.getAccPeriodId();
-        String sql2 = "SELECT count(*) as n "
-                + "FROM acc_journal j "
-                + "INNER JOIN transaction t ON j.transaction_id=t.transaction_id "
-                + "INNER JOIN transaction_type y ON j.transaction_type_id=y.transaction_type_id "
-                + "INNER JOIN acc_coa a ON j.acc_coa_id=a.acc_coa_id  "
-                + "WHERE j.acc_period_id=" + aAccIncomeStatement.getAccPeriodId();
         String aWhere = "";
         String AccStartWith = "";
+        String TransTableName = "";
         String DrCr = "";
         String aOrder = " ORDER BY j.journal_date DESC,y.transaction_type_name ASC";
         this.CategoryHeader = aCategoryHeader;
@@ -2405,238 +2394,308 @@ public class AccLedgerBean implements Serializable {
         }
         switch (aCategory) {
             case "RevORSaleProduct":
+                TransTableName = "transaction";
                 AccStartWith = "4-10-000-010";
                 DrCr = "Cr";
                 break;
             case "RevORSaleService":
+                TransTableName = "transaction";
                 AccStartWith = "4-10-000-020";
                 DrCr = "Cr";
                 break;
             case "RevORSaleHire":
+                TransTableName = "transaction";
                 AccStartWith = "4-10-000-050";
                 DrCr = "Cr";
                 break;
             case "RevORSaleDisc":
+                TransTableName = "transaction";
                 AccStartWith = "4-10-000-030";
                 DrCr = "Dr";
                 break;
             case "RevORSaleReturn":
+                TransTableName = "transaction_cr_dr_note";
                 AccStartWith = "4-10-000-040";
                 DrCr = "Dr";
                 break;
             case "RevNORInterest":
+                TransTableName = "transaction";
                 AccStartWith = "4-20-000-010";
                 DrCr = "Cr";
                 break;
             case "RevNORDividend":
+                TransTableName = "transaction";
                 AccStartWith = "4-20-000-020";
                 DrCr = "Cr";
                 break;
             case "RevNORCommission":
+                TransTableName = "transaction";
                 AccStartWith = "4-20-000-030";
                 DrCr = "Cr";
                 break;
             case "RevNORRental":
+                TransTableName = "transaction";
                 AccStartWith = "4-20-000-040";
                 DrCr = "Cr";
                 break;
             case "RevNORGainSaleAsset":
+                TransTableName = "transaction";
                 AccStartWith = "4-20-000-050";
                 DrCr = "Cr";
                 break;
             case "RevNORGainGift":
+                TransTableName = "transaction";
                 AccStartWith = "4-20-000-060";
                 DrCr = "Cr";
                 break;
             case "RevNORGainExchange":
+                TransTableName = "transaction";
                 AccStartWith = "4-20-000-070";
                 DrCr = "Cr";
                 break;
             case "RevNOROther":
+                TransTableName = "transaction";
                 AccStartWith = "4-20-000-080";
                 DrCr = "Cr";
                 break;
             case "ExpCOGSProduct":
+                TransTableName = "transaction";
                 AccStartWith = "5-10-000-010";
                 DrCr = "Dr";
                 break;
             case "ExpCOGSService":
+                TransTableName = "transaction";
                 AccStartWith = "5-10-000-020";
                 DrCr = "Dr";
                 break;
             case "ExpCOGSFreight":
+                TransTableName = "transaction";
                 AccStartWith = "5-10-000-030";
                 DrCr = "Dr";
                 break;
             case "ExpCOGSInvAdj":
+                TransTableName = "transaction";
                 AccStartWith = "5-10-000-040";
                 DrCr = "Dr";
                 break;
             case "ExpCOGSReturn":
+                TransTableName = "transaction";
                 AccStartWith = "5-10-000-050";
                 DrCr = "Cr";
                 break;
             case "ExpCOGSDisc":
+                TransTableName = "transaction";
                 AccStartWith = "5-10-000-060";
                 DrCr = "Cr";
                 break;
             case "ExpCOGSManfSold":
+                TransTableName = "transaction";
                 AccStartWith = "5-10-000-070";
                 DrCr = "Dr";
                 break;
             case "ExpCOGSLoyalty":
+                TransTableName = "transaction";
                 AccStartWith = "5-10-000-080";
                 DrCr = "Dr";
                 break;
             case "ExpCOGSInvWriteOff":
+                TransTableName = "transaction";
                 AccStartWith = "5-10-000-090";
                 DrCr = "Dr";
                 break;
             case "ExpOEAdvertise":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-000";
                 DrCr = "Dr";
                 break;
             case "ExpOEAudit":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-010";
                 DrCr = "Dr";
                 break;
             case "ExpOEBadDebts":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-020";
                 DrCr = "Dr";
                 break;
             case "ExpOECommission":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-030";
                 DrCr = "Dr";
                 break;
             case "ExpOEComputer":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-040";
                 DrCr = "Dr";
                 break;
             case "ExpOEDonations":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-050";
                 DrCr = "Dr";
                 break;
             case "ExpOEEntertainment":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-060";
                 DrCr = "Dr";
                 break;
             case "ExpOEFreightTransport":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-070";
                 DrCr = "Dr";
                 break;
             case "ExpOEGift":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-080";
                 DrCr = "Dr";
                 break;
             case "ExpOEHotelLodging":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-090";
                 DrCr = "Dr";
                 break;
             case "ExpOELegal":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-100";
                 DrCr = "Dr";
                 break;
             case "ExpOEUtility":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-110";
                 DrCr = "Dr";
                 break;
             case "ExpOERent":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-120";
                 DrCr = "Dr";
                 break;
             case "ExpOERates":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-130";
                 DrCr = "Dr";
                 break;
             case "ExpOERepairMaint":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-140";
                 DrCr = "Dr";
                 break;
             case "ExpOESalesPromotion":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-150";
                 DrCr = "Dr";
                 break;
             case "ExpOEStaffWelfare":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-160";
                 DrCr = "Dr";
                 break;
             case "ExpOEStartupPreOperate":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-170";
                 DrCr = "Dr";
                 break;
             case "ExpOEStationeryPrint":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-180";
                 DrCr = "Dr";
                 break;
             case "ExpOESubsAllowance":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-190";
                 DrCr = "Dr";
                 break;
             case "ExpOETelephone":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-200";
                 DrCr = "Dr";
                 break;
             case "ExpOETraining":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-210";
                 DrCr = "Dr";
                 break;
             case "ExpOETravel":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-220";
                 DrCr = "Dr";
                 break;
             case "ExpOEWorkshopConf":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-230";
                 DrCr = "Dr";
                 break;
             case "ExpOEInternet":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-240";
                 DrCr = "Dr";
                 break;
             case "ExpOEDepriciation":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-250";
                 DrCr = "Dr";
                 break;
             case "ExpOELossDisposalAsset":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-260";
                 DrCr = "Dr";
                 break;
             case "ExpOEManagementFees":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-270";
                 DrCr = "Dr";
                 break;
             case "ExpOEScientificResearch":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-280";
                 DrCr = "Dr";
                 break;
             case "ExpOEEmployment":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-290";
                 DrCr = "Dr";
                 break;
             case "ExpOEFinancial":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-300";
                 DrCr = "Dr";
                 break;
             case "ExpOEShortInsurance":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-400";
                 DrCr = "Dr";
                 break;
             case "ExpOEIncomeTax":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-410";
                 DrCr = "Dr";
                 break;
             case "ExpOEProposedDividend":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-420";
                 DrCr = "Dr";
                 break;
             case "ExpOEOther":
+                TransTableName = "transaction";
                 AccStartWith = "5-20-430";
                 DrCr = "Dr";
                 break;
             case "ExpNOE":
+                TransTableName = "transaction";
                 AccStartWith = "5-30-000";
                 DrCr = "Dr";
                 break;
         }
+        String sql = "SELECT y.transaction_type_name,t.transaction_id,t.transaction_number,a.account_name,j.currency_code,j.journal_date,j.debit_amount,j.credit_amount,j.xrate "
+                + "FROM acc_journal j "
+                + "INNER JOIN " + TransTableName + " t ON j.transaction_id=t.transaction_id "
+                + "INNER JOIN transaction_type y ON j.transaction_type_id=y.transaction_type_id "
+                + "INNER JOIN acc_coa a ON j.acc_coa_id=a.acc_coa_id  "
+                + "WHERE j.acc_period_id=" + aAccIncomeStatement.getAccPeriodId();
+        String sql2 = "SELECT count(*) as n "
+                + "FROM acc_journal j "
+                + "INNER JOIN " + TransTableName + " t ON j.transaction_id=t.transaction_id "
+                + "INNER JOIN transaction_type y ON j.transaction_type_id=y.transaction_type_id "
+                + "INNER JOIN acc_coa a ON j.acc_coa_id=a.acc_coa_id  "
+                + "WHERE j.acc_period_id=" + aAccIncomeStatement.getAccPeriodId();
         aWhere = aWhere + " AND j.account_code LIKE '" + AccStartWith + "%'";
         sql = sql + aWhere + aOrder + " LIMIT 1000";
         sql2 = sql2 + aWhere;

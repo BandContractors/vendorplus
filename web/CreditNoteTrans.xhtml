@@ -210,7 +210,7 @@
                             <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Receipt']} #{langsys['Account']}"/>
                             <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Total']} #{langsys['Paid']}"/>
                             <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Credit']} #{langsys['Amount']}"/>
-                            <h:outputLabel id="olbRefundAmount" styleClass="clsLabelTransItem" style="width: 150px;color: red;" value="#{transBean.transObj.totalPaid ge transBean.transObj.grandTotal ? utilityBean.translateWordsInText(langsys, 'Paid Amount to be Refunded on Deposit A/C'):utilityBean.translateWordsInText(langsys, 'Amount to Reverse Credit')}"/>
+                            <h:outputLabel id="olbRefundAmount" styleClass="clsLabelTransItem" style="width: 150px;color: red;" value="#{transBean.transObj.totalPaid ge transBean.transObj.grandTotal ? utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS, 'Paid Amount to be Refunded on Deposit ACC'):utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS, 'Amount to Reverse Credit')}"/>
 
                             <h:inputText id="itxtFirstPay" value="#{transBean.transObj.amountTendered ge transBean.transObj.grandTotal ? transBean.transObj.grandTotal:transBean.transObj.amountTendered}" styleClass="clsInputTransItem" style="width: 150px;background-color: yellow;font-weight: bold;font-size: 20px;" autocomplete="off" disabled="true">
                                 <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>

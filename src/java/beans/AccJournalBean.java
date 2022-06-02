@@ -907,7 +907,7 @@ public class AccJournalBean implements Serializable {
                     accjournal.setAccountCode(SalesReturnAccountCode);
                     accjournal.setDebitAmount(NetSalesReturnAmount);
                     accjournal.setCreditAmount(0);
-                    accjournal.setNarration("Sales Return");
+                    accjournal.setNarration("Reversed Sales Revenue");
                     this.saveAccJournal(accjournal);
                 }
                 ListItemIndex = ListItemIndex + 1;
@@ -926,7 +926,7 @@ public class AccJournalBean implements Serializable {
                     accjournal.setBillTransactorId(0);
                 }
                 ItemInventoryAccountCode = ati2.get(ListItemIndex2).getAccountCode();
-                ItemInventoryCostAmount = (-1) * ati2.get(ListItemIndex2).getUnitCostPrice();
+                ItemInventoryCostAmount = new AccCurrencyBean().roundAmount(accjournal.getCurrencyCode(), (-1) * ati2.get(ListItemIndex2).getUnitCostPrice());
                 try {
                     ItemInventoryAccountId = new AccCoaBean().getAccCoaByCodeOrId(ItemInventoryAccountCode, 0).getAccCoaId();
                 } catch (NullPointerException npe) {
@@ -960,7 +960,7 @@ public class AccJournalBean implements Serializable {
                 } else if (ati3.get(ListItemIndex3).getItem_type().equals("SERVICE")) {//Cost of Purchase - Services	5-10-000-020	
                     ItemInventoryItemTypeAccountCode = "5-10-000-020";
                 }
-                ItemInventoryItemTypeCostAmount = (-1) * ati3.get(ListItemIndex3).getUnitCostPrice();
+                ItemInventoryItemTypeCostAmount = new AccCurrencyBean().roundAmount(accjournal.getCurrencyCode(), (-1) * ati3.get(ListItemIndex3).getUnitCostPrice());
                 try {
                     ItemInventoryItemTypeAccountId = new AccCoaBean().getAccCoaByCodeOrId(ItemInventoryItemTypeAccountCode, 0).getAccCoaId();
                 } catch (NullPointerException npe) {
