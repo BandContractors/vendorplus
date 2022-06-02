@@ -734,6 +734,11 @@ public class AccJournalBean implements Serializable {
     }
 
     public void postJournalCreditNote(long aCrNoteTransId, int aAccPeriodId, double aRefundAmount) {
+        //REVSERSE SALES REVENUE BY SALES RETURN
+        //There is need to account for sale returns as though no sale had occurred in the first place.
+        //Hence, the value of goods returned must be deducted from the sale revenue.
+        //If sale was initially made on credit, the receivable recognized must be reversed by the amount of sales returned. 
+        //If the sales in respect of the returns were made for cash, then a payable must be recognized to acknowledge the liability to reimburse the customer the amount he had paid for those purchases.
         long JobId = 0;
         try {
             Trans trans = new Trans();
@@ -777,19 +782,6 @@ public class AccJournalBean implements Serializable {
             } catch (NullPointerException npe) {
                 SalesDiscAccountId = 0;
             }
-            double GrossSalesAmount = 0;
-            double NetSalesAmount = 0;
-            double PaidCashAmount = 0;
-            double LoyaltyAmountExpense = 0;
-            double ReceivableAmount = 0;
-            double VatOutputTaxAmount = 0;
-            double CashDiscountAmount = 0;
-
-            GrossSalesAmount = (-1) * trans.getGrandTotal();
-            LoyaltyAmountExpense = (-1) * trans.getSpendPointsAmount();
-            ReceivableAmount = (-1) * trans.getGrandTotal();// + PaidLoyaltyAmount);
-            VatOutputTaxAmount = (-1) * trans.getTotalVat();
-            CashDiscountAmount = (-1) * trans.getCashDiscount();
 
             AccJournal accjournal = new AccJournal();
             //get job Id
@@ -819,9 +811,8 @@ public class AccJournalBean implements Serializable {
             } catch (NullPointerException npe) {
                 aBillTransactor = null;
             }
-            //CREDIT MADE
-            if (ReceivableAmount > 0) {
-                //Debit cash account
+            //REVERSE CREDIT
+            if (aRefundAmount < 0) {
                 accjournal.setAccChildAccountId(0);
                 if (aBillTransactor != null) {
                     accjournal.setBillTransactorId(aBillTransactor.getTransactorId());
@@ -829,76 +820,101 @@ public class AccJournalBean implements Serializable {
                 accjournal.setAccCoaId(ARAccountId);
                 accjournal.setAccountCode(ARAccountCode);
                 accjournal.setDebitAmount(0);
-                accjournal.setCreditAmount(ReceivableAmount);
-                accjournal.setNarration("");
+                accjournal.setCreditAmount((-1) * aRefundAmount);
+                accjournal.setNarration("Receivable Reversed by Sales Return Amount");
                 this.saveAccJournal(accjournal);
             }
-            //VAT OUTPUT
-            if (VatOutputTaxAmount > 0) {
-                //accjournal.setAccChildAccountId(aTrans.getAccChildAccountId());
+
+            //REFUND PAID AMOUNT TO CUSTOMER DEPOSIT A/C
+            int DepositAccountId = 0;
+            String DepositAccountCode = "2-00-000-070";//Customer Advances and Deposits Payable
+            try {
+                DepositAccountId = new AccCoaBean().getAccCoaByCodeOrId(DepositAccountCode, 0).getAccCoaId();
+            } catch (NullPointerException npe) {
+                DepositAccountId = 0;
+            }
+            if (aRefundAmount > 0) {
+                if (aBillTransactor != null) {
+                    accjournal.setBillTransactorId(aBillTransactor.getTransactorId());
+                }
+                accjournal.setAccChildAccountId(0);
+                accjournal.setAccCoaId(DepositAccountId);
+                accjournal.setAccountCode(DepositAccountCode);
+                accjournal.setDebitAmount(0);
+                accjournal.setCreditAmount(aRefundAmount);
+                accjournal.setNarration("Paid Amount Refunded to Deposit AC");
+                this.saveAccJournal(accjournal);
+            }
+
+            //CHANGE IN VAT OUTPUT
+            if (trans.getTotalVat() != 0) {
                 accjournal.setAccChildAccountId(0);
                 accjournal.setBillTransactorId(0);
                 accjournal.setAccCoaId(SalesVatOutputTaxAccountId);
                 accjournal.setAccountCode(SalesVatOutputTaxAccountCode);
-                accjournal.setDebitAmount(VatOutputTaxAmount);
-                accjournal.setCreditAmount(0);
-                accjournal.setNarration("");
+                if (trans.getTotalVat() < 0) {
+                    accjournal.setDebitAmount((-1) * trans.getTotalVat());
+                    accjournal.setCreditAmount(0);
+                    accjournal.setNarration("Reverse Reduction in VAT Output");
+                } else {
+                    accjournal.setDebitAmount(0);
+                    accjournal.setCreditAmount(trans.getTotalVat());
+                    accjournal.setNarration("Increase in VAT Output");
+                }
+
                 this.saveAccJournal(accjournal);
             }
-            //SALES DISCOUNT (DISCOUNT ALLOWED) - Cash Discount
-            if ((CashDiscountAmount + LoyaltyAmountExpense) > 0) {
-                //Debit Disc Allowed
+
+            //CHANGE IN SALES CASH DISCOUNT
+            if ((trans.getSpendPointsAmount() + trans.getCashDiscount()) != 0) {
                 accjournal.setAccChildAccountId(0);
                 if (aBillTransactor != null) {
                     accjournal.setBillTransactorId(aBillTransactor.getTransactorId());
                 }
                 accjournal.setAccCoaId(SalesDiscAccountId);
                 accjournal.setAccountCode(SalesDiscAccountCode);
-                accjournal.setDebitAmount(0);
-                accjournal.setCreditAmount((CashDiscountAmount + LoyaltyAmountExpense));
-                accjournal.setNarration("");
+                if ((trans.getSpendPointsAmount() + trans.getCashDiscount()) < 0) {
+                    accjournal.setDebitAmount(0);
+                    accjournal.setCreditAmount((-1) * (trans.getSpendPointsAmount() + trans.getCashDiscount()));
+                    accjournal.setNarration("Reduction in Cash Discount");
+                } else {
+                    accjournal.setDebitAmount((-1) * (trans.getSpendPointsAmount() + trans.getCashDiscount()));
+                    accjournal.setCreditAmount(0);
+                    accjournal.setNarration("Increase in Cash Discount");
+                }
                 this.saveAccJournal(accjournal);
             }
-            //SALES REVENUE
-            //1. Sales revues per Sales Account
-            List<TransItem> ati = new TransItemBean().getTransItemsSummaryByItemType(trans.getTransactionId());
-            //2. post account sales revenue
+            //REVERSE SALES REVENUE
+            List<TransItem> ati = new TransItemBean().getTransItemsSummaryByItemTypeCrNote(trans.getTransactionId());
             int ListItemIndex = 0;
             int ListItemNo = ati.size();
-            String ItemSalesAccountCode = "";
-            int ItemSalesAccountId = 0;
-            double ItemNetSalesAmount = 0;//Amt exc VAT
+            String SalesReturnAccountCode = "4-10-000-040";
+            int SalesReturnAccountId = 0;
+            double NetSalesReturnAmount = 0;//Amt exc VAT
             while (ListItemIndex < ListItemNo) {
                 accjournal.setAccChildAccountId(0);
                 if (aBillTransactor != null) {
                     accjournal.setBillTransactorId(aBillTransactor.getTransactorId());
                 }
-                if (ati.get(ListItemIndex).getItem_type().equals("PRODUCT")) {//4-10-000-010 - SALES Products
-                    ItemSalesAccountCode = "4-10-000-010";
-                } else if (ati.get(ListItemIndex).getItem_type().equals("SERVICE")) {//4-10-000-020 - SALES Services	
-                    ItemSalesAccountCode = "4-10-000-020";
-                }
-                ItemNetSalesAmount = (-1) * ati.get(ListItemIndex).getAmountExcVat();
+                NetSalesReturnAmount = (-1) * ati.get(ListItemIndex).getAmountExcVat();
                 try {
-                    ItemSalesAccountId = new AccCoaBean().getAccCoaByCodeOrId(ItemSalesAccountCode, 0).getAccCoaId();
+                    SalesReturnAccountId = new AccCoaBean().getAccCoaByCodeOrId(SalesReturnAccountCode, 0).getAccCoaId();
                 } catch (NullPointerException npe) {
-                    ItemSalesAccountId = 0;
+                    SalesReturnAccountId = 0;
                 }
-                if (ItemSalesAccountId > 0 && ItemNetSalesAmount > 0) {
-                    accjournal.setAccCoaId(ItemSalesAccountId);
-                    accjournal.setAccountCode(ItemSalesAccountCode);
-                    accjournal.setDebitAmount(ItemNetSalesAmount);
+                if (SalesReturnAccountId > 0 && NetSalesReturnAmount > 0) {
+                    accjournal.setAccCoaId(SalesReturnAccountId);
+                    accjournal.setAccountCode(SalesReturnAccountCode);
+                    accjournal.setDebitAmount(NetSalesReturnAmount);
                     accjournal.setCreditAmount(0);
-                    accjournal.setNarration("");
+                    accjournal.setNarration("Sales Return");
                     this.saveAccJournal(accjournal);
                 }
                 ListItemIndex = ListItemIndex + 1;
             }
 
-            //Dr COS - InventoryAcc
-            //1. Cost by InventoryAcc
-            List<TransItem> ati2 = new TransItemBean().getInventoryCostByTrans(trans.getTransactionId());
-            //2. Credit inventory account
+            //REVERSE COS INVENTORY
+            List<TransItem> ati2 = new TransItemBean().getInventoryCostByTransCrNote(trans.getTransactionId());
             int ListItemIndex2 = 0;
             int ListItemNo2 = ati2.size();
             String ItemInventoryAccountCode = "";
@@ -910,7 +926,7 @@ public class AccJournalBean implements Serializable {
                     accjournal.setBillTransactorId(0);
                 }
                 ItemInventoryAccountCode = ati2.get(ListItemIndex2).getAccountCode();
-                ItemInventoryCostAmount = ati2.get(ListItemIndex2).getUnitCostPrice();
+                ItemInventoryCostAmount = (-1) * ati2.get(ListItemIndex2).getUnitCostPrice();
                 try {
                     ItemInventoryAccountId = new AccCoaBean().getAccCoaByCodeOrId(ItemInventoryAccountCode, 0).getAccCoaId();
                 } catch (NullPointerException npe) {
@@ -921,16 +937,14 @@ public class AccJournalBean implements Serializable {
                     accjournal.setAccountCode(ItemInventoryAccountCode);
                     accjournal.setDebitAmount(ItemInventoryCostAmount);
                     accjournal.setCreditAmount(0);
-                    accjournal.setNarration("INVENTORY COST OF SALE");
+                    accjournal.setNarration("Reversed Inventory Cost of Sale");
                     this.saveAccJournal(accjournal);
                 }
                 ListItemIndex2 = ListItemIndex2 + 1;
             }
 
-            //Cr COS - COS ACC
-            //1. Cost by ItemType
-            List<TransItem> ati3 = new TransItemBean().getInventoryItemTypeCostByTrans(trans.getTransactionId());
-            //2. Debit COS
+            //REVERSE COS ACC
+            List<TransItem> ati3 = new TransItemBean().getInventoryItemTypeCostByTransCrNote(trans.getTransactionId());
             int ListItemIndex3 = 0;
             int ListItemNo3 = ati3.size();
             String ItemInventoryItemTypeAccountCode = "";
@@ -946,7 +960,7 @@ public class AccJournalBean implements Serializable {
                 } else if (ati3.get(ListItemIndex3).getItem_type().equals("SERVICE")) {//Cost of Purchase - Services	5-10-000-020	
                     ItemInventoryItemTypeAccountCode = "5-10-000-020";
                 }
-                ItemInventoryItemTypeCostAmount = ati3.get(ListItemIndex3).getUnitCostPrice();
+                ItemInventoryItemTypeCostAmount = (-1) * ati3.get(ListItemIndex3).getUnitCostPrice();
                 try {
                     ItemInventoryItemTypeAccountId = new AccCoaBean().getAccCoaByCodeOrId(ItemInventoryItemTypeAccountCode, 0).getAccCoaId();
                 } catch (NullPointerException npe) {
@@ -957,31 +971,10 @@ public class AccJournalBean implements Serializable {
                     accjournal.setAccountCode(ItemInventoryItemTypeAccountCode);
                     accjournal.setDebitAmount(0);
                     accjournal.setCreditAmount(ItemInventoryItemTypeCostAmount);
-                    accjournal.setNarration("INVENTORY COST OF SALE");
+                    accjournal.setNarration("Reversed Inventory Cost of Sale");
                     this.saveAccJournal(accjournal);
                 }
                 ListItemIndex3 = ListItemIndex3 + 1;
-            }
-
-            int DepositAccountId = 0;
-            String DepositAccountCode = "2-00-000-070";//Customer Advances and Deposits Payable
-            try {
-                DepositAccountId = new AccCoaBean().getAccCoaByCodeOrId(DepositAccountCode, 0).getAccCoaId();
-            } catch (NullPointerException npe) {
-                DepositAccountId = 0;
-            }
-            //Credit Deposit
-            if (aRefundAmount > 0) {
-                if (aBillTransactor != null) {
-                    accjournal.setBillTransactorId(aBillTransactor.getTransactorId());
-                }
-                accjournal.setAccChildAccountId(0);
-                accjournal.setAccCoaId(DepositAccountId);
-                accjournal.setAccountCode(DepositAccountCode);
-                accjournal.setDebitAmount(0);
-                accjournal.setCreditAmount(aRefundAmount);
-                accjournal.setNarration("PREPAID INCOME");
-                this.saveAccJournal(accjournal);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);

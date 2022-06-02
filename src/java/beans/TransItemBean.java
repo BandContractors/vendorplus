@@ -5311,10 +5311,57 @@ public class TransItemBean implements Serializable {
         }
         return transitems;
     }
+    
+    public List<TransItem> getTransItemsSummaryByItemTypeCrNote(long aTransactionId) {
+        String sql;
+        sql = "{call sp_search_trans_item_summary_by_item_type_cr_note(?)}";
+        ResultSet rs = null;
+        List<TransItem> transitems = new ArrayList<>();
+        TransItem transitem = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aTransactionId);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                transitem = new TransItem();
+                //transitem.setItem_type(rs.getString("item_type"));
+                transitem.setAmountExcVat(rs.getDouble("amount_exc_vat"));
+                transitem.setAmountIncVat(rs.getDouble("amount_inc_vat"));
+                transitems.add(transitem);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return transitems;
+    }
 
     public List<TransItem> getInventoryCostByTrans(long aTransactionId) {
         String sql;
         sql = "{call sp_search_inventory_cost_by_trans(?)}";
+        ResultSet rs = null;
+        List<TransItem> transitems = new ArrayList<>();
+        TransItem transitem = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aTransactionId);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                transitem = new TransItem();
+                transitem.setAccountCode(rs.getString("account_code"));
+                transitem.setUnitCostPrice(rs.getDouble("unit_cost_price"));
+                transitems.add(transitem);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return transitems;
+    }
+    
+    public List<TransItem> getInventoryCostByTransCrNote(long aTransactionId) {
+        String sql;
+        sql = "{call sp_search_inventory_cost_by_trans_cr_note(?)}";
         ResultSet rs = null;
         List<TransItem> transitems = new ArrayList<>();
         TransItem transitem = null;
@@ -5430,6 +5477,29 @@ public class TransItemBean implements Serializable {
     public List<TransItem> getInventoryItemTypeCostByTrans(long aTransactionId) {
         String sql;
         sql = "{call sp_search_inventory_item_type_cost_by_trans(?)}";
+        ResultSet rs = null;
+        List<TransItem> transitems = new ArrayList<>();
+        TransItem transitem = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aTransactionId);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                transitem = new TransItem();
+                transitem.setItem_type(rs.getString("item_type"));
+                transitem.setUnitCostPrice(rs.getDouble("unit_cost_price"));
+                transitems.add(transitem);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return transitems;
+    }
+    
+    public List<TransItem> getInventoryItemTypeCostByTransCrNote(long aTransactionId) {
+        String sql;
+        sql = "{call sp_search_inventory_item_type_cost_by_trans_cr_note(?)}";
         ResultSet rs = null;
         List<TransItem> transitems = new ArrayList<>();
         TransItem transitem = null;
@@ -10959,11 +11029,11 @@ public class TransItemBean implements Serializable {
         }
     }
 
-    public void updateModelTransItemCallAdjust(int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aTrans, TransItem aTransItemToUpdate, Item aItem, double aDefaultQty) {
+    public void updateModelTransItemCallAdjust(int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aTrans, TransItem aTransItemToUpdate, Item aItem, double aDefaultQty,StockBean aStockBean) {
         try {
             this.updateModelTransItemCEC(aStoreId, aTransTypeId, aTransReasonId, aSaleType, aTrans, aTransItemToUpdate, aItem, aDefaultQty);
             if (null != aTransItemToUpdate) {
-                new StockBean().refreshSpecificList(aStoreId, aTransItemToUpdate.getItemId());
+                aStockBean.refreshSpecificList(aStoreId, aTransItemToUpdate.getItemId());
                 this.refreshAdjustUponItemChange(aTransItemToUpdate);
             }
         } catch (Exception e) {
