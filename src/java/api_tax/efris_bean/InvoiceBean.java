@@ -1694,8 +1694,11 @@ public class InvoiceBean implements Serializable {
             } else {
                 InvoiceNo = itemslist.get(0).getInvoiceNo();
             }
+            if (null == InvoiceNo) {
+                InvoiceNo = "";
+            }
         } catch (Exception e) {
-            //System.out.println("getApprovalStatusOffline:" + e.getMessage());
+            InvoiceNo = "";
             LOGGER.log(Level.INFO, output);
             LOGGER.log(Level.ERROR, e);
         }
@@ -1774,8 +1777,11 @@ public class InvoiceBean implements Serializable {
             } else {
                 InvoiceNo = itemslist.get(0).getInvoiceNo();
             }
+            if (null == InvoiceNo) {
+                InvoiceNo = "";
+            }
         } catch (Exception e) {
-            //System.out.println("getApprovalStatusOnline:" + e.getMessage());
+            InvoiceNo = "";
             LOGGER.log(Level.INFO, output);
             LOGGER.log(Level.ERROR, e);
         }

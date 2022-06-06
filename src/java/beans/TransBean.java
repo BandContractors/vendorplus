@@ -3524,11 +3524,11 @@ public class TransBean implements Serializable {
         }
     }
 
-    public void raiseCreditNoteCall(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aNewTrans, List<TransItem> aNewTransItems, Pay aPay, double aRefundAmount) {
+    public void raiseCreditNoteCall(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aNewTrans, List<TransItem> aNewTransItems, Pay aPay, double aRefundAmount, double aReverseCreditAmt) {
         //get some details
         String OrderTransNo = aNewTrans.getTransactionRef();
         //save
-        this.raiseCreditNote(aLevel, aStoreId, aTransTypeId, aTransReasonId, aSaleType, aNewTrans, aNewTransItems, aPay, aRefundAmount);
+        this.raiseCreditNote(aLevel, aStoreId, aTransTypeId, aTransReasonId, aSaleType, aNewTrans, aNewTransItems, aPay, aRefundAmount, aReverseCreditAmt);
         //update a few things needed after sales invoice saving
         if (OrderTransNo.length() > 0) {
             Trans OrderTrans = this.getTransByNumberType(OrderTransNo, 11);
@@ -4032,7 +4032,7 @@ public class TransBean implements Serializable {
         }
     }
 
-    public void raiseCreditNote(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aNewTrans, List<TransItem> aNewTransItems, Pay aPay, double aRefundAmount) {
+    public void raiseCreditNote(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aNewTrans, List<TransItem> aNewTransItems, Pay aPay, double aRefundAmount, double aReverseCreditAmt) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
         try {
@@ -4101,14 +4101,16 @@ public class TransBean implements Serializable {
             }
             //journal
             if (SavedCrDrNoteTransId > 0 && isTransItemReverseSuccess) {
-                new AccJournalBean().postJournalCreditNote(SavedCrDrNoteTransId, new AccPeriodBean().getAccPeriod(new CompanySetting().getCURRENT_SERVER_DATE()).getAccPeriodId(), aRefundAmount);
+                new AccJournalBean().postJournalCreditNote(SavedCrDrNoteTransId, new AccPeriodBean().getAccPeriod(new CompanySetting().getCURRENT_SERVER_DATE()).getAccPeriodId(), aRefundAmount, aReverseCreditAmt);
                 //session
                 switch (aLevel) {
                     case "PARENT":
                         httpSession.setAttribute("CURRENT_TRANSACTION_ID", SavedCrDrNoteTransId);
+                        httpSession.setAttribute("CURRENT_PAY_ID", 0);
                         break;
                     case "CHILD":
                         httpSession.setAttribute("CURRENT_TRANSACTION_ID_CHILD", SavedCrDrNoteTransId);
+                        httpSession.setAttribute("CURRENT_PAY_ID_CHILD", 0);
                         break;
                 }
                 //Deposit refund as deposit
@@ -4142,7 +4144,7 @@ public class TransBean implements Serializable {
                         break;
                 }
                 //Refresh Print output
-                new OutputDetailBean().refreshOutput(aLevel, "");
+                new OutputDetailBean().refreshOutputCrDr(aLevel, "");
                 //Refresh stock alerts
                 new UtilityBean().refreshAlertsThread();
                 //TAX API

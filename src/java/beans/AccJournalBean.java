@@ -733,7 +733,7 @@ public class AccJournalBean implements Serializable {
         }
     }
 
-    public void postJournalCreditNote(long aCrNoteTransId, int aAccPeriodId, double aRefundAmount) {
+    public void postJournalCreditNote(long aCrNoteTransId, int aAccPeriodId, double aRefundAmount, double aReverseCreditAmt) {
         //REVSERSE SALES REVENUE BY SALES RETURN
         //There is need to account for sale returns as though no sale had occurred in the first place.
         //Hence, the value of goods returned must be deducted from the sale revenue.
@@ -812,7 +812,7 @@ public class AccJournalBean implements Serializable {
                 aBillTransactor = null;
             }
             //REVERSE CREDIT
-            if (aRefundAmount < 0) {
+            if (aReverseCreditAmt > 0) {
                 accjournal.setAccChildAccountId(0);
                 if (aBillTransactor != null) {
                     accjournal.setBillTransactorId(aBillTransactor.getTransactorId());
@@ -820,7 +820,7 @@ public class AccJournalBean implements Serializable {
                 accjournal.setAccCoaId(ARAccountId);
                 accjournal.setAccountCode(ARAccountCode);
                 accjournal.setDebitAmount(0);
-                accjournal.setCreditAmount((-1) * aRefundAmount);
+                accjournal.setCreditAmount(aReverseCreditAmt);
                 accjournal.setNarration("Receivable Reversed by Sales Return Amount");
                 this.saveAccJournal(accjournal);
             }
