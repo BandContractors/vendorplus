@@ -14535,8 +14535,14 @@ public class TransBean implements Serializable {
         this.TransListHist = new ReportBean().getTransHistory(aTransId);
     }
 
-    public void initCheckCreditNoteSession(String aTransNo, long aTransId, String aAction) {
-        //first set current selection in session
+    public void initCheckCrDrNoteSession(String aTransNo, long aTransId, String aAction) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
+        String msg = "";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         FacesContext context = FacesContext.getCurrentInstance();
         HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
         HttpSession httpSession = request.getSession(true);
@@ -14556,24 +14562,36 @@ public class TransBean implements Serializable {
                 this.PayObj = null;
             }
             //refresh output
-            new OutputDetailBean().refreshOutput("PARENT", "");
+            new OutputDetailBean().refreshOutputCrDr("PARENT", "");
+            this.setActionMessage("");
         } else if (aList.size() == 1) {
             this.ActionType = "None";
-            Trans CrNote = aList.get(0);
-            httpSession.setAttribute("CURRENT_TRANSACTION_ID", CrNote.getTransactionId());
-            httpSession.setAttribute("CURRENT_TRANSACTION_ACTION", "None");//aAction
-            httpSession.setAttribute("CURRENT_PAY_ID", 0);
-            this.clearTrans(this.TransObj);
-            try {
-                this.TransItemList.clear();
-            } catch (NullPointerException npe) {
+            Trans CrDrNote = aList.get(0);
+            if ((CrDrNote.getTransactionTypeId() == 82 && aAction.equals("Cr")) || (CrDrNote.getTransactionTypeId() == 83 && aAction.equals("Dr"))) {
+                httpSession.setAttribute("CURRENT_TRANSACTION_ID", CrDrNote.getTransactionId());
+                httpSession.setAttribute("CURRENT_TRANSACTION_ACTION", "None");//aAction
+                httpSession.setAttribute("CURRENT_PAY_ID", 0);
+                this.clearTrans(this.TransObj);
+                try {
+                    this.TransItemList.clear();
+                } catch (NullPointerException npe) {
+                }
+                try {
+                    new PayBean().clearPay(this.PayObj);
+                } catch (NullPointerException npe) {
+                }
+                //refresh output
+                new OutputDetailBean().refreshOutputCrDr("PARENT", "");
+                this.setActionMessage("");
+            } else if (CrDrNote.getTransactionTypeId() == 82 && aAction.equals("Dr")) {
+                msg = "Transaction Has Credit Note //" + CrDrNote.getTransactionNumber();
+                //FacesContext.getCurrentInstance().addMessage("Note", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+                this.setActionMessage(ub.translateWordsInText(BaseName, msg));
+            } else if (CrDrNote.getTransactionTypeId() == 83 && aAction.equals("Cr")) {
+                msg = "Transaction Has Debit Note //" + CrDrNote.getTransactionNumber();
+                //FacesContext.getCurrentInstance().addMessage("Note", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+                this.setActionMessage(ub.translateWordsInText(BaseName, msg));
             }
-            try {
-                new PayBean().clearPay(this.PayObj);
-            } catch (NullPointerException npe) {
-            }
-            //refresh output
-            new OutputDetailBean().refreshOutputCrDr("PARENT", "");
         } else {
             this.ActionType = "None";
             httpSession.setAttribute("CURRENT_TRANSACTION_ID", 0);
@@ -14590,6 +14608,10 @@ public class TransBean implements Serializable {
             }
             //refresh output
             new OutputDetailBean().refreshOutputCrDr("PARENT", "");
+            //msg
+            msg = "Transaction Has More Than One Credit or Debit Note";
+            //FacesContext.getCurrentInstance().addMessage("Note", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            this.setActionMessage(ub.translateWordsInText(BaseName, msg));
         }
     }
 
