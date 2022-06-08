@@ -640,6 +640,30 @@ public class AccCurrencyBean implements Serializable {
         return RoundedAmount;
     }
 
+    /**
+     * Rounds off to at least 3 decimal places If currency rounds off to less 3
+     * decimal places, values will be rounded off to 3 decimal places otherwise
+     * decimal places rounding takes precedence
+     *
+     * @param aCurrencyCode
+     * @param aMount
+     * @return RoundedAmount
+     */
+    public double roundAmountMinThreeDps(String aCurrencyCode, double aMount) {
+        double RoundedAmount = 0;
+        try {
+            AccCurrency currency = new AccCurrencyBean().getCurrency(aCurrencyCode);
+            int DecimalPlaces = currency.getDecimal_places();
+            int RoundingMode = currency.getRounding_mode();
+            if (DecimalPlaces < 3) {
+                DecimalPlaces = 3;
+            }
+            RoundedAmount = Precision.round(aMount, DecimalPlaces, RoundingMode);
+        } catch (Exception e) {
+        }
+        return RoundedAmount;
+    }
+
     public void refreshSavedCurrencyLists() {
         String sql;
         sql = "SELECT * FROM acc_currency";

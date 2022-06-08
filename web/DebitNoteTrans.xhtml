@@ -96,7 +96,7 @@
                             <!-- row record -->
                             <h:inputText value="#{ati.itemQty}" style="width: 50px;" autocomplete="off">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                                <f:ajax event="blur" listener="#{transItemBean.editTransItemCr(transBean.transObj.transactionTypeId,transBean.transObj.transactionReasonId,'',transBean.transObj, transBean.transItemList,ati)}" execute="dtblTransactionItem" render="@form"/>
+                                <f:ajax event="blur" listener="#{transItemBean.editTransItemCrDr(transBean.transObj.transactionTypeId,transBean.transObj.transactionReasonId,'',transBean.transObj, transBean.transItemList,ati)}" execute="dtblTransactionItem" render="@form"/>
                             </h:inputText>
                             #{transItemBean.getSpecificSizeQtyFromQtyAndSizeStr(ati)}
                         </p:column>
@@ -229,7 +229,7 @@
                                 <p:dialog widgetVar="statusDialog1" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                                     <p:graphicImage name="/images/ajax-loader.gif"/>
                                 </p:dialog>
-                                <p:ajax listener="#{transBean.raiseCreditNoteCall('PARENT',transBean.transObj.storeId,transBean.transObj.transactionTypeId,transBean.transObj.transactionReasonId,'',transBean.transObj,transBean.transItemList,transBean.payObj,(transBean.transObj.totalPaid ge transBean.transObj.grandTotal ? transBean.transObj.totalPaid-transBean.transObj.grandTotal:0),(transBean.transObj.totalPaid ge transBean.transObj.grandTotal ? transBean.getTrans(transBean.transObj.transactionId).grandTotal-transBean.transObj.totalPaid :(transBean.getTrans(transBean.transObj.transactionId).grandTotal-transBean.transObj.totalPaid)+(transBean.transObj.totalPaid-transBean.transObj.grandTotal)))}" process="pnlTransaction" update="pnlTransaction pnlgOutput"/>
+                                <p:ajax listener="#{transBean.raiseDebitNoteCall('PARENT',transBean.transObj.storeId,transBean.transObj.transactionTypeId,transBean.transObj.transactionReasonId,'',transBean.transObj,transBean.transItemList,transBean.payObj)}" process="pnlTransaction" update="pnlTransaction pnlgOutput"/>
                             </p:commandButton>
                         </h:panelGrid>
                         <h:panelGrid columns="1">

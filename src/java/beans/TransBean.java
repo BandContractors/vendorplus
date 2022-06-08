@@ -3540,6 +3540,22 @@ public class TransBean implements Serializable {
         }
     }
 
+    public void raiseDebitNoteCall(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aNewTrans, List<TransItem> aNewTransItems, Pay aPay) {
+        //get some details
+        String OrderTransNo = aNewTrans.getTransactionRef();
+        //save
+        this.raiseDebitNote(aLevel, aStoreId, aTransTypeId, aTransReasonId, aSaleType, aNewTrans, aNewTransItems, aPay);
+        //update a few things needed after sales invoice saving
+        if (OrderTransNo.length() > 0) {
+            Trans OrderTrans = this.getTransByNumberType(OrderTransNo, 11);
+            //get order's invoioce status 0,1,2
+            int InvoiceStatus = this.getOrderInvoiceStatus(OrderTrans);
+            //get order's invoioce pay status 0,1,2
+            //save invoice status if not 0
+            this.updateOrderStatus(OrderTrans.getTransactionId(), "is_invoiced", InvoiceStatus);
+        }
+    }
+
     public void updateTransCECcallFromOpenBalance(long aTransactionId, Trans aTrans, TransBean aTransBean, AccJournal aAccJournal, AccJournalBean aAccJournalBean, TransItemBean aTransItemBean, TransactorBean aTransactorBean) {
         //do before update
         Trans trans = this.getTrans(aTransactionId);
@@ -4148,7 +4164,7 @@ public class TransBean implements Serializable {
                 //Refresh stock alerts
                 new UtilityBean().refreshAlertsThread();
                 //TAX API
-                if (aTransTypeId == 2 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {//SALES INVOICE
+                if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {//SALES INVOICE
                     int IsThreadOn = 0;
                     try {
                         IsThreadOn = Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_THREAD_ON").getParameter_value());
@@ -4179,7 +4195,157 @@ public class TransBean implements Serializable {
                     }
                 }
                 //SMbi API
-                if (aTransTypeId == 2 && new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_SMBI_URL").getParameter_value().length() > 0) {
+                if (new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_SMBI_URL").getParameter_value().length() > 0) {
+                    int CrDrTransTypeId = 0;
+                    if (aNewTrans.getGrandTotal() > OldTrans.getGrandTotal() || aNewTrans.getTotalVat() > OldTrans.getTotalVat()) {//Debit note
+                        CrDrTransTypeId = 83;
+                    } else if (aNewTrans.getGrandTotal() < OldTrans.getGrandTotal() || aNewTrans.getTotalVat() < OldTrans.getTotalVat()) {//Credit note
+                        CrDrTransTypeId = 82;
+                    }
+                    new Transaction_smbi_mapBean().insertTransaction_smbi_mapCallThread(SavedCrDrNoteTransId, CrDrTransTypeId);
+                }
+                //Update Total Paid for Sales/Purchase Invoice
+                if (aTransTypeId == 2 || aTransTypeId == 1) {
+                    new PayTransBean().updateTransTotalPaid(aNewTrans.getTransactionId());
+                }
+            }
+        }
+    }
+
+    public void raiseDebitNote(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aNewTrans, List<TransItem> aNewTransItems, Pay aPay) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
+        TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
+        TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
+        Store store = new StoreBean().getStore(aStoreId);
+        String ValidationMessage = new CreditDebitNoteBean().validateDebitNote(aStoreId, aNewTrans, aNewTransItems);
+        String sql = null;
+        String msg = "";
+        long TransHistId = 0;
+        long PayHistId = 0;
+        long newPayId = 0;
+        boolean isTransItemReverseSuccess = false;
+        //Pay oldPay = new Pay();
+        //Pay newPay = new Pay();
+        //Pay savedpay = null;
+        //Trans SavedCrNote = null;
+        int hasReversed = 0;
+        long SavedCrDrNoteTransId = 0;
+
+        //TransactionType tt = new TransactionTypeBean().getTransactionType(aNewTrans.getTransactionTypeId());
+        TransItemBean TransItemBean = new TransItemBean();
+        Trans OldTrans = new Trans();
+        OldTrans = new TransBean().getTrans(aNewTrans.getTransactionId());
+        List<TransItem> OldTransItems = TransItemBean.getTransItemsByTransactionId(aNewTrans.getTransactionId());
+        if (aTransTypeId == 76) {//Open Balance
+            //do nothing
+        } else {
+            this.setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, OldTrans, new TransItemBean().getTransItemsByTransactionId(aNewTrans.getTransactionId()));
+        }
+        //first clear current session
+        FacesContext context = FacesContext.getCurrentInstance();
+        HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+        HttpSession httpSession = request.getSession(true);
+        switch (aLevel) {
+            case "PARENT":
+                httpSession.setAttribute("CURRENT_TRANSACTION_ID", 0);
+                httpSession.setAttribute("CURRENT_PAY_ID", 0);
+                break;
+            case "CHILD":
+                httpSession.setAttribute("CURRENT_TRANSACTION_ID_CHILD", 0);
+                httpSession.setAttribute("CURRENT_PAY_ID_CHILD", 0);
+                break;
+        }
+        if (ValidationMessage.length() > 0) {
+            switch (aLevel) {
+                case "PARENT":
+                    this.setActionMessage(ub.translateWordsInText(BaseName, "Transaction Not Saved"));
+                    break;
+                case "CHILD":
+                    this.setActionMessageChild(ub.translateWordsInText(BaseName, "Transaction Not Saved"));
+                    break;
+            }
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, ValidationMessage)));
+        } else {
+            int ExistCountDrCrNotes = new CreditDebitNoteBean().getCountDebitAndCreditNotes(OldTrans.getTransactionNumber());
+            //insert note
+            SavedCrDrNoteTransId = new CreditDebitNoteBean().saveCreditDebitNote(OldTrans, aNewTrans, OldTransItems, aNewTransItems, 1);
+            //reverse stock
+            if (SavedCrDrNoteTransId > 0) {
+                TransItemBean tib = new TransItemBean();
+                isTransItemReverseSuccess = tib.reverseTransItemsCEC(OldTrans, aNewTrans, OldTransItems, aNewTransItems);
+            }
+            //journal
+            if (SavedCrDrNoteTransId > 0 && isTransItemReverseSuccess) {
+                new AccJournalBean().postJournalDebitNote(SavedCrDrNoteTransId, new AccPeriodBean().getAccPeriod(new CompanySetting().getCURRENT_SERVER_DATE()).getAccPeriodId());
+                //session
+                switch (aLevel) {
+                    case "PARENT":
+                        httpSession.setAttribute("CURRENT_TRANSACTION_ID", SavedCrDrNoteTransId);
+                        httpSession.setAttribute("CURRENT_PAY_ID", 0);
+                        break;
+                    case "CHILD":
+                        httpSession.setAttribute("CURRENT_TRANSACTION_ID_CHILD", SavedCrDrNoteTransId);
+                        httpSession.setAttribute("CURRENT_PAY_ID_CHILD", 0);
+                        break;
+                }
+                //SMbi API insert loyalty transaction for the note
+                String scope = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_SMBI_SCOPE").getParameter_value();
+                if (SavedCrDrNoteTransId > 0 && aNewTrans.getCardNumber().length() > 0 && (scope.isEmpty() || scope.contains("LOYALTY"))) {
+                    int x = new Loyalty_transactionBean().insertLoyalty_transaction_cr_dr(SavedCrDrNoteTransId);
+                }
+                TransItemBean = null;
+                //clean stock
+                StockBean.deleteZeroQtyStock();
+                switch (aLevel) {
+                    case "PARENT":
+                        this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully ( Transaction Id : " + new GeneralUserSetting().getCurrentTransactionId() + " )"));
+                        break;
+                    case "CHILD":
+                        this.setActionMessageChild(ub.translateWordsInText(BaseName, "Saved Successfully ( Transaction Id : " + new GeneralUserSetting().getCurrentTransactionIdChild() + " )"));
+                        break;
+                }
+                //Refresh Print output
+                new OutputDetailBean().refreshOutputCrDr(aLevel, "");
+                //Refresh stock alerts
+                new UtilityBean().refreshAlertsThread();
+                //TAX API
+                if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
+                    int IsThreadOn = 0;
+                    try {
+                        IsThreadOn = Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_THREAD_ON").getParameter_value());
+                    } catch (Exception e) {
+                        //
+                    }
+                    Transaction_tax_map PrevSyncedTaxInvoice = new Transaction_tax_mapBean().getTransaction_tax_map(OldTrans.getTransactionId(), aTransTypeId);
+                    if (null == PrevSyncedTaxInvoice) {
+                        //do nothing, original record was not synced/found, that cannot tbe updated
+                    } else {
+                        if (ExistCountDrCrNotes >= 1) {
+                            new Transaction_tax_mapBean().markTransaction_tax_mapUpdated_more_than_once(PrevSyncedTaxInvoice);
+                        } else {
+                            if (IsThreadOn == 0) {
+                                if (aNewTrans.getGrandTotal() > OldTrans.getGrandTotal() || aNewTrans.getTotalVat() > OldTrans.getTotalVat()) {//Debit note
+                                    new InvoiceBean().submitDebitNote(SavedCrDrNoteTransId, 83);
+                                } else if (aNewTrans.getGrandTotal() < OldTrans.getGrandTotal() || aNewTrans.getTotalVat() < OldTrans.getTotalVat()) {//Credit note
+                                    new InvoiceBean().submitCreditNote(SavedCrDrNoteTransId, 82);
+                                }
+                            } else if (IsThreadOn == 1) {
+                                if (aNewTrans.getGrandTotal() > OldTrans.getGrandTotal() || aNewTrans.getTotalVat() > OldTrans.getTotalVat()) {//Debit note
+                                    new InvoiceBean().submitDebitNoteThread(SavedCrDrNoteTransId, 83);
+                                } else if (aNewTrans.getGrandTotal() < OldTrans.getGrandTotal() || aNewTrans.getTotalVat() < OldTrans.getTotalVat()) {//Credit note
+                                    new InvoiceBean().submitCreditNoteThread(SavedCrDrNoteTransId, 82);
+                                }
+                            }
+                        }
+                    }
+                }
+                //SMbi API
+                if (new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_SMBI_URL").getParameter_value().length() > 0) {
                     int CrDrTransTypeId = 0;
                     if (aNewTrans.getGrandTotal() > OldTrans.getGrandTotal() || aNewTrans.getTotalVat() > OldTrans.getTotalVat()) {//Debit note
                         CrDrTransTypeId = 83;

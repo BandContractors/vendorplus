@@ -96,7 +96,7 @@
                             <!-- row record -->
                             <h:inputText value="#{ati.itemQty}" style="width: 50px;" autocomplete="off">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                                <f:ajax event="blur" listener="#{transItemBean.editTransItemCr(transBean.transObj.transactionTypeId,transBean.transObj.transactionReasonId,'',transBean.transObj, transBean.transItemList,ati)}" execute="dtblTransactionItem" render="@form"/>
+                                <f:ajax event="blur" listener="#{transItemBean.editTransItemCrDr(transBean.transObj.transactionTypeId,transBean.transObj.transactionReasonId,'',transBean.transObj, transBean.transItemList,ati)}" execute="dtblTransactionItem" render="@form"/>
                             </h:inputText>
                             #{transItemBean.getSpecificSizeQtyFromQtyAndSizeStr(ati)}
                         </p:column>

@@ -993,14 +993,58 @@ public class CreditDebitNoteBean implements Serializable {
                 msg = "Selected Date does not Match Accounting Period";
             } else if (new AccPeriodBean().getAccPeriod(new CompanySetting().getCURRENT_SERVER_DATE()).getIsClosed() == 1) {
                 msg = "Selected Date is for a Closed Accounting Period";
-            } else if (this.countItemsWithQtyChange("Adds",new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans)) > 0) {
+            } else if (this.countItemsWithQtyChange("Adds", new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans)) > 0) {
                 msg = "You Cannot Add Quantity for Credit Note";
-            } else if (this.countItemsWithQtyChange("Subs",new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans)) == 0) {
+            } else if (this.countItemsWithQtyChange("Subs", new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans)) == 0) {
                 msg = "Atleast One Item Quantity has to Change";
             }
         } catch (Exception e) {
             msg = "An Error has Occured During the Validation Process";
             //System.err.println("--:validateTransCEC:--" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
+        }
+        return msg;
+    }
+
+    public String validateDebitNote(int aStoreId, Trans trans, List<TransItem> aActiveTransItems) {
+        String msg = "";
+        try {
+            TransactionType transtype = new TransactionTypeBean().getTransactionType(83);
+            TransactionReason transreason = new TransactionReasonBean().getTransactionReason(127);
+            Store store = new StoreBean().getStore(aStoreId);
+
+            String ItemMessage = "";
+            try {
+                //ItemMessage = new TransItemBean().getAnyItemTotalQtyGreaterThanCurrentQty(new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans), store.getStoreId(), transtype.getTransactionTypeName());
+            } catch (NullPointerException npe) {
+            }
+            UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
+            List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
+            GroupRightBean grb = new GroupRightBean();
+
+            if (null == transtype) {
+                msg = "Invalid Transaction";
+            } else if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, Integer.toString(transreason.getTransactionReasonId()), "Add") == 0) {
+                msg = "Access Denied";
+            } else if (trans.getTransactionDate() == null) {
+                msg = "Select " + transtype.getTransactionDateLabel();
+            } else if ((new GeneralUserSetting().getDaysFromDateToLicenseExpiryDate(trans.getTransactionDate()) <= 0 || new GeneralUserSetting().getDaysFromDateToLicenseExpiryDate(new CompanySetting().getCURRENT_SERVER_DATE()) <= 0) && CompanySetting.getLicenseType() != 9) {
+                msg = "Server Date is Wrong or Lincese is Expired";
+            } else if (aActiveTransItems.size() < 1) {
+                msg = "Item not Found for " + transtype.getTransactionOutputLabel();
+            } else if (trans.getGrandTotal() <= 0) {
+                msg = "Invalid Debit Note Amount";
+            } else if (null == new AccPeriodBean().getAccPeriod(new CompanySetting().getCURRENT_SERVER_DATE())) {
+                msg = "Selected Date does not Match Accounting Period";
+            } else if (new AccPeriodBean().getAccPeriod(new CompanySetting().getCURRENT_SERVER_DATE()).getIsClosed() == 1) {
+                msg = "Selected Date is for a Closed Accounting Period";
+            } else if (this.countItemsWithQtyChange("Adds", new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans)) == 0) {
+                msg = "Atleast One Item Quantity has to Change";
+            } else if (this.countItemsWithQtyChange("Subs", new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans)) > 0) {
+                msg = "You Cannot Subtract Quantity for Debit Note";
+            }
+        } catch (Exception e) {
+            msg = "An Error has Occured During the Validation Process";
             LOGGER.log(Level.ERROR, e);
         }
         return msg;

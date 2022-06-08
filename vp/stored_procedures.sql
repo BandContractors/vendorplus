@@ -2170,6 +2170,19 @@ BEGIN
 END//
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS sp_search_trans_item_summary_by_item_type_dr_note;
+DELIMITER //
+CREATE PROCEDURE sp_search_trans_item_summary_by_item_type_dr_note
+(
+	IN in_transaction_id bigint 
+) 
+BEGIN 
+		SELECT sum(ti.amount_exc_vat) as amount_exc_vat,sum(ti.amount_inc_vat) as amount_inc_vat FROM transaction_item_cr_dr_note ti 
+		INNER JOIN item i ON ti.item_id=i.item_id  
+		WHERE ti.transaction_id=in_transaction_id;
+END//
+DELIMITER ;
+
 DROP PROCEDURE IF EXISTS sp_search_inventory_cost_by_trans;
 DELIMITER //
 CREATE PROCEDURE sp_search_inventory_cost_by_trans
@@ -2186,6 +2199,19 @@ DELIMITER ;
 DROP PROCEDURE IF EXISTS sp_search_inventory_cost_by_trans_cr_note;
 DELIMITER //
 CREATE PROCEDURE sp_search_inventory_cost_by_trans_cr_note
+(
+	IN in_transaction_id bigint 
+) 
+BEGIN 
+		SELECT IFNULL(ti.account_code,'') as account_code,sum(ti.item_qty*(CASE WHEN ti.unit_vat>0 THEN (ti.unit_cost_price/(1 + (ti.vat_perc/100))) ELSE ti.unit_cost_price END)) as unit_cost_price FROM transaction_item_cr_dr_note ti 
+		WHERE ti.transaction_id=in_transaction_id AND IFNULL(ti.account_code,'')<>'' AND IFNULL(ti.account_code,'') NOT LIKE '5%'  
+		GROUP BY IFNULL(ti.account_code,'');
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_inventory_cost_by_trans_dr_note;
+DELIMITER //
+CREATE PROCEDURE sp_search_inventory_cost_by_trans_dr_note
 (
 	IN in_transaction_id bigint 
 ) 
@@ -2213,6 +2239,20 @@ DELIMITER ;
 DROP PROCEDURE IF EXISTS sp_search_inventory_item_type_cost_by_trans_cr_note;
 DELIMITER //
 CREATE PROCEDURE sp_search_inventory_item_type_cost_by_trans_cr_note
+(
+	IN in_transaction_id bigint 
+) 
+BEGIN 
+		SELECT i.item_type,sum(ti.item_qty*(CASE WHEN ti.unit_vat>0 THEN (ti.unit_cost_price/(1 + (ti.vat_perc/100))) ELSE ti.unit_cost_price END)) as unit_cost_price FROM transaction_item_cr_dr_note ti 
+		INNER JOIN item i ON ti.item_id=i.item_id 
+		WHERE ti.transaction_id=in_transaction_id AND IFNULL(ti.account_code,'')<>'' AND IFNULL(ti.account_code,'') NOT LIKE '5%'  
+		GROUP BY i.item_type;
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_inventory_item_type_cost_by_trans_dr_note;
+DELIMITER //
+CREATE PROCEDURE sp_search_inventory_item_type_cost_by_trans_dr_note
 (
 	IN in_transaction_id bigint 
 ) 

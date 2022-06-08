@@ -1022,11 +1022,11 @@ public class AccJournalBean implements Serializable {
             double VatOutputTaxAmount = 0;
             double CashDiscountAmount = 0;
 
-            if ((trans.getChangeAmount() > 0)) {
-                PaidCashAmount = trans.getGrandTotal();// - aTrans.getSpendPointsAmount();
-            } else {
-                PaidCashAmount = trans.getAmountTendered();
-            }
+//            if ((trans.getChangeAmount() > 0)) {
+//                PaidCashAmount = trans.getGrandTotal();// - aTrans.getSpendPointsAmount();
+//            } else {
+//                PaidCashAmount = trans.getAmountTendered();
+//            }
             ReceivableAmount = trans.getGrandTotal() - PaidCashAmount;// + PaidLoyaltyAmount);
             VatOutputTaxAmount = trans.getTotalVat();
             CashDiscountAmount = trans.getCashDiscount();
@@ -1070,7 +1070,7 @@ public class AccJournalBean implements Serializable {
                 accjournal.setAccountCode(ARAccountCode);
                 accjournal.setDebitAmount(ReceivableAmount);
                 accjournal.setCreditAmount(0);
-                accjournal.setNarration("CREDIT RECEIVABLE FROM CLIENT");
+                accjournal.setNarration("Amount Receivable from Debit Note");
                 this.saveAccJournal(accjournal);
             }
             //VAT OUTPUT
@@ -1081,7 +1081,7 @@ public class AccJournalBean implements Serializable {
                 accjournal.setAccountCode(SalesVatOutputTaxAccountCode);
                 accjournal.setDebitAmount(0);
                 accjournal.setCreditAmount(VatOutputTaxAmount);
-                accjournal.setNarration("VAT OUTPUT PAYABLE");
+                accjournal.setNarration("VAT Output Payable from Debit Note");
                 this.saveAccJournal(accjournal);
             }
             //SALES DISCOUNT (DISCOUNT ALLOWED) - Cash Discount
@@ -1095,12 +1095,12 @@ public class AccJournalBean implements Serializable {
                 accjournal.setAccountCode(SalesDiscAccountCode);
                 accjournal.setDebitAmount((CashDiscountAmount));
                 accjournal.setCreditAmount(0);
-                accjournal.setNarration("SALES DISCOUNT TO CLIENT");
+                accjournal.setNarration("Sales Discount from Debit Note");
                 this.saveAccJournal(accjournal);
             }
             //SALES REVENUE
             //1. Sales revues per Sales Account
-            List<TransItem> ati = new TransItemBean().getTransItemsSummaryByItemType(trans.getTransactionId());
+            List<TransItem> ati = new TransItemBean().getTransItemsSummaryByItemTypeDrNote(trans.getTransactionId());
             //2. post account sales revenue
             int ListItemIndex = 0;
             int ListItemNo = ati.size();
@@ -1128,7 +1128,7 @@ public class AccJournalBean implements Serializable {
                     accjournal.setAccountCode(ItemSalesAccountCode);
                     accjournal.setDebitAmount(0);
                     accjournal.setCreditAmount(ItemNetSalesAmount);
-                    accjournal.setNarration("ITEM SALES REVENUE");
+                    accjournal.setNarration("Item Sales Revenue from Debit Note");
                     this.saveAccJournal(accjournal);
                 }
                 ListItemIndex = ListItemIndex + 1;
@@ -1136,7 +1136,7 @@ public class AccJournalBean implements Serializable {
 
             //CREDIT COS - InventoryAcc
             //1. Cost by InventoryAcc
-            List<TransItem> ati2 = new TransItemBean().getInventoryCostByTrans(trans.getTransactionId());
+            List<TransItem> ati2 = new TransItemBean().getInventoryCostByTransDrNote(trans.getTransactionId());
             //2. Credit inventory account
             int ListItemIndex2 = 0;
             int ListItemNo2 = ati2.size();
@@ -1149,7 +1149,7 @@ public class AccJournalBean implements Serializable {
                     accjournal.setBillTransactorId(0);
                 }
                 ItemInventoryAccountCode = ati2.get(ListItemIndex2).getAccountCode();
-                ItemInventoryCostAmount = ati2.get(ListItemIndex2).getUnitCostPrice();
+                ItemInventoryCostAmount = new AccCurrencyBean().roundAmount(accjournal.getCurrencyCode(), ati2.get(ListItemIndex2).getUnitCostPrice());
                 try {
                     ItemInventoryAccountId = new AccCoaBean().getAccCoaByCodeOrId(ItemInventoryAccountCode, 0).getAccCoaId();
                 } catch (NullPointerException npe) {
@@ -1160,7 +1160,7 @@ public class AccJournalBean implements Serializable {
                     accjournal.setAccountCode(ItemInventoryAccountCode);
                     accjournal.setDebitAmount(0);
                     accjournal.setCreditAmount(ItemInventoryCostAmount);
-                    accjournal.setNarration("INVENTORY COST OF SALE");
+                    accjournal.setNarration("Inventory Cost of Sale from Debit Note");
                     this.saveAccJournal(accjournal);
                 }
                 ListItemIndex2 = ListItemIndex2 + 1;
@@ -1168,7 +1168,7 @@ public class AccJournalBean implements Serializable {
 
             //DEBIT COS - COS ACC
             //1. Cost by ItemType
-            List<TransItem> ati3 = new TransItemBean().getInventoryItemTypeCostByTrans(trans.getTransactionId());
+            List<TransItem> ati3 = new TransItemBean().getInventoryItemTypeCostByTransDrNote(trans.getTransactionId());
             //2. Debit COS
             int ListItemIndex3 = 0;
             int ListItemNo3 = ati3.size();
@@ -1185,7 +1185,7 @@ public class AccJournalBean implements Serializable {
                 } else if (ati3.get(ListItemIndex3).getItem_type().equals("SERVICE")) {//Cost of Purchase - Services	5-10-000-020	
                     ItemInventoryItemTypeAccountCode = "5-10-000-020";
                 }
-                ItemInventoryItemTypeCostAmount = ati3.get(ListItemIndex3).getUnitCostPrice();
+                ItemInventoryItemTypeCostAmount = new AccCurrencyBean().roundAmount(accjournal.getCurrencyCode(), ati3.get(ListItemIndex3).getUnitCostPrice());
                 try {
                     ItemInventoryItemTypeAccountId = new AccCoaBean().getAccCoaByCodeOrId(ItemInventoryItemTypeAccountCode, 0).getAccCoaId();
                 } catch (NullPointerException npe) {
@@ -1196,7 +1196,7 @@ public class AccJournalBean implements Serializable {
                     accjournal.setAccountCode(ItemInventoryItemTypeAccountCode);
                     accjournal.setDebitAmount(ItemInventoryItemTypeCostAmount);
                     accjournal.setCreditAmount(0);
-                    accjournal.setNarration("INVENTORY COST OF SALE");
+                    accjournal.setNarration("Inventory Cost of Sale from Debit Note");
                     this.saveAccJournal(accjournal);
                 }
                 ListItemIndex3 = ListItemIndex3 + 1;
