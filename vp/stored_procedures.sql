@@ -2177,9 +2177,9 @@ CREATE PROCEDURE sp_search_trans_item_summary_by_item_type_dr_note
 	IN in_transaction_id bigint 
 ) 
 BEGIN 
-		SELECT sum(ti.amount_exc_vat) as amount_exc_vat,sum(ti.amount_inc_vat) as amount_inc_vat FROM transaction_item_cr_dr_note ti 
+        SELECT i.item_type,sum(ti.amount_exc_vat) as amount_exc_vat,sum(ti.amount_inc_vat) as amount_inc_vat FROM transaction_item_cr_dr_note ti 
 		INNER JOIN item i ON ti.item_id=i.item_id  
-		WHERE ti.transaction_id=in_transaction_id;
+		WHERE ti.transaction_id=in_transaction_id GROUP BY i.item_type;
 END//
 DELIMITER ;
 

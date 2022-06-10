@@ -996,7 +996,7 @@ public class CreditDebitNoteBean implements Serializable {
             } else if (this.countItemsWithQtyChange("Adds", new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans)) > 0) {
                 msg = "You Cannot Add Quantity for Credit Note";
             } else if (this.countItemsWithQtyChange("Subs", new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans)) == 0) {
-                msg = "Atleast One Item Quantity has to Change";
+                msg = "Atleast One Item Quantity has to Decrease";
             }
         } catch (Exception e) {
             msg = "An Error has Occured During the Validation Process";
@@ -1015,7 +1015,7 @@ public class CreditDebitNoteBean implements Serializable {
 
             String ItemMessage = "";
             try {
-                //ItemMessage = new TransItemBean().getAnyItemTotalQtyGreaterThanCurrentQty(new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans), store.getStoreId(), transtype.getTransactionTypeName());
+                ItemMessage = new TransItemBean().getAnyItemTotalQtyGreaterThanCurrentQty(new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans), store.getStoreId(), transtype.getTransactionTypeName());
             } catch (NullPointerException npe) {
             }
             UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
@@ -1039,9 +1039,13 @@ public class CreditDebitNoteBean implements Serializable {
             } else if (new AccPeriodBean().getAccPeriod(new CompanySetting().getCURRENT_SERVER_DATE()).getIsClosed() == 1) {
                 msg = "Selected Date is for a Closed Accounting Period";
             } else if (this.countItemsWithQtyChange("Adds", new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans)) == 0) {
-                msg = "Atleast One Item Quantity has to Change";
+                msg = "Atleast One Item Quantity has to Increase";
             } else if (this.countItemsWithQtyChange("Subs", new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans)) > 0) {
                 msg = "You Cannot Subtract Quantity for Debit Note";
+            } else if (trans.getBillTransactorId() == 0) {
+                msg = "You Cannot Debit Transaction With No Customer";
+            } else if (!ItemMessage.equals("")) {
+                msg = "Insufficient Stock for Item ##" + ItemMessage;
             }
         } catch (Exception e) {
             msg = "An Error has Occured During the Validation Process";

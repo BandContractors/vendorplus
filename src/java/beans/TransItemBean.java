@@ -5349,7 +5349,7 @@ public class TransItemBean implements Serializable {
             rs = ps.executeQuery();
             while (rs.next()) {
                 transitem = new TransItem();
-                //transitem.setItem_type(rs.getString("item_type"));
+                transitem.setItem_type(rs.getString("item_type"));
                 transitem.setAmountExcVat(rs.getDouble("amount_exc_vat"));
                 transitem.setAmountIncVat(rs.getDouble("amount_inc_vat"));
                 transitems.add(transitem);
@@ -10483,7 +10483,7 @@ public class TransItemBean implements Serializable {
         int ListItemNo = ati.size();
         double TQty = 0;
         this.setItemString("");
-        while (ListItemIndex < ListItemNo && ((aTransactionType.equals("SALE INVOICE") && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "DEPLETE_SOLD_STOCK_UPON").getParameter_value().equals("0")) || aTransactionType.equals("TRANSFER") || aTransactionType.equals("DISPOSE STOCK") || aTransactionType.equals("STOCK ADJUSTMENT") || (aTransactionType.equals("GOODS DELIVERY") && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "DEPLETE_SOLD_STOCK_UPON").getParameter_value().equals("1")))) {
+        while (ListItemIndex < ListItemNo && ((aTransactionType.equals("SALE INVOICE") && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "DEPLETE_SOLD_STOCK_UPON").getParameter_value().equals("0")) || aTransactionType.equals("DEBIT NOTE") || aTransactionType.equals("TRANSFER") || aTransactionType.equals("DISPOSE STOCK") || aTransactionType.equals("STOCK ADJUSTMENT") || (aTransactionType.equals("GOODS DELIVERY") && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "DEPLETE_SOLD_STOCK_UPON").getParameter_value().equals("1")))) {
             this.setItemString(ati.get(ListItemIndex).getDescription() + " " + ati.get(ListItemIndex).getBatchno());
             if (aTransactionType.equals("STOCK ADJUSTMENT") && ati.get(ListItemIndex).getNarration().equals("Add")) {
                 //skip for adding

@@ -217,7 +217,7 @@
                             <h:inputText id="itxtTotalPaid" value="#{transBean.transObj.totalPaid}" styleClass="clsInputTransItem" style="width: 150px;background-color: yellow;" disabled="true">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:inputText>
-                            <h:inputText id="itxtDebitAmount" value="#{transBean.getTrans(transBean.transObj.transactionId).grandTotal-transBean.transObj.grandTotal}" styleClass="clsInputTransItem" style="width: 150px;background-color: red;color: white" disabled="true">
+                            <h:inputText id="itxtDebitAmount" value="#{transBean.transObj.grandTotal-transBean.getTrans(transBean.transObj.transactionId).grandTotal}" styleClass="clsInputTransItem" style="width: 150px;background-color: red;color: white" disabled="true">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:inputText>
                             <h:outputLabel value=""/>
