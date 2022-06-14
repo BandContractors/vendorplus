@@ -392,6 +392,7 @@ public class Stock_ledgerBean implements Serializable {
                 if (null == im) {
                     //do nothing
                 } else {
+                    String TableName = this.getStockLedgerTableName(aStock_ledgerBean);
                     double LatestUnitCostPrice = new TransItemBean().getItemLatestUnitCostPrice(aStock_ledger4Sync.getItem_id(), "", "", "");
                     if (aStock_ledger4Sync.getQty_added() > 0) {
                         Stock stockadd = new Stock();
@@ -430,7 +431,7 @@ public class Stock_ledgerBean implements Serializable {
                         } catch (Exception e) {
                             ItemIdTax = "";
                         }
-                        new StockManage().addStockCall(stockadd, ItemIdTax, aStock_ledger4Sync.getTax_update_id(), SupplierTIN, SupplierName);
+                        new StockManage().addStockCall(stockadd, ItemIdTax, aStock_ledger4Sync.getTax_update_id(), SupplierTIN, SupplierName, TableName);
                     } else if (aStock_ledger4Sync.getQty_subtracted() > 0) {
                         Stock stocksub = new Stock();
                         stocksub.setItemId(aStock_ledger4Sync.getItem_id());
@@ -444,7 +445,7 @@ public class Stock_ledgerBean implements Serializable {
                         } catch (Exception e) {
                             ItemIdTax = "";
                         }
-                        new StockManage().subtractStockCall(stocksub, ItemIdTax, aStock_ledger4Sync.getTax_update_id(), AdjustType);
+                        new StockManage().subtractStockCall(stocksub, ItemIdTax, aStock_ledger4Sync.getTax_update_id(), AdjustType, TableName);
                     }
                     //refresh UI
                     this.reportStockTaxAPICall(aStock_ledger, aStock_ledgerBean, aItem);
@@ -918,6 +919,17 @@ public class Stock_ledgerBean implements Serializable {
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
+    }
+
+    public String getStockLedgerTableName(Stock_ledgerBean aStock_ledgerBean) {
+        int Month1 = 0;
+        int Year1 = 0;
+        try {
+            Month1 = new UtilityBean().getMonthFromDate(aStock_ledgerBean.getDate1());
+            Year1 = new UtilityBean().getYearFromDate(aStock_ledgerBean.getDate1());
+        } catch (Exception e) {
+        }
+        return this.getStockLedgerTableName(Year1, Month1);
     }
 
     public String getStockLedgerTableName(int aYearNo, int aMonthNo) {

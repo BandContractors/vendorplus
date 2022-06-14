@@ -8,6 +8,7 @@ package api_tax.efris_bean;
 import api_tax.efris.GeneralUtilities;
 import api_tax.efris.innerclasses.ItemTax;
 import beans.AccCurrencyBean;
+import beans.Api_tax_error_logBean;
 import beans.ItemBean;
 import beans.Item_tax_mapBean;
 import beans.Parameter_listBean;
@@ -19,6 +20,7 @@ import beans.UnitBean;
 import com.google.gson.Gson;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import entities.Api_tax_error_log;
 import entities.CompanySetting;
 import entities.Item;
 import entities.Stock;
@@ -78,11 +80,16 @@ public class StockManage implements Serializable {
         }
     }
 
-    public void addStockCall(Stock aStock, String aItemIdTax, long aTax_update_id, String aSupplierTin, String aSupplierName) {
+    public void addStockCall(Stock aStock, String aItemIdTax, long aTax_update_id, String aSupplierTin, String aSupplierName, String aTableName) {
         try {
             if (null != aStock && aTax_update_id > 0) {
                 //1. indicate record4Sync
-                String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
+                String TableName = "";
+                if (null != aTableName && aTableName.length() > 0) {
+                    TableName = aTableName;
+                } else {
+                    TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
+                }
                 int record4Sync = new Stock_ledgerBean().updateTaxStock_ledger(TableName, aTax_update_id, 1, 0);
                 String id = "";
                 String APIMode = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_MODE").getParameter_value();
@@ -102,6 +109,15 @@ public class StockManage implements Serializable {
                     if (recordSynced.equals("SUCCESS")) {
                         //3. update local db that synced yes
                         int x = new Stock_ledgerBean().updateTaxStock_ledger(TableName, aTax_update_id, 1, 1);
+                    } else {
+                        Api_tax_error_log lg = new Api_tax_error_log();
+                        lg.setTransaction_type_id(0);
+                        lg.setTransaction_reason_id(0);
+                        lg.setError_desc(recordSynced);
+                        lg.setName_table(TableName);
+                        lg.setId_table(aTax_update_id);
+                        lg.setError_date(new CompanySetting().getCURRENT_SERVER_DATE());
+                        int x = new Api_tax_error_logBean().insertApi_tax_error_log(lg);
                     }
                 }
             }
@@ -131,6 +147,15 @@ public class StockManage implements Serializable {
                     if (recordSynced.equals("SUCCESS")) {
                         //3. update local db that synced yes
                         //int x = new Stock_ledgerBean().updateTaxStock_ledger(aTax_update_id, 1, 1);
+                    } else {
+                        Api_tax_error_log lg = new Api_tax_error_log();
+                        lg.setTransaction_type_id(0);
+                        lg.setTransaction_reason_id(0);
+                        lg.setError_desc(recordSynced);
+                        lg.setName_table("item");
+                        lg.setId_table(aStock.getItemId());
+                        lg.setError_date(new CompanySetting().getCURRENT_SERVER_DATE());
+                        int x = new Api_tax_error_logBean().insertApi_tax_error_log(lg);
                     }
                 }
             }
@@ -140,11 +165,16 @@ public class StockManage implements Serializable {
         }
     }
 
-    public void subtractStockCall(Stock aStock, String aItemIdTax, long aTax_update_id, String aAdjustType) {
+    public void subtractStockCall(Stock aStock, String aItemIdTax, long aTax_update_id, String aAdjustType, String aTableName) {
         try {
             if (null != aStock && aTax_update_id > 0) {
                 //1. indicate record4Sync
-                String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
+                String TableName = "";
+                if (null != aTableName && aTableName.length() > 0) {
+                    TableName = aTableName;
+                } else {
+                    TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
+                }
                 int record4Sync = new Stock_ledgerBean().updateTaxStock_ledger(TableName, aTax_update_id, 1, 0);
                 String APIMode = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_MODE").getParameter_value();
                 String id = "";
@@ -164,6 +194,15 @@ public class StockManage implements Serializable {
                     if (recordSynced.equals("SUCCESS")) {
                         //3. update local db that synced yes
                         int x = new Stock_ledgerBean().updateTaxStock_ledger(TableName, aTax_update_id, 1, 1);
+                    } else {
+                        Api_tax_error_log lg = new Api_tax_error_log();
+                        lg.setTransaction_type_id(0);
+                        lg.setTransaction_reason_id(0);
+                        lg.setError_desc(recordSynced);
+                        lg.setName_table(TableName);
+                        lg.setId_table(aTax_update_id);
+                        lg.setError_date(new CompanySetting().getCURRENT_SERVER_DATE());
+                        int x = new Api_tax_error_logBean().insertApi_tax_error_log(lg);
                     }
                 }
             }
@@ -178,7 +217,7 @@ public class StockManage implements Serializable {
             Runnable task = new Runnable() {
                 @Override
                 public void run() {
-                    addStockCall(aStock, aItemIdTax, aTax_update_id, aSupplierTin, aSupplierName);
+                    addStockCall(aStock, aItemIdTax, aTax_update_id, aSupplierTin, aSupplierName, "");
                 }
             };
             Executor e = Executors.newSingleThreadExecutor();
@@ -194,7 +233,7 @@ public class StockManage implements Serializable {
             Runnable task = new Runnable() {
                 @Override
                 public void run() {
-                    subtractStockCall(aStock, aItemIdTax, aTax_update_id, aAdjustType);
+                    subtractStockCall(aStock, aItemIdTax, aTax_update_id, aAdjustType, "");
                 }
             };
             Executor e = Executors.newSingleThreadExecutor();
@@ -835,6 +874,15 @@ public class StockManage implements Serializable {
                     //do stock taking
                     //Item_tax_map im = new Item_tax_mapBean().getItem_tax_mapSynced(item.getItemId());
                     this.callAddStockFromItemReg(item, aItemIdTax);//this.callAddStockFromItemReg(item, im);
+                } else {
+                    Api_tax_error_log lg = new Api_tax_error_log();
+                    lg.setTransaction_type_id(0);
+                    lg.setTransaction_reason_id(0);
+                    lg.setError_desc(recordSynced);
+                    lg.setName_table("item");
+                    lg.setId_table(item.getItemId());
+                    lg.setError_date(new CompanySetting().getCURRENT_SERVER_DATE());
+                    int x = new Api_tax_error_logBean().insertApi_tax_error_log(lg);
                 }
             }
         } catch (Exception e) {

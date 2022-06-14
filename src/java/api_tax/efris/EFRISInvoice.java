@@ -25,7 +25,7 @@ public class EFRISInvoice {
         this.summary = summary;
         this.extend = extend;
     }
-    
+
     private SellerDetails sellerDetails;
     private BasicInformation basicInformation;
     private BuyerDetails buyerDetails;

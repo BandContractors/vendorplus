@@ -123,3 +123,16 @@ VALUES('scrpt_db_upgrade_17',120,Now(),'6.0','');
 ALTER TABLE timesheet_log ADD COLUMN action varchar(20) default '1' not null;
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_17',124,Now(),'6.0','');
+
+CREATE TABLE api_tax_error_log (
+  api_tax_error_log_id bigint(20) NOT NULL AUTO_INCREMENT,
+  id_table bigint(50) NOT NULL,
+  name_table varchar(50) NOT NULL,
+  transaction_type_id int(11) NOT NULL,
+  transaction_reason_id int(11) NOT NULL,
+  error_desc varchar(500) NOT NULL,
+  error_date datetime NOT NULL,
+  PRIMARY KEY (api_tax_error_log_id)
+);
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_17',137,Now(),'6.0','');

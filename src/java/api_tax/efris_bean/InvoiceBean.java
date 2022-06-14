@@ -18,6 +18,7 @@ import api_tax.efris.innerclasses.T108;
 import api_tax.efris.innerclasses.T111;
 import api_tax.efris.innerclasses.TaxDetails;
 import beans.AccCurrencyBean;
+import beans.Api_tax_error_logBean;
 import beans.CreditDebitNoteBean;
 import beans.ItemBean;
 import beans.Item_tax_mapBean;
@@ -31,6 +32,7 @@ import beans.UserDetailBean;
 import com.google.gson.Gson;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import entities.Api_tax_error_log;
 import entities.CompanySetting;
 import entities.Item;
 import entities.Item_tax_map;
@@ -152,10 +154,21 @@ public class InvoiceBean implements Serializable {
             this.prepareInvoice(aTransId);
             if (goodsDetails.size() > 0) {
                 String APIMode = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_MODE").getParameter_value();
+                String ErrMsg = "";
                 if (APIMode.equals("OFFLINE")) {
-                    this.submit_invoice_offline();
+                    ErrMsg = this.submit_invoice_offline();
                 } else {
-                    this.submit_invoice_online();
+                    ErrMsg = this.submit_invoice_online();
+                }
+                if (ErrMsg.length() > 0) {
+                    Api_tax_error_log lg = new Api_tax_error_log();
+                    lg.setTransaction_type_id(2);
+                    lg.setTransaction_reason_id(0);
+                    lg.setError_desc(ErrMsg);
+                    lg.setName_table("transaction");
+                    lg.setId_table(aTransId);
+                    lg.setError_date(new CompanySetting().getCURRENT_SERVER_DATE());
+                    int x = new Api_tax_error_logBean().insertApi_tax_error_log(lg);
                 }
             }
             //update home db
@@ -163,7 +176,6 @@ public class InvoiceBean implements Serializable {
                 new Transaction_tax_mapBean().saveTransaction_tax_map(aTransId, InvoiceNo, VerificationCode, QrCode);
             }
         } catch (Exception e) {
-            //System.err.println("submitTaxInvoice:" + e.getMessage());
             LOGGER.log(Level.ERROR, e);
         }
     }
@@ -454,7 +466,8 @@ public class InvoiceBean implements Serializable {
         }
     }
 
-    public void submit_invoice_offline() {
+    public String submit_invoice_offline() {
+        String ErrorMessage = "";
         AntifakeCode = "";
         InvoiceNo = "";
         returnCode = "";
@@ -515,13 +528,15 @@ public class InvoiceBean implements Serializable {
             //System.out.println("Invoice: " + InvoiceNo);
             //-System.out.println("-------------------------------------");
         } catch (Exception e) {
-            //Logger.getLogger(InvoiceBean.class.getName()).log(Level.SEVERE, null, e);
+            ErrorMessage = returnCode + ":" + returnMessage;
             LOGGER.log(Level.INFO, output);
             LOGGER.log(Level.ERROR, e);
         }
+        return ErrorMessage;
     }
 
-    public void submit_invoice_online() {
+    public String submit_invoice_online() {
+        String ErrorMessage = "";
         AntifakeCode = "";
         InvoiceNo = "";
         returnCode = "";
@@ -602,12 +617,11 @@ public class InvoiceBean implements Serializable {
             //System.out.println("Invoice: " + InvoiceNo);
             //-System.out.println("-------------------------------------");
         } catch (Exception e) {
-            //System.out.println("returnCode:" + returnCode);
-            //System.out.println("returnMessage:" + returnMessage);
-            //Logger.getLogger(InvoiceBean.class.getName()).log(Level.SEVERE, null, e);
+            ErrorMessage = returnCode + ":" + returnMessage;
             LOGGER.log(Level.INFO, output);
             LOGGER.log(Level.ERROR, e);
         }
+        return ErrorMessage;
     }
 
     public void submitCreditNoteThread(long aTransId, int aTransTypeId) {
@@ -648,6 +662,15 @@ public class InvoiceBean implements Serializable {
                     if (ReturnMessage.equals("SUCCESS")) {
                         new Transaction_tax_mapBean().saveTransaction_tax_map_cr_dr_note(CreditNoteTrans, InvoiceNo, VerificationCode, QrCode, ReferenceNo);
                         this.updateCreditNote(ReferenceNo, DeviceNo, SellerTin);
+                    } else {
+                        Api_tax_error_log lg = new Api_tax_error_log();
+                        lg.setTransaction_type_id(aTransTypeId);
+                        lg.setTransaction_reason_id(0);
+                        lg.setError_desc(ReturnMessage);
+                        lg.setName_table("transaction_cr_dr_note");
+                        lg.setId_table(aTransId);
+                        lg.setError_date(new CompanySetting().getCURRENT_SERVER_DATE());
+                        int x = new Api_tax_error_logBean().insertApi_tax_error_log(lg);
                     }
                 }
             }
@@ -1052,11 +1075,19 @@ public class InvoiceBean implements Serializable {
                     //3. Insert Tax Map for debit note
                     if (ReturnMsg.equals("SUCCESS")) {
                         new Transaction_tax_mapBean().saveTransaction_tax_map_cr_dr_note(DebitNoteTrans, InvoiceNo, VerificationCode, QrCode, ReferenceNo);
+                    } else {
+                        Api_tax_error_log lg = new Api_tax_error_log();
+                        lg.setTransaction_type_id(aTransTypeId);
+                        lg.setTransaction_reason_id(0);
+                        lg.setError_desc(ReturnMsg);
+                        lg.setName_table("transaction_cr_dr_note");
+                        lg.setId_table(aTransId);
+                        lg.setError_date(new CompanySetting().getCURRENT_SERVER_DATE());
+                        int x = new Api_tax_error_logBean().insertApi_tax_error_log(lg);
                     }
                 }
             }
         } catch (Exception e) {
-            //System.err.println("submitDebitNote:" + e.getMessage());
             LOGGER.log(Level.ERROR, e);
         }
     }
