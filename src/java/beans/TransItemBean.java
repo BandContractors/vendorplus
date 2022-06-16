@@ -6677,7 +6677,13 @@ public class TransItemBean implements Serializable {
         }
     }
 
-    public void checkExemptTaxpayer(long aTransactorId, TransItem aTransItem) {
+    public void checkExemptDemmedTaxpayer(long aTransactorId, TransItem aTransItem) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
         try {
             String TIN = "";
             String ItemCategoryCode = "";
@@ -6697,10 +6703,12 @@ public class TransItemBean implements Serializable {
                 //0 Error, 1 Normal, 2 Exempt, 3 Deemed
                 if (CommTaxpayerCode == 2) {
                     aTransItem.setVatRated2("EXEMPT");
-                } else if (CommTaxpayerCode == 1 || CommTaxpayerCode == 3) {
-                    FacesContext.getCurrentInstance().addMessage("", new FacesMessage("Item Not Exempt for Taxpayer"));
+                } else if (CommTaxpayerCode == 3) {
+                    aTransItem.setVatRated2("DEEMED");
+                } else if (CommTaxpayerCode == 1) {
+                    FacesContext.getCurrentInstance().addMessage("", new FacesMessage(ub.translateWordsInText(BaseName, "Not Exempt and Not Deemed for Taxpayer")));
                 } else {
-                    FacesContext.getCurrentInstance().addMessage("", new FacesMessage("Error Occurred"));
+                    FacesContext.getCurrentInstance().addMessage("", new FacesMessage(ub.translateWordsInText(BaseName, "Error Occurred")));
                 }
             }
         } catch (Exception e) {

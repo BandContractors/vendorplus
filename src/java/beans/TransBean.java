@@ -12120,7 +12120,31 @@ public class TransBean implements Serializable {
         }
     }
 
-    public void reSubmitInvoiceTaxAPI(long aInnerTransId, long aTransTypeId, Trans aTrans, TransBean aTransBean) {
+    public void reSubmitInvoiceTaxAPIAll(List<Trans> aTransList, Trans aTrans, TransBean aTransBean) {
+        try {
+            int n = 0;
+            for (int i = 0; i < aTransList.size() && n <= 100; i++) {
+                if (aTransList.get(i).getTax_synced() == 0) {
+                    this.reSubmitInvoiceTaxAPI(aTransList.get(i).getTransactionId(), aTransList.get(i).getTransactionTypeId());
+                    n = n + 1;
+                }
+            }
+            this.reportSalesTaxAPI(aTrans, aTransBean);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void reSubmitInvoiceTaxAPIOne(long aInnerTransId, long aTransTypeId, Trans aTrans, TransBean aTransBean) {
+        try {
+            this.reSubmitInvoiceTaxAPI(aInnerTransId, aTransTypeId);
+            this.reportSalesTaxAPI(aTrans, aTransBean);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void reSubmitInvoiceTaxAPI(long aInnerTransId, long aTransTypeId) {
         try {
             List<TransItem> tis = new TransItemBean().getTransItemsByTransactionId(aInnerTransId);
             if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0 && new Item_tax_mapBean().countItemsNotMappedSynced(tis) == 0) {
@@ -12131,7 +12155,7 @@ public class TransBean implements Serializable {
                 } else if (aTransTypeId == 83) {//Debit Note
                     new InvoiceBean().submitDebitNote(aInnerTransId, 83);
                 }
-                this.reportSalesTaxAPI(aTrans, aTransBean);
+                //this.reportSalesTaxAPI(aTrans, aTransBean);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);

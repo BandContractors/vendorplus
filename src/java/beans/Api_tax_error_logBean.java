@@ -1,14 +1,14 @@
 package beans;
 
 import connections.DBConnection;
-import entities.Trans;
 import entities.Api_tax_error_log;
 import java.io.Serializable;
-import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import org.apache.log4j.Level;
@@ -28,6 +28,7 @@ public class Api_tax_error_logBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = Logger.getLogger(Api_tax_error_logBean.class.getName());
+    private List<Api_tax_error_log> Api_tax_error_logList;
 
     public void setApi_tax_error_logFromResultset(Api_tax_error_log aApi_tax_error_log, ResultSet aResultSet) {
         try {
@@ -90,5 +91,75 @@ public class Api_tax_error_logBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
         return inserted;
+    }
+
+    public void refreshApi_tax_error_logList(int aTransTypeId, long aTransId) {
+        try {
+            try {
+                this.Api_tax_error_logList.clear();
+            } catch (Exception e) {
+                this.Api_tax_error_logList = new ArrayList<>();
+            }
+            String sql;
+            sql = "select * from api_tax_error_log where transaction_type_id=" + aTransTypeId + " and id_table=" + aTransId + " order by error_date desc";
+            ResultSet rs = null;
+            Api_tax_error_log obj = null;
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                rs = ps.executeQuery();
+                while (rs.next()) {
+                    obj = new Api_tax_error_log();
+                    this.setApi_tax_error_logFromResultset(obj, rs);
+                    this.Api_tax_error_logList.add(obj);
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void refreshApi_tax_error_logList(long aTaxUpdateId) {
+        try {
+            try {
+                this.Api_tax_error_logList.clear();
+            } catch (Exception e) {
+                this.Api_tax_error_logList = new ArrayList<>();
+            }
+            String sql;
+            sql = "select * from api_tax_error_log where name_table LIKE 'stock_ledger%' and id_table=" + aTaxUpdateId + " order by error_date desc";
+            ResultSet rs = null;
+            Api_tax_error_log obj = null;
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                rs = ps.executeQuery();
+                while (rs.next()) {
+                    obj = new Api_tax_error_log();
+                    this.setApi_tax_error_logFromResultset(obj, rs);
+                    this.Api_tax_error_logList.add(obj);
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    /**
+     * @return the Api_tax_error_logList
+     */
+    public List<Api_tax_error_log> getApi_tax_error_logList() {
+        return Api_tax_error_logList;
+    }
+
+    /**
+     * @param Api_tax_error_logList the Api_tax_error_logList to set
+     */
+    public void setApi_tax_error_logList(List<Api_tax_error_log> Api_tax_error_logList) {
+        this.Api_tax_error_logList = Api_tax_error_logList;
     }
 }

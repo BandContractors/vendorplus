@@ -120,6 +120,12 @@
                     #{langsys['Stock']} #{langsys['TaxBody']} #{langsys['Status']} : #{stock_ledgerBean.stock_ledgerList.size()} #{langsys['Records']}  #{langsys['Found']}
                     <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
                     <p:columnToggler datasource="tblDetail" trigger="toggler" />
+                    <p:commandButton id="cmdbSyncAll" icon="ui-icon-arrowreturnthick-1-n" value="#{langsys['Resync']} #{langsys['All']}" onclick="PF('statusDialog1').show()" onsuccess="PF('statusDialog1').hide()" title="#{langsys['Resync']} #{langsys['All']} (#{langsys['Limit']} #{langsys['of']} 100 #{langsys['Records']} #{langsys['for']} #{langsys['each']} #{langsys['Resync']})" style="background-color: #d2222d;">
+                        <p:dialog widgetVar="statusDialog1" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                        <p:ajax listener="#{stock_ledgerBean.reSubmitStockTaxAPIAll(stock_ledgerBean.stock_ledgerList,stock_ledger,stock_ledgerBean,itemBean.selectedItem)}" update="tblDetail"/>
+                    </p:commandButton>
                 </f:facet>
                 <f:facet name="{Exporters}">
                     <h:commandLink>
@@ -176,15 +182,28 @@
                 <p:column headerText="#{langsys['Synced']}">
                     <h:outputText value="#{itm.tax_update_synced eq 1 ? 'Yes':itm.tax_update_synced eq 0 ? 'No':''}" styleClass="#{itm.tax_update_synced eq 1 ? 'green':itm.tax_update_synced eq 0 ? 'red':''}" style="width: 60px;color: #ffffff !important;text-align: right !important;"/>
                 </p:column>
-                <p:column headerText="#{langsys['Re-Sync']}" exportable="false" visible="true">
+                <p:column headerText="#{langsys['Resync']}" exportable="false" visible="true">
                     <p:commandButton id="cmdbSync" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" icon="ui-icon-arrowreturnthick-1-n" style="width: 20px;height: 30px;margin: 5px;"  rendered="#{itm.tax_update_synced eq 0}">
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
-                        <p:ajax listener="#{stock_ledgerBean.reSubmitStockTaxAPI(itm,stock_ledger,stock_ledgerBean,itemBean.selectedItem)}" update="tblDetail"/>
+                        <p:ajax listener="#{stock_ledgerBean.reSubmitStockTaxAPIOne(itm,stock_ledger,stock_ledgerBean,itemBean.selectedItem)}" update="tblDetail"/>
                     </p:commandButton>
+                    <p:commandLink value="M" action="#{api_tax_error_logBean.refreshApi_tax_error_logList(itm.tax_update_id)}" oncomplete="PF('dlgSyncMsg').show()" update="formReport:pnlgSyncMsg" style="color: blue;text-decoration: none;" rendered="#{itm.tax_update_synced eq 0}" title="#{langsys['View']} #{langsys['Sync']} #{langsys['Error']} #{langsys['Message']}"/>
                 </p:column>
             </p:dataTable>
+            <p:dialog header="#{langsys['Sync']} #{langsys['Error']} #{langsys['Message']}" widgetVar="dlgSyncMsg" modal="true" height="170">
+                <h:panelGrid id="pnlgSyncMsg">
+                    <p:dataTable tableStyle="width:auto;" var="m" value="#{api_tax_error_logBean.api_tax_error_logList}">
+                        <p:column headerText="#{langsys['Error']}" style="text-align: left;">
+                            <h:outputText value="#{m.error_desc}"/>
+                        </p:column>
+                        <p:column headerText="#{langsys['Date']}" style="text-align: left;">
+                            <h:outputText value="#{utilityBean.formatDateTime(m.error_date)}"/>
+                        </p:column>
+                    </p:dataTable>
+                </h:panelGrid>
+            </p:dialog>
         </h:form>
     </h:body>
 </html>

@@ -385,6 +385,32 @@ public class Stock_ledgerBean implements Serializable {
         return update_flag;
     }
 
+    public void reSubmitStockTaxAPIAll(List<Stock_ledger> aStock_ledgerList, Stock_ledger aStock_ledger, Stock_ledgerBean aStock_ledgerBean, Item aItem) {
+        try {
+            int n = 0;
+            for (int i = 0; i < aStock_ledgerList.size() && n <= 100; i++) {
+                if (aStock_ledgerList.get(i).getTax_update_synced() == 0) {
+                    this.reSubmitStockTaxAPI(aStock_ledgerList.get(i), aStock_ledger, aStock_ledgerBean, aItem);
+                    n = n + 1;
+                }
+            }
+            //refresh UI
+            this.reportStockTaxAPICall(aStock_ledger, aStock_ledgerBean, aItem);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void reSubmitStockTaxAPIOne(Stock_ledger aStock_ledger4Sync, Stock_ledger aStock_ledger, Stock_ledgerBean aStock_ledgerBean, Item aItem) {
+        try {
+            this.reSubmitStockTaxAPI(aStock_ledger4Sync, aStock_ledger, aStock_ledgerBean, aItem);
+            //refresh UI
+            this.reportStockTaxAPICall(aStock_ledger, aStock_ledgerBean, aItem);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public void reSubmitStockTaxAPI(Stock_ledger aStock_ledger4Sync, Stock_ledger aStock_ledger, Stock_ledgerBean aStock_ledgerBean, Item aItem) {
         try {
             if (aStock_ledger4Sync.getTransaction_type_id() != 2 && aStock_ledger4Sync.getTransaction_type_id() != 4 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
@@ -447,8 +473,6 @@ public class Stock_ledgerBean implements Serializable {
                         }
                         new StockManage().subtractStockCall(stocksub, ItemIdTax, aStock_ledger4Sync.getTax_update_id(), AdjustType, TableName);
                     }
-                    //refresh UI
-                    this.reportStockTaxAPICall(aStock_ledger, aStock_ledgerBean, aItem);
                 }
             }
         } catch (Exception e) {

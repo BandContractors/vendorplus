@@ -174,7 +174,7 @@
                     <h:inputText disabled="true" style="color: green;font-weight: bold;width: 130px;;height: 24px;" styleClass="clsInput" id="itxtPrepaidAcc" value="#{accJournalBean.returnBalanceString(trans.deposit_customer)}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
-                    <p:commandLink onclick="PF('dlgMore').show();" value="M" title="#{langsys['More']} #{langsys['Detail']} (#{langsys['Representative']}, #{langsys[transBean.transTypeObj.transactionNumberLabel]}, #{langsys['Terms']} #{langsys['and']} #{langsys['Conditions']})"/>
+                    <p:commandLink onclick="PF('dlgMore').show();" value="M" title="#{langsys['More']} #{langsys['Detail']} (#{langsys['Representative']}, #{langsys['Invoice']} #{langsys['Number']}, #{langsys['Terms']} #{langsys['and']} #{langsys['Conditions']})"/>
                 </h:panelGrid>
             </h:panelGrid>
             <h:panelGrid id="gridTransItem" styleClass="clsGridMainInput" columns="11">
@@ -291,8 +291,8 @@
                     <h:selectOneMenu styleClass="clsMenu" style="width: 150px;height: 30px;" id="menuVatRated2" value="#{transItem.vatRated2}">
                         <f:selectItems value="#{utilityBean.getStringArrayFromCommaSeperatedStr(itemBean.selectedItem.vatRated)}"/>
                     </h:selectOneMenu>
-                    <h:commandButton value="#{langsys['Check']} #{langsys['Exempt']}" style="height: 30px;">
-                        <f:ajax listener="#{transItemBean.checkExemptTaxpayer(trans.transactorId,transItem)}" execute="@form" render="gridTransItem gridItemStatus pgrdMsgs"/>
+                    <h:commandButton value="#{langsys['Check']} #{langsys['Exempt']}/#{langsys['Deemed']}" style="height: 30px;">
+                        <f:ajax listener="#{transItemBean.checkExemptDemmedTaxpayer(trans.transactorId,transItem)}" execute="@form" render="gridTransItem gridItemStatus pgrdMsgs"/>
                     </h:commandButton>
                 </h:panelGrid>
                 <h:panelGrid id="pgrdWarranty2" columns="2" rendered="#{transItem.specifyWarranty}">
