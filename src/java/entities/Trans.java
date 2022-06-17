@@ -66,6 +66,8 @@ public class Trans implements Serializable {
     private double TotalStdVatableAmount;
     private double TotalZeroVatableAmount;
     private double TotalExemptVatableAmount;
+    private double TotalDeemedVatableAmount;
+    private double TotalDeemedVat;
     private double VatPerc;
     private String IsCashDiscountVatLiable;
     //for report
@@ -1946,5 +1948,33 @@ public class Trans implements Serializable {
      */
     public void setMode_code(int mode_code) {
         this.mode_code = mode_code;
+    }
+
+    /**
+     * @return the TotalDeemedVatableAmount
+     */
+    public double getTotalDeemedVatableAmount() {
+        return TotalDeemedVatableAmount;
+    }
+
+    /**
+     * @param TotalDeemedVatableAmount the TotalDeemedVatableAmount to set
+     */
+    public void setTotalDeemedVatableAmount(double TotalDeemedVatableAmount) {
+        this.TotalDeemedVatableAmount = TotalDeemedVatableAmount;
+    }
+
+    /**
+     * @return the TotalDeemedVat
+     */
+    public double getTotalDeemedVat() {
+        return TotalDeemedVat;
+    }
+
+    /**
+     * @param TotalDeemedVat the TotalDeemedVat to set
+     */
+    public void setTotalDeemedVat(double TotalDeemedVat) {
+        this.TotalDeemedVat = TotalDeemedVat;
     }
 }

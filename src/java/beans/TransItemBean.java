@@ -6339,36 +6339,57 @@ public class TransItemBean implements Serializable {
                 ti.setDuration_value(NewTransItem.getDuration_value());
 
                 //Check if this is a vatable item
-                if ("STANDARD".equals(NewTransItem.getVatRated()) && ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "PURCHASE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE RETURN INVOICE".equals(transtype.getTransactionTypeName()))) {
+                if (("STANDARD".equals(NewTransItem.getVatRated()) || "DEEMED".equals(NewTransItem.getVatRated())) && ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "PURCHASE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE RETURN INVOICE".equals(transtype.getTransactionTypeName()))) {
                     //this is a vatable item
-                    ti.setVatPerc(VatPercent);
-                    //Check if VAT is Inclusive or Excuksive
-                    if ("Yes".equals(CompanySetting.getIsVatInclusive())) {
-                        //VAT - Inclusive
-                        if ("No".equals(CompanySetting.getIsTradeDiscountVatLiable())) {
-                            ti.setUnitPriceIncVat(NewTransItem.getUnitPrice());
+                    if ("STANDARD".equals(NewTransItem.getVatRated())) {
+                        ti.setVatPerc(VatPercent);
+                        //Check if VAT is Inclusive or Excuksive
+                        if ("Yes".equals(CompanySetting.getIsVatInclusive())) {
+                            //VAT - Inclusive
+                            if ("No".equals(CompanySetting.getIsTradeDiscountVatLiable())) {
+                                ti.setUnitPriceIncVat(NewTransItem.getUnitPrice());
+                                IncludedVat = (NewTransItem.getUnitPrice() - NewTransItem.getUnitTradeDiscount()) - (100 * (NewTransItem.getUnitPrice() - NewTransItem.getUnitTradeDiscount()) / (100 + VatPercent));
+                                ti.setUnitVat(IncludedVat);
+                                ti.setUnitPriceExcVat(NewTransItem.getUnitPrice() - IncludedVat);
+                            } else {
+                                //do nothing; IncVat=IncVat
+                                ti.setUnitPriceIncVat(NewTransItem.getUnitPrice());
+                                IncludedVat = NewTransItem.getUnitPrice() - (100 * NewTransItem.getUnitPrice() / (100 + VatPercent));
+                                ti.setUnitVat(IncludedVat);
+                                ti.setUnitPriceExcVat(NewTransItem.getUnitPrice() - IncludedVat);
+                            }
+                        } else {
+                            //VAT - Exclusive
+                            ti.setUnitPriceExcVat(NewTransItem.getUnitPrice());
+                            if ("No".equals(CompanySetting.getIsTradeDiscountVatLiable())) {
+                                ExcludedVat = (VatPercent / 100) * (NewTransItem.getUnitPrice() - NewTransItem.getUnitTradeDiscount());
+                            } else {
+                                ExcludedVat = (VatPercent / 100) * NewTransItem.getUnitPrice();
+                            }
+                            ti.setUnitVat(ExcludedVat);
+                            ti.setUnitPriceIncVat(NewTransItem.getUnitPrice() + ExcludedVat);
+                        }
+                    } else if ("DEEMED".equals(NewTransItem.getVatRated())) {
+                        ti.setVatPerc(VatPercent);
+                        //Check if VAT is Inclusive or Excuksive
+                        if ("Yes".equals(CompanySetting.getIsVatInclusive())) {
+                            //VAT - Inclusive
                             IncludedVat = (NewTransItem.getUnitPrice() - NewTransItem.getUnitTradeDiscount()) - (100 * (NewTransItem.getUnitPrice() - NewTransItem.getUnitTradeDiscount()) / (100 + VatPercent));
-                            ti.setUnitVat(IncludedVat);
+                            ti.setUnitPriceIncVat(NewTransItem.getUnitPrice() - IncludedVat);
+                            ti.setUnitVat(0);
+                            ti.setVatPerc(0);
                             ti.setUnitPriceExcVat(NewTransItem.getUnitPrice() - IncludedVat);
+                            ti.setVatPerc(0);
                         } else {
-                            //do nothing; IncVat=IncVat
+                            //VAT - Exclusive
+                            //ExcludedVat = (VatPercent / 100) * (NewTransItem.getUnitPrice() - NewTransItem.getUnitTradeDiscount());
+                            ExcludedVat = 0;
+                            ti.setUnitPriceExcVat(NewTransItem.getUnitPrice());
+                            ti.setUnitVat(ExcludedVat);
                             ti.setUnitPriceIncVat(NewTransItem.getUnitPrice());
-                            IncludedVat = NewTransItem.getUnitPrice() - (100 * NewTransItem.getUnitPrice() / (100 + VatPercent));
-                            ti.setUnitVat(IncludedVat);
-                            ti.setUnitPriceExcVat(NewTransItem.getUnitPrice() - IncludedVat);
+                            ti.setVatPerc(0);
                         }
-                    } else {
-                        //VAT - Exclusive
-                        ti.setUnitPriceExcVat(NewTransItem.getUnitPrice());
-                        if ("No".equals(CompanySetting.getIsTradeDiscountVatLiable())) {
-                            ExcludedVat = (VatPercent / 100) * (NewTransItem.getUnitPrice() - NewTransItem.getUnitTradeDiscount());
-                        } else {
-                            ExcludedVat = (VatPercent / 100) * NewTransItem.getUnitPrice();
-                        }
-                        ti.setUnitVat(ExcludedVat);
-                        ti.setUnitPriceIncVat(NewTransItem.getUnitPrice() + ExcludedVat);
                     }
-
                 } else {
                     //this ISNT a vatable item
                     ti.setVatPerc(0);
@@ -6677,6 +6698,39 @@ public class TransItemBean implements Serializable {
         }
     }
 
+    public void markExemptDemmed(Item aSelectedItem, TransItem aTransItem, String aExemptDemmed) {
+        try {
+            if (null != aSelectedItem && null != aTransItem) {
+                String CurrentVatRated = aSelectedItem.getVatRated();
+                if (aExemptDemmed.equals("EXEMPT")) {
+                    if (!CurrentVatRated.contains("EXEMPT")) {
+                        if (CurrentVatRated.length() > 0) {
+                            CurrentVatRated = CurrentVatRated + "," + "EXEMPT";
+                        } else {
+                            CurrentVatRated = "EXEMPT";
+                        }
+                        aSelectedItem.setVatRated(CurrentVatRated);
+                        aTransItem.setVatRated2("EXEMPT");
+                    }
+                } else if (aExemptDemmed.equals("DEEMED")) {
+                    if (aExemptDemmed.equals("DEEMED")) {
+                        if (CurrentVatRated.length() > 0) {
+                            CurrentVatRated = CurrentVatRated + "," + "DEEMED";
+                        } else {
+                            CurrentVatRated = "DEEMED";
+                        }
+                        aSelectedItem.setVatRated(CurrentVatRated);
+                        aTransItem.setVatRated2("DEEMED");
+                    }
+                } else {
+                    aTransItem.setVatRated2("");
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public void checkExemptDemmedTaxpayer(long aTransactorId, TransItem aTransItem) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -6702,9 +6756,11 @@ public class TransItemBean implements Serializable {
                 int CommTaxpayerCode = new TaxpayerBean().checkDeemedExemptTaxpayer(APIMode, TIN, ItemCategoryCode);
                 //0 Error, 1 Normal, 2 Exempt, 3 Deemed
                 if (CommTaxpayerCode == 2) {
-                    aTransItem.setVatRated2("EXEMPT");
+                    FacesContext.getCurrentInstance().addMessage("", new FacesMessage(ub.translateWordsInText(BaseName, "Exempt")));
                 } else if (CommTaxpayerCode == 3) {
-                    aTransItem.setVatRated2("DEEMED");
+                    FacesContext.getCurrentInstance().addMessage("", new FacesMessage(ub.translateWordsInText(BaseName, "Deemed")));
+                } else if (CommTaxpayerCode == 4) {
+                    FacesContext.getCurrentInstance().addMessage("", new FacesMessage(ub.translateWordsInText(BaseName, "Exempt and Deemed")));
                 } else if (CommTaxpayerCode == 1) {
                     FacesContext.getCurrentInstance().addMessage("", new FacesMessage(ub.translateWordsInText(BaseName, "Not Exempt and Not Deemed for Taxpayer")));
                 } else {

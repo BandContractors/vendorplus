@@ -20,6 +20,7 @@ import javax.servlet.http.HttpSession;
 import utilities.ConvertNumToWordBean;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import utilities.UtilityBean;
 
 @ManagedBean
 @SessionScoped
@@ -208,6 +209,12 @@ public class OutputDetailBean implements Serializable {
             try {
                 if (aOutputDetail.getTrans().getTransactionTypeId() == 66) {
                     aOutputDetail.getTrans().setTotal_weight(new TransItemBean().calcTransTotalWeight(aOutputDetail.getTrans_items()));
+                }
+            } catch (Exception e) {
+            }
+            try {
+                if (aOutputDetail.getTrans().getTransactionTypeId() == 2) {
+                    new UtilityBean().calcUpdateTransDeemedAmount(aOutputDetail.getTrans(), aOutputDetail.getTrans_items());
                 }
             } catch (Exception e) {
             }
