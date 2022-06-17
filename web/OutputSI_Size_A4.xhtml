@@ -235,6 +235,17 @@
                                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputLabel>
                                 <h:outputLabel style="font-size: 14px;" value="0"/>
+                                
+                                <h:outputLabel style="font-size: 14px;" value="#{langout['Deemed']}"/>
+                                <h:outputLabel style="font-size: 14px;" value="#{generalUserSetting.outputDetailParent.trans.vatPerc}">
+                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputLabel>
+                                <h:outputLabel style="font-size: 14px;" value="#{generalUserSetting.outputDetailParent.trans.totalDeemedVatableAmount}">
+                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputLabel>
+                                <h:outputLabel style="font-size: 14px;" value="#{generalUserSetting.outputDetailParent.trans.totalDeemedVat}">
+                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputLabel>
                             </h:panelGrid>
                         </h:panelGrid>
                     </h:panelGrid>

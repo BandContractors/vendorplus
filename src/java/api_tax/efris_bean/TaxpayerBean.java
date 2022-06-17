@@ -127,6 +127,7 @@ public class TaxpayerBean implements Serializable {
     }
 
     public int checkDeemedExemptTaxpayer(String aApiTaxMode, String aTIN, String aCommodityCatCode) {
+        int TpCatCode = 0;
         int CommCatCode = 0;//0 Error, 1 Normal, 2 Exempt, 3 Deemed
         Taxpayer tp = null;
         String output = "";
@@ -191,10 +192,10 @@ public class TaxpayerBean implements Serializable {
                 DecryptedContent = new String(Base64.decodeBase64(content));
             }
             JSONObject parentbasicInformationjsonObject = new JSONObject(DecryptedContent);
-            JSONArray jSONArray = parentbasicInformationjsonObject.getJSONArray("commodityCategory");
+            JSONArray jSONArrayCom = parentbasicInformationjsonObject.getJSONArray("commodityCategory");
             String CommTaxPayerType = "";
-            for (int i = 0, size = jSONArray.length(); i < size; i++) {
-                JSONObject objectInArray = jSONArray.getJSONObject(i);
+            for (int i = 0, size = jSONArrayCom.length(); i < size; i++) {
+                JSONObject objectInArray = jSONArrayCom.getJSONObject(i);
                 CommTaxPayerType = objectInArray.get("commodityCategoryTaxpayerType").toString();
             }
             if (CommTaxPayerType.equals("101")) {
@@ -203,6 +204,8 @@ public class TaxpayerBean implements Serializable {
                 CommCatCode = 2;
             } else if (CommTaxPayerType.equals("103")) {
                 CommCatCode = 3;
+            } else if (CommTaxPayerType.equals("104")) {
+                CommCatCode = 4;
             } else {
                 CommCatCode = 0;
             }

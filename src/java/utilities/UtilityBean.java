@@ -1274,7 +1274,7 @@ public class UtilityBean implements Serializable {
                 if (aTransItemList.get(i).getVatRated().equals("DEEMED") && VatPercent > 0) {
                     double ExcludedVat = (VatPercent / 100) * aTransItemList.get(i).getAmountExcVat();
                     DeemedTotalVat = DeemedTotalVat + ExcludedVat;
-                    DeemedTotalAmount = DeemedTotalAmount + (aTransItemList.get(i).getAmountExcVat() + ExcludedVat);
+                    DeemedTotalAmount = DeemedTotalAmount + aTransItemList.get(i).getAmountExcVat();
                 }
             }
             aTrans.setTotalDeemedVatableAmount(DeemedTotalAmount);
