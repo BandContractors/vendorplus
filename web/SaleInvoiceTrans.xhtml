@@ -276,11 +276,10 @@
                 </p:remoteCommand>
             </h:panelGrid>
             <h:panelGrid id="pgrdOverrideWarranty" columns="2">
-                <h:panelGrid id="pgrdOverride2" columns="6" rendered="#{transItem.overridePrices}">
+                <h:panelGrid id="pgrdOverride2" columns="5" rendered="#{transItem.overridePrices}">
                     <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Unit Price']}(New)"/>
                     <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Discount']}(New)"/>
                     <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="VAT #{langsys['Rate']}(New)"/>
-                    <h:outputLabel value=""/>
                     <h:outputLabel value=""/>
                     <h:outputLabel value=""/>
 
@@ -298,9 +297,6 @@
                     </h:commandButton>
                     <h:commandButton value="#{langsys['Deemed']}" style="height: 30px;">
                         <f:ajax listener="#{transItemBean.markExemptDemmed(itemBean.selectedItem,transItem,'DEEMED')}" execute="pgrdOverrideWarranty" render="pgrdOverrideWarranty"/>
-                    </h:commandButton>
-                    <h:commandButton value="#{langsys['Check']} #{langsys['Exempt']}/#{langsys['Deemed']}" style="height: 30px;">
-                        <f:ajax listener="#{transItemBean.checkExemptDemmedTaxpayer(trans.transactorId,transItem)}" execute="@form" render="gridTransItem gridItemStatus pgrdMsgs"/>
                     </h:commandButton>
                 </h:panelGrid>
                 <h:panelGrid id="pgrdWarranty2" columns="2" rendered="#{transItem.specifyWarranty}">

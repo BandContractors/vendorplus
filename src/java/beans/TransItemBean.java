@@ -6730,48 +6730,7 @@ public class TransItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
-    public void checkExemptDemmedTaxpayer(long aTransactorId, TransItem aTransItem) {
-        UtilityBean ub = new UtilityBean();
-        String BaseName = "language_en";
-        try {
-            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
-        } catch (Exception e) {
-        }
-        try {
-            String TIN = "";
-            String ItemCategoryCode = "";
-            try {
-                TIN = new TransactorBean().getTransactor(aTransactorId).getTaxIdentity();
-            } catch (Exception e) {
-                //
-            }
-            try {
-                ItemCategoryCode = new Item_tax_mapBean().getItem_tax_mapSynced(aTransItem.getItemId()).getItem_code_tax();
-            } catch (Exception e) {
-                //
-            }
-            if (TIN.length() > 0 && ItemCategoryCode.length() > 0) {
-                String APIMode = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_MODE").getParameter_value();
-                int CommTaxpayerCode = new TaxpayerBean().checkDeemedExemptTaxpayer(APIMode, TIN, ItemCategoryCode);
-                //0 Error, 1 Normal, 2 Exempt, 3 Deemed
-                if (CommTaxpayerCode == 2) {
-                    FacesContext.getCurrentInstance().addMessage("", new FacesMessage(ub.translateWordsInText(BaseName, "Exempt")));
-                } else if (CommTaxpayerCode == 3) {
-                    FacesContext.getCurrentInstance().addMessage("", new FacesMessage(ub.translateWordsInText(BaseName, "Deemed")));
-                } else if (CommTaxpayerCode == 4) {
-                    FacesContext.getCurrentInstance().addMessage("", new FacesMessage(ub.translateWordsInText(BaseName, "Exempt and Deemed")));
-                } else if (CommTaxpayerCode == 1) {
-                    FacesContext.getCurrentInstance().addMessage("", new FacesMessage(ub.translateWordsInText(BaseName, "Not Exempt and Not Deemed for Taxpayer")));
-                } else {
-                    FacesContext.getCurrentInstance().addMessage("", new FacesMessage(ub.translateWordsInText(BaseName, "Error Occurred")));
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.ERROR, e);
-        }
-    }
-
+    
     public void clearTransItems(Trans aTrans, List<TransItem> aActiveTransItems) {
         try {
             aActiveTransItems.clear();
