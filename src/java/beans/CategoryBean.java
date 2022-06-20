@@ -168,6 +168,12 @@ public class CategoryBean implements Serializable {
         if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Delete") == 0) {
             msg = "Not Allowed to Access this Function";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+        } else if (null != new ItemBean().getItemObjectListByCategory(CatId)){
+            msg = "Category is in use by an Item";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+        } else if (null != new SubCategoryBean().getSubCategoriesByCategoryId(CatId)){
+            msg = "Category is in use by a Subcategory";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
             String sql = "DELETE FROM category WHERE category_id=?";
             try (

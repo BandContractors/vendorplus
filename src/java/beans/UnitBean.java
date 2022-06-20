@@ -154,6 +154,9 @@ public class UnitBean implements Serializable {
         if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Delete") == 0) {
             msg = "Not Allowed to Access this Function";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+        } else if (null != new ItemBean().getItemObjectListByUnit(UnitId)) {
+            msg = "Unit is in use by an Item";
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
             String sql = "DELETE FROM unit WHERE unit_id=?";
             try (

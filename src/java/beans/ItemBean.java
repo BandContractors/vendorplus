@@ -1865,6 +1865,48 @@ public class ItemBean implements Serializable {
         return getItemObjectList();
     }
 
+    public List<Item> getItemObjectListByUnit(int Unit) {
+        String sql;
+        sql = "{call sp_search_item_by_unit(?)}";
+        ResultSet rs;
+        this.setItemObjectList(new ArrayList<>());
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setInt(1, Unit);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Item item = new Item();
+                this.setItemFromResultset(item, rs);
+                this.getItemObjectList().add(item);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return getItemObjectList();
+    }
+
+    public List<Item> getItemObjectListByCategory(int Category) {
+        String sql;
+        sql = "{call sp_search_item_by_category(?)}";
+        ResultSet rs;
+        this.setItemObjectList(new ArrayList<>());
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setInt(1, Category);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Item item = new Item();
+                this.setItemFromResultset(item, rs);
+                this.getItemObjectList().add(item);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return getItemObjectList();
+    }
+
     public void updateLookUpsUI(Item aItem) {
         try {
             //Item item = null;

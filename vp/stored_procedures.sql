@@ -3760,6 +3760,32 @@ BEGIN
 END//
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS sp_search_item_by_unit;
+DELIMITER //
+CREATE PROCEDURE sp_search_item_by_unit
+(
+	IN in_unit_id int 
+) 
+BEGIN 
+		SELECT * FROM view_item 
+		WHERE unit_id=in_unit_id 
+		ORDER BY description ASC;
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_item_by_category;
+DELIMITER //
+CREATE PROCEDURE sp_search_item_by_category
+(
+	IN in_category_id int 
+) 
+BEGIN 
+		SELECT * FROM view_item 
+		WHERE category_id=in_category_id 
+		ORDER BY description ASC;
+END//
+DELIMITER ;
+
 DROP PROCEDURE IF EXISTS sp_search_item_active_by_code;
 DELIMITER //
 CREATE PROCEDURE sp_search_item_active_by_code
