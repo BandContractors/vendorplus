@@ -65,7 +65,7 @@ import sessions.GeneralUserSetting;
 @ManagedBean
 @SessionScoped
 public class UtilityBean implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = Logger.getLogger(UtilityBean.class.getName());
     private Pattern pattern;
@@ -74,13 +74,13 @@ public class UtilityBean implements Serializable {
     private String HOST_NAME;
     private String IP;
     private String FileNameWithPath = "";
-    
+
     public boolean isTime24Hour(String time) {
         pattern = Pattern.compile(TIME24HOURS_PATTERN);
         matcher = pattern.matcher(time);
         return matcher.matches();
     }
-    
+
     public static String combineTwoStr(String aStr1, String aStr2, int aBracket) {
         String CombStr = "";
         if (null == aStr1) {
@@ -106,7 +106,7 @@ public class UtilityBean implements Serializable {
         }
         return CombStr;
     }
-    
+
     public String returnYesNoString(int aYesNo) {
         if (aYesNo == 0) {
             return "N";
@@ -116,7 +116,7 @@ public class UtilityBean implements Serializable {
             return "";
         }
     }
-    
+
     public long getNewTableColumnSeqNumber(String aTableName, String aColumnName) {
         String sql = "{call sp_get_new_id(?,?,?)}";
         long NewId = 0;
@@ -135,16 +135,16 @@ public class UtilityBean implements Serializable {
         }
         return NewId;
     }
-    
+
     public static double daysBetween(Date d1, Date d2) {
         return (double) ((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24)) + 1;
     }
-    
+
     public static double weeksBetween(Date d1, Date d2) {
         double daysbtn = daysBetween(d1, d2);
         return (double) Math.ceil(daysbtn / 7);
     }
-    
+
     public static double weeksBetweenReturn(Date d1, Date d2) {
         double daysbtnr = 0;
         Calendar cal1 = new GregorianCalendar();
@@ -160,13 +160,13 @@ public class UtilityBean implements Serializable {
         }
         return daysbtnr;
     }
-    
+
     public Date AddDays(Date aDate, int aDays) {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, aDays);
         return cal.getTime();
     }
-    
+
     public String formatDate(Date aDate) {
         String outs = "";
         try {
@@ -176,7 +176,7 @@ public class UtilityBean implements Serializable {
         }
         return outs;
     }
-    
+
     public int isDatesEqual(Date aDate1, Date aDate2) {
         int outs = 0;
         try {
@@ -201,7 +201,7 @@ public class UtilityBean implements Serializable {
         }
         return outs;
     }
-    
+
     public String formatDateTimeServer(Date aDate) {
         String outs = "";
         try {
@@ -211,7 +211,7 @@ public class UtilityBean implements Serializable {
         }
         return outs;
     }
-    
+
     public String formatDateTime(Date aDate) {
         String outs = "";
         try {
@@ -221,7 +221,7 @@ public class UtilityBean implements Serializable {
         }
         return outs;
     }
-    
+
     public String convertIntAsString(int aInt) {
         String aStr;
         try {
@@ -231,7 +231,7 @@ public class UtilityBean implements Serializable {
         }
         return aStr;
     }
-    
+
     public Date convertDateUserToDbTz(Date aFromDate) {
         Date ToDate = null;
         String sql = "{call sp_convert_timezone(?,?,?,?)}";
@@ -252,7 +252,7 @@ public class UtilityBean implements Serializable {
         }
         return ToDate;
     }
-    
+
     public int countIntegers(String input) {
         int count = 0;
         boolean isPreviousDigit = false;
@@ -269,7 +269,7 @@ public class UtilityBean implements Serializable {
         }
         return count;
     }
-    
+
     public String formatDoubleToString(double aAmount) {
         String aString = "";
         //DecimalFormat myFormatter = new DecimalFormat("###,###.###;(###,###.###)");
@@ -281,7 +281,7 @@ public class UtilityBean implements Serializable {
         }
         return aString;
     }
-    
+
     public String formatDoubleToStringHide(double aAmount, int aHideResult) {
         String aString = "";
         //DecimalFormat myFormatter = new DecimalFormat("###,###.###;(###,###.###)");
@@ -297,7 +297,7 @@ public class UtilityBean implements Serializable {
             return "";
         }
     }
-    
+
     public String formatDoubleToString(double aAmount, String aCurrencyCode) {
         String aString = "";
         String aPattern = "";
@@ -312,7 +312,7 @@ public class UtilityBean implements Serializable {
         }
         return aString;
     }
-    
+
     public String formatDoubleToStringPlain(double aAmount, String aCurrencyCode) {
         String aString = "";
         String aPattern = "";
@@ -327,21 +327,21 @@ public class UtilityBean implements Serializable {
         }
         return aString;
     }
-    
+
     public String formatDoublePlain2DP(double aAmount) {
         String aString = "";
         String aPattern = "##0.00";
         aString = this.formatNumber(aPattern, aAmount) + "";
         return aString;
     }
-    
+
     public String formatDoublePlain1DP4(double aAmount) {
         String aString = "";
         String aPattern = "0.0000";
         aString = this.formatNumber(aPattern, aAmount) + "";
         return aString;
     }
-    
+
     public boolean isXGreaterThanY(int aX, int aY) {
         boolean aR = false;
         try {
@@ -351,11 +351,11 @@ public class UtilityBean implements Serializable {
                 aR = false;
             }
         } catch (Exception e) {
-            
+
         }
         return aR;
     }
-    
+
     public String formatNumber(String aPattern, Double aNumber) {
         String format = "";
         try {
@@ -370,7 +370,7 @@ public class UtilityBean implements Serializable {
         }
         return format;
     }
-    
+
     public String formatNumber(Double aNumber) {
         String format = "";
         try {
@@ -385,7 +385,7 @@ public class UtilityBean implements Serializable {
         }
         return format;
     }
-    
+
     public String convertLocaleToString() {
         String locale = "";
         try {
@@ -394,7 +394,7 @@ public class UtilityBean implements Serializable {
         }
         return locale;
     }
-    
+
     public String setColorByValueFromZero(double aValue, String aCondition, String aTrueColor, String aFalseColor) {
         if (aCondition.equals("greater")) {
             if (aValue > 0) {
@@ -412,7 +412,7 @@ public class UtilityBean implements Serializable {
             return aFalseColor;
         }
     }
-    
+
     public String getClassRedAmberGreenOrder(int aProcessed, int bPaid, int cCancelled) {
         String classname = "";
         if (aProcessed == 1 && bPaid == 1) {
@@ -437,7 +437,7 @@ public class UtilityBean implements Serializable {
         System.out.println("Process: " + aProcessed + ", Paid: " + bPaid + ", Cancelled:" + cCancelled + " == " + classname);
         return classname;
     }
-    
+
     public String getColorRedAmberGreenOrder(int aProcessed, int bPaid, int cCancelled) {
         String colorname = "";
         if (aProcessed == 1 && bPaid == 1) {
@@ -450,7 +450,7 @@ public class UtilityBean implements Serializable {
         System.out.println("Process: " + aProcessed + ", Paid: " + bPaid + ", Cancelled:" + cCancelled + " == " + colorname);
         return colorname;
     }
-    
+
     public String returnOneString(String aString1, String aString2, int aPriority) {
         //aPriority:1 for str1, 2 for str2 and 0 for any
         if (aPriority == 1) {
@@ -469,7 +469,7 @@ public class UtilityBean implements Serializable {
             return "";
         }
     }
-    
+
     public String getItemImageAddress(Item item) {
         String ImgBaseURL = "";
         String ImageName = "";
@@ -484,7 +484,7 @@ public class UtilityBean implements Serializable {
         }
         return ItemImageAddress;
     }
-    
+
     public String convertMonthNoToName(int aMonthNumber, int aShort) {
         String ms = "";
         if (aMonthNumber == 1) {
@@ -562,7 +562,7 @@ public class UtilityBean implements Serializable {
         }
         return ms;
     }
-    
+
     public int convertMonthNameToNo(String aMonthName) {
         int ms = 0;
         if (aMonthName.equals("Jan") || aMonthName.equals("January")) {
@@ -592,7 +592,7 @@ public class UtilityBean implements Serializable {
         }
         return ms;
     }
-    
+
     public Integer getCurrentYear() {
         int current_year = 0;
         //current_year = Calendar.getInstance().get(Calendar.YEAR);
@@ -601,7 +601,7 @@ public class UtilityBean implements Serializable {
         current_year = cal.get(Calendar.YEAR);
         return current_year;
     }
-    
+
     public Integer getYearFromDate(Date aDate) {
         int date_year = 0;
         try {
@@ -612,7 +612,7 @@ public class UtilityBean implements Serializable {
         }
         return date_year;
     }
-    
+
     public Integer getCurrentMonth() {
         int current_month = 0;
         //current_month = Calendar.getInstance().get(Calendar.MONTH) + 1;
@@ -621,7 +621,7 @@ public class UtilityBean implements Serializable {
         current_month = cal.get(Calendar.MONTH) + 1;
         return current_month;
     }
-    
+
     public Integer getMonthFromDate(Date aDate) {
         int date_month = 0;
         try {
@@ -632,7 +632,7 @@ public class UtilityBean implements Serializable {
         }
         return date_month;
     }
-    
+
     public Integer getDayFromDate(Date aDate) {
         int day_month = 0;
         try {
@@ -643,7 +643,7 @@ public class UtilityBean implements Serializable {
         }
         return day_month;
     }
-    
+
     public void clearList(List<Object> aList) {
         try {
             aList.clear();
@@ -651,7 +651,7 @@ public class UtilityBean implements Serializable {
             //do nothing
         }
     }
-    
+
     public void refreshAlertsThread() {
         try {
             Runnable task = new Runnable() {
@@ -666,7 +666,7 @@ public class UtilityBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void refreshAlerts() {
         //Refresh stock alerts
         try {
@@ -678,7 +678,7 @@ public class UtilityBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public String formatCapitaliseFirstCharacter(String aString) {
         if (aString.length() < 2) {
             return aString;
@@ -686,7 +686,7 @@ public class UtilityBean implements Serializable {
             return aString.substring(0, 1).toUpperCase() + aString.substring(1).toLowerCase();
         }
     }
-    
+
     public String formatCapitaliseAllCharacter(String aString) {
         if (aString.length() == 0) {
             return aString;
@@ -694,7 +694,7 @@ public class UtilityBean implements Serializable {
             return aString.substring(0).toUpperCase();
         }
     }
-    
+
     public int setTimePartOfDateOnly(Date aDate, String aTimePart) {
         int x = 0;
         if (null == aDate || aTimePart.length() == 0 || aTimePart.length() != 5) {
@@ -712,7 +712,7 @@ public class UtilityBean implements Serializable {
         }
         return x;
     }
-    
+
     public long getN(String aSQL) {
         ResultSet rs = null;
         long n = 0;
@@ -732,7 +732,7 @@ public class UtilityBean implements Serializable {
         }
         return n;
     }
-    
+
     public double getD(String aSQL) {
         ResultSet rs = null;
         double d = 0;
@@ -776,7 +776,7 @@ public class UtilityBean implements Serializable {
         }
         return objs;
     }
-    
+
     public void sampleSendInvoice() {
 //        try {
 //            Gson gson = new Gson();
@@ -802,7 +802,7 @@ public class UtilityBean implements Serializable {
 //            e.printStackTrace();
 //        }
     }
-    
+
     public String getEmptyIfNull(String aStringValue) {
         if (aStringValue == null) {
             return "";
@@ -810,13 +810,13 @@ public class UtilityBean implements Serializable {
             return aStringValue;
         }
     }
-    
+
     public void backupDatabase(String aDbName, String aDbUser, String aDbPassword, String aMySQLDumpFolderPath, String aSaveFolderPath) {
         try {
             String dbName = aDbName;
             String dbUser = aDbUser;
             String dbPass = aDbPassword;
-            
+
             Calendar cal = Calendar.getInstance();
             //cal.setTime(new CompanySetting().getCURRENT_SERVER_DATE());
             cal.setTime(new Date());
@@ -843,7 +843,7 @@ public class UtilityBean implements Serializable {
             System.err.println("Error at Backup" + ex.getMessage());
         }
     }
-    
+
     public String getCommaSeperatedItemIds(List<TransItem> aTransItems) {
         String CommaSeperatedStr = "";
         try {
@@ -863,7 +863,7 @@ public class UtilityBean implements Serializable {
         }
         return CommaSeperatedStr;
     }
-    
+
     public String getCommaSeperatedStrFromStringArray(String[] aStringArray) {
         String CommaSeperatedStr = "";
         try {
@@ -883,7 +883,7 @@ public class UtilityBean implements Serializable {
         }
         return CommaSeperatedStr;
     }
-    
+
     public String getCommaSeperatedItemIdsFromItemCodeOther(List<Item_code_other> aItem_code_others) {
         String CommaSeperatedStr = "";
         try {
@@ -903,7 +903,7 @@ public class UtilityBean implements Serializable {
         }
         return CommaSeperatedStr;
     }
-    
+
     public String[] getStringArrayFromCommaSeperatedStr(String aCommaSeperatedStr) {
         String[] StringArray = null;
         try {
@@ -919,7 +919,7 @@ public class UtilityBean implements Serializable {
         }
         return StringArray;
     }
-    
+
     public String[] getStringArrayFromXSeperatedStr(String aXSeperatedStr, String aSeperator) {
         String[] StringArray = null;
         try {
@@ -935,7 +935,7 @@ public class UtilityBean implements Serializable {
         }
         return StringArray;
     }
-    
+
     public String getFirstStringFromCommaSeperatedStr(String aCommaSeperatedStr) {
         String FirstString = "";
         try {
@@ -951,7 +951,7 @@ public class UtilityBean implements Serializable {
         }
         return FirstString;
     }
-    
+
     public String getVATRateStrFromArray(String[] aStringArray) {
         String CommaSeperatedStr = "";
         String zero = "";
@@ -993,7 +993,7 @@ public class UtilityBean implements Serializable {
         }
         return CommaSeperatedStr;
     }
-    
+
     public void printJdbcConnPool() {
         System.out.println("Entered!");
         try {
@@ -1017,7 +1017,7 @@ public class UtilityBean implements Serializable {
             e.printStackTrace();
         }
     }
-    
+
     public void clearCustomerDisplay() {
         //Customer Display
         String PortName = new Parameter_listBean().getParameter_listByContextNameMemory("CUSTOMER_DISPLAY", "COM_PORT_NAME").getParameter_value();
@@ -1032,7 +1032,7 @@ public class UtilityBean implements Serializable {
             ub.invokeLocalCustomerDisplay(ClientPcName, PortName, Size, "", "");
         }
     }
-    
+
     public void invokeLocalCustomerDisplay(String aClientPcName, String aPortName, int aSize, String aLine1, String aLine2) {
         try {
             Runnable task = new Runnable() {
@@ -1047,7 +1047,7 @@ public class UtilityBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void invokeLocalCustomerDisplayNoThread(String aClientPcName, String aPortName, int aSize, String aLine1, String aLine2) {
         try {
             if (aPortName.length() > 0 && aClientPcName.length() > 0) {
@@ -1061,7 +1061,7 @@ public class UtilityBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public String getClientIp(HttpServletRequest request) {
         String remoteAddr = "";
         try {
@@ -1077,7 +1077,7 @@ public class UtilityBean implements Serializable {
         }
         return remoteAddr;
     }
-    
+
     public String getClientComputerName(String remoteAddr) {
         String computerName = "";
         try {
@@ -1092,7 +1092,7 @@ public class UtilityBean implements Serializable {
         setHOST_NAME(computerName);
         return computerName;
     }
-    
+
     public void callgenerateUNSPCexcel(String aFileNameWithPath) {
         String APIMode = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_MODE").getParameter_value();
         if (APIMode.equals("OFFLINE")) {
@@ -1101,7 +1101,7 @@ public class UtilityBean implements Serializable {
             new T124().generateUNSPCexcelOnline(aFileNameWithPath);
         }
     }
-    
+
     public void cleanSaleInvoiceTranss() {
         try {
             Runnable task = new Runnable() {
@@ -1154,7 +1154,7 @@ public class UtilityBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void cleanLocalItemTaxRatesWithRemote() {
         try {
             Runnable task = new Runnable() {
@@ -1191,7 +1191,7 @@ public class UtilityBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void reArrangeLocalItemTaxRates() {
         try {
             Runnable task = new Runnable() {
@@ -1226,7 +1226,7 @@ public class UtilityBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public String translateWordsInText(String aToLanguageBaseName, String aFromText) {
         String ToText = "";
         try {
@@ -1264,7 +1264,7 @@ public class UtilityBean implements Serializable {
         }
         return ToText;
     }
-    
+
     public void calcUpdateTransDeemedAmount(Trans aTrans, List<TransItem> aTransItemList) {
         double DeemedTotalAmount = 0;
         double DeemedTotalVat = 0;
@@ -1360,5 +1360,5 @@ public class UtilityBean implements Serializable {
     public void setFileNameWithPath(String FileNameWithPath) {
         this.FileNameWithPath = FileNameWithPath;
     }
-    
+
 }
