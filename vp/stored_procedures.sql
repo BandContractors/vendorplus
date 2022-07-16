@@ -1403,6 +1403,19 @@ BEGIN
 END//
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS sp_search_transactor_by_tax_identity;
+DELIMITER //
+CREATE PROCEDURE sp_search_transactor_by_tax_identity
+(
+	IN in_tax_identity varchar(100) 
+) 
+BEGIN 
+	SELECT * FROM transactor t 
+	WHERE t.tax_identity = in_tax_identity
+	ORDER BY t.tax_identity ASC LIMIT 10; 
+END//
+DELIMITER ;
+
 DROP PROCEDURE IF EXISTS sp_search_transactor_active_by_name;
 DELIMITER //
 CREATE PROCEDURE sp_search_transactor_active_by_name

@@ -7,6 +7,7 @@ package api;
 
 import api_sm_bi.CheckApiBean;
 import api_sm_bi.SMbiBean;
+import api_tax.efris_bean.EFRIS_invoice_detailBean;
 import beans.Cdc_generalBean;
 import beans.Parameter_listBean;
 import java.util.Timer;
@@ -68,7 +69,13 @@ public class TaskManager {
             long RepeatAfterMilliseconds = 1000 * 60 * RepeatAfterMinutes;
             if (RepeatAfterMinutes > 0 && new Parameter_listBean().getParameter_listByContextName("API", "API_SMBI_URL").getParameter_value().length() > 0) {
                 timer.schedule(new PeriodicTaskSyncSmBi(), DelayMilliseconds, RepeatAfterMilliseconds);
-            }
+            }            
+            
+            //A) Inter-Branch level tasks such as Efris Invoice.
+            //long DelayMilliseconds_Efris = 20;//1000 mls=1 sec
+            long DelayMilliseconds_Efris = 1000;//1000 mls=1 sec
+            long RepeatAfterMilliseconds_Efris = 1000 * 60 * 1;//1000 mls=1 sec
+            timer.schedule(new PeriodicTaskSyncEfrisInvoice(), DelayMilliseconds_Efris, RepeatAfterMilliseconds_Efris);
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -94,6 +101,17 @@ public class TaskManager {
                 if (new CheckApiBean().IsSmBiAvailable() && new Parameter_listBean().getParameter_listByContextName("API", "API_SMBI_URL").getParameter_value().length() > 0) {
                     new SMbiBean().syncSMbiCall();
                 }
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    private class PeriodicTaskSyncEfrisInvoice extends TimerTask {
+
+        @Override
+        public void run() {
+            try {
+                new EFRIS_invoice_detailBean().saveImportedEFRISInvoice();
             } catch (Exception e) {
             }
         }

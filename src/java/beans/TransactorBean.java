@@ -1278,6 +1278,44 @@ public class TransactorBean implements Serializable {
         return Transactors;
     }
 
+    public Transactor getTransactorBy_transactor_names(String fullTransactor_names) {
+        String sql = "{call sp_search_transactor_by_name(?)}";
+        ResultSet rs;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setString(1, fullTransactor_names);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                return this.getTransactorFromResultSet(rs);
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+            return null;
+        }
+    }
+
+    public Transactor getTransactorBy_tax_identity(String tax_identity) {
+        String sql = "{call sp_search_transactor_by_tax_identity(?)}";
+        ResultSet rs;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setString(1, tax_identity);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                return this.getTransactorFromResultSet(rs);
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+            return null;
+        }
+    }
+
     public void clearList() {
         try {
             this.TransactorList.clear();
