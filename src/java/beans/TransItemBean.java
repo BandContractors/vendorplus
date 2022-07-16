@@ -11267,7 +11267,7 @@ public class TransItemBean implements Serializable {
         long LatestItemReceivedTransItemId = 0;
         int PurInvoMode = 0;
         try {
-            PurInvoMode = Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "PURCHASE_INVOICE_MODE").getParameter_value());
+            PurInvoMode = Integer.parseInt(new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "PURCHASE_INVOICE_MODE").getParameter_value());
         } catch (Exception e) {
             // do nothing
         }
