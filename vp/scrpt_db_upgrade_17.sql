@@ -146,5 +146,7 @@ VALUES('scrpt_db_upgrade_17',144,Now(),'6.0','');
 
 INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
 VALUES (94, 'MOBILE', 'RECEIVE_INVOICE_CASH_TYPE', '1','0 for Invoice received as credit sale or 1 for Invoice received as cash sale');
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (95, 'API', 'API_EFRIS_SYNC_JOB_REPEAT_AFTER', '10','Time in Minutes the Sync Job to URA EFRIS should take before repeating');
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
-VALUES('scrpt_db_upgrade_17',149,Now(),'6.0','');
+VALUES('scrpt_db_upgrade_17',151,Now(),'6.0','');
