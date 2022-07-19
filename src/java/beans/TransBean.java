@@ -12146,14 +12146,22 @@ public class TransBean implements Serializable {
 
     public void reSubmitInvoiceTaxAPI(long aInnerTransId, long aTransTypeId) {
         try {
-            List<TransItem> tis = new TransItemBean().getTransItemsByTransactionId(aInnerTransId);
-            if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0 && new Item_tax_mapBean().countItemsNotMappedSynced(tis) == 0) {
+            if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
                 if (aTransTypeId == 2) {//Invoice
-                    new InvoiceBean().submitTaxInvoice(aInnerTransId);
+                    List<TransItem> tis1 = new TransItemBean().getTransItemsByTransactionId(aInnerTransId);
+                    if (new Item_tax_mapBean().countItemsNotMappedSynced(tis1) == 0) {
+                        new InvoiceBean().submitTaxInvoice(aInnerTransId);
+                    }
                 } else if (aTransTypeId == 82) {//Credit Note
-                    new InvoiceBean().submitCreditNote(aInnerTransId, 82);
+                    List<TransItem> tis2 = new CreditDebitNoteBean().getTransItemsByTransactionId_cr_dr_note(aInnerTransId);
+                    if (new Item_tax_mapBean().countItemsNotMappedSynced(tis2) == 0) {
+                        new InvoiceBean().submitCreditNote(aInnerTransId, 82);
+                    }
                 } else if (aTransTypeId == 83) {//Debit Note
-                    new InvoiceBean().submitDebitNote(aInnerTransId, 83);
+                    List<TransItem> tis3 = new CreditDebitNoteBean().getTransItemsByTransactionId_cr_dr_note(aInnerTransId);
+                    if (new Item_tax_mapBean().countItemsNotMappedSynced(tis3) == 0) {
+                        new InvoiceBean().submitDebitNote(aInnerTransId, 83);
+                    }
                 }
                 //this.reportSalesTaxAPI(aTrans, aTransBean);
             }

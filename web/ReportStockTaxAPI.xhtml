@@ -120,7 +120,7 @@
                     #{langsys['Stock']} #{langsys['TaxBody']} #{langsys['Status']} : #{stock_ledgerBean.stock_ledgerList.size()} #{langsys['Records']}  #{langsys['Found']}
                     <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
                     <p:columnToggler datasource="tblDetail" trigger="toggler" />
-                    <p:commandButton id="cmdbSyncAll" icon="ui-icon-arrowreturnthick-1-n" value="#{langsys['Resync']} #{langsys['All']}" onclick="PF('statusDialog1').show()" onsuccess="PF('statusDialog1').hide()" title="#{langsys['Resync']} #{langsys['All']} (#{langsys['Limit']} #{langsys['of']} 100 #{langsys['Records']} #{langsys['for']} #{langsys['each']} #{langsys['Resync']})" style="background-color: #d2222d;">
+                    <p:commandButton id="cmdbSyncAll" icon="ui-icon-arrowreturnthick-1-n" value="#{langsys['Resync']} #{langsys['All']}" onclick="PF('statusDialog1').show()" onsuccess="PF('statusDialog1').hide()" title="#{langsys['Resync']} #{langsys['All']} (#{langsys['Limit']} #{langsys['of']} 100 #{langsys['Records']} #{langsys['for']} #{langsys['each']} #{langsys['Resync']})" style="background-color: #d2222d;float: right;">
                         <p:dialog widgetVar="statusDialog1" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>

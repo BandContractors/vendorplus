@@ -160,36 +160,45 @@
                             <h:outputLabel style="font-size: 16px; font-weight: bold;" id="IolblSalesInvoiceGrandTotal" value="#{generalUserSetting.outputDetailParent.trans.grandTotal}">
                                 <f:convertNumber pattern="#{accCurrencyBean.getNumberFormatByCurrency(generalUserSetting.outputDetailParent.trans.currencyCode)}" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
-
                         </h:panelGrid>
-
+                        
                         <h:panelGrid id="IpgrdSalesInvoiceVAT">
                             <h:panelGrid rendered="#{companySetting.EShowVatAnalysisInvoice.equals('Yes')}" style="width: 290px; margin: 0px;border-bottom-style: dotted" columns="3">
-                                <h:outputLabel style="font-size: 14px;" value="VAT #{langout['Rate']}(%)"/>
-                                <h:outputLabel style="font-size: 14px;" value="Vatable #{langout['Amount']}"/>
-                                <h:outputLabel style="font-size: 14px;" value="VAT"/>
+                                <h:outputLabel style="font-size: 12px;" value="VAT #{langout['Rate']}(%)"/>
+                                <h:outputLabel style="font-size: 12px;" value="Vatable #{langout['Amount']}"/>
+                                <h:outputLabel style="font-size: 12px;" value="VAT"/>
 
-                                <h:outputLabel style="font-size: 14px;" value="#{generalUserSetting.outputDetailParent.trans.vatPerc}">
+                                <h:outputLabel style="font-size: 12px;" value="#{langout['Standard']}(#{utilityBean.formatDoubleToString(generalUserSetting.outputDetailParent.trans.vatPerc)})">
                                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputLabel>
-                                <h:outputLabel style="font-size: 14px;" value="#{generalUserSetting.outputDetailParent.trans.totalStdVatableAmount}">
+                                <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.trans.totalStdVatableAmount}">
                                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputLabel>
-                                <h:outputLabel style="font-size: 14px;" value="#{generalUserSetting.outputDetailParent.trans.totalVat}">
+                                <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.trans.totalVat}">
                                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputLabel>
 
-                                <h:outputLabel style="font-size: 14px;" value="#{langout['Zero']} 0"/>
-                                <h:outputLabel style="font-size: 14px;" value="#{generalUserSetting.outputDetailParent.trans.totalZeroVatableAmount}">
+                                <h:outputLabel style="font-size: 12px;" value="#{langout['Zero']}(0)"/>
+                                <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.trans.totalZeroVatableAmount}">
                                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputLabel>
-                                <h:outputLabel style="font-size: 14px;" value="0"/>
+                                <h:outputLabel style="font-size: 12px;" value="0"/>
 
-                                <h:outputLabel style="font-size: 14px;" value="#{langout['Exempt']} n/a"/>
-                                <h:outputLabel style="font-size: 14px;" value="#{generalUserSetting.outputDetailParent.trans.totalExemptVatableAmount}">
+                                <h:outputLabel style="font-size: 12px;" value="#{langout['Exempt']}(-)"/>
+                                <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.trans.totalExemptVatableAmount}">
                                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputLabel>
-                                <h:outputLabel style="font-size: 14px;" value="0"/>
+                                <h:outputLabel style="font-size: 12px;" value="0"/>
+
+                                <h:outputLabel style="font-size: 12px;" value="#{langout['Deemed']}(#{utilityBean.formatDoubleToString(generalUserSetting.outputDetailParent.trans.vatPerc)})">
+                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputLabel>
+                                <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.trans.totalDeemedVatableAmount}">
+                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputLabel>
+                                <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.trans.totalDeemedVat}">
+                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputLabel>
                             </h:panelGrid>
                         </h:panelGrid>
 

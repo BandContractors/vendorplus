@@ -418,6 +418,10 @@ public class OutputDetailBean implements Serializable {
             } catch (Exception e) {
                 //e.printStackTrace();
             }
+            try {
+                new UtilityBean().calcUpdateTransDeemedAmount(aOutputDetail.getTrans(), aOutputDetail.getTrans_items());
+            } catch (Exception e) {
+            }
             //refresh amount in words
             try {
                 if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "OUTPUT_SHOW_AMOUNT_IN_WORDS").getParameter_value().equals("1")) {

@@ -136,3 +136,10 @@ CREATE TABLE api_tax_error_log (
 );
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_17',137,Now(),'6.0','');
+
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (92, 'MOBILE', 'STORE_MOB_DEVICE_MAP', '','Comma seperated combination in the format of StoreCode1:DevineNo1,StoreCode2:DevineNo2');
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (93, 'GENERAL', 'WALK_IN_CUSTOMER_DEFAULT_REFNO', '','Specifies the default reference number for Walk-In Customer i.e. no match for TIN and Names');
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_17',144,Now(),'6.0','');
