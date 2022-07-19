@@ -74,7 +74,7 @@ public class TaskManager {
             //A) Inter-Branch level tasks such as Efris Invoice.
             //long DelayMilliseconds_Efris = 20;//1000 mls=1 sec
             long DelayMilliseconds_Efris = 1000;//1000 mls=1 sec
-            long RepeatAfterMilliseconds_Efris = 1000 * 60 * 1;//1000 mls=1 sec
+            long RepeatAfterMilliseconds_Efris = 1000 * 60 * 2;//1000 mls=1 sec
             timer.schedule(new PeriodicTaskSyncEfrisInvoice(), DelayMilliseconds_Efris, RepeatAfterMilliseconds_Efris);
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -111,7 +111,7 @@ public class TaskManager {
         @Override
         public void run() {
             try {
-                new EFRIS_invoice_detailBean().saveImportedEFRISInvoice();
+                //new EFRIS_invoice_detailBean().saveImportedEFRISInvoice();
             } catch (Exception e) {
             }
         }

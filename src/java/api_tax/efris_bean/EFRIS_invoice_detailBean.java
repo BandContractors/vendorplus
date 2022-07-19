@@ -24,6 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import org.apache.log4j.Level;
@@ -42,6 +43,8 @@ public class EFRIS_invoice_detailBean implements Serializable {
 
     public void saveImportedEFRISInvoice() {
         try {
+
+            //new T106Bean().synchInvoices();
             System.out.println("We are here");
             List<EFRIS_invoice_detail> invoiceList;
             //get unprocessed invoices
@@ -51,15 +54,15 @@ public class EFRIS_invoice_detailBean implements Serializable {
                 EFRIS_invoice_detail invoice = invoiceList.get(i);
                 //convert invoice to trans
                 Trans trans = new Trans();
-                this.setTransFromEFRIS_invoice_detail(trans, invoice);                
+                this.setTransFromEFRIS_invoice_detail(trans, invoice);
                 System.out.println("Now getting Invoices");
 
                 //get good/items details                
                 List<EFRIS_good_detail> goodList;
                 goodList = new EFRIS_good_detailBean().getEFRIS_invoice_detailByInvoiceNo(invoice.getInvoiceNo());
                 //convert invoice to trans
-                List<TransItem> transItemList =  new ArrayList<>();
-                new EFRIS_good_detailBean().setTransItemFromEFRIS_good_detail(transItemList, goodList);                
+                List<TransItem> transItemList = new ArrayList<>();
+                new EFRIS_good_detailBean().setTransItemFromEFRIS_good_detail(transItemList, goodList);
                 System.out.println("Now getting Goods");
 
                 //save in SM db
@@ -216,15 +219,27 @@ public class EFRIS_invoice_detailBean implements Serializable {
     public void setTransFromEFRIS_invoice_detail(Trans aTrans, EFRIS_invoice_detail aEFRIS_invoice_detail) {
         try {
             try {
+                String dateInString = aEFRIS_invoice_detail.getIssuedDate();
+
+                //input "14/07/2022 18:41:23"
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH);
+                Date parsedDate = sdf.parse(dateInString);
+                //output 2022-07-14
+                SimpleDateFormat print = new SimpleDateFormat("dd-MM-yyyy");
+                System.out.println(print.format(parsedDate));
+
                 //SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy", Locale.ENGLISH);
                 //String dateInString = "7-Jun-2013";
-                SimpleDateFormat formatter = new SimpleDateFormat("dd-mm-yyyy");
-                String dateInString = aEFRIS_invoice_detail.getIssuedDate();
-                Date date = formatter.parse(dateInString);
-                aTrans.setTransactionDate(date);
+                //SimpleDateFormat formatter = new SimpleDateFormat("dd-mm-yyyy", Locale.ENGLISH);
+                //String dateInString = aEFRIS_invoice_detail.getIssuedDate();
+                //Date date = formatter.parse(dateInString);
+                
+                //aTrans.setTransactionDate(date);
+                aTrans.setTransactionDate(parsedDate);
                 //aEFRIS_invoice_detail.setIssuedDate(aResultSet.getString("issuedDate"));
             } catch (Exception e) {
                 aTrans.setTransactionDate(null);
+                LOGGER.log(Level.ERROR, e);
             }
             try {
                 Transactor aTransactor;
@@ -246,17 +261,17 @@ public class EFRIS_invoice_detailBean implements Serializable {
                 aTrans.setTransactionReasonId(0);
             }
             try {
-                aTrans.setSubTotal(Integer. parseInt(aEFRIS_invoice_detail.getGrossAmount()) - Integer. parseInt(aEFRIS_invoice_detail.getTaxAmount()));
+                aTrans.setSubTotal(Integer.parseInt(aEFRIS_invoice_detail.getGrossAmount()) - Integer.parseInt(aEFRIS_invoice_detail.getTaxAmount()));
             } catch (Exception e) {
                 aTrans.setSubTotal(0);
             }
             try {
-                aTrans.setTotalVat(Integer. parseInt(aEFRIS_invoice_detail.getTaxAmount()));;
+                aTrans.setTotalVat(Integer.parseInt(aEFRIS_invoice_detail.getTaxAmount()));;
             } catch (Exception e) {
                 aTrans.setTotalVat(0);
             }
             try {
-                aTrans.setGrandTotal(Integer. parseInt(aEFRIS_invoice_detail.getGrossAmount()));;
+                aTrans.setGrandTotal(Integer.parseInt(aEFRIS_invoice_detail.getGrossAmount()));;
             } catch (Exception e) {
                 aTrans.setGrandTotal(0);
             }
@@ -433,6 +448,7 @@ public class EFRIS_invoice_detailBean implements Serializable {
                 list.add(obj);
             }
         } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
             LOGGER.log(Level.ERROR, e);
         }
         return list;

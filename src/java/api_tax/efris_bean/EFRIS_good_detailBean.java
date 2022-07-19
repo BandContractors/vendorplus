@@ -8,6 +8,7 @@ package api_tax.efris_bean;
 import api_tax.efris.EFRIS_good_detail;
 import api_tax.efris.innerclasses.GoodsDetails;
 import beans.ItemBean;
+import beans.TransItemBean;
 import connections.DBConnection;
 import entities.CompanySetting;
 import entities.Item;
@@ -204,12 +205,12 @@ public class EFRIS_good_detailBean implements Serializable {
 
     public void setTransItemFromEFRIS_good_detail(List<TransItem> aTransItem, List<EFRIS_good_detail> aEFRIS_good_detail) {
         try {
-            for (int i=0; i<aEFRIS_good_detail.size(); i++){
+            for (int i = 0; i < aEFRIS_good_detail.size(); i++) {
                 TransItem item = new TransItem();
                 EFRIS_good_detail goodDetail = aEFRIS_good_detail.get(i);
-                
+
                 this.setTransItemFromEFRIS_good_detail(item, goodDetail);
-                
+
                 aTransItem.add(item);
             }
         } catch (Exception e) {
@@ -242,17 +243,35 @@ public class EFRIS_good_detailBean implements Serializable {
                 aTransItem.setAmount(0);
             }
             try {
-                aTransItem.setUnitVat(Double.parseDouble(aEFRIS_good_detail.getTax()));
+                if (aEFRIS_good_detail.getTaxRate().equals("0.18") && aEFRIS_good_detail.getDeemedFlag().equals("1")) {
+                    aTransItem.setUnitVat(0);
+                } else {
+                    aTransItem.setUnitVat(Double.parseDouble(aEFRIS_good_detail.getTax()) / Integer.parseInt(aEFRIS_good_detail.getQty()));
+                }
             } catch (Exception e) {
                 aTransItem.setUnitVat(0);
             }
             try {
-                aTransItem.setVatRated(aItem.getVatRated());
+                if (aEFRIS_good_detail.getTaxRate().equals("0.18") && aEFRIS_good_detail.getDeemedFlag().equals("1")) {
+                    aTransItem.setVatRated("DEEMED");
+                } else if (aEFRIS_good_detail.getTaxRate().equals("0.18")) {
+                    aTransItem.setVatRated("STANDARD");
+                } else if (aEFRIS_good_detail.getTaxRate().equals("0")) {
+                    aTransItem.setVatRated("ZERO");
+                } else if (aEFRIS_good_detail.getTaxRate().equals("-")) {
+                    aTransItem.setVatRated("EXEMPT");
+                } else {
+                    aTransItem.setVatRated("");
+                }
             } catch (Exception e) {
                 aTransItem.setVatRated("");
             }
             try {
-                aTransItem.setVatPerc(Double.parseDouble(aEFRIS_good_detail.getTaxRate()) * 100);
+                if (aEFRIS_good_detail.getTaxRate().equals("0.18") && aEFRIS_good_detail.getDeemedFlag().equals("1")) {
+                    aTransItem.setVatPerc(0);
+                } else {
+                    aTransItem.setVatPerc(Double.parseDouble(aEFRIS_good_detail.getTaxRate()) * 100);
+                }
             } catch (Exception e) {
                 aTransItem.setVatPerc(0);
             }
@@ -261,6 +280,34 @@ public class EFRIS_good_detailBean implements Serializable {
                 aTransItem.setItemCode(aItem.getItemCode());
             } catch (Exception e) {
                 aTransItem.setItemCode("");
+            }
+            try {
+                aTransItem.setUnitPriceIncVat(Double.parseDouble(aEFRIS_good_detail.getUnitPrice()));
+            } catch (Exception e) {
+                aTransItem.setUnitPriceIncVat(0);
+            }
+            try {
+                if (aEFRIS_good_detail.getTaxRate().equals("0.18") && aEFRIS_good_detail.getDeemedFlag().equals("1")) {
+                    aTransItem.setUnitPriceExcVat(Double.parseDouble(aEFRIS_good_detail.getUnitPrice()) - (0 / Integer.parseInt(aEFRIS_good_detail.getQty())));
+                } else {
+                    aTransItem.setUnitPriceExcVat(Double.parseDouble(aEFRIS_good_detail.getUnitPrice()) - ((Double.parseDouble(aEFRIS_good_detail.getTax()) / Integer.parseInt(aEFRIS_good_detail.getQty()))));
+                }
+            } catch (Exception e) {
+                aTransItem.setUnitPriceExcVat(0);
+            }
+            try {
+                if (aEFRIS_good_detail.getTaxRate().equals("0.18") && aEFRIS_good_detail.getDeemedFlag().equals("1")) {
+                    aTransItem.setAmountIncVat(Double.parseDouble(aEFRIS_good_detail.getTotal()) - Double.parseDouble(aEFRIS_good_detail.getTax()));
+                } else {
+                    aTransItem.setAmountIncVat(Double.parseDouble(aEFRIS_good_detail.getTotal()));
+                }
+            } catch (Exception e) {
+                aTransItem.setAmountIncVat(0);
+            }
+            try {
+                aTransItem.setAmountExcVat(Double.parseDouble(aEFRIS_good_detail.getTotal()) - Double.parseDouble(aEFRIS_good_detail.getTax()));
+            } catch (Exception e) {
+                aTransItem.setAmountExcVat(0);
             }
             try {
                 aTransItem.setDescription(aEFRIS_good_detail.getItem());
@@ -274,14 +321,25 @@ public class EFRIS_good_detailBean implements Serializable {
                 aTransItem.setUnitSymbol("");
             }
             try {
-                aTransItem.setUnitCostPrice(aItem.getUnitCostPrice());
+                //aTransItem.setUnitCostPrice(aItem.getUnitCostPrice());
+                aTransItem.setUnitCostPrice(new TransItemBean().getItemLatestUnitCostPrice(aItem.getItemId(), "", "", ""));
             } catch (Exception e) {
                 aTransItem.setUnitCostPrice(0);
+            }
+            try {
+                aTransItem.setUnitProfitMargin(aTransItem.getUnitPriceExcVat() - aTransItem.getUnitCostPrice());
+            } catch (Exception e) {
+                aTransItem.setUnitProfitMargin(0);
             }
             try {
                 aTransItem.setItem_currency_code(aItem.getCurrencyCode());
             } catch (Exception e) {
                 aTransItem.setItem_currency_code("");
+            }
+            try {
+                aTransItem.setSpecific_size(1);
+            } catch (Exception e) {
+                aTransItem.setSpecific_size(0);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);

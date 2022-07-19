@@ -425,7 +425,12 @@ public class TransExtBean implements Serializable {
                 bItem = new ItemBean().getItem(transitem.getItemId());
                 bItemCatId = bItem.getCategoryId();
                 bUserDetail = new UserDetailBean().getUserDetail(aTrans.getTransactionUserDetailId());
-                bUserCatId = bUserDetail.getUserCategoryId();
+                //bUserCatId = bUserDetail.getUserCategoryId();
+                try {
+                    bUserCatId = bUserDetail.getUserCategoryId();
+                } catch (NullPointerException npe) {
+                    bUserCatId = 0;
+                }
                 try {
                     bItemSubCatId = bItem.getSubCategoryId();
                 } catch (NullPointerException npe) {
