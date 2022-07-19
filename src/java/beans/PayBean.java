@@ -2897,7 +2897,7 @@ public class PayBean implements Serializable {
         }
         while (ListItemIndex < ListItemNo) {
             if (aPayAll) {
-                aPayTranss.get(ListItemIndex).setTransPaidAmount(aPayTranss.get(ListItemIndex).getGrandTotal() - aPayTranss.get(ListItemIndex).getSumTransPaidAmount());
+                aPayTranss.get(ListItemIndex).setTransPaidAmount((aPayTranss.get(ListItemIndex).getGrandTotal() + aPayTranss.get(ListItemIndex).getCr_dr_amount()) - aPayTranss.get(ListItemIndex).getSumTransPaidAmount());
             } else {
                 aPayTranss.get(ListItemIndex).setTransPaidAmount(0);
             }
@@ -2908,7 +2908,7 @@ public class PayBean implements Serializable {
     }
 
     public void doPayAllTrans(List<PayTrans> aPayTranss, Pay aPay, PayTrans aPayTrans) {
-        double bal = aPayTrans.getGrandTotal() - aPayTrans.getSumTransPaidAmount();
+        double bal = (aPayTrans.getGrandTotal() + aPayTrans.getCr_dr_amount()) - aPayTrans.getSumTransPaidAmount();
         if (aPayTrans.getTransPaidAmount() == bal) {
             aPayTrans.setTransPaidAmount(0);
         } else {

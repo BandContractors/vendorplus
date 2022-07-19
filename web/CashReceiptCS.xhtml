@@ -103,7 +103,8 @@
                             <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                                 <p:graphicImage name="/images/ajax-loader.gif"/>
                             </p:dialog>
-                            <p:ajax listener="#{payTransBean.refreshPayTranssByBillTrPayCatTransNo3(trans.transactionNumber2,payBean.selectedBillTransactor.transactorId,generalUserSetting.getCurrentPayCategory(),pay.currencyCode,payBean.date1,payBean.date2)}" process="pnlSearch" update="pnlInput pnlButtons"/>
+                            <!-- <p:ajax listener="#{payTransBean.refreshPayTranssByBillTrPayCatTransNo3(trans.transactionNumber2,payBean.selectedBillTransactor.transactorId,generalUserSetting.getCurrentPayCategory(),pay.currencyCode,payBean.date1,payBean.date2)}" process="pnlSearch" update="pnlInput pnlButtons"/> -->
+                            <p:ajax listener="#{payTransBean.refreshPayTranssForCashReceiptCS(trans.transactionNumber2,payBean.selectedBillTransactor.transactorId,0,pay.currencyCode,payBean.date1,payBean.date2)}" process="pnlSearch" update="pnlInput pnlButtons"/>
                             <p:ajax listener="#{payBean.setPayAll(false)}" process="pnlInput" update="pnlInput"/>
                         </p:commandButton>
                     </h:panelGrid>
@@ -119,7 +120,7 @@
                     </p:column>
                     <p:column>
                         <f:facet name="header">#{langsys['Transaction']}</f:facet>
-                        <h:outputLabel value="#{transactionTypeBean.getTransactionType(pts.transactionTypeId).transactionTypeName} : #{pts.transactionNumber}"/>
+                        <h:outputLabel value="#{transactionTypeBean.getTransactionType(pts.transactionTypeId).transactionTypeName} #{pts.transactionNumber}"/>
                     </p:column>
                     <p:column>
                         <f:facet name="header">#{langsys['Date']}</f:facet>
@@ -140,6 +141,14 @@
                         </h:outputLabel>
                     </p:column>
                     <p:column>
+                        <f:facet name="header">#{langsys['Note']}</f:facet>
+                        <h:outputLabel value="#{pts.cr_dr_amount}">
+                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:outputLabel> 
+                        <h:outputLabel value=" #{langsys['Credit']}" rendered="#{pts.cr_dr_type eq 'Credit Note'}"/>
+                        <h:outputLabel value=" #{langsys['Debit']}" rendered="#{pts.cr_dr_type eq 'Debit Note'}"/>
+                    </p:column>
+                    <p:column>
                         <f:facet name="header">#{langsys['Total']} #{langsys['Received']}</f:facet>
                         <h:outputLabel value="#{pts.sumTransPaidAmount}" style="color: blue">
                             <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -147,7 +156,7 @@
                     </p:column>
                     <p:column>
                         <f:facet name="header">#{langsys['Receivable']} #{langsys['Balance']}</f:facet>
-                        <h:outputLabel value="#{pts.grandTotal-pts.sumTransPaidAmount}" style="color: red">
+                        <h:outputLabel value="#{(pts.grandTotal+pts.cr_dr_amount)-pts.sumTransPaidAmount}" style="color: red">
                             <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputLabel>
                     </p:column>

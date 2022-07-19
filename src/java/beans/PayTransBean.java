@@ -291,6 +291,23 @@ public class PayTransBean implements Serializable {
         return totalbal;
     }
 
+    public double getTotalBalByTransId(long aTransId, double aCrDrAmount) {
+        String sql = "select t.transaction_id,t.grand_total,ifnull((select sum(pt.trans_paid_amount) from pay_trans pt where pt.transaction_id=t.transaction_id),0) as total_paid_calc from transaction t where t.transaction_id=" + aTransId;
+        ResultSet rs = null;
+        double totalbal = 0;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                totalbal = (rs.getDouble("grand_total") + aCrDrAmount) - rs.getDouble("total_paid_calc");
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return totalbal;
+    }
+
     public void updateTransTotalPaid(long aTransId) {
         String sql = "UPDATE transaction SET total_paid=(select ifnull(sum(pt.trans_paid_amount),0) from pay_trans pt where pt.transaction_id=" + aTransId + ") WHERE transaction_id>0 AND transaction_id=" + aTransId;
         try (
@@ -636,6 +653,62 @@ public class PayTransBean implements Serializable {
         }
     }
 
+    public void refreshPayTranssForCashReceiptCS(String aTransactionNumber, long aBillTransactorId, int aStoreId, String aCurrencyCode, Date aDate1, Date aDate2) {
+        try {
+            if (null == aTransactionNumber) {
+                aTransactionNumber = "";
+            }
+            if (null == aCurrencyCode) {
+                aCurrencyCode = "";
+            }
+            if (aBillTransactorId != 0) {
+                String sql = "{call sp_search_trans_for_cash_receipt_credit_sale(?,?,?,?,?,?)}";
+                ResultSet rs = null;
+                PayTranss = new ArrayList<>();
+                try (
+                        Connection conn = DBConnection.getMySQLConnection();
+                        PreparedStatement ps = conn.prepareStatement(sql);) {
+                    ps.setLong(1, aBillTransactorId);
+                    ps.setInt(2, aStoreId);
+                    ps.setString(3, aCurrencyCode);
+                    ps.setString(4, aTransactionNumber);
+                    try {
+                        ps.setDate(5, new java.sql.Date(aDate1.getTime()));
+                    } catch (NullPointerException npe) {
+                        ps.setDate(5, null);
+                    }
+                    try {
+                        ps.setDate(6, new java.sql.Date(aDate2.getTime()));
+                    } catch (NullPointerException npe) {
+                        ps.setDate(6, null);
+                    }
+                    rs = ps.executeQuery();
+                    PayTrans pt;
+                    while (rs.next()) {
+                        pt = this.getPayTransFromResultset(rs);
+                        try {
+                            pt.setCr_dr_amount(rs.getDouble("cr_dr_amount"));
+                        } catch (Exception e) {
+                            pt.setCr_dr_amount(0);
+                        }
+                        try {
+                            pt.setCr_dr_type(rs.getString("cr_dr_type"));
+                        } catch (Exception e) {
+                            pt.setCr_dr_type("");
+                        }
+                        PayTranss.add(pt);
+                    }
+                } catch (Exception e) {
+                    LOGGER.log(Level.ERROR, e);
+                }
+            } else {
+                PayTranss = null;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public void clearPayTranss(List<PayTrans> aPayTranss, Pay aPay) {
         try {
             if (null != aPayTranss) {
@@ -665,11 +738,11 @@ public class PayTransBean implements Serializable {
         int ListItemIndex = 0;
         int ListItemNo = aPayTranss.size();
         while (ListItemIndex < ListItemNo) {
-            if (aPayTranss.get(ListItemIndex).getTransPaidAmount() > (aPayTranss.get(ListItemIndex).getGrandTotal() - aPayTranss.get(ListItemIndex).getSumTransPaidAmount())) {
+            if (aPayTranss.get(ListItemIndex).getTransPaidAmount() > ((aPayTranss.get(ListItemIndex).getGrandTotal() + aPayTranss.get(ListItemIndex).getCr_dr_amount()) - aPayTranss.get(ListItemIndex).getSumTransPaidAmount())) {
                 RecGreaterBal = aPayTranss.get(ListItemIndex).getTransactionNumber();
                 break;
             }
-            if (aPayTranss.get(ListItemIndex).getTransPaidAmount() > this.getTotalBalByTransId(aPayTranss.get(ListItemIndex).getTransactionId())) {
+            if (aPayTranss.get(ListItemIndex).getTransPaidAmount() > this.getTotalBalByTransId(aPayTranss.get(ListItemIndex).getTransactionId(), aPayTranss.get(ListItemIndex).getCr_dr_amount())) {
                 RecGreaterBal = aPayTranss.get(ListItemIndex).getTransactionNumber();
                 break;
             }

@@ -9524,7 +9524,7 @@ BEGIN
 			inner join pay p on p.pay_id=pt.pay_id and p.pay_category='IN' 
 			group by pt.transaction_id
 			) as TP on t.transaction_id=TP.transaction_id 
-		where (t.transaction_type_id IN(2,65,68) or t.transaction_reason_id=117) and t.grand_total>ifnull(TP.sum_trans_paid_amount,0) ",
+		where (t.transaction_type_id IN(2,65,68) or t.transaction_reason_id=117) and (t.grand_total+IFNULL(tc.grand_total,0))>ifnull(TP.sum_trans_paid_amount,0) ",
 		@CUST,@STORE,@CUR,@TRANSNO,@DAT); 
 	PREPARE stmt FROM @sql1;
 	EXECUTE stmt;

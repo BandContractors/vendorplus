@@ -143,3 +143,8 @@ INSERT INTO parameter_list (parameter_list_id, context, parameter_name, paramete
 VALUES (93, 'GENERAL', 'WALK_IN_CUSTOMER_DEFAULT_REFNO', '','Specifies the default reference number for Walk-In Customer i.e. no match for TIN and Names');
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_17',144,Now(),'6.0','');
+
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (94, 'MOBILE', 'RECEIVE_INVOICE_CASH_TYPE', '1','0 for Invoice received as credit sale or 1 for Invoice received as cash sale');
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_17',149,Now(),'6.0','');
