@@ -82,9 +82,17 @@ public class CreditDebitNoteBean implements Serializable {
         }
     }
 
-    public List<Trans> getTrans_cr_dr_notes(String aTransNumberRef) {
+    public List<Trans> getTrans_cr_dr_notes(String aTransNumberRef, int aIs_cancel) {
+        //aIs_cancel: 0 No 1 Yes 2 All
         List<Trans> aList = new ArrayList<>();
-        String sql = "SELECT * FROM transaction_cr_dr_note WHERE transaction_ref=?";
+        String sql = "";
+        if (aIs_cancel == 0) {
+            sql = "SELECT * FROM transaction_cr_dr_note WHERE transaction_ref=? AND is_cancel=0";
+        } else if (aIs_cancel == 1) {
+            sql = "SELECT * FROM transaction_cr_dr_note WHERE transaction_ref=? AND is_cancel=1";
+        } else {
+            sql = "SELECT * FROM transaction_cr_dr_note WHERE transaction_ref=?";
+        }
         ResultSet rs = null;
         try (
                 Connection conn = DBConnection.getMySQLConnection();

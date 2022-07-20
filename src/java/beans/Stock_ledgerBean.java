@@ -269,7 +269,7 @@ public class Stock_ledgerBean implements Serializable {
             //check alert-expiry status
             new Alert_generalBean().checkExpiryStatusForAlertThread(stockledger.getItem_id(), stockledger.getBatchno(), stockledger.getCode_specific(), stockledger.getDesc_specific());
             //URA-STOCK-API
-            if (aTrans_type_id != 2 && aTrans_type_id != 4 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
+            if (aTrans_type_id != 2 && aTrans_type_id != 4 && new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
                 Item_tax_map im = new Item_tax_mapBean().getItem_tax_map(stockledger.getItem_id());
                 if (null == im) {
                     //do nothing
@@ -300,7 +300,7 @@ public class Stock_ledgerBean implements Serializable {
                         }
                         if (SupplierId == 0) {
                             SupplierTIN = CompanySetting.getTaxIdentity();
-                            SupplierName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "PAYEE_NAME").getParameter_value();
+                            SupplierName = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "PAYEE_NAME").getParameter_value();
                         } else {
                             Transactor tr = new TransactorBean().getTransactor(SupplierId);
                             SupplierTIN = tr.getTaxIdentity();
@@ -413,7 +413,7 @@ public class Stock_ledgerBean implements Serializable {
 
     public void reSubmitStockTaxAPI(Stock_ledger aStock_ledger4Sync, Stock_ledger aStock_ledger, Stock_ledgerBean aStock_ledgerBean, Item aItem) {
         try {
-            if (aStock_ledger4Sync.getTransaction_type_id() != 2 && aStock_ledger4Sync.getTransaction_type_id() != 4 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
+            if (aStock_ledger4Sync.getTransaction_type_id() != 2 && aStock_ledger4Sync.getTransaction_type_id() != 4 && new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
                 Item_tax_map im = new Item_tax_mapBean().getItem_tax_map(aStock_ledger4Sync.getItem_id());
                 if (null == im) {
                     //do nothing
@@ -445,7 +445,7 @@ public class Stock_ledgerBean implements Serializable {
                         }
                         if (SupplierId == 0) {
                             SupplierTIN = CompanySetting.getTaxIdentity();
-                            SupplierName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "PAYEE_NAME").getParameter_value();
+                            SupplierName = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "PAYEE_NAME").getParameter_value();
                         } else {
                             Transactor tr = new TransactorBean().getTransactor(SupplierId);
                             SupplierTIN = tr.getTaxIdentity();
