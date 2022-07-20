@@ -198,6 +198,11 @@ public class EFRIS_good_detailBean implements Serializable {
             } catch (Exception e) {
                 aEFRIS_good_detail.setProcess_date(null);
             }
+            try {
+                aEFRIS_good_detail.setProcess_desc(aResultSet.getString("process_desc"));
+            } catch (Exception e) {
+                aEFRIS_good_detail.setProcess_desc("");
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -369,9 +374,9 @@ public class EFRIS_good_detailBean implements Serializable {
         String sql = "INSERT INTO efris_good_detail"
                 + "(invoiceNo, referenceNo, item, itemCode, qty, unitOfMeasure, unitPrice, total, taxRate, tax, discountTotal, discountTaxRate,"
                 + "orderNumber,discountFlag, deemedFlag, exciseFlag, categoryId, categoryName, goodsCategoryId, goodsCategoryName, exciseRate,"
-                + "exciseRule, exciseTax, pack, stick, exciseUnit, exciseCurrency, exciseRateName, process_flag, add_date, process_date)"
+                + "exciseRule, exciseTax, pack, stick, exciseUnit, exciseCurrency, exciseRateName, process_flag, add_date, process_date, process_desc)"
                 + "VALUES"
-                + "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+                + "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -398,7 +403,7 @@ public class EFRIS_good_detailBean implements Serializable {
             ps.setString(19, aEFRIS_good_detail.getGoodsCategoryId());
             ps.setString(20, aEFRIS_good_detail.getGoodsCategoryName());
             ps.setString(21, aEFRIS_good_detail.getExciseRate());
-            //exciseRule, exciseTax, pack, stick, exciseUnit, exciseCurrency, exciseRateName, process_flag, add_date, process_date
+            //exciseRule, exciseTax, pack, stick, exciseUnit, exciseCurrency, exciseRateName, process_flag, add_date, process_date, process_desc
             ps.setString(22, aEFRIS_good_detail.getExciseRule());
             ps.setString(23, aEFRIS_good_detail.getExciseTax());
             ps.setString(24, aEFRIS_good_detail.getPack());
@@ -409,6 +414,7 @@ public class EFRIS_good_detailBean implements Serializable {
             ps.setInt(29, 0);
             ps.setTimestamp(30, new java.sql.Timestamp(new CompanySetting().getCURRENT_SERVER_DATE().getTime()));
             ps.setString(31, null);
+            ps.setString(32, "");
             ps.executeUpdate();
             saved = 1;
         } catch (Exception e) {
@@ -422,9 +428,9 @@ public class EFRIS_good_detailBean implements Serializable {
         String sql = "INSERT INTO efris_good_detail"
                 + "(invoiceNo, referenceNo, item, itemCode, qty, unitOfMeasure, unitPrice, total, taxRate, tax, discountTotal, discountTaxRate,"
                 + "orderNumber,discountFlag, deemedFlag, exciseFlag, categoryId, categoryName, goodsCategoryId, goodsCategoryName, exciseRate,"
-                + "exciseRule, exciseTax, pack, stick, exciseUnit, exciseCurrency, exciseRateName, process_flag, add_date, process_date)"
+                + "exciseRule, exciseTax, pack, stick, exciseUnit, exciseCurrency, exciseRateName, process_flag, add_date, process_date, process_desc)"
                 + "VALUES"
-                + "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+                + "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -451,7 +457,7 @@ public class EFRIS_good_detailBean implements Serializable {
             ps.setString(19, aGoodsDetails.getGoodsCategoryId());
             ps.setString(20, aGoodsDetails.getGoodsCategoryName());
             ps.setString(21, aGoodsDetails.getExciseRate());
-            //exciseRule, exciseTax, pack, stick, exciseUnit, exciseCurrency, exciseRateName, process_flag, add_date, process_date
+            //exciseRule, exciseTax, pack, stick, exciseUnit, exciseCurrency, exciseRateName, process_flag, add_date, process_date, process_desc
             ps.setString(22, aGoodsDetails.getExciseRule());
             ps.setString(23, aGoodsDetails.getExciseTax());
             ps.setString(24, aGoodsDetails.getPack());
@@ -462,6 +468,7 @@ public class EFRIS_good_detailBean implements Serializable {
             ps.setInt(29, 0);
             ps.setTimestamp(30, new java.sql.Timestamp(new CompanySetting().getCURRENT_SERVER_DATE().getTime()));
             ps.setString(31, null);
+            ps.setString(32, "");
             ps.executeUpdate();
             saved = 1;
         } catch (Exception e) {

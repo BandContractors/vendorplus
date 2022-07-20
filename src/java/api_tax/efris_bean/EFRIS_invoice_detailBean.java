@@ -11,11 +11,13 @@ import api_tax.efris.innerclasses.T106;
 import beans.TransExtBean;
 import beans.TransItemBean;
 import beans.TransactorBean;
+import beans.UserDetailBean;
 import connections.DBConnection;
 import entities.CompanySetting;
 import entities.Trans;
 import entities.TransItem;
 import entities.Transactor;
+import entities.UserDetail;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -211,6 +213,11 @@ public class EFRIS_invoice_detailBean implements Serializable {
             } catch (Exception e) {
                 aEFRIS_invoice_detail.setProcess_date(null);
             }
+            try {
+                aEFRIS_invoice_detail.setProcess_desc(aResultSet.getString("process_desc"));
+            } catch (Exception e) {
+                aEFRIS_invoice_detail.setProcess_desc("");
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -225,16 +232,9 @@ public class EFRIS_invoice_detailBean implements Serializable {
                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH);
                 Date parsedDate = sdf.parse(dateInString);
                 //output 2022-07-14
-                SimpleDateFormat print = new SimpleDateFormat("dd-MM-yyyy");
-                System.out.println(print.format(parsedDate));
+                //SimpleDateFormat print = new SimpleDateFormat("dd-MM-yyyy");
+                //System.out.println(print.format(parsedDate));
 
-                //SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy", Locale.ENGLISH);
-                //String dateInString = "7-Jun-2013";
-                //SimpleDateFormat formatter = new SimpleDateFormat("dd-mm-yyyy", Locale.ENGLISH);
-                //String dateInString = aEFRIS_invoice_detail.getIssuedDate();
-                //Date date = formatter.parse(dateInString);
-                
-                //aTrans.setTransactionDate(date);
                 aTrans.setTransactionDate(parsedDate);
                 //aEFRIS_invoice_detail.setIssuedDate(aResultSet.getString("issuedDate"));
             } catch (Exception e) {
@@ -290,6 +290,23 @@ public class EFRIS_invoice_detailBean implements Serializable {
             } catch (Exception e) {
                 aTrans.setXrate(0);
             }
+            try {
+                UserDetail aUserDetail;
+                if (aEFRIS_invoice_detail.getOperator().length() > 0) {
+                    aUserDetail = new UserDetailBean().getUserDetailByUserName(aEFRIS_invoice_detail.getOperator());
+                    aTrans.setAddUserDetailId(aUserDetail.getUserDetailId());
+                    aTrans.setAddUserDetailName(aUserDetail.getUserName());
+                    aTrans.setTransactionUserDetailId(aUserDetail.getUserDetailId());
+                    aTrans.setTransactionUserDetailName(aUserDetail.getUserName());
+                } else {
+                    aTrans.setAddUserDetailId(0);
+                    aTrans.setAddUserDetailName("");
+                    aTrans.setTransactionUserDetailId(0);
+                    aTrans.setTransactionUserDetailName("");
+                }
+            } catch (Exception e) {
+                aTrans.setAddUserDetailId(0);
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -300,9 +317,9 @@ public class EFRIS_invoice_detailBean implements Serializable {
         String sql = "INSERT INTO efris_invoice_detail"
                 + "(id, invoiceNo, oriInvoiceId, oriInvoiceNo, issuedDate, buyerTin, buyerLegalName, buyerNinBrn, currency, grossAmount,"
                 + "taxAmount, dataSource, isInvalid, isRefund, invoiceType, invoiceKind, invoiceIndustryCode, branchName, deviceNo,"
-                + "uploadingTime, referenceNo, operator, userName, process_flag, add_date, process_date)"
+                + "uploadingTime, referenceNo, operator, userName, process_flag, add_date, process_date, process_desc)"
                 + "VALUES"
-                + "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+                + "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -327,7 +344,7 @@ public class EFRIS_invoice_detailBean implements Serializable {
             ps.setString(17, aEFRIS_invoice_detail.getInvoiceIndustryCode());
             ps.setString(18, aEFRIS_invoice_detail.getBranchName());
             ps.setString(19, aEFRIS_invoice_detail.getDeviceNo());
-            //uploadingTime, referenceNo, operator, userName, process_flag, add_date, process_date
+            //uploadingTime, referenceNo, operator, userName, process_flag, add_date, process_date, process_desc
             ps.setString(20, aEFRIS_invoice_detail.getUploadingTime());
             ps.setString(21, aEFRIS_invoice_detail.getReferenceNo());
             ps.setString(22, aEFRIS_invoice_detail.getOperator());
@@ -335,6 +352,7 @@ public class EFRIS_invoice_detailBean implements Serializable {
             ps.setInt(24, 0);
             ps.setTimestamp(25, new java.sql.Timestamp(new CompanySetting().getCURRENT_SERVER_DATE().getTime()));
             ps.setString(26, null);
+            ps.setString(27, "");
             ps.executeUpdate();
             saved = 1;
         } catch (Exception e) {
@@ -348,9 +366,9 @@ public class EFRIS_invoice_detailBean implements Serializable {
         String sql = "INSERT INTO efris_invoice_detail"
                 + "(id, invoiceNo, oriInvoiceId, oriInvoiceNo, issuedDate, buyerTin, buyerLegalName, buyerNinBrn, currency, grossAmount,"
                 + "taxAmount, dataSource, isInvalid, isRefund, invoiceType, invoiceKind, invoiceIndustryCode, branchName, deviceNo,"
-                + "uploadingTime, referenceNo, operator, userName, process_flag, add_date, process_date)"
+                + "uploadingTime, referenceNo, operator, userName, process_flag, add_date, process_date, process_desc)"
                 + "VALUES"
-                + "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+                + "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -378,7 +396,7 @@ public class EFRIS_invoice_detailBean implements Serializable {
             ps.setString(17, aT106.getInvoiceIndustryCode());
             ps.setString(18, aT106.getBranchName());
             ps.setString(19, aT106.getDeviceNo());
-            //uploadingTime, referenceNo, operator, userName, process_flag, add_date, process_date
+            //uploadingTime, referenceNo, operator, userName, process_flag, add_date, process_date, process_desc
             ps.setString(20, aT106.getUploadingTime());
             ps.setString(21, aT106.getReferenceNo());
             ps.setString(22, aT106.getOperator());
@@ -386,6 +404,7 @@ public class EFRIS_invoice_detailBean implements Serializable {
             ps.setInt(24, 0);
             ps.setTimestamp(25, new java.sql.Timestamp(new CompanySetting().getCURRENT_SERVER_DATE().getTime()));
             ps.setString(26, null);
+            ps.setString(27, "");
             ps.executeUpdate();
             saved = 1;
         } catch (Exception e) {

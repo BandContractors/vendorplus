@@ -50,6 +50,7 @@ public class EFRIS_good_detail implements Serializable {
     private int process_flag;
     private Date add_date;
     private Date process_date;
+    private String process_desc;
 
     // Getter Methods 
     public String getItem() {
@@ -343,5 +344,19 @@ public class EFRIS_good_detail implements Serializable {
      */
     public void setReferenceNo(String referenceNo) {
         this.referenceNo = referenceNo;
+    }
+
+    /**
+     * @return the process_desc
+     */
+    public String getProcess_desc() {
+        return process_desc;
+    }
+
+    /**
+     * @param process_desc the process_desc to set
+     */
+    public void setProcess_desc(String process_desc) {
+        this.process_desc = process_desc;
     }
 }

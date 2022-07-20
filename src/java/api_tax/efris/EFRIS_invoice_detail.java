@@ -44,6 +44,7 @@ public class EFRIS_invoice_detail implements Serializable {
     private int process_flag;
     private Date add_date;
     private Date process_date;
+    private String process_desc;
 
     /**
      * @return the id
@@ -421,6 +422,20 @@ public class EFRIS_invoice_detail implements Serializable {
      */
     public void setEFRIS_invoice_detail_id(long EFRIS_invoice_detail_id) {
         this.EFRIS_invoice_detail_id = EFRIS_invoice_detail_id;
+    }
+
+    /**
+     * @return the process_desc
+     */
+    public String getProcess_desc() {
+        return process_desc;
+    }
+
+    /**
+     * @param process_desc the process_desc to set
+     */
+    public void setProcess_desc(String process_desc) {
+        this.process_desc = process_desc;
     }
     
 }

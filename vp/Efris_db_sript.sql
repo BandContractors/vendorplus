@@ -65,3 +65,6 @@ create table efris_good_detail (
     add_date datetime not null,
     process_date datetime
 )ENGINE=InnoDB;
+
+ALTER TABLE efris_invoice_detail ADD COLUMN process_desc varchar(500);
+ALTER TABLE efris_good_detail ADD COLUMN process_desc varchar(500);
