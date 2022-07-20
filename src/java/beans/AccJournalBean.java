@@ -5415,7 +5415,7 @@ public class AccJournalBean implements Serializable {
     public void initReportSalesInvoiceAge(InvoiceAge aInvoiceAge, List<InvoiceAge> aInvoiceAgeList, List<InvoiceAge> aInvoiceAgeListSummary) {
         String AgeBand = "";
         try {
-            AgeBand = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "SALES_INVOICE_AGING_BAND").getParameter_value();
+            AgeBand = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "SALES_INVOICE_AGING_BAND").getParameter_value();
             if (null == AgeBand || AgeBand.isEmpty() || AgeBand.length() != 9) {
                 AgeBand = "0030,0060";
             }
@@ -5453,7 +5453,7 @@ public class AccJournalBean implements Serializable {
     public void initReportSupplierInvoiceAge(InvoiceAge aInvoiceAge, List<InvoiceAge> aInvoiceAgeList, List<InvoiceAge> aInvoiceAgeListSummary) {
         String AgeBand = "";
         try {
-            AgeBand = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "SUPPLIER_INVOICE_AGING_BAND").getParameter_value();
+            AgeBand = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "SUPPLIER_INVOICE_AGING_BAND").getParameter_value();
             if (null == AgeBand || AgeBand.isEmpty() || AgeBand.length() != 9) {
                 AgeBand = "0030,0060";
             }

@@ -1349,7 +1349,7 @@ public class TransItemBean implements Serializable {
             Store store = new StoreBean().getStore(aTrans.getStoreId());
             Store store2 = new StoreBean().getStore(aTrans.getStore2Id());
             //update stock
-            if (("SALE INVOICE".equals(transtype.getTransactionTypeName()) && !new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "DEPLETE_SOLD_STOCK_UPON").getParameter_value().equals("0")) || ("GOODS DELIVERY".equals(transtype.getTransactionTypeName()) && !new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "DEPLETE_SOLD_STOCK_UPON").getParameter_value().equals("1"))) {
+            if (("SALE INVOICE".equals(transtype.getTransactionTypeName()) && !new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "DEPLETE_SOLD_STOCK_UPON").getParameter_value().equals("0")) || ("GOODS DELIVERY".equals(transtype.getTransactionTypeName()) && !new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "DEPLETE_SOLD_STOCK_UPON").getParameter_value().equals("1"))) {
                 //ingore stock update
             } else {
                 if (new ItemBean().getItem(aTransitem.getItemId()).getIsTrack() == 1) {
@@ -1383,7 +1383,7 @@ public class TransItemBean implements Serializable {
                         stock.setUnitCost(UnitCostPrice);
                         i = new StockBean().subtractStock(stock, aTransitem.getItemQty());
                         stock.setSpecific_size(aTransitem.getSpecific_size());
-                        String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
+                        String TableName = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
                         new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", stock, aTransitem.getItemQty(), "Add", aTrans.getTransactionTypeId(), aTrans.getTransactionId(), aTrans.getAddUserDetailId());
                     }
                     if ("HIRE INVOICE".equals(transtype.getTransactionTypeName())) {
@@ -1435,7 +1435,7 @@ public class TransItemBean implements Serializable {
                     }
                     int PurInvoMode = 0;
                     try {
-                        PurInvoMode = Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "PURCHASE_INVOICE_MODE").getParameter_value());
+                        PurInvoMode = Integer.parseInt(new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "PURCHASE_INVOICE_MODE").getParameter_value());
                     } catch (Exception e) {
                         // do nothing
                     }
@@ -1460,7 +1460,7 @@ public class TransItemBean implements Serializable {
                             stock.setUnitCost(UnitCostPrice);
                             i = new StockBean().addStock(stock, aTransitem.getItemQty());
                             stock.setSpecific_size(aTransitem.getSpecific_size());
-                            String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
+                            String TableName = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
                             new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, aTransitem.getItemQty(), "Add", aTrans.getTransactionTypeId(), aTrans.getTransactionId(), aTrans.getAddUserDetailId());
                         } else {
                             //insert
@@ -1497,7 +1497,7 @@ public class TransItemBean implements Serializable {
                             stock.setAssetStatusDesc("");
                             stock.setSpecific_size(aTransitem.getSpecific_size());
                             i = new StockBean().saveStock(stock);
-                            String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
+                            String TableName = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
                             new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, aTransitem.getItemQty(), "Add", aTrans.getTransactionTypeId(), aTrans.getTransactionId(), aTrans.getAddUserDetailId());
                         }
                     }
@@ -1519,7 +1519,7 @@ public class TransItemBean implements Serializable {
 
                         }
                         stock.setSpecific_size(aTransitem.getSpecific_size());
-                        String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
+                        String TableName = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
                         new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", stock, aTransitem.getItemQty(), "Add", aTrans.getTransactionTypeId(), aTrans.getTransactionId(), aTrans.getAddUserDetailId());
                     }
                     //TRANSFER - 2. Add/Insert stock to the destination store
@@ -1535,7 +1535,7 @@ public class TransItemBean implements Serializable {
                             stock.setDescSpecific(aTransitem.getDescSpecific());
                             i = new StockBean().addStock(stock, aTransitem.getItemQty());
                             stock.setSpecific_size(aTransitem.getSpecific_size());
-                            String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
+                            String TableName = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
                             new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, aTransitem.getItemQty(), "Add", aTrans.getTransactionTypeId(), aTrans.getTransactionId(), aTrans.getAddUserDetailId());
                         } else {
                             //insert
@@ -1567,7 +1567,7 @@ public class TransItemBean implements Serializable {
                             stock.setAssetStatusDesc("");
                             stock.setSpecific_size(aTransitem.getSpecific_size());
                             i = new StockBean().saveStock(stock);
-                            String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
+                            String TableName = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
                             new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, aTransitem.getItemQty(), "Add", aTrans.getTransactionTypeId(), aTrans.getTransactionId(), aTrans.getAddUserDetailId());
                         }
                     }
@@ -1582,7 +1582,7 @@ public class TransItemBean implements Serializable {
                         stock.setDescSpecific(aTransitem.getDescSpecific());
                         i = new StockBean().subtractStock(stock, aTransitem.getItemQty());
                         stock.setSpecific_size(aTransitem.getSpecific_size());
-                        String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
+                        String TableName = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
                         new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", stock, aTransitem.getItemQty(), "Add", aTrans.getTransactionTypeId(), aTrans.getTransactionId(), aTrans.getAddUserDetailId());
                     }
                     //UNPACK - 2. Add/Insert stock to the destination small item
@@ -1598,7 +1598,7 @@ public class TransItemBean implements Serializable {
                             stock.setDescSpecific(aTransitem.getDescSpecific());
                             i = new StockBean().addStock(stock, aTransitem.getItemQty2());
                             stock.setSpecific_size(aTransitem.getSpecific_size());
-                            String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
+                            String TableName = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
                             new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, aTransitem.getItemQty2(), "Add", aTrans.getTransactionTypeId(), aTrans.getTransactionId(), aTrans.getAddUserDetailId());
                         } else {
                             //insert
@@ -1667,7 +1667,7 @@ public class TransItemBean implements Serializable {
                             stock.setAccountCode(this.getTransItemInventCostAccount(transtype, transreason, new ItemBean().getItem(stock.getItemId())));
                             stock.setSpecific_size(aTransitem.getSpecific_size());
                             i = new StockBean().saveStock(stock);
-                            String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
+                            String TableName = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
                             new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, aTransitem.getItemQty2(), "Add", aTrans.getTransactionTypeId(), aTrans.getTransactionId(), aTrans.getAddUserDetailId());
                         }
                     }
@@ -6730,7 +6730,7 @@ public class TransItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void clearTransItems(Trans aTrans, List<TransItem> aActiveTransItems) {
         try {
             aActiveTransItems.clear();

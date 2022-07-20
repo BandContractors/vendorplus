@@ -14710,27 +14710,46 @@ public class TransBean implements Serializable {
     }
 
     public void initSalesInvoiceSession(long aTransId, String aAction) {
-        //first set current selection in session
-        FacesContext context = FacesContext.getCurrentInstance();
-        HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
-        HttpSession httpSession = request.getSession(true);
-        httpSession.setAttribute("CURRENT_TRANSACTION_ID", aTransId);
-        httpSession.setAttribute("CURRENT_TRANSACTION_ACTION", aAction);
-        httpSession.setAttribute("CURRENT_PAY_ID", 0);
-        this.ActionType = aAction;
-        this.TransObj = new TransBean().getTrans(aTransId);
-        this.updateLookup(this.TransObj);
-        this.TransItemList = new TransItemBean().getTransItemsByTransactionId(aTransId);
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
+        String msg = "";
+        this.setActionMessage("");
         try {
-            this.PayObj = new PayBean().getTransactionFirstPayByTransNo(TransObj.getTransactionNumber());//first payment
-            httpSession.setAttribute("CURRENT_PAY_ID", this.PayObj.getPayId());
-        } catch (NullPointerException npe) {
-            this.PayObj = null;
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
         }
-        //refresh output
-        new OutputDetailBean().refreshOutput("PARENT", "");
-        //refresh history
-        this.TransListHist = new ReportBean().getTransHistory(aTransId);
+        this.TransObj = new TransBean().getTrans(aTransId);
+        List<Trans> aList = new ArrayList<>();
+        if (this.TransObj.getTransactionTypeId() == 2) {
+            aList = new CreditDebitNoteBean().getTrans_cr_dr_notes(this.TransObj.getTransactionNumber(), 0);
+        }
+        if (aAction.equals("Edit") && !aList.isEmpty()) {
+            this.ActionType = "None";
+            msg = "Transaction Has Credit or Debit Note";
+            this.setActionMessage(ub.translateWordsInText(BaseName, msg));
+        } else {
+            //first set current selection in session
+            FacesContext context = FacesContext.getCurrentInstance();
+            HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+            HttpSession httpSession = request.getSession(true);
+            httpSession.setAttribute("CURRENT_TRANSACTION_ID", aTransId);
+            httpSession.setAttribute("CURRENT_TRANSACTION_ACTION", aAction);
+            httpSession.setAttribute("CURRENT_PAY_ID", 0);
+            this.ActionType = aAction;
+            //this.TransObj = new TransBean().getTrans(aTransId);
+            this.updateLookup(this.TransObj);
+            this.TransItemList = new TransItemBean().getTransItemsByTransactionId(aTransId);
+            try {
+                this.PayObj = new PayBean().getTransactionFirstPayByTransNo(TransObj.getTransactionNumber());//first payment
+                httpSession.setAttribute("CURRENT_PAY_ID", this.PayObj.getPayId());
+            } catch (NullPointerException npe) {
+                this.PayObj = null;
+            }
+            //refresh output
+            new OutputDetailBean().refreshOutput("PARENT", "");
+            //refresh history
+            this.TransListHist = new ReportBean().getTransHistory(aTransId);
+        }
     }
 
     public void initCheckCrDrNoteSession(String aTransNo, long aTransId, String aAction) {
@@ -14744,7 +14763,7 @@ public class TransBean implements Serializable {
         FacesContext context = FacesContext.getCurrentInstance();
         HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
         HttpSession httpSession = request.getSession(true);
-        List<Trans> aList = new CreditDebitNoteBean().getTrans_cr_dr_notes(aTransNo);
+        List<Trans> aList = new CreditDebitNoteBean().getTrans_cr_dr_notes(aTransNo, 0);
         if (aList.isEmpty()) {
             this.ActionType = aAction;
             httpSession.setAttribute("CURRENT_TRANSACTION_ID", 0);

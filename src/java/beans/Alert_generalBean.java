@@ -233,7 +233,7 @@ public class Alert_generalBean implements Serializable {
             //get EXPIRY_ALERTS_MODE 0(None),1(Out of stock),2(Low stock),3(Both Out and Low)
             String STOCK_ALERTS_MODE = "0";
             try {
-                STOCK_ALERTS_MODE = new Parameter_listBean().getParameter_listByContextNameMemory("ALERTS", "STOCK_ALERTS_MODE").getParameter_value();
+                STOCK_ALERTS_MODE = new Parameter_listBean().getParameter_listByContextName("ALERTS", "STOCK_ALERTS_MODE").getParameter_value();
             } catch (Exception e) {
                 //do nothing
             }
@@ -282,7 +282,7 @@ public class Alert_generalBean implements Serializable {
             //get EXPIRY_ALERTS_MODE 0(None),1(Expired,Unusable),2(Expired,Unusable,High),3(Expired,Unusable,High,Medium)
             String EXPIRY_ALERTS_MODE = "0";
             try {
-                EXPIRY_ALERTS_MODE = new Parameter_listBean().getParameter_listByContextNameMemory("ALERTS", "EXPIRY_ALERTS_MODE").getParameter_value();
+                EXPIRY_ALERTS_MODE = new Parameter_listBean().getParameter_listByContextName("ALERTS", "EXPIRY_ALERTS_MODE").getParameter_value();
             } catch (Exception e) {
                 //do nothing
             }
@@ -330,7 +330,7 @@ public class Alert_generalBean implements Serializable {
             //get STOCK_ALERTS_EMAIL 0(No),1(Yes-Out of stock),2(Yes-Low stock),3(Yes-Both Out and Low)
             String STOCK_ALERTS_EMAIL = "0";
             try {
-                STOCK_ALERTS_EMAIL = new Parameter_listBean().getParameter_listByContextNameMemory("ALERTS", "STOCK_ALERTS_EMAIL").getParameter_value();
+                STOCK_ALERTS_EMAIL = new Parameter_listBean().getParameter_listByContextName("ALERTS", "STOCK_ALERTS_EMAIL").getParameter_value();
             } catch (Exception e) {
                 //do nothing
             }
@@ -376,7 +376,7 @@ public class Alert_generalBean implements Serializable {
             //get EXPIRY_ALERTS_EMAIL 0(No),1(Yes-Expired,Unusable),2(Yes-Expired,Unusable,High),3(Yes-Expired,Unusable,High,Medium)
             String EXPIRY_ALERTS_EMAIL = "0";
             try {
-                EXPIRY_ALERTS_EMAIL = new Parameter_listBean().getParameter_listByContextNameMemory("ALERTS", "EXPIRY_ALERTS_EMAIL").getParameter_value();
+                EXPIRY_ALERTS_EMAIL = new Parameter_listBean().getParameter_listByContextName("ALERTS", "EXPIRY_ALERTS_EMAIL").getParameter_value();
             } catch (Exception e) {
                 //do nothing
             }

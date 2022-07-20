@@ -213,13 +213,13 @@
                         <p:dataExporter type="xml" target="tblDetail" fileName="Sales_Invoice_Detail" />
                     </h:commandLink>
                 </f:facet>
-                <p:column headerText="#{langsys['View']}" exportable="false">
+                <p:column headerText="#{langsys['View']}" exportable="false" visible="false">
                     <p:commandButton id="cmdbView" icon="ui-icon-search" oncomplete="PF('dlgSalesInvoice').show();" actionListener="#{transBean.initSalesInvoiceSession(itm.transactionId,'View')}" update=":formTransaction"/>
                 </p:column>
-                <p:column headerText="#{langsys['Edit']}" exportable="false">
+                <p:column headerText="#{langsys['Edit']}" exportable="false" visible="false">
                     <p:commandButton id="cmdbEdit" icon="ui-icon-pencil" oncomplete="PF('dlgSalesInvoice').show();" actionListener="#{transBean.initSalesInvoiceSession(itm.transactionId,'Edit')}" update=":formTransaction"/>
                 </p:column>
-                <p:column headerText="#{langsys['Action']}" exportable="false" visible="false">
+                <p:column headerText="#{langsys['Action']}" exportable="false" visible="true">
                     <p:splitButton value="#{langsys['Select']}" icon="ui-icon-pencil">
                         <p:menuitem value="#{langsys['View']}" icon="ui-icon-search" oncomplete="PF('dlgSalesInvoice').show();" actionListener="#{transBean.initSalesInvoiceSession(itm.transactionId,'View')}" update=":formTransaction"/>
                         <p:menuitem value="#{langsys['Edit']}" icon="ui-icon-pencil" oncomplete="PF('dlgSalesInvoice').show();" actionListener="#{transBean.initSalesInvoiceSession(itm.transactionId,'Edit')}" update=":formTransaction"/>

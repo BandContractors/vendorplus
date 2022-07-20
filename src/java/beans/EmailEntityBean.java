@@ -174,7 +174,7 @@ public class EmailEntityBean implements Serializable {
             List<String> EmailsList = this.createEmailsList(aEmailEntity);
             int SendBatchSize = 10;
             try {
-                SendBatchSize = Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("EMAIL", "SEND_BATCH_SIZE").getParameter_value());
+                SendBatchSize = Integer.parseInt(new Parameter_listBean().getParameter_listByContextName("EMAIL", "SEND_BATCH_SIZE").getParameter_value());
             } catch (Exception e) {
             }
             String RecipientType = "";

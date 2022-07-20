@@ -1,6 +1,5 @@
 package entities;
 
-
 import java.io.Serializable;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
@@ -9,7 +8,6 @@ import javax.faces.bean.SessionScoped;
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author btwesigye
@@ -24,13 +22,15 @@ public class PayTrans implements Serializable {
     private long TransactionId;
     private String TransactionNumber;
     private double TransPaidAmount;
-    
+
     private double SumTransPaidAmount;
     private double GrandTotal;
     private String TransactionRef;
     private int TransactionTypeId;
     private int TransactionReasonId;
     private String account_code;
+    private double cr_dr_amount;
+    private String cr_dr_type;
 
     /**
      * @return the PayTransId
@@ -185,5 +185,33 @@ public class PayTrans implements Serializable {
     public void setAccount_code(String account_code) {
         this.account_code = account_code;
     }
-    
+
+    /**
+     * @return the cr_dr_amount
+     */
+    public double getCr_dr_amount() {
+        return cr_dr_amount;
+    }
+
+    /**
+     * @param cr_dr_amount the cr_dr_amount to set
+     */
+    public void setCr_dr_amount(double cr_dr_amount) {
+        this.cr_dr_amount = cr_dr_amount;
+    }
+
+    /**
+     * @return the cr_dr_type
+     */
+    public String getCr_dr_type() {
+        return cr_dr_type;
+    }
+
+    /**
+     * @param cr_dr_type the cr_dr_type to set
+     */
+    public void setCr_dr_type(String cr_dr_type) {
+        this.cr_dr_type = cr_dr_type;
+    }
+
 }
