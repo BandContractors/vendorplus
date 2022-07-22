@@ -5,6 +5,7 @@
  */
 package api_tax.efris_bean;
 
+import api_tax.efris.EFRIS_invoice_detail;
 import api_tax.efris.GeneralUtilities;
 import api_tax.efris.innerclasses.GoodsDetails;
 import api_tax.efris.innerclasses.T106;
@@ -16,8 +17,11 @@ import com.sun.jersey.api.client.WebResource;
 import entities.CompanySetting;
 import java.io.Serializable;
 import java.security.PrivateKey;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import org.apache.commons.codec.binary.Base64;
@@ -52,12 +56,12 @@ public class T106Bean implements Serializable {
     public void synchInvoices() {
         //String uInvoiceNo = "";
         try {
-            String APIMode = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_MODE").getParameter_value();
+            String APIMode = new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_MODE").getParameter_value();
             //from transBean
-            if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
+            if (new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
                 String ReferenceNo = "";
                 String SellerTIN = CompanySetting.getTaxIdentity();
-                String DeviceNo = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value();
+                String DeviceNo = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value();
                 //get Status
                 if (ReferenceNo.length() == 0) {
                     if (APIMode.equals("OFFLINE")) {
@@ -66,6 +70,9 @@ public class T106Bean implements Serializable {
                         this.getInvoicesUploadedOnline(ReferenceNo, DeviceNo, SellerTIN);
                     }
                 }
+                
+                //save imported invoices
+                new EFRIS_invoice_detailBean().saveImportedEFRISInvoice();
             }
         } catch (Exception e) {
             //System.out.println("updateCreditNote:" + e.getMessage());
@@ -92,7 +99,7 @@ public class T106Bean implements Serializable {
                     + " \"pageSize\": \"10\"\n"
                     + "}";
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
-            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_OFFLINE").getParameter_value());
+            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_URL_OFFLINE").getParameter_value());
             String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", aDeviceNo, "T111", aSellerTIN);
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             output = response.getEntity(String.class);
@@ -145,7 +152,18 @@ public class T106Bean implements Serializable {
     public void getInvoicesUploadedOnline(String aReferenceNo, String aDeviceNo, String aSellerTIN) {
         String DecryptedContent = "";
         String output = "";
+        String startDate = "";
         try {
+            List<EFRIS_invoice_detail> aEFRIS_invoice_detail = new EFRIS_invoice_detailBean().getEFRIS_invoice_detail_All();
+            if (aEFRIS_invoice_detail.size() > 0){
+                //do nothing
+                int size = aEFRIS_invoice_detail.size();
+                Date lastAddDate = aEFRIS_invoice_detail.get(size - 1).getAdd_date();
+                System.out.println("lastAddDate: " + lastAddDate);
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+                startDate = sdf.format(lastAddDate);
+                System.out.println("startDate: " + startDate);
+            }
             String json = "{\n"
                     + " \"oriInvoiceNo\": \"\",\n"
                     + " \"invoiceNo\": \"\",\n"
@@ -159,7 +177,8 @@ public class T106Bean implements Serializable {
                     + " \"invoiceKind\": \"1\",\n"
                     + " \"isInvalid\": \"\",\n"
                     + " \"isRefund\": \"\",\n"
-                    + " \"startDate\": \"\",\n"
+                    + " \"startDate\": \""+startDate+"\",\n"
+                    //+ " \"startDate\": \"\",\n"
                     + " \"endDate\": \"\",\n"
                     + " \"pageNo\": \"1\",\n"
                     + " \"pageSize\": \"10\",\n"
@@ -167,12 +186,12 @@ public class T106Bean implements Serializable {
                     //+ " \"branchName\": \"10\"\n"
                     + "}";
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
-            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_ONLINE").getParameter_value());
+            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_URL_ONLINE").getParameter_value());
             /**
              * Read Private Key
              */
-            PrivateKey key = new SecurityPKI().getPrivate(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_FILE").getParameter_value(), Security.Decrypt(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_PASSWORD").getParameter_value()), new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_ALIAS").getParameter_value());
-            String AESpublickeystring = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_AES_PUBLIC_KEY").getParameter_value();
+            PrivateKey key = new SecurityPKI().getPrivate(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_FILE").getParameter_value(), Security.Decrypt(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_PASSWORD").getParameter_value()), new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_ALIAS").getParameter_value());
+            String AESpublickeystring = new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_AES_PUBLIC_KEY").getParameter_value();
             /**
              * Encrypt Content
              */
@@ -224,11 +243,12 @@ public class T106Bean implements Serializable {
                 //System.out.println("Invoice Detail" + invoiceDetail);
                 //get goodsDetails
                 List<GoodsDetails> goodsDetails = this.getInvoiceGoodsDetail(invoiceDetail);
-                //save goodsDetails
-                int saved = new EFRIS_good_detailBean().saveEFRIS_good_detail(goodsDetails, t106.getInvoiceNo(), t106.getReferenceNo());
-
-                if (saved == 1) {
-                    int savedInvoice = new EFRIS_invoice_detailBean().insertEFRIS_invoice_detail(t106);
+                
+                //save invoice Details
+                int savedInvoice = new EFRIS_invoice_detailBean().insertEFRIS_invoice_detail(t106);
+                if (savedInvoice == 1) {
+                    //save goodsDetails
+                    int saved = new EFRIS_good_detailBean().saveEFRIS_good_detail(goodsDetails, t106.getInvoiceNo(), t106.getReferenceNo());
                 }
                 //itemslist.add(t106);
             }
@@ -247,13 +267,13 @@ public class T106Bean implements Serializable {
                     + "	\"invoiceNo\": \"" + aTaxInvoiceNumber + "\"\n"
                     + "}";
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
-            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_ONLINE").getParameter_value());
+            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_URL_ONLINE").getParameter_value());
             /**
              * Read Private Key
              */
-            PrivateKey key = new SecurityPKI().getPrivate(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_FILE").getParameter_value(), Security.Decrypt(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_PASSWORD").getParameter_value()), new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_ALIAS").getParameter_value());
-            //String AESpublickeystring = SecurityPKI.decrypt(new SecurityPKI().AESPublicKey(CompanySetting.getTaxIdentity(), new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value()), key);
-            String AESpublickeystring = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_AES_PUBLIC_KEY").getParameter_value();
+            PrivateKey key = new SecurityPKI().getPrivate(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_FILE").getParameter_value(), Security.Decrypt(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_PASSWORD").getParameter_value()), new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_ALIAS").getParameter_value());
+            //String AESpublickeystring = SecurityPKI.decrypt(new SecurityPKI().AESPublicKey(CompanySetting.getTaxIdentity(), new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value()), key);
+            String AESpublickeystring = new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_AES_PUBLIC_KEY").getParameter_value();
             /**
              * Encrypt Content
              */

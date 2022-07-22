@@ -73,7 +73,7 @@ public class TransExtBean implements Serializable {
                     //error happened in inserting
                 } else {
                     //save trans items
-                    TransItemBean tib = new TransItemBean();
+                    //TransItemBean tib = new TransItemBean();
                     InsertedTransItems = this.insertTransItems(aStoreId, aTransTypeId, aTransReasonId, aSaleType, trans, aActiveTransItems, trans.getTransactionId());
                     if (InsertedTransItems == aActiveTransItems.size()) {
                         //pay, stock, journal

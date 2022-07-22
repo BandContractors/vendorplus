@@ -8,10 +8,12 @@ package api_tax.efris_bean;
 import api_tax.efris.EFRIS_good_detail;
 import api_tax.efris.innerclasses.GoodsDetails;
 import beans.ItemBean;
+import beans.Item_tax_mapBean;
 import beans.TransItemBean;
 import connections.DBConnection;
 import entities.CompanySetting;
 import entities.Item;
+import entities.Item_tax_map;
 import entities.TransItem;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -35,6 +37,43 @@ public class EFRIS_good_detailBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = Logger.getLogger(EFRIS_good_detailBean.class.getName());
+
+    public String validateSaleInvoiceItems(List<EFRIS_good_detail> aEFRIS_good_detailList) {
+        String status = "";
+        try {
+            //List<Bi_stg_sale_invoice_item> invItems = invoiceItems;
+            for (int i = 0, size = aEFRIS_good_detailList.size(); i < size; i++) {
+                EFRIS_good_detail aEFRIS_good_detail = aEFRIS_good_detailList.get(i);
+                //get Item_tax_mapBean
+                Item_tax_map aItem_tax_map = new Item_tax_mapBean().getItem_tax_mapByIdTax(aEFRIS_good_detail.getItemCode());
+
+                int itemQty = Integer.parseInt(aEFRIS_good_detail.getQty());
+                if (aItem_tax_map == null) {
+                    status = "Item code at position " + (i + 1) + " not in item_tax_map";
+                    break;
+                } else if (new ItemBean().findItem(aItem_tax_map.getItem_id()) == null) {
+                    status = "Item at position " + (i + 1) + "does not exist";
+                    break;
+                } else if (new ItemBean().getItemCurrentStockStatus(aItem_tax_map.getItem_id()).getQty_total() < itemQty) {
+                    status = "Item at position " + (i + 1) + "Has less Stock";
+                    break;
+                } else {
+                    status = "success";
+                }
+
+                //update validation status
+                if (status.equals("success")) {
+                    this.updateEFRIS_good_detailValidation(aEFRIS_good_detail.getEFRIS_good_detail_id(), 1, status);
+                } else {
+                    this.updateEFRIS_good_detailValidation(aEFRIS_good_detail.getEFRIS_good_detail_id(), 2, status);
+                }
+            }
+        } catch (Exception e) {
+            status = e.getMessage();
+            LOGGER.log(Level.ERROR, e);
+        }
+        return status;
+    }
 
     public void setEFRIS_good_detailFromResultset(EFRIS_good_detail aEFRIS_good_detail, ResultSet aResultSet) {
         try {
@@ -225,8 +264,11 @@ public class EFRIS_good_detailBean implements Serializable {
 
     public void setTransItemFromEFRIS_good_detail(TransItem aTransItem, EFRIS_good_detail aEFRIS_good_detail) {
         try {
+            //get Item_tax_mapBean
+            Item_tax_map aItem_tax_map = new Item_tax_mapBean().getItem_tax_mapByIdTax(aEFRIS_good_detail.getItemCode());
             //get item details in SM
-            Item aItem = new ItemBean().getItemByDesc(aEFRIS_good_detail.getItem());
+            //Item aItem = new ItemBean().getItemByDesc(aEFRIS_good_detail.getItem());
+            Item aItem = new ItemBean().findItem(aItem_tax_map.getItem_id());
             try {
                 aTransItem.setItemId(aItem.getItemId());
             } catch (Exception e) {
@@ -475,6 +517,24 @@ public class EFRIS_good_detailBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
         return saved;
+    }
+
+    public void updateEFRIS_good_detailValidation(long aEFRIS_good_detail_id, int status, String statusMsg) {
+        //int saved = 0;
+        String sql = "UPDATE efris_good_detail SET process_flag = ?, process_desc = ?, process_date = ? WHERE efris_good_detail_id = ?";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setInt(1, status);
+            ps.setString(2, statusMsg);
+            ps.setTimestamp(3, new java.sql.Timestamp(new CompanySetting().getCURRENT_SERVER_DATE().getTime()));
+            ps.setLong(4, aEFRIS_good_detail_id);
+            ps.executeUpdate();
+            //saved = 1;
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        //return saved;
     }
 
     public EFRIS_good_detail getEFRIS_good_detailById(long aEFRIS_good_detail_id) {

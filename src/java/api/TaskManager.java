@@ -8,6 +8,7 @@ package api;
 import api_sm_bi.CheckApiBean;
 import api_sm_bi.SMbiBean;
 import api_tax.efris_bean.EFRIS_invoice_detailBean;
+import api_tax.efris_bean.T106Bean;
 import beans.Cdc_generalBean;
 import beans.Parameter_listBean;
 import java.util.Timer;
@@ -24,6 +25,11 @@ public class TaskManager {
 
     public void startTask() {
         try {
+            //API-TAX - take AES public key snapshot
+            if (new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0 && new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_MODE").getParameter_value().equals("ONLINE")) {
+                new Cdc_generalBean().takeNewSnapshot_AesPublicKeyAtLogin();
+            }
+            
             //A) Branch level tasks such as snapshots, etc.
             long RepeatAfter = 24 * 60 * 60 * 1000;//1000 mls=1 sec
             //DBConnection.readConnectionConfigurations("configurations.ConfigFile");
@@ -69,13 +75,22 @@ public class TaskManager {
             long RepeatAfterMilliseconds = 1000 * 60 * RepeatAfterMinutes;
             if (RepeatAfterMinutes > 0 && new Parameter_listBean().getParameter_listByContextName("API", "API_SMBI_URL").getParameter_value().length() > 0) {
                 timer.schedule(new PeriodicTaskSyncSmBi(), DelayMilliseconds, RepeatAfterMilliseconds);
-            }            
-            
+            }
+
             //A) Inter-Branch level tasks such as Efris Invoice.
-            //long DelayMilliseconds_Efris = 20;//1000 mls=1 sec
-            long DelayMilliseconds_Efris = 1000;//1000 mls=1 sec
-            long RepeatAfterMilliseconds_Efris = 1000 * 60 * 2;//1000 mls=1 sec
-            timer.schedule(new PeriodicTaskSyncEfrisInvoice(), DelayMilliseconds_Efris, RepeatAfterMilliseconds_Efris);
+            long RepeatAfterMinutes_Efris = 0;
+            try {
+                RepeatAfterMinutes_Efris = Long.parseLong(new Parameter_listBean().getParameter_listByContextName("API", "API_EFRIS_SYNC_JOB_REPEAT_AFTER").getParameter_value());
+            } catch (Exception e) {
+                RepeatAfterMinutes_Efris = 0;
+            }
+            //1000 mls=1 sec
+            long DelayMilliseconds_Efris = 1000;
+            long RepeatAfterMilliseconds_Efris = 1000 * 60 * RepeatAfterMinutes_Efris;
+            //add job to the timer
+            if (RepeatAfterMinutes_Efris > 0) {
+                timer.schedule(new PeriodicTaskSyncEfrisInvoice(), DelayMilliseconds_Efris, RepeatAfterMilliseconds_Efris);
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -111,6 +126,7 @@ public class TaskManager {
         @Override
         public void run() {
             try {
+                new T106Bean().synchInvoices();
                 //new EFRIS_invoice_detailBean().saveImportedEFRISInvoice();
             } catch (Exception e) {
             }

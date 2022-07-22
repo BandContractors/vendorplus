@@ -509,8 +509,8 @@ public class Cdc_generalBean implements Serializable {
     public void takeNewSnapshot_AesPublicKeyAtLogin() {
         try {
             //check if it hasnt been taken
-            if (new Cdc_generalBean().isTodaySnapshotFoundAESPK()) {
-                if (new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_AES_PUBLIC_KEY").getParameter_value().length() == 0) {
+            if (this.isTodaySnapshotFoundAESPK()) {
+                if (new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_AES_PUBLIC_KEY").getParameter_value().length() == 0) {
                     this.takeNewSnapshot_AesPublicKey();
                 } else {
                     //ignore 

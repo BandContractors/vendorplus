@@ -68,3 +68,4 @@ create table efris_good_detail (
 
 ALTER TABLE efris_invoice_detail ADD COLUMN process_desc varchar(500);
 ALTER TABLE efris_good_detail ADD COLUMN process_desc varchar(500);
+ALTER TABLE efris_invoice_detail MODIFY id varchar(32) not null unique;

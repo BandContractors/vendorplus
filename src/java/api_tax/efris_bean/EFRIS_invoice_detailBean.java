@@ -8,12 +8,18 @@ package api_tax.efris_bean;
 import api_tax.efris.EFRIS_good_detail;
 import api_tax.efris.EFRIS_invoice_detail;
 import api_tax.efris.innerclasses.T106;
+import beans.AccChildAccountBean;
+import beans.AccCurrencyBean;
+import beans.Parameter_listBean;
+import beans.StoreBean;
 import beans.TransExtBean;
-import beans.TransItemBean;
 import beans.TransactorBean;
 import beans.UserDetailBean;
 import connections.DBConnection;
+import entities.AccChildAccount;
+import entities.AccCurrency;
 import entities.CompanySetting;
+import entities.Store;
 import entities.Trans;
 import entities.TransItem;
 import entities.Transactor;
@@ -31,6 +37,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import utilities.UtilityBean;
 
 /**
  *
@@ -45,35 +52,100 @@ public class EFRIS_invoice_detailBean implements Serializable {
 
     public void saveImportedEFRISInvoice() {
         try {
-
-            //new T106Bean().synchInvoices();
-            System.out.println("We are here");
             List<EFRIS_invoice_detail> invoiceList;
             //get unprocessed invoices
             invoiceList = this.getEFRIS_invoice_detail_Unprocessed();
 
             for (int i = 0; i < invoiceList.size(); i++) {
                 EFRIS_invoice_detail invoice = invoiceList.get(i);
-                //convert invoice to trans
-                Trans trans = new Trans();
-                this.setTransFromEFRIS_invoice_detail(trans, invoice);
-                System.out.println("Now getting Invoices");
 
                 //get good/items details                
                 List<EFRIS_good_detail> goodList;
                 goodList = new EFRIS_good_detailBean().getEFRIS_invoice_detailByInvoiceNo(invoice.getInvoiceNo());
-                //convert invoice to trans
-                List<TransItem> transItemList = new ArrayList<>();
-                new EFRIS_good_detailBean().setTransItemFromEFRIS_good_detail(transItemList, goodList);
-                System.out.println("Now getting Goods");
 
-                //save in SM db
-                //storeId=1 Busula, aTransTypeId=2 SALE INVOICE, aTransReasonId=2 RETAIL SALE INVOICE, aSaleType=RETAIL SALE INVOICE
-                new TransExtBean().saveSalesInvoiceImported("PARENT", 1, 2, 2, "RETAIL SALE INVOICE", trans, transItemList, null, null, null, null, null, null);
+                //validate invoice and good detail
+                String validationMsg = this.validateSaleInvoice(invoice, goodList);
+                if (validationMsg.equals("success")) {
+                    //convert invoice to trans
+                    Trans trans = new Trans();
+                    this.setTransFromEFRIS_invoice_detail(trans, invoice);
+
+                    //convert invoice to trans
+                    List<TransItem> transItemList = new ArrayList<>();
+                    new EFRIS_good_detailBean().setTransItemFromEFRIS_good_detail(transItemList, goodList);
+
+                    //save in SM db
+                    int store_id = this.getStoreByDeviceNo(invoice.getDeviceNo()).getStoreId();
+                    //storeId=1 Busula, aTransTypeId=2 SALE INVOICE, aTransReasonId=2 RETAIL SALE INVOICE, aSaleType=RETAIL SALE INVOICE
+                    new TransExtBean().saveSalesInvoiceImported("PARENT", store_id, 2, 2, "RETAIL SALE INVOICE", trans, transItemList, null, null, null, null, null, null);
+                }
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
+    }
+
+    public String validateSaleInvoice(EFRIS_invoice_detail aEFRIS_invoice_detail, List<EFRIS_good_detail> aEFRIS_good_detail) {
+        String status;
+        try {
+            Store store;
+            //currencyCode using currency
+            AccCurrency currency = new AccCurrencyBean().getCurrency(aEFRIS_invoice_detail.getCurrency());
+            //user using operator
+            UserDetail aUserDetail = new UserDetailBean().getUserDetailByUserName(aEFRIS_invoice_detail.getOperator());
+            //store using deviceNo
+            String storeDeviceMapping = new Parameter_listBean().getParameter_listByContextName("MOBILE", "STORE_MOB_DEVICE_MAP").getParameter_value();
+            store = this.getStoreByDeviceNo(aEFRIS_invoice_detail.getDeviceNo());
+            //validate goodDetail/items
+            String itemValidationMsg = new EFRIS_good_detailBean().validateSaleInvoiceItems(aEFRIS_good_detail);
+            int payMethodId = 1;
+            if (currency == null) {
+                status = "Currency code does not exist";
+            } else if (aUserDetail == null) {
+                status = "Operator/User does not exist";
+            } else if (storeDeviceMapping.length() == 0) {
+                status = "Device Store Mapping Not Configured";
+            } else if (store == null) {
+                status = "Device Number not mapped to any store";
+            } else if (new AccChildAccountBean().getAccChildAccountsForCashReceipt(currency.getCurrencyCode(), payMethodId, store.getStoreId(), aUserDetail.getUserDetailId()).get(0) == null) {
+                status = "Operator/User does not have a child account";
+            } else if (!itemValidationMsg.equals("success")) {
+                status = itemValidationMsg;
+            } else {
+                status = "success";
+            }
+        } catch (Exception e) {
+            status = e.getMessage();
+            LOGGER.log(Level.ERROR, e);
+        }
+
+        //update validation status
+        try {
+            if (status.equals("success")) {
+                this.updateEFRIS_invoice_detailValidation(aEFRIS_invoice_detail.getEFRIS_invoice_detail_id(), 1, status);
+            } else {
+                this.updateEFRIS_invoice_detailValidation(aEFRIS_invoice_detail.getEFRIS_invoice_detail_id(), 2, status);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return status;
+    }
+
+    public Store getStoreByDeviceNo(String aDeviceNo) {
+        Store store = null;
+        String storeDeviceMapping = new Parameter_listBean().getParameter_listByContextName("MOBILE", "STORE_MOB_DEVICE_MAP").getParameter_value();
+        String[] storeDeviceNoArray = new UtilityBean().getStringArrayFromCommaSeperatedStr(storeDeviceMapping);
+        if (storeDeviceNoArray.length > 0) {
+            for (int i = 0; i < storeDeviceNoArray.length; i++) {
+                String[] storeDeviceNo = new UtilityBean().getStringArrayFromXSeperatedStr(":", storeDeviceNoArray[i]);
+                if (storeDeviceNo[1].equals(aDeviceNo)) {
+                    store = new StoreBean().getStoreByCode(storeDeviceNo[0]);
+                    break;
+                }
+            }
+        }
+        return store;
     }
 
     public void setEFRIS_invoice_detailFromResultset(EFRIS_invoice_detail aEFRIS_invoice_detail, ResultSet aResultSet) {
@@ -228,15 +300,12 @@ public class EFRIS_invoice_detailBean implements Serializable {
             try {
                 String dateInString = aEFRIS_invoice_detail.getIssuedDate();
 
+                //convert string to date
                 //input "14/07/2022 18:41:23"
                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH);
                 Date parsedDate = sdf.parse(dateInString);
-                //output 2022-07-14
-                //SimpleDateFormat print = new SimpleDateFormat("dd-MM-yyyy");
-                //System.out.println(print.format(parsedDate));
 
                 aTrans.setTransactionDate(parsedDate);
-                //aEFRIS_invoice_detail.setIssuedDate(aResultSet.getString("issuedDate"));
             } catch (Exception e) {
                 aTrans.setTransactionDate(null);
                 LOGGER.log(Level.ERROR, e);
@@ -276,6 +345,16 @@ public class EFRIS_invoice_detailBean implements Serializable {
                 aTrans.setGrandTotal(0);
             }
             try {
+                String receiveInvoiceCashType = new Parameter_listBean().getParameter_listByContextName("MOBILE", "RECEIVE_INVOICE_CASH_TYPE").getParameter_value();
+                if (receiveInvoiceCashType.equals("1")) {
+                    aTrans.setAmountTendered(Double.parseDouble(aEFRIS_invoice_detail.getGrossAmount()));
+                } else {
+                    aTrans.setAmountTendered(0);
+                }
+            } catch (Exception e) {
+                aTrans.setAmountTendered(0);
+            }
+            try {
                 aTrans.setPayMethod(1);
             } catch (Exception e) {
                 aTrans.setPayMethod(0);
@@ -289,6 +368,11 @@ public class EFRIS_invoice_detailBean implements Serializable {
                 aTrans.setXrate(1);
             } catch (Exception e) {
                 aTrans.setXrate(0);
+            }
+            try {
+                aTrans.setStoreId(this.getStoreByDeviceNo(aEFRIS_invoice_detail.getDeviceNo()).getStoreId());
+            } catch (Exception e) {
+                aTrans.setStoreId(0);
             }
             try {
                 UserDetail aUserDetail;
@@ -306,6 +390,21 @@ public class EFRIS_invoice_detailBean implements Serializable {
                 }
             } catch (Exception e) {
                 aTrans.setAddUserDetailId(0);
+                aTrans.setAddUserDetailName("");
+                aTrans.setTransactionUserDetailId(0);
+                aTrans.setTransactionUserDetailName("");
+            }
+            try {
+                String currencyCode = aTrans.getCurrencyCode();
+                int payMethodId = aTrans.getPayMethod();
+                int storeId = aTrans.getStoreId();
+                int userId = aTrans.getAddUserDetailId();
+                //get child account
+                AccChildAccount childAccount = new AccChildAccountBean().getAccChildAccountsForCashReceipt(currencyCode, payMethodId, storeId, userId).get(0);
+
+                aTrans.setAccChildAccountId(childAccount.getAccChildAccountId());
+            } catch (Exception e) {
+                aTrans.setAccChildAccountId(0);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -413,6 +512,24 @@ public class EFRIS_invoice_detailBean implements Serializable {
         return saved;
     }
 
+    public void updateEFRIS_invoice_detailValidation(long aEFRIS_invoice_detail_id, int status, String statusMsg) {
+        //int saved = 0;
+        String sql = "UPDATE efris_invoice_detail SET process_flag = ?, process_desc = ?, process_date = ? WHERE efris_invoice_detail_id = ?";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setInt(1, status);
+            ps.setString(2, statusMsg);
+            ps.setTimestamp(3, new java.sql.Timestamp(new CompanySetting().getCURRENT_SERVER_DATE().getTime()));
+            ps.setLong(4, aEFRIS_invoice_detail_id);
+            ps.executeUpdate();
+            //saved = 1;
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        //return saved;
+    }
+
     public EFRIS_invoice_detail getEFRIS_invoice_detail(long aEFRIS_invoice_detail_id) {
         String sql = "SELECT * FROM efris_invoice_detail WHERE efris_invoice_detail_id=?";
         ResultSet rs;
@@ -467,7 +584,6 @@ public class EFRIS_invoice_detailBean implements Serializable {
                 list.add(obj);
             }
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
             LOGGER.log(Level.ERROR, e);
         }
         return list;

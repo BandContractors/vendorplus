@@ -199,6 +199,28 @@ public class StoreBean implements Serializable {
         }
     }
 
+    public Store getStoreByCode(String aStoreCode) {
+        //String sql = "{call sp_search_store_by_store_code(?)}";
+        String sql = "SELECT * from store where store_code = ?";
+        ResultSet rs;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setString(1, aStoreCode);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                Store store = new Store();
+                this.setStoreFromResultset(store, rs);
+                return store;
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);//se.getMessage());
+            return null;
+        }
+    }
+
     public void deleteStoreByObject(Store store) {
         this.deleteStore(store);
     }
