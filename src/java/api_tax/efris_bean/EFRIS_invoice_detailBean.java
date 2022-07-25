@@ -134,16 +134,22 @@ public class EFRIS_invoice_detailBean implements Serializable {
 
     public Store getStoreByDeviceNo(String aDeviceNo) {
         Store store = null;
-        String storeDeviceMapping = new Parameter_listBean().getParameter_listByContextName("MOBILE", "STORE_MOB_DEVICE_MAP").getParameter_value();
-        String[] storeDeviceNoArray = new UtilityBean().getStringArrayFromCommaSeperatedStr(storeDeviceMapping);
-        if (storeDeviceNoArray.length > 0) {
-            for (int i = 0; i < storeDeviceNoArray.length; i++) {
-                String[] storeDeviceNo = new UtilityBean().getStringArrayFromXSeperatedStr(":", storeDeviceNoArray[i]);
-                if (storeDeviceNo[1].equals(aDeviceNo)) {
-                    store = new StoreBean().getStoreByCode(storeDeviceNo[0]);
-                    break;
+        try {
+            String storeDeviceMapping = new Parameter_listBean().getParameter_listByContextName("MOBILE", "STORE_MOB_DEVICE_MAP").getParameter_value();
+            if (storeDeviceMapping.length() > 0) {
+                String[] storeDeviceNoArray = new UtilityBean().getStringArrayFromCommaSeperatedStr(storeDeviceMapping);
+                if (storeDeviceNoArray.length > 0) {
+                    for (int i = 0; i < storeDeviceNoArray.length; i++) {
+                        String[] storeDeviceNo = new UtilityBean().getStringArrayFromXSeperatedStr(storeDeviceNoArray[i], ":");
+                        if (storeDeviceNo[1].equals(aDeviceNo)) {
+                            store = new StoreBean().getStoreByCode(storeDeviceNo[0]);
+                            break;
+                        }
+                    }
                 }
             }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return store;
     }

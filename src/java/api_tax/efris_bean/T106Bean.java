@@ -70,12 +70,11 @@ public class T106Bean implements Serializable {
                         this.getInvoicesUploadedOnline(ReferenceNo, DeviceNo, SellerTIN);
                     }
                 }
-                
+
                 //save imported invoices
-                new EFRIS_invoice_detailBean().saveImportedEFRISInvoice();
+                //new EFRIS_invoice_detailBean().saveImportedEFRISInvoice();
             }
         } catch (Exception e) {
-            //System.out.println("updateCreditNote:" + e.getMessage());
             LOGGER.log(Level.ERROR, e);
         }
     }
@@ -155,14 +154,12 @@ public class T106Bean implements Serializable {
         String startDate = "";
         try {
             List<EFRIS_invoice_detail> aEFRIS_invoice_detail = new EFRIS_invoice_detailBean().getEFRIS_invoice_detail_All();
-            if (aEFRIS_invoice_detail.size() > 0){
-                //do nothing
+            if (aEFRIS_invoice_detail.size() > 0) {
+                //get last add date
                 int size = aEFRIS_invoice_detail.size();
                 Date lastAddDate = aEFRIS_invoice_detail.get(size - 1).getAdd_date();
-                System.out.println("lastAddDate: " + lastAddDate);
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
                 startDate = sdf.format(lastAddDate);
-                System.out.println("startDate: " + startDate);
             }
             String json = "{\n"
                     + " \"oriInvoiceNo\": \"\",\n"
@@ -177,7 +174,7 @@ public class T106Bean implements Serializable {
                     + " \"invoiceKind\": \"1\",\n"
                     + " \"isInvalid\": \"\",\n"
                     + " \"isRefund\": \"\",\n"
-                    + " \"startDate\": \""+startDate+"\",\n"
+                    + " \"startDate\": \"" + startDate + "\",\n"
                     //+ " \"startDate\": \"\",\n"
                     + " \"endDate\": \"\",\n"
                     + " \"pageNo\": \"1\",\n"
@@ -207,8 +204,8 @@ public class T106Bean implements Serializable {
 
             JSONObject parentjsonObject = new JSONObject(output);
             JSONObject dataobject = parentjsonObject.getJSONObject("returnStateInfo");
-            System.out.println("returnCode: " + dataobject.getString("returnCode"));
-            System.out.println("returnMessage: " + dataobject.getString("returnMessage"));
+            //System.out.println("returnCode: " + dataobject.getString("returnCode"));
+            //System.out.println("returnMessage: " + dataobject.getString("returnMessage"));
 
             JSONObject dataobjectcontent = parentjsonObject.getJSONObject("data");
             String content = dataobjectcontent.getString("content");
@@ -230,27 +227,134 @@ public class T106Bean implements Serializable {
             }
             JSONObject parentbasicInformationjsonObject = new JSONObject(DecryptedContent);
             JSONArray jSONArray = parentbasicInformationjsonObject.getJSONArray("records");
-            //print invoices
-            //System.out.println("DecryptedContent:" + DecryptedContent);
-            System.out.println("Invoices:" + jSONArray);
-            System.out.println("Invoice Length:" + jSONArray.length());
-            //List<T106> itemslist = new ArrayList<>();
+            JSONObject page = parentbasicInformationjsonObject.getJSONObject("page");
+            int pageCount = page.getInt("pageCount");
+            int pageNo = page.getInt("pageNo");
+            int pageSize = page.getInt("pageSize");
+            int totalSize = page.getInt("totalSize");
+
+            if (pageCount > 1) {
+                //iterate the pages in reverse order
+                for (int i=pageCount; i>0; i--){
+                    this.getInvoiceUploadedOnlineByPage(aReferenceNo, aDeviceNo, aSellerTIN, i, pageSize, startDate);
+                }
+            } else if (pageCount == 1) {
+                //just get the that page
+                //print invoices
+                //System.out.println("DecryptedContent:" + DecryptedContent);
+                //System.out.println("Invoices:" + jSONArray);
+                //System.out.println("Invoice Length:" + jSONArray.length());
+                //List<T106> itemslist = new ArrayList<>();
+                for (int i = 0, size = jSONArray.length(); i < size; i++) {
+                    JSONObject objectInArray = jSONArray.getJSONObject(i);
+                    Gson g = new Gson();
+                    T106 t106 = g.fromJson(objectInArray.toString(), T106.class);
+                    String invoiceDetail = this.getTaxInvoiceDecryptedContentOnline(t106.getInvoiceNo(), aDeviceNo, aSellerTIN);
+                    //get goodsDetails
+                    List<GoodsDetails> goodsDetails = this.getInvoiceGoodsDetail(invoiceDetail);
+
+                    //save invoice Details
+                    //int savedInvoice = 0;
+                    int savedInvoice = new EFRIS_invoice_detailBean().insertEFRIS_invoice_detail(t106);
+                    if (savedInvoice == 1) {
+                    //save goodsDetails
+                        int saved = new EFRIS_good_detailBean().saveEFRIS_good_detail(goodsDetails, t106.getInvoiceNo(), t106.getReferenceNo());
+                    }
+                    //itemslist.add(t106);
+                }
+            } else {
+                //do nothing when pageCount is 0
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.INFO, output);
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void getInvoiceUploadedOnlineByPage(String aReferenceNo, String aDeviceNo, String aSellerTIN, int pageNo, int pageSize, String startDate) {
+        String DecryptedContent = "";
+        String output = "";
+        //String startDate = "";
+        try {
+            String json = "{\n"
+                    + " \"oriInvoiceNo\": \"\",\n"
+                    + " \"invoiceNo\": \"\",\n"
+                    + " \"deviceNo\": \"\",\n"
+                    + " \"buyerTin\": \"\",\n"
+                    + " \"buyerNinBrn\": \"\",\n"
+                    + " \"buyerLegalName\": \"\",\n"
+                    + " \"combineKeywords\": \"\",\n"
+                    + " \"invoiceType\": \"\",\n"
+                    //+ " \"invoiceType\": \"1\",\n"
+                    + " \"invoiceKind\": \"1\",\n"
+                    + " \"isInvalid\": \"\",\n"
+                    + " \"isRefund\": \"\",\n"
+                    + " \"startDate\": \"" + startDate + "\",\n"
+                    //+ " \"startDate\": \"\",\n"
+                    + " \"endDate\": \"\",\n"
+                    + " \"pageNo\": \"" + pageNo + "\",\n"
+                    + " \"pageSize\": \"" + pageSize + "\",\n"
+                    + " \"referenceNo\": \"" + aReferenceNo + "\",\n"
+                    //+ " \"branchName\": \"10\"\n"
+                    + "}";
+            com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
+            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_URL_ONLINE").getParameter_value());
+            /**
+             * Read Private Key
+             */
+            PrivateKey key = new SecurityPKI().getPrivate(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_FILE").getParameter_value(), Security.Decrypt(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_PASSWORD").getParameter_value()), new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_ALIAS").getParameter_value());
+            String AESpublickeystring = new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_AES_PUBLIC_KEY").getParameter_value();
+            /**
+             * Encrypt Content
+             */
+            String encryptedcontent = SecurityPKI.AESencrypt(json, Base64.decodeBase64(AESpublickeystring));
+            String signedcontent = Base64.encodeBase64String(new SecurityPKI().sign(encryptedcontent, key));
+            /**
+             * Post Data
+             */
+            String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", aDeviceNo, "T106", aSellerTIN);
+            ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
+            output = response.getEntity(String.class);
+
+            JSONObject parentjsonObject = new JSONObject(output);
+            JSONObject dataobject = parentjsonObject.getJSONObject("returnStateInfo");
+
+            JSONObject dataobjectcontent = parentjsonObject.getJSONObject("data");
+            String content = dataobjectcontent.getString("content");
+            /**
+             * Decrypt Response
+             */
+            JSONObject dataDescription = dataobjectcontent.getJSONObject("dataDescription");
+            String zipCode = "0";
+            try {
+                zipCode = dataDescription.getString("zipCode");
+            } catch (Exception e) {
+                //do nothing
+            }
+            if (zipCode.equals("0")) {
+                DecryptedContent = SecurityPKI.AESdecrypt(content, Base64.decodeBase64(AESpublickeystring));
+            } else {
+                byte[] str = GzipUtils.decompress(Base64.decodeBase64(content));
+                DecryptedContent = SecurityPKI.AESdecrypt2(str, Base64.decodeBase64(AESpublickeystring));
+            }
+            JSONObject parentbasicInformationjsonObject = new JSONObject(DecryptedContent);
+            JSONArray jSONArray = parentbasicInformationjsonObject.getJSONArray("records");
+            JSONObject page = parentbasicInformationjsonObject.getJSONObject("page");
+            
             for (int i = 0, size = jSONArray.length(); i < size; i++) {
                 JSONObject objectInArray = jSONArray.getJSONObject(i);
                 Gson g = new Gson();
                 T106 t106 = g.fromJson(objectInArray.toString(), T106.class);
                 String invoiceDetail = this.getTaxInvoiceDecryptedContentOnline(t106.getInvoiceNo(), aDeviceNo, aSellerTIN);
-                //System.out.println("Invoice Detail" + invoiceDetail);
                 //get goodsDetails
                 List<GoodsDetails> goodsDetails = this.getInvoiceGoodsDetail(invoiceDetail);
-                
+
                 //save invoice Details
                 int savedInvoice = new EFRIS_invoice_detailBean().insertEFRIS_invoice_detail(t106);
                 if (savedInvoice == 1) {
                     //save goodsDetails
                     int saved = new EFRIS_good_detailBean().saveEFRIS_good_detail(goodsDetails, t106.getInvoiceNo(), t106.getReferenceNo());
                 }
-                //itemslist.add(t106);
             }
         } catch (Exception e) {
             LOGGER.log(Level.INFO, output);
@@ -308,7 +412,6 @@ public class T106Bean implements Serializable {
                 DecryptedContent = SecurityPKI.AESdecrypt2(str, Base64.decodeBase64(AESpublickeystring));
             }
         } catch (Exception e) {
-            //System.out.println("getTaxInvoiceDetailOffline:" + e.getMessage());
             LOGGER.log(Level.INFO, output);
             LOGGER.log(Level.ERROR, e);
         }
@@ -326,11 +429,9 @@ public class T106Bean implements Serializable {
             String qCode = summary.getString("qrCode");
 
             JSONArray goodsDetailsjSONArray = parentbasicInformationjsonObject.getJSONArray("goodsDetails");
-            //System.out.println("Goods Detail: " + goodsDetailsjSONArray);
 
             for (int i = 0, size = goodsDetailsjSONArray.length(); i < size; i++) {
                 JSONObject objectInArray = goodsDetailsjSONArray.getJSONObject(i);
-                //System.out.println("One Good detail: " + objectInArray);
                 Gson g = new Gson();
                 GoodsDetails gd = g.fromJson(objectInArray.toString(), GoodsDetails.class);
                 goodsDetails.add(gd);

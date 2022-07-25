@@ -52,10 +52,10 @@ public class EFRIS_good_detailBean implements Serializable {
                     status = "Item code at position " + (i + 1) + " not in item_tax_map";
                     break;
                 } else if (new ItemBean().findItem(aItem_tax_map.getItem_id()) == null) {
-                    status = "Item at position " + (i + 1) + "does not exist";
+                    status = "Item at position " + (i + 1) + " does not exist";
                     break;
                 } else if (new ItemBean().getItemCurrentStockStatus(aItem_tax_map.getItem_id()).getQty_total() < itemQty) {
-                    status = "Item at position " + (i + 1) + "Has less Stock";
+                    status = "Item at position " + (i + 1) + " Has less Stock";
                     break;
                 } else {
                     status = "success";
