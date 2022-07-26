@@ -1186,6 +1186,10 @@ public class NavigationBean implements Serializable {
         return "ReportSalesInvoiceDetail?faces-redirect=true";
     }
 
+    public String redirectToReportEFDLogs() {
+        return "ReportEFDLogs?faces-redirect=true";
+    }
+
     public String redirectToReportSalesCrDrNoteDetail() {
         return "ReportSalesCrDrNoteDetail?faces-redirect=true";
     }
