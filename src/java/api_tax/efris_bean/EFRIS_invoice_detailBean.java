@@ -10,8 +10,10 @@ import api_tax.efris.EFRIS_invoice_detail;
 import api_tax.efris.innerclasses.T106;
 import beans.AccChildAccountBean;
 import beans.AccCurrencyBean;
+import beans.MenuItemBean;
 import beans.Parameter_listBean;
 import beans.StoreBean;
+import beans.TransBean;
 import beans.TransExtBean;
 import beans.TransactorBean;
 import beans.UserDetailBean;
@@ -28,13 +30,18 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import utilities.UtilityBean;
@@ -49,6 +56,14 @@ public class EFRIS_invoice_detailBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = Logger.getLogger(EFRIS_invoice_detailBean.class.getName());
+
+    private List<EFRIS_invoice_detail> EFRIS_invoice_detailList;
+    private Date fromDate;
+    private Date toDate;
+    private int storeId;
+    //@ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
+    private String ActionMessage = null;
 
     public void saveImportedEFRISInvoice() {
         try {
@@ -606,6 +621,199 @@ public class EFRIS_invoice_detailBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
         return list;
+    }
+
+    public void reportSalesInvoiceDetail() {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
+        String msg = "";
+        this.setActionMessage("");
+        try {
+            if (fromDate != null && toDate != null) {
+                //okay no problem
+            } else {
+                msg = "Select Date Range";
+            }
+        } catch (Exception e) {
+            //do nothing
+        }
+        ResultSet rs;
+        this.EFRIS_invoice_detailList = new ArrayList<>();
+        if (msg.length() > 0) {
+            this.setActionMessage(ub.translateWordsInText(BaseName, msg));
+            FacesContext.getCurrentInstance().addMessage("Report", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+        } else {
+            String sql = "SELECT * FROM efris_invoice_detail WHERE efris_invoice_detail_id > 0";
+            String wheresql = "";
+            String ordersql;
+            if (this.getStoreId() > 0) {
+                //wheresql = wheresql + " AND store_id=" + this.getStoreId();
+            }
+            if (this.getFromDate() != null && this.getToDate() != null) {
+                wheresql = wheresql + " AND add_date BETWEEN '" + new java.sql.Timestamp(this.getFromDate().getTime()) + "' AND '" + new java.sql.Timestamp(this.getToDate().getTime()) + "'";
+            }
+            ordersql = " ORDER BY add_date DESC,efris_invoice_detail_id DESC";
+            sql = sql + wheresql + ordersql;
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                rs = ps.executeQuery();
+                //EFRIS_invoice_detail aEFRIS_invoice_detail = null;
+                while (rs.next()) {
+                    EFRIS_invoice_detail aEFRIS_invoice_detail = new EFRIS_invoice_detail();
+                    this.setEFRIS_invoice_detailFromResultset(aEFRIS_invoice_detail, rs);
+                    this.EFRIS_invoice_detailList.add(aEFRIS_invoice_detail);
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
+            }
+        }
+    }
+
+    public void initResetEFDLogsDetail() {
+        if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
+            // Skip ajax requests.
+        } else {
+            this.resetEFDLogsDetail();
+        }
+    }
+
+    public void resetEFDLogsDetail() {
+        this.setActionMessage("");
+        try {
+            //this.clearTrans(aTrans);
+        } catch (NullPointerException npe) {
+        }
+        try {
+            this.setFromDate(null);
+            this.setToDate(null);
+            this.setStoreId(0);
+            this.EFRIS_invoice_detailList.clear();
+        } catch (NullPointerException npe) {
+        }
+    }
+
+    public void setDateToToday() {
+        Date CurrentServerDate = new CompanySetting().getCURRENT_SERVER_DATE();
+        this.setFromDate(CurrentServerDate);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(this.getFromDate());
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        // Put it back in the Date object  
+        this.setFromDate(cal.getTime());
+
+        this.setToDate(CurrentServerDate);
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTime(this.getToDate());
+        cal2.set(Calendar.HOUR_OF_DAY, 23);
+        cal2.set(Calendar.MINUTE, 59);
+        cal2.set(Calendar.SECOND, 0);
+        cal2.set(Calendar.MILLISECOND, 0);
+        // Put it back in the Date object  
+        this.setToDate(cal2.getTime());
+    }
+
+    public void setDateToYesterday() {
+        Date CurrentServerDate = new CompanySetting().getCURRENT_SERVER_DATE();
+
+        this.setFromDate(CurrentServerDate);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(this.getFromDate());
+        cal.add(Calendar.DATE, -1);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        // Put it back in the Date object  
+        this.setFromDate(cal.getTime());
+
+        this.setToDate(CurrentServerDate);
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTime(this.getToDate());
+        cal2.add(Calendar.DATE, -1);
+        cal2.set(Calendar.HOUR_OF_DAY, 23);
+        cal2.set(Calendar.MINUTE, 59);
+        cal2.set(Calendar.SECOND, 0);
+        cal2.set(Calendar.MILLISECOND, 0);
+        // Put it back in the Date object  
+        this.setToDate(cal2.getTime());
+    }
+
+    /**
+     * @return the EFRIS_invoice_detailList
+     */
+    public List<EFRIS_invoice_detail> getEFRIS_invoice_detailList() {
+        return EFRIS_invoice_detailList;
+    }
+
+    /**
+     * @param EFRIS_invoice_detailList the EFRIS_invoice_detailList to set
+     */
+    public void setEFRIS_invoice_detailList(List<EFRIS_invoice_detail> EFRIS_invoice_detailList) {
+        this.EFRIS_invoice_detailList = EFRIS_invoice_detailList;
+    }
+
+    /**
+     * @return the fromDate
+     */
+    public Date getFromDate() {
+        return fromDate;
+    }
+
+    /**
+     * @param fromDate the fromDate to set
+     */
+    public void setFromDate(Date fromDate) {
+        this.fromDate = fromDate;
+    }
+
+    /**
+     * @return the toDate
+     */
+    public Date getToDate() {
+        return toDate;
+    }
+
+    /**
+     * @param toDate the toDate to set
+     */
+    public void setToDate(Date toDate) {
+        this.toDate = toDate;
+    }
+
+    /**
+     * @return the storeId
+     */
+    public int getStoreId() {
+        return storeId;
+    }
+
+    /**
+     * @param storeId the storeId to set
+     */
+    public void setStoreId(int storeId) {
+        this.storeId = storeId;
+    }
+
+    /**
+     * @return the ActionMessage
+     */
+    public String getActionMessage() {
+        return ActionMessage;
+    }
+
+    /**
+     * @param ActionMessage the ActionMessage to set
+     */
+    public void setActionMessage(String ActionMessage) {
+        this.ActionMessage = ActionMessage;
     }
 
 }
