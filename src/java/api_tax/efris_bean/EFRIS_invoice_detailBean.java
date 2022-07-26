@@ -317,6 +317,15 @@ public class EFRIS_invoice_detailBean implements Serializable {
                 LOGGER.log(Level.ERROR, e);
             }
             try {
+                if (null == aEFRIS_invoice_detail.getReferenceNo()) {
+                    aTrans.setTransactionNumber("");
+                } else {
+                    aTrans.setTransactionNumber(aEFRIS_invoice_detail.getReferenceNo());
+                }
+            } catch (Exception e) {
+                aTrans.setTransactionNumber("");
+            }
+            try {
                 Transactor aTransactor;
                 if (aEFRIS_invoice_detail.getBuyerTin().length() > 0) {
                     aTransactor = new TransactorBean().getTransactorBy_tax_identity(aEFRIS_invoice_detail.getBuyerTin());
@@ -451,7 +460,11 @@ public class EFRIS_invoice_detailBean implements Serializable {
             ps.setString(19, aEFRIS_invoice_detail.getDeviceNo());
             //uploadingTime, referenceNo, operator, userName, process_flag, add_date, process_date, process_desc
             ps.setString(20, aEFRIS_invoice_detail.getUploadingTime());
-            ps.setString(21, aEFRIS_invoice_detail.getReferenceNo());
+            if (aEFRIS_invoice_detail.getReferenceNo().isEmpty()) {
+                ps.setString(21, aEFRIS_invoice_detail.getInvoiceNo());
+            } else {
+                ps.setString(21, aEFRIS_invoice_detail.getReferenceNo());
+            }
             ps.setString(22, aEFRIS_invoice_detail.getOperator());
             ps.setString(23, aEFRIS_invoice_detail.getUserName());
             ps.setInt(24, 0);
