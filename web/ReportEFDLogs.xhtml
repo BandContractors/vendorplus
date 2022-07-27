@@ -88,15 +88,15 @@
                     </h:commandLink>
                 </f:facet>
                 <p:column headerText="#{langsys['View']}" exportable="false" visible="false">
-                    <p:commandButton id="cmdbView" icon="ui-icon-search" oncomplete="PF('dlgSalesInvoice').show();" actionListener="#{transBean.initSalesInvoiceSession(itm.invoiceNo,'View')}" update=":formTransaction"/>
+                    <p:commandButton id="cmdbView" icon="ui-icon-search" oncomplete="PF('dlgEFDLogs').show();" actionListener="#{eFRIS_invoice_detailBean.initEFDLogSession(itm.EFRIS_invoice_detail_id)}" update=":formTransaction"/>
                 </p:column>
                 <p:column headerText="#{langsys['Edit']}" exportable="false" visible="false">
-                    <p:commandButton id="cmdbEdit" icon="ui-icon-pencil" oncomplete="PF('dlgSalesInvoice').show();" actionListener="#{transBean.initSalesInvoiceSession(itm.invoiceNo,'Edit')}" update=":formTransaction"/>
+                    <p:commandButton id="cmdbEdit" icon="ui-icon-pencil" oncomplete="PF('dlgEFDLogs').show();" actionListener="#{eFRIS_invoice_detailBean.initEFDLogSession(itm.EFRIS_invoice_detail_id)}" update=":formTransaction"/>
                 </p:column>
                 <p:column headerText="#{langsys['Action']}" exportable="false" visible="true">
                     <p:splitButton value="#{langsys['Select']}" icon="ui-icon-pencil">
-                        <p:menuitem value="#{langsys['View']}" icon="ui-icon-search" oncomplete="PF('dlgSalesInvoice').show();" actionListener="#{transBean.initSalesInvoiceSession(itm.invoiceNo,'View')}" update=":formTransaction"/>
-                        <p:menuitem value="#{langsys['Edit']}" icon="ui-icon-pencil" oncomplete="PF('dlgSalesInvoice').show();" actionListener="#{transBean.initSalesInvoiceSession(itm.invoiceNo,'Edit')}" update=":formTransaction"/>
+                        <p:menuitem value="#{langsys['View']}" icon="ui-icon-search" oncomplete="PF('dlgEFDLogs').show();" actionListener="#{eFRIS_invoice_detailBean.initEFDLogSession(itm.EFRIS_invoice_detail_id)}" update=":formTransaction"/>
+                        <p:menuitem value="#{langsys['Resync']}" icon="ui-icon-pencil" oncomplete="PF('dlgEFDLogs').show();" actionListener="#{eFRIS_invoice_detailBean.initEFDLogSession(itm.EFRIS_invoice_detail_id)}" update=":formTransaction"/>
                     </p:splitButton>
                 </p:column>
                 <p:column headerText="#{langsys['Invoice']} #{langsys['No']}">
@@ -135,7 +135,7 @@
                 </p:column>
             </p:dataTable>
         </h:form>
-        <ui:include src="ViewSaleInvoiceTrans.xhtml"/>
+        <ui:include src="ViewEFDLogsTrans.xhtml"/>
     </h:body>
 
 </html>

@@ -10,11 +10,16 @@ import api_tax.efris.EFRIS_invoice_detail;
 import api_tax.efris.innerclasses.T106;
 import beans.AccChildAccountBean;
 import beans.AccCurrencyBean;
+import beans.CreditDebitNoteBean;
 import beans.MenuItemBean;
+import beans.OutputDetailBean;
 import beans.Parameter_listBean;
+import beans.PayBean;
+import beans.ReportBean;
 import beans.StoreBean;
 import beans.TransBean;
 import beans.TransExtBean;
+import beans.TransItemBean;
 import beans.TransactorBean;
 import beans.UserDetailBean;
 import connections.DBConnection;
@@ -42,6 +47,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import utilities.UtilityBean;
@@ -58,6 +65,8 @@ public class EFRIS_invoice_detailBean implements Serializable {
     static Logger LOGGER = Logger.getLogger(EFRIS_invoice_detailBean.class.getName());
 
     private List<EFRIS_invoice_detail> EFRIS_invoice_detailList;
+    private EFRIS_invoice_detail EFRIS_invoice_detailObj;
+    private List<EFRIS_good_detail> EFRIS_good_detailList;
     private Date fromDate;
     private Date toDate;
     private int storeId;
@@ -697,6 +706,49 @@ public class EFRIS_invoice_detailBean implements Serializable {
         }
     }
 
+    public void initEFDLogSession(long aEFRIS_invoice_detail_id) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
+        String msg = "";
+        this.setActionMessage("");
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
+        this.EFRIS_invoice_detailObj = new EFRIS_invoice_detailBean().getEFRIS_invoice_detail(aEFRIS_invoice_detail_id);
+        List<Trans> aList = new ArrayList<>();
+//        if (this.TransObj.getTransactionTypeId() == 2) {
+//            aList = new CreditDebitNoteBean().getTrans_cr_dr_notes(this.TransObj.getTransactionNumber(), 0);
+//        }
+//        if (aAction.equals("Edit") && !aList.isEmpty()) {
+//            this.ActionType = "None";
+//            msg = "Transaction Has Credit or Debit Note";
+//            this.setActionMessage(ub.translateWordsInText(BaseName, msg));
+//        } else {
+            //first set current selection in session
+//            FacesContext context = FacesContext.getCurrentInstance();
+//            HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+//            HttpSession httpSession = request.getSession(true);
+//            httpSession.setAttribute("CURRENT_TRANSACTION_ID", aTransId);
+//            httpSession.setAttribute("CURRENT_TRANSACTION_ACTION", aAction);
+//            httpSession.setAttribute("CURRENT_PAY_ID", 0);
+//            this.ActionType = aAction;
+            //this.TransObj = new TransBean().getTrans(aTransId);
+//            this.updateLookup(this.TransObj);
+            this.EFRIS_good_detailList = new EFRIS_good_detailBean().getEFRIS_invoice_detailByInvoiceNo(this.EFRIS_invoice_detailObj.getInvoiceNo());
+            try {
+//                this.PayObj = new PayBean().getTransactionFirstPayByTransNo(TransObj.getTransactionNumber());//first payment
+//                httpSession.setAttribute("CURRENT_PAY_ID", this.PayObj.getPayId());
+            } catch (NullPointerException npe) {
+//                this.PayObj = null;
+            }
+            //refresh output
+            new OutputDetailBean().refreshOutput("PARENT", "");
+            //refresh history
+//            this.TransListHist = new ReportBean().getTransHistory(aTransId);
+//        }
+    }
+
     public void setDateToToday() {
         Date CurrentServerDate = new CompanySetting().getCURRENT_SERVER_DATE();
         this.setFromDate(CurrentServerDate);
@@ -814,6 +866,34 @@ public class EFRIS_invoice_detailBean implements Serializable {
      */
     public void setActionMessage(String ActionMessage) {
         this.ActionMessage = ActionMessage;
+    }
+
+    /**
+     * @return the EFRIS_invoice_detailObj
+     */
+    public EFRIS_invoice_detail getEFRIS_invoice_detailObj() {
+        return EFRIS_invoice_detailObj;
+    }
+
+    /**
+     * @param EFRIS_invoice_detailObj the EFRIS_invoice_detailObj to set
+     */
+    public void setEFRIS_invoice_detailObj(EFRIS_invoice_detail EFRIS_invoice_detailObj) {
+        this.EFRIS_invoice_detailObj = EFRIS_invoice_detailObj;
+    }
+
+    /**
+     * @return the EFRIS_good_detailList
+     */
+    public List<EFRIS_good_detail> getEFRIS_good_detailList() {
+        return EFRIS_good_detailList;
+    }
+
+    /**
+     * @param EFRIS_good_detailList the EFRIS_good_detailList to set
+     */
+    public void setEFRIS_good_detailList(List<EFRIS_good_detail> EFRIS_good_detailList) {
+        this.EFRIS_good_detailList = EFRIS_good_detailList;
     }
 
 }
