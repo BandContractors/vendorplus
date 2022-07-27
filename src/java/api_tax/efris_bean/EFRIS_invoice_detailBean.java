@@ -484,7 +484,9 @@ public class EFRIS_invoice_detailBean implements Serializable {
             ps.setString(19, aEFRIS_invoice_detail.getDeviceNo());
             //uploadingTime, referenceNo, operator, userName, process_flag, add_date, process_date, process_desc
             ps.setString(20, aEFRIS_invoice_detail.getUploadingTime());
-            if (aEFRIS_invoice_detail.getReferenceNo().isEmpty()) {
+            if (aEFRIS_invoice_detail.getReferenceNo() == null) {
+                ps.setString(21, aEFRIS_invoice_detail.getInvoiceNo());
+            } else if (aEFRIS_invoice_detail.getReferenceNo().isEmpty()) {
                 ps.setString(21, aEFRIS_invoice_detail.getInvoiceNo());
             } else {
                 ps.setString(21, aEFRIS_invoice_detail.getReferenceNo());
@@ -540,7 +542,9 @@ public class EFRIS_invoice_detailBean implements Serializable {
             ps.setString(19, aT106.getDeviceNo());
             //uploadingTime, referenceNo, operator, userName, process_flag, add_date, process_date, process_desc
             ps.setString(20, aT106.getUploadingTime());
-            if (aT106.getReferenceNo().isEmpty()) {
+            if (aT106.getReferenceNo() == null) {
+                ps.setString(21, aT106.getInvoiceNo());
+            } else if (aT106.getReferenceNo().isEmpty()) {
                 ps.setString(21, aT106.getInvoiceNo());
             } else {
                 ps.setString(21, aT106.getReferenceNo());

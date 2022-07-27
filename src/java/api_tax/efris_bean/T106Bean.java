@@ -72,7 +72,7 @@ public class T106Bean implements Serializable {
                 }
 
                 //save imported invoices
-                //new EFRIS_invoice_detailBean().saveImportedEFRISInvoice();
+                new EFRIS_invoice_detailBean().saveImportedEFRISInvoice();
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -154,13 +154,32 @@ public class T106Bean implements Serializable {
         String startDate = "";
         try {
             List<EFRIS_invoice_detail> aEFRIS_invoice_detail = new EFRIS_invoice_detailBean().getEFRIS_invoice_detail_All();
+            String ParameterListSartDate = new Parameter_listBean().getParameter_listByContextName("API", "API_EFRIS_SYNC_JOB_FROM_DATE").getParameter_value();
+            //heck if the table is empty
             if (aEFRIS_invoice_detail.size() > 0) {
                 //get last add date
                 int size = aEFRIS_invoice_detail.size();
                 Date lastAddDate = aEFRIS_invoice_detail.get(size - 1).getAdd_date();
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
                 startDate = sdf.format(lastAddDate);
+            } else if (ParameterListSartDate.length() > 0) {
+                try {
+                    Date date;
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+                    date = sdf.parse(ParameterListSartDate);
+                    startDate = ParameterListSartDate;
+                } catch (Exception e) {
+                    LOGGER.log(Level.ERROR, e);
+                    Date date = new CompanySetting().getCURRENT_SERVER_DATE();
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+                    startDate = sdf.format(date);
+                }
+            } else {
+                Date date = new CompanySetting().getCURRENT_SERVER_DATE();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+                startDate = sdf.format(date);
             }
+            System.out.println("StartDate: " + startDate);
             String json = "{\n"
                     + " \"oriInvoiceNo\": \"\",\n"
                     + " \"invoiceNo\": \"\",\n"
@@ -235,7 +254,7 @@ public class T106Bean implements Serializable {
 
             if (pageCount > 1) {
                 //iterate the pages in reverse order
-                for (int i=pageCount; i>0; i--){
+                for (int i = pageCount; i > 0; i--) {
                     this.getInvoiceUploadedOnlineByPage(aReferenceNo, aDeviceNo, aSellerTIN, i, pageSize, startDate);
                 }
             } else if (pageCount == 1) {
@@ -257,7 +276,7 @@ public class T106Bean implements Serializable {
                     //int savedInvoice = 0;
                     int savedInvoice = new EFRIS_invoice_detailBean().insertEFRIS_invoice_detail(t106);
                     if (savedInvoice == 1) {
-                    //save goodsDetails
+                        //save goodsDetails
                         int saved = new EFRIS_good_detailBean().saveEFRIS_good_detail(goodsDetails, t106.getInvoiceNo(), t106.getReferenceNo());
                     }
                     //itemslist.add(t106);
@@ -339,8 +358,9 @@ public class T106Bean implements Serializable {
             }
             JSONObject parentbasicInformationjsonObject = new JSONObject(DecryptedContent);
             JSONArray jSONArray = parentbasicInformationjsonObject.getJSONArray("records");
+            //System.out.println("Invoices:" + jSONArray);
             JSONObject page = parentbasicInformationjsonObject.getJSONObject("page");
-            
+
             for (int i = 0, size = jSONArray.length(); i < size; i++) {
                 JSONObject objectInArray = jSONArray.getJSONObject(i);
                 Gson g = new Gson();

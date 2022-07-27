@@ -127,7 +127,7 @@ public class TaskManager {
         public void run() {
             try {
                 new T106Bean().synchInvoices();
-                new EFRIS_invoice_detailBean().saveImportedEFRISInvoice();
+                //new EFRIS_invoice_detailBean().saveImportedEFRISInvoice();
             } catch (Exception e) {
             }
         }
