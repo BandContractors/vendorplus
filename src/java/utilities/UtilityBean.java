@@ -232,6 +232,26 @@ public class UtilityBean implements Serializable {
         return aStr;
     }
 
+    public int convertStringAsInt(String aStr) {
+        int aInt;
+        try {
+            aInt = Integer.parseInt(aStr);
+        } catch (Exception e) {
+            aInt = 0;
+        }
+        return aInt;
+    }
+
+    public double convertStringAsDouble(String aStr) {
+        double aDouble;
+        try {
+            aDouble = Double.parseDouble(aStr);
+        } catch (Exception e) {
+            aDouble = 0;
+        }
+        return aDouble;
+    }
+
     public Date convertDateUserToDbTz(Date aFromDate) {
         Date ToDate = null;
         String sql = "{call sp_convert_timezone(?,?,?,?)}";

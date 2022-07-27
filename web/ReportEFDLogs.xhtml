@@ -69,6 +69,11 @@
                          paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
                          rowsPerPageTemplate="50,100,200,400"
                          rowStyleClass="#{itm.process_flag eq 1 ? 'green' : itm.process_flag eq 2 ? 'red' : 'amber'}">
+                <f:facet name="header">
+                    #{eFRIS_invoice_detailBean.EFRIS_invoice_detailList.size()} #{langsys['Records']} #{langsys['Found']}
+                    <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
+                    <p:columnToggler datasource="tblDetail" trigger="toggler" />
+                </f:facet>
                 <f:facet name="{Exporters}">
                     <h:commandLink>
                         <p:graphicImage name="images/excel.png" width="24"/>
@@ -87,22 +92,16 @@
                         <p:dataExporter type="xml" target="tblDetail" fileName="EFD_Logs_Detail" />
                     </h:commandLink>
                 </f:facet>
-                <p:column headerText="#{langsys['View']}" exportable="false" visible="false">
-                    <p:commandButton id="cmdbView" icon="ui-icon-search" oncomplete="PF('dlgEFDLogs').show();" actionListener="#{eFRIS_invoice_detailBean.initEFDLogSession(itm.EFRIS_invoice_detail_id)}" update=":formTransaction"/>
-                </p:column>
-                <p:column headerText="#{langsys['Edit']}" exportable="false" visible="false">
-                    <p:commandButton id="cmdbEdit" icon="ui-icon-pencil" oncomplete="PF('dlgEFDLogs').show();" actionListener="#{eFRIS_invoice_detailBean.initEFDLogSession(itm.EFRIS_invoice_detail_id)}" update=":formTransaction"/>
-                </p:column>
                 <p:column headerText="#{langsys['Action']}" exportable="false" visible="true">
                     <p:splitButton value="#{langsys['Select']}" icon="ui-icon-pencil">
                         <p:menuitem value="#{langsys['View']}" icon="ui-icon-search" oncomplete="PF('dlgEFDLogs').show();" actionListener="#{eFRIS_invoice_detailBean.initEFDLogSession(itm.EFRIS_invoice_detail_id)}" update=":formTransaction"/>
-                        <p:menuitem value="#{langsys['Resync']}" icon="ui-icon-pencil" oncomplete="PF('dlgEFDLogs').show();" actionListener="#{eFRIS_invoice_detailBean.initEFDLogSession(itm.EFRIS_invoice_detail_id)}" update=":formTransaction"/>
+                        <!--<p:menuitem value="" icon="ui-icon-pencil" oncomplete="PF('dlgEFDLogs').show();" actionListener="" update=":formTransaction"/>-->
                     </p:splitButton>
                 </p:column>
                 <p:column headerText="#{langsys['Invoice']} #{langsys['No']}">
                     <h:outputLabel value="#{itm.invoiceNo}"/>
                 </p:column>
-                <p:column headerText="#{langsys[transactionTypeBean.getTransactionType(2).transactionDateLabel]}">
+                <p:column headerText="#{langsys[transactionTypeBean.getTransactionType(2).transactionDateLabel]}" visible="false">
                     <h:outputText value="#{itm.issuedDate}"/>
                 </p:column>
                 <p:column headerText="#{langsys['Add']} #{langsys['Date']}">
@@ -115,19 +114,19 @@
                     <h:outputText value="#{itm.currency}"/>
                 </p:column>
                 <p:column headerText="VAT" style="text-align: right;">
-                    <h:outputText value="#{itm.taxAmount}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    <h:outputText value="#{utilityBean.convertStringAsDouble(itm.taxAmount)}">
+                        <f:convertNumber pattern="###,###.#" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Total']} #{langsys['Paid']}">
-                    <h:outputText value="#{itm.grossAmount}" style="width: 60px;color: #ffffff !important;text-align: right !important;">
+                    <h:outputText value="#{utilityBean.convertStringAsDouble(itm.grossAmount)}" style="width: 60px;color: #ffffff !important;text-align: right !important;">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Added']} #{langsys['By']}" visible="false">
                     <h:outputText value="#{itm.operator}"/>
                 </p:column>
-                <p:column headerText="#{langsys['Validation']} #{langsys['Message']}" visible="false">
+                <p:column headerText="#{langsys['Validation']} #{langsys['Message']}">
                     <h:outputText value="#{itm.process_desc}"/>
                 </p:column>
                 <p:column headerText="#{langsys['Validation']} #{langsys['Date']}" visible="false">

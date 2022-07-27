@@ -383,8 +383,6 @@
                         <p:separator />
                         <p:menuitem value="#{langsys['User']} #{langsys['Earn']} #{langsys['Report']}" action="#{navigationBean.redirectToReportSalesUserEarnDetail()}" />
                         <p:separator />
-                        <p:menuitem value="#{langsys['EFD']} #{langsys['Logs']} #{langsys['Report']}" action="#{navigationBean.redirectToReportEFDLogs()}" />
-                        <p:separator />
                     </p:submenu>
                     <p:separator />
                     <p:submenu label="#{langsys['Purchase']} #{langsys['and']} #{langsys['Expense']}">  
@@ -512,6 +510,8 @@
                         <p:menuitem value="#{langsys['TaxBody']} #{langsys['Stock']}" action="#{navigationBean.redirectToReportStockTaxAPI()}" />
                         <p:separator />
                         <p:menuitem value="SMbi #{langsys['Interface']}" action="#{navigationBean.redirectToReportSMbiAPI()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['EFD']} #{langsys['Logs']} #{langsys['Report']}" action="#{navigationBean.redirectToReportEFDLogs()}" />
                         <p:separator />
                     </p:submenu>
                     <p:separator />
