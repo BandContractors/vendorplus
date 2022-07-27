@@ -540,7 +540,12 @@ public class EFRIS_invoice_detailBean implements Serializable {
             ps.setString(19, aT106.getDeviceNo());
             //uploadingTime, referenceNo, operator, userName, process_flag, add_date, process_date, process_desc
             ps.setString(20, aT106.getUploadingTime());
-            ps.setString(21, aT106.getReferenceNo());
+            if (aT106.getReferenceNo().isEmpty()) {
+                ps.setString(21, aT106.getInvoiceNo());
+            } else {
+                ps.setString(21, aT106.getReferenceNo());
+            }
+            //ps.setString(21, aT106.getReferenceNo());
             ps.setString(22, aT106.getOperator());
             ps.setString(23, aT106.getUserName());
             ps.setInt(24, 0);
