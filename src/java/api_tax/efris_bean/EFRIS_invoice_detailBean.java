@@ -637,6 +637,17 @@ public class EFRIS_invoice_detailBean implements Serializable {
         return list;
     }
 
+    public void reSynchEFDLogsDetail(long aEFRIS_invoice_detail_id) {
+        try {
+            //resynch
+            this.updateEFRIS_invoice_detailValidation(aEFRIS_invoice_detail_id, 0, "ReSynced");
+            //update the datable
+            this.reportSalesInvoiceDetail();            
+        } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public void reportSalesInvoiceDetail() {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";

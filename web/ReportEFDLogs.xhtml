@@ -94,8 +94,9 @@
                 </f:facet>
                 <p:column headerText="#{langsys['Action']}" exportable="false" visible="true">
                     <p:splitButton value="#{langsys['Select']}" icon="ui-icon-pencil">
-                        <p:menuitem value="#{langsys['View']}" icon="ui-icon-search" oncomplete="PF('dlgEFDLogs').show();" actionListener="#{eFRIS_invoice_detailBean.initEFDLogSession(itm.EFRIS_invoice_detail_id)}" update=":formTransaction"/>
-                        <!--<p:menuitem value="" icon="ui-icon-pencil" oncomplete="PF('dlgEFDLogs').show();" actionListener="" update=":formTransaction"/>-->
+                        <p:menuitem value="#{langsys['View']} #{langsys['Items']}" icon="ui-icon-search" oncomplete="PF('dlgEFDLogs').show();" actionListener="#{eFRIS_invoice_detailBean.initEFDLogSession(itm.EFRIS_invoice_detail_id)}" update=":formTransaction"/>
+                        <p:menuitem value="#{langsys['ReSync']}" icon="ui-icon-pencil" actionListener="#{eFRIS_invoice_detailBean.reSynchEFDLogsDetail(itm.EFRIS_invoice_detail_id)}" process="formReport:pnlgFilter tblDetail" update="formReport:pnlgMessage tblDetail" rendered="#{itm.process_flag eq 2}">
+                        </p:menuitem>
                     </p:splitButton>
                 </p:column>
                 <p:column headerText="#{langsys['Invoice']} #{langsys['No']}">
