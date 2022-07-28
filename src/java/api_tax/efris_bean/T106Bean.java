@@ -165,6 +165,7 @@ public class T106Bean implements Serializable {
             } else if (ParameterListSartDate.length() > 0) {
                 try {
                     Date date;
+                    //parse the string to date to check its validity else an exception will be thrown
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
                     date = sdf.parse(ParameterListSartDate);
                     startDate = ParameterListSartDate;
@@ -179,7 +180,7 @@ public class T106Bean implements Serializable {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
                 startDate = sdf.format(date);
             }
-            System.out.println("StartDate: " + startDate);
+            //System.out.println("StartDate: " + startDate);
             String json = "{\n"
                     + " \"oriInvoiceNo\": \"\",\n"
                     + " \"invoiceNo\": \"\",\n"
@@ -268,18 +269,22 @@ public class T106Bean implements Serializable {
                     JSONObject objectInArray = jSONArray.getJSONObject(i);
                     Gson g = new Gson();
                     T106 t106 = g.fromJson(objectInArray.toString(), T106.class);
-                    String invoiceDetail = this.getTaxInvoiceDecryptedContentOnline(t106.getInvoiceNo(), aDeviceNo, aSellerTIN);
-                    //get goodsDetails
-                    List<GoodsDetails> goodsDetails = this.getInvoiceGoodsDetail(invoiceDetail);
+                    //101:EFD, 102:Windows Client APP, 103:WebService API, 104:Mis, 105:Webportal, 106:Offline Mode Enabler
+                    //get 101:EFD and 105:Webportal
+                    if (t106.getDataSource().equals("101") || t106.getDataSource().equals("105")) {
+                        String invoiceDetail = this.getTaxInvoiceDecryptedContentOnline(t106.getInvoiceNo(), aDeviceNo, aSellerTIN);
+                        //get goodsDetails
+                        List<GoodsDetails> goodsDetails = this.getInvoiceGoodsDetail(invoiceDetail);
 
-                    //save invoice Details
-                    //int savedInvoice = 0;
-                    int savedInvoice = new EFRIS_invoice_detailBean().insertEFRIS_invoice_detail(t106);
-                    if (savedInvoice == 1) {
-                        //save goodsDetails
-                        int saved = new EFRIS_good_detailBean().saveEFRIS_good_detail(goodsDetails, t106.getInvoiceNo(), t106.getReferenceNo());
+                        //save invoice Details
+                        //int savedInvoice = 0;
+                        int savedInvoice = new EFRIS_invoice_detailBean().insertEFRIS_invoice_detail(t106);
+                        if (savedInvoice == 1) {
+                            //save goodsDetails
+                            int saved = new EFRIS_good_detailBean().saveEFRIS_good_detail(goodsDetails, t106.getInvoiceNo(), t106.getReferenceNo());
+                        }
+                        //itemslist.add(t106);
                     }
-                    //itemslist.add(t106);
                 }
             } else {
                 //do nothing when pageCount is 0
@@ -365,15 +370,19 @@ public class T106Bean implements Serializable {
                 JSONObject objectInArray = jSONArray.getJSONObject(i);
                 Gson g = new Gson();
                 T106 t106 = g.fromJson(objectInArray.toString(), T106.class);
-                String invoiceDetail = this.getTaxInvoiceDecryptedContentOnline(t106.getInvoiceNo(), aDeviceNo, aSellerTIN);
-                //get goodsDetails
-                List<GoodsDetails> goodsDetails = this.getInvoiceGoodsDetail(invoiceDetail);
+                //101:EFD, 102:Windows Client APP, 103:WebService API, 104:Mis, 105:Webportal, 106:Offline Mode Enabler
+                //get 101:EFD and 105:Webportal
+                if (t106.getDataSource().equals("101") || t106.getDataSource().equals("105")) {
+                    String invoiceDetail = this.getTaxInvoiceDecryptedContentOnline(t106.getInvoiceNo(), aDeviceNo, aSellerTIN);
+                    //get goodsDetails
+                    List<GoodsDetails> goodsDetails = this.getInvoiceGoodsDetail(invoiceDetail);
 
-                //save invoice Details
-                int savedInvoice = new EFRIS_invoice_detailBean().insertEFRIS_invoice_detail(t106);
-                if (savedInvoice == 1) {
-                    //save goodsDetails
-                    int saved = new EFRIS_good_detailBean().saveEFRIS_good_detail(goodsDetails, t106.getInvoiceNo(), t106.getReferenceNo());
+                    //save invoice Details
+                    int savedInvoice = new EFRIS_invoice_detailBean().insertEFRIS_invoice_detail(t106);
+                    if (savedInvoice == 1) {
+                        //save goodsDetails
+                        int saved = new EFRIS_good_detailBean().saveEFRIS_good_detail(goodsDetails, t106.getInvoiceNo(), t106.getReferenceNo());
+                    }
                 }
             }
         } catch (Exception e) {
