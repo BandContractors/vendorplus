@@ -1416,6 +1416,19 @@ BEGIN
 END//
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS sp_search_transactor_by_transactor_ref;
+DELIMITER //
+CREATE PROCEDURE sp_search_transactor_by_transactor_ref
+(
+	IN in_transactor_ref varchar(20) 
+) 
+BEGIN 
+	SELECT * FROM transactor t 
+	WHERE t.transactor_ref = in_transactor_ref
+	ORDER BY t.transactor_ref ASC LIMIT 10; 
+END//
+DELIMITER ;
+
 DROP PROCEDURE IF EXISTS sp_search_transactor_active_by_name;
 DELIMITER //
 CREATE PROCEDURE sp_search_transactor_active_by_name

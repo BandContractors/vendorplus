@@ -350,12 +350,21 @@ public class EFRIS_invoice_detailBean implements Serializable {
                 aTrans.setTransactionNumber("");
             }
             try {
-                Transactor aTransactor;
+                Transactor aTransactor = null;
+                //get transactor using taxIdentity TIN
                 if (aEFRIS_invoice_detail.getBuyerTin().length() > 0) {
                     aTransactor = new TransactorBean().getTransactorBy_tax_identity(aEFRIS_invoice_detail.getBuyerTin());
-                    aTrans.setTransactorId(aTransactor.getTransactorId());
-                } else if (aEFRIS_invoice_detail.getBuyerLegalName().length() > 0) {
+                }
+                //get transactor using legalname or transactorNames
+                if (aEFRIS_invoice_detail.getBuyerLegalName().length() > 0 && aTransactor == null) {
                     aTransactor = new TransactorBean().getTransactorBy_transactor_names(aEFRIS_invoice_detail.getBuyerLegalName());
+                }
+                //et default customer
+                if (new Parameter_listBean().getParameter_listByContextName("GENERAL", "WALK_IN_CUSTOMER_DEFAULT_REFNO").getParameter_value().length() > 0 && aTransactor == null) {
+                    String refNo = new Parameter_listBean().getParameter_listByContextName("GENERAL", "WALK_IN_CUSTOMER_DEFAULT_REFNO").getParameter_value();
+                    aTransactor = new TransactorBean().getTransactorBy_transactor_ref(refNo);
+                }
+                if (aTransactor != null) {
                     aTrans.setTransactorId(aTransactor.getTransactorId());
                 } else {
                     aTrans.setTransactorId(0);
@@ -646,9 +655,9 @@ public class EFRIS_invoice_detailBean implements Serializable {
             //resynch
             this.updateEFRIS_invoice_detailValidation(aEFRIS_invoice_detail_id, 0, "ReSynced");
             //update the datable
-            this.reportSalesInvoiceDetail();            
+            this.reportSalesInvoiceDetail();
         } catch (Exception e) {
-                LOGGER.log(Level.ERROR, e);
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -745,7 +754,7 @@ public class EFRIS_invoice_detailBean implements Serializable {
 //            msg = "Transaction Has Credit or Debit Note";
 //            this.setActionMessage(ub.translateWordsInText(BaseName, msg));
 //        } else {
-            //first set current selection in session
+        //first set current selection in session
 //            FacesContext context = FacesContext.getCurrentInstance();
 //            HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
 //            HttpSession httpSession = request.getSession(true);
@@ -753,18 +762,18 @@ public class EFRIS_invoice_detailBean implements Serializable {
 //            httpSession.setAttribute("CURRENT_TRANSACTION_ACTION", aAction);
 //            httpSession.setAttribute("CURRENT_PAY_ID", 0);
 //            this.ActionType = aAction;
-            //this.TransObj = new TransBean().getTrans(aTransId);
+        //this.TransObj = new TransBean().getTrans(aTransId);
 //            this.updateLookup(this.TransObj);
-            this.EFRIS_good_detailList = new EFRIS_good_detailBean().getEFRIS_invoice_detailByInvoiceNo(this.EFRIS_invoice_detailObj.getInvoiceNo());
-            try {
+        this.EFRIS_good_detailList = new EFRIS_good_detailBean().getEFRIS_invoice_detailByInvoiceNo(this.EFRIS_invoice_detailObj.getInvoiceNo());
+        try {
 //                this.PayObj = new PayBean().getTransactionFirstPayByTransNo(TransObj.getTransactionNumber());//first payment
 //                httpSession.setAttribute("CURRENT_PAY_ID", this.PayObj.getPayId());
-            } catch (NullPointerException npe) {
+        } catch (NullPointerException npe) {
 //                this.PayObj = null;
-            }
-            //refresh output
-            new OutputDetailBean().refreshOutput("PARENT", "");
-            //refresh history
+        }
+        //refresh output
+        new OutputDetailBean().refreshOutput("PARENT", "");
+        //refresh history
 //            this.TransListHist = new ReportBean().getTransHistory(aTransId);
 //        }
     }
