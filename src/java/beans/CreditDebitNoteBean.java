@@ -9,7 +9,6 @@ import entities.Trans;
 import entities.TransItem;
 import entities.TransactionReason;
 import entities.TransactionType;
-import entities.Transaction_approval;
 import entities.Transactor;
 import entities.UserDetail;
 import java.io.Serializable;

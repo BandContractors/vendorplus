@@ -23,6 +23,7 @@ import com.sun.jersey.api.client.WebResource;
 import entities.Api_tax_error_log;
 import entities.CompanySetting;
 import entities.Item;
+import entities.Item_unit_other;
 import entities.Stock;
 import entities.Transactor;
 import java.io.Serializable;
@@ -814,12 +815,12 @@ public class StockManage implements Serializable {
         return ReturnMsg;
     }
 
-    public void registerItemCallThread(long aItemId, String aItemIdTax, String aItemCodeTax) {
+    public void registerItemCallThread(long aItemId, String aItemIdTax, String aItemCodeTax, String aOperationType) {
         try {
             Runnable task = new Runnable() {
                 @Override
                 public void run() {
-                    registerItemCall(aItemId, aItemIdTax, aItemCodeTax);
+                    registerItemCall(aItemId, aItemIdTax, aItemCodeTax, aOperationType);
                 }
             };
             Executor e = Executors.newSingleThreadExecutor();
@@ -829,7 +830,7 @@ public class StockManage implements Serializable {
         }
     }
 
-    public void registerItemCall(long aItemId, String aItemIdTax, String aItemCodeTax) {
+    public void registerItemCall(long aItemId, String aItemIdTax, String aItemCodeTax, String aOperationType) {
         try {
             Item item = new ItemBean().getItem(aItemId);
             if (null != item) {
@@ -864,9 +865,9 @@ public class StockManage implements Serializable {
                 String recordSynced = "";
                 String APIMode = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_MODE").getParameter_value();
                 if (APIMode.equals("OFFLINE")) {
-                    recordSynced = this.registerItemOffline(item, aItemIdTax);
+                    recordSynced = this.registerItemOffline(item, aItemIdTax, aOperationType);
                 } else {
-                    recordSynced = this.registerItemOnline(item, aItemIdTax);
+                    recordSynced = this.registerItemOnline(item, aItemIdTax, aOperationType);
                 }
                 if (recordSynced.equals("SUCCESS")) {
                     //update local db that synced yes
@@ -890,7 +891,7 @@ public class StockManage implements Serializable {
         }
     }
 
-    public String registerItemOffline(Item aItem, String aItemIdTax) {
+    public String registerItemOffline(Item aItem, String aItemIdTax, String aOperationType) {
         String ReturnMsg = "";
         String output = "";
         try {
@@ -902,6 +903,7 @@ public class StockManage implements Serializable {
             }
             String json = "[\n"
                     + "	{\n"
+                    + "	\"operationType\": \"" + aOperationType + "\",\n"
                     + "	\"goodsName\": \"" + aItem.getDescription() + "\",\n"
                     + "	\"goodsCode\": \"" + aItemIdTax + "\",\n"
                     + "	\"measureUnit\": \"" + aItem.getUnit_symbol_tax() + "\",\n"
@@ -911,12 +913,8 @@ public class StockManage implements Serializable {
                     + "	\"haveExciseTax\": \"102\",\n"
                     + "	\"description\": \"1\",\n"
                     + "	\"stockPrewarning\": \"" + aItem.getReorderLevel() + "\",\n"
-                    + "	\"pieceMeasureUnit\": \"\",\n"
-                    + "	\"havePieceUnit\": \"102\",\n"
-                    + "	\"pieceUnitPrice\": \"\",\n"
-                    + "	\"packageScaledValue\": \"\",\n"
-                    + "	\"pieceScaledValue\": \"\",\n"
-                    + "	\"exciseDutyCode\": \"\"\n"
+                    + "	\"exciseDutyCode\": \"\",\n"
+                    + this.getGoodsOtherUnits(aItem.getItemId())
                     + "},\n"
                     + "]";
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
@@ -950,7 +948,7 @@ public class StockManage implements Serializable {
         return ReturnMsg;
     }
 
-    public String registerItemOnline(Item aItem, String aItemIdTax) {
+    public String registerItemOnline(Item aItem, String aItemIdTax, String aOperationType) {
         String ReturnMsg = "";
         String output = "";
         try {
@@ -962,6 +960,7 @@ public class StockManage implements Serializable {
             }
             String json = "[\n"
                     + "	{\n"
+                    + "	\"operationType\": \"" + aOperationType + "\",\n"
                     + "	\"goodsName\": \"" + aItem.getDescription() + "\",\n"
                     + "	\"goodsCode\": \"" + aItemIdTax + "\",\n"
                     + "	\"measureUnit\": \"" + aItem.getUnit_symbol_tax() + "\",\n"
@@ -971,14 +970,11 @@ public class StockManage implements Serializable {
                     + "	\"haveExciseTax\": \"102\",\n"
                     + "	\"description\": \"1\",\n"
                     + "	\"stockPrewarning\": \"" + aItem.getReorderLevel() + "\",\n"
-                    + "	\"pieceMeasureUnit\": \"\",\n"
-                    + "	\"havePieceUnit\": \"102\",\n"
-                    + "	\"pieceUnitPrice\": \"\",\n"
-                    + "	\"packageScaledValue\": \"\",\n"
-                    + "	\"pieceScaledValue\": \"\",\n"
-                    + "	\"exciseDutyCode\": \"\"\n"
+                    + "	\"exciseDutyCode\": \"\",\n"
+                    + this.getGoodsOtherUnits(aItem.getItemId())
                     + "},\n"
                     + "]";
+            //System.out.println("JSN:" + json);
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
             WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_ONLINE").getParameter_value());
             /**
@@ -1024,6 +1020,62 @@ public class StockManage implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
         return ReturnMsg;
+    }
+
+    public String getGoodsOtherUnits(long aItemId) {
+        String gous = "";
+        try {
+            List<Item_unit_other> iuList = new ArrayList<>();
+            iuList = new ItemBean().getItem_unit_otherList(aItemId, 1);
+            String OtherUnit1Str = "";
+            String OtherUnit2MoreStr = "";
+            if (iuList.isEmpty()) {
+                OtherUnit1Str = ""
+                        + "\"pieceMeasureUnit\": \"\",\n"
+                        + "\"havePieceUnit\": \"102\",\n"
+                        + "\"haveOtherUnit\": \"102\",\n"
+                        + "\"pieceUnitPrice\": \"\",\n"
+                        + "\"packageScaledValue\": \"\",\n"
+                        + "\"pieceScaledValue\": \"\"\n";
+            } else if (iuList.size() >= 1) {
+                int n = iuList.size();
+                String hasotherunit = "102";
+                if (n > 1) {
+                    hasotherunit = "101";
+                }
+                for (int i = 0; i < n; i++) {
+                    if (i == 0) {
+                        OtherUnit1Str = ""
+                                + "\"pieceMeasureUnit\": \"" + new UnitBean().getUnit(iuList.get(i).getOther_unit_id()).getUnit_symbol_tax() + "\",\n"
+                                + "\"havePieceUnit\": \"101\",\n"
+                                + "\"haveOtherUnit\": \"" + hasotherunit + "\",\n"
+                                + "\"pieceUnitPrice\": \"" + iuList.get(i).getOther_unit_retailsale_price() + "\",\n"
+                                + "\"packageScaledValue\": \"" + iuList.get(i).getBase_qty() + "\",\n"
+                                + "\"pieceScaledValue\": \"" + iuList.get(i).getOther_qty() + "\"\n";
+                    } else {
+                        String linestr = "{\n"
+                                + "\"otherUnit\": \"" + new UnitBean().getUnit(iuList.get(i).getOther_unit_id()).getUnit_symbol_tax() + "\",\n"
+                                + "\"otherPrice\": \"" + iuList.get(i).getOther_unit_retailsale_price() + "\",\n"
+                                + "\"otherScaled\": \"" + iuList.get(i).getOther_qty() + "\",\n"
+                                + "\"packageScaled\": \"" + iuList.get(i).getBase_qty() + "\"\n"
+                                + "}";
+                        if (OtherUnit2MoreStr.length() == 0) {
+                            OtherUnit2MoreStr = linestr;
+                        } else {
+                            OtherUnit2MoreStr = OtherUnit2MoreStr + "," + linestr;
+                        }
+                    }
+                }
+            }
+            if (OtherUnit2MoreStr.length() > 0) {
+                gous = OtherUnit1Str + ",\"goodsOtherUnits\": [" + OtherUnit2MoreStr + ",]";
+            } else {
+                gous = OtherUnit1Str;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return gous;
     }
 
 }

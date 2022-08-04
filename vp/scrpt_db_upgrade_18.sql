@@ -1,5 +1,5 @@
 create table item_unit_other (
-                        item_unit_other bigint(20) primary key auto_increment,
+                        item_unit_other_id bigint(20) primary key auto_increment,
                         item_id bigint(20),
                         base_qty double,
                         other_unit_id int,

@@ -209,12 +209,16 @@ public class Item_tax_mapBean implements Serializable {
                         itmap4save.setIs_synced(0);
                         int x = this.saveItem_tax_map(itmap4save);
                         if (x == 1 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {//register to URA
-                            new StockManage().registerItemCall(ItemId, itmap4save.getItem_id_tax(), aItemCodeTax);
+                            new StockManage().registerItemCall(ItemId, itmap4save.getItem_id_tax(), aItemCodeTax, "101");
                         }
                     } else {//update
                         if (itmap.getItem_code_tax().equals(aItemCodeTax) && itmap.getIs_synced() == 1) {
-                            //nothing has changed
+                            //code has not changed, update any changes
+                            if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
+                                new StockManage().registerItemCall(ItemId, itmap.getItem_id_tax(), aItemCodeTax, "102");
+                            }
                         } else {
+                            //Code has changed, push a new one
                             itmap4save.setItem_tax_map_id(itmap.getItem_tax_map_id());
                             itmap4save.setItem_id(ItemId);
                             if (aItemIdTaxUser.length() > 0) {
@@ -227,8 +231,8 @@ public class Item_tax_mapBean implements Serializable {
                             itmap4save.setItem_code_tax(aItemCodeTax);
                             itmap4save.setIs_synced(0);
                             int x = this.saveItem_tax_map(itmap4save);
-                            if (x == 1 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {//register to URA
-                                new StockManage().registerItemCall(ItemId, itmap4save.getItem_id_tax(), aItemCodeTax);
+                            if (x == 1 && new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
+                                new StockManage().registerItemCall(ItemId, itmap4save.getItem_id_tax(), aItemCodeTax, "101");
                             }
                         }
                     }

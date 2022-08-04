@@ -29,6 +29,7 @@
     <f:event listener="#{itemBean.initItemObj()}" type="preRenderView" />
     <f:event listener="#{itemBean.initItem_tax_mapObj()}" type="preRenderView" />
     <f:event listener="#{itemBean.initItem_code_otherObj()}" type="preRenderView" />
+    <f:event listener="#{itemBean.initItem_unit_otherObj()}" type="preRenderView" />
     <f:event listener="#{itemBean.initItem_store_reorderObj()}" type="preRenderView" />
     <f:event listener="#{itemBean.initItemTaxObj()}" type="preRenderView" />
     <f:event listener="#{itemBean.refreshInventoryType(itemBean.itemObj,generalUserSetting.currentItemPurpose)}" type="preRenderView" />
@@ -45,7 +46,7 @@
                     <h:panelGrid styleClass="clsGridMainInput" columns="4">
                         <h:outputLabel value="#{langsys['Description']}:"/>
                         <h:inputText id="itxtDescription" value="#{itemBean.itemObj.description}" autocomplete="off" style="width: 233px"/>
-                        <h:outputLabel value="#{langsys['Unit']}:"/>
+                        <p:commandLink value="#{langsys['Unit']}:" action="#{itemBean.displayItemOtherUnits()}" oncomplete="PF('sbarItemUnit').show()" update="formMain:pnlgItemUnit1 formMain:pnlgItemUnit2" style="color: blue;text-decoration: none;"/>
                         <h:selectOneMenu id="menuUnit" value="#{itemBean.itemObj.unitId}" style="width: 240px">
                             <f:selectItem itemLabel="" itemValue="0"/>
                             <f:selectItems value="#{unitBean.units}" var="u" itemLabel="#{u.unitName}" itemValue="#{u.unitId}"/>
@@ -471,6 +472,83 @@
                         </p:column>
                     </p:dataTable>
                     <p:growl id="growlIC"/>
+                </h:panelGrid>
+            </p:sidebar>
+            <p:sidebar widgetVar="sbarItemUnit" position="bottom" baseZIndex="10000" style="height: 600px;">
+                <h:panelGrid id="pnlgItemUnit1" columns="1">
+                    <h:outputLabel value="#{langsys['Multiple']} #{langsys['Units']} #{langsys['for']} : #{itemBean.item_unit_otherObj.description}" style="font-weight: bold;"/>
+                </h:panelGrid>
+                <h:panelGrid id="pnlgItemUnit2" columns="1" style="text-align: center;border-style: solid;border-color: #CDCDCD;">
+                    <h:panelGrid columns="9">
+                        <h:outputLabel value="#{langsys['Base']} #{langsys['Unit']} #{langsys['Qty']}"/>
+                        <h:outputLabel value="#{langsys['Base']} #{langsys['Unit']}"/>
+                        <h:outputLabel value="#{langsys['Other']} #{langsys['Unit']} #{langsys['Qty']}"/>
+                        <h:outputLabel value="#{langsys['Other']} #{langsys['Unit']}"/>
+                        <h:outputLabel value="#{langsys['Retail']} #{langsys['Price']}"/>
+                        <h:outputLabel value="#{langsys['Wholesale']} #{langsys['Price']}"/>
+                        <h:outputLabel value="#{langsys['Default']} #{langsys['for']} #{langsys['Purchase']}"/>
+                        <h:outputLabel value="#{langsys['Default']} #{langsys['for']} #{langsys['Sale']}"/>
+                        <h:outputLabel value=""/>
+
+                        <h:inputText value="#{itemBean.item_unit_otherObj.base_qty}" autocomplete="off" style="width: 120px;height: 24px;"/>
+                        <h:inputText value="#{itemBean.item_unit_otherObj.base_unit_symbol}" disabled="true" style="width: 100px;height: 24px;"/>
+                        <h:inputText value="#{itemBean.item_unit_otherObj.other_qty}" autocomplete="off" style="width: 120px;height: 24px;"/>
+                        <h:selectOneMenu value="#{itemBean.item_unit_otherObj.other_unit_id}" style="width: 100px;height: 30px;">
+                            <f:selectItem itemLabel="" itemValue="0"/>
+                            <f:selectItems value="#{unitBean.units}" var="u" itemLabel="#{u.unitSymbol}" itemValue="#{u.unitId}"/>
+                        </h:selectOneMenu>
+                        <h:inputText value="#{itemBean.item_unit_otherObj.other_unit_retailsale_price}" autocomplete="off" style="width: 120px;height: 24px;"/>
+                        <h:inputText value="#{itemBean.item_unit_otherObj.other_unit_wholesale_price}" autocomplete="off" style="width: 120px;height: 24px;"/>
+                        <h:selectOneMenu value="#{itemBean.item_unit_otherObj.other_default_purchase}" style="width: 170px;height: 30px;">
+                            <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
+                            <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
+                        </h:selectOneMenu>
+                        <h:selectOneMenu value="#{itemBean.item_unit_otherObj.other_default_sale}" style="width: 170px;height: 30px;">
+                            <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
+                            <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
+                        </h:selectOneMenu>
+                        <p:commandButton value="Add" icon="ui-icon-plus" actionListener="#{itemBean.addItem_unit_other(itemBean.item_unit_otherObj)}" update="formMain:pnlgItemUnit2 formMain:tblItemUnit formMain:growlIU"/>
+                    </h:panelGrid>
+                    <p:dataTable id="tblItemUnit" rowIndexVar="rowIndex" tableStyle="width:auto;" var="iu" value="#{itemBean.item_unit_otherList}" 
+                                 rowStyleClass="#{iu.is_active eq 1 ? 'white' : 'red'}">
+                        <p:column headerText="#{langsys['Base']} #{langsys['Unit']} #{langsys['Qty']}" style="text-align: left;">
+                            <h:outputText value="#{iu.base_qty}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{langsys['Base']} #{langsys['Unit']}">
+                            <h:outputText value="#{iu.base_unit_symbol} "/>
+                        </p:column>
+                        <p:column headerText="#{langsys['Other']} #{langsys['Unit']} #{langsys['Qty']}" style="text-align: left;">
+                            <h:outputText value="#{iu.other_qty}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{langsys['Other']} #{langsys['Unit']}">
+                            <h:outputText value="#{iu.other_unit_symbol} "/>
+                        </p:column>
+                        <p:column headerText="#{langsys['Retail']} #{langsys['Price']}" style="text-align: left;">
+                            <h:outputText value="#{iu.other_unit_retailsale_price}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{langsys['Wholesale']} #{langsys['Price']}" style="text-align: left;">
+                            <h:outputText value="#{iu.other_unit_wholesale_price}">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{langsys['Default']} #{langsys['for']} #{langsys['Purchase']}">
+                            <h:outputText value="#{iu.other_default_purchase eq 1 ? 'Yes':'No'}"/>
+                        </p:column>
+                        <p:column headerText="#{langsys['Default']} #{langsys['for']} #{langsys['Sale']}">
+                            <h:outputText value="#{iu.other_default_sale eq 1 ? 'Yes':'No'} "/>
+                        </p:column>
+                        <p:column headerText="">
+                            <p:commandButton id="cmdbRemoveItemUnit" value="-" actionListener="#{itemBean.deleteItem_unit_otherCall(iu)}" update="formMain:tblItemUnit formMain:growlIU">
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                    <p:growl id="growlIU"/>
                 </h:panelGrid>
             </p:sidebar>
             <p:sidebar widgetVar="sbarItemReorder" position="bottom" baseZIndex="10000" style="height: 600px;">
