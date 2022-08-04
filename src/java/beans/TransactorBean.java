@@ -1316,6 +1316,25 @@ public class TransactorBean implements Serializable {
         }
     }
 
+    public Transactor getTransactorBy_transactor_ref(String transactor_ref) {
+        String sql = "{call sp_search_transactor_by_transactor_ref(?)}";
+        ResultSet rs;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setString(1, transactor_ref);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                return this.getTransactorFromResultSet(rs);
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+            return null;
+        }
+    }
+
     public void clearList() {
         try {
             this.TransactorList.clear();
