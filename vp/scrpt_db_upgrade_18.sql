@@ -32,3 +32,10 @@ select ti.transaction_id,i.unit_id from trans_production ti inner join item i on
 
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_18',33,Now(),'6.0','');
+
+ALTER TABLE efris_invoice_detail 
+ADD COLUMN verification_code VARCHAR(50) NOT NULL DEFAULT '' AFTER process_desc,
+ADD COLUMN qr_code VARCHAR(1000) NOT NULL DEFAULT '' AFTER verification_code;
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
+VALUES('scrpt_db_upgrade_18',39,Now(),'6.0','');
+

@@ -13,6 +13,7 @@ import entities.Trans;
 import entities.TransItem;
 import entities.TransactionReason;
 import entities.TransactionType;
+import entities.Transaction_tax_map;
 import entities.Transactor;
 import entities.UserDetail;
 import entities.UserItemEarn;
@@ -49,7 +50,7 @@ public class TransExtBean implements Serializable {
     static Logger LOGGER = Logger.getLogger(TransExtBean.class.getName());
     private boolean ShowDetail;
 
-    public void saveSalesInvoiceImported(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {
+    public void saveSalesInvoiceImported(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa, Transaction_tax_map aTransaction_tax_map) {
         UtilityBean ub = new UtilityBean();
         int InsertedTransItems = 0;
         //CheckValueBfr = this.checkTrans(0, trans, aActiveTransItems);
@@ -80,11 +81,13 @@ public class TransExtBean implements Serializable {
                         new TransBean().saveTransOthersThread(trans.getTransactionId(), trans.getPayMethod());
                     }
                     //Update TAX Map
-                    String InvoiceNo = "";
-                    String VerificationCode = "";
-                    String QrCode = "";
-                    if (InvoiceNo.length() > 0) {
-                        new Transaction_tax_mapBean().saveTransaction_tax_map(trans.getTransactionId(), InvoiceNo, VerificationCode, QrCode);
+                    if (null != aTransaction_tax_map) {
+                        String InvoiceNo = aTransaction_tax_map.getTransaction_number_tax();
+                        String VerificationCode = aTransaction_tax_map.getVerification_code_tax();
+                        String QrCode = aTransaction_tax_map.getQr_code_tax();
+                        if (InvoiceNo.length() > 0) {
+                            new Transaction_tax_mapBean().saveTransaction_tax_map(trans.getTransactionId(), InvoiceNo, VerificationCode, QrCode);
+                        }
                     }
                     //SMbi API Transactions
                     if (new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_SMBI_URL").getParameter_value().length() > 0) {

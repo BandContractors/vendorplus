@@ -29,6 +29,7 @@ import entities.CompanySetting;
 import entities.Store;
 import entities.Trans;
 import entities.TransItem;
+import entities.Transaction_tax_map;
 import entities.Transactor;
 import entities.UserDetail;
 import java.io.Serializable;
@@ -101,7 +102,8 @@ public class EFRIS_invoice_detailBean implements Serializable {
                     //save in SM db
                     int store_id = this.getStoreByDeviceNo(invoice.getDeviceNo()).getStoreId();
                     //storeId=1 Busula, aTransTypeId=2 SALE INVOICE, aTransReasonId=2 RETAIL SALE INVOICE, aSaleType=RETAIL SALE INVOICE
-                    new TransExtBean().saveSalesInvoiceImported("PARENT", store_id, 2, 2, "RETAIL SALE INVOICE", trans, transItemList, null, null, null, null, null, null);
+                    Transaction_tax_map TransTaxMap = new Transaction_tax_map();
+                    new TransExtBean().saveSalesInvoiceImported("PARENT", store_id, 2, 2, "RETAIL SALE INVOICE", trans, transItemList, null, null, null, null, null, null, TransTaxMap);
                 }
             }
         } catch (Exception e) {
@@ -131,9 +133,10 @@ public class EFRIS_invoice_detailBean implements Serializable {
                 status = "Device Store Mapping Not Configured";
             } else if (store == null) {
                 status = "Device Number not mapped to any store";
-            } else if (!new StoreBean().getStoresByUser(aUserDetail.getUserDetailId()).contains(store) && aUserDetail.getIsUserGenAdmin().equals("No")) {
-                status = "Operator/User has no access to the store mapped to the device number";
-            } else if (new AccChildAccountBean().getAccChildAccountsForCashReceipt(currency.getCurrencyCode(), payMethodId, store.getStoreId(), aUserDetail.getUserDetailId()).get(0) == null) {
+            } //else if (!new StoreBean().getStoresByUser(aUserDetail.getUserDetailId()).contains(store) && aUserDetail.getIsUserGenAdmin().equals("No")) {
+            //    status = "Operator/User has no access to the store mapped to the device number";
+            //} 
+            else if (new AccChildAccountBean().getAccChildAccountsForCashReceipt(currency.getCurrencyCode(), payMethodId, store.getStoreId(), aUserDetail.getUserDetailId()).get(0) == null) {
                 status = "Operator/User does not have a child account";
             } else if (!itemValidationMsg.equals("success")) {
                 status = itemValidationMsg;
@@ -354,17 +357,26 @@ public class EFRIS_invoice_detailBean implements Serializable {
             try {
                 Transactor aTransactor = null;
                 //get transactor using taxIdentity TIN
-                if (aEFRIS_invoice_detail.getBuyerTin().length() > 0) {
-                    aTransactor = new TransactorBean().getTransactorBy_tax_identity(aEFRIS_invoice_detail.getBuyerTin());
+                if (null != aEFRIS_invoice_detail.getBuyerTin()) {
+                    if (aEFRIS_invoice_detail.getBuyerTin().length() > 0) {
+                        aTransactor = new TransactorBean().getTransactorBy_tax_identity(aEFRIS_invoice_detail.getBuyerTin());
+                    }
                 }
                 //get transactor using legalname or transactorNames
-                if (aEFRIS_invoice_detail.getBuyerLegalName().length() > 0 && aTransactor == null) {
-                    aTransactor = new TransactorBean().getTransactorBy_transactor_names(aEFRIS_invoice_detail.getBuyerLegalName());
+                if (null != aEFRIS_invoice_detail.getBuyerLegalName()) {
+                    if (aEFRIS_invoice_detail.getBuyerLegalName().length() > 0 && aTransactor == null) {
+                        aTransactor = new TransactorBean().getTransactorBy_transactor_names(aEFRIS_invoice_detail.getBuyerLegalName());
+                    }
                 }
                 //et default customer
                 if (new Parameter_listBean().getParameter_listByContextName("GENERAL", "WALK_IN_CUSTOMER_DEFAULT_REFNO").getParameter_value().length() > 0 && aTransactor == null) {
                     String refNo = new Parameter_listBean().getParameter_listByContextName("GENERAL", "WALK_IN_CUSTOMER_DEFAULT_REFNO").getParameter_value();
                     aTransactor = new TransactorBean().getTransactorBy_transactor_ref(refNo);
+                    if (null != aEFRIS_invoice_detail.getBuyerLegalName()) {
+                        if (aEFRIS_invoice_detail.getBuyerLegalName().length() > 0) {
+                            aTrans.setTransactor_rep(aEFRIS_invoice_detail.getBuyerLegalName());
+                        }
+                    }
                 }
                 if (aTransactor != null) {
                     aTrans.setTransactorId(aTransactor.getTransactorId());
