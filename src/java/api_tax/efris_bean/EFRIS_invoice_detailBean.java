@@ -103,6 +103,9 @@ public class EFRIS_invoice_detailBean implements Serializable {
                     int store_id = this.getStoreByDeviceNo(invoice.getDeviceNo()).getStoreId();
                     //storeId=1 Busula, aTransTypeId=2 SALE INVOICE, aTransReasonId=2 RETAIL SALE INVOICE, aSaleType=RETAIL SALE INVOICE
                     Transaction_tax_map TransTaxMap = new Transaction_tax_map();
+                    TransTaxMap.setVerification_code_tax(invoice.getAntifakeCode());
+                    TransTaxMap.setQr_code_tax(invoice.getQrCode());
+                    TransTaxMap.setTransaction_number_tax(invoice.getInvoiceNo());
                     new TransExtBean().saveSalesInvoiceImported("PARENT", store_id, 2, 2, "RETAIL SALE INVOICE", trans, transItemList, null, null, null, null, null, null, TransTaxMap);
                 }
             }
@@ -324,6 +327,16 @@ public class EFRIS_invoice_detailBean implements Serializable {
                 aEFRIS_invoice_detail.setProcess_desc(aResultSet.getString("process_desc"));
             } catch (Exception e) {
                 aEFRIS_invoice_detail.setProcess_desc("");
+            }            
+            try {
+                aEFRIS_invoice_detail.setAntifakeCode(aResultSet.getString("verification_code"));
+            } catch (Exception e) {
+                aEFRIS_invoice_detail.setAntifakeCode("");
+            }            
+            try {
+                aEFRIS_invoice_detail.setQrCode(aResultSet.getString("qr_code"));
+            } catch (Exception e) {
+                aEFRIS_invoice_detail.setQrCode("");
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -468,6 +481,16 @@ public class EFRIS_invoice_detailBean implements Serializable {
             } catch (Exception e) {
                 aTrans.setAccChildAccountId(0);
             }
+            try {
+                aTrans.setVerification_code_tax(aEFRIS_invoice_detail.getAntifakeCode());
+            } catch (Exception e) {
+                aTrans.setVerification_code_tax("");
+            }
+            try {
+                aTrans.setQr_code_tax(aEFRIS_invoice_detail.getQrCode());
+            } catch (Exception e) {
+                aTrans.setQr_code_tax("");
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -478,9 +501,10 @@ public class EFRIS_invoice_detailBean implements Serializable {
         String sql = "INSERT INTO efris_invoice_detail"
                 + "(id, invoiceNo, oriInvoiceId, oriInvoiceNo, issuedDate, buyerTin, buyerLegalName, buyerNinBrn, currency, grossAmount,"
                 + "taxAmount, dataSource, isInvalid, isRefund, invoiceType, invoiceKind, invoiceIndustryCode, branchName, deviceNo,"
-                + "uploadingTime, referenceNo, operator, userName, process_flag, add_date, process_date, process_desc)"
+                + "uploadingTime, referenceNo, operator, userName, process_flag, add_date, process_date, process_desc,"
+                + "verification_code, qr_code)"
                 + "VALUES"
-                + "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+                + "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -520,6 +544,9 @@ public class EFRIS_invoice_detailBean implements Serializable {
             ps.setTimestamp(25, new java.sql.Timestamp(new CompanySetting().getCURRENT_SERVER_DATE().getTime()));
             ps.setString(26, null);
             ps.setString(27, "");
+            //verification_code, qr_code
+            ps.setString(28, aEFRIS_invoice_detail.getAntifakeCode());
+            ps.setString(29, aEFRIS_invoice_detail.getQrCode());
             ps.executeUpdate();
             saved = 1;
         } catch (Exception e) {
@@ -533,9 +560,10 @@ public class EFRIS_invoice_detailBean implements Serializable {
         String sql = "INSERT INTO efris_invoice_detail"
                 + "(id, invoiceNo, oriInvoiceId, oriInvoiceNo, issuedDate, buyerTin, buyerLegalName, buyerNinBrn, currency, grossAmount,"
                 + "taxAmount, dataSource, isInvalid, isRefund, invoiceType, invoiceKind, invoiceIndustryCode, branchName, deviceNo,"
-                + "uploadingTime, referenceNo, operator, userName, process_flag, add_date, process_date, process_desc)"
+                + "uploadingTime, referenceNo, operator, userName, process_flag, add_date, process_date, process_desc,"
+                + "verification_code, qr_code)"
                 + "VALUES"
-                + "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+                + "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -579,6 +607,9 @@ public class EFRIS_invoice_detailBean implements Serializable {
             ps.setTimestamp(25, new java.sql.Timestamp(new CompanySetting().getCURRENT_SERVER_DATE().getTime()));
             ps.setString(26, null);
             ps.setString(27, "");
+            //verification_code, qr_code
+            ps.setString(28, aT106.getAntifakeCode());
+            ps.setString(29, aT106.getQrCode());
             ps.executeUpdate();
             saved = 1;
         } catch (Exception e) {

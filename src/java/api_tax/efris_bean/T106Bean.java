@@ -44,15 +44,6 @@ public class T106Bean implements Serializable {
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = Logger.getLogger(T106Bean.class.getName());
 
-    public void init() {
-        //nothing yet
-    }
-
-    public void clear_all() {
-        //Nothing yet
-    }
-
-    //public void synchInvoices(String aReferenceNo, String aDeviceNo, String aSellerTIN) {
     public void synchInvoices() {
         //String uInvoiceNo = "";
         try {
@@ -182,6 +173,8 @@ public class T106Bean implements Serializable {
                     //get 101:EFD and 105:Webportal
                     if (t106.getDataSource().equals("101") || t106.getDataSource().equals("105")) {
                         String invoiceDetail = this.getTaxInvoiceDecryptedContentOnline(t106.getInvoiceNo(), aDeviceNo, aSellerTIN);
+                        //qrCode and antifakeCode
+                        this.setInvoiceQrAntifakeCodes(t106, invoiceDetail);
                         //get goodsDetails
                         List<GoodsDetails> goodsDetails = this.getInvoiceGoodsDetail(invoiceDetail);
 
@@ -327,6 +320,8 @@ public class T106Bean implements Serializable {
                     //get 101:EFD and 105:Webportal
                     if (t106.getDataSource().equals("101") || t106.getDataSource().equals("105")) {
                         String invoiceDetail = this.getTaxInvoiceDecryptedContentOnline(t106.getInvoiceNo(), aDeviceNo, aSellerTIN);
+                        //qrCode and antifakeCode
+                        this.setInvoiceQrAntifakeCodes(t106, invoiceDetail);
                         //get goodsDetails
                         List<GoodsDetails> goodsDetails = this.getInvoiceGoodsDetail(invoiceDetail);
 
@@ -428,6 +423,8 @@ public class T106Bean implements Serializable {
                 //get 101:EFD and 105:Webportal
                 if (t106.getDataSource().equals("101") || t106.getDataSource().equals("105")) {
                     String invoiceDetail = this.getTaxInvoiceDecryptedContentOnline(t106.getInvoiceNo(), aDeviceNo, aSellerTIN);
+                    //qrCode and antifakeCode
+                    this.setInvoiceQrAntifakeCodes(t106, invoiceDetail);
                     //get goodsDetails
                     List<GoodsDetails> goodsDetails = this.getInvoiceGoodsDetail(invoiceDetail);
 
@@ -506,10 +503,12 @@ public class T106Bean implements Serializable {
                 JSONObject objectInArray = jSONArray.getJSONObject(i);
                 Gson g = new Gson();
                 T106 t106 = g.fromJson(objectInArray.toString(), T106.class);
-                    //101:EFD, 102:Windows Client APP, 103:WebService API, 104:Mis, 105:Webportal, 106:Offline Mode Enabler
+                //101:EFD, 102:Windows Client APP, 103:WebService API, 104:Mis, 105:Webportal, 106:Offline Mode Enabler
                 //get 101:EFD and 105:Webportal
                 if (t106.getDataSource().equals("101") || t106.getDataSource().equals("105")) {
                     String invoiceDetail = this.getTaxInvoiceDecryptedContentOnline(t106.getInvoiceNo(), aDeviceNo, aSellerTIN);
+                    //qrCode and antifakeCode
+                    this.setInvoiceQrAntifakeCodes(t106, invoiceDetail);
                     //get goodsDetails
                     List<GoodsDetails> goodsDetails = this.getInvoiceGoodsDetail(invoiceDetail);
 
@@ -581,6 +580,23 @@ public class T106Bean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
         return DecryptedContent;
+    }
+
+    public void setInvoiceQrAntifakeCodes(T106 aT106, String DecryptedContent) {
+        try {
+            JSONObject parentbasicInformationjsonObject = new JSONObject(DecryptedContent);
+            JSONObject databasicInformation = parentbasicInformationjsonObject.getJSONObject("basicInformation");
+            String afCode = databasicInformation.getString("antifakeCode");
+            String invNo = databasicInformation.getString("invoiceNo");
+            JSONObject summary = parentbasicInformationjsonObject.getJSONObject("summary");
+            String qrCode = summary.getString("qrCode");
+
+            aT106.setAntifakeCode(afCode);
+            aT106.setQrCode(qrCode);
+
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
     }
 
     public List<GoodsDetails> getInvoiceGoodsDetail(String DecryptedContent) {

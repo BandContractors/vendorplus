@@ -37,8 +37,10 @@ public class T106 implements Serializable {
     private String referenceNo;
     private String operator;
     private String userName;
-    //private String invoiceNo;
-    //private String oriInvoiceNo;
+    
+    //qrCode, antifakeCode
+    private String antifakeCode;
+    private String qrCode;
     //private String grossAmount;
 
     /**
@@ -361,6 +363,34 @@ public class T106 implements Serializable {
      */
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    /**
+     * @return the antifakeCode
+     */
+    public String getAntifakeCode() {
+        return antifakeCode;
+    }
+
+    /**
+     * @param antifakeCode the antifakeCode to set
+     */
+    public void setAntifakeCode(String antifakeCode) {
+        this.antifakeCode = antifakeCode;
+    }
+
+    /**
+     * @return the qrCode
+     */
+    public String getQrCode() {
+        return qrCode;
+    }
+
+    /**
+     * @param qrCode the qrCode to set
+     */
+    public void setQrCode(String qrCode) {
+        this.qrCode = qrCode;
     }
     
 }

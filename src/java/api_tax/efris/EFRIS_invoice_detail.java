@@ -44,7 +44,11 @@ public class EFRIS_invoice_detail implements Serializable {
     private int process_flag;
     private Date add_date;
     private Date process_date;
-    private String process_desc;
+    private String process_desc;    
+    
+    //qrCode, antifakeCode
+    private String antifakeCode;
+    private String qrCode;
 
     /**
      * @return the id
@@ -436,6 +440,34 @@ public class EFRIS_invoice_detail implements Serializable {
      */
     public void setProcess_desc(String process_desc) {
         this.process_desc = process_desc;
+    }
+
+    /**
+     * @return the antifakeCode
+     */
+    public String getAntifakeCode() {
+        return antifakeCode;
+    }
+
+    /**
+     * @param antifakeCode the antifakeCode to set
+     */
+    public void setAntifakeCode(String antifakeCode) {
+        this.antifakeCode = antifakeCode;
+    }
+
+    /**
+     * @return the qrCode
+     */
+    public String getQrCode() {
+        return qrCode;
+    }
+
+    /**
+     * @param qrCode the qrCode to set
+     */
+    public void setQrCode(String qrCode) {
+        this.qrCode = qrCode;
     }
     
 }
