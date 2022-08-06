@@ -57,10 +57,10 @@ import org.primefaces.event.TabChangeEvent;
 @ManagedBean
 @SessionScoped
 public class ItemBean implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = Logger.getLogger(ItemBean.class.getName());
-    
+
     private List<Item> Items;
     private String ActionMessage = null;
     private Item SelectedItem = null;
@@ -96,7 +96,7 @@ public class ItemBean implements Serializable {
     private Item_unit_other Item_unit_otherObj;
     private int ReorderLevelEdited;
     private int ItemOtherUnitsEdited;
-    
+
     public void refreshInventoryType(Item aItem, String aItemPurpose) {
         try {
             this.InventoryTypeList = new ArrayList<>();
@@ -134,7 +134,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void updateItemObjName(Part aFile, Item aItem) {
         try {
             if (aFile.getName().length() > 0) {
@@ -143,7 +143,7 @@ public class ItemBean implements Serializable {
         } catch (Exception e) {
         }
     }
-    
+
     public void handleFileUpload(Item aItem) {
         try (InputStream input = file.getInputStream()) {
             Files.copy(input, new File(new GeneralUserSetting().getITEM_IMAGE_LOCAL_LOCATION(), Long.toString(aItem.getItemId()) + ".png").toPath());
@@ -151,11 +151,11 @@ public class ItemBean implements Serializable {
             // Show faces message?
         }
     }
-    
+
     public void ItemBarCodeListener(AjaxBehaviorEvent event) {
         //System.out.println("OkaY");
     }
-    
+
     public void checkRemoteTaxRateAndUpdateLocal(long aItemId, String aDescription, String aVatRateOrder) {
         try {
             Item item = null;
@@ -210,7 +210,7 @@ public class ItemBean implements Serializable {
                         taxratelocal = taxratelocal + "," + taxrateadd;
                         //re-arrange
                         String taxratelocalNew = "";
-                        
+
                         String TAX_VAT_RATE_ORDER = item.getVat_rate_order();
                         taxratelocalNew = this.reArrangeVatRate(taxratelocal, TAX_VAT_RATE_ORDER);
                         // now update new tax rate
@@ -225,7 +225,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void reArrangeVatRateCall(long aItemId, String aDescription) {
         try {
             Item item = null;
@@ -251,7 +251,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public String reArrangeVatRate(String aNotArrangedVatRated, String aVatRatedOrder) {
         String ArrangedVatRated = "";
         if (aVatRatedOrder.isEmpty() || (!aVatRatedOrder.contains("ZERO") && !aVatRatedOrder.contains("EXEMPT") && !aVatRatedOrder.contains("STANDARD"))) {
@@ -269,7 +269,7 @@ public class ItemBean implements Serializable {
         }
         return ArrangedVatRated;
     }
-    
+
     public String getVatRateOrder(String aVatRated) {
         String VatRateOrder = "STANDARD,EXEMPT,ZERO";
         if (aVatRated.length() > 0) {
@@ -281,7 +281,7 @@ public class ItemBean implements Serializable {
         }
         return VatRateOrder;
     }
-    
+
     public void saveItem() {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -350,7 +350,7 @@ public class ItemBean implements Serializable {
             }
         }
     }
-    
+
     public void saveItem(Item aItem) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -381,7 +381,7 @@ public class ItemBean implements Serializable {
             }
         }
     }
-    
+
     public String validateItem(Item aItem) {
         String msg = "";
         String sql2 = null;
@@ -438,7 +438,7 @@ public class ItemBean implements Serializable {
         }
         return msg;
     }
-    
+
     public int saveValidatedItem(Item aItem) {
         int save_status = 0;
         String sql = null;
@@ -589,7 +589,7 @@ public class ItemBean implements Serializable {
         }
         return save_status;
     }
-    
+
     public void setItemFromResultset(Item aItem, ResultSet aResultSet) {
         try {
             try {
@@ -785,7 +785,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void setItemFromResultsetReport(Item aItem, ResultSet aResultSet) {
         try {
             try {
@@ -1007,7 +1007,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void setItem_code_otherFromResultset(Item_code_other aItem_code_other, ResultSet aResultSet) {
         try {
             try {
@@ -1034,7 +1034,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void setItem_unit_otherFromResultset(Item_unit_other aItem_unit_other, ResultSet aResultSet) {
         try {
             try {
@@ -1101,7 +1101,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void setItem_store_reorderFromResultset(Item_store_reorder aItem_store_reorder, ResultSet aResultSet) {
         try {
             try {
@@ -1133,7 +1133,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public Item getItem(long ItemId) {
         String sql = "{call sp_search_item_by_id(?)}";
         ResultSet rs = null;
@@ -1154,7 +1154,7 @@ public class ItemBean implements Serializable {
             return null;
         }
     }
-    
+
     public Item getItemByDesc(String aItemDesc) {
         String sql = "SELECT * FROM item WHERE description='" + aItemDesc + "'";
         ResultSet rs = null;
@@ -1174,7 +1174,7 @@ public class ItemBean implements Serializable {
             return null;
         }
     }
-    
+
     public void setItem(long aItemId, Item aItem) {
         String sql = "{call sp_search_item_by_id(?)}";
         ResultSet rs = null;
@@ -1193,7 +1193,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public Item findItem(long ItemId) {
         String sql = "{call sp_search_item_by_id(?)}";
         ResultSet rs = null;
@@ -1214,7 +1214,7 @@ public class ItemBean implements Serializable {
             return null;
         }
     }
-    
+
     public void setItem_unspscFromResultset(Item_unspsc aItem_unspsc, ResultSet aResultSet) {
         try {
             try {
@@ -1266,7 +1266,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public Item_unspsc findItem_unspsc(long aItem_unspsc_id) {
         String sql = "SELECT * FROM item_unspsc WHERE item_unspsc_id=" + aItem_unspsc_id;
         ResultSet rs = null;
@@ -1286,7 +1286,7 @@ public class ItemBean implements Serializable {
             return null;
         }
     }
-    
+
     public Item findItemByCode(String ItemCode) {
         String sql = "{call sp_search_item_by_code(?)}";
         ResultSet rs = null;
@@ -1307,7 +1307,7 @@ public class ItemBean implements Serializable {
             return null;
         }
     }
-    
+
     public Item findItemByCodeActive(String ItemCode) {
         if (ItemCode.trim().isEmpty()) {
             return null;
@@ -1333,7 +1333,7 @@ public class ItemBean implements Serializable {
             return null;
         }
     }
-    
+
     public Item findItemByIdActive(long aItemId) {
         if (aItemId == 0) {
             return null;
@@ -1357,7 +1357,7 @@ public class ItemBean implements Serializable {
             return null;
         }
     }
-    
+
     public void deleteItem(Item aItem) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -1369,7 +1369,7 @@ public class ItemBean implements Serializable {
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
-        
+
         if (grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, "8", "Delete") == 0) {
             msg = "Not Allowed to Access this Function";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(msg));
@@ -1388,7 +1388,7 @@ public class ItemBean implements Serializable {
             }
         }
     }
-    
+
     public void displayItem(Item ItemFrom) {
         try {
             this.ItemObj = this.getItem(ItemFrom.getItemId());
@@ -1405,7 +1405,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void clearItemSearch() {
         try {
             this.clearItem(this.ItemObj);
@@ -1415,13 +1415,13 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void onUNSPSCTabChange(TabChangeEvent event) {
         if (event.getTab().getTitle().equals("Manage")) {
             this.displayUNSPSC();
         }
     }
-    
+
     public void displayUNSPSC() {
         try {
             //clear TaxMap
@@ -1477,7 +1477,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void displayItemCodes() {
         try {
             //clear
@@ -1503,7 +1503,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void clearItem_unit_other(int aInitWithItemObj) {
         try {
             if (null != this.Item_unit_otherObj) {
@@ -1541,7 +1541,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void displayItemOtherUnits() {
         try {
             if (this.ItemOtherUnitsEdited == 1) {
@@ -1563,7 +1563,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void displayItemReorderLevels() {
         try {
             if (this.ReorderLevelEdited == 0) {
@@ -1589,7 +1589,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void copyItemReorderLevels() {
         try {
             try {
@@ -1614,7 +1614,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public String getVatTaxRatesRemote(ItemTax aItemTax) {
         String str = "";
         if (Double.parseDouble(aItemTax.getTaxRate()) > 0) {
@@ -1640,7 +1640,7 @@ public class ItemBean implements Serializable {
         }
         return str;
     }
-    
+
     public void clearItem() {
         try {
             if (null == this.ItemObj) {
@@ -1707,7 +1707,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void copyToNew() {
         try {
             if (null == this.ItemObj) {
@@ -1722,14 +1722,14 @@ public class ItemBean implements Serializable {
                 try {
                     this.Item_code_otherList.clear();
                 } catch (Exception e) {
-                    
+
                 }
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void clearItem(Item aItem) {
         try {
             if (null != aItem) {
@@ -1797,7 +1797,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void initClearItem(Item aItem, List<Item> aItemList) {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -1816,7 +1816,7 @@ public class ItemBean implements Serializable {
             }
         }
     }
-    
+
     public void initClearItemParent() {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -1830,11 +1830,11 @@ public class ItemBean implements Serializable {
             }
         }
     }
-    
+
     public void clearSelectedItem() {
         this.clearItem(this.getSelectedItem());
     }
-    
+
     public List<Item> getItemObjectList_old(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -1857,7 +1857,7 @@ public class ItemBean implements Serializable {
         }
         return getItemObjectList();
     }
-    
+
     public List<Item> getItemObjectList(String Query) {
         this.setTypedItemCode(Query);
         String sql, sqlDesc = "", sqlCode = "", sqlCodeOther = "";
@@ -1919,7 +1919,7 @@ public class ItemBean implements Serializable {
         }
         return getItemObjectList();
     }
-    
+
     public List<Item> getItemObjectListActive_old(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -1941,7 +1941,7 @@ public class ItemBean implements Serializable {
         }
         return getItemObjectList();
     }
-    
+
     public List<Item> getItemObjectListActive(String Query) {
         this.setTypedItemCode(Query);
         String sql, sqlDesc = "", sqlCode = "", sqlCodeOther = "";
@@ -2003,7 +2003,7 @@ public class ItemBean implements Serializable {
         }
         return getItemObjectList();
     }
-    
+
     public List<Item> getItemObjectListByUnit(int Unit) {
         String sql;
         sql = "{call sp_search_item_by_unit(?)}";
@@ -2024,7 +2024,7 @@ public class ItemBean implements Serializable {
         }
         return getItemObjectList();
     }
-    
+
     public List<Item> getItemObjectListByCategory(int Category) {
         String sql;
         sql = "{call sp_search_item_by_category(?)}";
@@ -2045,7 +2045,7 @@ public class ItemBean implements Serializable {
         }
         return getItemObjectList();
     }
-    
+
     public void updateLookUpsUI(Item aItem) {
         try {
             //Item item = null;
@@ -2078,7 +2078,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public List<Item> getItemObjectListForSale_old(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -2101,7 +2101,7 @@ public class ItemBean implements Serializable {
         }
         return getItemObjectList();
     }
-    
+
     public List<Item> getItemObjectListForSale(String Query) {
         this.setTypedItemCode(Query);
         String sql, sqlDesc = "", sqlCode = "", sqlCodeOther = "";
@@ -2163,7 +2163,7 @@ public class ItemBean implements Serializable {
         }
         return getItemObjectList();
     }
-    
+
     public List<Item_unspsc> getItem_unspscObjectList(String Query) {
         String sql;
         sql = "SELECT * FROM item_unspsc WHERE segment_name LIKE '%" + Query + "%' OR family_name LIKE '%" + Query + "%' OR class_name LIKE '%" + Query + "%' OR commodity_name LIKE '%" + Query + "%' ";
@@ -2183,7 +2183,7 @@ public class ItemBean implements Serializable {
         }
         return ius;
     }
-    
+
     public List<Item> getItemObjectListForProduction_old(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -2206,7 +2206,7 @@ public class ItemBean implements Serializable {
         }
         return getItemObjectList();
     }
-    
+
     public List<Item> getItemObjectListForProduction(String Query) {
         this.setTypedItemCode(Query);
         String sql, sqlDesc = "", sqlCode = "", sqlCodeOther = "";
@@ -2268,7 +2268,7 @@ public class ItemBean implements Serializable {
         }
         return getItemObjectList();
     }
-    
+
     public List<Item> getItemObjectListForHire(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -2290,7 +2290,7 @@ public class ItemBean implements Serializable {
         }
         return getItemObjectList();
     }
-    
+
     public List<Item> getItemObjectListForStockDispose_old(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -2312,7 +2312,7 @@ public class ItemBean implements Serializable {
         }
         return getItemObjectList();
     }
-    
+
     public List<Item> getItemObjectListForStockDispose(String Query) {
         this.setTypedItemCode(Query);
         String sql, sqlDesc = "", sqlCode = "", sqlCodeOther = "";
@@ -2374,7 +2374,7 @@ public class ItemBean implements Serializable {
         }
         return getItemObjectList();
     }
-    
+
     public List<Item> getItemObjectListForConsumption(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -2396,7 +2396,7 @@ public class ItemBean implements Serializable {
         }
         return getItemObjectList();
     }
-    
+
     public List<Item> getItemObjectListForTransfer(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -2418,7 +2418,7 @@ public class ItemBean implements Serializable {
         }
         return getItemObjectList();
     }
-    
+
     public List<Item> getItemObjectListForUnpack(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -2440,7 +2440,7 @@ public class ItemBean implements Serializable {
         }
         return getItemObjectList();
     }
-    
+
     public List<Item> getItemObjectListForPurchase_old(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -2462,7 +2462,7 @@ public class ItemBean implements Serializable {
         }
         return getItemObjectList();
     }
-    
+
     public List<Item> getItemObjectListForPurchase(String Query) {
         this.setTypedItemCode(Query);
         String sql, sqlDesc = "", sqlCode = "", sqlCodeOther = "";
@@ -2524,7 +2524,7 @@ public class ItemBean implements Serializable {
         }
         return getItemObjectList();
     }
-    
+
     public List<Item> getItemObjectListForReceiveGoods_old(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -2546,7 +2546,7 @@ public class ItemBean implements Serializable {
         }
         return getItemObjectList();
     }
-    
+
     public List<Item> getItemObjectListForReceiveGoods(String Query) {
         this.setTypedItemCode(Query);
         String sql, sqlDesc = "", sqlCode = "", sqlCodeOther = "";
@@ -2608,7 +2608,7 @@ public class ItemBean implements Serializable {
         }
         return getItemObjectList();
     }
-    
+
     public List<Item> getItemObjectListForReceiveExpenses(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -2630,7 +2630,7 @@ public class ItemBean implements Serializable {
         }
         return getItemObjectList();
     }
-    
+
     public List<Item> getItemObjectListForReceiveAssets(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -2652,7 +2652,7 @@ public class ItemBean implements Serializable {
         }
         return getItemObjectList();
     }
-    
+
     public List<Item> getItemObjectListForPurchaseExpense_old(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -2675,7 +2675,7 @@ public class ItemBean implements Serializable {
         }
         return getItemObjectList();
     }
-    
+
     public List<Item> getItemObjectListForPurchaseExpense(String Query) {
         this.setTypedItemCode(Query);
         String sql, sqlDesc = "", sqlCode = "", sqlCodeOther = "";
@@ -2737,7 +2737,7 @@ public class ItemBean implements Serializable {
         }
         return getItemObjectList();
     }
-    
+
     public List<Item> getItemObjectListForPurchaseGoods_old(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -2760,7 +2760,7 @@ public class ItemBean implements Serializable {
         }
         return getItemObjectList();
     }
-    
+
     public List<Item> getItemObjectListForPurchaseGoods(String Query) {
         this.setTypedItemCode(Query);
         String sql, sqlDesc = "", sqlCode = "", sqlCodeOther = "";
@@ -2822,7 +2822,7 @@ public class ItemBean implements Serializable {
         }
         return getItemObjectList();
     }
-    
+
     public List<Item> getItemObjectListForAssetFixed(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -2875,7 +2875,7 @@ public class ItemBean implements Serializable {
         }
         return Items;
     }
-    
+
     public List<Item> getItems(String Query) {
         this.setTypedItemCode(Query);
         String sql, sqlDesc = "", sqlCode = "", sqlCodeOther = "";
@@ -2937,7 +2937,7 @@ public class ItemBean implements Serializable {
         }
         return getItemObjectList();
     }
-    
+
     public List<Item> getItemObjectListForQuickOrder(int aCategoryId, int aSubCategoryId) {
         String sql = "";
         String aWhereSql = "";
@@ -2971,7 +2971,7 @@ public class ItemBean implements Serializable {
         }
         return getItemObjectList();
     }
-    
+
     public void refreshItemsList_old(String aNameOrCode) {
         this.ItemsList = new ArrayList<>();
         if (aNameOrCode.replace(" ", "").length() <= 0) {
@@ -3013,7 +3013,7 @@ public class ItemBean implements Serializable {
             }
         }
     }
-    
+
     public void setRetailToWhole() {
         try {
             this.ItemObj.setUnitWholesalePrice(this.ItemObj.getUnitRetailsalePrice());
@@ -3021,7 +3021,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void refreshItemsList(String aNameOrCode, int aLimitFlag) {//aLimitFlag: 0 No Limit, 1 Use Set Limit
         this.ItemsList = new ArrayList<>();
         if (aNameOrCode.replace(" ", "").length() <= 0) {
@@ -3103,7 +3103,7 @@ public class ItemBean implements Serializable {
             }
         }
     }
-    
+
     public List<Item> getReportItems(Item aItem, boolean RETRIEVE_REPORT) {
         String sql = "{call sp_report_item(?,?,?)}";
         ResultSet rs = null;
@@ -3158,11 +3158,11 @@ public class ItemBean implements Serializable {
         }
         return this.ReportItems;
     }
-    
+
     public long getReportItemsCount() {
         return this.ReportItems.size();
     }
-    
+
     public List<Item> getReportItemsSummary(Item aItem, boolean RETRIEVE_REPORT) {
         String sql = "{call sp_report_item_summary(?,?,?)}";
         ResultSet rs = null;
@@ -3195,7 +3195,7 @@ public class ItemBean implements Serializable {
                     } catch (NullPointerException npe) {
                         aItem.setCountItems(0);
                     }
-                    
+
                     this.ReportItemsSummary.add(item);
                 }
             } catch (Exception e) {
@@ -3206,7 +3206,7 @@ public class ItemBean implements Serializable {
         }
         return this.ReportItemsSummary;
     }
-    
+
     public void reportItemDetail(String aPurpose, String aItemType, int aCategoryId, int aSubCategoryId, String aCurrency, String aIsSuspended, int aIsGeneral, int aIsTaxMapped) {
         String sql = "SELECT * FROM view_item_detail WHERE 1=1";
         String wheresql = "";
@@ -3291,7 +3291,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void reportItemDetailStock(String aItemType, int aCategoryId, int aSubCategoryId, String aCurrency, String aIsSuspended, int aIsGeneral) {
         String sql = "SELECT * FROM view_item_detail_stock WHERE 1=1";
         String wheresql = "";
@@ -3336,7 +3336,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void reportItemDetailAsset(String aItemType, int aCategoryId, int aSubCategoryId, String aCurrency, String aIsSuspended, int aIsGeneral) {
         String sql = "SELECT * FROM view_item_detail_asset WHERE 1=1";
         String wheresql = "";
@@ -3381,7 +3381,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void reportItemDetailExpense(String aItemType, int aCategoryId, int aSubCategoryId, String aCurrency, String aIsSuspended, int aIsGeneral) {
         String sql = "SELECT * FROM view_item_detail_expense WHERE 1=1";
         String wheresql = "";
@@ -3426,7 +3426,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void reportItemStockLowOut(String aItemType, int aCategoryId, int aSubCategoryId, String aCurrency, int aIsGeneral, String aStockType, String aStockStatus, int aStoreId) {
         String ViewName = "";
         if (aStoreId > 0) {
@@ -3522,7 +3522,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void reportItemStockLowOut_old(String aItemType, int aCategoryId, int aSubCategoryId, String aCurrency, int aIsGeneral, String aStockType, String aStockStatus) {
         String sql = "SELECT * FROM view_inventory_low_out_vw WHERE is_suspended='No'";
         String sqlsum = "SELECT stock_status,count(*) as qty_total FROM view_inventory_low_out_vw WHERE is_suspended='No'";
@@ -3602,7 +3602,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public Item getItemCurrentStockStatus(long aItem_id) {
         String sql = "SELECT * FROM view_inventory_low_out_vw WHERE item_id=" + aItem_id;
         ResultSet rs = null;
@@ -3620,7 +3620,7 @@ public class ItemBean implements Serializable {
         }
         return item;
     }
-    
+
     public void initItemObj() {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -3634,7 +3634,7 @@ public class ItemBean implements Serializable {
             }
         }
     }
-    
+
     public void initItem_tax_mapObj() {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -3644,7 +3644,7 @@ public class ItemBean implements Serializable {
             }
         }
     }
-    
+
     public void initItemTaxObj() {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -3654,7 +3654,7 @@ public class ItemBean implements Serializable {
             }
         }
     }
-    
+
     public void initItem_code_otherObj() {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -3664,7 +3664,7 @@ public class ItemBean implements Serializable {
             }
         }
     }
-    
+
     public void initItem_unit_otherObj() {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -3674,7 +3674,7 @@ public class ItemBean implements Serializable {
             }
         }
     }
-    
+
     public void initItem_store_reorderObj() {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -3684,7 +3684,7 @@ public class ItemBean implements Serializable {
             }
         }
     }
-    
+
     public void initStockLocation() {
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
@@ -3699,20 +3699,20 @@ public class ItemBean implements Serializable {
             }
         }
     }
-    
+
     public void refreshStockLocation(long aItemId) {
         try {
             this.LocationList.clear();
         } catch (NullPointerException npe) {
             this.LocationList = new ArrayList<>();
         }
-        
+
         try {
             this.StockList.clear();
         } catch (NullPointerException npe) {
             this.StockList = new ArrayList<>();
         }
-        
+
         if (aItemId > 0) {
             try {
                 this.LocationList = new LocationBean().getLocationsByItem(aItemId);
@@ -3724,17 +3724,17 @@ public class ItemBean implements Serializable {
             }
         }
     }
-    
+
     public long getReportItemsSummaryCount() {
         return this.ReportItemsSummary.size();
     }
-    
+
     public void openChildItem(String aItemPurpose) {
         FacesContext context = FacesContext.getCurrentInstance();
         HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
         HttpSession httpSession = request.getSession(false);
         httpSession.setAttribute("ITEM_PURPOSE", aItemPurpose);
-        
+
         Map<String, Object> options = new HashMap<String, Object>();
         options.put("modal", true);
         options.put("draggable", false);
@@ -3748,7 +3748,7 @@ public class ItemBean implements Serializable {
         options.put("dynamic", true);
         org.primefaces.PrimeFaces.current().dialog().openDynamic("ItemChild", options, null);
     }
-    
+
     public void openChildItem(String aItemPurpose, long aItemId) {
         if (new NavigationBean().checkAccessDeniedReturn("8", "View") == 1) {
             FacesContext context = FacesContext.getCurrentInstance();
@@ -3777,7 +3777,7 @@ public class ItemBean implements Serializable {
             org.primefaces.PrimeFaces.current().dialog().openDynamic("ItemChild", options, null);
         }
     }
-    
+
     public List<Item> getProductionItemObjectList_old(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -3800,7 +3800,7 @@ public class ItemBean implements Serializable {
         }
         return getItemObjectList();
     }
-    
+
     public List<Item> getProductionItemObjectList(String Query) {
         this.setTypedItemCode(Query);
         String sql, sqlDesc = "", sqlCode = "", sqlCodeOther = "";
@@ -3862,7 +3862,7 @@ public class ItemBean implements Serializable {
         }
         return getItemObjectList();
     }
-    
+
     public List<Item> getItemObjectListForRawMaterial_old(String Query) {
         this.setTypedItemCode(Query);
         String sql;
@@ -3885,7 +3885,7 @@ public class ItemBean implements Serializable {
         }
         return getItemObjectList();
     }
-    
+
     public List<Item> getItemObjectListForRawMaterial(String Query) {
         this.setTypedItemCode(Query);
         String sql, sqlDesc = "", sqlCode = "", sqlCodeOther = "";
@@ -3947,7 +3947,7 @@ public class ItemBean implements Serializable {
         }
         return getItemObjectList();
     }
-    
+
     public void refreshItem_unspscList(String Query) {
         String sql;
         if (Query.length() == 0) {
@@ -3979,7 +3979,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void refreshItemSearchList_old(String Query) {
         String sql = "{call sp_search_item_for_sale_limit100(?)}";
         ResultSet rs = null;
@@ -3999,7 +3999,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void refreshItemSearchList(String Query) {
         this.setTypedItemCode(Query);
         String sql, sqlDesc = "", sqlCode = "", sqlCodeOther = "";
@@ -4060,7 +4060,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void resetAtItemSearchList() {
         try {
             this.SearchItemDesc = "";
@@ -4078,7 +4078,7 @@ public class ItemBean implements Serializable {
             //LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void updateItemFromUNSPC(Item aItem, Item_unspsc aItem_unspsc) {
         String[] StringArray = null;
         String CommaSeperatedStr = "";
@@ -4130,7 +4130,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void refreshItem_code_otherList(Item aItem) {
         String sql;
         sql = "SELECT * FROM item_code_other WHERE item_id=" + aItem.getItemId();
@@ -4158,7 +4158,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void refreshItem_unit_otherList(Item aItem, int aIs_active) {
         String sql;
         sql = "SELECT * FROM item_unit_other WHERE item_id=" + aItem.getItemId() + " AND is_active=" + aIs_active;
@@ -4178,7 +4178,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public List<Item_unit_other> getItem_unit_otherList(long aItemId, int aIs_active) {
         String sql;
         sql = "SELECT * FROM item_unit_other WHERE item_id=" + aItemId + " AND is_active=" + aIs_active;
@@ -4199,7 +4199,7 @@ public class ItemBean implements Serializable {
         }
         return iuList;
     }
-    
+
     public void updateLookupItem_unit_other(Item_unit_other aItem_unit_other) {
         try {
             if (null != aItem_unit_other) {
@@ -4218,7 +4218,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void refreshItem_store_reorderList(Item aItem) {
         String sql;
         sql = "select "
@@ -4240,7 +4240,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public int saveItem_code_other(Item_code_other aItem_code_other) {
         int saved = 0;
         String sql = "INSERT INTO item_code_other(item_id,item_code) VALUES(?,?)";
@@ -4266,7 +4266,7 @@ public class ItemBean implements Serializable {
         }
         return saved;
     }
-    
+
     public int saveItem_store_reorder(Item_store_reorder aItem_store_reorder) {
         int saved = 0;
         String sql = "";
@@ -4308,7 +4308,7 @@ public class ItemBean implements Serializable {
         }
         return saved;
     }
-    
+
     public void saveItem_code_otherCall(Item_code_other aItem_code_other) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -4344,7 +4344,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void addItem_unit_other(Item_unit_other aItem_unit_other) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -4354,7 +4354,15 @@ public class ItemBean implements Serializable {
         }
         String msg = "";
         try {
-            if (1 == 1) {
+            if (aItem_unit_other.getOther_unit_id() == 0) {
+                msg = "Select Other Unit";
+            } else if (aItem_unit_other.getOther_unit_retailsale_price() <= 0) {
+                msg = "Specify Other Retail Price";
+            } else if (aItem_unit_other.getOther_qty() <= 0) {
+                msg = "Specify Other Unit Quantity";
+            } else if (aItem_unit_other.getBase_qty() <= 0) {
+                msg = "Specify Base Unit Quantity";
+            } else {
                 try {
                     aItem_unit_other.setIs_active(1);
                     aItem_unit_other.setOther_unit_symbol(new UnitBean().getUnit(aItem_unit_other.getOther_unit_id()).getUnitSymbol());
@@ -4363,15 +4371,13 @@ public class ItemBean implements Serializable {
                     msg = "Added to the List";
                 } catch (Exception e) {
                 }
-            } else {
-                msg = "Saving Has Failed";
             }
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public int insertOrUpdateItem_unit_other(Item_unit_other aItem_unit_other) {
         int saved = 0;
         String sql = "";
@@ -4416,7 +4422,7 @@ public class ItemBean implements Serializable {
         }
         return saved;
     }
-    
+
     public int insertOrUpdateItem_unit_otherList() {
         int saved = 0;
         int n = 0;
@@ -4425,7 +4431,7 @@ public class ItemBean implements Serializable {
             try {
                 n = this.Item_unit_otherList.size();
             } catch (Exception e) {
-                
+
             }
             if (n >= 1) {
                 long ItemId = 0;
@@ -4451,7 +4457,7 @@ public class ItemBean implements Serializable {
         }
         return saved;
     }
-    
+
     public int saveItem_store_reorderCall(long aItem_id) {
         int saved = 0;
         try {
@@ -4475,7 +4481,7 @@ public class ItemBean implements Serializable {
         }
         return saved;
     }
-    
+
     public void deleteItem_code_otherCall(Item_code_other aItem_code_other) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -4485,7 +4491,7 @@ public class ItemBean implements Serializable {
         }
         String msg = "";
         String sql = "delete from item_code_other where item_code_other_id=" + aItem_code_other.getItem_code_other_id();
-        
+
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -4501,7 +4507,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public void deleteItem_unit_otherCall(Item_unit_other aItem_unit_other) {
         try {
             if (null != aItem_unit_other) {
@@ -4516,7 +4522,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     public Item_code_other getItem_code_otherByCode(String aItem_code) {
         String sql;
         int ItemCodeErrorOn = Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("GENERAL", "ITEM_CODE_ERROR_ON").getParameter_value());
