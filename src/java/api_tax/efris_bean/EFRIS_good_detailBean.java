@@ -49,13 +49,16 @@ public class EFRIS_good_detailBean implements Serializable {
 
                 int itemQty = Integer.parseInt(aEFRIS_good_detail.getQty());
                 if (aItem_tax_map == null) {
-                    status = "Item code at position " + (i + 1) + " not in item_tax_map";
+                    //status = "Item code at position " + (i + 1) + " not in item_tax_map";
+                    status = "Item "+aEFRIS_good_detail.getItem()+" with code: "+aEFRIS_good_detail.getItemCode()+", Unit: "+aEFRIS_good_detail.getUnitOfMeasure()+" is not in mapped";
                     break;
                 } else if (new ItemBean().findItem(aItem_tax_map.getItem_id()) == null) {
-                    status = "Item at position " + (i + 1) + " does not exist";
+                    //status = "Item at position " + (i + 1) + " does not exist";
+                    status = "Item "+aEFRIS_good_detail.getItem()+" does not exist";
                     break;
                 } else if (new ItemBean().getItemCurrentStockStatus(aItem_tax_map.getItem_id()).getQty_total() < itemQty) {
-                    status = "Item at position " + (i + 1) + " Has less Stock";
+                    //status = "Item at position " + (i + 1) + " Has less Stock";
+                    status = "Item "+aEFRIS_good_detail.getItem()+" Has less Stock";
                     break;
                 } else {
                     status = "success";

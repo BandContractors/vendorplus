@@ -172,7 +172,7 @@ public class T106Bean implements Serializable {
                     //101:EFD, 102:Windows Client APP, 103:WebService API, 104:Mis, 105:Webportal, 106:Offline Mode Enabler
                     //get 101:EFD and 105:Webportal
                     if (t106.getDataSource().equals("101") || t106.getDataSource().equals("105")) {
-                        String invoiceDetail = this.getTaxInvoiceDecryptedContentOnline(t106.getInvoiceNo(), aDeviceNo, aSellerTIN);
+                        String invoiceDetail = this.getTaxInvoiceDecryptedContentOffline(t106.getInvoiceNo(), aDeviceNo, aSellerTIN);
                         //qrCode and antifakeCode
                         this.setInvoiceQrAntifakeCodes(t106, invoiceDetail);
                         //get goodsDetails
@@ -344,6 +344,90 @@ public class T106Bean implements Serializable {
         }
     }
 
+    public void getInvoiceUploadedOfflineByPage(String aReferenceNo, String aDeviceNo, String aSellerTIN, int pageNo, int pageSize, String startDate) {
+        String DecryptedContent;
+        String output = "";
+        try {
+            String json = "{\n"
+                    + " \"oriInvoiceNo\": \"\",\n"
+                    + " \"invoiceNo\": \"\",\n"
+                    + " \"deviceNo\": \"\",\n"
+                    + " \"buyerTin\": \"\",\n"
+                    + " \"buyerNinBrn\": \"\",\n"
+                    + " \"buyerLegalName\": \"\",\n"
+                    + " \"combineKeywords\": \"\",\n"
+                    + " \"invoiceType\": \"\",\n"
+                    + " \"invoiceKind\": \"1\",\n"
+                    + " \"isInvalid\": \"\",\n"
+                    + " \"isRefund\": \"\",\n"
+                    + " \"startDate\": \"" + startDate + "\",\n"
+                    + " \"endDate\": \"\",\n"
+                    + " \"pageNo\": \"" + pageNo + "\",\n"
+                    + " \"pageSize\": \"" + pageSize + "\",\n"
+                    + " \"referenceNo\": \"" + aReferenceNo + "\",\n"
+                    + "}";
+            com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
+            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_URL_OFFLINE").getParameter_value());
+            /**
+             * Post Data
+             */
+            //String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", aDeviceNo, "T111", aSellerTIN);
+            String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", aDeviceNo, "T106", aSellerTIN);
+            ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
+            output = response.getEntity(String.class);
+
+            JSONObject parentjsonObject = new JSONObject(output);
+            JSONObject dataobject = parentjsonObject.getJSONObject("returnStateInfo");
+
+            JSONObject dataobjectcontent = parentjsonObject.getJSONObject("data");
+            String content = dataobjectcontent.getString("content");
+            /**
+             * Decrypt Response
+             */
+            JSONObject dataDescription = dataobjectcontent.getJSONObject("dataDescription");
+            String zipCode = "0";
+            try {
+                zipCode = dataDescription.getString("zipCode");
+            } catch (Exception e) {
+                //do nothing
+            }
+            if (zipCode.equals("0")) {
+                DecryptedContent = new String(Base64.decodeBase64(content));
+            } else {
+                byte[] str = GzipUtils.decompress(Base64.decodeBase64(content));
+                DecryptedContent = new String(str);
+            }
+            JSONObject parentbasicInformationjsonObject = new JSONObject(DecryptedContent);
+            JSONArray jSONArray = parentbasicInformationjsonObject.getJSONArray("records");
+            JSONObject page = parentbasicInformationjsonObject.getJSONObject("page");
+
+            for (int i = 0, size = jSONArray.length(); i < size; i++) {
+                JSONObject objectInArray = jSONArray.getJSONObject(i);
+                Gson g = new Gson();
+                T106 t106 = g.fromJson(objectInArray.toString(), T106.class);
+                //101:EFD, 102:Windows Client APP, 103:WebService API, 104:Mis, 105:Webportal, 106:Offline Mode Enabler
+                //get 101:EFD and 105:Webportal
+                if (t106.getDataSource().equals("101") || t106.getDataSource().equals("105")) {
+                    String invoiceDetail = this.getTaxInvoiceDecryptedContentOffline(t106.getInvoiceNo(), aDeviceNo, aSellerTIN);
+                    //qrCode and antifakeCode
+                    this.setInvoiceQrAntifakeCodes(t106, invoiceDetail);
+                    //get goodsDetails
+                    List<GoodsDetails> goodsDetails = this.getInvoiceGoodsDetail(invoiceDetail);
+
+                    //save invoice Details
+                    int savedInvoice = new EFRIS_invoice_detailBean().insertEFRIS_invoice_detail(t106);
+                    if (savedInvoice == 1) {
+                        //save goodsDetails
+                        int saved = new EFRIS_good_detailBean().saveEFRIS_good_detail(goodsDetails, t106.getInvoiceNo(), t106.getReferenceNo());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.INFO, output);
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public void getInvoiceUploadedOnlineByPage(String aReferenceNo, String aDeviceNo, String aSellerTIN, int pageNo, int pageSize, String startDate) {
         String DecryptedContent = "";
         String output = "";
@@ -441,36 +525,18 @@ public class T106Bean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
-    public void getInvoiceUploadedOfflineByPage(String aReferenceNo, String aDeviceNo, String aSellerTIN, int pageNo, int pageSize, String startDate) {
-        String DecryptedContent;
+    
+    //Get invoice details
+    public String getTaxInvoiceDecryptedContentOffline(String aTaxInvoiceNumber, String aDeviceNo, String aSellerTIN) {
+        String DecryptedContent = "";
         String output = "";
         try {
             String json = "{\n"
-                    + " \"oriInvoiceNo\": \"\",\n"
-                    + " \"invoiceNo\": \"\",\n"
-                    + " \"deviceNo\": \"\",\n"
-                    + " \"buyerTin\": \"\",\n"
-                    + " \"buyerNinBrn\": \"\",\n"
-                    + " \"buyerLegalName\": \"\",\n"
-                    + " \"combineKeywords\": \"\",\n"
-                    + " \"invoiceType\": \"\",\n"
-                    + " \"invoiceKind\": \"1\",\n"
-                    + " \"isInvalid\": \"\",\n"
-                    + " \"isRefund\": \"\",\n"
-                    + " \"startDate\": \"" + startDate + "\",\n"
-                    + " \"endDate\": \"\",\n"
-                    + " \"pageNo\": \"" + pageNo + "\",\n"
-                    + " \"pageSize\": \"" + pageSize + "\",\n"
-                    + " \"referenceNo\": \"" + aReferenceNo + "\",\n"
+                    + "	\"invoiceNo\": \"" + aTaxInvoiceNumber + "\"\n"
                     + "}";
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
             WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_URL_OFFLINE").getParameter_value());
-            /**
-             * Post Data
-             */
-            //String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", aDeviceNo, "T111", aSellerTIN);
-            String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", aDeviceNo, "T106", aSellerTIN);
+            String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", aDeviceNo, "T108", aSellerTIN);
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             output = response.getEntity(String.class);
 
@@ -479,11 +545,10 @@ public class T106Bean implements Serializable {
 
             JSONObject dataobjectcontent = parentjsonObject.getJSONObject("data");
             String content = dataobjectcontent.getString("content");
-            /**
-             * Decrypt Response
-             */
+
             JSONObject dataDescription = dataobjectcontent.getJSONObject("dataDescription");
             String zipCode = "0";
+
             try {
                 zipCode = dataDescription.getString("zipCode");
             } catch (Exception e) {
@@ -495,35 +560,11 @@ public class T106Bean implements Serializable {
                 byte[] str = GzipUtils.decompress(Base64.decodeBase64(content));
                 DecryptedContent = new String(str);
             }
-            JSONObject parentbasicInformationjsonObject = new JSONObject(DecryptedContent);
-            JSONArray jSONArray = parentbasicInformationjsonObject.getJSONArray("records");
-            JSONObject page = parentbasicInformationjsonObject.getJSONObject("page");
-
-            for (int i = 0, size = jSONArray.length(); i < size; i++) {
-                JSONObject objectInArray = jSONArray.getJSONObject(i);
-                Gson g = new Gson();
-                T106 t106 = g.fromJson(objectInArray.toString(), T106.class);
-                //101:EFD, 102:Windows Client APP, 103:WebService API, 104:Mis, 105:Webportal, 106:Offline Mode Enabler
-                //get 101:EFD and 105:Webportal
-                if (t106.getDataSource().equals("101") || t106.getDataSource().equals("105")) {
-                    String invoiceDetail = this.getTaxInvoiceDecryptedContentOnline(t106.getInvoiceNo(), aDeviceNo, aSellerTIN);
-                    //qrCode and antifakeCode
-                    this.setInvoiceQrAntifakeCodes(t106, invoiceDetail);
-                    //get goodsDetails
-                    List<GoodsDetails> goodsDetails = this.getInvoiceGoodsDetail(invoiceDetail);
-
-                    //save invoice Details
-                    int savedInvoice = new EFRIS_invoice_detailBean().insertEFRIS_invoice_detail(t106);
-                    if (savedInvoice == 1) {
-                        //save goodsDetails
-                        int saved = new EFRIS_good_detailBean().saveEFRIS_good_detail(goodsDetails, t106.getInvoiceNo(), t106.getReferenceNo());
-                    }
-                }
-            }
         } catch (Exception e) {
             LOGGER.log(Level.INFO, output);
             LOGGER.log(Level.ERROR, e);
         }
+        return DecryptedContent;
     }
 
     //Get invoice details
