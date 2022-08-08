@@ -974,7 +974,7 @@ public class StockManage implements Serializable {
                     + this.getGoodsOtherUnits(aItem.getItemId())
                     + "},\n"
                     + "]";
-            //System.out.println("JSN:" + json);
+            //System.out.println("JSON:" + json);
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
             WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_ONLINE").getParameter_value());
             /**
@@ -992,7 +992,7 @@ public class StockManage implements Serializable {
              * Post Data
              */
             String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T130", CompanySetting.getTaxIdentity());
-            //System.out.println("json>:" + json);
+            //System.out.println("PostData:" + PostData);
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             output = response.getEntity(String.class);
 
