@@ -4353,6 +4353,46 @@ public class ItemBean implements Serializable {
         } catch (Exception e) {
         }
         String msg = "";
+        //check for other unit exists
+        int OtherUnitExists = 0;
+        try {
+            String UnitCodeTax1 = new UnitBean().getUnit(aItem_unit_other.getOther_unit_id()).getUnit_symbol_tax();
+            if (null == UnitCodeTax1) {
+                UnitCodeTax1 = "x";
+            }
+            for (int i = 0; i < this.Item_unit_otherList.size(); i++) {
+                if (this.Item_unit_otherList.get(i).getIs_active() == 1) {
+                    String UnitCodeTax2 = new UnitBean().getUnit(this.Item_unit_otherList.get(i).getOther_unit_id()).getUnit_symbol_tax();
+                    if (null == UnitCodeTax2) {
+                        UnitCodeTax2 = "xx";
+                    }
+                    if ((aItem_unit_other.getOther_unit_id() == this.Item_unit_otherList.get(i).getOther_unit_id()) || (UnitCodeTax1.equals(UnitCodeTax2))) {
+                        OtherUnitExists = 1;
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            //do nothing
+        }
+        //check for other unit and base unti are same
+        int BaseOtherSame = 0;
+        try {
+            String BaseUnitCodeTax = new UnitBean().getUnit(this.ItemObj.getUnitId()).getUnit_symbol_tax();
+            if (null == BaseUnitCodeTax) {
+                BaseUnitCodeTax = "x";
+            }
+            String OtherUnitCodeTax = new UnitBean().getUnit(aItem_unit_other.getOther_unit_id()).getUnit_symbol_tax();
+            if (null == OtherUnitCodeTax) {
+                OtherUnitCodeTax = "xx";
+            }
+            if ((aItem_unit_other.getOther_unit_id() == this.ItemObj.getUnitId()) || (BaseUnitCodeTax == OtherUnitCodeTax)) {
+                BaseOtherSame = 1;
+            }
+        } catch (Exception e) {
+            //do nothing
+        }
+
         try {
             if (aItem_unit_other.getOther_unit_id() == 0) {
                 msg = "Select Other Unit";
@@ -4362,6 +4402,10 @@ public class ItemBean implements Serializable {
                 msg = "Specify Other Unit Quantity";
             } else if (aItem_unit_other.getBase_qty() <= 0) {
                 msg = "Specify Base Unit Quantity";
+            } else if (OtherUnitExists == 1) {
+                msg = "Other Unit Exists";
+            } else if (BaseOtherSame == 1) {
+                msg = "Base and Other Unit Cannot be the Same";
             } else {
                 try {
                     aItem_unit_other.setIs_active(1);

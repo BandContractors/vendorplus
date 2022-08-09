@@ -1334,6 +1334,25 @@ public class TransactorBean implements Serializable {
             return null;
         }
     }
+    
+    public Transactor getTransactorBy_transactor_names_equal(String transactor_names) {
+        String sql = "{call sp_search_transactor_by_names_equal(?)}";
+        ResultSet rs;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setString(1, transactor_names);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                return this.getTransactorFromResultSet(rs);
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+            return null;
+        }
+    }
 
     public void clearList() {
         try {

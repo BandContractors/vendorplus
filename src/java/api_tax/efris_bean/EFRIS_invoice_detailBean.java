@@ -327,12 +327,12 @@ public class EFRIS_invoice_detailBean implements Serializable {
                 aEFRIS_invoice_detail.setProcess_desc(aResultSet.getString("process_desc"));
             } catch (Exception e) {
                 aEFRIS_invoice_detail.setProcess_desc("");
-            }            
+            }
             try {
                 aEFRIS_invoice_detail.setAntifakeCode(aResultSet.getString("verification_code"));
             } catch (Exception e) {
                 aEFRIS_invoice_detail.setAntifakeCode("");
-            }            
+            }
             try {
                 aEFRIS_invoice_detail.setQrCode(aResultSet.getString("qr_code"));
             } catch (Exception e) {
@@ -378,7 +378,7 @@ public class EFRIS_invoice_detailBean implements Serializable {
                 //get transactor using legalname or transactorNames
                 if (null != aEFRIS_invoice_detail.getBuyerLegalName()) {
                     if (aEFRIS_invoice_detail.getBuyerLegalName().length() > 0 && aTransactor == null) {
-                        aTransactor = new TransactorBean().getTransactorBy_transactor_names(aEFRIS_invoice_detail.getBuyerLegalName());
+                        aTransactor = new TransactorBean().getTransactorBy_transactor_names_equal(aEFRIS_invoice_detail.getBuyerLegalName());
                     }
                 }
                 //et default customer
