@@ -69,3 +69,24 @@ create table efris_good_detail (
 ALTER TABLE efris_invoice_detail ADD COLUMN process_desc varchar(500);
 ALTER TABLE efris_good_detail ADD COLUMN process_desc varchar(500);
 ALTER TABLE efris_invoice_detail MODIFY id varchar(32) not null unique;
+
+-- commodity category
+create table efris_goods_commodity (
+	efris_goods_commodity_id bigint primary key auto_increment,
+    commodityCategoryCode varchar(18) not null default '',
+    parentCode varchar(18) not null default '',
+    commodityCategoryName varchar(200) not null default '',
+    commodityCategoryLevel varchar(1) not null default '',
+    rate varchar(4) not null default '',
+    isLeafNode varchar(3) not null default '',
+    serviceMark varchar(3) not null default '',
+    isZeroRate varchar(3) not null default '',
+    zeroRateStartDate varchar(100) not null default '',
+    zeroRateEndDate varchar(100) not null default '',
+    isExempt varchar(3) not null default '',
+    exemptRateStartDate varchar(100) not null default '',
+    exemptRateEndDate varchar(100) not null default '',
+    enableStatusCode varchar(1) not null default '',
+    exclusion varchar(1) not null default '',
+    add_date datetime not null
+)ENGINE=InnoDB;

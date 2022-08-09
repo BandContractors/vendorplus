@@ -40,9 +40,9 @@ import utilities.SecurityPKI;
  * @author bajuna
  */
 public class T124 {
-
+    
     static Logger LOGGER = Logger.getLogger(T124.class.getName());
-
+    
     public void generateUNSPCexcelOffline(String aFileNameWithPath) {
         String output = "";
         String returnCode = "";
@@ -55,10 +55,10 @@ public class T124 {
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
             WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_OFFLINE").getParameter_value());
             String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T124", CompanySetting.getTaxIdentity());
-
+            
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             output = response.getEntity(String.class);
-
+            
             JSONObject parentjsonObject = new JSONObject(output);
             JSONObject dataobject = parentjsonObject.getJSONObject("returnStateInfo");
             returnCode = dataobject.getString("returnCode");
@@ -66,7 +66,7 @@ public class T124 {
             JSONObject dataobjectcontent = parentjsonObject.getJSONObject("data");
             String content = dataobjectcontent.getString("content");
             JSONObject dataDescription = dataobjectcontent.getJSONObject("dataDescription");
-
+            
             String zipCode = "0";
             String DecryptedContent = "";
             try {
@@ -90,11 +90,11 @@ public class T124 {
             /**
              * End Get total page size
              */
-
+            
             XSSFWorkbook workbook2 = new XSSFWorkbook();
             XSSFSheet sheet2 = workbook2.createSheet("Category");// creating a blank sheet
             int rownum = 0;
-
+            
             Row row = sheet2.createRow(rownum++);
             Cell cell = row.createCell(0);
             cell.setCellValue("commodityCategoryCode");
@@ -126,7 +126,7 @@ public class T124 {
             cell.setCellValue("enableStatusCode");
             cell = row.createCell(14);
             cell.setCellValue("exclusion");
-
+            
             for (int x = 1; x <= counter; x++) {
                 json = "{\n"
                         + "	\"pageNo\": \"" + counter + "\",\n"
@@ -135,12 +135,12 @@ public class T124 {
                 PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T124", CompanySetting.getTaxIdentity());
                 response = webResource.type("application/json").post(ClientResponse.class, PostData);
                 output = response.getEntity(String.class);
-
+                
                 parentjsonObject = new JSONObject(output);
                 dataobjectcontent = parentjsonObject.getJSONObject("data");
                 content = dataobjectcontent.getString("content");
                 dataDescription = dataobjectcontent.getJSONObject("dataDescription");
-
+                
                 zipCode = "0";
                 DecryptedContent = "";
                 try {
@@ -193,7 +193,7 @@ public class T124 {
                     cell = row.createCell(14);
                     cell.setCellValue(goodsCommodity.getExclusion());
                 }
-
+                
             }
             FileOutputStream out = new FileOutputStream(new File(aFileNameWithPath)); // file name with path
             workbook2.write(out);
@@ -203,7 +203,7 @@ public class T124 {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    
     public void generateUNSPCexcelOnline(String aFileNameWithPath) {
         String output = "";
         String returnCode = "";
@@ -268,11 +268,11 @@ public class T124 {
             /**
              * End Get total page size
              */
-
+            
             XSSFWorkbook workbook2 = new XSSFWorkbook();
             XSSFSheet sheet2 = workbook2.createSheet("Category");// creating a blank sheet
             int rownum = 0;
-
+            
             Row row = sheet2.createRow(rownum++);
             Cell cell = row.createCell(0);
             cell.setCellValue("commodityCategoryCode");
@@ -304,7 +304,7 @@ public class T124 {
             cell.setCellValue("enableStatusCode");
             cell = row.createCell(14);
             cell.setCellValue("exclusion");
-
+            
             for (int x = 1; x <= counter; x++) {
                 json = "{\n"
                         + "	\"pageNo\": \"" + counter + "\",\n"
@@ -314,7 +314,7 @@ public class T124 {
                 PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T124", CompanySetting.getTaxIdentity());
                 response = webResource.type("application/json").post(ClientResponse.class, PostData);
                 output = response.getEntity(String.class);
-
+                
                 parentjsonObject = new JSONObject(output);
                 dataobjectcontent = parentjsonObject.getJSONObject("data");
                 content = dataobjectcontent.getString("content");
@@ -381,6 +381,234 @@ public class T124 {
             FileOutputStream out = new FileOutputStream(new File(aFileNameWithPath)); // file name with path
             workbook2.write(out);
             out.close();
+        } catch (Exception e) {
+            LOGGER.log(Level.INFO, output);
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void downloadGoodsCommodities() {
+        try {
+            String APIMode = new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_MODE").getParameter_value();
+            //from transBean
+            if (new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
+                String ReferenceNo = "";
+                String SellerTIN = CompanySetting.getTaxIdentity();
+                String DeviceNo = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value();
+                //get Status
+                if (ReferenceNo.length() == 0) {
+                    if (APIMode.equals("OFFLINE")) {
+                        this.generateUNSPCOffline();
+                    } else {
+                        this.generateUNSPCOnline();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+    
+    public void generateUNSPCOffline() {
+        String output = "";
+        String returnCode = "";
+        String returnMessage = "";
+        try {
+            String json = "{\n"
+                    + "	\"pageNo\": \"1\",\n"
+                    + "	\"pageSize\": \"99\"\n"
+                    + "}";
+            com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
+            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_OFFLINE").getParameter_value());
+            String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T124", CompanySetting.getTaxIdentity());
+            
+            ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
+            output = response.getEntity(String.class);
+            
+            JSONObject parentjsonObject = new JSONObject(output);
+            JSONObject dataobject = parentjsonObject.getJSONObject("returnStateInfo");
+            returnCode = dataobject.getString("returnCode");
+            returnMessage = dataobject.getString("returnMessage");
+            JSONObject dataobjectcontent = parentjsonObject.getJSONObject("data");
+            String content = dataobjectcontent.getString("content");
+            JSONObject dataDescription = dataobjectcontent.getJSONObject("dataDescription");
+            
+            String zipCode = "0";
+            String DecryptedContent = "";
+            try {
+                zipCode = dataDescription.getString("zipCode");
+            } catch (Exception e) {
+                //do nothing
+            }
+            if (zipCode.equals("0")) {
+                DecryptedContent = new String(Base64.decodeBase64(content));
+            } else {
+                byte[] str = GzipUtils.decompress(Base64.decodeBase64(content));
+                DecryptedContent = new String(str);
+            }
+
+            /**
+             * Get total page size
+             */
+            JSONObject parentbasicInformationjsonObject = new JSONObject(DecryptedContent);
+            JSONObject page = parentbasicInformationjsonObject.getJSONObject("page");
+            int counter = page.getInt("pageCount");
+            /**
+             * End Get total page size
+             */
+            
+            for (int x = 1; x <= counter; x++) {
+                json = "{\n"
+                        + "	\"pageNo\": \"" + counter + "\",\n"
+                        + "	\"pageSize\": \"99\"\n"
+                        + "}";
+                PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T124", CompanySetting.getTaxIdentity());
+                response = webResource.type("application/json").post(ClientResponse.class, PostData);
+                output = response.getEntity(String.class);
+                
+                parentjsonObject = new JSONObject(output);
+                dataobjectcontent = parentjsonObject.getJSONObject("data");
+                content = dataobjectcontent.getString("content");
+                dataDescription = dataobjectcontent.getJSONObject("dataDescription");
+                
+                zipCode = "0";
+                DecryptedContent = "";
+                try {
+                    zipCode = dataDescription.getString("zipCode");
+                } catch (Exception e) {
+                    //do nothing
+                }
+                if (zipCode.equals("0")) {
+                    DecryptedContent = new String(Base64.decodeBase64(content));
+                } else {
+                    byte[] str = GzipUtils.decompress(Base64.decodeBase64(content));
+                    DecryptedContent = new String(str);
+                }
+                JSONObject jSONObject = new JSONObject(DecryptedContent);
+                JSONArray array = jSONObject.getJSONArray("records");
+                List<GoodsCommodity> arList = new ArrayList<>();
+                for (int i = 0; i < array.length(); i++) {
+                    Gson g = new Gson();
+                    GoodsCommodity temp = g.fromJson(array.get(i).toString(), GoodsCommodity.class);
+                    arList.add(temp);
+                }
+                //save goods commodity                
+                int savedGoodsCommodity = new EFRIS_goods_commodityBean().saveEFRIS_goods_commodity(arList);                
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.INFO, output);
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+    
+    public void generateUNSPCOnline() {
+        String output = "";
+        String returnCode = "";
+        String returnMessage = "";
+        try {
+            String json = "{\n"
+                    + "	\"pageNo\": \"1\",\n"
+                    + "	\"pageSize\": \"99\"\n"
+                    + "}";
+            System.out.println("JSON1:" + json);
+            com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
+            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_ONLINE").getParameter_value());
+            /**
+             * Read Private Key
+             */
+            PrivateKey key = new SecurityPKI().getPrivate(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_FILE").getParameter_value(), Security.Decrypt(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_PASSWORD").getParameter_value()), new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_ALIAS").getParameter_value());
+            //String AESpublickeystring = SecurityPKI.decrypt(new SecurityPKI().AESPublicKey(CompanySetting.getTaxIdentity(), new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value()), key);
+            String AESpublickeystring = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_AES_PUBLIC_KEY").getParameter_value();
+            /**
+             * Encrypt Content
+             */
+            String encryptedcontent = SecurityPKI.AESencrypt(json, Base64.decodeBase64(AESpublickeystring));
+            String signedcontent = Base64.encodeBase64String(new SecurityPKI().sign(encryptedcontent, key));
+            /**
+             * Post Data
+             */
+            String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T124", CompanySetting.getTaxIdentity());
+            System.out.println("PostData1:" + PostData);
+            ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
+            output = response.getEntity(String.class);
+            System.out.println("output1:" + output);
+            
+            JSONObject parentjsonObject = new JSONObject(output);
+            JSONObject dataobject = parentjsonObject.getJSONObject("returnStateInfo");
+            returnCode = dataobject.getString("returnCode");
+            returnMessage = dataobject.getString("returnMessage");
+            JSONObject dataobjectcontent = parentjsonObject.getJSONObject("data");
+            String content = dataobjectcontent.getString("content");
+            /**
+             * Decrypt Response
+             */
+            JSONObject dataDescription = dataobjectcontent.getJSONObject("dataDescription");
+            String zipCode = "0";
+            String DecryptedContent = "";
+            try {
+                zipCode = dataDescription.getString("zipCode");
+            } catch (Exception e) {
+                //do nothing
+            }
+            if (zipCode.equals("0")) {
+                DecryptedContent = SecurityPKI.AESdecrypt(content, Base64.decodeBase64(AESpublickeystring));
+            } else {
+                byte[] str = GzipUtils.decompress(Base64.decodeBase64(content));
+                DecryptedContent = SecurityPKI.AESdecrypt2(str, Base64.decodeBase64(AESpublickeystring));
+            }
+            /**
+             * Get total page size
+             */
+            JSONObject parentbasicInformationjsonObject = new JSONObject(DecryptedContent);
+            JSONObject page = parentbasicInformationjsonObject.getJSONObject("page");
+            int counter = page.getInt("pageCount");
+            /**
+             * End Get total page size
+             */
+            for (int x = 1; x <= counter; x++) {
+                json = "{\n"
+                        + "	\"pageNo\": \"" + counter + "\",\n"
+                        + "	\"pageSize\": \"99\"\n"
+                        + "}";
+                System.out.println("JSON2:" + json);
+                PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T124", CompanySetting.getTaxIdentity());
+                response = webResource.type("application/json").post(ClientResponse.class, PostData);
+                output = response.getEntity(String.class);
+                
+                parentjsonObject = new JSONObject(output);
+                dataobjectcontent = parentjsonObject.getJSONObject("data");
+                content = dataobjectcontent.getString("content");
+                /**
+                 * Decrypt Response
+                 */
+                dataDescription = dataobjectcontent.getJSONObject("dataDescription");
+                zipCode = "0";
+                DecryptedContent = "";
+                try {
+                    zipCode = dataDescription.getString("zipCode");
+                } catch (Exception e) {
+                    //do nothing
+                }
+                if (zipCode.equals("0")) {
+                    DecryptedContent = SecurityPKI.AESdecrypt(content, Base64.decodeBase64(AESpublickeystring));
+                } else {
+                    byte[] str = GzipUtils.decompress(Base64.decodeBase64(content));
+                    DecryptedContent = SecurityPKI.AESdecrypt2(str, Base64.decodeBase64(AESpublickeystring));
+                }
+                /**
+                 * Get records
+                 */
+                JSONObject jSONObject = new JSONObject(DecryptedContent);
+                JSONArray array = jSONObject.getJSONArray("records");
+                List<GoodsCommodity> arList = new ArrayList<>();
+                for (int i = 0; i < array.length(); i++) {
+                    Gson g = new Gson();
+                    GoodsCommodity temp = g.fromJson(array.get(i).toString(), GoodsCommodity.class);
+                    arList.add(temp);
+                }
+                //save goods commodity                
+                int savedGoodsCommodity = new EFRIS_goods_commodityBean().saveEFRIS_goods_commodity(arList);
+            }
         } catch (Exception e) {
             LOGGER.log(Level.INFO, output);
             LOGGER.log(Level.ERROR, e);
