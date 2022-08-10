@@ -165,6 +165,7 @@ public class T106Bean implements Serializable {
                     this.getInvoiceUploadedOfflineByPage(aReferenceNo, aDeviceNo, aSellerTIN, i, pageSize, startDate);
                 }
             } else if (pageCount == 1) {
+                EFRIS_invoice_detailBean efdb = null;
                 for (int i = 0, size = jSONArray.length(); i < size; i++) {
                     JSONObject objectInArray = jSONArray.getJSONObject(i);
                     Gson g = new Gson();
@@ -172,17 +173,21 @@ public class T106Bean implements Serializable {
                     //101:EFD, 102:Windows Client APP, 103:WebService API, 104:Mis, 105:Webportal, 106:Offline Mode Enabler
                     //get 101:EFD and 105:Webportal
                     if (t106.getDataSource().equals("101") || t106.getDataSource().equals("105")) {
-                        String invoiceDetail = this.getTaxInvoiceDecryptedContentOffline(t106.getInvoiceNo(), aDeviceNo, aSellerTIN);
+                        String invoiceDetail = this.getTaxInvoiceDecryptedContentOnline(t106.getInvoiceNo(), aDeviceNo, aSellerTIN);
                         //qrCode and antifakeCode
                         this.setInvoiceQrAntifakeCodes(t106, invoiceDetail);
                         //get goodsDetails
                         List<GoodsDetails> goodsDetails = this.getInvoiceGoodsDetail(invoiceDetail);
 
-                        //save invoice Details
-                        int savedInvoice = new EFRIS_invoice_detailBean().insertEFRIS_invoice_detail(t106);
-                        if (savedInvoice == 1) {
-                            //save goodsDetails
-                            int saved = new EFRIS_good_detailBean().saveEFRIS_good_detail(goodsDetails, t106.getInvoiceNo(), t106.getReferenceNo());
+                        efdb = new EFRIS_invoice_detailBean();
+                        //check if invoice already exists
+                        if (!efdb.isEFRIS_invoice_detail_Exist(t106.getId())) {
+                            //save invoice Details
+                            int savedInvoice = efdb.insertEFRIS_invoice_detail(t106);
+                            if (savedInvoice == 1) {
+                                //save goodsDetails
+                                int saved = new EFRIS_good_detailBean().saveEFRIS_good_detail(goodsDetails, t106.getInvoiceNo(), t106.getReferenceNo());
+                            }
                         }
                     }
                 }
@@ -312,6 +317,7 @@ public class T106Bean implements Serializable {
                 //System.out.println("Invoices:" + jSONArray);
                 //System.out.println("Invoice Length:" + jSONArray.length());
                 //List<T106> itemslist = new ArrayList<>();
+                EFRIS_invoice_detailBean efdb = null;
                 for (int i = 0, size = jSONArray.length(); i < size; i++) {
                     JSONObject objectInArray = jSONArray.getJSONObject(i);
                     Gson g = new Gson();
@@ -325,12 +331,15 @@ public class T106Bean implements Serializable {
                         //get goodsDetails
                         List<GoodsDetails> goodsDetails = this.getInvoiceGoodsDetail(invoiceDetail);
 
-                        //save invoice Details
-                        //int savedInvoice = 0;
-                        int savedInvoice = new EFRIS_invoice_detailBean().insertEFRIS_invoice_detail(t106);
-                        if (savedInvoice == 1) {
-                            //save goodsDetails
-                            int saved = new EFRIS_good_detailBean().saveEFRIS_good_detail(goodsDetails, t106.getInvoiceNo(), t106.getReferenceNo());
+                        efdb = new EFRIS_invoice_detailBean();
+                        //check if invoice already exists
+                        if (!efdb.isEFRIS_invoice_detail_Exist(t106.getId())) {
+                            //save invoice Details
+                            int savedInvoice = efdb.insertEFRIS_invoice_detail(t106);
+                            if (savedInvoice == 1) {
+                                //save goodsDetails
+                                int saved = new EFRIS_good_detailBean().saveEFRIS_good_detail(goodsDetails, t106.getInvoiceNo(), t106.getReferenceNo());
+                            }
                         }
                         //itemslist.add(t106);
                     }
@@ -401,6 +410,7 @@ public class T106Bean implements Serializable {
             JSONArray jSONArray = parentbasicInformationjsonObject.getJSONArray("records");
             JSONObject page = parentbasicInformationjsonObject.getJSONObject("page");
 
+            EFRIS_invoice_detailBean efdb = null;
             for (int i = 0, size = jSONArray.length(); i < size; i++) {
                 JSONObject objectInArray = jSONArray.getJSONObject(i);
                 Gson g = new Gson();
@@ -414,11 +424,15 @@ public class T106Bean implements Serializable {
                     //get goodsDetails
                     List<GoodsDetails> goodsDetails = this.getInvoiceGoodsDetail(invoiceDetail);
 
-                    //save invoice Details
-                    int savedInvoice = new EFRIS_invoice_detailBean().insertEFRIS_invoice_detail(t106);
-                    if (savedInvoice == 1) {
-                        //save goodsDetails
-                        int saved = new EFRIS_good_detailBean().saveEFRIS_good_detail(goodsDetails, t106.getInvoiceNo(), t106.getReferenceNo());
+                    efdb = new EFRIS_invoice_detailBean();
+                    //check if invoice already exists
+                    if (!efdb.isEFRIS_invoice_detail_Exist(t106.getId())) {
+                        //save invoice Details
+                        int savedInvoice = efdb.insertEFRIS_invoice_detail(t106);
+                        if (savedInvoice == 1) {
+                            //save goodsDetails
+                            int saved = new EFRIS_good_detailBean().saveEFRIS_good_detail(goodsDetails, t106.getInvoiceNo(), t106.getReferenceNo());
+                        }
                     }
                 }
             }
@@ -499,6 +513,7 @@ public class T106Bean implements Serializable {
             //System.out.println("Invoices:" + jSONArray);
             JSONObject page = parentbasicInformationjsonObject.getJSONObject("page");
 
+            EFRIS_invoice_detailBean efdb = null;
             for (int i = 0, size = jSONArray.length(); i < size; i++) {
                 JSONObject objectInArray = jSONArray.getJSONObject(i);
                 Gson g = new Gson();
@@ -512,11 +527,15 @@ public class T106Bean implements Serializable {
                     //get goodsDetails
                     List<GoodsDetails> goodsDetails = this.getInvoiceGoodsDetail(invoiceDetail);
 
-                    //save invoice Details
-                    int savedInvoice = new EFRIS_invoice_detailBean().insertEFRIS_invoice_detail(t106);
-                    if (savedInvoice == 1) {
-                        //save goodsDetails
-                        int saved = new EFRIS_good_detailBean().saveEFRIS_good_detail(goodsDetails, t106.getInvoiceNo(), t106.getReferenceNo());
+                    efdb = new EFRIS_invoice_detailBean();
+                    //check if invoice already exists
+                    if (!efdb.isEFRIS_invoice_detail_Exist(t106.getId())) {
+                        //save invoice Details
+                        int savedInvoice = efdb.insertEFRIS_invoice_detail(t106);
+                        if (savedInvoice == 1) {
+                            //save goodsDetails
+                            int saved = new EFRIS_good_detailBean().saveEFRIS_good_detail(goodsDetails, t106.getInvoiceNo(), t106.getReferenceNo());
+                        }
                     }
                 }
             }
@@ -525,7 +544,7 @@ public class T106Bean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     //Get invoice details
     public String getTaxInvoiceDecryptedContentOffline(String aTaxInvoiceNumber, String aDeviceNo, String aSellerTIN) {
         String DecryptedContent = "";
