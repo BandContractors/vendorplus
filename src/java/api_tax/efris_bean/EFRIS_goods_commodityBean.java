@@ -21,9 +21,11 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import org.apache.log4j.Level;
@@ -243,7 +245,7 @@ public class EFRIS_goods_commodityBean implements Serializable {
         }
     }
 
-    public List<EFRIS_goods_commodity> getEFRIS_invoice_detail_All() {
+    public List<EFRIS_goods_commodity> getEFRIS_goods_commodity_All() {
         String sql = "SELECT * FROM efris_goods_commodity";
         ResultSet rs;
         List<EFRIS_goods_commodity> list = new ArrayList<>();
@@ -280,5 +282,22 @@ public class EFRIS_goods_commodityBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
         return list;
+    }
+
+    public Date getGoodsCommodityLastSyncDate() {
+        Date lastDate = null;
+        try {
+            List<EFRIS_goods_commodity> aEFRIS_goods_commodity = this.getEFRIS_goods_commodity_All();
+            //check if the table is empty
+            if (aEFRIS_goods_commodity.size() > 0) {
+                //get last add date
+                int size = aEFRIS_goods_commodity.size();
+                lastDate = aEFRIS_goods_commodity.get(size - 1).getAdd_date();
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+            lastDate = null;
+        }
+        return lastDate;
     }
 }

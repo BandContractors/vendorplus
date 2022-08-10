@@ -1,5 +1,6 @@
 package utilities;
 
+import api_tax.efris_bean.EFRIS_goods_commodityBean;
 import api_tax.efris_bean.T124;
 import beans.AccCurrencyBean;
 import beans.AccJournalBean;
@@ -1120,6 +1121,21 @@ public class UtilityBean implements Serializable {
         } else {
             new T124().generateUNSPCexcelOnline(aFileNameWithPath);
         }
+    }
+
+    public void callDownloadUNSPC() {
+        new T124().downloadGoodsCommodities();
+    }
+
+    public Date getGoodsCommodityLastSyncDate() {
+        Date lastDate;
+        try {
+            lastDate = new EFRIS_goods_commodityBean().getGoodsCommodityLastSyncDate();
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+            lastDate = null;
+        }
+        return lastDate;
     }
 
     public void cleanSaleInvoiceTranss() {

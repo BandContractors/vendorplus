@@ -47,6 +47,18 @@
                         </p:commandButton>
                     </h:panelGrid>
                 </p:tab>
+                <p:tab title="Sync UNSPC From URA">
+                    <h:panelGrid columns="1">
+                        <h:outputLabel id="ura" value="UNSPC never Synced before" rendered="#{utilityBean.getGoodsCommodityLastSyncDate() eq null}"/>
+                        <h:outputLabel id="ura2" value="Last Synced on #{utilityBean.formatDate(utilityBean.getGoodsCommodityLastSyncDate())}" rendered="#{utilityBean.getGoodsCommodityLastSyncDate() ne null}"/>
+                        <p:commandButton styleClass="clsButtonBig" id="cmdbSyncUNSPC" value="Sync UNSPC" accesskey="t" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                            <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                                <p:graphicImage name="/images/ajax-loader.gif"/>
+                            </p:dialog>
+                            <p:ajax listener="#{utilityBean.callDownloadUNSPC()}" process="@form" update="@form" />
+                        </p:commandButton>
+                    </h:panelGrid>
+                </p:tab>
                 <p:tab title="Clean Invoice (TotalPaid Not Updated)">
                     <h:panelGrid columns="1">
                         <p:commandButton styleClass="clsButtonBig" id="cmdbCleanInvoice" value="Clean.Invoice" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
