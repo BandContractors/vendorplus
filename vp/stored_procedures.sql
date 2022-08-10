@@ -1429,6 +1429,18 @@ BEGIN
 END//
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS sp_search_transactor_by_names_equal;
+DELIMITER //
+CREATE PROCEDURE sp_search_transactor_by_names_equal
+(
+	IN in_transactor_names varchar(20) 
+) 
+BEGIN 
+	SELECT * FROM transactor t 
+	WHERE t.transactor_names = in_transactor_names; 
+END//
+DELIMITER ;
+
 DROP PROCEDURE IF EXISTS sp_search_transactor_active_by_name;
 DELIMITER //
 CREATE PROCEDURE sp_search_transactor_active_by_name

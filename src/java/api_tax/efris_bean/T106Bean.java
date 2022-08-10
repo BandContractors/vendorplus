@@ -179,11 +179,7 @@ public class T106Bean implements Serializable {
                         List<GoodsDetails> goodsDetails = this.getInvoiceGoodsDetail(invoiceDetail);
 
                         //save invoice Details
-                        int savedInvoice = new EFRIS_invoice_detailBean().insertEFRIS_invoice_detail(t106);
-                        if (savedInvoice == 1) {
-                            //save goodsDetails
-                            int saved = new EFRIS_good_detailBean().saveEFRIS_good_detail(goodsDetails, t106.getInvoiceNo(), t106.getReferenceNo());
-                        }
+                        this.saveInvoice(t106, goodsDetails);
                     }
                 }
             } else {
@@ -326,13 +322,12 @@ public class T106Bean implements Serializable {
                         List<GoodsDetails> goodsDetails = this.getInvoiceGoodsDetail(invoiceDetail);
 
                         //save invoice Details
-                        //int savedInvoice = 0;
-                        int savedInvoice = new EFRIS_invoice_detailBean().insertEFRIS_invoice_detail(t106);
-                        if (savedInvoice == 1) {
-                            //save goodsDetails
-                            int saved = new EFRIS_good_detailBean().saveEFRIS_good_detail(goodsDetails, t106.getInvoiceNo(), t106.getReferenceNo());
-                        }
-                        //itemslist.add(t106);
+                        this.saveInvoice(t106, goodsDetails);
+                        //int savedInvoice = new EFRIS_invoice_detailBean().insertEFRIS_invoice_detail(t106);
+                        //if (savedInvoice == 1) {
+                        //save goodsDetails
+                        //int saved = new EFRIS_good_detailBean().saveEFRIS_good_detail(goodsDetails, t106.getInvoiceNo(), t106.getReferenceNo());
+                        //}
                     }
                 }
             } else {
@@ -415,11 +410,7 @@ public class T106Bean implements Serializable {
                     List<GoodsDetails> goodsDetails = this.getInvoiceGoodsDetail(invoiceDetail);
 
                     //save invoice Details
-                    int savedInvoice = new EFRIS_invoice_detailBean().insertEFRIS_invoice_detail(t106);
-                    if (savedInvoice == 1) {
-                        //save goodsDetails
-                        int saved = new EFRIS_good_detailBean().saveEFRIS_good_detail(goodsDetails, t106.getInvoiceNo(), t106.getReferenceNo());
-                    }
+                    this.saveInvoice(t106, goodsDetails);
                 }
             }
         } catch (Exception e) {
@@ -513,11 +504,7 @@ public class T106Bean implements Serializable {
                     List<GoodsDetails> goodsDetails = this.getInvoiceGoodsDetail(invoiceDetail);
 
                     //save invoice Details
-                    int savedInvoice = new EFRIS_invoice_detailBean().insertEFRIS_invoice_detail(t106);
-                    if (savedInvoice == 1) {
-                        //save goodsDetails
-                        int saved = new EFRIS_good_detailBean().saveEFRIS_good_detail(goodsDetails, t106.getInvoiceNo(), t106.getReferenceNo());
-                    }
+                    this.saveInvoice(t106, goodsDetails);
                 }
             }
         } catch (Exception e) {
@@ -676,6 +663,17 @@ public class T106Bean implements Serializable {
                     int saved = new EFRIS_good_detailBean().saveEFRIS_good_detail(aGoodsDetails, aT106.getInvoiceNo(), aT106.getReferenceNo());
                 }
             }
+
+            //EFRIS_invoice_detailBean efdb = new EFRIS_invoice_detailBean();
+            //check if invoice already exists
+            //if (!efdb.isEFRIS_invoice_detail_Exist(aT106.getId())) {
+            //save invoice Details
+            //int savedInvoice = efdb.insertEFRIS_invoice_detail(aT106);
+            //if (savedInvoice == 1) {
+            //save goodsDetails
+            //int saved = new EFRIS_good_detailBean().saveEFRIS_good_detail(aGoodsDetails, aT106.getInvoiceNo(), aT106.getReferenceNo());
+            //}
+            //}
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }

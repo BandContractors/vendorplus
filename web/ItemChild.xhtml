@@ -507,7 +507,7 @@
                             <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
                             <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
                         </h:selectOneMenu>
-                        <p:commandButton value="Add" icon="ui-icon-plus" actionListener="#{itemBean.addItem_unit_other(itemBean.item_unit_otherObj)}" update="formMain:pnlgItemUnit2 formMain:tblItemUnit formMain:growlIU"/>
+                        <p:commandButton value="#{langsys['Add']}" icon="ui-icon-plus" actionListener="#{itemBean.addItem_unit_other(itemBean.item_unit_otherObj)}" update="formMain:pnlgItemUnit2 formMain:tblItemUnit formMain:growlIU"/>
                     </h:panelGrid>
                     <p:dataTable id="tblItemUnit" rowIndexVar="rowIndex" tableStyle="width:auto;" var="iu" value="#{itemBean.item_unit_otherList}" 
                                  rowStyleClass="#{iu.is_active eq 1 ? 'white' : 'red'}">

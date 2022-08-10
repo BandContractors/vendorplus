@@ -716,6 +716,25 @@ public class EFRIS_invoice_detailBean implements Serializable {
         return list;
     }
 
+    // to validate existing invoices not pushed yet
+    public Boolean isEFRIS_invoice_detail_Exist(String id) {
+        String sql = "SELECT * FROM efris_invoice_detail where id=?";
+        ResultSet rs;
+        List<EFRIS_invoice_detail> list = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setString(1, id);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                return true;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return false;
+    }
+
     public void reSynchEFDLogsDetail(long aEFRIS_invoice_detail_id) {
         try {
             //resynch

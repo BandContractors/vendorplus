@@ -39,3 +39,7 @@ ADD COLUMN qr_code VARCHAR(1000) NOT NULL DEFAULT '' AFTER verification_code;
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_18',39,Now(),'6.0','');
 
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (97, 'GENERAL', 'FORCE_UNIT_SELECTION', '0','0:No and 1:Yes. If Yes, Unit will be selected manually at each transaction. If No, default unit is be selected automatically.');
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',44,Now(),'6.0','');
+
