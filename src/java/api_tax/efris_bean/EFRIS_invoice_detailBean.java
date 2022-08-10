@@ -657,6 +657,27 @@ public class EFRIS_invoice_detailBean implements Serializable {
         }
     }
 
+    public EFRIS_invoice_detail getEFRIS_invoice_detailById(String aId) {
+        String sql = "SELECT * FROM efris_invoice_detail WHERE id=?";
+        ResultSet rs;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setString(1, aId);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                EFRIS_invoice_detail obj = new EFRIS_invoice_detail();
+                this.setEFRIS_invoice_detailFromResultset(obj, rs);
+                return obj;
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+            return null;
+        }
+    }
+
     public List<EFRIS_invoice_detail> getEFRIS_invoice_detail_All() {
         String sql = "SELECT * FROM efris_invoice_detail";
         ResultSet rs;

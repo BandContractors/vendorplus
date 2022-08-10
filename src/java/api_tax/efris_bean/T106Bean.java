@@ -525,7 +525,7 @@ public class T106Bean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
+
     //Get invoice details
     public String getTaxInvoiceDecryptedContentOffline(String aTaxInvoiceNumber, String aDeviceNo, String aSellerTIN) {
         String DecryptedContent = "";
@@ -662,6 +662,23 @@ public class T106Bean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
         return goodsDetails;
+    }
+
+    public void saveInvoice(T106 aT106, List<GoodsDetails> aGoodsDetails) {
+        try {
+            //check if invoice already in db
+            EFRIS_invoice_detail eFRIS_invoice_detail = new EFRIS_invoice_detailBean().getEFRIS_invoice_detailById(aT106.getId());
+            if (eFRIS_invoice_detail == null) {
+                //save invoice Details
+                int savedInvoice = new EFRIS_invoice_detailBean().insertEFRIS_invoice_detail(aT106);
+                if (savedInvoice == 1) {
+                    //save goodsDetails
+                    int saved = new EFRIS_good_detailBean().saveEFRIS_good_detail(aGoodsDetails, aT106.getInvoiceNo(), aT106.getReferenceNo());
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
     }
 
 }
