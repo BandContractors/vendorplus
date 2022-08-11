@@ -212,7 +212,7 @@ public class TransactorBean implements Serializable {
         String sql3 = null;
         String sql4 = null;
         String sql5 = null;
-        String TaxBranchNo = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value();
+        String TaxBranchNo = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value();
         sql2 = "SELECT * FROM transactor WHERE transactor_names='" + transactor.getTransactorNames() + "'";
         sql3 = "SELECT * FROM transactor WHERE transactor_names='" + transactor.getTransactorNames() + "' AND transactor_id!=" + transactor.getTransactorId();
         sql4 = "SELECT * FROM transactor WHERE transactor_ref='" + transactor.getTransactorRef() + "'";
@@ -227,6 +227,61 @@ public class TransactorBean implements Serializable {
         } else if (transactor.getTransactorId() > 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, new NavigationBean().getTransactorReasonStr(new GeneralUserSetting().getTransactorType()), "Edit") == 0) {
             msg = "Not Allowed to Access this Function";
         } else if (new CustomValidator().TextSize(transactor.getTransactorType(), 1, 20).equals("FAIL")) {
+            msg = "Type Must be Between 1 and 20 Characters";
+        } else if (new CustomValidator().TextSize(transactor.getCategory(), 1, 20).equals("FAIL")) {
+            msg = "Category Must be Between 1 and 20 Characters";
+        } else if (new CustomValidator().TextSize(transactor.getTransactorNames(), 3, 100).equals("FAIL")) {
+            msg = "Business Name Must be Between 3 and 100 Characters";
+        } else if (new CustomValidator().TextSize(transactor.getTrade_name(), 0, 100).equals("FAIL")) {
+            msg = "Trade Name Must be Between 3 and 100 Characters";
+        } else if (new CustomValidator().TextSize(transactor.getPhone(), 0, 100).equals("FAIL")) {
+            msg = "Phone Must be Between 1 and 100 Characters";
+        } else if (new CustomValidator().TextSize(transactor.getEmail(), 0, 100).equals("FAIL")) {
+            msg = "Email Must be Between 1 and 100 Characters";
+        } else if (new CustomValidator().TextSize(transactor.getWebsite(), 0, 100).equals("FAIL")) {
+            msg = "Website Must be Between 1 and 100 Characters";
+        } else if (new CustomValidator().TextSize(transactor.getCpName(), 0, 100).equals("FAIL")) {
+            msg = "Contact Person Name Must be Between 1 and 100 Characters";
+        } else if (new CustomValidator().TextSize(transactor.getCpTitle(), 0, 100).equals("FAIL")) {
+            msg = "Contact Person Ttitle Must be Between 1 and 100 Characters";
+        } else if (new CustomValidator().TextSize(transactor.getCpPhone(), 0, 100).equals("FAIL")) {
+            msg = "Contact Person Phone Must be Between 1 and 100 Characters";
+        } else if (new CustomValidator().TextSize(transactor.getCpEmail(), 0, 100).equals("FAIL")) {
+            msg = "Contact Person Email Must be Between 1 and 100 Characters";
+        } else if (new CustomValidator().TextSize(transactor.getPhysicalAddress(), 0, 255).equals("FAIL")) {
+            msg = "Physical Address Must be Between 1 and 250 Characters";
+        } else if (new CustomValidator().TextSize(transactor.getTaxIdentity(), 0, 100).equals("FAIL")) {
+            msg = "Tax Identity Must be Between 1 and 100 Characters";
+        } else if (new CustomValidator().TextSize(transactor.getAccountDetails(), 0, 255).equals("FAIL")) {
+            msg = "Account Details Cannot Exceed 255 Characters";
+        } else if ((new CustomValidator().CheckRecords(sql2) > 0 && transactor.getTransactorId() == 0) || (new CustomValidator().CheckRecords(sql3) > 0 && transactor.getTransactorId() > 0)) {
+            msg = "Name Already Exists";
+        } else if (transtype.getTrans_number_format().length() == 0 && ((new CustomValidator().CheckRecords(sql4) > 0 && transactor.getTransactorId() == 0) || (new CustomValidator().CheckRecords(sql5) > 0 && transactor.getTransactorId() > 0))) {
+            msg = "Reference Number Already Exists!";
+        } else if (TaxBranchNo.length() > 0 && transactor.getCategory().equals("Business") && transactor.getTaxIdentity().length() == 0) {
+            msg = "Enter Tax Identification Number for the Business";
+        } else if (TaxBranchNo.length() > 0 && transactor.getCategory().equals("Government") && transactor.getTaxIdentity().length() == 0) {
+            msg = "Enter Tax Identification Number for the Government Entity";
+        } else if (TaxBranchNo.length() > 0 && transactor.getCategory().equals("Consumer") && transactor.getTaxIdentity().length() == 0 && transactor.getIdNumber().length() == 0 && transactor.getPhone().length() == 0) {
+            msg = "Enter Phone Number or Identification Number for the Consumer";
+        }
+        return msg;
+    }
+
+    public String validateTransactor(Transactor transactor) {
+        String sql = null;
+        String msg = "";
+        String sql2 = null;
+        String sql3 = null;
+        String sql4 = null;
+        String sql5 = null;
+        String TaxBranchNo = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value();
+        sql2 = "SELECT * FROM transactor WHERE transactor_names='" + transactor.getTransactorNames() + "'";
+        sql3 = "SELECT * FROM transactor WHERE transactor_names='" + transactor.getTransactorNames() + "' AND transactor_id!=" + transactor.getTransactorId();
+        sql4 = "SELECT * FROM transactor WHERE transactor_ref='" + transactor.getTransactorRef() + "'";
+        sql5 = "SELECT * FROM transactor WHERE transactor_ref='" + transactor.getTransactorRef() + "' AND transactor_id!=" + transactor.getTransactorId();
+        TransactionType transtype = new TransactionTypeBean().getTransactionType(17);
+        if (new CustomValidator().TextSize(transactor.getTransactorType(), 1, 20).equals("FAIL")) {
             msg = "Type Must be Between 1 and 20 Characters";
         } else if (new CustomValidator().TextSize(transactor.getCategory(), 1, 20).equals("FAIL")) {
             msg = "Category Must be Between 1 and 20 Characters";
@@ -313,6 +368,39 @@ public class TransactorBean implements Serializable {
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Transaction Not Saved")));
             }
         }
+    }
+
+    public String saveTransactorAPI(Transactor transactor, int aUserId, int aStoreId) {
+        String msg = "";
+        String ValidationMsg = this.validateTransactor(transactor);
+        if (ValidationMsg.length() > 0) {
+            msg = ValidationMsg;
+        } else {
+            try {
+                long TransId = 0;
+                try {
+                    TransactionType transtype = new TransactionTypeBean().getTransactionType(17);
+                    if (transactor.getTransactorId() == 0) {
+                        if (transtype.getTrans_number_format().length() > 0) {
+                            transactor.setTransactorRef(new Trans_number_controlBean().getNewTransNumber(transtype, aUserId, aStoreId));
+                            new Trans_number_controlBean().updateTrans_number_control(transtype);
+                        }
+                        transactor.setStore_id(aStoreId);
+                    }
+                    TransId = this.insertUpdateTransactor(transactor);
+                } catch (NullPointerException npe) {
+                    TransId = 0;
+                }
+                if (TransId > 0) {
+                    msg = "success:" + TransId;
+                } else {
+                    msg = "Saving Transactor Failed";
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
+            }
+        }
+        return msg;
     }
 
     public long insertUpdateTransactor(Transactor transactor) {
@@ -1088,7 +1176,7 @@ public class TransactorBean implements Serializable {
             transactor.setMonthNetPay(0);
             transactor.setTransactor_segment_id(0);
             transactor.setStore_id(0);
-            transactor.setLocCountry(new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "COUNTRY_CODE").getParameter_value());
+            transactor.setLocCountry(new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "COUNTRY_CODE").getParameter_value());
             transactor.setIs_credit_limit(0);
             transactor.setCredit_limit(0);
             transactor.setTrade_name("");
@@ -1334,7 +1422,7 @@ public class TransactorBean implements Serializable {
             return null;
         }
     }
-    
+
     public Transactor getTransactorBy_transactor_names_equal(String transactor_names) {
         String sql = "{call sp_search_transactor_by_names_equal(?)}";
         ResultSet rs;
@@ -1774,7 +1862,7 @@ public class TransactorBean implements Serializable {
         }
         return uniqueLocDistrictList;
     }
-    
+
     public void checkExemptDemmedTaxpayer(long aTransactorId, long aItemId) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";

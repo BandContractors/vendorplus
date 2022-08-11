@@ -242,6 +242,7 @@
                 </p:column>
                 <p:column headerText="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}">
                     <h:outputText value="#{transactorBean.getTransactor(itm.transactorId).transactorNames}"/>
+                    <h:outputText value=" (#{langsys['Attention']}: #{itm.transactor_rep})" rendered="#{itm.transactor_rep.length() gt 0}"/>
                 </p:column>
                 <p:column headerText="Tax #{langsys['Identity']}" visible="false">
                     <h:outputText value="#{transactorBean.getTransactor(itm.billTransactorId).taxIdentity}"/>

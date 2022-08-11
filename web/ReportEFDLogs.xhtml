@@ -99,7 +99,7 @@
                         </p:menuitem>
                     </p:splitButton>
                 </p:column>
-                <p:column headerText="#{langsys['Invoice']} #{langsys['No']}">
+                <p:column headerText="FDN">
                     <h:outputLabel value="#{itm.invoiceNo}"/>
                 </p:column>
                 <p:column headerText="#{langsys[transactionTypeBean.getTransactionType(2).transactionDateLabel]}" visible="false">
@@ -108,7 +108,7 @@
                 <p:column headerText="#{langsys['Add']} #{langsys['Date']}">
                     <h:outputText value="#{utilityBean.formatDate(itm.add_date)}"/>
                 </p:column>
-                <p:column headerText="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}">
+                <p:column headerText="#{langsys['Customer']} #{langsys['Name']}">
                     <h:outputText value="#{itm.buyerLegalName}"/>
                 </p:column>
                 <p:column headerText="#{langsys['Currency']}">

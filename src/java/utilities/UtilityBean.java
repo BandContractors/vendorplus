@@ -775,8 +775,7 @@ public class UtilityBean implements Serializable {
     }
 
 //    public static void main(String[] args) {
-//        java.util.Date du=new java.util.Date;
-//        java.sql.Date ds=new java.sql.Timestamp
+//        System.out.println("A:" + "success:123".contains("succesps"));
 //    }
     public List<ThreadClass> getRunningThreads() {
         List<ThreadClass> objs = new ArrayList<>();

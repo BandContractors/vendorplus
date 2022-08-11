@@ -327,12 +327,12 @@ public class EFRIS_invoice_detailBean implements Serializable {
                 aEFRIS_invoice_detail.setProcess_desc(aResultSet.getString("process_desc"));
             } catch (Exception e) {
                 aEFRIS_invoice_detail.setProcess_desc("");
-            }            
+            }
             try {
                 aEFRIS_invoice_detail.setAntifakeCode(aResultSet.getString("verification_code"));
             } catch (Exception e) {
                 aEFRIS_invoice_detail.setAntifakeCode("");
-            }            
+            }
             try {
                 aEFRIS_invoice_detail.setQrCode(aResultSet.getString("qr_code"));
             } catch (Exception e) {
@@ -368,20 +368,71 @@ public class EFRIS_invoice_detailBean implements Serializable {
                 aTrans.setTransactionNumber("");
             }
             try {
+                aTrans.setStoreId(this.getStoreByDeviceNo(aEFRIS_invoice_detail.getDeviceNo()).getStoreId());
+            } catch (Exception e) {
+                aTrans.setStoreId(0);
+            }
+            try {
+                UserDetail aUserDetail;
+                if (aEFRIS_invoice_detail.getOperator().length() > 0) {
+                    aUserDetail = new UserDetailBean().getUserDetailByUserName(aEFRIS_invoice_detail.getOperator());
+                    aTrans.setAddUserDetailId(aUserDetail.getUserDetailId());
+                    aTrans.setAddUserDetailName(aUserDetail.getUserName());
+                    aTrans.setTransactionUserDetailId(aUserDetail.getUserDetailId());
+                    aTrans.setTransactionUserDetailName(aUserDetail.getUserName());
+                } else {
+                    aTrans.setAddUserDetailId(0);
+                    aTrans.setAddUserDetailName("");
+                    aTrans.setTransactionUserDetailId(0);
+                    aTrans.setTransactionUserDetailName("");
+                }
+            } catch (Exception e) {
+                aTrans.setAddUserDetailId(0);
+                aTrans.setAddUserDetailName("");
+                aTrans.setTransactionUserDetailId(0);
+                aTrans.setTransactionUserDetailName("");
+            }
+            try {
                 Transactor aTransactor = null;
                 //get transactor using taxIdentity TIN
                 if (null != aEFRIS_invoice_detail.getBuyerTin()) {
                     if (aEFRIS_invoice_detail.getBuyerTin().length() > 0) {
                         aTransactor = new TransactorBean().getTransactorBy_tax_identity(aEFRIS_invoice_detail.getBuyerTin());
+                        //add transactor from background and use what has been added
+                        try {
+                            if (null == aTransactor && aEFRIS_invoice_detail.getBuyerLegalName().length() > 0) {
+                                //add
+                                TransactorBean trBean = new TransactorBean();
+                                Transactor tr = new Transactor();
+                                trBean.clearTransactor(tr);
+                                tr.setTaxIdentity(aEFRIS_invoice_detail.getBuyerTin());
+                                tr.setTransactorNames(aEFRIS_invoice_detail.getBuyerLegalName());
+                                tr.setTransactorType("CUSTOMER");
+                                tr.setCategory("Business");
+                                tr.setIsSuspended("No");
+                                tr.setStore_id(aTrans.getStoreId());
+                                String trMsg = trBean.saveTransactorAPI(tr, aTrans.getAddUserDetailId(), aTrans.getStoreId());
+                                long trId = 0;
+                                if (trMsg.contains("success:")) {
+                                    trId = Long.parseLong(new UtilityBean().getStringArrayFromXSeperatedStr(trMsg, ":")[1]);
+                                }
+                                //get added
+                                if (trId > 0) {
+                                    aTransactor = new TransactorBean().getTransactorBy_tax_identity(aEFRIS_invoice_detail.getBuyerTin());
+                                }
+                            }
+                        } catch (Exception e) {
+                            LOGGER.log(Level.ERROR, e);
+                        }
                     }
                 }
                 //get transactor using legalname or transactorNames
                 if (null != aEFRIS_invoice_detail.getBuyerLegalName()) {
                     if (aEFRIS_invoice_detail.getBuyerLegalName().length() > 0 && aTransactor == null) {
-                        aTransactor = new TransactorBean().getTransactorBy_transactor_names(aEFRIS_invoice_detail.getBuyerLegalName());
+                        aTransactor = new TransactorBean().getTransactorBy_transactor_names_equal(aEFRIS_invoice_detail.getBuyerLegalName());
                     }
                 }
-                //et default customer
+                //Set default customer
                 if (new Parameter_listBean().getParameter_listByContextName("GENERAL", "WALK_IN_CUSTOMER_DEFAULT_REFNO").getParameter_value().length() > 0 && aTransactor == null) {
                     String refNo = new Parameter_listBean().getParameter_listByContextName("GENERAL", "WALK_IN_CUSTOMER_DEFAULT_REFNO").getParameter_value();
                     aTransactor = new TransactorBean().getTransactorBy_transactor_ref(refNo);
@@ -405,17 +456,17 @@ public class EFRIS_invoice_detailBean implements Serializable {
                 aTrans.setTransactionReasonId(0);
             }
             try {
-                aTrans.setSubTotal(Integer.parseInt(aEFRIS_invoice_detail.getGrossAmount()) - Integer.parseInt(aEFRIS_invoice_detail.getTaxAmount()));
+                aTrans.setSubTotal(Double.parseDouble(aEFRIS_invoice_detail.getGrossAmount()) - Double.parseDouble(aEFRIS_invoice_detail.getTaxAmount()));
             } catch (Exception e) {
                 aTrans.setSubTotal(0);
             }
             try {
-                aTrans.setTotalVat(Integer.parseInt(aEFRIS_invoice_detail.getTaxAmount()));;
+                aTrans.setTotalVat(Double.parseDouble(aEFRIS_invoice_detail.getTaxAmount()));;
             } catch (Exception e) {
                 aTrans.setTotalVat(0);
             }
             try {
-                aTrans.setGrandTotal(Integer.parseInt(aEFRIS_invoice_detail.getGrossAmount()));;
+                aTrans.setGrandTotal(Double.parseDouble(aEFRIS_invoice_detail.getGrossAmount()));;
             } catch (Exception e) {
                 aTrans.setGrandTotal(0);
             }
@@ -443,31 +494,6 @@ public class EFRIS_invoice_detailBean implements Serializable {
                 aTrans.setXrate(1);
             } catch (Exception e) {
                 aTrans.setXrate(0);
-            }
-            try {
-                aTrans.setStoreId(this.getStoreByDeviceNo(aEFRIS_invoice_detail.getDeviceNo()).getStoreId());
-            } catch (Exception e) {
-                aTrans.setStoreId(0);
-            }
-            try {
-                UserDetail aUserDetail;
-                if (aEFRIS_invoice_detail.getOperator().length() > 0) {
-                    aUserDetail = new UserDetailBean().getUserDetailByUserName(aEFRIS_invoice_detail.getOperator());
-                    aTrans.setAddUserDetailId(aUserDetail.getUserDetailId());
-                    aTrans.setAddUserDetailName(aUserDetail.getUserName());
-                    aTrans.setTransactionUserDetailId(aUserDetail.getUserDetailId());
-                    aTrans.setTransactionUserDetailName(aUserDetail.getUserName());
-                } else {
-                    aTrans.setAddUserDetailId(0);
-                    aTrans.setAddUserDetailName("");
-                    aTrans.setTransactionUserDetailId(0);
-                    aTrans.setTransactionUserDetailName("");
-                }
-            } catch (Exception e) {
-                aTrans.setAddUserDetailId(0);
-                aTrans.setAddUserDetailName("");
-                aTrans.setTransactionUserDetailId(0);
-                aTrans.setTransactionUserDetailName("");
             }
             try {
                 String currencyCode = aTrans.getCurrencyCode();
