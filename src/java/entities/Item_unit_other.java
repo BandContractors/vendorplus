@@ -32,6 +32,7 @@ public class Item_unit_other implements Serializable {
     private int is_active;
     private String last_edit_by;
     private Date last_edit_date;
+    private int base_unit_id;
 
     /**
      * @return the item_unit_other_id
@@ -241,6 +242,20 @@ public class Item_unit_other implements Serializable {
      */
     public void setOther_unit_symbol(String other_unit_symbol) {
         this.other_unit_symbol = other_unit_symbol;
+    }
+
+    /**
+     * @return the base_unit_id
+     */
+    public int getBase_unit_id() {
+        return base_unit_id;
+    }
+
+    /**
+     * @param base_unit_id the base_unit_id to set
+     */
+    public void setBase_unit_id(int base_unit_id) {
+        this.base_unit_id = base_unit_id;
     }
 
 }

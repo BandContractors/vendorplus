@@ -15,21 +15,21 @@ create table item_unit_other (
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_18',15,Now(),'6.0','');
 
+-- drop table transaction_item_unit;
+-- drop table transaction_item_cr_dr_note_unit;
+-- drop table transaction_item_hist_unit;
+-- drop table trans_production_item_unit;
+-- drop table trans_production_unit; 
 CREATE TABLE IF NOT EXISTS transaction_item_unit (PRIMARY KEY (transaction_item_id)) AS 
-select ti.transaction_item_id,i.unit_id from transaction_item ti inner join item i on ti.item_id=i.item_id;
-
+select ti.transaction_item_id,i.unit_id,ti.item_qty as base_unit_qty from transaction_item ti inner join item i on ti.item_id=i.item_id;
 CREATE TABLE IF NOT EXISTS transaction_item_cr_dr_note_unit (PRIMARY KEY (transaction_item_id)) AS 
-select ti.transaction_item_id,i.unit_id from transaction_item_cr_dr_note ti inner join item i on ti.item_id=i.item_id;
-
+select ti.transaction_item_id,i.unit_id,ti.item_qty as base_unit_qty from transaction_item_cr_dr_note ti inner join item i on ti.item_id=i.item_id;
 CREATE TABLE IF NOT EXISTS transaction_item_hist_unit (PRIMARY KEY (transaction_item_hist_id)) AS 
-select ti.transaction_item_hist_id,i.unit_id from transaction_item_hist ti inner join item i on ti.item_id=i.item_id;
-
+select ti.transaction_item_hist_id,i.unit_id,ti.item_qty as base_unit_qty from transaction_item_hist ti inner join item i on ti.item_id=i.item_id;
 CREATE TABLE IF NOT EXISTS trans_production_item_unit (PRIMARY KEY (trans_production_item_id)) AS 
-select ti.trans_production_item_id,i.unit_id from trans_production_item ti inner join item i on ti.input_item_id=i.item_id;
-
+select ti.trans_production_item_id,i.unit_id,ti.input_qty as base_unit_qty from trans_production_item ti inner join item i on ti.input_item_id=i.item_id;
 CREATE TABLE IF NOT EXISTS trans_production_unit (PRIMARY KEY (transaction_id)) AS 
-select ti.transaction_id,i.unit_id from trans_production ti inner join item i on ti.output_item_id=i.item_id;
-
+select ti.transaction_id,i.unit_id,ti.output_qty as base_unit_qty from trans_production ti inner join item i on ti.output_item_id=i.item_id;
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) 
 VALUES('scrpt_db_upgrade_18',33,Now(),'6.0','');
 
@@ -40,6 +40,6 @@ INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_
 VALUES('scrpt_db_upgrade_18',39,Now(),'6.0','');
 
 INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
-VALUES (97, 'GENERAL', 'FORCE_UNIT_SELECTION', '0','0:No and 1:Yes. If Yes, Unit will be selected manually at each transaction. If No, default unit is be selected automatically.');
+VALUES (97, 'GENERAL', 'FORCE_UNIT_SELECTION', '0','0:No and 1:Yes. If Yes, Unit will be selected manually at each transaction. If No, default unit is be selected automatically. Applies to Items with multiple units');
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',44,Now(),'6.0','');
 

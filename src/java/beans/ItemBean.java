@@ -11,6 +11,7 @@ import entities.Item;
 import entities.Item_code_other;
 import entities.Item_store_reorder;
 import entities.Item_tax_map;
+import entities.Item_unit;
 import entities.Item_unit_other;
 import entities.Item_unspsc;
 import entities.Location;
@@ -96,6 +97,7 @@ public class ItemBean implements Serializable {
     private Item_unit_other Item_unit_otherObj;
     private int ReorderLevelEdited;
     private int ItemOtherUnitsEdited;
+    private List<Item_unit> Item_unitList = new ArrayList<>();
 
     public void refreshInventoryType(Item aItem, String aItemPurpose) {
         try {
@@ -1096,6 +1098,63 @@ public class ItemBean implements Serializable {
                 aItem_unit_other.setLast_edit_date(new Date(aResultSet.getTimestamp("last_edit_date").getTime()));
             } catch (Exception e) {
                 aItem_unit_other.setLast_edit_date(null);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void setItem_unitFromResultset(Item_unit aItem_unit, ResultSet aResultSet) {
+        try {
+            try {
+                aItem_unit.setUnit_id(aResultSet.getInt("unit_id"));
+            } catch (Exception e) {
+                aItem_unit.setUnit_id(0);
+            }
+            try {
+                aItem_unit.setUnit_symbol(aResultSet.getString("unit_symbol"));
+            } catch (Exception e) {
+                aItem_unit.setUnit_symbol("");
+            }
+            try {
+                aItem_unit.setUnit_name(aResultSet.getString("unit_name"));
+            } catch (Exception e) {
+                aItem_unit.setUnit_name("");
+            }
+            try {
+                aItem_unit.setIs_base(aResultSet.getInt("is_base"));
+            } catch (Exception e) {
+                aItem_unit.setIs_base(0);
+            }
+            try {
+                aItem_unit.setDefault_purchase(aResultSet.getInt("default_purchase"));
+            } catch (Exception e) {
+                aItem_unit.setDefault_purchase(0);
+            }
+            try {
+                aItem_unit.setDefault_sale(aResultSet.getInt("default_sale"));
+            } catch (Exception e) {
+                aItem_unit.setDefault_sale(0);
+            }
+            try {
+                aItem_unit.setBase_qty(aResultSet.getDouble("base_qty"));
+            } catch (Exception e) {
+                aItem_unit.setBase_qty(0);
+            }
+            try {
+                aItem_unit.setOther_qty(aResultSet.getDouble("other_qty"));
+            } catch (Exception e) {
+                aItem_unit.setOther_qty(0);
+            }
+            try {
+                aItem_unit.setUnit_retailsale_price(aResultSet.getDouble("unit_retailsale_price"));
+            } catch (Exception e) {
+                aItem_unit.setUnit_retailsale_price(0);
+            }
+            try {
+                aItem_unit.setUnit_wholesale_price(aResultSet.getDouble("unit_wholesale_price"));
+            } catch (Exception e) {
+                aItem_unit.setUnit_wholesale_price(0);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -4593,6 +4652,44 @@ public class ItemBean implements Serializable {
         }
     }
 
+    public void setItemUnitList(List<Item_unit> aItem_unitList, Item aItem) {
+        String sql;
+        sql = "select un.* from "
+                + "("
+                + "select i.unit_id,u.unit_symbol,u.unit_name,1 as is_base,0 as default_sale,0 as default_purchase,"
+                + "1 as base_qty,1 as other_qty,i.unit_retailsale_price,i.unit_wholesale_price "
+                + "from item i inner join unit u on i.unit_id=u.unit_id where i.item_id=? "
+                + "UNION "
+                + "select u.unit_id,u.unit_symbol,u.unit_name,0 as is_base,iu.other_default_sale as default_sale,iu.other_default_purchase as default_purchase,"
+                + "iu.base_qty,iu.other_qty,iu.other_unit_retailsale_price as unit_retailsale_price,iu.other_unit_wholesale_price as unit_wholesale_price "
+                + "from item_unit_other iu inner join unit u on iu.other_unit_id=u.unit_id where iu.is_active=1 and iu.item_id=? "
+                + ") as un order by default_sale desc,is_base desc";
+        ResultSet rs = null;
+        try {
+            aItem_unitList.clear();
+        } catch (Exception e) {
+            aItem_unitList = new ArrayList<>();
+        }
+        if (null == aItem) {
+            //do nothing
+        } else {
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                ps.setLong(1, aItem.getItemId());
+                ps.setLong(2, aItem.getItemId());
+                rs = ps.executeQuery();
+                while (rs.next()) {
+                    Item_unit iu = new Item_unit();
+                    this.setItem_unitFromResultset(iu, rs);
+                    aItem_unitList.add(iu);
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
+            }
+        }
+    }
+
     /**
      * @param Items the Items to set
      */
@@ -5025,5 +5122,19 @@ public class ItemBean implements Serializable {
      */
     public void setItemOtherUnitsEdited(int ItemOtherUnitsEdited) {
         this.ItemOtherUnitsEdited = ItemOtherUnitsEdited;
+    }
+
+    /**
+     * @return the Item_unitList
+     */
+    public List<Item_unit> getItem_unitList() {
+        return Item_unitList;
+    }
+
+    /**
+     * @param Item_unitList the Item_unitList to set
+     */
+    public void setItem_unitList(List<Item_unit> Item_unitList) {
+        this.Item_unitList = Item_unitList;
     }
 }

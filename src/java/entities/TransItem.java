@@ -122,6 +122,9 @@ public class TransItem implements Serializable {
     private int is_tax_synced=1;
     private double discount_amount;//cash discount + loyalty discount
     private int hide_unit_price_invoice;
+    private int unit_id;
+    private double base_unit_qty;
+    private Item_unit Item_unitObj;
     /**
      * @return the TransactionItemId
      */
@@ -1478,6 +1481,48 @@ public class TransItem implements Serializable {
      */
     public void setHide_unit_price_invoice(int hide_unit_price_invoice) {
         this.hide_unit_price_invoice = hide_unit_price_invoice;
+    }
+
+    /**
+     * @return the unit_id
+     */
+    public int getUnit_id() {
+        return unit_id;
+    }
+
+    /**
+     * @param unit_id the unit_id to set
+     */
+    public void setUnit_id(int unit_id) {
+        this.unit_id = unit_id;
+    }
+
+    /**
+     * @return the base_unit_qty
+     */
+    public double getBase_unit_qty() {
+        return base_unit_qty;
+    }
+
+    /**
+     * @param base_unit_qty the base_unit_qty to set
+     */
+    public void setBase_unit_qty(double base_unit_qty) {
+        this.base_unit_qty = base_unit_qty;
+    }
+
+    /**
+     * @return the Item_unitObj
+     */
+    public Item_unit getItem_unitObj() {
+        return Item_unitObj;
+    }
+
+    /**
+     * @param Item_unitObj the Item_unitObj to set
+     */
+    public void setItem_unitObj(Item_unit Item_unitObj) {
+        this.Item_unitObj = Item_unitObj;
     }
 
 }
