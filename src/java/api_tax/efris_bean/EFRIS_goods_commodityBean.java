@@ -163,22 +163,82 @@ public class EFRIS_goods_commodityBean implements Serializable {
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             //commodityCategoryCode, parentCode, commodityCategoryName, commodityCategoryLevel, rate, isLeafNode, serviceMark, isZeroRate
-            ps.setString(1, aGoodsCommodity.getCommodityCategoryCode());
-            ps.setString(2, aGoodsCommodity.getParentCode());
-            ps.setString(3, aGoodsCommodity.getCommodityCategoryName());
-            ps.setString(4, aGoodsCommodity.getCommodityCategoryLevel());
-            ps.setString(5, aGoodsCommodity.getRate());
-            ps.setString(6, aGoodsCommodity.getIsLeafNode());
-            ps.setString(7, aGoodsCommodity.getServiceMark());
-            ps.setString(8, aGoodsCommodity.getIsZeroRate());
+            if (aGoodsCommodity.getCommodityCategoryCode() != null) {
+                ps.setString(1, aGoodsCommodity.getCommodityCategoryCode());
+            } else {
+                ps.setString(1, "");
+            }
+            if (aGoodsCommodity.getParentCode() != null) {
+                ps.setString(2, aGoodsCommodity.getParentCode());
+            } else {
+                ps.setString(2, "");
+            }
+            if (aGoodsCommodity.getCommodityCategoryName() != null) {
+                ps.setString(3, aGoodsCommodity.getCommodityCategoryName());
+            } else {
+                ps.setString(3, "");
+            }
+            if (aGoodsCommodity.getCommodityCategoryLevel() != null) {
+                ps.setString(4, aGoodsCommodity.getCommodityCategoryLevel());
+            } else {
+                ps.setString(4, "");
+            }
+            if (aGoodsCommodity.getRate() != null) {
+                ps.setString(5, aGoodsCommodity.getRate());
+            } else {
+                ps.setString(5, "");
+            }
+            if (aGoodsCommodity.getIsLeafNode() != null) {
+                ps.setString(6, aGoodsCommodity.getIsLeafNode());
+            } else {
+                ps.setString(6, "");
+            }
+            if (aGoodsCommodity.getServiceMark() != null) {
+                ps.setString(7, aGoodsCommodity.getServiceMark());
+            } else {
+                ps.setString(7, "");
+            }
+            if (aGoodsCommodity.getIsZeroRate() != null) {
+                ps.setString(8, aGoodsCommodity.getIsZeroRate());
+            } else {
+                ps.setString(8, "");
+            }
             //zeroRateStartDate, zeroRateEndDate,isExempt,exemptRateStartDate, exemptRateEndDate, enableStatusCode, exclusion, add_date
-            ps.setString(9, aGoodsCommodity.getZeroRateStartDate());
-            ps.setString(10, aGoodsCommodity.getZeroRateEndDate());
-            ps.setString(11, aGoodsCommodity.getIsExempt());
-            ps.setString(12, aGoodsCommodity.getExemptRateStartDate());
-            ps.setString(13, aGoodsCommodity.getExemptRateEndDate());
-            ps.setString(14, aGoodsCommodity.getEnableStatusCode());
-            ps.setString(15, aGoodsCommodity.getExclusion());
+            if (aGoodsCommodity.getZeroRateStartDate() != null) {
+                ps.setString(9, aGoodsCommodity.getZeroRateStartDate());
+            } else {
+                ps.setString(9, "");
+            }
+            if (aGoodsCommodity.getZeroRateEndDate() != null) {
+                ps.setString(10, aGoodsCommodity.getZeroRateEndDate());
+            } else {
+                ps.setString(10, "");
+            }
+            if (aGoodsCommodity.getIsExempt() != null) {
+                ps.setString(11, aGoodsCommodity.getIsExempt());
+            } else {
+                ps.setString(11, "");
+            }
+            if (aGoodsCommodity.getExemptRateStartDate() != null) {
+                ps.setString(12, aGoodsCommodity.getExemptRateStartDate());
+            } else {
+                ps.setString(12, "");
+            }
+            if (aGoodsCommodity.getExemptRateEndDate() != null) {
+                ps.setString(13, aGoodsCommodity.getExemptRateEndDate());
+            } else {
+                ps.setString(13, "");
+            }
+            if (aGoodsCommodity.getEnableStatusCode() != null) {
+                ps.setString(14, aGoodsCommodity.getEnableStatusCode());
+            } else {
+                ps.setString(14, "");
+            }
+            if (aGoodsCommodity.getExclusion() != null) {
+                ps.setString(15, aGoodsCommodity.getExclusion());
+            } else {
+                ps.setString(15, "");
+            }
             ps.setTimestamp(16, new java.sql.Timestamp(new CompanySetting().getCURRENT_SERVER_DATE().getTime()));
             ps.executeUpdate();
             saved = 1;
@@ -188,7 +248,7 @@ public class EFRIS_goods_commodityBean implements Serializable {
         return saved;
     }
 
-    public int insertEFRIS_goods_commodity(EFRIS_goods_commodity aEFRIS_goods_commodity){
+    public int insertEFRIS_goods_commodity(EFRIS_goods_commodity aEFRIS_goods_commodity) {
         int saved = 0;
         String sql = "INSERT INTO efris_goods_commodity"
                 + "(commodityCategoryCode, parentCode, commodityCategoryName, commodityCategoryLevel, rate, isLeafNode, serviceMark, isZeroRate,"

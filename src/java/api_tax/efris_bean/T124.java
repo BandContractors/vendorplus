@@ -13,15 +13,13 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import entities.CompanySetting;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.Serializable;
 import java.security.PrivateKey;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -39,8 +37,11 @@ import utilities.SecurityPKI;
  *
  * @author bajuna
  */
-public class T124 {
+@ManagedBean
+@SessionScoped
+public class T124 implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     static Logger LOGGER = Logger.getLogger(T124.class.getName());
 
     public void generateUNSPCexcelOffline(String aFileNameWithPath) {
@@ -53,8 +54,8 @@ public class T124 {
                     + "	\"pageSize\": \"99\"\n"
                     + "}";
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
-            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_OFFLINE").getParameter_value());
-            String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T124", CompanySetting.getTaxIdentity());
+            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_URL_OFFLINE").getParameter_value());
+            String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T124", CompanySetting.getTaxIdentity());
 
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             output = response.getEntity(String.class);
@@ -132,7 +133,7 @@ public class T124 {
                         + "	\"pageNo\": \"" + counter + "\",\n"
                         + "	\"pageSize\": \"99\"\n"
                         + "}";
-                PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T124", CompanySetting.getTaxIdentity());
+                PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T124", CompanySetting.getTaxIdentity());
                 response = webResource.type("application/json").post(ClientResponse.class, PostData);
                 output = response.getEntity(String.class);
 
@@ -215,13 +216,13 @@ public class T124 {
                     + "}";
             System.out.println("JSON1:" + json);
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
-            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_ONLINE").getParameter_value());
+            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_URL_ONLINE").getParameter_value());
             /**
              * Read Private Key
              */
-            PrivateKey key = new SecurityPKI().getPrivate(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_FILE").getParameter_value(), Security.Decrypt(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_PASSWORD").getParameter_value()), new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_ALIAS").getParameter_value());
-            //String AESpublickeystring = SecurityPKI.decrypt(new SecurityPKI().AESPublicKey(CompanySetting.getTaxIdentity(), new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value()), key);
-            String AESpublickeystring = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_AES_PUBLIC_KEY").getParameter_value();
+            PrivateKey key = new SecurityPKI().getPrivate(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_FILE").getParameter_value(), Security.Decrypt(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_PASSWORD").getParameter_value()), new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_ALIAS").getParameter_value());
+            //String AESpublickeystring = SecurityPKI.decrypt(new SecurityPKI().AESPublicKey(CompanySetting.getTaxIdentity(), new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value()), key);
+            String AESpublickeystring = new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_AES_PUBLIC_KEY").getParameter_value();
             /**
              * Encrypt Content
              */
@@ -230,7 +231,7 @@ public class T124 {
             /**
              * Post Data
              */
-            String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T124", CompanySetting.getTaxIdentity());
+            String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T124", CompanySetting.getTaxIdentity());
             System.out.println("PostData1:" + PostData);
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             output = response.getEntity(String.class);
@@ -311,7 +312,7 @@ public class T124 {
                         + "	\"pageSize\": \"99\"\n"
                         + "}";
                 System.out.println("JSON2:" + json);
-                PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T124", CompanySetting.getTaxIdentity());
+                PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T124", CompanySetting.getTaxIdentity());
                 response = webResource.type("application/json").post(ClientResponse.class, PostData);
                 output = response.getEntity(String.class);
 
@@ -410,8 +411,8 @@ public class T124 {
                     + "	\"pageSize\": \"99\"\n"
                     + "}";
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
-            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_OFFLINE").getParameter_value());
-            String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T124", CompanySetting.getTaxIdentity());
+            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_URL_OFFLINE").getParameter_value());
+            String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T124", CompanySetting.getTaxIdentity());
 
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             output = response.getEntity(String.class);
@@ -453,7 +454,7 @@ public class T124 {
                         + "	\"pageNo\": \"" + counter + "\",\n"
                         + "	\"pageSize\": \"99\"\n"
                         + "}";
-                PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T124", CompanySetting.getTaxIdentity());
+                PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T124", CompanySetting.getTaxIdentity());
                 response = webResource.type("application/json").post(ClientResponse.class, PostData);
                 output = response.getEntity(String.class);
 
@@ -503,23 +504,30 @@ public class T124 {
                     + "}";
             System.out.println("JSON1:" + json);
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
-            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_ONLINE").getParameter_value());
+            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_URL_ONLINE").getParameter_value());
             /**
              * Read Private Key
              */
-            PrivateKey key = new SecurityPKI().getPrivate(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_FILE").getParameter_value(), Security.Decrypt(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_PASSWORD").getParameter_value()), new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_ALIAS").getParameter_value());
-            //String AESpublickeystring = SecurityPKI.decrypt(new SecurityPKI().AESPublicKey(CompanySetting.getTaxIdentity(), new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value()), key);
-            String AESpublickeystring = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_AES_PUBLIC_KEY").getParameter_value();
+            PrivateKey key = new SecurityPKI().getPrivate(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_FILE").getParameter_value(), Security.Decrypt(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_PASSWORD").getParameter_value()), new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_ALIAS").getParameter_value());
+            //String AESpublickeystring = SecurityPKI.decrypt(new SecurityPKI().AESPublicKey(CompanySetting.getTaxIdentity(), new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value()), key);
+            String AESpublickeystring = new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_AES_PUBLIC_KEY").getParameter_value();
             /**
              * Encrypt Content
              */
-            String encryptedcontent = SecurityPKI.AESencrypt(json, Base64.decodeBase64(AESpublickeystring));
-            String signedcontent = Base64.encodeBase64String(new SecurityPKI().sign(encryptedcontent, key));
+            //String encryptedcontent = SecurityPKI.AESencrypt(json, Base64.decodeBase64(AESpublickeystring));
+            //String signedcontent = Base64.encodeBase64String(new SecurityPKI().sign(encryptedcontent, key));
+            //emma
+            String encryptedcontent2 = Base64.encodeBase64String(json.getBytes("UTF-8"));
+            String signedcontent2 = Base64.encodeBase64String(new SecurityPKI().sign(encryptedcontent2, key));
             /**
              * Post Data
              */
-            String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T124", CompanySetting.getTaxIdentity());
+            //String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T124", CompanySetting.getTaxIdentity());
+            String PostData = GeneralUtilities.PostData_Online(encryptedcontent2, signedcontent2, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T124", CompanySetting.getTaxIdentity());
             System.out.println("PostData1:" + PostData);
+            //convert to json
+            //JSONObject PostDataJson = new JSONObject(PostData);
+            //System.out.println("PostDataJson:" + PostDataJson);
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             output = response.getEntity(String.class);
             System.out.println("output1:" + output);
@@ -528,6 +536,8 @@ public class T124 {
             JSONObject dataobject = parentjsonObject.getJSONObject("returnStateInfo");
             returnCode = dataobject.getString("returnCode");
             returnMessage = dataobject.getString("returnMessage");
+            System.out.println("returnCode:" + returnCode);
+            System.out.println("returnMessage:" + returnMessage);
             JSONObject dataobjectcontent = parentjsonObject.getJSONObject("data");
             String content = dataobjectcontent.getString("content");
             /**
@@ -541,11 +551,31 @@ public class T124 {
             } catch (Exception e) {
                 //do nothing
             }
+//            if (zipCode.equals("0")) {
+//                DecryptedContent = SecurityPKI.AESdecrypt(content, Base64.decodeBase64(AESpublickeystring));
+//            } else {
+//                byte[] str = GzipUtils.decompress(Base64.decodeBase64(content));
+//                DecryptedContent = SecurityPKI.AESdecrypt2(str, Base64.decodeBase64(AESpublickeystring));
+//            }
+            //emma
             if (zipCode.equals("0")) {
-                DecryptedContent = SecurityPKI.AESdecrypt(content, Base64.decodeBase64(AESpublickeystring));
+                DecryptedContent = new String(Base64.decodeBase64(content));
             } else {
-                byte[] str = GzipUtils.decompress(Base64.decodeBase64(content));
-                DecryptedContent = SecurityPKI.AESdecrypt2(str, Base64.decodeBase64(AESpublickeystring));
+                //GzipUtils aGzipUtils = new GzipUtils();
+                //byte[] str = aGzipUtils.;
+                try {
+                    byte[] str = GzipUtils.decompress(Base64.decodeBase64(content));
+                    DecryptedContent = new String(str);
+                } catch (Throwable t) {
+                    LOGGER.log(Level.ERROR, t);
+                    //LOG.error("Failure during static initialization", t);
+                    //throw t;
+                }
+                //byte[] str = GzipUtils.decompress(Base64.decodeBase64(content));
+                //byte[] str = GzipUtils.decompress(Base64.decodeBase64(content.getBytes("UTF-8")));
+                //byte[] str = GzipUtils.decompress(content.getBytes("UTF-8"));
+                //byte[] str = GzipUtils.decompress(content.getBytes());
+                //DecryptedContent = new String(str);
             }
             /**
              * Get total page size
@@ -562,7 +592,10 @@ public class T124 {
                         + "	\"pageSize\": \"99\"\n"
                         + "}";
                 System.out.println("JSON2:" + json);
-                PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T124", CompanySetting.getTaxIdentity());
+                //emma
+                encryptedcontent2 = Base64.encodeBase64String(json.getBytes("UTF-8"));
+                signedcontent2 = Base64.encodeBase64String(new SecurityPKI().sign(encryptedcontent2, key));
+                PostData = GeneralUtilities.PostData_Online(encryptedcontent2, signedcontent2, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T124", CompanySetting.getTaxIdentity());
                 response = webResource.type("application/json").post(ClientResponse.class, PostData);
                 output = response.getEntity(String.class);
 
@@ -580,11 +613,18 @@ public class T124 {
                 } catch (Exception e) {
                     //do nothing
                 }
+//                if (zipCode.equals("0")) {
+//                    DecryptedContent = SecurityPKI.AESdecrypt(content, Base64.decodeBase64(AESpublickeystring));
+//                } else {
+//                    byte[] str = GzipUtils.decompress(Base64.decodeBase64(content));
+//                    DecryptedContent = SecurityPKI.AESdecrypt2(str, Base64.decodeBase64(AESpublickeystring));
+//                }
+                //emma
                 if (zipCode.equals("0")) {
-                    DecryptedContent = SecurityPKI.AESdecrypt(content, Base64.decodeBase64(AESpublickeystring));
+                    DecryptedContent = new String(Base64.decodeBase64(content));
                 } else {
                     byte[] str = GzipUtils.decompress(Base64.decodeBase64(content));
-                    DecryptedContent = SecurityPKI.AESdecrypt2(str, Base64.decodeBase64(AESpublickeystring));
+                    DecryptedContent = new String(str);
                 }
                 /**
                  * Get records
