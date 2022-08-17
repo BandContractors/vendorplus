@@ -4652,6 +4652,14 @@ public class ItemBean implements Serializable {
         }
     }
 
+    public void refreshItemUnitList(Item aItem) {
+        try {
+            this.setItemUnitList(this.Item_unitList, aItem);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public void setItemUnitList(List<Item_unit> aItem_unitList, Item aItem) {
         String sql;
         sql = "select un.* from "
@@ -4688,6 +4696,63 @@ public class ItemBean implements Serializable {
                 LOGGER.log(Level.ERROR, e);
             }
         }
+    }
+
+    public Item_unit getItemUnitFrmDb(long aItem_id, int aUnit_id) {
+        Item_unit iu = null;
+        String sql;
+        sql = "select un.* from "
+                + "("
+                + "select i.unit_id,u.unit_symbol,u.unit_name,1 as is_base,0 as default_sale,0 as default_purchase,"
+                + "1 as base_qty,1 as other_qty,i.unit_retailsale_price,i.unit_wholesale_price "
+                + "from item i inner join unit u on i.unit_id=u.unit_id where i.item_id=? and u.unit_id=? "
+                + "UNION "
+                + "select u.unit_id,u.unit_symbol,u.unit_name,0 as is_base,iu.other_default_sale as default_sale,iu.other_default_purchase as default_purchase,"
+                + "iu.base_qty,iu.other_qty,iu.other_unit_retailsale_price as unit_retailsale_price,iu.other_unit_wholesale_price as unit_wholesale_price "
+                + "from item_unit_other iu inner join unit u on iu.other_unit_id=u.unit_id where iu.is_active=1 and iu.item_id=? and u.unit_id=? "
+                + ") as un order by default_sale desc,is_base desc";
+        ResultSet rs = null;
+        if (aItem_id <= 0 && aUnit_id <= 0) {
+            //do nothing
+        } else {
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                ps.setLong(1, aItem_id);
+                ps.setInt(2, aUnit_id);
+                ps.setLong(3, aItem_id);
+                ps.setInt(4, aUnit_id);
+                rs = ps.executeQuery();
+                if (rs.next()) {
+                    iu = new Item_unit();
+                    this.setItem_unitFromResultset(iu, rs);
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
+            }
+        }
+        return iu;
+    }
+
+    public Item_unit getItemUnitFrmList(int aUnit_id) {
+        Item_unit iu = null;
+
+        if (aUnit_id <= 0) {
+            //do nothing
+        } else {
+            try {
+                for (int i = 0; i < this.Item_unitList.size(); i++) {
+                    if (aUnit_id == this.Item_unitList.get(i).getUnit_id()) {
+                        //iu = new Item_unit();
+                        iu = this.Item_unitList.get(i);
+                        break;
+                    }
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
+            }
+        }
+        return iu;
     }
 
     /**

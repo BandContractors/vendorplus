@@ -236,8 +236,8 @@
                         <h:outputText value="#{itm.currencyCode}">
                         </h:outputText>
                     </p:column>
-                    <p:ajax event="itemSelect" listener="#{itemBean.setItemUnitList(itemBean.item_unitList,itemBean.selectedItem)}" process="@this menuUnit" update="menuUnit"/>
-                    <p:ajax event="change" listener="#{itemBean.setItemUnitList(itemBean.item_unitList,itemBean.selectedItem)}" rendered="#{itemBean.selectedItem!=null}" process="@this menuUnit" update="menuUnit"/>
+                    <p:ajax event="itemSelect" listener="#{itemBean.refreshItemUnitList(itemBean.selectedItem)}" process="@this menuUnit" update="menuUnit"/>
+                    <p:ajax event="change" listener="#{itemBean.refreshItemUnitList(itemBean.selectedItem)}" rendered="#{itemBean.selectedItem!=null}" process="@this menuUnit" update="menuUnit"/>
                     <p:ajax event="itemSelect" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentSaleType,trans,transItem,itemBean.selectedItem,1.0)}" process="@this menuCurrency" update="menuBatchno,menuUnit,itxtUnitPrice,itxtQty,itxtAmount,gridItemStatus,pgrdOverrideWarranty,pgrdSpecific"/>
                     <p:ajax event="change" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentSaleType,trans,transItem,itemBean.selectedItem,1.0)}" rendered="#{itemBean.selectedItem!=null}" process="@this menuCurrency" update="menuBatchno,menuUnit,itxtUnitPrice,itxtQty,itxtAmount,gridItemStatus,pgrdOverrideWarranty,pgrdSpecific"/>
                     <p:ajax event="itemSelect" listener="#{stockBean.refreshBatchList(generalUserSetting.getCurrentStore().getStoreId(),transItem.itemId)}" process="@this menuCurrency menuBatchno" update="menuBatchno,menuUnit,itxtUnitPrice,itxtQty,itxtAmount,gridItemStatus,pgrdOverrideWarranty,pgrdSpecific"/>
