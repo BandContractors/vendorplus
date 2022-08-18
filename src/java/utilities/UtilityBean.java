@@ -1123,7 +1123,8 @@ public class UtilityBean implements Serializable {
     }
 
     public void callDownloadUNSPC() {
-        new T124().downloadGoodsCommodities();
+        //new T124().downloadGoodsCommodities();        
+        new T124().downloadGoodsCommoditiesThread();
     }
 
     public Date getGoodsCommodityLastSyncDate() {
