@@ -47,7 +47,6 @@ public class T106Bean implements Serializable {
     public void synchInvoices() {
         //String uInvoiceNo = "";
         try {
-            //new T124().downloadGoodsCommodities();
             String APIMode = new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_MODE").getParameter_value();
             //from transBean
             if (new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {

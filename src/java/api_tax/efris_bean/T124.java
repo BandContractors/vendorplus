@@ -18,6 +18,8 @@ import java.io.Serializable;
 import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import org.apache.commons.codec.binary.Base64;
@@ -401,6 +403,29 @@ public class T124 implements Serializable {
         }
     }
 
+    public void downloadGoodsCommoditiesThread() {
+        try {
+            //Runnable task = new Runnable() {
+            Runnable task = () -> {
+                try {
+                    T124 t124 = new T124();
+                    String APIMode = new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_MODE").getParameter_value();
+                    if (APIMode.equals("OFFLINE")) {
+                        t124.generateUNSPCOffline();
+                    } else {
+                        t124.generateUNSPCOnline();
+                    }
+                } catch (Exception e) {
+                    LOGGER.log(Level.ERROR, e);
+                }
+            };
+            Executor e = Executors.newSingleThreadExecutor();
+            e.execute(task);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public void generateUNSPCOffline() {
         String output = "";
         String returnCode = "";
@@ -445,14 +470,15 @@ public class T124 implements Serializable {
             JSONObject parentbasicInformationjsonObject = new JSONObject(DecryptedContent);
             JSONObject page = parentbasicInformationjsonObject.getJSONObject("page");
             int counter = page.getInt("pageCount");
+            int pageSize = page.getInt("pageSize");
             /**
              * End Get total page size
              */
 
             for (int x = 1; x <= counter; x++) {
                 json = "{\n"
-                        + "	\"pageNo\": \"" + counter + "\",\n"
-                        + "	\"pageSize\": \"99\"\n"
+                        + "	\"pageNo\": \"" + x + "\",\n"
+                        + "	\"pageSize\": \"" + pageSize + "\"\n"
                         + "}";
                 PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T124", CompanySetting.getTaxIdentity());
                 response = webResource.type("application/json").post(ClientResponse.class, PostData);
@@ -509,20 +535,14 @@ public class T124 implements Serializable {
              * Read Private Key
              */
             PrivateKey key = new SecurityPKI().getPrivate(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_FILE").getParameter_value(), Security.Decrypt(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_PASSWORD").getParameter_value()), new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_ALIAS").getParameter_value());
-            //String AESpublickeystring = SecurityPKI.decrypt(new SecurityPKI().AESPublicKey(CompanySetting.getTaxIdentity(), new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value()), key);
-            String AESpublickeystring = new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_AES_PUBLIC_KEY").getParameter_value();
             /**
              * Encrypt Content
              */
-            //String encryptedcontent = SecurityPKI.AESencrypt(json, Base64.decodeBase64(AESpublickeystring));
-            //String signedcontent = Base64.encodeBase64String(new SecurityPKI().sign(encryptedcontent, key));
-            //emma
             String encryptedcontent2 = Base64.encodeBase64String(json.getBytes("UTF-8"));
             String signedcontent2 = Base64.encodeBase64String(new SecurityPKI().sign(encryptedcontent2, key));
             /**
              * Post Data
              */
-            //String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T124", CompanySetting.getTaxIdentity());
             String PostData = GeneralUtilities.PostData_Online(encryptedcontent2, signedcontent2, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T124", CompanySetting.getTaxIdentity());
             System.out.println("PostData1:" + PostData);
             //convert to json
@@ -551,31 +571,17 @@ public class T124 implements Serializable {
             } catch (Exception e) {
                 //do nothing
             }
-//            if (zipCode.equals("0")) {
-//                DecryptedContent = SecurityPKI.AESdecrypt(content, Base64.decodeBase64(AESpublickeystring));
-//            } else {
-//                byte[] str = GzipUtils.decompress(Base64.decodeBase64(content));
-//                DecryptedContent = SecurityPKI.AESdecrypt2(str, Base64.decodeBase64(AESpublickeystring));
-//            }
-            //emma
+
+            //Decode and or decompress
             if (zipCode.equals("0")) {
                 DecryptedContent = new String(Base64.decodeBase64(content));
             } else {
-                //GzipUtils aGzipUtils = new GzipUtils();
-                //byte[] str = aGzipUtils.;
                 try {
                     byte[] str = GzipUtils.decompress(Base64.decodeBase64(content));
                     DecryptedContent = new String(str);
                 } catch (Throwable t) {
                     LOGGER.log(Level.ERROR, t);
-                    //LOG.error("Failure during static initialization", t);
-                    //throw t;
                 }
-                //byte[] str = GzipUtils.decompress(Base64.decodeBase64(content));
-                //byte[] str = GzipUtils.decompress(Base64.decodeBase64(content.getBytes("UTF-8")));
-                //byte[] str = GzipUtils.decompress(content.getBytes("UTF-8"));
-                //byte[] str = GzipUtils.decompress(content.getBytes());
-                //DecryptedContent = new String(str);
             }
             /**
              * Get total page size
@@ -583,13 +589,14 @@ public class T124 implements Serializable {
             JSONObject parentbasicInformationjsonObject = new JSONObject(DecryptedContent);
             JSONObject page = parentbasicInformationjsonObject.getJSONObject("page");
             int counter = page.getInt("pageCount");
+            int pageSize = page.getInt("pageSize");
             /**
              * End Get total page size
              */
             for (int x = 1; x <= counter; x++) {
                 json = "{\n"
-                        + "	\"pageNo\": \"" + counter + "\",\n"
-                        + "	\"pageSize\": \"99\"\n"
+                        + "	\"pageNo\": \"" + x + "\",\n"
+                        + "	\"pageSize\": \"" + pageSize + "\"\n"
                         + "}";
                 System.out.println("JSON2:" + json);
                 //emma
@@ -613,13 +620,7 @@ public class T124 implements Serializable {
                 } catch (Exception e) {
                     //do nothing
                 }
-//                if (zipCode.equals("0")) {
-//                    DecryptedContent = SecurityPKI.AESdecrypt(content, Base64.decodeBase64(AESpublickeystring));
-//                } else {
-//                    byte[] str = GzipUtils.decompress(Base64.decodeBase64(content));
-//                    DecryptedContent = SecurityPKI.AESdecrypt2(str, Base64.decodeBase64(AESpublickeystring));
-//                }
-                //emma
+                //Decode and or decompress
                 if (zipCode.equals("0")) {
                     DecryptedContent = new String(Base64.decodeBase64(content));
                 } else {
