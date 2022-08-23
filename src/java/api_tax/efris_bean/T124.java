@@ -588,7 +588,7 @@ public class T124 implements Serializable {
                 try {
                     byte[] str = GzipUtils.decompress(Base64.decodeBase64(content));
                     DecryptedContent = new String(str);
-                    System.out.println("DecryptedContent: " + DecryptedContent);
+                    //System.out.println("DecryptedContent: " + DecryptedContent);
                 } catch (Throwable t) {
                     LOGGER.log(Level.ERROR, t);
                 }
@@ -659,8 +659,8 @@ public class T124 implements Serializable {
                     arList.add(temp);
                 }
                 //save goods commodity
-                //int savedGoodsCommodity = new EFRIS_goods_commodityBean().saveEFRIS_goods_commodity(arList);
-                int savedGoodsCommodity = 1;
+                int savedGoodsCommodity = new EFRIS_goods_commodityBean().saveEFRIS_goods_commodity(arList);
+                //int savedGoodsCommodity = 1;
 
                 if (savedGoodsCommodity == 1) {
                     //set total number of goods commodities already downloaded
