@@ -16,6 +16,7 @@ import entities.Item_unit_other;
 import entities.Item_unspsc;
 import entities.Location;
 import entities.Stock;
+import entities.TransItem;
 import entities.Unit;
 import entities.UserDetail;
 import java.io.File;
@@ -4652,9 +4653,32 @@ public class ItemBean implements Serializable {
         }
     }
 
-    public void refreshItemUnitList(Item aItem) {
+    public void refreshItemUnitList(Item aItem, TransItem aTransItem) {
         try {
             this.setItemUnitList(this.Item_unitList, aItem);
+            Item_unit iu = this.Item_unitList.get(0);
+            aItem.setUnitRetailsalePrice(iu.getUnit_retailsale_price());
+            aItem.setUnitWholesalePrice(iu.getUnit_wholesale_price());
+            aTransItem.setUnit_id(iu.getUnit_id());
+            aTransItem.setUnitSymbol(iu.getUnit_symbol());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void changeItemUnitSales(Item aItem, TransItem aTransItem, int aTransTypeId, int aTransReasId) {
+        try {
+            Item_unit iu = this.getItemUnitFrmList(aTransItem.getUnit_id());
+            aItem.setUnitRetailsalePrice(iu.getUnit_retailsale_price());
+            aItem.setUnitWholesalePrice(iu.getUnit_wholesale_price());
+            aTransItem.setUnit_id(iu.getUnit_id());
+            aTransItem.setUnitSymbol(iu.getUnit_symbol());
+            if (aTransTypeId == 2 && aTransReasId == 10) {
+                aTransItem.setUnitPrice(aItem.getUnitWholesalePrice());
+            } else {
+                aTransItem.setUnitPrice(aItem.getUnitRetailsalePrice());
+            }
+            new TransItemBean().editTransItemUponUnitChange(aTransTypeId, aTransReasId, aTransItem);
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
