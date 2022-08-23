@@ -45,6 +45,8 @@ public class T124 implements Serializable {
 
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = Logger.getLogger(T124.class.getName());
+    public static int totalUNSPC;
+    public static int downloadedUNSPC;
 
     public void generateUNSPCexcelOffline(String aFileNameWithPath) {
         String output = "";
@@ -391,7 +393,7 @@ public class T124 implements Serializable {
     }
 
     public void downloadGoodsCommodities() {
-        try {
+        try {            
             String APIMode = new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_MODE").getParameter_value();
             if (APIMode.equals("OFFLINE")) {
                 this.generateUNSPCOffline();
@@ -405,6 +407,10 @@ public class T124 implements Serializable {
 
     public void downloadGoodsCommoditiesThread() {
         try {
+            //reset total number of goods commodities to be downloaded
+            totalUNSPC = 0;
+            //reset total number of goods commodities already downloaded
+            downloadedUNSPC = 0;
             //Runnable task = new Runnable() {
             Runnable task = () -> {
                 try {
@@ -428,8 +434,6 @@ public class T124 implements Serializable {
 
     public void generateUNSPCOffline() {
         String output = "";
-        String returnCode = "";
-        String returnMessage = "";
         try {
             String json = "{\n"
                     + "	\"pageNo\": \"1\",\n"
@@ -444,8 +448,8 @@ public class T124 implements Serializable {
 
             JSONObject parentjsonObject = new JSONObject(output);
             JSONObject dataobject = parentjsonObject.getJSONObject("returnStateInfo");
-            returnCode = dataobject.getString("returnCode");
-            returnMessage = dataobject.getString("returnMessage");
+            String returnCode = dataobject.getString("returnCode");
+            String returnMessage = dataobject.getString("returnMessage");
             JSONObject dataobjectcontent = parentjsonObject.getJSONObject("data");
             String content = dataobjectcontent.getString("content");
             JSONObject dataDescription = dataobjectcontent.getJSONObject("dataDescription");
@@ -469,17 +473,26 @@ public class T124 implements Serializable {
              */
             JSONObject parentbasicInformationjsonObject = new JSONObject(DecryptedContent);
             JSONObject page = parentbasicInformationjsonObject.getJSONObject("page");
-            int counter = page.getInt("pageCount");
+            int pageCount = page.getInt("pageCount");
             int pageSize = page.getInt("pageSize");
+            int totalSize = page.getInt("totalSize");
+
+            //set total number of goods commodities to be downloaded
+            totalUNSPC = totalSize;
+            //reset total number of goods commodities already downloaded
+            downloadedUNSPC = 0;
             /**
              * End Get total page size
              */
 
-            for (int x = 1; x <= counter; x++) {
+            for (int x = 1; x <= pageCount; x++) {
                 json = "{\n"
                         + "	\"pageNo\": \"" + x + "\",\n"
                         + "	\"pageSize\": \"" + pageSize + "\"\n"
                         + "}";
+                /**
+                 * Post Data
+                 */
                 PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T124", CompanySetting.getTaxIdentity());
                 response = webResource.type("application/json").post(ClientResponse.class, PostData);
                 output = response.getEntity(String.class);
@@ -512,6 +525,11 @@ public class T124 implements Serializable {
                 }
                 //save goods commodity                
                 int savedGoodsCommodity = new EFRIS_goods_commodityBean().saveEFRIS_goods_commodity(arList);
+
+                if (savedGoodsCommodity == 1) {
+                    //set total number of goods commodities already downloaded
+                    downloadedUNSPC = downloadedUNSPC + arList.size();
+                }
             }
         } catch (Exception e) {
             LOGGER.log(Level.INFO, output);
@@ -521,14 +539,11 @@ public class T124 implements Serializable {
 
     public void generateUNSPCOnline() {
         String output = "";
-        String returnCode = "";
-        String returnMessage = "";
         try {
             String json = "{\n"
                     + "	\"pageNo\": \"1\",\n"
                     + "	\"pageSize\": \"99\"\n"
                     + "}";
-            System.out.println("JSON1:" + json);
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
             WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_URL_ONLINE").getParameter_value());
             /**
@@ -544,20 +559,14 @@ public class T124 implements Serializable {
              * Post Data
              */
             String PostData = GeneralUtilities.PostData_Online(encryptedcontent2, signedcontent2, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T124", CompanySetting.getTaxIdentity());
-            System.out.println("PostData1:" + PostData);
-            //convert to json
-            //JSONObject PostDataJson = new JSONObject(PostData);
-            //System.out.println("PostDataJson:" + PostDataJson);
+
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             output = response.getEntity(String.class);
-            System.out.println("output1:" + output);
 
             JSONObject parentjsonObject = new JSONObject(output);
             JSONObject dataobject = parentjsonObject.getJSONObject("returnStateInfo");
-            returnCode = dataobject.getString("returnCode");
-            returnMessage = dataobject.getString("returnMessage");
-            System.out.println("returnCode:" + returnCode);
-            System.out.println("returnMessage:" + returnMessage);
+            String returnCode = dataobject.getString("returnCode");
+            String returnMessage = dataobject.getString("returnMessage");
             JSONObject dataobjectcontent = parentjsonObject.getJSONObject("data");
             String content = dataobjectcontent.getString("content");
             /**
@@ -579,6 +588,7 @@ public class T124 implements Serializable {
                 try {
                     byte[] str = GzipUtils.decompress(Base64.decodeBase64(content));
                     DecryptedContent = new String(str);
+                    System.out.println("DecryptedContent: " + DecryptedContent);
                 } catch (Throwable t) {
                     LOGGER.log(Level.ERROR, t);
                 }
@@ -588,20 +598,30 @@ public class T124 implements Serializable {
              */
             JSONObject parentbasicInformationjsonObject = new JSONObject(DecryptedContent);
             JSONObject page = parentbasicInformationjsonObject.getJSONObject("page");
-            int counter = page.getInt("pageCount");
+            int pageCount = page.getInt("pageCount");
             int pageSize = page.getInt("pageSize");
+            int totalSize = page.getInt("totalSize");
+
+            //set total number of goods commodities to be downloaded
+            totalUNSPC = totalSize;
+            //reset total number of goods commodities already downloaded
+            downloadedUNSPC = 0;
             /**
              * End Get total page size
              */
-            for (int x = 1; x <= counter; x++) {
+            for (int x = 1; x <= pageCount; x++) {
                 json = "{\n"
                         + "	\"pageNo\": \"" + x + "\",\n"
                         + "	\"pageSize\": \"" + pageSize + "\"\n"
                         + "}";
-                System.out.println("JSON2:" + json);
-                //emma
+                /**
+                 * Encrypt Content
+                 */
                 encryptedcontent2 = Base64.encodeBase64String(json.getBytes("UTF-8"));
                 signedcontent2 = Base64.encodeBase64String(new SecurityPKI().sign(encryptedcontent2, key));
+                /**
+                 * Post Data
+                 */
                 PostData = GeneralUtilities.PostData_Online(encryptedcontent2, signedcontent2, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T124", CompanySetting.getTaxIdentity());
                 response = webResource.type("application/json").post(ClientResponse.class, PostData);
                 output = response.getEntity(String.class);
@@ -638,8 +658,14 @@ public class T124 implements Serializable {
                     GoodsCommodity temp = g.fromJson(array.get(i).toString(), GoodsCommodity.class);
                     arList.add(temp);
                 }
-                //save goods commodity                
-                int savedGoodsCommodity = new EFRIS_goods_commodityBean().saveEFRIS_goods_commodity(arList);
+                //save goods commodity
+                //int savedGoodsCommodity = new EFRIS_goods_commodityBean().saveEFRIS_goods_commodity(arList);
+                int savedGoodsCommodity = 1;
+
+                if (savedGoodsCommodity == 1) {
+                    //set total number of goods commodities already downloaded
+                    downloadedUNSPC = downloadedUNSPC + arList.size();
+                }
             }
         } catch (Exception e) {
             LOGGER.log(Level.INFO, output);

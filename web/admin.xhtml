@@ -57,6 +57,10 @@
                             </p:dialog>
                             <p:ajax listener="#{utilityBean.callDownloadUNSPC()}" process="@form" update="@form" />
                         </p:commandButton>
+                        <h1 class="text-center">
+                            <h:outputText id="txt_count" value="Downloaded #{utilityBean.downloadedUNSPC} out of #{utilityBean.totalUNSPC}"/>
+                        </h1>
+                        <p:poll interval="2" listener="#{utilityBean.getDownloadedUNSPCTotal()}" update="txt_count"/>
                     </h:panelGrid>
                 </p:tab>
                 <p:tab title="Clean Invoice (TotalPaid Not Updated)">

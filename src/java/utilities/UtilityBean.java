@@ -75,6 +75,8 @@ public class UtilityBean implements Serializable {
     private String HOST_NAME;
     private String IP;
     private String FileNameWithPath = "";
+    private int downloadedUNSPC = 0;
+    private int totalUNSPC = 0;
 
     public boolean isTime24Hour(String time) {
         pattern = Pattern.compile(TIME24HOURS_PATTERN);
@@ -1127,6 +1129,11 @@ public class UtilityBean implements Serializable {
         new T124().downloadGoodsCommoditiesThread();
     }
 
+    public void getDownloadedUNSPCTotal() {
+        this.setTotalUNSPC(T124.totalUNSPC);
+        this.setDownloadedUNSPC(T124.downloadedUNSPC);
+    }
+
     public Date getGoodsCommodityLastSyncDate() {
         Date lastDate;
         try {
@@ -1395,6 +1402,34 @@ public class UtilityBean implements Serializable {
      */
     public void setFileNameWithPath(String FileNameWithPath) {
         this.FileNameWithPath = FileNameWithPath;
+    }
+
+    /**
+     * @return the downloadedUNSPC
+     */
+    public int getDownloadedUNSPC() {
+        return downloadedUNSPC;
+    }
+
+    /**
+     * @param downloadedUNSPC the downloadedUNSPC to set
+     */
+    public void setDownloadedUNSPC(int downloadedUNSPC) {
+        this.downloadedUNSPC = downloadedUNSPC;
+    }
+
+    /**
+     * @return the totalUNSPC
+     */
+    public int getTotalUNSPC() {
+        return totalUNSPC;
+    }
+
+    /**
+     * @param totalUNSPC the totalUNSPC to set
+     */
+    public void setTotalUNSPC(int totalUNSPC) {
+        this.totalUNSPC = totalUNSPC;
     }
 
 }
