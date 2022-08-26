@@ -77,6 +77,7 @@ public class UtilityBean implements Serializable {
     private String FileNameWithPath = "";
     private int downloadedUNSPC = 0;
     private int totalUNSPC = 0;
+    private double downloadedUNSPCPercentage = 0;
 
     public boolean isTime24Hour(String time) {
         pattern = Pattern.compile(TIME24HOURS_PATTERN);
@@ -1132,6 +1133,11 @@ public class UtilityBean implements Serializable {
     public void getDownloadedUNSPCTotal() {
         this.setTotalUNSPC(T124.totalUNSPC);
         this.setDownloadedUNSPC(T124.downloadedUNSPC);
+        if (this.getTotalUNSPC() != 0) {
+            this.setDownloadedUNSPCPercentage((100 * this.getDownloadedUNSPC()) / this.getTotalUNSPC());
+        } else {
+            this.setDownloadedUNSPCPercentage(0);
+        }
     }
 
     public Date getGoodsCommodityLastSyncDate() {
@@ -1143,6 +1149,10 @@ public class UtilityBean implements Serializable {
             lastDate = null;
         }
         return lastDate;
+    }
+
+    public void onComplete() {
+        javax.faces.context.FacesContext.getCurrentInstance().addMessage(null, new javax.faces.application.FacesMessage("Progress Completed"));
     }
 
     public void cleanSaleInvoiceTranss() {
@@ -1430,6 +1440,20 @@ public class UtilityBean implements Serializable {
      */
     public void setTotalUNSPC(int totalUNSPC) {
         this.totalUNSPC = totalUNSPC;
+    }
+
+    /**
+     * @return the downloadedUNSPCPercentage
+     */
+    public double getDownloadedUNSPCPercentage() {
+        return downloadedUNSPCPercentage;
+    }
+
+    /**
+     * @param downloadedUNSPCPercentage the downloadedUNSPCPercentage to set
+     */
+    public void setDownloadedUNSPCPercentage(double downloadedUNSPCPercentage) {
+        this.downloadedUNSPCPercentage = downloadedUNSPCPercentage;
     }
 
 }

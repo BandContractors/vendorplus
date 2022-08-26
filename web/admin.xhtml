@@ -19,6 +19,15 @@
             {
                 return alert('Record saved successfully!');
             }
+            function start() {
+                this.progressInterval = setInterval(function () {
+                    PF('pb').setValue(PF('pb').getValue() + 10);
+                }, 2000);
+            }
+            function cancel() {
+                clearInterval(this.progressInterval);
+                PF('pb').setValue(0);
+            }
         </script> 
     </h:head>
     <h:body>
@@ -51,7 +60,7 @@
                     <h:panelGrid columns="1">
                         <h:outputLabel id="ura" value="UNSPC never Synced before" rendered="#{utilityBean.getGoodsCommodityLastSyncDate() eq null}"/>
                         <h:outputLabel id="ura2" value="Last Synced on #{utilityBean.formatDate(utilityBean.getGoodsCommodityLastSyncDate())}" rendered="#{utilityBean.getGoodsCommodityLastSyncDate() ne null}"/>
-                        <p:commandButton styleClass="clsButtonBig" id="cmdbSyncUNSPC" value="Sync UNSPC" accesskey="t" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                        <p:commandButton styleClass="clsButtonBig" id="cmdbSyncUNSPC" value="Sync UNSPC" accesskey="t" onclick="PF('statusDialog').show();PF('pbAjaxLong').start();PF('startButton3').disable();" onsuccess="PF('statusDialog').hide()" widgetVar="startButton3">
                             <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                                 <p:graphicImage name="/images/ajax-loader.gif"/>
                             </p:dialog>
@@ -61,6 +70,16 @@
                             <h:outputText id="txt_count" value="Downloaded #{utilityBean.downloadedUNSPC} out of #{utilityBean.totalUNSPC}"/>
                         </h1>
                         <p:poll interval="2" listener="#{utilityBean.getDownloadedUNSPCTotal()}" update="txt_count"/>
+                        <p:growl id="growl"/>
+                        <p:progressBar widgetVar="pbAjaxLong" ajax="true" interval="2000" value="#{utilityBean.downloadedUNSPCPercentage}" labelTemplate="{value}%">
+                            <p:ajax event="complete" listener="#{utilityBean.onComplete}" update="growl" oncomplete="PF('startButton3').enable()" />
+                        </p:progressBar>
+                        <!--<p:commandButton value="Start Ajax" type="button" onclick="PF('pbAjaxLong').start();PF('startButton3').disable();" widgetVar="startButton3"/>-->
+                        <!-- 
+                        <p:progressBar widgetVar="pb" />
+                        <p:commandButton value="Start" type="button" onclick="start()" />
+                        <p:commandButton value="Cancel" type="button" onclick="cancel()" />
+                        -->
                     </h:panelGrid>
                 </p:tab>
                 <p:tab title="Clean Invoice (TotalPaid Not Updated)">
