@@ -6,6 +6,7 @@ import sessions.GeneralUserSetting;
 import connections.DBConnection;
 import entities.Category;
 import entities.CompanySetting;
+import entities.DiscountPackageItem;
 import entities.GroupRight;
 import entities.Item;
 import entities.Item_code_other;
@@ -16,6 +17,7 @@ import entities.Item_unit_other;
 import entities.Item_unspsc;
 import entities.Location;
 import entities.Stock;
+import entities.Trans;
 import entities.TransItem;
 import entities.Unit;
 import entities.UserDetail;
@@ -4656,17 +4658,19 @@ public class ItemBean implements Serializable {
     public void refreshItemUnitList(Item aItem, TransItem aTransItem) {
         try {
             this.setItemUnitList(this.Item_unitList, aItem);
-            Item_unit iu = this.Item_unitList.get(0);
-            aItem.setUnitRetailsalePrice(iu.getUnit_retailsale_price());
-            aItem.setUnitWholesalePrice(iu.getUnit_wholesale_price());
-            aTransItem.setUnit_id(iu.getUnit_id());
-            aTransItem.setUnitSymbol(iu.getUnit_symbol());
+            if (null != this.Item_unitList && this.Item_unitList.size() > 0) {
+                Item_unit iu = this.Item_unitList.get(0);
+                aItem.setUnitRetailsalePrice(iu.getUnit_retailsale_price());
+                aItem.setUnitWholesalePrice(iu.getUnit_wholesale_price());
+                aTransItem.setUnit_id(iu.getUnit_id());
+                aTransItem.setUnitSymbol(iu.getUnit_symbol());
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
     }
 
-    public void changeItemUnitSales(Item aItem, TransItem aTransItem, int aTransTypeId, int aTransReasId) {
+    public void changeItemUnitSales(Item aItem, TransItem aTransItem, int aTransTypeId, int aTransReasId, int aStoreId, Trans aTrans) {
         try {
             Item_unit iu = this.getItemUnitFrmList(aTransItem.getUnit_id());
             aItem.setUnitRetailsalePrice(iu.getUnit_retailsale_price());
@@ -4677,6 +4681,14 @@ public class ItemBean implements Serializable {
                 aTransItem.setUnitPrice(aItem.getUnitWholesalePrice());
             } else {
                 aTransItem.setUnitPrice(aItem.getUnitRetailsalePrice());
+            }
+            DiscountPackageItem dpi = new DiscountPackageItemBean().getActiveDiscountPackageItem(aStoreId, aItem.getItemId(), 1, aTrans.getTransactorId(), aItem.getCategoryId(), aItem.getSubCategoryId());
+            if (dpi != null) {
+                if (aTransReasId == 10 || aTransReasId == 15 || aTransReasId == 109) {
+                    aTransItem.setUnitTradeDiscount(aItem.getUnitWholesalePrice() * dpi.getWholesaleDiscountAmt() / 100);
+                } else {
+                    aTransItem.setUnitTradeDiscount(aItem.getUnitRetailsalePrice() * dpi.getRetailsaleDiscountAmt() / 100);
+                }
             }
             new TransItemBean().editTransItemUponUnitChange(aTransTypeId, aTransReasId, aTransItem);
         } catch (Exception e) {
@@ -4777,6 +4789,61 @@ public class ItemBean implements Serializable {
             }
         }
         return iu;
+    }
+
+    public double getBaseUnitQty(long aItemId, int aOtherUnitId, double aOtherUnitQty) {
+        double BaseUnitQty = 0;
+        try {
+            Item_unit iu = this.getItemUnitFrmDb(aItemId, aOtherUnitId);
+            if (null != iu) {
+                BaseUnitQty = aOtherUnitQty * iu.getBase_qty() / iu.getOther_qty();
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return BaseUnitQty;
+    }
+
+    public double getOtherUnitQty(long aItemId, int aBaseUnitId, double aBaseUnitQty) {
+        double OtherUnitQty = 0;
+        try {
+            Item_unit iu = this.getItemUnitFrmDb(aItemId, aBaseUnitId);
+            if (null != iu) {
+                OtherUnitQty = aBaseUnitQty * iu.getOther_qty() / iu.getBase_qty();
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return OtherUnitQty;
+    }
+
+    public double getUnitConversionRate(long aItemId, int aFromUnitId, int aToUnitId) {
+        double ConversionRate = 1;
+        try {
+            if (aFromUnitId == aToUnitId) {
+                ConversionRate = 1;
+            } else {
+                Item_unit FromIu = this.getItemUnitFrmDb(aItemId, aFromUnitId);
+                Item_unit ToIu = this.getItemUnitFrmDb(aItemId, aToUnitId);
+                if (null != FromIu && null != ToIu) {
+                    //other to base
+                    if (FromIu.getIs_base() == 0 && ToIu.getIs_base() == 1) {
+                        ConversionRate = ToIu.getOther_qty() / ToIu.getBase_qty();
+                    }
+                    //base to other
+                    if (FromIu.getIs_base() == 1 && ToIu.getIs_base() == 0) {
+                        ConversionRate = ToIu.getBase_qty() / ToIu.getOther_qty();
+                    }
+                    //other to other
+                    if (FromIu.getIs_base() == 0 && ToIu.getIs_base() == 0) {
+                        ConversionRate = (FromIu.getOther_qty() / FromIu.getBase_qty()) * (ToIu.getBase_qty() / ToIu.getOther_qty());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return ConversionRate;
     }
 
     /**

@@ -642,6 +642,7 @@ public class StockManage implements Serializable {
                     + " },\n"
                     + " \"goodsStockInItem\": [{\n"
                     + " \"commodityGoodsId\": \"" + aId + "\",\n"
+                    //+ " \"measureUnit\": \"" + aQty + "\",\n"
                     + " \"quantity\": \"" + aQty + "\",\n"
                     + " \"unitPrice\": \"" + aUnitPrice + "\"\n"
                     + " }]\n"

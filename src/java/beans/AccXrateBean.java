@@ -473,6 +473,38 @@ public class AccXrateBean implements Serializable {
         return xrate;
     }
 
+    public double convertCurrency(double aFromAmount, String aFrmCurrencyCode, String aToCurrencyCode) {
+        double aToAmount = 0;
+        try {
+            double xrate = 1;
+            double XrateMultiply = 1;
+            AccCurrency LocalCurrency = null;
+            LocalCurrency = new AccCurrencyBean().getLocalCurrency();
+            try {
+                if (null == aFrmCurrencyCode || aFrmCurrencyCode.isEmpty() || aToCurrencyCode.isEmpty()) {
+                    xrate = 1;
+                } else {
+                    xrate = new AccXrateBean().getXrate(aFrmCurrencyCode, aToCurrencyCode);
+                }
+            } catch (NullPointerException npe) {
+                xrate = 1;
+            }
+            try {
+                if (aFrmCurrencyCode.equals(LocalCurrency.getCurrencyCode()) && !aToCurrencyCode.equals(LocalCurrency.getCurrencyCode())) {
+                    XrateMultiply = 1 / xrate;
+                } else {
+                    XrateMultiply = xrate;
+                }
+            } catch (NullPointerException npe) {
+                XrateMultiply = 1;
+            }
+            aToAmount = aFromAmount * XrateMultiply;
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return aToAmount;
+    }
+
     /**
      * @return the AccXrateList
      */

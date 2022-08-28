@@ -336,7 +336,8 @@ public class InvoiceBean implements Serializable {
                     gd.setItemCode(im.getItem_id_tax());
                     gd.setQty(ub.formatDoublePlain2DP(transitems.get(i).getItemQty()));
                     try {
-                        String UnitSymbolTax = new UnitBean().getUnit(itm.getUnitId()).getUnit_symbol_tax();
+                        //String UnitSymbolTax = new UnitBean().getUnit(itm.getUnitId()).getUnit_symbol_tax();
+                        String UnitSymbolTax = new UnitBean().getUnit(transitems.get(i).getUnit_id()).getUnit_symbol_tax();
                         if (null == UnitSymbolTax) {
                             gd.setUnitOfMeasure("PCE");
                         } else {

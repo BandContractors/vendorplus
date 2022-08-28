@@ -248,7 +248,7 @@
 
                 <p:selectOneMenu id="menuUnit" styleClass="clsMenu" value="#{transItem.unit_id}">
                     <f:selectItems value="#{itemBean.item_unitList}" var="iu" itemLabel="#{iu.unit_symbol}" itemValue="#{iu.unit_id}"/>
-                    <p:ajax listener="#{itemBean.changeItemUnitSales(itemBean.selectedItem,transItem,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId)}" process="@this autcItem" update="itxtAmount itxtUnitPrice"/>
+                    <p:ajax listener="#{itemBean.changeItemUnitSales(itemBean.selectedItem,transItem,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentStore.storeId,trans)}" process="@this autcItem" update="itxtAmount itxtUnitPrice pgrdOverrideWarranty"/>
                 </p:selectOneMenu>
                 <p:selectOneMenu id="menuBatchno" styleClass="clsMenu" value="#{transItem.batchno}">
                     <c:if test="#{stockBean.batchList.size()>1}" >
