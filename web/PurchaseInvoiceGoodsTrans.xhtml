@@ -32,6 +32,7 @@
         <f:viewAction action="#{transBean.refreshPayMethodsActiveIn('1,2,3,4,5,7,11')}"/>
         <f:viewAction action="#{transBean.refreshAccChildAccountsForCashReceipt(trans.currencyCode, trans.payMethod,generalUserSetting.getCurrentStore().storeId,generalUserSetting.getCurrentUser().userDetailId)}"/>
         <f:viewAction action="#{utilityBean.clearList(alert_generalBean.alertList)}"/>
+        <f:viewAction action="#{utilityBean.clearList(itemBean.item_unitList)}"/>
         <f:viewAction action="#{transBean.refreshTranssDraft(generalUserSetting.currentStore.storeId,generalUserSetting.currentUser.userDetailId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId)}"/>
     </f:metadata>
     <h:body>
@@ -183,27 +184,32 @@
                         <h:outputText value="#{itm.currencyCode}">
                         </h:outputText>
                     </p:column>
-                    <p:ajax event="itemSelect" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,'',trans,transItem,itemBean.selectedItem,1.0)}" process="@this" update="itxtUnit itxtUnitPrice itxtAmount pgrdSpecific"/>
-                    <p:ajax event="change" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,'',trans,transItem,itemBean.selectedItem,1.0)}" rendered="#{itemBean.selectedItem!=null}" process="@this" update="itxtUnit itxtUnitPrice itxtAmount pgrdSpecific"/>
+                    <p:ajax event="itemSelect" listener="#{itemBean.refreshItemUnitList(itemBean.selectedItem,transItem,2)}" process="@this menuUnit" update="menuUnit itxtUnitPrice itxtAmount"/>
+                    <p:ajax event="change" listener="#{itemBean.refreshItemUnitList(itemBean.selectedItem,transItem,2)}" rendered="#{itemBean.selectedItem!=null}" process="@this menuUnit" update="menuUnit itxtUnitPrice itxtAmount"/>
+                    <p:ajax event="itemSelect" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,'',trans,transItem,itemBean.selectedItem,1.0)}" process="@this" update="menuUnit itxtUnitPrice itxtAmount pgrdSpecific"/>
+                    <p:ajax event="change" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,'',trans,transItem,itemBean.selectedItem,1.0)}" rendered="#{itemBean.selectedItem!=null}" process="@this" update="menuUnit itxtUnitPrice itxtAmount pgrdSpecific"/>
                 </p:autoComplete>
-                <h:inputText id="itxtUnit" styleClass="clsInputTransItem" value="#{unitBean.getUnit(itemBean.getItem(transItem.itemId).getUnitId()).unitSymbol}" disabled="true" style="width: 115px"/>
-                <h:inputText id="itxtQty" styleClass="clsInputTransItem" style="width: 115px" value="#{transItem.itemQty}" autocomplete="off">
+                <p:selectOneMenu id="menuUnit" styleClass="clsMenu" value="#{transItem.unit_id}">
+                    <f:selectItems value="#{itemBean.item_unitList}" var="iu" itemLabel="#{iu.unit_symbol}" itemValue="#{iu.unit_id}"/>
+                    <p:ajax listener="#{itemBean.changeItemUnitPurchases(itemBean.selectedItem,transItem,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentStore.storeId,trans)}" process="@this autcItem" update="itxtUnitPrice itxtAmount"/>
+                </p:selectOneMenu>
+                <h:inputText id="itxtQty" styleClass="clsInputTransItem" style="width: 115px;height: 24px;" value="#{transItem.itemQty}" autocomplete="off">
                     <f:ajax event="blur" listener="#{transItem.setAmount(transItem.itemQty*(transItem.unitPrice + transItem.unitVat - transItem.unitTradeDiscount))}" execute="itxtQty itxtUnitPrice itxtUnitVat itxtUnitTradeDisc" render="itxtAmount"/>
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
-                <h:inputText id="itxtUnitPrice" styleClass="clsInputTransItem" style="width: 130px" disabled="false" value="#{transItem.unitPrice}" autocomplete="off">
+                <h:inputText id="itxtUnitPrice" styleClass="clsInputTransItem" style="width: 130px;height: 24px;" disabled="false" value="#{transItem.unitPrice}" autocomplete="off">
                     <f:ajax event="blur" listener="#{transItem.setAmount(transItem.itemQty*(transItem.unitPrice + transItem.unitVat - transItem.unitTradeDiscount))}" execute="itxtQty itxtUnitPrice itxtUnitVat itxtUnitTradeDisc" render="itxtAmount"/>
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
-                <h:inputText id="itxtUnitVat" styleClass="clsInputTransItem" style="width: 120px" disabled="false" value="#{transItem.unitVat}" autocomplete="off">
+                <h:inputText id="itxtUnitVat" styleClass="clsInputTransItem" style="width: 120px;height: 24px;" disabled="false" value="#{transItem.unitVat}" autocomplete="off">
                     <f:ajax event="blur" listener="#{transItem.setAmount(transItem.itemQty*(transItem.unitPrice + transItem.unitVat - transItem.unitTradeDiscount))}" execute="itxtQty itxtUnitPrice itxtUnitVat itxtUnitTradeDisc" render="itxtAmount"/>
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
-                <h:inputText id="itxtUnitTradeDisc" styleClass="clsInputTransItem" style="width: 120px" disabled="false" value="#{transItem.unitTradeDiscount}" autocomplete="off">
+                <h:inputText id="itxtUnitTradeDisc" styleClass="clsInputTransItem" style="width: 120px;height: 24px;" disabled="false" value="#{transItem.unitTradeDiscount}" autocomplete="off">
                     <f:ajax event="blur" listener="#{transItem.setAmount(transItem.itemQty*(transItem.unitPrice + transItem.unitVat - transItem.unitTradeDiscount))}" execute="itxtQty itxtUnitPrice itxtUnitVat itxtUnitTradeDisc" render="itxtAmount"/>
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
-                <h:inputText id="itxtAmount" styleClass="clsInputTransItem" style="width: 150px" disabled="true" value="#{transItem.amount}">
+                <h:inputText id="itxtAmount" styleClass="clsInputTransItem" style="width: 150px;height: 24px;" disabled="true" value="#{transItem.amount}">
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
 

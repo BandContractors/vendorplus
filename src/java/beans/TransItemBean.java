@@ -8688,6 +8688,13 @@ public class TransItemBean implements Serializable {
             // do nothing
         }
         try {
+            double BaseQty = new ItemBean().getBaseUnitQty(NewTransItem.getItemId(), NewTransItem.getUnit_id(), NewTransItem.getItemQty());
+            if (BaseQty > 0) {
+                NewTransItem.setBase_unit_qty(BaseQty);
+            } else {
+                NewTransItem.setUnit_id(aSelectedItem.getUnitId());
+                NewTransItem.setBase_unit_qty(NewTransItem.getItemQty());
+            }
             TransItem ti = new TransItem();
             ti.setTransactionItemId(NewTransItem.getTransactionItemId());
             ti.setTransactionId(NewTransItem.getTransactionId());
@@ -8698,17 +8705,16 @@ public class TransItemBean implements Serializable {
             ti.setUnitTradeDiscount(NewTransItem.getUnitTradeDiscount());
             ti.setAmount(NewTransItem.getAmount());
             ti.setVatRated(NewTransItem.getVatRated());
-
             ti.setVatPerc(CompanySetting.getVatPerc());
             ti.setUnitVat(NewTransItem.getUnitVat());
             ti.setUnitPriceExcVat(NewTransItem.getUnitPrice());
             ti.setUnitPriceIncVat(NewTransItem.getUnitPrice() + NewTransItem.getUnitVat());
-
             ti.setItemExpryDate(NewTransItem.getItemExpryDate());
             ti.setItemMnfDate(NewTransItem.getItemMnfDate());
             ti.setAmountIncVat(NewTransItem.getAmount());
             ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
-
+            ti.setUnit_id(NewTransItem.getUnit_id());
+            ti.setBase_unit_qty(NewTransItem.getBase_unit_qty());
             //bms veraibales
             try {
                 ti.setCodeSpecific(NewTransItem.getCodeSpecific());
@@ -8804,7 +8810,7 @@ public class TransItemBean implements Serializable {
                 }
             }
             //check if itme+batchno already exists
-            int ItemFoundAtIndex = itemExists(aActiveTransItems, ti.getItemId(), ti.getBatchno(), ti.getCodeSpecific(), ti.getDescSpecific());
+            int ItemFoundAtIndex = itemExists(aActiveTransItems, ti.getItemId(), ti.getBatchno(), ti.getCodeSpecific(), ti.getDescSpecific(), ti.getUnit_id());
             if (ItemFoundAtIndex == -1) {
                 //round off amounts basing on currency rules
                 this.roundTransItemsAmount(aTrans, ti);
