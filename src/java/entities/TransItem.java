@@ -16,6 +16,7 @@ import javax.faces.bean.SessionScoped;
 @ManagedBean
 @SessionScoped
 public class TransItem implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     private long TransactionItemId;
@@ -118,13 +119,14 @@ public class TransItem implements Serializable {
     private int override_gen_name;
     private String item_type;
     private String currency_code;
-    private String transaction_number; 
-    private int is_tax_synced=1;
+    private String transaction_number;
+    private int is_tax_synced = 1;
     private double discount_amount;//cash discount + loyalty discount
     private int hide_unit_price_invoice;
     private int unit_id;
     private double base_unit_qty;
     private Item_unit Item_unitObj;
+
     /**
      * @return the TransactionItemId
      */

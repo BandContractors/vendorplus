@@ -1700,12 +1700,7 @@ public class TransBean implements Serializable {
                     } else if (trans.getTransactionTypeId() == 75) {//Cash Adjustment
                         tib.saveTransItemsCashAdjustment(trans, aActiveTransItems, trans.getTransactionId());
                     } else {
-                        //dt1 = new Date();
                         tib.saveTransItemsCEC(aStoreId, aTransTypeId, aTransReasonId, aSaleType, trans, aActiveTransItems, trans.getTransactionId());
-                        //dt2 = new Date();
-                        //ms = (dt2.getTime() - dt1.getTime());
-                        //tms = tms + ms;
-                        //TimeStr = TimeStr + " SItems:" + ms;
                     }
 
                     //save payment

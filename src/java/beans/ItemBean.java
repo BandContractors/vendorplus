@@ -19,6 +19,7 @@ import entities.Location;
 import entities.Stock;
 import entities.Trans;
 import entities.TransItem;
+import entities.TransactionType;
 import entities.Unit;
 import entities.UserDetail;
 import java.io.File;
@@ -4437,7 +4438,7 @@ public class ItemBean implements Serializable {
         } catch (Exception e) {
             //do nothing
         }
-        //check for other unit and base unti are same
+        //check for other unit and base unit are same
         int BaseOtherSame = 0;
         try {
             String BaseUnitCodeTax = new UnitBean().getUnit(this.ItemObj.getUnitId()).getUnit_symbol_tax();
@@ -4655,21 +4656,6 @@ public class ItemBean implements Serializable {
         }
     }
 
-    public void refreshItemUnitList(Item aItem, TransItem aTransItem) {
-        try {
-            this.setItemUnitList(this.Item_unitList, aItem);
-            if (null != this.Item_unitList && this.Item_unitList.size() > 0) {
-                Item_unit iu = this.Item_unitList.get(0);
-                aItem.setUnitRetailsalePrice(iu.getUnit_retailsale_price());
-                aItem.setUnitWholesalePrice(iu.getUnit_wholesale_price());
-                aTransItem.setUnit_id(iu.getUnit_id());
-                aTransItem.setUnitSymbol(iu.getUnit_symbol());
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.ERROR, e);
-        }
-    }
-
     public void changeItemUnitSales(Item aItem, TransItem aTransItem, int aTransTypeId, int aTransReasId, int aStoreId, Trans aTrans) {
         try {
             Item_unit iu = this.getItemUnitFrmList(aTransItem.getUnit_id());
@@ -4696,7 +4682,59 @@ public class ItemBean implements Serializable {
         }
     }
 
-    public void setItemUnitList(List<Item_unit> aItem_unitList, Item aItem) {
+    public void changeItemUnitPurchases(Item aItem, TransItem aTransItem, int aTransTypeId, int aTransReasId, int aStoreId, Trans aTrans) {
+        try {
+            TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
+            Item_unit iu = this.getItemUnitFrmList(aTransItem.getUnit_id());
+            aItem.setUnitRetailsalePrice(iu.getUnit_retailsale_price());
+            aItem.setUnitWholesalePrice(iu.getUnit_wholesale_price());
+            aTransItem.setUnit_id(iu.getUnit_id());
+            aTransItem.setUnitSymbol(iu.getUnit_symbol());
+//            if (aTransTypeId == 2 && aTransReasId == 10) {
+//                aTransItem.setUnitPrice(aItem.getUnitWholesalePrice());
+//            } else {
+//                aTransItem.setUnitPrice(aItem.getUnitRetailsalePrice());
+//            }
+            //apply recent unit cost
+            if (transtype.getTransactionTypeName().equals("ITEM RECEIVED") || transtype.getTransactionTypeName().equals("PRODUCTION") || transtype.getTransactionTypeName().equals("STOCK ADJUSTMENT") || transtype.getTransactionTypeName().equals("DISPOSE STOCK") || transtype.getTransactionTypeName().equals("PURCHASE INVOICE")) {
+                String CurCode = aTrans.getCurrencyCode();
+                if (null == CurCode || CurCode.isEmpty()) {
+                    CurCode = aItem.getCurrencyCode();
+                }
+                aTransItem.setUnitCostPrice(new TransItemBean().getItemLatestUnitCostPrice(aItem.getItemId(), "", "", "", aTransItem.getUnit_id(), CurCode, 1));
+            }
+            //new TransItemBean().editTransItemUponUnitChange(aTransTypeId, aTransReasId, aTransItem);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void refreshItemUnitList(Item aItem, TransItem aTransItem, int aOrderByFlag) {
+        //aOrderByFlag 1 Sales, 2 Purchase, 0 None
+        try {
+            this.setItemUnitList(this.Item_unitList, aItem, aOrderByFlag);
+            if (null != this.Item_unitList && this.Item_unitList.size() > 0) {
+                Item_unit iu = this.Item_unitList.get(0);
+                aItem.setUnitRetailsalePrice(iu.getUnit_retailsale_price());
+                aItem.setUnitWholesalePrice(iu.getUnit_wholesale_price());
+                aTransItem.setUnit_id(iu.getUnit_id());
+                aTransItem.setUnitSymbol(iu.getUnit_symbol());
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void setItemUnitList(List<Item_unit> aItem_unitList, Item aItem, int aOrderByFlag) {
+        //aOrderByFlag 1 Sales, 2 Purchase, 0 None
+        String OrderBy;
+        if (aOrderByFlag == 1) {
+            OrderBy = "default_sale desc,is_base desc";
+        } else if (aOrderByFlag == 2) {
+            OrderBy = "default_purchase desc,is_base desc";
+        } else {
+            OrderBy = "is_base desc";
+        }
         String sql;
         sql = "select un.* from "
                 + "("
@@ -4707,7 +4745,7 @@ public class ItemBean implements Serializable {
                 + "select u.unit_id,u.unit_symbol,u.unit_name,0 as is_base,iu.other_default_sale as default_sale,iu.other_default_purchase as default_purchase,"
                 + "iu.base_qty,iu.other_qty,iu.other_unit_retailsale_price as unit_retailsale_price,iu.other_unit_wholesale_price as unit_wholesale_price "
                 + "from item_unit_other iu inner join unit u on iu.other_unit_id=u.unit_id where iu.is_active=1 and iu.item_id=? "
-                + ") as un order by default_sale desc,is_base desc";
+                + ") as un order by " + OrderBy;
         ResultSet rs = null;
         try {
             aItem_unitList.clear();
