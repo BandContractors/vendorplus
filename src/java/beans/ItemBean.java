@@ -4682,7 +4682,7 @@ public class ItemBean implements Serializable {
         }
     }
 
-    public void changeItemUnitPurchases(Item aItem, TransItem aTransItem, int aTransTypeId, int aTransReasId, int aStoreId, Trans aTrans) {
+    public void changeItemUnit(Item aItem, TransItem aTransItem, int aTransTypeId, int aTransReasId, int aStoreId, Trans aTrans) {
         try {
             TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
             Item_unit iu = this.getItemUnitFrmList(aTransItem.getUnit_id());
@@ -4690,20 +4690,14 @@ public class ItemBean implements Serializable {
             aItem.setUnitWholesalePrice(iu.getUnit_wholesale_price());
             aTransItem.setUnit_id(iu.getUnit_id());
             aTransItem.setUnitSymbol(iu.getUnit_symbol());
-//            if (aTransTypeId == 2 && aTransReasId == 10) {
-//                aTransItem.setUnitPrice(aItem.getUnitWholesalePrice());
-//            } else {
-//                aTransItem.setUnitPrice(aItem.getUnitRetailsalePrice());
-//            }
             //apply recent unit cost
-            if (transtype.getTransactionTypeName().equals("ITEM RECEIVED") || transtype.getTransactionTypeName().equals("PRODUCTION") || transtype.getTransactionTypeName().equals("STOCK ADJUSTMENT") || transtype.getTransactionTypeName().equals("DISPOSE STOCK") || transtype.getTransactionTypeName().equals("PURCHASE INVOICE")) {
+            if (transtype.getTransactionTypeName().equals("ITEM RECEIVED") || transtype.getTransactionTypeName().equals("PRODUCTION") || transtype.getTransactionTypeName().equals("STOCK ADJUSTMENT") || transtype.getTransactionTypeName().equals("DISPOSE STOCK") || transtype.getTransactionTypeName().equals("PURCHASE INVOICE") || transtype.getTransactionTypeName().equals("STOCK CONSUMPTION")) {
                 String CurCode = aTrans.getCurrencyCode();
                 if (null == CurCode || CurCode.isEmpty()) {
                     CurCode = aItem.getCurrencyCode();
                 }
                 aTransItem.setUnitCostPrice(new TransItemBean().getItemLatestUnitCostPrice(aItem.getItemId(), "", "", "", aTransItem.getUnit_id(), CurCode, 1));
             }
-            //new TransItemBean().editTransItemUponUnitChange(aTransTypeId, aTransReasId, aTransItem);
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -4866,7 +4860,8 @@ public class ItemBean implements Serializable {
                 if (null != FromIu && null != ToIu) {
                     //other to base
                     if (FromIu.getIs_base() == 0 && ToIu.getIs_base() == 1) {
-                        ConversionRate = ToIu.getOther_qty() / ToIu.getBase_qty();
+                        //ConversionRate = ToIu.getOther_qty() / ToIu.getBase_qty();
+                        ConversionRate = FromIu.getOther_qty() / FromIu.getBase_qty();
                     }
                     //base to other
                     if (FromIu.getIs_base() == 1 && ToIu.getIs_base() == 0) {
