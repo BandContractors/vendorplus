@@ -1,0 +1,31 @@
+Functions using old 
+-TIB.saveTransItemAutoUnpack
+-TIB.reverseTransItemCEC
+
+-TIB.saveTransItem (DELETED)
+
+
+
+>>>>Ensure UnitCost+Unit_ID in trans_item, production, prod_item and stock are not rounded off.
+>Test Item Reg to URA that includes Stock Update
+>Stock Take
+>Saving of draft
+>IR: Price History
+>IR:Items picked by "Purchase Order Ref"
+>autoUnpackItem [Shpould be based on Base_qty]
+>Check Quick Order
+>Loading drafts (SI, IR, and PI), loadTransferForInvoiceTrans.
+>Posting of cos for sales and cr and dr for items...
+>Walk thru for the unpacking.
+>Test loading from Transfer; should come with unit...
+>Unit cost and Profit Margin
+>EFDs Impact
+>SMbi Impact
+>AutoUnPack with an item that is oter unit as default.
+
+Check why TransItem Add adds twice for UnPack
+
+Put a function in utility for Calc of Base_qty given Other Qty
+Multi-units for update; check of inventory
+SMbi -- Loyalty
+SMbi -- Sales, Cr, Dr

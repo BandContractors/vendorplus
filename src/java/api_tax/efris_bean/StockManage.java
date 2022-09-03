@@ -61,7 +61,7 @@ public class StockManage implements Serializable {
                 Stock stockadd = new Stock();
                 stockadd.setItemId(aItem.getItemId());
                 stockadd.setCurrentqty(qtybal);
-                stockadd.setUnitCost(new TransItemBean().getItemLatestUnitCostPrice(aItem.getItemId(), "", "", ""));
+                stockadd.setUnitCost(new TransItemBean().getItemLatestUnitCostPrice(aItem.getItemId(), "", "", "", aItem.getUnitId(), aItem.getCurrencyCode(), 1));
                 String SupplierTIN = "";
                 String SupplierName = "";
                 long SupplierId = 0;
@@ -73,7 +73,13 @@ public class StockManage implements Serializable {
                     SupplierTIN = tr.getTaxIdentity();
                     SupplierName = tr.getTransactorNames();
                 }
-                new StockManage().addStockCallFromItemReg(stockadd, aItemIdTax, SupplierTIN, SupplierName);
+                String UnitCodeTax = "";
+                try {
+                    UnitCodeTax = new UnitBean().getUnit(aItem.getUnitId()).getUnit_symbol_tax();
+                } catch (Exception e) {
+                    UnitCodeTax = "";
+                }
+                new StockManage().addStockCallFromItemReg(stockadd, aItemIdTax, SupplierTIN, SupplierName, UnitCodeTax);
             }
         } catch (Exception e) {
             //System.err.println("callAddStockUponItemReg:" + e.getMessage());
@@ -81,7 +87,7 @@ public class StockManage implements Serializable {
         }
     }
 
-    public void addStockCall(Stock aStock, String aItemIdTax, long aTax_update_id, String aSupplierTin, String aSupplierName, String aTableName) {
+    public void addStockCall(Stock aStock, String aItemIdTax, long aTax_update_id, String aSupplierTin, String aSupplierName, String aTableName, String aUnitCodeTax) {
         try {
             if (null != aStock && aTax_update_id > 0) {
                 //1. indicate record4Sync
@@ -103,9 +109,9 @@ public class StockManage implements Serializable {
                     //2. update tax db and check if synced yes
                     String recordSynced = "";
                     if (APIMode.equals("OFFLINE")) {
-                        recordSynced = this.addStockOffline(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()), aSupplierTin, aSupplierName);
+                        recordSynced = this.addStockOffline(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()), aSupplierTin, aSupplierName, aUnitCodeTax);
                     } else {
-                        recordSynced = this.addStockOnline(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()), aSupplierTin, aSupplierName);
+                        recordSynced = this.addStockOnline(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()), aSupplierTin, aSupplierName, aUnitCodeTax);
                     }
                     if (recordSynced.equals("SUCCESS")) {
                         //3. update local db that synced yes
@@ -127,7 +133,7 @@ public class StockManage implements Serializable {
         }
     }
 
-    public void addStockCallFromItemReg(Stock aStock, String aItemIdTax, String aSupplierTin, String aSupplierName) {
+    public void addStockCallFromItemReg(Stock aStock, String aItemIdTax, String aSupplierTin, String aSupplierName, String aUnitCodeTax) {
         try {
             if (null != aStock) {
                 String id = "";
@@ -141,9 +147,9 @@ public class StockManage implements Serializable {
                     //2. update tax db and check if synced yes
                     String recordSynced = "";
                     if (APIMode.equals("OFFLINE")) {
-                        recordSynced = this.addStockOffline(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()), aSupplierTin, aSupplierName);
+                        recordSynced = this.addStockOffline(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()), aSupplierTin, aSupplierName, aUnitCodeTax);
                     } else {
-                        recordSynced = this.addStockOnline(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()), aSupplierTin, aSupplierName);
+                        recordSynced = this.addStockOnline(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()), aSupplierTin, aSupplierName, aUnitCodeTax);
                     }
                     if (recordSynced.equals("SUCCESS")) {
                         //3. update local db that synced yes
@@ -166,7 +172,7 @@ public class StockManage implements Serializable {
         }
     }
 
-    public void subtractStockCall(Stock aStock, String aItemIdTax, long aTax_update_id, String aAdjustType, String aTableName) {
+    public void subtractStockCall(Stock aStock, String aItemIdTax, long aTax_update_id, String aAdjustType, String aTableName, String aUnitCodeTax) {
         try {
             if (null != aStock && aTax_update_id > 0) {
                 //1. indicate record4Sync
@@ -188,9 +194,9 @@ public class StockManage implements Serializable {
                     //2. update tax db and check if synced yes
                     String recordSynced = "";
                     if (APIMode.equals("OFFLINE")) {
-                        recordSynced = this.subtractStockOffline(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()), aAdjustType);
+                        recordSynced = this.subtractStockOffline(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()), aAdjustType, aUnitCodeTax);
                     } else {
-                        recordSynced = this.subtractStockOnline(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()), aAdjustType);
+                        recordSynced = this.subtractStockOnline(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()), aAdjustType, aUnitCodeTax);
                     }
                     if (recordSynced.equals("SUCCESS")) {
                         //3. update local db that synced yes
@@ -213,12 +219,12 @@ public class StockManage implements Serializable {
         }
     }
 
-    public void addStockCallThread(Stock aStock, String aItemIdTax, long aTax_update_id, String aSupplierTin, String aSupplierName) {
+    public void addStockCallThread(Stock aStock, String aItemIdTax, long aTax_update_id, String aSupplierTin, String aSupplierName, String aUnitCodeTax) {
         try {
             Runnable task = new Runnable() {
                 @Override
                 public void run() {
-                    addStockCall(aStock, aItemIdTax, aTax_update_id, aSupplierTin, aSupplierName, "");
+                    addStockCall(aStock, aItemIdTax, aTax_update_id, aSupplierTin, aSupplierName, "", aUnitCodeTax);
                 }
             };
             Executor e = Executors.newSingleThreadExecutor();
@@ -229,12 +235,12 @@ public class StockManage implements Serializable {
         }
     }
 
-    public void subtractStockCallThread(Stock aStock, String aItemIdTax, long aTax_update_id, String aAdjustType) {
+    public void subtractStockCallThread(Stock aStock, String aItemIdTax, long aTax_update_id, String aAdjustType, String aUnitCodeTax) {
         try {
             Runnable task = new Runnable() {
                 @Override
                 public void run() {
-                    subtractStockCall(aStock, aItemIdTax, aTax_update_id, aAdjustType, "");
+                    subtractStockCall(aStock, aItemIdTax, aTax_update_id, aAdjustType, "", aUnitCodeTax);
                 }
             };
             Executor e = Executors.newSingleThreadExecutor();
@@ -573,7 +579,7 @@ public class StockManage implements Serializable {
         return itemtax;
     }
 
-    public String addStockOffline(String aId, String aQty, String aUnitPrice, String aSupplierTin, String aSupplierName) {
+    public String addStockOffline(String aId, String aQty, String aUnitPrice, String aSupplierTin, String aSupplierName, String aUnitCodeTax) {
         String ReturnMsg = "";
         String output = "";
         //System.out.println("aUnitPrice:" + aUnitPrice);
@@ -589,6 +595,7 @@ public class StockManage implements Serializable {
                     + " },\n"
                     + " \"goodsStockInItem\": [{\n"
                     + " \"commodityGoodsId\": \"" + aId + "\",\n"
+                    + " \"measureUnit\": \"" + aUnitCodeTax + "\",\n"
                     + " \"quantity\": \"" + aQty + "\",\n"
                     + " \"unitPrice\": \"" + aUnitPrice + "\"\n"
                     + " }]\n"
@@ -626,7 +633,7 @@ public class StockManage implements Serializable {
         return ReturnMsg;
     }
 
-    public String addStockOnline(String aId, String aQty, String aUnitPrice, String aSupplierTin, String aSupplierName) {
+    public String addStockOnline(String aId, String aQty, String aUnitPrice, String aSupplierTin, String aSupplierName, String aUnitCodeTax) {
         String ReturnMsg = "";
         String output = "";
         //System.out.println("aUnitPrice:" + aUnitPrice);
@@ -642,7 +649,7 @@ public class StockManage implements Serializable {
                     + " },\n"
                     + " \"goodsStockInItem\": [{\n"
                     + " \"commodityGoodsId\": \"" + aId + "\",\n"
-                    //+ " \"measureUnit\": \"" + aQty + "\",\n"
+                    + " \"measureUnit\": \"" + aUnitCodeTax + "\",\n"
                     + " \"quantity\": \"" + aQty + "\",\n"
                     + " \"unitPrice\": \"" + aUnitPrice + "\"\n"
                     + " }]\n"
@@ -696,7 +703,7 @@ public class StockManage implements Serializable {
         return ReturnMsg;
     }
 
-    public String subtractStockOffline(String aId, String aQty, String aUnitPrice, String aAdjustType) {
+    public String subtractStockOffline(String aId, String aQty, String aUnitPrice, String aAdjustType, String aUnitCodeTax) {
         String ReturnMsg = "";
         String output = "";
         //System.out.println("aUnitPrice:" + aUnitPrice);
@@ -712,6 +719,7 @@ public class StockManage implements Serializable {
                     + " },\n"
                     + " \"goodsStockInItem\": [{\n"
                     + " \"commodityGoodsId\": \"" + aId + "\",\n"
+                    + " \"measureUnit\": \"" + aUnitCodeTax + "\",\n"
                     + " \"quantity\": \"" + aQty + "\",\n"
                     + " \"unitPrice\": \"" + aUnitPrice + "\"\n"
                     + " }]\n"
@@ -748,7 +756,7 @@ public class StockManage implements Serializable {
         return ReturnMsg;
     }
 
-    public String subtractStockOnline(String aId, String aQty, String aUnitPrice, String aAdjustType) {
+    public String subtractStockOnline(String aId, String aQty, String aUnitPrice, String aAdjustType, String aUnitCodeTax) {
         String ReturnMsg = "";
         String output = "";
         //System.out.println("aUnitPrice:" + aUnitPrice);
@@ -764,6 +772,7 @@ public class StockManage implements Serializable {
                     + " },\n"
                     + " \"goodsStockInItem\": [{\n"
                     + " \"commodityGoodsId\": \"" + aId + "\",\n"
+                    + " \"measureUnit\": \"" + aUnitCodeTax + "\",\n"
                     + " \"quantity\": \"" + aQty + "\",\n"
                     + " \"unitPrice\": \"" + aUnitPrice + "\"\n"
                     + " }]\n"

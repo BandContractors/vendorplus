@@ -14485,3 +14485,33 @@ BEGIN
 	SELECT * FROM pay_shift ORDER BY pay_shift_id ASC; 
 END//
 DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_alter_stock_ledger_tables_trans_item_id;
+DELIMITER //
+CREATE PROCEDURE sp_alter_stock_ledger_tables_trans_item_id
+(
+IN in_db_name varchar(100) 
+)
+BEGIN 
+	DECLARE finished INTEGER DEFAULT 0;
+	DECLARE TableName varchar(30) DEFAULT "";
+	-- declare cursor for stock legder tables
+	DEClARE curTableName CURSOR FOR SELECT TABLE_NAME as tb FROM information_schema.tables WHERE TABLE_SCHEMA=in_db_name AND TABLE_NAME LIKE 'stock_ledger%';
+	-- declare NOT FOUND handler
+	DECLARE CONTINUE HANDLER FOR NOT FOUND SET finished = 1;
+	OPEN curTableName;
+	getTableName: LOOP
+		FETCH curTableName INTO TableName;
+		IF finished = 1 THEN 
+			LEAVE getTableName;
+		END IF;
+		-- alter table
+		set @sql_text = CONCAT("ALTER TABLE ",TableName," ADD COLUMN transaction_item_id BIGINT(20) NULL DEFAULT '0'");
+		-- select @sql_text;
+        PREPARE stmt FROM @sql_text;
+		EXECUTE stmt;
+		DEALLOCATE PREPARE stmt;
+	END LOOP getTableName;
+	CLOSE curTableName;
+END//
+DELIMITER ;

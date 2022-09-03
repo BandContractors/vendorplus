@@ -24,6 +24,7 @@
         <f:viewAction action="#{navigationBean.checkAccessDenied(utilityBean.convertIntAsString(19), 'View')}"/>
         <f:viewAction action="#{navigationBean.checkLicenseExpired()}"/>
         <f:viewAction action="#{transBean.initClearAllCEC('PARENT',trans,transItemBean.activeTransItems,transItem,itemBean.selectedItem,null,2,null,userDetailBean.selectedUserDetail,null)}" />
+        <f:viewAction action="#{utilityBean.clearList(itemBean.item_unitList)}"/>
         <f:viewAction action="#{transBean.initTransType(13,19)}"/>
     </f:metadata>
     <f:event listener="#{navigationBean.checkCurrentPage('TRANSFER REQUEST','','')}" type="preRenderView" />
@@ -45,21 +46,21 @@
                 <h:outputLabel  value="#{langsys['Delivery']} #{langsys['Date']}"/>
                 <h:outputLabel  value="#{langsys[transBean.transTypeObj.transactionRefLabel]}"/>
 
-                <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}"/>
-                <h:selectOneMenu styleClass="clsMenu" id="menuToStore" value="#{trans.store2Id}" >
+                <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}" style="width: 235px;height: 24px;"/>
+                <h:selectOneMenu styleClass="clsMenu" id="menuToStore" value="#{trans.store2Id}" style="height: 30px;">
                     <f:selectItem itemLabel="" itemValue="0"/>
                     <f:selectItems value="#{storeBean.stores}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
                 </h:selectOneMenu>
                 <p:calendar styleClass="clsInput" id="calTransactionDate" pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.transactionDate}" size="8"/>
                 <p:calendar styleClass="clsInput" id="calDeliveryDate" pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.deliveryDate}" size="8"/>
-                <h:inputText styleClass="clsInput" id="itxtTransactionRef" value="#{trans.transactionRef}" autocomplete="off"/>
+                <h:inputText styleClass="clsInput" id="itxtTransactionRef" value="#{trans.transactionRef}" autocomplete="off" style="height: 24px;width: 150px;"/>
             </h:panelGrid>
             <h:panelGrid id="gridTransItem" styleClass="clsGridMainInput" columns="4">
                 <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Item']} #{langsys['Description']}"/>
                 <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Item']} #{langsys['Details']}"/>
                 <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Unit']}"/>
                 <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Qty']}"/>
-                
+
                 <p:autoComplete id="autcItem" widgetVar="WautcItem" value="#{itemBean.selectedItem}"  
                                 completeMethod="#{itemBean.getItemObjectListForStockDispose}" 
                                 var="itm" 
@@ -86,12 +87,17 @@
                         <h:outputText value="#{itm.currencyCode}">
                         </h:outputText>
                     </p:column>
-                    <p:ajax event="itemSelect" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,'',trans,transItem,itemBean.selectedItem,1.0)}" process="@this" update="itxtUnit itxtNarration"/>
-                    <p:ajax event="change" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,'',trans,transItem,itemBean.selectedItem,1.0)}" rendered="#{itemBean.selectedItem!=null}" process="@this" update="itxtUnit itxtNarration"/>
+                    <p:ajax event="itemSelect" listener="#{itemBean.refreshItemUnitList(itemBean.selectedItem,transItem,1)}" process="@this menuUnit" update="menuUnit"/>
+                    <p:ajax event="change" listener="#{itemBean.refreshItemUnitList(itemBean.selectedItem,transItem,1)}" rendered="#{itemBean.selectedItem!=null}" process="@this menuUnit" update="menuUnit"/>
+                    <p:ajax event="itemSelect" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,'',trans,transItem,itemBean.selectedItem,1.0)}" process="@this" update="menuUnit itxtNarration"/>
+                    <p:ajax event="change" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,'',trans,transItem,itemBean.selectedItem,1.0)}" rendered="#{itemBean.selectedItem!=null}" process="@this" update="menuUnit itxtNarration"/>
                 </p:autoComplete>
-                <h:inputText id="itxtNarration" styleClass="clsInputTransItem" value="#{transItem.narration}" style="width: 250px" disabled="#{itemBean.selectedItem.isGeneral==0}"/>
-                <h:inputText id="itxtUnit" styleClass="clsInputTransItem" value="#{unitBean.getUnit(itemBean.getItem(transItem.itemId).getUnitId()).unitSymbol}" style="width: 100px" disabled="true"/>
-                <h:inputText id="itxtQty" styleClass="clsInputTransItem" style="width: 100px" value="#{transItem.itemQty}" autocomplete="off">
+                <h:inputText id="itxtNarration" styleClass="clsInputTransItem" value="#{transItem.narration}" style="width: 237px;height: 24px;" disabled="#{itemBean.selectedItem.isGeneral==0}"/>
+                <p:selectOneMenu id="menuUnit" styleClass="clsMenu" value="#{transItem.unit_id}" style="height: 30px;width: 103px;">
+                    <f:selectItems value="#{itemBean.item_unitList}" var="iu" itemLabel="#{iu.unit_symbol}" itemValue="#{iu.unit_id}"/>
+                    <p:ajax listener="#{itemBean.changeItemUnit(itemBean.selectedItem,transItem,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentStore.storeId,trans)}" process="@this autcItem"/>
+                </p:selectOneMenu>
+                <h:inputText id="itxtQty" styleClass="clsInputTransItem" style="width: 150px;height: 24px;" value="#{transItem.itemQty}" autocomplete="off">
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
             </h:panelGrid>

@@ -8,6 +8,7 @@ import entities.Item_tax_map;
 import entities.Parameter_list;
 import entities.Stock;
 import entities.Stock_ledger;
+import entities.TransItem;
 import entities.Transactor;
 import java.io.Serializable;
 import java.sql.CallableStatement;
@@ -143,6 +144,11 @@ public class Stock_ledgerBean implements Serializable {
             } catch (NullPointerException npe) {
                 aStock_ledger.setTax_update_synced(0);
             }
+            try {
+                aStock_ledger.setTransaction_item_id(aResultSet.getLong("transaction_item_id"));
+            } catch (Exception e) {
+                aStock_ledger.setTransaction_item_id(0);
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -167,6 +173,10 @@ public class Stock_ledgerBean implements Serializable {
     }
 
     public void callInsertStock_ledger(String aTableName, String aAddSubtract, Stock aStock, double aQty, String aAction_type, int aTrans_type_id, long aTrans_id, int aUser_detail_id) {
+        //to be deleted
+    }
+
+    public void callInsertStock_ledger(String aTableName, String aAddSubtract, Stock aStock, double aQty, String aAction_type, int aTrans_type_id, long aTrans_id, int aUser_detail_id, long aTrans_item_id) {
         try {
             Stock_ledger stockledger = new Stock_ledger();
             try {
@@ -262,6 +272,7 @@ public class Stock_ledgerBean implements Serializable {
             stockledger.setTax_update_id(update_id);
             stockledger.setTax_is_updated(0);
             stockledger.setTax_update_synced(0);
+            stockledger.setTransaction_item_id(aTrans_item_id);
             //insert
             this.insertStock_ledger(aTableName, stockledger);
             //check alert-stock status
@@ -274,8 +285,10 @@ public class Stock_ledgerBean implements Serializable {
                 if (null == im) {
                     //do nothing
                 } else {
+                    Item itm = new ItemBean().getItem(stockledger.getItem_id());
+                    TransItem ti = new TransItemBean().getTransItem(aTrans_item_id);
                     if (aStock.getUnitCost() == 0) {
-                        aStock.setUnitCost(new TransItemBean().getItemLatestUnitCostPrice(aStock.getItemId(), "", "", ""));
+                        aStock.setUnitCost(new TransItemBean().getItemLatestUnitCostPrice(aStock.getItemId(), "", "", "", ti.getUnit_id(), itm.getCurrencyCode(), 1));
                     }
                     if (aAddSubtract.equals("Add")) {
                         Stock stockadd = new Stock();
@@ -312,7 +325,13 @@ public class Stock_ledgerBean implements Serializable {
                         } catch (Exception e) {
                             ItemIdTax = "";
                         }
-                        new StockManage().addStockCallThread(stockadd, ItemIdTax, stockledger.getTax_update_id(), SupplierTIN, SupplierName);
+                        String UnitCodeTax = "";
+                        try {
+                            UnitCodeTax = new UnitBean().getUnit(ti.getUnit_id()).getUnit_symbol_tax();
+                        } catch (Exception e) {
+                            UnitCodeTax = "";
+                        }
+                        new StockManage().addStockCallThread(stockadd, ItemIdTax, stockledger.getTax_update_id(), SupplierTIN, SupplierName, UnitCodeTax);
                     } else if (aAddSubtract.equals("Subtract")) {
                         Stock stocksub = new Stock();
                         stocksub.setItemId(aStock.getItemId());
@@ -326,7 +345,13 @@ public class Stock_ledgerBean implements Serializable {
                         } catch (Exception e) {
                             ItemIdTax = "";
                         }
-                        new StockManage().subtractStockCallThread(stocksub, ItemIdTax, stockledger.getTax_update_id(), AdjustType);
+                        String UnitCodeTax = "";
+                        try {
+                            UnitCodeTax = new UnitBean().getUnit(ti.getUnit_id()).getUnit_symbol_tax();
+                        } catch (Exception e) {
+                            UnitCodeTax = "";
+                        }
+                        new StockManage().subtractStockCallThread(stocksub, ItemIdTax, stockledger.getTax_update_id(), AdjustType, UnitCodeTax);
                     }
                 }
             }
@@ -339,8 +364,8 @@ public class Stock_ledgerBean implements Serializable {
         String sql = "INSERT INTO " + aTableName
                 + "(store_id,item_id,batchno,code_specific,desc_specific,specific_size,"
                 + "qty_added,qty_subtracted,transaction_type_id,action_type,transaction_id,user_detail_id,add_date,qty_bal,"
-                + "tax_update_id,tax_is_updated,tax_update_synced)"
-                + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                + "tax_update_id,tax_is_updated,tax_update_synced,transaction_item_id)"
+                + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -365,6 +390,7 @@ public class Stock_ledgerBean implements Serializable {
             ps.setLong(15, aStock_ledger.getTax_update_id());
             ps.setInt(16, aStock_ledger.getTax_is_updated());
             ps.setInt(17, aStock_ledger.getTax_update_synced());
+            ps.setLong(18, aStock_ledger.getTransaction_item_id());
             ps.executeUpdate();
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -418,8 +444,10 @@ public class Stock_ledgerBean implements Serializable {
                 if (null == im) {
                     //do nothing
                 } else {
+                    Item itm = new ItemBean().getItem(aStock_ledger4Sync.getItem_id());
+                    TransItem ti = new TransItemBean().getTransItem(aStock_ledger4Sync.getTransaction_item_id());
                     String TableName = this.getStockLedgerTableName(aStock_ledgerBean);
-                    double LatestUnitCostPrice = new TransItemBean().getItemLatestUnitCostPrice(aStock_ledger4Sync.getItem_id(), "", "", "");
+                    double LatestUnitCostPrice = new TransItemBean().getItemLatestUnitCostPrice(aStock_ledger4Sync.getItem_id(), "", "", "", itm.getUnitId(), itm.getCurrencyCode(), 1);
                     if (aStock_ledger4Sync.getQty_added() > 0) {
                         Stock stockadd = new Stock();
                         stockadd.setItemId(aStock_ledger4Sync.getItem_id());
@@ -457,7 +485,20 @@ public class Stock_ledgerBean implements Serializable {
                         } catch (Exception e) {
                             ItemIdTax = "";
                         }
-                        new StockManage().addStockCall(stockadd, ItemIdTax, aStock_ledger4Sync.getTax_update_id(), SupplierTIN, SupplierName, TableName);
+                        String UnitCodeTax = "";
+                        try {
+                            UnitCodeTax = new UnitBean().getUnit(ti.getUnit_id()).getUnit_symbol_tax();
+                        } catch (Exception e) {
+                            UnitCodeTax = "";
+                        }
+                        try {
+                            if (null == UnitCodeTax || UnitCodeTax.isEmpty()) {
+                                UnitCodeTax = new UnitBean().getUnit(new ItemBean().getItem(aStock_ledger4Sync.getItem_id()).getUnitId()).getUnit_symbol_tax();
+                            }
+                        } catch (Exception e) {
+                            UnitCodeTax = "";
+                        }
+                        new StockManage().addStockCall(stockadd, ItemIdTax, aStock_ledger4Sync.getTax_update_id(), SupplierTIN, SupplierName, TableName, UnitCodeTax);
                     } else if (aStock_ledger4Sync.getQty_subtracted() > 0) {
                         Stock stocksub = new Stock();
                         stocksub.setItemId(aStock_ledger4Sync.getItem_id());
@@ -471,7 +512,20 @@ public class Stock_ledgerBean implements Serializable {
                         } catch (Exception e) {
                             ItemIdTax = "";
                         }
-                        new StockManage().subtractStockCall(stocksub, ItemIdTax, aStock_ledger4Sync.getTax_update_id(), AdjustType, TableName);
+                        String UnitCodeTax = "";
+                        try {
+                            UnitCodeTax = new UnitBean().getUnit(ti.getUnit_id()).getUnit_symbol_tax();
+                        } catch (Exception e) {
+                            UnitCodeTax = "";
+                        }
+                        try {
+                            if (null == UnitCodeTax || UnitCodeTax.isEmpty()) {
+                                UnitCodeTax = new UnitBean().getUnit(new ItemBean().getItem(aStock_ledger4Sync.getItem_id()).getUnitId()).getUnit_symbol_tax();
+                            }
+                        } catch (Exception e) {
+                            UnitCodeTax = "";
+                        }
+                        new StockManage().subtractStockCall(stocksub, ItemIdTax, aStock_ledger4Sync.getTax_update_id(), AdjustType, TableName, UnitCodeTax);
                     }
                 }
             }
@@ -505,6 +559,7 @@ public class Stock_ledgerBean implements Serializable {
             aStock_ledger.setTax_update_id(0);
             aStock_ledger.setTax_is_updated(0);
             aStock_ledger.setTax_update_synced(0);
+            aStock_ledger.setTransaction_item_id(0);
         }
     }
 
@@ -594,13 +649,16 @@ public class Stock_ledgerBean implements Serializable {
         aStock_ledgerBean.setActionMessage("");
         ResultSet rs = null;
         this.Stock_ledgerList = new ArrayList<>();
-        String sql = "SELECT l.*,i.description,un.unit_symbol,tt.transaction_type_name,us.user_name,s.store_name "
+        String sql = "SELECT l.*,i.description,ifnull(un2.unit_symbol,un.unit_symbol) as unit_symbol,un.unit_symbol as base_unit_symbol,"
+                + "tt.transaction_type_name,us.user_name,s.store_name,tiu.transaction_item_id "
                 + "FROM " + aTableName + " l "
                 + "INNER JOIN item i ON l.item_id=i.item_id "
                 + "INNER JOIN unit un ON i.unit_id=un.unit_id "
                 + "INNER JOIN transaction_type tt ON l.transaction_type_id=tt.transaction_type_id "
                 + "INNER JOIN user_detail us ON l.user_detail_id=us.user_detail_id "
                 + "INNER JOIN store s ON l.store_id=s.store_id "
+                + "LEFT JOIN transaction_item_unit tiu ON l.transaction_item_id=tiu.transaction_item_id "
+                + "LEFT JOIN unit un2 ON tiu.unit_id=un2.unit_id "
                 + "WHERE 1=1";
         String wheresql = "";
         String ordersql = "";
@@ -637,6 +695,7 @@ public class Stock_ledgerBean implements Serializable {
                 slb.setStock_ledgerFromResultset(sl, rs);
                 sl.setDescription(rs.getString("description"));
                 sl.setUnit_symbol(rs.getString("unit_symbol"));
+                sl.setBase_unit_symbol(rs.getString("base_unit_symbol"));
                 sl.setTransaction_type_name(rs.getString("transaction_type_name"));
                 sl.setUser_name(rs.getString("user_name"));
                 sl.setStore_name(rs.getString("store_name"));
@@ -678,7 +737,7 @@ public class Stock_ledgerBean implements Serializable {
                 + "t.*,"
                 + "i.description,"
                 + "u.unit_symbol,"
-                + "(select case when l1.qty_added>0 then l1.qty_bal-l1.qty_added when l1.qty_subtracted>0 then l1.qty_bal+l1.qty_subtracted else 0 end from " + aTableName + " l1 where l1.stock_ledger_id=t.min_id) as qty_open,"
+                + "(select case when l1.qty_added>0 then l1.qty_bal-ifnull(tiu.base_unit_qty,l1.qty_added) when l1.qty_subtracted>0 then l1.qty_bal+ifnull(tiu.base_unit_qty,l1.qty_subtracted) else 0 end from " + aTableName + " l1 LEFT JOIN transaction_item_unit tiu ON l1.transaction_id=tiu.transaction_item_id where l1.stock_ledger_id=t.min_id) as qty_open,"
                 + "(select l2.qty_bal from " + aTableName + " l2 where l2.stock_ledger_id=t.max_id) as qty_close "
                 + "from "
                 + "("
@@ -753,13 +812,16 @@ public class Stock_ledgerBean implements Serializable {
         aStock_ledgerBean.setActionMessage("");
         ResultSet rs = null;
         this.Stock_ledgerList = new ArrayList<>();
-        String sql = "SELECT l.*,i.description,un.unit_symbol,tt.transaction_type_name,us.user_name,s.store_name "
+        String sql = "SELECT l.*,i.description,ifnull(un2.unit_symbol,un.unit_symbol) as unit_symbol,un.unit_symbol as base_unit_symbol,"
+                + "tt.transaction_type_name,us.user_name,s.store_name,tiu.transaction_item_id "
                 + "FROM " + aTableName + " l "
                 + "INNER JOIN item i ON l.item_id=i.item_id "
                 + "INNER JOIN unit un ON i.unit_id=un.unit_id "
                 + "INNER JOIN transaction_type tt ON l.transaction_type_id=tt.transaction_type_id "
                 + "INNER JOIN user_detail us ON l.user_detail_id=us.user_detail_id "
                 + "INNER JOIN store s ON l.store_id=s.store_id "
+                + "LEFT JOIN transaction_item_unit tiu ON l.transaction_item_id=tiu.transaction_item_id "
+                + "LEFT JOIN unit un2 ON tiu.unit_id=un2.unit_id "
                 + "WHERE l.transaction_type_id NOT IN (2,4) AND l.tax_is_updated=1";
         String wheresql = "";
         String ordersql = "";
@@ -796,6 +858,7 @@ public class Stock_ledgerBean implements Serializable {
                 slb.setStock_ledgerFromResultset(sl, rs);
                 sl.setDescription(rs.getString("description"));
                 sl.setUnit_symbol(rs.getString("unit_symbol"));
+                sl.setBase_unit_symbol(rs.getString("base_unit_symbol"));
                 sl.setTransaction_type_name(rs.getString("transaction_type_name"));
                 sl.setUser_name(rs.getString("user_name"));
                 sl.setStore_name(rs.getString("store_name"));
@@ -824,12 +887,13 @@ public class Stock_ledgerBean implements Serializable {
                 + "sm.*,tt.transaction_type_name from "
                 + "("
                 + "select "
-                + "l.transaction_type_id,"
+                + "l.transaction_type_id,l.item_id,ifnull(tiu.unit_id,0) as unit_id,"
                 + "sum(l.qty_added) as qty_added,"
                 + "sum(l.qty_subtracted) as qty_subtracted  "
                 + "from " + aTableName + " l "
+                + "LEFT JOIN transaction_item_unit tiu ON l.transaction_item_id=tiu.transaction_item_id "
                 + "where 1=1 " + aWhereSql + " "
-                + "group by l.transaction_type_id"
+                + "group by l.transaction_type_id,l.item_id,ifnull(tiu.unit_id,0)"
                 + ") as sm "
                 + "inner join transaction_type tt on sm.transaction_type_id=tt.transaction_type_id "
                 + "order by tt.transaction_type_name";
@@ -838,11 +902,19 @@ public class Stock_ledgerBean implements Serializable {
                 PreparedStatement ps = conn.prepareStatement(wheresql);) {
             rs = ps.executeQuery();
             Stock_ledger sl = null;
+            int UnitId = 0;
+            ItemBean ib = new ItemBean();
+            UnitBean ub = new UnitBean();
             while (rs.next()) {
                 sl = new Stock_ledger();
                 sl.setTransaction_type_name(rs.getString("transaction_type_name"));
                 sl.setQty_subtracted(rs.getDouble("qty_subtracted"));
                 sl.setQty_added(rs.getDouble("qty_added"));
+                UnitId = rs.getInt("unit_id");
+                if (UnitId == 0) {
+                    UnitId = ib.getItem(rs.getLong("item_id")).getUnitId();
+                }
+                sl.setUnit_symbol(ub.getUnit(UnitId).getUnitSymbol());
                 sll.add(sl);
             }
         } catch (Exception e) {

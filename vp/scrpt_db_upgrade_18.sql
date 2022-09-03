@@ -43,3 +43,6 @@ INSERT INTO parameter_list (parameter_list_id, context, parameter_name, paramete
 VALUES (97, 'GENERAL', 'FORCE_UNIT_SELECTION', '0','0:No and 1:Yes. If Yes, Unit will be selected manually at each transaction. If No, default unit is be selected automatically. Applies to Items with multiple units');
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',44,Now(),'6.0','');
 
+-- Replace db_name with database name such as daytoday_sm_branch
+CALL sp_alter_stock_ledger_tables_trans_item_id("db_name");
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',48,Now(),'6.0','');
