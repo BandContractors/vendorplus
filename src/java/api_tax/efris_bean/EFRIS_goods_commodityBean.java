@@ -140,7 +140,14 @@ public class EFRIS_goods_commodityBean implements Serializable {
             int goodsSaved = 0;
             //save goods commodity
             for (int i = 0, size = aGoodsCommoditys.size(); i < size; i++) {
-                goodsSaved = goodsSaved + this.insertEFRIS_goods_commodity(aGoodsCommoditys.get(i));
+                //check if EFRIS_goods_commodity is already in the db
+                EFRIS_goods_commodity aEFRIS_goods_commodity = this.getEFRIS_invoice_detailByCommodityCategoryCode(aGoodsCommoditys.get(i).getCommodityCategoryCode());
+                if (aEFRIS_goods_commodity == null) {
+                    goodsSaved = goodsSaved + this.insertEFRIS_goods_commodity(aGoodsCommoditys.get(i));
+                } else {
+                    //EFRIS_goods_commodity already exists
+                    goodsSaved = goodsSaved + 1;
+                }
             }
 
             if (goodsSaved == aGoodsCommoditys.size()) {
@@ -324,24 +331,25 @@ public class EFRIS_goods_commodityBean implements Serializable {
         return list;
     }
 
-    public List<EFRIS_goods_commodity> getEFRIS_invoice_detailByInvoiceNo(String aCommodityCategoryCode) {
+    public EFRIS_goods_commodity getEFRIS_invoice_detailByCommodityCategoryCode(String aCommodityCategoryCode) {
         String sql = "SELECT * FROM efris_goods_commodity where commodityCategoryCode=?";
         ResultSet rs;
-        List<EFRIS_goods_commodity> list = new ArrayList<>();
+        EFRIS_goods_commodity aEFRIS_goods_commodity = new EFRIS_goods_commodity();
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             ps.setString(1, aCommodityCategoryCode);
             rs = ps.executeQuery();
-            while (rs.next()) {
-                EFRIS_goods_commodity obj = new EFRIS_goods_commodity();
-                this.setEFRIS_goods_commodityFromResultset(obj, rs);
-                list.add(obj);
+            if (rs.next()) {
+                this.setEFRIS_goods_commodityFromResultset(aEFRIS_goods_commodity, rs);
+            } else {
+                aEFRIS_goods_commodity = null;
             }
         } catch (Exception e) {
+            aEFRIS_goods_commodity = null;
             LOGGER.log(Level.ERROR, e);
         }
-        return list;
+        return aEFRIS_goods_commodity;
     }
 
     public Date getGoodsCommodityLastSyncDate() {
