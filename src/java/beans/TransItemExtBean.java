@@ -3,6 +3,7 @@ package beans;
 import connections.DBConnection;
 import entities.CompanySetting;
 import entities.TransItem;
+import entities.Transaction_item_hist_unit;
 import entities.Transaction_item_unit;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -77,7 +78,7 @@ public class TransItemExtBean implements Serializable {
         }
     }
 
-    public long getTransItemId(long aTransId, long aItemId, String aBatchno,String aCodeSpecific,String aDescSpecific) {
+    public long getTransItemId(long aTransId, long aItemId, String aBatchno, String aCodeSpecific, String aDescSpecific) {
         long TransItemId = 0;
         String sql = "SELECT * FROM transaction_item WHERE transaction_id=" + aTransId + " AND item_id=" + aItemId + " AND batchno='" + aBatchno + "' AND code_specific='" + aCodeSpecific + "' AND desc_specific='" + aDescSpecific + "'";
         ResultSet rs = null;
@@ -116,6 +117,26 @@ public class TransItemExtBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
         return newId;
+    }
+
+    public int insertTransaction_item_hist_unit(Transaction_item_hist_unit aTransaction_item_hist_unit) {
+        int inserted = 0;
+        String sql = "INSERT INTO transaction_item_hist_unit"
+                + "(transaction_item_hist_id,unit_id,base_unit_qty)"
+                + " VALUES"
+                + "(?,?,?)";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aTransaction_item_hist_unit.getTransaction_item_hist_id());
+            ps.setInt(2, aTransaction_item_hist_unit.getUnit_id());
+            ps.setDouble(3, aTransaction_item_hist_unit.getBase_unit_qty());
+            ps.executeUpdate();
+            inserted = 1;
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return inserted;
     }
 
     /**

@@ -362,7 +362,7 @@ public class Transaction_approvalBean implements Serializable {
         }
         return Updated;
     }
-    
+
     public int updateTransaction_approval_processed(Transaction_approval aTransaction_approval, long aTransaction_id) {
         int Updated = 0;
         String sql = "UPDATE transaction_approval SET "

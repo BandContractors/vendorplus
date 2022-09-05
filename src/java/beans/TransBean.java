@@ -19,6 +19,7 @@ import entities.TransItem;
 import entities.GroupRight;
 import entities.Transactor;
 import entities.Item;
+import entities.Item_unit;
 import entities.Location;
 import entities.PayMethod;
 import entities.PayTrans;
@@ -5473,6 +5474,14 @@ public class TransBean implements Serializable {
                             transitem.setDescSpecific("");
                         }
                         transitem.setAccountCode(tib.getTransItemInventCostAccount(transtype, transreason, item));
+                        transitem.setUnit_id(TransferItems.get(i).getUnit_id());
+                        transitem.setBase_unit_qty(TransferItems.get(i).getBase_unit_qty());
+                        Item_unit iu = new ItemBean().getItemUnitFrmDb(transitem.getItemId(), transitem.getUnit_id());
+                        if (null != iu) {
+                            item.setUnitRetailsalePrice(iu.getUnit_retailsale_price());
+                            item.setUnitWholesalePrice(iu.getUnit_wholesale_price());
+                            item.setUnitSymbol(iu.getUnit_symbol());
+                        }
                         tib.updateModelTransItemAutoAddFrmTransfer(store, transtype, transreason, new GeneralUserSetting().getCurrentSaleType(), aTrans, new StatusBean(), aActiveTransItems, transitem, item);
                     }
                     tib.clearTransItem(aTransItem);

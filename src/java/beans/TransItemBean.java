@@ -21,6 +21,7 @@ import entities.Store;
 import entities.SubCategory;
 import entities.Trans;
 import entities.TransactionReason;
+import entities.Transaction_item_hist_unit;
 import entities.Transaction_item_unit;
 import java.io.Serializable;
 import java.sql.CallableStatement;
@@ -1616,7 +1617,7 @@ public class TransItemBean implements Serializable {
         String msg = "";
         if (1 == 2) {
         } else {
-            sql = "{call sp_insert_transaction_item_hist(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_insert_transaction_item_hist_out(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
             try (
                     Connection conn = DBConnection.getMySQLConnection();
                     CallableStatement cs = conn.prepareCall(sql);) {
@@ -1770,8 +1771,22 @@ public class TransItemBean implements Serializable {
                 } catch (NullPointerException npe) {
                     cs.setDouble("in_specific_size", 1);
                 }
+                cs.registerOutParameter("out_transaction_item_hist_id", VARCHAR);
                 //save
                 cs.executeUpdate();
+                long TransItemHistId = cs.getLong("out_transaction_item_hist_id");
+
+                try {
+                    if (TransItemHistId > 0) {
+                        Transaction_item_hist_unit tihu = new Transaction_item_hist_unit();
+                        tihu.setTransaction_item_hist_id(TransItemHistId);
+                        tihu.setUnit_id(transitem.getUnit_id());
+                        tihu.setBase_unit_qty(transitem.getBase_unit_qty());
+                        new TransItemExtBean().insertTransaction_item_hist_unit(tihu);
+                    }
+                } catch (Exception e) {
+                    LOGGER.log(Level.ERROR, e);
+                }
             } catch (Exception e) {
                 LOGGER.log(Level.ERROR, e);
                 this.setActionMessage("DRAFT not saved");
