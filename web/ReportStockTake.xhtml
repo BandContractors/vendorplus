@@ -160,8 +160,8 @@
                     <p:column headerText="#{langsys['Specific']} #{langsys['Code']}">
                         <h:outputLabel value="#{i.code_specific}"/>
                     </p:column>
-                    <p:column headerText="#{langsys['Batch']} #{langsys['No']}">
-                        <h:outputLabel value="#{i.batchno}"/>
+                    <p:column headerText="#{langsys['Unit']}">
+                        <h:outputLabel value="#{i.unit_symbol}"/>
                     </p:column>
                     <p:column headerText="#{langsys['Qty']} #{langsys['System']}" style="text-align: right;">
                         <h:outputLabel value="#{utilityBean.formatDoubleToString(i.qty_system)}"/>

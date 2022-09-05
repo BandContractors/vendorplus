@@ -16041,8 +16041,14 @@ public class TransBean implements Serializable {
         if (aTransReasonId > 0) {
             TReasWhereSql = " AND t.transaction_reason_id=" + aTransReasonId;
         }
-        sql = "SELECT SUM(ti.item_qty) AS item_qty,SUM(ti.qty_damage) AS qty_damage FROM transaction_item ti INNER JOIN transaction t ON ti.transaction_id=t.transaction_id "
-                + " WHERE t.transaction_type_id=" + aTransTypeId + "" + TReasWhereSql + " AND t.transaction_ref='" + aTransNo + "' AND ti.item_id=" + aTransItem.getItemId();
+        /*
+         sql = "SELECT SUM(ti.item_qty) AS item_qty,SUM(ti.qty_damage) AS qty_damage FROM transaction_item ti INNER JOIN transaction t ON ti.transaction_id=t.transaction_id "
+         + " WHERE t.transaction_type_id=" + aTransTypeId + "" + TReasWhereSql + " AND t.transaction_ref='" + aTransNo + "' AND ti.item_id=" + aTransItem.getItemId();
+         */
+        sql = "SELECT SUM(ti.item_qty) AS item_qty,SUM(ti.qty_damage) AS qty_damage FROM transaction_item ti "
+                + "INNER JOIN transaction t ON ti.transaction_id=t.transaction_id "
+                + "INNER JOIN transaction_item_unit tiu ON ti.transaction_item_id=tiu.transaction_item_id "
+                + " WHERE t.transaction_type_id=" + aTransTypeId + "" + TReasWhereSql + " AND t.transaction_ref='" + aTransNo + "' AND ti.item_id=" + aTransItem.getItemId() + "' AND tiu.unit_id=" + aTransItem.getUnit_id();
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {

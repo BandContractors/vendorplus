@@ -7177,6 +7177,17 @@ public class TransItemBean implements Serializable {
         new TransBean().setTransTotalsAndUpdate(aTrans, aActiveTransItems);
     }
 
+    public void updateBaseUnityQty(TransItem aTransItem) {
+        try {
+            double BaseQty = new ItemBean().getBaseUnitQty(aTransItem.getItemId(), aTransItem.getUnit_id(), aTransItem.getItemQty());
+            if (BaseQty > 0) {
+                aTransItem.setBase_unit_qty(BaseQty);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public void editTransItemCEC(int aTransTypeId, int aTransReasonId, String aSaleType, Trans aTrans, List<TransItem> aActiveTransItems, TransItem ti) {
         try {
             TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);

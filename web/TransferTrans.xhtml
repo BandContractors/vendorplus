@@ -181,7 +181,7 @@
                     <!-- row record -->
                     <h:inputText value="#{ati.itemQty}" style="width: 50px;" disabled="#{0>=ati.itemQty}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                        <f:ajax event="change" execute="dtblTransactionItem" render="dtblTransactionItem"/>
+                        <f:ajax event="change" listener="#{transItemBean.updateBaseUnityQty(ati)}" execute="dtblTransactionItem" render="dtblTransactionItem"/>
                     </h:inputText>
                 </p:column>
                 <p:column>

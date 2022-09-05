@@ -7,6 +7,7 @@ import entities.Acc_currency_tax_list;
 import entities.GroupRight;
 import entities.UserDetail;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -662,6 +663,17 @@ public class AccCurrencyBean implements Serializable {
         } catch (Exception e) {
         }
         return RoundedAmount;
+    }
+    
+    public double roundDoubleToXDps(double aDouble, int aDecimalPlaces) {
+        double RoundedDouble = 0;
+        try {
+            int DecimalPlaces = aDecimalPlaces;
+            int RoundingMode = 4;//4 is BigDecimal.ROUND_HALF_UP
+            RoundedDouble = Precision.round(aDouble, DecimalPlaces, RoundingMode);
+        } catch (Exception e) {
+        }
+        return RoundedDouble;
     }
 
     public void refreshSavedCurrencyLists() {

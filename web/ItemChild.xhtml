@@ -272,7 +272,7 @@
                                     <!-- column header -->
                                     <f:facet name="header">#{langsys['Qty']}</f:facet>
                                     <!-- row record -->
-                                    #{utilityBean.formatDoubleToString(stck.currentqty)}
+                                    #{utilityBean.formatDoubleToStringByDp(stck.currentqty,8)}
                                 </p:column>
                                 <p:column style="text-align: left;">
                                     <!-- column header -->

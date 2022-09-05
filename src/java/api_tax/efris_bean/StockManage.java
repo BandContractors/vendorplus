@@ -109,9 +109,9 @@ public class StockManage implements Serializable {
                     //2. update tax db and check if synced yes
                     String recordSynced = "";
                     if (APIMode.equals("OFFLINE")) {
-                        recordSynced = this.addStockOffline(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()), aSupplierTin, aSupplierName, aUnitCodeTax);
+                        recordSynced = this.addStockOffline(id, Double.toString(new AccCurrencyBean().roundDoubleToXDps(aStock.getCurrentqty(), 8)), Double.toString(aStock.getUnitCost()), aSupplierTin, aSupplierName, aUnitCodeTax);
                     } else {
-                        recordSynced = this.addStockOnline(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()), aSupplierTin, aSupplierName, aUnitCodeTax);
+                        recordSynced = this.addStockOnline(id, Double.toString(new AccCurrencyBean().roundDoubleToXDps(aStock.getCurrentqty(), 8)), Double.toString(aStock.getUnitCost()), aSupplierTin, aSupplierName, aUnitCodeTax);
                     }
                     if (recordSynced.equals("SUCCESS")) {
                         //3. update local db that synced yes
@@ -147,9 +147,9 @@ public class StockManage implements Serializable {
                     //2. update tax db and check if synced yes
                     String recordSynced = "";
                     if (APIMode.equals("OFFLINE")) {
-                        recordSynced = this.addStockOffline(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()), aSupplierTin, aSupplierName, aUnitCodeTax);
+                        recordSynced = this.addStockOffline(id, Double.toString(new AccCurrencyBean().roundDoubleToXDps(aStock.getCurrentqty(), 8)), Double.toString(aStock.getUnitCost()), aSupplierTin, aSupplierName, aUnitCodeTax);
                     } else {
-                        recordSynced = this.addStockOnline(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()), aSupplierTin, aSupplierName, aUnitCodeTax);
+                        recordSynced = this.addStockOnline(id, Double.toString(new AccCurrencyBean().roundDoubleToXDps(aStock.getCurrentqty(), 8)), Double.toString(aStock.getUnitCost()), aSupplierTin, aSupplierName, aUnitCodeTax);
                     }
                     if (recordSynced.equals("SUCCESS")) {
                         //3. update local db that synced yes
@@ -194,9 +194,9 @@ public class StockManage implements Serializable {
                     //2. update tax db and check if synced yes
                     String recordSynced = "";
                     if (APIMode.equals("OFFLINE")) {
-                        recordSynced = this.subtractStockOffline(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()), aAdjustType, aUnitCodeTax);
+                        recordSynced = this.subtractStockOffline(id, Double.toString(new AccCurrencyBean().roundDoubleToXDps(aStock.getCurrentqty(), 8)), Double.toString(aStock.getUnitCost()), aAdjustType, aUnitCodeTax);
                     } else {
-                        recordSynced = this.subtractStockOnline(id, Double.toString(aStock.getCurrentqty()), Double.toString(aStock.getUnitCost()), aAdjustType, aUnitCodeTax);
+                        recordSynced = this.subtractStockOnline(id, Double.toString(aStock.getCurrentqty()), Double.toString(new AccCurrencyBean().roundDoubleToXDps(aStock.getCurrentqty(), 8)), aAdjustType, aUnitCodeTax);
                     }
                     if (recordSynced.equals("SUCCESS")) {
                         //3. update local db that synced yes

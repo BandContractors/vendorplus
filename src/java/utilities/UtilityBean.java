@@ -306,6 +306,25 @@ public class UtilityBean implements Serializable {
         return aString;
     }
 
+    public String formatDoubleToStringByDp(double aAmount, int aDecimalPlaces) {
+        String aString = "";
+        String fmt = "";
+        if (aDecimalPlaces > 0) {
+            fmt = "###,###.";
+            for (int i = 0; i < aDecimalPlaces; i++) {
+                fmt = fmt + "#";
+            }
+        } else {
+            fmt = "###,###";
+        }
+        if (aAmount >= 0) {
+            aString = this.formatNumber(fmt, aAmount) + "";
+        } else if (aAmount < 0) {
+            aString = this.formatNumber(fmt, aAmount) + "";
+        }
+        return aString;
+    }
+
     public String formatDoubleToStringHide(double aAmount, int aHideResult) {
         String aString = "";
         //DecimalFormat myFormatter = new DecimalFormat("###,###.###;(###,###.###)");
@@ -778,7 +797,13 @@ public class UtilityBean implements Serializable {
     }
 
 //    public static void main(String[] args) {
-//        System.out.println("A:" + "success:123".contains("succesps"));
+//        System.out.println(new AccCurrencyBean().roundDoubleToXDps(12.12,8));
+//        System.out.println(new AccCurrencyBean().roundDoubleToXDps(12,8));
+//        System.out.println(new AccCurrencyBean().roundDoubleToXDps(12.1234567,8));
+//        System.out.println(new AccCurrencyBean().roundDoubleToXDps(12.12345678,8));
+//        System.out.println(new AccCurrencyBean().roundDoubleToXDps(12.123456789,8));
+//        System.out.println(new AccCurrencyBean().roundDoubleToXDps(12.12345671234,8));
+//        System.out.println(new AccCurrencyBean().roundDoubleToXDps(12.0,8));
 //    }
     public List<ThreadClass> getRunningThreads() {
         List<ThreadClass> objs = new ArrayList<>();

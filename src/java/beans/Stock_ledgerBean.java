@@ -286,7 +286,13 @@ public class Stock_ledgerBean implements Serializable {
                     //do nothing
                 } else {
                     Item itm = new ItemBean().getItem(stockledger.getItem_id());
-                    TransItem ti = new TransItemBean().getTransItem(aTrans_item_id);
+                    TransItem ti = null;
+                    if (aTrans_type_id == 84) {//STOCK TAKE
+                        ti = new TransItem();
+                        ti.setUnit_id(itm.getUnitId());
+                    } else {
+                        ti = new TransItemBean().getTransItem(aTrans_item_id);
+                    }
                     if (aStock.getUnitCost() == 0) {
                         aStock.setUnitCost(new TransItemBean().getItemLatestUnitCostPrice(aStock.getItemId(), "", "", "", ti.getUnit_id(), itm.getCurrencyCode(), 1));
                     }
@@ -445,7 +451,13 @@ public class Stock_ledgerBean implements Serializable {
                     //do nothing
                 } else {
                     Item itm = new ItemBean().getItem(aStock_ledger4Sync.getItem_id());
-                    TransItem ti = new TransItemBean().getTransItem(aStock_ledger4Sync.getTransaction_item_id());
+                    TransItem ti = null;
+                    if (aStock_ledger4Sync.getTransaction_type_id() == 84) {//STOCK TAKE
+                        ti = new TransItem();
+                        ti.setUnit_id(itm.getUnitId());
+                    } else {
+                        ti = new TransItemBean().getTransItem(aStock_ledger4Sync.getTransaction_item_id());
+                    }
                     String TableName = this.getStockLedgerTableName(aStock_ledgerBean);
                     double LatestUnitCostPrice = new TransItemBean().getItemLatestUnitCostPrice(aStock_ledger4Sync.getItem_id(), "", "", "", itm.getUnitId(), itm.getCurrencyCode(), 1);
                     if (aStock_ledger4Sync.getQty_added() > 0) {

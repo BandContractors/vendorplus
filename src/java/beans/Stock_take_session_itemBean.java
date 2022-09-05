@@ -134,6 +134,11 @@ public class Stock_take_session_itemBean implements Serializable {
             } catch (NullPointerException npe) {
                 aStock_take_session_item.setNotes("");
             }
+            try {
+                aStock_take_session_item.setUnit_symbol(aResultSet.getString("unit_symbol"));
+            } catch (Exception e) {
+                aStock_take_session_item.setUnit_symbol("");
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -312,7 +317,7 @@ public class Stock_take_session_itemBean implements Serializable {
         }
     }
 
-    public int stockAdjust(Stocktake_session_item aStocktake_session_item, int aStore_id, int aTransTypeId, long aTransId) {
+    public int stockAdjust(Stocktake_session_item aStocktake_session_item, int aStore_id, int aTransTypeId, long aTransItemId) {
         int adjusted = 0;
         try {
             if (null != aStocktake_session_item) {
@@ -334,10 +339,10 @@ public class Stock_take_session_itemBean implements Serializable {
                         String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
                         if (aStocktake_session_item.getQty_over() > 0) {
                             i = stockbean.addStock(stock, aStocktake_session_item.getQty_over());
-                            new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, aStocktake_session_item.getQty_over(), "Add", aTransTypeId, aTransId, new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                            new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, aStocktake_session_item.getQty_over(), "Add", aTransTypeId, aStocktake_session_item.getStock_take_session_id(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), aTransItemId);
                         } else if (aStocktake_session_item.getQty_short() > 0) {
                             i = new StockBean().subtractStock(stock, aStocktake_session_item.getQty_short());
-                            new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", stock, aStocktake_session_item.getQty_short(), "Add", aTransTypeId, aTransId, new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                            new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", stock, aStocktake_session_item.getQty_short(), "Add", aTransTypeId, aStocktake_session_item.getStock_take_session_id(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), aTransItemId);
                         }
                         adjusted = 1;
                     } else {
@@ -376,11 +381,11 @@ public class Stock_take_session_itemBean implements Serializable {
                         if (aStocktake_session_item.getQty_over() > 0) {
                             stock.setCurrentqty(aStocktake_session_item.getQty_over());
                             i = new StockBean().saveStock(stock);
-                            new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, aStocktake_session_item.getQty_over(), "Add", aTransTypeId, aTransId, new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                            new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, aStocktake_session_item.getQty_over(), "Add", aTransTypeId, aStocktake_session_item.getStock_take_session_id(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), aTransItemId);
                         } else if (aStocktake_session_item.getQty_short() > 0) {
                             stock.setCurrentqty(0 - aStocktake_session_item.getQty_short());
                             i = new StockBean().saveStock(stock);
-                            new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", stock, (0 - aStocktake_session_item.getQty_short()), "Add", aTransTypeId, aTransId, new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                            new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", stock, (0 - aStocktake_session_item.getQty_short()), "Add", aTransTypeId, aStocktake_session_item.getStock_take_session_id(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), aTransItemId);
                         }
                         adjusted = 1;
                     }
@@ -535,10 +540,11 @@ public class Stock_take_session_itemBean implements Serializable {
         String sql = "";
         String wheresql = "";
         String ordersql = "";
-        sql = "SELECT i.*,m.description "
+        sql = "SELECT i.*,m.description,u.unit_symbol "
                 + "FROM stock_take_session_item i "
                 + "INNER JOIN stock_take_session s ON i.stock_take_session_id=s.stock_take_session_id "
                 + "INNER JOIN item m ON i.item_id=m.item_id "
+                + "INNER JOIN unit u ON m.unit_id=u.unit_id "
                 + "WHERE 1=1";
         if (aStocktake_session_item.getStock_take_session_id() > 0) {
             wheresql = wheresql + " AND i.stock_take_session_id=" + aStocktake_session_item.getStock_take_session_id();
