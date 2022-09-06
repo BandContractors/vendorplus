@@ -487,7 +487,12 @@ public class TransItemBean implements Serializable {
                     }
                     //update stock
                     try {
-                        this.adjustStockForTransItems(new TransBean().getTrans(transitem.getTransactionId()), this.getTransItemsByTransactionId(transitem.getTransactionId()));
+                        //this.adjustStockForTransItems(new TransBean().getTrans(transitem.getTransactionId()), this.getTransItemsByTransactionId(transitem.getTransactionId()));
+                        if (aTransTypeId == 67 && transitem.getBase_unit_qty() <= 0 && transitem.getQty_damage() <= 0) {
+                            //do nothing
+                        } else {
+                            this.adjustStockForTransItem(new TransBean().getTrans(transitem.getTransactionId()), this.getTransItem(InsertedId1));
+                        }
                     } catch (Exception e) {
                         //do nothing
                     }
