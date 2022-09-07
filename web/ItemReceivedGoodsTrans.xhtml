@@ -237,7 +237,7 @@
                     <!-- column header -->
                     <f:facet name="header">#{langsys['Batch']} #{langsys['No.']}</f:facet>
                     <!-- row record -->
-                    <h:inputText value="#{ati.batchno}">
+                    <h:inputText value="#{ati.batchno}" style="width: 100px;">
                         <f:ajax event="change" execute="dtblTransactionItem" render="dtblTransactionItem"/>
                     </h:inputText>
                 </p:column>
@@ -247,7 +247,7 @@
                     <!-- row record -->
                     <h:inputText value="#{ati.itemQty}" style="width: 50px;">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                        <f:ajax event="change" execute="dtblTransactionItem" render="dtblTransactionItem"/>
+                        <f:ajax event="change" listener="#{transItemBean.updateBaseUnityQty(ati)}" execute="dtblTransactionItem" render="dtblTransactionItem"/>
                     </h:inputText>
                 </p:column>
                 <p:column>

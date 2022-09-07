@@ -749,7 +749,7 @@ public class Stock_ledgerBean implements Serializable {
                 + "t.*,"
                 + "i.description,"
                 + "u.unit_symbol,"
-                + "(select case when l1.qty_added>0 then l1.qty_bal-ifnull(tiu.base_unit_qty,l1.qty_added) when l1.qty_subtracted>0 then l1.qty_bal+ifnull(tiu.base_unit_qty,l1.qty_subtracted) else 0 end from " + aTableName + " l1 LEFT JOIN transaction_item_unit tiu ON l1.transaction_id=tiu.transaction_item_id where l1.stock_ledger_id=t.min_id) as qty_open,"
+                + "(select case when l1.qty_added>0 then l1.qty_bal-ifnull(tiu.base_unit_qty,l1.qty_added) when l1.qty_subtracted>0 then l1.qty_bal+ifnull(tiu.base_unit_qty,l1.qty_subtracted) else 0 end from " + aTableName + " l1 LEFT JOIN transaction_item_unit tiu ON l1.transaction_item_id=tiu.transaction_item_id where l1.stock_ledger_id=t.min_id) as qty_open,"
                 + "(select l2.qty_bal from " + aTableName + " l2 where l2.stock_ledger_id=t.max_id) as qty_close "
                 + "from "
                 + "("
@@ -762,7 +762,8 @@ public class Stock_ledgerBean implements Serializable {
                 + ") as t "
                 + "inner join item i on t.item_id=i.item_id "
                 + "inner join unit u on i.unit_id=u.unit_id "
-                + "order by i.description;";
+                + "order by i.description";
+        //System.out.println("sql:" + sql);
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {

@@ -12190,8 +12190,9 @@ CREATE PROCEDURE sp_search_transaction_item_by_tt_tr_ii
 	IN in_limit int
 ) 
 BEGIN 
-	SELECT * FROM transaction_item ti 
+	SELECT ti.*,tiu.unit_id,tiu.base_unit_qty FROM transaction_item ti 
 	INNER JOIN transaction t ON ti.transaction_id=t.transaction_id 
+    INNER JOIN transaction_item_unit tiu ON ti.transaction_item_id=tiu.transaction_item_id 
 	WHERE ti.item_id=in_item_id AND t.transaction_type_id=in_transaction_type_id 
 	AND t.transaction_reason_id=in_transaction_reason_id 
 	ORDER BY t.transaction_date DESC 

@@ -4697,6 +4697,10 @@ public class ItemBean implements Serializable {
                     CurCode = aItem.getCurrencyCode();
                 }
                 aTransItem.setUnitCostPrice(new TransItemBean().getItemLatestUnitCostPrice(aItem.getItemId(), "", "", "", aTransItem.getUnit_id(), CurCode, 1));
+                if (transtype.getTransactionTypeName().equals("PURCHASE INVOICE")) {
+                    aTransItem.setUnitPrice(aTransItem.getUnitCostPrice());
+                    aTransItem.setAmount(aTransItem.getItemQty() * (aTransItem.getUnitPrice() + aTransItem.getUnitVat() - aTransItem.getUnitTradeDiscount()));
+                }
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);

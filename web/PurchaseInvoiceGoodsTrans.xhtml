@@ -300,7 +300,7 @@
                     <f:facet name="header">#{langsys['Qty']}</f:facet>
                     <!-- row record -->
                     <h:inputText value="#{ati.itemQty}" style="width: 50px;">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         <f:ajax event="change" listener="#{transItemBean.editTransItemCEC(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,'',trans, transItemBean.activeTransItems,ati)}" execute="dtblTransactionItem" render="dtblTransactionItem TransactionFormPurchase:pgrdTotals TransactionFormPurchase:pgrdPayment TransactionFormPurchase:gridItemStatus TransactionFormPurchase:pgrdMsgs"/>
                     </h:inputText>
                 </p:column>
@@ -310,7 +310,7 @@
                     <f:facet name="header">#{langsys['Unit']} #{langsys['Price']}</f:facet>
                     <!-- row record -->
                     <h:outputLabel value="#{ati.unitPriceExcVat}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                 </p:column>
 
@@ -319,7 +319,7 @@
                     <f:facet name="header">#{langsys['Unit']} VAT</f:facet>
                     <!-- row record -->
                     <h:outputLabel value="#{ati.unitVat}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                 </p:column>
 
@@ -328,7 +328,7 @@
                     <f:facet name="header">#{langsys['Unit']} #{langsys['Item']} #{langsys['Discount']}</f:facet>
                     <!-- row record -->
                     <h:outputLabel value="#{ati.unitTradeDiscount}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                 </p:column>
 
@@ -337,7 +337,7 @@
                     <f:facet name="header">#{langsys['Amount']}</f:facet>
                     <!-- row record -->
                     <h:outputLabel value="#{ati.amountIncVat}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                 </p:column>
 

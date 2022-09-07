@@ -88,7 +88,7 @@
                                     <h:outputLabel style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;" value="#{transItemBean.showItemDescriptionCEC(ti)}" escape="false"/>
                                 </td>
                                 <td style="text-align: right;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                    #{utilityBean.formatDoubleToString(ti.itemQty)}
+                                    #{ti.unitSymbol} #{utilityBean.formatDoubleToString(ti.itemQty)}
                                 </td>
                                 <td style="text-align: right;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
                                     #{utilityBean.formatDoubleToString(ti.unitPriceExcVat)}
