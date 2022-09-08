@@ -61,8 +61,8 @@
                             <h:outputLabel style="font-size: 12px;" value="#{langout[generalUserSetting.outputDetailParent.transaction_type.transactionRefLabel]}:" rendered="#{generalUserSetting.outputDetailParent.trans.transactionRef.length()>0}"/>
                             <h:outputLabel style="font-size: 14px;font-weight: bold;" value="#{generalUserSetting.outputDetailParent.trans.transactionRef}" rendered="#{generalUserSetting.outputDetailParent.trans.transactionRef.length()>0}"/>
                             <h:outputLabel style="font-size: 12px;" value="#{langout[menuItemBean.menuItemObj.CUSTOMER_NAME]}:"/>
-                            <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transactor.transactorNames}" rendered="#{generalUserSetting.outputDetailParent.trans.location_name.length() eq 0}"/>
-                            <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transactor.transactorNames} (#{generalUserSetting.outputDetailParent.trans.location_name})" rendered="#{generalUserSetting.outputDetailParent.trans.location_name.length() gt 0}"/>
+                            <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transactor.transactorNames}" rendered="#{generalUserSetting.outputDetailParent.transactor.transactorNames.length() gt 0}"/>
+                            <h:outputLabel style="font-size: 12px;" value="(#{generalUserSetting.outputDetailParent.trans.location_name})" rendered="#{generalUserSetting.outputDetailParent.trans.location_name.length() gt 0}"/>
                             <h:outputLabel style="font-size: 12px;" value="#{langout['Bill']} #{langout['For']}:" rendered="#{generalUserSetting.outputDetailParent.bill_transactor.transactorId!=generalUserSetting.outputDetailParent.transactor.transactorId}"/>
                             <h:outputLabel id="IolblSalesInvoiceBillCustomer" style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.bill_transactor.transactorNames}" rendered="#{generalUserSetting.outputDetailParent.bill_transactor.transactorId!=generalUserSetting.outputDetailParent.transactor.transactorId}"/>
                             <h:outputLabel style="font-size: 12px;" value="#{langout['Phone']}:" rendered="#{generalUserSetting.outputDetailParent.transactor.phone.length()>0}"/>
@@ -91,7 +91,7 @@
                                     <h:outputLabel style="font-size: 10px;" value="#{ti.itemQty}">
                                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                     </h:outputLabel>
-                                    <h:outputLabel style="font-size: 10px;" value="#{unitBean.getUnit(itemBean.getItem(ti.itemId).unitId).unitSymbol}"/>
+                                    <h:outputLabel style="font-size: 10px;" value="#{ti.unitSymbol}"/>
                                     <h:outputLabel style="font-size: 10px;" value="@" rendered="#{itemBean.getItem(ti.itemId).hide_unit_price_invoice eq 0}"/>
                                     <h:outputLabel style="font-size: 10px;" value="#{ti.unitPriceIncVat}" rendered="#{itemBean.getItem(ti.itemId).hide_unit_price_invoice eq 0}">
                                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
