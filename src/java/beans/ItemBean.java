@@ -2,6 +2,7 @@ package beans;
 
 import api_tax.efris.innerclasses.ItemTax;
 import api_tax.efris_bean.StockManage;
+import com.sun.javafx.scene.control.skin.VirtualFlow;
 import sessions.GeneralUserSetting;
 import connections.DBConnection;
 import entities.Category;
@@ -4682,6 +4683,48 @@ public class ItemBean implements Serializable {
         }
     }
 
+    public void changeItemUnitQuickOrder(TransItem aTransItem, int aTransTypeId, int aTransReasId, int aStoreId, Trans aTrans) {
+        try {
+            //Item_unit iu = this.getItemUnitFrmList(aTransItem.getUnit_id());
+            Item_unit iu = this.getItemUnitFrmDb(aTransItem.getItemId(), aTransItem.getUnit_id());
+            aTransItem.setUnit_id(iu.getUnit_id());
+            aTransItem.setUnitSymbol(iu.getUnit_symbol());
+            if (aTransTypeId == 2 && aTransReasId == 10) {
+                aTransItem.setUnitPrice(iu.getUnit_wholesale_price());
+            } else {
+                aTransItem.setUnitPrice(iu.getUnit_retailsale_price());
+            }
+            Item itm = null;
+            try {
+                itm = new ItemBean().getItem(aTransItem.getItemId());
+            } catch (Exception e) {
+            }
+            DiscountPackageItem dpi = null;
+            if (null != itm) {
+                dpi = new DiscountPackageItemBean().getActiveDiscountPackageItem(aStoreId, itm.getItemId(), 1, aTrans.getTransactorId(), itm.getCategoryId(), itm.getSubCategoryId());
+            }
+            if (dpi != null) {
+                if (aTransReasId == 10 || aTransReasId == 15 || aTransReasId == 109) {
+                    aTransItem.setUnitTradeDiscount(iu.getUnit_wholesale_price() * dpi.getWholesaleDiscountAmt() / 100);
+                } else {
+                    aTransItem.setUnitTradeDiscount(iu.getUnit_retailsale_price() * dpi.getRetailsaleDiscountAmt() / 100);
+                }
+            }
+            double BaseQty = this.getBaseUnitQty(aTransItem.getItemId(), aTransItem.getUnit_id(), aTransItem.getItemQty());
+            if (BaseQty > 0) {
+                aTransItem.setBase_unit_qty(BaseQty);
+            } else {
+                if (null != itm) {
+                    aTransItem.setUnit_id(itm.getUnitId());
+                    aTransItem.setBase_unit_qty(aTransItem.getItemQty());
+                }
+            }
+            new TransItemBean().editTransItemUponUnitChange(aTransTypeId, aTransReasId, aTransItem);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public void changeItemUnit(Item aItem, TransItem aTransItem, int aTransTypeId, int aTransReasId, int aStoreId, Trans aTrans) {
         try {
             TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
@@ -4705,6 +4748,18 @@ public class ItemBean implements Serializable {
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
+    }
+
+    public List<Item_unit> getItemUnitList(long aItemId, TransItem aTransItem, int aOrderByFlag) {
+        //aOrderByFlag 1 Sales, 2 Purchase, 0 None
+        List<Item_unit> iuList = new ArrayList<>();
+        try {
+            Item itm = this.getItem(aItemId);
+            this.setItemUnitList(iuList, itm, aOrderByFlag);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return iuList;
     }
 
     public void refreshItemUnitList(Item aItem, TransItem aTransItem, int aOrderByFlag) {

@@ -20,7 +20,7 @@
                             <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 9pt;color:blue;font-weight: bold;text-decoration: none;">#{companySetting.getSloghan()}</h:outputLabel>
                         </h:panelGrid>
                         <h:panelGrid columns="1" style="background-color: #000000;float: right;text-align: right;">
-                            <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 18pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">#{langout[generalUserSetting.outputDetailParent.transaction_type.transactionOutputLabel]}</h:outputLabel>
+                            <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 18pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_OUT,generalUserSetting.outputDetailParent.transaction_type.transactionOutputLabel)}</h:outputLabel>
                         </h:panelGrid>
                     </h:panelGrid>
                     <h:panelGrid columns="3" style="width: 100%; margin: 0px;">

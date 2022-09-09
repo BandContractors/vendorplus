@@ -10347,9 +10347,13 @@ public class TransItemBean implements Serializable {
     }
 
     public void removeTransItemCEC(int aTransTypeId, int aTransReasonId, Trans aTrans, List<TransItem> aActiveTransItems, TransItem ti) {
-        aActiveTransItems.remove(ti);
-        //update totals
-        new TransBean().setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems);
+        try {
+            aActiveTransItems.remove(ti);
+            //update totals
+            new TransBean().setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
     }
 
     public void overridePrice(TransItem aTransItem) {
@@ -11807,18 +11811,22 @@ public class TransItemBean implements Serializable {
                         aSelectedItem = new ItemBean().findItemByIdActive(ic.getItem_id());
                     }
                 }
-                if (aTransTypeId == 2) {
+            } catch (Exception e) {
+                aSelectedItem = null;
+            }
+        }//For ItemClick -- aSelectedItem is already Item Object
+        if (aEntryMode.equals("BarCode") || aEntryMode.equals("ItemClick")) {
+            try {
+                if (aTransTypeId == 2 || aTransTypeId == 11) {
                     new ItemBean().refreshItemUnitList(aSelectedItem, aSelectedTransItem, 1);
                 } else if (aTransTypeId == 1) {
                     new ItemBean().refreshItemUnitList(aSelectedItem, aSelectedTransItem, 2);
                 } else {
                     new ItemBean().refreshItemUnitList(aSelectedItem, aSelectedTransItem, 0);
                 }
-            } catch (NullPointerException npe) {
-                aSelectedItem = null;
+            } catch (Exception e) {
             }
-        }//For ItemClick -- aSelectedItem is already Item Object
-
+        }
         if (aSelectedItem == null) {
             aStatusBean.setItemAddedStatus("");
             aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Item Not Found"));

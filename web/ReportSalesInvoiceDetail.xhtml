@@ -59,7 +59,7 @@
                     <p:calendar id="calDate2"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{transBean.date2}" size="18"/>
                 </h:panelGrid>
                 <h:panelGrid columns="2">
-                    <p:outputLabel value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS, transactionTypeBean.getTransactionType(2).transactionNumberLabel)}:"/>
+                    <p:outputLabel value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(2).transactionNumberLabel)}:"/>
                     <p:inputText id="itxtInvoiceNo" value="#{trans.transactionNumber}" style="width: 215px;"/>
                     <p:outputLabel value="#{langsys['Added']} #{langsys['By']}:"/>
                     <p:selectOneMenu id="menuAddUser" value="#{trans.addUserDetailId}" style="width: 200px;">

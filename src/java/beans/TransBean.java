@@ -1243,6 +1243,7 @@ public class TransBean implements Serializable {
                 int QualifyForSave = 1;
                 if (trans.getTransactionId() > 0) {
                     QualifyForSave = 0;
+                    int TransItemsUnitDeleted = new TransItemExtBean().deleteTransItemsUnitByTransId(trans.getTransactionId());
                     int TransItemsDeleted = new TransItemBean().deleteTransItemsCEC(trans.getTransactionId());
                     if (TransItemsDeleted == 1) {
                         new TransItemBean().resetTransactionItem(1, aActiveTransItems);

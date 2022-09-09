@@ -44,6 +44,7 @@
         <f:viewAction action="#{transBean.setOutputNumber(0)}"/>
         <f:viewAction action="#{transBean.initUserDetail(generalUserSetting.currentUser.userDetailId)}"/>
         <f:viewAction action="#{utilityBean.clearList(alert_generalBean.alertList)}"/>
+        <f:viewAction action="#{utilityBean.clearList(itemBean.item_unitList)}"/>
     </f:metadata>
     <f:event listener="#{navigationBean.checkCurrentPage('SALE ORDER','','')}" type="preRenderView" />
     <f:event listener="#{statusBean.initClearStatus()}" type="preRenderView" />
@@ -65,7 +66,7 @@
                 </h:panelGrid>
                 <h:panelGrid id="pnlTransNumber" rendered="#{trans.transactionId>0}">
                     <h:outputLabel value="#{langsys['Order']} #{langsys['Number']}" style="color: white;"/>
-                    <h:outputLabel value="#{langsys[trans.transactionNumber]}" style="color: white;"/>
+                    <h:outputLabel value="#{trans.transactionNumber}" style="color: white;"/>
                 </h:panelGrid>
                 <h:panelGrid columns="3">
                     <h:selectOneMenu style="height: 31px;" styleClass="clsMenu" id="menuTransactionReason" value="#{trans.transactionReasonId}">
@@ -131,14 +132,17 @@
                             <f:facet name="header">#{langsys['Item']} #{langsys['Description']}</f:facet>
                             <!-- row record -->
                             <p:outputLabel value="#{transItemBean.showItemDescriptionCECexcSpecific(ati)}" escape="false"/>
-                            <h:inputText style="width: 200px" value="#{ati.descSpecific}" rendered="#{ati.is_general==1}" title="Specify more details"/>
+                            <h:inputText style="width: 150px" value="#{ati.descSpecific}" rendered="#{ati.is_general==1}" title="Specify more details"/>
                         </p:column>
                         <p:column style="width: 100px;">
                             <!-- column header -->
                             <f:facet name="header">#{langsys['Unit']} #{langsys['Price']}</f:facet>
                             <!-- row record -->
-                            #{ati.unitSymbol}
-                            <h:inputText id="itxtUnitPrice" style="width: 100px" disabled="#{ati.is_general==0 and ati.is_override_price==0}" value="#{ati.unitPrice}" autocomplete="off">
+                            <p:selectOneMenu id="menuUnit" value="#{ati.unit_id}" style="width: 85px;">
+                                <f:selectItems value="#{itemBean.getItemUnitList(ati.itemId, ati, 1)}" var="iu" itemLabel="#{iu.unit_symbol}" itemValue="#{iu.unit_id}"/>
+                                <p:ajax listener="#{itemBean.changeItemUnitQuickOrder(ati,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentStore.storeId,trans)}" process="dtblTransactionItem" update="dtblTransactionItem TransactionFormSales:pgrdTotals"/>
+                            </p:selectOneMenu>
+                            <h:inputText id="itxtUnitPrice" style="width: 100px;" disabled="#{ati.is_general==0 and ati.is_override_price==0}" value="#{ati.unitPrice}" autocomplete="off">
                                 <f:ajax event="change" listener="#{transItemBean.editTransItemQuickOrder(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,'',trans, transItemBean.activeTransItems,ati)}" execute="dtblTransactionItem" render="dtblTransactionItem TransactionFormSales:pgrdTotals"/>
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:inputText>
