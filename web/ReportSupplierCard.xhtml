@@ -117,9 +117,9 @@
                     </tr>
                     <tr style="background-color: #ADD8E6;font-weight: bold">
                         <td>#{langsys[menuItemBean.menuItemObj.SUPPLIER_NAME]}</td>
-                        <td>#{langsys[transactionTypeBean.getTransactionType(1).transactionNumberLabel]}</td>
-                        <td>#{langsys[transactionTypeBean.getTransactionType(1).transactionDateLabel]}</td>
-                        <td>#{langsys[transactionTypeBean.getTransactionType(1).transactionUserLabel]}</td>
+                        <td>#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(1).transactionNumberLabel)}</td>
+                        <td>#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(1).transactionDateLabel)}</td>
+                        <td>#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(1).transactionUserLabel)}</td>
                         <td>#{langsys['Item']} #{langsys['Description']}</td>
                         <td>#{langsys['Amount']}</td>
                         <td>#{langsys['Total']}</td>

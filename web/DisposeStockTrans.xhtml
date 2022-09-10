@@ -51,7 +51,7 @@
                     <f:selectItems value="#{accCurrencyBean.getAccCurrenciesLocal()}" var="ac" itemLabel="#{ac.currencyCode}" itemValue="#{ac.currencyCode}"/>
                     <f:ajax event="change" execute="@form" render="@form"/>
                 </h:selectOneMenu>
-                <h:outputLabel  value="#{langsys[transBean.transTypeObj.transactionDateLabel]}:"/>
+                <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeObj.transactionDateLabel)}:"/>
                 <p:calendar styleClass="clsInput" id="calTransactionDate"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.transactionDate}">
                 </p:calendar>
             </h:panelGrid>

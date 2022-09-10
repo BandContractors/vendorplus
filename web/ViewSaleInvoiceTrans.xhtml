@@ -46,15 +46,15 @@
                         <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{storeBean.getStore(transBean.transObj.storeId).storeName}" style="width: 140px;"/>
                         <h:outputLabel  value="#{langsys['Currency']}"/>
                         <h:inputText styleClass="clsInput" id="itxtCurrency" disabled="true" value="#{transBean.transObj.currencyCode}" style="width: 170px;"/>
-                        <h:outputLabel  value="#{langsys[transactionTypeBean.getTransactionType(2).transactionDateLabel]}"/>
+                        <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(2).transactionDateLabel)}"/>
                         <h:inputText id="itxtTransactionDate" value="#{utilityBean.formatDate(transBean.transObj.transactionDate)}" style="width:100px;" disabled="true"/>
 
-                        <h:outputLabel  value="#{langsys[transactionTypeBean.getTransactionType(2).transactionRefLabel]}"/>
+                        <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(2).transactionRefLabel)}"/>
                         <h:inputText styleClass="clsInput" id="itxtTransactionRef" value="#{transBean.transObj.transactionRef}" autocomplete="off" style="width: 140px;" disabled="true"/>
                         <h:outputLabel  value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}"/>
                         <h:inputText styleClass="clsInput" id="itxtTransactor" value="#{transactorBean.getTransactor(transBean.transObj.transactorId).transactorNames}" autocomplete="off" style="width: 170px;" disabled="true"/>
 
-                        <h:outputLabel value="#{langsys[transactionTypeBean.getTransactionType(2).transactionUserLabel]}"/>
+                        <h:outputLabel value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(2).transactionUserLabel)}"/>
                         <h:inputText value="#{userDetailBean.getUserDetail(transBean.transObj.transactionUserDetailId).userName}" style="width: 100px;" disabled="true"/>
 
                         <h:outputLabel  value="#{langsys['Last']} #{langsys['Edit']} #{langsys['Date']}"/>

@@ -42,7 +42,7 @@
                     <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="6">
                         <h:outputLabel  value="#{langsys['From']}:"/>
                         <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{storeBean.getStore(transBean.transObj.storeId).storeName}" style="width: 170px;"/>
-                        <h:outputLabel  value="#{langsys[transactionTypeBean.getTransactionType(12).transactionDateLabel]}:"/>
+                        <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(12).transactionDateLabel)}:"/>
                         <h:inputText id="itxtTransactionDate" value="#{utilityBean.formatDate(transBean.transObj.transactionDate)}" disabled="true"/>
                         <h:outputLabel  value=""/>
                         <h:outputLabel  value=""/>
@@ -103,7 +103,7 @@
                     </p:dataTable>
                     <h:panelGrid style="background-color: yellow;width: 100%"/>
                     <h:panelGrid styleClass="clsGridMainInput" columns="8">
-                        <h:outputLabel  value="#{langsys[transactionTypeBean.getTransactionType(12).transactionUserLabel]}:"/>
+                        <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(12).transactionUserLabel)}:"/>
                         <h:inputText disabled="true" style="width: 170px;" value="#{userDetailBean.getUserDetail(transBean.transObj.transactionUserDetailId).userName}"/>
                         <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Delivery']} #{langsys['Address']}"/>
                         <h:inputTextarea styleClass="clsInput" id="itxaDeliveryAddress" rows="4" value="#{transBean.transObj.deliveryAddress}" disabled="true"/>

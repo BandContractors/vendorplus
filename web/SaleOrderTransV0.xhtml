@@ -55,7 +55,7 @@
             </h:panelGrid>
             <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="7">
                 <h:outputLabel  value="#{langsys['Send']} #{langsys['Order']} #{langsys['To']}"/>
-                <h:outputLabel  value="#{langsys[transBean.transTypeObj.transactionNumberLabel]}"/>
+                <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeObj.transactionNumberLabel)}"/>
                 <h:outputLabel  value="#{langsys['Currency']}"/>
                 <p:commandLink actionListener="#{transactorBean.openChildTransactor('CUSTOMER')}" value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}"/>
                 <h:outputLabel  value="#{transBean.transTypeObj.transactionDateLabel}"/>
@@ -360,7 +360,7 @@
 
             <h:panelGrid id="pgrdTermsConditions" styleClass="clsGridMainInput" columns="2">
                 <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Delivery']} #{langsys['Date']}"/>
-                <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys[transBean.transTypeObj.transactionUserLabel]}"/>
+                <h:outputLabel styleClass="clsLabelTransItem" value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeObj.transactionUserLabel)}"/>
                 <p:calendar styleClass="clsInput" id="calDeliveryDate" pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.deliveryDate}"/>
                 <p:autoComplete id="autcTransactionUser" value="#{userDetailBean.selectedUserDetail}" 
                                 completeMethod="#{userDetailBean.getUserDetailObjectListActive}" 

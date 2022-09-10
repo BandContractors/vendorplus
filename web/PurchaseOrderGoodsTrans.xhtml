@@ -40,7 +40,7 @@
                 <h:selectOneMenu styleClass="clsMenu" id="menuTransactionReason" value="#{trans.transactionReasonId}">
                     <f:selectItem itemValue="#{transBean.transReasonObj.transactionReasonId}" itemLabel="#{transBean.transReasonObj.transactionReasonName}"/>
                 </h:selectOneMenu>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys[transBean.transTypeObj.transactionOutputLabel]} - #{langsys['Goods']} #{langsys['and']} #{langsys['Services']} (#{langsys['For']} #{langsys['Sale']})"/>
+                <h:outputLabel style="background-color:#00B461;color: white;" value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeObj.transactionOutputLabel)} - #{langsys['Goods']} #{langsys['and']} #{langsys['Services']} (#{langsys['For']} #{langsys['Sale']})"/>
                 <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Stock']}:#{langsys['No']} #{langsys['effect']}"/>
                 <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Ledger']}:#{langsys['No']} #{langsys['effect']}"/>
             </h:panelGrid>

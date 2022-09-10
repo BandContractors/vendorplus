@@ -44,7 +44,7 @@
                 <h:outputLabel  value="#{langsys['From']}:"/>
                 <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}">
                 </h:inputText>
-                <h:outputLabel  value="#{langsys[transactionTypeBean.getTransactionType(7).transactionDateLabel]}:"/>
+                <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(7).transactionDateLabel)}:"/>
                 <p:calendar styleClass="clsInput" id="calTransactionDate"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.transactionDate}">
                 </p:calendar>
             </h:panelGrid>

@@ -36,12 +36,12 @@
                     </h:panelGrid>
 
                     <h:panelGrid columns="1" style="text-align: center;width:100%;margin: 0px;background-color: gray;color: white;-webkit-print-color-adjust: exact;">
-                        <h:outputLabel value="#{langsys[transactionTypeBean.getTransactionType(2).transactionOutputLabel]}" style="font-size:30px;font-weight: bold;"/>
-                        <h:outputLabel value="#{langsys[transactionTypeBean.getTransactionType(2).transactionNumberLabel]}:#{salesInvoiceBean.getCurrentTransaction().transactionNumber}" style="font-weight: bold;"/>
+                        <h:outputLabel value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(2).transactionOutputLabel)}" style="font-size:30px;font-weight: bold;"/>
+                        <h:outputLabel value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(2).transactionNumberLabel)}:#{salesInvoiceBean.getCurrentTransaction().transactionNumber}" style="font-weight: bold;"/>
                     </h:panelGrid>
 
                     <h:panelGrid styleClass="clsGridMainInput" columns="4" style="width: 100%">
-                        <h:outputLabel  value="#{langsys[transactionTypeBean.getTransactionType(2).transactionRefLabel]}:"/>
+                        <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(2).transactionRefLabel)}:"/>
                         <h:inputText styleClass="clsInput" id="itxtvvTransactionId" disabled="true" value="#{salesInvoiceBean.getCurrentTransaction().transactionRef}" style="border: none;"/>
                         <h:outputLabel  value="#{langsys['From']}:"/>
                         <h:inputText styleClass="clsInput" id="itxtvFromStore" disabled="true" value="#{storeBean.getStore(salesInvoiceBean.getCurrentTransaction().storeId).storeName}" style="border: none;"/>
@@ -235,7 +235,7 @@
                         <h:outputLabel value="#{salesInvoiceBean.getCurrentTransUserDetail().firstName} #{salesInvoiceBean.getCurrentTransUserDetail().secondName}"/>
                         <h:outputLabel value="#{salesInvoiceBean.getCurrentUserDetail().firstName} #{salesInvoiceBean.getCurrentUserDetail().secondName}"/>
                         <h:outputLabel value="#{utilityBean.formatDateTime(salesInvoiceBean.getCurrentTransaction().addDate)}"/>
-                        <h:outputLabel value="#{langsys[transactionTypeBean.getTransactionType(2).transactionUserLabel]}}" style="border-top-style: dotted;"/>
+                        <h:outputLabel value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(2).transactionUserLabel)}}" style="border-top-style: dotted;"/>
                         <h:outputLabel value="#{langsys['Added']} #{langsys['by']}" style="border-top-style: dotted;"/>
                         <h:outputLabel value="#{langsys['Date']}" style="border-top-style: dotted;"/>
                     </h:panelGrid>

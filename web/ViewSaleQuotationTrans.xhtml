@@ -44,9 +44,9 @@
                         <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{storeBean.getStore(transBean.transObj.storeId).storeName}" style="width: 170px;"/>
                         <h:outputLabel  value="#{langsys['Currency']}:"/>
                         <h:inputText styleClass="clsInput" id="itxtCurrency" disabled="true" value="#{transBean.transObj.currencyCode}" style="width: 170px;"/>
-                        <h:outputLabel  value="#{langsys[transactionTypeBean.getTransactionType(10).transactionDateLabel]}:"/>
+                        <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(10).transactionDateLabel)}:"/>
                         <h:inputText id="itxtTransactionDate" value="#{utilityBean.formatDate(transBean.transObj.transactionDate)}" disabled="true"/>
-                        <h:outputLabel  value="#{langsys[transactionTypeBean.getTransactionType(10).transactionRefLabel]}:"/>
+                        <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(10).transactionRefLabel)}:"/>
                         <h:inputText styleClass="clsInput" id="itxtTransactionRef" value="#{transBean.transObj.transactionRef}" autocomplete="off" style="width: 170px;" disabled="true"/>
                         <h:outputLabel  value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}:"/>
                         <h:inputText styleClass="clsInput" id="itxtTransactor" value="#{transactorBean.getTransactor(transBean.transObj.transactorId).transactorNames}" autocomplete="off" style="width: 170px;" disabled="true"/>
@@ -145,12 +145,12 @@
 
                     <h:panelGrid style="background-color: yellow;width: 100%"/>
                     <h:panelGrid styleClass="clsGridMainInput" columns="2">
-                        <h:outputLabel  value="#{langsys[transactionTypeBean.getTransactionType(10).transactionUserLabel]}:"/>
+                        <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(10).transactionUserLabel)}:"/>
                         <h:inputText disabled="true" style="width: 170px;" value="#{userDetailBean.getUserDetail(transBean.transObj.transactionUserDetailId).userName}"/>
                     </h:panelGrid>
                     <h:panelGrid id="pgrdTermsConditions" styleClass="clsGridMainInput" columns="3">
                         <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Delivery']} #{langsys['Date']}"/>
-                        <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys[transactionTypeBean.getTransactionType(10).transactionUserLabel]}"/>
+                        <h:outputLabel styleClass="clsLabelTransItem" value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(10).transactionUserLabel)}"/>
                         <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Expiry']} #{langsys['Date']}"/>
                         <h:inputText id="itxtDeliveryDate" value="#{utilityBean.formatDate(transBean.transObj.deliveryDate)}" disabled="true"/>
                         <h:inputText disabled="true" style="width: 170px;" value="#{userDetailBean.getUserDetail(transBean.transObj.transactionUserDetailId).userName}"/>

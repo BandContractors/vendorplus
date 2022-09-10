@@ -42,9 +42,9 @@
             <h:panelGrid id="pnlgHeader" styleClass="clsGridMainInput" columns="5">
                 <h:outputLabel  value="#{langsys['Request']} #{langsys['From']}"/>
                 <h:outputLabel  value="#{langsys['Request']} #{langsys['To']}"/>
-                <h:outputLabel  value="#{langsys[transBean.transTypeObj.transactionDateLabel]}"/>
+                <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeObj.transactionDateLabel)}"/>
                 <h:outputLabel  value="#{langsys['Delivery']} #{langsys['Date']}"/>
-                <h:outputLabel  value="#{langsys[transBean.transTypeObj.transactionRefLabel]}"/>
+                <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeObj.transactionRefLabel)}"/>
 
                 <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}" style="width: 235px;height: 24px;"/>
                 <h:selectOneMenu styleClass="clsMenu" id="menuToStore" value="#{trans.store2Id}" style="height: 30px;">

@@ -47,11 +47,11 @@
 
             <h:panelGrid columns="3" id="pnlHeader">
                 <h:panelGrid styleClass="clsGridMainInput" columns="2">
-                    <h:outputLabel  value="#{langsys[transBean.transTypeObj.transactionDateLabel]}:"/>
+                    <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeObj.transactionDateLabel)}:"/>
                     <p:calendar pattern="#{companySetting.getDateFormat()}" styleClass="clsInput" id="calTransactionDate" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.transactionDate}" size="8"/>
                 </h:panelGrid>
                 <p:panel style="background-color:  #ADD8E6;">
-                    <h:outputLabel  value="#{langsys[transBean.transTypeObj.transactionRefLabel]}:"/>
+                    <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeObj.transactionRefLabel)}:"/>
                     <h:inputText styleClass="clsInput" id="itxtTransactionRef" value="#{trans.transactionRef}" autocomplete="off" style="font-weight: bold;width: 150px;">
                         <f:ajax event="change" listener="#{transBean.RetrieveAndUpdateTransAndItems(9,8,30, trans, transItemBean.activeTransItems)}" render="dtblTransactionItem pnlTransactor" />
                     </h:inputText>

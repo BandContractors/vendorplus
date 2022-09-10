@@ -41,14 +41,14 @@
                 <h:selectOneMenu styleClass="clsMenu" id="menuTransactionReason" value="#{trans.transactionReasonId}">
                     <f:selectItem itemValue="#{transBean.transReasonObj.transactionReasonId}" itemLabel="#{transBean.transReasonObj.transactionReasonName}"/>
                 </h:selectOneMenu>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys[transBean.transTypeObj.transactionOutputLabel]} - #{langsys['Raw Materials']}, #{langsys['Consumables']} #{langsys['and']} #{langsys['Services']}(#{langsys['Operational']} &amp; #{langsys['Non']})"/>
+                <h:outputLabel style="background-color:#00B461;color: white;" value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeObj.transactionOutputLabel)} - #{langsys['Raw Materials']}, #{langsys['Consumables']} #{langsys['and']} #{langsys['Services']}(#{langsys['Operational']} &amp; #{langsys['Non']})"/>
                 <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Stock']}:#{langsys['No.']} #{langsys['effect']}"/>
                 <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Ledger']}:#{langsys['No.']} #{langsys['effect']}"/>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainInput" columns="7" id="pnlHeader">
                 <h:outputLabel  value="#{langsys['From']}:"/>
-                <h:outputLabel  value="#{langsys[transBean.transTypeObj.transactionRefLabel]}:"/>
+                <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeObj.transactionRefLabel)}:"/>
                 <h:outputLabel  value="#{langsys['Currency']}:"/>
                 <p:commandLink actionListener="#{transactorBean.openChildTransactor('SUPPLIER')}" value="#{langsys[menuItemBean.menuItemObj.SUPPLIER_NAME]}"/>
                 <h:outputLabel  value="#{transBean.transTypeObj.transactionDateLabel}:"/>

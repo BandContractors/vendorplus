@@ -47,10 +47,10 @@
 
             <h:panelGrid styleClass="clsGridMainInput" columns="7" id="pnlHeader">
                 <h:outputLabel  value="#{langsys['From']}:"/>
-                <h:outputLabel  value="#{langsys[transBean.transTypeObj.transactionRefLabel]}:"/>
+                <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeObj.transactionRefLabel)}:"/>
                 <h:outputLabel  value="#{langsys['Currency']}:"/>
                 <p:commandLink actionListener="#{transactorBean.openChildTransactor('SUPPLIER')}" value="#{menuItemBean.menuItemObj.SUPPLIER_NAME}"/>
-                <h:outputLabel  value="#{langsys[transBean.transTypeObj.transactionDateLabel]}:"/>
+                <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeObj.transactionDateLabel)}:"/>
                 <h:outputLabel id="olblDebtCredit" style="color: coral;font-weight: bold;" value="#{langsys['Payable']} (#{generalUserSetting.LOCAL_CURRENCY.currencyCode})"/>
                 <h:outputLabel id="olblDeposit" style="color: green;font-weight: bold;" value="#{langsys['Prepaid']} (#{trans.currencyCode})"/>
 

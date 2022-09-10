@@ -86,7 +86,7 @@
                             <p:ajax event="change" listener="#{pay.setBillTransactorId(payBean.selectedBillTransactor.transactorId)}" rendered="#{payBean.selectedBillTransactor!=null}" update="pnlInput pnlButtons" />
                             <p:ajax event="change" listener="#{payTransBean.clearPayTranss(payTransBean.payTranss, pay)}" update="pnlInput"/>
                         </p:autoComplete>
-                        <h:outputLabel  value="#{langsys[transactionTypeBean.getTransactionType(1).transactionNumberLabel]}:"/>
+                        <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(1).transactionNumberLabel)}:"/>
                         <h:inputText id="itxtTransactionNumber2" value="#{trans.transactionNumber2}" autocomplete="off" style="width:155px">
                             <f:ajax event="change" listener="#{pay.setBillTransactorId(transBean.getTransByTransNumber(trans.transactionNumber2).billTransactorId)}" render="pnlInput pnlButtons" />
                             <f:ajax event="change" listener="#{payTransBean.clearPayTranss(payTransBean.payTranss, pay)}" render="pnlInput"/>
@@ -116,15 +116,15 @@
                             #{transactionReasonBean.getTransactionReason(pts.transactionReasonId).transactionReasonName}
                     </p:column>
                     <p:column>
-                        <f:facet name="header">#{langsys[transactionTypeBean.getTransactionType(1).transactionNumberLabel]}</f:facet>
+                        <f:facet name="header">#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(1).transactionNumberLabel)}</f:facet>
                             #{pts.transactionNumber}
                     </p:column>
                     <p:column>
-                        <f:facet name="header">#{langsys[transactionTypeBean.getTransactionType(1).transactionDateLabel]}</f:facet>
+                        <f:facet name="header">#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(1).transactionDateLabel)}</f:facet>
                         <h:outputLabel value="#{utilityBean.formatDate(transBean.getTrans(pts.transactionId).transactionDate)}"/>
                     </p:column>
                     <p:column>
-                        <f:facet name="header">#{langsys[transactionTypeBean.getTransactionType(1).transactionRefLabel]}</f:facet>
+                        <f:facet name="header">#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(1).transactionRefLabel)}</f:facet>
                             #{pts.transactionRef}
                     </p:column>
                     <p:column>

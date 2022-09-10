@@ -34,7 +34,7 @@
                     <h:panelGrid styleClass="clsGridMainHeader" columns="4" style="width: 100%">
                         <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['VIEW']}" rendered="#{transProductionBean.actionType.equals('View')}"/>
                         <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['EDIT']}" rendered="#{transProductionBean.actionType.equals('Edit')}"/>
-                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys[transactionTypeBean.getTransactionType(70).transactionOutputLabel]} : #{transProductionBean.transProdObj.transaction_number}"/>
+                        <h:outputLabel style="background-color:#00B461;color: white;" value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(70).transactionOutputLabel)} : #{transProductionBean.transProdObj.transaction_number}"/>
                         <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Stock']}(#{langsys['Product']}↑↓ #{langsys['Raw Material']}↑↓)"/>
                         <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Ledger']}:INV-ACC↓↑ COS-ACC↓↑"/>
                     </h:panelGrid>
@@ -44,7 +44,7 @@
                         <h:outputLabel  value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}:"/>
                         <h:inputText styleClass="clsInput" disabled="true" value="#{transProductionBean.transProdObj.transactor_names}" style="width: 500px;"/>
 
-                        <h:outputLabel  value="#{langsys[transactionTypeBean.getTransactionType(70).transactionDateLabel]}:"/>
+                        <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(70).transactionDateLabel)}:"/>
                         <h:inputText id="itxtTransactionDate" value="#{utilityBean.formatDate(transProductionBean.transProdObj.transactionDate)}" disabled="true" style="width: 200px;"/>
                         <h:outputLabel value="#{langsys['Product']}:"/>
                         <h:inputText disabled="true" value="#{transItemBean.showItemDescriptionCEC(transProductionBean.transProdObj.outputItemName, transProductionBean.transProdObj.codeSpecific, transProductionBean.transProdObj.descSpecific, transProductionBean.transProdObj.descMore)}" style="width: 500px;"/>
@@ -60,12 +60,12 @@
                         <h:inputText value="#{transProductionBean.transProdObj.outputTotalCost}" style="width: 200px;" disabled="true">
                             <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
-                        <h:outputLabel value="#{langsys[transactionTypeBean.getTransactionType(70).transactionUserLabel]}:"/>
+                        <h:outputLabel value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(70).transactionUserLabel)}:"/>
                         <h:inputText disabled="true" value="#{userDetailBean.getUserDetail(transProductionBean.transProdObj.transactionUserDetailId).userName}" style="width: 500px;"/>
                         
-                        <h:outputLabel  value="#{langsys[transactionTypeBean.getTransactionType(70).transactionNumberLabel]}:"/>
+                        <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(70).transactionNumberLabel)}:"/>
                         <h:inputText styleClass="clsInput" disabled="true" value="#{transProductionBean.transProdObj.transaction_number}" style="width: 200px;"/>
-                        <h:outputLabel  value="#{langsys[transactionTypeBean.getTransactionType(70).transactionRefLabel]}:"/>
+                        <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(70).transactionRefLabel)}:"/>
                         <h:inputText styleClass="clsInput" disabled="true" value="#{transProductionBean.transProdObj.transactionRef}" style="width: 500px;"/>
 
                     </h:panelGrid>

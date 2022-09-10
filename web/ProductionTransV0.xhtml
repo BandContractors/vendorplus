@@ -50,7 +50,7 @@
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainInput" columns="3">
-                <h:outputLabel  value="#{langsys[transBean.transTypeObj.transactionDateLabel]}:"/>
+                <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeObj.transactionDateLabel)}:"/>
                 <p:calendar id="calTransactionDate"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.transactionDate}" size="8"/>
                 <h:panelGrid id="pnlSearch" columns="5" style="background-color: #b3f2b3;width: 100%;">
                     <h:outputLabel value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}:"/>
@@ -76,7 +76,7 @@
                         <p:ajax event="itemSelect" listener="#{transBean.refreshTransList(11,transactorBean.selectedTransactor.transactorId,20,'is_processed','0,2')}" update="menuTransNumber" />
                         <p:ajax event="change" listener="#{transBean.refreshTransList(11,transactorBean.selectedTransactor.transactorId,20,'is_processed','0,2')}" rendered="#{transactorBean.selectedTransactor!=null}" update="menuTransNumber" />
                     </p:autoComplete>
-                    <h:outputLabel  value="#{langsys[transBean.transTypeRefObj.transactionNumberLabel]}:"/>
+                    <h:outputLabel  value="#{langsys[transBean.transTypeRefObj.transactionNumberLabel)}:"/>
                     <p:selectOneMenu id="menuTransNumber" value="#{trans.transactionRef}" editable="true" dynamic="true">
                         <f:selectItem itemLabel="#{langsys['Select']} #{langsys['or']} #{langsys['Type']}" itemValue="0"/>
                         <f:selectItems value="#{transBean.transList}" var="stl" itemLabel="#{stl.transactionNumber}" itemValue="#{stl.transactionNumber}"/>

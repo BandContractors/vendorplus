@@ -49,9 +49,9 @@
 
             <h:panelGrid id="pnlgSearch" style="background-color: #b3f2b3;width: 100%;" styleClass="clsGridMainInput" columns="5">
                 <h:outputLabel  value="#{langsys['From']}"/>
-                <h:outputLabel  value="#{langsys[transBean.transTypeObj.transactionDateLabel]}"/>
+                <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeObj.transactionDateLabel)}"/>
                 <h:outputLabel  value="#{langsys['To']}"/>
-                <h:outputLabel  value="#{langsys[transBean.transTypeObj.transactionRefLabel]}"/>
+                <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeObj.transactionRefLabel)}"/>
                 <h:outputLabel  value=""/>
 
                 <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}" style="height: 24px;width: 235px;"/>

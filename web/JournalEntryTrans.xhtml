@@ -49,7 +49,7 @@
                     <f:selectItems value="#{accCurrencyBean.currencyList}" var="ac" itemLabel="#{ac.currencyCode}" itemValue="#{ac.currencyCode}"/>
                     <f:ajax event="change" execute="@this" render="@this"/>
                 </h:selectOneMenu>
-                <h:outputLabel  value="#{langsys[transactionTypeBean.getTransactionType(16).transactionDateLabel]}:"/>
+                <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(16).transactionDateLabel)}:"/>
                 <p:calendar styleClass="clsInput" id="calTransactionDate" pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.transactionDate}" size="10"/> 
                 <h:outputLabel value="Partner:"/>
                 <p:autoComplete id="autcTransactor" value="#{transactorBean.selectedTransactor}" 
@@ -75,7 +75,7 @@
                     <p:ajax event="itemSelect" listener="#{trans.setTransactorId(transactorBean.selectedTransactor.transactorId)}"/>
                     <p:ajax event="change" listener="#{trans.setTransactorId(transactorBean.selectedTransactor.transactorId)}" rendered="#{transactorBean.selectedTransactor!=null} "/>
                 </p:autoComplete>
-                <h:outputLabel  value="#{langsys[transactionTypeBean.getTransactionType(16).transactionRefLabel]}:"/>
+                <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(16).transactionRefLabel)}:"/>
                 <h:inputText styleClass="clsInput" id="itxtTransactionRef" value="#{trans.transactionRef}" autocomplete="off" style="width: 100px;"/>
             </h:panelGrid>
             <div class="ui-fluid">
