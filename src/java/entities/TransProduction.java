@@ -74,6 +74,9 @@ public class TransProduction implements Serializable {
     private double input_unit_qty;
     private double input_qty_bfr_prod;
     private double input_qty_afr_prod;
+    //other
+    private int unit_id;
+    private double base_unit_qty;
 
     /**
      * @return the TransactionId
@@ -759,6 +762,34 @@ public class TransProduction implements Serializable {
      */
     public void setInput_qty_afr_prod(double input_qty_afr_prod) {
         this.input_qty_afr_prod = input_qty_afr_prod;
+    }
+
+    /**
+     * @return the unit_id
+     */
+    public int getUnit_id() {
+        return unit_id;
+    }
+
+    /**
+     * @param unit_id the unit_id to set
+     */
+    public void setUnit_id(int unit_id) {
+        this.unit_id = unit_id;
+    }
+
+    /**
+     * @return the base_unit_qty
+     */
+    public double getBase_unit_qty() {
+        return base_unit_qty;
+    }
+
+    /**
+     * @param base_unit_qty the base_unit_qty to set
+     */
+    public void setBase_unit_qty(double base_unit_qty) {
+        this.base_unit_qty = base_unit_qty;
     }
     
     

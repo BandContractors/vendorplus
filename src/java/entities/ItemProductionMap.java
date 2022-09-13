@@ -32,6 +32,8 @@ public class ItemProductionMap implements Serializable {
     private long StockId;
     private double InputQtyCurrent;
     private double InputQtyBalance;
+    private int output_unit_id;
+    private int input_unit_id;
 
     /**
      * @return the ItemProductionMapId
@@ -241,6 +243,34 @@ public class ItemProductionMap implements Serializable {
      */
     public void setInputQtyBalance(double InputQtyBalance) {
         this.InputQtyBalance = InputQtyBalance;
+    }
+
+    /**
+     * @return the output_unit_id
+     */
+    public int getOutput_unit_id() {
+        return output_unit_id;
+    }
+
+    /**
+     * @param output_unit_id the output_unit_id to set
+     */
+    public void setOutput_unit_id(int output_unit_id) {
+        this.output_unit_id = output_unit_id;
+    }
+
+    /**
+     * @return the input_unit_id
+     */
+    public int getInput_unit_id() {
+        return input_unit_id;
+    }
+
+    /**
+     * @param input_unit_id the input_unit_id to set
+     */
+    public void setInput_unit_id(int input_unit_id) {
+        this.input_unit_id = input_unit_id;
     }
 
 }

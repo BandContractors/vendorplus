@@ -16,6 +16,7 @@ import javax.faces.bean.SessionScoped;
 @ManagedBean
 @SessionScoped
 public class TransProductionItem implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     private long TransProductionItemId;
@@ -32,7 +33,8 @@ public class TransProductionItem implements Serializable {
     private double input_unit_qty;
     private double input_qty_bfr_prod;
     private double input_qty_afr_prod;
-    
+    private int unit_id;
+    private double base_unit_qty;
 
     /**
      * @return the TransProductionItemId
@@ -230,5 +232,32 @@ public class TransProductionItem implements Serializable {
         this.input_qty_afr_prod = input_qty_afr_prod;
     }
 
- 
+    /**
+     * @return the unit_id
+     */
+    public int getUnit_id() {
+        return unit_id;
+    }
+
+    /**
+     * @param unit_id the unit_id to set
+     */
+    public void setUnit_id(int unit_id) {
+        this.unit_id = unit_id;
+    }
+
+    /**
+     * @return the base_unit_qty
+     */
+    public double getBase_unit_qty() {
+        return base_unit_qty;
+    }
+
+    /**
+     * @param base_unit_qty the base_unit_qty to set
+     */
+    public void setBase_unit_qty(double base_unit_qty) {
+        this.base_unit_qty = base_unit_qty;
+    }
+
 }

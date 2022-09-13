@@ -4754,8 +4754,10 @@ public class ItemBean implements Serializable {
         //aOrderByFlag 1 Sales, 2 Purchase, 0 None
         List<Item_unit> iuList = new ArrayList<>();
         try {
-            Item itm = this.getItem(aItemId);
-            this.setItemUnitList(iuList, itm, aOrderByFlag);
+            if (aItemId > 0) {
+                Item itm = this.getItem(aItemId);
+                this.setItemUnitList(iuList, itm, aOrderByFlag);
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }

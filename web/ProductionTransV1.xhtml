@@ -76,7 +76,7 @@
                         <p:ajax event="itemSelect" listener="#{transBean.refreshTransList(11,transactorBean.selectedTransactor.transactorId,20,'is_processed','0,2')}" update="menuTransNumber" />
                         <p:ajax event="change" listener="#{transBean.refreshTransList(11,transactorBean.selectedTransactor.transactorId,20,'is_processed','0,2')}" rendered="#{transactorBean.selectedTransactor!=null}" update="menuTransNumber" />
                     </p:autoComplete>
-                    <h:outputLabel  value="#{transBean.transTypeRefObj.transactionNumberLabel}:"/>
+                    <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeRefObj.transactionNumberLabel)}:"/>
                     <p:selectOneMenu id="menuTransNumber" value="#{trans.transactionRef}" editable="true" dynamic="true">
                         <f:selectItem itemLabel="#{langsys['Select']} #{langsys['or']} #{langsys['Type']}" itemValue="0"/>
                         <f:selectItems value="#{transBean.transList}" var="stl" itemLabel="#{stl.transactionNumber}" itemValue="#{stl.transactionNumber}"/>
