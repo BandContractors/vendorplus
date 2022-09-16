@@ -4734,7 +4734,7 @@ public class ItemBean implements Serializable {
             aTransItem.setUnit_id(iu.getUnit_id());
             aTransItem.setUnitSymbol(iu.getUnit_symbol());
             //apply recent unit cost
-            if (transtype.getTransactionTypeName().equals("ITEM RECEIVED") || transtype.getTransactionTypeName().equals("PRODUCTION") || transtype.getTransactionTypeName().equals("STOCK ADJUSTMENT") || transtype.getTransactionTypeName().equals("DISPOSE STOCK") || transtype.getTransactionTypeName().equals("PURCHASE INVOICE") || transtype.getTransactionTypeName().equals("STOCK CONSUMPTION")) {
+            if (transtype.getTransactionTypeName().equals("ITEM RECEIVED") || transtype.getTransactionTypeName().equals("STOCK ADJUSTMENT") || transtype.getTransactionTypeName().equals("DISPOSE STOCK") || transtype.getTransactionTypeName().equals("PURCHASE INVOICE") || transtype.getTransactionTypeName().equals("STOCK CONSUMPTION")) {
                 String CurCode = aTrans.getCurrencyCode();
                 if (null == CurCode || CurCode.isEmpty()) {
                     CurCode = aItem.getCurrencyCode();

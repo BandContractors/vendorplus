@@ -749,7 +749,8 @@ public class ItemProductionMapBean implements Serializable {
                 try {
                     aItemProductionMap.setInputItemId(aItem.getItemId());
                     aItemProductionMap.setInputItemName(aItem.getDescription());
-                    aItemProductionMap.setInputItemUnit(new UnitBean().getUnit(aItem.getUnitId()).getUnitSymbol());
+                    aItemProductionMap.setInput_unit_id(aTransItem.getUnit_id());
+                    aItemProductionMap.setInputItemUnit(new UnitBean().getUnit(aItemProductionMap.getInput_unit_id()).getUnitSymbol());
                     aItemProductionMap.setBatchno("");
                     aItemProductionMap.setCodeSpecific("");
                     aItemProductionMap.setDescSpecific("");
@@ -758,6 +759,7 @@ public class ItemProductionMapBean implements Serializable {
                 } catch (NullPointerException npe) {
                     aItemProductionMap.setInputItemId(0);
                     aItemProductionMap.setInputItemName("");
+                    aItemProductionMap.setInput_unit_id(0);
                     aItemProductionMap.setInputItemUnit("");
                     aItemProductionMap.setBatchno("");
                     aItemProductionMap.setCodeSpecific("");

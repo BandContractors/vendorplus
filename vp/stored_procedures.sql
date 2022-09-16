@@ -12232,7 +12232,9 @@ CREATE PROCEDURE sp_insert_trans_production
 	IN in_account_code varchar(20),
 	IN in_transaction_number varchar(50),
 	IN in_transactor_id bigint,
-	IN in_specific_size double
+	IN in_specific_size double,
+    IN in_unit_id int,
+    IN in_base_unit_qty double
 ) 
 BEGIN 
 	SET @new_id=0;
@@ -12308,7 +12310,9 @@ BEGIN
 		account_code,
 		transaction_number,
 		transactor_id,
-		specific_size
+		specific_size,
+        unit_id,
+		base_unit_qty
 	) 
     VALUES
 	(
@@ -12338,7 +12342,9 @@ BEGIN
 		in_account_code,
 		@in_transaction_number,
 		@in_transactor_id,
-		@in_specific_size
+		@in_specific_size,
+        in_unit_id,
+		in_base_unit_qty
 	); 
 SET out_transaction_id=@new_id;	
 SET out_output_qty=in_output_qty;
@@ -12360,7 +12366,9 @@ CREATE PROCEDURE sp_insert_trans_production_item
 	IN in_desc_more varchar(250),
 	IN in_input_unit_qty double,
 	IN in_input_qty_bfr_prod double,
-	IN in_input_qty_afr_prod double
+	IN in_input_qty_afr_prod double,
+    IN in_unit_id int,
+    IN in_base_unit_qty double
 ) 
 BEGIN 
 	SET @new_id=0;
@@ -12400,7 +12408,9 @@ BEGIN
 		desc_more,
 		input_unit_qty,
 		input_qty_bfr_prod,
-		input_qty_afr_prod
+		input_qty_afr_prod,
+        unit_id,
+		base_unit_qty
 		) 
     VALUES
 	(
@@ -12415,7 +12425,9 @@ BEGIN
 		in_desc_more,
 		in_input_unit_qty,
 		in_input_qty_bfr_prod,
-		in_input_qty_afr_prod
+		in_input_qty_afr_prod,
+        in_unit_id,
+		in_base_unit_qty
 		); 
 END//
 DELIMITER ;

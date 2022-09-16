@@ -961,7 +961,7 @@ public class StockBean implements Serializable {
         }
     }
 
-    public void setStockCurrentQty(ItemProductionMap aItemProductionMap, int aStoreId, long aItemId) {
+    public void setStockCurrentQtyUnit(ItemProductionMap aItemProductionMap, int aStoreId, long aItemId, int aUnitId) {
         double CurrentQty = 0;
         if (null == aItemProductionMap) {
             //do nothing
@@ -971,6 +971,10 @@ public class StockBean implements Serializable {
             } else {
                 try {
                     CurrentQty = this.getStock(aStoreId, aItemId, aItemProductionMap.getBatchno(), aItemProductionMap.getCodeSpecific(), aItemProductionMap.getDescSpecific()).getCurrentqty();
+                    double OtherQty = new ItemBean().getOtherUnitQty(aItemId, aUnitId, CurrentQty);
+                    if (OtherQty > 0) {
+                        CurrentQty = OtherQty;
+                    }
                 } catch (Exception e) {
                     //do nothing
                 }

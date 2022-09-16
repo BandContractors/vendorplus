@@ -190,8 +190,8 @@ public class TransProductionItemBean implements Serializable {
                 this.saveTransProductionItems(aTransProductionId, aOutputQty, aStoreId, ati.get(ListItemIndex));
                 ListItemIndex = ListItemIndex + 1;
             }
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -207,7 +207,7 @@ public class TransProductionItemBean implements Serializable {
         if (1 == 2) {
         } else {
             if (aTransProductionItem.getTransProductionItemId() == 0) {
-                sql = "{call sp_insert_trans_production_item(?,?,?,?,?,?,?,?,?,?,?)}";
+                sql = "{call sp_insert_trans_production_item(?,?,?,?,?,?,?,?,?,?,?,?,?)}";
             }
             try (
                     Connection conn = DBConnection.getMySQLConnection();
@@ -222,51 +222,61 @@ public class TransProductionItemBean implements Serializable {
                     cs.setLong("in_input_item_id", aItemProductionMap.getInputItemId());
                     try {
                         cs.setDouble("in_input_qty_bfr_prod", aItemProductionMap.getInputQtyCurrent());
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         cs.setDouble("in_input_qty_bfr_prod", 0);
                     }
                     try {
                         cs.setDouble("in_input_qty_afr_prod", aItemProductionMap.getInputQtyBalance());
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         cs.setDouble("in_input_qty_afr_prod", 0);
                     }
                     try {
                         cs.setDouble("in_input_unit_qty", aItemProductionMap.getInputQty());
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         cs.setDouble("in_input_unit_qty", 0);
                     }
                     //calInputQty = aItemProductionMap.getInputQty() * aOutputQty;
                     //cs.setDouble("in_input_qty", calInputQty);
                     try {
                         cs.setDouble("in_input_qty", aItemProductionMap.getInputQtyTotal());
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         cs.setDouble("in_input_qty", 0);
                     }
                     try {
                         cs.setDouble("in_input_unit_cost", new TransItemBean().getItemLatestUnitCostPrice(aItemProductionMap.getInputItemId(), aItemProductionMap.getBatchno(), aItemProductionMap.getCodeSpecific(), aItemProductionMap.getDescSpecific()));
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         cs.setDouble("in_input_unit_cost", 0);
                     }
                     try {
                         cs.setString("in_batchno", aItemProductionMap.getBatchno());
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         cs.setString("in_batchno", "");
                     }
 
                     try {
                         cs.setString("in_code_specific", aItemProductionMap.getCodeSpecific());
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         cs.setString("in_code_specific", "");
                     }
                     try {
                         cs.setString("in_desc_specific", aItemProductionMap.getDescSpecific());
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         cs.setString("in_desc_specific", "");
                     }
                     try {
                         cs.setString("in_desc_more", "");
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         cs.setString("in_desc_more", "");
+                    }
+                    try {
+                        cs.setInt("in_unit_id", aItemProductionMap.getInput_unit_id());
+                    } catch (Exception e) {
+                        cs.setInt("in_unit_id", 0);
+                    }
+                    try {
+                        cs.setDouble("in_base_unit_qty", aItemProductionMap.getInputQty());
+                    } catch (Exception e) {
+                        cs.setDouble("in_base_unit_qty", 0);
                     }
                     //save
                     cs.executeUpdate();
