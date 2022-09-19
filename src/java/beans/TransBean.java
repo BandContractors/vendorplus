@@ -4121,7 +4121,8 @@ public class TransBean implements Serializable {
             //reverse stock
             if (SavedCrDrNoteTransId > 0) {
                 TransItemBean tib = new TransItemBean();
-                isTransItemReverseSuccess = tib.reverseTransItemsCEC(OldTrans, aNewTrans, OldTransItems, aNewTransItems);
+                //isTransItemReverseSuccess = tib.reverseTransItemsCEC(OldTrans, aNewTrans, OldTransItems, aNewTransItems);
+                isTransItemReverseSuccess = new CreditDebitNoteBean().stockAdjustCrDrNote(SavedCrDrNoteTransId);
             }
             //journal
             if (SavedCrDrNoteTransId > 0 && isTransItemReverseSuccess) {
@@ -4137,20 +4138,6 @@ public class TransBean implements Serializable {
                         httpSession.setAttribute("CURRENT_PAY_ID_CHILD", 0);
                         break;
                 }
-                //Deposit refund as deposit
-                /*
-                 if (null != aPay && aRefundAmount > 0) {
-                 newPayId = new PayBean().saveCustomerDepositFrmCrNote(SavedCrDrNoteTransId, aPay, new GeneralUserSetting().getCurrentUser().getUserDetailId(), aRefundAmount);
-                 switch (aLevel) {
-                 case "PARENT":
-                 httpSession.setAttribute("CURRENT_PAY_ID", newPayId);
-                 break;
-                 case "CHILD":
-                 httpSession.setAttribute("CURRENT_PAY_ID_CHILD", newPayId);
-                 break;
-                 }
-                 }
-                 */
                 //SMbi API insert loyalty transaction for the note
                 String scope = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_SMBI_SCOPE").getParameter_value();
                 if (SavedCrDrNoteTransId > 0 && aNewTrans.getCardNumber().length() > 0 && (scope.isEmpty() || scope.contains("LOYALTY"))) {
@@ -4285,7 +4272,8 @@ public class TransBean implements Serializable {
             //reverse stock
             if (SavedCrDrNoteTransId > 0) {
                 TransItemBean tib = new TransItemBean();
-                isTransItemReverseSuccess = tib.reverseTransItemsCEC(OldTrans, aNewTrans, OldTransItems, aNewTransItems);
+                //isTransItemReverseSuccess = tib.reverseTransItemsCEC(OldTrans, aNewTrans, OldTransItems, aNewTransItems);
+                isTransItemReverseSuccess = new CreditDebitNoteBean().stockAdjustCrDrNote(SavedCrDrNoteTransId);
             }
             //journal
             if (SavedCrDrNoteTransId > 0 && isTransItemReverseSuccess) {

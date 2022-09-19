@@ -1,13 +1,14 @@
 Functions using old 
 -TIB.saveTransItemAutoUnpack
 -TIB.reverseTransItemCEC
+-TIB.isItemTotalQtyGreaterThanCurrentQty
 
 -TIB.saveTransItem (DELETED)
 
 
 
 >>>>Ensure UnitCost+Unit_ID in trans_item, production, prod_item and stock are not rounded off.
->Test Item Reg to URA that includes Stock Update
+>Test Stock Adjustment for New Trans and CrDrNote at the reverse for orders sent to another store. 
 >Stock Take
 >Saving of draft
 >IR: Price History

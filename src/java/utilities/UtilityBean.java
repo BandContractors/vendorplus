@@ -1358,6 +1358,7 @@ public class UtilityBean implements Serializable {
             aTrans.setTotalDeemedVatableAmount(DeemedTotalAmount);
             aTrans.setTotalDeemedVat(DeemedTotalVat);
         } catch (Exception e) {
+            e.printStackTrace();
             LOGGER.log(Level.ERROR, e);
         }
     }

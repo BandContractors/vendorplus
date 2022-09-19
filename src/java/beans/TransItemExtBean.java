@@ -3,6 +3,7 @@ package beans;
 import connections.DBConnection;
 import entities.CompanySetting;
 import entities.TransItem;
+import entities.Transaction_item_cr_dr_note_unit;
 import entities.Transaction_item_hist_unit;
 import entities.Transaction_item_unit;
 import java.io.Serializable;
@@ -117,6 +118,23 @@ public class TransItemExtBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
         return newId;
+    }
+
+    public void insertTransaction_item_cr_dr_note_unit(Transaction_item_cr_dr_note_unit aTransaction_item_cr_dr_note_unit) {
+        String sql = "INSERT INTO transaction_item_cr_dr_note_unit"
+                + "(transaction_item_id,unit_id,base_unit_qty)"
+                + " VALUES"
+                + "(?,?,?)";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
+            ps.setLong(1, aTransaction_item_cr_dr_note_unit.getTransaction_item_id());
+            ps.setInt(2, aTransaction_item_cr_dr_note_unit.getUnit_id());
+            ps.setDouble(3, aTransaction_item_cr_dr_note_unit.getBase_unit_qty());
+            ps.executeUpdate();
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
     }
 
     public int insertTransaction_item_hist_unit(Transaction_item_hist_unit aTransaction_item_hist_unit) {

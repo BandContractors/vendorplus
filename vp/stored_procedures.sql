@@ -2371,8 +2371,8 @@ CREATE PROCEDURE sp_search_transaction_item_by_transaction_id
 	IN in_transaction_id bigint 
 ) 
 BEGIN 
-		SELECT ti.*,tu.unit_id,tu.base_unit_qty FROM transaction_item ti 
-        INNER JOIN transaction_item_unit tu ON ti.transaction_item_id=tu.transaction_item_id 
+		SELECT ti.*,tiu.unit_id,tiu.base_unit_qty FROM transaction_item ti 
+        INNER JOIN transaction_item_unit tiu ON ti.transaction_item_id=tiu.transaction_item_id 
 		WHERE ti.transaction_id=in_transaction_id ORDER BY ti.transaction_item_id ASC;
 END//
 DELIMITER ;
@@ -13496,7 +13496,8 @@ CREATE PROCEDURE sp_insert_transaction_item_cr_dr_note
 	IN in_duration_value double,
 	IN in_qty_damage double,
 	IN in_duration_passed double,
-	IN in_specific_size double
+	IN in_specific_size double,
+    OUT out_transaction_item_id bigint
 ) 
 BEGIN 
 	SET @new_id=0;
@@ -13655,6 +13656,7 @@ BEGIN
 		in_duration_passed,
 		@in_specific_size
 	); 
+	SET out_transaction_item_id=@new_id;
 END//
 DELIMITER ;
 
@@ -13834,8 +13836,22 @@ CREATE PROCEDURE sp_search_transaction_item_by_transaction_id_cr_dr_note
 	IN in_transaction_id bigint 
 ) 
 BEGIN 
-		SELECT * FROM transaction_item_cr_dr_note ti 
+		SELECT ti.*,tiu.unit_id,tiu.base_unit_qty FROM transaction_item_cr_dr_note ti 
+        INNER JOIN transaction_item_cr_dr_note_unit tiu ON ti.transaction_item_id=tiu.transaction_item_id 
 		WHERE ti.transaction_id=in_transaction_id ORDER BY ti.transaction_item_id ASC;
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_transaction_item_cr_dr_note;
+DELIMITER //
+CREATE PROCEDURE sp_search_transaction_item_cr_dr_note
+(
+	IN in_transaction_item_id bigint 
+) 
+BEGIN 
+		SELECT ti.*,tiu.unit_id,tiu.base_unit_qty FROM transaction_item_cr_dr_note ti 
+        INNER JOIN transaction_item_cr_dr_note_unit tiu ON ti.transaction_item_id=tiu.transaction_item_id 
+		WHERE ti.transaction_item_id=in_transaction_item_id;
 END//
 DELIMITER ;
 

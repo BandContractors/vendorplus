@@ -280,7 +280,7 @@ public class Stock_ledgerBean implements Serializable {
             //check alert-expiry status
             new Alert_generalBean().checkExpiryStatusForAlertThread(stockledger.getItem_id(), stockledger.getBatchno(), stockledger.getCode_specific(), stockledger.getDesc_specific());
             //URA-STOCK-API
-            if (aTrans_type_id != 2 && aTrans_type_id != 4 && new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
+            if (aTrans_type_id != 2 && aTrans_type_id != 4 && aTrans_type_id != 82 && aTrans_type_id != 83 && new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
                 Item_tax_map im = new Item_tax_mapBean().getItem_tax_map(stockledger.getItem_id());
                 if (null == im) {
                     //do nothing
@@ -661,7 +661,18 @@ public class Stock_ledgerBean implements Serializable {
         aStock_ledgerBean.setActionMessage("");
         ResultSet rs = null;
         this.Stock_ledgerList = new ArrayList<>();
-        String sql = "SELECT l.*,i.description,ifnull(un2.unit_symbol,un.unit_symbol) as unit_symbol,un.unit_symbol as base_unit_symbol,"
+//        String sql = "SELECT l.*,i.description,ifnull(un2.unit_symbol,un.unit_symbol) as unit_symbol,un.unit_symbol as base_unit_symbol,"
+//                + "tt.transaction_type_name,us.user_name,s.store_name,tiu.transaction_item_id "
+//                + "FROM " + aTableName + " l "
+//                + "INNER JOIN item i ON l.item_id=i.item_id "
+//                + "INNER JOIN unit un ON i.unit_id=un.unit_id "
+//                + "INNER JOIN transaction_type tt ON l.transaction_type_id=tt.transaction_type_id "
+//                + "INNER JOIN user_detail us ON l.user_detail_id=us.user_detail_id "
+//                + "INNER JOIN store s ON l.store_id=s.store_id "
+//                + "LEFT JOIN transaction_item_unit tiu ON l.transaction_item_id=tiu.transaction_item_id "
+//                + "LEFT JOIN unit un2 ON tiu.unit_id=un2.unit_id "
+//                + "WHERE 1=1";
+        String sql1 = "SELECT l.*,i.description,ifnull(un2.unit_symbol,un.unit_symbol) as unit_symbol,un.unit_symbol as base_unit_symbol,"
                 + "tt.transaction_type_name,us.user_name,s.store_name,tiu.transaction_item_id "
                 + "FROM " + aTableName + " l "
                 + "INNER JOIN item i ON l.item_id=i.item_id "
@@ -671,7 +682,18 @@ public class Stock_ledgerBean implements Serializable {
                 + "INNER JOIN store s ON l.store_id=s.store_id "
                 + "LEFT JOIN transaction_item_unit tiu ON l.transaction_item_id=tiu.transaction_item_id "
                 + "LEFT JOIN unit un2 ON tiu.unit_id=un2.unit_id "
-                + "WHERE 1=1";
+                + "WHERE l.transaction_type_id NOT IN(82,83)";
+        String sql2 = "SELECT l.*,i.description,ifnull(un2.unit_symbol,un.unit_symbol) as unit_symbol,un.unit_symbol as base_unit_symbol,"
+                + "tt.transaction_type_name,us.user_name,s.store_name,tiu.transaction_item_id "
+                + "FROM " + aTableName + " l "
+                + "INNER JOIN item i ON l.item_id=i.item_id "
+                + "INNER JOIN unit un ON i.unit_id=un.unit_id "
+                + "INNER JOIN transaction_type tt ON l.transaction_type_id=tt.transaction_type_id "
+                + "INNER JOIN user_detail us ON l.user_detail_id=us.user_detail_id "
+                + "INNER JOIN store s ON l.store_id=s.store_id "
+                + "LEFT JOIN transaction_item_cr_dr_note_unit tiu ON l.transaction_item_id=tiu.transaction_item_id "
+                + "LEFT JOIN unit un2 ON tiu.unit_id=un2.unit_id "
+                + "WHERE l.transaction_type_id IN(82,83)";
         String wheresql = "";
         String ordersql = "";
         if (aStock_ledger.getStore_id() > 0) {
@@ -693,8 +715,10 @@ public class Stock_ledgerBean implements Serializable {
         if (aStock_ledgerBean.getDate1() != null && aStock_ledgerBean.getDate2() != null) {
             wheresql = wheresql + " AND l.add_date BETWEEN '" + new java.sql.Timestamp(aStock_ledgerBean.getDate1().getTime()) + "' AND '" + new java.sql.Timestamp(aStock_ledgerBean.getDate2().getTime()) + "'";
         }
-        ordersql = " ORDER BY l.add_date DESC,l.stock_ledger_id DESC";
-        sql = sql + wheresql + ordersql;
+        //ordersql = " ORDER BY l.add_date DESC,l.stock_ledger_id DESC";
+        String sql = "(" + sql1 + wheresql + ") UNION (" + sql2 + wheresql + ") ";
+        ordersql = " ORDER BY add_date DESC,stock_ledger_id DESC";
+        sql = sql + ordersql;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -715,6 +739,8 @@ public class Stock_ledgerBean implements Serializable {
                 try {
                     if (sl.getTransaction_type_id() == 70) {
                         TransNo = new TransProductionBean().getTransProductionById(sl.getTransaction_id()).getTransaction_number();
+                    } else if (sl.getTransaction_type_id() == 82 || sl.getTransaction_type_id() == 83) {
+                        TransNo = new CreditDebitNoteBean().getTrans_cr_dr_note(sl.getTransaction_id()).getTransactionNumber();
                     } else {
                         TransNo = new TransBean().getTrans(sl.getTransaction_id()).getTransactionNumber();
                     }

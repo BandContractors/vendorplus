@@ -3236,7 +3236,7 @@ public class TransItemBean implements Serializable {
                         x = new StockBean().subtractStock(s, aDiffHistNewQty);
                         s.setSpecific_size(aTransItem.getSpecific_size());
                         String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), aTransItem.getTransactionItemId());
                     } else {
                         //insert
                         Stock s = new Stock();
@@ -3283,7 +3283,7 @@ public class TransItemBean implements Serializable {
                         int x = 0;
                         x = new StockBean().saveStock(s);
                         String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", s, (-1 * aDiffHistNewQty), "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", s, (-1 * aDiffHistNewQty), "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), aTransItem.getTransactionItemId());
                     }
 
                 } else if (aDiffHistNewQty < 0) {
@@ -3301,7 +3301,7 @@ public class TransItemBean implements Serializable {
                         x = new StockBean().addStock(s, aDiffHistNewQty);
                         s.setSpecific_size(aTransItem.getSpecific_size());
                         String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), aTransItem.getTransactionItemId());
                     } else {
                         //insert
                         Stock s = new Stock();
@@ -3328,7 +3328,6 @@ public class TransItemBean implements Serializable {
                         } else {
                             s.setUnitCost(aTransItem.getUnitCostPrice());
                         }
-
                         try {
                             s.setItemExpDate(aTransItem.getItemExpryDate());
                             s.setItemMnfDate(aTransItem.getItemMnfDate());
@@ -3348,7 +3347,7 @@ public class TransItemBean implements Serializable {
                         int x = 0;
                         x = new StockBean().saveStock(s);
                         String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), aTransItem.getTransactionItemId());
                     }
                 }
 
@@ -3369,7 +3368,7 @@ public class TransItemBean implements Serializable {
                         x = new StockBean().addStock(s, aDiffHistNewQty);
                         s.setSpecific_size(aTransItem.getSpecific_size());
                         String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), aTransItem.getTransactionItemId());
                     } else {
                         //insert
                         Stock s = new Stock();
@@ -3417,7 +3416,7 @@ public class TransItemBean implements Serializable {
                         x = new StockBean().saveStock(s);
                         s.setSpecific_size(aTransItem.getSpecific_size());
                         String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), aTransItem.getTransactionItemId());
                     }
                 } else if (aDiffHistNewQty < 0) {
                     //subtract stock
@@ -3434,7 +3433,7 @@ public class TransItemBean implements Serializable {
                         x = new StockBean().subtractStock(s, aDiffHistNewQty);
                         s.setSpecific_size(aTransItem.getSpecific_size());
                         String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), aTransItem.getTransactionItemId());
                     } else {
                         //insert
                         Stock s = new Stock();
@@ -3481,7 +3480,7 @@ public class TransItemBean implements Serializable {
                         int x = 0;
                         x = new StockBean().saveStock(s);
                         String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", s, (-1 * aDiffHistNewQty), "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", s, (-1 * aDiffHistNewQty), "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), aTransItem.getTransactionItemId());
                     }
                 }
             }
@@ -7214,7 +7213,7 @@ public class TransItemBean implements Serializable {
     public void updateBaseUnityQty(TransItem aTransItem) {
         try {
             double BaseQty = new ItemBean().getBaseUnitQty(aTransItem.getItemId(), aTransItem.getUnit_id(), aTransItem.getItemQty());
-            if (BaseQty > 0) {
+            if (BaseQty >= 0) {
                 aTransItem.setBase_unit_qty(BaseQty);
             }
         } catch (Exception e) {
@@ -7310,6 +7309,7 @@ public class TransItemBean implements Serializable {
         try {
             TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
             TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
+            this.updateBaseUnityQty(ti);
             if (ti.getItemQty() < 0) {
                 ti.setItemQty(0);
             }
@@ -10259,13 +10259,13 @@ public class TransItemBean implements Serializable {
         return ItemFoundAtIndex;
     }
 
-    public TransItem itemExistsObj(List<TransItem> aActiveTransItems, Long aItemId, String aBatchNo, String aCodeSpec, String aDescSpec) {
+    public TransItem itemExistsObj(List<TransItem> aActiveTransItems, Long aItemId, String aBatchNo, String aCodeSpec, String aDescSpec, int aUnitId) {
         List<TransItem> ati = aActiveTransItems;
         TransItem ItemFound = null;
         int ListItemIndex = 0;
         int ListItemNo = ati.size();
         while (ListItemIndex < ListItemNo) {
-            if (ati.get(ListItemIndex).getItemId() == aItemId && aBatchNo.equals(ati.get(ListItemIndex).getBatchno()) && aCodeSpec.equals(ati.get(ListItemIndex).getCodeSpecific()) && aDescSpec.equals(ati.get(ListItemIndex).getDescSpecific())) {
+            if (ati.get(ListItemIndex).getItemId() == aItemId && aBatchNo.equals(ati.get(ListItemIndex).getBatchno()) && aCodeSpec.equals(ati.get(ListItemIndex).getCodeSpecific()) && aDescSpec.equals(ati.get(ListItemIndex).getDescSpecific()) && ati.get(ListItemIndex).getUnit_id() == aUnitId) {
                 ItemFound = ati.get(ListItemIndex);
                 break;
             } else {
@@ -10471,7 +10471,6 @@ public class TransItemBean implements Serializable {
                 //skip for adding
                 this.setItemString("");
             } else {
-                //if (this.isItemTotalQtyGreaterThanCurrentQty(aStoreId, ati.get(ListItemIndex).getItemId(), ati.get(ListItemIndex).getBatchno(), ati.get(ListItemIndex).getItemQty(), ati.get(ListItemIndex).getCodeSpecific(), ati.get(ListItemIndex).getDescSpecific())) {
                 if (this.isItemTotalQtyGreaterThanCurrentQty(aStoreId, ati.get(ListItemIndex).getItemId(), ati.get(ListItemIndex).getBatchno(), ati.get(ListItemIndex).getBase_unit_qty(), ati.get(ListItemIndex).getCodeSpecific(), ati.get(ListItemIndex).getDescSpecific())) {
                     this.setItemString(new ItemBean().findItem(ati.get(ListItemIndex).getItemId()).getDescription() + " " + ati.get(ListItemIndex).getBatchno() + ", " + UtilityBean.combineTwoStr(ati.get(ListItemIndex).getCodeSpecific(), ati.get(ListItemIndex).getDescSpecific(), 2));
                     break;
@@ -12276,6 +12275,8 @@ public class TransItemBean implements Serializable {
         int ListItemNoPrev = PrevTransItemList.size();
         double PrevQty = 0;
         double CurQty = 0;
+        double PrevQtyBaseUnit = 0;
+        double CurQtyBaseUnit = 0;
         TransItem CurTransItem = null;
         TransItem PrevTransItem = null;
         //TransItem CurLessPrevTransItem = null;
@@ -12283,26 +12284,29 @@ public class TransItemBean implements Serializable {
         while (ListItemIndexCur < ListItemNoCur) {
             //CurLessPrevTransItem = new TransItem();
             CurQty = 0;
+            CurQtyBaseUnit = 0;
             CurTransItem = new TransItem();
             this.copyObjectTransItem(aCurTransItemList.get(ListItemIndexCur), CurTransItem);
-            //CurQty = CurTransItem.getItemQty();
-            CurQty = CurTransItem.getBase_unit_qty();
+            CurQty = CurTransItem.getItemQty();
+            CurQtyBaseUnit = CurTransItem.getBase_unit_qty();
             ListItemIndexPrev = 0;
             while (ListItemIndexPrev < ListItemNoPrev) {
                 PrevQty = 0;
+                PrevQtyBaseUnit = 0;
                 PrevTransItem = new TransItem();
                 //PrevTransItem = PrevTransItemList.get(ListItemIndexPrev);
                 this.copyObjectTransItem(PrevTransItemList.get(ListItemIndexPrev), PrevTransItem);
                 //if (CurTransItem.getItemId() == PrevTransItem.getItemId() && CurTransItem.getBatchno().equals(PrevTransItem.getBatchno()) && CurTransItem.getCodeSpecific() == null ? PrevTransItem.getCodeSpecific() == null : CurTransItem.getCodeSpecific().equals(PrevTransItem.getCodeSpecific()) && CurTransItem.getDescSpecific() == null ? PrevTransItem.getDescSpecific() == null : CurTransItem.getDescSpecific().equals(PrevTransItem.getDescSpecific())) {
-                if (CurTransItem.getItemId() == PrevTransItem.getItemId() && ub.getEmptyIfNull(CurTransItem.getBatchno()).equals(ub.getEmptyIfNull(PrevTransItem.getBatchno())) && ub.getEmptyIfNull(CurTransItem.getCodeSpecific()).equals(PrevTransItem.getCodeSpecific()) && ub.getEmptyIfNull(CurTransItem.getDescSpecific()).equals(ub.getEmptyIfNull(PrevTransItem.getDescSpecific()))) {
-                    //PrevQty = PrevTransItem.getItemQty();
-                    PrevQty = PrevTransItem.getBase_unit_qty();
+                if (CurTransItem.getItemId() == PrevTransItem.getItemId() && CurTransItem.getUnit_id() == PrevTransItem.getUnit_id() && ub.getEmptyIfNull(CurTransItem.getBatchno()).equals(ub.getEmptyIfNull(PrevTransItem.getBatchno())) && ub.getEmptyIfNull(CurTransItem.getCodeSpecific()).equals(PrevTransItem.getCodeSpecific()) && ub.getEmptyIfNull(CurTransItem.getDescSpecific()).equals(ub.getEmptyIfNull(PrevTransItem.getDescSpecific()))) {
+                    PrevQty = PrevTransItem.getItemQty();
+                    PrevQtyBaseUnit = PrevTransItem.getBase_unit_qty();
                     break;
                 }
                 ListItemIndexPrev = ListItemIndexPrev + 1;
             }
             if ((CurQty - PrevQty) != 0) {
                 CurTransItem.setItemQty(CurQty - PrevQty);
+                CurTransItem.setBase_unit_qty(CurQtyBaseUnit - PrevQtyBaseUnit);
                 CurLessPrevTransItemList.add(CurTransItem);
             }
             ListItemIndexCur = ListItemIndexCur + 1;
