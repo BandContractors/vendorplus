@@ -8212,6 +8212,10 @@ BEGIN
 	dep_start_date,dep_method_id,dep_rate,average_method_id,effective_life,residual_value,narration,qty_balance,duration_value,
 	qty_damage,duration_passed,specific_size 
 	FROM transaction_item WHERE transaction_item_id=in_transaction_item_id AND transaction_id=in_transaction_id;
+    
+    INSERT INTO transaction_item_hist_unit(transaction_item_hist_id,unit_id,base_unit_qty) 
+	SELECT @new_id,unit_id,base_unit_qty   
+	FROM transaction_item_unit WHERE transaction_item_id=in_transaction_item_id AND transaction_id=in_transaction_id;
 END//
 DELIMITER ;
 
@@ -8284,7 +8288,8 @@ CREATE PROCEDURE sp_search_transaction_item_hist_by_ids
 	IN in_transaction_hist_id bigint
 ) 
 BEGIN 
-		SELECT * FROM transaction_item_hist tih 
+		SELECT tih.*,tiu.unit_id,tiu.base_unit_qty FROM transaction_item_hist tih 
+        INNER JOIN transaction_item_hist_unit tiu ON tih.transaction_item_hist_id=tiu.transaction_item_hist_id 
 		WHERE tih.transaction_hist_id=in_transaction_hist_id AND tih.transaction_id=in_transaction_id ORDER BY tih.transaction_item_id ASC;
 END//
 DELIMITER ;

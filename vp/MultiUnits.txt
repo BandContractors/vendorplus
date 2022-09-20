@@ -8,6 +8,8 @@ Functions using old
 
 
 >>>>Ensure UnitCost+Unit_ID in trans_item, production, prod_item and stock are not rounded off.
+>Test UnitCost for Stock Adjust, Consume, etc.
+>Open Balance
 >Test Stock Adjustment for New Trans and CrDrNote at the reverse for orders sent to another store. 
 >Stock Take
 >Saving of draft

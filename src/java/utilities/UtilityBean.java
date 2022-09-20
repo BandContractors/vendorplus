@@ -1347,18 +1347,31 @@ public class UtilityBean implements Serializable {
         double DeemedTotalAmount = 0;
         double DeemedTotalVat = 0;
         try {
-            double VatPercent = aTrans.getVatPerc();
-            for (int i = 0; i < aTransItemList.size(); i++) {
-                if (aTransItemList.get(i).getVatRated().equals("DEEMED") && VatPercent > 0) {
-                    double ExcludedVat = (VatPercent / 100) * aTransItemList.get(i).getAmountExcVat();
-                    DeemedTotalVat = DeemedTotalVat + ExcludedVat;
-                    DeemedTotalAmount = DeemedTotalAmount + aTransItemList.get(i).getAmountExcVat();
+            if (null != aTrans && null != aTransItemList) {
+                double VatPercent = aTrans.getVatPerc();
+                for (int i = 0; i < aTransItemList.size(); i++) {
+                    if (aTransItemList.get(i).getVatRated().equals("DEEMED") && VatPercent > 0) {
+                        double ExcludedVat = (VatPercent / 100) * aTransItemList.get(i).getAmountExcVat();
+                        DeemedTotalVat = DeemedTotalVat + ExcludedVat;
+                        DeemedTotalAmount = DeemedTotalAmount + aTransItemList.get(i).getAmountExcVat();
+                    }
+                }
+                aTrans.setTotalDeemedVatableAmount(DeemedTotalAmount);
+                aTrans.setTotalDeemedVat(DeemedTotalVat);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void assignNumbersToList(List<TransItem> aTransItems) {
+        try {
+            if (null != aTransItems) {
+                for (int i = 1; i <= aTransItems.size(); i++) {
+                    aTransItems.get(i - 1).setItem_no(i);
                 }
             }
-            aTrans.setTotalDeemedVatableAmount(DeemedTotalAmount);
-            aTrans.setTotalDeemedVat(DeemedTotalVat);
         } catch (Exception e) {
-            e.printStackTrace();
             LOGGER.log(Level.ERROR, e);
         }
     }

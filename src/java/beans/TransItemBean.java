@@ -2332,7 +2332,7 @@ public class TransItemBean implements Serializable {
             cs.setDouble("in_duration_passed", transitem.getDuration_passed());
             //save
             cs.executeUpdate();
-            success = 1;
+            success = new TransItemExtBean().updateTransaction_item_unit(transitem.getTransactionItemId(), transitem.getBase_unit_qty());
         } catch (Exception e) {
             success = 0;
             LOGGER.log(Level.ERROR, e);
@@ -2603,7 +2603,7 @@ public class TransItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-
+    /*
     public boolean updateTransItems(long aTransactionId, long aTransactionHistId, List<TransItem> aNewTransItems) {
         try {
             //get trans items that was moved to the history table
@@ -2642,6 +2642,7 @@ public class TransItemBean implements Serializable {
             return false;
         }
     }
+    */
 
     public boolean updateTransItemsV2(long aTransactionId, long aTransactionHistId, List<TransItem> aNewTransItems) {
         try {
@@ -2688,7 +2689,7 @@ public class TransItemBean implements Serializable {
     public boolean updateTransItemsCEC(long aTransactionId, long aTransactionHistId, List<TransItem> aNewTransItems) {
         try {
             //get trans items that was moved to the history table
-            List<TransItem> aHistTransItems = new ArrayList<TransItem>();
+            List<TransItem> aHistTransItems = new ArrayList<>();
             this.setTransItemsHistoryByIDs(aTransactionId, aTransactionHistId, aHistTransItems);
 
             //1. Reverse and update all trans items whoose qty has changed
@@ -2697,20 +2698,22 @@ public class TransItemBean implements Serializable {
             int NewListItemNo = aNewTransItems.size();
             int HistListItemNo = aHistTransItems.size();
             double aDiffHistNewQty = 0;
+            double aDiffHistNewQtyBase = 0;
             double aDiffHistNewQty_damage = 0;
             TransItem nti = new TransItem();
             TransItem hti = new TransItem();
+            UtilityBean ub = new UtilityBean();
             while (NewListItemIndex < NewListItemNo) {
                 HistListItemIndex = 0;
                 aDiffHistNewQty = 0;
+                aDiffHistNewQtyBase = 0;
                 aDiffHistNewQty_damage = 0;
-                //hti = aHistTransItems.get(HistListItemIndex);
                 nti = aNewTransItems.get(NewListItemIndex);
                 while (HistListItemIndex < HistListItemNo) {
-                    //nti = aNewTransItems.get(NewListItemIndex);
                     hti = aHistTransItems.get(HistListItemIndex);
-                    if (nti.getItemId() == hti.getItemId() && nti.getBatchno().equals(hti.getBatchno()) && (nti.getCodeSpecific() == null ? hti.getCodeSpecific() == null : nti.getCodeSpecific().equals(hti.getCodeSpecific())) && (nti.getDescSpecific() == null ? hti.getDescSpecific() == null : nti.getDescSpecific().equals(hti.getDescSpecific()))) {
+                    if (nti.getItemId() == hti.getItemId() && nti.getUnit_id() == hti.getUnit_id() && nti.getBatchno().equals(hti.getBatchno()) && ub.getEmptyIfNull(nti.getCodeSpecific()).equals(ub.getEmptyIfNull(hti.getCodeSpecific())) && ub.getEmptyIfNull(nti.getDescSpecific()).equals(ub.getEmptyIfNull(hti.getDescSpecific()))) {
                         aDiffHistNewQty = hti.getItemQty() - nti.getItemQty();
+                        aDiffHistNewQtyBase = hti.getBase_unit_qty() - nti.getBase_unit_qty();
                         aDiffHistNewQty_damage = hti.getQty_damage() - nti.getQty_damage();
                         break;
                     }
@@ -2720,9 +2723,9 @@ public class TransItemBean implements Serializable {
                 if (aDiffHistNewQty > 0 || aDiffHistNewQty < 0 || aDiffHistNewQty_damage > 0 || aDiffHistNewQty_damage < 0) {
                     Trans t = new TransBean().getTrans(aTransactionId);
                     if (t.getTransactionTypeId() == 2 && t.getStore2Id() > 0) {//Invoice with Store2Id -- for order sent to
-                        this.reverseTransItemCEC(t.getStore2Id(), t.getTransactionTypeId(), t.getTransactionReasonId(), "", nti, aDiffHistNewQty, aDiffHistNewQty_damage);
+                        this.reverseTransItemCEC(t.getStore2Id(), t.getTransactionTypeId(), t.getTransactionReasonId(), "", nti, aDiffHistNewQty, aDiffHistNewQty_damage, aDiffHistNewQtyBase);
                     } else {
-                        this.reverseTransItemCEC(t.getStoreId(), t.getTransactionTypeId(), t.getTransactionReasonId(), "", nti, aDiffHistNewQty, aDiffHistNewQty_damage);
+                        this.reverseTransItemCEC(t.getStoreId(), t.getTransactionTypeId(), t.getTransactionReasonId(), "", nti, aDiffHistNewQty, aDiffHistNewQty_damage, aDiffHistNewQtyBase);
                     }
                     this.updateTransItemCEC(nti);
                 }
@@ -2734,7 +2737,7 @@ public class TransItemBean implements Serializable {
             return false;
         }
     }
-
+    /*
     public boolean reverseTransItemsCEC(Trans aOldTrans, Trans aNewTrans, List<TransItem> aOldTransItems, List<TransItem> aNewTransItems) {
         try {
             //1. Reverse and update all trans items whoose qty has changed
@@ -2952,6 +2955,7 @@ public class TransItemBean implements Serializable {
             Stk = null;
         }
     }
+    */
 
     public void reverseTransItemV2(TransactionType aTransType, TransactionReason aTransReason, TransItem aTransItem, double aDiffHistNewQty) {
         String sql = null;
@@ -3200,7 +3204,7 @@ public class TransItemBean implements Serializable {
         }
     }
 
-    public void reverseTransItemCEC(int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, TransItem aTransItem, double aDiffHistNewQty, double aDiffHistNewQty_damage) {
+    public void reverseTransItemCEC(int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, TransItem aTransItem, double aDiffHistNewQty, double aDiffHistNewQty_damage, double aDiffHistNewQtyBase) {
         String sql = null;
         String sql2 = null;
         StockBean StkBean = new StockBean();
@@ -3233,7 +3237,7 @@ public class TransItemBean implements Serializable {
                         s.setCodeSpecific(aTransItem.getCodeSpecific());
                         s.setDescSpecific(aTransItem.getDescSpecific());
                         int x = 0;
-                        x = new StockBean().subtractStock(s, aDiffHistNewQty);
+                        x = new StockBean().subtractStock(s, aDiffHistNewQtyBase);
                         s.setSpecific_size(aTransItem.getSpecific_size());
                         String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
                         new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), aTransItem.getTransactionItemId());
@@ -3246,24 +3250,16 @@ public class TransItemBean implements Serializable {
                         s.setBatchno(aTransItem.getBatchno());
                         s.setCodeSpecific(aTransItem.getCodeSpecific());
                         s.setDescSpecific(aTransItem.getDescSpecific());
-                        s.setCurrentqty(-1 * aDiffHistNewQty);
+                        s.setCurrentqty(-1 * aDiffHistNewQtyBase);
                         //get the last unit cost price
-                        long LatestTransItemId = 0;
-                        double LatestTransItemUnitCostPrice = 0;
-                        LatestTransItemId = this.getItemUnitCostPriceLatestTransItemId(transtype.getTransactionTypeId(), transreason.getTransactionReasonId(), s.getStoreId(), s.getItemId(), s.getBatchno(), s.getCodeSpecific(), s.getDescSpecific());
-                        if (LatestTransItemId > 0) {
-                            try {
-                                LatestTransItemUnitCostPrice = this.getTransItem(LatestTransItemId).getUnitCostPrice();
-                            } catch (NullPointerException npe) {
-                                LatestTransItemUnitCostPrice = 0;
-                            }
-                        }
-                        if (LatestTransItemUnitCostPrice > 0) {
-                            s.setUnitCost(LatestTransItemUnitCostPrice);
+                        double UnitCostPrice = 0;
+                        //the purchase interface (asset,goods,expenses) uses unit_price for cost price
+                        if (transtype.getTransactionTypeId() == 1) {
+                            UnitCostPrice = (aTransItem.getUnitPrice() + aTransItem.getUnitVat()) - aTransItem.getUnitTradeDiscount();
                         } else {
-                            s.setUnitCost(aTransItem.getUnitCostPrice());
+                            UnitCostPrice = aTransItem.getUnitCostPrice();
                         }
-
+                        s.setUnitCost(UnitCostPrice);
                         try {
                             s.setItemExpDate(aTransItem.getItemExpryDate());
                             s.setItemMnfDate(aTransItem.getItemMnfDate());
@@ -3285,10 +3281,10 @@ public class TransItemBean implements Serializable {
                         String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
                         new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", s, (-1 * aDiffHistNewQty), "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), aTransItem.getTransactionItemId());
                     }
-
                 } else if (aDiffHistNewQty < 0) {
                     //add stock
                     aDiffHistNewQty = (-1) * aDiffHistNewQty;//remove the -ve from the quantity
+                    aDiffHistNewQtyBase = (-1) * aDiffHistNewQtyBase;
                     if (Stk != null) {
                         //update/add
                         Stock s = new Stock();
@@ -3298,7 +3294,7 @@ public class TransItemBean implements Serializable {
                         s.setCodeSpecific(aTransItem.getCodeSpecific());
                         s.setDescSpecific(aTransItem.getDescSpecific());
                         int x = 0;
-                        x = new StockBean().addStock(s, aDiffHistNewQty);
+                        x = new StockBean().addStock(s, aDiffHistNewQtyBase);
                         s.setSpecific_size(aTransItem.getSpecific_size());
                         String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
                         new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), aTransItem.getTransactionItemId());
@@ -3311,23 +3307,16 @@ public class TransItemBean implements Serializable {
                         s.setBatchno(aTransItem.getBatchno());
                         s.setCodeSpecific(aTransItem.getCodeSpecific());
                         s.setDescSpecific(aTransItem.getDescSpecific());
-                        s.setCurrentqty(aDiffHistNewQty);
+                        s.setCurrentqty(aDiffHistNewQtyBase);
                         //get the last unit cost price
-                        long LatestTransItemId = 0;
-                        double LatestTransItemUnitCostPrice = 0;
-                        LatestTransItemId = this.getItemUnitCostPriceLatestTransItemId(transtype.getTransactionTypeId(), transreason.getTransactionReasonId(), s.getStoreId(), s.getItemId(), s.getBatchno(), s.getCodeSpecific(), s.getDescSpecific());
-                        if (LatestTransItemId > 0) {
-                            try {
-                                LatestTransItemUnitCostPrice = this.getTransItem(LatestTransItemId).getUnitCostPrice();
-                            } catch (NullPointerException npe) {
-                                LatestTransItemUnitCostPrice = 0;
-                            }
-                        }
-                        if (LatestTransItemUnitCostPrice > 0) {
-                            s.setUnitCost(LatestTransItemUnitCostPrice);
+                        double UnitCostPrice = 0;
+                        //the purchase interface (asset,goods,expenses) uses unit_price for cost price
+                        if (transtype.getTransactionTypeId() == 1) {
+                            UnitCostPrice = (aTransItem.getUnitPrice() + aTransItem.getUnitVat()) - aTransItem.getUnitTradeDiscount();
                         } else {
-                            s.setUnitCost(aTransItem.getUnitCostPrice());
+                            UnitCostPrice = aTransItem.getUnitCostPrice();
                         }
+                        s.setUnitCost(UnitCostPrice);
                         try {
                             s.setItemExpDate(aTransItem.getItemExpryDate());
                             s.setItemMnfDate(aTransItem.getItemMnfDate());
@@ -3365,7 +3354,7 @@ public class TransItemBean implements Serializable {
                         s.setCodeSpecific(aTransItem.getCodeSpecific());
                         s.setDescSpecific(aTransItem.getDescSpecific());
                         int x = 0;
-                        x = new StockBean().addStock(s, aDiffHistNewQty);
+                        x = new StockBean().addStock(s, aDiffHistNewQtyBase);
                         s.setSpecific_size(aTransItem.getSpecific_size());
                         String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
                         new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), aTransItem.getTransactionItemId());
@@ -3378,24 +3367,16 @@ public class TransItemBean implements Serializable {
                         s.setBatchno(aTransItem.getBatchno());
                         s.setCodeSpecific(aTransItem.getCodeSpecific());
                         s.setDescSpecific(aTransItem.getDescSpecific());
-                        s.setCurrentqty(aDiffHistNewQty);
+                        s.setCurrentqty(aDiffHistNewQtyBase);
                         //get the last unit cost price
-                        long LatestTransItemId = 0;
-                        double LatestTransItemUnitCostPrice = 0;
-                        LatestTransItemId = this.getItemUnitCostPriceLatestTransItemId(9, 13, s.getStoreId(), s.getItemId(), s.getBatchno(), s.getCodeSpecific(), s.getDescSpecific());
-                        if (LatestTransItemId > 0) {
-                            try {
-                                LatestTransItemUnitCostPrice = this.getTransItem(LatestTransItemId).getUnitCostPrice();
-                            } catch (NullPointerException npe) {
-                                LatestTransItemUnitCostPrice = 0;
-                            }
-                        }
-                        if (LatestTransItemUnitCostPrice > 0) {
-                            s.setUnitCost(LatestTransItemUnitCostPrice);
+                        double UnitCostPrice = 0;
+                        //the asset interface uses unit_price for cost price
+                        if (transreason.getTransactionReasonId() == 29) {
+                            UnitCostPrice = aTransItem.getUnitPrice();
                         } else {
-                            s.setUnitCost(aTransItem.getUnitCostPrice());
+                            UnitCostPrice = aTransItem.getUnitCostPrice();
                         }
-
+                        s.setUnitCost(UnitCostPrice);
                         try {
                             s.setItemExpDate(aTransItem.getItemExpryDate());
                             s.setItemMnfDate(aTransItem.getItemMnfDate());
@@ -3430,7 +3411,7 @@ public class TransItemBean implements Serializable {
                         s.setCodeSpecific(aTransItem.getCodeSpecific());
                         s.setDescSpecific(aTransItem.getDescSpecific());
                         int x = 0;
-                        x = new StockBean().subtractStock(s, aDiffHistNewQty);
+                        x = new StockBean().subtractStock(s, aDiffHistNewQtyBase);
                         s.setSpecific_size(aTransItem.getSpecific_size());
                         String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
                         new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), aTransItem.getTransactionItemId());
@@ -3443,24 +3424,16 @@ public class TransItemBean implements Serializable {
                         s.setBatchno(aTransItem.getBatchno());
                         s.setCodeSpecific(aTransItem.getCodeSpecific());
                         s.setDescSpecific(aTransItem.getDescSpecific());
-                        s.setCurrentqty(-1 * aDiffHistNewQty);
+                        s.setCurrentqty(-1 * aDiffHistNewQtyBase);
                         //get the last unit cost price
-                        long LatestTransItemId = 0;
-                        double LatestTransItemUnitCostPrice = 0;
-                        LatestTransItemId = this.getItemUnitCostPriceLatestTransItemId(9, 13, s.getStoreId(), s.getItemId(), s.getBatchno(), s.getCodeSpecific(), s.getDescSpecific());
-                        if (LatestTransItemId > 0) {
-                            try {
-                                LatestTransItemUnitCostPrice = this.getTransItem(LatestTransItemId).getUnitCostPrice();
-                            } catch (NullPointerException npe) {
-                                LatestTransItemUnitCostPrice = 0;
-                            }
-                        }
-                        if (LatestTransItemUnitCostPrice > 0) {
-                            s.setUnitCost(LatestTransItemUnitCostPrice);
+                        double UnitCostPrice = 0;
+                        //the asset interface uses unit_price for cost price
+                        if (transreason.getTransactionReasonId() == 29) {
+                            UnitCostPrice = aTransItem.getUnitPrice();
                         } else {
-                            s.setUnitCost(aTransItem.getUnitCostPrice());
+                            UnitCostPrice = aTransItem.getUnitCostPrice();
                         }
-
+                        s.setUnitCost(UnitCostPrice);
                         try {
                             s.setItemExpDate(aTransItem.getItemExpryDate());
                             s.setItemMnfDate(aTransItem.getItemMnfDate());
@@ -3652,99 +3625,97 @@ public class TransItemBean implements Serializable {
             TransItem transitem = new TransItem();
             try {
                 transitem.setTransactionItemId(aResultSet.getLong("transaction_item_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setTransactionItemId(0);
             }
             try {
                 transitem.setTransactionId(aResultSet.getLong("transaction_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setTransactionId(0);
             }
             try {
                 transitem.setItemId(aResultSet.getLong("item_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setItemId(0);
             }
             try {
                 transitem.setBatchno(aResultSet.getString("batchno"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setBatchno("");
             }
             try {
                 transitem.setItemQty(aResultSet.getDouble("item_qty"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setItemQty(0);
             }
-
             try {
                 transitem.setUnitPrice(aResultSet.getDouble("unit_price"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setUnitPrice(0);
             }
-
             try {
                 transitem.setItemMnfDate(new Date(aResultSet.getDate("item_mnf_date").getTime()));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setItemMnfDate(null);
             }
             try {
                 transitem.setItemExpryDate(new Date(aResultSet.getDate("item_expiry_date").getTime()));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setItemExpryDate(null);
             }
             try {
                 transitem.setUnitTradeDiscount(aResultSet.getDouble("unit_trade_discount"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setUnitTradeDiscount(0);
             }
             try {
                 transitem.setUnitVat(aResultSet.getDouble("unit_vat"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setUnitVat(0);
             }
             try {
                 transitem.setAmount(aResultSet.getDouble("amount"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setAmount(0);
             }
             try {
                 transitem.setVatRated(aResultSet.getString("vat_rated"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setVatRated("");
             }
             try {
                 transitem.setVatPerc(aResultSet.getDouble("vat_perc"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setVatPerc(0);
             }
             try {
                 transitem.setUnitPriceIncVat(aResultSet.getDouble("unit_price_inc_vat"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setUnitPriceIncVat(0);
             }
             try {
                 transitem.setUnitPriceExcVat(aResultSet.getDouble("unit_price_exc_vat"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setUnitPriceExcVat(0);
             }
             try {
                 transitem.setAmountIncVat(aResultSet.getDouble("amount_inc_vat"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setAmountIncVat(0);
             }
             try {
                 transitem.setAmountExcVat(aResultSet.getDouble("amount_exc_vat"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setAmountExcVat(0);
             }
             try {
                 transitem.setStockEffect(aResultSet.getString("stock_effect"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setStockEffect("");
             }
             try {
                 transitem.setIsTradeDiscountVatLiable(aResultSet.getString("is_trade_discount_vat_liable"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setIsTradeDiscountVatLiable("");
             }
             try {
@@ -3879,32 +3850,32 @@ public class TransItemBean implements Serializable {
             }
             try {
                 transitem.setPurchaseDate(new Date(aResultSet.getDate("purchase_date").getTime()));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setPurchaseDate(null);
             }
             try {
                 transitem.setDepStartDate(new Date(aResultSet.getDate("dep_start_date").getTime()));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setDepStartDate(null);
             }
             try {
                 transitem.setDepMethodId(aResultSet.getInt("dep_method_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setDepMethodId(0);
             }
             try {
                 transitem.setDepRate(aResultSet.getDouble("dep_rate"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setDepRate(0);
             }
             try {
                 transitem.setAverageMethodId(aResultSet.getInt("average_method_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setAverageMethodId(0);
             }
             try {
                 transitem.setEffectiveLife(aResultSet.getInt("effective_life"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setEffectiveLife(0);
             }
             try {
@@ -3924,7 +3895,7 @@ public class TransItemBean implements Serializable {
             }
             try {
                 transitem.setDuration_value(aResultSet.getDouble("duration_value"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setDuration_value(0);
             }
             try {
@@ -3934,7 +3905,7 @@ public class TransItemBean implements Serializable {
             }
             try {
                 transitem.setDuration_passed(aResultSet.getDouble("duration_passed"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setDuration_passed(0);
             }
             try {
@@ -3943,7 +3914,7 @@ public class TransItemBean implements Serializable {
                 } else {
                     transitem.setSpecific_size(1);
                 }
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setSpecific_size(1);
             }
             try {
@@ -5487,27 +5458,27 @@ public class TransItemBean implements Serializable {
                 ti.setItem_no(i);
                 try {
                     ti.setAlias_name(rs.getString("alias_name"));
-                } catch (NullPointerException | SQLException npe) {
+                } catch (Exception e) {
                     ti.setAlias_name("");
                 }
                 try {
                     ti.setDisplay_alias_name(rs.getInt("display_alias_name"));
-                } catch (NullPointerException | SQLException npe) {
+                } catch (Exception e) {
                     ti.setDisplay_alias_name(0);
                 }
                 try {
                     ti.setOverride_gen_name(rs.getInt("override_gen_name"));
-                } catch (NullPointerException | SQLException npe) {
+                } catch (Exception e) {
                     ti.setOverride_gen_name(0);
                 }
                 try {
                     ti.setHide_unit_price_invoice(rs.getInt("hide_unit_price_invoice"));
-                } catch (NullPointerException | SQLException npe) {
+                } catch (Exception e) {
                     ti.setHide_unit_price_invoice(0);
                 }
                 try {
                     ti.setItemCode(rs.getString("item_code"));
-                } catch (NullPointerException | SQLException npe) {
+                } catch (Exception e) {
                     ti.setItemCode("");
                 }
                 tis.add(ti);

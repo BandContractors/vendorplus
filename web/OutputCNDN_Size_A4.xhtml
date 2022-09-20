@@ -100,7 +100,7 @@
                                     <h:outputLabel  style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;" value="#{ti.item_no}" escape="false"/>
                                 </td>
                                 <td style="text-align: left;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                    <h:outputLabel  style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;" value="#{transItemBean.showItemDescriptionCEC(ti)}" escape="false"/>
+                                    <h:outputLabel  style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;" value="#{transItemBean.showItemDescriptionCEC(ti)} (#{ti.unitSymbol})" escape="false"/>
                                 </td>
                                 <td style="text-align: right;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
                                     #{utilityBean.formatDoubleToString(ti.itemQty)}

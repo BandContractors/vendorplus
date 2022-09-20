@@ -120,6 +120,22 @@ public class TransItemExtBean implements Serializable {
         return newId;
     }
 
+    public int updateTransaction_item_unit(long aTransaction_item_id, double aBase_unit_qty) {
+        int success = 0;
+        String sql = "UPDATE transaction_item_unit SET base_unit_qty=? WHERE transaction_item_id=?";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
+            ps.setLong(1, aTransaction_item_id);
+            ps.setDouble(2, aBase_unit_qty);
+            ps.executeUpdate();
+            success = 1;
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return success;
+    }
+
     public void insertTransaction_item_cr_dr_note_unit(Transaction_item_cr_dr_note_unit aTransaction_item_cr_dr_note_unit) {
         String sql = "INSERT INTO transaction_item_cr_dr_note_unit"
                 + "(transaction_item_id,unit_id,base_unit_qty)"

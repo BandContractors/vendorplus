@@ -82,7 +82,7 @@
                                     <h:outputLabel style="font-size: 10px;" value="#{ti.itemQty}">
                                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                     </h:outputLabel>
-                                    <h:outputLabel style="font-size: 10px;" value="#{unitBean.getUnit(itemBean.getItem(ti.itemId).unitId).unitSymbol}"/>
+                                    <h:outputLabel style="font-size: 10px;" value="#{ti.unitSymbol}"/>
                                 </h:column>
                             </h:dataTable>
                         </h:panelGrid>
