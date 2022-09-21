@@ -2604,45 +2604,45 @@ public class TransItemBean implements Serializable {
         }
     }
     /*
-    public boolean updateTransItems(long aTransactionId, long aTransactionHistId, List<TransItem> aNewTransItems) {
-        try {
-            //get trans items that was moved to the history table
-            List<TransItem> aHistTransItems = new ArrayList<TransItem>();
-            this.setTransItemsHistoryByIDs(aTransactionId, aTransactionHistId, aHistTransItems);
+     public boolean updateTransItems(long aTransactionId, long aTransactionHistId, List<TransItem> aNewTransItems) {
+     try {
+     //get trans items that was moved to the history table
+     List<TransItem> aHistTransItems = new ArrayList<TransItem>();
+     this.setTransItemsHistoryByIDs(aTransactionId, aTransactionHistId, aHistTransItems);
 
-            //1. Reverse and update all trans items whoose qty has changed
-            int NewListItemIndex = 0;
-            int HistListItemIndex = 0;
-            int NewListItemNo = aNewTransItems.size();
-            int HistListItemNo = aHistTransItems.size();
-            double aDiffHistNewQty = 0;
-            TransItem nti = new TransItem();
-            TransItem hti = new TransItem();
-            while (NewListItemIndex < NewListItemNo) {
-                HistListItemIndex = 0;
-                hti = aHistTransItems.get(HistListItemIndex);
-                while (HistListItemIndex < HistListItemNo) {
-                    nti = aNewTransItems.get(NewListItemIndex);
-                    if (nti.getItemId() == hti.getItemId() && nti.getBatchno().equals(hti.getBatchno()) && (nti.getCodeSpecific() == null ? hti.getCodeSpecific() == null : nti.getCodeSpecific().equals(hti.getCodeSpecific())) && (nti.getDescSpecific() == null ? hti.getDescSpecific() == null : nti.getDescSpecific().equals(hti.getDescSpecific()))) {
-                        aDiffHistNewQty = hti.getItemQty() - nti.getItemQty();
-                        break;
-                    }
-                    HistListItemIndex = HistListItemIndex + 1;
-                }
-                //2. Reverse and update individual trans item whoose qty has changed
-                if (aDiffHistNewQty > 0 || aDiffHistNewQty < 0) {
-                    this.reverseTransItem(nti, aDiffHistNewQty);
-                    this.updateTransItem(nti);
-                }
-                NewListItemIndex = NewListItemIndex + 1;
-            }
-            return true;
-        } catch (Exception e) {
-            LOGGER.log(Level.ERROR, e);
-            return false;
-        }
-    }
-    */
+     //1. Reverse and update all trans items whoose qty has changed
+     int NewListItemIndex = 0;
+     int HistListItemIndex = 0;
+     int NewListItemNo = aNewTransItems.size();
+     int HistListItemNo = aHistTransItems.size();
+     double aDiffHistNewQty = 0;
+     TransItem nti = new TransItem();
+     TransItem hti = new TransItem();
+     while (NewListItemIndex < NewListItemNo) {
+     HistListItemIndex = 0;
+     hti = aHistTransItems.get(HistListItemIndex);
+     while (HistListItemIndex < HistListItemNo) {
+     nti = aNewTransItems.get(NewListItemIndex);
+     if (nti.getItemId() == hti.getItemId() && nti.getBatchno().equals(hti.getBatchno()) && (nti.getCodeSpecific() == null ? hti.getCodeSpecific() == null : nti.getCodeSpecific().equals(hti.getCodeSpecific())) && (nti.getDescSpecific() == null ? hti.getDescSpecific() == null : nti.getDescSpecific().equals(hti.getDescSpecific()))) {
+     aDiffHistNewQty = hti.getItemQty() - nti.getItemQty();
+     break;
+     }
+     HistListItemIndex = HistListItemIndex + 1;
+     }
+     //2. Reverse and update individual trans item whoose qty has changed
+     if (aDiffHistNewQty > 0 || aDiffHistNewQty < 0) {
+     this.reverseTransItem(nti, aDiffHistNewQty);
+     this.updateTransItem(nti);
+     }
+     NewListItemIndex = NewListItemIndex + 1;
+     }
+     return true;
+     } catch (Exception e) {
+     LOGGER.log(Level.ERROR, e);
+     return false;
+     }
+     }
+     */
 
     public boolean updateTransItemsV2(long aTransactionId, long aTransactionHistId, List<TransItem> aNewTransItems) {
         try {
@@ -2738,224 +2738,224 @@ public class TransItemBean implements Serializable {
         }
     }
     /*
-    public boolean reverseTransItemsCEC(Trans aOldTrans, Trans aNewTrans, List<TransItem> aOldTransItems, List<TransItem> aNewTransItems) {
-        try {
-            //1. Reverse and update all trans items whoose qty has changed
-            int NewListItemIndex = 0;
-            int HistListItemIndex = 0;
-            int NewListItemNo = aNewTransItems.size();
-            int HistListItemNo = aOldTransItems.size();
-            double aDiffHistNewQty = 0;
-            double aDiffHistNewQty_damage = 0;
-            TransItem nti = new TransItem();
-            TransItem hti = new TransItem();
-            while (NewListItemIndex < NewListItemNo) {
-                HistListItemIndex = 0;
-                aDiffHistNewQty = 0;
-                aDiffHistNewQty_damage = 0;
-                //hti = aOldTransItems.get(HistListItemIndex);
-                nti = aNewTransItems.get(NewListItemIndex);
-                while (HistListItemIndex < HistListItemNo) {
-                    //nti = aNewTransItems.get(NewListItemIndex);
-                    hti = aOldTransItems.get(HistListItemIndex);
-                    if (nti.getItemId() == hti.getItemId() && nti.getBatchno().equals(hti.getBatchno()) && (nti.getCodeSpecific() == null ? hti.getCodeSpecific() == null : nti.getCodeSpecific().equals(hti.getCodeSpecific())) && (nti.getDescSpecific() == null ? hti.getDescSpecific() == null : nti.getDescSpecific().equals(hti.getDescSpecific()))) {
-                        aDiffHistNewQty = hti.getItemQty() - nti.getItemQty();
-                        aDiffHistNewQty_damage = hti.getQty_damage() - nti.getQty_damage();
-                        break;
-                    }
-                    HistListItemIndex = HistListItemIndex + 1;
-                }
-                //2. Reverse and update individual trans item whoose qty has changed
-                if (aDiffHistNewQty > 0 || aDiffHistNewQty < 0 || aDiffHistNewQty_damage > 0 || aDiffHistNewQty_damage < 0) {
-                    //Trans t = new TransBean().getTrans(aTransactionId);
-                    if (aOldTrans.getTransactionTypeId() == 2 && aOldTrans.getStore2Id() > 0) {//Invoice with Store2Id -- for order sent to
-                        this.reverseTransItemCEC(aOldTrans.getStore2Id(), aOldTrans.getTransactionTypeId(), aOldTrans.getTransactionReasonId(), "", nti, aDiffHistNewQty, aDiffHistNewQty_damage);
-                    } else {
-                        this.reverseTransItemCEC(aOldTrans.getStoreId(), aOldTrans.getTransactionTypeId(), aOldTrans.getTransactionReasonId(), "", nti, aDiffHistNewQty, aDiffHistNewQty_damage);
-                    }
-                    //this.updateTransItemCEC(nti);
-                }
-                NewListItemIndex = NewListItemIndex + 1;
-            }
-            return true;
-        } catch (Exception e) {
-            LOGGER.log(Level.ERROR, e);
-            return false;
-        }
-    }
+     public boolean reverseTransItemsCEC(Trans aOldTrans, Trans aNewTrans, List<TransItem> aOldTransItems, List<TransItem> aNewTransItems) {
+     try {
+     //1. Reverse and update all trans items whoose qty has changed
+     int NewListItemIndex = 0;
+     int HistListItemIndex = 0;
+     int NewListItemNo = aNewTransItems.size();
+     int HistListItemNo = aOldTransItems.size();
+     double aDiffHistNewQty = 0;
+     double aDiffHistNewQty_damage = 0;
+     TransItem nti = new TransItem();
+     TransItem hti = new TransItem();
+     while (NewListItemIndex < NewListItemNo) {
+     HistListItemIndex = 0;
+     aDiffHistNewQty = 0;
+     aDiffHistNewQty_damage = 0;
+     //hti = aOldTransItems.get(HistListItemIndex);
+     nti = aNewTransItems.get(NewListItemIndex);
+     while (HistListItemIndex < HistListItemNo) {
+     //nti = aNewTransItems.get(NewListItemIndex);
+     hti = aOldTransItems.get(HistListItemIndex);
+     if (nti.getItemId() == hti.getItemId() && nti.getBatchno().equals(hti.getBatchno()) && (nti.getCodeSpecific() == null ? hti.getCodeSpecific() == null : nti.getCodeSpecific().equals(hti.getCodeSpecific())) && (nti.getDescSpecific() == null ? hti.getDescSpecific() == null : nti.getDescSpecific().equals(hti.getDescSpecific()))) {
+     aDiffHistNewQty = hti.getItemQty() - nti.getItemQty();
+     aDiffHistNewQty_damage = hti.getQty_damage() - nti.getQty_damage();
+     break;
+     }
+     HistListItemIndex = HistListItemIndex + 1;
+     }
+     //2. Reverse and update individual trans item whoose qty has changed
+     if (aDiffHistNewQty > 0 || aDiffHistNewQty < 0 || aDiffHistNewQty_damage > 0 || aDiffHistNewQty_damage < 0) {
+     //Trans t = new TransBean().getTrans(aTransactionId);
+     if (aOldTrans.getTransactionTypeId() == 2 && aOldTrans.getStore2Id() > 0) {//Invoice with Store2Id -- for order sent to
+     this.reverseTransItemCEC(aOldTrans.getStore2Id(), aOldTrans.getTransactionTypeId(), aOldTrans.getTransactionReasonId(), "", nti, aDiffHistNewQty, aDiffHistNewQty_damage);
+     } else {
+     this.reverseTransItemCEC(aOldTrans.getStoreId(), aOldTrans.getTransactionTypeId(), aOldTrans.getTransactionReasonId(), "", nti, aDiffHistNewQty, aDiffHistNewQty_damage);
+     }
+     //this.updateTransItemCEC(nti);
+     }
+     NewListItemIndex = NewListItemIndex + 1;
+     }
+     return true;
+     } catch (Exception e) {
+     LOGGER.log(Level.ERROR, e);
+     return false;
+     }
+     }
 
-    public void reverseTransItem(TransItem transitem, double aDiffHistNewQty) {
-        String sql = null;
-        String sql2 = null;
-        StockBean StkBean = new StockBean();
-        Stock Stk = new Stock();
+     public void reverseTransItem(TransItem transitem, double aDiffHistNewQty) {
+     String sql = null;
+     String sql2 = null;
+     StockBean StkBean = new StockBean();
+     Stock Stk = new Stock();
 
-        if (transitem.getTransactionItemId() == 0 || new ItemBean().getItem(transitem.getItemId()).getItemType().equals("SERVICE")) {
-            //do nothing
-        } else {
-            //1. reverse stock
-            Stk = StkBean.getStock(new GeneralUserSetting().getCurrentStore().getStoreId(), transitem.getItemId(), transitem.getBatchno(), transitem.getCodeSpecific(), transitem.getDescSpecific());
-            //for additive transactions, if diff is +ve, subtract; if diff is -ve Add
-            //originally "PURCHASE INVOICE" but changed to "ITEM RECEIVED"
-            if ("ITEM RECEIVED".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
-                if (aDiffHistNewQty > 0) {
-                    //subtract stock
-                    if (Stk != null) {
-                        //update/subtract
-                        sql2 = "{call sp_subtract_stock_by_store_item_batch(?,?,?,?)}";
-                        try (
-                                Connection conn2 = DBConnection.getMySQLConnection();
-                                CallableStatement cs2 = conn2.prepareCall(sql2);) {
-                            cs2.setInt("in_store_id", new GeneralUserSetting().getCurrentStore().getStoreId());
-                            cs2.setLong("in_item_id", transitem.getItemId());
-                            cs2.setString("in_batchno", transitem.getBatchno());
-                            cs2.setDouble("in_qty", aDiffHistNewQty);
-                            cs2.executeUpdate();
-                        } catch (Exception e) {
-                            LOGGER.log(Level.ERROR, e);
-                        }
-                    } else {
-                        //insert
-                        Stock stk = new Stock();
-                        stk.setStoreId(new GeneralUserSetting().getCurrentStore().getStoreId());
-                        stk.setItemId(transitem.getItemId());
-                        stk.setBatchno(transitem.getBatchno());
-                        stk.setCurrentqty(-1 * aDiffHistNewQty);
-                        stk.setItemExpDate(transitem.getItemExpryDate());
-                        stk.setItemMnfDate(transitem.getItemMnfDate());
+     if (transitem.getTransactionItemId() == 0 || new ItemBean().getItem(transitem.getItemId()).getItemType().equals("SERVICE")) {
+     //do nothing
+     } else {
+     //1. reverse stock
+     Stk = StkBean.getStock(new GeneralUserSetting().getCurrentStore().getStoreId(), transitem.getItemId(), transitem.getBatchno(), transitem.getCodeSpecific(), transitem.getDescSpecific());
+     //for additive transactions, if diff is +ve, subtract; if diff is -ve Add
+     //originally "PURCHASE INVOICE" but changed to "ITEM RECEIVED"
+     if ("ITEM RECEIVED".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
+     if (aDiffHistNewQty > 0) {
+     //subtract stock
+     if (Stk != null) {
+     //update/subtract
+     sql2 = "{call sp_subtract_stock_by_store_item_batch(?,?,?,?)}";
+     try (
+     Connection conn2 = DBConnection.getMySQLConnection();
+     CallableStatement cs2 = conn2.prepareCall(sql2);) {
+     cs2.setInt("in_store_id", new GeneralUserSetting().getCurrentStore().getStoreId());
+     cs2.setLong("in_item_id", transitem.getItemId());
+     cs2.setString("in_batchno", transitem.getBatchno());
+     cs2.setDouble("in_qty", aDiffHistNewQty);
+     cs2.executeUpdate();
+     } catch (Exception e) {
+     LOGGER.log(Level.ERROR, e);
+     }
+     } else {
+     //insert
+     Stock stk = new Stock();
+     stk.setStoreId(new GeneralUserSetting().getCurrentStore().getStoreId());
+     stk.setItemId(transitem.getItemId());
+     stk.setBatchno(transitem.getBatchno());
+     stk.setCurrentqty(-1 * aDiffHistNewQty);
+     stk.setItemExpDate(transitem.getItemExpryDate());
+     stk.setItemMnfDate(transitem.getItemMnfDate());
 
-                    }
+     }
 
-                } else if (aDiffHistNewQty < 0) {
-                    //add stock
-                    aDiffHistNewQty = (-1) * aDiffHistNewQty;//remove the -ve from the quantity
-                    if (Stk != null) {
-                        //update/add
-                        sql2 = "{call sp_add_stock_by_store_item_batch(?,?,?,?)}";
-                        try (
-                                Connection conn2 = DBConnection.getMySQLConnection();
-                                CallableStatement cs2 = conn2.prepareCall(sql2);) {
-                            cs2.setInt("in_store_id", new GeneralUserSetting().getCurrentStore().getStoreId());
-                            cs2.setLong("in_item_id", transitem.getItemId());
-                            cs2.setString("in_batchno", transitem.getBatchno());
-                            cs2.setDouble("in_qty", aDiffHistNewQty);
-                            cs2.executeUpdate();
-                        } catch (Exception e) {
-                            LOGGER.log(Level.ERROR, e);
-                        }
-                    } else {
-                        //insert
-                        sql2 = "{call sp_insert_stock(?,?,?,?,?,?)}";
-                        try (
-                                Connection conn2 = DBConnection.getMySQLConnection();
-                                CallableStatement cs2 = conn2.prepareCall(sql2);) {
-                            cs2.setInt("in_store_id", new GeneralUserSetting().getCurrentStore().getStoreId());
-                            cs2.setLong("in_item_id", transitem.getItemId());
-                            cs2.setString("in_batchno", transitem.getBatchno());
-                            cs2.setDouble("in_currentqty", aDiffHistNewQty);
-                            try {
-                                cs2.setDate("in_item_exp_date", new java.sql.Date(transitem.getItemExpryDate().getTime()));
-                                cs2.setDate("in_item_mnf_date", new java.sql.Date(transitem.getItemMnfDate().getTime()));
-                            } catch (NullPointerException npe) {
-                                cs2.setDate("in_item_exp_date", null);
-                                cs2.setDate("in_item_mnf_date", null);
-                            }
-                            cs2.executeUpdate();
-                        } catch (Exception e) {
-                            LOGGER.log(Level.ERROR, e);
-                        }
-                    }
-                }
+     } else if (aDiffHistNewQty < 0) {
+     //add stock
+     aDiffHistNewQty = (-1) * aDiffHistNewQty;//remove the -ve from the quantity
+     if (Stk != null) {
+     //update/add
+     sql2 = "{call sp_add_stock_by_store_item_batch(?,?,?,?)}";
+     try (
+     Connection conn2 = DBConnection.getMySQLConnection();
+     CallableStatement cs2 = conn2.prepareCall(sql2);) {
+     cs2.setInt("in_store_id", new GeneralUserSetting().getCurrentStore().getStoreId());
+     cs2.setLong("in_item_id", transitem.getItemId());
+     cs2.setString("in_batchno", transitem.getBatchno());
+     cs2.setDouble("in_qty", aDiffHistNewQty);
+     cs2.executeUpdate();
+     } catch (Exception e) {
+     LOGGER.log(Level.ERROR, e);
+     }
+     } else {
+     //insert
+     sql2 = "{call sp_insert_stock(?,?,?,?,?,?)}";
+     try (
+     Connection conn2 = DBConnection.getMySQLConnection();
+     CallableStatement cs2 = conn2.prepareCall(sql2);) {
+     cs2.setInt("in_store_id", new GeneralUserSetting().getCurrentStore().getStoreId());
+     cs2.setLong("in_item_id", transitem.getItemId());
+     cs2.setString("in_batchno", transitem.getBatchno());
+     cs2.setDouble("in_currentqty", aDiffHistNewQty);
+     try {
+     cs2.setDate("in_item_exp_date", new java.sql.Date(transitem.getItemExpryDate().getTime()));
+     cs2.setDate("in_item_mnf_date", new java.sql.Date(transitem.getItemMnfDate().getTime()));
+     } catch (NullPointerException npe) {
+     cs2.setDate("in_item_exp_date", null);
+     cs2.setDate("in_item_mnf_date", null);
+     }
+     cs2.executeUpdate();
+     } catch (Exception e) {
+     LOGGER.log(Level.ERROR, e);
+     }
+     }
+     }
 
-            }
+     }
 
-            if ("SALE INVOICE".equals(new GeneralUserSetting().getCurrentTransactionTypeName()) || "DISPOSE STOCK".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
-                if (aDiffHistNewQty > 0) {
-                    //add stock
-                    if (Stk != null) {
-                        //update/add
-                        sql2 = "{call sp_add_stock_by_store_item_batch(?,?,?,?)}";
-                        try (
-                                Connection conn2 = DBConnection.getMySQLConnection();
-                                CallableStatement cs2 = conn2.prepareCall(sql2);) {
-                            cs2.setInt("in_store_id", new GeneralUserSetting().getCurrentStore().getStoreId());
-                            cs2.setLong("in_item_id", transitem.getItemId());
-                            cs2.setString("in_batchno", transitem.getBatchno());
-                            cs2.setDouble("in_qty", aDiffHistNewQty);
-                            cs2.executeUpdate();
-                        } catch (Exception e) {
-                            LOGGER.log(Level.ERROR, e);
-                        }
-                    } else {
-                        //insert
-                        sql2 = "{call sp_insert_stock(?,?,?,?,?,?)}";
-                        try (
-                                Connection conn2 = DBConnection.getMySQLConnection();
-                                CallableStatement cs2 = conn2.prepareCall(sql2);) {
-                            cs2.setInt("in_store_id", new GeneralUserSetting().getCurrentStore().getStoreId());
-                            cs2.setLong("in_item_id", transitem.getItemId());
-                            cs2.setString("in_batchno", transitem.getBatchno());
-                            cs2.setDouble("in_currentqty", aDiffHistNewQty);
-                            try {
-                                cs2.setDate("in_item_exp_date", new java.sql.Date(transitem.getItemExpryDate().getTime()));
-                                cs2.setDate("in_item_mnf_date", new java.sql.Date(transitem.getItemMnfDate().getTime()));
-                            } catch (NullPointerException npe) {
-                                cs2.setDate("in_item_exp_date", null);
-                                cs2.setDate("in_item_mnf_date", null);
-                            }
-                            cs2.executeUpdate();
-                        } catch (Exception e) {
-                            LOGGER.log(Level.ERROR, e);
-                        }
-                    }
-                } else if (aDiffHistNewQty < 0) {
-                    //subtract stock
-                    aDiffHistNewQty = (-1) * aDiffHistNewQty;//remove the -ve from the quantity
+     if ("SALE INVOICE".equals(new GeneralUserSetting().getCurrentTransactionTypeName()) || "DISPOSE STOCK".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
+     if (aDiffHistNewQty > 0) {
+     //add stock
+     if (Stk != null) {
+     //update/add
+     sql2 = "{call sp_add_stock_by_store_item_batch(?,?,?,?)}";
+     try (
+     Connection conn2 = DBConnection.getMySQLConnection();
+     CallableStatement cs2 = conn2.prepareCall(sql2);) {
+     cs2.setInt("in_store_id", new GeneralUserSetting().getCurrentStore().getStoreId());
+     cs2.setLong("in_item_id", transitem.getItemId());
+     cs2.setString("in_batchno", transitem.getBatchno());
+     cs2.setDouble("in_qty", aDiffHistNewQty);
+     cs2.executeUpdate();
+     } catch (Exception e) {
+     LOGGER.log(Level.ERROR, e);
+     }
+     } else {
+     //insert
+     sql2 = "{call sp_insert_stock(?,?,?,?,?,?)}";
+     try (
+     Connection conn2 = DBConnection.getMySQLConnection();
+     CallableStatement cs2 = conn2.prepareCall(sql2);) {
+     cs2.setInt("in_store_id", new GeneralUserSetting().getCurrentStore().getStoreId());
+     cs2.setLong("in_item_id", transitem.getItemId());
+     cs2.setString("in_batchno", transitem.getBatchno());
+     cs2.setDouble("in_currentqty", aDiffHistNewQty);
+     try {
+     cs2.setDate("in_item_exp_date", new java.sql.Date(transitem.getItemExpryDate().getTime()));
+     cs2.setDate("in_item_mnf_date", new java.sql.Date(transitem.getItemMnfDate().getTime()));
+     } catch (NullPointerException npe) {
+     cs2.setDate("in_item_exp_date", null);
+     cs2.setDate("in_item_mnf_date", null);
+     }
+     cs2.executeUpdate();
+     } catch (Exception e) {
+     LOGGER.log(Level.ERROR, e);
+     }
+     }
+     } else if (aDiffHistNewQty < 0) {
+     //subtract stock
+     aDiffHistNewQty = (-1) * aDiffHistNewQty;//remove the -ve from the quantity
 
-                    if (Stk != null) {
-                        //update/subtract
-                        sql2 = "{call sp_subtract_stock_by_store_item_batch(?,?,?,?)}";
-                        try (
-                                Connection conn2 = DBConnection.getMySQLConnection();
-                                CallableStatement cs2 = conn2.prepareCall(sql2);) {
-                            cs2.setInt("in_store_id", new GeneralUserSetting().getCurrentStore().getStoreId());
-                            cs2.setLong("in_item_id", transitem.getItemId());
-                            cs2.setString("in_batchno", transitem.getBatchno());
-                            cs2.setDouble("in_qty", aDiffHistNewQty);
-                            cs2.executeUpdate();
-                        } catch (Exception e) {
-                            LOGGER.log(Level.ERROR, e);
-                        }
-                    } else {
-                        //insert
-                        sql2 = "{call sp_insert_stock(?,?,?,?,?,?)}";
-                        try (
-                                Connection conn2 = DBConnection.getMySQLConnection();
-                                CallableStatement cs2 = conn2.prepareCall(sql2);) {
-                            cs2.setInt("in_store_id", new GeneralUserSetting().getCurrentStore().getStoreId());
-                            cs2.setLong("in_item_id", transitem.getItemId());
-                            cs2.setString("in_batchno", transitem.getBatchno());
-                            cs2.setDouble("in_currentqty", (-1 * aDiffHistNewQty));
-                            try {
-                                cs2.setDate("in_item_exp_date", new java.sql.Date(transitem.getItemExpryDate().getTime()));
-                                cs2.setDate("in_item_mnf_date", new java.sql.Date(transitem.getItemMnfDate().getTime()));
-                            } catch (NullPointerException npe) {
-                                cs2.setDate("in_item_exp_date", null);
-                                cs2.setDate("in_item_mnf_date", null);
-                            }
-                            cs2.executeUpdate();
-                        } catch (Exception e) {
-                            LOGGER.log(Level.ERROR, e);
-                        }
-                    }
-                }
+     if (Stk != null) {
+     //update/subtract
+     sql2 = "{call sp_subtract_stock_by_store_item_batch(?,?,?,?)}";
+     try (
+     Connection conn2 = DBConnection.getMySQLConnection();
+     CallableStatement cs2 = conn2.prepareCall(sql2);) {
+     cs2.setInt("in_store_id", new GeneralUserSetting().getCurrentStore().getStoreId());
+     cs2.setLong("in_item_id", transitem.getItemId());
+     cs2.setString("in_batchno", transitem.getBatchno());
+     cs2.setDouble("in_qty", aDiffHistNewQty);
+     cs2.executeUpdate();
+     } catch (Exception e) {
+     LOGGER.log(Level.ERROR, e);
+     }
+     } else {
+     //insert
+     sql2 = "{call sp_insert_stock(?,?,?,?,?,?)}";
+     try (
+     Connection conn2 = DBConnection.getMySQLConnection();
+     CallableStatement cs2 = conn2.prepareCall(sql2);) {
+     cs2.setInt("in_store_id", new GeneralUserSetting().getCurrentStore().getStoreId());
+     cs2.setLong("in_item_id", transitem.getItemId());
+     cs2.setString("in_batchno", transitem.getBatchno());
+     cs2.setDouble("in_currentqty", (-1 * aDiffHistNewQty));
+     try {
+     cs2.setDate("in_item_exp_date", new java.sql.Date(transitem.getItemExpryDate().getTime()));
+     cs2.setDate("in_item_mnf_date", new java.sql.Date(transitem.getItemMnfDate().getTime()));
+     } catch (NullPointerException npe) {
+     cs2.setDate("in_item_exp_date", null);
+     cs2.setDate("in_item_mnf_date", null);
+     }
+     cs2.executeUpdate();
+     } catch (Exception e) {
+     LOGGER.log(Level.ERROR, e);
+     }
+     }
+     }
 
-            }
-            StkBean = null;
-            Stk = null;
-        }
-    }
-    */
+     }
+     StkBean = null;
+     Stk = null;
+     }
+     }
+     */
 
     public void reverseTransItemV2(TransactionType aTransType, TransactionReason aTransReason, TransItem aTransItem, double aDiffHistNewQty) {
         String sql = null;
@@ -3339,7 +3339,6 @@ public class TransItemBean implements Serializable {
                         new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), aTransItem.getTransactionItemId());
                     }
                 }
-
             }
 
             if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "DISPOSE STOCK".equals(transtype.getTransactionTypeName()) || "GOODS DELIVERY".equals(transtype.getTransactionTypeName()) || "STOCK CONSUMPTION".equals(transtype.getTransactionTypeName())) {
@@ -3402,6 +3401,7 @@ public class TransItemBean implements Serializable {
                 } else if (aDiffHistNewQty < 0) {
                     //subtract stock
                     aDiffHistNewQty = (-1) * aDiffHistNewQty;//remove the -ve from the quantity
+                    aDiffHistNewQtyBase = (-1) * aDiffHistNewQtyBase;
                     if (Stk != null) {
                         //update/subtract
                         Stock s = new Stock();

@@ -3734,15 +3734,17 @@ public class TransBean implements Serializable {
             }
 
             //Update by Reversing trans items qty differences
-            TransItemBean tib = new TransItemBean();
-            if (aTransTypeId == 76) {//Open Balance
-                if (tib.updateTransItemCECOpenBalance(aNewTransItems.get(0)) == 1) {
-                    isTransItemReverseSuccess = true;
+            if (isTransItemCopySuccess) {
+                TransItemBean tib = new TransItemBean();
+                if (aTransTypeId == 76) {//Open Balance
+                    if (tib.updateTransItemCECOpenBalance(aNewTransItems.get(0)) == 1) {
+                        isTransItemReverseSuccess = true;
+                    } else {
+                        isTransItemReverseSuccess = false;
+                    }
                 } else {
-                    isTransItemReverseSuccess = false;
+                    isTransItemReverseSuccess = tib.updateTransItemsCEC(aNewTrans.getTransactionId(), TransHistId, aNewTransItems);
                 }
-            } else {
-                isTransItemReverseSuccess = tib.updateTransItemsCEC(aNewTrans.getTransactionId(), TransHistId, aNewTransItems);
             }
             //update trans
             if (isTransCopySuccess && isTransItemCopySuccess && isTransItemReverseSuccess) {

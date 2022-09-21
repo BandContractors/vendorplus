@@ -1161,8 +1161,8 @@ public class CreditDebitNoteBean implements Serializable {
                 Stock Stk = new Stock();
                 Stk = StkBean.getStock(aTransCrDr.getStoreId(), aTransItemCrDr.getItemId(), aTransItemCrDr.getBatchno(), aTransItemCrDr.getCodeSpecific(), aTransItemCrDr.getDescSpecific());
                 double UnitCostPrice = 0;
-                //add stock if qty is negative (-)
-                if (aTransItemCrDr.getItemQty() < 0) {
+                //stock change (previous-current) is positive (+):add(+)
+                if (aTransItemCrDr.getItemQty() > 0) {
                     if (Stk != null) {
                         //update
                         Stock stock = new Stock();
@@ -1174,10 +1174,10 @@ public class CreditDebitNoteBean implements Serializable {
                         stock.setDescSpecific(aTransItemCrDr.getDescSpecific());
                         UnitCostPrice = aTransItemCrDr.getUnitCostPrice();
                         stock.setUnitCost(UnitCostPrice);
-                        i = new StockBean().addStock(stock, (-1)*aTransItemCrDr.getBase_unit_qty());
+                        i = new StockBean().addStock(stock, aTransItemCrDr.getBase_unit_qty());
                         stock.setSpecific_size(aTransItemCrDr.getSpecific_size());
                         String TableName = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, (-1)*aTransItemCrDr.getItemQty(), "Add", aTransCrDr.getTransactionTypeId(), aTransCrDr.getTransactionId(), aTransCrDr.getAddUserDetailId(), aTransItemCrDr.getTransactionItemId());
+                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, aTransItemCrDr.getItemQty(), "Add", aTransCrDr.getTransactionTypeId(), aTransCrDr.getTransactionId(), aTransCrDr.getAddUserDetailId(), aTransItemCrDr.getTransactionItemId());
                     } else {
                         //insert
                         Stock stock = new Stock();
@@ -1188,7 +1188,7 @@ public class CreditDebitNoteBean implements Serializable {
                         stock.setCodeSpecific(aTransItemCrDr.getCodeSpecific());
                         stock.setDescSpecific(aTransItemCrDr.getDescSpecific());
                         stock.setDescMore(aTransItemCrDr.getDescMore());
-                        stock.setCurrentqty((-1)*aTransItemCrDr.getBase_unit_qty());
+                        stock.setCurrentqty(aTransItemCrDr.getBase_unit_qty());
                         stock.setItemMnfDate(aTransItemCrDr.getItemMnfDate());
                         stock.setItemExpDate(aTransItemCrDr.getItemExpryDate());
                         UnitCostPrice = aTransItemCrDr.getUnitCostPrice();
@@ -1208,10 +1208,10 @@ public class CreditDebitNoteBean implements Serializable {
                         stock.setSpecific_size(aTransItemCrDr.getSpecific_size());
                         i = new StockBean().saveStock(stock);
                         String TableName = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, (-1)*aTransItemCrDr.getItemQty(), "Add", aTransCrDr.getTransactionTypeId(), aTransCrDr.getTransactionId(), aTransCrDr.getAddUserDetailId(), aTransItemCrDr.getTransactionItemId());
+                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, aTransItemCrDr.getItemQty(), "Add", aTransCrDr.getTransactionTypeId(), aTransCrDr.getTransactionId(), aTransCrDr.getAddUserDetailId(), aTransItemCrDr.getTransactionItemId());
                     }
-                //subtract stock if qty is positive (+)
-                } else if (aTransItemCrDr.getItemQty() > 0) {
+                    //stock change (previous-current) is negative (-):subtract(-)
+                } else if (aTransItemCrDr.getItemQty() < 0) {
                     if (Stk != null) {
                         //update
                         Stock stock = new Stock();
@@ -1223,10 +1223,10 @@ public class CreditDebitNoteBean implements Serializable {
                         stock.setDescSpecific(aTransItemCrDr.getDescSpecific());
                         UnitCostPrice = aTransItemCrDr.getUnitCostPrice();
                         stock.setUnitCost(UnitCostPrice);
-                        i = new StockBean().subtractStock(stock, aTransItemCrDr.getBase_unit_qty());
+                        i = new StockBean().subtractStock(stock, (-1) * aTransItemCrDr.getBase_unit_qty());
                         stock.setSpecific_size(aTransItemCrDr.getSpecific_size());
                         String TableName = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", stock, aTransItemCrDr.getItemQty(), "Add", aTransCrDr.getTransactionTypeId(), aTransCrDr.getTransactionId(), aTransCrDr.getAddUserDetailId(), aTransItemCrDr.getTransactionItemId());
+                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", stock, (-1) * aTransItemCrDr.getItemQty(), "Add", aTransCrDr.getTransactionTypeId(), aTransCrDr.getTransactionId(), aTransCrDr.getAddUserDetailId(), aTransItemCrDr.getTransactionItemId());
                     } else {
                         //insert
                         Stock stock = new Stock();
@@ -1237,7 +1237,7 @@ public class CreditDebitNoteBean implements Serializable {
                         stock.setCodeSpecific(aTransItemCrDr.getCodeSpecific());
                         stock.setDescSpecific(aTransItemCrDr.getDescSpecific());
                         stock.setDescMore(aTransItemCrDr.getDescMore());
-                        stock.setCurrentqty((-1)*aTransItemCrDr.getBase_unit_qty());
+                        stock.setCurrentqty(aTransItemCrDr.getBase_unit_qty());
                         stock.setItemMnfDate(aTransItemCrDr.getItemMnfDate());
                         stock.setItemExpDate(aTransItemCrDr.getItemExpryDate());
                         UnitCostPrice = aTransItemCrDr.getUnitCostPrice();
@@ -1257,7 +1257,7 @@ public class CreditDebitNoteBean implements Serializable {
                         stock.setSpecific_size(aTransItemCrDr.getSpecific_size());
                         i = new StockBean().saveStock(stock);
                         String TableName = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", stock, aTransItemCrDr.getItemQty(), "Add", aTransCrDr.getTransactionTypeId(), aTransCrDr.getTransactionId(), aTransCrDr.getAddUserDetailId(), aTransItemCrDr.getTransactionItemId());
+                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, aTransItemCrDr.getItemQty(), "Add", aTransCrDr.getTransactionTypeId(), aTransCrDr.getTransactionId(), aTransCrDr.getAddUserDetailId(), aTransItemCrDr.getTransactionItemId());
                     }
                 }
                 StkBean = null;

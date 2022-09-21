@@ -8215,7 +8215,7 @@ BEGIN
     
     INSERT INTO transaction_item_hist_unit(transaction_item_hist_id,unit_id,base_unit_qty) 
 	SELECT @new_id,unit_id,base_unit_qty   
-	FROM transaction_item_unit WHERE transaction_item_id=in_transaction_item_id AND transaction_id=in_transaction_id;
+	FROM transaction_item_unit WHERE transaction_item_id=in_transaction_item_id;
 END//
 DELIMITER ;
 
