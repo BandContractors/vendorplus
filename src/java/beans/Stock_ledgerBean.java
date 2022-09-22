@@ -5,6 +5,7 @@ import connections.DBConnection;
 import entities.CompanySetting;
 import entities.Item;
 import entities.Item_tax_map;
+import entities.Item_unit_other;
 import entities.Parameter_list;
 import entities.Stock;
 import entities.Stock_ledger;
@@ -28,6 +29,7 @@ import javax.faces.context.FacesContext;
 import utilities.UtilityBean;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.primefaces.event.ToggleEvent;
 
 /*
  * To change this template, choose Tools | Templates
@@ -51,6 +53,7 @@ public class Stock_ledgerBean implements Serializable {
     private List<Stock_ledger> Stock_ledgerSummary;
     @ManagedProperty("#{menuItemBean}")
     private MenuItemBean menuItemBean;
+    private List<Item_unit_other> Item_unit_otherList;
 
     public void setStock_ledgerFromResultset(Stock_ledger aStock_ledger, ResultSet aResultSet) {
         try {
@@ -1111,6 +1114,115 @@ public class Stock_ledgerBean implements Serializable {
         return TableName;
     }
 
+    public void onColumnToggleDetail(ToggleEvent event) {
+        try {
+            String ColIndex = event.getData().toString();
+            String Visibility = event.getVisibility().toString();
+            if (ColIndex.equals("10") && Visibility.equals("VISIBLE")) {
+                this.loadMultipleUnitsForEachStockLedger();
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    //loop through stock leger records and their multiple units
+    public void loadMultipleUnitsForEachStockLedger() {
+        if (Stock_ledgerList != null) {
+            if (Stock_ledgerList.size() > 0) {
+                for (Stock_ledger sl : Stock_ledgerList) {
+                    if (sl.getQty_bal() != Math.floor(sl.getQty_bal())) {
+                        setItem_unit_otherList(getListOfOtherUnitsForStockLedger(sl.getItem_id()));
+                        if (getItem_unit_otherList() != null) {
+                            if (getItem_unit_otherList().size() > 0) {
+                                sl.setItem_unit_otherList(getItem_unit_otherList());
+                                sl.setMultiUnitsString(buildOtherUnitValuesForStockLedger(sl.getQty_bal(), sl));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public String buildOtherUnitValuesForStockLedger(Double qty_bal, Stock_ledger sl) {
+        int otherQty = 0;
+        double doubleOtherQty = 0.0;
+        StringBuilder strBuilder = new StringBuilder("");
+        Double otherUnitValue = 0.0;
+        Item_unit_other iuo = null;
+        try {
+            int baseQty = qty_bal.intValue();
+            strBuilder.append(qty_bal.intValue()).append(" ").append(sl.getBase_unit_symbol());
+            Double nextValueLessThanFullbase = qty_bal - baseQty;
+
+            List<Item_unit_other> iuoList = sl.getItem_unit_otherList();
+            int ouiListSize = iuoList.size();
+            for (int i = 0; i < ouiListSize; i++) {
+                otherQty = 0;
+                iuo = iuoList.get(i);
+                // if (i > 0) {
+                //otherUnitValue = nextValueLessThanFullbase * (iuo.getOther_qty() / iuoList.get(i - 1).getOther_qty());
+                // } else {
+                otherUnitValue = nextValueLessThanFullbase * iuo.getOther_qty();
+                // }
+                //check if its the last unit in the list and round off
+                //System.out.println(i + ": " + sl.getDescription() + " unit qty " + iuo.getOther_qty());
+                if (i == ouiListSize - 1) {
+                    otherQty = (int) Math.round(otherUnitValue);//get whole number
+                    double othernumber = otherUnitValue - otherQty;
+                    if (othernumber <= 0.0001) {
+                        doubleOtherQty = otherUnitValue;
+                    }
+
+                } else {
+                    otherQty = otherUnitValue.intValue();//get whole number
+                }
+                if (otherQty > 0) {
+                    double othernumber = otherUnitValue - otherQty;
+                    if (othernumber <= 0.0001) {
+                        otherQty = (int) Math.round(otherUnitValue);
+                        //System.out.println("otherQty :" + otherQty);
+                    }
+
+                    strBuilder.append(", ").append(otherQty).append(" ").append(iuo.getOther_unit_symbol());
+                }
+                //System.out.println(strBuilder.toString());
+                nextValueLessThanFullbase = (otherUnitValue - otherQty) / iuo.getOther_qty();
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return strBuilder.toString();
+    }
+
+    public List<Item_unit_other> getListOfOtherUnitsForStockLedger(long item_id) {
+        String sql = "SELECT distinct itu.other_unit_id, itu.item_id,itu.base_qty,itu.other_qty,"
+                + " (select u.unit_symbol from unit u where unit_id =itu.other_unit_id ) as other_unit_symbol "
+                + "FROM item_unit_other itu, item i "
+                + "WHERE itu.item_id=" + item_id + "";
+        //build a list of item other units for a record ledger
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            Item_unit_other iuo = null;
+            setItem_unit_otherList(new ArrayList<>());
+            while (rs.next()) {
+                iuo = new Item_unit_other();
+                iuo.setOther_qty(rs.getLong("other_unit_id"));
+                iuo.setOther_qty(rs.getDouble("other_qty"));
+                iuo.setItem_id(rs.getLong("item_id"));
+                iuo.setOther_unit_symbol(rs.getString("other_unit_symbol"));
+                getItem_unit_otherList().add(iuo);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return getItem_unit_otherList();
+    }
+
     /**
      * @return the Stock_ledgerList
      */
@@ -1207,5 +1319,19 @@ public class Stock_ledgerBean implements Serializable {
      */
     public void setMenuItemBean(MenuItemBean menuItemBean) {
         this.menuItemBean = menuItemBean;
+    }
+
+    /**
+     * @return the Item_unit_otherList
+     */
+    public List<Item_unit_other> getItem_unit_otherList() {
+        return Item_unit_otherList;
+    }
+
+    /**
+     * @param Item_unit_otherList the Item_unit_otherList to set
+     */
+    public void setItem_unit_otherList(List<Item_unit_other> Item_unit_otherList) {
+        this.Item_unit_otherList = Item_unit_otherList;
     }
 }

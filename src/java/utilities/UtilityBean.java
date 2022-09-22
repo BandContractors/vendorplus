@@ -48,7 +48,9 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.*;
+import javax.faces.context.FacesContext;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.IntrospectionException;
@@ -61,6 +63,8 @@ import javax.management.ReflectionException;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.primefaces.event.ToggleEvent;
+import org.primefaces.model.Visibility;
 import sessions.GeneralUserSetting;
 
 @ManagedBean
@@ -84,6 +88,12 @@ public class UtilityBean implements Serializable {
         matcher = pattern.matcher(time);
         return matcher.matches();
     }
+
+//    public void onColumnToggle(ToggleEvent event) {
+//        String ColIndex=event.getData().toString();
+//        String Visibility=event.getVisibility().name() + ":" + event.getVisibility().toString();
+//        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("ColIndex:" + ColIndex + ",Visibility:" + Visibility));
+//    }
 
     public static String combineTwoStr(String aStr1, String aStr2, int aBracket) {
         String CombStr = "";

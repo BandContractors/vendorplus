@@ -17,10 +17,11 @@ import javax.faces.bean.SessionScoped;
 @ManagedBean
 @SessionScoped
 public class Stock_ledger implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     private long stock_ledger_id;
-    private int store_id; 
+    private int store_id;
     private long item_id;
     private String batchno;
     private String code_specific;
@@ -48,6 +49,9 @@ public class Stock_ledger implements Serializable {
     private int tax_is_updated;
     private int tax_update_synced;
     private long transaction_item_id;
+    private List<Item_unit_other> Item_unit_otherList;
+    private String multiUnitsString;
+    private String openingQtyMultiUnitsString;
 
     /**
      * @return the stock_ledger_id
@@ -453,5 +457,47 @@ public class Stock_ledger implements Serializable {
      */
     public void setBase_unit_symbol(String base_unit_symbol) {
         this.base_unit_symbol = base_unit_symbol;
+    }
+
+    /**
+     * @return the Item_unit_otherList
+     */
+    public List<Item_unit_other> getItem_unit_otherList() {
+        return Item_unit_otherList;
+    }
+
+    /**
+     * @param Item_unit_otherList the Item_unit_otherList to set
+     */
+    public void setItem_unit_otherList(List<Item_unit_other> Item_unit_otherList) {
+        this.Item_unit_otherList = Item_unit_otherList;
+    }
+
+    /**
+     * @return the multiUnitsString
+     */
+    public String getMultiUnitsString() {
+        return multiUnitsString;
+    }
+
+    /**
+     * @param multiUnitsString the multiUnitsString to set
+     */
+    public void setMultiUnitsString(String multiUnitsString) {
+        this.multiUnitsString = multiUnitsString;
+    }
+
+    /**
+     * @return the openingQtyMultiUnitsString
+     */
+    public String getOpeningQtyMultiUnitsString() {
+        return openingQtyMultiUnitsString;
+    }
+
+    /**
+     * @param openingQtyMultiUnitsString the openingQtyMultiUnitsString to set
+     */
+    public void setOpeningQtyMultiUnitsString(String openingQtyMultiUnitsString) {
+        this.openingQtyMultiUnitsString = openingQtyMultiUnitsString;
     }
 }

@@ -1990,7 +1990,7 @@ public class StockBean implements Serializable {
             }
         }
     }
-
+    
     /**
      * @return the StocksList
      */

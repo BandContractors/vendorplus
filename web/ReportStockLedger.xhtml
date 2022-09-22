@@ -181,7 +181,15 @@
                     <f:facet name="header">
                         #{langsys['Stock']} #{langsys['Movement']} (#{langsys['Detail']}) : #{stock_ledgerBean.stock_ledgerList.size()}#{langsys['Records']}  #{langsys['Found']}
                         <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
-                        <p:columnToggler datasource="tblDetail" trigger="toggler" />
+                        <p:columnToggler datasource="tblDetail" trigger="toggler">
+                        </p:columnToggler>
+                        <p:commandButton id="cmdbLoadUnits" value="#{langsys['Detail']}" onclick="PF('statusDialog1').show()" onsuccess="PF('statusDialog1').hide()" 
+                                         style="float: right;width: 200px;display:#{stock_ledgerBean.stock_ledgerList.size() gt 0 ? 'inline-block': 'none'};background-color: yellow;">
+                            <p:dialog widgetVar="statusDialog1" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                                <p:graphicImage name="/images/ajax-loader.gif"/>
+                            </p:dialog>
+                            <p:ajax listener="#{stock_ledgerBean.loadMultipleUnitsForEachStockLedger()}" process="@this" update="tblDetail"/>
+                        </p:commandButton>
                     </f:facet>
                     <f:facet name="{Exporters}">
                         <h:commandLink>
@@ -239,6 +247,9 @@
                         <h:outputText value="#{itm.qty_bal}">
                             <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText><h:outputText value=" #{itm.base_unit_symbol}"/>
+                    </p:column>
+                    <p:column headerText="#{langsys['Detail']}" style="text-align: right;background-color: yellow;font-size: 13px;width: 7%;">
+                        <h:outputText value="#{itm.multiUnitsString}"/>
                     </p:column>
                 </p:dataTable>
             </h:panelGrid>

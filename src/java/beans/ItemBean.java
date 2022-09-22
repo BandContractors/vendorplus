@@ -2,6 +2,8 @@ package beans;
 
 import api_tax.efris.innerclasses.ItemTax;
 import api_tax.efris_bean.StockManage;
+import com.google.gson.Gson;
+import com.google.gson.JsonParser;
 import com.sun.javafx.scene.control.skin.VirtualFlow;
 import sessions.GeneralUserSetting;
 import connections.DBConnection;
@@ -50,6 +52,7 @@ import utilities.CustomValidator;
 import utilities.UtilityBean;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.json.JSONObject;
 import org.primefaces.event.TabChangeEvent;
 /*
  * To change this template, choose Tools | Templates
@@ -4417,10 +4420,23 @@ public class ItemBean implements Serializable {
         } catch (Exception e) {
         }
         String msg = "";
+        Item_unit_other iuo = new Item_unit_other();
+        Gson g = new Gson();
+        String json = "";
+        try {
+            if (null != aItem_unit_other) {
+                // from object to json
+                json = g.toJson(aItem_unit_other);
+                // from json to object
+                iuo = g.fromJson(json, Item_unit_other.class);
+            }
+        } catch (Exception e) {
+
+        }
         //check for other unit exists
         int OtherUnitExists = 0;
         try {
-            String UnitCodeTax1 = new UnitBean().getUnit(aItem_unit_other.getOther_unit_id()).getUnit_symbol_tax();
+            String UnitCodeTax1 = new UnitBean().getUnit(iuo.getOther_unit_id()).getUnit_symbol_tax();
             if (null == UnitCodeTax1) {
                 UnitCodeTax1 = "x";
             }
@@ -4430,7 +4446,7 @@ public class ItemBean implements Serializable {
                     if (null == UnitCodeTax2) {
                         UnitCodeTax2 = "xx";
                     }
-                    if ((aItem_unit_other.getOther_unit_id() == this.Item_unit_otherList.get(i).getOther_unit_id()) || (UnitCodeTax1.equals(UnitCodeTax2))) {
+                    if ((iuo.getOther_unit_id() == this.Item_unit_otherList.get(i).getOther_unit_id()) || (UnitCodeTax1.equals(UnitCodeTax2))) {
                         OtherUnitExists = 1;
                         break;
                     }
@@ -4446,11 +4462,11 @@ public class ItemBean implements Serializable {
             if (null == BaseUnitCodeTax) {
                 BaseUnitCodeTax = "x";
             }
-            String OtherUnitCodeTax = new UnitBean().getUnit(aItem_unit_other.getOther_unit_id()).getUnit_symbol_tax();
+            String OtherUnitCodeTax = new UnitBean().getUnit(iuo.getOther_unit_id()).getUnit_symbol_tax();
             if (null == OtherUnitCodeTax) {
                 OtherUnitCodeTax = "xx";
             }
-            if ((aItem_unit_other.getOther_unit_id() == this.ItemObj.getUnitId()) || (BaseUnitCodeTax == OtherUnitCodeTax)) {
+            if ((iuo.getOther_unit_id() == this.ItemObj.getUnitId()) || (BaseUnitCodeTax == OtherUnitCodeTax)) {
                 BaseOtherSame = 1;
             }
         } catch (Exception e) {
@@ -4458,13 +4474,13 @@ public class ItemBean implements Serializable {
         }
 
         try {
-            if (aItem_unit_other.getOther_unit_id() == 0) {
+            if (iuo.getOther_unit_id() == 0) {
                 msg = "Select Other Unit";
-            } else if (aItem_unit_other.getOther_unit_retailsale_price() <= 0) {
+            } else if (iuo.getOther_unit_retailsale_price() <= 0) {
                 msg = "Specify Other Retail Price";
-            } else if (aItem_unit_other.getOther_qty() <= 0) {
+            } else if (iuo.getOther_qty() <= 0) {
                 msg = "Specify Other Unit Quantity";
-            } else if (aItem_unit_other.getBase_qty() <= 0) {
+            } else if (iuo.getBase_qty() <= 0) {
                 msg = "Specify Base Unit Quantity";
             } else if (OtherUnitExists == 1) {
                 msg = "Other Unit Exists";
@@ -4472,9 +4488,9 @@ public class ItemBean implements Serializable {
                 msg = "Base and Other Unit Cannot be the Same";
             } else {
                 try {
-                    aItem_unit_other.setIs_active(1);
-                    aItem_unit_other.setOther_unit_symbol(new UnitBean().getUnit(aItem_unit_other.getOther_unit_id()).getUnitSymbol());
-                    this.Item_unit_otherList.add(aItem_unit_other);
+                    iuo.setIs_active(1);
+                    iuo.setOther_unit_symbol(new UnitBean().getUnit(iuo.getOther_unit_id()).getUnitSymbol());
+                    this.Item_unit_otherList.add(iuo);
                     this.setItemOtherUnitsEdited(1);
                     msg = "Added to the List";
                 } catch (Exception e) {
