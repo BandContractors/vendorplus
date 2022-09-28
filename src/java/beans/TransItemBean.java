@@ -6359,6 +6359,15 @@ public class TransItemBean implements Serializable {
         aTransItem.setAmount(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getAmount()));
         aTransItem.setAmountIncVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getAmountIncVat()));
         aTransItem.setAmountExcVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getAmountExcVat()));
+        /*
+         aTransItem.setUnitVat(new AccCurrencyBean().roundDoubleToXDps(aTransItem.getUnitVat(),4));
+         aTransItem.setUnitPriceExcVat(new AccCurrencyBean().roundDoubleToXDps(aTransItem.getUnitPriceExcVat(),4));
+         aTransItem.setUnitPriceIncVat(new AccCurrencyBean().roundDoubleToXDps(aTransItem.getUnitPriceIncVat(),4));
+         aTransItem.setUnitProfitMargin(new AccCurrencyBean().roundDoubleToXDps(aTransItem.getUnitProfitMargin(),4));
+         aTransItem.setAmount(new AccCurrencyBean().roundDoubleToXDps(aTransItem.getAmount(),4));
+         aTransItem.setAmountIncVat(new AccCurrencyBean().roundDoubleToXDps(aTransItem.getAmountIncVat(),4));
+         aTransItem.setAmountExcVat(new AccCurrencyBean().roundDoubleToXDps(aTransItem.getAmountExcVat(),4));
+         */
     }
 
     public void roundTransItemsAmount_prev(Trans aTrans, TransItem aTransItem) {

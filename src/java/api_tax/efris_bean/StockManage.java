@@ -883,8 +883,9 @@ public class StockManage implements Serializable {
                     //update local db that synced yes
                     int x = new Item_tax_mapBean().saveItem_tax_mapSync(aItemId, 1);
                     //do stock taking
-                    //Item_tax_map im = new Item_tax_mapBean().getItem_tax_mapSynced(item.getItemId());
-                    this.callAddStockFromItemReg(item, aItemIdTax);//this.callAddStockFromItemReg(item, im);
+                    if (aOperationType.equals("101")) {
+                        this.callAddStockFromItemReg(item, aItemIdTax);
+                    }
                 } else {
                     Api_tax_error_log lg = new Api_tax_error_log();
                     lg.setTransaction_type_id(0);

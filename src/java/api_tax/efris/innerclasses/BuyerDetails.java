@@ -12,6 +12,7 @@ import java.io.Serializable;
  * @author bajuna
  */
 public class BuyerDetails implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     private String buyerTin;
@@ -47,20 +48,20 @@ public class BuyerDetails implements Serializable {
     }
 
     public BuyerDetails() {
-        this.buyerAddress="";
-        this.buyerBusinessName="";
-        this.buyerCitizenship="";
-        this.buyerEmail="";
-        this.buyerLegalName="";
-        this.buyerLinePhone="";
-        this.buyerMobilePhone="";
-        this.buyerNinBrn="";
-        this.buyerPassportNum="";
-        this.buyerPlaceOfBusi="";
-        this.buyerReferenceNo="";
-        this.buyerSector="";
-        this.buyerTin="";
-        this.buyerType="";
+        this.buyerAddress = "";
+        this.buyerBusinessName = "";
+        this.buyerCitizenship = "";
+        this.buyerEmail = "";
+        this.buyerLegalName = "";
+        this.buyerLinePhone = "";
+        this.buyerMobilePhone = "";
+        this.buyerNinBrn = "";
+        this.buyerPassportNum = "";
+        this.buyerPlaceOfBusi = "";
+        this.buyerReferenceNo = "";
+        this.buyerSector = "";
+        this.buyerTin = "";
+        this.buyerType = "";
     }
 
     // Getter Methods 

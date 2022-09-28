@@ -209,11 +209,11 @@ public class UserDetailBean implements Serializable {
         } else if (new CustomValidator().CheckPassword(userdetail.getUserPassword(), userdetail.getUserPasswordConfirm()).equals("FAIL")) {
             msg = "New and Confirm Password Should Match and Between 5 to 20 Characters";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
-        } else if (new CustomValidator().TextSize(userdetail.getUserName(), 5, 20).equals("FAIL")) {
-            msg = "User Name Must be Between 5 to 20 Characters";
+        } else if (new CustomValidator().TextSize(userdetail.getUserName(), 2, 20).equals("FAIL")) {
+            msg = "User Name Must be Between 2 to 20 Characters";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
-        } else if (new CustomValidator().TextSize(userdetail.getFirstName(), 3, 100).equals("FAIL")) {
-            msg = "First Name Must be Between 3 to 100 Characters";
+        } else if (new CustomValidator().TextSize(userdetail.getFirstName(), 2, 100).equals("FAIL")) {
+            msg = "First Name Must be Between 2 to 100 Characters";
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else if (new CustomValidator().TextSize(userdetail.getSecondName(), 0, 100).equals("FAIL")) {
             msg = "Second Name Must be Between 1 and 100 Characters";

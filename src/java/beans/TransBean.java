@@ -2185,8 +2185,13 @@ public class TransBean implements Serializable {
                     if (DeleteInserted == 1) {
                         //delete inserted
                         int deleted1 = new TransItemBean().deleteTransItemsCEC(trans.getTransactionId());
+                        int deleted2 = 0;
+                        int deleted3 = 0;
                         if (deleted1 == 1) {
-                            int deleted2 = this.deleteTransCEC(trans.getTransactionId());
+                            deleted2 = new TransItemExtBean().deleteTransItemsUnitByTransId(trans.getTransactionId());
+                        }
+                        if (deleted2 == 1) {
+                            deleted3 = this.deleteTransCEC(trans.getTransactionId());
                         }
                         //display msg
                         switch (aLevel) {
@@ -2306,20 +2311,19 @@ public class TransBean implements Serializable {
 
     public double checkTrans(long aTransactionId, Trans aTrans, List<TransItem> aTransItems) {
         double value = 0;
-        //int CountItems = 0;
-        //double CountQty = 0;
+        int CountItems = 0;
+        double CountQty = 0;
         try {
             if (aTransactionId == 0) {
-                //CountItems = aTransItems.size();
-                //CountQty = new TransItemBean().getTransItemsTotalQty(aTransItems);
-                value = aTransItems.size() + new TransItemBean().getTransItemsTotalQty(aTransItems);
+                CountItems = aTransItems.size();
+                CountQty = new TransItemBean().getTransItemsTotalQty(aTransItems);
             } else if (aTransactionId > 0) {
-                //List<TransItem> tis = new TransItemBean().getTransItemsByTransactionId(aTransactionId);
-                //CountItems = tis.size();
-                //CountQty = new TransItemBean().getTransItemsTotalQty(tis);
-                value = new UtilityBean().getD("SELECT (count(*)+sum(item_qty)) as d FROM transaction_item ti WHERE ti.transaction_id=" + aTransactionId);
+                List<TransItem> tis = new TransItemBean().getTransItemsByTransactionId(aTransactionId);
+                CountItems = tis.size();
+                CountQty = new TransItemBean().getTransItemsTotalQty(tis);
+                //value = new UtilityBean().getD("SELECT (count(*)+sum(item_qty)) as d FROM transaction_item ti WHERE ti.transaction_id=" + aTransactionId);
             }
-            //value = CountQty + CountItems;
+            value = CountQty + CountItems;
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }

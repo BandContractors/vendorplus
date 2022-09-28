@@ -191,6 +191,22 @@ public class TransItemExtBean implements Serializable {
         return deleted;
     }
 
+    public int deleteTransaction_item_unit(long aTransaction_item_id) {
+        int deleted = 0;
+        String sql = "DELETE FROM transaction_item_unit WHERE transaction_item_id=?";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aTransaction_item_id);
+            ps.executeUpdate();
+            deleted = 1;
+        } catch (Exception e) {
+            deleted = 0;
+            LOGGER.log(Level.ERROR, e);
+        }
+        return deleted;
+    }
+
     /**
      * @return the menuItemBean
      */

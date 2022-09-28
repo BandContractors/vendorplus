@@ -94,7 +94,6 @@ public class UtilityBean implements Serializable {
 //        String Visibility=event.getVisibility().name() + ":" + event.getVisibility().toString();
 //        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("ColIndex:" + ColIndex + ",Visibility:" + Visibility));
 //    }
-
     public static String combineTwoStr(String aStr1, String aStr2, int aBracket) {
         String CombStr = "";
         if (null == aStr1) {
