@@ -12373,7 +12373,8 @@ CREATE PROCEDURE sp_insert_trans_production_item
 	IN in_input_qty_bfr_prod double,
 	IN in_input_qty_afr_prod double,
     IN in_unit_id int,
-    IN in_base_unit_qty double
+    IN in_base_unit_qty double,
+    OUT out_trans_production_item_id bigint
 ) 
 BEGIN 
 	SET @new_id=0;
@@ -12434,6 +12435,7 @@ BEGIN
         in_unit_id,
 		in_base_unit_qty
 		); 
+	SET out_trans_production_item_id=@new_id;
 END//
 DELIMITER ;
 

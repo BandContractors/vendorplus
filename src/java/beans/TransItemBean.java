@@ -11244,7 +11244,6 @@ public class TransItemBean implements Serializable {
                 LatestUnitCostPrice = 0;
             }
         }
-
         //2. if not recently received, check from stock table for any store
         if (LatestUnitCostPrice <= 0) {
             try {
@@ -11253,7 +11252,6 @@ public class TransItemBean implements Serializable {
                 LatestUnitCostPrice = 0;
             }
         }
-
         //3. if nothing in stock table, check from item settings
         if (LatestUnitCostPrice <= 0) {
             try {
@@ -11262,7 +11260,6 @@ public class TransItemBean implements Serializable {
                 LatestUnitCostPrice = 0;
             }
         }
-
         return LatestUnitCostPrice;
     }
 
@@ -11283,7 +11280,6 @@ public class TransItemBean implements Serializable {
         } catch (Exception e) {
             // do nothing
         }
-
         //1. check if item has been received before
         try {
             if (PurInvoMode == 0) {
@@ -11314,7 +11310,6 @@ public class TransItemBean implements Serializable {
                 LatestUnitCostPrice = 0;
             }
         }
-
         //2. if not recently received, check from stock table for any store
         if (LatestUnitCostPrice <= 0) {
             try {
@@ -11328,7 +11323,6 @@ public class TransItemBean implements Serializable {
                 LatestUnitCostPrice = 0;
             }
         }
-
         //3. if nothing in stock table, check from item settings
         if (LatestUnitCostPrice <= 0) {
             try {
@@ -11339,7 +11333,6 @@ public class TransItemBean implements Serializable {
                 LatestUnitCostPrice = 0;
             }
         }
-
         //convert unit and currency
         try {
             //convert unit

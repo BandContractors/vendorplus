@@ -260,7 +260,7 @@
                                 <h:selectOneMenu id="menuBatchInputInside" value="#{ati.batchno}" style="width: 100px;">
                                     <f:selectItem itemLabel="" itemValue=""/>
                                     <f:selectItems value="#{stockBean.getStocks(generalUserSetting.getCurrentStore().getStoreId(),ati.inputItemId)}" var="ic2" itemLabel="#{ic2.batchno}" itemValue="#{ic2.batchno}"/>
-                                    <f:ajax event="change" listener="#{stockBean.setStockCurrentQtyUnit(ati,generalUserSetting.currentStore.storeId,ati.inputItemId,ati.input_unit_id)}" execute="@this" render="currentQty leftQty"/>
+                                    <f:ajax event="change" listener="#{stockBean.setStockCurrentQty(ati,generalUserSetting.currentStore.storeId,ati.inputItemId)}" execute="@this" render="currentQty leftQty"/>
                                 </h:selectOneMenu>
                             </p:column>
                             <p:column>

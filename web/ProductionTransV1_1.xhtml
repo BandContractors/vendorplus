@@ -46,11 +46,11 @@
                     <f:selectItem itemValue="#{transBean.transReasonObj.transactionReasonId}" itemLabel="#{generalUserSetting.getCurrentStore().getStoreName()} / #{transBean.transReasonObj.transactionReasonName}"/>
                 </h:selectOneMenu>
                 <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Stock']}:#{langsys['Output']}↑ #{langsys['Input']}↓"/>
-                <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Ledger']}:INV ACC↓↑ COS-ACC↓↑"/>
+                <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Ledger']}:INV-ACC↓↑ COS-ACC↓↑"/>
             </h:panelGrid>
 
             <h:panelGrid styleClass="clsGridMainInput" columns="3">
-                <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeObj.transactionDateLabel)}:"/>
+                <h:outputLabel  value="#{transBean.transTypeObj.transactionDateLabel}:"/>
                 <p:calendar id="calTransactionDate"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.transactionDate}" size="8"/>
                 <h:panelGrid id="pnlSearch" columns="5" style="background-color: #b3f2b3;width: 100%;">
                     <h:outputLabel value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}:"/>
@@ -93,11 +93,12 @@
             <h:panelGrid columns="2">
                 <h:panelGrid columns="1">
                     <p:panel header="#{langsys['Produced']} #{langsys['Item']} (#{langsys['Output']}/#{langsys['Product']})">
-                        <h:panelGrid id="gridTransItem" columns="4">
+                        <h:panelGrid id="gridTransItem" columns="5">
                             <p:commandLink actionListener="#{itemBean.openChildItem('Stock',transItem.itemId)}" value="#{langsys['Produced']} #{langsys['Item']}"/>  
+                            <h:outputLabel value="PCs"/>
+                            <h:outputLabel value="#{langsys['Size']}"/>
                             <h:outputLabel value="#{langsys['Unit']}"/>
-                            <h:outputLabel value="#{langsys['Qty']} #{langsys['Produced']}"/>
-                            <h:outputLabel value="#{langsys['Unit']} #{langsys['Cost']}"/>
+                            <h:outputLabel value="#{langsys['Qty']}"/>
 
                             <p:autoComplete id="proItem" widgetVar="WproItem" value="#{itemBean.selectedItem}"  
                                             completeMethod="#{itemBean.getItemObjectListForProduction}" 
@@ -129,30 +130,42 @@
                                 <p:ajax event="blur" listener="#{transProductionBean.getItemProductionMapsByParentItemId(itemProductionMap.outputItemId)}" process="@this" update="dtbRawItem batch menuUnit1 itxtQty itxtUnitCost calMnfDate calExpDate pgrdSpecific"/>
                                 <p:ajax event="blur" listener="#{transProductionBean.updateUnitCostProduction(transItem,generalUserSetting.currentStore.storeId)}" process="@this" update="itxtUnitCost"/>
                             </p:autoComplete>
-                            <p:inputText value="#{transItem.description}" style="width: 210px" disabled="true" rendered="#{transItem.transactionItemId==1}"/>
-                            <p:selectOneMenu id="menuUnit1" styleClass="clsMenu" value="#{itemProductionMap.output_unit_id}" style="width: 90px;" rendered="#{transItem.transactionItemId==0}">
-                                <f:selectItems value="#{itemBean.getItemUnitList(itemProductionMap.outputItemId, null, 1)}" var="iu" itemLabel="#{iu.unit_symbol}" itemValue="#{iu.unit_id}"/>
-                                <p:ajax listener="#{transProductionBean.changeItemUnit('Prod',itemProductionMap,transItem,generalUserSetting.currentStore.storeId)}" process="@this proItem" update="itxtUnitCost"/>
-                            </p:selectOneMenu>
-                            <p:inputText value="#{transProduction.outputItemUnit}" style="width: 110px" disabled="true" rendered="#{transItem.transactionItemId==1}"/>
-                            <p:inputText id="itxtQty" style="width: 100px" value="#{transItem.itemQty}" autocomplete="off">
+                            <p:inputText value="#{transItem.description}" style="width: 205px" disabled="true" rendered="#{transItem.transactionItemId==1}"/>
+                            <h:inputText id="itxtUnitSizeQty" style="width: 100px" value="#{transItem.specific_size_qty}" autocomplete="off">
+                                <f:ajax event="change" listener="#{transProductionBean.specifySizeProduced(transItem)}" render="itxtQty dtbRawItem"/>
+                                <f:ajax event="keyup" listener="#{transProductionBean.specifySizeProduced(transItem)}" render="itxtQty dtbRawItem"/>
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                 <f:ajax event="change" listener="#{transProductionBean.updateListUponChangeOutputQty(transItem,generalUserSetting.currentStore.storeId,transProductionBean.itmCombinationList)}" execute="@this" render="dtbRawItem"/>
                                 <f:ajax event="keyup" listener="#{transProductionBean.updateListUponChangeOutputQty(transItem,generalUserSetting.currentStore.storeId,transProductionBean.itmCombinationList)}" execute="@this" render="dtbRawItem"/>
-                            </p:inputText>
-                            <p:inputText id="itxtUnitCost" value="#{transItem.unitCostPrice}" style="width: 100px;">
+                            </h:inputText>
+                            <h:inputText id="itxtUnitSize" style="width: 100px" value="#{transItem.specific_size}" autocomplete="off" disabled="true">
+                                <f:ajax event="change" listener="#{transProductionBean.specifySizeProduced(transItem)}" render="itxtQty totQty dtbRawItem"/>
+                                <f:ajax event="keyup" listener="#{transProductionBean.specifySizeProduced(transItem)}" render="itxtQty totQty dtbRawItem"/>
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:inputText>
+                            <p:selectOneMenu id="menuUnit1" styleClass="clsMenu" value="#{itemProductionMap.output_unit_id}" style="width: 90px;" rendered="#{transItem.transactionItemId==0}">
+                                <f:selectItems value="#{itemBean.getItemUnitList(itemProductionMap.outputItemId, null, 1)}" var="iu" itemLabel="#{iu.unit_symbol}" itemValue="#{iu.unit_id}"/>
+                            </p:selectOneMenu>
+                            <p:inputText value="#{transProduction.outputItemUnit}" style="width: 110px" disabled="true" rendered="#{transItem.transactionItemId==1}"/>
+                            <p:inputText id="itxtQty" style="width: 100px" value="#{transItem.itemQty}" autocomplete="off" disabled="true">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:ajax event="change" listener="#{transProductionBean.updateListUponChangeOutputQty(transItem,generalUserSetting.currentStore.storeId,transProductionBean.itmCombinationList)}" execute="@this" render="totQty dtbRawItem"/>
+                                <f:ajax event="keyup" listener="#{transProductionBean.updateListUponChangeOutputQty(transItem,generalUserSetting.currentStore.storeId,transProductionBean.itmCombinationList)}" execute="@this" render="totQty dtbRawItem"/>
                             </p:inputText>
 
                             <h:outputLabel value="#{langsys['Batch']}"/>
                             <h:outputLabel value="#{langsys['Manuf']} #{langsys['Date']}"/>
                             <h:outputLabel value="#{langsys['Expiry']} #{langsys['Date']}"/>
+                            <h:outputLabel value="#{langsys['Unit']} #{langsys['Cost']}"/>
                             <h:outputLabel value=""/>
                             <p:inputText id="batch" value="#{transItem.batchno}" style="width: 210px"/>
                             <p:calendar id="calMnfDate" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{transItem.itemMnfDate}" size="8" pattern="#{companySetting.getDateFormat()}">
                             </p:calendar>
                             <p:calendar id="calExpDate" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{transItem.itemExpryDate}" size="8" pattern="#{companySetting.getDateFormat()}">
                             </p:calendar>
+                            <p:inputText id="itxtUnitCost" value="#{transItem.unitCostPrice}" style="width: 100px;">
+                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </p:inputText>
                             <h:outputLabel value=""/>
                         </h:panelGrid>
                         <h:panelGrid id="pgrdSpecific">
@@ -203,7 +216,7 @@
                                 <f:selectItems value="#{itemBean.getItemUnitList(transProductionBean.itemProductionMapObj.inputItemId, null, 1)}" var="iu" itemLabel="#{iu.unit_symbol}" itemValue="#{iu.unit_id}"/>
                                 <p:ajax listener="#{transProductionBean.changeItemUnit('Raw',transProductionBean.itemProductionMapObj,transItem,generalUserSetting.currentStore.storeId)}" process="@this rawItem" update="itxtCurrentQty itxtLeftQty"/>
                             </p:selectOneMenu>
-                            <h:selectOneMenu id="menuBatchInputOutside" value="#{transProductionBean.itemProductionMapObj.batchno}" style="width: 50px;height: 30px;">
+                            <h:selectOneMenu id="menuBatchInputOutside" value="#{transProductionBean.itemProductionMapObj.batchno}" style="width: 100px;height: 30px;">
                                 <f:selectItem itemLabel="" itemValue=""/>
                                 <f:selectItems value="#{stockBean.batchList}" var="ic2" itemLabel="#{ic2.batchno}" itemValue="#{ic2.batchno}"/>
                                 <f:ajax event="change" listener="#{stockBean.setStockCurrentQtyUnit(transProductionBean.itemProductionMapObj,generalUserSetting.currentStore.storeId,transProductionBean.itemProductionMapObj.inputItemId,transProductionBean.itemProductionMapObj.input_unit_id)}" execute="gridRawMaterialItem" render="itxtCurrentQty itxtLeftQty"/>
@@ -217,7 +230,7 @@
                             </p:inputText>
                             <p:inputText id="itxtQty4" style="width: 70px" value="#{transProductionBean.itemProductionMapObj.inputQtyTotal}" autocomplete="off">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                                <f:ajax event="keyup" listener="#{transProductionBean.updateUponChangeInputTotalQtyUsed(transItem,transProductionBean.itemProductionMapObj)}" execute="@this" render="itxtQty3 itxtLeftQty" />
+                                <f:ajax event="keyup" listener="#{transProductionBean.updateUponChangeInputTotalQtyUsed(transItem,transProductionBean.itemProductionMapObj)}" execute="@this" render="itxtQty3" />
                             </p:inputText>
                             <p:inputText id="itxtLeftQty" style="width: 70px" value="#{transProductionBean.itemProductionMapObj.inputQtyBalance}" autocomplete="off">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -260,7 +273,7 @@
                                 <h:selectOneMenu id="menuBatchInputInside" value="#{ati.batchno}" style="width: 100px;">
                                     <f:selectItem itemLabel="" itemValue=""/>
                                     <f:selectItems value="#{stockBean.getStocks(generalUserSetting.getCurrentStore().getStoreId(),ati.inputItemId)}" var="ic2" itemLabel="#{ic2.batchno}" itemValue="#{ic2.batchno}"/>
-                                    <f:ajax event="change" listener="#{stockBean.setStockCurrentQtyUnit(ati,generalUserSetting.currentStore.storeId,ati.inputItemId,ati.input_unit_id)}" execute="@this" render="currentQty leftQty"/>
+                                    <f:ajax event="change" listener="#{stockBean.setStockCurrentQty(ati,generalUserSetting.currentStore.storeId,ati.inputItemId)}" execute="@this" render="currentQty leftQty"/>
                                 </h:selectOneMenu>
                             </p:column>
                             <p:column>
@@ -288,7 +301,7 @@
                                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                     <f:ajax event="keyup" listener="#{transProductionBean.updateUponChangeInputTotalQtyUsed(transItem,generalUserSetting.currentStore.storeId,ati)}" execute="@this" render="unitQty TransFormProd:itxtUnitCost leftQty" />
                                 </h:inputText>
-                            </p:column>  
+                            </p:column>
                             <p:column>
                                 <!-- column header -->
                                 <f:facet name="header">#{langsys['Qty']} #{langsys['Left']} (#{langsys['Balance']})</f:facet>
@@ -302,7 +315,7 @@
                                 <!-- column header -->
                                 <f:facet name="header">#{langsys['Action']}</f:facet>
                                 <!-- row record -->
-                                <h:commandLink value="#{langsys['Remove']}">
+                                <h:commandLink value="Remove">
                                     <f:ajax execute="dtbRawItem" listener="#{transProductionBean.removeTransProductionItem(transItem,ati)}" render="dtbRawItem TransFormProd:itxtUnitCost"/>
                                 </h:commandLink>                    
                             </p:column> 
@@ -354,17 +367,13 @@
                             </p:column>
                             <p:column style="font-size: 12px;">
                                 <!-- column header -->
-                                <f:facet name="header">#{langsys['Unit']}</f:facet>
-                                <!-- row record -->
-                                #{ati.outputItemUnit}
-                            </p:column>
-                            <p:column style="font-size: 12px;">
-                                <!-- column header -->
                                 <f:facet name="header">#{langsys['Ordered']} #{langsys['Qty']}</f:facet>
                                 <!-- row record -->
                                 <p:outputLabel value="#{ati.orderedQty}">
                                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </p:outputLabel>
+                                #{ati.outputItemUnit}
+                                #{transProductionBean.getPCsOrdered(ati)}
                             </p:column>                      
                             <p:column style="font-size: 12px;">
                                 <!-- column header -->
@@ -373,6 +382,8 @@
                                 <p:outputLabel value="#{ati.outputQty}">
                                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </p:outputLabel>
+                                #{ati.outputItemUnit}
+                                #{transProductionBean.getPCsProduced(ati)}
                             </p:column>                      
                         </p:dataTable>
                     </p:panel>

@@ -962,25 +962,31 @@ public class StockBean implements Serializable {
     }
 
     public void setStockCurrentQtyUnit(ItemProductionMap aItemProductionMap, int aStoreId, long aItemId, int aUnitId) {
-        double CurrentQty = 0;
-        if (null == aItemProductionMap) {
-            //do nothing
-        } else {
-            if (aItemId == 0) {
+        try {
+            double CurrentQty = 0;
+            if (null == aItemProductionMap) {
                 //do nothing
             } else {
-                try {
-                    CurrentQty = this.getStock(aStoreId, aItemId, aItemProductionMap.getBatchno(), aItemProductionMap.getCodeSpecific(), aItemProductionMap.getDescSpecific()).getCurrentqty();
-                    double OtherQty = new ItemBean().getOtherUnitQty(aItemId, aUnitId, CurrentQty);
-                    if (OtherQty > 0) {
-                        CurrentQty = OtherQty;
-                    }
-                } catch (Exception e) {
+                if (aItemId == 0) {
                     //do nothing
+                } else {
+                    try {
+                        CurrentQty = this.getStock(aStoreId, aItemId, aItemProductionMap.getBatchno(), aItemProductionMap.getCodeSpecific(), aItemProductionMap.getDescSpecific()).getCurrentqty();
+                        double OtherQty = new ItemBean().getOtherUnitQty(aItemId, aUnitId, CurrentQty);
+                        if (OtherQty > 0) {
+                            CurrentQty = OtherQty;
+                        }
+                    } catch (Exception e) {
+                        //do nothing
+                    }
                 }
+                aItemProductionMap.setInputQtyCurrent(CurrentQty);
+                aItemProductionMap.setInputQtyBalance(CurrentQty - aItemProductionMap.getInputQtyTotal());
+                double BaseQty = new ItemBean().getBaseUnitQty(aItemId, aUnitId, aItemProductionMap.getInputQtyTotal());
+                aItemProductionMap.setInputQtyTotalBaseUnit(BaseQty);
             }
-            aItemProductionMap.setInputQtyCurrent(CurrentQty);
-            aItemProductionMap.setInputQtyBalance(CurrentQty - aItemProductionMap.getInputQtyTotal());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -1990,7 +1996,7 @@ public class StockBean implements Serializable {
             }
         }
     }
-    
+
     /**
      * @return the StocksList
      */

@@ -2,11 +2,11 @@ Functions using old
 -TIB.saveTransItemAutoUnpack
 -TIB.reverseTransItemCEC
 -TIB.isItemTotalQtyGreaterThanCurrentQty
+-TIB: public double getItemLatestUnitCostPrice(long aItemId, String aBatchno, String aCodeSpec, String aDescSpec, int aToUnitId, String aToCurrencyCode, int aConvertCurrencyFlag) {
+-new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", stock, aItemProductionMap.getInputQtyTotal(), "Add", 70, aTransProductionID, new GeneralUserSetting().getCurrentUser().getUserDetailId());
+-
 
--TIB.saveTransItem (DELETED)
-
-
-
+TransProductionItemBean().checkAndAutoUnpack
 >>>>Ensure UnitCost+Unit_ID in trans_item, production, prod_item and stock are not rounded off.
 >Test UnitCost for Stock Adjust, Consume, etc.
 >Open Balance
