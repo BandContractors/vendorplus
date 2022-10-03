@@ -32,3 +32,12 @@ Put a function in utility for Calc of Base_qty given Other Qty
 Multi-units for update; check of inventory
 SMbi -- Loyalty
 SMbi -- Sales, Cr, Dr
+
+Production:
+-Check validation methods if unit s needed
+-Check when unit of product changes
+-CHeck when qty of product changes
+-Picked from order
+-Reports
+-Adjust URA stock mng
+
