@@ -9,6 +9,7 @@ import entities.Item_unit_other;
 import entities.Parameter_list;
 import entities.Stock;
 import entities.Stock_ledger;
+import entities.Trans;
 import entities.TransItem;
 import entities.TransProduction;
 import entities.TransProductionItem;
@@ -365,7 +366,8 @@ public class Stock_ledgerBean implements Serializable {
                         stocksub.setCurrentqty(aQty);
                         stocksub.setUnitCost(aStock.getUnitCost());
                         //get AdjustType
-                        String AdjustType = "105";//Others
+                        String AdjustStockinType = new Stock_ledgerBean().getAjustAndStockinTypeFrmStock_ledger(aTableName, stockledger.getTax_update_id());
+                        String AdjustType = new UtilityBean().getStringArrayFromXSeperatedStr(AdjustStockinType, ":")[0];
                         String ItemIdTax = "";
                         try {
                             ItemIdTax = new Item_tax_mapBean().getItem_tax_map(stocksub.getItemId()).getItem_id_tax();
@@ -436,6 +438,84 @@ public class Stock_ledgerBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
         return update_flag;
+    }
+
+    public String getAjustAndStockinTypeFrmStock_ledger(String aTableName, long aTax_update_id) {
+        String AdjustAndStockinType = "";
+        String AdjustType = "";
+        String StockinType = "";
+        ResultSet rs = null;
+        String sql = "SELECT * FROM " + aTableName + " WHERE tax_update_id=" + aTax_update_id;
+        //System.out.println("sql:" + sql);
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            Stock_ledger sl = null;
+            if (rs.next()) {
+                sl = new Stock_ledger();
+                this.setStock_ledgerFromResultset(sl, rs);
+            }
+            if (null != sl) {
+                //a)adjustType
+                //101: Expired Goods, 102: Damaged Goods, 103: Personal Uses, 105:Raw Material(s), 104:Others. (Please specify)
+                //If operationType = 101，adjustType must be empty; If operationType = 102，adjustType cannot be empty
+                if (sl.getQty_added() > 0) {
+                    AdjustType = "";
+                } else if (sl.getQty_subtracted() > 0) {
+                    if (sl.getTransaction_type_id() == 70) {
+                        AdjustType = "105";
+                    } else if (sl.getTransaction_type_id() == 3) {
+                        AdjustType = "102";
+                    } else {
+                        AdjustType = "104";
+                    }
+                }
+                //b)stockInType
+                //101:Import 102:Local Purchase 103:Manufacture/Assembling 104:Opening Stock
+                //If operationType = 101，stockInType cannot be empty
+                //If operationType = 102，stockInType must be empty
+                if (sl.getQty_subtracted() > 0) {
+                    StockinType = "";
+                } else if (sl.getQty_added() > 0) {
+                    if (sl.getTransaction_type_id() == 70) {
+                        StockinType = "103";
+                    } else if (sl.getTransaction_type_id() == 1 || sl.getTransaction_type_id() == 9) {
+                        try {
+                            Trans t = new TransBean().getTrans(sl.getTransaction_id());
+                            if (null != t) {
+                                if (t.getBillTransactorId() > 0) {
+                                    Transactor trc = new TransactorBean().getTransactor(t.getBillTransactorId());
+                                    if (null != trc) {
+                                        if (trc.getLocCountry().length() == 0) {
+                                            StockinType = "102";
+                                        } else if (!trc.getLocCountry().toUpperCase().equals(new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "COUNTRY_NAME").getParameter_value().toUpperCase())) {
+                                            StockinType = "101";
+                                        } else {
+                                            StockinType = "102";
+                                        }
+                                    } else {
+                                        StockinType = "102";
+                                    }
+                                } else {
+                                    StockinType = "102";
+                                }
+                            } else {
+                                StockinType = "102";
+                            }
+                        } catch (Exception e) {
+                        }
+                    } else {
+                        StockinType = "102";
+                    }
+                }
+            }
+            AdjustAndStockinType = AdjustType + ":" + StockinType;
+            //System.out.println("AdjustAndStockinType:" + AdjustAndStockinType);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return AdjustAndStockinType;
     }
 
     public void reSubmitStockTaxAPIAll(List<Stock_ledger> aStock_ledgerList, Stock_ledger aStock_ledger, Stock_ledgerBean aStock_ledgerBean, Item aItem) {
@@ -538,7 +618,8 @@ public class Stock_ledgerBean implements Serializable {
                         stocksub.setCurrentqty(aStock_ledger4Sync.getQty_subtracted());
                         stocksub.setUnitCost(LatestUnitCostPrice);
                         //get AdjustType
-                        String AdjustType = "105";//Others
+                        String AdjustStockinType = new Stock_ledgerBean().getAjustAndStockinTypeFrmStock_ledger(TableName, aStock_ledger4Sync.getTax_update_id());
+                        String AdjustType = new UtilityBean().getStringArrayFromXSeperatedStr(AdjustStockinType, ":")[0];
                         String ItemIdTax = "";
                         try {
                             ItemIdTax = new Item_tax_mapBean().getItem_tax_map(stocksub.getItemId()).getItem_id_tax();

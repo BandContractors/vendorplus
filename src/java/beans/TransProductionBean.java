@@ -1064,9 +1064,9 @@ public class TransProductionBean implements Serializable {
                 msg = "Enter Unit Cost";
             } else if (transItem.getItemQty() == 0) {
                 msg = "Produced Qty Cannot be Zero";
-            } else if (aActiveTransItems.isEmpty()) {
-                msg = "Add Raw Materials";
-            } else if (transItem.getItemId() == 0) {
+            } /*else if (aActiveTransItems.isEmpty()) {
+             msg = "Add Raw Materials";
+             } */ else if (transItem.getItemId() == 0) {
                 msg = "Specify Produced Item";
             } else if (trans.getTransactionUserDetailId() == 0 && transtype.getIsTransactionUserMandatory().equals("Yes")) {
                 msg = "Specify Production User";
@@ -1357,7 +1357,13 @@ public class TransProductionBean implements Serializable {
                         String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
                         new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, transItem.getItemQty(), "Add", aTransTypeId, InsertedTransId, new GeneralUserSetting().getCurrentUser().getUserDetailId(), InsertedTransId);
                     }
-                    new TransProductionItemBean().saveTransProductionItemsCEC(InsertedTransId, InsertedOutputQty, InsertedStoreId, aTransProducts);
+                    try {
+                        if (!aTransProducts.isEmpty()) {
+                            new TransProductionItemBean().saveTransProductionItemsCEC(InsertedTransId, InsertedOutputQty, InsertedStoreId, aTransProducts);
+                        }
+                    } catch (Exception e) {
+
+                    }
                     //Save PRODUCTION Journal Entry
                     new AccJournalBean().postJournalProduction(InsertedTransId);
                     //after

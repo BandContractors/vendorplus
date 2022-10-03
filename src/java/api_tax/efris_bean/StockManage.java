@@ -39,6 +39,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import utilities.Security;
 import utilities.SecurityPKI;
+import utilities.UtilityBean;
 
 /**
  *
@@ -67,7 +68,7 @@ public class StockManage implements Serializable {
                 long SupplierId = 0;
                 if (SupplierId == 0) {
                     SupplierTIN = CompanySetting.getTaxIdentity();
-                    SupplierName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "PAYEE_NAME").getParameter_value();
+                    SupplierName = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "PAYEE_NAME").getParameter_value();
                 } else {
                     Transactor tr = new TransactorBean().getTransactor(SupplierId);
                     SupplierTIN = tr.getTaxIdentity();
@@ -95,11 +96,11 @@ public class StockManage implements Serializable {
                 if (null != aTableName && aTableName.length() > 0) {
                     TableName = aTableName;
                 } else {
-                    TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
+                    TableName = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
                 }
                 int record4Sync = new Stock_ledgerBean().updateTaxStock_ledger(TableName, aTax_update_id, 1, 0);
                 String id = "";
-                String APIMode = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_MODE").getParameter_value();
+                String APIMode = new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_MODE").getParameter_value();
                 if (APIMode.equals("OFFLINE")) {
                     id = this.getItemIdFromTaxOffline(aItemIdTax);
                 } else {
@@ -108,10 +109,13 @@ public class StockManage implements Serializable {
                 if (id.length() > 0 && record4Sync == 1) {
                     //2. update tax db and check if synced yes
                     String recordSynced = "";
+                    String AdjustStockinType = new Stock_ledgerBean().getAjustAndStockinTypeFrmStock_ledger(TableName, aTax_update_id);
+                    String AdjustType = new UtilityBean().getStringArrayFromXSeperatedStr(AdjustStockinType, ":")[0];
+                    String StockinType = new UtilityBean().getStringArrayFromXSeperatedStr(AdjustStockinType, ":")[1];
                     if (APIMode.equals("OFFLINE")) {
-                        recordSynced = this.addStockOffline(id, Double.toString(new AccCurrencyBean().roundDoubleToXDps(aStock.getCurrentqty(), 8)), Double.toString(aStock.getUnitCost()), aSupplierTin, aSupplierName, aUnitCodeTax);
+                        recordSynced = this.addStockOffline(id, Double.toString(new AccCurrencyBean().roundDoubleToXDps(aStock.getCurrentqty(), 8)), Double.toString(aStock.getUnitCost()), aSupplierTin, aSupplierName, aUnitCodeTax, AdjustType, StockinType);
                     } else {
-                        recordSynced = this.addStockOnline(id, Double.toString(new AccCurrencyBean().roundDoubleToXDps(aStock.getCurrentqty(), 8)), Double.toString(aStock.getUnitCost()), aSupplierTin, aSupplierName, aUnitCodeTax);
+                        recordSynced = this.addStockOnline(id, Double.toString(new AccCurrencyBean().roundDoubleToXDps(aStock.getCurrentqty(), 8)), Double.toString(aStock.getUnitCost()), aSupplierTin, aSupplierName, aUnitCodeTax, AdjustType, StockinType);
                     }
                     if (recordSynced.equals("SUCCESS")) {
                         //3. update local db that synced yes
@@ -137,7 +141,7 @@ public class StockManage implements Serializable {
         try {
             if (null != aStock) {
                 String id = "";
-                String APIMode = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_MODE").getParameter_value();
+                String APIMode = new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_MODE").getParameter_value();
                 if (APIMode.equals("OFFLINE")) {
                     id = this.getItemIdFromTaxOffline(aItemIdTax);
                 } else {
@@ -146,10 +150,12 @@ public class StockManage implements Serializable {
                 if (id.length() > 0) {
                     //2. update tax db and check if synced yes
                     String recordSynced = "";
+                    String AdjustType = "103";//Personal Uses
+                    String StockInType = "104";//Opening Stock
                     if (APIMode.equals("OFFLINE")) {
-                        recordSynced = this.addStockOffline(id, Double.toString(new AccCurrencyBean().roundDoubleToXDps(aStock.getCurrentqty(), 8)), Double.toString(aStock.getUnitCost()), aSupplierTin, aSupplierName, aUnitCodeTax);
+                        recordSynced = this.addStockOffline(id, Double.toString(new AccCurrencyBean().roundDoubleToXDps(aStock.getCurrentqty(), 8)), Double.toString(aStock.getUnitCost()), aSupplierTin, aSupplierName, aUnitCodeTax, AdjustType, StockInType);
                     } else {
-                        recordSynced = this.addStockOnline(id, Double.toString(new AccCurrencyBean().roundDoubleToXDps(aStock.getCurrentqty(), 8)), Double.toString(aStock.getUnitCost()), aSupplierTin, aSupplierName, aUnitCodeTax);
+                        recordSynced = this.addStockOnline(id, Double.toString(new AccCurrencyBean().roundDoubleToXDps(aStock.getCurrentqty(), 8)), Double.toString(aStock.getUnitCost()), aSupplierTin, aSupplierName, aUnitCodeTax, AdjustType, StockInType);
                     }
                     if (recordSynced.equals("SUCCESS")) {
                         //3. update local db that synced yes
@@ -180,10 +186,10 @@ public class StockManage implements Serializable {
                 if (null != aTableName && aTableName.length() > 0) {
                     TableName = aTableName;
                 } else {
-                    TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
+                    TableName = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
                 }
                 int record4Sync = new Stock_ledgerBean().updateTaxStock_ledger(TableName, aTax_update_id, 1, 0);
-                String APIMode = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_MODE").getParameter_value();
+                String APIMode = new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_MODE").getParameter_value();
                 String id = "";
                 if (APIMode.equals("OFFLINE")) {
                     id = this.getItemIdFromTaxOffline(aItemIdTax);
@@ -214,7 +220,6 @@ public class StockManage implements Serializable {
                 }
             }
         } catch (Exception e) {
-            //System.err.println("subtractStockCall:" + e.getMessage());
             LOGGER.log(Level.ERROR, e);
         }
     }
@@ -267,8 +272,8 @@ public class StockManage implements Serializable {
                     + "	\"pageSize\": \"10\"\n"
                     + "}";
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
-            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_OFFLINE").getParameter_value());
-            String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T127", CompanySetting.getTaxIdentity());
+            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_URL_OFFLINE").getParameter_value());
+            String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T127", CompanySetting.getTaxIdentity());
 
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             output = response.getEntity(String.class);
@@ -311,8 +316,8 @@ public class StockManage implements Serializable {
                     + "	\"pageSize\": \"10\"\n"
                     + "}";
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
-            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_OFFLINE").getParameter_value());
-            String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T127", CompanySetting.getTaxIdentity());
+            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_URL_OFFLINE").getParameter_value());
+            String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T127", CompanySetting.getTaxIdentity());
 
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             output = response.getEntity(String.class);
@@ -359,13 +364,13 @@ public class StockManage implements Serializable {
                     + "	\"pageSize\": \"10\"\n"
                     + "}";
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
-            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_ONLINE").getParameter_value());
+            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_URL_ONLINE").getParameter_value());
             /**
              * Read Private Key
              */
-            PrivateKey key = new SecurityPKI().getPrivate(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_FILE").getParameter_value(), Security.Decrypt(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_PASSWORD").getParameter_value()), new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_ALIAS").getParameter_value());
-            //String AESpublickeystring = SecurityPKI.decrypt(new SecurityPKI().AESPublicKey(CompanySetting.getTaxIdentity(), new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value()), key);
-            String AESpublickeystring = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_AES_PUBLIC_KEY").getParameter_value();
+            PrivateKey key = new SecurityPKI().getPrivate(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_FILE").getParameter_value(), Security.Decrypt(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_PASSWORD").getParameter_value()), new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_ALIAS").getParameter_value());
+            //String AESpublickeystring = SecurityPKI.decrypt(new SecurityPKI().AESPublicKey(CompanySetting.getTaxIdentity(), new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value()), key);
+            String AESpublickeystring = new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_AES_PUBLIC_KEY").getParameter_value();
             /**
              * Encrypt Content
              */
@@ -374,7 +379,7 @@ public class StockManage implements Serializable {
             /**
              * Post Data
              */
-            String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T127", CompanySetting.getTaxIdentity());
+            String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T127", CompanySetting.getTaxIdentity());
 
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             output = response.getEntity(String.class);
@@ -423,13 +428,13 @@ public class StockManage implements Serializable {
                     + "	\"pageSize\": \"10\"\n"
                     + "}";
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
-            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_ONLINE").getParameter_value());
+            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_URL_ONLINE").getParameter_value());
             /**
              * Read Private Key
              */
-            PrivateKey key = new SecurityPKI().getPrivate(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_FILE").getParameter_value(), Security.Decrypt(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_PASSWORD").getParameter_value()), new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_ALIAS").getParameter_value());
-            //String AESpublickeystring = SecurityPKI.decrypt(new SecurityPKI().AESPublicKey(CompanySetting.getTaxIdentity(), new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value()), key);
-            String AESpublickeystring = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_AES_PUBLIC_KEY").getParameter_value();
+            PrivateKey key = new SecurityPKI().getPrivate(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_FILE").getParameter_value(), Security.Decrypt(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_PASSWORD").getParameter_value()), new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_ALIAS").getParameter_value());
+            //String AESpublickeystring = SecurityPKI.decrypt(new SecurityPKI().AESPublicKey(CompanySetting.getTaxIdentity(), new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value()), key);
+            String AESpublickeystring = new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_AES_PUBLIC_KEY").getParameter_value();
             /**
              * Encrypt Content
              */
@@ -438,7 +443,7 @@ public class StockManage implements Serializable {
             /**
              * Post Data
              */
-            String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T127", CompanySetting.getTaxIdentity());
+            String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T127", CompanySetting.getTaxIdentity());
 
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             output = response.getEntity(String.class);
@@ -487,13 +492,13 @@ public class StockManage implements Serializable {
                     + "	\"pageSize\": \"10\"\n"
                     + "}";
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
-            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_ONLINE").getParameter_value());
+            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_URL_ONLINE").getParameter_value());
             /**
              * Read Private Key
              */
-            PrivateKey key = new SecurityPKI().getPrivate(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_FILE").getParameter_value(), Security.Decrypt(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_PASSWORD").getParameter_value()), new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_ALIAS").getParameter_value());
-            //String AESpublickeystring = SecurityPKI.decrypt(new SecurityPKI().AESPublicKey(CompanySetting.getTaxIdentity(), new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value()), key);
-            String AESpublickeystring = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_AES_PUBLIC_KEY").getParameter_value();
+            PrivateKey key = new SecurityPKI().getPrivate(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_FILE").getParameter_value(), Security.Decrypt(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_PASSWORD").getParameter_value()), new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_ALIAS").getParameter_value());
+            //String AESpublickeystring = SecurityPKI.decrypt(new SecurityPKI().AESPublicKey(CompanySetting.getTaxIdentity(), new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value()), key);
+            String AESpublickeystring = new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_AES_PUBLIC_KEY").getParameter_value();
             /**
              * Encrypt Content
              */
@@ -502,7 +507,7 @@ public class StockManage implements Serializable {
             /**
              * Post Data
              */
-            String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T127", CompanySetting.getTaxIdentity());
+            String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T127", CompanySetting.getTaxIdentity());
 
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             output = response.getEntity(String.class);
@@ -547,8 +552,8 @@ public class StockManage implements Serializable {
                     + "	\"pageSize\": \"10\"\n"
                     + "}";
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
-            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_OFFLINE").getParameter_value());
-            String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T127", CompanySetting.getTaxIdentity());
+            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_URL_OFFLINE").getParameter_value());
+            String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T127", CompanySetting.getTaxIdentity());
 
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             output = response.getEntity(String.class);
@@ -579,7 +584,7 @@ public class StockManage implements Serializable {
         return itemtax;
     }
 
-    public String addStockOffline(String aId, String aQty, String aUnitPrice, String aSupplierTin, String aSupplierName, String aUnitCodeTax) {
+    public String addStockOffline(String aId, String aQty, String aUnitPrice, String aSupplierTin, String aSupplierName, String aUnitCodeTax, String aAdjustType, String aStockInType) {
         String ReturnMsg = "";
         String output = "";
         //System.out.println("aUnitPrice:" + aUnitPrice);
@@ -589,8 +594,8 @@ public class StockManage implements Serializable {
                     + " \"operationType\": \"101\",\n"
                     + " \"supplierTin\": \"" + aSupplierTin + "\",\n"
                     + " \"supplierName\": \"" + aSupplierName + "\",\n"
-                    + " \"adjustType\": \"\",\n"
-                    + " \"stockInType\": \"102\",\n"
+                    + " \"adjustType\": \"" + aAdjustType + "\",\n"
+                    + " \"stockInType\": \"" + aStockInType + "\",\n"
                     + " \"remarks\": \"Increase inventory\"\n"
                     + " },\n"
                     + " \"goodsStockInItem\": [{\n"
@@ -602,8 +607,8 @@ public class StockManage implements Serializable {
                     + "}";
 
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
-            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_OFFLINE").getParameter_value());
-            String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T131", CompanySetting.getTaxIdentity());
+            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_URL_OFFLINE").getParameter_value());
+            String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T131", CompanySetting.getTaxIdentity());
             //System.out.println("json:" + json);
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             output = response.getEntity(String.class);
@@ -633,7 +638,7 @@ public class StockManage implements Serializable {
         return ReturnMsg;
     }
 
-    public String addStockOnline(String aId, String aQty, String aUnitPrice, String aSupplierTin, String aSupplierName, String aUnitCodeTax) {
+    public String addStockOnline(String aId, String aQty, String aUnitPrice, String aSupplierTin, String aSupplierName, String aUnitCodeTax, String aAdjustType, String aStockInType) {
         String ReturnMsg = "";
         String output = "";
         //System.out.println("aUnitPrice:" + aUnitPrice);
@@ -643,8 +648,8 @@ public class StockManage implements Serializable {
                     + " \"operationType\": \"101\",\n"
                     + " \"supplierTin\": \"" + aSupplierTin + "\",\n"
                     + " \"supplierName\": \"" + aSupplierName + "\",\n"
-                    + " \"adjustType\": \"\",\n"
-                    + " \"stockInType\": \"102\",\n"
+                    + " \"adjustType\": \"" + aAdjustType + "\",\n"
+                    + " \"stockInType\": \"" + aStockInType + "\",\n"
                     + " \"remarks\": \"Increase inventory\"\n"
                     + " },\n"
                     + " \"goodsStockInItem\": [{\n"
@@ -656,13 +661,13 @@ public class StockManage implements Serializable {
                     + "}";
 
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
-            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_ONLINE").getParameter_value());
+            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_URL_ONLINE").getParameter_value());
             /**
              * Read Private Key
              */
-            PrivateKey key = new SecurityPKI().getPrivate(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_FILE").getParameter_value(), Security.Decrypt(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_PASSWORD").getParameter_value()), new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_ALIAS").getParameter_value());
-            //String AESpublickeystring = SecurityPKI.decrypt(new SecurityPKI().AESPublicKey(CompanySetting.getTaxIdentity(), new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value()), key);
-            String AESpublickeystring = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_AES_PUBLIC_KEY").getParameter_value();
+            PrivateKey key = new SecurityPKI().getPrivate(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_FILE").getParameter_value(), Security.Decrypt(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_PASSWORD").getParameter_value()), new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_ALIAS").getParameter_value());
+            //String AESpublickeystring = SecurityPKI.decrypt(new SecurityPKI().AESPublicKey(CompanySetting.getTaxIdentity(), new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value()), key);
+            String AESpublickeystring = new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_AES_PUBLIC_KEY").getParameter_value();
             /**
              * Encrypt Content
              */
@@ -671,7 +676,7 @@ public class StockManage implements Serializable {
             /**
              * Post Data
              */
-            String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T131", CompanySetting.getTaxIdentity());
+            String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T131", CompanySetting.getTaxIdentity());
             //System.out.println("json:" + json);
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             output = response.getEntity(String.class);
@@ -725,8 +730,8 @@ public class StockManage implements Serializable {
                     + " }]\n"
                     + "}";
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
-            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_OFFLINE").getParameter_value());
-            String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T131", CompanySetting.getTaxIdentity());
+            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_URL_OFFLINE").getParameter_value());
+            String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T131", CompanySetting.getTaxIdentity());
 
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             output = response.getEntity(String.class);
@@ -743,8 +748,6 @@ public class StockManage implements Serializable {
             if (DecryptedContent.length() == 2) {
                 ReturnMsg = dataobject.getString("returnMessage");
             } else {
-                //System.out.println("subtractStock:DecryptedContent:" + DecryptedContent);
-                //System.out.println("subtractStock:returnMessage:" + dataobject.getString("returnMessage"));
                 ReturnMsg = dataobject.getString("returnMessage") + ":DecryptedContent";
                 LOGGER.log(Level.INFO, ReturnMsg);
             }
@@ -778,13 +781,13 @@ public class StockManage implements Serializable {
                     + " }]\n"
                     + "}";
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
-            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_ONLINE").getParameter_value());
+            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_URL_ONLINE").getParameter_value());
             /**
              * Read Private Key
              */
-            PrivateKey key = new SecurityPKI().getPrivate(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_FILE").getParameter_value(), Security.Decrypt(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_PASSWORD").getParameter_value()), new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_ALIAS").getParameter_value());
-            //String AESpublickeystring = SecurityPKI.decrypt(new SecurityPKI().AESPublicKey(CompanySetting.getTaxIdentity(), new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value()), key);
-            String AESpublickeystring = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_AES_PUBLIC_KEY").getParameter_value();
+            PrivateKey key = new SecurityPKI().getPrivate(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_FILE").getParameter_value(), Security.Decrypt(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_PASSWORD").getParameter_value()), new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_ALIAS").getParameter_value());
+            //String AESpublickeystring = SecurityPKI.decrypt(new SecurityPKI().AESPublicKey(CompanySetting.getTaxIdentity(), new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value()), key);
+            String AESpublickeystring = new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_AES_PUBLIC_KEY").getParameter_value();
             /**
              * Encrypt Content
              */
@@ -793,7 +796,7 @@ public class StockManage implements Serializable {
             /**
              * Post Data
              */
-            String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T131", CompanySetting.getTaxIdentity());
+            String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T131", CompanySetting.getTaxIdentity());
 
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             output = response.getEntity(String.class);
@@ -873,7 +876,7 @@ public class StockManage implements Serializable {
                 }
                 //register
                 String recordSynced = "";
-                String APIMode = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_MODE").getParameter_value();
+                String APIMode = new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_MODE").getParameter_value();
                 if (APIMode.equals("OFFLINE")) {
                     recordSynced = this.registerItemOffline(item, aItemIdTax, aOperationType);
                 } else {
@@ -929,8 +932,8 @@ public class StockManage implements Serializable {
                     + "},\n"
                     + "]";
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
-            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_OFFLINE").getParameter_value());
-            String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T130", CompanySetting.getTaxIdentity());
+            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_URL_OFFLINE").getParameter_value());
+            String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T130", CompanySetting.getTaxIdentity());
             //System.out.println("json>:" + json);
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             output = response.getEntity(String.class);
@@ -987,13 +990,13 @@ public class StockManage implements Serializable {
                     + "]";
             //System.out.println("JSON:" + json);
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
-            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_ONLINE").getParameter_value());
+            WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_URL_ONLINE").getParameter_value());
             /**
              * Read Private Key
              */
-            PrivateKey key = new SecurityPKI().getPrivate(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_FILE").getParameter_value(), Security.Decrypt(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_PASSWORD").getParameter_value()), new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_KEYSTORE_ALIAS").getParameter_value());
-            //String AESpublickeystring = SecurityPKI.decrypt(new SecurityPKI().AESPublicKey(CompanySetting.getTaxIdentity(), new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value()), key);
-            String AESpublickeystring = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_AES_PUBLIC_KEY").getParameter_value();
+            PrivateKey key = new SecurityPKI().getPrivate(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_FILE").getParameter_value(), Security.Decrypt(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_PASSWORD").getParameter_value()), new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_KEYSTORE_ALIAS").getParameter_value());
+            //String AESpublickeystring = SecurityPKI.decrypt(new SecurityPKI().AESPublicKey(CompanySetting.getTaxIdentity(), new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value()), key);
+            String AESpublickeystring = new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_AES_PUBLIC_KEY").getParameter_value();
             /**
              * Encrypt Content
              */
@@ -1002,7 +1005,7 @@ public class StockManage implements Serializable {
             /**
              * Post Data
              */
-            String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T130", CompanySetting.getTaxIdentity());
+            String PostData = GeneralUtilities.PostData_Online(encryptedcontent, signedcontent, "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T130", CompanySetting.getTaxIdentity());
             //System.out.println("PostData:" + PostData);
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             output = response.getEntity(String.class);
