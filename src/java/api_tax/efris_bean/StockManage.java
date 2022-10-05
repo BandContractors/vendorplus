@@ -587,7 +587,10 @@ public class StockManage implements Serializable {
     public String addStockOffline(String aId, String aQty, String aUnitPrice, String aSupplierTin, String aSupplierName, String aUnitCodeTax, String aAdjustType, String aStockInType) {
         String ReturnMsg = "";
         String output = "";
-        //System.out.println("aUnitPrice:" + aUnitPrice);
+        if (aStockInType.equals("103")) {
+            aSupplierTin = "";
+            aSupplierName = "";
+        }
         try {
             String json = "{\n"
                     + " \"goodsStockIn\": {\n"
@@ -625,13 +628,10 @@ public class StockManage implements Serializable {
             if (DecryptedContent.length() == 2) {
                 ReturnMsg = dataobject.getString("returnMessage");
             } else {
-                //System.out.println("addStockOffline:DecryptedContent:" + DecryptedContent);
-                //System.out.println("addStockOffline:returnMessage:" + dataobject.getString("returnMessage"));
                 ReturnMsg = dataobject.getString("returnMessage") + ":DecryptedContent";
                 LOGGER.log(Level.INFO, ReturnMsg);
             }
         } catch (Exception e) {
-            //System.err.println("addStockOffline:" + ex.getMessage());
             LOGGER.log(Level.INFO, output);
             LOGGER.log(Level.ERROR, e);
         }
@@ -641,7 +641,10 @@ public class StockManage implements Serializable {
     public String addStockOnline(String aId, String aQty, String aUnitPrice, String aSupplierTin, String aSupplierName, String aUnitCodeTax, String aAdjustType, String aStockInType) {
         String ReturnMsg = "";
         String output = "";
-        //System.out.println("aUnitPrice:" + aUnitPrice);
+        if (aStockInType.equals("103")) {
+            aSupplierTin = "";
+            aSupplierName = "";
+        }
         try {
             String json = "{\n"
                     + " \"goodsStockIn\": {\n"
