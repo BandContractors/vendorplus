@@ -262,17 +262,17 @@ public class TransProductionBean implements Serializable {
                     transprod = new TransProduction();
                     try {
                         transprod.setOutputItemId(rs.getLong("item_id"));
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         transprod.setOutputItemId(0);
                     }
                     try {
                         transprod.setOrderedQty(rs.getDouble("item_qty"));
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         transprod.setOrderedQty(0);
                     }
                     try {
                         transprod.setOutputQty(rs.getDouble("qty_produced"));
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         transprod.setOutputQty(0);
                     }
                     Item outputItem = new Item();
@@ -883,7 +883,9 @@ public class TransProductionBean implements Serializable {
             msg = "Select Item to Add";
         } else if (aItemProductionMap.getInputQty() <= 0) {
             msg = "Check Raw Material Item Qty";
-        } else if (this.itemExists(this.getItmCombinationList(), aItemProductionMap.getInputItemId(), aItemProductionMap.getBatchno(), aItemProductionMap.getCodeSpecific(), aItemProductionMap.getDescSpecific(), aItemProductionMap.getInput_unit_id()) > -1) {
+        } else if (aItemProductionMap.getInputQtyBalance() < 0) {
+            msg = "Check Raw Material Item Qty Balance Cannot be Zero";
+        } else if (this.itemExists(this.getItmCombinationList(), aItemProductionMap.getInputItemId(), aItemProductionMap.getBatchno(), aItemProductionMap.getCodeSpecific(), aItemProductionMap.getDescSpecific()) > -1) {
             msg = "Raw Material Item Exists";
         } else if (new ItemProductionMapBean().differentCurrencyExists(aTransItem.getItemId(), aItemProductionMap.getInputItemId())) {
             msg = "Both Input and Output Items Must be of the Same Currency";
@@ -936,6 +938,24 @@ public class TransProductionBean implements Serializable {
         return ItemFoundAtIndex;
     }
 
+    public int itemExists(List<ItemProductionMap> aItmCombinationList, Long ItemId, String BatchNumb, String aCodeSpec, String aDescSpec) {
+        List<ItemProductionMap> ati = aItmCombinationList;
+        int ItemFoundAtIndex = -1;
+        int ListItemIndex = 0;
+        int ListItemNo = ati.size();
+        double SubT = 0;
+        while (ListItemIndex < ListItemNo) {
+            if (ati.get(ListItemIndex).getInputItemId() == ItemId && BatchNumb.equals(ati.get(ListItemIndex).getBatchno()) && aCodeSpec.equals(ati.get(ListItemIndex).getCodeSpecific()) && aDescSpec.equals(ati.get(ListItemIndex).getDescSpecific())) {
+                ItemFoundAtIndex = ListItemIndex;
+                break;
+            } else {
+                ItemFoundAtIndex = -1;
+            }
+            ListItemIndex = ListItemIndex + 1;
+        }
+        return ItemFoundAtIndex;
+    }
+
     public void clearTransProductionItem(ItemProductionMap aItemProductionMap) {
         try {
             if (aItemProductionMap != null) {
@@ -976,11 +996,11 @@ public class TransProductionBean implements Serializable {
         List<ItemProductionMap> ati = aActiveTransItems;
         int ListItemIndex = 0;
         int ListItemNo = ati.size();
-        double producedQty = transItem.getItemQty();
-        double TQty = 0;
+        //double producedQty = transItem.getItemQty();
         String ItemString = "";
         while (ListItemIndex < ListItemNo) {
-            if (new TransItemBean().isItemTotalQtyGreaterThanCurrentQty(aStoreId, ati.get(ListItemIndex).getInputItemId(), ati.get(ListItemIndex).getBatchno(), (ati.get(ListItemIndex).getInputQty() * producedQty), ati.get(ListItemIndex).getCodeSpecific(), ati.get(ListItemIndex).getDescSpecific())) {
+            //if (new TransItemBean().isItemTotalQtyGreaterThanCurrentQty(aStoreId, ati.get(ListItemIndex).getInputItemId(), ati.get(ListItemIndex).getBatchno(), (ati.get(ListItemIndex).getInputQty() * producedQty), ati.get(ListItemIndex).getCodeSpecific(), ati.get(ListItemIndex).getDescSpecific())) {
+            if (new TransItemBean().isItemTotalQtyGreaterThanCurrentQty(aStoreId, ati.get(ListItemIndex).getInputItemId(), ati.get(ListItemIndex).getBatchno(), ati.get(ListItemIndex).getInputQtyTotalBaseUnit(), ati.get(ListItemIndex).getCodeSpecific(), ati.get(ListItemIndex).getDescSpecific())) {
                 ItemString = ati.get(ListItemIndex).getInputItemName();
                 break;
             } else {
