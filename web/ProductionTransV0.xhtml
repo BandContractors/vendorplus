@@ -134,7 +134,7 @@
                                 <f:selectItems value="#{itemBean.getItemUnitList(itemProductionMap.outputItemId, null, 1)}" var="iu" itemLabel="#{iu.unit_symbol}" itemValue="#{iu.unit_id}"/>
                                 <p:ajax listener="#{transProductionBean.changeItemUnit('Prod',itemProductionMap,transItem,generalUserSetting.currentStore.storeId)}" process="@this proItem" update="itxtUnitCost"/>
                             </p:selectOneMenu>
-                            <p:inputText value="#{transProduction.outputItemUnit}" style="width: 110px" disabled="true" rendered="#{transItem.transactionItemId==1}"/>
+                            <p:inputText value="#{transItem.unitSymbol}" style="width: 110px" disabled="true" rendered="#{transItem.transactionItemId==1}"/>
                             <p:inputText id="itxtQty" style="width: 100px" value="#{transItem.itemQty}" autocomplete="off">
                                 <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                 <f:ajax event="change" listener="#{transProductionBean.updateListUponChangeOutputQty(transItem,generalUserSetting.currentStore.storeId,transProductionBean.itmCombinationList)}" execute="@this" render="dtbRawItem"/>

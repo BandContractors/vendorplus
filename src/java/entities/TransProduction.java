@@ -74,6 +74,7 @@ public class TransProduction implements Serializable {
     private double input_unit_qty;
     private double input_qty_bfr_prod;
     private double input_qty_afr_prod;
+    private String input_unit_symbol;
     //other
     private int unit_id;
     private double base_unit_qty;
@@ -790,6 +791,20 @@ public class TransProduction implements Serializable {
      */
     public void setBase_unit_qty(double base_unit_qty) {
         this.base_unit_qty = base_unit_qty;
+    }
+
+    /**
+     * @return the input_unit_symbol
+     */
+    public String getInput_unit_symbol() {
+        return input_unit_symbol;
+    }
+
+    /**
+     * @param input_unit_symbol the input_unit_symbol to set
+     */
+    public void setInput_unit_symbol(String input_unit_symbol) {
+        this.input_unit_symbol = input_unit_symbol;
     }
     
     

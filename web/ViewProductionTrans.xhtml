@@ -62,7 +62,7 @@
                         </h:inputText>
                         <h:outputLabel value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(70).transactionUserLabel)}:"/>
                         <h:inputText disabled="true" value="#{userDetailBean.getUserDetail(transProductionBean.transProdObj.transactionUserDetailId).userName}" style="width: 500px;"/>
-                        
+
                         <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(70).transactionNumberLabel)}:"/>
                         <h:inputText styleClass="clsInput" disabled="true" value="#{transProductionBean.transProdObj.transaction_number}" style="width: 200px;"/>
                         <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(70).transactionRefLabel)}:"/>
@@ -91,7 +91,7 @@
                             <!-- column header -->
                             <f:facet name="header">#{langsys['Unit']}</f:facet>
                             <!-- row record -->
-                            #{unitBean.getUnit(itemBean.getItem(ati.inputItemId).getUnitId()).unitSymbol}
+                            #{ati.inputItemUnit}
                         </p:column>
                         <p:column>
                             <!-- column header -->

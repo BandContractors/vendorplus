@@ -112,6 +112,7 @@ public class TransProductionItemBean implements Serializable {
             } else {
                 item = new ItemBean().getItem(aTransProductionItem.getInputItemId());
                 aTransProductionItem.setInputItemName(item.getDescription());
+                aTransProductionItem.setInputItemUnit(new UnitBean().getUnit(aTransProductionItem.getUnit_id()).getUnitSymbol());
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
