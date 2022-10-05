@@ -3603,7 +3603,8 @@ public class TransItemBean implements Serializable {
     }
 
     public TransItem getTransItemByTransAndItem(long aTransactionItemId, long aItemId) {
-        String sql = "SELECT * FROM transaction_item WHERE transaction_id=" + aTransactionItemId + " AND item_id=" + aItemId;
+        String sql = "SELECT ti.*,tiu.unit_id,tiu.base_unit_qty FROM transaction_item ti INNER JOIN transaction_item_unit tiu ON ti.transaction_item_id=tiu.transaction_item_id "
+                + "WHERE t.transaction_id=" + aTransactionItemId + " AND t.item_id=" + aItemId;
         ResultSet rs = null;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
@@ -3615,7 +3616,26 @@ public class TransItemBean implements Serializable {
                 return null;
             }
         } catch (Exception e) {
-            System.err.println("getTransItemByTransAndItem:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
+            return null;
+        }
+    }
+
+    public TransItem getTransItemByTransItemUnit(long aTransactionId, long aItemId, int aUnit_id) {
+        String sql = "SELECT ti.*,tiu.unit_id,tiu.base_unit_qty FROM transaction_item ti INNER JOIN transaction_item_unit tiu ON ti.transaction_item_id=tiu.transaction_item_id "
+                + "WHERE t.transaction_id=" + aTransactionId + " AND t.item_id=" + aItemId + " AND tiu.unit_id=" + aUnit_id;
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                return this.getTransItemFromResultSet(rs);
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
             return null;
         }
     }
