@@ -13,11 +13,14 @@ import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
-
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import utilities.UtilityBean;
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+
 /**
  *
  * @author btwesigye
@@ -27,6 +30,7 @@ import javax.faces.context.FacesContext;
 public class AccCoaBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    static Logger LOGGER = Logger.getLogger(AccCoaBean.class.getName());
     private String ActionMessage = null;
     private List<AccCoa> AccCoaObjectList;
     private AccCoa AccCoaObject;
@@ -35,96 +39,96 @@ public class AccCoaBean implements Serializable {
         try {
             try {
                 acccoa.setAccCoaId(aResultSet.getInt("acc_coa_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 acccoa.setAccCoaId(0);
             }
             try {
                 acccoa.setAccountCode(aResultSet.getString("account_code"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 acccoa.setAccountCode("");
             }
             try {
                 acccoa.setAccountName(aResultSet.getString("account_name"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 acccoa.setAccountName("");
             }
             try {
                 acccoa.setAccountDesc(aResultSet.getString("account_desc"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 acccoa.setAccountDesc("");
             }
             try {
                 acccoa.setAccClassId(aResultSet.getInt("acc_class_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 acccoa.setAccClassId(0);
             }
             try {
                 acccoa.setAccTypeId(aResultSet.getInt("acc_type_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 acccoa.setAccTypeId(0);
             }
             try {
                 acccoa.setAccGroupId(aResultSet.getInt("acc_group_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 acccoa.setAccGroupId(0);
             }
             try {
                 acccoa.setAccCategoryId(aResultSet.getInt("acc_category_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 acccoa.setAccCategoryId(0);
             }
             try {
                 acccoa.setOrderCoa(aResultSet.getInt("order_coa"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 acccoa.setOrderCoa(0);
             }
             try {
                 acccoa.setIsActive(aResultSet.getInt("is_active"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 acccoa.setIsActive(0);
             }
             try {
                 acccoa.setIsDeleted(aResultSet.getInt("is_deleted"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 acccoa.setIsDeleted(0);
             }
             try {
                 acccoa.setIsChild(aResultSet.getInt("is_child"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 acccoa.setIsChild(0);
             }
             try {
                 acccoa.setIsTransactorMandatory(aResultSet.getInt("is_transactor_mandatory"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 acccoa.setIsTransactorMandatory(0);
             }
             try {
                 acccoa.setIsSystemAccount(aResultSet.getInt("is_system_account"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 acccoa.setIsSystemAccount(0);
             }
             try {
                 acccoa.setAddBy(aResultSet.getInt("add_by"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 acccoa.setAddBy(0);
             }
             try {
                 acccoa.setLastEditBy(aResultSet.getInt("last_edit_by"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 acccoa.setLastEditBy(0);
             }
             try {
                 acccoa.setAddDate(new Date(aResultSet.getTimestamp("add_date").getTime()));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 acccoa.setAddDate(null);
             }
             try {
                 acccoa.setLastEditDate(new Date(aResultSet.getTimestamp("last_edit_date").getTime()));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 acccoa.setLastEditDate(null);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -143,16 +147,8 @@ public class AccCoaBean implements Serializable {
                 this.setAccCoaFromResultset(accCoa, rs);
                 this.AccCoaObjectList.add(accCoa);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return AccCoaObjectList;
     }
@@ -172,16 +168,8 @@ public class AccCoaBean implements Serializable {
                 this.setAccCoaFromResultset(accCoa, rs);
                 this.AccCoaObjectList.add(accCoa);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return AccCoaObjectList;
     }
@@ -205,16 +193,8 @@ public class AccCoaBean implements Serializable {
                 coa = new AccCoa();
                 this.setAccCoaFromResultset(coa, rs);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return coa;
     }
@@ -238,16 +218,8 @@ public class AccCoaBean implements Serializable {
                 //coa = new AccCoa();
                 this.setAccCoaFromResultset(coa, rs);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -266,16 +238,8 @@ public class AccCoaBean implements Serializable {
                 this.setAccCoaFromResultset(accCoa, rs);
                 this.AccCoaObjectList.add(accCoa);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return AccCoaObjectList;
     }
@@ -305,16 +269,8 @@ public class AccCoaBean implements Serializable {
                 this.setAccCoaFromResultset(accCoa, rs);
                 this.AccCoaObjectList.add(accCoa);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return AccCoaObjectList;
     }
@@ -354,7 +310,7 @@ public class AccCoaBean implements Serializable {
                 this.AccCoaObjectList.add(accCoa);
             }
         } catch (Exception e) {
-            System.err.println("getAccCoaObjectListByInventoryType:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
         return AccCoaObjectList;
     }
@@ -375,16 +331,8 @@ public class AccCoaBean implements Serializable {
                 this.setAccCoaFromResultset(accCoa, rs);
                 this.AccCoaObjectList.add(accCoa);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println(ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return AccCoaObjectList;
     }
@@ -404,16 +352,8 @@ public class AccCoaBean implements Serializable {
                 this.setAccCoaFromResultset(ac, rs);
                 acs.add(ac);
             }
-        } catch (SQLException se) {
-            System.err.println("getAccsByCategory:" + se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println("getAccsByCategory:" + ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return acs;
     }
@@ -432,16 +372,8 @@ public class AccCoaBean implements Serializable {
                 this.setAccCoaFromResultset(ac, rs);
                 acs.add(ac);
             }
-        } catch (SQLException se) {
-            System.err.println("getAccsBySearch:" + se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println("getAccsBySearch:" + ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return acs;
     }
@@ -469,8 +401,8 @@ public class AccCoaBean implements Serializable {
             if (aAccCoaBean.getAccCoaObject().getAccCoaId() > 0) {
                 wheresql = wheresql + " AND acc_coa_id=" + aAccCoaBean.getAccCoaObject().getAccCoaId();
             }
-        } catch (NullPointerException npe) {
-
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         ordersql = " ORDER BY account_code ASC";
         sql = sql + wheresql + ordersql;
@@ -484,8 +416,8 @@ public class AccCoaBean implements Serializable {
                 this.setAccCoaFromResultset(acccoa, rs);
                 this.AccCoaObjectList.add(acccoa);
             }
-        } catch (SQLException se) {
-            System.err.println(se.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -503,16 +435,8 @@ public class AccCoaBean implements Serializable {
                 this.setAccCoaFromResultset(ac, rs);
                 acs.add(ac);
             }
-        } catch (SQLException se) {
-            System.err.println("getNonChildAccounts:" + se.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.err.println("getNonChildAccounts:" + ex.getMessage());
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
         return acs;
     }
@@ -529,12 +453,12 @@ public class AccCoaBean implements Serializable {
         aAccCoaBean.setActionMessage("");
         try {
             new AccCoaBean().clearAccCoa(aAccCoa);
-        } catch (NullPointerException npe) {
+        } catch (Exception e) {
         }
         try {
             aAccCoaBean.setAccCoaObject(null);
             aAccCoaBean.AccCoaObjectList.clear();
-        } catch (NullPointerException npe) {
+        } catch (Exception e) {
         }
     }
 
