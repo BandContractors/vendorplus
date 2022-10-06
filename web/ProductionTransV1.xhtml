@@ -145,6 +145,8 @@
                             </h:inputText>
                             <p:selectOneMenu id="menuUnit1" styleClass="clsMenu" value="#{itemProductionMap.output_unit_id}" style="width: 90px;" rendered="#{transItem.transactionItemId==0}">
                                 <f:selectItems value="#{itemBean.getItemUnitList(itemProductionMap.outputItemId, null, 1)}" var="iu" itemLabel="#{iu.unit_symbol}" itemValue="#{iu.unit_id}"/>
+                                <p:ajax listener="#{transItem.setUnit_id(itemProductionMap.output_unit_id)}" process="@this"/>
+                                <p:ajax listener="#{transProductionBean.updateUnitCostProduction(transItem,generalUserSetting.currentStore.storeId)}" process="@this" update="itxtUnitCost"/>
                             </p:selectOneMenu>
                             <p:inputText value="#{transItem.unitSymbol}" style="width: 110px" disabled="true" rendered="#{transItem.transactionItemId==1}"/>
                             <p:inputText id="itxtQty" style="width: 100px" value="#{transItem.itemQty}" autocomplete="off" disabled="true">
@@ -214,7 +216,7 @@
                             </p:autoComplete>
                             <p:selectOneMenu id="menuUnit2" styleClass="clsMenu" value="#{transProductionBean.itemProductionMapObj.input_unit_id}" style="width: 90px;">
                                 <f:selectItems value="#{itemBean.getItemUnitList(transProductionBean.itemProductionMapObj.inputItemId, null, 1)}" var="iu" itemLabel="#{iu.unit_symbol}" itemValue="#{iu.unit_id}"/>
-                                <p:ajax listener="#{transProductionBean.changeItemUnit('Raw',transProductionBean.itemProductionMapObj,transItem,generalUserSetting.currentStore.storeId)}" process="@this rawItem" update="itxtCurrentQty itxtLeftQty"/>
+                                <p:ajax listener="#{stockBean.setStockCurrentQtyUnit(transProductionBean.itemProductionMapObj,generalUserSetting.currentStore.storeId,itemBean.selectedItemX.itemId,transProductionBean.itemProductionMapObj.input_unit_id)}" process="@this rawItem" update="itxtCurrentQty itxtLeftQty"/>
                             </p:selectOneMenu>
                             <h:selectOneMenu id="menuBatchInputOutside" value="#{transProductionBean.itemProductionMapObj.batchno}" style="width: 100px;height: 30px;">
                                 <f:selectItem itemLabel="" itemValue=""/>

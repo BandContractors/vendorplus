@@ -657,6 +657,8 @@ public class TransProductionBean implements Serializable {
             for (ItemProductionMap obj : aItemProductionMapList) {
                 obj.setInputQtyTotal(aTransItem.getItemQty() * obj.getInputQty());
                 obj.setInputQtyBalance(obj.getInputQtyCurrent() - obj.getInputQtyTotal());
+                double BaseQty = new ItemBean().getBaseUnitQty(obj.getInputItemId(), obj.getInput_unit_id(), obj.getInputQtyTotal());
+                obj.setInputQtyTotalBaseUnit(BaseQty);
             }
         } catch (Exception e) {
             //do nothing

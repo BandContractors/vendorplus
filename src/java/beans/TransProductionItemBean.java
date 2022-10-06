@@ -251,7 +251,8 @@ public class TransProductionItemBean implements Serializable {
                         cs.setDouble("in_input_qty", 0);
                     }
                     try {
-                        cs.setDouble("in_input_unit_cost", new TransItemBean().getItemLatestUnitCostPrice(aItemProductionMap.getInputItemId(), aItemProductionMap.getBatchno(), aItemProductionMap.getCodeSpecific(), aItemProductionMap.getDescSpecific()));
+                        //cs.setDouble("in_input_unit_cost", new TransItemBean().getItemLatestUnitCostPrice(aItemProductionMap.getInputItemId(), aItemProductionMap.getBatchno(), aItemProductionMap.getCodeSpecific(), aItemProductionMap.getDescSpecific()));
+                        cs.setDouble("in_input_unit_cost", new TransItemBean().getItemLatestUnitCostPrice(aItemProductionMap.getInputItemId(), aItemProductionMap.getBatchno(), aItemProductionMap.getCodeSpecific(), aItemProductionMap.getDescSpecific(), aItemProductionMap.getInput_unit_id(), new AccCurrencyBean().getLocalCurrency().getCurrencyCode(), 1));
                     } catch (Exception e) {
                         cs.setDouble("in_input_unit_cost", 0);
                     }
@@ -281,7 +282,7 @@ public class TransProductionItemBean implements Serializable {
                         cs.setInt("in_unit_id", 0);
                     }
                     try {
-                        cs.setDouble("in_base_unit_qty", aItemProductionMap.getInputQty());
+                        cs.setDouble("in_base_unit_qty", aItemProductionMap.getInputQtyTotalBaseUnit());
                     } catch (Exception e) {
                         cs.setDouble("in_base_unit_qty", 0);
                     }
