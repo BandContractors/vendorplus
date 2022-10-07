@@ -85,17 +85,19 @@
                     </p:column> 
                     <p:ajax event="itemSelect" listener="#{transItem.setItemId(itemBean.selectedItem.itemId)}" process="@this" update="menuBatchSpecific itxtUnit menuSmallItem"/>
                     <p:ajax event="change" listener="#{transItem.setItemId(itemBean.selectedItem.itemId)}" rendered="#{itemBean.selectedItem!=null}" process="@this" update="menuBatchSpecific itxtUnit menuSmallItem"/>
+                    <p:ajax event="itemSelect" listener="#{transItem.setUnit_id(itemBean.selectedItem.unitId)}" process="@this"/>
+                    <p:ajax event="change" listener="#{transItem.setUnit_id(itemBean.selectedItem.unitId)}" rendered="#{itemBean.selectedItem!=null}" process="@this"/>
                     <p:ajax event="itemSelect" listener="#{stockBean.refreshSpecificList(generalUserSetting.currentStore.storeId,transItem.itemId)}" process="@this" update="menuBatchSpecific itxtUnit menuSmallItem"/>
                     <p:ajax event="change" listener="#{stockBean.refreshSpecificList(generalUserSetting.currentStore.storeId,transItem.itemId)}" rendered="#{itemBean.selectedItem!=null}" process="@this" update="menuBatchSpecific itxtUnit menuSmallItem"/>
                 </p:autoComplete>
-                <h:inputText id="itxtUnit" styleClass="clsInputTransItem" value="#{unitBean.getUnit(itemBean.getItem(transItem.itemId).getUnitId()).unitSymbol}" style="width: 50px" disabled="true"/>
-                <h:selectOneMenu id="menuBatchSpecific" styleClass="clsMenu" value="#{transItem.stockId}" style="width: 500px;">
+                <h:inputText id="itxtUnit" styleClass="clsInputTransItem" value="#{unitBean.getUnit(itemBean.getItem(transItem.itemId).getUnitId()).unitSymbol}" style="width: 50px;height: 24px;" disabled="true"/>
+                <h:selectOneMenu id="menuBatchSpecific" styleClass="clsMenu" value="#{transItem.stockId}" style="width: 325px;height: 30px;">
                     <c:if test="#{stockBean.specificList.size()>1}" >
                         <f:selectItem itemLabel="#{langsys['Select']}"/>
                     </c:if>
                     <f:selectItems value="#{stockBean.specificList}" var="ic" itemLabel="#{ic.batchno} #{ic.codeSpecific} #{ic.descSpecific}" itemValue="#{ic.stockId}"/>
                 </h:selectOneMenu>
-                <h:inputText id="itxtQty" styleClass="clsInputTransItem" style="width: 120px" value="#{transItem.itemQty}" autocomplete="off">
+                <h:inputText id="itxtQty" styleClass="clsInputTransItem" style="width: 120px;height: 24px;" value="#{transItem.itemQty}" autocomplete="off">
                     <f:ajax event="keyup" listener="#{transItemBean.calUnpackedQty(transItem)}" execute="@this" render="itxtQty2"/>
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
@@ -104,14 +106,14 @@
                 <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Unit']}"/>
                 <h:outputLabel styleClass="clsLabelTransItem" value=""/>
                 <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Qty']} #{langsys['Unpacked']}"/>
-                <h:selectOneMenu id="menuSmallItem" styleClass="clsMenu" value="#{transItem.itemId2}" style="width: 245px;">
+                <h:selectOneMenu id="menuSmallItem" styleClass="clsMenu" value="#{transItem.itemId2}" style="width: 245px;height: 30px;">
                     <f:selectItem itemLabel="" itemValue="0"/>
                     <f:selectItems value="#{itemMapBean.getItemMapsByBigItemId(transItem.itemId)}" var="im2" itemLabel="#{itemBean.getItem(im2.smallItemId).description}" itemValue="#{im2.smallItemId}"/>
                     <f:ajax event="change" listener="#{transItemBean.calUnpackedQty(transItem)}" execute="@this itxtQty" render="itxtUnit2 itxtQty2"/>
                 </h:selectOneMenu>
-                <h:inputText id="itxtUnit2" styleClass="clsInputTransItem" value="#{unitBean.getUnit(itemBean.getItem(transItem.itemId2).getUnitId()).unitSymbol}" style="width: 50px" disabled="true"/>
+                <h:inputText id="itxtUnit2" styleClass="clsInputTransItem" value="#{unitBean.getUnit(itemBean.getItem(transItem.itemId2).getUnitId()).unitSymbol}" style="width: 50px;height: 24px;" disabled="true"/>
                 <h:outputLabel styleClass="clsLabelTransItem" value=""/>
-                <h:inputText id="itxtQty2" styleClass="clsInputTransItem" style="width: 120px" value="#{transItem.itemQty2}" autocomplete="off" disabled="true">
+                <h:inputText id="itxtQty2" styleClass="clsInputTransItem" style="width: 120px;height: 24px;" value="#{transItem.itemQty2}" autocomplete="off" disabled="true">
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
             </h:panelGrid>

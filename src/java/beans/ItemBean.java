@@ -3,8 +3,6 @@ package beans;
 import api_tax.efris.innerclasses.ItemTax;
 import api_tax.efris_bean.StockManage;
 import com.google.gson.Gson;
-import com.google.gson.JsonParser;
-import com.sun.javafx.scene.control.skin.VirtualFlow;
 import sessions.GeneralUserSetting;
 import connections.DBConnection;
 import entities.Category;
@@ -52,7 +50,6 @@ import utilities.CustomValidator;
 import utilities.UtilityBean;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.json.JSONObject;
 import org.primefaces.event.TabChangeEvent;
 /*
  * To change this template, choose Tools | Templates

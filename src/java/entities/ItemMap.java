@@ -24,6 +24,8 @@ public class ItemMap implements Serializable {
     private double FractionQty;
     private int Position;
     private long MapGroupId;
+    private String BigUnitSymbol;
+    private String SmallUnitSymbol;
 
     /**
      * @return the ItemMapId
@@ -107,5 +109,33 @@ public class ItemMap implements Serializable {
      */
     public void setMapGroupId(long MapGroupId) {
         this.MapGroupId = MapGroupId;
+    }
+
+    /**
+     * @return the BigUnitSymbol
+     */
+    public String getBigUnitSymbol() {
+        return BigUnitSymbol;
+    }
+
+    /**
+     * @param BigUnitSymbol the BigUnitSymbol to set
+     */
+    public void setBigUnitSymbol(String BigUnitSymbol) {
+        this.BigUnitSymbol = BigUnitSymbol;
+    }
+
+    /**
+     * @return the SmallUnitSymbol
+     */
+    public String getSmallUnitSymbol() {
+        return SmallUnitSymbol;
+    }
+
+    /**
+     * @param SmallUnitSymbol the SmallUnitSymbol to set
+     */
+    public void setSmallUnitSymbol(String SmallUnitSymbol) {
+        this.SmallUnitSymbol = SmallUnitSymbol;
     }
 }
