@@ -124,7 +124,9 @@ public class TransItem implements Serializable {
     private double discount_amount;//cash discount + loyalty discount
     private int hide_unit_price_invoice;
     private int unit_id;
+    private int unit_id2;
     private double base_unit_qty;
+    private double base_unit_qty2;
     private Item_unit Item_unitObj;
 
     /**
@@ -1525,6 +1527,34 @@ public class TransItem implements Serializable {
      */
     public void setItem_unitObj(Item_unit Item_unitObj) {
         this.Item_unitObj = Item_unitObj;
+    }
+
+    /**
+     * @return the base_unit_qty2
+     */
+    public double getBase_unit_qty2() {
+        return base_unit_qty2;
+    }
+
+    /**
+     * @param base_unit_qty2 the base_unit_qty2 to set
+     */
+    public void setBase_unit_qty2(double base_unit_qty2) {
+        this.base_unit_qty2 = base_unit_qty2;
+    }
+
+    /**
+     * @return the unit_id2
+     */
+    public int getUnit_id2() {
+        return unit_id2;
+    }
+
+    /**
+     * @param unit_id2 the unit_id2 to set
+     */
+    public void setUnit_id2(int unit_id2) {
+        this.unit_id2 = unit_id2;
     }
 
 }

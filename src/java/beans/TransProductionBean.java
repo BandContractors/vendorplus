@@ -1263,6 +1263,12 @@ public class TransProductionBean implements Serializable {
                         cs.setTimestamp("in_add_date", null);
                     }
                     try {
+                        if (trans.getTransactionUserDetailId() == 0) {
+                            trans.setTransactionUserDetailId(new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                        }
+                    } catch (Exception e) {
+                    }
+                    try {
                         cs.setInt("in_transaction_user_detail_id", trans.getTransactionUserDetailId());
                     } catch (Exception e) {
                         cs.setInt("in_transaction_user_detail_id", 0);
