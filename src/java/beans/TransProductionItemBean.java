@@ -427,6 +427,8 @@ public class TransProductionItemBean implements Serializable {
                 ti.setCodeSpecific(aActiveTransItems.get(i).getCodeSpecific());
                 ti.setDescSpecific(aActiveTransItems.get(i).getDescSpecific());
                 ti.setItemQty(aActiveTransItems.get(i).getInputQtyTotal());
+                ti.setBase_unit_qty(aActiveTransItems.get(i).getInputQtyTotalBaseUnit());
+                ti.setUnit_id(aActiveTransItems.get(i).getInput_unit_id());
                 aTransItems.add(ti);
             }
             new TransItemBean().checkAndAutoUnpack(aTransItems);

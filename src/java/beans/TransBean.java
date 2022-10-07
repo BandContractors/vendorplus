@@ -3225,7 +3225,6 @@ public class TransBean implements Serializable {
                 cs.setDouble("in_spent_points_amount", 0);
                 //save
                 cs.executeUpdate();
-
                 //save trans item
                 aTransItem.setTransactionId(cs.getLong("out_transaction_id"));
                 TransItemBean tib = new TransItemBean();
