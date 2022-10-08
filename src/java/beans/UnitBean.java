@@ -46,6 +46,55 @@ public class UnitBean implements Serializable {
     @ManagedProperty("#{menuItemBean}")
     private MenuItemBean menuItemBean;
 
+    public void setUnitFromResultset(Unit aUnit, ResultSet aResultSet) {
+        try {
+            try {
+                aUnit.setUnitId(aResultSet.getInt("unit_id"));
+            } catch (Exception e) {
+                aUnit.setUnitId(0);
+            }
+            try {
+                aUnit.setUnitName(aResultSet.getString("unit_name"));
+            } catch (Exception e) {
+                aUnit.setUnitName("");
+            }
+            try {
+                aUnit.setUnitSymbol(aResultSet.getString("unit_symbol"));
+            } catch (Exception e) {
+                aUnit.setUnitSymbol("");
+            }
+            try {
+                aUnit.setUnit_symbol_tax(aResultSet.getString("unit_symbol_tax"));
+            } catch (Exception e) {
+                aUnit.setUnit_symbol_tax("");
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void setUnit_tax_listFromResultset(Unit_tax_list aUnit_tax_list, ResultSet aResultSet) {
+        try {
+            try {
+                aUnit_tax_list.setUnit_tax_list_id(aResultSet.getInt("unit_tax_list_id"));
+            } catch (Exception e) {
+                aUnit_tax_list.setUnit_tax_list_id(0);
+            }
+            try {
+                aUnit_tax_list.setUnit_symbol_tax(aResultSet.getString("unit_symbol_tax"));
+            } catch (Exception e) {
+                aUnit_tax_list.setUnit_symbol_tax("");
+            }
+            try {
+                aUnit_tax_list.setUnit_name_tax(aResultSet.getString("unit_name_tax"));
+            } catch (Exception e) {
+                aUnit_tax_list.setUnit_name_tax("");
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public void saveUnit(Unit unit, Unit_tax_list aUnit_tax_listObj) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -117,10 +166,7 @@ public class UnitBean implements Serializable {
             rs = ps.executeQuery();
             if (rs.next()) {
                 Unit unit = new Unit();
-                unit.setUnitId(rs.getInt("unit_id"));
-                unit.setUnitName(rs.getString("unit_name"));
-                unit.setUnitSymbol(rs.getString("unit_symbol"));
-                unit.setUnit_symbol_tax(rs.getString("unit_symbol_tax"));
+                this.setUnitFromResultset(unit, rs);
                 return unit;
             } else {
                 return null;
@@ -180,7 +226,7 @@ public class UnitBean implements Serializable {
             UnitTo.setUnitSymbol(UnitFrom.getUnitSymbol());
             UnitTo.setUnit_symbol_tax(UnitFrom.getUnit_symbol_tax());
         } catch (Exception e) {
-            System.out.println("displayUnit-a:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
 
         try {
@@ -191,7 +237,7 @@ public class UnitBean implements Serializable {
                 //this.Unit_tax_listObj.setUnit_name_tax(utl.getUnit_name_tax());
             }
         } catch (Exception e) {
-            System.out.println("displayUnit-b:" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -224,10 +270,7 @@ public class UnitBean implements Serializable {
             rs = ps.executeQuery();
             while (rs.next()) {
                 Unit unit = new Unit();
-                unit.setUnitId(rs.getInt("unit_id"));
-                unit.setUnitName(rs.getString("unit_name"));
-                unit.setUnitSymbol(rs.getString("unit_symbol"));
-                unit.setUnit_symbol_tax(rs.getString("unit_symbol_tax"));
+                this.setUnitFromResultset(unit, rs);
                 Units.add(unit);
             }
         } catch (Exception e) {
@@ -252,10 +295,28 @@ public class UnitBean implements Serializable {
             rs = ps.executeQuery();
             while (rs.next()) {
                 Unit unit = new Unit();
-                unit.setUnitId(rs.getInt("unit_id"));
-                unit.setUnitName(rs.getString("unit_name"));
-                unit.setUnitSymbol(rs.getString("unit_symbol"));
-                unit.setUnit_symbol_tax(rs.getString("unit_symbol_tax"));
+                this.setUnitFromResultset(unit, rs);
+                Units.add(unit);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return Units;
+    }
+
+    public List<Unit> getUnitsByUnitCodeTax(String aUnitCodeTax) {
+        String sql;
+        sql = "SELECT * FROM unit WHERE unit_symbol_tax=?";
+        ResultSet rs = null;
+        Unit u = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setString(1, aUnitCodeTax);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Unit unit = new Unit();
+                this.setUnitFromResultset(unit, rs);
                 Units.add(unit);
             }
         } catch (Exception e) {
@@ -275,9 +336,7 @@ public class UnitBean implements Serializable {
             rs = ps.executeQuery();
             while (rs.next()) {
                 Unit_tax_list obj = new Unit_tax_list();
-                obj.setUnit_tax_list_id(rs.getInt("unit_tax_list_id"));
-                obj.setUnit_symbol_tax(rs.getString("unit_symbol_tax"));
-                obj.setUnit_name_tax(rs.getString("unit_name_tax"));
+                this.setUnit_tax_listFromResultset(obj, rs);
                 lst.add(obj);
             }
         } catch (Exception e) {
@@ -295,9 +354,7 @@ public class UnitBean implements Serializable {
             rs = ps.executeQuery();
             if (rs.next()) {
                 Unit_tax_list obj = new Unit_tax_list();
-                obj.setUnit_tax_list_id(rs.getInt("unit_tax_list_id"));
-                obj.setUnit_symbol_tax(rs.getString("unit_symbol_tax"));
-                obj.setUnit_name_tax(rs.getString("unit_name_tax"));
+                this.setUnit_tax_listFromResultset(obj, rs);
                 return obj;
             } else {
                 return null;
@@ -317,9 +374,7 @@ public class UnitBean implements Serializable {
             rs = ps.executeQuery();
             if (rs.next()) {
                 Unit_tax_list obj = new Unit_tax_list();
-                obj.setUnit_tax_list_id(rs.getInt("unit_tax_list_id"));
-                obj.setUnit_symbol_tax(rs.getString("unit_symbol_tax"));
-                obj.setUnit_name_tax(rs.getString("unit_name_tax"));
+                this.setUnit_tax_listFromResultset(obj, rs);
                 return obj;
             } else {
                 return null;
@@ -340,9 +395,7 @@ public class UnitBean implements Serializable {
             rs = ps.executeQuery();
             while (rs.next()) {
                 Unit_tax_list obj = new Unit_tax_list();
-                obj.setUnit_tax_list_id(rs.getInt("unit_tax_list_id"));
-                obj.setUnit_symbol_tax(rs.getString("unit_symbol_tax"));
-                obj.setUnit_name_tax(rs.getString("unit_name_tax"));
+                this.setUnit_tax_listFromResultset(obj, rs);
                 lst.add(obj);
             }
         } catch (Exception e) {
