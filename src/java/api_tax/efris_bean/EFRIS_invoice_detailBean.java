@@ -129,9 +129,8 @@ public class EFRIS_invoice_detailBean implements Serializable {
                 status = "Device Number not mapped to any store";
             } //else if (!new StoreBean().getStoresByUser(aUserDetail.getUserDetailId()).contains(store) && aUserDetail.getIsUserGenAdmin().equals("No")) {
             //    status = "Operator/User has no access to the store mapped to the device number";
-            //} 
-            else if (new AccChildAccountBean().getAccChildAccountsForCashReceipt(currency.getCurrencyCode(), payMethodId, store.getStoreId(), aUserDetail.getUserDetailId()).get(0) == null) {
-                status = "Operator/User does not have a child account";
+            else if (new AccChildAccountBean().getAccChildAccountsForCashReceipt(currency.getCurrencyCode(), payMethodId, store.getStoreId(), aUserDetail.getUserDetailId()) == null) {
+                status = "Operator/User does not have a child account or child account is inactive";
             } else if (!itemValidationMsg.equals("success")) {
                 status = itemValidationMsg;
             } else {
