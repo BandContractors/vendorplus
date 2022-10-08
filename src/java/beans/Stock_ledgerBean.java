@@ -9,6 +9,7 @@ import entities.Item_unit_other;
 import entities.Parameter_list;
 import entities.Stock;
 import entities.Stock_ledger;
+import entities.Trans;
 import entities.TransItem;
 import entities.TransProduction;
 import entities.TransProductionItem;
@@ -61,92 +62,92 @@ public class Stock_ledgerBean implements Serializable {
         try {
             try {
                 aStock_ledger.setStock_ledger_id(aResultSet.getLong("stock_ledger_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock_ledger.setStock_ledger_id(0);
             }
             try {
                 aStock_ledger.setStore_id(aResultSet.getInt("store_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock_ledger.setStore_id(0);
             }
             try {
                 aStock_ledger.setItem_id(aResultSet.getLong("item_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock_ledger.setItem_id(0);
             }
             try {
                 aStock_ledger.setBatchno(aResultSet.getString("batchno"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock_ledger.setBatchno("");
             }
             try {
                 aStock_ledger.setCode_specific(aResultSet.getString("code_specific"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock_ledger.setCode_specific("");
             }
             try {
                 aStock_ledger.setDesc_specific(aResultSet.getString("desc_specific"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock_ledger.setDesc_specific("");
             }
             try {
                 aStock_ledger.setSpecific_size(aResultSet.getDouble("specific_size"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock_ledger.setSpecific_size(0);
             }
             try {
                 aStock_ledger.setQty_added(aResultSet.getDouble("qty_added"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock_ledger.setQty_added(0);
             }
             try {
                 aStock_ledger.setQty_subtracted(aResultSet.getDouble("qty_subtracted"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock_ledger.setQty_subtracted(0);
             }
             try {
                 aStock_ledger.setTransaction_type_id(aResultSet.getInt("transaction_type_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock_ledger.setTransaction_type_id(0);
             }
             try {
                 aStock_ledger.setAction_type(aResultSet.getString("action_type"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock_ledger.setAction_type("");
             }
             try {
                 aStock_ledger.setTransaction_id(aResultSet.getLong("transaction_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock_ledger.setTransaction_id(0);
             }
             try {
                 aStock_ledger.setUser_detail_id(aResultSet.getInt("user_detail_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock_ledger.setUser_detail_id(0);
             }
             try {
                 aStock_ledger.setAdd_date(new Date(aResultSet.getTimestamp("add_date").getTime()));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock_ledger.setAdd_date(null);
             }
             try {
                 aStock_ledger.setQty_bal(aResultSet.getDouble("qty_bal"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock_ledger.setQty_bal(0);
             }
             try {
                 aStock_ledger.setTax_update_id(aResultSet.getLong("tax_update_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock_ledger.setTax_update_id(0);
             }
             try {
                 aStock_ledger.setTax_is_updated(aResultSet.getInt("tax_is_updated"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock_ledger.setTax_is_updated(0);
             }
             try {
                 aStock_ledger.setTax_update_synced(aResultSet.getInt("tax_update_synced"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aStock_ledger.setTax_update_synced(0);
             }
             try {
@@ -188,27 +189,27 @@ public class Stock_ledgerBean implements Serializable {
             TransProductionItem TransProdItem = null;
             try {
                 stockledger.setStore_id(aStock.getStoreId());
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 stockledger.setStore_id(0);
             }
             try {
                 stockledger.setItem_id(aStock.getItemId());
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 stockledger.setItem_id(0);
             }
             try {
                 stockledger.setBatchno(aStock.getBatchno());
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 stockledger.setBatchno("");
             }
             try {
                 stockledger.setCode_specific(aStock.getCodeSpecific());
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 stockledger.setCode_specific("");
             }
             try {
                 stockledger.setDesc_specific(aStock.getDescSpecific());
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 stockledger.setDesc_specific("");
             }
             try {
@@ -217,7 +218,7 @@ public class Stock_ledgerBean implements Serializable {
                 } else {
                     stockledger.setSpecific_size(1);
                 }
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 stockledger.setSpecific_size(1);
             }
             try {
@@ -226,7 +227,7 @@ public class Stock_ledgerBean implements Serializable {
                 } else {
                     stockledger.setQty_added(0);
                 }
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 stockledger.setQty_added(0);
             }
             try {
@@ -235,32 +236,32 @@ public class Stock_ledgerBean implements Serializable {
                 } else {
                     stockledger.setQty_subtracted(0);
                 }
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 stockledger.setQty_subtracted(0);
             }
             try {
                 stockledger.setTransaction_type_id(aTrans_type_id);
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 stockledger.setTransaction_type_id(0);
             }
             try {
                 stockledger.setAction_type(aAction_type);
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 stockledger.setAction_type("");
             }
             try {
                 stockledger.setTransaction_id(aTrans_id);
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 stockledger.setTransaction_id(0);
             }
             try {
                 stockledger.setUser_detail_id(aUser_detail_id);
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 stockledger.setUser_detail_id(0);
             }
             try {
                 stockledger.setAdd_date(new CompanySetting().getCURRENT_SERVER_DATE());
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 stockledger.setAdd_date(null);
             }
             double qtybal = 0;
@@ -365,7 +366,8 @@ public class Stock_ledgerBean implements Serializable {
                         stocksub.setCurrentqty(aQty);
                         stocksub.setUnitCost(aStock.getUnitCost());
                         //get AdjustType
-                        String AdjustType = "105";//Others
+                        String AdjustStockinType = new Stock_ledgerBean().getAjustAndStockinTypeFrmStock_ledger(aTableName, stockledger.getTax_update_id());
+                        String AdjustType = new UtilityBean().getStringArrayFromXSeperatedStr(AdjustStockinType, ":")[0];
                         String ItemIdTax = "";
                         try {
                             ItemIdTax = new Item_tax_mapBean().getItem_tax_map(stocksub.getItemId()).getItem_id_tax();
@@ -436,6 +438,99 @@ public class Stock_ledgerBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
         return update_flag;
+    }
+
+    public String getAjustAndStockinTypeFrmStock_ledger(String aTableName, long aTax_update_id) {
+        String AdjustAndStockinType = "";
+        String AdjustType = "";
+        String StockinType = "";
+        ResultSet rs = null;
+        String sql = "SELECT * FROM " + aTableName + " WHERE tax_update_id=" + aTax_update_id;
+        //System.out.println("sql:" + sql);
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            Stock_ledger sl = null;
+            if (rs.next()) {
+                sl = new Stock_ledger();
+                this.setStock_ledgerFromResultset(sl, rs);
+            }
+            if (null != sl) {
+                //a)adjustType
+                //101: Expired Goods, 102: Damaged Goods, 103: Personal Uses, 105:Raw Material(s), 104:Others. (Please specify)
+                //If operationType = 101，adjustType must be empty; If operationType = 102，adjustType cannot be empty
+                if (sl.getQty_added() > 0) {
+                    AdjustType = "";
+                } else if (sl.getQty_subtracted() > 0) {
+                    if (sl.getTransaction_type_id() == 70) {
+                        AdjustType = "105";
+                    } else if (sl.getTransaction_type_id() == 3) {
+                        TransItem ti = new TransItemBean().getTransItem(sl.getTransaction_item_id());
+                        if (null != ti) {
+                            if (ti.getNarration().equals("EXPIRED")) {
+                                AdjustType = "101";
+                            } else if (ti.getNarration().equals("DAMAGE")) {
+                                AdjustType = "102";
+                            } else if (ti.getNarration().equals("LOST")) {
+                                AdjustType = "102";
+                            } else if (ti.getNarration().equals("OTHER")) {
+                                AdjustType = "104";
+                            } else {
+                                AdjustType = "102";
+                            }
+                        } else {
+                            AdjustType = "102";
+                        }
+                    } else {
+                        AdjustType = "104";
+                    }
+                }
+                //b)stockInType
+                //101:Import 102:Local Purchase 103:Manufacture/Assembling 104:Opening Stock
+                //If operationType = 101，stockInType cannot be empty
+                //If operationType = 102，stockInType must be empty
+                if (sl.getQty_subtracted() > 0) {
+                    StockinType = "";
+                } else if (sl.getQty_added() > 0) {
+                    if (sl.getTransaction_type_id() == 70) {
+                        StockinType = "103";
+                    } else if (sl.getTransaction_type_id() == 1 || sl.getTransaction_type_id() == 9) {
+                        try {
+                            Trans t = new TransBean().getTrans(sl.getTransaction_id());
+                            if (null != t) {
+                                if (t.getBillTransactorId() > 0) {
+                                    Transactor trc = new TransactorBean().getTransactor(t.getBillTransactorId());
+                                    if (null != trc) {
+                                        if (trc.getLocCountry().length() == 0) {
+                                            StockinType = "102";
+                                        } else if (!trc.getLocCountry().toUpperCase().equals(new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "COUNTRY_CODE").getParameter_value().toUpperCase())) {
+                                            StockinType = "101";
+                                        } else {
+                                            StockinType = "102";
+                                        }
+                                    } else {
+                                        StockinType = "102";
+                                    }
+                                } else {
+                                    StockinType = "102";
+                                }
+                            } else {
+                                StockinType = "102";
+                            }
+                        } catch (Exception e) {
+                        }
+                    } else {
+                        StockinType = "102";
+                    }
+                }
+            }
+            AdjustAndStockinType = AdjustType + ":" + StockinType;
+            //System.out.println("AdjustAndStockinType:" + AdjustAndStockinType);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return AdjustAndStockinType;
     }
 
     public void reSubmitStockTaxAPIAll(List<Stock_ledger> aStock_ledgerList, Stock_ledger aStock_ledger, Stock_ledgerBean aStock_ledgerBean, Item aItem) {
@@ -538,7 +633,8 @@ public class Stock_ledgerBean implements Serializable {
                         stocksub.setCurrentqty(aStock_ledger4Sync.getQty_subtracted());
                         stocksub.setUnitCost(LatestUnitCostPrice);
                         //get AdjustType
-                        String AdjustType = "105";//Others
+                        String AdjustStockinType = new Stock_ledgerBean().getAjustAndStockinTypeFrmStock_ledger(TableName, aStock_ledger4Sync.getTax_update_id());
+                        String AdjustType = new UtilityBean().getStringArrayFromXSeperatedStr(AdjustStockinType, ":")[0];
                         String ItemIdTax = "";
                         try {
                             ItemIdTax = new Item_tax_mapBean().getItem_tax_map(stocksub.getItemId()).getItem_id_tax();

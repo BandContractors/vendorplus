@@ -16,6 +16,7 @@ import connections.DBConnection;
 import entities.CompanySetting;
 import entities.Item;
 import entities.Item_code_other;
+import entities.Item_unit;
 import entities.ThreadClass;
 import entities.Trans;
 import entities.TransItem;
@@ -48,9 +49,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.faces.application.FacesMessage;
 import javax.faces.bean.*;
-import javax.faces.context.FacesContext;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.IntrospectionException;
@@ -63,8 +62,6 @@ import javax.management.ReflectionException;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.primefaces.event.ToggleEvent;
-import org.primefaces.model.Visibility;
 import sessions.GeneralUserSetting;
 
 @ManagedBean
@@ -806,14 +803,12 @@ public class UtilityBean implements Serializable {
     }
 
 //    public static void main(String[] args) {
-//        System.out.println(new AccCurrencyBean().roundDoubleToXDps(12.12,8));
-//        System.out.println(new AccCurrencyBean().roundDoubleToXDps(12,8));
-//        System.out.println(new AccCurrencyBean().roundDoubleToXDps(12.1234567,8));
-//        System.out.println(new AccCurrencyBean().roundDoubleToXDps(12.12345678,8));
-//        System.out.println(new AccCurrencyBean().roundDoubleToXDps(12.123456789,8));
-//        System.out.println(new AccCurrencyBean().roundDoubleToXDps(12.12345671234,8));
-//        System.out.println(new AccCurrencyBean().roundDoubleToXDps(12.0,8));
+//        List<Item_unit> aItem_unitList=new ArrayList<>();
+//        Item aItem=new ItemBean().getItem(2510);
+//        new ItemBean().setItemUnitList(aItem_unitList, aItem, 0);
+//        System.out.println(aItem_unitList.size());
 //    }
+    
     public List<ThreadClass> getRunningThreads() {
         List<ThreadClass> objs = new ArrayList<>();
         Set<Thread> threads = Thread.getAllStackTraces().keySet();

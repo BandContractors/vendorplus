@@ -64,3 +64,7 @@ UPDATE trans_production t SET t.base_unit_qty=t.output_qty,t.unit_id=(select i.u
 WHERE t.transaction_id>0;
 
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',66,Now(),'6.0','');
+
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (98, 'COMPANY_SETTING', 'COUNTRY_NAME', 'UGANDA','Country of Registration for the company or Branch; this should be the full name e.g UGANDA');
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',70,Now(),'6.0','');

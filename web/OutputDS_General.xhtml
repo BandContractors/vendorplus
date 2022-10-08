@@ -79,7 +79,12 @@
                             <!-- row record -->
                             #{ti2.unitSymbol}
                         </p:column>
-
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langout['Reason']}</f:facet>
+                            <!-- row record -->
+                            #{ti2.narration}
+                        </p:column>
                         <p:column>
                             <!-- column header -->
                             <f:facet name="header">#{langout['Batch']} #{langout['No.']}</f:facet>

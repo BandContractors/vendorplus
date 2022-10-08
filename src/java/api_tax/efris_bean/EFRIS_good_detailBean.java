@@ -10,11 +10,14 @@ import api_tax.efris.innerclasses.GoodsDetails;
 import beans.ItemBean;
 import beans.Item_tax_mapBean;
 import beans.TransItemBean;
+import beans.UnitBean;
 import connections.DBConnection;
 import entities.CompanySetting;
 import entities.Item;
 import entities.Item_tax_map;
+import entities.Item_unit;
 import entities.TransItem;
+import entities.Unit;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -26,6 +29,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import utilities.UtilityBean;
 
 /**
  *
@@ -46,24 +50,33 @@ public class EFRIS_good_detailBean implements Serializable {
                 EFRIS_good_detail aEFRIS_good_detail = aEFRIS_good_detailList.get(i);
                 //get Item_tax_mapBean
                 Item_tax_map aItem_tax_map = new Item_tax_mapBean().getItem_tax_mapByIdTax(aEFRIS_good_detail.getItemCode());
-
                 int itemQty = Integer.parseInt(aEFRIS_good_detail.getQty());
+
+                //check for for unit of measure
+                List<Item_unit> ItemUnitList = new ArrayList<>();
+                try {
+                    ItemUnitList = new ItemBean().getItemUnitListByCodeTax(new ItemBean().findItem(aItem_tax_map.getItem_id()), aEFRIS_good_detail.getUnitOfMeasure());
+                } catch (Exception e) {
+
+                }
                 if (aItem_tax_map == null) {
                     //status = "Item code at position " + (i + 1) + " not in item_tax_map";
-                    status = "Item "+aEFRIS_good_detail.getItem()+" with code: "+aEFRIS_good_detail.getItemCode()+", Unit: "+aEFRIS_good_detail.getUnitOfMeasure()+" is not in mapped";
+                    status = "Item " + aEFRIS_good_detail.getItem() + " with code: " + aEFRIS_good_detail.getItemCode() + ", Unit: " + aEFRIS_good_detail.getUnitOfMeasure() + " is not in mapped";
                     break;
                 } else if (new ItemBean().findItem(aItem_tax_map.getItem_id()) == null) {
                     //status = "Item at position " + (i + 1) + " does not exist";
-                    status = "Item "+aEFRIS_good_detail.getItem()+" does not exist";
+                    status = "Item " + aEFRIS_good_detail.getItem() + " does not exist";
                     break;
                 } else if (new ItemBean().getItemCurrentStockStatus(aItem_tax_map.getItem_id()).getQty_total() < itemQty) {
                     //status = "Item at position " + (i + 1) + " Has less Stock";
-                    status = "Item "+aEFRIS_good_detail.getItem()+" Has less Stock";
+                    status = "Item " + aEFRIS_good_detail.getItem() + " Has less Stock";
+                    break;
+                } else if (ItemUnitList.isEmpty()) {
+                    status = "Unit of measure (" + aEFRIS_good_detail.getUnitOfMeasure() + ") not mapped to the item ";
                     break;
                 } else {
                     status = "success";
                 }
-
                 //update validation status
                 if (status.equals("success")) {
                     this.updateEFRIS_good_detailValidation(aEFRIS_good_detail.getEFRIS_good_detail_id(), 1, status);
@@ -390,6 +403,20 @@ public class EFRIS_good_detailBean implements Serializable {
                 aTransItem.setSpecific_size(1);
             } catch (Exception e) {
                 aTransItem.setSpecific_size(0);
+            }
+            //set for unit of measure
+            try {
+                String EfrisUnitCode = aEFRIS_good_detail.getUnitOfMeasure();
+                if (new UtilityBean().getEmptyIfNull(EfrisUnitCode).length() > 0) {
+                    List<Item_unit> ItemUnitList = new ItemBean().getItemUnitListByCodeTax(aItem, EfrisUnitCode);
+                    if (ItemUnitList.size() > 0) {
+                        aTransItem.setUnit_id(ItemUnitList.get(0).getUnit_id());
+                        double BaseQty = new ItemBean().getBaseUnitQty(aItem.getItemId(), aTransItem.getUnit_id(), aTransItem.getItemQty());
+                        aTransItem.setBase_unit_qty(BaseQty);
+                    }
+                }
+            } catch (Exception e) {
+
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
