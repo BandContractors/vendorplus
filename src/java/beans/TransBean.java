@@ -19,6 +19,7 @@ import entities.TransItem;
 import entities.GroupRight;
 import entities.Transactor;
 import entities.Item;
+import entities.Item_unit;
 import entities.Location;
 import entities.PayMethod;
 import entities.PayTrans;
@@ -643,8 +644,10 @@ public class TransBean implements Serializable {
                         aTransItems.get(i).setQty_balance(aTransItems.get(i).getQty_taken() - aTransItems.get(i).getQty_total());//balance
                         if (aTransItems.get(i).getQty_balance() > 0) {
                             aTransItems.get(i).setItemQty(aTransItems.get(i).getQty_balance());//Qty to Deliver=balance
+                            new TransItemBean().updateBaseUnityQty(aTransItems.get(i));
                         } else {
                             aTransItems.get(i).setItemQty(0);//Qty to Deliver=0
+                            aTransItems.get(i).setBase_unit_qty(0);
                         }
                     }
                 } else {
@@ -1242,6 +1245,7 @@ public class TransBean implements Serializable {
                 int QualifyForSave = 1;
                 if (trans.getTransactionId() > 0) {
                     QualifyForSave = 0;
+                    int TransItemsUnitDeleted = new TransItemExtBean().deleteTransItemsUnitByTransId(trans.getTransactionId());
                     int TransItemsDeleted = new TransItemBean().deleteTransItemsCEC(trans.getTransactionId());
                     if (TransItemsDeleted == 1) {
                         new TransItemBean().resetTransactionItem(1, aActiveTransItems);
@@ -1329,15 +1333,20 @@ public class TransBean implements Serializable {
         if (aTransactorId == 0 || aTransNo.length() == 0 || null == aTransItem) {
             //do nothing
         } else {
-            sql = "SELECT  ti.item_id,ti.item_qty,ti.specific_size,IFNULL(ti.batchno, '') as batchno,IFNULL(ti.code_specific, '') as code_specific,IFNULL(ti.desc_specific, '') as desc_specific, "
+            sql = "SELECT  ti.item_id,tiu.unit_id,ti.item_qty,ti.specific_size,IFNULL(ti.batchno, '') as batchno,IFNULL(ti.code_specific, '') as code_specific,IFNULL(ti.desc_specific, '') as desc_specific, "
                     + "("
-                    + "select IFNULL(sum(ti2.item_qty),0) as sum_qty from transaction_item ti2 INNER JOIN transaction t2 ON ti2.transaction_id=t2.transaction_id WHERE t2.transaction_type_id=2 AND ti2.item_id=ti.item_id AND t2.transaction_ref=t.transaction_number AND t2.transactor_id=t.transactor_id "
+                    + "select IFNULL(sum(ti2.item_qty),0) as sum_qty from transaction_item ti2 "
+                    + "INNER JOIN transaction t2 ON ti2.transaction_id=t2.transaction_id "
+                    + "INNER JOIN transaction_item_unit tiu2 ON ti2.transaction_item_id=tiu2.transaction_item_id "
+                    + "WHERE t2.transaction_type_id=2 AND ti2.item_id=ti.item_id AND tiu2.unit_id=tiu.unit_id AND t2.transaction_ref=t.transaction_number AND t2.transactor_id=t.transactor_id "
                     + "AND IFNULL(ti2.batchno, '')=IFNULL(ti.batchno, '') and IFNULL(ti2.code_specific, '')=IFNULL(ti.code_specific, '') and IFNULL(ti2.desc_specific, '')=IFNULL(ti.desc_specific, '') "
                     + ") as qty_invoiced "
                     + "FROM transaction_item ti "
                     + "INNER JOIN transaction t ON ti.transaction_id=t.transaction_id "
+                    + "INNER JOIN transaction_item_unit tiu ON ti.transaction_item_id=tiu.transaction_item_id "
                     + "WHERE transaction_type_id=11 AND t.transactor_id=" + aTransactorId + " AND t.transaction_number='" + aTransNo + "' "
                     + "AND ti.item_id=" + aTransItem.getItemId() + " "
+                    + "AND tiu.unit_id=" + aTransItem.getUnit_id() + " "
                     + "AND IFNULL(ti.batchno, '')='" + aTransItem.getBatchno() + "' and IFNULL(ti.code_specific, '')='" + aTransItem.getCodeSpecific() + "' and IFNULL(ti.desc_specific, '')='" + aTransItem.getDescSpecific() + "' ";
             try (
                     Connection conn = DBConnection.getMySQLConnection();
@@ -1377,13 +1386,17 @@ public class TransBean implements Serializable {
         if (null == aOrderTrans) {
             //do nothing
         } else {
-            sql = "SELECT  ti.item_id,ti.item_qty,ti.specific_size,IFNULL(ti.batchno, '') as batchno,IFNULL(ti.code_specific, '') as code_specific,IFNULL(ti.desc_specific, '') as desc_specific, "
+            sql = "SELECT  ti.item_id,tiu.unit_id,ti.item_qty,ti.specific_size,IFNULL(ti.batchno, '') as batchno,IFNULL(ti.code_specific, '') as code_specific,IFNULL(ti.desc_specific, '') as desc_specific, "
                     + "("
-                    + "select IFNULL(sum(ti2.item_qty),0) as sum_qty from transaction_item ti2 INNER JOIN transaction t2 ON ti2.transaction_id=t2.transaction_id WHERE t2.transaction_type_id=2 AND ti2.item_id=ti.item_id AND t2.transaction_ref=t.transaction_number AND t2.transactor_id=t.transactor_id "
+                    + "select IFNULL(sum(ti2.item_qty),0) as sum_qty from transaction_item ti2 "
+                    + "INNER JOIN transaction t2 ON ti2.transaction_id=t2.transaction_id "
+                    + "INNER JOIN transaction_item_unit tiu2 ON ti2.transaction_item_id=tiu2.transaction_item_id "
+                    + "WHERE t2.transaction_type_id=2 AND ti2.item_id=ti.item_id AND tiu2.unit_id=tiu.unit_id AND t2.transaction_ref=t.transaction_number AND t2.transactor_id=t.transactor_id "
                     + "AND IFNULL(ti2.batchno, '')=IFNULL(ti.batchno, '') and IFNULL(ti2.code_specific, '')=IFNULL(ti.code_specific, '') and IFNULL(ti2.desc_specific, '')=IFNULL(ti.desc_specific, '') "
                     + ") as qty_invoiced "
                     + "FROM transaction_item ti "
                     + "INNER JOIN transaction t ON ti.transaction_id=t.transaction_id "
+                    + "INNER JOIN transaction_item_unit tiu ON ti.transaction_item_id=tiu.transaction_item_id "
                     + "WHERE transaction_type_id=11 AND t.transactor_id=" + aOrderTrans.getTransactorId() + " AND t.transaction_number='" + aOrderTrans.getTransactionNumber() + "'";
             try (
                     Connection conn = DBConnection.getMySQLConnection();
@@ -2172,8 +2185,13 @@ public class TransBean implements Serializable {
                     if (DeleteInserted == 1) {
                         //delete inserted
                         int deleted1 = new TransItemBean().deleteTransItemsCEC(trans.getTransactionId());
+                        int deleted2 = 0;
+                        int deleted3 = 0;
                         if (deleted1 == 1) {
-                            int deleted2 = this.deleteTransCEC(trans.getTransactionId());
+                            deleted2 = new TransItemExtBean().deleteTransItemsUnitByTransId(trans.getTransactionId());
+                        }
+                        if (deleted2 == 1) {
+                            deleted3 = this.deleteTransCEC(trans.getTransactionId());
                         }
                         //display msg
                         switch (aLevel) {
@@ -2293,20 +2311,19 @@ public class TransBean implements Serializable {
 
     public double checkTrans(long aTransactionId, Trans aTrans, List<TransItem> aTransItems) {
         double value = 0;
-        //int CountItems = 0;
-        //double CountQty = 0;
+        int CountItems = 0;
+        double CountQty = 0;
         try {
             if (aTransactionId == 0) {
-                //CountItems = aTransItems.size();
-                //CountQty = new TransItemBean().getTransItemsTotalQty(aTransItems);
-                value = aTransItems.size() + new TransItemBean().getTransItemsTotalQty(aTransItems);
+                CountItems = aTransItems.size();
+                CountQty = new TransItemBean().getTransItemsTotalQty(aTransItems);
             } else if (aTransactionId > 0) {
-                //List<TransItem> tis = new TransItemBean().getTransItemsByTransactionId(aTransactionId);
-                //CountItems = tis.size();
-                //CountQty = new TransItemBean().getTransItemsTotalQty(tis);
-                value = new UtilityBean().getD("SELECT (count(*)+sum(item_qty)) as d FROM transaction_item ti WHERE ti.transaction_id=" + aTransactionId);
+                List<TransItem> tis = new TransItemBean().getTransItemsByTransactionId(aTransactionId);
+                CountItems = tis.size();
+                CountQty = new TransItemBean().getTransItemsTotalQty(tis);
+                //value = new UtilityBean().getD("SELECT (count(*)+sum(item_qty)) as d FROM transaction_item ti WHERE ti.transaction_id=" + aTransactionId);
             }
-            //value = CountQty + CountItems;
+            value = CountQty + CountItems;
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -3721,15 +3738,17 @@ public class TransBean implements Serializable {
             }
 
             //Update by Reversing trans items qty differences
-            TransItemBean tib = new TransItemBean();
-            if (aTransTypeId == 76) {//Open Balance
-                if (tib.updateTransItemCECOpenBalance(aNewTransItems.get(0)) == 1) {
-                    isTransItemReverseSuccess = true;
+            if (isTransItemCopySuccess) {
+                TransItemBean tib = new TransItemBean();
+                if (aTransTypeId == 76) {//Open Balance
+                    if (tib.updateTransItemCECOpenBalance(aNewTransItems.get(0)) == 1) {
+                        isTransItemReverseSuccess = true;
+                    } else {
+                        isTransItemReverseSuccess = false;
+                    }
                 } else {
-                    isTransItemReverseSuccess = false;
+                    isTransItemReverseSuccess = tib.updateTransItemsCEC(aNewTrans.getTransactionId(), TransHistId, aNewTransItems);
                 }
-            } else {
-                isTransItemReverseSuccess = tib.updateTransItemsCEC(aNewTrans.getTransactionId(), TransHistId, aNewTransItems);
             }
             //update trans
             if (isTransCopySuccess && isTransItemCopySuccess && isTransItemReverseSuccess) {
@@ -4108,7 +4127,8 @@ public class TransBean implements Serializable {
             //reverse stock
             if (SavedCrDrNoteTransId > 0) {
                 TransItemBean tib = new TransItemBean();
-                isTransItemReverseSuccess = tib.reverseTransItemsCEC(OldTrans, aNewTrans, OldTransItems, aNewTransItems);
+                //isTransItemReverseSuccess = tib.reverseTransItemsCEC(OldTrans, aNewTrans, OldTransItems, aNewTransItems);
+                isTransItemReverseSuccess = new CreditDebitNoteBean().stockAdjustCrDrNote(SavedCrDrNoteTransId);
             }
             //journal
             if (SavedCrDrNoteTransId > 0 && isTransItemReverseSuccess) {
@@ -4124,20 +4144,6 @@ public class TransBean implements Serializable {
                         httpSession.setAttribute("CURRENT_PAY_ID_CHILD", 0);
                         break;
                 }
-                //Deposit refund as deposit
-                /*
-                 if (null != aPay && aRefundAmount > 0) {
-                 newPayId = new PayBean().saveCustomerDepositFrmCrNote(SavedCrDrNoteTransId, aPay, new GeneralUserSetting().getCurrentUser().getUserDetailId(), aRefundAmount);
-                 switch (aLevel) {
-                 case "PARENT":
-                 httpSession.setAttribute("CURRENT_PAY_ID", newPayId);
-                 break;
-                 case "CHILD":
-                 httpSession.setAttribute("CURRENT_PAY_ID_CHILD", newPayId);
-                 break;
-                 }
-                 }
-                 */
                 //SMbi API insert loyalty transaction for the note
                 String scope = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_SMBI_SCOPE").getParameter_value();
                 if (SavedCrDrNoteTransId > 0 && aNewTrans.getCardNumber().length() > 0 && (scope.isEmpty() || scope.contains("LOYALTY"))) {
@@ -4272,7 +4278,8 @@ public class TransBean implements Serializable {
             //reverse stock
             if (SavedCrDrNoteTransId > 0) {
                 TransItemBean tib = new TransItemBean();
-                isTransItemReverseSuccess = tib.reverseTransItemsCEC(OldTrans, aNewTrans, OldTransItems, aNewTransItems);
+                //isTransItemReverseSuccess = tib.reverseTransItemsCEC(OldTrans, aNewTrans, OldTransItems, aNewTransItems);
+                isTransItemReverseSuccess = new CreditDebitNoteBean().stockAdjustCrDrNote(SavedCrDrNoteTransId);
             }
             //journal
             if (SavedCrDrNoteTransId > 0 && isTransItemReverseSuccess) {
@@ -5372,6 +5379,7 @@ public class TransBean implements Serializable {
                         } else {
                             aActiveTransItems.get(i).setItemQty(0);
                         }
+                        new TransItemBean().editTransItemCEC(transtype.getTransactionTypeId(), transreason.getTransactionReasonId(), "", trans, aActiveTransItems, aActiveTransItems.get(i));
                         //for profit margin
                         if ("SALE INVOICE".equals(transtype.getTransactionTypeName())) {
                             if (item.getIsTrack() == 1) {
@@ -5473,6 +5481,14 @@ public class TransBean implements Serializable {
                             transitem.setDescSpecific("");
                         }
                         transitem.setAccountCode(tib.getTransItemInventCostAccount(transtype, transreason, item));
+                        transitem.setUnit_id(TransferItems.get(i).getUnit_id());
+                        transitem.setBase_unit_qty(TransferItems.get(i).getBase_unit_qty());
+                        Item_unit iu = new ItemBean().getItemUnitFrmDb(transitem.getItemId(), transitem.getUnit_id());
+                        if (null != iu) {
+                            item.setUnitRetailsalePrice(iu.getUnit_retailsale_price());
+                            item.setUnitWholesalePrice(iu.getUnit_wholesale_price());
+                            item.setUnitSymbol(iu.getUnit_symbol());
+                        }
                         tib.updateModelTransItemAutoAddFrmTransfer(store, transtype, transreason, new GeneralUserSetting().getCurrentSaleType(), aTrans, new StatusBean(), aActiveTransItems, transitem, item);
                     }
                     tib.clearTransItem(aTransItem);
@@ -16041,8 +16057,14 @@ public class TransBean implements Serializable {
         if (aTransReasonId > 0) {
             TReasWhereSql = " AND t.transaction_reason_id=" + aTransReasonId;
         }
-        sql = "SELECT SUM(ti.item_qty) AS item_qty,SUM(ti.qty_damage) AS qty_damage FROM transaction_item ti INNER JOIN transaction t ON ti.transaction_id=t.transaction_id "
-                + " WHERE t.transaction_type_id=" + aTransTypeId + "" + TReasWhereSql + " AND t.transaction_ref='" + aTransNo + "' AND ti.item_id=" + aTransItem.getItemId();
+        /*
+         sql = "SELECT SUM(ti.item_qty) AS item_qty,SUM(ti.qty_damage) AS qty_damage FROM transaction_item ti INNER JOIN transaction t ON ti.transaction_id=t.transaction_id "
+         + " WHERE t.transaction_type_id=" + aTransTypeId + "" + TReasWhereSql + " AND t.transaction_ref='" + aTransNo + "' AND ti.item_id=" + aTransItem.getItemId();
+         */
+        sql = "SELECT SUM(ti.item_qty) AS item_qty,SUM(ti.qty_damage) AS qty_damage FROM transaction_item ti "
+                + "INNER JOIN transaction t ON ti.transaction_id=t.transaction_id "
+                + "INNER JOIN transaction_item_unit tiu ON ti.transaction_item_id=tiu.transaction_item_id "
+                + " WHERE t.transaction_type_id=" + aTransTypeId + "" + TReasWhereSql + " AND t.transaction_ref='" + aTransNo + "' AND ti.item_id=" + aTransItem.getItemId() + "' AND tiu.unit_id=" + aTransItem.getUnit_id();
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {

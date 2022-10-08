@@ -414,9 +414,9 @@ public class Stock_take_sessionBean implements Serializable {
                         UserDetail userdetail = new GeneralUserSetting().getCurrentUser();
                         aStocktake_session_item.setAdd_date(dt);
                         aStocktake_session_item.setAdd_by(userdetail.getUserName());
-                        long savedid = new Stock_take_session_itemBean().insertStock_take_session_item(aStocktake_session_item);
-                        if (savedid > 0) {
-                            aStocktake_session_item.setStock_take_session_item_id(savedid);
+                        long SavedSessionItemId = new Stock_take_session_itemBean().insertStock_take_session_item(aStocktake_session_item);
+                        if (SavedSessionItemId > 0) {
+                            aStocktake_session_item.setStock_take_session_item_id(SavedSessionItemId);
                             //update counted
                             int c = this.updateAddCounted(aStocktake_session_item.getStock_take_session_id(), 1, dt, userdetail.getUserName());
                             //1:Save and Adjust, 2:Save Only
@@ -424,10 +424,10 @@ public class Stock_take_sessionBean implements Serializable {
                                 //adjust
                                 int adjusted = 0;
                                 //update adjusted
-                                adjusted = new Stock_take_session_itemBean().stockAdjust(aStocktake_session_item, ss.getStore_id(), 84, savedid);
+                                adjusted = new Stock_take_session_itemBean().stockAdjust(aStocktake_session_item, ss.getStore_id(), 84, SavedSessionItemId);
                                 //pending;
                                 if (adjusted == 1) {
-                                    new Stock_take_session_itemBean().updateIsAdjusted(savedid, 1);
+                                    new Stock_take_session_itemBean().updateIsAdjusted(SavedSessionItemId, 1);
                                 }
                             }
                             msg = "Saved Successfully";
@@ -581,7 +581,9 @@ public class Stock_take_sessionBean implements Serializable {
         if (msg.length() > 0) {
             FacesContext.getCurrentInstance().addMessage("Report", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
-            String sql = "select i.*,ifnull(s.batchno,'') batchno,ifnull(s.code_specific,'') code_specific,ifnull(s.desc_specific,'') desc_specific,ifnull(s.specific_size,1) specific_size,ifnull(s.currentqty,0) currentqty,ifnull(s.unit_cost,i.unit_cost_price) unit_cost from item i left join stock s on i.item_id=s.item_id AND s.store_id=" + new GeneralUserSetting().getCurrentStore().getStoreId() + " WHERE i.is_track=1 AND i.is_suspended='No' ";
+            String sql = "select i.*,ifnull(s.batchno,'') batchno,ifnull(s.code_specific,'') code_specific,ifnull(s.desc_specific,'') desc_specific,ifnull(s.specific_size,1) specific_size,ifnull(s.currentqty,0) currentqty,ifnull(s.unit_cost,i.unit_cost_price) unit_cost,unit_symbol from item i "
+                    + "inner join unit u on i.unit_id=u.unit_id "
+                    + "left join stock s on i.item_id=s.item_id AND s.store_id=" + new GeneralUserSetting().getCurrentStore().getStoreId() + " WHERE i.is_track=1 AND i.is_suspended='No' ";
             String wheresql = "";
             String ordersql = "";
             if (aStock_take_sessionBean.getItem_id() > 0) {
@@ -654,6 +656,7 @@ public class Stock_take_sessionBean implements Serializable {
                         objUncounted.setQty_diff_adjusted(0);
                         objUncounted.setNotes("");
                         objUncounted.setDescription(rs.getString("description"));
+                        objUncounted.setUnit_symbol(rs.getString("unit_symbol"));
                         aStocktake_session_itemList.add(objUncounted);
                     }
                     if (null != objCounted && (aFlag == 0 || aFlag == 2)) {//Counted

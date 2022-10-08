@@ -3,6 +3,8 @@ package beans;
 import connections.DBConnection;
 import entities.CompanySetting;
 import entities.TransItem;
+import entities.Transaction_item_cr_dr_note_unit;
+import entities.Transaction_item_hist_unit;
 import entities.Transaction_item_unit;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -77,7 +79,7 @@ public class TransItemExtBean implements Serializable {
         }
     }
 
-    public long getTransItemId(long aTransId, long aItemId, String aBatchno,String aCodeSpecific,String aDescSpecific) {
+    public long getTransItemId(long aTransId, long aItemId, String aBatchno, String aCodeSpecific, String aDescSpecific) {
         long TransItemId = 0;
         String sql = "SELECT * FROM transaction_item WHERE transaction_id=" + aTransId + " AND item_id=" + aItemId + " AND batchno='" + aBatchno + "' AND code_specific='" + aCodeSpecific + "' AND desc_specific='" + aDescSpecific + "'";
         ResultSet rs = null;
@@ -116,6 +118,93 @@ public class TransItemExtBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
         return newId;
+    }
+
+    public int updateTransaction_item_unit(long aTransaction_item_id, double aBase_unit_qty) {
+        int success = 0;
+        String sql = "UPDATE transaction_item_unit SET base_unit_qty=? WHERE transaction_item_id=?";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
+            ps.setLong(1, aTransaction_item_id);
+            ps.setDouble(2, aBase_unit_qty);
+            ps.executeUpdate();
+            success = 1;
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return success;
+    }
+
+    public void insertTransaction_item_cr_dr_note_unit(Transaction_item_cr_dr_note_unit aTransaction_item_cr_dr_note_unit) {
+        String sql = "INSERT INTO transaction_item_cr_dr_note_unit"
+                + "(transaction_item_id,unit_id,base_unit_qty)"
+                + " VALUES"
+                + "(?,?,?)";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
+            ps.setLong(1, aTransaction_item_cr_dr_note_unit.getTransaction_item_id());
+            ps.setInt(2, aTransaction_item_cr_dr_note_unit.getUnit_id());
+            ps.setDouble(3, aTransaction_item_cr_dr_note_unit.getBase_unit_qty());
+            ps.executeUpdate();
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public int insertTransaction_item_hist_unit(Transaction_item_hist_unit aTransaction_item_hist_unit) {
+        int inserted = 0;
+        String sql = "INSERT INTO transaction_item_hist_unit"
+                + "(transaction_item_hist_id,unit_id,base_unit_qty)"
+                + " VALUES"
+                + "(?,?,?)";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aTransaction_item_hist_unit.getTransaction_item_hist_id());
+            ps.setInt(2, aTransaction_item_hist_unit.getUnit_id());
+            ps.setDouble(3, aTransaction_item_hist_unit.getBase_unit_qty());
+            ps.executeUpdate();
+            inserted = 1;
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return inserted;
+    }
+
+    public int deleteTransItemsUnitByTransId(long aTransId) {
+        int deleted = 0;
+        String sql = "DELETE FROM transaction_item_unit WHERE transaction_item_id IN("
+                + "SELECT ti.transaction_item_id FROM transaction_item ti WHERE ti.transaction_id=?"
+                + ")";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aTransId);
+            ps.executeUpdate();
+            deleted = 1;
+        } catch (Exception e) {
+            deleted = 0;
+            LOGGER.log(Level.ERROR, e);
+        }
+        return deleted;
+    }
+
+    public int deleteTransaction_item_unit(long aTransaction_item_id) {
+        int deleted = 0;
+        String sql = "DELETE FROM transaction_item_unit WHERE transaction_item_id=?";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aTransaction_item_id);
+            ps.executeUpdate();
+            deleted = 1;
+        } catch (Exception e) {
+            deleted = 0;
+            LOGGER.log(Level.ERROR, e);
+        }
+        return deleted;
     }
 
     /**

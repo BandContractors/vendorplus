@@ -168,7 +168,7 @@
                                 <h:outputLabel style="font-size: 12px;" value="#{langsys['Comment']}:" rendered="#{transaction_approval.status_comment.length()>0}"/>
                                 <h:outputLabel style="font-size: 12px;" value="#{transaction_approval.status_comment}" rendered="#{transaction_approval.status_comment.length()>0}" />
                             </h:panelGrid>
-                            
+
                             <h:panelGrid style="width: 290px; margin: 0px;" columns="2" rendered="#{transaction_approval.transaction_id>0}">
                                 <h:outputLabel style="font-size: 12px;" value="#{langout[transactionTypeBean.getTransactionType(transaction_approval.transaction_type_id).getTransactionNumberLabel()]}:"/>
                                 <h:outputLabel style="font-size: 20px;font-weight: bold;" value="#{transBean.getTrans(transaction_approval.transaction_id).getTransactionNumber()}"/>
@@ -207,7 +207,7 @@
                                         <h:outputLabel style="font-size: 10px;" value="#{ti.itemQty}">
                                             <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                         </h:outputLabel> 
-                                        <h:outputLabel style="font-size: 10px;" value="#{ti.unitSymbol}"/>
+                                        <h:outputLabel style="font-size: 10px;" value="#{unitBean.getUnit(ti.unit_id).unitSymbol}"/>
                                         <h:outputLabel style="font-size: 10px;" value="@" rendered="#{ti.hide_unit_price_invoice eq 0}"/>
                                         <h:outputLabel style="font-size: 10px;" value="#{ti.unitPriceIncVat}" rendered="#{ti.hide_unit_price_invoice eq 0}">
                                             <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>

@@ -30,7 +30,7 @@
                             </p:panel>
                         </h:panelGrid>
                         <h:panelGrid style="width: 290px; margin: 0px;text-align: center;-webkit-print-color-adjust: exact; ">
-                            <h:outputLabel style="font-size: 20px;background-color: gray;color: white;font-weight: bold;text-align: center;" value="#{langout[generalUserSetting.outputDetailParent.transaction_type.transactionOutputLabel]}"/>
+                            <h:outputLabel style="font-size: 20px;background-color: gray;color: white;font-weight: bold;text-align: center;" value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_OUT,generalUserSetting.outputDetailParent.transaction_type.transactionOutputLabel)}"/>
                         </h:panelGrid>
                         <h:panelGrid style="width: 290px; margin: 0px;float:left;" columns="2">
                             <h:outputLabel value="#{companySetting.getPhysicalAddress()}"/>
@@ -47,9 +47,9 @@
                         </h:panelGrid>
 
                         <h:panelGrid id="IpgrdSalesInvoiceHeader4" style="width: 290px; margin: 0px;" columns="2">
-                            <h:outputLabel style="font-size: 12px;" value="#{langout[generalUserSetting.outputDetailParent.transaction_type.transactionNumberLabel]}:"/>
+                            <h:outputLabel style="font-size: 12px;" value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_OUT,generalUserSetting.outputDetailParent.transaction_type.transactionNumberLabel)}:"/>
                             <h:outputLabel id="IolblSalesInvoiceNo" style="font-size: 20px;font-weight: bold;" value="#{generalUserSetting.outputDetailParent.trans.transactionNumber}"/>
-                            <h:outputLabel style="font-size: 12px;" value="#{langout[generalUserSetting.outputDetailParent.transaction_type.transactionDateLabel]}:"/>
+                            <h:outputLabel style="font-size: 12px;" value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_OUT,generalUserSetting.outputDetailParent.transaction_type.transactionDateLabel)}:"/>
                             <h:outputLabel id="IolblSalesInvoiceDate" style="font-size: 12px;" value="#{utilityBean.formatDateTime(generalUserSetting.outputDetailParent.trans.addDate)}"/>
                         </h:panelGrid>
 
@@ -82,7 +82,7 @@
                                     <h:outputLabel style="font-size: 10px;" value="#{ti.itemQty}">
                                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                                     </h:outputLabel>
-                                    <h:outputLabel style="font-size: 10px;" value="#{unitBean.getUnit(itemBean.getItem(ti.itemId).unitId).unitSymbol}"/>
+                                    <h:outputLabel style="font-size: 10px;" value="#{ti.unitSymbol}"/>
                                 </h:column>
                             </h:dataTable>
                         </h:panelGrid>

@@ -59,52 +59,6 @@ public class ItemProductionMapBean implements Serializable {
     @ManagedProperty("#{menuItemBean}")
     private MenuItemBean menuItemBean;
 
-    public void saveItemProductionMap(ItemProductionMap itemproductionmap) {
-        UtilityBean ub = new UtilityBean();
-        String BaseName = "language_en";
-        try {
-            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
-        } catch (Exception e) {
-        }
-        String msg = "";
-        String sql = null;
-        String sql2 = null;
-
-        if (itemproductionmap != null) {
-
-            if (itemproductionmap.getItemProductionMapId() == 0) {
-                sql = "{call sp_insert_item_production_map(?,?,?)}";
-            } else if (itemproductionmap.getItemProductionMapId() > 0) {
-                sql = "{call sp_update_item_production_map(?,?,?,?,?,?)}";
-            }
-
-            try (
-                    Connection conn = DBConnection.getMySQLConnection();
-                    CallableStatement cs = conn.prepareCall(sql);) {
-                if (itemproductionmap.getItemProductionMapId() == 0) {
-                    cs.setLong("in_output_item_id", itemproductionmap.getOutputItemId());
-                    cs.setLong("in_input_item_id", itemproductionmap.getInputItemId());
-                    cs.setDouble("in_input_qty", itemproductionmap.getInputQty());
-                    cs.executeUpdate();
-                } else if (itemproductionmap.getItemProductionMapId() > 0) {
-                    cs.setLong("in_output_item_id", itemproductionmap.getOutputItemId());
-                    cs.setLong("in_input_item_id", itemproductionmap.getInputItemId());
-                    cs.setDouble("in_input_qty", itemproductionmap.getInputQty());
-                    cs.executeUpdate();
-                }
-            } catch (Exception e) {
-                LOGGER.log(Level.ERROR, e);
-                this.setActionMessage(ub.translateWordsInText(BaseName, "Item Production Map Not Saved"));
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, "Item Production Map Not Saved")));
-            }
-        } else {
-            this.setActionMessage(ub.translateWordsInText(BaseName, "Select Raw Material"));
-        }
-
-        this.clearItemProductionMap(itemproductionmap);
-        this.setActionMessage(ub.translateWordsInText(BaseName, "Saved Successfully"));
-    }
-
     public void saveItemProductionMap(ItemProductionMap aItemProductionMap, List<ItemProductionMap> aInputItems, List<ItemProductionMap> aItems) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -123,6 +77,7 @@ public class ItemProductionMapBean implements Serializable {
                     ItemProductionMap ic = aInputItems.get(i);
                     ic.setItemProductionMapId(aItemProductionMap.getItemProductionMapId());
                     ic.setOutputItemId(aItemProductionMap.getOutputItemId());
+                    ic.setOutput_unit_id(aItemProductionMap.getOutput_unit_id());
                     savedok = this.saveValidatedItem(aInputItems.get(i));
                     if (savedok == 0) {
                         break;
@@ -147,7 +102,12 @@ public class ItemProductionMapBean implements Serializable {
 
     public String validateItemProductionMap(ItemProductionMap aItemProductionMap, List<ItemProductionMap> aInputItems) {
         String msg = "";
-        String sql2 = "SELECT * FROM item_production_map WHERE input_item_id=" + aItemProductionMap.getOutputItemId();
+        /*
+         String sql2 = "SELECT * FROM item_production_map WHERE input_item_id=" + aItemProductionMap.getOutputItemId();
+         else if (new CustomValidator().CheckRecords(sql2) > 0) {
+         msg = "A Child item cannot be mapped as a Parent item!";
+         } 
+         */
         UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
         List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
         GroupRightBean grb = new GroupRightBean();
@@ -157,8 +117,6 @@ public class ItemProductionMapBean implements Serializable {
             msg = "YOU ARE NOT ALLOWED TO USE THIS FUNCTION, CONTACT SYSTEM ADMINISTRATOR...";
         } else if (aItemProductionMap.getOutputItemId() == 0) {
             msg = "Select a Parent Item please";
-        } else if (new CustomValidator().CheckRecords(sql2) > 0) {
-            msg = "A Child item cannot be mapped as a Parent item!";
         } else if (aInputItems.size() <= 0) {
             msg = "Please add Child Items!";
         } else {
@@ -225,11 +183,10 @@ public class ItemProductionMapBean implements Serializable {
         int save_status = 0;
         String sql = null;
         if (aItemProductionMap.getItemProductionMapId() == 0) {
-            sql = "INSERT INTO item_production_map(output_item_id,input_item_id,input_qty) VALUES(" + aItemProductionMap.getOutputItemId() + "," + aItemProductionMap.getInputItemId() + "," + aItemProductionMap.getInputQty() + ")";
+            sql = "INSERT INTO item_production_map(output_item_id,input_item_id,input_qty,output_unit_id,input_unit_id) VALUES(" + aItemProductionMap.getOutputItemId() + "," + aItemProductionMap.getInputItemId() + "," + aItemProductionMap.getInputQty() + "," + aItemProductionMap.getOutput_unit_id() + "," + aItemProductionMap.getInput_unit_id() + ")";
         } else if (aItemProductionMap.getItemProductionMapId() > 0) {
-            sql = "UPDATE item_production_map SET output_item_id=" + aItemProductionMap.getOutputItemId() + ",input_item_id=" + aItemProductionMap.getInputItemId() + ",input_qty=" + aItemProductionMap.getInputQty() + " WHERE item_production_map_id=" + aItemProductionMap.getItemProductionMapId();
+            sql = "UPDATE item_production_map SET output_item_id=" + aItemProductionMap.getOutputItemId() + ",input_item_id=" + aItemProductionMap.getInputItemId() + ",input_qty=" + aItemProductionMap.getInputQty() + ",output_unit_id=" + aItemProductionMap.getOutput_unit_id() + ",input_unit_id=" + aItemProductionMap.getInput_unit_id() + " WHERE item_production_map_id=" + aItemProductionMap.getItemProductionMapId();
         }
-        //System.out.println(sql);
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 CallableStatement cs = conn.prepareCall(sql);) {
@@ -253,8 +210,10 @@ public class ItemProductionMapBean implements Serializable {
         try {
             if (null == aItemProductionMap) {
                 msg = "Select Item to Add";
-            } else if (aItemProductionMap.getOutputItemId() == 0 || aItemProductionMap.getInputItemId() == 0 || aItemProductionMap.getInputQty() < 0) {//aItemProductionMap.getInputQty() <= 0
+            } else if (aItemProductionMap.getOutputItemId() == 0 || aItemProductionMap.getInputItemId() == 0 || aItemProductionMap.getInputQty() < 0) {
                 msg = "Check Parent and Child Item and Qty";
+            } else if (aItemProductionMap.getOutput_unit_id() == 0 || aItemProductionMap.getInput_unit_id() == 0) {
+                msg = "Check Unit for Parent and Child Item";
             } else if (this.combinationExists(aItemProductionMap.getOutputItemId(), aItemProductionMap.getInputItemId())) {
                 msg = "Input Item Exists";
             } else if (this.differentCurrencyExists(aItemProductionMap.getOutputItemId(), aItemProductionMap.getInputItemId())) {
@@ -265,6 +224,8 @@ public class ItemProductionMapBean implements Serializable {
                 ic.setOutputItemId(aItemProductionMap.getOutputItemId());
                 ic.setInputItemId(aItemProductionMap.getInputItemId());
                 ic.setInputQty(aItemProductionMap.getInputQty());
+                ic.setInput_unit_id(aItemProductionMap.getInput_unit_id());
+                ic.setOutput_unit_id(aItemProductionMap.getOutput_unit_id());
                 this.updateLookUpsUI(ic);
                 this.ItemProductionMapsListEdit.add(ic);
                 this.clearItemProductionChild(aItemProductionMap);
@@ -325,7 +286,7 @@ public class ItemProductionMapBean implements Serializable {
                 try {
                     Item ParentItem = new ItemBean().getItem(aItemProductionMap.getOutputItemId());
                     aItemProductionMap.setOutputItemName(ParentItem.getDescription());
-                    aItemProductionMap.setOutputItemUnit(new UnitBean().getUnit(ParentItem.getUnitId()).getUnitSymbol());
+                    aItemProductionMap.setOutputItemUnit(new UnitBean().getUnit(aItemProductionMap.getOutput_unit_id()).getUnitSymbol());
                 } catch (NullPointerException npe) {
                     aItemProductionMap.setOutputItemName("");
                     aItemProductionMap.setOutputItemUnit("");
@@ -334,7 +295,7 @@ public class ItemProductionMapBean implements Serializable {
                 try {
                     Item InputItem = new ItemBean().getItem(aItemProductionMap.getInputItemId());
                     aItemProductionMap.setInputItemName(InputItem.getDescription());
-                    aItemProductionMap.setInputItemUnit(new UnitBean().getUnit(InputItem.getUnitId()).getUnitSymbol());
+                    aItemProductionMap.setInputItemUnit(new UnitBean().getUnit(aItemProductionMap.getInput_unit_id()).getUnitSymbol());
                 } catch (NullPointerException npe) {
                     aItemProductionMap.setInputItemName("");
                     aItemProductionMap.setInputItemUnit("");
@@ -699,25 +660,34 @@ public class ItemProductionMapBean implements Serializable {
         try {
             try {
                 aItemProductionMap.setItemProductionMapId(aResultSet.getLong("item_production_map_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aItemProductionMap.setItemProductionMapId(0);
             }
             try {
                 aItemProductionMap.setOutputItemId(aResultSet.getLong("output_item_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aItemProductionMap.setOutputItemId(0);
             }
             try {
                 aItemProductionMap.setInputItemId(aResultSet.getLong("input_item_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aItemProductionMap.setInputItemId(0);
             }
             try {
                 aItemProductionMap.setInputQty(aResultSet.getDouble("input_qty"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 aItemProductionMap.setInputQty(0);
             }
-
+            try {
+                aItemProductionMap.setOutput_unit_id(aResultSet.getInt("output_unit_id"));
+            } catch (Exception e) {
+                aItemProductionMap.setOutput_unit_id(0);
+            }
+            try {
+                aItemProductionMap.setInput_unit_id(aResultSet.getInt("input_unit_id"));
+            } catch (Exception e) {
+                aItemProductionMap.setInput_unit_id(0);
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -732,7 +702,7 @@ public class ItemProductionMapBean implements Serializable {
                 try {
                     Item InputItem = new ItemBean().getItem(aItemProductionMap.getInputItemId());
                     aItemProductionMap.setInputItemName(InputItem.getDescription());
-                    aItemProductionMap.setInputItemUnit(new UnitBean().getUnit(InputItem.getUnitId()).getUnitSymbol());
+                    aItemProductionMap.setInputItemUnit(new UnitBean().getUnit(aItemProductionMap.getInput_unit_id()).getUnitSymbol());
                 } catch (NullPointerException npe) {
                     aItemProductionMap.setInputItemName("");
                     aItemProductionMap.setInputItemUnit("");
@@ -779,7 +749,8 @@ public class ItemProductionMapBean implements Serializable {
                 try {
                     aItemProductionMap.setInputItemId(aItem.getItemId());
                     aItemProductionMap.setInputItemName(aItem.getDescription());
-                    aItemProductionMap.setInputItemUnit(new UnitBean().getUnit(aItem.getUnitId()).getUnitSymbol());
+                    aItemProductionMap.setInput_unit_id(aTransItem.getUnit_id());
+                    aItemProductionMap.setInputItemUnit(new UnitBean().getUnit(aItemProductionMap.getInput_unit_id()).getUnitSymbol());
                     aItemProductionMap.setBatchno("");
                     aItemProductionMap.setCodeSpecific("");
                     aItemProductionMap.setDescSpecific("");
@@ -788,6 +759,7 @@ public class ItemProductionMapBean implements Serializable {
                 } catch (NullPointerException npe) {
                     aItemProductionMap.setInputItemId(0);
                     aItemProductionMap.setInputItemName("");
+                    aItemProductionMap.setInput_unit_id(0);
                     aItemProductionMap.setInputItemUnit("");
                     aItemProductionMap.setBatchno("");
                     aItemProductionMap.setCodeSpecific("");

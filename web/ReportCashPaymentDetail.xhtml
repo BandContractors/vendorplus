@@ -44,7 +44,7 @@
                 <p:outputLabel value="#{langsys['To']} #{payBean.dateType}" id="lblDate2"/>
                 <p:outputLabel value="#{langsys['Pay']} #{langsys['No.']}"/>
                 <p:outputLabel value="#{langsys[menuItemBean.menuItemObj.SUPPLIER_NAME]}"/>
-                <p:outputLabel value="#{langsys[transactionTypeBean.getTransactionType(1).transactionNumberLabel]}"/>
+                <p:outputLabel value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(1).transactionNumberLabel)}"/>
                 <p:selectOneMenu id="menuFromStore" value="#{pay.storeId}" style="width: 120px;">
                     <f:selectItem itemLabel="#{langsys['Select']}" itemValue="0"/>
                     <f:selectItems value="#{storeBean.stores}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>

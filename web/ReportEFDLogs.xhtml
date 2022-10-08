@@ -102,7 +102,7 @@
                 <p:column headerText="FDN">
                     <h:outputLabel value="#{itm.invoiceNo}"/>
                 </p:column>
-                <p:column headerText="#{langsys[transactionTypeBean.getTransactionType(2).transactionDateLabel]}" visible="false">
+                <p:column headerText="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(2).transactionDateLabel)}" visible="false">
                     <h:outputText value="#{itm.issuedDate}"/>
                 </p:column>
                 <p:column headerText="#{langsys['Add']} #{langsys['Date']}">

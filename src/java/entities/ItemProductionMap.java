@@ -22,6 +22,7 @@ public class ItemProductionMap implements Serializable {
     private long InputItemId;
     private double InputQty;
     private double InputQtyTotal;
+    private double InputQtyTotalBaseUnit;
     private String OutputItemName;
     private String InputItemName;
     private String OutputItemUnit;
@@ -32,6 +33,8 @@ public class ItemProductionMap implements Serializable {
     private long StockId;
     private double InputQtyCurrent;
     private double InputQtyBalance;
+    private int output_unit_id;
+    private int input_unit_id;
 
     /**
      * @return the ItemProductionMapId
@@ -87,6 +90,34 @@ public class ItemProductionMap implements Serializable {
      */
     public void setInputQty(double InputQty) {
         this.InputQty = InputQty;
+    }
+
+    /**
+     * @return the InputQtyTotal
+     */
+    public double getInputQtyTotal() {
+        return InputQtyTotal;
+    }
+
+    /**
+     * @param InputQtyTotal the InputQtyTotal to set
+     */
+    public void setInputQtyTotal(double InputQtyTotal) {
+        this.InputQtyTotal = InputQtyTotal;
+    }
+
+    /**
+     * @return the InputQtyTotalBaseUnit
+     */
+    public double getInputQtyTotalBaseUnit() {
+        return InputQtyTotalBaseUnit;
+    }
+
+    /**
+     * @param InputQtyTotalBaseUnit the InputQtyTotalBaseUnit to set
+     */
+    public void setInputQtyTotalBaseUnit(double InputQtyTotalBaseUnit) {
+        this.InputQtyTotalBaseUnit = InputQtyTotalBaseUnit;
     }
 
     /**
@@ -202,20 +233,6 @@ public class ItemProductionMap implements Serializable {
     }
 
     /**
-     * @return the InputQtyTotal
-     */
-    public double getInputQtyTotal() {
-        return InputQtyTotal;
-    }
-
-    /**
-     * @param InputQtyTotal the InputQtyTotal to set
-     */
-    public void setInputQtyTotal(double InputQtyTotal) {
-        this.InputQtyTotal = InputQtyTotal;
-    }
-
-    /**
      * @return the InputQtyCurrent
      */
     public double getInputQtyCurrent() {
@@ -243,4 +260,31 @@ public class ItemProductionMap implements Serializable {
         this.InputQtyBalance = InputQtyBalance;
     }
 
+    /**
+     * @return the output_unit_id
+     */
+    public int getOutput_unit_id() {
+        return output_unit_id;
+    }
+
+    /**
+     * @param output_unit_id the output_unit_id to set
+     */
+    public void setOutput_unit_id(int output_unit_id) {
+        this.output_unit_id = output_unit_id;
+    }
+
+    /**
+     * @return the input_unit_id
+     */
+    public int getInput_unit_id() {
+        return input_unit_id;
+    }
+
+    /**
+     * @param input_unit_id the input_unit_id to set
+     */
+    public void setInput_unit_id(int input_unit_id) {
+        this.input_unit_id = input_unit_id;
+    }
 }

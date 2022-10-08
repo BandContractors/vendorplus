@@ -35,6 +35,7 @@ public class Stocktake_session_item implements Serializable {
     private int qty_diff_adjusted;
     private String notes;
     private String description;
+    private String unit_symbol;
 
     /**
      * @return the stock_take_session_item_id
@@ -272,5 +273,19 @@ public class Stocktake_session_item implements Serializable {
      */
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    /**
+     * @return the unit_symbol
+     */
+    public String getUnit_symbol() {
+        return unit_symbol;
+    }
+
+    /**
+     * @param unit_symbol the unit_symbol to set
+     */
+    public void setUnit_symbol(String unit_symbol) {
+        this.unit_symbol = unit_symbol;
     }
 }

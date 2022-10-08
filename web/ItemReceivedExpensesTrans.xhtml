@@ -25,6 +25,7 @@
         <f:viewAction action="#{navigationBean.checkLicenseExpired()}"/>
         <f:viewAction action="#{transBean.initClearAllCEC('PARENT',trans,transItemBean.activeTransItems,transItem,itemBean.selectedItem,transactorBean.selectedTransactor,2,null,userDetailBean.selectedUserDetail,null)}" />
         <f:viewAction action="#{statusBean.initClearStatus()}"/>
+        <f:viewAction action="#{utilityBean.clearList(itemBean.item_unitList)}"/>
         <f:viewAction action="#{transBean.initCurrencyCode(9, trans)}"/>
         <f:viewAction action="#{transBean.initTransType(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId)}"/>
     </f:metadata>
@@ -46,11 +47,11 @@
 
             <h:panelGrid columns="3" id="pnlHeader">
                 <h:panelGrid styleClass="clsGridMainInput" columns="2">
-                    <h:outputLabel  value="#{langsys[transBean.transTypeObj.transactionDateLabel]}:"/>
+                    <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeObj.transactionDateLabel)}:"/>
                     <p:calendar pattern="#{companySetting.getDateFormat()}" styleClass="clsInput" id="calTransactionDate" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.transactionDate}" size="8"/>
                 </h:panelGrid>
                 <p:panel style="background-color:  #ADD8E6;">
-                    <h:outputLabel  value="#{langsys[transBean.transTypeObj.transactionRefLabel]}:"/>
+                    <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeObj.transactionRefLabel)}:"/>
                     <h:inputText styleClass="clsInput" id="itxtTransactionRef" value="#{trans.transactionRef}" autocomplete="off" style="font-weight: bold;width: 150px;">
                         <f:ajax event="change" listener="#{transBean.RetrieveAndUpdateTransAndItems(9,8,30, trans, transItemBean.activeTransItems)}" render="dtblTransactionItem pnlTransactor" />
                     </h:inputText>
@@ -124,17 +125,22 @@
                         <h:outputText value="#{itm.currencyCode}">
                         </h:outputText>
                     </p:column>
-                    <p:ajax event="itemSelect" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,'',trans,transItem,itemBean.selectedItem,1.0)}" process="@this" update="itxtUnit itxtUnitCost pgrdOverrideWarranty pgrdSpecific lblCur"/>
-                    <p:ajax event="change" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,'',trans,transItem,itemBean.selectedItem,1.0)}" rendered="#{itemBean.selectedItem!=null}" process="@this" update="itxtUnit itxtUnitCost pgrdOverrideWarranty pgrdSpecific lblCur"/>
+                    <p:ajax event="itemSelect" listener="#{itemBean.refreshItemUnitList(itemBean.selectedItem,transItem,2)}" process="@this menuUnit" update="menuUnit"/>
+                    <p:ajax event="change" listener="#{itemBean.refreshItemUnitList(itemBean.selectedItem,transItem,2)}" rendered="#{itemBean.selectedItem!=null}" process="@this menuUnit" update="menuUnit"/>
+                    <p:ajax event="itemSelect" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,'',trans,transItem,itemBean.selectedItem,1.0)}" process="@this" update="menuUnit menuUnitCost pgrdOverrideWarranty pgrdSpecific lblCur"/>
+                    <p:ajax event="change" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,'',trans,transItem,itemBean.selectedItem,1.0)}" rendered="#{itemBean.selectedItem!=null}" process="@this" update="menuUnit menuUnitCost pgrdOverrideWarranty pgrdSpecific lblCur"/>
                 </p:autoComplete>
-                <h:inputText id="itxtUnit" styleClass="clsInputTransItem" value="#{unitBean.getUnit(itemBean.getItem(transItem.itemId).getUnitId()).unitSymbol}" disabled="true" style="width: 100px;"/>
-                <h:inputText id="itxtQty" styleClass="clsInputTransItem" value="#{transItem.itemQty}" autocomplete="off" style="width: 60px;">
+                <p:selectOneMenu id="menuUnit" styleClass="clsMenu" value="#{transItem.unit_id}">
+                    <f:selectItems value="#{itemBean.item_unitList}" var="iu" itemLabel="#{iu.unit_symbol}" itemValue="#{iu.unit_id}"/>
+                    <p:ajax listener="#{itemBean.changeItemUnit(itemBean.selectedItem,transItem,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentStore.storeId,trans)}" process="@this autcItem" update="menuUnitCost"/>
+                </p:selectOneMenu>
+                <h:inputText id="itxtQty" styleClass="clsInputTransItem" value="#{transItem.itemQty}" autocomplete="off" style="width: 60px;height: 24px;">
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
-                <h:inputText id="itxtUnitCost" styleClass="clsInputTransItem" value="#{transItem.unitCostPrice}" style="width: 140px;">
+                <h:inputText id="menuUnitCost" styleClass="clsInputTransItem" value="#{transItem.unitCostPrice}" style="width: 140px;height: 24px;">
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
-                <h:inputText id="itxtBatchno" styleClass="clsInputTransItem" value="#{transItem.batchno}" style="width: 100px;"/>
+                <h:inputText id="itxtBatchno" styleClass="clsInputTransItem" value="#{transItem.batchno}" style="width: 100px;height: 24px;"/>
                 <p:calendar id="calMnfDate" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{transItem.itemMnfDate}" size="8" pattern="#{companySetting.getDateFormat()}">
                 </p:calendar>
                 <p:calendar id="calExpDate" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{transItem.itemExpryDate}" size="8" pattern="#{companySetting.getDateFormat()}">
@@ -213,7 +219,7 @@
                     <!-- column header -->
                     <f:facet name="header">#{langsys['Batch']} #{langsys['No.']}</f:facet>
                     <!-- row record -->
-                    <h:inputText value="#{ati.batchno}">
+                    <h:inputText value="#{ati.batchno}" style="width: 100px;">
                         <f:ajax event="change" execute="dtblTransactionItem" render="dtblTransactionItem"/>
                     </h:inputText>
                 </p:column>
@@ -223,7 +229,7 @@
                     <!-- row record -->
                     <h:inputText value="#{ati.itemQty}" style="width: 50px;">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                        <f:ajax event="change" execute="dtblTransactionItem" render="dtblTransactionItem"/>
+                        <f:ajax event="change" listener="#{transItemBean.updateBaseUnityQty(ati)}" execute="dtblTransactionItem" render="dtblTransactionItem"/>
                     </h:inputText>
                 </p:column>
                 <p:column>

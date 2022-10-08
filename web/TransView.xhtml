@@ -58,7 +58,7 @@
 
             <h:panelGrid id="pgrdTransViewOptions2" columns="4" styleClass="clsLikeMainFromWidth" style="background-color:bisque;">
                 <h:panelGrid id="pgrdTransViewOptions21" columns="1" style="background-color:bisque;">
-                    <h:outputLabel  style="text-align: right;" value="#{langsys[transactionTypeBean.getTransactionType(transactionType.transactionTypeId).transactionNumberLabel]}"/>
+                    <h:outputLabel  style="text-align: right;" value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(transactionType.transactionTypeId).transactionNumberLabel)}"/>
                     <h:inputText styleClass="clsInput" id="itxtTransactionNo2" value="#{trans.transactionNumber2}" autocomplete="off">
                         <f:ajax event="change" listener="#{trans.setTransactionNumber3('')}" render="itxtTransactionNo2 itxtTransactionNo3"/>
                     </h:inputText>
@@ -67,7 +67,7 @@
                     <h:outputLabel  value="#{langsys['OR']}"/>
                 </h:panelGrid>
                 <h:panelGrid id="pgrdTransViewOptions23" columns="1" style="background-color:bisque;">
-                    <h:outputLabel  style="text-align: right;" value="#{langsys[transactionTypeBean.getTransactionType(transactionType.transactionTypeId).transactionNumberLabel]} #{langsys['BY']} #{generalUserSetting.getCurrentUser().userName}"/>
+                    <h:outputLabel  style="text-align: right;" value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(transactionType.transactionTypeId).transactionNumberLabel)} #{langsys['BY']} #{generalUserSetting.getCurrentUser().userName}"/>
                     <h:selectOneMenu styleClass="clsMenu" id="menuTransactionNo3" value="#{trans.transactionNumber3}">
                         <f:selectItem itemValue="" itemLabel=""/>
                         <f:selectItems value="#{transBean.getTranssByAddUser(generalUserSetting.getCurrentUser().userDetailId,transactionType.transactionTypeId,generalUserSetting.getCurrentStore().getStoreId())}" var="t2" itemLabel="#{langsys['No.']}:#{t2.transactionNumber} #{langsys['Reference']}:#{t2.transactionRef} #{langsys['Amount']}:#{t2.grandTotal})" itemValue="#{t2.transactionNumber}"/>
@@ -80,7 +80,7 @@
             </h:panelGrid>
 
             <h:panelGrid id="pgrdTransHeader" styleClass="clsGridMainInput" columns="6">
-                <h:outputLabel  value="#{langsys[transactionTypeBean.getTransactionType(trans.transactionTypeId).transactionNumberLabel]}"/>
+                <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(trans.transactionTypeId).transactionNumberLabel)}"/>
                 <h:inputText styleClass="clsInput" id="itxtTransactionId" disabled="true" value="#{trans.transactionNumber}"/>
                 <h:outputLabel  value="#{langsys['Transaction']} #{langsys['Type']}"/>
                 <h:inputText styleClass="clsInput" id="itxtTransactionType" disabled="true" value="#{transactionTypeBean.getTransactionType(trans.transactionTypeId).transactionTypeName}">
@@ -89,11 +89,11 @@
                 <h:outputLabel  value="#{langsys['Transaction']} #{langsys['Reason']}"/>
                 <h:inputText styleClass="clsInput" id="itxtTransactionReason" disabled="true" value="#{transactionReasonBean.getTransactionReason(trans.transactionReasonId).transactionReasonName}"/>
 
-                <h:outputLabel  value="#{langsys[transactionTypeBean.getTransactionType(trans.transactionTypeId).transactionRefLabel]}"/>
+                <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(trans.transactionTypeId).transactionRefLabel)}"/>
                 <h:inputText styleClass="clsInput" disabled="true" value="#{trans.transactionRef}"/>
-                <h:outputLabel  value="#{langsys[transactionTypeBean.getTransactionType(trans.transactionTypeId).transactionDateLabel]}"/>
+                <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(trans.transactionTypeId).transactionDateLabel)}"/>
                 <h:inputText styleClass="clsInput" disabled="true" value="#{utilityBean.formatDate(trans.transactionDate)}"/>
-                <h:outputLabel value="#{langsys[transactionTypeBean.getTransactionType(trans.transactionTypeId).transactionUserLabel]}"/>
+                <h:outputLabel value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(trans.transactionTypeId).transactionUserLabel)}"/>
                 <h:inputText styleClass="clsInput" disabled="true" value="#{userDetailBean.getUserDetail(trans.transactionUserDetailId).firstName} #{userDetailBean.getUserDetail(trans.transactionUserDetailId).secondName}"/>
 
                 <h:outputLabel  value="#{langsys['Add']} #{langsys['Date']}"/>
@@ -110,7 +110,7 @@
                 <h:outputLabel  value="#{langsys['Last']} #{langsys['Edited']} #{langsys['Date']}"/>
                 <h:inputText styleClass="clsInput" disabled="true" value="#{utilityBean.formatDate(trans.editDate)}"/>
 
-                <h:outputLabel  value="#{langsys[transactionTypeBean.getTransactionType(trans.transactionTypeId).transactorLabel]}"/>
+                <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(trans.transactionTypeId).transactorLabel)}"/>
                 <h:inputText styleClass="clsInput" id="itxtCustomerName" disabled="true" value="#{transactorBean.getTransactor(trans.transactorId).transactorNames}"/>
                 <h:outputLabel  value="#{langsys['Bill']}#{langsys['For']}"/>
                 <h:inputText styleClass="clsInput" id="itxtCustomerName2" disabled="true" value="#{transactorBean.getTransactor(trans.billTransactorId).transactorNames}"/>

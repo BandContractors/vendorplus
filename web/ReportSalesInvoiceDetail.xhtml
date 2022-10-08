@@ -59,14 +59,14 @@
                     <p:calendar id="calDate2"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{transBean.date2}" size="18"/>
                 </h:panelGrid>
                 <h:panelGrid columns="2">
-                    <p:outputLabel value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS, transactionTypeBean.getTransactionType(2).transactionNumberLabel)}:"/>
+                    <p:outputLabel value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(2).transactionNumberLabel)}:"/>
                     <p:inputText id="itxtInvoiceNo" value="#{trans.transactionNumber}" style="width: 215px;"/>
                     <p:outputLabel value="#{langsys['Added']} #{langsys['By']}:"/>
                     <p:selectOneMenu id="menuAddUser" value="#{trans.addUserDetailId}" style="width: 200px;">
                         <f:selectItem itemLabel="#{langsys['Select']}"/>
                         <f:selectItems value="#{userDetailBean.getUserDetails()}" var="ua" itemLabel="#{ua.firstName} #{ua.secondName} #{ua.thirdName}" itemValue="#{ua.userDetailId}"/>
                     </p:selectOneMenu>
-                    <h:outputLabel value="#{langsys[transactionTypeBean.getTransactionType(2).transactionUserLabel]}:"/>
+                    <h:outputLabel value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(2).transactionUserLabel)}:"/>
                     <p:selectOneMenu id="menuTransUser" value="#{trans.transactionUserDetailId}" style="width: 200px;">
                         <f:selectItem itemLabel="#{langsys['Select']}" itemValue="0"/>
                         <f:selectItems value="#{userDetailBean.getUserDetails()}" var="ut" itemLabel="#{ut.firstName} #{ut.secondName} #{ut.thirdName}" itemValue="#{ut.userDetailId}"/>
@@ -82,7 +82,7 @@
                     </p:commandButton>
                 </h:panelGrid>
                 <h:panelGrid columns="2">
-                    <p:outputLabel value="#{langsys[transactionTypeBean.getTransactionType(2).transactionRefLabel]}:"/>
+                    <p:outputLabel value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(2).transactionRefLabel)}:"/>
                     <p:inputText id="itxtRefNo" value="#{trans.transactionRef}" style="width: 230px;"/>
                     <p:outputLabel value="#{langsys['Bill']} #{langsys['For']}:"/>
                     <p:autoComplete id="autcBillTransactor" value="#{transactorBean.selectedBillTransactor}" 
@@ -130,10 +130,10 @@
                     <p:selectOneMenu id="menuSummariseBy" value="#{transBean.fieldName}" style="width: 220px;">
                         <f:selectItem itemLabel="#{langsys['Select']}" itemValue=""/>
                         <f:selectItem itemLabel="#{langsys['Added']} #{langsys['By']}" itemValue="add_user_detail_id"/>
-                        <f:selectItem itemLabel="#{langsys[transactionTypeBean.getTransactionType(2).transactionUserLabel]}" itemValue="transaction_user_detail_id"/>
+                        <f:selectItem itemLabel="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(2).transactionUserLabel)}" itemValue="transaction_user_detail_id"/>
                         <f:selectItem itemLabel="#{langsys['Bill']} #{langsys['For']}" itemValue="bill_transactor_id"/>
                         <f:selectItem itemLabel="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}" itemValue="transactor_id"/>
-                        <f:selectItem itemLabel="#{langsys[transactionTypeBean.getTransactionType(2).transactionDateLabel]}" itemValue="transaction_date"/>
+                        <f:selectItem itemLabel="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(2).transactionDateLabel)}" itemValue="transaction_date"/>
                         <f:selectItem itemLabel="#{companySetting.getStoreEquivName()}" itemValue="store_id"/>
                     </p:selectOneMenu>
                 </h:panelGrid>
@@ -152,7 +152,7 @@
                         <p:column headerText="#{langsys['Added']} #{langsys['By']}" style="text-align: left;" rendered="#{transBean.fieldName.equals('add_user_detail_id')}">
                             <h:outputText value="#{userDetailBean.getUserDetail(sm.addUserDetailId).userName}" rendered="#{sm.addUserDetailId>0}"/>
                         </p:column>
-                        <p:column headerText="#{langsys[transactionTypeBean.getTransactionType(2).transactionUserLabel]}" style="text-align: left;" rendered="#{transBean.fieldName.equals('transaction_user_detail_id')}">
+                        <p:column headerText="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(2).transactionUserLabel)}" style="text-align: left;" rendered="#{transBean.fieldName.equals('transaction_user_detail_id')}">
                             <h:outputText value="#{userDetailBean.getUserDetail(sm.transactionUserDetailId).userName}"/>
                         </p:column>
                         <p:column headerText="#{langsys['Bill']} #{langsys['For']}" style="text-align: left;" rendered="#{transBean.fieldName.equals('bill_transactor_id')}">
@@ -161,7 +161,7 @@
                         <p:column headerText="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}" style="text-align: left;" rendered="#{transBean.fieldName.equals('transactor_id')}">
                             <h:outputText value="#{transactorBean.getTransactor(sm.transactorId).transactorNames}"/>
                         </p:column>
-                        <p:column headerText="#{langsys[transactionTypeBean.getTransactionType(2).transactionDateLabel]}" style="text-align: left;" rendered="#{transBean.fieldName.equals('transaction_date')}">
+                        <p:column headerText="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(2).transactionDateLabel)}" style="text-align: left;" rendered="#{transBean.fieldName.equals('transaction_date')}">
                             <h:outputText value="#{utilityBean.formatDate(sm.transactionDate)}"/>
                         </p:column>
                         <p:column headerText="#{companySetting.getStoreEquivName()}" style="text-align: left;" rendered="#{transBean.fieldName.equals('store_id')}">
@@ -223,15 +223,15 @@
                     <p:splitButton value="#{langsys['Select']}" icon="ui-icon-pencil">
                         <p:menuitem value="#{langsys['View']}" icon="ui-icon-search" oncomplete="PF('dlgSalesInvoice').show();" actionListener="#{transBean.initSalesInvoiceSession(itm.transactionId,'View')}" update=":formTransaction"/>
                         <p:menuitem value="#{langsys['Edit']}" icon="ui-icon-pencil" oncomplete="PF('dlgSalesInvoice').show();" actionListener="#{transBean.initSalesInvoiceSession(itm.transactionId,'Edit')}" update=":formTransaction"/>
-                        <p:menuitem value="#{langsys['Credit']} #{langsys['Note']}" icon="ui-icon-plusthick" oncomplete="PF('dlgCreditNote').show();" actionListener="#{transBean.initCheckCrDrNoteSession(itm.transactionNumber,itm.transactionId,'Cr')}" update=":formCreditNote"/>
-                        <p:menuitem value="#{langsys['Debit']} #{langsys['Note']}" icon="ui-icon-minusthick" oncomplete="PF('dlgDebitNote').show();" actionListener="#{transBean.initCheckCrDrNoteSession(itm.transactionNumber,itm.transactionId,'Dr')}" update=":formDebitNote"/>
+                        <p:menuitem value="#{langsys['Credit']} #{langsys['Note']}" icon="ui-icon-minusthick" oncomplete="PF('dlgCreditNote').show();" actionListener="#{transBean.initCheckCrDrNoteSession(itm.transactionNumber,itm.transactionId,'Cr')}" update=":formCreditNote"/>
+                        <p:menuitem value="#{langsys['Debit']} #{langsys['Note']}" icon="ui-icon-plusthick" oncomplete="PF('dlgDebitNote').show();" actionListener="#{transBean.initCheckCrDrNoteSession(itm.transactionNumber,itm.transactionId,'Dr')}" update=":formDebitNote"/>
                     </p:splitButton>
                 </p:column>
                 <p:column headerText="#{langsys['Sales']} #{langsys['Type']}">
                     <h:outputLabel value="#{transactionReasonBean.getTransactionReason(itm.transactionReasonId).transactionReasonName} "/>
                     <h:outputLabel value="#{itm.transactionNumber}"/>
                 </p:column>
-                <p:column headerText="#{langsys[transactionTypeBean.getTransactionType(2).transactionDateLabel]}" rendered="#{transBean.dateType.equals('Invoice Date')}">
+                <p:column headerText="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(2).transactionDateLabel)}" rendered="#{transBean.dateType.equals('Invoice Date')}">
                     <h:outputText value="#{utilityBean.formatDate(itm.transactionDate)}"/>
                 </p:column>
                 <p:column headerText="#{langsys['Add']} #{langsys['Date']}" rendered="#{transBean.dateType.equals('Add Date')}">
@@ -275,7 +275,7 @@
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="#{langsys[transactionTypeBean.getTransactionType(2).transactionUserLabel]}" visible="false">
+                <p:column headerText="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(2).transactionUserLabel)}" visible="false">
                     <h:outputText value="#{userDetailBean.getUserDetail(itm.transactionUserDetailId).userName}"/>
                 </p:column>
                 <p:column headerText="#{langsys['Added']} #{langsys['By']}" visible="false">

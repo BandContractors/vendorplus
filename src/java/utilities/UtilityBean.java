@@ -48,7 +48,9 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.*;
+import javax.faces.context.FacesContext;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.IntrospectionException;
@@ -61,6 +63,8 @@ import javax.management.ReflectionException;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.primefaces.event.ToggleEvent;
+import org.primefaces.model.Visibility;
 import sessions.GeneralUserSetting;
 
 @ManagedBean
@@ -85,6 +89,11 @@ public class UtilityBean implements Serializable {
         return matcher.matches();
     }
 
+//    public void onColumnToggle(ToggleEvent event) {
+//        String ColIndex=event.getData().toString();
+//        String Visibility=event.getVisibility().name() + ":" + event.getVisibility().toString();
+//        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("ColIndex:" + ColIndex + ",Visibility:" + Visibility));
+//    }
     public static String combineTwoStr(String aStr1, String aStr2, int aBracket) {
         String CombStr = "";
         if (null == aStr1) {
@@ -302,6 +311,25 @@ public class UtilityBean implements Serializable {
             aString = this.formatNumber("###,###.###", aAmount) + "";
         } else if (aAmount < 0) {
             aString = this.formatNumber("###,###.###", aAmount) + "";
+        }
+        return aString;
+    }
+
+    public String formatDoubleToStringByDp(double aAmount, int aDecimalPlaces) {
+        String aString = "";
+        String fmt = "";
+        if (aDecimalPlaces > 0) {
+            fmt = "###,###.";
+            for (int i = 0; i < aDecimalPlaces; i++) {
+                fmt = fmt + "#";
+            }
+        } else {
+            fmt = "###,###";
+        }
+        if (aAmount >= 0) {
+            aString = this.formatNumber(fmt, aAmount) + "";
+        } else if (aAmount < 0) {
+            aString = this.formatNumber(fmt, aAmount) + "";
         }
         return aString;
     }
@@ -778,7 +806,13 @@ public class UtilityBean implements Serializable {
     }
 
 //    public static void main(String[] args) {
-//        System.out.println("A:" + "success:123".contains("succesps"));
+//        System.out.println(new AccCurrencyBean().roundDoubleToXDps(12.12,8));
+//        System.out.println(new AccCurrencyBean().roundDoubleToXDps(12,8));
+//        System.out.println(new AccCurrencyBean().roundDoubleToXDps(12.1234567,8));
+//        System.out.println(new AccCurrencyBean().roundDoubleToXDps(12.12345678,8));
+//        System.out.println(new AccCurrencyBean().roundDoubleToXDps(12.123456789,8));
+//        System.out.println(new AccCurrencyBean().roundDoubleToXDps(12.12345671234,8));
+//        System.out.println(new AccCurrencyBean().roundDoubleToXDps(12.0,8));
 //    }
     public List<ThreadClass> getRunningThreads() {
         List<ThreadClass> objs = new ArrayList<>();
@@ -1322,16 +1356,30 @@ public class UtilityBean implements Serializable {
         double DeemedTotalAmount = 0;
         double DeemedTotalVat = 0;
         try {
-            double VatPercent = aTrans.getVatPerc();
-            for (int i = 0; i < aTransItemList.size(); i++) {
-                if (aTransItemList.get(i).getVatRated().equals("DEEMED") && VatPercent > 0) {
-                    double ExcludedVat = (VatPercent / 100) * aTransItemList.get(i).getAmountExcVat();
-                    DeemedTotalVat = DeemedTotalVat + ExcludedVat;
-                    DeemedTotalAmount = DeemedTotalAmount + aTransItemList.get(i).getAmountExcVat();
+            if (null != aTrans && null != aTransItemList) {
+                double VatPercent = aTrans.getVatPerc();
+                for (int i = 0; i < aTransItemList.size(); i++) {
+                    if (aTransItemList.get(i).getVatRated().equals("DEEMED") && VatPercent > 0) {
+                        double ExcludedVat = (VatPercent / 100) * aTransItemList.get(i).getAmountExcVat();
+                        DeemedTotalVat = DeemedTotalVat + ExcludedVat;
+                        DeemedTotalAmount = DeemedTotalAmount + aTransItemList.get(i).getAmountExcVat();
+                    }
+                }
+                aTrans.setTotalDeemedVatableAmount(DeemedTotalAmount);
+                aTrans.setTotalDeemedVat(DeemedTotalVat);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void assignNumbersToList(List<TransItem> aTransItems) {
+        try {
+            if (null != aTransItems) {
+                for (int i = 1; i <= aTransItems.size(); i++) {
+                    aTransItems.get(i - 1).setItem_no(i);
                 }
             }
-            aTrans.setTotalDeemedVatableAmount(DeemedTotalAmount);
-            aTrans.setTotalDeemedVat(DeemedTotalVat);
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }

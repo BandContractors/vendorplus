@@ -393,6 +393,7 @@ public class OutputDetailBean implements Serializable {
             }
             try {
                 aOutputDetail.setTrans_items(new CreditDebitNoteBean().getTransItemsByTransactionId_cr_dr_note(aOutputDetail.getTrans().getTransactionId()));
+                new UtilityBean().assignNumbersToList(aOutputDetail.getTrans_items());
             } catch (Exception e) {
             }
             try {

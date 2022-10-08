@@ -17,10 +17,11 @@ import javax.faces.bean.SessionScoped;
 @ManagedBean
 @SessionScoped
 public class Stock_ledger implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     private long stock_ledger_id;
-    private int store_id; 
+    private int store_id;
     private long item_id;
     private String batchno;
     private String code_specific;
@@ -36,6 +37,7 @@ public class Stock_ledger implements Serializable {
     private double qty_bal;
     private String description;
     private String unit_symbol;
+    private String base_unit_symbol;
     private String transaction_type_name;
     private String user_name;
     private String store_name;
@@ -46,6 +48,10 @@ public class Stock_ledger implements Serializable {
     private long tax_update_id;
     private int tax_is_updated;
     private int tax_update_synced;
+    private long transaction_item_id;
+    private List<Item_unit_other> Item_unit_otherList;
+    private String multiUnitsString;
+    private String openingQtyMultiUnitsString;
 
     /**
      * @return the stock_ledger_id
@@ -423,5 +429,75 @@ public class Stock_ledger implements Serializable {
      */
     public void setTax_update_id(long tax_update_id) {
         this.tax_update_id = tax_update_id;
+    }
+
+    /**
+     * @return the transaction_item_id
+     */
+    public long getTransaction_item_id() {
+        return transaction_item_id;
+    }
+
+    /**
+     * @param transaction_item_id the transaction_item_id to set
+     */
+    public void setTransaction_item_id(long transaction_item_id) {
+        this.transaction_item_id = transaction_item_id;
+    }
+
+    /**
+     * @return the base_unit_symbol
+     */
+    public String getBase_unit_symbol() {
+        return base_unit_symbol;
+    }
+
+    /**
+     * @param base_unit_symbol the base_unit_symbol to set
+     */
+    public void setBase_unit_symbol(String base_unit_symbol) {
+        this.base_unit_symbol = base_unit_symbol;
+    }
+
+    /**
+     * @return the Item_unit_otherList
+     */
+    public List<Item_unit_other> getItem_unit_otherList() {
+        return Item_unit_otherList;
+    }
+
+    /**
+     * @param Item_unit_otherList the Item_unit_otherList to set
+     */
+    public void setItem_unit_otherList(List<Item_unit_other> Item_unit_otherList) {
+        this.Item_unit_otherList = Item_unit_otherList;
+    }
+
+    /**
+     * @return the multiUnitsString
+     */
+    public String getMultiUnitsString() {
+        return multiUnitsString;
+    }
+
+    /**
+     * @param multiUnitsString the multiUnitsString to set
+     */
+    public void setMultiUnitsString(String multiUnitsString) {
+        this.multiUnitsString = multiUnitsString;
+    }
+
+    /**
+     * @return the openingQtyMultiUnitsString
+     */
+    public String getOpeningQtyMultiUnitsString() {
+        return openingQtyMultiUnitsString;
+    }
+
+    /**
+     * @param openingQtyMultiUnitsString the openingQtyMultiUnitsString to set
+     */
+    public void setOpeningQtyMultiUnitsString(String openingQtyMultiUnitsString) {
+        this.openingQtyMultiUnitsString = openingQtyMultiUnitsString;
     }
 }

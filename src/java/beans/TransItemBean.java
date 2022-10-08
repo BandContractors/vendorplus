@@ -21,6 +21,7 @@ import entities.Store;
 import entities.SubCategory;
 import entities.Trans;
 import entities.TransactionReason;
+import entities.Transaction_item_hist_unit;
 import entities.Transaction_item_unit;
 import java.io.Serializable;
 import java.sql.CallableStatement;
@@ -138,17 +139,6 @@ public class TransItemBean implements Serializable {
         }
     }
 
-    public void saveTransItems(Trans aTrans, List<TransItem> aActiveTransItems, long TransactionId) {
-        List<TransItem> ati = aActiveTransItems;
-        int ListItemIndex = 0;
-        int ListItemNo = ati.size();
-        while (ListItemIndex < ListItemNo) {
-            ati.get(ListItemIndex).setTransactionId(TransactionId);
-            this.saveTransItem(aTrans, ati.get(ListItemIndex));
-            ListItemIndex = ListItemIndex + 1;
-        }
-    }
-
     public void saveTransItemsCEC(int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aTrans, List<TransItem> aActiveTransItems, long TransactionId) {
         try {
             List<TransItem> ati = aActiveTransItems;
@@ -240,542 +230,6 @@ public class TransItemBean implements Serializable {
             ati.get(ListItemIndex).setTransactionId(TransactionId);
             this.saveTransItemCashAdjustment(aTrans, ati.get(ListItemIndex));
             ListItemIndex = ListItemIndex + 1;
-        }
-    }
-
-    public void saveTransItem(Trans aTrans, TransItem transitem) {
-        String sql = null;
-        String sql2 = null;
-        String msg = "";
-
-        TransactionTypeBean TransTypeBean = new TransactionTypeBean();
-        TransactionType TransType = new TransactionType();
-        StockBean StkBean = new StockBean();
-
-        if (1 == 2) {
-        } else {
-
-            if (transitem.getTransactionItemId() == 0) {
-                sql = "{call sp_insert_transaction_item(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
-            } else if (transitem.getTransactionItemId() > 0) {
-                sql = "{call sp_update_transaction_item(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
-            }
-
-            try (
-                    Connection conn = DBConnection.getMySQLConnection();
-                    CallableStatement cs = conn.prepareCall(sql);) {
-                if (transitem.getTransactionItemId() == 0) {
-                    //clean batch
-                    if (transitem.getBatchno() == null) {
-                        transitem.setBatchno("");
-                    }
-
-                    cs.setString("in_is_trade_discount_vat_liable", CompanySetting.getIsTradeDiscountVatLiable());
-                    cs.setLong("in_transaction_id", transitem.getTransactionId());
-                    cs.setLong("in_item_id", transitem.getItemId());
-                    cs.setString("in_batchno", transitem.getBatchno());
-                    try {
-                        cs.setDate("in_item_mnf_date", new java.sql.Date(transitem.getItemMnfDate().getTime()));
-                    } catch (NullPointerException npe) {
-                        cs.setDate("in_item_mnf_date", null);
-                    }
-                    try {
-                        cs.setDate("in_item_expiry_date", new java.sql.Date(transitem.getItemExpryDate().getTime()));
-                    } catch (NullPointerException npe) {
-                        cs.setDate("in_item_mnf_date", null);
-                    }
-                    cs.setDouble("in_item_qty", transitem.getItemQty());
-                    cs.setDouble("in_unit_price", transitem.getUnitPrice());
-                    cs.setDouble("in_unit_trade_discount", transitem.getUnitTradeDiscount());
-                    cs.setDouble("in_unit_vat", transitem.getUnitVat());
-                    cs.setDouble("in_amount", transitem.getAmount());
-                    cs.setString("in_vat_rated", transitem.getVatRated());
-                    cs.setDouble("in_vat_perc", transitem.getVatPerc());
-                    cs.setDouble("in_unit_price_inc_vat", transitem.getUnitPriceIncVat());
-                    cs.setDouble("in_unit_price_exc_vat", transitem.getUnitPriceExcVat());
-                    cs.setDouble("in_amount_inc_vat", transitem.getAmountIncVat());
-                    cs.setDouble("in_amount_exc_vat", transitem.getAmountExcVat());
-                    if ("SALE INVOICE".equals(new GeneralUserSetting().getCurrentTransactionTypeName()) || "HIRE INVOICE".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
-                        cs.setString("in_stock_effect", "D");
-                    } else if ("PURCHASE INVOICE".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
-                        cs.setString("in_stock_effect", "C");
-                    } else if ("EXPENSE ENTRY".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
-                        cs.setString("in_stock_effect", "C");
-                    } else if ("TRANSFER".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
-                        cs.setString("in_stock_effect", "B");
-                    } else if ("DISPOSE STOCK".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
-                        cs.setString("in_stock_effect", "D");
-                    } else if ("UNPACK".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
-                        cs.setString("in_stock_effect", "D");
-                    } else if ("ITEM RECEIVED".equals(new GeneralUserSetting().getCurrentTransactionTypeName()) || "HIRE RETURN NOTE".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
-                        cs.setString("in_stock_effect", "C");
-                    } else {
-                        cs.setString("in_stock_effect", "");
-                    }
-                    //for profit margin
-                    cs.setDouble("in_unit_cost_price", transitem.getUnitCostPrice());
-                    cs.setDouble("in_unit_profit_margin", transitem.getUnitProfitMargin());
-                    //for user earning
-                    if ("HIRE INVOICE".equals(new GeneralUserSetting().getCurrentTransactionTypeName()) || ("SALE INVOICE".equals(new GeneralUserSetting().getCurrentTransactionTypeName()) && ("RETAIL SALE INVOICE".equals(new GeneralUserSetting().getCurrentSaleType()) || "WHOLE SALE INVOICE".equals(new GeneralUserSetting().getCurrentSaleType())))) {
-                        UserItemEarn bUserItemEarn = new UserItemEarn();
-                        Item bItem = new Item();
-                        UserDetail bUserDetail = new UserDetail();
-                        int bTransTypeId, bTransReasId, bItemCatId, bItemSubCatId, bUserCatId;
-                        bTransTypeId = new GeneralUserSetting().getCurrentTransactionTypeId();
-                        bTransReasId = new GeneralUserSetting().getCurrentTransactionReasonId();
-                        bItem = new ItemBean().getItem(transitem.getItemId());
-                        bItemCatId = bItem.getCategoryId();
-                        bUserDetail = new UserDetailBean().getUserDetail(aTrans.getTransactionUserDetailId());
-                        bUserCatId = bUserDetail.getUserCategoryId();
-                        try {
-                            bItemSubCatId = bItem.getSubCategoryId();
-                        } catch (NullPointerException npe) {
-                            bItemSubCatId = 0;
-                        }
-                        try {
-                            //System.out.println(bTransTypeId + "," + bTransReasId + "," + bItemCatId + "," + bItemSubCatId + "," + bUserCatId);
-                            bUserItemEarn = new UserItemEarnBean().getUserItemEarnByTtypeTreasIcatIsubcatUcat(bTransTypeId, bTransReasId, bItemCatId, bItemSubCatId, bUserCatId);
-                        } catch (NullPointerException npe) {
-                            bUserItemEarn = null;
-                        }
-                        if (null != bUserItemEarn) {
-                            cs.setDouble("in_earn_perc", bUserItemEarn.getEarnPerc());
-                            cs.setDouble("in_earn_amount", (double) (bUserItemEarn.getEarnPerc() * transitem.getAmountIncVat() * 0.01));
-                        } else {
-                            cs.setDouble("in_earn_perc", 0);
-                            cs.setDouble("in_earn_amount", 0);
-                        }
-                    } else {
-                        cs.setDouble("in_earn_perc", 0);
-                        cs.setDouble("in_earn_amount", 0);
-                    }
-                    try {
-                        cs.setString("in_code_specific", transitem.getCodeSpecific());
-                    } catch (NullPointerException npe) {
-                        cs.setString("in_code_specific", "");
-                    }
-                    try {
-                        cs.setString("in_desc_specific", transitem.getDescSpecific());
-                    } catch (NullPointerException npe) {
-                        cs.setString("in_desc_specific", "");
-                    }
-                    try {
-                        cs.setString("in_desc_more", transitem.getDescMore());
-                    } catch (NullPointerException npe) {
-                        cs.setString("in_desc_more", "");
-                    }
-                    try {
-                        cs.setString("in_warranty_desc", transitem.getWarrantyDesc());
-                    } catch (NullPointerException npe) {
-                        cs.setString("in_warranty_desc", "");
-                    }
-                    try {
-                        cs.setDate("in_warranty_expiry_date", new java.sql.Date(transitem.getWarrantyExpiryDate().getTime()));
-                    } catch (NullPointerException npe) {
-                        cs.setDate("in_warranty_expiry_date", null);
-                    }
-                    try {
-                        cs.setString("in_account_code", transitem.getAccountCode());
-                    } catch (NullPointerException npe) {
-                        cs.setString("in_account_code", "");
-                    }
-                    try {
-                        cs.setDate("in_purchase_date", new java.sql.Date(transitem.getPurchaseDate().getTime()));
-                    } catch (NullPointerException npe) {
-                        cs.setDate("in_purchase_date", null);
-                    }
-                    try {
-                        cs.setDate("in_dep_start_date", new java.sql.Date(transitem.getDepStartDate().getTime()));
-                    } catch (NullPointerException npe) {
-                        cs.setDate("in_dep_start_date", null);
-                    }
-                    try {
-                        cs.setInt("in_dep_method_id", transitem.getDepMethodId());
-                    } catch (NullPointerException npe) {
-                        cs.setInt("in_dep_method_id", 0);
-                    }
-                    try {
-                        cs.setDouble("in_dep_rate", transitem.getDepRate());
-                    } catch (NullPointerException npe) {
-                        cs.setDouble("in_dep_rate", 0);
-                    }
-                    try {
-                        cs.setInt("in_average_method_id", transitem.getAverageMethodId());
-                    } catch (NullPointerException npe) {
-                        cs.setInt("in_average_method_id", 0);
-                    }
-                    try {
-                        cs.setInt("in_effective_life", transitem.getEffectiveLife());
-                    } catch (NullPointerException npe) {
-                        cs.setInt("in_effective_life", 0);
-                    }
-                    try {
-                        cs.setDouble("in_residual_value", transitem.getResidualValue());
-                    } catch (NullPointerException npe) {
-                        cs.setDouble("in_residual_value", 0);
-                    }
-                    try {
-                        cs.setString("in_narration", transitem.getNarration());
-                    } catch (NullPointerException npe) {
-                        cs.setString("in_narration", "");
-                    }
-                    try {
-                        cs.setDouble("in_qty_balance", transitem.getQty_balance());
-                    } catch (NullPointerException npe) {
-                        cs.setDouble("in_qty_balance", 0);
-                    }
-                    try {
-                        cs.setDouble("in_duration_value", transitem.getDuration_value());
-                    } catch (NullPointerException npe) {
-                        cs.setDouble("in_duration_value", 0);
-                    }
-                    try {
-                        cs.setDouble("in_qty_damage", transitem.getQty_damage());
-                    } catch (NullPointerException npe) {
-                        cs.setDouble("in_qty_damage", 0);
-                    }
-                    try {
-                        cs.setDouble("in_duration_passed", transitem.getDuration_passed());
-                    } catch (NullPointerException npe) {
-                        cs.setDouble("in_duration_passed", 0);
-                    }
-                    try {
-                        if (transitem.getSpecific_size() > 0) {
-                            cs.setDouble("in_specific_size", transitem.getSpecific_size());
-                        } else {
-                            cs.setDouble("in_specific_size", 1);
-                        }
-                    } catch (NullPointerException npe) {
-                        cs.setDouble("in_specific_size", 1);
-                    }
-                    //save
-                    cs.executeUpdate();
-                    //repeat for the unpacked ones
-                    if ("UNPACK".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
-                        cs.setLong("in_item_id", transitem.getItemId2());
-                        cs.setDouble("in_item_qty", transitem.getItemQty2());
-                        cs.setString("in_stock_effect", "C");
-                        cs.executeUpdate();
-                    }
-
-                    //update stock
-                    TransType = TransTypeBean.getTransactionType(new GeneralUserSetting().getCurrentTransactionTypeId());
-                    if (new ItemBean().getItem(transitem.getItemId()).getIsTrack() == 1) {
-                        if ("SALE INVOICE".equals(new GeneralUserSetting().getCurrentTransactionTypeName()) || "DISPOSE STOCK".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
-                            Stock stock = new Stock();
-                            int i = 0;
-                            stock.setStoreId(new GeneralUserSetting().getCurrentStore().getStoreId());
-                            stock.setItemId(transitem.getItemId());
-                            stock.setBatchno(transitem.getBatchno());
-                            stock.setCodeSpecific(transitem.getCodeSpecific());
-                            stock.setDescSpecific(transitem.getDescSpecific());
-                            i = new StockBean().subtractStock(stock, transitem.getItemQty());
-                            stock.setSpecific_size(transitem.getSpecific_size());
-                            String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                            new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", stock, transitem.getItemQty(), "Add", new GeneralUserSetting().getCurrentTransactionTypeId(), transitem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
-                        }
-                        if ("HIRE INVOICE".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
-                            Stock_out sout = new Stock_out();
-                            int i = 0;
-                            sout.setStore_id(new GeneralUserSetting().getCurrentStore().getStoreId());
-                            sout.setItem_id(transitem.getItemId());
-                            sout.setBatchno(transitem.getBatchno());
-                            sout.setCode_specific(transitem.getCodeSpecific());
-                            sout.setDesc_specific(transitem.getDescSpecific());
-                            sout.setQty_out(transitem.getItemQty());
-                            sout.setTransactor_id(aTrans.getTransactorId());
-                            sout.setSite_id(aTrans.getSite_id());
-                            sout.setTransaction_id(aTrans.getTransactionId());
-                            i = new Stock_outBean().InsertOrUpdateStock_out(sout, "Add");
-                        }
-                        if ("HIRE RETURN NOTE".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
-                            Stock_out sout = new Stock_out();
-                            int i = 0;
-                            sout.setStore_id(new GeneralUserSetting().getCurrentStore().getStoreId());
-                            sout.setItem_id(transitem.getItemId());
-                            sout.setBatchno(transitem.getBatchno());
-                            sout.setCode_specific(transitem.getCodeSpecific());
-                            sout.setDesc_specific(transitem.getDescSpecific());
-                            sout.setQty_out(transitem.getItemQty() + transitem.getQty_damage());
-                            sout.setTransactor_id(aTrans.getTransactorId());
-                            sout.setSite_id(aTrans.getSite_id());
-                            Trans aRefTrans = null;
-                            try {
-                                aRefTrans = new TransBean().getTransByTransNumber(aTrans.getTransactionRef());
-                                sout.setTransaction_id(aRefTrans.getTransactionId());
-                            } catch (NullPointerException npe) {
-                                sout.setTransaction_id(0);
-                            }
-                            if (sout.getTransaction_id() > 0) {
-                                i = new Stock_outBean().UpdateNoInsertStock_out(sout, "Subtract");
-                            }
-                            //update if any damage/lost item has been returned
-                            if (i == 1 && transitem.getQty_damage() > 0) {
-                                Stock stock2 = new Stock();
-                                int i2 = 0;
-                                stock2.setStoreId(new GeneralUserSetting().getCurrentStore().getStoreId());
-                                stock2.setItemId(transitem.getItemId());
-                                stock2.setBatchno(transitem.getBatchno());
-                                stock2.setCodeSpecific(transitem.getCodeSpecific());
-                                stock2.setDescSpecific(transitem.getDescSpecific());
-                                i2 = new StockBean().updateStockDamage(stock2, transitem.getQty_damage(), "Add");
-                            }
-                        }
-                        if ("ITEM RECEIVED".equals(new GeneralUserSetting().getCurrentTransactionTypeName()) || (new GeneralUserSetting().getCurrentTransactionTypeId() == 1 && new GeneralUserSetting().getCurrentTransactionReasonId() == 29)) {
-                            double UnitCostPrice = 0;
-                            if (StkBean.getStock(new GeneralUserSetting().getCurrentStore().getStoreId(), transitem.getItemId(), transitem.getBatchno(), transitem.getCodeSpecific(), transitem.getDescSpecific()) != null) {
-                                //update/add
-                                Stock stock = new Stock();
-                                int i = 0;
-                                stock.setStoreId(new GeneralUserSetting().getCurrentStore().getStoreId());
-                                stock.setItemId(transitem.getItemId());
-                                stock.setBatchno(transitem.getBatchno());
-                                stock.setCodeSpecific(transitem.getCodeSpecific());
-                                stock.setDescSpecific(transitem.getDescSpecific());
-                                UnitCostPrice = 0;
-                                //the asset interface uses unit_price for cost price
-                                if (new GeneralUserSetting().getCurrentTransactionReasonId() == 29) {
-                                    UnitCostPrice = transitem.getUnitPrice();
-                                } else {
-                                    UnitCostPrice = transitem.getUnitCostPrice();
-                                }
-                                stock.setUnitCost(UnitCostPrice);
-                                i = new StockBean().addStock(stock, transitem.getItemQty());
-                                stock.setSpecific_size(transitem.getSpecific_size());
-                                String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                                new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, transitem.getItemQty(), "Add", new GeneralUserSetting().getCurrentTransactionTypeId(), transitem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
-                            } else {
-                                //insert
-                                Stock stock = new Stock();
-                                int i = 0;
-                                stock.setStoreId(new GeneralUserSetting().getCurrentStore().getStoreId());
-                                stock.setItemId(transitem.getItemId());
-                                stock.setBatchno(transitem.getBatchno());
-                                stock.setCodeSpecific(transitem.getCodeSpecific());
-                                stock.setDescSpecific(transitem.getDescSpecific());
-                                stock.setDescMore(transitem.getDescMore());
-                                stock.setCurrentqty(transitem.getItemQty());
-                                stock.setItemMnfDate(transitem.getItemMnfDate());
-                                stock.setItemExpDate(transitem.getItemExpryDate());
-                                UnitCostPrice = 0;
-                                if (new GeneralUserSetting().getCurrentTransactionReasonId() == 29) {
-                                    UnitCostPrice = transitem.getUnitPrice();
-                                } else {
-                                    UnitCostPrice = transitem.getUnitCostPrice();
-                                }
-                                stock.setUnitCost(UnitCostPrice);
-                                stock.setWarrantyDesc(transitem.getWarrantyDesc());
-                                stock.setWarrantyExpiryDate(transitem.getWarrantyExpiryDate());
-                                stock.setPurchaseDate(transitem.getPurchaseDate());
-                                stock.setDepStartDate(transitem.getDepStartDate());
-                                stock.setDepMethodId(transitem.getDepMethodId());
-                                stock.setDepRate(transitem.getDepRate());
-                                stock.setAverageMethodId(transitem.getAverageMethodId());
-                                stock.setEffectiveLife(transitem.getEffectiveLife());
-                                stock.setAccountCode(transitem.getAccountCode());
-                                stock.setResidualValue(transitem.getResidualValue());
-                                stock.setAssetStatusId(1);
-                                stock.setAssetStatusDesc("");
-                                stock.setSpecific_size(transitem.getSpecific_size());
-                                i = new StockBean().saveStock(stock);
-                                String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                                new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, transitem.getItemQty(), "Add", new GeneralUserSetting().getCurrentTransactionTypeId(), transitem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
-                            }
-                        }
-
-                        //TRANSFER - 1. Subtract stock from the source store
-                        double FromUnitCost = 0;
-                        if ("TRANSFER".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
-                            Stock stock = new Stock();
-                            int i = 0;
-                            stock.setStoreId(new GeneralUserSetting().getCurrentStore().getStoreId());
-                            stock.setItemId(transitem.getItemId());
-                            stock.setBatchno(transitem.getBatchno());
-                            stock.setCodeSpecific(transitem.getCodeSpecific());
-                            stock.setDescSpecific(transitem.getDescSpecific());
-                            i = new StockBean().subtractStock(stock, transitem.getItemQty());
-                            try {
-                                FromUnitCost = new StockBean().getStock(stock.getStoreId(), stock.getItemId(), stock.getBatchno(), stock.getCodeSpecific(), stock.getDescSpecific()).getUnitCost();
-                            } catch (NullPointerException npe) {
-
-                            }
-                            stock.setSpecific_size(transitem.getSpecific_size());
-                            String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                            new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", stock, transitem.getItemQty(), "Add", new GeneralUserSetting().getCurrentTransactionTypeId(), transitem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
-                        }
-                        //TRANSFER - 2. Add/Insert stock to the destination store
-                        if ("TRANSFER".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
-                            if (StkBean.getStock(new GeneralUserSetting().getCurrentStore2Id(), transitem.getItemId(), transitem.getBatchno(), transitem.getCodeSpecific(), transitem.getDescSpecific()) != null) {
-                                //update/add
-                                Stock stock = new Stock();
-                                int i = 0;
-                                stock.setStoreId(new GeneralUserSetting().getCurrentStore2Id());
-                                stock.setItemId(transitem.getItemId());
-                                stock.setBatchno(transitem.getBatchno());
-                                stock.setCodeSpecific(transitem.getCodeSpecific());
-                                stock.setDescSpecific(transitem.getDescSpecific());
-                                i = new StockBean().addStock(stock, transitem.getItemQty());
-                                stock.setSpecific_size(transitem.getSpecific_size());
-                                String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                                new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, transitem.getItemQty(), "Add", new GeneralUserSetting().getCurrentTransactionTypeId(), transitem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
-                            } else {
-                                //insert
-                                Stock stock = new Stock();
-                                int i = 0;
-                                stock.setStoreId(new GeneralUserSetting().getCurrentStore2Id());
-                                stock.setItemId(transitem.getItemId());
-                                stock.setBatchno(transitem.getBatchno());
-                                stock.setCodeSpecific(transitem.getCodeSpecific());
-                                stock.setDescSpecific(transitem.getDescSpecific());
-                                stock.setCurrentqty(transitem.getItemQty());
-                                stock.setDescMore(transitem.getDescMore());
-                                stock.setCurrentqty(transitem.getItemQty());
-                                stock.setItemMnfDate(transitem.getItemMnfDate());
-                                stock.setItemExpDate(transitem.getItemExpryDate());
-                                //get cost price from the mother store
-                                stock.setUnitCost(FromUnitCost);
-
-                                stock.setWarrantyDesc(transitem.getWarrantyDesc());
-                                stock.setWarrantyExpiryDate(transitem.getWarrantyExpiryDate());
-                                stock.setPurchaseDate(transitem.getPurchaseDate());
-                                stock.setDepStartDate(transitem.getDepStartDate());
-                                stock.setDepMethodId(transitem.getDepMethodId());
-                                stock.setDepRate(transitem.getDepRate());
-                                stock.setAverageMethodId(transitem.getAverageMethodId());
-                                stock.setEffectiveLife(transitem.getEffectiveLife());
-                                stock.setAccountCode(transitem.getAccountCode());
-                                stock.setResidualValue(transitem.getResidualValue());
-                                stock.setAssetStatusId(1);
-                                stock.setAssetStatusDesc("");
-                                stock.setSpecific_size(transitem.getSpecific_size());
-                                i = new StockBean().saveStock(stock);
-                                String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                                new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, transitem.getItemQty(), "Add", new GeneralUserSetting().getCurrentTransactionTypeId(), transitem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
-                            }
-                        }
-                        //UNPACK - 1. Subtract stock from the source BigItem
-                        if ("UNPACK".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
-                            Stock stock = new Stock();
-                            int i = 0;
-                            stock.setStoreId(new GeneralUserSetting().getCurrentStore().getStoreId());
-                            stock.setItemId(transitem.getItemId());
-                            stock.setBatchno(transitem.getBatchno());
-                            stock.setCodeSpecific(transitem.getCodeSpecific());
-                            stock.setDescSpecific(transitem.getDescSpecific());
-                            i = new StockBean().subtractStock(stock, transitem.getItemQty());
-                            stock.setSpecific_size(transitem.getSpecific_size());
-                            String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                            new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", stock, transitem.getItemQty(), "Add", new GeneralUserSetting().getCurrentTransactionTypeId(), transitem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
-                        }
-                        //UNPACK - 2. Add/Insert stock to the destination small item
-                        if ("UNPACK".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
-                            if (StkBean.getStock(new GeneralUserSetting().getCurrentStore().getStoreId(), transitem.getItemId2(), transitem.getBatchno(), transitem.getCodeSpecific(), transitem.getDescSpecific()) != null) {
-                                //update/add
-                                Stock stock = new Stock();
-                                int i = 0;
-                                stock.setStoreId(new GeneralUserSetting().getCurrentStore().getStoreId());
-                                stock.setItemId(transitem.getItemId2());
-                                stock.setBatchno(transitem.getBatchno());
-                                stock.setCodeSpecific(transitem.getCodeSpecific());
-                                stock.setDescSpecific(transitem.getDescSpecific());
-                                i = new StockBean().addStock(stock, transitem.getItemQty2());
-                                stock.setSpecific_size(transitem.getSpecific_size());
-                                String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                                new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, transitem.getItemQty2(), "Add", new GeneralUserSetting().getCurrentTransactionTypeId(), transitem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
-                            } else {
-                                //insert
-                                Stock stock = new Stock();
-                                int i = 0;
-                                stock.setStoreId(new GeneralUserSetting().getCurrentStore().getStoreId());
-                                stock.setItemId(transitem.getItemId2());
-                                stock.setBatchno(transitem.getBatchno());
-                                stock.setCodeSpecific(transitem.getCodeSpecific());
-                                stock.setDescSpecific(transitem.getDescSpecific());
-                                stock.setCurrentqty(transitem.getItemQty2());
-                                //temp fix -- start
-                                Item aItem = new ItemBean().getItem(transitem.getItemId2());
-                                stock.setDescMore("");
-                                if (aItem.getItemType().equals("PRODUCT")) {
-                                    stock.setAccountCode("5-10-000-010");
-                                } else if (aItem.getItemType().equals("SERVICE")) {
-                                    stock.setAccountCode("5-10-000-020");
-                                }
-                                stock.setAssetStatusId(1);
-                                stock.setAssetStatusDesc("");
-                                //temp fix -- end
-                                //get the last unit cost price
-                                long LatestTransItemId = 0;
-                                double LatestTransItemUnitCostPrice = 0;
-                                LatestTransItemId = this.getItemUnitCostPriceLatestTransItemId(9, 13, stock.getStoreId(), stock.getItemId(), stock.getBatchno(), stock.getCodeSpecific(), stock.getDescSpecific());
-                                if (LatestTransItemId > 0) {
-                                    try {
-                                        LatestTransItemUnitCostPrice = this.getTransItem(LatestTransItemId).getUnitCostPrice();
-                                    } catch (NullPointerException npe) {
-                                        LatestTransItemUnitCostPrice = 0;
-                                    }
-                                }
-                                //incase the small item has never been supplied; try to get the the latest unit cost for the bigger item and divide
-                                if (LatestTransItemUnitCostPrice <= 0) {
-                                    long LatestTransItemIdBig = 0;
-                                    double LatestTransItemUnitCostPriceBig = 0;
-                                    double FractionQty = 0;
-                                    LatestTransItemIdBig = this.getItemUnitCostPriceLatestTransItemId(9, 13, stock.getStoreId(), transitem.getItemId(), stock.getBatchno(), stock.getCodeSpecific(), stock.getDescSpecific());
-                                    if (LatestTransItemIdBig > 0) {
-                                        //get fraction qty
-                                        try {
-                                            FractionQty = new ItemMapBean().getItemMapByBigItemId(transitem.getItemId()).getFractionQty();
-                                        } catch (NullPointerException npe) {
-                                            FractionQty = 0;
-                                        }
-                                        try {
-                                            if (FractionQty > 0) {
-                                                LatestTransItemUnitCostPriceBig = this.getTransItem(LatestTransItemIdBig).getUnitCostPrice() / FractionQty;
-                                            }
-                                        } catch (NullPointerException npe) {
-                                            LatestTransItemUnitCostPriceBig = 0;
-                                        }
-                                    }
-                                    if (LatestTransItemUnitCostPriceBig > 0) {
-                                        LatestTransItemUnitCostPrice = LatestTransItemUnitCostPriceBig;
-                                    }
-                                }
-
-                                if (LatestTransItemUnitCostPrice > 0) {
-                                    stock.setUnitCost(LatestTransItemUnitCostPrice);
-                                } else {
-                                    stock.setUnitCost(transitem.getUnitCostPrice());
-                                }
-
-                                try {
-                                    stock.setItemMnfDate(transitem.getItemMnfDate());
-                                } catch (NullPointerException npe) {
-                                    stock.setItemMnfDate(null);
-                                }
-                                try {
-                                    stock.setItemExpDate(transitem.getItemExpryDate());
-                                } catch (NullPointerException npe) {
-                                    stock.setItemExpDate(null);
-                                }
-                                stock.setSpecific_size(transitem.getSpecific_size());
-                                i = new StockBean().saveStock(stock);
-                                String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                                new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, transitem.getItemQty2(), "Add", new GeneralUserSetting().getCurrentTransactionTypeId(), transitem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
-                            }
-                        }
-                    }
-
-                    TransType = null;
-                    TransTypeBean = null;
-                    StkBean = null;
-
-                } else if (transitem.getTransactionItemId() > 0) {
-                    //do nothing; this is for edit
-                }
-            } catch (Exception e) {
-                LOGGER.log(Level.ERROR, e);
-                this.setActionMessage("TransItem NOT saved");
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("TransItem NOT saved!"));
-            }
         }
     }
 
@@ -1032,8 +486,15 @@ public class TransItemBean implements Serializable {
                         }
                     }
                     //update stock
+                    //this.adjustStockForTransItems(new TransBean().getTrans(transitem.getTransactionId()), this.getTransItemsByTransactionId(transitem.getTransactionId()));
                     try {
-                        this.adjustStockForTransItems(new TransBean().getTrans(transitem.getTransactionId()), this.getTransItemsByTransactionId(transitem.getTransactionId()));
+                        if (InsertedId1 > 0) {
+                            if (aTransTypeId == 67 && transitem.getBase_unit_qty() <= 0 && transitem.getQty_damage() <= 0) {
+                                //do nothing
+                            } else {
+                                this.adjustStockForTransItem(new TransBean().getTrans(transitem.getTransactionId()), this.getTransItem(InsertedId1));
+                            }
+                        }
                     } catch (Exception e) {
                         //do nothing
                     }
@@ -1422,7 +883,7 @@ public class TransItemBean implements Serializable {
                         i = new StockBean().subtractStock(stock, aTransitem.getBase_unit_qty());
                         stock.setSpecific_size(aTransitem.getSpecific_size());
                         String TableName = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", stock, aTransitem.getBase_unit_qty(), "Add", aTrans.getTransactionTypeId(), aTrans.getTransactionId(), aTrans.getAddUserDetailId());
+                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", stock, aTransitem.getItemQty(), "Add", aTrans.getTransactionTypeId(), aTrans.getTransactionId(), aTrans.getAddUserDetailId(), aTransitem.getTransactionItemId());
                     }
                     if ("HIRE INVOICE".equals(transtype.getTransactionTypeName())) {
                         Stock_out sout = new Stock_out();
@@ -1499,7 +960,7 @@ public class TransItemBean implements Serializable {
                             i = new StockBean().addStock(stock, aTransitem.getBase_unit_qty());
                             stock.setSpecific_size(aTransitem.getSpecific_size());
                             String TableName = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                            new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, aTransitem.getBase_unit_qty(), "Add", aTrans.getTransactionTypeId(), aTrans.getTransactionId(), aTrans.getAddUserDetailId());
+                            new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, aTransitem.getItemQty(), "Add", aTrans.getTransactionTypeId(), aTrans.getTransactionId(), aTrans.getAddUserDetailId(), aTransitem.getTransactionItemId());
                         } else {
                             //insert
                             Stock stock = new Stock();
@@ -1536,7 +997,7 @@ public class TransItemBean implements Serializable {
                             stock.setSpecific_size(aTransitem.getSpecific_size());
                             i = new StockBean().saveStock(stock);
                             String TableName = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                            new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, aTransitem.getBase_unit_qty(), "Add", aTrans.getTransactionTypeId(), aTrans.getTransactionId(), aTrans.getAddUserDetailId());
+                            new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, aTransitem.getItemQty(), "Add", aTrans.getTransactionTypeId(), aTrans.getTransactionId(), aTrans.getAddUserDetailId(), aTransitem.getTransactionItemId());
                         }
                     }
 
@@ -1558,7 +1019,7 @@ public class TransItemBean implements Serializable {
                         }
                         stock.setSpecific_size(aTransitem.getSpecific_size());
                         String TableName = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", stock, aTransitem.getBase_unit_qty(), "Add", aTrans.getTransactionTypeId(), aTrans.getTransactionId(), aTrans.getAddUserDetailId());
+                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", stock, aTransitem.getItemQty(), "Add", aTrans.getTransactionTypeId(), aTrans.getTransactionId(), aTrans.getAddUserDetailId(), aTransitem.getTransactionItemId());
                     }
                     //TRANSFER - 2. Add/Insert stock to the destination store
                     if ("TRANSFER".equals(transtype.getTransactionTypeName())) {
@@ -1574,7 +1035,7 @@ public class TransItemBean implements Serializable {
                             i = new StockBean().addStock(stock, aTransitem.getBase_unit_qty());
                             stock.setSpecific_size(aTransitem.getSpecific_size());
                             String TableName = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                            new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, aTransitem.getBase_unit_qty(), "Add", aTrans.getTransactionTypeId(), aTrans.getTransactionId(), aTrans.getAddUserDetailId());
+                            new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, aTransitem.getItemQty(), "Add", aTrans.getTransactionTypeId(), aTrans.getTransactionId(), aTrans.getAddUserDetailId(), aTransitem.getTransactionItemId());
                         } else {
                             //insert
                             Stock stock = new Stock();
@@ -1606,7 +1067,7 @@ public class TransItemBean implements Serializable {
                             stock.setSpecific_size(aTransitem.getSpecific_size());
                             i = new StockBean().saveStock(stock);
                             String TableName = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                            new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, aTransitem.getBase_unit_qty(), "Add", aTrans.getTransactionTypeId(), aTrans.getTransactionId(), aTrans.getAddUserDetailId());
+                            new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, aTransitem.getItemQty(), "Add", aTrans.getTransactionTypeId(), aTrans.getTransactionId(), aTrans.getAddUserDetailId(), aTransitem.getTransactionItemId());
                         }
                     }
                     //UNPACK - 1. Subtract stock from the source BigItem
@@ -1621,7 +1082,7 @@ public class TransItemBean implements Serializable {
                         i = new StockBean().subtractStock(stock, aTransitem.getBase_unit_qty());
                         stock.setSpecific_size(aTransitem.getSpecific_size());
                         String TableName = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", stock, aTransitem.getBase_unit_qty(), "Add", aTrans.getTransactionTypeId(), aTrans.getTransactionId(), aTrans.getAddUserDetailId());
+                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", stock, aTransitem.getItemQty(), "Add", aTrans.getTransactionTypeId(), aTrans.getTransactionId(), aTrans.getAddUserDetailId(), aTransitem.getTransactionItemId());
                     }
                     //UNPACK - 2. Add/Insert stock to the destination small item
                     if ("UNPACK".equals(transtype.getTransactionTypeName())) {
@@ -1637,7 +1098,7 @@ public class TransItemBean implements Serializable {
                             i = new StockBean().addStock(stock, aTransitem.getItemQty2());
                             stock.setSpecific_size(aTransitem.getSpecific_size());
                             String TableName = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                            new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, aTransitem.getItemQty2(), "Add", aTrans.getTransactionTypeId(), aTrans.getTransactionId(), aTrans.getAddUserDetailId());
+                            new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, aTransitem.getItemQty2(), "Add", aTrans.getTransactionTypeId(), aTrans.getTransactionId(), aTrans.getAddUserDetailId(), aTransitem.getTransactionItemId());
                         } else {
                             //insert
                             Stock stock = new Stock();
@@ -1706,7 +1167,7 @@ public class TransItemBean implements Serializable {
                             stock.setSpecific_size(aTransitem.getSpecific_size());
                             i = new StockBean().saveStock(stock);
                             String TableName = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                            new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, aTransitem.getItemQty2(), "Add", aTrans.getTransactionTypeId(), aTrans.getTransactionId(), aTrans.getAddUserDetailId());
+                            new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, aTransitem.getItemQty2(), "Add", aTrans.getTransactionTypeId(), aTrans.getTransactionId(), aTrans.getAddUserDetailId(), aTransitem.getTransactionItemId());
                         }
                     }
                 }
@@ -2163,7 +1624,7 @@ public class TransItemBean implements Serializable {
         String msg = "";
         if (1 == 2) {
         } else {
-            sql = "{call sp_insert_transaction_item_hist(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_insert_transaction_item_hist_out(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
             try (
                     Connection conn = DBConnection.getMySQLConnection();
                     CallableStatement cs = conn.prepareCall(sql);) {
@@ -2317,8 +1778,22 @@ public class TransItemBean implements Serializable {
                 } catch (NullPointerException npe) {
                     cs.setDouble("in_specific_size", 1);
                 }
+                cs.registerOutParameter("out_transaction_item_hist_id", VARCHAR);
                 //save
                 cs.executeUpdate();
+                long TransItemHistId = cs.getLong("out_transaction_item_hist_id");
+
+                try {
+                    if (TransItemHistId > 0) {
+                        Transaction_item_hist_unit tihu = new Transaction_item_hist_unit();
+                        tihu.setTransaction_item_hist_id(TransItemHistId);
+                        tihu.setUnit_id(transitem.getUnit_id());
+                        tihu.setBase_unit_qty(transitem.getBase_unit_qty());
+                        new TransItemExtBean().insertTransaction_item_hist_unit(tihu);
+                    }
+                } catch (Exception e) {
+                    LOGGER.log(Level.ERROR, e);
+                }
             } catch (Exception e) {
                 LOGGER.log(Level.ERROR, e);
                 this.setActionMessage("DRAFT not saved");
@@ -2857,7 +2332,7 @@ public class TransItemBean implements Serializable {
             cs.setDouble("in_duration_passed", transitem.getDuration_passed());
             //save
             cs.executeUpdate();
-            success = 1;
+            success = new TransItemExtBean().updateTransaction_item_unit(transitem.getTransactionItemId(), transitem.getBase_unit_qty());
         } catch (Exception e) {
             success = 0;
             LOGGER.log(Level.ERROR, e);
@@ -3128,45 +2603,46 @@ public class TransItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
+    /*
+     public boolean updateTransItems(long aTransactionId, long aTransactionHistId, List<TransItem> aNewTransItems) {
+     try {
+     //get trans items that was moved to the history table
+     List<TransItem> aHistTransItems = new ArrayList<TransItem>();
+     this.setTransItemsHistoryByIDs(aTransactionId, aTransactionHistId, aHistTransItems);
 
-    public boolean updateTransItems(long aTransactionId, long aTransactionHistId, List<TransItem> aNewTransItems) {
-        try {
-            //get trans items that was moved to the history table
-            List<TransItem> aHistTransItems = new ArrayList<TransItem>();
-            this.setTransItemsHistoryByIDs(aTransactionId, aTransactionHistId, aHistTransItems);
-
-            //1. Reverse and update all trans items whoose qty has changed
-            int NewListItemIndex = 0;
-            int HistListItemIndex = 0;
-            int NewListItemNo = aNewTransItems.size();
-            int HistListItemNo = aHistTransItems.size();
-            double aDiffHistNewQty = 0;
-            TransItem nti = new TransItem();
-            TransItem hti = new TransItem();
-            while (NewListItemIndex < NewListItemNo) {
-                HistListItemIndex = 0;
-                hti = aHistTransItems.get(HistListItemIndex);
-                while (HistListItemIndex < HistListItemNo) {
-                    nti = aNewTransItems.get(NewListItemIndex);
-                    if (nti.getItemId() == hti.getItemId() && nti.getBatchno().equals(hti.getBatchno()) && (nti.getCodeSpecific() == null ? hti.getCodeSpecific() == null : nti.getCodeSpecific().equals(hti.getCodeSpecific())) && (nti.getDescSpecific() == null ? hti.getDescSpecific() == null : nti.getDescSpecific().equals(hti.getDescSpecific()))) {
-                        aDiffHistNewQty = hti.getItemQty() - nti.getItemQty();
-                        break;
-                    }
-                    HistListItemIndex = HistListItemIndex + 1;
-                }
-                //2. Reverse and update individual trans item whoose qty has changed
-                if (aDiffHistNewQty > 0 || aDiffHistNewQty < 0) {
-                    this.reverseTransItem(nti, aDiffHistNewQty);
-                    this.updateTransItem(nti);
-                }
-                NewListItemIndex = NewListItemIndex + 1;
-            }
-            return true;
-        } catch (Exception e) {
-            LOGGER.log(Level.ERROR, e);
-            return false;
-        }
-    }
+     //1. Reverse and update all trans items whoose qty has changed
+     int NewListItemIndex = 0;
+     int HistListItemIndex = 0;
+     int NewListItemNo = aNewTransItems.size();
+     int HistListItemNo = aHistTransItems.size();
+     double aDiffHistNewQty = 0;
+     TransItem nti = new TransItem();
+     TransItem hti = new TransItem();
+     while (NewListItemIndex < NewListItemNo) {
+     HistListItemIndex = 0;
+     hti = aHistTransItems.get(HistListItemIndex);
+     while (HistListItemIndex < HistListItemNo) {
+     nti = aNewTransItems.get(NewListItemIndex);
+     if (nti.getItemId() == hti.getItemId() && nti.getBatchno().equals(hti.getBatchno()) && (nti.getCodeSpecific() == null ? hti.getCodeSpecific() == null : nti.getCodeSpecific().equals(hti.getCodeSpecific())) && (nti.getDescSpecific() == null ? hti.getDescSpecific() == null : nti.getDescSpecific().equals(hti.getDescSpecific()))) {
+     aDiffHistNewQty = hti.getItemQty() - nti.getItemQty();
+     break;
+     }
+     HistListItemIndex = HistListItemIndex + 1;
+     }
+     //2. Reverse and update individual trans item whoose qty has changed
+     if (aDiffHistNewQty > 0 || aDiffHistNewQty < 0) {
+     this.reverseTransItem(nti, aDiffHistNewQty);
+     this.updateTransItem(nti);
+     }
+     NewListItemIndex = NewListItemIndex + 1;
+     }
+     return true;
+     } catch (Exception e) {
+     LOGGER.log(Level.ERROR, e);
+     return false;
+     }
+     }
+     */
 
     public boolean updateTransItemsV2(long aTransactionId, long aTransactionHistId, List<TransItem> aNewTransItems) {
         try {
@@ -3213,7 +2689,7 @@ public class TransItemBean implements Serializable {
     public boolean updateTransItemsCEC(long aTransactionId, long aTransactionHistId, List<TransItem> aNewTransItems) {
         try {
             //get trans items that was moved to the history table
-            List<TransItem> aHistTransItems = new ArrayList<TransItem>();
+            List<TransItem> aHistTransItems = new ArrayList<>();
             this.setTransItemsHistoryByIDs(aTransactionId, aTransactionHistId, aHistTransItems);
 
             //1. Reverse and update all trans items whoose qty has changed
@@ -3222,20 +2698,22 @@ public class TransItemBean implements Serializable {
             int NewListItemNo = aNewTransItems.size();
             int HistListItemNo = aHistTransItems.size();
             double aDiffHistNewQty = 0;
+            double aDiffHistNewQtyBase = 0;
             double aDiffHistNewQty_damage = 0;
             TransItem nti = new TransItem();
             TransItem hti = new TransItem();
+            UtilityBean ub = new UtilityBean();
             while (NewListItemIndex < NewListItemNo) {
                 HistListItemIndex = 0;
                 aDiffHistNewQty = 0;
+                aDiffHistNewQtyBase = 0;
                 aDiffHistNewQty_damage = 0;
-                //hti = aHistTransItems.get(HistListItemIndex);
                 nti = aNewTransItems.get(NewListItemIndex);
                 while (HistListItemIndex < HistListItemNo) {
-                    //nti = aNewTransItems.get(NewListItemIndex);
                     hti = aHistTransItems.get(HistListItemIndex);
-                    if (nti.getItemId() == hti.getItemId() && nti.getBatchno().equals(hti.getBatchno()) && (nti.getCodeSpecific() == null ? hti.getCodeSpecific() == null : nti.getCodeSpecific().equals(hti.getCodeSpecific())) && (nti.getDescSpecific() == null ? hti.getDescSpecific() == null : nti.getDescSpecific().equals(hti.getDescSpecific()))) {
+                    if (nti.getItemId() == hti.getItemId() && nti.getUnit_id() == hti.getUnit_id() && nti.getBatchno().equals(hti.getBatchno()) && ub.getEmptyIfNull(nti.getCodeSpecific()).equals(ub.getEmptyIfNull(hti.getCodeSpecific())) && ub.getEmptyIfNull(nti.getDescSpecific()).equals(ub.getEmptyIfNull(hti.getDescSpecific()))) {
                         aDiffHistNewQty = hti.getItemQty() - nti.getItemQty();
+                        aDiffHistNewQtyBase = hti.getBase_unit_qty() - nti.getBase_unit_qty();
                         aDiffHistNewQty_damage = hti.getQty_damage() - nti.getQty_damage();
                         break;
                     }
@@ -3245,9 +2723,9 @@ public class TransItemBean implements Serializable {
                 if (aDiffHistNewQty > 0 || aDiffHistNewQty < 0 || aDiffHistNewQty_damage > 0 || aDiffHistNewQty_damage < 0) {
                     Trans t = new TransBean().getTrans(aTransactionId);
                     if (t.getTransactionTypeId() == 2 && t.getStore2Id() > 0) {//Invoice with Store2Id -- for order sent to
-                        this.reverseTransItemCEC(t.getStore2Id(), t.getTransactionTypeId(), t.getTransactionReasonId(), "", nti, aDiffHistNewQty, aDiffHistNewQty_damage);
+                        this.reverseTransItemCEC(t.getStore2Id(), t.getTransactionTypeId(), t.getTransactionReasonId(), "", nti, aDiffHistNewQty, aDiffHistNewQty_damage, aDiffHistNewQtyBase);
                     } else {
-                        this.reverseTransItemCEC(t.getStoreId(), t.getTransactionTypeId(), t.getTransactionReasonId(), "", nti, aDiffHistNewQty, aDiffHistNewQty_damage);
+                        this.reverseTransItemCEC(t.getStoreId(), t.getTransactionTypeId(), t.getTransactionReasonId(), "", nti, aDiffHistNewQty, aDiffHistNewQty_damage, aDiffHistNewQtyBase);
                     }
                     this.updateTransItemCEC(nti);
                 }
@@ -3259,224 +2737,225 @@ public class TransItemBean implements Serializable {
             return false;
         }
     }
+    /*
+     public boolean reverseTransItemsCEC(Trans aOldTrans, Trans aNewTrans, List<TransItem> aOldTransItems, List<TransItem> aNewTransItems) {
+     try {
+     //1. Reverse and update all trans items whoose qty has changed
+     int NewListItemIndex = 0;
+     int HistListItemIndex = 0;
+     int NewListItemNo = aNewTransItems.size();
+     int HistListItemNo = aOldTransItems.size();
+     double aDiffHistNewQty = 0;
+     double aDiffHistNewQty_damage = 0;
+     TransItem nti = new TransItem();
+     TransItem hti = new TransItem();
+     while (NewListItemIndex < NewListItemNo) {
+     HistListItemIndex = 0;
+     aDiffHistNewQty = 0;
+     aDiffHistNewQty_damage = 0;
+     //hti = aOldTransItems.get(HistListItemIndex);
+     nti = aNewTransItems.get(NewListItemIndex);
+     while (HistListItemIndex < HistListItemNo) {
+     //nti = aNewTransItems.get(NewListItemIndex);
+     hti = aOldTransItems.get(HistListItemIndex);
+     if (nti.getItemId() == hti.getItemId() && nti.getBatchno().equals(hti.getBatchno()) && (nti.getCodeSpecific() == null ? hti.getCodeSpecific() == null : nti.getCodeSpecific().equals(hti.getCodeSpecific())) && (nti.getDescSpecific() == null ? hti.getDescSpecific() == null : nti.getDescSpecific().equals(hti.getDescSpecific()))) {
+     aDiffHistNewQty = hti.getItemQty() - nti.getItemQty();
+     aDiffHistNewQty_damage = hti.getQty_damage() - nti.getQty_damage();
+     break;
+     }
+     HistListItemIndex = HistListItemIndex + 1;
+     }
+     //2. Reverse and update individual trans item whoose qty has changed
+     if (aDiffHistNewQty > 0 || aDiffHistNewQty < 0 || aDiffHistNewQty_damage > 0 || aDiffHistNewQty_damage < 0) {
+     //Trans t = new TransBean().getTrans(aTransactionId);
+     if (aOldTrans.getTransactionTypeId() == 2 && aOldTrans.getStore2Id() > 0) {//Invoice with Store2Id -- for order sent to
+     this.reverseTransItemCEC(aOldTrans.getStore2Id(), aOldTrans.getTransactionTypeId(), aOldTrans.getTransactionReasonId(), "", nti, aDiffHistNewQty, aDiffHistNewQty_damage);
+     } else {
+     this.reverseTransItemCEC(aOldTrans.getStoreId(), aOldTrans.getTransactionTypeId(), aOldTrans.getTransactionReasonId(), "", nti, aDiffHistNewQty, aDiffHistNewQty_damage);
+     }
+     //this.updateTransItemCEC(nti);
+     }
+     NewListItemIndex = NewListItemIndex + 1;
+     }
+     return true;
+     } catch (Exception e) {
+     LOGGER.log(Level.ERROR, e);
+     return false;
+     }
+     }
 
-    public boolean reverseTransItemsCEC(Trans aOldTrans, Trans aNewTrans, List<TransItem> aOldTransItems, List<TransItem> aNewTransItems) {
-        try {
-            //1. Reverse and update all trans items whoose qty has changed
-            int NewListItemIndex = 0;
-            int HistListItemIndex = 0;
-            int NewListItemNo = aNewTransItems.size();
-            int HistListItemNo = aOldTransItems.size();
-            double aDiffHistNewQty = 0;
-            double aDiffHistNewQty_damage = 0;
-            TransItem nti = new TransItem();
-            TransItem hti = new TransItem();
-            while (NewListItemIndex < NewListItemNo) {
-                HistListItemIndex = 0;
-                aDiffHistNewQty = 0;
-                aDiffHistNewQty_damage = 0;
-                //hti = aOldTransItems.get(HistListItemIndex);
-                nti = aNewTransItems.get(NewListItemIndex);
-                while (HistListItemIndex < HistListItemNo) {
-                    //nti = aNewTransItems.get(NewListItemIndex);
-                    hti = aOldTransItems.get(HistListItemIndex);
-                    if (nti.getItemId() == hti.getItemId() && nti.getBatchno().equals(hti.getBatchno()) && (nti.getCodeSpecific() == null ? hti.getCodeSpecific() == null : nti.getCodeSpecific().equals(hti.getCodeSpecific())) && (nti.getDescSpecific() == null ? hti.getDescSpecific() == null : nti.getDescSpecific().equals(hti.getDescSpecific()))) {
-                        aDiffHistNewQty = hti.getItemQty() - nti.getItemQty();
-                        aDiffHistNewQty_damage = hti.getQty_damage() - nti.getQty_damage();
-                        break;
-                    }
-                    HistListItemIndex = HistListItemIndex + 1;
-                }
-                //2. Reverse and update individual trans item whoose qty has changed
-                if (aDiffHistNewQty > 0 || aDiffHistNewQty < 0 || aDiffHistNewQty_damage > 0 || aDiffHistNewQty_damage < 0) {
-                    //Trans t = new TransBean().getTrans(aTransactionId);
-                    if (aOldTrans.getTransactionTypeId() == 2 && aOldTrans.getStore2Id() > 0) {//Invoice with Store2Id -- for order sent to
-                        this.reverseTransItemCEC(aOldTrans.getStore2Id(), aOldTrans.getTransactionTypeId(), aOldTrans.getTransactionReasonId(), "", nti, aDiffHistNewQty, aDiffHistNewQty_damage);
-                    } else {
-                        this.reverseTransItemCEC(aOldTrans.getStoreId(), aOldTrans.getTransactionTypeId(), aOldTrans.getTransactionReasonId(), "", nti, aDiffHistNewQty, aDiffHistNewQty_damage);
-                    }
-                    //this.updateTransItemCEC(nti);
-                }
-                NewListItemIndex = NewListItemIndex + 1;
-            }
-            return true;
-        } catch (Exception e) {
-            LOGGER.log(Level.ERROR, e);
-            return false;
-        }
-    }
+     public void reverseTransItem(TransItem transitem, double aDiffHistNewQty) {
+     String sql = null;
+     String sql2 = null;
+     StockBean StkBean = new StockBean();
+     Stock Stk = new Stock();
 
-    public void reverseTransItem(TransItem transitem, double aDiffHistNewQty) {
-        String sql = null;
-        String sql2 = null;
-        StockBean StkBean = new StockBean();
-        Stock Stk = new Stock();
+     if (transitem.getTransactionItemId() == 0 || new ItemBean().getItem(transitem.getItemId()).getItemType().equals("SERVICE")) {
+     //do nothing
+     } else {
+     //1. reverse stock
+     Stk = StkBean.getStock(new GeneralUserSetting().getCurrentStore().getStoreId(), transitem.getItemId(), transitem.getBatchno(), transitem.getCodeSpecific(), transitem.getDescSpecific());
+     //for additive transactions, if diff is +ve, subtract; if diff is -ve Add
+     //originally "PURCHASE INVOICE" but changed to "ITEM RECEIVED"
+     if ("ITEM RECEIVED".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
+     if (aDiffHistNewQty > 0) {
+     //subtract stock
+     if (Stk != null) {
+     //update/subtract
+     sql2 = "{call sp_subtract_stock_by_store_item_batch(?,?,?,?)}";
+     try (
+     Connection conn2 = DBConnection.getMySQLConnection();
+     CallableStatement cs2 = conn2.prepareCall(sql2);) {
+     cs2.setInt("in_store_id", new GeneralUserSetting().getCurrentStore().getStoreId());
+     cs2.setLong("in_item_id", transitem.getItemId());
+     cs2.setString("in_batchno", transitem.getBatchno());
+     cs2.setDouble("in_qty", aDiffHistNewQty);
+     cs2.executeUpdate();
+     } catch (Exception e) {
+     LOGGER.log(Level.ERROR, e);
+     }
+     } else {
+     //insert
+     Stock stk = new Stock();
+     stk.setStoreId(new GeneralUserSetting().getCurrentStore().getStoreId());
+     stk.setItemId(transitem.getItemId());
+     stk.setBatchno(transitem.getBatchno());
+     stk.setCurrentqty(-1 * aDiffHistNewQty);
+     stk.setItemExpDate(transitem.getItemExpryDate());
+     stk.setItemMnfDate(transitem.getItemMnfDate());
 
-        if (transitem.getTransactionItemId() == 0 || new ItemBean().getItem(transitem.getItemId()).getItemType().equals("SERVICE")) {
-            //do nothing
-        } else {
-            //1. reverse stock
-            Stk = StkBean.getStock(new GeneralUserSetting().getCurrentStore().getStoreId(), transitem.getItemId(), transitem.getBatchno(), transitem.getCodeSpecific(), transitem.getDescSpecific());
-            //for additive transactions, if diff is +ve, subtract; if diff is -ve Add
-            //originally "PURCHASE INVOICE" but changed to "ITEM RECEIVED"
-            if ("ITEM RECEIVED".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
-                if (aDiffHistNewQty > 0) {
-                    //subtract stock
-                    if (Stk != null) {
-                        //update/subtract
-                        sql2 = "{call sp_subtract_stock_by_store_item_batch(?,?,?,?)}";
-                        try (
-                                Connection conn2 = DBConnection.getMySQLConnection();
-                                CallableStatement cs2 = conn2.prepareCall(sql2);) {
-                            cs2.setInt("in_store_id", new GeneralUserSetting().getCurrentStore().getStoreId());
-                            cs2.setLong("in_item_id", transitem.getItemId());
-                            cs2.setString("in_batchno", transitem.getBatchno());
-                            cs2.setDouble("in_qty", aDiffHistNewQty);
-                            cs2.executeUpdate();
-                        } catch (Exception e) {
-                            LOGGER.log(Level.ERROR, e);
-                        }
-                    } else {
-                        //insert
-                        Stock stk = new Stock();
-                        stk.setStoreId(new GeneralUserSetting().getCurrentStore().getStoreId());
-                        stk.setItemId(transitem.getItemId());
-                        stk.setBatchno(transitem.getBatchno());
-                        stk.setCurrentqty(-1 * aDiffHistNewQty);
-                        stk.setItemExpDate(transitem.getItemExpryDate());
-                        stk.setItemMnfDate(transitem.getItemMnfDate());
+     }
 
-                    }
+     } else if (aDiffHistNewQty < 0) {
+     //add stock
+     aDiffHistNewQty = (-1) * aDiffHistNewQty;//remove the -ve from the quantity
+     if (Stk != null) {
+     //update/add
+     sql2 = "{call sp_add_stock_by_store_item_batch(?,?,?,?)}";
+     try (
+     Connection conn2 = DBConnection.getMySQLConnection();
+     CallableStatement cs2 = conn2.prepareCall(sql2);) {
+     cs2.setInt("in_store_id", new GeneralUserSetting().getCurrentStore().getStoreId());
+     cs2.setLong("in_item_id", transitem.getItemId());
+     cs2.setString("in_batchno", transitem.getBatchno());
+     cs2.setDouble("in_qty", aDiffHistNewQty);
+     cs2.executeUpdate();
+     } catch (Exception e) {
+     LOGGER.log(Level.ERROR, e);
+     }
+     } else {
+     //insert
+     sql2 = "{call sp_insert_stock(?,?,?,?,?,?)}";
+     try (
+     Connection conn2 = DBConnection.getMySQLConnection();
+     CallableStatement cs2 = conn2.prepareCall(sql2);) {
+     cs2.setInt("in_store_id", new GeneralUserSetting().getCurrentStore().getStoreId());
+     cs2.setLong("in_item_id", transitem.getItemId());
+     cs2.setString("in_batchno", transitem.getBatchno());
+     cs2.setDouble("in_currentqty", aDiffHistNewQty);
+     try {
+     cs2.setDate("in_item_exp_date", new java.sql.Date(transitem.getItemExpryDate().getTime()));
+     cs2.setDate("in_item_mnf_date", new java.sql.Date(transitem.getItemMnfDate().getTime()));
+     } catch (NullPointerException npe) {
+     cs2.setDate("in_item_exp_date", null);
+     cs2.setDate("in_item_mnf_date", null);
+     }
+     cs2.executeUpdate();
+     } catch (Exception e) {
+     LOGGER.log(Level.ERROR, e);
+     }
+     }
+     }
 
-                } else if (aDiffHistNewQty < 0) {
-                    //add stock
-                    aDiffHistNewQty = (-1) * aDiffHistNewQty;//remove the -ve from the quantity
-                    if (Stk != null) {
-                        //update/add
-                        sql2 = "{call sp_add_stock_by_store_item_batch(?,?,?,?)}";
-                        try (
-                                Connection conn2 = DBConnection.getMySQLConnection();
-                                CallableStatement cs2 = conn2.prepareCall(sql2);) {
-                            cs2.setInt("in_store_id", new GeneralUserSetting().getCurrentStore().getStoreId());
-                            cs2.setLong("in_item_id", transitem.getItemId());
-                            cs2.setString("in_batchno", transitem.getBatchno());
-                            cs2.setDouble("in_qty", aDiffHistNewQty);
-                            cs2.executeUpdate();
-                        } catch (Exception e) {
-                            LOGGER.log(Level.ERROR, e);
-                        }
-                    } else {
-                        //insert
-                        sql2 = "{call sp_insert_stock(?,?,?,?,?,?)}";
-                        try (
-                                Connection conn2 = DBConnection.getMySQLConnection();
-                                CallableStatement cs2 = conn2.prepareCall(sql2);) {
-                            cs2.setInt("in_store_id", new GeneralUserSetting().getCurrentStore().getStoreId());
-                            cs2.setLong("in_item_id", transitem.getItemId());
-                            cs2.setString("in_batchno", transitem.getBatchno());
-                            cs2.setDouble("in_currentqty", aDiffHistNewQty);
-                            try {
-                                cs2.setDate("in_item_exp_date", new java.sql.Date(transitem.getItemExpryDate().getTime()));
-                                cs2.setDate("in_item_mnf_date", new java.sql.Date(transitem.getItemMnfDate().getTime()));
-                            } catch (NullPointerException npe) {
-                                cs2.setDate("in_item_exp_date", null);
-                                cs2.setDate("in_item_mnf_date", null);
-                            }
-                            cs2.executeUpdate();
-                        } catch (Exception e) {
-                            LOGGER.log(Level.ERROR, e);
-                        }
-                    }
-                }
+     }
 
-            }
+     if ("SALE INVOICE".equals(new GeneralUserSetting().getCurrentTransactionTypeName()) || "DISPOSE STOCK".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
+     if (aDiffHistNewQty > 0) {
+     //add stock
+     if (Stk != null) {
+     //update/add
+     sql2 = "{call sp_add_stock_by_store_item_batch(?,?,?,?)}";
+     try (
+     Connection conn2 = DBConnection.getMySQLConnection();
+     CallableStatement cs2 = conn2.prepareCall(sql2);) {
+     cs2.setInt("in_store_id", new GeneralUserSetting().getCurrentStore().getStoreId());
+     cs2.setLong("in_item_id", transitem.getItemId());
+     cs2.setString("in_batchno", transitem.getBatchno());
+     cs2.setDouble("in_qty", aDiffHistNewQty);
+     cs2.executeUpdate();
+     } catch (Exception e) {
+     LOGGER.log(Level.ERROR, e);
+     }
+     } else {
+     //insert
+     sql2 = "{call sp_insert_stock(?,?,?,?,?,?)}";
+     try (
+     Connection conn2 = DBConnection.getMySQLConnection();
+     CallableStatement cs2 = conn2.prepareCall(sql2);) {
+     cs2.setInt("in_store_id", new GeneralUserSetting().getCurrentStore().getStoreId());
+     cs2.setLong("in_item_id", transitem.getItemId());
+     cs2.setString("in_batchno", transitem.getBatchno());
+     cs2.setDouble("in_currentqty", aDiffHistNewQty);
+     try {
+     cs2.setDate("in_item_exp_date", new java.sql.Date(transitem.getItemExpryDate().getTime()));
+     cs2.setDate("in_item_mnf_date", new java.sql.Date(transitem.getItemMnfDate().getTime()));
+     } catch (NullPointerException npe) {
+     cs2.setDate("in_item_exp_date", null);
+     cs2.setDate("in_item_mnf_date", null);
+     }
+     cs2.executeUpdate();
+     } catch (Exception e) {
+     LOGGER.log(Level.ERROR, e);
+     }
+     }
+     } else if (aDiffHistNewQty < 0) {
+     //subtract stock
+     aDiffHistNewQty = (-1) * aDiffHistNewQty;//remove the -ve from the quantity
 
-            if ("SALE INVOICE".equals(new GeneralUserSetting().getCurrentTransactionTypeName()) || "DISPOSE STOCK".equals(new GeneralUserSetting().getCurrentTransactionTypeName())) {
-                if (aDiffHistNewQty > 0) {
-                    //add stock
-                    if (Stk != null) {
-                        //update/add
-                        sql2 = "{call sp_add_stock_by_store_item_batch(?,?,?,?)}";
-                        try (
-                                Connection conn2 = DBConnection.getMySQLConnection();
-                                CallableStatement cs2 = conn2.prepareCall(sql2);) {
-                            cs2.setInt("in_store_id", new GeneralUserSetting().getCurrentStore().getStoreId());
-                            cs2.setLong("in_item_id", transitem.getItemId());
-                            cs2.setString("in_batchno", transitem.getBatchno());
-                            cs2.setDouble("in_qty", aDiffHistNewQty);
-                            cs2.executeUpdate();
-                        } catch (Exception e) {
-                            LOGGER.log(Level.ERROR, e);
-                        }
-                    } else {
-                        //insert
-                        sql2 = "{call sp_insert_stock(?,?,?,?,?,?)}";
-                        try (
-                                Connection conn2 = DBConnection.getMySQLConnection();
-                                CallableStatement cs2 = conn2.prepareCall(sql2);) {
-                            cs2.setInt("in_store_id", new GeneralUserSetting().getCurrentStore().getStoreId());
-                            cs2.setLong("in_item_id", transitem.getItemId());
-                            cs2.setString("in_batchno", transitem.getBatchno());
-                            cs2.setDouble("in_currentqty", aDiffHistNewQty);
-                            try {
-                                cs2.setDate("in_item_exp_date", new java.sql.Date(transitem.getItemExpryDate().getTime()));
-                                cs2.setDate("in_item_mnf_date", new java.sql.Date(transitem.getItemMnfDate().getTime()));
-                            } catch (NullPointerException npe) {
-                                cs2.setDate("in_item_exp_date", null);
-                                cs2.setDate("in_item_mnf_date", null);
-                            }
-                            cs2.executeUpdate();
-                        } catch (Exception e) {
-                            LOGGER.log(Level.ERROR, e);
-                        }
-                    }
-                } else if (aDiffHistNewQty < 0) {
-                    //subtract stock
-                    aDiffHistNewQty = (-1) * aDiffHistNewQty;//remove the -ve from the quantity
+     if (Stk != null) {
+     //update/subtract
+     sql2 = "{call sp_subtract_stock_by_store_item_batch(?,?,?,?)}";
+     try (
+     Connection conn2 = DBConnection.getMySQLConnection();
+     CallableStatement cs2 = conn2.prepareCall(sql2);) {
+     cs2.setInt("in_store_id", new GeneralUserSetting().getCurrentStore().getStoreId());
+     cs2.setLong("in_item_id", transitem.getItemId());
+     cs2.setString("in_batchno", transitem.getBatchno());
+     cs2.setDouble("in_qty", aDiffHistNewQty);
+     cs2.executeUpdate();
+     } catch (Exception e) {
+     LOGGER.log(Level.ERROR, e);
+     }
+     } else {
+     //insert
+     sql2 = "{call sp_insert_stock(?,?,?,?,?,?)}";
+     try (
+     Connection conn2 = DBConnection.getMySQLConnection();
+     CallableStatement cs2 = conn2.prepareCall(sql2);) {
+     cs2.setInt("in_store_id", new GeneralUserSetting().getCurrentStore().getStoreId());
+     cs2.setLong("in_item_id", transitem.getItemId());
+     cs2.setString("in_batchno", transitem.getBatchno());
+     cs2.setDouble("in_currentqty", (-1 * aDiffHistNewQty));
+     try {
+     cs2.setDate("in_item_exp_date", new java.sql.Date(transitem.getItemExpryDate().getTime()));
+     cs2.setDate("in_item_mnf_date", new java.sql.Date(transitem.getItemMnfDate().getTime()));
+     } catch (NullPointerException npe) {
+     cs2.setDate("in_item_exp_date", null);
+     cs2.setDate("in_item_mnf_date", null);
+     }
+     cs2.executeUpdate();
+     } catch (Exception e) {
+     LOGGER.log(Level.ERROR, e);
+     }
+     }
+     }
 
-                    if (Stk != null) {
-                        //update/subtract
-                        sql2 = "{call sp_subtract_stock_by_store_item_batch(?,?,?,?)}";
-                        try (
-                                Connection conn2 = DBConnection.getMySQLConnection();
-                                CallableStatement cs2 = conn2.prepareCall(sql2);) {
-                            cs2.setInt("in_store_id", new GeneralUserSetting().getCurrentStore().getStoreId());
-                            cs2.setLong("in_item_id", transitem.getItemId());
-                            cs2.setString("in_batchno", transitem.getBatchno());
-                            cs2.setDouble("in_qty", aDiffHistNewQty);
-                            cs2.executeUpdate();
-                        } catch (Exception e) {
-                            LOGGER.log(Level.ERROR, e);
-                        }
-                    } else {
-                        //insert
-                        sql2 = "{call sp_insert_stock(?,?,?,?,?,?)}";
-                        try (
-                                Connection conn2 = DBConnection.getMySQLConnection();
-                                CallableStatement cs2 = conn2.prepareCall(sql2);) {
-                            cs2.setInt("in_store_id", new GeneralUserSetting().getCurrentStore().getStoreId());
-                            cs2.setLong("in_item_id", transitem.getItemId());
-                            cs2.setString("in_batchno", transitem.getBatchno());
-                            cs2.setDouble("in_currentqty", (-1 * aDiffHistNewQty));
-                            try {
-                                cs2.setDate("in_item_exp_date", new java.sql.Date(transitem.getItemExpryDate().getTime()));
-                                cs2.setDate("in_item_mnf_date", new java.sql.Date(transitem.getItemMnfDate().getTime()));
-                            } catch (NullPointerException npe) {
-                                cs2.setDate("in_item_exp_date", null);
-                                cs2.setDate("in_item_mnf_date", null);
-                            }
-                            cs2.executeUpdate();
-                        } catch (Exception e) {
-                            LOGGER.log(Level.ERROR, e);
-                        }
-                    }
-                }
-
-            }
-            StkBean = null;
-            Stk = null;
-        }
-    }
+     }
+     StkBean = null;
+     Stk = null;
+     }
+     }
+     */
 
     public void reverseTransItemV2(TransactionType aTransType, TransactionReason aTransReason, TransItem aTransItem, double aDiffHistNewQty) {
         String sql = null;
@@ -3725,7 +3204,7 @@ public class TransItemBean implements Serializable {
         }
     }
 
-    public void reverseTransItemCEC(int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, TransItem aTransItem, double aDiffHistNewQty, double aDiffHistNewQty_damage) {
+    public void reverseTransItemCEC(int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, TransItem aTransItem, double aDiffHistNewQty, double aDiffHistNewQty_damage, double aDiffHistNewQtyBase) {
         String sql = null;
         String sql2 = null;
         StockBean StkBean = new StockBean();
@@ -3758,10 +3237,10 @@ public class TransItemBean implements Serializable {
                         s.setCodeSpecific(aTransItem.getCodeSpecific());
                         s.setDescSpecific(aTransItem.getDescSpecific());
                         int x = 0;
-                        x = new StockBean().subtractStock(s, aDiffHistNewQty);
+                        x = new StockBean().subtractStock(s, aDiffHistNewQtyBase);
                         s.setSpecific_size(aTransItem.getSpecific_size());
                         String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), aTransItem.getTransactionItemId());
                     } else {
                         //insert
                         Stock s = new Stock();
@@ -3771,24 +3250,16 @@ public class TransItemBean implements Serializable {
                         s.setBatchno(aTransItem.getBatchno());
                         s.setCodeSpecific(aTransItem.getCodeSpecific());
                         s.setDescSpecific(aTransItem.getDescSpecific());
-                        s.setCurrentqty(-1 * aDiffHistNewQty);
+                        s.setCurrentqty(-1 * aDiffHistNewQtyBase);
                         //get the last unit cost price
-                        long LatestTransItemId = 0;
-                        double LatestTransItemUnitCostPrice = 0;
-                        LatestTransItemId = this.getItemUnitCostPriceLatestTransItemId(transtype.getTransactionTypeId(), transreason.getTransactionReasonId(), s.getStoreId(), s.getItemId(), s.getBatchno(), s.getCodeSpecific(), s.getDescSpecific());
-                        if (LatestTransItemId > 0) {
-                            try {
-                                LatestTransItemUnitCostPrice = this.getTransItem(LatestTransItemId).getUnitCostPrice();
-                            } catch (NullPointerException npe) {
-                                LatestTransItemUnitCostPrice = 0;
-                            }
-                        }
-                        if (LatestTransItemUnitCostPrice > 0) {
-                            s.setUnitCost(LatestTransItemUnitCostPrice);
+                        double UnitCostPrice = 0;
+                        //the purchase interface (asset,goods,expenses) uses unit_price for cost price
+                        if (transtype.getTransactionTypeId() == 1) {
+                            UnitCostPrice = (aTransItem.getUnitPrice() + aTransItem.getUnitVat()) - aTransItem.getUnitTradeDiscount();
                         } else {
-                            s.setUnitCost(aTransItem.getUnitCostPrice());
+                            UnitCostPrice = aTransItem.getUnitCostPrice();
                         }
-
+                        s.setUnitCost(UnitCostPrice);
                         try {
                             s.setItemExpDate(aTransItem.getItemExpryDate());
                             s.setItemMnfDate(aTransItem.getItemMnfDate());
@@ -3808,12 +3279,12 @@ public class TransItemBean implements Serializable {
                         int x = 0;
                         x = new StockBean().saveStock(s);
                         String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", s, (-1 * aDiffHistNewQty), "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", s, (-1 * aDiffHistNewQty), "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), aTransItem.getTransactionItemId());
                     }
-
                 } else if (aDiffHistNewQty < 0) {
                     //add stock
                     aDiffHistNewQty = (-1) * aDiffHistNewQty;//remove the -ve from the quantity
+                    aDiffHistNewQtyBase = (-1) * aDiffHistNewQtyBase;
                     if (Stk != null) {
                         //update/add
                         Stock s = new Stock();
@@ -3823,10 +3294,10 @@ public class TransItemBean implements Serializable {
                         s.setCodeSpecific(aTransItem.getCodeSpecific());
                         s.setDescSpecific(aTransItem.getDescSpecific());
                         int x = 0;
-                        x = new StockBean().addStock(s, aDiffHistNewQty);
+                        x = new StockBean().addStock(s, aDiffHistNewQtyBase);
                         s.setSpecific_size(aTransItem.getSpecific_size());
                         String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), aTransItem.getTransactionItemId());
                     } else {
                         //insert
                         Stock s = new Stock();
@@ -3836,24 +3307,16 @@ public class TransItemBean implements Serializable {
                         s.setBatchno(aTransItem.getBatchno());
                         s.setCodeSpecific(aTransItem.getCodeSpecific());
                         s.setDescSpecific(aTransItem.getDescSpecific());
-                        s.setCurrentqty(aDiffHistNewQty);
+                        s.setCurrentqty(aDiffHistNewQtyBase);
                         //get the last unit cost price
-                        long LatestTransItemId = 0;
-                        double LatestTransItemUnitCostPrice = 0;
-                        LatestTransItemId = this.getItemUnitCostPriceLatestTransItemId(transtype.getTransactionTypeId(), transreason.getTransactionReasonId(), s.getStoreId(), s.getItemId(), s.getBatchno(), s.getCodeSpecific(), s.getDescSpecific());
-                        if (LatestTransItemId > 0) {
-                            try {
-                                LatestTransItemUnitCostPrice = this.getTransItem(LatestTransItemId).getUnitCostPrice();
-                            } catch (NullPointerException npe) {
-                                LatestTransItemUnitCostPrice = 0;
-                            }
-                        }
-                        if (LatestTransItemUnitCostPrice > 0) {
-                            s.setUnitCost(LatestTransItemUnitCostPrice);
+                        double UnitCostPrice = 0;
+                        //the purchase interface (asset,goods,expenses) uses unit_price for cost price
+                        if (transtype.getTransactionTypeId() == 1) {
+                            UnitCostPrice = (aTransItem.getUnitPrice() + aTransItem.getUnitVat()) - aTransItem.getUnitTradeDiscount();
                         } else {
-                            s.setUnitCost(aTransItem.getUnitCostPrice());
+                            UnitCostPrice = aTransItem.getUnitCostPrice();
                         }
-
+                        s.setUnitCost(UnitCostPrice);
                         try {
                             s.setItemExpDate(aTransItem.getItemExpryDate());
                             s.setItemMnfDate(aTransItem.getItemMnfDate());
@@ -3873,10 +3336,9 @@ public class TransItemBean implements Serializable {
                         int x = 0;
                         x = new StockBean().saveStock(s);
                         String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), aTransItem.getTransactionItemId());
                     }
                 }
-
             }
 
             if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) || "DISPOSE STOCK".equals(transtype.getTransactionTypeName()) || "GOODS DELIVERY".equals(transtype.getTransactionTypeName()) || "STOCK CONSUMPTION".equals(transtype.getTransactionTypeName())) {
@@ -3891,10 +3353,10 @@ public class TransItemBean implements Serializable {
                         s.setCodeSpecific(aTransItem.getCodeSpecific());
                         s.setDescSpecific(aTransItem.getDescSpecific());
                         int x = 0;
-                        x = new StockBean().addStock(s, aDiffHistNewQty);
+                        x = new StockBean().addStock(s, aDiffHistNewQtyBase);
                         s.setSpecific_size(aTransItem.getSpecific_size());
                         String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), aTransItem.getTransactionItemId());
                     } else {
                         //insert
                         Stock s = new Stock();
@@ -3904,24 +3366,16 @@ public class TransItemBean implements Serializable {
                         s.setBatchno(aTransItem.getBatchno());
                         s.setCodeSpecific(aTransItem.getCodeSpecific());
                         s.setDescSpecific(aTransItem.getDescSpecific());
-                        s.setCurrentqty(aDiffHistNewQty);
+                        s.setCurrentqty(aDiffHistNewQtyBase);
                         //get the last unit cost price
-                        long LatestTransItemId = 0;
-                        double LatestTransItemUnitCostPrice = 0;
-                        LatestTransItemId = this.getItemUnitCostPriceLatestTransItemId(9, 13, s.getStoreId(), s.getItemId(), s.getBatchno(), s.getCodeSpecific(), s.getDescSpecific());
-                        if (LatestTransItemId > 0) {
-                            try {
-                                LatestTransItemUnitCostPrice = this.getTransItem(LatestTransItemId).getUnitCostPrice();
-                            } catch (NullPointerException npe) {
-                                LatestTransItemUnitCostPrice = 0;
-                            }
-                        }
-                        if (LatestTransItemUnitCostPrice > 0) {
-                            s.setUnitCost(LatestTransItemUnitCostPrice);
+                        double UnitCostPrice = 0;
+                        //the asset interface uses unit_price for cost price
+                        if (transreason.getTransactionReasonId() == 29) {
+                            UnitCostPrice = aTransItem.getUnitPrice();
                         } else {
-                            s.setUnitCost(aTransItem.getUnitCostPrice());
+                            UnitCostPrice = aTransItem.getUnitCostPrice();
                         }
-
+                        s.setUnitCost(UnitCostPrice);
                         try {
                             s.setItemExpDate(aTransItem.getItemExpryDate());
                             s.setItemMnfDate(aTransItem.getItemMnfDate());
@@ -3942,11 +3396,12 @@ public class TransItemBean implements Serializable {
                         x = new StockBean().saveStock(s);
                         s.setSpecific_size(aTransItem.getSpecific_size());
                         String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), aTransItem.getTransactionItemId());
                     }
                 } else if (aDiffHistNewQty < 0) {
                     //subtract stock
                     aDiffHistNewQty = (-1) * aDiffHistNewQty;//remove the -ve from the quantity
+                    aDiffHistNewQtyBase = (-1) * aDiffHistNewQtyBase;
                     if (Stk != null) {
                         //update/subtract
                         Stock s = new Stock();
@@ -3956,10 +3411,10 @@ public class TransItemBean implements Serializable {
                         s.setCodeSpecific(aTransItem.getCodeSpecific());
                         s.setDescSpecific(aTransItem.getDescSpecific());
                         int x = 0;
-                        x = new StockBean().subtractStock(s, aDiffHistNewQty);
+                        x = new StockBean().subtractStock(s, aDiffHistNewQtyBase);
                         s.setSpecific_size(aTransItem.getSpecific_size());
                         String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", s, aDiffHistNewQty, "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), aTransItem.getTransactionItemId());
                     } else {
                         //insert
                         Stock s = new Stock();
@@ -3969,24 +3424,16 @@ public class TransItemBean implements Serializable {
                         s.setBatchno(aTransItem.getBatchno());
                         s.setCodeSpecific(aTransItem.getCodeSpecific());
                         s.setDescSpecific(aTransItem.getDescSpecific());
-                        s.setCurrentqty(-1 * aDiffHistNewQty);
+                        s.setCurrentqty(-1 * aDiffHistNewQtyBase);
                         //get the last unit cost price
-                        long LatestTransItemId = 0;
-                        double LatestTransItemUnitCostPrice = 0;
-                        LatestTransItemId = this.getItemUnitCostPriceLatestTransItemId(9, 13, s.getStoreId(), s.getItemId(), s.getBatchno(), s.getCodeSpecific(), s.getDescSpecific());
-                        if (LatestTransItemId > 0) {
-                            try {
-                                LatestTransItemUnitCostPrice = this.getTransItem(LatestTransItemId).getUnitCostPrice();
-                            } catch (NullPointerException npe) {
-                                LatestTransItemUnitCostPrice = 0;
-                            }
-                        }
-                        if (LatestTransItemUnitCostPrice > 0) {
-                            s.setUnitCost(LatestTransItemUnitCostPrice);
+                        double UnitCostPrice = 0;
+                        //the asset interface uses unit_price for cost price
+                        if (transreason.getTransactionReasonId() == 29) {
+                            UnitCostPrice = aTransItem.getUnitPrice();
                         } else {
-                            s.setUnitCost(aTransItem.getUnitCostPrice());
+                            UnitCostPrice = aTransItem.getUnitCostPrice();
                         }
-
+                        s.setUnitCost(UnitCostPrice);
                         try {
                             s.setItemExpDate(aTransItem.getItemExpryDate());
                             s.setItemMnfDate(aTransItem.getItemMnfDate());
@@ -4006,7 +3453,7 @@ public class TransItemBean implements Serializable {
                         int x = 0;
                         x = new StockBean().saveStock(s);
                         String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", s, (-1 * aDiffHistNewQty), "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", s, (-1 * aDiffHistNewQty), "Edit", aTransTypeId, aTransItem.getTransactionId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), aTransItem.getTransactionItemId());
                     }
                 }
             }
@@ -4178,99 +3625,97 @@ public class TransItemBean implements Serializable {
             TransItem transitem = new TransItem();
             try {
                 transitem.setTransactionItemId(aResultSet.getLong("transaction_item_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setTransactionItemId(0);
             }
             try {
                 transitem.setTransactionId(aResultSet.getLong("transaction_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setTransactionId(0);
             }
             try {
                 transitem.setItemId(aResultSet.getLong("item_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setItemId(0);
             }
             try {
                 transitem.setBatchno(aResultSet.getString("batchno"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setBatchno("");
             }
             try {
                 transitem.setItemQty(aResultSet.getDouble("item_qty"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setItemQty(0);
             }
-
             try {
                 transitem.setUnitPrice(aResultSet.getDouble("unit_price"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setUnitPrice(0);
             }
-
             try {
                 transitem.setItemMnfDate(new Date(aResultSet.getDate("item_mnf_date").getTime()));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setItemMnfDate(null);
             }
             try {
                 transitem.setItemExpryDate(new Date(aResultSet.getDate("item_expiry_date").getTime()));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setItemExpryDate(null);
             }
             try {
                 transitem.setUnitTradeDiscount(aResultSet.getDouble("unit_trade_discount"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setUnitTradeDiscount(0);
             }
             try {
                 transitem.setUnitVat(aResultSet.getDouble("unit_vat"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setUnitVat(0);
             }
             try {
                 transitem.setAmount(aResultSet.getDouble("amount"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setAmount(0);
             }
             try {
                 transitem.setVatRated(aResultSet.getString("vat_rated"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setVatRated("");
             }
             try {
                 transitem.setVatPerc(aResultSet.getDouble("vat_perc"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setVatPerc(0);
             }
             try {
                 transitem.setUnitPriceIncVat(aResultSet.getDouble("unit_price_inc_vat"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setUnitPriceIncVat(0);
             }
             try {
                 transitem.setUnitPriceExcVat(aResultSet.getDouble("unit_price_exc_vat"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setUnitPriceExcVat(0);
             }
             try {
                 transitem.setAmountIncVat(aResultSet.getDouble("amount_inc_vat"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setAmountIncVat(0);
             }
             try {
                 transitem.setAmountExcVat(aResultSet.getDouble("amount_exc_vat"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setAmountExcVat(0);
             }
             try {
                 transitem.setStockEffect(aResultSet.getString("stock_effect"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setStockEffect("");
             }
             try {
                 transitem.setIsTradeDiscountVatLiable(aResultSet.getString("is_trade_discount_vat_liable"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setIsTradeDiscountVatLiable("");
             }
             try {
@@ -4405,32 +3850,32 @@ public class TransItemBean implements Serializable {
             }
             try {
                 transitem.setPurchaseDate(new Date(aResultSet.getDate("purchase_date").getTime()));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setPurchaseDate(null);
             }
             try {
                 transitem.setDepStartDate(new Date(aResultSet.getDate("dep_start_date").getTime()));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setDepStartDate(null);
             }
             try {
                 transitem.setDepMethodId(aResultSet.getInt("dep_method_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setDepMethodId(0);
             }
             try {
                 transitem.setDepRate(aResultSet.getDouble("dep_rate"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setDepRate(0);
             }
             try {
                 transitem.setAverageMethodId(aResultSet.getInt("average_method_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setAverageMethodId(0);
             }
             try {
                 transitem.setEffectiveLife(aResultSet.getInt("effective_life"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setEffectiveLife(0);
             }
             try {
@@ -4450,7 +3895,7 @@ public class TransItemBean implements Serializable {
             }
             try {
                 transitem.setDuration_value(aResultSet.getDouble("duration_value"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setDuration_value(0);
             }
             try {
@@ -4460,7 +3905,7 @@ public class TransItemBean implements Serializable {
             }
             try {
                 transitem.setDuration_passed(aResultSet.getDouble("duration_passed"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setDuration_passed(0);
             }
             try {
@@ -4469,7 +3914,7 @@ public class TransItemBean implements Serializable {
                 } else {
                     transitem.setSpecific_size(1);
                 }
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setSpecific_size(1);
             }
             try {
@@ -5316,8 +4761,11 @@ public class TransItemBean implements Serializable {
                 ps.setInt(3, aTransReasonId);
                 ps.setInt(4, aLimit);
                 rs = ps.executeQuery();
+                TransItem ti = null;
                 while (rs.next()) {
-                    tis.add(this.getTransItemFromResultSet(rs));
+                    ti = this.getTransItemFromResultSet(rs);
+                    this.updateLookUpsUI(ti);
+                    tis.add(ti);
                 }
                 this.ActionMessage = ((""));
             } catch (Exception e) {
@@ -6010,27 +5458,27 @@ public class TransItemBean implements Serializable {
                 ti.setItem_no(i);
                 try {
                     ti.setAlias_name(rs.getString("alias_name"));
-                } catch (NullPointerException | SQLException npe) {
+                } catch (Exception e) {
                     ti.setAlias_name("");
                 }
                 try {
                     ti.setDisplay_alias_name(rs.getInt("display_alias_name"));
-                } catch (NullPointerException | SQLException npe) {
+                } catch (Exception e) {
                     ti.setDisplay_alias_name(0);
                 }
                 try {
                     ti.setOverride_gen_name(rs.getInt("override_gen_name"));
-                } catch (NullPointerException | SQLException npe) {
+                } catch (Exception e) {
                     ti.setOverride_gen_name(0);
                 }
                 try {
                     ti.setHide_unit_price_invoice(rs.getInt("hide_unit_price_invoice"));
-                } catch (NullPointerException | SQLException npe) {
+                } catch (Exception e) {
                     ti.setHide_unit_price_invoice(0);
                 }
                 try {
                     ti.setItemCode(rs.getString("item_code"));
-                } catch (NullPointerException | SQLException npe) {
+                } catch (Exception e) {
                     ti.setItemCode("");
                 }
                 tis.add(ti);
@@ -6911,6 +6359,15 @@ public class TransItemBean implements Serializable {
         aTransItem.setAmount(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getAmount()));
         aTransItem.setAmountIncVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getAmountIncVat()));
         aTransItem.setAmountExcVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getAmountExcVat()));
+        /*
+         aTransItem.setUnitVat(new AccCurrencyBean().roundDoubleToXDps(aTransItem.getUnitVat(),4));
+         aTransItem.setUnitPriceExcVat(new AccCurrencyBean().roundDoubleToXDps(aTransItem.getUnitPriceExcVat(),4));
+         aTransItem.setUnitPriceIncVat(new AccCurrencyBean().roundDoubleToXDps(aTransItem.getUnitPriceIncVat(),4));
+         aTransItem.setUnitProfitMargin(new AccCurrencyBean().roundDoubleToXDps(aTransItem.getUnitProfitMargin(),4));
+         aTransItem.setAmount(new AccCurrencyBean().roundDoubleToXDps(aTransItem.getAmount(),4));
+         aTransItem.setAmountIncVat(new AccCurrencyBean().roundDoubleToXDps(aTransItem.getAmountIncVat(),4));
+         aTransItem.setAmountExcVat(new AccCurrencyBean().roundDoubleToXDps(aTransItem.getAmountExcVat(),4));
+         */
     }
 
     public void roundTransItemsAmount_prev(Trans aTrans, TransItem aTransItem) {
@@ -7376,6 +6833,13 @@ public class TransItemBean implements Serializable {
             }
 
             if (StockFail1 == 0 && StockFail2 == 0 && StockFail3 == 0) {
+                double BaseQty = new ItemBean().getBaseUnitQty(NewTransItem.getItemId(), NewTransItem.getUnit_id(), NewTransItem.getItemQty());
+                if (BaseQty > 0) {
+                    NewTransItem.setBase_unit_qty(BaseQty);
+                } else {
+                    NewTransItem.setUnit_id(aSelectedItem.getUnitId());
+                    NewTransItem.setBase_unit_qty(NewTransItem.getItemQty());
+                }
                 TransItem ti = new TransItem();
                 ti.setTransactionItemId(NewTransItem.getTransactionItemId());
                 ti.setTransactionId(NewTransItem.getTransactionId());
@@ -7386,6 +6850,8 @@ public class TransItemBean implements Serializable {
                 ti.setUnitTradeDiscount(NewTransItem.getUnitTradeDiscount());
                 ti.setAmount(NewTransItem.getAmount());
                 ti.setVatRated(NewTransItem.getVatRated());
+                ti.setUnit_id(NewTransItem.getUnit_id());
+                ti.setBase_unit_qty(NewTransItem.getBase_unit_qty());
                 //for UNPACK
                 //ti.setItemId2(NewTransItem.getItemId2());
                 //ti.setItemQty2(NewTransItem.getItemQty2());
@@ -7482,7 +6948,7 @@ public class TransItemBean implements Serializable {
                     ti.setSpecific_size(1);
                 }
                 //check if itme+batchno already exists
-                int ItemFoundAtIndex = itemExists(aActiveTransItems, ti.getItemId(), ti.getBatchno(), ti.getCodeSpecific(), ti.getDescSpecific());
+                int ItemFoundAtIndex = itemExists(aActiveTransItems, ti.getItemId(), ti.getBatchno(), ti.getCodeSpecific(), ti.getDescSpecific(), ti.getUnit_id());
                 if (ti.getAmount() < 0 || ti.getAmountExcVat() < 0 || ti.getAmountExcVat() < 0) {
                     aStatusBean.setItemAddedStatus("");
                     aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Discount Cannot Exceed Unit Price or Prices are Wrong"));
@@ -7575,6 +7041,8 @@ public class TransItemBean implements Serializable {
                 //for profit margin set to 0
                 ti.setUnitCostPrice(0);
                 ti.setUnitProfitMargin(0);
+                ti.setUnit_id(NewTransItem.getUnit_id());
+                ti.setBase_unit_qty(NewTransItem.getBase_unit_qty());
                 //for bms
                 try {
                     ti.setCodeSpecific(NewTransItem.getCodeSpecific());
@@ -7621,7 +7089,7 @@ public class TransItemBean implements Serializable {
                     ti.setSpecific_size(1);
                 }
                 //check if itme+batchno already exists
-                int ItemFoundAtIndex = itemExists(aActiveTransItems, ti.getItemId(), ti.getBatchno(), ti.getCodeSpecific(), ti.getDescSpecific());
+                int ItemFoundAtIndex = itemExists(aActiveTransItems, ti.getItemId(), ti.getBatchno(), ti.getCodeSpecific(), ti.getDescSpecific(), ti.getUnit_id());
                 if (ItemFoundAtIndex == -1) {
                     //round off amounts basing on currency rules
                     this.roundTransItemsAmount(aTrans, ti);
@@ -7722,10 +7190,22 @@ public class TransItemBean implements Serializable {
         new TransBean().setTransTotalsAndUpdate(aTrans, aActiveTransItems);
     }
 
+    public void updateBaseUnityQty(TransItem aTransItem) {
+        try {
+            double BaseQty = new ItemBean().getBaseUnitQty(aTransItem.getItemId(), aTransItem.getUnit_id(), aTransItem.getItemQty());
+            if (BaseQty >= 0) {
+                aTransItem.setBase_unit_qty(BaseQty);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public void editTransItemCEC(int aTransTypeId, int aTransReasonId, String aSaleType, Trans aTrans, List<TransItem> aActiveTransItems, TransItem ti) {
         try {
             TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
             TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
+            this.updateBaseUnityQty(ti);
             if (ti.getItemQty() < 0) {
                 ti.setItemQty(0);
             }
@@ -7809,6 +7289,7 @@ public class TransItemBean implements Serializable {
         try {
             TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
             TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
+            this.updateBaseUnityQty(ti);
             if (ti.getItemQty() < 0) {
                 ti.setItemQty(0);
             }
@@ -9939,6 +9420,13 @@ public class TransItemBean implements Serializable {
                 aStatusBean.setShowItemAddedStatus(0);
                 aStatusBean.setShowItemNotAddedStatus(1);
             } else {
+                double BaseQty = new ItemBean().getBaseUnitQty(NewTransItem.getItemId(), NewTransItem.getUnit_id(), NewTransItem.getItemQty());
+                if (BaseQty > 0) {
+                    NewTransItem.setBase_unit_qty(BaseQty);
+                } else {
+                    NewTransItem.setUnit_id(aSelectedItem.getUnitId());
+                    NewTransItem.setBase_unit_qty(NewTransItem.getItemQty());
+                }
                 TransItem ti = new TransItem();
                 ti.setTransactionItemId(NewTransItem.getTransactionItemId());
                 ti.setTransactionId(NewTransItem.getTransactionId());
@@ -9949,7 +9437,8 @@ public class TransItemBean implements Serializable {
                 ti.setUnitTradeDiscount(NewTransItem.getUnitTradeDiscount());
                 ti.setAmount(NewTransItem.getAmount());
                 ti.setVatRated(NewTransItem.getVatRated());
-
+                ti.setUnit_id(NewTransItem.getUnit_id());
+                ti.setBase_unit_qty(NewTransItem.getBase_unit_qty());
                 ti.setVatPerc(CompanySetting.getVatPerc());
                 ti.setUnitVat(NewTransItem.getUnitVat());
                 ti.setUnitPriceExcVat(NewTransItem.getUnitPrice());
@@ -10061,7 +9550,7 @@ public class TransItemBean implements Serializable {
                     ti.setSpecific_size(1);
                 }
                 //check if itme+batchno already exists
-                int ItemFoundAtIndex = itemExists(aActiveTransItems, ti.getItemId(), ti.getBatchno(), ti.getCodeSpecific(), ti.getDescSpecific());
+                int ItemFoundAtIndex = itemExists(aActiveTransItems, ti.getItemId(), ti.getBatchno(), ti.getCodeSpecific(), ti.getDescSpecific(), ti.getUnit_id());
                 if (ItemFoundAtIndex == -1) {
                     if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "LIST_ITEMS_APPEND").getParameter_value().equals("0")) {
                         this.updateLookUpsUI(ti);
@@ -10750,13 +10239,13 @@ public class TransItemBean implements Serializable {
         return ItemFoundAtIndex;
     }
 
-    public TransItem itemExistsObj(List<TransItem> aActiveTransItems, Long aItemId, String aBatchNo, String aCodeSpec, String aDescSpec) {
+    public TransItem itemExistsObj(List<TransItem> aActiveTransItems, Long aItemId, String aBatchNo, String aCodeSpec, String aDescSpec, int aUnitId) {
         List<TransItem> ati = aActiveTransItems;
         TransItem ItemFound = null;
         int ListItemIndex = 0;
         int ListItemNo = ati.size();
         while (ListItemIndex < ListItemNo) {
-            if (ati.get(ListItemIndex).getItemId() == aItemId && aBatchNo.equals(ati.get(ListItemIndex).getBatchno()) && aCodeSpec.equals(ati.get(ListItemIndex).getCodeSpecific()) && aDescSpec.equals(ati.get(ListItemIndex).getDescSpecific())) {
+            if (ati.get(ListItemIndex).getItemId() == aItemId && aBatchNo.equals(ati.get(ListItemIndex).getBatchno()) && aCodeSpec.equals(ati.get(ListItemIndex).getCodeSpecific()) && aDescSpec.equals(ati.get(ListItemIndex).getDescSpecific()) && ati.get(ListItemIndex).getUnit_id() == aUnitId) {
                 ItemFound = ati.get(ListItemIndex);
                 break;
             } else {
@@ -10846,9 +10335,13 @@ public class TransItemBean implements Serializable {
     }
 
     public void removeTransItemCEC(int aTransTypeId, int aTransReasonId, Trans aTrans, List<TransItem> aActiveTransItems, TransItem ti) {
-        aActiveTransItems.remove(ti);
-        //update totals
-        new TransBean().setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems);
+        try {
+            aActiveTransItems.remove(ti);
+            //update totals
+            new TransBean().setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
     }
 
     public void overridePrice(TransItem aTransItem) {
@@ -10886,10 +10379,10 @@ public class TransItemBean implements Serializable {
             if (ti.getItemQty() < 0) {
                 ti.setItemQty(0);
             }
-            double BaseQty = new ItemBean().getBaseUnitQty(ti.getItemId(), ti.getUnit_id(), ti.getItemQty());
-            if (BaseQty > 0) {
-                ti.setBase_unit_qty(BaseQty);
-            }
+//            double BaseQty = new ItemBean().getBaseUnitQty(ti.getItemId(), ti.getUnit_id(), ti.getItemQty());
+//            if (BaseQty > 0) {
+//                ti.setBase_unit_qty(BaseQty);
+//            }
             //update totals
             this.editTransItemCEC(aTransTypeId, aTransReasonId, "", aTrans, aActiveTransItems, ti);
         } catch (Exception e) {
@@ -10902,10 +10395,10 @@ public class TransItemBean implements Serializable {
             if (ti.getItemQty() < 0) {
                 ti.setItemQty(0);
             }
-            double BaseQty = new ItemBean().getBaseUnitQty(ti.getItemId(), ti.getUnit_id(), ti.getItemQty());
-            if (BaseQty > 0) {
-                ti.setBase_unit_qty(BaseQty);
-            }
+//            double BaseQty = new ItemBean().getBaseUnitQty(ti.getItemId(), ti.getUnit_id(), ti.getItemQty());
+//            if (BaseQty > 0) {
+//                ti.setBase_unit_qty(BaseQty);
+//            }
             //update totals
             this.editTransItemCEC(aTransTypeId, aTransReasonId, "", aTrans, aActiveTransItems, ti);
         } catch (Exception e) {
@@ -10958,7 +10451,6 @@ public class TransItemBean implements Serializable {
                 //skip for adding
                 this.setItemString("");
             } else {
-                //if (this.isItemTotalQtyGreaterThanCurrentQty(aStoreId, ati.get(ListItemIndex).getItemId(), ati.get(ListItemIndex).getBatchno(), ati.get(ListItemIndex).getItemQty(), ati.get(ListItemIndex).getCodeSpecific(), ati.get(ListItemIndex).getDescSpecific())) {
                 if (this.isItemTotalQtyGreaterThanCurrentQty(aStoreId, ati.get(ListItemIndex).getItemId(), ati.get(ListItemIndex).getBatchno(), ati.get(ListItemIndex).getBase_unit_qty(), ati.get(ListItemIndex).getCodeSpecific(), ati.get(ListItemIndex).getDescSpecific())) {
                     this.setItemString(new ItemBean().findItem(ati.get(ListItemIndex).getItemId()).getDescription() + " " + ati.get(ListItemIndex).getBatchno() + ", " + UtilityBean.combineTwoStr(ati.get(ListItemIndex).getCodeSpecific(), ati.get(ListItemIndex).getDescSpecific(), 2));
                     break;
@@ -11752,7 +11244,6 @@ public class TransItemBean implements Serializable {
                 LatestUnitCostPrice = 0;
             }
         }
-
         //2. if not recently received, check from stock table for any store
         if (LatestUnitCostPrice <= 0) {
             try {
@@ -11761,7 +11252,6 @@ public class TransItemBean implements Serializable {
                 LatestUnitCostPrice = 0;
             }
         }
-
         //3. if nothing in stock table, check from item settings
         if (LatestUnitCostPrice <= 0) {
             try {
@@ -11770,7 +11260,6 @@ public class TransItemBean implements Serializable {
                 LatestUnitCostPrice = 0;
             }
         }
-
         return LatestUnitCostPrice;
     }
 
@@ -11791,7 +11280,6 @@ public class TransItemBean implements Serializable {
         } catch (Exception e) {
             // do nothing
         }
-
         //1. check if item has been received before
         try {
             if (PurInvoMode == 0) {
@@ -11822,7 +11310,6 @@ public class TransItemBean implements Serializable {
                 LatestUnitCostPrice = 0;
             }
         }
-
         //2. if not recently received, check from stock table for any store
         if (LatestUnitCostPrice <= 0) {
             try {
@@ -11836,7 +11323,6 @@ public class TransItemBean implements Serializable {
                 LatestUnitCostPrice = 0;
             }
         }
-
         //3. if nothing in stock table, check from item settings
         if (LatestUnitCostPrice <= 0) {
             try {
@@ -11847,7 +11333,6 @@ public class TransItemBean implements Serializable {
                 LatestUnitCostPrice = 0;
             }
         }
-
         //convert unit and currency
         try {
             //convert unit
@@ -12306,18 +11791,22 @@ public class TransItemBean implements Serializable {
                         aSelectedItem = new ItemBean().findItemByIdActive(ic.getItem_id());
                     }
                 }
-                if (aTransTypeId == 2) {
+            } catch (Exception e) {
+                aSelectedItem = null;
+            }
+        }//For ItemClick -- aSelectedItem is already Item Object
+        if (aEntryMode.equals("BarCode") || aEntryMode.equals("ItemClick")) {
+            try {
+                if (aTransTypeId == 2 || aTransTypeId == 11) {
                     new ItemBean().refreshItemUnitList(aSelectedItem, aSelectedTransItem, 1);
                 } else if (aTransTypeId == 1) {
                     new ItemBean().refreshItemUnitList(aSelectedItem, aSelectedTransItem, 2);
                 } else {
                     new ItemBean().refreshItemUnitList(aSelectedItem, aSelectedTransItem, 0);
                 }
-            } catch (NullPointerException npe) {
-                aSelectedItem = null;
+            } catch (Exception e) {
             }
-        }//For ItemClick -- aSelectedItem is already Item Object
-
+        }
         if (aSelectedItem == null) {
             aStatusBean.setItemAddedStatus("");
             aStatusBean.setItemNotAddedStatus(ub.translateWordsInText(BaseName, "Item Not Found"));
@@ -12759,6 +12248,8 @@ public class TransItemBean implements Serializable {
         int ListItemNoPrev = PrevTransItemList.size();
         double PrevQty = 0;
         double CurQty = 0;
+        double PrevQtyBaseUnit = 0;
+        double CurQtyBaseUnit = 0;
         TransItem CurTransItem = null;
         TransItem PrevTransItem = null;
         //TransItem CurLessPrevTransItem = null;
@@ -12766,26 +12257,29 @@ public class TransItemBean implements Serializable {
         while (ListItemIndexCur < ListItemNoCur) {
             //CurLessPrevTransItem = new TransItem();
             CurQty = 0;
+            CurQtyBaseUnit = 0;
             CurTransItem = new TransItem();
             this.copyObjectTransItem(aCurTransItemList.get(ListItemIndexCur), CurTransItem);
-            //CurQty = CurTransItem.getItemQty();
-            CurQty = CurTransItem.getBase_unit_qty();
+            CurQty = CurTransItem.getItemQty();
+            CurQtyBaseUnit = CurTransItem.getBase_unit_qty();
             ListItemIndexPrev = 0;
             while (ListItemIndexPrev < ListItemNoPrev) {
                 PrevQty = 0;
+                PrevQtyBaseUnit = 0;
                 PrevTransItem = new TransItem();
                 //PrevTransItem = PrevTransItemList.get(ListItemIndexPrev);
                 this.copyObjectTransItem(PrevTransItemList.get(ListItemIndexPrev), PrevTransItem);
                 //if (CurTransItem.getItemId() == PrevTransItem.getItemId() && CurTransItem.getBatchno().equals(PrevTransItem.getBatchno()) && CurTransItem.getCodeSpecific() == null ? PrevTransItem.getCodeSpecific() == null : CurTransItem.getCodeSpecific().equals(PrevTransItem.getCodeSpecific()) && CurTransItem.getDescSpecific() == null ? PrevTransItem.getDescSpecific() == null : CurTransItem.getDescSpecific().equals(PrevTransItem.getDescSpecific())) {
-                if (CurTransItem.getItemId() == PrevTransItem.getItemId() && ub.getEmptyIfNull(CurTransItem.getBatchno()).equals(ub.getEmptyIfNull(PrevTransItem.getBatchno())) && ub.getEmptyIfNull(CurTransItem.getCodeSpecific()).equals(PrevTransItem.getCodeSpecific()) && ub.getEmptyIfNull(CurTransItem.getDescSpecific()).equals(ub.getEmptyIfNull(PrevTransItem.getDescSpecific()))) {
-                    //PrevQty = PrevTransItem.getItemQty();
-                    PrevQty = PrevTransItem.getBase_unit_qty();
+                if (CurTransItem.getItemId() == PrevTransItem.getItemId() && CurTransItem.getUnit_id() == PrevTransItem.getUnit_id() && ub.getEmptyIfNull(CurTransItem.getBatchno()).equals(ub.getEmptyIfNull(PrevTransItem.getBatchno())) && ub.getEmptyIfNull(CurTransItem.getCodeSpecific()).equals(PrevTransItem.getCodeSpecific()) && ub.getEmptyIfNull(CurTransItem.getDescSpecific()).equals(ub.getEmptyIfNull(PrevTransItem.getDescSpecific()))) {
+                    PrevQty = PrevTransItem.getItemQty();
+                    PrevQtyBaseUnit = PrevTransItem.getBase_unit_qty();
                     break;
                 }
                 ListItemIndexPrev = ListItemIndexPrev + 1;
             }
             if ((CurQty - PrevQty) != 0) {
                 CurTransItem.setItemQty(CurQty - PrevQty);
+                CurTransItem.setBase_unit_qty(CurQtyBaseUnit - PrevQtyBaseUnit);
                 CurLessPrevTransItemList.add(CurTransItem);
             }
             ListItemIndexCur = ListItemIndexCur + 1;

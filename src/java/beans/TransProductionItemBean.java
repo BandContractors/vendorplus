@@ -15,6 +15,7 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import static java.sql.Types.VARCHAR;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -122,59 +123,67 @@ public class TransProductionItemBean implements Serializable {
             TransProductionItem transProductionItem = new TransProductionItem();
             transProductionItem.setTransProductionItemId(aResultSet.getLong("trans_production_item_id"));
             transProductionItem.setTransProductionId(aResultSet.getLong("transaction_id"));
-
             try {
                 transProductionItem.setInputItemId(aResultSet.getLong("input_item_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transProductionItem.setInputItemId(0);
             }
             try {
                 transProductionItem.setInputQty(aResultSet.getDouble("input_qty"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transProductionItem.setInputQty(0);
             }
             try {
                 transProductionItem.setInputUnitCost(aResultSet.getDouble("input_unit_cost"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transProductionItem.setInputUnitCost(0);
             }
             try {
                 transProductionItem.setBatchno(aResultSet.getString("batchno"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transProductionItem.setBatchno("");
             }
             try {
                 transProductionItem.setCodeSpecific(aResultSet.getString("code_specific"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transProductionItem.setCodeSpecific("");
             }
             try {
                 transProductionItem.setDescSpecific(aResultSet.getString("desc_specific"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transProductionItem.setDescSpecific("");
             }
             try {
                 transProductionItem.setDescMore(aResultSet.getString("desc_more"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transProductionItem.setDescMore("");
             }
             try {
                 transProductionItem.setInput_unit_qty(aResultSet.getDouble("input_unit_qty"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transProductionItem.setInput_unit_qty(0);
             }
             try {
                 transProductionItem.setInput_qty_bfr_prod(aResultSet.getDouble("input_qty_bfr_prod"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transProductionItem.setInput_qty_bfr_prod(0);
             }
             try {
                 transProductionItem.setInput_qty_afr_prod(aResultSet.getDouble("input_qty_afr_prod"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transProductionItem.setInput_qty_afr_prod(0);
             }
+            try {
+                transProductionItem.setUnit_id(aResultSet.getInt("unit_id"));
+            } catch (Exception e) {
+                transProductionItem.setUnit_id(0);
+            }
+            try {
+                transProductionItem.setBase_unit_qty(aResultSet.getDouble("base_unit_qty"));
+            } catch (Exception e) {
+                transProductionItem.setBase_unit_qty(0);
+            }
             return transProductionItem;
-
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
             return null;
@@ -190,16 +199,16 @@ public class TransProductionItemBean implements Serializable {
                 this.saveTransProductionItems(aTransProductionId, aOutputQty, aStoreId, ati.get(ListItemIndex));
                 ListItemIndex = ListItemIndex + 1;
             }
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
     public void saveTransProductionItems(long aTransProductionID, double aOutputQty, int aStoreId, ItemProductionMap aItemProductionMap) {
         String sql = null;
         String msg = "";
-        long InsertedTransId = 0;
-        //double calInputQty = 0.0;
+        //trans_production_item_id
+        long InsertedTransProdItemId = 0;
         TransactionTypeBean TransTypeBean = new TransactionTypeBean();
         StockBean StkBean = new StockBean();
         TransProductionItem aTransProductionItem = new TransProductionItem();
@@ -207,7 +216,7 @@ public class TransProductionItemBean implements Serializable {
         if (1 == 2) {
         } else {
             if (aTransProductionItem.getTransProductionItemId() == 0) {
-                sql = "{call sp_insert_trans_production_item(?,?,?,?,?,?,?,?,?,?,?)}";
+                sql = "{call sp_insert_trans_production_item(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
             }
             try (
                     Connection conn = DBConnection.getMySQLConnection();
@@ -222,59 +231,65 @@ public class TransProductionItemBean implements Serializable {
                     cs.setLong("in_input_item_id", aItemProductionMap.getInputItemId());
                     try {
                         cs.setDouble("in_input_qty_bfr_prod", aItemProductionMap.getInputQtyCurrent());
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         cs.setDouble("in_input_qty_bfr_prod", 0);
                     }
                     try {
                         cs.setDouble("in_input_qty_afr_prod", aItemProductionMap.getInputQtyBalance());
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         cs.setDouble("in_input_qty_afr_prod", 0);
                     }
                     try {
                         cs.setDouble("in_input_unit_qty", aItemProductionMap.getInputQty());
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         cs.setDouble("in_input_unit_qty", 0);
                     }
-                    //calInputQty = aItemProductionMap.getInputQty() * aOutputQty;
-                    //cs.setDouble("in_input_qty", calInputQty);
                     try {
                         cs.setDouble("in_input_qty", aItemProductionMap.getInputQtyTotal());
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         cs.setDouble("in_input_qty", 0);
                     }
                     try {
                         cs.setDouble("in_input_unit_cost", new TransItemBean().getItemLatestUnitCostPrice(aItemProductionMap.getInputItemId(), aItemProductionMap.getBatchno(), aItemProductionMap.getCodeSpecific(), aItemProductionMap.getDescSpecific()));
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         cs.setDouble("in_input_unit_cost", 0);
                     }
                     try {
                         cs.setString("in_batchno", aItemProductionMap.getBatchno());
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         cs.setString("in_batchno", "");
                     }
-
                     try {
                         cs.setString("in_code_specific", aItemProductionMap.getCodeSpecific());
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         cs.setString("in_code_specific", "");
                     }
                     try {
                         cs.setString("in_desc_specific", aItemProductionMap.getDescSpecific());
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         cs.setString("in_desc_specific", "");
                     }
                     try {
                         cs.setString("in_desc_more", "");
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         cs.setString("in_desc_more", "");
                     }
+                    try {
+                        cs.setInt("in_unit_id", aItemProductionMap.getInput_unit_id());
+                    } catch (Exception e) {
+                        cs.setInt("in_unit_id", 0);
+                    }
+                    try {
+                        cs.setDouble("in_base_unit_qty", aItemProductionMap.getInputQty());
+                    } catch (Exception e) {
+                        cs.setDouble("in_base_unit_qty", 0);
+                    }
+                    cs.registerOutParameter("out_trans_production_item_id", VARCHAR);
                     //save
                     cs.executeUpdate();
-                    //System.out.println("Added Pro Item");
-
+                    InsertedTransProdItemId = cs.getLong("out_trans_production_item_id");
                     //update stock
                     double FromUnitCost = 0;
-
                     Stock stock = new Stock();
                     int i = 0;
                     stock.setStoreId(aStoreId);
@@ -282,21 +297,17 @@ public class TransProductionItemBean implements Serializable {
                     stock.setBatchno(aItemProductionMap.getBatchno());
                     stock.setCodeSpecific(aItemProductionMap.getCodeSpecific());
                     stock.setDescSpecific(aItemProductionMap.getDescSpecific());
-                    //i = new StockBean().subtractStock(stock, calInputQty);
-                    i = new StockBean().subtractStock(stock, aItemProductionMap.getInputQtyTotal());
+                    i = new StockBean().subtractStock(stock, aItemProductionMap.getInputQtyTotalBaseUnit());
                     stock.setSpecific_size(1);
                     String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
-                    new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", stock, aItemProductionMap.getInputQtyTotal(), "Add", 70, aTransProductionID, new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                    new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", stock, aItemProductionMap.getInputQtyTotal(), "Add", 70, aTransProductionID, new GeneralUserSetting().getCurrentUser().getUserDetailId(), InsertedTransProdItemId);
                     try {
                         FromUnitCost = new StockBean().getStock(stock.getStoreId(), stock.getItemId(), stock.getBatchno(), stock.getCodeSpecific(), stock.getDescSpecific()).getUnitCost();
                     } catch (NullPointerException npe) {
-
                     }
                     TransProductionBean tpb = new TransProductionBean();
-
                     TransTypeBean = null;
                     StkBean = null;
-
                 } else if (aTransProductionItem.getTransProductionId() > 0) {
                     //do nothing; this is for edit
                 }
@@ -304,7 +315,6 @@ public class TransProductionItemBean implements Serializable {
                 LOGGER.log(Level.ERROR, e);
                 FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage("TransProduction NOT saved!"));
             }
-
         }
     }
 

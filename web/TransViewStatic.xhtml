@@ -30,7 +30,7 @@
     <h:body>
         <h:form id="TransForm" styleClass="clsMainFrom">
             <h:panelGrid id="pgrdTransHeader" styleClass="clsGridMainInput" columns="6">
-                <h:outputLabel  value="#{langsys[transactionTypeBean.getTransactionType(salesInvoiceBean.getCurrentTransaction().transactionTypeId).transactionNumberLabel]}"/>
+                <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(salesInvoiceBean.getCurrentTransaction().transactionTypeId).transactionNumberLabel)}"/>
                 <h:inputText styleClass="clsInput" id="itxtTransactionId" disabled="true" value="#{salesInvoiceBean.getCurrentTransaction().transactionNumber}"/>
                 <h:outputLabel  value="#{langsys['Transaction']} #{langsys['Type']}"/>
                 <h:inputText styleClass="clsInput" id="itxtTransactionType" disabled="true" value="#{transactionTypeBean.getTransactionType(salesInvoiceBean.getCurrentTransaction().transactionTypeId).transactionTypeName}">
@@ -39,11 +39,11 @@
                 <h:outputLabel  value="#{langsys['Transaction']} #{langsys['Reason']}"/>
                 <h:inputText styleClass="clsInput" id="itxtTransactionReason" disabled="true" value="#{transactionReasonBean.getTransactionReason(salesInvoiceBean.getCurrentTransaction().transactionReasonId).transactionReasonName}"/>
 
-                <h:outputLabel  value="#{langsys[transactionTypeBean.getTransactionType(salesInvoiceBean.getCurrentTransaction().transactionTypeId).transactionRefLabel]}"/>
+                <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(salesInvoiceBean.getCurrentTransaction().transactionTypeId).transactionRefLabel)}"/>
                 <h:inputText styleClass="clsInput" disabled="true" value="#{salesInvoiceBean.getCurrentTransaction().transactionRef}"/>
-                <h:outputLabel  value="#{langsys[transactionTypeBean.getTransactionType(salesInvoiceBean.getCurrentTransaction().transactionTypeId).transactionDateLabel]}"/>
+                <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(salesInvoiceBean.getCurrentTransaction().transactionTypeId).transactionDateLabel)}"/>
                 <h:inputText styleClass="clsInput" disabled="true" value="#{utilityBean.formatDate(salesInvoiceBean.getCurrentTransaction().transactionDate)}"/>
-                <h:outputLabel value="#{langsys[transactionTypeBean.getTransactionType(salesInvoiceBean.getCurrentTransaction().transactionTypeId).transactionUserLabel]}"/>
+                <h:outputLabel value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(salesInvoiceBean.getCurrentTransaction().transactionTypeId).transactionUserLabel)}"/>
                 <h:inputText styleClass="clsInput" disabled="true" value="#{userDetailBean.getUserDetail(salesInvoiceBean.getCurrentTransaction().transactionUserDetailId).firstName} #{userDetailBean.getUserDetail(salesInvoiceBean.getCurrentTransaction().addUserDetailId).secondName}"/>
 
                 <h:outputLabel  value="#{langsys['Add']} #{langsys['Date']}"/>

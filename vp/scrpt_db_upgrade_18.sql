@@ -43,3 +43,24 @@ INSERT INTO parameter_list (parameter_list_id, context, parameter_name, paramete
 VALUES (97, 'GENERAL', 'FORCE_UNIT_SELECTION', '0','0:No and 1:Yes. If Yes, Unit will be selected manually at each transaction. If No, default unit is be selected automatically. Applies to Items with multiple units');
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',44,Now(),'6.0','');
 
+-- Replace db_name with database name such as daytoday_sm_branch
+CALL sp_alter_stock_ledger_tables_trans_item_id("db_name");
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',48,Now(),'6.0','');
+
+ALTER TABLE item_production_map ADD COLUMN output_unit_id INT NULL DEFAULT '0',ADD COLUMN input_unit_id INT NULL DEFAULT '0';
+UPDATE item_production_map m set 
+m.output_unit_id=(select i1.unit_id from item i1 where i1.item_id=m.output_item_id),
+m.input_unit_id=(select i2.unit_id from item i2 where i2.item_id=m.input_item_id) 
+WHERE m.item_production_map_id>0;
+
+DROP TABLE trans_production_item_unit;
+DROP TABLE trans_production_unit;
+ALTER TABLE trans_production_item ADD COLUMN unit_id INT NULL DEFAULT '0',ADD COLUMN base_unit_qty DOUBLE NULL DEFAULT '0';
+ALTER TABLE trans_production ADD COLUMN unit_id INT NULL DEFAULT '0',ADD COLUMN base_unit_qty DOUBLE NULL DEFAULT '0';
+
+UPDATE trans_production_item ti SET ti.base_unit_qty=ti.input_qty,ti.unit_id=(select i.unit_id from item i where i.item_id=ti.input_item_id) 
+WHERE ti.trans_production_item_id>0;
+UPDATE trans_production t SET t.base_unit_qty=t.output_qty,t.unit_id=(select i.unit_id from item i where i.item_id=t.output_item_id) 
+WHERE t.transaction_id>0;
+
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',66,Now(),'6.0','');

@@ -2371,8 +2371,8 @@ CREATE PROCEDURE sp_search_transaction_item_by_transaction_id
 	IN in_transaction_id bigint 
 ) 
 BEGIN 
-		SELECT ti.*,tu.unit_id,tu.base_unit_qty FROM transaction_item ti 
-        INNER JOIN transaction_item_unit tu ON ti.transaction_item_id=tu.transaction_item_id 
+		SELECT ti.*,tiu.unit_id,tiu.base_unit_qty FROM transaction_item ti 
+        INNER JOIN transaction_item_unit tiu ON ti.transaction_item_id=tiu.transaction_item_id 
 		WHERE ti.transaction_id=in_transaction_id ORDER BY ti.transaction_item_id ASC;
 END//
 DELIMITER ;
@@ -8212,6 +8212,10 @@ BEGIN
 	dep_start_date,dep_method_id,dep_rate,average_method_id,effective_life,residual_value,narration,qty_balance,duration_value,
 	qty_damage,duration_passed,specific_size 
 	FROM transaction_item WHERE transaction_item_id=in_transaction_item_id AND transaction_id=in_transaction_id;
+    
+    INSERT INTO transaction_item_hist_unit(transaction_item_hist_id,unit_id,base_unit_qty) 
+	SELECT @new_id,unit_id,base_unit_qty   
+	FROM transaction_item_unit WHERE transaction_item_id=in_transaction_item_id;
 END//
 DELIMITER ;
 
@@ -8284,7 +8288,8 @@ CREATE PROCEDURE sp_search_transaction_item_hist_by_ids
 	IN in_transaction_hist_id bigint
 ) 
 BEGIN 
-		SELECT * FROM transaction_item_hist tih 
+		SELECT tih.*,tiu.unit_id,tiu.base_unit_qty FROM transaction_item_hist tih 
+        INNER JOIN transaction_item_hist_unit tiu ON tih.transaction_item_hist_id=tiu.transaction_item_hist_id 
 		WHERE tih.transaction_hist_id=in_transaction_hist_id AND tih.transaction_id=in_transaction_id ORDER BY tih.transaction_item_id ASC;
 END//
 DELIMITER ;
@@ -11864,6 +11869,219 @@ BEGIN
 END//
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS sp_insert_transaction_item_hist_out;
+DELIMITER //
+CREATE PROCEDURE sp_insert_transaction_item_hist_out
+(
+	IN in_transaction_hist_id bigint,
+	IN in_transaction_id bigint,
+	IN in_item_id bigint,
+	IN in_batchno varchar(100),
+	IN in_item_qty double,
+	IN in_unit_price double,
+	IN in_unit_trade_discount double,
+	IN in_unit_vat double,
+	IN in_amount double,
+	IN in_item_expiry_date date,
+	IN in_item_mnf_date date,
+	IN in_vat_rated varchar(50),
+	IN in_vat_perc double,
+	IN in_unit_price_inc_vat double,
+	IN in_unit_price_exc_vat double,
+	IN in_amount_inc_vat double,
+	IN in_amount_exc_vat double,
+	IN in_stock_effect varchar(1),
+	IN in_is_trade_discount_vat_liable varchar(3),
+	IN in_unit_cost_price double,
+	IN in_unit_profit_margin double,
+	IN in_earn_perc double,
+	IN in_earn_amount double,
+	IN in_code_specific varchar(250),
+	IN in_desc_specific varchar(250),
+	IN in_desc_more varchar(250),
+	IN in_warranty_desc varchar(150),
+	IN in_warranty_expiry_date date,
+	IN in_account_code varchar(20),
+	IN in_purchase_date date,
+	IN in_dep_start_date date,
+	IN in_dep_method_id int,
+	IN in_dep_rate double,
+	IN in_average_method_id int,
+	IN in_effective_life int,
+	IN in_residual_value double,
+	IN in_narration varchar(100),
+	IN in_qty_balance double,
+	IN in_duration_value double,
+	IN in_qty_damage double,
+	IN in_duration_passed double,
+	IN in_specific_size double,
+    OUT out_transaction_item_hist_id bigint
+) 
+BEGIN 
+	SET @new_id=0;
+	CALL sp_get_new_id("transaction_item_hist","transaction_item_hist_id",@new_id);
+
+	SET @item_expiry_date=NULL;
+	if (in_item_expiry_date is not null) then
+		set @item_expiry_date=in_item_expiry_date;
+	end if;
+
+	SET @item_mnf_date=NULL;
+	if (in_item_mnf_date is not null) then
+		set @item_mnf_date=in_item_mnf_date;
+	end if;
+
+	SET @in_batchno='';
+	if (in_batchno is not null) then
+		set @in_batchno=in_batchno;
+	end if;
+	SET @code_specific='';
+	if (in_code_specific is not null) then
+		set @code_specific=in_code_specific;
+	end if;
+	SET @desc_specific='';
+	if (in_desc_specific is not null) then
+		set @desc_specific=in_desc_specific;
+	end if;
+	SET @desc_more=null;
+	if (in_desc_more!='' and in_desc_more is not null) then
+		set @desc_more=in_desc_more;
+	end if;
+	SET @warranty_desc=null;
+	if (in_warranty_desc!="" and in_warranty_desc is not null) then
+		set @warranty_desc=in_warranty_desc;
+	end if;
+	SET @warranty_expiry_date=NULL;
+	if (in_warranty_expiry_date is not null) then
+		set @warranty_expiry_date=in_warranty_expiry_date;
+	end if;
+	SET @account_code=null;
+	if (in_account_code!='' and in_account_code is not null) then
+		set @account_code=in_account_code;
+	end if;
+		SET @in_purchase_date=NULL;
+		if (in_purchase_date is not null) then
+			set @in_purchase_date=in_purchase_date;
+		end if;
+		SET @in_dep_start_date=NULL;
+		if (in_dep_start_date is not null) then
+			set @in_dep_start_date=in_dep_start_date;
+		end if;
+		SET @in_dep_method_id=NULL;
+		if (in_dep_method_id!=0) then
+			set @in_dep_method_id=in_dep_method_id;
+		end if;
+		SET @in_average_method_id=NULL;
+		if (in_average_method_id!=0) then
+			set @in_average_method_id=in_average_method_id;
+		end if;
+		SET @in_item_id=NULL;
+		if (in_item_id!=0) then
+			set @in_item_id=in_item_id;
+		end if;
+		SET @in_specific_size=1;
+		if (in_specific_size!=0) then
+			set @in_specific_size=in_specific_size;
+		end if;
+
+	INSERT INTO transaction_item_hist
+	(
+		transaction_item_hist_id,
+		transaction_hist_id,
+		transaction_item_id,
+		transaction_id,
+		item_id,
+		batchno,
+		item_qty,
+		unit_price,
+		unit_trade_discount,
+		unit_vat,
+		amount,
+		item_expiry_date,
+		item_mnf_date,
+		vat_rated,
+		vat_perc,
+		unit_price_inc_vat,
+		unit_price_exc_vat,
+		amount_inc_vat,
+		amount_exc_vat,
+		stock_effect,
+		is_trade_discount_vat_liable,
+		unit_cost_price,
+		unit_profit_margin,
+		earn_perc,
+		earn_amount,
+		code_specific,
+		desc_specific,
+		desc_more,
+		warranty_desc,
+		warranty_expiry_date,
+		account_code,
+		purchase_date,
+		dep_start_date,
+		dep_method_id,
+		dep_rate,
+		average_method_id,
+		effective_life,
+		residual_value,
+		narration,
+		qty_balance,
+		duration_value,
+		qty_damage,
+		duration_passed,
+		specific_size
+	) 
+    VALUES
+	(
+		@new_id,
+		in_transaction_hist_id,
+		0,
+		0,
+		@in_item_id,
+		@in_batchno,
+		in_item_qty,
+		in_unit_price,
+		in_unit_trade_discount,
+		in_unit_vat,
+		in_amount,
+		@item_expiry_date,
+		@item_mnf_date,
+		in_vat_rated,
+		in_vat_perc,
+		in_unit_price_inc_vat,
+		in_unit_price_exc_vat,
+		in_amount_inc_vat,
+		in_amount_exc_vat,
+		in_stock_effect,
+		in_is_trade_discount_vat_liable,
+		in_unit_cost_price,
+		in_unit_profit_margin,
+		in_earn_perc,
+		in_earn_amount,
+		@code_specific,
+		@desc_specific,
+		@desc_more,
+		@warranty_desc,
+		@warranty_expiry_date,
+		@account_code,
+		@in_purchase_date,
+		@in_dep_start_date,
+		@in_dep_method_id,
+		in_dep_rate,
+		@in_average_method_id,
+		in_effective_life,
+		in_residual_value,
+		in_narration,
+		in_qty_balance,
+		in_duration_value,
+		in_qty_damage,
+		in_duration_passed,
+		in_specific_size
+	); 
+    SET out_transaction_item_hist_id=@new_id;
+END//
+DELIMITER ;
+
 DROP PROCEDURE IF EXISTS sp_search_transaction_sales_by_user;
 DELIMITER //
 CREATE PROCEDURE sp_search_transaction_sales_by_user
@@ -11934,7 +12152,8 @@ CREATE PROCEDURE sp_search_transaction_item_hist_by_hist_id
 	IN in_transaction_hist_id bigint 
 ) 
 BEGIN 
-		SELECT * FROM transaction_item_hist tih 
+		SELECT tih.*,tihu.unit_id,tihu.base_unit_qty FROM transaction_item_hist tih 
+        INNER JOIN transaction_item_hist_unit tihu ON tih.transaction_item_hist_id=tihu.transaction_item_hist_id 
 		WHERE tih.transaction_hist_id=in_transaction_hist_id;
 END//
 DELIMITER ;
@@ -11976,8 +12195,9 @@ CREATE PROCEDURE sp_search_transaction_item_by_tt_tr_ii
 	IN in_limit int
 ) 
 BEGIN 
-	SELECT * FROM transaction_item ti 
+	SELECT ti.*,tiu.unit_id,tiu.base_unit_qty FROM transaction_item ti 
 	INNER JOIN transaction t ON ti.transaction_id=t.transaction_id 
+    INNER JOIN transaction_item_unit tiu ON ti.transaction_item_id=tiu.transaction_item_id 
 	WHERE ti.item_id=in_item_id AND t.transaction_type_id=in_transaction_type_id 
 	AND t.transaction_reason_id=in_transaction_reason_id 
 	ORDER BY t.transaction_date DESC 
@@ -12017,7 +12237,9 @@ CREATE PROCEDURE sp_insert_trans_production
 	IN in_account_code varchar(20),
 	IN in_transaction_number varchar(50),
 	IN in_transactor_id bigint,
-	IN in_specific_size double
+	IN in_specific_size double,
+    IN in_unit_id int,
+    IN in_base_unit_qty double
 ) 
 BEGIN 
 	SET @new_id=0;
@@ -12093,7 +12315,9 @@ BEGIN
 		account_code,
 		transaction_number,
 		transactor_id,
-		specific_size
+		specific_size,
+        unit_id,
+		base_unit_qty
 	) 
     VALUES
 	(
@@ -12123,7 +12347,9 @@ BEGIN
 		in_account_code,
 		@in_transaction_number,
 		@in_transactor_id,
-		@in_specific_size
+		@in_specific_size,
+        in_unit_id,
+		in_base_unit_qty
 	); 
 SET out_transaction_id=@new_id;	
 SET out_output_qty=in_output_qty;
@@ -12145,7 +12371,10 @@ CREATE PROCEDURE sp_insert_trans_production_item
 	IN in_desc_more varchar(250),
 	IN in_input_unit_qty double,
 	IN in_input_qty_bfr_prod double,
-	IN in_input_qty_afr_prod double
+	IN in_input_qty_afr_prod double,
+    IN in_unit_id int,
+    IN in_base_unit_qty double,
+    OUT out_trans_production_item_id bigint
 ) 
 BEGIN 
 	SET @new_id=0;
@@ -12185,7 +12414,9 @@ BEGIN
 		desc_more,
 		input_unit_qty,
 		input_qty_bfr_prod,
-		input_qty_afr_prod
+		input_qty_afr_prod,
+        unit_id,
+		base_unit_qty
 		) 
     VALUES
 	(
@@ -12200,8 +12431,11 @@ BEGIN
 		in_desc_more,
 		in_input_unit_qty,
 		in_input_qty_bfr_prod,
-		in_input_qty_afr_prod
+		in_input_qty_afr_prod,
+        in_unit_id,
+		in_base_unit_qty
 		); 
+	SET out_trans_production_item_id=@new_id;
 END//
 DELIMITER ;
 
@@ -13269,7 +13503,8 @@ CREATE PROCEDURE sp_insert_transaction_item_cr_dr_note
 	IN in_duration_value double,
 	IN in_qty_damage double,
 	IN in_duration_passed double,
-	IN in_specific_size double
+	IN in_specific_size double,
+    OUT out_transaction_item_id bigint
 ) 
 BEGIN 
 	SET @new_id=0;
@@ -13428,6 +13663,7 @@ BEGIN
 		in_duration_passed,
 		@in_specific_size
 	); 
+	SET out_transaction_item_id=@new_id;
 END//
 DELIMITER ;
 
@@ -13607,8 +13843,22 @@ CREATE PROCEDURE sp_search_transaction_item_by_transaction_id_cr_dr_note
 	IN in_transaction_id bigint 
 ) 
 BEGIN 
-		SELECT * FROM transaction_item_cr_dr_note ti 
+		SELECT ti.*,tiu.unit_id,tiu.base_unit_qty FROM transaction_item_cr_dr_note ti 
+        INNER JOIN transaction_item_cr_dr_note_unit tiu ON ti.transaction_item_id=tiu.transaction_item_id 
 		WHERE ti.transaction_id=in_transaction_id ORDER BY ti.transaction_item_id ASC;
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_search_transaction_item_cr_dr_note;
+DELIMITER //
+CREATE PROCEDURE sp_search_transaction_item_cr_dr_note
+(
+	IN in_transaction_item_id bigint 
+) 
+BEGIN 
+		SELECT ti.*,tiu.unit_id,tiu.base_unit_qty FROM transaction_item_cr_dr_note ti 
+        INNER JOIN transaction_item_cr_dr_note_unit tiu ON ti.transaction_item_id=tiu.transaction_item_id 
+		WHERE ti.transaction_item_id=in_transaction_item_id;
 END//
 DELIMITER ;
 
@@ -14483,5 +14733,35 @@ DELIMITER //
 CREATE PROCEDURE sp_search_pay_shift_by_none() 
 BEGIN 
 	SELECT * FROM pay_shift ORDER BY pay_shift_id ASC; 
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_alter_stock_ledger_tables_trans_item_id;
+DELIMITER //
+CREATE PROCEDURE sp_alter_stock_ledger_tables_trans_item_id
+(
+IN in_db_name varchar(100) 
+)
+BEGIN 
+	DECLARE finished INTEGER DEFAULT 0;
+	DECLARE TableName varchar(30) DEFAULT "";
+	-- declare cursor for stock legder tables
+	DEClARE curTableName CURSOR FOR SELECT TABLE_NAME as tb FROM information_schema.tables WHERE TABLE_SCHEMA=in_db_name AND TABLE_NAME LIKE 'stock_ledger%';
+	-- declare NOT FOUND handler
+	DECLARE CONTINUE HANDLER FOR NOT FOUND SET finished = 1;
+	OPEN curTableName;
+	getTableName: LOOP
+		FETCH curTableName INTO TableName;
+		IF finished = 1 THEN 
+			LEAVE getTableName;
+		END IF;
+		-- alter table
+		set @sql_text = CONCAT("ALTER TABLE ",TableName," ADD COLUMN transaction_item_id BIGINT(20) NULL DEFAULT '0'");
+		-- select @sql_text;
+        PREPARE stmt FROM @sql_text;
+		EXECUTE stmt;
+		DEALLOCATE PREPARE stmt;
+	END LOOP getTableName;
+	CLOSE curTableName;
 END//
 DELIMITER ;

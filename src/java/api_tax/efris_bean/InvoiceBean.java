@@ -301,6 +301,16 @@ public class InvoiceBean implements Serializable {
                     if (transactor.getIdNumber().length() > 0) {
                         buyerDetails.setBuyerNinBrn(transactor.getIdNumber());
                     }
+                    if (new UtilityBean().getEmptyIfNull(transactor.getTrade_name()).length() > 0) {
+                        buyerDetails.setBuyerBusinessName(transactor.getTrade_name());
+                    }
+                    if (new UtilityBean().getEmptyIfNull(trans.getTransactor_rep()).length() > 0) {
+                        if (new UtilityBean().getEmptyIfNull(buyerDetails.getBuyerBusinessName()).length() > 0) {
+                            buyerDetails.setBuyerBusinessName(buyerDetails.getBuyerBusinessName() + " (" + trans.getTransactor_rep() + ")");
+                        } else {
+                            buyerDetails.setBuyerBusinessName(trans.getTransactor_rep());
+                        }
+                    }
                 } else {
                     if (null != trans.getTransactor_rep() && trans.getTransactor_rep().length() > 0) {
                         buyerDetails.setBuyerLegalName(trans.getTransactor_rep());
@@ -500,6 +510,11 @@ public class InvoiceBean implements Serializable {
             summary.setNetAmount(ub.formatDoublePlain2DP(acb.roundAmountMinTwoDps(trans.getCurrencyCode(), NetAmountSummary)));
             summary.setItemCount(Integer.toString(goodsDetails.size()));
             summary.setModeCode("1");
+            if (null != trans.getTermsConditions()) {
+                if (trans.getTermsConditions().length() > 0) {
+                    summary.setRemarks(trans.getTermsConditions());
+                }
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }

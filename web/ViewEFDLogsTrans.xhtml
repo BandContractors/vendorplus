@@ -37,13 +37,13 @@
                         <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{eFRIS_invoice_detailBean.EFRIS_invoice_detailObj.deviceNo}" style="width: 140px;"/>
                         <h:outputLabel  value="#{langsys['Currency']}"/>
                         <h:inputText styleClass="clsInput" id="itxtCurrency" disabled="true" value="#{eFRIS_invoice_detailBean.EFRIS_invoice_detailObj.currency}" style="width: 170px;"/>
-                        <h:outputLabel  value="#{langsys[transactionTypeBean.getTransactionType(2).transactionDateLabel]}"/>
+                        <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(2).transactionDateLabel)}"/>
                         <h:inputText id="itxtTransactionDate" value="#{utilityBean.formatDate(eFRIS_invoice_detailBean.EFRIS_invoice_detailObj.add_date)}" style="width:100px;" disabled="true"/>
 
                         <h:outputLabel  value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}"/>
                         <h:inputText styleClass="clsInput" id="itxtTransactor" value="#{eFRIS_invoice_detailBean.EFRIS_invoice_detailObj.buyerLegalName}" autocomplete="off" style="width: 170px;" disabled="true"/>
 
-                        <h:outputLabel value="#{langsys[transactionTypeBean.getTransactionType(2).transactionUserLabel]}"/>
+                        <h:outputLabel value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(2).transactionUserLabel)}"/>
                         <h:inputText value="#{eFRIS_invoice_detailBean.EFRIS_invoice_detailObj.operator}" style="width: 100px;" disabled="true"/>
 
                         <h:outputLabel  value="#{langsys['Processed']} #{langsys['Date']}"/>

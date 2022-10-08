@@ -121,10 +121,10 @@
             <h:panelGrid id="pnlHeader" styleClass="clsPanelReportFilter" columns="1">
                 <h:panelGrid columns="8" rendered="#{transExtBean.showDetail}">
                     <h:outputLabel  value="#{langsys['From']}"/>
-                    <h:outputLabel  value="#{langsys[transBean.transTypeObj.transactionDateLabel]}"/>
+                    <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeObj.transactionDateLabel)}"/>
                     <h:outputLabel  value="#{langsys['Currency']}"/>
                     <p:commandLink actionListener="#{transactorBean.openChildTransactor('CUSTOMER')}" value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}" style="text-decoration: none;"/>
-                    <h:outputLabel  value="#{langsys[transBean.transTypeObj.transactionRefLabel]}"/>
+                    <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeObj.transactionRefLabel)}"/>
                     <h:outputLabel id="olblDebtCredit" style="color: coral;font-weight: bold;" value="#{langsys['Receivable']}(#{generalUserSetting.LOCAL_CURRENCY.currencyCode})"/>
                     <h:outputLabel id="olblDeposit" style="color: green;font-weight: bold;" value="#{langsys['Deposit']}(#{trans.currencyCode})"/>
                     <h:outputLabel value=""/>
@@ -549,7 +549,7 @@
                     <h:panelGrid columns="2">
                         <p:outputLabel value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]} #{langsys['Representative']} (#{langsys['Attention']})"/>
                         <p:inputText id="itxtRep" value="#{trans.transactor_rep}" autocomplete="off" style="width: 220px;height: 25px;"/>
-                        <p:outputLabel value="#{langsys[transBean.transTypeObj.transactionNumberLabel]}"/>
+                        <p:outputLabel value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeObj.transactionNumberLabel)}"/>
                         <p:inputText id="itxtTransNo" value="#{trans.transactionNumber}" autocomplete="off" style="width: 220px;height: 25px;"/>
                         <p:outputLabel value="#{langsys['Terms']} #{langsys['and']} #{langsys['Conditions']}"/>
                         <h:inputTextarea styleClass="clsInput" id="itxaTermsConditions" rows="2" cols="26" value="#{trans.termsConditions}"/>
@@ -631,7 +631,7 @@
                     <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Balance']}"/>
                     <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Payment']} #{langsys['Method']}"/>
                     <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Receipt']} #{langsys['Account']}"/>
-                    <h:outputLabel  value="#{langsys[transBean.transTypeObj.transactionUserLabel]}"/>
+                    <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeObj.transactionUserLabel)}"/>
 
                     <h:inputText id="itxtAmountTendered" value="#{trans.amountTendered}" styleClass="clsInputTransItem" style="width: 220px;height: 24px;background-color: yellow;font-weight: bold;font-size: 20px;" autocomplete="off">
                         <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -753,7 +753,7 @@
                         <p:column headerText="#{langsys['Item']} #{langsys['Description']}" style="text-align: left;">
                             <p:commandButton value="#{itm.description}"  oncomplete="PF('sbarItemSearch').hide()" style="text-align: left;">
                                 <p:ajax listener="#{itemBean.setSelectedItem(itm)}" update="TransactionFormSales:gridTransItem"/>
-                                <p:ajax listener="#{itemBean.refreshItemUnitListSales()}" process="@this TransactionFormSales:menuUnit" update="TransactionFormSales:menuUnit"/>
+                                <p:ajax listener="#{itemBean.refreshItemUnitList(itemBean.selectedItem,transItem,1)}" process="@this TransactionFormSales:menuUnit" update="TransactionFormSales:menuUnit"/>
                                 <p:ajax listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentSaleType,trans,transItem,itemBean.selectedItem,1.0)}" process="@this TransactionFormSales:menuCurrency" update="TransactionFormSales:menuBatchno,TransactionFormSales:menuUnit,TransactionFormSales:itxtUnitPrice,TransactionFormSales:itxtQty,TransactionFormSales:itxtAmount,TransactionFormSales:gridItemStatus,TransactionFormSales:pgrdOverrideWarranty,TransactionFormSales:pgrdSpecific"/>
                                 <p:ajax listener="#{stockBean.refreshBatchList(generalUserSetting.getCurrentStore().getStoreId(),transItem.itemId)}" process="@this TransactionFormSales:menuCurrency TransactionFormSales:menuBatchno" update="TransactionFormSales:menuBatchno,TransactionFormSales:menuUnit,TransactionFormSales:itxtUnitPrice,TransactionFormSales:itxtQty,TransactionFormSales:itxtAmount,TransactionFormSales:gridItemStatus,TransactionFormSales:pgrdOverrideWarranty,TransactionFormSales:pgrdSpecific"/>
                             </p:commandButton>

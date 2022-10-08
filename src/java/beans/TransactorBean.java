@@ -532,68 +532,120 @@ public class TransactorBean implements Serializable {
                 transactor.setTransactorId(0);
             }
             try {
-                transactor.setTransactorType(rs.getString("transactor_type"));
+                if (null == rs.getString("transactor_type")) {
+                    transactor.setTransactorType("");
+                } else {
+                    transactor.setTransactorType(rs.getString("transactor_type"));
+                }
             } catch (NullPointerException npe) {
                 transactor.setTransactorType("");
             }
             try {
-                transactor.setTransactorNames(rs.getString("transactor_names"));
-            } catch (NullPointerException npe) {
+                if (null == rs.getString("transactor_names")) {
+                    transactor.setTransactorNames("");
+                } else {
+                    transactor.setTransactorNames(rs.getString("transactor_names"));
+                }
+            } catch (Exception e) {
                 transactor.setTransactorNames("");
             }
             try {
-                transactor.setPhone(rs.getString("phone"));
-            } catch (NullPointerException npe) {
+                if (null == rs.getString("phone")) {
+                    transactor.setPhone("");
+                } else {
+                    transactor.setPhone(rs.getString("phone"));
+                }
+            } catch (Exception e) {
                 transactor.setPhone("");
             }
             try {
-                transactor.setEmail(rs.getString("email"));
-            } catch (NullPointerException npe) {
+                if (null == rs.getString("email")) {
+                    transactor.setEmail("");
+                } else {
+                    transactor.setEmail(rs.getString("email"));
+                }
+            } catch (Exception e) {
                 transactor.setEmail("");
             }
             try {
-                transactor.setWebsite(rs.getString("website"));
-            } catch (NullPointerException npe) {
+                if (null == rs.getString("website")) {
+                    transactor.setWebsite("");
+                } else {
+                    transactor.setWebsite(rs.getString("website"));
+                }
+            } catch (Exception e) {
                 transactor.setWebsite("");
             }
             try {
-                transactor.setCpName(rs.getString("cpname"));
-            } catch (NullPointerException npe) {
+                if (null == rs.getString("cpname")) {
+                    transactor.setCpName("");
+                } else {
+                    transactor.setCpName(rs.getString("cpname"));
+                }
+            } catch (Exception e) {
                 transactor.setCpName("");
             }
             try {
-                transactor.setCpTitle(rs.getString("cptitle"));
-            } catch (NullPointerException npe) {
+                if (null == rs.getString("cptitle")) {
+                    transactor.setCpTitle("");
+                } else {
+                    transactor.setCpTitle(rs.getString("cptitle"));
+                }
+            } catch (Exception e) {
                 transactor.setCpTitle("");
             }
             try {
-                transactor.setCpPhone(rs.getString("cpphone"));
-            } catch (NullPointerException npe) {
+                if (null == rs.getString("cpphone")) {
+                    transactor.setCpPhone("");
+                } else {
+                    transactor.setCpPhone(rs.getString("cpphone"));
+                }
+            } catch (Exception e) {
                 transactor.setCpPhone("");
             }
             try {
-                transactor.setCpEmail(rs.getString("cpemail"));
-            } catch (NullPointerException npe) {
+                if (null == rs.getString("cpemail")) {
+                    transactor.setCpEmail("");
+                } else {
+                    transactor.setCpEmail(rs.getString("cpemail"));
+                }
+            } catch (Exception e) {
                 transactor.setCpEmail("");
             }
             try {
-                transactor.setPhysicalAddress(rs.getString("physical_address"));
-            } catch (NullPointerException npe) {
+                if (null == rs.getString("physical_address")) {
+                    transactor.setPhysicalAddress("");
+                } else {
+                    transactor.setPhysicalAddress(rs.getString("physical_address"));
+                }
+            } catch (Exception e) {
                 transactor.setPhysicalAddress("");
             }
             try {
-                transactor.setTaxIdentity(rs.getString("tax_identity"));
-            } catch (NullPointerException npe) {
+                if (null == rs.getString("tax_identity")) {
+                    transactor.setTaxIdentity("");
+                } else {
+                    transactor.setTaxIdentity(rs.getString("tax_identity"));
+                }
+            } catch (Exception e) {
                 transactor.setTaxIdentity("");
             }
             try {
-                transactor.setAccountDetails(rs.getString("account_details"));
-            } catch (NullPointerException npe) {
+                if (null == rs.getString("account_details")) {
+                    transactor.setAccountDetails("");
+                } else {
+                    transactor.setAccountDetails(rs.getString("account_details"));
+                }
+            } catch (Exception e) {
                 transactor.setAccountDetails("");
             }
             try {
-                transactor.setCardNumber(rs.getString("card_number"));
-            } catch (NullPointerException npe) {
+                if (null == rs.getString("card_number")) {
+                    transactor.setCardNumber("");
+                } else {
+                    transactor.setCardNumber(rs.getString("card_number"));
+                }
+            } catch (Exception e) {
                 transactor.setCardNumber("");
             }
             try {
@@ -602,43 +654,75 @@ public class TransactorBean implements Serializable {
                 transactor.setDOB(null);
             }
             try {
-                transactor.setIsSuspended(rs.getString("is_suspended"));
-            } catch (NullPointerException npe) {
+                if (null == rs.getString("is_suspended")) {
+                    transactor.setIsSuspended("");
+                } else {
+                    transactor.setIsSuspended(rs.getString("is_suspended"));
+                }
+            } catch (Exception e) {
                 transactor.setIsSuspended("");
             }
             try {
-                transactor.setSuspendedReason(rs.getString("suspended_reason"));
-            } catch (NullPointerException npe) {
+                if (null == rs.getString("suspended_reason")) {
+                    transactor.setSuspendedReason("");
+                } else {
+                    transactor.setSuspendedReason(rs.getString("suspended_reason"));
+                }
+            } catch (Exception e) {
                 transactor.setSuspendedReason("");
             }
             try {
-                transactor.setCategory(rs.getString("category"));
-            } catch (NullPointerException npe) {
+                if (null == rs.getString("category")) {
+                    transactor.setCategory("");
+                } else {
+                    transactor.setCategory(rs.getString("category"));
+                }
+            } catch (Exception e) {
                 transactor.setCategory("");
             }
             try {
-                transactor.setSex(rs.getString("sex"));
-            } catch (NullPointerException npe) {
+                if (null == rs.getString("sex")) {
+                    transactor.setSex("");
+                } else {
+                    transactor.setSex(rs.getString("sex"));
+                }
+            } catch (Exception e) {
                 transactor.setSex("");
             }
             try {
-                transactor.setOccupation(rs.getString("occupation"));
-            } catch (NullPointerException npe) {
+                if (null == rs.getString("occupation")) {
+                    transactor.setOccupation("");
+                } else {
+                    transactor.setOccupation(rs.getString("occupation"));
+                }
+            } catch (Exception e) {
                 transactor.setOccupation("");
             }
             try {
-                transactor.setLocCountry(rs.getString("loc_country"));
-            } catch (NullPointerException npe) {
+                if (null == rs.getString("loc_country")) {
+                    transactor.setLocCountry("");
+                } else {
+                    transactor.setLocCountry(rs.getString("loc_country"));
+                }
+            } catch (Exception e) {
                 transactor.setLocCountry("");
             }
             try {
-                transactor.setLocDistrict(rs.getString("loc_district"));
-            } catch (NullPointerException npe) {
+                if (null == rs.getString("loc_district")) {
+                    transactor.setLocDistrict("");
+                } else {
+                    transactor.setLocDistrict(rs.getString("loc_district"));
+                }
+            } catch (Exception e) {
                 transactor.setLocDistrict("");
             }
             try {
-                transactor.setLocTown(rs.getString("loc_town"));
-            } catch (NullPointerException npe) {
+                if (null == rs.getString("loc_town")) {
+                    transactor.setLocTown("");
+                } else {
+                    transactor.setLocTown(rs.getString("loc_town"));
+                }
+            } catch (Exception e) {
                 transactor.setLocTown("");
             }
             try {
@@ -648,18 +732,30 @@ public class TransactorBean implements Serializable {
             }
 
             try {
-                transactor.setFileReference(rs.getString("file_reference"));
-            } catch (NullPointerException npe) {
+                if (null == rs.getString("file_reference")) {
+                    transactor.setFileReference("");
+                } else {
+                    transactor.setFileReference(rs.getString("file_reference"));
+                }
+            } catch (Exception e) {
                 transactor.setFileReference("");
             }
             try {
-                transactor.setIdType(rs.getString("id_type"));
-            } catch (NullPointerException npe) {
+                if (null == rs.getString("id_type")) {
+                    transactor.setIdType("");
+                } else {
+                    transactor.setIdType(rs.getString("id_type"));
+                }
+            } catch (Exception e) {
                 transactor.setIdType("");
             }
             try {
-                transactor.setIdNumber(rs.getString("id_number"));
-            } catch (NullPointerException npe) {
+                if (null == rs.getString("id_number")) {
+                    transactor.setIdNumber("");
+                } else {
+                    transactor.setIdNumber(rs.getString("id_number"));
+                }
+            } catch (Exception e) {
                 transactor.setIdNumber("");
             }
             try {
@@ -668,18 +764,30 @@ public class TransactorBean implements Serializable {
                 transactor.setIdExpiryDate(null);
             }
             try {
-                transactor.setTransactorRef(rs.getString("transactor_ref"));
-            } catch (NullPointerException npe) {
+                if (null == rs.getString("transactor_ref")) {
+                    transactor.setTransactorRef("");
+                } else {
+                    transactor.setTransactorRef(rs.getString("transactor_ref"));
+                }
+            } catch (Exception e) {
                 transactor.setTransactorRef("");
             }
             try {
-                transactor.setTitle(rs.getString("title"));
-            } catch (NullPointerException npe) {
+                if (null == rs.getString("title")) {
+                    transactor.setTitle("");
+                } else {
+                    transactor.setTitle(rs.getString("title"));
+                }
+            } catch (Exception e) {
                 transactor.setTitle("");
             }
             try {
-                transactor.setPosition(rs.getString("position"));
-            } catch (NullPointerException npe) {
+                if (null == rs.getString("position")) {
+                    transactor.setPosition("");
+                } else {
+                    transactor.setPosition(rs.getString("position"));
+                }
+            } catch (Exception e) {
                 transactor.setPosition("");
             }
             try {
@@ -708,7 +816,11 @@ public class TransactorBean implements Serializable {
                 transactor.setCredit_limit(0);
             }
             try {
-                transactor.setTrade_name(rs.getString("trade_name"));
+                if (null == rs.getString("trade_name")) {
+                    transactor.setTrade_name("");
+                } else {
+                    transactor.setTrade_name(rs.getString("trade_name"));
+                }
             } catch (Exception e) {
                 transactor.setTrade_name("");
             }
@@ -719,6 +831,311 @@ public class TransactorBean implements Serializable {
     }
 
     public void setTransactorFromResultSet(Transactor transactor, ResultSet rs) {
+        try {
+            try {
+                transactor.setTransactorId(rs.getLong("transactor_id"));
+            } catch (NullPointerException npe) {
+                transactor.setTransactorId(0);
+            }
+            try {
+                if (null == rs.getString("transactor_type")) {
+                    transactor.setTransactorType("");
+                } else {
+                    transactor.setTransactorType(rs.getString("transactor_type"));
+                }
+            } catch (NullPointerException npe) {
+                transactor.setTransactorType("");
+            }
+            try {
+                if (null == rs.getString("transactor_names")) {
+                    transactor.setTransactorNames("");
+                } else {
+                    transactor.setTransactorNames(rs.getString("transactor_names"));
+                }
+            } catch (Exception e) {
+                transactor.setTransactorNames("");
+            }
+            try {
+                if (null == rs.getString("phone")) {
+                    transactor.setPhone("");
+                } else {
+                    transactor.setPhone(rs.getString("phone"));
+                }
+            } catch (Exception e) {
+                transactor.setPhone("");
+            }
+            try {
+                if (null == rs.getString("email")) {
+                    transactor.setEmail("");
+                } else {
+                    transactor.setEmail(rs.getString("email"));
+                }
+            } catch (Exception e) {
+                transactor.setEmail("");
+            }
+            try {
+                if (null == rs.getString("website")) {
+                    transactor.setWebsite("");
+                } else {
+                    transactor.setWebsite(rs.getString("website"));
+                }
+            } catch (Exception e) {
+                transactor.setWebsite("");
+            }
+            try {
+                if (null == rs.getString("cpname")) {
+                    transactor.setCpName("");
+                } else {
+                    transactor.setCpName(rs.getString("cpname"));
+                }
+            } catch (Exception e) {
+                transactor.setCpName("");
+            }
+            try {
+                if (null == rs.getString("cptitle")) {
+                    transactor.setCpTitle("");
+                } else {
+                    transactor.setCpTitle(rs.getString("cptitle"));
+                }
+            } catch (Exception e) {
+                transactor.setCpTitle("");
+            }
+            try {
+                if (null == rs.getString("cpphone")) {
+                    transactor.setCpPhone("");
+                } else {
+                    transactor.setCpPhone(rs.getString("cpphone"));
+                }
+            } catch (Exception e) {
+                transactor.setCpPhone("");
+            }
+            try {
+                if (null == rs.getString("cpemail")) {
+                    transactor.setCpEmail("");
+                } else {
+                    transactor.setCpEmail(rs.getString("cpemail"));
+                }
+            } catch (Exception e) {
+                transactor.setCpEmail("");
+            }
+            try {
+                if (null == rs.getString("physical_address")) {
+                    transactor.setPhysicalAddress("");
+                } else {
+                    transactor.setPhysicalAddress(rs.getString("physical_address"));
+                }
+            } catch (Exception e) {
+                transactor.setPhysicalAddress("");
+            }
+            try {
+                if (null == rs.getString("tax_identity")) {
+                    transactor.setTaxIdentity("");
+                } else {
+                    transactor.setTaxIdentity(rs.getString("tax_identity"));
+                }
+            } catch (Exception e) {
+                transactor.setTaxIdentity("");
+            }
+            try {
+                if (null == rs.getString("account_details")) {
+                    transactor.setAccountDetails("");
+                } else {
+                    transactor.setAccountDetails(rs.getString("account_details"));
+                }
+            } catch (Exception e) {
+                transactor.setAccountDetails("");
+            }
+            try {
+                if (null == rs.getString("card_number")) {
+                    transactor.setCardNumber("");
+                } else {
+                    transactor.setCardNumber(rs.getString("card_number"));
+                }
+            } catch (Exception e) {
+                transactor.setCardNumber("");
+            }
+            try {
+                transactor.setDOB(new Date(rs.getDate("dob").getTime()));
+            } catch (NullPointerException npe) {
+                transactor.setDOB(null);
+            }
+            try {
+                if (null == rs.getString("is_suspended")) {
+                    transactor.setIsSuspended("");
+                } else {
+                    transactor.setIsSuspended(rs.getString("is_suspended"));
+                }
+            } catch (Exception e) {
+                transactor.setIsSuspended("");
+            }
+            try {
+                if (null == rs.getString("suspended_reason")) {
+                    transactor.setSuspendedReason("");
+                } else {
+                    transactor.setSuspendedReason(rs.getString("suspended_reason"));
+                }
+            } catch (Exception e) {
+                transactor.setSuspendedReason("");
+            }
+            try {
+                if (null == rs.getString("category")) {
+                    transactor.setCategory("");
+                } else {
+                    transactor.setCategory(rs.getString("category"));
+                }
+            } catch (Exception e) {
+                transactor.setCategory("");
+            }
+            try {
+                if (null == rs.getString("sex")) {
+                    transactor.setSex("");
+                } else {
+                    transactor.setSex(rs.getString("sex"));
+                }
+            } catch (Exception e) {
+                transactor.setSex("");
+            }
+            try {
+                if (null == rs.getString("occupation")) {
+                    transactor.setOccupation("");
+                } else {
+                    transactor.setOccupation(rs.getString("occupation"));
+                }
+            } catch (Exception e) {
+                transactor.setOccupation("");
+            }
+            try {
+                if (null == rs.getString("loc_country")) {
+                    transactor.setLocCountry("");
+                } else {
+                    transactor.setLocCountry(rs.getString("loc_country"));
+                }
+            } catch (Exception e) {
+                transactor.setLocCountry("");
+            }
+            try {
+                if (null == rs.getString("loc_district")) {
+                    transactor.setLocDistrict("");
+                } else {
+                    transactor.setLocDistrict(rs.getString("loc_district"));
+                }
+            } catch (Exception e) {
+                transactor.setLocDistrict("");
+            }
+            try {
+                if (null == rs.getString("loc_town")) {
+                    transactor.setLocTown("");
+                } else {
+                    transactor.setLocTown(rs.getString("loc_town"));
+                }
+            } catch (Exception e) {
+                transactor.setLocTown("");
+            }
+            try {
+                transactor.setFirstDate(new Date(rs.getDate("first_date").getTime()));
+            } catch (NullPointerException npe) {
+                transactor.setFirstDate(null);
+            }
+
+            try {
+                if (null == rs.getString("file_reference")) {
+                    transactor.setFileReference("");
+                } else {
+                    transactor.setFileReference(rs.getString("file_reference"));
+                }
+            } catch (Exception e) {
+                transactor.setFileReference("");
+            }
+            try {
+                if (null == rs.getString("id_type")) {
+                    transactor.setIdType("");
+                } else {
+                    transactor.setIdType(rs.getString("id_type"));
+                }
+            } catch (Exception e) {
+                transactor.setIdType("");
+            }
+            try {
+                if (null == rs.getString("id_number")) {
+                    transactor.setIdNumber("");
+                } else {
+                    transactor.setIdNumber(rs.getString("id_number"));
+                }
+            } catch (Exception e) {
+                transactor.setIdNumber("");
+            }
+            try {
+                transactor.setIdExpiryDate(new Date(rs.getDate("id_expiry_date").getTime()));
+            } catch (NullPointerException npe) {
+                transactor.setIdExpiryDate(null);
+            }
+            try {
+                if (null == rs.getString("transactor_ref")) {
+                    transactor.setTransactorRef("");
+                } else {
+                    transactor.setTransactorRef(rs.getString("transactor_ref"));
+                }
+            } catch (Exception e) {
+                transactor.setTransactorRef("");
+            }
+            try {
+                if (null == rs.getString("title")) {
+                    transactor.setTitle("");
+                } else {
+                    transactor.setTitle(rs.getString("title"));
+                }
+            } catch (Exception e) {
+                transactor.setTitle("");
+            }
+            try {
+                if (null == rs.getString("position")) {
+                    transactor.setPosition("");
+                } else {
+                    transactor.setPosition(rs.getString("position"));
+                }
+            } catch (Exception e) {
+                transactor.setPosition("");
+            }
+            try {
+                transactor.setMonthGrossPay(rs.getDouble("month_gross_pay"));
+            } catch (NullPointerException npe) {
+                transactor.setMonthGrossPay(0);
+            }
+            try {
+                transactor.setMonthNetPay(rs.getDouble("month_net_pay"));
+            } catch (NullPointerException npe) {
+                transactor.setMonthNetPay(0);
+            }
+            try {
+                transactor.setTransactor_segment_id(rs.getInt("transactor_segment_id"));
+            } catch (NullPointerException npe) {
+                transactor.setTransactor_segment_id(0);
+            }
+            try {
+                transactor.setIs_credit_limit(rs.getInt("is_credit_limit"));
+            } catch (Exception e) {
+                transactor.setIs_credit_limit(0);
+            }
+            try {
+                transactor.setCredit_limit(rs.getDouble("credit_limit"));
+            } catch (Exception e) {
+                transactor.setCredit_limit(0);
+            }
+            try {
+                if (null == rs.getString("trade_name")) {
+                    transactor.setTrade_name("");
+                } else {
+                    transactor.setTrade_name(rs.getString("trade_name"));
+                }
+            } catch (Exception e) {
+                transactor.setTrade_name("");
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void setTransactorFromResultSet_del(Transactor transactor, ResultSet rs) {
         try {
             //Transactor transactor = new Transactor();
             try {

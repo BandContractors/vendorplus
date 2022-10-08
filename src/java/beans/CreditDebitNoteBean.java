@@ -4,11 +4,14 @@ import connections.DBConnection;
 import entities.CompanySetting;
 import entities.GroupRight;
 import entities.Pay;
+import entities.Stock;
 import entities.Store;
 import entities.Trans;
 import entities.TransItem;
 import entities.TransactionReason;
 import entities.TransactionType;
+import entities.Transaction_item_cr_dr_note_unit;
+import entities.Transaction_item_unit;
 import entities.Transactor;
 import entities.UserDetail;
 import java.io.Serializable;
@@ -164,13 +167,15 @@ public class CreditDebitNoteBean implements Serializable {
             for (int i = 0; i < aNewTransItems.size(); i++) {
                 //check if item has changed
                 TransItem NewTransItem = aNewTransItems.get(i);
-                TransItem OldTransItem = tib.itemExistsObj(aOldTransItems, NewTransItem.getItemId(), NewTransItem.getBatchno(), NewTransItem.getCodeSpecific(), NewTransItem.getDescSpecific());
+                TransItem OldTransItem = tib.itemExistsObj(aOldTransItems, NewTransItem.getItemId(), NewTransItem.getBatchno(), NewTransItem.getCodeSpecific(), NewTransItem.getDescSpecific(), NewTransItem.getUnit_id());
                 Double ChangedQty = NewTransItem.getItemQty() - OldTransItem.getItemQty();//can be + or -
+                Double ChangedQtyBase = NewTransItem.getBase_unit_qty() - OldTransItem.getBase_unit_qty();
                 if (ChangedQty != 0) {
                     TransItem CreditDebitTransItem = new TransItem();
                     tib.copyObjectTransItem(NewTransItem, CreditDebitTransItem);//From,To
                     CreditDebitTransItem.setTransactionItemId(0);
                     CreditDebitTransItem.setItemQty(ChangedQty);
+                    CreditDebitTransItem.setBase_unit_qty(ChangedQtyBase);
                     //These remain unchanged, values in the new object will be taken
                     //UnitPrice,UnitTradeDiscount,UnitVat,UnitPriceIncVat,UnitPriceExcVat,UnitCostPrice,UnitProfitMargin
                     //EarnPerc,Qty_balance,Qty_damage,Duration_value,Duration_passed,earn_amount
@@ -478,7 +483,7 @@ public class CreditDebitNoteBean implements Serializable {
     public void saveTransItem_cr_dr_note(int aStoreId, int aTransTypeId, int aTransReasonId, Trans aTrans, TransItem transitem) {
         String sql = null;
         if (transitem.getTransactionItemId() == 0) {
-            sql = "{call sp_insert_transaction_item_cr_dr_note(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+            sql = "{call sp_insert_transaction_item_cr_dr_note(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         } else if (transitem.getTransactionItemId() > 0) {
             sql = "{call sp_update_transaction_item_cr_dr_note(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         }
@@ -619,8 +624,21 @@ public class CreditDebitNoteBean implements Serializable {
                 } catch (NullPointerException npe) {
                     cs.setDouble("in_specific_size", 1);
                 }
+                cs.registerOutParameter("out_transaction_item_id", VARCHAR);
                 //save
                 cs.executeUpdate();
+                long InsertedId1 = cs.getLong("out_transaction_item_id");
+                try {
+                    if (InsertedId1 > 0) {
+                        Transaction_item_cr_dr_note_unit tiu = new Transaction_item_cr_dr_note_unit();
+                        tiu.setTransaction_item_id(InsertedId1);
+                        tiu.setUnit_id(transitem.getUnit_id());
+                        tiu.setBase_unit_qty(transitem.getBase_unit_qty());
+                        new TransItemExtBean().insertTransaction_item_cr_dr_note_unit(tiu);
+                    }
+                } catch (Exception e) {
+                    LOGGER.log(Level.ERROR, e);
+                }
             } else if (transitem.getTransactionItemId() > 0) {
                 //do nothing; this is for edit
             }
@@ -649,6 +667,28 @@ public class CreditDebitNoteBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
         return tis;
+    }
+
+    public TransItem getTransItem_cr_dr_note(long aTransactionItemId) {
+        TransItem ti = null;
+        String sql;
+        sql = "{call sp_search_transaction_item_cr_dr_note(?)}";
+        ResultSet rs = null;
+        List<TransItem> tis = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aTransactionItemId);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                ti = new TransItemBean().getTransItemFromResultSet(rs);
+                new TransItemBean().updateLookUpsUI(ti);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return ti;
     }
 
     public int getCountDebitAndCreditNotes(String aTransactionNumber) {
@@ -1079,6 +1119,155 @@ public class CreditDebitNoteBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
         return Found;
+    }
+
+    public boolean stockAdjustCrDrNote(long aCrDrNoteTransId) {
+        try {
+            Trans trans = this.getTrans_cr_dr_note(aCrDrNoteTransId);
+            List<TransItem> transItemList = this.getTransItemsByTransactionId_cr_dr_note(aCrDrNoteTransId);
+            int i = 0;
+            int n = 0;
+            int nSuccess = 0;
+            try {
+                n = transItemList.size();
+            } catch (Exception e) {
+                //
+            }
+            while (i < n) {
+                int success = this.stockAdjustCrDrNote(trans, transItemList.get(i));
+                nSuccess = nSuccess + success;
+                i = i + 1;
+            }
+            if (nSuccess == n) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+            return false;
+        }
+    }
+
+    public int stockAdjustCrDrNote(Trans aTransCrDr, TransItem aTransItemCrDr) {
+        int success = 0;
+        try {
+            if (new ItemBean().getItem(aTransItemCrDr.getItemId()).getIsTrack() == 0) {
+                success = 1;
+            } else {
+                String sql = null;
+                String sql2 = null;
+                StockBean StkBean = new StockBean();
+                Stock Stk = new Stock();
+                Stk = StkBean.getStock(aTransCrDr.getStoreId(), aTransItemCrDr.getItemId(), aTransItemCrDr.getBatchno(), aTransItemCrDr.getCodeSpecific(), aTransItemCrDr.getDescSpecific());
+                double UnitCostPrice = 0;
+                //Credit Note:add(+) stock
+                if (aTransItemCrDr.getItemQty() < 0) {
+                    if (Stk != null) {
+                        //update
+                        Stock stock = new Stock();
+                        int i = 0;
+                        stock.setStoreId(aTransCrDr.getStoreId());
+                        stock.setItemId(aTransItemCrDr.getItemId());
+                        stock.setBatchno(aTransItemCrDr.getBatchno());
+                        stock.setCodeSpecific(aTransItemCrDr.getCodeSpecific());
+                        stock.setDescSpecific(aTransItemCrDr.getDescSpecific());
+                        UnitCostPrice = aTransItemCrDr.getUnitCostPrice();
+                        stock.setUnitCost(UnitCostPrice);
+                        i = new StockBean().addStock(stock, (-1) * aTransItemCrDr.getBase_unit_qty());
+                        stock.setSpecific_size(aTransItemCrDr.getSpecific_size());
+                        String TableName = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
+                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, (-1) * aTransItemCrDr.getItemQty(), "Add", aTransCrDr.getTransactionTypeId(), aTransCrDr.getTransactionId(), aTransCrDr.getAddUserDetailId(), aTransItemCrDr.getTransactionItemId());
+                    } else {
+                        //insert
+                        Stock stock = new Stock();
+                        int i = 0;
+                        stock.setStoreId(aTransCrDr.getStoreId());
+                        stock.setItemId(aTransItemCrDr.getItemId());
+                        stock.setBatchno(aTransItemCrDr.getBatchno());
+                        stock.setCodeSpecific(aTransItemCrDr.getCodeSpecific());
+                        stock.setDescSpecific(aTransItemCrDr.getDescSpecific());
+                        stock.setDescMore(aTransItemCrDr.getDescMore());
+                        stock.setCurrentqty((-1) * aTransItemCrDr.getBase_unit_qty());
+                        stock.setItemMnfDate(aTransItemCrDr.getItemMnfDate());
+                        stock.setItemExpDate(aTransItemCrDr.getItemExpryDate());
+                        UnitCostPrice = aTransItemCrDr.getUnitCostPrice();
+                        stock.setUnitCost(UnitCostPrice);
+                        stock.setWarrantyDesc(aTransItemCrDr.getWarrantyDesc());
+                        stock.setWarrantyExpiryDate(aTransItemCrDr.getWarrantyExpiryDate());
+                        stock.setPurchaseDate(aTransItemCrDr.getPurchaseDate());
+                        stock.setDepStartDate(aTransItemCrDr.getDepStartDate());
+                        stock.setDepMethodId(aTransItemCrDr.getDepMethodId());
+                        stock.setDepRate(aTransItemCrDr.getDepRate());
+                        stock.setAverageMethodId(aTransItemCrDr.getAverageMethodId());
+                        stock.setEffectiveLife(aTransItemCrDr.getEffectiveLife());
+                        stock.setAccountCode(aTransItemCrDr.getAccountCode());
+                        stock.setResidualValue(aTransItemCrDr.getResidualValue());
+                        stock.setAssetStatusId(1);
+                        stock.setAssetStatusDesc("");
+                        stock.setSpecific_size(aTransItemCrDr.getSpecific_size());
+                        i = new StockBean().saveStock(stock);
+                        String TableName = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
+                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, (-1) * aTransItemCrDr.getItemQty(), "Add", aTransCrDr.getTransactionTypeId(), aTransCrDr.getTransactionId(), aTransCrDr.getAddUserDetailId(), aTransItemCrDr.getTransactionItemId());
+                    }
+                    //Debit Note:subtract(-) stock
+                } else if (aTransItemCrDr.getItemQty() > 0) {
+                    if (Stk != null) {
+                        //update
+                        Stock stock = new Stock();
+                        int i = 0;
+                        stock.setStoreId(aTransCrDr.getStoreId());
+                        stock.setItemId(aTransItemCrDr.getItemId());
+                        stock.setBatchno(aTransItemCrDr.getBatchno());
+                        stock.setCodeSpecific(aTransItemCrDr.getCodeSpecific());
+                        stock.setDescSpecific(aTransItemCrDr.getDescSpecific());
+                        UnitCostPrice = aTransItemCrDr.getUnitCostPrice();
+                        stock.setUnitCost(UnitCostPrice);
+                        i = new StockBean().subtractStock(stock, aTransItemCrDr.getBase_unit_qty());
+                        stock.setSpecific_size(aTransItemCrDr.getSpecific_size());
+                        String TableName = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
+                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Subtract", stock, aTransItemCrDr.getItemQty(), "Add", aTransCrDr.getTransactionTypeId(), aTransCrDr.getTransactionId(), aTransCrDr.getAddUserDetailId(), aTransItemCrDr.getTransactionItemId());
+                    } else {
+                        //insert
+                        Stock stock = new Stock();
+                        int i = 0;
+                        stock.setStoreId(aTransCrDr.getStoreId());
+                        stock.setItemId(aTransItemCrDr.getItemId());
+                        stock.setBatchno(aTransItemCrDr.getBatchno());
+                        stock.setCodeSpecific(aTransItemCrDr.getCodeSpecific());
+                        stock.setDescSpecific(aTransItemCrDr.getDescSpecific());
+                        stock.setDescMore(aTransItemCrDr.getDescMore());
+                        stock.setCurrentqty((-1) * aTransItemCrDr.getBase_unit_qty());
+                        stock.setItemMnfDate(aTransItemCrDr.getItemMnfDate());
+                        stock.setItemExpDate(aTransItemCrDr.getItemExpryDate());
+                        UnitCostPrice = aTransItemCrDr.getUnitCostPrice();
+                        stock.setUnitCost(UnitCostPrice);
+                        stock.setWarrantyDesc(aTransItemCrDr.getWarrantyDesc());
+                        stock.setWarrantyExpiryDate(aTransItemCrDr.getWarrantyExpiryDate());
+                        stock.setPurchaseDate(aTransItemCrDr.getPurchaseDate());
+                        stock.setDepStartDate(aTransItemCrDr.getDepStartDate());
+                        stock.setDepMethodId(aTransItemCrDr.getDepMethodId());
+                        stock.setDepRate(aTransItemCrDr.getDepRate());
+                        stock.setAverageMethodId(aTransItemCrDr.getAverageMethodId());
+                        stock.setEffectiveLife(aTransItemCrDr.getEffectiveLife());
+                        stock.setAccountCode(aTransItemCrDr.getAccountCode());
+                        stock.setResidualValue(aTransItemCrDr.getResidualValue());
+                        stock.setAssetStatusId(1);
+                        stock.setAssetStatusDesc("");
+                        stock.setSpecific_size(aTransItemCrDr.getSpecific_size());
+                        i = new StockBean().saveStock(stock);
+                        String TableName = new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
+                        new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, (-1) * aTransItemCrDr.getItemQty(), "Add", aTransCrDr.getTransactionTypeId(), aTransCrDr.getTransactionId(), aTransCrDr.getAddUserDetailId(), aTransItemCrDr.getTransactionItemId());
+                    }
+                }
+                StkBean = null;
+                Stk = null;
+                success = 1;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return success;
     }
 
     /**

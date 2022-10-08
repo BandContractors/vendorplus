@@ -8,34 +8,31 @@
         <title>Item Received Price History</title>
         <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <f:loadBundle basename="#{menuItemBean.menuItemObj.LANG_BASE_NAME_SYS}" var="langsys" />
     </h:head>
     <h:body>
         <h:form id="formReport">
             <p:dataTable tableStyle="width:auto;" id="tblTransactionItem" var="rts" value="#{transItemBean.transItems}" 
                          >
-                <p:column headerText="Cur">
-                    <h:outputText value="#{transBean.getTrans(rts.transactionId).currencyCode}"/>
-                </p:column>
-                <p:column headerText="Unit.Cost.Price">
+                <p:column headerText="#{langsys['Unit']} #{langsys['Cost']} #{langsys['Price']}">
                     <h:outputText value="#{rts.unitCostPrice}">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Qty">
+                <p:column headerText="#{langsys['Qty']}">
                     <h:outputText value="#{rts.itemQty}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['Unit']}">
+                    <h:outputText value="#{rts.unitSymbol}"/>
                 </p:column>
                 <p:column headerText="#{menuItemBean.menuItemObj.SUPPLIER_NAME}">
                     <h:outputText value="#{transactorBean.getTransactor(transBean.getTrans(rts.transactionId).transactorId).transactorNames}">
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Date">
+                <p:column headerText="#{langsys['Date']}">
                     <h:outputText value="#{utilityBean.formatDate(transBean.getTrans(rts.transactionId).transactionDate)}"/>
-                </p:column>
-                <p:column headerText="Ref">
-                    <h:outputText value="#{transBean.getTrans(rts.transactionId).transactionRef}">
-                    </h:outputText>
                 </p:column>
             </p:dataTable>
         </h:form>
