@@ -308,6 +308,8 @@ public class ItemMapBean implements Serializable {
                 itemmap.setPosition(rs.getInt("position"));
                 itemmap.setMapGroupId(rs.getLong("map_group_id"));
                 this.SelectedMapGroupId = rs.getLong("map_group_id");
+                this.changeItemMap("Big", itemmap, new ItemBean().getItem(itemmap.getBigItemId()));
+                this.changeItemMap("Small", itemmap, new ItemBean().getItem(itemmap.getSmallItemId()));
                 ItemMaps.add(itemmap);
             }
         } catch (Exception e) {
@@ -438,6 +440,22 @@ public class ItemMapBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
         return records;
+    }
+
+    public void changeItemMap(String aFlag, ItemMap aItemMap, Item aSelectedItem) {
+        try {
+            if (null != aItemMap && null != aSelectedItem) {
+                if (aFlag.equals("Big")) {
+                    aItemMap.setBigItemId(aSelectedItem.getItemId());
+                    aItemMap.setBigUnitSymbol(new UnitBean().getUnit(aSelectedItem.getUnitId()).getUnitSymbol());
+                } else if (aFlag.equals("Small")) {
+                    aItemMap.setSmallItemId(aSelectedItem.getItemId());
+                    aItemMap.setSmallUnitSymbol(new UnitBean().getUnit(aSelectedItem.getUnitId()).getUnitSymbol());
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
     }
 
     /**

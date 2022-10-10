@@ -10,16 +10,11 @@ import api_tax.efris.EFRIS_invoice_detail;
 import api_tax.efris.innerclasses.T106;
 import beans.AccChildAccountBean;
 import beans.AccCurrencyBean;
-import beans.CreditDebitNoteBean;
 import beans.MenuItemBean;
 import beans.OutputDetailBean;
 import beans.Parameter_listBean;
-import beans.PayBean;
-import beans.ReportBean;
 import beans.StoreBean;
-import beans.TransBean;
 import beans.TransExtBean;
-import beans.TransItemBean;
 import beans.TransactorBean;
 import beans.UserDetailBean;
 import connections.DBConnection;
@@ -36,7 +31,6 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -45,11 +39,8 @@ import java.util.List;
 import java.util.Locale;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import utilities.UtilityBean;
@@ -138,9 +129,8 @@ public class EFRIS_invoice_detailBean implements Serializable {
                 status = "Device Number not mapped to any store";
             } //else if (!new StoreBean().getStoresByUser(aUserDetail.getUserDetailId()).contains(store) && aUserDetail.getIsUserGenAdmin().equals("No")) {
             //    status = "Operator/User has no access to the store mapped to the device number";
-            //} 
-            else if (new AccChildAccountBean().getAccChildAccountsForCashReceipt(currency.getCurrencyCode(), payMethodId, store.getStoreId(), aUserDetail.getUserDetailId()).get(0) == null) {
-                status = "Operator/User does not have a child account";
+            else if (new AccChildAccountBean().getAccChildAccountsForCashReceipt(currency.getCurrencyCode(), payMethodId, store.getStoreId(), aUserDetail.getUserDetailId()) == null) {
+                status = "Operator/User does not have a child account or child account is inactive";
             } else if (!itemValidationMsg.equals("success")) {
                 status = itemValidationMsg;
             } else {

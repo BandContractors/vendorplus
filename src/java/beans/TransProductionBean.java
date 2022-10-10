@@ -262,17 +262,17 @@ public class TransProductionBean implements Serializable {
                     transprod = new TransProduction();
                     try {
                         transprod.setOutputItemId(rs.getLong("item_id"));
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         transprod.setOutputItemId(0);
                     }
                     try {
                         transprod.setOrderedQty(rs.getDouble("item_qty"));
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         transprod.setOrderedQty(0);
                     }
                     try {
                         transprod.setOutputQty(rs.getDouble("qty_produced"));
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         transprod.setOutputQty(0);
                     }
                     Item outputItem = new Item();
@@ -306,31 +306,36 @@ public class TransProductionBean implements Serializable {
     }
 
     public void setItemForProduction(TransProduction aTransProduction, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aTrans, TransItem aTransItemToUpdate, Item aItem) {
-        if (null == aItem) {
-            aItem = new Item();
+        try {
+            if (null == aItem) {
+                aItem = new Item();
+            }
+            new ItemBean().setItem(aTransProduction.getOutputItemId(), aItem);
+            double qty4prod = aTransProduction.getOrderedQty() - aTransProduction.getOutputQty();
+            if (qty4prod < 0) {
+                qty4prod = 0;
+            }
+            new TransItemBean().updateModelTransItemCEC(aStoreId, aTransTypeId, aTransReasonId, aSaleType, aTrans, aTransItemToUpdate, aItem, qty4prod);
+            // to differentiate product from order and that not from order
+            aTransItemToUpdate.setTransactionItemId(1);
+            aTransItemToUpdate.setDescription(aTransProduction.getOutputItemName());
+            aTransItemToUpdate.setBatchno(aTransProduction.getBatchno());
+            aTransItemToUpdate.setDescSpecific(aTransProduction.getDescSpecific());
+            aTransItemToUpdate.setCodeSpecific(aTransProduction.getCodeSpecific());
+            aTransItemToUpdate.setDescMore(aTransProduction.getDescMore());
+            aTransItemToUpdate.setIs_general(aItem.getIsGeneral());
+            aTransItemToUpdate.setSpecific_size(aTransProduction.getSpecific_size());
+            aTransItemToUpdate.setUnit_id(aTransProduction.getUnit_id());
+            aTransItemToUpdate.setBase_unit_qty(aTransProduction.getBase_unit_qty());
+            aTransItemToUpdate.setUnitSymbol(new UnitBean().getUnit(aTransProduction.getUnit_id()).getUnitSymbol());
+            double pcs4prod = 0;
+            if (aTransItemToUpdate.getSpecific_size() > 0) {
+                pcs4prod = aTransItemToUpdate.getItemQty() / aTransItemToUpdate.getSpecific_size();
+            }
+            aTransItemToUpdate.setSpecific_size_qty(pcs4prod);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
-        new ItemBean().setItem(aTransProduction.getOutputItemId(), aItem);
-        double qty4prod = aTransProduction.getOrderedQty() - aTransProduction.getOutputQty();
-        if (qty4prod < 0) {
-            qty4prod = 0;
-        }
-        new TransItemBean().updateModelTransItemCEC(aStoreId, aTransTypeId, aTransReasonId, aSaleType, aTrans, aTransItemToUpdate, aItem, qty4prod);
-        // to differentiate product from order and that not from order
-        aTransItemToUpdate.setTransactionItemId(1);
-        aTransItemToUpdate.setDescription(aTransProduction.getOutputItemName());
-        aTransItemToUpdate.setBatchno(aTransProduction.getBatchno());
-        aTransItemToUpdate.setDescSpecific(aTransProduction.getDescSpecific());
-        aTransItemToUpdate.setCodeSpecific(aTransProduction.getCodeSpecific());
-        aTransItemToUpdate.setDescMore(aTransProduction.getDescMore());
-        aTransItemToUpdate.setIs_general(aItem.getIsGeneral());
-        aTransItemToUpdate.setSpecific_size(aTransProduction.getSpecific_size());
-        aTransItemToUpdate.setUnit_id(aTransProduction.getUnit_id());
-        aTransItemToUpdate.setBase_unit_qty(aTransProduction.getBase_unit_qty());
-        double pcs4prod = 0;
-        if (aTransItemToUpdate.getSpecific_size() > 0) {
-            pcs4prod = aTransItemToUpdate.getItemQty() / aTransItemToUpdate.getSpecific_size();
-        }
-        aTransItemToUpdate.setSpecific_size_qty(pcs4prod);
     }
 
     public double getQtyOrded(int aTransTypeId, long aTransactorId, String aTransactionNumber, long aItemId, String aBatchno, String aCodeSpe, String aDescSpe) {
@@ -374,14 +379,16 @@ public class TransProductionBean implements Serializable {
         return trans;
     }
 
-    public TransItem getTransItemOrded(int aTransTypeId, long aTransactorId, String aTransactionNumber, long aItemId, String aBatchno, String aCodeSpe, String aDescSpe) {
+    public TransItem getTransItemOrded(int aTransTypeId, long aTransactorId, String aTransactionNumber, long aItemId, String aBatchno, String aCodeSpe, String aDescSpe, int aUnit_id) {
         double qty = 0;
         String sql = "";
         ResultSet rs = null;
         TransItem transItem = null;
-        sql = "SELECT ti.* FROM transaction_item ti "
+        sql = "SELECT ti.*,tiu.unit_id,tiu.base_unit_qty FROM transaction_item ti "
                 + "INNER JOIN transaction t ON ti.transaction_id=t.transaction_id "
-                + "WHERE transaction_type_id=" + aTransTypeId + " AND t.transactor_id=" + aTransactorId + " AND t.transaction_number='" + aTransactionNumber + "' AND ti.batchno='" + aBatchno + "' AND ti.code_specific='" + aCodeSpe + "' AND ti.desc_specific='" + aDescSpe + "'";
+                + "INNER JOIN transaction_item_unit tiu ON ti.transaction_item_id=tiu.transaction_item_id "
+                + "WHERE t.transaction_type_id=" + aTransTypeId + " AND t.transactor_id=" + aTransactorId + " AND t.transaction_number='" + aTransactionNumber
+                + "' AND ti.batchno='" + aBatchno + "' AND ti.code_specific='" + aCodeSpe + "' AND ti.desc_specific='" + aDescSpe + "' AND tiu.unit_id=" + aUnit_id;
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -620,12 +627,16 @@ public class TransProductionBean implements Serializable {
     }
 
     public void updateUnitCostProduction(TransItem aTransItem, int aStoreId) {
-        if (new Parameter_listBean().getParameter_listByContextNameMemory("PRODUCTION", "CALC_OUTPUT_UNIT_COST_FROM_INPUT").getParameter_value().equals("1")) {
-            double costprice = 0;
-            costprice = this.getTotalUnitCostRawMaterials(aStoreId);
-            aTransItem.setUnitCostPrice(costprice);
-        } else {
-            this.updateUnitCostProductionFromOutput(aTransItem, aStoreId);
+        try {
+            if (this.getItmCombinationList().size() > 0 && new Parameter_listBean().getParameter_listByContextNameMemory("PRODUCTION", "CALC_OUTPUT_UNIT_COST_FROM_INPUT").getParameter_value().equals("1")) {
+                double costprice = 0;
+                costprice = this.getTotalUnitCostRawMaterials(aStoreId);
+                aTransItem.setUnitCostPrice(costprice);
+            } else {
+                this.updateUnitCostProductionFromOutput(aTransItem, aStoreId);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
@@ -646,6 +657,8 @@ public class TransProductionBean implements Serializable {
             for (ItemProductionMap obj : aItemProductionMapList) {
                 obj.setInputQtyTotal(aTransItem.getItemQty() * obj.getInputQty());
                 obj.setInputQtyBalance(obj.getInputQtyCurrent() - obj.getInputQtyTotal());
+                double BaseQty = new ItemBean().getBaseUnitQty(obj.getInputItemId(), obj.getInput_unit_id(), obj.getInputQtyTotal());
+                obj.setInputQtyTotalBaseUnit(BaseQty);
             }
         } catch (Exception e) {
             //do nothing
@@ -872,7 +885,9 @@ public class TransProductionBean implements Serializable {
             msg = "Select Item to Add";
         } else if (aItemProductionMap.getInputQty() <= 0) {
             msg = "Check Raw Material Item Qty";
-        } else if (this.itemExists(this.getItmCombinationList(), aItemProductionMap.getInputItemId(), aItemProductionMap.getBatchno(), aItemProductionMap.getCodeSpecific(), aItemProductionMap.getDescSpecific(), aItemProductionMap.getInput_unit_id()) > -1) {
+        } else if (aItemProductionMap.getInputQtyBalance() < 0) {
+            msg = "Check Raw Material Item Qty Balance Cannot be Zero";
+        } else if (this.itemExists(this.getItmCombinationList(), aItemProductionMap.getInputItemId(), aItemProductionMap.getBatchno(), aItemProductionMap.getCodeSpecific(), aItemProductionMap.getDescSpecific()) > -1) {
             msg = "Raw Material Item Exists";
         } else if (new ItemProductionMapBean().differentCurrencyExists(aTransItem.getItemId(), aItemProductionMap.getInputItemId())) {
             msg = "Both Input and Output Items Must be of the Same Currency";
@@ -925,6 +940,24 @@ public class TransProductionBean implements Serializable {
         return ItemFoundAtIndex;
     }
 
+    public int itemExists(List<ItemProductionMap> aItmCombinationList, Long ItemId, String BatchNumb, String aCodeSpec, String aDescSpec) {
+        List<ItemProductionMap> ati = aItmCombinationList;
+        int ItemFoundAtIndex = -1;
+        int ListItemIndex = 0;
+        int ListItemNo = ati.size();
+        double SubT = 0;
+        while (ListItemIndex < ListItemNo) {
+            if (ati.get(ListItemIndex).getInputItemId() == ItemId && BatchNumb.equals(ati.get(ListItemIndex).getBatchno()) && aCodeSpec.equals(ati.get(ListItemIndex).getCodeSpecific()) && aDescSpec.equals(ati.get(ListItemIndex).getDescSpecific())) {
+                ItemFoundAtIndex = ListItemIndex;
+                break;
+            } else {
+                ItemFoundAtIndex = -1;
+            }
+            ListItemIndex = ListItemIndex + 1;
+        }
+        return ItemFoundAtIndex;
+    }
+
     public void clearTransProductionItem(ItemProductionMap aItemProductionMap) {
         try {
             if (aItemProductionMap != null) {
@@ -965,11 +998,11 @@ public class TransProductionBean implements Serializable {
         List<ItemProductionMap> ati = aActiveTransItems;
         int ListItemIndex = 0;
         int ListItemNo = ati.size();
-        double producedQty = transItem.getItemQty();
-        double TQty = 0;
+        //double producedQty = transItem.getItemQty();
         String ItemString = "";
         while (ListItemIndex < ListItemNo) {
-            if (new TransItemBean().isItemTotalQtyGreaterThanCurrentQty(aStoreId, ati.get(ListItemIndex).getInputItemId(), ati.get(ListItemIndex).getBatchno(), (ati.get(ListItemIndex).getInputQty() * producedQty), ati.get(ListItemIndex).getCodeSpecific(), ati.get(ListItemIndex).getDescSpecific())) {
+            //if (new TransItemBean().isItemTotalQtyGreaterThanCurrentQty(aStoreId, ati.get(ListItemIndex).getInputItemId(), ati.get(ListItemIndex).getBatchno(), (ati.get(ListItemIndex).getInputQty() * producedQty), ati.get(ListItemIndex).getCodeSpecific(), ati.get(ListItemIndex).getDescSpecific())) {
+            if (new TransItemBean().isItemTotalQtyGreaterThanCurrentQty(aStoreId, ati.get(ListItemIndex).getInputItemId(), ati.get(ListItemIndex).getBatchno(), ati.get(ListItemIndex).getInputQtyTotalBaseUnit(), ati.get(ListItemIndex).getCodeSpecific(), ati.get(ListItemIndex).getDescSpecific())) {
                 ItemString = ati.get(ListItemIndex).getInputItemName();
                 break;
             } else {
@@ -1064,9 +1097,9 @@ public class TransProductionBean implements Serializable {
                 msg = "Enter Unit Cost";
             } else if (transItem.getItemQty() == 0) {
                 msg = "Produced Qty Cannot be Zero";
-            } else if (aActiveTransItems.isEmpty()) {
-                msg = "Add Raw Materials";
-            } else if (transItem.getItemId() == 0) {
+            } /*else if (aActiveTransItems.isEmpty()) {
+             msg = "Add Raw Materials";
+             } */ else if (transItem.getItemId() == 0) {
                 msg = "Specify Produced Item";
             } else if (trans.getTransactionUserDetailId() == 0 && transtype.getIsTransactionUserMandatory().equals("Yes")) {
                 msg = "Specify Production User";
@@ -1230,6 +1263,12 @@ public class TransProductionBean implements Serializable {
                         cs.setTimestamp("in_add_date", null);
                     }
                     try {
+                        if (trans.getTransactionUserDetailId() == 0) {
+                            trans.setTransactionUserDetailId(new GeneralUserSetting().getCurrentUser().getUserDetailId());
+                        }
+                    } catch (Exception e) {
+                    }
+                    try {
                         cs.setInt("in_transaction_user_detail_id", trans.getTransactionUserDetailId());
                     } catch (Exception e) {
                         cs.setInt("in_transaction_user_detail_id", 0);
@@ -1357,7 +1396,13 @@ public class TransProductionBean implements Serializable {
                         String TableName = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "CURRENT_TABLE_NAME_STOCK_LEDGER").getParameter_value();
                         new Stock_ledgerBean().callInsertStock_ledger(TableName, "Add", stock, transItem.getItemQty(), "Add", aTransTypeId, InsertedTransId, new GeneralUserSetting().getCurrentUser().getUserDetailId(), InsertedTransId);
                     }
-                    new TransProductionItemBean().saveTransProductionItemsCEC(InsertedTransId, InsertedOutputQty, InsertedStoreId, aTransProducts);
+                    try {
+                        if (!aTransProducts.isEmpty()) {
+                            new TransProductionItemBean().saveTransProductionItemsCEC(InsertedTransId, InsertedOutputQty, InsertedStoreId, aTransProducts);
+                        }
+                    } catch (Exception e) {
+
+                    }
                     //Save PRODUCTION Journal Entry
                     new AccJournalBean().postJournalProduction(InsertedTransId);
                     //after
@@ -1452,7 +1497,7 @@ public class TransProductionBean implements Serializable {
                 this.updateLookup(transProd);
                 //get order details if any
                 try {
-                    TransItem transitem = this.getTransItemOrded(11, transProd.getTransactor_id(), transProd.getTransactionRef(), transProd.getOutputItemId(), transProd.getBatchno(), transProd.getCodeSpecific(), transProd.getDescSpecific());
+                    TransItem transitem = this.getTransItemOrded(11, transProd.getTransactor_id(), transProd.getTransactionRef(), transProd.getOutputItemId(), transProd.getBatchno(), transProd.getCodeSpecific(), transProd.getDescSpecific(), transProd.getUnit_id());
                     if (null != transitem) {
                         transProd.setOrderedQty(transitem.getItemQty());
                         transProd.setSpecific_size(transitem.getSpecific_size());
@@ -1588,7 +1633,7 @@ public class TransProductionBean implements Serializable {
         if (aTransProductionBean.getDate1() != null && aTransProductionBean.getDate2() != null) {
             wheresql = wheresql + " AND transaction_date BETWEEN '" + new java.sql.Date(aTransProductionBean.getDate1().getTime()) + "' AND '" + new java.sql.Date(aTransProductionBean.getDate2().getTime()) + "'";
         }
-        String sql = "SELECT ti.input_item_id,ti.batchno,ti.code_specific,ti.desc_specific,sum(ti.input_qty) as input_qty "
+        String sql = "SELECT ti.input_item_id,ti.batchno,ti.code_specific,ti.desc_specific,sum(ti.base_unit_qty) as base_unit_qty "
                 + "FROM trans_production_item ti "
                 + "INNER JOIN trans_production t ON ti.transaction_id=t.transaction_id "
                 + "WHERE 1=1 " + wheresql + " "
@@ -1603,35 +1648,39 @@ public class TransProductionBean implements Serializable {
                 transProductionItem = new TransProductionItem();
                 try {
                     transProductionItem.setInputItemId(rs.getLong("input_item_id"));
-                } catch (NullPointerException npe) {
+                } catch (Exception e) {
                     transProductionItem.setInputItemId(0);
                 }
                 try {
-                    transProductionItem.setInputQty(rs.getDouble("input_qty"));
-                } catch (NullPointerException npe) {
-                    transProductionItem.setInputQty(0);
-                }
-                try {
                     transProductionItem.setBatchno(rs.getString("batchno"));
-                } catch (NullPointerException npe) {
+                } catch (Exception e) {
                     transProductionItem.setBatchno("");
                 }
                 try {
                     transProductionItem.setCodeSpecific(rs.getString("code_specific"));
-                } catch (NullPointerException npe) {
+                } catch (Exception e) {
                     transProductionItem.setCodeSpecific("");
                 }
                 try {
                     transProductionItem.setDescSpecific(rs.getString("desc_specific"));
-                } catch (NullPointerException npe) {
+                } catch (Exception e) {
                     transProductionItem.setDescSpecific("");
+                }
+                try {
+                    transProductionItem.setBase_unit_qty(rs.getDouble("base_unit_qty"));
+                } catch (Exception e) {
+                    transProductionItem.setBase_unit_qty(0);
                 }
                 try {
                     Item item = new ItemBean().getItem(transProductionItem.getInputItemId());
                     transProductionItem.setInputItemName(item.getDescription());
-                    transProductionItem.setInputItemUnit(new UnitBean().getUnit(item.getUnitId()).getUnitSymbol());
                 } catch (Exception e) {
                     transProductionItem.setInputItemName("");
+                }
+                try {
+                    Item item = new ItemBean().getItem(transProductionItem.getInputItemId());
+                    transProductionItem.setInputItemUnit(new UnitBean().getUnit(item.getUnitId()).getUnitSymbol());
+                } catch (Exception e) {
                     transProductionItem.setInputItemUnit("");
                 }
                 this.TransProdItemList.add(transProductionItem);
@@ -1692,7 +1741,7 @@ public class TransProductionBean implements Serializable {
         if (aTransProductionBean.getDate1() != null && aTransProductionBean.getDate2() != null) {
             wheresql = wheresql + " AND transaction_date BETWEEN '" + new java.sql.Date(aTransProductionBean.getDate1().getTime()) + "' AND '" + new java.sql.Date(aTransProductionBean.getDate2().getTime()) + "'";
         }
-        String sql = "SELECT t.*,ti.input_qty,ti.input_qty_bfr_prod,ti.input_qty_afr_prod "
+        String sql = "SELECT t.*,ti.input_qty,ti.input_qty_bfr_prod,ti.input_qty_afr_prod,ti.unit_id as unit_id_in,ti.base_unit_qty as base_unit_qty_in "
                 + "FROM trans_production_item ti inner join trans_production t on ti.transaction_id=t.transaction_id "
                 + "WHERE 1=1 " + wheresql + " "
                 + "ORDER BY t.transaction_id DESC";
@@ -1706,17 +1755,22 @@ public class TransProductionBean implements Serializable {
                 try {
                     transProduction.setInput_qty(rs.getDouble("input_qty"));
                 } catch (Exception e) {
-                    //do nothing
+                    transProduction.setInput_qty(0);
                 }
                 try {
                     transProduction.setInput_qty_bfr_prod(rs.getDouble("input_qty_bfr_prod"));
                 } catch (Exception e) {
-                    //do nothing
+                    transProduction.setInput_qty_bfr_prod(0);
                 }
                 try {
                     transProduction.setInput_qty_afr_prod(rs.getDouble("input_qty_afr_prod"));
                 } catch (Exception e) {
-                    //do nothing
+                    transProduction.setInput_qty_afr_prod(0);
+                }
+                try {
+                    transProduction.setInput_unit_symbol(new UnitBean().getUnit(rs.getInt("unit_id_in")).getUnitSymbol());
+                } catch (Exception e) {
+                    transProduction.setInput_unit_symbol("");
                 }
                 this.updateLookup(transProduction);
                 tpil.add(transProduction);
@@ -2182,9 +2236,12 @@ public class TransProductionBean implements Serializable {
             try {
                 Item item = new ItemBean().getItem(aTransProduction.getOutputItemId());
                 aTransProduction.setOutputItemName(item.getDescription());
-                aTransProduction.setOutputItemUnit(new UnitBean().getUnit(item.getUnitId()).getUnitSymbol());
             } catch (Exception e) {
                 aTransProduction.setOutputItemName("");
+            }
+            try {
+                aTransProduction.setOutputItemUnit(new UnitBean().getUnit(aTransProduction.getUnit_id()).getUnitSymbol());
+            } catch (Exception e) {
                 aTransProduction.setOutputItemUnit("");
             }
         }

@@ -33,11 +33,14 @@
                 <h:outputLabel styleClass="clsLabelTop" id="olblItemMapHeader" value="#{langsys['Item']} #{langsys['Mapping']}"/>
             </h:panelGrid>
 
-            <h:panelGrid id="gridItemMapDetail" styleClass="clsGridMainInput" columns="4">
-                <h:outputLabel styleClass="clsLabelTransItem" style="width: 250px" value="#{langsys['Big']} #{langsys['Item']}"/>
-                <h:outputLabel styleClass="clsLabelTransItem" style="width: 80px" value="#{langsys['Contains']}"/>
-                <h:outputLabel styleClass="clsLabelTransItem" style="width: 250px" value="#{langsys['Small']} #{langsys['Item']}"/>
-                <h:outputLabel styleClass="clsLabelTransItem" style="width: 80px" value="#{langsys['Position']}"/>
+            <h:panelGrid id="gridItemMapDetail" styleClass="clsGridMainInput" columns="7">
+                <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Big']} #{langsys['Item']}"/>
+                <h:outputLabel styleClass="clsLabelTransItem" value=""/>
+                <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Contains']}"/>
+                <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Small']} #{langsys['Item']}"/>
+                <h:outputLabel styleClass="clsLabelTransItem" value=""/>
+                <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Position']}"/>
+                <h:outputLabel styleClass="clsLabelTransItem" value=""/>
 
                 <p:autoComplete id="autcItem1" widgetVar="WautcItem1" value="#{itemBean.selectedItem}"  
                                 completeMethod="#{itemBean.getItemObjectList}" 
@@ -53,13 +56,11 @@
                     <p:column headerText="#{langsys['Alias']}" style="text-align: left" >  
                         #{itm.alias_name} 
                     </p:column>
-                    <p:ajax event="itemSelect" listener="#{itemMap.setBigItemId(itemBean.selectedItem.itemId)}" process="@this" update="dtblItemMap"/>
-                    <p:ajax event="change" listener="#{itemMap.setBigItemId(itemBean.selectedItem.itemId)}" rendered="#{itemBean.selectedItem!=null}" process="@this" update="dtblItemMap"/>
+                    <p:ajax event="itemSelect" listener="#{itemMapBean.changeItemMap('Big',itemMap,itemBean.selectedItem)}" process="@this" update="dtblItemMap txtBigUnitSymbol"/>
+                    <p:ajax event="change" listener="#{itemMapBean.changeItemMap('Big',itemMap,itemBean.selectedItem)}" rendered="#{itemBean.selectedItem!=null}" process="@this" update="dtblItemMap txtBigUnitSymbol"/>
                 </p:autoComplete>
-
-                <h:inputText id="itxtFractionQty" styleClass="clsInputTransItem" style="width: 80px" value="#{itemMap.fractionQty}" autocomplete="off">
-                </h:inputText>
-
+                <h:inputText id="txtBigUnitSymbol" style="width: 80px;height: 24px;" value="#{itemMap.bigUnitSymbol}" disabled="true"/>
+                <h:inputText id="itxtFractionQty" styleClass="clsInputTransItem" style="width: 80px;height: 24px;" value="#{itemMap.fractionQty}" autocomplete="off"/>
                 <p:autoComplete id="autcItem2" widgetVar="WautcItem2" value="#{itemBean.selectedItemX}"  
                                 completeMethod="#{itemBean.getItemObjectList}" 
                                 var="itm" 
@@ -71,15 +72,15 @@
                     <p:column headerText="#{langsys['Item']} #{langsys['Description']}" style="text-align: left" >  
                         #{itm.description} 
                     </p:column> 
-                    <p:ajax event="itemSelect" listener="#{itemMap.setSmallItemId(itemBean.selectedItemX.itemId)}" process="@this" update="dtblItemMap"/>
-                    <p:ajax event="change" listener="#{itemMap.setSmallItemId(itemBean.selectedItemX.itemId)}" rendered="#{itemBean.selectedItemX!=null}" process="@this" update="dtblItemMap"/>
+                    <p:ajax event="itemSelect" listener="#{itemMapBean.changeItemMap('Small',itemMap,itemBean.selectedItemX)}" process="@this" update="dtblItemMap txtSmallUnitSymbol"/>
+                    <p:ajax event="change" listener="#{itemMapBean.changeItemMap('Small',itemMap,itemBean.selectedItemX)}" rendered="#{itemBean.selectedItemX!=null}" process="@this" update="dtblItemMap txtSmallUnitSymbol"/>
                 </p:autoComplete>
-
-                <h:selectOneMenu styleClass="clsInputTransItem" id="menuPosition" value="#{itemMap.position}">
+                <h:inputText id="txtSmallUnitSymbol" style="width: 80px;height: 24px;" value="#{itemMap.smallUnitSymbol}" disabled="true"/>
+                <h:selectOneMenu styleClass="clsInputTransItem" id="menuPosition" value="#{itemMap.position}" style="height: 30px;">
                     <f:selectItem itemLabel="1" itemValue="1"/>
                     <f:selectItem itemLabel="2" itemValue="2"/>
                 </h:selectOneMenu>
-                <h:commandButton styleClass="clsButtonBig" value="#{langsys['Save']}" >
+                <h:commandButton value="#{langsys['Save']}" style="width: 120px;height: 30px;" >
                     <f:ajax listener="#{itemMapBean.saveItemMap(itemMap,itemBean.selectedItem,itemBean.selectedItemX)}" execute="gridItemMapDetail" render="dtblItemMap growl1"/>
                 </h:commandButton>
             </h:panelGrid>
@@ -100,21 +101,30 @@
                     <!-- row record -->
                     #{itemBean.getItem(im.bigItemId).getDescription()}
                 </p:column>
-
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header"></f:facet>
+                    <!-- row record -->
+                    #{im.bigUnitSymbol}
+                </p:column>
                 <p:column>
                     <!-- column header -->
                     <f:facet name="header">#{langsys['Contains']}</f:facet>
                     <!-- row record -->
                     #{im.fractionQty}
                 </p:column>
-
                 <p:column>
                     <!-- column header -->
                     <f:facet name="header">#{langsys['Small']} #{langsys['Item']}</f:facet>
                     <!-- row record -->
                     #{itemBean.getItem(im.smallItemId).getDescription()}
                 </p:column>
-
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header"></f:facet>
+                    <!-- row record -->
+                    #{im.smallUnitSymbol}
+                </p:column>
                 <p:column>
                     <!-- column header -->
                     <f:facet name="header">#{langsys['Action']}</f:facet>

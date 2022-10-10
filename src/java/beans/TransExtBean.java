@@ -1,18 +1,15 @@
 package beans;
 
-import api_tax.efris_bean.InvoiceBean;
-import static beans.TransBean.LOGGER;
-import static beans.TransItemBean.LOGGER;
 import connections.DBConnection;
 import entities.AccCoa;
 import entities.AccCurrency;
-import entities.CompanySetting;
 import entities.Item;
 import entities.Store;
 import entities.Trans;
 import entities.TransItem;
 import entities.TransactionReason;
 import entities.TransactionType;
+import entities.Transaction_item_unit;
 import entities.Transaction_tax_map;
 import entities.Transactor;
 import entities.UserDetail;
@@ -23,12 +20,8 @@ import java.sql.Connection;
 import static java.sql.Types.VARCHAR;
 import java.util.Arrays;
 import java.util.List;
-import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import sessions.GeneralUserSetting;
@@ -370,7 +363,7 @@ public class TransExtBean implements Serializable {
         int inserted = 0;
         String sql = null;
         String msg = "";
-        sql = "{call sp_insert_transaction_item(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+        sql = "{call sp_insert_transaction_item_out(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 CallableStatement cs = conn.prepareCall(sql);) {
@@ -554,14 +547,20 @@ public class TransExtBean implements Serializable {
             } catch (NullPointerException npe) {
                 cs.setDouble("in_specific_size", 1);
             }
+            cs.registerOutParameter("out_transaction_item_id", VARCHAR);
             //save
             cs.executeUpdate();
-            //repeat for the unpacked ones
-            if ("UNPACK".equals(transtype.getTransactionTypeName())) {
-                cs.setLong("in_item_id", transitem.getItemId2());
-                cs.setDouble("in_item_qty", transitem.getItemQty2());
-                cs.setString("in_stock_effect", "C");
-                cs.executeUpdate();
+            long InsertedId1 = cs.getLong("out_transaction_item_id");
+            try {
+                if (InsertedId1 > 0) {
+                    Transaction_item_unit tiu = new Transaction_item_unit();
+                    tiu.setTransaction_item_id(InsertedId1);
+                    tiu.setUnit_id(transitem.getUnit_id());
+                    tiu.setBase_unit_qty(transitem.getBase_unit_qty());
+                    new TransItemExtBean().insertTransaction_item_unit(tiu);
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
             inserted = 1;
         } catch (Exception e) {

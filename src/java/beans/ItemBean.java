@@ -3,8 +3,6 @@ package beans;
 import api_tax.efris.innerclasses.ItemTax;
 import api_tax.efris_bean.StockManage;
 import com.google.gson.Gson;
-import com.google.gson.JsonParser;
-import com.sun.javafx.scene.control.skin.VirtualFlow;
 import sessions.GeneralUserSetting;
 import connections.DBConnection;
 import entities.Category;
@@ -52,7 +50,6 @@ import utilities.CustomValidator;
 import utilities.UtilityBean;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.json.JSONObject;
 import org.primefaces.event.TabChangeEvent;
 /*
  * To change this template, choose Tools | Templates
@@ -4841,6 +4838,48 @@ public class ItemBean implements Serializable {
                 LOGGER.log(Level.ERROR, e);
             }
         }
+    }
+
+    public List<Item_unit> getItemUnitListByCodeTax(Item aItem, String aUnitCodeTax) {
+        List<Item_unit> aItem_unitList = new ArrayList<>();
+        String sql;
+        sql = "select un.* from "
+                + "("
+                + "select i.unit_id,u.unit_symbol,u.unit_name,1 as is_base,0 as default_sale,0 as default_purchase,"
+                + "1 as base_qty,1 as other_qty,i.unit_retailsale_price,i.unit_wholesale_price "
+                + "from item i inner join unit u on i.unit_id=u.unit_id where i.item_id=? and u.unit_symbol_tax=? "
+                + "UNION "
+                + "select u.unit_id,u.unit_symbol,u.unit_name,0 as is_base,iu.other_default_sale as default_sale,iu.other_default_purchase as default_purchase,"
+                + "iu.base_qty,iu.other_qty,iu.other_unit_retailsale_price as unit_retailsale_price,iu.other_unit_wholesale_price as unit_wholesale_price "
+                + "from item_unit_other iu inner join unit u on iu.other_unit_id=u.unit_id where iu.is_active=1 and iu.item_id=? and u.unit_symbol_tax=? "
+                + ") as un ";
+        ResultSet rs = null;
+        try {
+            aItem_unitList.clear();
+        } catch (Exception e) {
+            aItem_unitList = new ArrayList<>();
+        }
+        if (null == aItem || null==aUnitCodeTax) {
+            //do nothing
+        } else {
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                ps.setLong(1, aItem.getItemId());
+                ps.setString(2, aUnitCodeTax);
+                ps.setLong(3, aItem.getItemId());
+                ps.setString(4, aUnitCodeTax);
+                rs = ps.executeQuery();
+                while (rs.next()) {
+                    Item_unit iu = new Item_unit();
+                    this.setItem_unitFromResultset(iu, rs);
+                    aItem_unitList.add(iu);
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
+            }
+        }
+        return aItem_unitList;
     }
 
     public Item_unit getItemUnitFrmDb(long aItem_id, int aUnit_id) {
