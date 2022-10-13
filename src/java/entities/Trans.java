@@ -2,6 +2,7 @@ package entities;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 
@@ -157,7 +158,8 @@ public class Trans implements Serializable {
     private String fdn_ref;
     private int shift_id;
     private int mode_code;
-
+    private List<Item> TransItemsList;
+    private List<TransItem> aTransItemsDetailsList;
     /**
      * @return the TransactionId
      */
@@ -1976,5 +1978,33 @@ public class Trans implements Serializable {
      */
     public void setTotalDeemedVat(double TotalDeemedVat) {
         this.TotalDeemedVat = TotalDeemedVat;
+    }
+
+    /**
+     * @return the TransItemsList
+     */
+    public List<Item> getTransItemsList() {
+        return TransItemsList;
+    }
+
+    /**
+     * @param TransItemsList the TransItemsList to set
+     */
+    public void setTransItemsList(List<Item> TransItemsList) {
+        this.TransItemsList = TransItemsList;
+    }
+
+    /**
+     * @return the aTransItemsDetailsList
+     */
+    public List<TransItem> getaTransItemsDetailsList() {
+        return aTransItemsDetailsList;
+    }
+
+    /**
+     * @param aTransItemsDetailsList the aTransItemsDetailsList to set
+     */
+    public void setaTransItemsDetailsList(List<TransItem> aTransItemsDetailsList) {
+        this.aTransItemsDetailsList = aTransItemsDetailsList;
     }
 }
