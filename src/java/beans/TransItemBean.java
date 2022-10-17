@@ -12858,11 +12858,64 @@ public class TransItemBean implements Serializable {
                         break;
                     }
                 }
+                
             } catch (Exception e) {
                 LOGGER.log(Level.ERROR, e);
             }
         }
         return TransItemsString;
+    }
+    
+        public List<TransItem> getTransItemsList(long aTransId, int aLimitCharacters) {
+        String TransItemsString = "";
+        List<TransItem> transItemsList = new ArrayList<TransItem>();
+        String sql = "SELECT * FROM transaction_item WHERE transaction_id=" + aTransId;
+        ResultSet rs = null;
+        if (aTransId > 0) {
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                rs = ps.executeQuery();
+                TransItem transItem;
+                UtilityBean ub = new UtilityBean();
+                String itemdesc = "";
+                while (rs.next()) {
+                    transItem = getTransItemFromResultSet(rs);
+                    if (transItem != null) {
+                        transItemsList.add(transItem);
+                    }
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
+            }
+        }
+        return transItemsList;
+    }
+
+    public List<Item> getItemsList(long aTransId, int aLimitCharacters) {
+        String TransItemsString = "";
+        List<Item> itemsList = new ArrayList<Item>();
+        String sql = "SELECT * FROM transaction_item WHERE transaction_id=" + aTransId;
+        ResultSet rs = null;
+        if (aTransId > 0) {
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                rs = ps.executeQuery();
+                Item item;
+                UtilityBean ub = new UtilityBean();
+                String itemdesc = "";
+                while (rs.next()) {
+                    item = new ItemBean().getItem(rs.getLong("item_id"));
+                    if (item != null) {
+                        itemsList.add(item);
+                    }
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
+            }
+        }
+        return itemsList;
     }
 
     public Double getTransItemsTotalQty(List<TransItem> aTransItems) {
