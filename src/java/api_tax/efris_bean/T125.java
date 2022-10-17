@@ -7,14 +7,12 @@ package api_tax.efris_bean;
 
 import api_tax.efris.EFRIS_excise_duty_list;
 import api_tax.efris.GeneralUtilities;
-import api_tax.efris.innerclasses.GoodsCommodity;
+import api_tax.efris.innerclasses.ExciseDutyDetailsList;
 import beans.Parameter_listBean;
 import com.google.gson.Gson;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import entities.CompanySetting;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.Serializable;
 import java.security.PrivateKey;
 import java.util.ArrayList;
@@ -24,10 +22,6 @@ import java.util.concurrent.Executors;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import utilities.GzipUtils;
@@ -46,8 +40,6 @@ public class T125 implements Serializable {
 
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = Logger.getLogger(T125.class.getName());
-    public static int totalUNSPC;
-    public static int downloadedUNSPC;
 
     public void downloadExciseDuty_list() {
         try {
@@ -64,19 +56,15 @@ public class T125 implements Serializable {
 
     public void downloadExciseDuty_listThread() {
         try {
-            //reset total number of goods commodities to be downloaded
-            totalUNSPC = 0;
-            //reset total number of goods commodities already downloaded
-            downloadedUNSPC = 0;
             //Runnable task = new Runnable() {
             Runnable task = () -> {
                 try {
-                    T125 t124 = new T125();
+                    T125 t125 = new T125();
                     String APIMode = new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_MODE").getParameter_value();
                     if (APIMode.equals("OFFLINE")) {
-                        t124.getExciseDutyOffline();
+                        t125.getExciseDutyOffline();
                     } else {
-                        t124.getExciseDutyOnline();
+                        t125.getExciseDutyOnline();
                     }
                 } catch (Exception e) {
                     LOGGER.log(Level.ERROR, e);
@@ -92,13 +80,10 @@ public class T125 implements Serializable {
     public void getExciseDutyOffline() {
         String output = "";
         try {
-            String json = "{\n"
-                    + "	\"pageNo\": \"1\",\n"
-                    + "	\"pageSize\": \"99\"\n"
-                    + "}";
+            String json = "";
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
             WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_URL_OFFLINE").getParameter_value());
-            String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T124", CompanySetting.getTaxIdentity());
+            String PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T125", CompanySetting.getTaxIdentity());
 
             ClientResponse response = webResource.type("application/json").post(ClientResponse.class, PostData);
             output = response.getEntity(String.class);
@@ -118,6 +103,10 @@ public class T125 implements Serializable {
             } catch (Exception e) {
                 //do nothing
             }
+            
+            /**
+             * Decode and or decompress
+             */
             if (zipCode.equals("0")) {
                 DecryptedContent = new String(Base64.decodeBase64(content));
             } else {
@@ -126,67 +115,45 @@ public class T125 implements Serializable {
             }
 
             /**
-             * Get total page size
+             * Get exciseDutyList
              */
             JSONObject parentbasicInformationjsonObject = new JSONObject(DecryptedContent);
-            JSONObject page = parentbasicInformationjsonObject.getJSONObject("page");
-            int pageCount = page.getInt("pageCount");
-            int pageSize = page.getInt("pageSize");
-            int totalSize = page.getInt("totalSize");
+            JSONArray exciseDutyList = parentbasicInformationjsonObject.getJSONArray("exciseDutyList");
 
-            //set total number of goods commodities to be downloaded
-            totalUNSPC = totalSize;
-            //reset total number of goods commodities already downloaded
-            downloadedUNSPC = 0;
-            /**
-             * End Get total page size
-             */
+            List<EFRIS_excise_duty_list> arList = new ArrayList<>();
+            for (int i = 0; i < exciseDutyList.length(); i++) {
+                Gson g = new Gson();
+                EFRIS_excise_duty_list temp = g.fromJson(exciseDutyList.get(i).toString(), EFRIS_excise_duty_list.class);
 
-            for (int x = 1; x <= pageCount; x++) {
-                json = "{\n"
-                        + "	\"pageNo\": \"" + x + "\",\n"
-                        + "	\"pageSize\": \"" + pageSize + "\"\n"
-                        + "}";
-                /**
-                 * Post Data
-                 */
-                PostData = GeneralUtilities.PostData_Offline(Base64.encodeBase64String(json.getBytes("UTF-8")), "", "AP04", "", "9230489223014123", "123", new Parameter_listBean().getParameter_listByContextName("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value(), "T124", CompanySetting.getTaxIdentity());
-                response = webResource.type("application/json").post(ClientResponse.class, PostData);
-                output = response.getEntity(String.class);
-
-                parentjsonObject = new JSONObject(output);
-                dataobjectcontent = parentjsonObject.getJSONObject("data");
-                content = dataobjectcontent.getString("content");
-                dataDescription = dataobjectcontent.getJSONObject("dataDescription");
-
-                zipCode = "0";
-                DecryptedContent = "";
-                try {
-                    zipCode = dataDescription.getString("zipCode");
-                } catch (Exception e) {
-                    //do nothing
-                }
-                if (zipCode.equals("0")) {
-                    DecryptedContent = new String(Base64.decodeBase64(content));
+                //set unit, currency, rate_perc, rate_value
+                if (temp.getExciseDutyDetailsList().size() > 0) {
+                    for (int e = 0; e < temp.getExciseDutyDetailsList().size(); e++) {
+                        ExciseDutyDetailsList edl = temp.getExciseDutyDetailsList().get(e);
+                        if (edl.getType().equals("101")) {//101 is Percentage, 102 is Unit of measurement
+                            temp.setRate_perc(edl.getRate());
+                            temp.setCurrency(edl.getCurrency());
+                        } else {
+                            temp.setRate_value(edl.getRate());
+                            temp.setUnit(edl.getUnit());
+                            if (edl.getCurrency() == null) {
+                                temp.setCurrency(edl.getCurrency());
+                            }
+                        }
+                    }
                 } else {
-                    byte[] str = GzipUtils.decompress(Base64.decodeBase64(content));
-                    DecryptedContent = new String(str);
+                    temp.setUnit("");
+                    temp.setCurrency("");
+                    temp.setRate_perc("");
+                    temp.setRate_value("");
                 }
-                JSONObject jSONObject = new JSONObject(DecryptedContent);
-                JSONArray array = jSONObject.getJSONArray("records");
-                List<GoodsCommodity> arList = new ArrayList<>();
-                for (int i = 0; i < array.length(); i++) {
-                    Gson g = new Gson();
-                    GoodsCommodity temp = g.fromJson(array.get(i).toString(), GoodsCommodity.class);
-                    arList.add(temp);
-                }
-                //save goods commodity                
-                int savedGoodsCommodity = new EFRIS_goods_commodityBean().saveEFRIS_goods_commodity(arList);
+                arList.add(temp);
+            }
+            //save Excise Duty List
+            int savedExciseDutyList = new EFRIS_excise_duty_listBean().saveEFRIS_excise_duty_list(arList);
+            //int savedExciseDutyList = 1;
 
-                if (savedGoodsCommodity == 1) {
-                    //set total number of goods commodities already downloaded
-                    downloadedUNSPC = downloadedUNSPC + arList.size();
-                }
+            if (savedExciseDutyList == 1) {
+                //do nothing for now
             }
         } catch (Exception e) {
             LOGGER.log(Level.INFO, output);
@@ -197,10 +164,6 @@ public class T125 implements Serializable {
     public void getExciseDutyOnline() {
         String output = "";
         try {
-            String json2 = "{\n"
-                    + "	\"pageNo\": \"1\",\n"
-                    + "	\"pageSize\": \"99\"\n"
-                    + "}";
             String json = "";
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
             WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_URL_ONLINE").getParameter_value());
@@ -238,8 +201,10 @@ public class T125 implements Serializable {
             } catch (Exception e) {
                 //do nothing
             }
-
-            //Decode and or decompress
+            
+            /**
+             * Decode and or decompress
+             */
             if (zipCode.equals("0")) {
                 DecryptedContent = new String(Base64.decodeBase64(content));
             } else {
@@ -256,16 +221,38 @@ public class T125 implements Serializable {
              */
             JSONObject parentbasicInformationjsonObject = new JSONObject(DecryptedContent);
             JSONArray exciseDutyList = parentbasicInformationjsonObject.getJSONArray("exciseDutyList");
-            
+
             List<EFRIS_excise_duty_list> arList = new ArrayList<>();
             for (int i = 0; i < exciseDutyList.length(); i++) {
                 Gson g = new Gson();
                 EFRIS_excise_duty_list temp = g.fromJson(exciseDutyList.get(i).toString(), EFRIS_excise_duty_list.class);
+
+                //set unit, currency, rate_perc, rate_value
+                if (temp.getExciseDutyDetailsList().size() > 0) {
+                    for (int e = 0; e < temp.getExciseDutyDetailsList().size(); e++) {
+                        ExciseDutyDetailsList edl = temp.getExciseDutyDetailsList().get(e);
+                        if (edl.getType().equals("101")) {//101 is Percentage, 102 is Unit of measurement
+                            temp.setRate_perc(edl.getRate());
+                            temp.setCurrency(edl.getCurrency());
+                        } else {
+                            temp.setRate_value(edl.getRate());
+                            temp.setUnit(edl.getUnit());
+                            if (edl.getCurrency() == null) {
+                                temp.setCurrency(edl.getCurrency());
+                            }
+                        }
+                    }
+                } else {
+                    temp.setUnit("");
+                    temp.setCurrency("");
+                    temp.setRate_perc("");
+                    temp.setRate_value("");
+                }
                 arList.add(temp);
             }
-            //save goods commodity
+            //save Excise Duty List
             int savedExciseDutyList = new EFRIS_excise_duty_listBean().saveEFRIS_excise_duty_list(arList);
-            //int savedGoodsCommodity = 1;
+            //int savedExciseDutyList = 1;
 
             if (savedExciseDutyList == 1) {
                 //do nothing for now

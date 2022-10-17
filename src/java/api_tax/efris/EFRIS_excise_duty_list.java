@@ -5,8 +5,10 @@
  */
 package api_tax.efris;
 
+import api_tax.efris.innerclasses.ExciseDutyDetailsList;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -24,6 +26,7 @@ public class EFRIS_excise_duty_list implements Serializable {
     private String rateText;
     private String isLeafNode;
     private String effectiveDate;
+    private List<ExciseDutyDetailsList> exciseDutyDetailsList;
     private String unit; //unit_code_tax
     private String currency; //currency_code_tax
     private String rate_perc;
@@ -213,5 +216,19 @@ public class EFRIS_excise_duty_list implements Serializable {
      */
     public void setAdd_date(Date add_date) {
         this.add_date = add_date;
+    }
+
+    /**
+     * @return the exciseDutyDetailsList
+     */
+    public List<ExciseDutyDetailsList> getExciseDutyDetailsList() {
+        return exciseDutyDetailsList;
+    }
+
+    /**
+     * @param exciseDutyDetailsList the exciseDutyDetailsList to set
+     */
+    public void setExciseDutyDetailsList(List<ExciseDutyDetailsList> exciseDutyDetailsList) {
+        this.exciseDutyDetailsList = exciseDutyDetailsList;
     }
 }

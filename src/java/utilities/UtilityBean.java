@@ -2,6 +2,7 @@ package utilities;
 
 import api_tax.efris_bean.EFRIS_goods_commodityBean;
 import api_tax.efris_bean.T124;
+import api_tax.efris_bean.T125;
 import beans.AccCurrencyBean;
 import beans.AccJournalBean;
 import beans.Alert_generalBean;
@@ -1182,6 +1183,10 @@ public class UtilityBean implements Serializable {
 
     public void onComplete() {
         javax.faces.context.FacesContext.getCurrentInstance().addMessage(null, new javax.faces.application.FacesMessage("Progress Completed"));
+    }
+
+    public void callDownloadExciseDuty_list() {        
+        new T125().downloadExciseDuty_list();
     }
 
     public void cleanSaleInvoiceTranss() {
