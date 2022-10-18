@@ -46,7 +46,7 @@
                     <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="6">
                         <h:outputLabel value="#{langsys['Amount']} #{langsys['Received']}:"/>
                         <h:inputText value="#{payBean.payObj.paidAmount}" disabled="true">
-                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
                         <h:outputLabel value="#{langsys['Currency']}:"/>
                         <h:inputText value="#{payBean.payObj.currencyCode}" disabled="true"/>

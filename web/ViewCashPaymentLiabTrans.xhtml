@@ -50,7 +50,7 @@
                         <h:inputText value="#{transactorBean.getTransactor(payBean.payObj.billTransactorId).transactorNames}" disabled="true"/>
                         <h:outputLabel value="#{langsys['Amount']} #{langsys['Paid']}"/>
                         <h:inputText value="#{payBean.payObj.paidAmount}" disabled="true">
-                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
 
                         <h:outputLabel value="#{langsys['Pay']} #{langsys['Date']}:"/>

@@ -6383,32 +6383,22 @@ public class TransItemBean implements Serializable {
     }
 
     public void roundTransItemsAmount(Trans aTrans, TransItem aTransItem) {
-        aTransItem.setUnitVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getUnitVat()));
-        aTransItem.setUnitPriceExcVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getUnitPriceExcVat()));
-        aTransItem.setUnitPriceIncVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getUnitPriceIncVat()));
-        aTransItem.setUnitProfitMargin(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getUnitProfitMargin()));
-        aTransItem.setAmount(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getAmount()));
-        aTransItem.setAmountIncVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getAmountIncVat()));
-        aTransItem.setAmountExcVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getAmountExcVat()));
         /*
-         aTransItem.setUnitVat(new AccCurrencyBean().roundDoubleToXDps(aTransItem.getUnitVat(),4));
-         aTransItem.setUnitPriceExcVat(new AccCurrencyBean().roundDoubleToXDps(aTransItem.getUnitPriceExcVat(),4));
-         aTransItem.setUnitPriceIncVat(new AccCurrencyBean().roundDoubleToXDps(aTransItem.getUnitPriceIncVat(),4));
-         aTransItem.setUnitProfitMargin(new AccCurrencyBean().roundDoubleToXDps(aTransItem.getUnitProfitMargin(),4));
-         aTransItem.setAmount(new AccCurrencyBean().roundDoubleToXDps(aTransItem.getAmount(),4));
-         aTransItem.setAmountIncVat(new AccCurrencyBean().roundDoubleToXDps(aTransItem.getAmountIncVat(),4));
-         aTransItem.setAmountExcVat(new AccCurrencyBean().roundDoubleToXDps(aTransItem.getAmountExcVat(),4));
+         aTransItem.setUnitVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getUnitVat()));
+         aTransItem.setUnitPriceExcVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getUnitPriceExcVat()));
+         aTransItem.setUnitPriceIncVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getUnitPriceIncVat()));
+         aTransItem.setUnitProfitMargin(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getUnitProfitMargin()));
+         aTransItem.setAmount(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getAmount()));
+         aTransItem.setAmountIncVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getAmountIncVat()));
+         aTransItem.setAmountExcVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getAmountExcVat()));
          */
-    }
-
-    public void roundTransItemsAmount_prev(Trans aTrans, TransItem aTransItem) {
-        aTransItem.setUnitVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getUnitVat()));
-        aTransItem.setUnitPriceExcVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getUnitPriceExcVat()));
-        aTransItem.setUnitPriceIncVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getUnitPriceIncVat()));
-        aTransItem.setUnitProfitMargin(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getUnitProfitMargin()));
-        aTransItem.setAmount(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getAmount()));
-        aTransItem.setAmountIncVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getAmountIncVat()));
-        aTransItem.setAmountExcVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getAmountExcVat()));
+        aTransItem.setUnitVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getUnitVat(), "ITEM"));
+        aTransItem.setUnitPriceExcVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getUnitPriceExcVat(), "ITEM"));
+        aTransItem.setUnitPriceIncVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getUnitPriceIncVat(), "ITEM"));
+        aTransItem.setUnitProfitMargin(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getUnitProfitMargin(), "ITEM"));
+        aTransItem.setAmount(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getAmount(), "ITEM"));
+        aTransItem.setAmountIncVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getAmountIncVat(), "ITEM"));
+        aTransItem.setAmountExcVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getAmountExcVat(), "ITEM"));
     }
 
     public void addTransItemCallCEC(int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aTrans, StatusBean aStatusBean, List<TransItem> aActiveTransItems, TransItem NewTransItem, Item aSelectedItem) {
@@ -12858,15 +12848,15 @@ public class TransItemBean implements Serializable {
                         break;
                     }
                 }
-                
+
             } catch (Exception e) {
                 LOGGER.log(Level.ERROR, e);
             }
         }
         return TransItemsString;
     }
-    
-        public List<TransItem> getTransItemsList(long aTransId, int aLimitCharacters) {
+
+    public List<TransItem> getTransItemsList(long aTransId, int aLimitCharacters) {
         String TransItemsString = "";
         List<TransItem> transItemsList = new ArrayList<TransItem>();
         String sql = "SELECT * FROM transaction_item WHERE transaction_id=" + aTransId;

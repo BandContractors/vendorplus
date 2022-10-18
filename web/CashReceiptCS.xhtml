@@ -90,7 +90,7 @@
                         </p:autoComplete>
                         <h:outputLabel id="olblDeposit" value="#{langsys['Deposit']}(#{pay.currencyCode})"/>
                         <h:inputText disabled="true" style="color: green;font-weight: bold;width: 155px;;height: 24px;" styleClass="clsInput" id="itxtPrepaidAcc" value="#{accJournalBean.returnBalanceString(trans.deposit_customer)}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
                         <h:outputLabel  value="#{langsys['Transaction']} #{langsys['No.']}:"/>
                         <h:inputText id="itxtTransactionNumber2" value="#{trans.transactionNumber2}" autocomplete="off" style="width: 155px;">
@@ -137,13 +137,13 @@
                     <p:column>
                         <f:facet name="header">#{langsys['Amount']}</f:facet>
                         <h:outputLabel value="#{pts.grandTotal}">
-                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputLabel>
                     </p:column>
                     <p:column>
                         <f:facet name="header">#{langsys['Note']}</f:facet>
                         <h:outputLabel value="#{pts.cr_dr_amount}">
-                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputLabel> 
                         <h:outputLabel value=" #{langsys['Credit']}" rendered="#{pts.cr_dr_type eq 'Credit Note'}"/>
                         <h:outputLabel value=" #{langsys['Debit']}" rendered="#{pts.cr_dr_type eq 'Debit Note'}"/>
@@ -151,13 +151,13 @@
                     <p:column>
                         <f:facet name="header">#{langsys['Total']} #{langsys['Received']}</f:facet>
                         <h:outputLabel value="#{pts.sumTransPaidAmount}" style="color: blue">
-                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputLabel>
                     </p:column>
                     <p:column>
                         <f:facet name="header">#{langsys['Receivable']} #{langsys['Balance']}</f:facet>
                         <h:outputLabel value="#{(pts.grandTotal+pts.cr_dr_amount)-pts.sumTransPaidAmount}" style="color: red">
-                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputLabel>
                     </p:column>
                     <p:column>
@@ -165,7 +165,7 @@
                             #{langsys['Receive']} #{langsys['Amount']}
                         </f:facet>
                         <h:inputText value="#{pts.transPaidAmount}" style="width: 120px;">
-                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             <f:ajax event="change" listener="#{payTransBean.editPayTrans(payTransBean.payTranss,pts,pay)}" execute="dtblPayTranss" render="dtblPayTranss formPay:itxtPaidAmount"/>
                         </h:inputText>
                     </p:column>
@@ -183,7 +183,7 @@
                 <h:panelGrid id="pnlInputDetails" styleClass="clsGridMainInput" columns="4">
                     <h:outputLabel  value="#{langsys['Amount']} #{langsys['Received']}:"/>
                     <h:inputText id="itxtPaidAmount" value="#{pay.paidAmount}" disabled="true" style="width: 233px;">
-                        <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
                     <h:outputLabel  style="width: 250px;" value="#{langsys['Receipt']} #{langsys['Date']}:"/>
                     <p:calendar styleClass="clsInput" id="calPaymentDate"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{pay.payDate}" disabled="#{generalUserSetting.isAllowedToBackDate==0}" size="20"/>
@@ -209,7 +209,7 @@
                     <h:inputText id="itxtStatusDesc" style="width: 233px;" value="#{pay.statusDesc}" styleClass="clsInputTransItem"/>
                     <h:outputLabel  style="width: 250px;" value="#{langsys['Points']} #{langsys['Spent']} #{langsys['Amount']}:"/>
                     <h:inputText id="itxtSpendPointsAmount" style="width: 233px;" value="#{pay.pointsSpentAmount}" styleClass="clsInputTransItem" disabled="true">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
                 </h:panelGrid>
             </h:panelGrid>

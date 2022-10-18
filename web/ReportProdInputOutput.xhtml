@@ -134,7 +134,7 @@
                             <td></td>
                             <td>
                                 <h:outputText value="#{ti.base_unit_qty}" style="color: red">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputText>
                                 #{ti.inputItemUnit}
                             </td>
@@ -160,7 +160,7 @@
                                 </td>
                                 <td>
                                     <h:outputText value="#{t.outputQty}" style="color: #00B461;">
-                                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                     </h:outputText>
                                     #{t.outputItemUnit}
                                     #{transProductionBean.getPCsProduced(t)}

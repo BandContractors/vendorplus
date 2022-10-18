@@ -73,7 +73,7 @@
                     </p:column>
                     <p:column headerText="#{langsys['Retail']} #{langsys['Sale']} #{langsys['Price']}" style="text-align: left">  
                         <h:outputText value="#{itm.unitRetailsalePrice}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                     <p:column headerText="#{langsys['Currency']}" style="text-align: left">
@@ -99,7 +99,7 @@
                 </h:selectOneMenu>
                 <h:inputText id="itxtQty" styleClass="clsInputTransItem" style="width: 120px;height: 24px;" value="#{transItem.itemQty}" autocomplete="off">
                     <f:ajax event="keyup" listener="#{transItemBean.calUnpackedQty(transItem)}" execute="@this" render="itxtQty2"/>
-                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
 
                 <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Unpack']} #{langsys['To']} #{langsys['Small']} #{langsys['Item']}"/>
@@ -114,7 +114,7 @@
                 <h:inputText id="itxtUnit2" styleClass="clsInputTransItem" value="#{unitBean.getUnit(itemBean.getItem(transItem.itemId2).getUnitId()).unitSymbol}" style="width: 50px;height: 24px;" disabled="true"/>
                 <h:outputLabel styleClass="clsLabelTransItem" value=""/>
                 <h:inputText id="itxtQty2" styleClass="clsInputTransItem" style="width: 120px;height: 24px;" value="#{transItem.itemQty2}" autocomplete="off" disabled="true">
-                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
             </h:panelGrid>
 

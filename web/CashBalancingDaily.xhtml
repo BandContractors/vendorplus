@@ -68,63 +68,63 @@
                     </p:column>
                     <p:column headerText="#{langsys['Cash']} #{langsys['at']} #{langsys['Begin']}" style="text-align: right;font-size: 13px;">
                         <h:outputText value="#{itmNew.cash_begin}">
-                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                     <p:column headerText="#{langsys['Transfer']} +" style="text-align: right;font-size: 13px;color: #00B461;">
                         <h:outputText value="#{itmNew.cash_transfer_in}">
-                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                     <p:column headerText="#{langsys['Adjust']} +" style="text-align: right;font-size: 13px;color: #00B461;">
                         <h:outputText value="#{itmNew.cash_adjustment_pos}">
-                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                     <p:column headerText="#{langsys['Cash']} #{langsys['Received']}" style="text-align: right;font-size: 13px;color: #00B461;">
                         <h:outputText value="#{itmNew.cash_receipts}">
-                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                     <p:column headerText="#{langsys['Transfer']} -" style="text-align: right;font-size: 13px;color: red;">
                         <h:outputText value="#{itmNew.cash_transfer_out}">
-                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                     <p:column headerText="#{langsys['Adjust']} -" style="text-align: right;font-size: 13px;color: red;">
                         <h:outputText value="#{itmNew.cash_adjustment_neg}">
-                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                     <p:column headerText="#{langsys['Cash']} #{langsys['Paid']}" style="text-align: right;font-size: 13px;color: red;">
                         <h:outputText value="#{itmNew.cash_payments}">
-                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                     <p:column headerText="#{langsys['Day']} #{langsys['Net']} #{langsys['Cash']}" style="text-align: right;font-size: 13px;color: #007fff;">
                         <h:outputText value="#{itmNew.net_cash}">
-                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                     <p:column headerText="#{langsys['Day']} #{langsys['Actual']} #{langsys['Cash']}" style="text-align: right;font-size: 13px;color: #007fff;">
                         <h:inputText value="#{itmNew.actual_cash_count}" style="width: 75px;text-align: right;margin: 0px;">
-                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             <f:ajax event="blur" listener="#{cash_balancing_dailyBean.calculateCashOverOrShort(itmNew)}" execute="tblNew" render="tblNew"/>
                         </h:inputText>
                     </p:column>
                     <p:column headerText="#{langsys['Cash']} #{langsys['Over']}" style="text-align: right;font-size: 13px;color: red;">
                         <h:outputText value="#{itmNew.cash_over}">
-                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                     <p:column headerText="#{langsys['Cash']} #{langsys['Short']}" style="text-align: right;font-size: 13px;color: red;">
                         <h:outputText value="#{itmNew.cash_short}">
-                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                     <p:column headerText="#{langsys['Cash']} #{langsys['at']} #{langsys['End']}" style="text-align: right;font-size: 13px;">
                         <h:outputText value="#{itmNew.cash_balance}">
-                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                     <p:column headerText="" style="width: 30px;">

@@ -170,10 +170,10 @@
                         <p:ajax listener="#{transBean.loadOrderForInvoiceTrans(trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor,transBean.authorisedByUserDetail,transItemBean.selectedAccCoa)}" process="@form" update="pnlHeader gridTransItem pgrdOverrideWarranty pgrdSpecific gridItemStatus dtblTransactionItem pgrdTotals pgrdScheme pgrdPayment pgrdMsgs pgrdApprove growl1"/>
                     </p:selectOneMenu>
                     <h:inputText disabled="true" style="color: coral;font-weight: bold;width: 145px;height: 24px;" styleClass="clsInput" id="itxtDebtCredit" value="#{accJournalBean.returnBalanceString(trans.balance_receivable)}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
                     <h:inputText disabled="true" style="color: green;font-weight: bold;width: 130px;;height: 24px;" styleClass="clsInput" id="itxtPrepaidAcc" value="#{accJournalBean.returnBalanceString(trans.deposit_customer)}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
                     <p:commandLink onclick="PF('dlgMore').show();" value="M" title="#{langsys['More']} #{langsys['Detail']} (#{langsys['Representative']}, #{langsys['Invoice']} #{langsys['Number']}, #{langsys['Terms']} #{langsys['and']} #{langsys['Conditions']})"/>
                 </h:panelGrid>
@@ -220,17 +220,17 @@
                     </p:column>
                     <p:column headerText="#{langsys['Retail']} #{langsys['sale']} #{langsys['Price']}" style="text-align: left">  
                         <h:outputText value="#{itm.unitRetailsalePrice}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                     <p:column headerText="#{langsys['Wholesale']} #{langsys['Price']}" style="text-align: left" rendered="#{generalUserSetting.currentTransactionReasonId==2 or generalUserSetting.currentTransactionReasonId==10}">
                         <h:outputText value="#{itm.unitWholesalePrice}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                     <p:column headerText="#{langsys['Special']} #{langsys['Price']}" style="text-align: left" rendered="#{generalUserSetting.currentTransactionReasonId==103}">
                         <h:outputText value="#{itm.unit_special_price}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                     <p:column headerText="#{langsys['Currency']}" style="text-align: left">
@@ -262,17 +262,17 @@
                 </h:commandButton>
                 <h:inputText id="itxtQty" styleClass="clsInputTransItem" style="width: 50px;height: 24px;" value="#{transItem.itemQty}" autocomplete="off">
                     <f:ajax event="blur" listener="#{transItem.setAmount(transItem.itemQty*transItem.unitPrice)}" render="itxtAmount"/>
-                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
                 <h:commandButton value="-" style="width: 34px;height: 30px;">
                     <f:ajax listener="#{transItemBean.subtractQtyTransItemCEC(transItem)}" execute="@this itxtQty" render="itxtQty itxtAmount"/>
                 </h:commandButton>
                 <h:inputText id="itxtUnitPrice" styleClass="clsInputTransItem" style="width: 100px;height: 24px;" disabled="#{itemBean.selectedItem.isGeneral==0}" value="#{transItem.unitPrice}" autocomplete="off">
                     <f:ajax event="blur" listener="#{transItem.setAmount(transItem.itemQty*transItem.unitPrice)}" render="itxtAmount"/>
-                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>             
                 <h:inputText id="itxtAmount" styleClass="clsInputTransItem" style="width: 100px;height: 24px;" disabled="true" value="#{transItem.amount}">
-                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
                 <p:commandButton id="cbtnAdd" value="#{langsys['Add']}" accesskey="a"  icon="ui-icon-plus">
                     <p:ajax listener="#{transItemBean.addTransItemCallCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentSaleType,trans,statusBean,transItemBean.activeTransItems,transItem,itemBean.selectedItem)}" process="@form" update="gridTransItem pgrdOverrideWarranty pgrdSpecific gridItemStatus dtblTransactionItem pgrdTotals pgrdScheme pgrdPayment pgrdMsgs"/>
@@ -290,10 +290,10 @@
                     <h:outputLabel value=""/>
 
                     <h:inputText id="itxtUnitPrice2" styleClass="clsInputTransItem" style="width: 150px;height: 24px;" disabled="false" value="#{transItem.unitPrice2}" autocomplete="off">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
                     <h:inputText id="itxtTradeDisc2" styleClass="clsInputTransItem" style="width: 150px;height: 24px;" disabled="false" value="#{transItem.unitTradeDiscount2}" autocomplete="off">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
                     <h:selectOneMenu styleClass="clsMenu" style="width: 150px;height: 30px;" id="menuVatRated2" value="#{transItem.vatRated2}">
                         <f:selectItems value="#{utilityBean.getStringArrayFromCommaSeperatedStr(itemBean.selectedItem.vatRated)}"/>
@@ -376,7 +376,7 @@
                         <f:ajax listener="#{transItemBean.addQtyTransItemCEC(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans,transItemBean.activeTransItems,ati)}" execute="dtblTransactionItem" render="dtblTransactionItem TransactionFormSales:pgrdTotals TransactionFormSales:pgrdPayment TransactionFormSales:gridItemStatus TransactionFormSales:pgrdMsgs"/>
                     </h:commandButton>
                     <h:inputText value="#{ati.itemQty}" style="width: 30px;">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                         <f:ajax event="change" listener="#{transItemBean.editTransItemCEC(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentSaleType,trans, transItemBean.activeTransItems,ati)}" execute="dtblTransactionItem" render="dtblTransactionItem TransactionFormSales:pgrdTotals TransactionFormSales:pgrdPayment TransactionFormSales:gridItemStatus TransactionFormSales:pgrdMsgs"/>
                     </h:inputText>
                     <h:commandButton id="cmdbRemoveQty" value="-" style="width: 34px;">
@@ -388,7 +388,7 @@
                     <f:facet name="header">#{langsys['Unit']} #{langsys['Price']}</f:facet>
                     <!-- row record -->
                     <h:outputLabel value="#{ati.unitPriceExcVat}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                 </p:column>
                 <p:column>
@@ -396,7 +396,7 @@
                     <f:facet name="header">#{langsys['Unit']} #{langsys['Discount']}</f:facet>
                     <!-- row record -->
                     <h:outputLabel value="#{ati.unitTradeDiscount}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                 </p:column>
                 <p:column>
@@ -404,7 +404,7 @@
                     <f:facet name="header">#{langsys['Unit']} VAT</f:facet>
                     <!-- row record -->
                     <h:outputLabel value="#{ati.unitVat}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                 </p:column>
                 <p:column>
@@ -412,7 +412,7 @@
                     <f:facet name="header">#{langsys['Amount']}</f:facet>
                     <!-- row record -->
                     <h:outputLabel value="#{ati.amountIncVat}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                 </p:column>
                 <p:column>
@@ -435,20 +435,20 @@
                 <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Bill']} #{langsys['Other']}?"/>
 
                 <h:inputText id="itxtSubTotal" value="#{trans.subTotal}" styleClass="clsInputTransItem" style="width: 150px;height: 24px;" disabled="true">
-                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
                 <h:inputText id="itxtTotalTradeDiscount" value="#{trans.totalTradeDiscount}" styleClass="clsInputTransItem" style="width: 150px;height: 24px;" autocomplete="off" disabled="true"> 
-                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
                 <h:inputText id="itxtCashDiscount" value="#{trans.cashDiscount}" styleClass="clsInputTransItem" style="width: 180px;height: 24px;" autocomplete="off" disabled="#{companySetting.getBoolIsAllowDiscount()}">
-                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                     <f:ajax event="blur" listener="#{transBean.setCashDiscountAmtAndUpdateCEC(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans, transItemBean.activeTransItems)}" render="cmdlCashDiscount itxtGrandTotal itxtChange pgrdApprove itxtTotalVat"/>
                 </h:inputText>
                 <h:inputText id="itxtLoyaltyDiscount" value="#{trans.spendPointsAmount}" styleClass="clsInputTransItem" style="width: 100px;height: 24px;" autocomplete="off" disabled="true">
-                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
                 <h:inputText id="itxtTotalVat" value="#{trans.totalVat}" styleClass="clsInputTransItem" style="width: 150px;height: 24px;" disabled="true">
-                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
                 <h:inputText id="itxtGrandTotal" value="#{trans.grandTotal}" styleClass="clsInputTransItem" style="width: 180px;height: 24px;background-color: yellow;font-weight: bold;font-size: 20px;" disabled="true">
                     <f:convertNumber pattern="#{accCurrencyBean.getNumberFormatByCurrency(trans.currencyCode)}" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -462,16 +462,16 @@
                     <h:panelGrid id="pnlgFilter1" columns="2">
                         <p:outputLabel value="#{langsys['Subtotal']} (#{trans.currencyCode}):"/>
                         <p:inputText value="#{trans.subTotal-trans.totalTradeDiscount}" readonly="true" style="background-color: #E5E5E5">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                         </p:inputText>
                         <p:outputLabel value="#{langsys['Cash']} #{langsys['Discount']}(%):"/>
                         <p:inputText value="#{trans.cash_dicsount_perc}" autocomplete="off" style="height: 25px;">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                             <p:ajax event="blur" listener="#{transBean.setCashDiscountPercAndUpdateCEC(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans, transItemBean.activeTransItems)}" update="itxtCashDiscountAmount :TransactionFormSales:cmdlCashDiscount :TransactionFormSales:itxtCashDiscount :TransactionFormSales:itxtGrandTotal :TransactionFormSales:itxtChange :TransactionFormSales:pgrdApprove :TransactionFormSales:itxtTotalVat"/>
                         </p:inputText>
                         <p:outputLabel value="#{langsys['Cash']} #{langsys['Discount']}(#{langsys['Amount']}):"/>
                         <p:inputText id="itxtCashDiscountAmount" value="#{trans.cashDiscount}" readonly="true" style="background-color: #E5E5E5">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                         </p:inputText>
                         <h:outputLabel value=""/>
                         <p:commandButton value="OK"  oncomplete="PF('dlgCashDiscount').hide()" style="width: 220px;height: 40px;">
@@ -490,11 +490,11 @@
                         <h:inputText id="itxtCardHolder" value="#{trans.cardHolder}" styleClass="clsInputTransItem" style="width: 170px;" autocomplete="off" disabled="true"/>
                         <h:outputLabel value="#{langsys['Balance']} #{langsys['Amount']}:"/>
                         <h:inputText id="itxtBalPointsAmount" value="#{trans.balancePointsAmount}" styleClass="clsInputTransItem" style="width: 170px;" disabled="true">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
                         <h:outputLabel value="#{langsys['Spend']} #{langsys['Amount']}:"/>
                         <h:inputText id="itxtSpendPointsAmount" value="#{trans.spendPointsAmount}" styleClass="clsInputTransItem" style="width: 170px;height: 25px" disabled="false" autocomplete="off">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
                         <h:outputLabel value=""/>
                         <p:commandButton value="OK"  oncomplete="PF('dlgLoyalty').hide()" style="width: 180px;height: 40px;">
@@ -509,7 +509,7 @@
                     <h:panelGrid id="pnlgFilter2" columns="2">
                         <p:outputLabel value="#{langsys['New']} #{langsys['Total']}:"/>
                         <p:inputText id="itxtGrandTotal2" value="#{transBean.grandTotal2}" autocomplete="off" style="height: 25px;">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                             <p:ajax event="blur" listener="#{transBean.setCashDiscountFromGrandTotalCEC(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans, transItemBean.activeTransItems,transBean.grandTotal2)}" update=":TransactionFormSales:cmdlCashDiscount :TransactionFormSales:itxtCashDiscount :TransactionFormSales:itxtGrandTotal :TransactionFormSales:itxtChange :TransactionFormSales:pgrdApprove :TransactionFormSales:itxtTotalVat"/>
                         </p:inputText>
                         <h:outputLabel value=""/>
@@ -591,11 +591,11 @@
                     </p:autoComplete>
                     <h:outputLabel id="olblDebtCredit2" style="color: coral;font-weight: bold;" value="#{langsys['Receivable']} (#{generalUserSetting.LOCAL_CURRENCY.currencyCode})"/>
                     <h:inputText disabled="true" style="color: coral;font-weight: bold;width: 135px;" styleClass="clsInput" id="itxtDebtCredit2" value="#{accJournalBean.returnBalanceString(trans.balance_receivable2)}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
                     <h:outputLabel id="olblDeposit2" style="color: green;font-weight: bold;" value="#{langsys['Deposit']} (#{trans.currencyCode})"/>
                     <h:inputText disabled="true" style="color: green;font-weight: bold;width: 160px;" id="itxtPrepaidAcc2" value="#{accJournalBean.returnBalanceString(trans.deposit_customer2)}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
                     <h:outputLabel  value="#{langsys['Scheme']}"/>
                     <p:autoComplete id="autcSchemeTransactor" value="#{transactorBean.selectedSchemeTransactor}" 
@@ -634,11 +634,11 @@
                     <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeObj.transactionUserLabel)}"/>
 
                     <h:inputText id="itxtAmountTendered" value="#{trans.amountTendered}" styleClass="clsInputTransItem" style="width: 220px;height: 24px;background-color: yellow;font-weight: bold;font-size: 20px;" autocomplete="off">
-                        <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                         <f:ajax event="blur" listener="#{transBean.setTransTotalsAndUpdateCEC(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans, transItemBean.activeTransItems)}" render="itxtChange"/>
                     </h:inputText>
                     <h:inputText id="itxtChange" value="#{trans.changeAmount}" styleClass="clsInputTransItem" style="width: 150px;height: 24px;background-color: red;color: white" disabled="true">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
                     <h:selectOneMenu styleClass="clsMenu" id="menuPayMethod" value="#{trans.payMethod}" style="height: 30px;">
                         <f:selectItem itemValue="0" itemLabel=""/>
@@ -766,17 +766,17 @@
                         </p:column>
                         <p:column headerText="#{langsys['Retail']} #{langsys['sale']} #{langsys['Price']}" style="text-align: left">  
                             <h:outputText value="#{itm.unitRetailsalePrice}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{langsys['Wholesale']} #{langsys['Price']}" style="text-align: left" rendered="#{generalUserSetting.currentTransactionReasonId==2 or generalUserSetting.currentTransactionReasonId==10}">
                             <h:outputText value="#{itm.unitWholesalePrice}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{langsys['Special']} #{langsys['Price']}" style="text-align: left" rendered="#{generalUserSetting.currentTransactionReasonId==103}">
                             <h:outputText value="#{itm.unit_special_price}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{langsys['Currency']}" style="text-align: left">

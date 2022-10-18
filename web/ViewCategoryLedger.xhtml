@@ -60,7 +60,7 @@
                             <f:facet name="header">#{accCurrencyBean.localCurrency.currencyCode}</f:facet>
                             <!-- row record -->
                             <h:outputLabel value="#{c.amount}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
                         </p:column>
                     </p:dataTable>

@@ -17,17 +17,17 @@
                 <h:panelGrid id="pnlgFilter1" columns="2">
                     <p:outputLabel value="#{langsys['Total']} (#{trans.currencyCode}):"/>
                     <p:inputText value="#{trans.grandTotal}" readonly="true">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </p:inputText>
                     <p:outputLabel value="#{langsys['Cash']} #{langsys['Discount']}(%):"/>
                     <p:inputText value="#{trans.cash_dicsount_perc}" autocomplete="false">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         <f:ajax event="change" listener="#{trans.setCashDiscount(trans.grandTotal * trans.cash_dicsount_perc/100)}" render="itxtCashDiscountAmount"/>
                         <f:ajax event="keyup" listener="#{trans.setCashDiscount(trans.grandTotal * trans.cash_dicsount_perc/100)}" render="itxtCashDiscountAmount"/>
                     </p:inputText>
                     <p:outputLabel value="#{langsys['Cash']} #{langsys['Discount']}(#{langsys['Amount']}):"/>
                     <p:inputText id="itxtCashDiscountAmount" value="#{trans.cashDiscount}" readonly="true">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </p:inputText>
                     <p:commandButton value="#{langsys['OK']}" actionListener="#{transBean.closeChildCashDiscount()}"/>
                 </h:panelGrid>

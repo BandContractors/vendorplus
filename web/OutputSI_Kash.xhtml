@@ -28,13 +28,13 @@
                         <ui:repeat var="ti" value="#{generalUserSetting.outputDetailParent.trans_items}">
                             <h:outputLabel style="width: 500px;" value="#{transItemBean.showItemDescriptionCEC(ti)}" escape="false"/>
                             <h:outputText value="#{ti.itemQty}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                             <h:outputText value="#{ti.unitPriceExcVat}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                             <h:outputText value="#{ti.amountIncVat}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </ui:repeat>
                     </h:panelGrid>

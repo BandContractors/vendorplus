@@ -82,7 +82,7 @@
                         </td>
                         <td colspan="2">
                             <h:outputText value="#{transBean.getReportBillTotal(trans)}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                             #{accCurrencyBean.localCurrency.currencyCode}
                         </td>
@@ -111,7 +111,7 @@
                             <td>#{t.currencyCode}</td>
                             <td>
                                 <h:outputText value="#{t.grandTotal}">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputText>
                             </td>
                             <td>#{t.transactionUserDetailName}</td>
@@ -122,7 +122,7 @@
                                 <td>#{ti.categoryName}</td>
                                 <td>
                                     <h:outputText value="#{ti.sumAmountIncVat}">
-                                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                     </h:outputText>
                                 </td>
                                 <td colspan="2"></td>

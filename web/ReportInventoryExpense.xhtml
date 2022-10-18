@@ -67,7 +67,7 @@
                         </p:column>
                         <p:column headerText="Cost" style="text-align: right;">
                             <h:outputText value="#{sm.costValue}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                     </p:dataTable>
@@ -115,7 +115,7 @@
                 </p:column>
                 <p:column headerText="Unit Cost">
                     <h:outputText value="#{itm.unitCost}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="Currency">

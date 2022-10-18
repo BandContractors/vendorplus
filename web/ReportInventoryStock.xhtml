@@ -67,37 +67,37 @@
                         </p:column>
                         <p:column headerText="Cost" style="text-align: right;">
                             <h:outputText value="#{sm.costValue}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="Retailsale" style="text-align: right;color:green;">
                             <h:outputText value="#{sm.retailsaleValue}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="Margin" style="text-align: right;color: green;">
                             <h:outputText value="#{sm.retailsaleValue-sm.costValue}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="% Margin" style="text-align: right;color: green;">
                             <h:outputText value="#{(sm.retailsaleValue-sm.costValue)*100/sm.costValue}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="Wholesale" style="text-align: right;color: coral;">
                             <h:outputText value="#{sm.wholesaleValue}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="Margin" style="text-align: right;color: coral;">
                             <h:outputText value="#{sm.wholesaleValue-sm.costValue}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="% Margin" style="text-align: right;color: coral;">
                             <h:outputText value="#{(sm.wholesaleValue-sm.costValue)*100/sm.costValue}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="Stock Value">
@@ -151,7 +151,7 @@
                 </p:column>
                 <p:column headerText="Unit Cost">
                     <h:outputText value="#{itm.unitCost}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="Reorder Level">

@@ -81,7 +81,7 @@
                             <f:facet name="header">#{langsys['Qty']}</f:facet>
                             <!-- row record -->
                             <h:inputText value="#{ati.itemQty}" style="width: 50px;" disabled="#{transBean.actionType.equals('View') or generalUserSetting.currentStore.storeId!=transBean.transObj.storeId}" autocomplete="off">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 <f:ajax event="change" listener="#{transItemBean.editTransItemV2(2,transBean.transObj, transBean.transItemList,ati)}" execute="dtblTransactionItem" render="@form"/>
                             </h:inputText>
                         </p:column>
@@ -90,7 +90,7 @@
                             <f:facet name="header">#{langsys['Unit']} #{langsys['Cost']}</f:facet>
                             <!-- row record -->
                             <h:inputText value="#{ati.unitCostPrice}" style="width: 100px;" disabled="#{transBean.actionType.equals('View') or generalUserSetting.currentStore.storeId!=transBean.transObj.storeId}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 <f:ajax event="change" execute="dtblTransactionItem" render="dtblTransactionItem"/>
                             </h:inputText>
                         </p:column>

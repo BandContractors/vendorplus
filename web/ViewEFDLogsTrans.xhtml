@@ -76,7 +76,7 @@
                             <f:facet name="header">#{langsys['Qty']}</f:facet>
                             <!-- row record -->
                             <h:outputLabel value="#{utilityBean.convertStringAsDouble(ati.qty)}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
                         </p:column>
                         <p:column>
@@ -84,7 +84,7 @@
                             <f:facet name="header">#{langsys['Unit']} #{langsys['Price']}</f:facet>
                             <!-- row record -->
                             <h:outputLabel value="#{utilityBean.convertStringAsDouble(ati.unitPrice)}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
                         </p:column>
                         <p:column>
@@ -92,7 +92,7 @@
                             <f:facet name="header">#{langsys['Unit']} VAT</f:facet>
                             <!-- row record -->
                             <h:outputLabel value="#{utilityBean.convertStringAsDouble(ati.tax)}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
                         </p:column>
                         <p:column>
@@ -100,7 +100,7 @@
                             <f:facet name="header">#{langsys['Amount']}</f:facet>
                             <!-- row record -->
                             <h:outputLabel id="id22" value="#{utilityBean.convertStringAsDouble(ati.total)}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
                         </p:column>
                         <p:column>

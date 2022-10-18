@@ -10599,9 +10599,9 @@ public class TransBean implements Serializable {
         aTrans.setTotalProfitMargin(this.getTotalProfitMargin(aActiveTransItems));
         this.setCashDiscountPerc(aTrans);
         //Customer Display
-        String PortName = new Parameter_listBean().getParameter_listByContextNameMemory("CUSTOMER_DISPLAY", "COM_PORT_NAME").getParameter_value();
+        String PortName = new Parameter_listBean().getParameter_listByContextName("CUSTOMER_DISPLAY", "COM_PORT_NAME").getParameter_value();
         String ClientPcName = new GeneralUserSetting().getClientComputerName();
-        String SizeStr = new Parameter_listBean().getParameter_listByContextNameMemory("CUSTOMER_DISPLAY", "MAX_CHARACTERS_PER_LINE").getParameter_value();
+        String SizeStr = new Parameter_listBean().getParameter_listByContextName("CUSTOMER_DISPLAY", "MAX_CHARACTERS_PER_LINE").getParameter_value();
         int Size = 0;
         if (SizeStr.length() > 0) {
             Size = Integer.parseInt(SizeStr);
@@ -10804,7 +10804,7 @@ public class TransBean implements Serializable {
             }
             ListItemIndex = ListItemIndex + 1;
         }
-        TotTradeDisc = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), TotTradeDisc);
+        TotTradeDisc = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), TotTradeDisc, "TOTAL_OTHER");
         return TotTradeDisc;
     }
 
@@ -10839,17 +10839,11 @@ public class TransBean implements Serializable {
         }
         //case for cash discount offered, overide vat from totals
         double VatPerc = CompanySetting.getVatPerc();
-        /*
-         if ((aTrans.getCashDiscount() + aTrans.getSpendPointsAmount()) > 0 && TVat > 0 && VatPerc > 0) {
-         //TVat = (aTrans.getSubTotal() - aTrans.getTotalTradeDiscount() - aTrans.getCashDiscount()) * VatPerc / 100;
-         TVat = (aTrans.getSubTotal() - aTrans.getTotalTradeDiscount() - aTrans.getCashDiscount() - aTrans.getSpendPointsAmount()) * VatPerc / 100;
-         }
-         */
         if ((aTrans.getCashDiscount() + aTrans.getSpendPointsAmount()) > 0 && aTrans.getTotalStdVatableAmount() >= 0 && VatPerc > 0) {
             //TVat = (aTrans.getSubTotal() - aTrans.getTotalTradeDiscount() - aTrans.getCashDiscount()) * VatPerc / 100;
             TVat = aTrans.getTotalStdVatableAmount() * VatPerc / 100;
         }
-        TVat = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), TVat);
+        TVat = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), TVat, "TOTAL_OTHER");
         return TVat;
     }
 
@@ -10897,7 +10891,7 @@ public class TransBean implements Serializable {
             }
             ListItemIndex = ListItemIndex + 1;
         }
-        SubT = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), SubT);
+        SubT = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), SubT, "TOTAL_OTHER");
         return SubT;
     }
 
@@ -10969,7 +10963,7 @@ public class TransBean implements Serializable {
                 ListItemIndex = ListItemIndex + 1;
             }
         }
-        GTotal = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), GTotal);
+        GTotal = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), GTotal, "TOTAL");
         return GTotal;
     }
 
@@ -11211,7 +11205,7 @@ public class TransBean implements Serializable {
                 ListItemIndex = ListItemIndex + 1;
             }
         }
-        GTotalStdVatableAmount = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), GTotalStdVatableAmount);
+        GTotalStdVatableAmount = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), GTotalStdVatableAmount, "TOTAL_OTHER");
         return GTotalStdVatableAmount;
     }
 
@@ -11294,7 +11288,7 @@ public class TransBean implements Serializable {
                 ListItemIndex = ListItemIndex + 1;
             }
         }
-        GTotalZeroVatableAmount = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), GTotalZeroVatableAmount);
+        GTotalZeroVatableAmount = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), GTotalZeroVatableAmount, "TOTAL_OTHER");
         return GTotalZeroVatableAmount;
     }
 
@@ -11377,7 +11371,7 @@ public class TransBean implements Serializable {
                 ListItemIndex = ListItemIndex + 1;
             }
         }
-        GTotalExemptVatableAmount = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), GTotalExemptVatableAmount);
+        GTotalExemptVatableAmount = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), GTotalExemptVatableAmount, "TOTAL_OTHER");
         return GTotalExemptVatableAmount;
     }
 
@@ -17353,7 +17347,7 @@ public class TransBean implements Serializable {
         List<TransItem> o_transItemList = new ArrayList<TransItem>();
         List<TransItem> n_transItemList = new ArrayList<TransItem>();
         Gson gson = new Gson();
-         String message = ""; 
+        String message = "";
 
         try {
             long transId = getTransObj().getTransactionId();
@@ -17391,14 +17385,14 @@ public class TransBean implements Serializable {
                 }
                 this.setTransTotalsAndUpdateCEC(getTransObj().getTransactionTypeId(), getTransObj().getTransactionReasonId(), getTransObj(), o_transItemList);
                 saveTransCallQuickOrder(aAction, aLevel, aStoreId, aTransTypeId, aTransReasonId, aSaleType, getTransObj(), o_transItemList, aSelectedTransactor, aSelectedBillTransactor, aTransUserDetail, aSelectedSchemeTransactor, aAuthorisedByUserDetail, aSelectedAccCoa, aStatusBean);
-                message = "Order Split Successfully";             
+                message = "Order Split Successfully";
             } else {
                 message = "No Order adjustments to save";
-               // this.setActionMessage(ub.translateWordsInText(BaseName, message));
+                // this.setActionMessage(ub.translateWordsInText(BaseName, message));
             }
-           
+
             this.refreshTransListQuickOrderManage(trans);
-             this.setActionMessage(ub.translateWordsInText(BaseName, message));
+            this.setActionMessage(ub.translateWordsInText(BaseName, message));
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
