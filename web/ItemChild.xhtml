@@ -227,7 +227,7 @@
                         <p:remoteCommand name="rcmdCopyRetailWhole" actionListener="#{itemBean.setRetailToWhole()}" update="itxtUnitWholesalePrice"/>
                     </h:panelGrid>
                     <h:panelGrid columns="1">  
-                        <p:commandLink value="Bar Code" rendered="#{itemBean.itemObj.itemCode.length()>0}">
+                        <p:commandLink value="Bar Code" rendered="#{itemBean.itemObj.itemCode.length()>0}" style="color: blue;text-decoration: none;">
                             <p:printer target="gnlgBarCodeOnly" rendered="false"/>
                         </p:commandLink>
                         <h:panelGrid id="gnlgBarCodeOnly" rendered="#{itemBean.itemObj.itemCode.length()>0}">  
