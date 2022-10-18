@@ -64,12 +64,12 @@
                         </p:column>
                         <p:column headerText="#{langsys['Retail']} #{langsys['Sale']} #{langsys['Price']}" style="text-align: left">  
                             <h:outputText value="#{itm.unitRetailsalePrice}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{langsys['Wholesale']} #{langsys['Price']}" style="text-align: left">
                             <h:outputText value="#{itm.unitWholesalePrice}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{langsys['Currency']}" style="text-align: left">
@@ -151,18 +151,18 @@
                     </p:column>
                     <p:column headerText="#{langsys['Open']} #{langsys['Qty']}" style="text-align: right;width: 10%;font-size: 13px;">
                         <h:outputText value="#{itm.qty_open}">
-                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText><h:outputText value=" #{itm.unit_symbol}"/>
                     </p:column>
                     <p:column headerText="#{langsys['Stock']} #{langsys['Changes']} (#{langsys['Added']}, #{langsys['Subtracted']})" style="width: 40%;font-size: 13px;">
                         <ui:repeat var="lst" value="#{itm.stock_ledgerList}" varStatus="status">
                             <h:outputText value="#{lst.transaction_type_name}" rendered="#{lst.qty_added>0 or lst.qty_subtracted>0}"/>
                             <h:outputText value="#{lst.qty_added}" style="background-color: #00B461;color: white;font-size: 13px;" rendered="#{lst.qty_added>0}">
-                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                             <h:outputText value="&nbsp;" rendered="#{lst.qty_added>0 and lst.qty_subtracted>0}"/>
                             <h:outputText value="#{lst.qty_subtracted}" style="background-color: red;color: white;font-size: 13px;" rendered="#{lst.qty_subtracted>0}">
-                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                             <h:outputText value="#{lst.unit_symbol}"/>
                             <h:outputText value=".&nbsp;&nbsp;"/>
@@ -170,7 +170,7 @@
                     </p:column>
                     <p:column headerText="#{langsys['Close']} #{langsys['Qty']}" style="text-align: right;width: 10%;font-size: 13px;">
                         <h:outputText value="#{itm.qty_close}">
-                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText><h:outputText value=" #{itm.unit_symbol}"/>
                     </p:column>
                 </p:dataTable>
@@ -235,17 +235,17 @@
                     </p:column>
                     <p:column headerText="#{langsys['Subtract']}" style="text-align: right;background-color: red;color: white;font-size: 13px;width: 7%;">
                         <h:outputText value="#{itm.qty_subtracted}" rendered="#{itm.qty_subtracted>0}">
-                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                     <p:column headerText="#{langsys['Add']}" style="text-align: right;background-color: #00B461;color: white;font-size: 13px;width: 5%;">
                         <h:outputText value="#{itm.qty_added}" rendered="#{itm.qty_added>0}">
-                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                     <p:column headerText="#{langsys['Balance']}" style="text-align: right;background-color: yellow;font-size: 13px;width: 7%;">
                         <h:outputText value="#{itm.qty_bal}">
-                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText><h:outputText value=" #{itm.base_unit_symbol}"/>
                     </p:column>
                     <p:column headerText="#{langsys['Detail']}" style="text-align: right;background-color: yellow;font-size: 13px;width: 7%;">

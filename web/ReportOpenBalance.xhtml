@@ -192,7 +192,7 @@
                 </p:column>
                 <p:column headerText="#{langsys['Amount']}" style="text-align: right;">
                     <h:outputText value="#{itm.grandTotal}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Reference']} #{langsys['No.']}">

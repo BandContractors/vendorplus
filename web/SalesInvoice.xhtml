@@ -78,7 +78,7 @@
                         <f:facet name="header">Qty</f:facet>
                         <!-- row record -->
                         <h:outputLabel value="#{ti.itemQty}" style="font-size: 14px;">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputLabel>#{unitBean.getUnit(itemBean.getItem(ti.itemId).unitId).unitSymbol}
                     </h:column>
                     <h:column>
@@ -86,7 +86,7 @@
                         <f:facet name="header">Price</f:facet>
                         <!-- row record -->
                         <h:outputLabel value="#{ti.unitPriceIncVat}" style="font-size: 14px;">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputLabel>
                     </h:column>
                     <h:column>
@@ -94,7 +94,7 @@
                         <f:facet name="header">Disc</f:facet>
                         <!-- row record -->
                         <h:outputLabel value="#{ti.unitTradeDiscount}" style="font-size: 14px;">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputLabel>
                     </h:column>
                     <h:column>
@@ -102,7 +102,7 @@
                         <f:facet name="header">Amount</f:facet>
                         <!-- row record -->
                         <h:outputLabel value="#{ti.amountIncVat}" style="font-size: 14px;">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputLabel>
                     </h:column>
                     </h:dataTable>
@@ -111,35 +111,35 @@
                 <h:panelGrid id="pgrdSalesInvoiceTotals" style="width: 350px; margin: 0px;border-bottom-style: dotted" columns="2">
                     <h:outputLabel style="font-size: 16px;" value="SubTotal :"/>
                     <h:outputLabel style="font-size: 16px;" id="olblSalesInvoiceSubTotal" value="#{salesInvoiceBean.getCurrentTransaction().subTotal}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                     <h:outputLabel style="font-size: 16px;" value="Total Trade Discount :"/>
                     <h:outputLabel style="font-size: 16px;" id="olblSalesInvoiceTotalTradeDiscount" value="#{salesInvoiceBean.getCurrentTransaction().totalTradeDiscount}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                     <h:outputLabel style="font-size: 16px;" value="Total VAT :"/>
                     <h:outputLabel style="font-size: 16px;" id="olblSalesInvoiceTotalVat" value="#{salesInvoiceBean.getCurrentTransaction().totalVat}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                     <h:outputLabel style="font-size: 16px;" value="Cash Discount :"/>
                     <h:outputLabel style="font-size: 16px;" id="olblSalesInvoiceCashDiscount" value="#{salesInvoiceBean.getCurrentTransaction().cashDiscount}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                     <h:outputLabel style="font-size: 16px; font-weight: bold;" value="GRAND TOTAL :"/>
                     <h:outputLabel style="font-size: 16px; font-weight: bold;" id="olblSalesInvoiceGrandTotal" value="#{salesInvoiceBean.getCurrentTransaction().grandTotal}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                     <h:outputLabel style="font-size: 16px;" value="POINTS AMOUNT SPENT :"/>
                     <h:outputLabel id="olblSalesInvoicePointsAmountSpent" value="#{salesInvoiceBean.getCurrentPay().pointsSpentAmount}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                     <h:outputLabel style="font-size: 16px; font-weight: bold;" value="AMOUNT TENDERED :"/>
                     <h:outputLabel style="font-size: 16px; font-weight: bold;" id="olblSalesInvoiceAmountTendered" value="#{salesInvoiceBean.getCurrentTransaction().amountTendered}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                     <h:outputLabel style="font-size: 16px; font-weight: bold;" value="CHANGE AMOUNT :"/>
                     <h:outputLabel style="font-size: 16px; font-weight: bold;" id="olblSalesInvoiceChangeAmount" value="#{salesInvoiceBean.getCurrentTransaction().changeAmount}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                 </h:panelGrid>
                 
@@ -151,26 +151,26 @@
                     
                     <h:outputLabel style="font-size: 14px;" value="Standard[S]"/>
                     <h:outputLabel style="font-size: 14px;" value="#{salesInvoiceBean.getCurrentTransaction().vatPerc}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                     <h:outputLabel style="font-size: 14px;" value="#{salesInvoiceBean.getCurrentTransaction().totalStdVatableAmount}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                     <h:outputLabel style="font-size: 14px;" value="#{salesInvoiceBean.getCurrentTransaction().totalVat}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                     
                     <h:outputLabel style="font-size: 14px;" value="Zero[Z]"/>
                     <h:outputLabel style="font-size: 14px;" value="0"/>
                     <h:outputLabel style="font-size: 14px;" value="#{salesInvoiceBean.getCurrentTransaction().totalZeroVatableAmount}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                     <h:outputLabel style="font-size: 14px;" value="0"/>
                     
                     <h:outputLabel style="font-size: 14px;" value="Exempt[E]"/>
                     <h:outputLabel style="font-size: 14px;" value="n/a"/>
                     <h:outputLabel style="font-size: 14px;" value="#{salesInvoiceBean.getCurrentTransaction().totalExemptVatableAmount}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                     <h:outputLabel style="font-size: 14px;" value="0"/>
                     
@@ -183,15 +183,15 @@
                     <h:outputLabel style="font-size: 14px;" id="olblSalesInvoiceCardHolder" value="#{salesInvoiceBean.getCurrentPointscard().cardHolder}"/>
                     <h:outputLabel style="font-size: 14px;" value="Points Spent :"/>
                     <h:outputLabel style="font-size: 14px;" id="olblSalesInvoicePointsSpent" value="#{salesInvoiceBean.getCurrentPay().pointsSpent}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                     <h:outputLabel style="font-size: 14px;" value="Points Awarded :"/>
                     <h:outputLabel style="font-size: 14px;" id="olblSalesInvoicePointsAwarded" value="#{salesInvoiceBean.getCurrentTransaction().pointsAwarded}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                     <h:outputLabel style="font-size: 14px;" value="Points Balance :"/>
                     <h:outputLabel style="font-size: 14px;" id="olblSalesInvoicePointsBalance" value="#{salesInvoiceBean.getCurrentPointscard().pointsBalance}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                 </h:panelGrid>
                 

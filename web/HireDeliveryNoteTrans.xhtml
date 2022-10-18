@@ -137,7 +137,7 @@
                     <f:facet name="header">Hired</f:facet>
                     <!-- row record -->
                     <h:outputLabel value="#{ati.qty_taken}" style="color: blue;">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                 </p:column>
                 <p:column>
@@ -145,7 +145,7 @@
                     <f:facet name="header">Total Delivered</f:facet>
                     <!-- row record -->
                     <h:outputLabel value="#{ati.qty_total}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                 </p:column>
                 <p:column>
@@ -153,7 +153,7 @@
                     <f:facet name="header">Total UnDelivered</f:facet>
                     <!-- row record -->
                     <h:outputLabel value="#{ati.qty_balance}" style="color: red;">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                 </p:column>
                 <p:column style="text-align: center;">
@@ -166,7 +166,7 @@
                     </f:facet>
                     <!-- row record -->
                     <h:inputText value="#{ati.itemQty}" style="width: 50px;" autocomplete="off">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         <f:ajax event="change" listener="#{transItemBean.refreshTransTotalWeight(trans,transItemBean.activeTransItems)}" execute="dtblTransactionItem" render="@form"/>
                     </h:inputText>
                 </p:column>
@@ -195,7 +195,7 @@
 
                 <h:outputLabel value="Total Weight(#{parameter_listBean.getParameter_listByContextNameMemory('ITEM','DEFAULT_MEASURE_UNIT').parameter_value})"/>
                 <h:inputText id="itxtTotalWeight" value="#{trans.total_weight}" disabled="true" style="width: 70px;">
-                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
             </h:panelGrid>
             <h:panelGrid id="pgrdCommands" styleClass="clsGridMainCommands" columns="1">

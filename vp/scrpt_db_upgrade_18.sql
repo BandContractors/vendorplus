@@ -185,3 +185,11 @@ VALUES ('135', 'SALES PACKAGING', '88', 'Pack items to be sold');
 
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',186,Now(),'6.0','');
 
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (99, 'ROUNDING_DECIMAL_PLACES', 'ROUND_DECIMAL_PLACES_ITEM', '0','Rounding off decimal places for (transaction item amounts). Put 0 for currency decimal places to take  or specify the number of decimal places');
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (100, 'ROUNDING_DECIMAL_PLACES', 'ROUND_DECIMAL_PLACES_TOTAL', '0','Rounding off decimal places for (transaction grand total). Put 0 for currency decimal places to take precedence or specify the number of decimal places');
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (101, 'ROUNDING_DECIMAL_PLACES', 'ROUND_DECIMAL_PLACES_TOTAL_OTHER', '0','Rounding off decimal places for (transaction totals excluding grand total). Put 0 for currency decimal places to take precedence or specify the number of decimal places');
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',194,Now(),'6.0','');
+

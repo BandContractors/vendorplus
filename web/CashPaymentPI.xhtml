@@ -134,19 +134,19 @@
                     <p:column>
                         <f:facet name="header">#{langsys['Amount']}</f:facet>
                         <h:outputLabel value="#{pts.grandTotal}">
-                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputLabel>
                     </p:column>
                     <p:column>
                         <f:facet name="header">#{langsys['Total']} #{langsys['Paid']}</f:facet>
                         <h:outputLabel value="#{pts.sumTransPaidAmount}" style="color: blue">
-                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputLabel>
                     </p:column>
                     <p:column>
                         <f:facet name="header">#{langsys['Payable']} #{langsys['Balance']}</f:facet>
                         <h:outputLabel value="#{pts.grandTotal-pts.sumTransPaidAmount}" style="color: red">
-                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputLabel>
                     </p:column>
                     <p:column>
@@ -154,7 +154,7 @@
                             #{langsys['Pay']} #{langsys['Amount']}
                         </f:facet>
                         <h:inputText value="#{pts.transPaidAmount}" style="width: 100px;">
-                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             <f:ajax event="change" listener="#{payTransBean.editPayTrans(payTransBean.payTranss,pts,pay)}" execute="dtblPayTranss" render="dtblPayTranss formPay:itxtPaidAmount"/>
                         </h:inputText>
                     </p:column>
@@ -172,7 +172,7 @@
                 <h:panelGrid id="pnlInputDetails" styleClass="clsGridMainInput" columns="4">
                     <h:outputLabel  value="#{langsys['Amount']} #{langsys['Paid']}:"/>
                     <h:inputText id="itxtPaidAmount" value="#{pay.paidAmount}" disabled="true" style="width: 233px;">
-                        <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
                     <h:outputLabel  style="width: 250px;" value="#{langsys['Pay']} #{langsys['Date']}:"/>
                     <p:calendar styleClass="clsInput" size="20" id="calPaymentDate"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{pay.payDate}" disabled="#{generalUserSetting.isAllowedToBackDate==0}">

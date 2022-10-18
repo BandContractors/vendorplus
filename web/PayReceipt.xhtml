@@ -67,7 +67,7 @@
                 <h:panelGrid id="IpgrdSalesInvoiceTotals" style="width: 290px; margin: 0px;border-bottom-style: dotted" columns="2">
                     <h:outputLabel style="font-size: 16px; font-weight: bold;" value="AMOUNT(#{companySetting.ECurrencyUsed})"/>
                     <h:outputLabel style="font-size: 16px; font-weight: bold;" id="IolblSalesInvoiceAmountTendered" value="#{salesInvoiceBean.getCurrentPay().paidAmount}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                     <h:outputLabel style="font-size: 16px;" value="Payment Method"/>
                     <h:outputLabel value=": #{payMethodBean.getPayMethod(salesInvoiceBean.getCurrentPay().payMethodId).payMethodName}"/>

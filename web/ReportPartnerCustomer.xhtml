@@ -110,7 +110,7 @@
                 </p:column>
                 <p:column headerText="#{langsys['Credit']} #{langsys['Limit']}" style="text-align: right;" visible="false">
                     <h:outputText value="#{rts.credit_limit}" rendered="#{rts.is_credit_limit eq 1}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
             </p:dataTable>

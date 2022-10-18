@@ -82,7 +82,7 @@
                     </p:autoComplete>
                     <h:outputLabel id="olblDeposit" value="#{langsys['Deposit']}(#{pay.currencyCode})"/>
                     <h:inputText disabled="true" style="color: green;font-weight: bold;width: 155px;;height: 24px;" styleClass="clsInput" id="itxtPrepaidAcc" value="#{accJournalBean.returnBalanceString(pay.customerDeposit)}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
                 </h:panelGrid>
             </h:panelGrid>
@@ -91,7 +91,7 @@
                 <h:panelGrid id="pnlInputDetails" styleClass="clsGridMainInput" columns="4">
                     <h:outputLabel  value="#{langsys['Amount']} #{langsys['Received']}:"/>
                     <h:inputText value="#{pay.paidAmount}" style="width: 233px;">
-                        <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         <f:ajax event="change" execute="@form" render="@form"/>
                     </h:inputText>
                     <h:outputLabel  style="width: 250px;" value="#{langsys['Receipt']} #{langsys['Date']}:"/>

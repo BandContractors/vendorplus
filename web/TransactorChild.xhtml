@@ -174,13 +174,13 @@
                     </h:selectOneMenu>
                     <h:outputLabel  value="#{langsys['Credit']} #{langsys['Limit']} (#{generalUserSetting.LOCAL_CURRENCY.currencyCode}):"/>
                     <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.credit_limit}" autocomplete="off" style="width: 203px;">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
                 </h:panelGrid>
                 <h:panelGrid id="pnlSalary" columns="1" rendered="#{transactorBean.transactorObj.transactorType.equals('EMPLOYEE')}">
                     <h:outputLabel  value="#{langsys['Gross']} #{langsys['Pay']} (#{langsys['Monthly']}):"/>
                     <h:inputText id="itxtGrossPay" styleClass="clsInput" value="#{transactorBean.transactorObj.monthGrossPay}" autocomplete="off">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         <f:ajax event="change" listener="#{transactorBean.refreshTotalSalaryDeductions(transactorBean.transactorObj)}" execute="@form" render="@form"/>
                     </h:inputText>
                     <p:dataTable rowIndexVar="rowIndex" id="dtblDeductions" value="#{transactorBean.salaryDeductions}" var="sd" 
@@ -205,7 +205,7 @@
                             <f:facet name="header">#{langsys['Percentage']} (%)</f:facet>
                             <!-- row record -->
                             <h:inputText id="itxtInnerPerc" value="#{sd.perc}" style="width: 50px;">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 <f:ajax event="change" listener="#{transactorBean.calcSalaryDeductionAmount(transactorBean.transactorObj,sd)}" execute="@form" render="@form"/>
                             </h:inputText>
                         </p:column>
@@ -214,7 +214,7 @@
                             <f:facet name="header">#{langsys['Amount']}</f:facet>
                             <!-- row record -->
                             <h:inputText id="itxtInnerAmount" value="#{sd.amount}" style="width: 80px;">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 <f:ajax event="change" listener="#{transactorBean.calcSalaryDeductionPerc(transactorBean.transactorObj,sd)}" execute="@form" render="@form"/>
                             </h:inputText>
                         </p:column>
@@ -233,7 +233,7 @@
                     </p:dataTable>
                     <h:outputLabel  value="#{langsys['Net']} #{langsys['Pay']} (#{langsys['Monthly']}):"/>
                     <h:inputText id="itxtMonthNetPay" styleClass="clsInput" value="#{transactorBean.transactorObj.monthNetPay}" autocomplete="off" disabled="true">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         <f:ajax event="change" execute="@this" render="@this"/>
                     </h:inputText>
                 </h:panelGrid>

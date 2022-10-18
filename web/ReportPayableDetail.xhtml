@@ -106,12 +106,12 @@
                         </p:column>
                         <p:column headerText="#{langsys['Cash']} #{langsys['Paid']}" style="text-align: right;">
                             <h:outputText value="#{sm.debitAmount}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{langsys['Credit']} #{langsys['Purchase']} (#{langsys['Payable']})" style="text-align: right;">
                             <h:outputText value="#{sm.creditAmount}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{langsys['Payable']} #{langsys['Balance']}" style="text-align: right;">
@@ -168,12 +168,12 @@
                 </p:column>
                 <p:column headerText="#{langsys['Cash']} #{langsys['Paid']}" style="text-align: right;">
                     <h:outputText value="#{itm.debitAmount}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Credit']} #{langsys['Purchase']} (#{langsys['Payable']})" style="text-align: right;">
                     <h:outputText value="#{itm.creditAmount}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Narration']}">

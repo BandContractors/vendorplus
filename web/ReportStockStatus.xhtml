@@ -104,7 +104,7 @@
                     </p:column>
                     <p:column headerText="#{langsys['Items']}" style="text-align: right;">
                         <h:outputText value="#{itms.qty_total}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                     <p:column headerText="%" style="text-align: right;">
@@ -162,12 +162,12 @@
                 </p:column>
                 <p:column headerText="#{langsys['Reorder']} #{langsys['Level']}" style="text-align: right;">
                     <h:outputText value="#{itm.reorderLevel}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Total']} #{langsys['Qty']}" style="text-align: right;">
                     <h:outputText value="#{itm.qty_total}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Status']}">

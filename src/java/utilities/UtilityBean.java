@@ -306,9 +306,9 @@ public class UtilityBean implements Serializable {
         //DecimalFormat myFormatter = new DecimalFormat("###,###.###;(###,###.###)");
         //DecimalFormat myFormatter = new DecimalFormat("###,###.###");
         if (aAmount >= 0) {
-            aString = this.formatNumber("###,###.###", aAmount) + "";
+            aString = this.formatNumber("###,###,###.########", aAmount) + "";
         } else if (aAmount < 0) {
-            aString = this.formatNumber("###,###.###", aAmount) + "";
+            aString = this.formatNumber("###,###,###.########", aAmount) + "";
         }
         return aString;
     }
@@ -337,9 +337,9 @@ public class UtilityBean implements Serializable {
         //DecimalFormat myFormatter = new DecimalFormat("###,###.###;(###,###.###)");
         //DecimalFormat myFormatter = new DecimalFormat("###,###.###");
         if (aAmount >= 0) {
-            aString = this.formatNumber("###,###.###", aAmount) + "";
+            aString = this.formatNumber("###,###,###.########", aAmount) + "";
         } else if (aAmount < 0) {
-            aString = this.formatNumber("###,###.###", aAmount) + "";
+            aString = this.formatNumber("###,###,###.########", aAmount) + "";
         }
         if (aHideResult == 0) {
             return aString;
@@ -353,7 +353,7 @@ public class UtilityBean implements Serializable {
         String aPattern = "";
         aPattern = new AccCurrencyBean().getNumberFormatByCurrency(aCurrencyCode);
         if (aPattern.length() == 0) {
-            aPattern = "###,###.###";
+            aPattern = "###,###,###.########";
         }
         if (aAmount >= 0) {
             aString = this.formatNumber(aPattern, aAmount) + "";
@@ -809,7 +809,6 @@ public class UtilityBean implements Serializable {
 //        new ItemBean().setItemUnitList(aItem_unitList, aItem, 0);
 //        System.out.println(aItem_unitList.size());
 //    }
-    
     public List<ThreadClass> getRunningThreads() {
         List<ThreadClass> objs = new ArrayList<>();
         Set<Thread> threads = Thread.getAllStackTraces().keySet();
@@ -1185,7 +1184,7 @@ public class UtilityBean implements Serializable {
         javax.faces.context.FacesContext.getCurrentInstance().addMessage(null, new javax.faces.application.FacesMessage("Progress Completed"));
     }
 
-    public void callDownloadExciseDuty_list() {        
+    public void callDownloadExciseDuty_list() {
         new T125().downloadExciseDuty_list();
     }
 
