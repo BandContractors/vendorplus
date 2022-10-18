@@ -176,7 +176,7 @@ CREATE TABLE transaction_package_item (
   vat_perc double DEFAULT NULL,
   narration varchar(100) DEFAULT NULL,
   PRIMARY KEY (transaction_package_item_id)
-) ENGINE=InnoDB1;
+) ENGINE=InnoDB;
 
 INSERT INTO transaction_type (transaction_type_id, transaction_type_name, transactor_label, transaction_number_label, transaction_output_label, transaction_date_label, transaction_user_label, is_transactor_mandatory, is_transaction_user_mandatory, is_transaction_ref_mandatory, is_authorise_user_mandatory, is_authorise_date_mandatory, is_delivery_address_mandatory, is_delivery_date_mandatory, is_pay_due_date_mandatory, is_expiry_date_mandatory, description, group_name, print_file_name1, print_file_name2, default_print_file, transaction_type_code, default_currency_code, trans_number_format) 
 VALUES ('88', 'PACKAGING', '', 'Packaging No', 'PACKAGING', 'Packaging Date', 'Packed By', 'No', 'No', 'No', 'No', 'No', 'No', 'No', 'No', 'No', 'No', 'Packaging', 'OutputPCG_General', 'OutputPCG_General', '1', 'PCG', 'UGX', 'CYMDX');
@@ -193,3 +193,25 @@ INSERT INTO parameter_list (parameter_list_id, context, parameter_name, paramete
 VALUES (101, 'ROUNDING_DECIMAL_PLACES', 'ROUND_DECIMAL_PLACES_TOTAL_OTHER', '0','Rounding off decimal places for (transaction totals excluding grand total). Put 0 for currency decimal places to take precedence or specify the number of decimal places');
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',194,Now(),'6.0','');
 
+ALTER TABLE item_excise_duty_map CHANGE COLUMN efris_excise_duty_list_id excise_duty_code VARCHAR(50) NOT NULL ;
+create table efris_goods_commodity (
+	efris_goods_commodity_id bigint primary key auto_increment,
+    commodityCategoryCode varchar(18) not null default '',
+    parentCode varchar(18) not null default '',
+    commodityCategoryName varchar(200) not null default '',
+    commodityCategoryLevel varchar(1) not null default '',
+    rate varchar(4) not null default '',
+    isLeafNode varchar(3) not null default '',
+    serviceMark varchar(3) not null default '',
+    isZeroRate varchar(3) not null default '',
+    zeroRateStartDate varchar(100) not null default '',
+    zeroRateEndDate varchar(100) not null default '',
+    isExempt varchar(3) not null default '',
+    exemptRateStartDate varchar(100) not null default '',
+    exemptRateEndDate varchar(100) not null default '',
+    enableStatusCode varchar(1) not null default '',
+    exclusion varchar(1) not null default '',
+    add_date datetime not null
+)ENGINE=InnoDB;
+
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',217,Now(),'6.0','');
