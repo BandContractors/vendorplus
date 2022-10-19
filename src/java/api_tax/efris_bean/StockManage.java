@@ -23,6 +23,7 @@ import com.sun.jersey.api.client.WebResource;
 import entities.Api_tax_error_log;
 import entities.CompanySetting;
 import entities.Item;
+import entities.Item_excise_duty_map;
 import entities.Item_unit_other;
 import entities.Stock;
 import entities.Transactor;
@@ -918,6 +919,18 @@ public class StockManage implements Serializable {
             } else {
                 UnitPriceStr = " \"unitPrice\": \"1\",\n";
             }
+            String exciseDutyCodeStr = " \"exciseDutyCode\": \"\",\n";
+            String haveExciseTaxStr = " \"haveExciseTax\": \"102\",\n";
+            try {
+                Item_excise_duty_map edm = new ItemBean().getItem_excise_duty_mapByItem(aItem.getItemId());
+                if (null != edm) {
+                    if (edm.getExcise_duty_code().length() > 0) {
+                        exciseDutyCodeStr = " \"exciseDutyCode\": \"" + edm.getExcise_duty_code() + "\",\n";
+                        haveExciseTaxStr = " \"haveExciseTax\": \"101\",\n";
+                    }
+                }
+            } catch (Exception e) {
+            }
             String json = "[\n"
                     + "	{\n"
                     + "	\"operationType\": \"" + aOperationType + "\",\n"
@@ -927,10 +940,10 @@ public class StockManage implements Serializable {
                     + UnitPriceStr
                     + "	\"currency\": \"" + aItem.getCurrency_code_tax() + "\",\n"
                     + "	\"commodityCategoryId\": \"" + aItem.getItem_code_tax() + "\",\n"
-                    + "	\"haveExciseTax\": \"102\",\n"
+                    + haveExciseTaxStr
                     + "	\"description\": \"1\",\n"
                     + "	\"stockPrewarning\": \"" + aItem.getReorderLevel() + "\",\n"
-                    + "	\"exciseDutyCode\": \"\",\n"
+                    + exciseDutyCodeStr
                     + this.getGoodsOtherUnits(aItem.getItemId())
                     + "},\n"
                     + "]";
@@ -975,6 +988,18 @@ public class StockManage implements Serializable {
             } else {
                 UnitPriceStr = " \"unitPrice\": \"1\",\n";
             }
+            String exciseDutyCodeStr = " \"exciseDutyCode\": \"\",\n";
+            String haveExciseTaxStr = " \"haveExciseTax\": \"102\",\n";
+            try {
+                Item_excise_duty_map edm = new ItemBean().getItem_excise_duty_mapByItem(aItem.getItemId());
+                if (null != edm) {
+                    if (edm.getExcise_duty_code().length() > 0) {
+                        exciseDutyCodeStr = " \"exciseDutyCode\": \"" + edm.getExcise_duty_code() + "\",\n";
+                        haveExciseTaxStr = " \"haveExciseTax\": \"101\",\n";
+                    }
+                }
+            } catch (Exception e) {
+            }
             String json = "[\n"
                     + "	{\n"
                     + "	\"operationType\": \"" + aOperationType + "\",\n"
@@ -984,10 +1009,10 @@ public class StockManage implements Serializable {
                     + UnitPriceStr
                     + "	\"currency\": \"" + aItem.getCurrency_code_tax() + "\",\n"
                     + "	\"commodityCategoryId\": \"" + aItem.getItem_code_tax() + "\",\n"
-                    + "	\"haveExciseTax\": \"102\",\n"
+                    + haveExciseTaxStr
                     + "	\"description\": \"1\",\n"
                     + "	\"stockPrewarning\": \"" + aItem.getReorderLevel() + "\",\n"
-                    + "	\"exciseDutyCode\": \"\",\n"
+                    + exciseDutyCodeStr
                     + this.getGoodsOtherUnits(aItem.getItemId())
                     + "},\n"
                     + "]";
