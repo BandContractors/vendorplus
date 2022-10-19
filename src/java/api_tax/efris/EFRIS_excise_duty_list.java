@@ -35,6 +35,7 @@ public class EFRIS_excise_duty_list implements Serializable {
     //Additionals
     //private String added_by;
     private Date add_date;
+    private String parentName;
 
     /**
      * @return the EFRIS_excise_duty_list_id
@@ -230,5 +231,19 @@ public class EFRIS_excise_duty_list implements Serializable {
      */
     public void setExciseDutyDetailsList(List<ExciseDutyDetailsList> exciseDutyDetailsList) {
         this.exciseDutyDetailsList = exciseDutyDetailsList;
+    }
+
+    /**
+     * @return the parentName
+     */
+    public String getParentName() {
+        return parentName;
+    }
+
+    /**
+     * @param parentName the parentName to set
+     */
+    public void setParentName(String parentName) {
+        this.parentName = parentName;
     }
 }

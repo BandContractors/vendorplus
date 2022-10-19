@@ -144,17 +144,17 @@ public class EFRIS_excise_duty_listBean implements Serializable {
             } else {
                 ps.setString(1, "");
             }
-            if (aEFRIS_excise_duty_list.getExciseDutyCode()!= null) {
+            if (aEFRIS_excise_duty_list.getExciseDutyCode() != null) {
                 ps.setString(2, aEFRIS_excise_duty_list.getExciseDutyCode());
             } else {
                 ps.setString(2, "");
             }
-            if (aEFRIS_excise_duty_list.getGoodService()!= null) {
+            if (aEFRIS_excise_duty_list.getGoodService() != null) {
                 ps.setString(3, aEFRIS_excise_duty_list.getGoodService());
             } else {
                 ps.setString(3, "");
             }
-            if (aEFRIS_excise_duty_list.getParentCode()!= null) {
+            if (aEFRIS_excise_duty_list.getParentCode() != null) {
                 ps.setString(4, aEFRIS_excise_duty_list.getParentCode());
             } else {
                 ps.setString(4, "");
@@ -169,28 +169,28 @@ public class EFRIS_excise_duty_listBean implements Serializable {
             } else {
                 ps.setString(6, "");
             }
-            if (aEFRIS_excise_duty_list.getEffectiveDate()!= null) {
+            if (aEFRIS_excise_duty_list.getEffectiveDate() != null) {
                 ps.setString(7, aEFRIS_excise_duty_list.getEffectiveDate());
             } else {
                 ps.setString(7, "");
             }
-            if (aEFRIS_excise_duty_list.getUnit()!= null) {
+            if (aEFRIS_excise_duty_list.getUnit() != null) {
                 ps.setString(8, aEFRIS_excise_duty_list.getUnit());
             } else {
                 ps.setString(8, "");
             }
             //currency, rate_perc, rate_value, add_date
-            if (aEFRIS_excise_duty_list.getCurrency()!= null) {
+            if (aEFRIS_excise_duty_list.getCurrency() != null) {
                 ps.setString(9, aEFRIS_excise_duty_list.getCurrency());
             } else {
                 ps.setString(9, "");
             }
-            if (aEFRIS_excise_duty_list.getRate_perc()!= null) {
+            if (aEFRIS_excise_duty_list.getRate_perc() != null) {
                 ps.setString(10, aEFRIS_excise_duty_list.getRate_perc());
             } else {
                 ps.setString(10, "");
             }
-            if (aEFRIS_excise_duty_list.getRate_value()!= null) {
+            if (aEFRIS_excise_duty_list.getRate_value() != null) {
                 ps.setString(11, aEFRIS_excise_duty_list.getRate_value());
             } else {
                 ps.setString(11, "");
