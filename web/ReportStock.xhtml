@@ -82,37 +82,37 @@
                         </p:column>
                         <p:column headerText="#{langsys['Cost']}" style="text-align: right;">
                             <h:outputText value="#{sm.costValue}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{langsys['Retail']} #{langsys['Sale']}" style="text-align: right;color:green;">
                             <h:outputText value="#{sm.retailsaleValue}" rendered="#{sm.stock_type.equals('Merchandise') or sm.stock_type.equals('Finished Goods')}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{langsys['Margin']}" style="text-align: right;color: green;">
                             <h:outputText value="#{sm.retailsaleValue-sm.costValue}" rendered="#{sm.stock_type.equals('Merchandise') or sm.stock_type.equals('Finished Goods')}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="% #{langsys['Margin']}" style="text-align: right;color: green;">
                             <h:outputText value="#{(sm.retailsaleValue-sm.costValue)*100/sm.costValue}" rendered="#{sm.stock_type.equals('Merchandise') or sm.stock_type.equals('Finished Goods')}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{langsys['Wholesale']}" style="text-align: right;color: coral;">
                             <h:outputText value="#{sm.wholesaleValue}" rendered="#{sm.stock_type.equals('Merchandise') or sm.stock_type.equals('Finished Goods')}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{langsys['Margin']}" style="text-align: right;color: coral;">
                             <h:outputText value="#{sm.wholesaleValue-sm.costValue}" rendered="#{sm.stock_type.equals('Merchandise') or sm.stock_type.equals('Finished Goods')}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="% #{langsys['Margin']}" style="text-align: right;color: coral;">
                             <h:outputText value="#{(sm.wholesaleValue-sm.costValue)*100/sm.costValue}" rendered="#{sm.stock_type.equals('Merchandise') or sm.stock_type.equals('Finished Goods')}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:summaryRow>
@@ -122,7 +122,7 @@
                             <p:column style="background-color: yellow;">
                                 #{accCurrencyBean.localCurrency.currencyCode}
                                 <h:outputText value="#{stockBean.stockTotalCostPrice}">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputText>
                             </p:column>
                             <p:column colspan="6" style="text-align:left;background-color: yellow;">
@@ -180,27 +180,27 @@
                 </p:column>
                 <p:column headerText="#{langsys['Unit']} #{langsys['Cost']}">
                     <h:outputText value="#{itm.unitCost}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Retail']} #{langsys['Sale']} #{langsys['Price']}">
                     <h:outputText value="#{itm.unitRetailsalePrice}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Retail']} #{langsys['Margin']}">
                     <h:outputText value="#{itm.unitRetailsalePrice-itm.unitCost}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Wholesale']} #{langsys['Price']}">
                     <h:outputText value="#{itm.unitWholesalePrice}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Wholesale']} #{langsys['Margin']}">
                     <h:outputText value="#{itm.unitWholesalePrice-itm.unitCost}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Reorder']} #{langsys['Level']}" visible="false">

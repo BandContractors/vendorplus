@@ -99,7 +99,7 @@
                     <f:facet name="header">#{langsys['Hired']}</f:facet>
                     <!-- row record -->
                     <h:outputLabel value="#{ati.qty_taken}" style="color: blue;">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                 </p:column>
                 <p:column>
@@ -107,7 +107,7 @@
                     <f:facet name="header">#{langsys['Total']} #{langsys['Delivered']}</f:facet>
                     <!-- row record -->
                     <h:outputLabel value="#{ati.qty_total}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                 </p:column>
                 <p:column>
@@ -115,7 +115,7 @@
                     <f:facet name="header">#{langsys['Total']} #{langsys['Undelivered']}</f:facet>
                     <!-- row record -->
                     <h:outputLabel value="#{ati.qty_balance}" style="color: red;">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                 </p:column>
                 <p:column style="text-align: center;">
@@ -123,7 +123,7 @@
                     <f:facet name="header">#{langsys['Delivered']}</f:facet>
                     <!-- row record -->
                     <h:inputText value="#{ati.itemQty}" style="width: 50px;" disabled="#{transBean.actionType.equals('View') or generalUserSetting.currentStore.storeId!=transBean.transObj.storeId}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         <f:ajax event="change" listener="#{transItemBean.editTransItemCEC(66,95,'',transBean.transObj, transBean.transItemList,ati)}" execute="dtblTransactionItem" render="@form"/>
                     </h:inputText>
                 </p:column>

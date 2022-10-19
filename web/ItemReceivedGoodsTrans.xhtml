@@ -153,10 +153,10 @@
                     <p:ajax listener="#{itemBean.changeItemUnit(itemBean.selectedItem,transItem,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentStore.storeId,trans)}" process="@this autcItem" update="itxtUnitCost"/>
                 </p:selectOneMenu>
                 <h:inputText id="itxtQty" styleClass="clsInputTransItem" value="#{transItem.itemQty}" autocomplete="off" style="width: 60px;height: 24px;">
-                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
                 <h:inputText id="itxtUnitCost" styleClass="clsInputTransItem" value="#{transItem.unitCostPrice}" style="width: 140px;height: 24px;">
-                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
                 <h:inputText id="itxtBatchno" styleClass="clsInputTransItem" value="#{transItem.batchno}" style="width: 100px;height: 24px;"/>
                 <p:calendar id="calMnfDate" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{transItem.itemMnfDate}" size="8" pattern="#{companySetting.getDateFormat()}">
@@ -246,7 +246,7 @@
                     <f:facet name="header">#{langsys['Qty']}</f:facet>
                     <!-- row record -->
                     <h:inputText value="#{ati.itemQty}" style="width: 50px;">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         <f:ajax event="change" listener="#{transItemBean.updateBaseUnityQty(ati)}" execute="dtblTransactionItem" render="dtblTransactionItem"/>
                     </h:inputText>
                 </p:column>
@@ -255,7 +255,7 @@
                     <f:facet name="header">#{langsys['Unit']} #{langsys['Cost']}</f:facet>
                     <!-- row record -->
                     <h:inputText value="#{ati.unitCostPrice}" style="width: 100px;">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         <f:ajax event="change" execute="dtblTransactionItem" render="dtblTransactionItem"/>
                     </h:inputText>
                 </p:column>

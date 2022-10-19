@@ -139,7 +139,7 @@
                         <f:facet name="header">#{langsys['Total']}</f:facet>
                         <!-- row record -->
                         <h:outputText value="#{t.grandTotal}" style="width: 30px;text-decoration:#{t.is_cancel eq 1 ? 'line-through':'none'};">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                     <p:column>
@@ -180,7 +180,7 @@
                         </p:column>
                         <p:column>
                             <h:outputText value="#{transBean.orderSummaryTotal}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column colspan="5">

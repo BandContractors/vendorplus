@@ -16,12 +16,12 @@
                          >
                 <p:column headerText="#{langsys['Unit']} #{langsys['Cost']} #{langsys['Price']}">
                     <h:outputText value="#{rts.unitCostPrice}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Qty']}">
                     <h:outputText value="#{rts.itemQty}">
-                        <f:convertNumber pattern="###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Unit']}">

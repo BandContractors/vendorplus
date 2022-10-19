@@ -87,7 +87,7 @@
                             <f:facet name="header">#{langsys['Qty']}</f:facet>
                             <!-- row record -->
                             <h:outputLabel value="#{ti2.itemQty}" style="font-size: 14px;">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
                         </p:column>
 
@@ -96,7 +96,7 @@
                             <f:facet name="header">#{langsys['Unit']} #{langsys['Price']}</f:facet>
                             <!-- row record -->
                             <h:outputLabel value="#{ti2.unitPriceExcVat}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
                         </p:column>
 
@@ -105,7 +105,7 @@
                             <f:facet name="header">#{langsys['Amount']}</f:facet>
                             <!-- row record -->
                             <h:outputLabel value="#{ti2.amountExcVat}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
                         </p:column>
 
@@ -127,7 +127,7 @@
                     <p:panelGrid columns="3">
                         <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['TOTAL']} #{langsys['DISPOSED']}"/>
                         <h:outputText id="itxtvGrandTotal" value="#{salesInvoiceBean.getCurrentTransaction().grandTotal}" style="width: 150px">
-                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                         <h:outputLabel style="width: 150px" value="#{salesInvoiceBean.getCurrentTransaction().currencyCode}"/>
                     </p:panelGrid>

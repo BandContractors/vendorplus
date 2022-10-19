@@ -83,13 +83,13 @@
                 
                     <p:column headerText="ReorderLevel Qty">
                         <h:outputText value="#{rts.reorderLevel}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                 
                     <p:column headerText="Current Qty">
                         <h:outputText value="#{rts.currentQty}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                 
@@ -147,7 +147,7 @@
                 
                     <p:column headerText="SumCurrentQty">
                         <h:outputText value="#{rtss.sumCurrentQty}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
              </p:dataTable>

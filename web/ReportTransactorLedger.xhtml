@@ -92,25 +92,25 @@
 
                 <p:column headerText="Sum Debit">
                     <h:outputText value="#{rtss.sumAmountDebit}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
 
                 <p:column headerText="Sum Credit">
                     <h:outputText value="#{rtss.sumAmountCredit}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
 
                 <p:column headerText="Net Debt">
                     <h:outputText value="#{rtss.netDebt}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
 
                 <p:column headerText="Net Credit">
                     <h:outputText value="#{rtss.netCredit}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
             </p:dataTable>
@@ -169,13 +169,13 @@
 
                 <p:column headerText="Debit">
                     <h:outputText value="#{rts.amountDebit}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
 
                 <p:column headerText="Credit">
                     <h:outputText value="#{rts.amountCredit}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
 

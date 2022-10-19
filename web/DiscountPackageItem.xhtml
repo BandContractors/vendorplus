@@ -77,17 +77,17 @@
                     </p:column>
                     <p:column headerText="Unit Retailsale Price" style="text-align: left">  
                         <h:outputLabel value="#{itm.unitRetailsalePrice}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputLabel>
                     </p:column>
                     <p:column headerText="Unit Wholesale Price" style="text-align: left">  
                         <h:outputLabel value="#{itm.unitWholesalePrice}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputLabel>
                     </p:column>
                     <p:column headerText="Unit Hire Price" style="text-align: left">  
                         <h:outputLabel value="#{itm.unit_hire_price}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputLabel>
                     </p:column>
                     <p:column headerText="Currency" style="text-align: left">
@@ -99,16 +99,16 @@
                 </p:autoComplete>
                 <h:inputText id="itxtUnit" styleClass="clsInputTransItem" value="#{unitBean.getUnit(itemBean.getItem(discountPackageItem.itemId).getUnitId()).unitSymbol}" style="width: 50px" disabled="true"/>
                 <h:inputText id="itxtQty" styleClass="clsInputTransItem" style="width: 50px" value="#{discountPackageItem.itemQty}" autocomplete="off" disabled="true">
-                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
                 <h:inputText id="itxtRetailsaleDiscount" styleClass="clsInputTransItem" style="width: 200px" value="#{discountPackageItem.retailsaleDiscountAmt}" autocomplete="off">
-                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
                 <h:inputText id="itxtWholesaleDiscount" styleClass="clsInputTransItem" style="width: 200px" value="#{discountPackageItem.wholesaleDiscountAmt}" autocomplete="off">
-                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
                 <h:inputText id="itxtHirePriceDiscount" styleClass="clsInputTransItem" style="width: 200px" value="#{discountPackageItem.hire_price_discount_amt}" autocomplete="off">
-                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
             </h:panelGrid>
             <h:panelGrid styleClass="clsGridMainCommands" columns="1">
@@ -148,7 +148,7 @@
                     <f:facet name="header">Qty</f:facet>
                     <!-- row record -->
                     <h:outputLabel style="color: #{generalSetting.getStyleColorByDaysFromNow('DISCOUNT-EXPIRY-DATE',discountPackageBean.getDiscountPackage(dpi.discountPackageId).endDate)};" value="#{dpi.itemQty}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                 </p:column>
                 <p:column>
@@ -156,7 +156,7 @@
                     <f:facet name="header">Retailsale Discount (%)</f:facet>
                     <!-- row record -->
                     <h:outputLabel style="color: #{generalSetting.getStyleColorByDaysFromNow('DISCOUNT-EXPIRY-DATE',discountPackageBean.getDiscountPackage(dpi.discountPackageId).endDate)};" value="#{dpi.retailsaleDiscountAmt}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                 </p:column>
                 <p:column>
@@ -164,7 +164,7 @@
                     <f:facet name="header">Wholesale Discount (%)</f:facet>
                     <!-- row record -->
                     <h:outputLabel style="color: #{generalSetting.getStyleColorByDaysFromNow('DISCOUNT-EXPIRY-DATE',discountPackageBean.getDiscountPackage(dpi.discountPackageId).endDate)};" value="#{dpi.wholesaleDiscountAmt}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                 </p:column>
                 <p:column>
@@ -172,7 +172,7 @@
                     <f:facet name="header">HirePrice Discount (%)</f:facet>
                     <!-- row record -->
                     <h:outputLabel style="color: #{generalSetting.getStyleColorByDaysFromNow('DISCOUNT-EXPIRY-DATE',discountPackageBean.getDiscountPackage(dpi.discountPackageId).endDate)};" value="#{dpi.hire_price_discount_amt}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                 </p:column>
                 <p:column>

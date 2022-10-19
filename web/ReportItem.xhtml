@@ -95,22 +95,22 @@
 
                 <p:column headerText="#{langsys['ReorderLevel']}">
                     <h:outputText value="#{rts.reorderLevel}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['CostPrice']}">
                     <h:outputText value="#{rts.unitCostPrice}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['WholeSalePrice']}">
                     <h:outputText value="#{rts.unitWholesalePrice}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['RetailSalePrice']}">
                     <h:outputText value="#{rts.unitRetailsalePrice}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['VatRated']}">
@@ -176,7 +176,7 @@
 
                 <p:column headerText="#{langsys['Items']}">
                     <h:outputText value="#{rtss.countItems}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
             </p:dataTable>

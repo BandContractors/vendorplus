@@ -120,17 +120,17 @@
                         </p:column>
                         <p:column headerText="#{langsys['Retail']} #{langsys['sale']} #{langsys['Price']}" style="text-align: left">  
                             <h:outputText value="#{itm.unitRetailsalePrice}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{langsys['Wholesale']} #{langsys['Price']}" style="text-align: left" rendered="#{generalUserSetting.currentTransactionReasonId==2 or generalUserSetting.currentTransactionReasonId==10}">
                             <h:outputText value="#{itm.unitWholesalePrice}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{langsys['Special']} #{langsys['Price']}" style="text-align: left" rendered="#{generalUserSetting.currentTransactionReasonId==103}">
                             <h:outputText value="#{itm.unit_special_price}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{langsys['Currency']}" style="text-align: left">
@@ -181,11 +181,11 @@
                         </p:column>
                         <p:column headerText="#{langsys['No']}" width="10%" style="text-align: right;">
                             <h:outputText value="#{sum.description}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                             <f:facet name="footer">
                                 <h:outputText value="#{subscriptionBean.getTotalNo(subscriptionBean.subscriptionsSummary_businessCategory)}">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputText>
                             </f:facet>
                         </p:column>
@@ -212,7 +212,7 @@
                         </p:column>
                         <p:column headerText="#{langsys['No']}" style="text-align: right;">
                             <h:outputText value="#{sum.no}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{langsys['Amount']}" style="text-align: right;">
@@ -226,12 +226,12 @@
                             </p:column>
                             <p:column style="text-align:right">
                                 <h:outputText value="#{subscriptionBean.getTotalGroupedNo(subscriptionBean.subscriptionsSummary_converted_by, sum.attribute)}">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputText>
                             </p:column>
                             <p:column style="text-align:right">
                                 <h:outputText value="#{subscriptionBean.getTotalGroupedAmount(subscriptionBean.subscriptionsSummary_converted_by, sum.attribute)}">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputText>
                             </p:column>
                         </p:summaryRow>
@@ -245,11 +245,11 @@
                         </p:column>
                         <p:column headerText="#{langsys['No']}" width="10%" style="text-align: right;">
                             <h:outputText value="#{sum.description}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                             <f:facet name="footer">
                                 <h:outputText value="#{subscriptionBean.getTotalNo(subscriptionBean.subscriptionsSummary_location)}">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputText>
                             </f:facet>
                         </p:column>
@@ -275,11 +275,11 @@
                         </p:column>
                         <p:column headerText="#{langsys['No']}" style="text-align: right;" width="10%">
                             <h:outputText value="#{sum.description}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                             <f:facet name="footer">
                                 <h:outputText value="#{subscriptionBean.getTotalNo(subscriptionBean.subscriptionsSummary_subscriptionCategory)}">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputText>
                             </f:facet>
                         </p:column>
@@ -306,7 +306,7 @@
                         </p:column>
                         <p:column headerText="#{langsys['No']}" style="text-align: right;">
                             <h:outputText value="#{sum.no}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{langsys['Amount']}" style="text-align: right;">
@@ -320,12 +320,12 @@
                             </p:column>
                             <p:column style="text-align:right">
                                 <h:outputText value="#{subscriptionBean.getTotalGroupedNo(subscriptionBean.subscriptionsSummary_referred_by, sum.attribute)}">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputText>
                             </p:column>
                             <p:column style="text-align:right">
                                 <h:outputText value="#{subscriptionBean.getTotalGroupedAmount(subscriptionBean.subscriptionsSummary_referred_by, sum.attribute)}">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputText>
                             </p:column>
                         </p:summaryRow>
@@ -336,7 +336,7 @@
                         </p:column>
                         <p:column headerText="#{langsys['No']}" width="10%" style="text-align: right;">
                             <h:outputText value="#{sum.description}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{langsys['Amount']}" style="text-align: right;">
@@ -357,11 +357,11 @@
                         </p:column>
                         <p:column headerText="#{langsys['No']}" width="10%" style="text-align: right;">
                             <h:outputText value="#{sum.description}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                             <f:facet name="footer">
                                 <h:outputText value="#{subscriptionBean.getTotalNo(subscriptionBean.subscriptionsSummary_status)}">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputText>
                             </f:facet>
                         </p:column>
@@ -385,11 +385,11 @@
                         </p:column>
                         <p:column headerText="#{langsys['No']}" width="10%" style="text-align: right;">
                             <h:outputText value="#{sum.description}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                             <f:facet name="footer">
                                 <h:outputText value="#{subscriptionBean.getTotalNo(subscriptionBean.subscriptionsSummary_recurring)}">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputText>
                             </f:facet>
                         </p:column>
@@ -415,7 +415,7 @@
                         </p:column>
                         <p:column headerText="#{langsys['Amount']} #{langsys['at']} #{langsys['Registration']}" style="text-align: right;">
                             <h:outputText value="#{sfa.amount_at_reg}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{langsys['Amount']} #{langsys['at']} #{langsys['Renewal']}" style="text-align: right;">
@@ -436,7 +436,7 @@
                         </p:column>
                         <p:column headerText="#{langsys['No']}" width="10%" style="text-align: right;">
                             <h:outputText value="#{sum.no}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{langsys['Amount']}" style="text-align: right;">
@@ -450,12 +450,12 @@
                             </p:column>
                             <p:column style="text-align:right">
                                 <h:outputText value="#{subscriptionBean.getTotalGroupedNo(subscriptionBean.subscriptionsSummary_agent, sum.attribute)}">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputText>
                             </p:column>
                             <p:column style="text-align:right">
                                 <h:outputText value="#{subscriptionBean.getTotalGroupedAmount(subscriptionBean.subscriptionsSummary_agent, sum.attribute)}">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputText>
                             </p:column>
                         </p:summaryRow>
@@ -511,7 +511,7 @@
                 </p:column>
                 <p:column headerText="#{langsys['Amount']}" style="text-align: right;">
                     <h:outputText value="#{s.amount}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Recurring']}" visible="false">
@@ -525,12 +525,12 @@
                 </p:column>
                 <p:column headerText="#{langsys['Unit']} #{langsys['Price']}" style="text-align: right;" visible="false">
                     <h:outputText value="#{s.unit_price}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Qty']}" style="text-align: right;">
                     <h:outputText value="#{s.qty}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Agent']}" visible="false">
@@ -702,17 +702,17 @@
                             </p:column>
                             <p:column headerText="#{langsys['Retail']} #{langsys['sale']} #{langsys['Price']}" style="text-align: left">  
                                 <h:outputText value="#{itm.unitRetailsalePrice}">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputText>
                             </p:column>
                             <p:column headerText="#{langsys['Wholesale']} #{langsys['Price']}" style="text-align: left" rendered="#{generalUserSetting.currentTransactionReasonId==2 or generalUserSetting.currentTransactionReasonId==10}">
                                 <h:outputText value="#{itm.unitWholesalePrice}">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputText>
                             </p:column>
                             <p:column headerText="#{langsys['Special']} #{langsys['Price']}" style="text-align: left" rendered="#{generalUserSetting.currentTransactionReasonId==103}">
                                 <h:outputText value="#{itm.unit_special_price}">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputText>
                             </p:column>
                             <p:column headerText="#{langsys['Currency']}" style="text-align: left">

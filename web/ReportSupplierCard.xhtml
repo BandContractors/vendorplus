@@ -83,10 +83,10 @@
                         <td colspan="3" align="center">
                             #{transactorBean.selectedBillTransactor.transactorNames}
                             <br/>#{langsys['Payable']}(#{accCurrencyBean.localCurrency.currencyCode}):<h:outputLabel style="color: coral;" value="#{accJournalBean.returnBalanceString(accLedgerBean.getPayableAccBalanceTrade(transactorBean.selectedBillTransactor.transactorId))}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
                             <br/>#{langsys['Prepaid']}(#{accCurrencyBean.localCurrency.currencyCode}):<h:outputLabel style="color: green;" value="#{accJournalBean.returnBalanceString(accLedgerBean.getPrepaidExpenseAccBalanceToCur(transactorBean.selectedBillTransactor.transactorId,accCurrencyBean.localCurrency.currencyCode))}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
                         </td>
                         <td colspan="3" align="right">
@@ -98,17 +98,17 @@
                         </td>
                         <td colspan="1">
                             <h:outputText value="#{transBean.grandTotalLoc}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </td>
                         <td colspan="1">
                             <h:outputText value="#{transBean.grandTotalPaidLoc}" style="color: blue">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </td>
                         <td colspan="1">
                             <h:outputText value="#{accJournalBean.returnBalanceString(transBean.grandTotalBalanceLoc)}" style="color: red">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </td>
                         <td colspan="1">
@@ -139,17 +139,17 @@
                             <td></td>
                             <td>
                                 <h:outputText value="#{t.grandTotal}">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputText>
                             </td>
                             <td>
                                 <h:outputText value="#{t.totalPaid}" style="color: blue">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputText>
                             </td>
                             <td>
                                 <h:outputText value="#{t.grandTotal-t.totalPaid}" style="color: red">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputText>
                             </td>
                             <td>#{t.currencyCode}</td>
@@ -160,7 +160,7 @@
                                 <td>#{ti.description} #{ti.descSpecific}</td>
                                 <td>
                                     <h:outputText value="#{ti.amountIncVat}">
-                                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                     </h:outputText>
                                 </td>
                                 <td colspan="4"></td>

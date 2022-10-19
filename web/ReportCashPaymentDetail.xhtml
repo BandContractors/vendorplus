@@ -201,7 +201,7 @@
                         </p:column>
                         <p:column headerText="#{langsys['Total']} #{langsys['Amount']} #{langsys['Paid']}" style="text-align: right;">
                             <h:outputText value="#{sm.paidAmount}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:summaryRow>
@@ -210,7 +210,7 @@
                             </p:column>
                             <p:column style="text-align:right">
                                 <h:outputText value="#{payBean.getTotalAmountRecieved(payBean.payListSummary,sm.currencyCode)}">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputText>
                             </p:column>
                         </p:summaryRow>
@@ -281,7 +281,7 @@
                     </p:column>
                     <p:column headerText="#{langsys['Amount']} #{langsys['Paid']}" style="text-align: right;">
                         <h:outputText value="#{itm.paidAmount}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                     <p:column headerText="#{langsys['Paid']} #{langsys['By']}">

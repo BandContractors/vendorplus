@@ -46,11 +46,11 @@
                     <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="6">
                         <h:outputLabel value="#{langsys['Amount']} #{langsys['Received']}:"/>
                         <h:inputText value="#{payBean.payObj.paidAmount}" disabled="true">
-                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
                         <h:outputLabel value="#{langsys['Points']} #{langsys['Spent']} #{langsys['Amount']}:"/>
                         <h:inputText value="#{payBean.payObj.pointsSpentAmount}" disabled="true">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
                         <h:outputLabel value="#{langsys['Currency']}:"/>
                         <h:inputText value="#{payBean.payObj.currencyCode}" disabled="true"/>
@@ -100,7 +100,7 @@
                         <p:column>
                             <f:facet name="header">#{langsys['Received']} #{langsys['Amount']}</f:facet>
                             <h:inputText value="#{pts.transPaidAmount}" disabled="true">
-                                <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:inputText>
                         </p:column>
                     </p:dataTable>

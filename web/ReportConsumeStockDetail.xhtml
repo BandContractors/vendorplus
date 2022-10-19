@@ -134,7 +134,7 @@
                 </p:column>
                 <p:column headerText="#{langsys['Cost']} #{langsys['Amount']}" style="text-align: right;">
                     <h:outputText value="#{itm.grandTotal}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Add']} #{langsys['Date']}" rendered="#{transBean.dateType.equals('Add Date')}">

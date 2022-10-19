@@ -80,7 +80,7 @@
                     </p:column>
                     <p:column headerText="#{langsys['Retail']} #{langsys['Sale']} #{langsys['Price']}" style="text-align: left">  
                         <h:outputText value="#{itm.unitRetailsalePrice}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                     <p:column headerText="#{langsys['Currency']}" style="text-align: left">
@@ -98,7 +98,7 @@
                     <p:ajax listener="#{itemBean.changeItemUnit(itemBean.selectedItem,transItem,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentStore.storeId,trans)}" process="@this autcItem"/>
                 </p:selectOneMenu>
                 <h:inputText id="itxtQty" styleClass="clsInputTransItem" style="width: 150px;height: 24px;" value="#{transItem.itemQty}" autocomplete="off">
-                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
             </h:panelGrid>
             <h:panelGrid id="gridTransItemButtons" styleClass="clsGridMainInput" columns="4">
@@ -142,7 +142,7 @@
                     <f:facet name="header">#{langsys['Requested']} #{langsys['Qty']}</f:facet>
                     <!-- row record -->
                     <h:inputText value="#{ati.itemQty}" style="width: 50px;">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         <f:ajax event="change" execute="dtblTransactionItem" render="@this"/>
                     </h:inputText>
                 </p:column>
