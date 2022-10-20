@@ -107,7 +107,7 @@ public class DBConnection implements Serializable {
             DataSource ds = (DataSource) envContext.lookup("jdbc/BranchPool");
             MySQL_Conn = ds.getConnection();
         } catch (NamingException | SQLException e) {
-            LOGGER.log(Level.ERROR, e);
+            //LOGGER.log(Level.ERROR, e);
         }
         return MySQL_Conn;
     }
