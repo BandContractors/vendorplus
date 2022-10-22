@@ -915,6 +915,7 @@ public class StockManage implements Serializable {
         String ReturnMsg = "";
         String output = "";
         Item_excise_duty_map edm = null;
+        String ExciseDutyCode = "";
         try {
             String UnitPriceStr = "";
             if (aItem.getUnitRetailsalePrice() > 0) {
@@ -928,7 +929,8 @@ public class StockManage implements Serializable {
                 edm = new ItemBean().getItem_excise_duty_mapByItem(aItem.getItemId());
                 if (null != edm) {
                     if (edm.getExcise_duty_code().length() > 0) {
-                        exciseDutyCodeStr = " \"exciseDutyCode\": \"" + edm.getExcise_duty_code() + "\",\n";
+                        ExciseDutyCode = edm.getExcise_duty_code();
+                        exciseDutyCodeStr = " \"exciseDutyCode\": \"" + ExciseDutyCode + "\",\n";
                         haveExciseTaxStr = " \"haveExciseTax\": \"101\",\n";
                     }
                 }
@@ -947,7 +949,7 @@ public class StockManage implements Serializable {
                     + "	\"description\": \"1\",\n"
                     + "	\"stockPrewarning\": \"" + aItem.getReorderLevel() + "\",\n"
                     + exciseDutyCodeStr
-                    + this.getGoodsOtherUnits(aItem, edm)
+                    + this.getGoodsOtherUnits(aItem, ExciseDutyCode)
                     + "},\n"
                     + "]";
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
@@ -985,6 +987,7 @@ public class StockManage implements Serializable {
         String ReturnMsg = "";
         String output = "";
         Item_excise_duty_map edm = null;
+        String ExciseDutyCode = "";
         try {
             String UnitPriceStr = "";
             if (aItem.getUnitRetailsalePrice() > 0) {
@@ -997,8 +1000,14 @@ public class StockManage implements Serializable {
             try {
                 edm = new ItemBean().getItem_excise_duty_mapByItem(aItem.getItemId());
                 if (null != edm) {
+                    if (edm.getExcise_duty_code().length() == 0) {
+                        edm = null;
+                    }
+                }
+                if (null != edm) {
                     if (edm.getExcise_duty_code().length() > 0) {
-                        exciseDutyCodeStr = " \"exciseDutyCode\": \"" + edm.getExcise_duty_code() + "\",\n";
+                        ExciseDutyCode = edm.getExcise_duty_code();
+                        exciseDutyCodeStr = " \"exciseDutyCode\": \"" + ExciseDutyCode + "\",\n";
                         haveExciseTaxStr = " \"haveExciseTax\": \"101\",\n";
                     }
                 }
@@ -1017,7 +1026,7 @@ public class StockManage implements Serializable {
                     + "	\"description\": \"1\",\n"
                     + "	\"stockPrewarning\": \"" + aItem.getReorderLevel() + "\",\n"
                     + exciseDutyCodeStr
-                    + this.getGoodsOtherUnits(aItem, edm)
+                    + this.getGoodsOtherUnits(aItem, ExciseDutyCode)
                     + "},\n"
                     + "]";
             //System.out.println("JSON:" + json);
@@ -1068,7 +1077,7 @@ public class StockManage implements Serializable {
         return ReturnMsg;
     }
 
-    public String getGoodsOtherUnits(Item aItem, Item_excise_duty_map aExcMap) {
+    public String getGoodsOtherUnits(Item aItem, String aExciseCode) {
         String gous = "";
         try {
             List<Item_unit_other> iuList = new ArrayList<>();
@@ -1076,11 +1085,20 @@ public class StockManage implements Serializable {
             String OtherUnit1Str = "";
             String OtherUnit2MoreStr = "";
             EFRIS_excise_duty_list ExciseDutyDtl = null;
+            String ExciseUnitCodeTax = "";
+            if (aExciseCode.length() > 0) {
+                ExciseDutyDtl = new EFRIS_excise_duty_listBean().getEFRIS_invoice_detailByExciseDutyCode(aExciseCode);
+                if (null != ExciseDutyDtl) {
+                    ExciseUnitCodeTax = ExciseDutyDtl.getUnit();
+                    if (null == ExciseUnitCodeTax) {
+                        ExciseUnitCodeTax = "";
+                    }
+                }
+            }
             if (iuList.isEmpty()) {
-                if (null != aExcMap) {
-                    ExciseDutyDtl = new EFRIS_excise_duty_listBean().getEFRIS_invoice_detailByExciseDutyCode(aExcMap.getExcise_duty_code());
+                if (null != ExciseDutyDtl && ExciseUnitCodeTax.length() > 0 && ExciseUnitCodeTax.equals(aItem.getUnit_symbol_tax())) {
                     OtherUnit1Str = ""
-                            + "\"pieceMeasureUnit\": \"" + ExciseDutyDtl.getUnit() + "\",\n"
+                            + "\"pieceMeasureUnit\": \"" + ExciseUnitCodeTax + "\",\n"
                             + "\"havePieceUnit\": \"101\",\n"
                             + "\"haveOtherUnit\": \"102\",\n"
                             + "\"pieceUnitPrice\": \"" + aItem.getUnitRetailsalePrice() + "\",\n"
@@ -1095,86 +1113,6 @@ public class StockManage implements Serializable {
                             + "\"packageScaledValue\": \"\",\n"
                             + "\"pieceScaledValue\": \"\"\n";
                 }
-            } else if (iuList.size() >= 1) {
-                int n = iuList.size();
-                String hasotherunit = "102";
-                if (n > 1 || null != aExcMap) {
-                    hasotherunit = "101";
-                }
-                Unit UnitOtherExcise = null;
-                if (null != aExcMap) {
-                    ExciseDutyDtl = new EFRIS_excise_duty_listBean().getEFRIS_invoice_detailByExciseDutyCode(aExcMap.getExcise_duty_code());
-                    if (null != ExciseDutyDtl) {
-                        UnitOtherExcise = new UnitBean().getUnitByItemCodeTax(aItem.getItemId(), ExciseDutyDtl.getUnit());
-                    }
-                }
-                if (null != aExcMap && null == UnitOtherExcise && null != ExciseDutyDtl) {
-                    OtherUnit1Str = ""
-                            + "\"pieceMeasureUnit\": \"" + ExciseDutyDtl.getUnit() + "\",\n"
-                            + "\"havePieceUnit\": \"101\",\n"
-                            + "\"haveOtherUnit\": \"" + hasotherunit + "\",\n"
-                            + "\"pieceUnitPrice\": \"" + aItem.getUnitRetailsalePrice() + "\",\n"
-                            + "\"packageScaledValue\": \"1\",\n"
-                            + "\"pieceScaledValue\": \"1\"\n";
-                }
-                for (int i = 0; i < n; i++) {
-                    if (i == 0 && null == aExcMap && null == UnitOtherExcise) {
-                        OtherUnit1Str = ""
-                                + "\"pieceMeasureUnit\": \"" + new UnitBean().getUnit(iuList.get(i).getOther_unit_id()).getUnit_symbol_tax() + "\",\n"
-                                + "\"havePieceUnit\": \"101\",\n"
-                                + "\"haveOtherUnit\": \"" + hasotherunit + "\",\n"
-                                + "\"pieceUnitPrice\": \"" + iuList.get(i).getOther_unit_retailsale_price() + "\",\n"
-                                + "\"packageScaledValue\": \"" + iuList.get(i).getBase_qty() + "\",\n"
-                                + "\"pieceScaledValue\": \"" + iuList.get(i).getOther_qty() + "\"\n";
-                    } else if (null != aExcMap && null != UnitOtherExcise && UnitOtherExcise.getUnitId() == iuList.get(i).getOther_unit_id()) {
-                        OtherUnit1Str = ""
-                                + "\"pieceMeasureUnit\": \"" + new UnitBean().getUnit(iuList.get(i).getOther_unit_id()).getUnit_symbol_tax() + "\",\n"
-                                + "\"havePieceUnit\": \"101\",\n"
-                                + "\"haveOtherUnit\": \"" + hasotherunit + "\",\n"
-                                + "\"pieceUnitPrice\": \"" + iuList.get(i).getOther_unit_retailsale_price() + "\",\n"
-                                + "\"packageScaledValue\": \"" + iuList.get(i).getBase_qty() + "\",\n"
-                                + "\"pieceScaledValue\": \"" + iuList.get(i).getOther_qty() + "\"\n";
-                    } else {
-                        String linestr = "{\n"
-                                + "\"otherUnit\": \"" + new UnitBean().getUnit(iuList.get(i).getOther_unit_id()).getUnit_symbol_tax() + "\",\n"
-                                + "\"otherPrice\": \"" + iuList.get(i).getOther_unit_retailsale_price() + "\",\n"
-                                + "\"otherScaled\": \"" + iuList.get(i).getOther_qty() + "\",\n"
-                                + "\"packageScaled\": \"" + iuList.get(i).getBase_qty() + "\"\n"
-                                + "}";
-                        if (OtherUnit2MoreStr.length() == 0) {
-                            OtherUnit2MoreStr = linestr;
-                        } else {
-                            OtherUnit2MoreStr = OtherUnit2MoreStr + "," + linestr;
-                        }
-                    }
-                }
-            }
-            if (OtherUnit2MoreStr.length() > 0) {
-                gous = OtherUnit1Str + ",\"goodsOtherUnits\": [" + OtherUnit2MoreStr + ",]";
-            } else {
-                gous = OtherUnit1Str;
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.ERROR, e);
-        }
-        return gous;
-    }
-
-    public String getGoodsOtherUnits_old(long aItemId) {
-        String gous = "";
-        try {
-            List<Item_unit_other> iuList = new ArrayList<>();
-            iuList = new ItemBean().getItem_unit_otherList(aItemId, 1);
-            String OtherUnit1Str = "";
-            String OtherUnit2MoreStr = "";
-            if (iuList.isEmpty()) {
-                OtherUnit1Str = ""
-                        + "\"pieceMeasureUnit\": \"\",\n"
-                        + "\"havePieceUnit\": \"102\",\n"
-                        + "\"haveOtherUnit\": \"102\",\n"
-                        + "\"pieceUnitPrice\": \"\",\n"
-                        + "\"packageScaledValue\": \"\",\n"
-                        + "\"pieceScaledValue\": \"\"\n";
             } else if (iuList.size() >= 1) {
                 int n = iuList.size();
                 String hasotherunit = "102";
