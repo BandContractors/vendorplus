@@ -301,15 +301,23 @@ public class ItemBean implements Serializable {
             BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         } catch (Exception e) {
         }
+        try {
+            this.ItemObj.setUnit_symbol_tax(new UnitBean().getUnit(this.ItemObj.getUnitId()).getUnit_symbol_tax());
+        } catch (Exception e) {
+        }
         String msg = "";
+        String msgExciseDuty = "";
         //first convert vat rated from array to string
         this.ItemObj.setVatRated(new UtilityBean().getVATRateStrFromArray(this.ItemObj.getSelectedVatRateds()));
         //re-arrange vat rate basing on order
         this.ItemObj.setVatRated(this.reArrangeVatRate(this.ItemObj.getVatRated(), this.ItemObj.getVat_rate_order()));
         //validate
         msg = this.validateItem(this.ItemObj);
+        msgExciseDuty = this.validateExciseDuty(ItemObj, this.Item_unit_otherList);
         if (msg.length() > 0) {
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+        } else if (msgExciseDuty.length() > 0) {
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msgExciseDuty)));
         } else {
             try {
                 if (this.saveValidatedItem(this.ItemObj) == 1) {
@@ -474,6 +482,49 @@ public class ItemBean implements Serializable {
             msg = "Adjust Current Stock before Changing Item Type";
         } else {
             msg = "";
+        }
+        return msg;
+    }
+
+    public String validateExciseDuty(Item aItem, List<Item_unit_other> aItem_unit_otherList) {
+        String msg = "";
+        try {
+            if (null == aItem_unit_otherList) {
+                aItem_unit_otherList = new ArrayList<>();
+            }
+            if (aItem.getExcise_duty_code().length() > 0) {
+                EFRIS_excise_duty_list ExciseDutyDtl = null;
+                String ExciseUnitCodeTax = "";
+                ExciseDutyDtl = new EFRIS_excise_duty_listBean().getEFRIS_invoice_detailByExciseDutyCode(aItem.getExcise_duty_code());
+                if (null != ExciseDutyDtl) {
+                    ExciseUnitCodeTax = ExciseDutyDtl.getUnit();
+                    if (null == ExciseUnitCodeTax) {
+                        ExciseUnitCodeTax = "";
+                    }
+                }
+                if (ExciseDutyDtl == null) {
+                    msg = "Excise Duty Code is Not Valid";
+                } else if (aItem_unit_otherList.isEmpty() && !ExciseUnitCodeTax.isEmpty() && !aItem.getUnit_symbol_tax().equals(ExciseUnitCodeTax)) {
+                    msg = "Unit of Excise Duty is different from Item Unit Code. Change or Add Unit";
+                } else if (!aItem_unit_otherList.isEmpty() && !ExciseUnitCodeTax.isEmpty()) {
+                    //check if found and on what position
+                    int found = 0;
+                    int foundPsn = -1;
+                    for (int i = 0; i < aItem_unit_otherList.size(); i++) {
+                        if (ExciseUnitCodeTax.equals(new UnitBean().getUnit(aItem_unit_otherList.get(i).getOther_unit_id()).getUnit_symbol_tax())) {
+                            found = 1;
+                            foundPsn = i;
+                            break;
+                        }
+                    }
+                    if (found == 0 && !aItem.getUnit_symbol_tax().equals(ExciseUnitCodeTax)) {
+                        msg = "Unit of Excise Duty is not found among Item Units. Change or Add Unit";
+                    } else if (found == 1 && !aItem.getUnit_symbol_tax().equals(ExciseUnitCodeTax) && foundPsn != 0) {
+                        msg = "Other Unit that Matches Excise Duty Unit should be the first on the list of other Units";
+                    }
+                }
+            }
+        } catch (Exception e) {
         }
         return msg;
     }
@@ -1895,6 +1946,7 @@ public class ItemBean implements Serializable {
                 aItem.setHide_unit_price_invoice(0);
                 aItem.setPurpose("");
                 aItem.setItem_code_tax("");
+                aItem.setExcise_duty_code("");
                 aItem.setIs_synced_tax(0);
                 aItem.setSelectedVatRateds(null);
                 aItem.setVat_rate_order(this.getVatRateOrder(new Parameter_listBean().getParameter_listByContextName("GENERAL", "TAX_VAT_RATE_ORDER").getParameter_value()));
