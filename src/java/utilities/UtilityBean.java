@@ -332,6 +332,31 @@ public class UtilityBean implements Serializable {
         return aString;
     }
 
+    public String formatDoubleToStringPlain(double aAmount, int aDecimalPlaces) {
+        //aPattern = "##0.00";
+        String aString = "";
+        String fmt = "";
+        if (aDecimalPlaces > 0) {
+            fmt = "##0.";
+            for (int i = 0; i < aDecimalPlaces; i++) {
+                fmt = fmt + "0";
+            }
+        } else {
+            fmt = "##0";
+        }
+        if (aAmount >= 0) {
+            aString = this.formatNumber(fmt, aAmount) + "";
+        } else if (aAmount < 0) {
+            aString = this.formatNumber(fmt, aAmount) + "";
+        }
+        return aString;
+    }
+
+//    public static void main(String[] args) {
+//        Double x = 123452212.10;
+//        System.out.println(new UtilityBean().formatDoubleToStringPlain(x, 2));
+//    }
+    
     public String formatDoubleToStringHide(double aAmount, int aHideResult) {
         String aString = "";
         //DecimalFormat myFormatter = new DecimalFormat("###,###.###;(###,###.###)");
@@ -803,12 +828,6 @@ public class UtilityBean implements Serializable {
         return d;
     }
 
-//    public static void main(String[] args) {
-//        List<Item_unit> aItem_unitList=new ArrayList<>();
-//        Item aItem=new ItemBean().getItem(2510);
-//        new ItemBean().setItemUnitList(aItem_unitList, aItem, 0);
-//        System.out.println(aItem_unitList.size());
-//    }
     public List<ThreadClass> getRunningThreads() {
         List<ThreadClass> objs = new ArrayList<>();
         Set<Thread> threads = Thread.getAllStackTraces().keySet();
