@@ -5,6 +5,7 @@
  */
 package api_tax.efris_bean;
 
+import api_tax.efris.EFRIS_excise_duty_list;
 import api_tax.efris.GeneralUtilities;
 import api_tax.efris.innerclasses.ItemTax;
 import beans.AccCurrencyBean;
@@ -27,6 +28,7 @@ import entities.Item_excise_duty_map;
 import entities.Item_unit_other;
 import entities.Stock;
 import entities.Transactor;
+import entities.Unit;
 import java.io.Serializable;
 import java.security.PrivateKey;
 import java.util.ArrayList;
@@ -912,6 +914,8 @@ public class StockManage implements Serializable {
     public String registerItemOffline(Item aItem, String aItemIdTax, String aOperationType) {
         String ReturnMsg = "";
         String output = "";
+        Item_excise_duty_map edm = null;
+        String ExciseDutyCode = "";
         try {
             String UnitPriceStr = "";
             if (aItem.getUnitRetailsalePrice() > 0) {
@@ -922,10 +926,11 @@ public class StockManage implements Serializable {
             String exciseDutyCodeStr = " \"exciseDutyCode\": \"\",\n";
             String haveExciseTaxStr = " \"haveExciseTax\": \"102\",\n";
             try {
-                Item_excise_duty_map edm = new ItemBean().getItem_excise_duty_mapByItem(aItem.getItemId());
+                edm = new ItemBean().getItem_excise_duty_mapByItem(aItem.getItemId());
                 if (null != edm) {
                     if (edm.getExcise_duty_code().length() > 0) {
-                        exciseDutyCodeStr = " \"exciseDutyCode\": \"" + edm.getExcise_duty_code() + "\",\n";
+                        ExciseDutyCode = edm.getExcise_duty_code();
+                        exciseDutyCodeStr = " \"exciseDutyCode\": \"" + ExciseDutyCode + "\",\n";
                         haveExciseTaxStr = " \"haveExciseTax\": \"101\",\n";
                     }
                 }
@@ -944,7 +949,7 @@ public class StockManage implements Serializable {
                     + "	\"description\": \"1\",\n"
                     + "	\"stockPrewarning\": \"" + aItem.getReorderLevel() + "\",\n"
                     + exciseDutyCodeStr
-                    + this.getGoodsOtherUnits(aItem.getItemId())
+                    + this.getGoodsOtherUnits(aItem, ExciseDutyCode)
                     + "},\n"
                     + "]";
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
@@ -981,6 +986,8 @@ public class StockManage implements Serializable {
     public String registerItemOnline(Item aItem, String aItemIdTax, String aOperationType) {
         String ReturnMsg = "";
         String output = "";
+        Item_excise_duty_map edm = null;
+        String ExciseDutyCode = "";
         try {
             String UnitPriceStr = "";
             if (aItem.getUnitRetailsalePrice() > 0) {
@@ -991,10 +998,16 @@ public class StockManage implements Serializable {
             String exciseDutyCodeStr = " \"exciseDutyCode\": \"\",\n";
             String haveExciseTaxStr = " \"haveExciseTax\": \"102\",\n";
             try {
-                Item_excise_duty_map edm = new ItemBean().getItem_excise_duty_mapByItem(aItem.getItemId());
+                edm = new ItemBean().getItem_excise_duty_mapByItem(aItem.getItemId());
+                if (null != edm) {
+                    if (edm.getExcise_duty_code().length() == 0) {
+                        edm = null;
+                    }
+                }
                 if (null != edm) {
                     if (edm.getExcise_duty_code().length() > 0) {
-                        exciseDutyCodeStr = " \"exciseDutyCode\": \"" + edm.getExcise_duty_code() + "\",\n";
+                        ExciseDutyCode = edm.getExcise_duty_code();
+                        exciseDutyCodeStr = " \"exciseDutyCode\": \"" + ExciseDutyCode + "\",\n";
                         haveExciseTaxStr = " \"haveExciseTax\": \"101\",\n";
                     }
                 }
@@ -1013,7 +1026,7 @@ public class StockManage implements Serializable {
                     + "	\"description\": \"1\",\n"
                     + "	\"stockPrewarning\": \"" + aItem.getReorderLevel() + "\",\n"
                     + exciseDutyCodeStr
-                    + this.getGoodsOtherUnits(aItem.getItemId())
+                    + this.getGoodsOtherUnits(aItem, ExciseDutyCode)
                     + "},\n"
                     + "]";
             //System.out.println("JSON:" + json);
@@ -1064,21 +1077,42 @@ public class StockManage implements Serializable {
         return ReturnMsg;
     }
 
-    public String getGoodsOtherUnits(long aItemId) {
+    public String getGoodsOtherUnits(Item aItem, String aExciseCode) {
         String gous = "";
         try {
             List<Item_unit_other> iuList = new ArrayList<>();
-            iuList = new ItemBean().getItem_unit_otherList(aItemId, 1);
+            iuList = new ItemBean().getItem_unit_otherList(aItem.getItemId(), 1);
             String OtherUnit1Str = "";
             String OtherUnit2MoreStr = "";
+            EFRIS_excise_duty_list ExciseDutyDtl = null;
+            String ExciseUnitCodeTax = "";
+            if (aExciseCode.length() > 0) {
+                ExciseDutyDtl = new EFRIS_excise_duty_listBean().getEFRIS_invoice_detailByExciseDutyCode(aExciseCode);
+                if (null != ExciseDutyDtl) {
+                    ExciseUnitCodeTax = ExciseDutyDtl.getUnit();
+                    if (null == ExciseUnitCodeTax) {
+                        ExciseUnitCodeTax = "";
+                    }
+                }
+            }
             if (iuList.isEmpty()) {
-                OtherUnit1Str = ""
-                        + "\"pieceMeasureUnit\": \"\",\n"
-                        + "\"havePieceUnit\": \"102\",\n"
-                        + "\"haveOtherUnit\": \"102\",\n"
-                        + "\"pieceUnitPrice\": \"\",\n"
-                        + "\"packageScaledValue\": \"\",\n"
-                        + "\"pieceScaledValue\": \"\"\n";
+                if (null != ExciseDutyDtl && ExciseUnitCodeTax.length() > 0 && ExciseUnitCodeTax.equals(aItem.getUnit_symbol_tax())) {
+                    OtherUnit1Str = ""
+                            + "\"pieceMeasureUnit\": \"" + ExciseUnitCodeTax + "\",\n"
+                            + "\"havePieceUnit\": \"101\",\n"
+                            + "\"haveOtherUnit\": \"102\",\n"
+                            + "\"pieceUnitPrice\": \"" + aItem.getUnitRetailsalePrice() + "\",\n"
+                            + "\"packageScaledValue\": \"1\",\n"
+                            + "\"pieceScaledValue\": \"1\"\n";
+                } else {
+                    OtherUnit1Str = ""
+                            + "\"pieceMeasureUnit\": \"\",\n"
+                            + "\"havePieceUnit\": \"102\",\n"
+                            + "\"haveOtherUnit\": \"102\",\n"
+                            + "\"pieceUnitPrice\": \"\",\n"
+                            + "\"packageScaledValue\": \"\",\n"
+                            + "\"pieceScaledValue\": \"\"\n";
+                }
             } else if (iuList.size() >= 1) {
                 int n = iuList.size();
                 String hasotherunit = "102";
