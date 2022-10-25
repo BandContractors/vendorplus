@@ -103,7 +103,7 @@ public class T125 implements Serializable {
             } catch (Exception e) {
                 //do nothing
             }
-            
+
             /**
              * Decode and or decompress
              */
@@ -201,7 +201,7 @@ public class T125 implements Serializable {
             } catch (Exception e) {
                 //do nothing
             }
-            
+
             /**
              * Decode and or decompress
              */
@@ -211,7 +211,6 @@ public class T125 implements Serializable {
                 try {
                     byte[] str = GzipUtils.decompress(Base64.decodeBase64(content));
                     DecryptedContent = new String(str);
-                    //System.out.println("DecryptedContent: " + DecryptedContent);
                 } catch (Throwable t) {
                     LOGGER.log(Level.ERROR, t);
                 }
@@ -233,11 +232,13 @@ public class T125 implements Serializable {
                         ExciseDutyDetailsList edl = temp.getExciseDutyDetailsList().get(e);
                         if (edl.getType().equals("101")) {//101 is Percentage, 102 is Unit of measurement
                             temp.setRate_perc(edl.getRate());
-                            temp.setCurrency(edl.getCurrency());
+                            if (temp.getCurrency() == null || "".equals(temp.getCurrency())) {
+                                temp.setCurrency(edl.getCurrency());
+                            }
                         } else {
                             temp.setRate_value(edl.getRate());
                             temp.setUnit(edl.getUnit());
-                            if (edl.getCurrency() == null) {
+                            if (temp.getCurrency() == null || "".equals(temp.getCurrency())) {
                                 temp.setCurrency(edl.getCurrency());
                             }
                         }

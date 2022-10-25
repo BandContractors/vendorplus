@@ -113,3 +113,13 @@ create table item_excise_duty_map (
 	item_id bigint(20) not null,
 	efris_excise_duty_list_id bigint not null
 )ENGINE=InnoDB;
+
+create table download_status (
+	download_status_id int primary key auto_increment,
+    download_name varchar(50) not null unique,
+	download_status int not null,
+	download_status_msg varchar(50) not null,
+	total_amount int not null,
+	total_downloaded int not null,
+    add_date datetime not null
+)ENGINE=InnoDB;

@@ -1204,7 +1204,8 @@ public class UtilityBean implements Serializable {
     }
 
     public void callDownloadExciseDuty_list() {
-        new T125().downloadExciseDuty_list();
+        //new T125().downloadExciseDuty_list();
+        new T125().downloadExciseDuty_listThread();
     }
 
     public void cleanSaleInvoiceTranss() {
