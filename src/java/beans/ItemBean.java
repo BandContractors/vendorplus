@@ -20,6 +20,7 @@ import entities.Location;
 import entities.Stock;
 import entities.Trans;
 import entities.TransItem;
+import entities.TransactionPackageItem;
 import entities.TransactionType;
 import entities.Unit;
 import entities.UserDetail;
@@ -4695,6 +4696,32 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
+    
+        public void changeItemUnitSales(Item aItem, TransactionPackageItem transactionPackageItem, int aTransTypeId, int aTransReasId, int aStoreId, Trans aTrans) {
+        try {
+            Item_unit iu = this.getItemUnitFrmList(transactionPackageItem.getUnitId());
+            aItem.setUnitRetailsalePrice(iu.getUnit_retailsale_price());
+            aItem.setUnitWholesalePrice(iu.getUnit_wholesale_price());
+            transactionPackageItem.setUnitId(iu.getUnit_id());
+            transactionPackageItem.setUnitSymbol(iu.getUnit_symbol());
+            if (aTransTypeId == 2 && aTransReasId == 10) {
+                transactionPackageItem.setUnitPrice(aItem.getUnitWholesalePrice());
+            } else {
+                transactionPackageItem.setUnitPrice(aItem.getUnitRetailsalePrice());
+            }
+            DiscountPackageItem dpi = new DiscountPackageItemBean().getActiveDiscountPackageItem(aStoreId, aItem.getItemId(), 1, aTrans.getTransactorId(), aItem.getCategoryId(), aItem.getSubCategoryId());
+            if (dpi != null) {
+                if (aTransReasId == 10 || aTransReasId == 15 || aTransReasId == 109) {
+                    transactionPackageItem.setUnitTradeDiscount(aItem.getUnitWholesalePrice() * dpi.getWholesaleDiscountAmt() / 100);
+                } else {
+                    transactionPackageItem.setUnitTradeDiscount(aItem.getUnitRetailsalePrice() * dpi.getRetailsaleDiscountAmt() / 100);
+                }
+            }
+            //new TransItemBean().editTransItemUponUnitChange(aTransTypeId, aTransReasId, transactionPackageItem);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
 
     public void changeItemUnitQuickOrder(TransItem aTransItem, int aTransTypeId, int aTransReasId, int aStoreId, Trans aTrans) {
         try {
@@ -4787,6 +4814,23 @@ public class ItemBean implements Serializable {
                 aItem.setUnitWholesalePrice(iu.getUnit_wholesale_price());
                 aTransItem.setUnit_id(iu.getUnit_id());
                 aTransItem.setUnitSymbol(iu.getUnit_symbol());
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+    
+    
+    public void refreshItemtransactionPackageUnitList(Item aItem, TransactionPackageItem transactionPackageItem, int aOrderByFlag) {
+        //aOrderByFlag 1 Sales, 2 Purchase, 0 None
+        try {
+            this.setItemUnitList(this.Item_unitList, aItem, aOrderByFlag);
+            if (null != this.Item_unitList && this.Item_unitList.size() > 0) {
+                Item_unit iu = this.Item_unitList.get(0);
+                aItem.setUnitRetailsalePrice(iu.getUnit_retailsale_price());
+                aItem.setUnitWholesalePrice(iu.getUnit_wholesale_price());
+                transactionPackageItem.setUnitId(iu.getUnit_id());
+               transactionPackageItem.setUnitSymbol(iu.getUnit_symbol());
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);

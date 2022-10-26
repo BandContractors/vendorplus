@@ -105,8 +105,9 @@
                         <p:separator />
                         <p:menuitem value="#{langsys['Goods']} #{langsys['Delivery']}" action="#{navigationBean.redirectToGoodsDelivery()}" />
                         <p:separator />
+                        <p:menuitem value="#{langsys['Sales']} #{langsys['Package']}" action="#{navigationBean.redirectToSalesPackaging()}" />
+                        <p:separator />
                     </p:submenu>
-                    <p:separator rendered="#{menuItemBean.menuItemObj.HIRE_MODULE_ON==1}"/>
                     <p:submenu label="#{langsys['Hire']}" rendered="#{menuItemBean.menuItemObj.HIRE_MODULE_ON==1}">
                         <p:separator />
                         <p:menuitem value="#{langsys['Hire']} #{langsys['Quotation']}" action="#{navigationBean.redirectToHireQuotation()}" />

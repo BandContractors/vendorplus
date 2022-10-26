@@ -128,6 +128,8 @@ public class TransItem implements Serializable {
     private double base_unit_qty;
     private double base_unit_qty2;
     private Item_unit Item_unitObj;
+    private String transactionPackageNumber;
+    private long transactionPackageId;
 
     /**
      * @return the TransactionItemId
@@ -1555,6 +1557,34 @@ public class TransItem implements Serializable {
      */
     public void setUnit_id2(int unit_id2) {
         this.unit_id2 = unit_id2;
+    }
+
+    /**
+     * @return the transactionPackageNumber
+     */
+    public String getTransactionPackageNumber() {
+        return transactionPackageNumber;
+    }
+
+    /**
+     * @param transactionPackageNumber the transactionPackageNumber to set
+     */
+    public void setTransactionPackageNumber(String transactionPackageNumber) {
+        this.transactionPackageNumber = transactionPackageNumber;
+    }
+
+    /**
+     * @return the transactionPackageId
+     */
+    public long getTransactionPackageId() {
+        return transactionPackageId;
+    }
+
+    /**
+     * @param transactionPackageId the transactionPackageId to set
+     */
+    public void setTransactionPackageId(long transactionPackageId) {
+        this.transactionPackageId = transactionPackageId;
     }
 
 }
