@@ -14,8 +14,8 @@ public class DownloadStatus implements Serializable {
     private String download_name;
     private int download_status;
     private String download_status_msg;
-    private double total_amount;
-    private double total_downloaded;
+    private int total_amount;
+    private int total_downloaded;
     private Date add_date;
 
     /**
@@ -77,28 +77,28 @@ public class DownloadStatus implements Serializable {
     /**
      * @return the total_amount
      */
-    public double getTotal_amount() {
+    public int getTotal_amount() {
         return total_amount;
     }
 
     /**
      * @param total_amount the total_amount to set
      */
-    public void setTotal_amount(double total_amount) {
+    public void setTotal_amount(int total_amount) {
         this.total_amount = total_amount;
     }
 
     /**
      * @return the total_downloaded
      */
-    public double getTotal_downloaded() {
+    public int getTotal_downloaded() {
         return total_downloaded;
     }
 
     /**
      * @param total_downloaded the total_downloaded to set
      */
-    public void setTotal_downloaded(double total_downloaded) {
+    public void setTotal_downloaded(int total_downloaded) {
         this.total_downloaded = total_downloaded;
     }
 
