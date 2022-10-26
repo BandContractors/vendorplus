@@ -1436,6 +1436,121 @@ public class ItemBean implements Serializable {
         }
     }
 
+    public int saveItem_unspsc(Item_unspsc aItem_unspscs) {
+        int saved = 0;
+        try {
+            //save Item_unspsc
+            saved = this.insertItem_unspsc(aItem_unspscs);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return saved;
+    }
+
+    public int saveItem_unspsc(List<Item_unspsc> aItem_unspscs) {
+        int saved = 0;
+        try {
+            int Item_UNSPSCListSaved = 0;
+            //save Item_unspsc
+            for (int i = 0, size = aItem_unspscs.size(); i < size; i++) {
+                Item_UNSPSCListSaved = Item_UNSPSCListSaved + this.insertItem_unspsc(aItem_unspscs.get(i));
+            }
+
+            if (Item_UNSPSCListSaved == aItem_unspscs.size()) {
+                saved = 1;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return saved;
+    }
+
+    public int insertItem_unspsc(Item_unspsc aItem_unspsc) {
+        int saved = 0;
+        String sql = "INSERT INTO item_unspsc"
+                + "(segment_code, segment_name, family_code, family_name, class_code, class_name, commodity_code, commodity_name,"
+                + "excise_duty_product_type, vat_rate, service_mark, zero_rate, exempt_rate, add_date)"
+                + "VALUES"
+                + "(?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            //segment_code, segment_name, family_code, family_name, class_code, class_name, commodity_code, commodity_name
+            if (aItem_unspsc.getSegment_code()!= null) {
+                ps.setString(1, aItem_unspsc.getSegment_code());
+            } else {
+                ps.setString(1, "");
+            }
+            if (aItem_unspsc.getSegment_name()!= null) {
+                ps.setString(2, aItem_unspsc.getSegment_name());
+            } else {
+                ps.setString(2, "");
+            }
+            if (aItem_unspsc.getFamily_code()!= null) {
+                ps.setString(3, aItem_unspsc.getFamily_code());
+            } else {
+                ps.setString(3, "");
+            }
+            if (aItem_unspsc.getFamily_name()!= null) {
+                ps.setString(4, aItem_unspsc.getFamily_name());
+            } else {
+                ps.setString(4, "");
+            }
+            if (aItem_unspsc.getClass_code()!= null) {
+                ps.setString(5, aItem_unspsc.getClass_code());
+            } else {
+                ps.setString(5, "");
+            }
+            if (aItem_unspsc.getClass_name()!= null) {
+                ps.setString(6, aItem_unspsc.getClass_name());
+            } else {
+                ps.setString(6, "");
+            }
+            if (aItem_unspsc.getCommodity_code()!= null) {
+                ps.setString(7, aItem_unspsc.getCommodity_code());
+            } else {
+                ps.setString(7, "");
+            }
+            if (aItem_unspsc.getCommodity_name()!= null) {
+                ps.setString(8, aItem_unspsc.getCommodity_name());
+            } else {
+                ps.setString(8, "");
+            }
+            //excise_duty_product_type, vat_rate, service_mark, zero_rate, exempt_rate, add_date
+            if (aItem_unspsc.getExcise_duty_product_type()!= null) {
+                ps.setString(9, aItem_unspsc.getExcise_duty_product_type());
+            } else {
+                ps.setString(9, "");
+            }
+            if (aItem_unspsc.getVat_rate()!= null) {
+                ps.setString(10, aItem_unspsc.getVat_rate());
+            } else {
+                ps.setString(10, "");
+            }
+            if (aItem_unspsc.getService_mark()!= null) {
+                ps.setString(11, aItem_unspsc.getService_mark());
+            } else {
+                ps.setString(11, "");
+            }
+            if (aItem_unspsc.getZero_rate()!= null) {
+                ps.setString(12, aItem_unspsc.getZero_rate());
+            } else {
+                ps.setString(12, "");
+            }
+            if (aItem_unspsc.getExempt_rate()!= null) {
+                ps.setString(13, aItem_unspsc.getExempt_rate());
+            } else {
+                ps.setString(13, "");
+            }
+            ps.setTimestamp(14, new java.sql.Timestamp(new CompanySetting().getCURRENT_SERVER_DATE().getTime()));
+            ps.executeUpdate();
+            saved = 1;
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return saved;
+    }
+
     public Item_unspsc findItem_unspsc(long aItem_unspsc_id) {
         String sql = "SELECT * FROM item_unspsc WHERE item_unspsc_id=" + aItem_unspsc_id;
         ResultSet rs = null;
@@ -1454,6 +1569,21 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
             return null;
         }
+    }
+
+    public int deleteItem_unspsc_All() {
+        int IsDeleted = 0;
+        String sql = "DELETE FROM item_unspsc WHERE item_unspsc_id > ?";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, 0);
+            ps.executeUpdate();
+            IsDeleted = 1;
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return IsDeleted;
     }
 
     public Item findItemByCode(String ItemCode) {

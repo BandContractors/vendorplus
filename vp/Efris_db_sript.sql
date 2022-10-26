@@ -123,3 +123,5 @@ create table download_status (
 	total_downloaded int not null,
     add_date datetime not null
 )ENGINE=InnoDB;
+INSERT INTO download_status (download_name, download_status, download_status_msg, total_amount, total_downloaded, add_date) 
+VALUES ('GOODS COMMODITY', '3', 'NEW', '0','0',Now());
