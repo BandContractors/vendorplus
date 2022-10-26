@@ -215,3 +215,15 @@ create table efris_goods_commodity (
 )ENGINE=InnoDB;
 
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',217,Now(),'6.0','');
+
+create table download_status (
+	download_status_id int primary key auto_increment,
+    download_name varchar(50) not null unique,
+	download_status int not null,
+	download_status_msg varchar(50) not null,
+	total_amount int not null,
+	total_downloaded int not null,
+    add_date datetime not null
+)ENGINE=InnoDB;
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',228,Now(),'6.0','');
+
