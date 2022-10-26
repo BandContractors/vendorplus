@@ -227,3 +227,17 @@ create table download_status (
 )ENGINE=InnoDB;
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',228,Now(),'6.0','');
 
+ALTER TABLE transaction_item_excise ADD COLUMN excise_duty_code VARCHAR(50) NULL AFTER transaction_item_id;
+INSERT INTO download_status (download_name, download_status, download_status_msg, total_amount, total_downloaded, add_date) VALUES ('GOODS COMMODITY', '3', 'NEW', '0','0',Now());
+
+CREATE TABLE transaction_packacge_item_unit (
+  transaction_packacge_item_unit_id bigint(20) NOT NULL DEFAULT '0',
+  unit_id int(11) NOT NULL,
+  base_unit_qty double NOT NULL,
+  PRIMARY KEY (transaction_packacge_item_unit_id)
+) ENGINE=InnoDB;
+
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',240,Now(),'6.0','');
+
+
+
