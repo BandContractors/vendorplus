@@ -7,11 +7,13 @@ package api_tax.efris_bean;
 
 import api_tax.efris.GeneralUtilities;
 import api_tax.efris.innerclasses.GoodsCommodity;
+import beans.DownloadStatusBean;
 import beans.Parameter_listBean;
 import com.google.gson.Gson;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import entities.CompanySetting;
+import entities.DownloadStatus;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.Serializable;
@@ -393,7 +395,7 @@ public class T124 implements Serializable {
     }
 
     public void downloadGoodsCommodities() {
-        try {            
+        try {
             String APIMode = new Parameter_listBean().getParameter_listByContextName("API", "API_TAX_MODE").getParameter_value();
             if (APIMode.equals("OFFLINE")) {
                 this.generateUNSPCOffline();
@@ -665,7 +667,26 @@ public class T124 implements Serializable {
                 if (savedGoodsCommodity == 1) {
                     //set total number of goods commodities already downloaded
                     downloadedUNSPC = downloadedUNSPC + arList.size();
+
+                    //UPDATE THE DOWNLOAD STATUS 
+                    DownloadStatus downloadStatus = new DownloadStatus();
+                    downloadStatus.setDownload_name("GOODS COMMODITY");
+                    downloadStatus.setTotal_amount(totalUNSPC);
+                    downloadStatus.setTotal_downloaded(downloadedUNSPC);
+                    if (totalUNSPC == downloadedUNSPC) {
+                        downloadStatus.setDownload_status(1);
+                        downloadStatus.setDownload_status_msg("SUCCESS");
+                    } else {
+                        downloadStatus.setDownload_status(2);
+                        downloadStatus.setDownload_status_msg("PROGRESS/FAILED");
+                    }
+                    new DownloadStatusBean().updateTotalDownloaded(downloadStatus);
                 }
+            }
+            
+            //merge Goodd commodity into item_UNSPSC
+            if (totalUNSPC == downloadedUNSPC){
+                new EFRIS_goods_commodityBean().mergeGoodCommodity_Item_UNSPSC();
             }
         } catch (Exception e) {
             LOGGER.log(Level.INFO, output);

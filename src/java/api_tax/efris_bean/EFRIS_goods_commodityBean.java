@@ -6,26 +6,18 @@
 package api_tax.efris_bean;
 
 import api_tax.efris.EFRIS_goods_commodity;
-import api_tax.efris.EFRIS_goods_commodity;
 import api_tax.efris.innerclasses.GoodsCommodity;
-import api_tax.efris.innerclasses.GoodsDetails;
 import beans.ItemBean;
-import beans.Item_tax_mapBean;
-import beans.TransItemBean;
 import connections.DBConnection;
 import entities.CompanySetting;
-import entities.Item;
-import entities.Item_tax_map;
-import entities.TransItem;
+import entities.Item_unspsc;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import org.apache.log4j.Level;
@@ -128,6 +120,85 @@ public class EFRIS_goods_commodityBean implements Serializable {
                 aEFRIS_goods_commodity.setAdd_date(new Date(aResultSet.getTimestamp("add_date").getTime()));
             } catch (Exception e) {
                 aEFRIS_goods_commodity.setAdd_date(null);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void setItem_unspscFromResultset(Item_unspsc aItem_unspsc, ResultSet aResultSet) {
+        try {
+            try {
+                aItem_unspsc.setSegment_code(aResultSet.getString("segment_code"));
+            } catch (Exception e) {
+                aItem_unspsc.setSegment_code("");
+            }
+            try {
+                aItem_unspsc.setSegment_name(aResultSet.getString("segment_name"));
+            } catch (Exception e) {
+                aItem_unspsc.setSegment_name("");
+            }
+            try {
+                aItem_unspsc.setFamily_code(aResultSet.getString("family_code"));
+            } catch (Exception e) {
+                aItem_unspsc.setFamily_code("");
+            }
+            try {
+                aItem_unspsc.setFamily_name(aResultSet.getString("family_name"));
+            } catch (Exception e) {
+                aItem_unspsc.setFamily_name("");
+            }
+            try {
+                aItem_unspsc.setClass_code(aResultSet.getString("class_code"));
+            } catch (Exception e) {
+                aItem_unspsc.setClass_code("");
+            }
+            try {
+                aItem_unspsc.setClass_name(aResultSet.getString("class_name"));
+            } catch (Exception e) {
+                aItem_unspsc.setClass_name("");
+            }
+            try {
+                aItem_unspsc.setCommodity_code(aResultSet.getString("commodity_code"));
+            } catch (Exception e) {
+                aItem_unspsc.setCommodity_code("");
+            }
+            try {
+                aItem_unspsc.setCommodity_name(aResultSet.getString("commodity_name"));
+            } catch (Exception e) {
+                aItem_unspsc.setCommodity_name("");
+            }
+            try {
+                aItem_unspsc.setVat_rate(aResultSet.getString("vat_rate"));
+            } catch (Exception e) {
+                aItem_unspsc.setVat_rate("");
+            }
+            try {
+                if (aResultSet.getString("service_mark").equals("101")) {
+                    aItem_unspsc.setService_mark("Y");
+                } else {
+                    aItem_unspsc.setService_mark("N");
+                }
+            } catch (Exception e) {
+                aItem_unspsc.setService_mark("");
+            }
+            try {
+                if (aResultSet.getString("zero_rate").equals("101")) {
+                    aItem_unspsc.setZero_rate("Y");
+                } else {
+                    aItem_unspsc.setZero_rate("N");
+                }
+            } catch (Exception e) {
+                aItem_unspsc.setZero_rate("");
+            }
+            try {
+                if (aResultSet.getString("exempt_rate").equals("101")) {
+                    aItem_unspsc.setExempt_rate("Y");
+                } else {
+                    aItem_unspsc.setExempt_rate("N");
+                }
+            } catch (Exception e) {
+                aItem_unspsc.setExempt_rate("");
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -367,5 +438,38 @@ public class EFRIS_goods_commodityBean implements Serializable {
             lastDate = null;
         }
         return lastDate;
+    }
+
+    public void mergeGoodCommodity_Item_UNSPSC() {
+        String sql = "select lv4.commodityCategoryCode as commodity_code,lv4.rate as vat_rate,lv4.serviceMark as service_mark,lv4.isZeroRate as zero_rate,lv4.isExempt as exempt_rate,lv4.commodityCategoryName as commodity_name,"
+                + "lv3.commodityCategoryName as class_name, lv3.commodityCategoryCode as class_code,"
+                + "lv2.commodityCategoryName as family_name, lv2.commodityCategoryCode as family_code,"
+                + "lv1.commodityCategoryName as segment, lv1.commodityCategoryCode as segment_code from efris_goods_commodity lv4 "
+                + "inner join efris_goods_commodity lv3 on lv3.commodityCategoryLevel=3 and lv4.parentCode=lv3.commodityCategoryCode "
+                + "inner join efris_goods_commodity lv2 on lv2.commodityCategoryLevel=2 and lv3.parentCode=lv2.commodityCategoryCode "
+                + "inner join efris_goods_commodity lv1 on lv1.commodityCategoryLevel=1 and lv2.parentCode=lv1.commodityCategoryCode "
+                + "where lv4.commodityCategoryLevel=4;";
+        ResultSet rs;
+
+        List<Item_unspsc> Item_unspscList = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Item_unspsc obj = new Item_unspsc();
+                this.setItem_unspscFromResultset(obj, rs);
+                Item_unspscList.add(obj);
+            }
+            //if item_unspsc is empty
+            if (Item_unspscList.size() > 0) {
+                int isItemUNSPSCDeleted = new ItemBean().deleteItem_unspsc_All();
+                if (isItemUNSPSCDeleted == 1){
+                    new ItemBean().saveItem_unspsc(Item_unspscList);
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
     }
 }
