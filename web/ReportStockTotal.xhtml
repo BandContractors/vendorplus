@@ -69,19 +69,19 @@
                 <h:outputLabel style="width:120px;color: white;" value="RetailSaleProfit"/>
                 
                 <h:outputText style="width:120px;color: fuchsia;" value="#{reportStockBean.getTotalCostValue()}">
-                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:outputText>
                 <h:outputText style="width:120px;color: coral;" value="#{reportStockBean.getTotalWholesaleValue()}">
-                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:outputText>
                 <h:outputText style="width:120px;color: white;" value="#{reportStockBean.getTotalRetailsaleValue()}">
-                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:outputText>
                 <h:outputText style="width:120px;color: coral;" value="#{reportStockBean.getTotalWholesaleValue() - reportStockBean.getTotalCostValue()}">
-                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:outputText>
                 <h:outputText style="width:120px;color: white;" value="#{reportStockBean.getTotalRetailsaleValue() - reportStockBean.getTotalCostValue()}">
-                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:outputText>
             </h:panelGrid>
             
@@ -111,25 +111,25 @@
                 
                     <p:column headerText="Qty">
                         <h:outputText value="#{rts.currentQty}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                     
                     <p:column headerText="CostValue">
                         <h:outputText value="#{rts.costValue}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                 
                     <p:column headerText="WholesaleValue">
                         <h:outputText value="#{rts.wholesaleValue}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                 
                     <p:column headerText="RetailsaleValue">
                         <h:outputText value="#{rts.retailsaleValue}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>                    
                 
@@ -192,25 +192,25 @@
                 
                     <p:column headerText="SumCurrentQty">
                         <h:outputText value="#{rtss.sumCurrentQty}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                 
                     <p:column headerText="SumCostValue">
                         <h:outputText value="#{rtss.sumCostValue}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                 
                     <p:column headerText="SumWholesaleValue">
                         <h:outputText value="#{rtss.sumWholesaleValue}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                 
                     <p:column headerText="SumRetailsaleValue">
                         <h:outputText value="#{rtss.sumRetailsaleValue}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                 

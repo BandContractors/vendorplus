@@ -155,15 +155,15 @@
                                 <h:inputText styleClass="clsInput" id="itxtvPayMethod" disabled="true" value="#{payMethodBean.getPayMethod(generalUserSetting.outputDetailParent.pay.payMethodId).payMethodName}" style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 8pt;color:#000000;font-weight: normal;text-decoration: none;width: 150px;border: none;"/>
                                 <h:outputLabel value="Amount.Tendered" style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 8pt;color:#000000;font-weight: normal;text-decoration: none;"/>
                                 <h:inputText id="itxtvAmountTendered" value="#{generalUserSetting.outputDetailParent.trans.amountTendered}" styleClass="clsInputTransItem" style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 8pt;color:#000000;font-weight: normal;text-decoration: none;width: 150px;border: none;" disabled="true">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:inputText>
                                 <h:outputLabel value="Spent.PointsAmt" style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 8pt;color:#000000;font-weight: normal;text-decoration: none;"/>
                                 <h:inputText id="itxtvSpendPointsAmount" value="#{generalUserSetting.outputDetailParent.pay.pointsSpentAmount}" styleClass="clsInputTransItem" style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 8pt;color:#000000;font-weight: normal;text-decoration: none;width: 150px;border: none;" disabled="true">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:inputText>
                                 <h:outputLabel value="Balance" style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 8pt;color:#000000;font-weight: normal;text-decoration: none;"/>
                                 <h:inputText id="itxtvChange" value="#{generalUserSetting.outputDetailParent.trans.changeAmount}" styleClass="clsInputTransItem" style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 8pt;color:#000000;font-weight: normal;text-decoration: none;width: 150px;border: none;" disabled="true">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:inputText>
                             </h:panelGrid>
                         </h:panelGrid>
@@ -171,20 +171,20 @@
                             <h:outputLabel value=""/>
                             <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 12pt;color:#000000;font-weight: bold;text-decoration: none;">Subtotal:</h:outputLabel>
                             <h:outputText style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 12pt;color:#000000;font-weight: bold;text-decoration: none;" value="#{generalUserSetting.outputDetailParent.trans.subTotal}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
 
                             <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 9pt;color:#000000;font-weight: normal;text-decoration: none;">#{utilityBean.formatDoubleToString(generalUserSetting.outputDetailParent.trans.cash_dicsount_perc)}%</h:outputLabel>
                             <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 12pt;color:#000000;font-weight: bold;text-decoration: none;">Discount:</h:outputLabel>
                             <h:outputText style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 12pt;color:#000000;font-weight: bold;text-decoration: none;" value="#{generalUserSetting.outputDetailParent.trans.cashDiscount}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
 
                             <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 9pt;color:#000000;font-weight: normal;text-decoration: none;" rendered="#{generalUserSetting.outputDetailParent.trans.totalVat>0}">#{utilityBean.formatDoubleToString(generalUserSetting.outputDetailParent.trans.vatPerc)}%</h:outputLabel>
                             <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 9pt;color:#000000;font-weight: normal;text-decoration: none;" rendered="#{0>=generalUserSetting.outputDetailParent.trans.totalVat}">%</h:outputLabel>
                             <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 12pt;color:#000000;font-weight: bold;text-decoration: none;">VAT:</h:outputLabel>
                             <h:outputText style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 12pt;color:#000000;font-weight: bold;text-decoration: none;" value="#{generalUserSetting.outputDetailParent.trans.totalVat}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
 
                             <h:outputLabel value=""/>

@@ -81,17 +81,17 @@
                     </p:column>
                     <p:column headerText="#{langsys['Retail']} #{langsys['Sale']} #{langsys['Price']}" style="text-align: left">  
                         <h:outputText value="#{itm.unitRetailsalePrice}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                     <p:column headerText="#{langsys['Wholesale']} #{langsys['Price']}" style="text-align: left" rendered="#{generalUserSetting.currentTransactionReasonId==2 or generalUserSetting.currentTransactionReasonId==10}">
                         <h:outputText value="#{itm.unitWholesalePrice}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                     <p:column headerText="#{langsys['Special']} #{langsys['Price']}" style="text-align: left" rendered="#{generalUserSetting.currentTransactionReasonId==103}">
                         <h:outputText value="#{itm.unit_special_price}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                     <p:column headerText="#{langsys['Currency']}" style="text-align: left">
@@ -147,7 +147,7 @@
                 </p:column>
                 <p:column headerText="#{langsys['Qty']} #{langsys['Counted']}" style="text-align: right;">
                     <h:inputText value="#{i.qty_physical}" style="width: 100px;" disabled="#{i.stock_take_session_item_id gt 0}">
-                        <f:convertNumber pattern="###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                         <f:ajax event="change" listener="#{stock_take_session_itemBean.changeQtyCounted(i)}" execute="dtblList" render="olblShort olblOver"/>
                     </h:inputText>
                 </p:column>

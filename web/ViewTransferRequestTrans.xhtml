@@ -75,7 +75,7 @@
                             <f:facet name="header">#{langsys['Requested']} #{langsys['Qty']}</f:facet>
                             <!-- row record -->
                             <h:inputText value="#{ati.itemQty}" style="width: 50px;" disabled="true" autocomplete="off">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:inputText>
                         </p:column>
                     </p:dataTable>

@@ -176,17 +176,17 @@
                         </p:column>
                         <p:column headerText="VAT" style="text-align: right;">
                             <h:outputText value="#{sm.totalVat}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{langsys['Discount']}" style="text-align: right;">
                             <h:outputText value="#{sm.cashDiscount}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{langsys['Total']}" style="text-align: right;">
                             <h:outputText value="#{sm.grandTotal}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                     </p:dataTable>
@@ -244,12 +244,12 @@
                 </p:column>
                 <p:column headerText="VAT" style="text-align: right;">
                     <h:outputText value="#{itm.totalVat}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Total']}" style="text-align: right;">
                     <h:outputText value="#{itm.grandTotal}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="FDN">

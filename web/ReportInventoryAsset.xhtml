@@ -65,7 +65,7 @@
                         </p:column>
                         <p:column headerText="#{langsys['Purchase']} #{langsys['Cost']}" style="text-align: right;">
                             <h:outputText value="#{sm.costValue}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                     </p:dataTable>
@@ -118,12 +118,12 @@
                 </p:column>
                 <p:column headerText="#{langsys['Qty']}">
                     <h:outputText value="#{itm.currentqty}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Unit']} #{langsys['Cost']}" style="text-align: right;">
                     <h:outputText value="#{itm.unitCost}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Purchase']} #{langsys['Date']}">
@@ -131,12 +131,12 @@
                 </p:column>
                 <p:column headerText="#{langsys['Depreciation']} #{langsys['Rate']}" style="text-align: right;">
                     <h:outputText value="#{itm.depRate}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Residual']} #{langsys['Value']}" style="text-align: right;">
                     <h:outputText value="#{itm.residualValue}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Effective']} #{langsys['life']}">
@@ -144,12 +144,12 @@
                 </p:column>
                 <p:column headerText="#{langsys['Damage']}/#{langsys['Lost']}" style="text-align: right;" rendered="#{menuItemBean.menuItemObj.HIRE_MODULE_ON==1}">
                     <h:outputText value="#{itm.qty_damage}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Qty']} #{langsys['Out']}" style="text-align: right;" rendered="#{menuItemBean.menuItemObj.HIRE_MODULE_ON==1}">
                     <h:outputText value="#{itm.qty_out}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
             </p:dataTable>

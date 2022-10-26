@@ -152,22 +152,22 @@
                 </p:column>
                 <p:column headerText="#{langsys['Retail']} #{langsys['Sale']} #{langsys['Price']}" style="text-align: right;font-size: 12px;">
                     <h:outputText value="#{itm.unitRetailsalePrice}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Wholesale']} #{langsys['Price']}" style="text-align: right;font-size: 12px;">
                     <h:outputText value="#{itm.unitWholesalePrice}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Hire']} #{langsys['Price']}" style="text-align: right;font-size: 12px;">
                     <h:outputText value="#{itm.unit_hire_price}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Cost']} #{langsys['Price']}" style="text-align: right;font-size: 12px;">
                     <h:outputText value="#{itm.unitCostPrice}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Sale']}" style="font-size: 12px;">

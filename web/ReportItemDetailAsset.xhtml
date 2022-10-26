@@ -128,7 +128,7 @@
                 </p:column>
                 <p:column headerText="Unit Hire Price" style="text-align: right;">
                     <h:outputText value="#{itm.unit_hire_price}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="Asset">

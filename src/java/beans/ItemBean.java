@@ -1,6 +1,8 @@
 package beans;
 
+import api_tax.efris.EFRIS_excise_duty_list;
 import api_tax.efris.innerclasses.ItemTax;
+import api_tax.efris_bean.EFRIS_excise_duty_listBean;
 import api_tax.efris_bean.StockManage;
 import com.google.gson.Gson;
 import sessions.GeneralUserSetting;
@@ -11,6 +13,7 @@ import entities.DiscountPackageItem;
 import entities.GroupRight;
 import entities.Item;
 import entities.Item_code_other;
+import entities.Item_excise_duty_map;
 import entities.Item_store_reorder;
 import entities.Item_tax_map;
 import entities.Item_unit;
@@ -90,7 +93,9 @@ public class ItemBean implements Serializable {
     private List<Category> InventoryAccountList;
     private Item_unspsc Item_unspscObj;
     private List<Item_unspsc> Item_unspscList;
+    private List<EFRIS_excise_duty_list> ExciseList;
     private String SearchUNSPSC = "";
+    private String SearchExcise = "";
     private Item_tax_map Item_tax_mapObj;
     private ItemTax ItemTaxObj;
     @ManagedProperty("#{menuItemBean}")
@@ -297,15 +302,23 @@ public class ItemBean implements Serializable {
             BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
         } catch (Exception e) {
         }
+        try {
+            this.ItemObj.setUnit_symbol_tax(new UnitBean().getUnit(this.ItemObj.getUnitId()).getUnit_symbol_tax());
+        } catch (Exception e) {
+        }
         String msg = "";
+        String msgExciseDuty = "";
         //first convert vat rated from array to string
         this.ItemObj.setVatRated(new UtilityBean().getVATRateStrFromArray(this.ItemObj.getSelectedVatRateds()));
         //re-arrange vat rate basing on order
         this.ItemObj.setVatRated(this.reArrangeVatRate(this.ItemObj.getVatRated(), this.ItemObj.getVat_rate_order()));
         //validate
         msg = this.validateItem(this.ItemObj);
+        msgExciseDuty = this.validateExciseDuty(ItemObj, this.Item_unit_otherList);
         if (msg.length() > 0) {
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+        } else if (msgExciseDuty.length() > 0) {
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msgExciseDuty)));
         } else {
             try {
                 if (this.saveValidatedItem(this.ItemObj) == 1) {
@@ -323,6 +336,33 @@ public class ItemBean implements Serializable {
                     //ITEM OTHER UNITS
                     if (this.ItemOtherUnitsEdited == 1) {
                         int x = this.insertOrUpdateItem_unit_otherList();
+                    }
+                    //EXCISE DUTY CODE
+                    if (this.ItemObj.getItemId() > 0 || (this.ItemObj.getItemId() == 0 && this.ItemObj.getExcise_duty_code().length() > 0)) {
+                        long ItemId = 0;
+                        if (this.ItemObj.getItemId() == 0 && this.ItemObj.getDescription().length() > 0) {
+                            Item item = this.getItemByDesc(this.ItemObj.getDescription());
+                            ItemId = item.getItemId();
+                        } else {
+                            ItemId = this.ItemObj.getItemId();
+                        }
+                        if (ItemId > 0) {
+                            Item_excise_duty_map excobj = this.getItem_excise_duty_mapByItem(ItemId);
+                            if (null == excobj) {
+                                //insert
+                                excobj = new Item_excise_duty_map();
+                                excobj.setItem_excise_duty_map_id(0);
+                                excobj.setItem_id(ItemId);
+                                excobj.setExcise_duty_code(this.getItemObj().getExcise_duty_code());
+                                int x = this.insertOrUpdateItem_excise_duty_map(excobj);
+                            } else {
+                                if (excobj.getExcise_duty_code() == null ? this.getItemObj().getExcise_duty_code() != null : !excobj.getExcise_duty_code().equals(this.getItemObj().getExcise_duty_code())) {
+                                    //update
+                                    excobj.setExcise_duty_code(this.getItemObj().getExcise_duty_code());
+                                    int x = this.insertOrUpdateItem_excise_duty_map(excobj);
+                                }
+                            }
+                        }
                     }
                     //ITEM TAX MAPPING
                     new Item_tax_mapBean().saveItem_tax_mapCall(this.ItemObj.getDescription(), this.ItemObj.getItem_code_tax(), "");
@@ -443,6 +483,49 @@ public class ItemBean implements Serializable {
             msg = "Adjust Current Stock before Changing Item Type";
         } else {
             msg = "";
+        }
+        return msg;
+    }
+
+    public String validateExciseDuty(Item aItem, List<Item_unit_other> aItem_unit_otherList) {
+        String msg = "";
+        try {
+            if (null == aItem_unit_otherList) {
+                aItem_unit_otherList = new ArrayList<>();
+            }
+            if (aItem.getExcise_duty_code().length() > 0) {
+                EFRIS_excise_duty_list ExciseDutyDtl = null;
+                String ExciseUnitCodeTax = "";
+                ExciseDutyDtl = new EFRIS_excise_duty_listBean().getEFRIS_invoice_detailByExciseDutyCode(aItem.getExcise_duty_code());
+                if (null != ExciseDutyDtl) {
+                    ExciseUnitCodeTax = ExciseDutyDtl.getUnit();
+                    if (null == ExciseUnitCodeTax) {
+                        ExciseUnitCodeTax = "";
+                    }
+                }
+                if (ExciseDutyDtl == null) {
+                    msg = "Excise Duty Code is Not Valid";
+                } else if (aItem_unit_otherList.isEmpty() && !ExciseUnitCodeTax.isEmpty() && !aItem.getUnit_symbol_tax().equals(ExciseUnitCodeTax)) {
+                    msg = "Unit of Excise Duty is different from Item Unit Code. Change or Add Unit";
+                } else if (!aItem_unit_otherList.isEmpty() && !ExciseUnitCodeTax.isEmpty()) {
+                    //check if found and on what position
+                    int found = 0;
+                    int foundPsn = -1;
+                    for (int i = 0; i < aItem_unit_otherList.size(); i++) {
+                        if (ExciseUnitCodeTax.equals(new UnitBean().getUnit(aItem_unit_otherList.get(i).getOther_unit_id()).getUnit_symbol_tax())) {
+                            found = 1;
+                            foundPsn = i;
+                            break;
+                        }
+                    }
+                    if (found == 0 && !aItem.getUnit_symbol_tax().equals(ExciseUnitCodeTax)) {
+                        msg = "Unit of Excise Duty is not found among Item Units. Change or Add Unit";
+                    } else if (found == 1 && !aItem.getUnit_symbol_tax().equals(ExciseUnitCodeTax) && foundPsn != 0) {
+                        msg = "Other Unit that Matches Excise Duty Unit should be the first on the list of other Units";
+                    }
+                }
+            }
+        } catch (Exception e) {
         }
         return msg;
     }
@@ -1110,6 +1193,28 @@ public class ItemBean implements Serializable {
         }
     }
 
+    public void setItem_excise_duty_mapFromResultset(Item_excise_duty_map aItem_excise_duty_map, ResultSet aResultSet) {
+        try {
+            try {
+                aItem_excise_duty_map.setItem_excise_duty_map_id(aResultSet.getLong("item_excise_duty_map_id"));
+            } catch (Exception e) {
+                aItem_excise_duty_map.setItem_excise_duty_map_id(0);
+            }
+            try {
+                aItem_excise_duty_map.setItem_id(aResultSet.getLong("item_id"));
+            } catch (Exception e) {
+                aItem_excise_duty_map.setItem_id(0);
+            }
+            try {
+                aItem_excise_duty_map.setExcise_duty_code(aResultSet.getString("excise_duty_code"));
+            } catch (Exception e) {
+                aItem_excise_duty_map.setExcise_duty_code("");
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public void setItem_unitFromResultset(Item_unit aItem_unit, ResultSet aResultSet) {
         try {
             try {
@@ -1466,6 +1571,10 @@ public class ItemBean implements Serializable {
                 this.ItemObj.setIs_synced_tax(itmap.getIs_synced());
             }
             this.setReorderLevelEdited(0);
+            Item_excise_duty_map excobj = this.getItem_excise_duty_mapByItem(ItemFrom.getItemId());
+            if (null != excobj) {
+                this.ItemObj.setExcise_duty_code(excobj.getExcise_duty_code());
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -1749,6 +1858,7 @@ public class ItemBean implements Serializable {
                 this.ItemObj.setOverride_gen_name(0);
                 this.ItemObj.setHide_unit_price_invoice(0);
                 this.ItemObj.setItem_code_tax("");
+                this.ItemObj.setExcise_duty_code("");
                 this.ItemObj.setIs_synced_tax(0);
                 this.ItemObj.setSelectedVatRateds(null);
                 this.ItemObj.setVat_rate_order(this.getVatRateOrder(new Parameter_listBean().getParameter_listByContextName("GENERAL", "TAX_VAT_RATE_ORDER").getParameter_value()));
@@ -1837,6 +1947,7 @@ public class ItemBean implements Serializable {
                 aItem.setHide_unit_price_invoice(0);
                 aItem.setPurpose("");
                 aItem.setItem_code_tax("");
+                aItem.setExcise_duty_code("");
                 aItem.setIs_synced_tax(0);
                 aItem.setSelectedVatRateds(null);
                 aItem.setVat_rate_order(this.getVatRateOrder(new Parameter_listBean().getParameter_listByContextName("GENERAL", "TAX_VAT_RATE_ORDER").getParameter_value()));
@@ -4045,20 +4156,32 @@ public class ItemBean implements Serializable {
         }
     }
 
-    public void refreshItemSearchList_old(String Query) {
-        String sql = "{call sp_search_item_for_sale_limit100(?)}";
+    public void refreshExciseList(String Query) {
+        String sql;
+        if (Query.length() == 0) {
+            sql = "select lv1.*,lv2.goodService as parentName from efris_excise_duty_list lv1 inner join efris_excise_duty_list lv2 on lv1.parentCode=lv2.exciseDutyCode "
+                    + "where lv1.isLeafNode=1 "
+                    + "order by parentName,goodService";
+        } else {
+            sql = "select lv1.*,lv2.goodService as parentName from efris_excise_duty_list lv1 inner join efris_excise_duty_list lv2 on lv1.parentCode=lv2.exciseDutyCode "
+                    + "where lv1.isLeafNode=1 and (lv1.exciseDutyCode='" + Query + "' or lv1.goodService LIKE '%" + Query + "%' or lv2.goodService LIKE '%" + Query + "%') "
+                    + "order by parentName,goodService";
+        }
         ResultSet rs = null;
-        this.setItemObjectList(new ArrayList<>());
+        this.ExciseList = new ArrayList<>();
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
-            ps.setString(1, Query);
             rs = ps.executeQuery();
             while (rs.next()) {
-                Item item = new Item();
-                this.setItemFromResultset(item, rs);
-                this.updateLookUpsUI(item);
-                this.getItemObjectList().add(item);
+                EFRIS_excise_duty_list obj = new EFRIS_excise_duty_list();
+                new EFRIS_excise_duty_listBean().setEFRIS_excise_duty_listFromResultset(obj, rs);
+                try {
+                    obj.setParentName(rs.getString("parentName"));
+                } catch (Exception e) {
+                    obj.setParentName("");
+                }
+                this.ExciseList.add(obj);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -4190,6 +4313,18 @@ public class ItemBean implements Serializable {
                     StringArray = CommaSeperatedStr.split(",");
                     aItem.setSelectedVatRateds(StringArray);
                 }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void updateItemFromExcise(Item aItem, EFRIS_excise_duty_list aExciseObj) {
+        try {
+            if (null == aItem || null == aExciseObj) {
+                //
+            } else {
+                aItem.setExcise_duty_code(aExciseObj.getExciseDutyCode());
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -4543,6 +4678,55 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
         return saved;
+    }
+
+    public int insertOrUpdateItem_excise_duty_map(Item_excise_duty_map aItem_excise_duty_map) {
+        int saved = 0;
+        String sql = "";
+        try {
+            if (null != aItem_excise_duty_map) {
+                if (aItem_excise_duty_map.getItem_excise_duty_map_id() == 0) {
+                    sql = "INSERT INTO item_excise_duty_map(item_id,excise_duty_code) VALUES (?,?)";
+                } else if (aItem_excise_duty_map.getItem_excise_duty_map_id() > 0) {
+                    sql = "UPDATE item_excise_duty_map SET item_id=?,excise_duty_code=? WHERE item_excise_duty_map_id=?";
+                }
+                try (
+                        Connection conn = DBConnection.getMySQLConnection();
+                        PreparedStatement ps = conn.prepareStatement(sql);) {
+                    ps.setLong(1, aItem_excise_duty_map.getItem_id());
+                    ps.setString(2, aItem_excise_duty_map.getExcise_duty_code());
+                    if (aItem_excise_duty_map.getItem_excise_duty_map_id() > 0) {
+                        ps.setLong(3, aItem_excise_duty_map.getItem_excise_duty_map_id());
+                    }
+                    ps.executeUpdate();
+                    saved = 1;
+                } catch (Exception e) {
+                    LOGGER.log(Level.ERROR, e);
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return saved;
+    }
+
+    public Item_excise_duty_map getItem_excise_duty_mapByItem(long aItemId) {
+        String sql;
+        sql = "SELECT * FROM item_excise_duty_map WHERE item_id=" + aItemId;
+        ResultSet rs = null;
+        Item_excise_duty_map obj = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                obj = new Item_excise_duty_map();
+                this.setItem_excise_duty_mapFromResultset(obj, rs);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return obj;
     }
 
     public int insertOrUpdateItem_unit_otherList() {
@@ -4903,7 +5087,7 @@ public class ItemBean implements Serializable {
         } catch (Exception e) {
             aItem_unitList = new ArrayList<>();
         }
-        if (null == aItem || null==aUnitCodeTax) {
+        if (null == aItem || null == aUnitCodeTax) {
             //do nothing
         } else {
             try (
@@ -5485,5 +5669,33 @@ public class ItemBean implements Serializable {
      */
     public void setItem_unitList(List<Item_unit> Item_unitList) {
         this.Item_unitList = Item_unitList;
+    }
+
+    /**
+     * @return the SearchExcise
+     */
+    public String getSearchExcise() {
+        return SearchExcise;
+    }
+
+    /**
+     * @param SearchExcise the SearchExcise to set
+     */
+    public void setSearchExcise(String SearchExcise) {
+        this.SearchExcise = SearchExcise;
+    }
+
+    /**
+     * @return the ExciseList
+     */
+    public List<EFRIS_excise_duty_list> getExciseList() {
+        return ExciseList;
+    }
+
+    /**
+     * @param ExciseList the ExciseList to set
+     */
+    public void setExciseList(List<EFRIS_excise_duty_list> ExciseList) {
+        this.ExciseList = ExciseList;
     }
 }

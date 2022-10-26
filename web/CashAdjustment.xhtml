@@ -66,7 +66,7 @@
                     </h:selectOneMenu>
                     <h:outputLabel value="#{langsys['Current']} #{langsys['Currency']} #{langsys['Balance']}:"/>
                     <h:inputText id="itxtBalance1" value="#{transItem.unitPrice}" autocomplete="off" style="width: 176px;" disabled="true">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
                     <h:outputLabel value="#{langsys['Adjustment']} #{langsys['Type']}:"/>
                     <h:selectOneMenu id="menuType" styleClass="clsMenu" value="#{transItem.narration}" style="width: 180px;">
@@ -78,11 +78,11 @@
                     <h:outputLabel id="lblAmount" value="#{transItem.narration} #{langsys['Amount']}:"/>
                     <h:inputText id="itxtAmountFrom" value="#{transItem.amountIncVat}" autocomplete="off" style="width: 176px;">
                         <f:ajax event="change" listener="#{accLedgerBean.refreshNewBalance(transItem)}" execute="@form" render="itxtAmountTo"/>
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
                     <h:outputLabel value="#{langsys['New']} #{langsys['Currency']} #{langsys['Balance']}:"/>
                     <h:inputText id="itxtAmountTo" style="width: 176px" value="#{transItem.amountExcVat}" autocomplete="off" disabled="true">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
                 </h:panelGrid>
             </h:panelGrid>
@@ -126,7 +126,7 @@
                     <f:facet name="header">#{langsys['Current']} #{langsys['Currency']} #{langsys['Balance']}</f:facet>
                     <!-- row record -->
                     <h:outputLabel value="#{ati.unitPrice}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                 </p:column>
                 <p:column>
@@ -140,7 +140,7 @@
                     <f:facet name="header">#{ati.narration} #{langsys['Amount']}</f:facet>
                     <!-- row record -->
                     <h:outputLabel value="#{ati.amountIncVat}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                 </p:column>
                 <p:column style="text-align: right;">
@@ -148,7 +148,7 @@
                     <f:facet name="header">#{langsys['New']} #{langsys['Currency']} #{langsys['Balance']}</f:facet>
                     <!-- row record -->
                     <h:outputLabel value="#{ati.amountExcVat}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                 </p:column>
                 <p:column>

@@ -83,7 +83,7 @@
                             <f:facet name="header">#{langsys['Qty']}</f:facet>
                             <!-- row record -->
                             <h:inputText value="#{ati.itemQty}" style="width: 50px;" disabled="#{transBean.actionType.equals('View') or generalUserSetting.currentStore.storeId!=transBean.transObj.storeId}" autocomplete="off">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 <f:ajax event="change" listener="#{transItemBean.editTransItemCEC(transBean.transObj.transactionTypeId,transBean.transObj.transactionReasonId,'',transBean.transObj, transBean.transItemList,ati)}" execute="dtblTransactionItem" render="@form"/>
                             </h:inputText>
                             #{transItemBean.getSpecificSizeQtyFromQtyAndSizeStr(ati)}

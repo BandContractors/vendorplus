@@ -58,7 +58,7 @@
                             <f:facet name="header">#{langsys['Amount']}</f:facet>
                             <!-- row record -->
                             <h:outputLabel value="#{ds.depAmount}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
                         </p:column>
                         <p:column style="font-size: 13px;">

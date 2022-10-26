@@ -89,7 +89,7 @@
                         <h:outputLabel value=""/>
                         <h:inputText value="#{transItem.accountName}" disabled="true"/>
                         <h:inputText value="#{transItem.amount}" autocomplete="off">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
                         <h:outputLabel value=""/>
                         <h:outputLabel value=""/>
@@ -140,7 +140,7 @@
                         <h:outputLabel value=""/>
                         <h:inputText value="#{transItem.accountName}" disabled="true"/>
                         <h:inputText value="#{transItem.amount}" autocomplete="off">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
                         <h:outputLabel value=""/>
                         <h:outputLabel value=""/>
@@ -174,7 +174,7 @@
                             <f:selectItems value="#{accChildAccountBean.getAccChildAccountsByCurrencyParent(trans.currencyCode,transItem.accountCode)}" var="ea" itemLabel="#{ea.childAccountName}" itemValue="#{ea.childAccountCode}"/>
                         </h:selectOneMenu>
                         <h:inputText value="#{transItem.amount}" autocomplete="off">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
                         <h:outputLabel value=""/>
                     </h:panelGrid>
@@ -250,10 +250,10 @@
                             <f:selectItems value="#{accChildAccountBean.getAccChildAccountsByCurrencyParent(trans.currencyCode,transItemBean.selectedAccCoa.accountCode)}" var="ea" itemLabel="#{ea.childAccountName}" itemValue="#{ea.childAccountCode}"/>
                         </h:selectOneMenu>
                         <h:inputText value="#{transItem.amountExcVat}" autocomplete="off">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
                         <h:inputText value="#{transItem.amountIncVat}" autocomplete="off">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
                         <h:outputLabel value=""/>
                     </h:panelGrid>

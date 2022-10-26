@@ -2,6 +2,7 @@ package utilities;
 
 import api_tax.efris_bean.EFRIS_goods_commodityBean;
 import api_tax.efris_bean.T124;
+import api_tax.efris_bean.T125;
 import beans.AccCurrencyBean;
 import beans.AccJournalBean;
 import beans.Alert_generalBean;
@@ -305,9 +306,9 @@ public class UtilityBean implements Serializable {
         //DecimalFormat myFormatter = new DecimalFormat("###,###.###;(###,###.###)");
         //DecimalFormat myFormatter = new DecimalFormat("###,###.###");
         if (aAmount >= 0) {
-            aString = this.formatNumber("###,###.###", aAmount) + "";
+            aString = this.formatNumber("###,###,###.########", aAmount) + "";
         } else if (aAmount < 0) {
-            aString = this.formatNumber("###,###.###", aAmount) + "";
+            aString = this.formatNumber("###,###,###.########", aAmount) + "";
         }
         return aString;
     }
@@ -331,14 +332,39 @@ public class UtilityBean implements Serializable {
         return aString;
     }
 
+    public String formatDoubleToStringPlain(double aAmount, int aDecimalPlaces) {
+        //aPattern = "##0.00";
+        String aString = "";
+        String fmt = "";
+        if (aDecimalPlaces > 0) {
+            fmt = "##0.";
+            for (int i = 0; i < aDecimalPlaces; i++) {
+                fmt = fmt + "0";
+            }
+        } else {
+            fmt = "##0";
+        }
+        if (aAmount >= 0) {
+            aString = this.formatNumber(fmt, aAmount) + "";
+        } else if (aAmount < 0) {
+            aString = this.formatNumber(fmt, aAmount) + "";
+        }
+        return aString;
+    }
+
+//    public static void main(String[] args) {
+//        Double x = 123452212.10;
+//        System.out.println(new UtilityBean().formatDoubleToStringPlain(x, 2));
+//    }
+    
     public String formatDoubleToStringHide(double aAmount, int aHideResult) {
         String aString = "";
         //DecimalFormat myFormatter = new DecimalFormat("###,###.###;(###,###.###)");
         //DecimalFormat myFormatter = new DecimalFormat("###,###.###");
         if (aAmount >= 0) {
-            aString = this.formatNumber("###,###.###", aAmount) + "";
+            aString = this.formatNumber("###,###,###.########", aAmount) + "";
         } else if (aAmount < 0) {
-            aString = this.formatNumber("###,###.###", aAmount) + "";
+            aString = this.formatNumber("###,###,###.########", aAmount) + "";
         }
         if (aHideResult == 0) {
             return aString;
@@ -352,7 +378,7 @@ public class UtilityBean implements Serializable {
         String aPattern = "";
         aPattern = new AccCurrencyBean().getNumberFormatByCurrency(aCurrencyCode);
         if (aPattern.length() == 0) {
-            aPattern = "###,###.###";
+            aPattern = "###,###,###.########";
         }
         if (aAmount >= 0) {
             aString = this.formatNumber(aPattern, aAmount) + "";
@@ -802,13 +828,6 @@ public class UtilityBean implements Serializable {
         return d;
     }
 
-//    public static void main(String[] args) {
-//        List<Item_unit> aItem_unitList=new ArrayList<>();
-//        Item aItem=new ItemBean().getItem(2510);
-//        new ItemBean().setItemUnitList(aItem_unitList, aItem, 0);
-//        System.out.println(aItem_unitList.size());
-//    }
-    
     public List<ThreadClass> getRunningThreads() {
         List<ThreadClass> objs = new ArrayList<>();
         Set<Thread> threads = Thread.getAllStackTraces().keySet();
@@ -1182,6 +1201,11 @@ public class UtilityBean implements Serializable {
 
     public void onComplete() {
         javax.faces.context.FacesContext.getCurrentInstance().addMessage(null, new javax.faces.application.FacesMessage("Progress Completed"));
+    }
+
+    public void callDownloadExciseDuty_list() {
+        //new T125().downloadExciseDuty_list();
+        new T125().downloadExciseDuty_listThread();
     }
 
     public void cleanSaleInvoiceTranss() {

@@ -206,17 +206,17 @@
                                 </p:column>
                                 <p:column headerText="#{langsys['Retail']} #{langsys['Sale']} #{langsys['Price']}" style="text-align: left">  
                                     <h:outputLabel value="#{itm.unitRetailsalePrice}">
-                                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                     </h:outputLabel>
                                 </p:column>
                                 <p:column headerText="#{langsys['Wholesale']} #{langsys['Price']}" style="text-align: left">  
                                     <h:outputLabel value="#{itm.unitWholesalePrice}">
-                                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                     </h:outputLabel>
                                 </p:column>
                                 <p:column headerText="#{langsys['Hire']} #{langsys['Price']}" style="text-align: left">  
                                     <h:outputLabel value="#{itm.unit_hire_price}">
-                                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                     </h:outputLabel>
                                 </p:column>
                                 <p:column headerText="#{langsys['Currency']}" style="text-align: left">
@@ -229,19 +229,19 @@
                     <h:panelGrid id="pnlSideInput2" columns="2">
                         <h:outputLabel  value="#{langsys['Quantity']}"/>
                         <h:inputText id="itxtQty" styleClass="clsInputTransItem" style="width: 195px" value="#{discountPackageItem.itemQty}" autocomplete="off" disabled="true">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
                         <h:outputLabel  value="#{langsys['Retail']} #{langsys['Sale']} #{langsys['Discount']} (%)"/>
                         <h:inputText id="itxtRetailsaleDiscount" styleClass="clsInputTransItem" style="width: 195px" value="#{discountPackageItem.retailsaleDiscountAmt}" autocomplete="off">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
                         <h:outputLabel  value="#{langsys['Wholesale']} #{langsys['Discount']} (%)"/>
                         <h:inputText id="itxtWholesaleDiscount" styleClass="clsInputTransItem" style="width: 195px" value="#{discountPackageItem.wholesaleDiscountAmt}" autocomplete="off">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
                         <h:outputLabel  value="#{langsys['Hire']} #{langsys['Price']} #{langsys['Discount']} (%)"/>
                         <h:inputText id="itxtHirePriceDiscount" styleClass="clsInputTransItem" style="width: 195px" value="#{discountPackageItem.hire_price_discount_amt}" autocomplete="off">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
                     </h:panelGrid>
                     <h:panelGrid columns="4">
@@ -267,7 +267,7 @@
                             <f:facet name="header">#{langsys['Qty']}</f:facet>
                             <!-- row record -->
                             <h:outputLabel value="#{di.itemQty}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
                         </p:column>
                         <p:column>
@@ -275,7 +275,7 @@
                             <f:facet name="header">#{langsys['Retail']} #{langsys['Discount']}(%)</f:facet>
                             <!-- row record -->
                             <h:outputLabel value="#{di.retailsaleDiscountAmt}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
                         </p:column>
                         <p:column>
@@ -283,7 +283,7 @@
                             <f:facet name="header">#{langsys['Wholesale']} #{langsys['Discount']}(%)</f:facet>
                             <!-- row record -->
                             <h:outputLabel value="#{di.wholesaleDiscountAmt}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
                         </p:column>
                         <p:column>
@@ -291,7 +291,7 @@
                             <f:facet name="header">#{langsys['Hire']} #{langsys['Discount']}(%)</f:facet>
                             <!-- row record -->
                             <h:outputLabel value="#{di.hire_price_discount_amt}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
                         </p:column>
                         <p:column>

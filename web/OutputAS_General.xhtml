@@ -93,7 +93,7 @@
                             <f:facet name="header">#{langout['Qty']}</f:facet>
                             <!-- row record -->
                             <h:outputLabel value="#{ti2.itemQty}" style="font-size: 14px;">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
                         </p:column>
                         <p:column>

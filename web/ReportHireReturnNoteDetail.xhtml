@@ -175,7 +175,7 @@
                 </p:column>
                 <p:column headerText="#{transBean.transObj.duration_type}s Passed">
                     <h:outputText value="#{itm.duration_value}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="Add Date" rendered="#{transBean.dateType.equals('Add Date')}">

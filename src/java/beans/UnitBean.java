@@ -404,6 +404,27 @@ public class UnitBean implements Serializable {
         return lst;
     }
 
+    public Unit getUnitByItemCodeTax(long aItemId, String aUnitCodeTax) {
+        String sql;
+        sql = "select u.* from item_unit_other iuo inner join unit u on iuo.item_id=? and iuo.other_unit_id=u.unit_id where u.unit_symbol_tax=?";
+        ResultSet rs = null;
+        Unit u = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aItemId);
+            ps.setString(2, aUnitCodeTax);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                u = new Unit();
+                this.setUnitFromResultset(u, rs);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return u;
+    }
+
     public void refreshUnit_tax_lists() {
         this.setUnit_tax_lists(this.getUnit_tax_lists());
     }

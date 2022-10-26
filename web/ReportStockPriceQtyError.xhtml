@@ -128,22 +128,22 @@
                 </p:column>
                 <p:column headerText="#{langsys['Unit']} #{langsys['Cost']} #{langsys['Price']}">
                     <h:outputText value="#{itm.unitCost}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Retail']} #{langsys['Price']}">
                     <h:outputText value="#{itm.unitRetailsalePrice}" style="color:#{itm.unitCost ge itm.unitRetailsalePrice ? 'red':'black'}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Wholesale']} #{langsys['Price']}">
                     <h:outputText value="#{itm.unitWholesalePrice}" style="color:#{itm.unitWholesalePrice gt 0 and itm.unitCost ge itm.unitWholesalePrice ? 'red':'black'}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Special']} #{langsys['Price']}">
                     <h:outputText value="#{itm.unitSpecialPrice}" style="color:#{itm.unitSpecialPrice gt 0 and itm.unitCost ge itm.unitSpecialPrice ? 'red':'black'}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Currency']}">

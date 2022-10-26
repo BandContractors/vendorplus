@@ -101,7 +101,7 @@
             <h:panelGrid id="pnlHeader2" columns="6">
                 <h:outputLabel value="#{trans.duration_type}s Hired"/>
                 <h:inputText id="itxtDurationValue" value="#{transBean.refTrans.duration_value}" disabled="true" style="width: 50px;">
-                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
                 <h:outputLabel value="#{transBean.transTypeObj.transactionDateLabel}"/>
                 <p:calendar id="calTransDate" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.transactionDate}" pattern="#{companySetting.getDateFormat()}" size="8">
@@ -109,7 +109,7 @@
                 </p:calendar>
                 <h:outputLabel value="#{trans.duration_type}s Passed"/>
                 <h:inputText id="itxtDuration1" value="#{trans.duration_value}" disabled="true" style="width: 50px;">
-                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
             </h:panelGrid>
 
@@ -146,7 +146,7 @@
                     <f:facet name="header">Taken</f:facet>
                     <!-- row record -->
                     <h:outputLabel value="#{ati.qty_taken}" style="color: blue;">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                 </p:column>
                 <p:column>
@@ -154,7 +154,7 @@
                     <f:facet name="header">Total ReturnedGood</f:facet>
                     <!-- row record -->
                     <h:outputLabel value="#{ati.qty_total}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                 </p:column>
                 <p:column>
@@ -162,7 +162,7 @@
                     <f:facet name="header">Total Lost/Damaged</f:facet>
                     <!-- row record -->
                     <h:outputLabel value="#{ati.qty_damage_total}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                 </p:column>
                 <p:column>
@@ -170,7 +170,7 @@
                     <f:facet name="header">Balance</f:facet>
                     <!-- row record -->
                     <h:outputLabel value="#{ati.qty_balance}" style="color: red;">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                 </p:column>
                 <p:column style="text-align: center;">
@@ -178,7 +178,7 @@
                     <f:facet name="header">Returned Good</f:facet>
                     <!-- row record -->
                     <h:inputText value="#{ati.itemQty}" style="width: 50px;" rendered="#{ati.qty_balance>0}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         <f:ajax event="blur" render="dtblTransactionItem"/>
                     </h:inputText>
                 </p:column>
@@ -187,7 +187,7 @@
                     <f:facet name="header">Returned Lost/Damaged</f:facet>
                     <!-- row record -->
                     <h:inputText value="#{ati.qty_damage}" style="width: 50px;" rendered="#{ati.qty_balance>0}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         <f:ajax event="blur" render="dtblTransactionItem"/>
                     </h:inputText>
                 </p:column>
@@ -196,7 +196,7 @@
                     <f:facet name="header">#{trans.duration_type}s Passed</f:facet>
                     <!-- row record -->
                     <h:outputLabel value="#{ati.duration_passed}" rendered="#{ati.qty_balance>0}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                 </p:column> 
             </p:dataTable>

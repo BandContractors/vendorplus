@@ -102,23 +102,23 @@
                                 <td style="border-top: 2px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" align="left" valign="top"><h:outputLabel style="font-family:Tahoma, Geneva, sans-serif; font-size: 9pt;color:#003300;font-weight: normal;text-decoration: none;" value="#{transItemBean.showItemDescriptionCEC(ti)}" escape="false"/></td>
                                 <td style="border-top: 2px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" align="left" valign="top">
                                     <h:outputText value="#{ti.itemQty}" style="font-family:Tahoma, Geneva, sans-serif; font-size: 9pt;color:#003300;font-weight: normal;text-decoration: none;">
-                                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                     </h:outputText>
                                 </td>
                                 <td style="border-top: 2px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" align="left" valign="top"><h:outputLabel style="font-family:Tahoma, Geneva, sans-serif; font-size: 9pt;color:#003300;font-weight: normal;text-decoration: none;">#{ti.narration}</h:outputLabel></td>
                                 <td style="border-top: 2px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" align="right" valign="top">
                                     <h:outputText value="#{ti.unitPriceExcVat}" style="font-family:Tahoma, Geneva, sans-serif; font-size: 9pt;color:#003300;font-weight: normal;text-decoration: none;">
-                                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                     </h:outputText>
                                 </td>
                                 <td style="border-top: 2px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" align="right" valign="top">
                                     <h:outputText value="#{ti.duration_value}" style="font-family:Tahoma, Geneva, sans-serif; font-size: 9pt;color:#003300;font-weight: normal;text-decoration: none;">
-                                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                     </h:outputText>
                                 </td>
                                 <td style="border-top: 2px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 2px solid #000000" align="right" valign="top">
                                     <h:outputText value="#{ti.amountExcVat}" style="font-family:Tahoma, Geneva, sans-serif; font-size: 9pt;color:#003300;font-weight: normal;text-decoration: none;">
-                                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                     </h:outputText>
                                 </td>
                             </tr>
@@ -142,7 +142,7 @@
                             <td align="left"><br/></td>
                             <td colspan="2" style="border-bottom: 2px solid #000000; border-left: 2px solid #000000; border-right: 2px solid #000000" align="right" valign="top">
                                 <h:outputText value="#{generalUserSetting.outputDetailChild.trans.subTotal}" style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputText>
                             </td>
                         </tr>
@@ -150,19 +150,19 @@
                             <td height="23" align="right"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 12pt;color:#008000;font-weight: bold;text-decoration: none;">#{accCurrencyBean.localCurrency.currencyCode}</h:outputLabel></td>
                             <td align="left" sdnum="1033;0;#,##0">
                                 <h:outputText value="#{generalUserSetting.outputDetailChild.trans.xrate}" style="font-family:'Times New Roman', Times, serif; font-size: 12pt;color:#008000;font-weight: bold;text-decoration: none;">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputText>
                             </td>
                             <td style="border-left: 1px solid #000000" align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">DISCOUNT</h:outputLabel></td>
                             <td align="right" sdnum="1033;0;0%">
                                 <h:outputText value="#{utilityBean.formatDoubleToString(generalUserSetting.outputDetailChild.trans.cash_dicsount_perc)}%" style="font-family:'Times New Roman', Times, serif; font-size: 6pt;color:#800000;font-weight: bold;text-decoration: none;">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputText>
                             </td>
                             <td align="left"><b><font color="#800080"><br/></font></b></td>
                             <td colspan="2" style="border-bottom: 2px solid #000000; border-left: 2px solid #000000; border-right: 2px solid #000000" align="right" valign="top">
                                 <h:outputText value="#{generalUserSetting.outputDetailChild.trans.cashDiscount}" style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputText>
                             </td>
                         </tr>
@@ -188,13 +188,13 @@
                             <td style="border-left: 1px solid #000000" align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">VAT</h:outputLabel></td>
                             <td align="right" sdnum="1033;0;0%">
                                 <h:outputText value="#{utilityBean.formatDoubleToString(generalUserSetting.outputDetailChild.trans.vatPerc)}%" style="font-family:'Times New Roman', Times, serif; font-size: 6pt;color:#800000;font-weight: bold;text-decoration: none;">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputText>
                             </td>
                             <td align="left"><b><font color="#800080"><br/></font></b></td>
                             <td colspan="2" style="border-left: 2px solid #000000; border-right: 2px solid #000000" align="right" valign="top">
                                 <h:outputText value="#{generalUserSetting.outputDetailChild.trans.totalVat}" style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputText>
                             </td>
                         </tr>
@@ -205,7 +205,7 @@
                             <td colspan="2" align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 11pt;color:#003300;font-weight: bold;text-decoration: none;">GRAND TOTAL</h:outputLabel></td>
                             <td colspan="2" style="border-left: 2px solid #000000; border-right: 2px solid #000000" align="right">
                                 <h:outputText value="#{generalUserSetting.outputDetailChild.trans.grandTotal}" style="font-family:'Times New Roman', Times, serif; font-size: 12pt;color:#003300;font-weight: bold;text-decoration: none;">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputText>
                             </td>
                         </tr>

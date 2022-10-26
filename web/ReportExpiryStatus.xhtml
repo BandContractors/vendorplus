@@ -95,7 +95,7 @@
                     </p:column>
                     <p:column headerText="#{langsys['Items']}" style="text-align: right;">
                         <h:outputText value="#{sl.status_qty}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                     <p:column headerText="%" style="text-align: right;">
@@ -156,7 +156,7 @@
                 </p:column>
                 <p:column headerText="#{langsys['Qty']}" style="text-align: right;">
                     <h:outputText value="#{sl.currentqty}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Expiry']} #{langsys['Date']}">
@@ -164,7 +164,7 @@
                 </p:column>
                 <p:column headerText="#{langsys['Days']} #{langsys['to']} #{langsys['Expiry']}" style="text-align: right;">
                     <h:outputText value="#{sl.days_to_expiry}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Risk']} #{langsys['of']} #{langsys['Expiry']}">

@@ -66,12 +66,12 @@
                     </h:selectOneMenu>
                     <h:outputLabel value="#{langsys['Currency']} #{langsys['Balance']}:"/>
                     <h:inputText id="itxtBalance1" value="#{transItem.unitPrice}" autocomplete="off" style="width: 176px;" disabled="true">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
                     <h:outputLabel value="#{langsys['Amount']} #{langsys['from']} #{langsys['Account']}:"/>
                     <h:inputText id="itxtAmountFrom" value="#{transItem.amountIncVat}" autocomplete="off" style="width: 176px;">
                         <f:ajax event="change" listener="#{accLedgerBean.refreshBalancesXrate(transItem)}" execute="@form" render="itxtAmountTo pnlXrate"/>
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
                 </h:panelGrid>
                 <h:panelGrid id="pnlToAcc" columns="2" styleClass="green" style="text-align: right;">
@@ -89,18 +89,18 @@
                     </h:selectOneMenu>
                     <h:outputLabel value="#{langsys['Currency']} #{langsys['Balance']}:"/>
                     <h:inputText id="itxtBalance2" value="#{transItem.unitPrice2}" autocomplete="off" style="width: 176px;" disabled="true">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
                     <h:outputLabel value="#{langsys['Amount']} #{langsys['to']} #{langsys['Account']}:"/>
                     <h:inputText id="itxtAmountTo" style="width: 176px" value="#{transItem.amountExcVat}" autocomplete="off">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
                 </h:panelGrid>
                 <h:panelGrid id="pnlXrate" columns="2" styleClass="amber" style="text-align: right;">
                     <h:outputLabel value="#{langsys['Exchange']} #{langsys['Rate']}:"/>
                     <h:inputText id="itxtXrate" value="#{transItem.vatPerc}" autocomplete="off" style="width: 180px;">
                         <f:ajax event="change" listener="#{accLedgerBean.refreshXrate(transItem)}" execute="@form" render="itxtAmountTo itxtFactor"/>
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
                     <h:outputLabel value="#{langsys['Multiply']} #{langsys['Factor']}:"/>
                     <h:inputText id="itxtFactor" value="#{transItem.depRate}" autocomplete="off" style="width: 180px;" disabled="true"/>
@@ -143,7 +143,7 @@
                     <!-- row record -->
                     #{ati.batchno} 
                     <h:outputLabel value="#{ati.amountIncVat}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                 </p:column>
                 <p:column>
@@ -159,7 +159,7 @@
                     <!-- row record -->
                     #{ati.descSpecific} 
                     <h:outputLabel value="#{ati.amountExcVat}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputLabel>
                 </p:column>
                 <p:column>

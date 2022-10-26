@@ -59,7 +59,7 @@
                     </p:column>
                     <p:column headerText="#{langsys['Balance']}" style="text-align: right;">
                         <h:outputText value="#{s.balance}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                     <p:column headerText="%" style="text-align: right;">
@@ -111,22 +111,22 @@
                 </p:column>
                 <p:column headerText="#{langsys['Days']} #{langsys['Old']}" style="text-align: right;">
                     <h:outputText value="#{l.age_days}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Invoice']} #{langsys['Amount']}" style="text-align: right;">
                     <h:outputText value="#{l.grand_total}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Paid']} #{langsys['Amount']}" style="text-align: right;">
                     <h:outputText value="#{l.total_paid}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Balance']}" style="text-align: right;">
                     <h:outputText value="#{l.balance}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Age']} #{langsys['Category']}">

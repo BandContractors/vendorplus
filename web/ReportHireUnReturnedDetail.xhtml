@@ -90,7 +90,7 @@
                         </p:column>
                         <p:column headerText="Unit Hire Price" style="text-align: left">  
                             <h:outputText value="#{itm.unit_hire_price}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="Currency" style="text-align: left">
@@ -163,12 +163,12 @@
                 </p:column>
                 <p:column headerText="QTY">
                     <h:outputText value="#{itm.qty_out}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{trans.duration_type}s Passed" rendered="#{transBean.fieldName.equals('')}">
                     <h:outputText value="#{itm.duration_passed}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="Site" rendered="#{transBean.fieldName.equals('')}">

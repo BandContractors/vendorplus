@@ -90,3 +90,36 @@ create table efris_goods_commodity (
     exclusion varchar(1) not null default '',
     add_date datetime not null
 )ENGINE=InnoDB;
+
+-- Excise duty
+create table efris_excise_duty_list (
+	efris_excise_duty_list_id bigint primary key auto_increment,
+	id varchar(20) not null,
+	exciseDutyCode varchar(20) not null,
+    goodService varchar(500),
+    parentCode varchar(20),
+    rateText varchar(50) not null,
+    isLeafNode varchar(1),
+    effectiveDate varchar(100),
+    unit varchar(3),
+    currency varchar(100) not null,
+    rate_perc varchar(500),
+    rate_value varchar(500),
+    add_date datetime not null
+)ENGINE=InnoDB;
+
+create table item_excise_duty_map (
+	item_excise_duty_map_id bigint primary key auto_increment,
+	item_id bigint(20) not null,
+	efris_excise_duty_list_id bigint not null
+)ENGINE=InnoDB;
+
+create table download_status (
+	download_status_id int primary key auto_increment,
+    download_name varchar(50) not null unique,
+	download_status int not null,
+	download_status_msg varchar(50) not null,
+	total_amount int not null,
+	total_downloaded int not null,
+    add_date datetime not null
+)ENGINE=InnoDB;

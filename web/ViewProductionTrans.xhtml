@@ -51,14 +51,14 @@
 
                         <h:outputLabel value="#{langsys['Unit']} #{langsys['Cost']}:"/>
                         <h:inputText value="#{transProductionBean.transProdObj.outputUnitCost}" style="width: 200px;" disabled="true">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
                         <h:outputLabel value="#{langsys['Produced']} #{langsys['Qty']}:"/>
                         <h:inputText value="#{utilityBean.formatDoubleToString(transProductionBean.transProdObj.outputQty)} #{transProductionBean.transProdObj.outputItemUnit} #{transProductionBean.getPCsProduced(transProductionBean.transProdObj)}" style="width: 500px;" disabled="true"/>
 
                         <h:outputLabel value="#{langsys['Total']} #{langsys['Cost']}:"/>
                         <h:inputText value="#{transProductionBean.transProdObj.outputTotalCost}" style="width: 200px;" disabled="true">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
                         <h:outputLabel value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(70).transactionUserLabel)}:"/>
                         <h:inputText disabled="true" value="#{userDetailBean.getUserDetail(transProductionBean.transProdObj.transactionUserDetailId).userName}" style="width: 500px;"/>
@@ -104,7 +104,7 @@
                             <f:facet name="header">#{langsys['Qty']} #{langsys['Before']} #{langsys['Production']}</f:facet>
                             <!-- row record -->
                             <h:outputLabel value="#{ati.input_qty_bfr_prod}" rendered="#{ati.input_qty_bfr_prod>0}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
                         </p:column>
                         <p:column>
@@ -112,7 +112,7 @@
                             <f:facet name="header">#{langsys['Unit']} #{langsys['Qty']} #{langsys['Used']}</f:facet>
                             <!-- row record -->
                             <h:inputText value="#{ati.input_unit_qty}" style="width: 60px;" disabled="true" autocomplete="off" rendered="#{ati.input_unit_qty>0}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:inputText>
                         </p:column>
                         <p:column>
@@ -120,7 +120,7 @@
                             <f:facet name="header">#{langsys['Total']} #{langsys['Qty']} #{langsys['Used']}</f:facet>
                             <!-- row record -->
                             <h:inputText value="#{ati.inputQty}" style="width: 80px;" disabled="true" autocomplete="off">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:inputText>
                         </p:column>
                         <p:column>
@@ -128,7 +128,7 @@
                             <f:facet name="header">#{langsys['Qty']} #{langsys['After']} #{langsys['Production']}</f:facet>
                             <!-- row record -->
                             <h:outputLabel value="#{ati.input_qty_afr_prod}" rendered="#{ati.input_qty_afr_prod>0}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
                         </p:column>
                         <p:column>

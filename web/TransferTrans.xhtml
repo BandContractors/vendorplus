@@ -97,7 +97,7 @@
                     </p:column>
                     <p:column headerText="#{langsys['Retail']} #{langsys['Sale']} #{langsys['Price']}" style="text-align: left">  
                         <h:outputText value="#{itm.unitRetailsalePrice}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:outputText>
                     </p:column>
                     <p:column headerText="#{langsys['Currency']}" style="text-align: left">
@@ -112,7 +112,7 @@
                     <p:ajax event="change" listener="#{stockBean.refreshSpecificList(generalUserSetting.currentStore.storeId,transItem.itemId)}" rendered="#{itemBean.selectedItem!=null}" process="@this" update="menuBatchSpecific menuUnit"/>
                 </p:autoComplete>
                 <h:inputText id="itxtQty" styleClass="clsInputTransItem" style="width: 50px;height: 24px;" value="#{transItem.itemQty}" autocomplete="off">
-                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
                 <p:selectOneMenu id="menuUnit" styleClass="clsMenu" value="#{transItem.unit_id}" style="height: 30px;width: 103px;">
                     <f:selectItems value="#{itemBean.item_unitList}" var="iu" itemLabel="#{iu.unit_symbol}" itemValue="#{iu.unit_id}"/>
@@ -164,7 +164,7 @@
                     <f:facet name="header">#{langsys['Requested']} #{langsys['Qty']}</f:facet>
                     <!-- row record -->
                     <h:outputText value="#{ati.qty_taken}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column>
@@ -172,7 +172,7 @@
                     <f:facet name="header">#{langsys['Issued']} #{langsys['Qty']}</f:facet>
                     <!-- row record -->
                     <h:outputText value="#{ati.qty_total}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column>
@@ -180,7 +180,7 @@
                     <f:facet name="header">#{langsys['Qty']} #{langsys['to']} #{langsys['Issue']}</f:facet>
                     <!-- row record -->
                     <h:inputText value="#{ati.itemQty}" style="width: 50px;" disabled="#{0>=ati.itemQty}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         <f:ajax event="change" listener="#{transItemBean.updateBaseUnityQty(ati)}" execute="dtblTransactionItem" render="dtblTransactionItem"/>
                     </h:inputText>
                 </p:column>
@@ -200,7 +200,7 @@
                     <f:facet name="header">#{langsys['Available']} #{langsys['Qty']}</f:facet>
                     <!-- row record -->
                     <h:outputText value="#{ati.qty_damage_total}" style="width: 50px;color:#{utilityBean.setColorByValueFromZero(ati.itemQty-ati.qty_damage_total,'greater','red','black')}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText> #{unitBean.getUnit(itemBean.getItem(ati.itemId).unitId).unitSymbol}
                 </p:column>
                 <p:column>
