@@ -10,6 +10,7 @@ import entities.TransItem;
 import entities.TransactionReason;
 import entities.TransactionType;
 import entities.Transaction_item_unit;
+import entities.Transaction_tax;
 import entities.Transaction_tax_map;
 import entities.Transactor;
 import entities.UserDetail;
@@ -17,6 +18,9 @@ import entities.UserItemEarn;
 import java.io.Serializable;
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import static java.sql.Types.VARCHAR;
 import java.util.Arrays;
 import java.util.List;
@@ -568,6 +572,74 @@ public class TransExtBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
         return inserted;
+    }
+
+    public void setTransaction_taxFromResultset(Transaction_tax aTransaction_tax, ResultSet aResultSet) {
+        try {
+            try {
+                aTransaction_tax.setTransaction_tax_id(aResultSet.getLong("transaction_tax_id"));
+            } catch (Exception e) {
+                aTransaction_tax.setTransaction_tax_id(0);
+            }
+            try {
+                aTransaction_tax.setTransaction_id(aResultSet.getLong("transaction_id"));
+            } catch (Exception e) {
+                aTransaction_tax.setTransaction_id(0);
+            }
+            try {
+                aTransaction_tax.setTax_category(aResultSet.getString("tax_category"));
+            } catch (Exception e) {
+                aTransaction_tax.setTax_category("");
+            }
+            try {
+                aTransaction_tax.setTax_rate_name(aResultSet.getString("tax_rate_name"));
+            } catch (Exception e) {
+                aTransaction_tax.setTax_rate_name("");
+            }
+            try {
+                aTransaction_tax.setTax_rate(aResultSet.getDouble("tax_rate"));
+            } catch (Exception e) {
+                aTransaction_tax.setTax_rate(0);
+            }
+            try {
+                aTransaction_tax.setTaxable_amount(aResultSet.getDouble("taxable_amount"));
+            } catch (Exception e) {
+                aTransaction_tax.setTaxable_amount(0);
+            }
+            try {
+                aTransaction_tax.setTax_amount(aResultSet.getDouble("tax_amount"));
+            } catch (Exception e) {
+                aTransaction_tax.setTax_amount(0);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public long insertTransaction_tax(Transaction_tax aTransaction_tax) {
+        long newId = 0;
+        String sql = "INSERT INTO transaction_tax"
+                + "(transaction_id,tax_category,tax_rate_name,tax_rate,taxable_amount,tax_amount)"
+                + " VALUES"
+                + "(?,?,?,?,?,?)";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
+            ps.setLong(1, aTransaction_tax.getTransaction_id());
+            ps.setString(2, aTransaction_tax.getTax_category());
+            ps.setString(3, aTransaction_tax.getTax_rate_name());
+            ps.setDouble(4, aTransaction_tax.getTax_rate());
+            ps.setDouble(5, aTransaction_tax.getTaxable_amount());
+            ps.setDouble(6, aTransaction_tax.getTax_amount());
+            ps.executeUpdate();
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                newId = rs.getLong(1);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return newId;
     }
 
     public void reverseShowDetail() {

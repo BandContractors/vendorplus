@@ -1,9 +1,12 @@
 package beans;
 
+import api_tax.efris.EFRIS_excise_duty_list;
+import api_tax.efris_bean.EFRIS_excise_duty_listBean;
 import connections.DBConnection;
 import entities.CompanySetting;
 import entities.TransItem;
 import entities.Transaction_item_cr_dr_note_unit;
+import entities.Transaction_item_excise;
 import entities.Transaction_item_hist_unit;
 import entities.Transaction_item_unit;
 import java.io.Serializable;
@@ -73,6 +76,58 @@ public class TransItemExtBean implements Serializable {
                 aTransaction_item_unit.setBase_unit_qty(aResultSet.getDouble("base_unit_qty"));
             } catch (Exception e) {
                 aTransaction_item_unit.setBase_unit_qty(0);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void setTransaction_item_exciseFromResultset(Transaction_item_excise aTransaction_item_excise, ResultSet aResultSet) {
+        try {
+            try {
+                aTransaction_item_excise.setTransaction_item_excise_id(aResultSet.getLong("transaction_item_excise_id"));
+            } catch (Exception e) {
+                aTransaction_item_excise.setTransaction_item_excise_id(0);
+            }
+            try {
+                aTransaction_item_excise.setTransaction_item_id(aResultSet.getLong("transaction_item_id"));
+            } catch (Exception e) {
+                aTransaction_item_excise.setTransaction_item_id(0);
+            }
+            try {
+                aTransaction_item_excise.setExcise_duty_code(aResultSet.getString("excise_duty_code"));
+            } catch (Exception e) {
+                aTransaction_item_excise.setExcise_duty_code("");
+            }
+            try {
+                aTransaction_item_excise.setRate_name(aResultSet.getString("rate_name"));
+            } catch (Exception e) {
+                aTransaction_item_excise.setRate_name("");
+            }
+            try {
+                aTransaction_item_excise.setRate_perc(aResultSet.getDouble("rate_perc"));
+            } catch (Exception e) {
+                aTransaction_item_excise.setRate_perc(0);
+            }
+            try {
+                aTransaction_item_excise.setRate_value(aResultSet.getDouble("rate_value"));
+            } catch (Exception e) {
+                aTransaction_item_excise.setRate_value(0);
+            }
+            try {
+                aTransaction_item_excise.setExcise_tax(aResultSet.getDouble("excise_tax"));
+            } catch (Exception e) {
+                aTransaction_item_excise.setExcise_tax(0);
+            }
+            try {
+                aTransaction_item_excise.setCurrency_code_tax(aResultSet.getString("currency_code_tax"));
+            } catch (Exception e) {
+                aTransaction_item_excise.setCurrency_code_tax("");
+            }
+            try {
+                aTransaction_item_excise.setUnit_code_tax(aResultSet.getString("unit_code_tax"));
+            } catch (Exception e) {
+                aTransaction_item_excise.setUnit_code_tax("");
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -173,6 +228,34 @@ public class TransItemExtBean implements Serializable {
         return inserted;
     }
 
+    public long insertTransaction_item_excise(Transaction_item_excise aTransaction_item_excise) {
+        long newId = 0;
+        String sql = "INSERT INTO transaction_item_excise"
+                + "(transaction_item_id,excise_duty_code,rate_name,rate_perc,rate_value,excise_tax,currency_code_tax,unit_code_tax)"
+                + " VALUES"
+                + "(?,?,?,?,?,?,?,?)";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
+            ps.setLong(1, aTransaction_item_excise.getTransaction_item_id());
+            ps.setString(2, aTransaction_item_excise.getExcise_duty_code());
+            ps.setString(3, aTransaction_item_excise.getRate_name());
+            ps.setDouble(4, aTransaction_item_excise.getRate_perc());
+            ps.setDouble(5, aTransaction_item_excise.getRate_value());
+            ps.setDouble(6, aTransaction_item_excise.getExcise_tax());
+            ps.setString(7, aTransaction_item_excise.getCurrency_code_tax());
+            ps.setString(8, aTransaction_item_excise.getUnit_code_tax());
+            ps.executeUpdate();
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                newId = rs.getLong(1);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return newId;
+    }
+
     public int deleteTransItemsUnitByTransId(long aTransId) {
         int deleted = 0;
         String sql = "DELETE FROM transaction_item_unit WHERE transaction_item_id IN("
@@ -205,6 +288,33 @@ public class TransItemExtBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
         return deleted;
+    }
+
+    public double calExciseDutyTax(String aExciseDutyCode, long aItemId, int aToUnitId, String aToCurrencyCode) {
+        double ExciseTax = 0;
+        try {
+            EFRIS_excise_duty_list ExciseDutyDtl = null;
+            String FromUnitCodeTax = "";
+            int FromUnitId = 0;
+            String FromCurrencyCodeTax = "";
+            String FromCurrencyCode = "";
+            if (aExciseDutyCode.length() > 0) {
+                ExciseDutyDtl = new EFRIS_excise_duty_listBean().getEFRIS_invoice_detailByExciseDutyCode(aExciseDutyCode);
+                if (null != ExciseDutyDtl) {
+                    FromUnitCodeTax = ExciseDutyDtl.getUnit();
+                    FromCurrencyCodeTax = ExciseDutyDtl.getCurrency();
+                    if (null == FromUnitCodeTax) {
+                        FromUnitCodeTax = "";
+                    }
+                    if (null == FromUnitCodeTax) {
+                        FromUnitCodeTax = "";
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return ExciseTax;
     }
 
     /**
