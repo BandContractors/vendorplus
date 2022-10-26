@@ -55,14 +55,14 @@ public class TransactionPackageBean implements Serializable {
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = Logger.getLogger(TransactionPackageBean.class.getName());
 
-    @ManagedProperty("#{menuItemBean}")
-    private MenuItemBean menuItemBean;
     private TransactionPackage transactionPackage;
     private List<TransactionPackageItem> aSalePackageItemList;
     private String ActionMessage;
     private String ActionMessageChild;
     private List<TransactionPackage> transactionPackageList;
     private String transactionNumber;
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     //create a sale package
     //save/update sale packege
@@ -85,8 +85,7 @@ public class TransactionPackageBean implements Serializable {
         tPackage.setStoreId(aStoreId);
         return tPackage;
     }
-    
-        
+
     public void addTransItemCallCEC(int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aTrans, StatusBean aStatusBean, TransactionPackage aTransPackage, List<TransItem> aActiveTransItems, TransItem aTransItem) {
 
         //get transaction package by transaction number
@@ -102,7 +101,6 @@ public class TransactionPackageBean implements Serializable {
         aActiveTransItems.add(aTransItem);
     }
 
-    
     public void covertTransactionPackageIntoTransItem(int aStoreId, int aTransTypeId, Trans aTrans, int aTransReasonId, TransItem aTransItem, TransactionPackage tPackage) {
 
         String sql = "insert"; //insert into transaction item table
@@ -309,7 +307,7 @@ public class TransactionPackageBean implements Serializable {
             } catch (Exception npe) {
                 transPackage.setTransactionNumber("");
             }
-         
+
             try {
                 transPackage.setGrandTotal(aResultSet.getDouble("grand_total"));
             } catch (Exception npe) {
@@ -638,7 +636,6 @@ public class TransactionPackageBean implements Serializable {
         return getTransactionPackageList();
     }
 
-    
     public TransactionPackage findTransactionPackage(long packageId) {
         String sql = "{call sp_search_transaction_package_by_id(?)}";
         ResultSet rs = null;

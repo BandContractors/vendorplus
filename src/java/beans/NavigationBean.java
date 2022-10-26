@@ -1806,7 +1806,7 @@ public class NavigationBean implements Serializable {
     }
     
      public String redirectToSalesPackaging() {
-        return "SalePackageV0?faces-redirect=true";
+        return "SalePackage?faces-redirect=true";
     }
 
     public String redirectToReportProdInputOutputDetail() {

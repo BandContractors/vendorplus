@@ -319,6 +319,8 @@ public class TransactionPackageItemBean implements Serializable {
             transactionPackage.setGrandTotal(new TransactionPackageBean().getGrandTotal(aTransactionPackageItemList));
             this.clearTransactionPackageItem(NewTransPackageItem);
             new ItemBean().clearSelectedItem();
+            
+            
 
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
