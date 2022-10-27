@@ -287,6 +287,25 @@ public class AccCurrencyBean implements Serializable {
         return ac;
     }
 
+    public AccCurrency getCurrencyByTaxCode(String aCurrencyTaxCode) {
+        String sql;
+        sql = "SELECT * FROM acc_currency WHERE currency_code_tax='" + aCurrencyTaxCode + "'";
+        ResultSet rs = null;
+        AccCurrency ac = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                ac = new AccCurrency();
+                this.setAccCurrencyFromResultset(ac, rs);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return ac;
+    }
+
     public void deleteAccCurrency(AccCurrency aAccCurrency) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";

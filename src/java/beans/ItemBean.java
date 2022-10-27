@@ -1477,68 +1477,68 @@ public class ItemBean implements Serializable {
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             //segment_code, segment_name, family_code, family_name, class_code, class_name, commodity_code, commodity_name
-            if (aItem_unspsc.getSegment_code()!= null) {
+            if (aItem_unspsc.getSegment_code() != null) {
                 ps.setString(1, aItem_unspsc.getSegment_code());
             } else {
                 ps.setString(1, "");
             }
-            if (aItem_unspsc.getSegment_name()!= null) {
+            if (aItem_unspsc.getSegment_name() != null) {
                 ps.setString(2, aItem_unspsc.getSegment_name());
             } else {
                 ps.setString(2, "");
             }
-            if (aItem_unspsc.getFamily_code()!= null) {
+            if (aItem_unspsc.getFamily_code() != null) {
                 ps.setString(3, aItem_unspsc.getFamily_code());
             } else {
                 ps.setString(3, "");
             }
-            if (aItem_unspsc.getFamily_name()!= null) {
+            if (aItem_unspsc.getFamily_name() != null) {
                 ps.setString(4, aItem_unspsc.getFamily_name());
             } else {
                 ps.setString(4, "");
             }
-            if (aItem_unspsc.getClass_code()!= null) {
+            if (aItem_unspsc.getClass_code() != null) {
                 ps.setString(5, aItem_unspsc.getClass_code());
             } else {
                 ps.setString(5, "");
             }
-            if (aItem_unspsc.getClass_name()!= null) {
+            if (aItem_unspsc.getClass_name() != null) {
                 ps.setString(6, aItem_unspsc.getClass_name());
             } else {
                 ps.setString(6, "");
             }
-            if (aItem_unspsc.getCommodity_code()!= null) {
+            if (aItem_unspsc.getCommodity_code() != null) {
                 ps.setString(7, aItem_unspsc.getCommodity_code());
             } else {
                 ps.setString(7, "");
             }
-            if (aItem_unspsc.getCommodity_name()!= null) {
+            if (aItem_unspsc.getCommodity_name() != null) {
                 ps.setString(8, aItem_unspsc.getCommodity_name());
             } else {
                 ps.setString(8, "");
             }
             //excise_duty_product_type, vat_rate, service_mark, zero_rate, exempt_rate, add_date
-            if (aItem_unspsc.getExcise_duty_product_type()!= null) {
+            if (aItem_unspsc.getExcise_duty_product_type() != null) {
                 ps.setString(9, aItem_unspsc.getExcise_duty_product_type());
             } else {
                 ps.setString(9, "");
             }
-            if (aItem_unspsc.getVat_rate()!= null) {
+            if (aItem_unspsc.getVat_rate() != null) {
                 ps.setString(10, aItem_unspsc.getVat_rate());
             } else {
                 ps.setString(10, "");
             }
-            if (aItem_unspsc.getService_mark()!= null) {
+            if (aItem_unspsc.getService_mark() != null) {
                 ps.setString(11, aItem_unspsc.getService_mark());
             } else {
                 ps.setString(11, "");
             }
-            if (aItem_unspsc.getZero_rate()!= null) {
+            if (aItem_unspsc.getZero_rate() != null) {
                 ps.setString(12, aItem_unspsc.getZero_rate());
             } else {
                 ps.setString(12, "");
             }
-            if (aItem_unspsc.getExempt_rate()!= null) {
+            if (aItem_unspsc.getExempt_rate() != null) {
                 ps.setString(13, aItem_unspsc.getExempt_rate());
             } else {
                 ps.setString(13, "");
@@ -5010,8 +5010,8 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
-        public void changeItemUnitSales(Item aItem, TransactionPackageItem transactionPackageItem, int aTransTypeId, int aTransReasId, int aStoreId, Trans aTrans) {
+
+    public void changeItemUnitSales(Item aItem, TransactionPackageItem transactionPackageItem, int aTransTypeId, int aTransReasId, int aStoreId, Trans aTrans) {
         try {
             Item_unit iu = this.getItemUnitFrmList(transactionPackageItem.getUnitId());
             aItem.setUnitRetailsalePrice(iu.getUnit_retailsale_price());
@@ -5133,8 +5133,7 @@ public class ItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
-    
+
     public void refreshItemtransactionPackageUnitList(Item aItem, TransactionPackageItem transactionPackageItem, int aOrderByFlag) {
         //aOrderByFlag 1 Sales, 2 Purchase, 0 None
         try {
@@ -5144,7 +5143,7 @@ public class ItemBean implements Serializable {
                 aItem.setUnitRetailsalePrice(iu.getUnit_retailsale_price());
                 aItem.setUnitWholesalePrice(iu.getUnit_wholesale_price());
                 transactionPackageItem.setUnitId(iu.getUnit_id());
-               transactionPackageItem.setUnitSymbol(iu.getUnit_symbol());
+                transactionPackageItem.setUnitSymbol(iu.getUnit_symbol());
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -5264,6 +5263,45 @@ public class ItemBean implements Serializable {
                 ps.setInt(2, aUnit_id);
                 ps.setLong(3, aItem_id);
                 ps.setInt(4, aUnit_id);
+                rs = ps.executeQuery();
+                if (rs.next()) {
+                    iu = new Item_unit();
+                    this.setItem_unitFromResultset(iu, rs);
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
+            }
+        }
+        return iu;
+    }
+
+    public Item_unit getItemUnitFrmDb(long aItem_id, String aUnit_code_tax) {
+        Item_unit iu = null;
+        if (null == aUnit_code_tax) {
+            aUnit_code_tax = "";
+        }
+        String sql;
+        sql = "select un.* from "
+                + "("
+                + "select i.unit_id,u.unit_symbol,u.unit_name,1 as is_base,0 as default_sale,0 as default_purchase,"
+                + "1 as base_qty,1 as other_qty,i.unit_retailsale_price,i.unit_wholesale_price "
+                + "from item i inner join unit u on i.unit_id=u.unit_id where i.item_id=? and u.unit_symbol_tax=? "
+                + "UNION "
+                + "select u.unit_id,u.unit_symbol,u.unit_name,0 as is_base,iu.other_default_sale as default_sale,iu.other_default_purchase as default_purchase,"
+                + "iu.base_qty,iu.other_qty,iu.other_unit_retailsale_price as unit_retailsale_price,iu.other_unit_wholesale_price as unit_wholesale_price "
+                + "from item_unit_other iu inner join unit u on iu.other_unit_id=u.unit_id where iu.is_active=1 and iu.item_id=? and u.unit_symbol_tax=? "
+                + ") as un order by default_sale desc,is_base desc";
+        ResultSet rs = null;
+        if (aItem_id <= 0 && aUnit_code_tax.isEmpty()) {
+            //do nothing
+        } else {
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                ps.setLong(1, aItem_id);
+                ps.setString(2, aUnit_code_tax);
+                ps.setLong(3, aItem_id);
+                ps.setString(4, aUnit_code_tax);
                 rs = ps.executeQuery();
                 if (rs.next()) {
                     iu = new Item_unit();
