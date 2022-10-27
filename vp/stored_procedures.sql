@@ -14765,3 +14765,206 @@ BEGIN
 	CLOSE curTableName;
 END//
 DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_insert_transaction_package;
+DELIMITER //
+CREATE PROCEDURE sp_insert_transaction_package(
+    IN in_transaction_number varchar(255),
+    IN in_transaction_date datetime,
+	IN in_store_id int,
+	IN in_store2_id int,
+	IN in_transactor_id bigint,
+	IN in_transaction_type_id int,
+	IN in_transaction_reason_id int,
+    IN in_sub_total double,
+    IN in_total_trade_discount double,
+    IN in_total_tax double,
+    IN in_grand_total double,
+	IN in_transaction_ref varchar(100),
+	IN in_transaction_comment varchar(255),
+	IN in_cash_discount double,
+	IN in_add_user_detail_id int,
+	IN in_add_date datetime,
+	IN in_edit_user_detail_id int,
+	IN in_edit_date datetime,
+	OUT out_transaction_package_id bigint,
+	IN in_vat_perc double,
+	IN in_transaction_user_detail_id int,
+    IN in_currency_code varchar(255),
+    IN in_location_id bigint(20),
+    IN in_status_code varchar(20),
+    IN in_status_date datetime
+)
+BEGIN 
+	-- SET @new_id=0;
+	-- CALL sp_get_new_id("transaction","transaction_id",@new_id);
+	
+	SET @cur_sys_datetime=null;
+	CALL sp_get_current_system_datetime(@cur_sys_datetime);
+
+	SET @edit_dateTime=null;
+	SET @edit_user_detail_id=null;
+	
+	SET @store2_id=NULL;
+	if (in_store2_id!=0) then
+		set @store2_id=in_store2_id;
+	end if;
+
+	SET @transactor_id=NULL;
+	if (in_transactor_id!=0) then
+		set @transactor_id=in_transactor_id;
+	end if;
+
+	SET @transaction_user_detail_id=NULL;
+	if (in_transaction_user_detail_id!=0) then
+		set @transaction_user_detail_id=in_transaction_user_detail_id;
+	end if;
+
+	SET @transaction_number=@new_id;
+	if (in_transaction_number!='') then
+		set @transaction_number=in_transaction_number;
+	end if;
+    
+    set @transaction_number=in_transaction_number;
+
+	SET @location_id=NULL;
+	if (in_location_id!=0) then
+		set @location_id=in_location_id;
+	end if;
+    
+	INSERT INTO transaction_package
+	(
+    transaction_number,
+    transaction_date,
+	store_id,
+	store2_id,
+	transactor_id,
+	transaction_type_id,
+	transaction_reason_id,
+    sub_total,
+    total_trade_discount,
+    total_tax,
+    grand_total,
+	transaction_ref,
+    transaction_comment,
+	cash_discount,
+	add_user_detail_id,
+	add_date,
+    edit_user_detail_id,
+	edit_date,
+    transaction_user_detail_id,
+    currency_code,
+    location_id,
+    status_code,
+    status_date
+	) 
+    VALUES
+	(
+		@transaction_number,
+		in_transaction_date,
+		in_store_id,
+		@store2_id,
+		@transactor_id,
+		in_transaction_type_id,
+		in_transaction_reason_id,
+		in_sub_total,
+		in_total_trade_discount,
+		in_total_tax,
+		in_grand_total,
+		in_transaction_ref,
+		in_transaction_comment,
+		in_cash_discount,
+		in_add_user_detail_id,
+        @cur_sys_datetime,
+		@edit_user_detail_id,
+		@edit_dateTime,
+		@transaction_user_detail_id,
+		in_currency_code,
+		@location_id,
+		in_status_code,
+		in_status_date
+	); 
+SET out_transaction_package_id=LAST_INSERT_ID();
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_insert_transaction_package_item;
+DELIMITER //
+CREATE PROCEDURE sp_insert_transaction_package_item(
+	OUT out_transaction_package_item_id bigint,
+	IN in_transaction_package_id bigint,
+	IN in_item_id bigint,
+	IN in_unit_id  bigint,
+	IN in_batchno varchar(255),
+	IN in_code_specific varchar(255),
+	IN in_desc_specific varchar(255),
+	IN in_desc_more varchar(255),
+	IN in_item_qty double,
+	IN in_base_unit_qty  double,
+	IN in_unit_price double,
+	IN in_unit_trade_discount double,
+	IN in_unit_vat double,
+	IN in_excise_rate_name varchar(255),
+	IN in_excise_rate_perc varchar(255),
+	IN in_excise_rate_value  double,
+	IN in_excise_tax double,
+	IN in_excise_currency_code_tax varchar(255),
+	IN in_excise_unit_code_tax varchar(255),
+	IN in_amount double,
+	IN in_vat_rated varchar(255),
+	IN in_vat_perc double,
+	IN in_narration varchar(255))
+BEGIN 
+
+INSERT INTO transaction_package_item
+(
+	transaction_package_id,
+	item_id,
+	unit_id,
+	batchno,
+	code_specific,
+	desc_specific,
+	desc_more,
+	item_qty,
+	base_unit_qty,
+	unit_price,
+	unit_trade_discount,
+	unit_vat,
+	excise_rate_name,
+	excise_rate_perc,
+	excise_rate_value,
+	excise_tax,
+	excise_currency_code_tax,
+	excise_unit_code_tax,
+	amount,
+	vat_rated,
+	vat_perc,
+	narration)
+VALUES
+(
+	in_transaction_package_id,
+	in_item_id,
+	in_unit_id,
+	in_batchno,
+	in_code_specific,
+	in_desc_specific,
+	in_desc_more,
+	in_item_qty,
+	in_base_unit_qty,
+	in_unit_price,
+	in_unit_trade_discount,
+	in_unit_vat,
+	in_excise_rate_name,
+	in_excise_rate_perc,
+	in_excise_rate_value,
+	in_excise_tax,
+	in_excise_currency_code_tax,
+	in_excise_unit_code_tax,
+	in_amount,
+	in_vat_rated,
+	in_vat_perc,
+	in_narration
+    );
+SET out_transaction_package_item_id=LAST_INSERT_ID();
+END//
+DELIMITER ;

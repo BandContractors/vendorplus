@@ -215,3 +215,29 @@ create table efris_goods_commodity (
 )ENGINE=InnoDB;
 
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',217,Now(),'6.0','');
+
+create table download_status (
+	download_status_id int primary key auto_increment,
+    download_name varchar(50) not null unique,
+	download_status int not null,
+	download_status_msg varchar(50) not null,
+	total_amount int not null,
+	total_downloaded int not null,
+    add_date datetime not null
+)ENGINE=InnoDB;
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',228,Now(),'6.0','');
+
+ALTER TABLE transaction_item_excise ADD COLUMN excise_duty_code VARCHAR(50) NULL AFTER transaction_item_id;
+INSERT INTO download_status (download_name, download_status, download_status_msg, total_amount, total_downloaded, add_date) VALUES ('GOODS COMMODITY', '3', 'NEW', '0','0',Now());
+
+CREATE TABLE transaction_packacge_item_unit (
+  transaction_packacge_item_unit_id bigint(20) NOT NULL DEFAULT '0',
+  unit_id int(11) NOT NULL,
+  base_unit_qty double NOT NULL,
+  PRIMARY KEY (transaction_packacge_item_unit_id)
+) ENGINE=InnoDB;
+
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',240,Now(),'6.0','');
+
+
+
