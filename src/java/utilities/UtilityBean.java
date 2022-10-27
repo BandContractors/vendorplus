@@ -1,6 +1,7 @@
 package utilities;
 
 import api_tax.efris_bean.EFRIS_goods_commodityBean;
+import api_tax.efris_bean.T115;
 import api_tax.efris_bean.T124;
 import api_tax.efris_bean.T125;
 import beans.AccCurrencyBean;
@@ -1206,6 +1207,10 @@ public class UtilityBean implements Serializable {
     public void callDownloadExciseDuty_list() {
         //new T125().downloadExciseDuty_list();
         new T125().downloadExciseDuty_listThread();
+    }
+
+    public void callDownloadRateUnit() {
+        new T115().downloadRateUnitThread();
     }
 
     public void cleanSaleInvoiceTranss() {
