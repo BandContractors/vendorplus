@@ -3,7 +3,9 @@ package beans;
 import api_tax.efris.EFRIS_excise_duty_list;
 import api_tax.efris_bean.EFRIS_excise_duty_listBean;
 import connections.DBConnection;
+import entities.AccCurrency;
 import entities.CompanySetting;
+import entities.Item_unit;
 import entities.TransItem;
 import entities.Transaction_item_cr_dr_note_unit;
 import entities.Transaction_item_excise;
@@ -115,19 +117,19 @@ public class TransItemExtBean implements Serializable {
                 aTransaction_item_excise.setRate_value(0);
             }
             try {
-                aTransaction_item_excise.setExcise_tax(aResultSet.getDouble("excise_tax"));
+                aTransaction_item_excise.setCalc_excise_tax_amount(aResultSet.getDouble("calc_excise_tax_amount"));
             } catch (Exception e) {
-                aTransaction_item_excise.setExcise_tax(0);
+                aTransaction_item_excise.setCalc_excise_tax_amount(0);
             }
             try {
-                aTransaction_item_excise.setCurrency_code_tax(aResultSet.getString("currency_code_tax"));
+                aTransaction_item_excise.setRate_currency_code_tax(aResultSet.getString("rate_currency_code_tax"));
             } catch (Exception e) {
-                aTransaction_item_excise.setCurrency_code_tax("");
+                aTransaction_item_excise.setRate_currency_code_tax("");
             }
             try {
-                aTransaction_item_excise.setUnit_code_tax(aResultSet.getString("unit_code_tax"));
+                aTransaction_item_excise.setRate_unit_code_tax(aResultSet.getString("rate_unit_code_tax"));
             } catch (Exception e) {
-                aTransaction_item_excise.setUnit_code_tax("");
+                aTransaction_item_excise.setRate_unit_code_tax("");
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -231,7 +233,7 @@ public class TransItemExtBean implements Serializable {
     public long insertTransaction_item_excise(Transaction_item_excise aTransaction_item_excise) {
         long newId = 0;
         String sql = "INSERT INTO transaction_item_excise"
-                + "(transaction_item_id,excise_duty_code,rate_name,rate_perc,rate_value,excise_tax,currency_code_tax,unit_code_tax)"
+                + "(transaction_item_id,excise_duty_code,rate_name,rate_perc,rate_value,calc_excise_tax_amount,rate_currency_code_tax,rate_unit_code_tax)"
                 + " VALUES"
                 + "(?,?,?,?,?,?,?,?)";
         try (
@@ -242,9 +244,9 @@ public class TransItemExtBean implements Serializable {
             ps.setString(3, aTransaction_item_excise.getRate_name());
             ps.setDouble(4, aTransaction_item_excise.getRate_perc());
             ps.setDouble(5, aTransaction_item_excise.getRate_value());
-            ps.setDouble(6, aTransaction_item_excise.getExcise_tax());
-            ps.setString(7, aTransaction_item_excise.getCurrency_code_tax());
-            ps.setString(8, aTransaction_item_excise.getUnit_code_tax());
+            ps.setDouble(6, aTransaction_item_excise.getCalc_excise_tax_amount());
+            ps.setString(7, aTransaction_item_excise.getRate_currency_code_tax());
+            ps.setString(8, aTransaction_item_excise.getRate_unit_code_tax());
             ps.executeUpdate();
             ResultSet rs = ps.getGeneratedKeys();
             if (rs.next()) {
@@ -290,8 +292,9 @@ public class TransItemExtBean implements Serializable {
         return deleted;
     }
 
-    public double calExciseDutyTax(String aExciseDutyCode, long aItemId, int aToUnitId, String aToCurrencyCode) {
-        double ExciseTax = 0;
+    public Transaction_item_excise setExciseDutyTax(String aExciseDutyCode, long aItemId, int aToUnitId, String aToCurrencyCode, double aQty, double aUnitPrice) {
+        Transaction_item_excise obj = new Transaction_item_excise();
+        double ExciseTaxAmount = 0;
         try {
             EFRIS_excise_duty_list ExciseDutyDtl = null;
             String FromUnitCodeTax = "";
@@ -306,15 +309,61 @@ public class TransItemExtBean implements Serializable {
                     if (null == FromUnitCodeTax) {
                         FromUnitCodeTax = "";
                     }
-                    if (null == FromUnitCodeTax) {
-                        FromUnitCodeTax = "";
+                    if (null == FromCurrencyCodeTax) {
+                        FromCurrencyCodeTax = "";
                     }
+                    if (FromCurrencyCodeTax.length() > 0) {
+                        AccCurrency AccCur = new AccCurrencyBean().getCurrencyByTaxCode(FromCurrencyCodeTax);
+                        if (null != AccCur) {
+                            FromCurrencyCode = AccCur.getCurrencyCode();
+                            if (null == FromCurrencyCode) {
+                                FromCurrencyCode = "";
+                            }
+                        }
+                    }
+                    double RatePerc = Double.parseDouble(ExciseDutyDtl.getRate_perc());
+                    double FromRateVal = Double.parseDouble(ExciseDutyDtl.getRate_value());
+                    double ToRateVal = Double.parseDouble(ExciseDutyDtl.getRate_value());
+                    double TaxViaPerc = 0;
+                    double TaxViaValue = 0;
+                    double UnitConvertRatio = 1.0;
+                    if (FromUnitCodeTax.length() > 0) {
+                        Item_unit iu = new ItemBean().getItemUnitFrmDb(aItemId, FromUnitCodeTax);
+                        if (null != iu) {
+                            FromUnitId = iu.getUnit_id();
+                        }
+                        if (FromUnitId > 0 && aToUnitId > 0) {
+                            UnitConvertRatio = new ItemBean().getUnitConversionRate(aItemId, FromUnitId, aToUnitId);
+                        }
+                    }
+                    if (RatePerc > 0) {
+                        TaxViaPerc = 0.01 * RatePerc * UnitConvertRatio * aQty * aUnitPrice;
+                    }
+                    if (FromRateVal > 0) {
+                        if (aToCurrencyCode.length() > 0 && FromCurrencyCode.length() > 0) {
+                            ToRateVal = new AccXrateBean().convertCurrency(FromRateVal, FromCurrencyCode, aToCurrencyCode);
+                        }
+                        TaxViaValue = ToRateVal * UnitConvertRatio * aQty;
+                    }
+                    if (TaxViaPerc >= TaxViaValue) {
+                        ExciseTaxAmount = TaxViaPerc;
+                    } else {
+                        ExciseTaxAmount = TaxViaValue;
+                    }
+                    //update the obj
+                    obj.setCalc_excise_tax_amount(ExciseTaxAmount);
+                    obj.setExcise_duty_code(aExciseDutyCode);
+                    obj.setRate_name(ExciseDutyDtl.getRateText());
+                    obj.setRate_perc(RatePerc);
+                    obj.setRate_value(FromRateVal);
+                    obj.setRate_currency_code_tax(FromCurrencyCodeTax);
+                    obj.setRate_unit_code_tax(FromUnitCodeTax);
                 }
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
-        return ExciseTax;
+        return obj;
     }
 
     /**

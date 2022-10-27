@@ -44,52 +44,92 @@ public class EFRIS_excise_duty_listBean implements Serializable {
                 aEFRIS_excise_duty_list.setId("");
             }
             try {
-                aEFRIS_excise_duty_list.setExciseDutyCode(aResultSet.getString("exciseDutyCode"));
+                if (null == aResultSet.getString("exciseDutyCode")) {
+                    aEFRIS_excise_duty_list.setExciseDutyCode("");
+                } else {
+                    aEFRIS_excise_duty_list.setExciseDutyCode(aResultSet.getString("exciseDutyCode"));
+                }
             } catch (Exception e) {
                 aEFRIS_excise_duty_list.setExciseDutyCode("");
             }
             try {
-                aEFRIS_excise_duty_list.setGoodService(aResultSet.getString("goodService"));
+                if (null == aResultSet.getString("goodService")) {
+                    aEFRIS_excise_duty_list.setGoodService("");
+                } else {
+                    aEFRIS_excise_duty_list.setGoodService(aResultSet.getString("goodService"));
+                }
             } catch (Exception e) {
                 aEFRIS_excise_duty_list.setGoodService("");
             }
             try {
-                aEFRIS_excise_duty_list.setParentCode(aResultSet.getString("parentCode"));
+                if (null == aResultSet.getString("parentCode")) {
+                    aEFRIS_excise_duty_list.setParentCode("");
+                } else {
+                    aEFRIS_excise_duty_list.setParentCode(aResultSet.getString("parentCode"));
+                }
             } catch (Exception e) {
                 aEFRIS_excise_duty_list.setParentCode("");
             }
             try {
-                aEFRIS_excise_duty_list.setRateText(aResultSet.getString("rateText"));
+                if (null == aResultSet.getString("rateText")) {
+                    aEFRIS_excise_duty_list.setRateText("");
+                } else {
+                    aEFRIS_excise_duty_list.setRateText(aResultSet.getString("rateText"));
+                }
             } catch (Exception e) {
                 aEFRIS_excise_duty_list.setRateText("");
             }
             try {
-                aEFRIS_excise_duty_list.setIsLeafNode(aResultSet.getString("isLeafNode"));
+                if (null == aResultSet.getString("isLeafNode")) {
+                    aEFRIS_excise_duty_list.setIsLeafNode("");
+                } else {
+                    aEFRIS_excise_duty_list.setIsLeafNode(aResultSet.getString("isLeafNode"));
+                }
             } catch (Exception e) {
                 aEFRIS_excise_duty_list.setIsLeafNode("");
             }
             try {
-                aEFRIS_excise_duty_list.setEffectiveDate(aResultSet.getString("effectiveDate"));
+                if (null == aResultSet.getString("effectiveDate")) {
+                    aEFRIS_excise_duty_list.setEffectiveDate("");
+                } else {
+                    aEFRIS_excise_duty_list.setEffectiveDate(aResultSet.getString("effectiveDate"));
+                }
             } catch (Exception e) {
                 aEFRIS_excise_duty_list.setEffectiveDate("");
             }
             try {
-                aEFRIS_excise_duty_list.setUnit(aResultSet.getString("unit"));
+                if (null == aResultSet.getString("unit")) {
+                    aEFRIS_excise_duty_list.setUnit("");
+                } else {
+                    aEFRIS_excise_duty_list.setUnit(aResultSet.getString("unit"));
+                }
             } catch (Exception e) {
                 aEFRIS_excise_duty_list.setUnit("");
             }
             try {
-                aEFRIS_excise_duty_list.setCurrency(aResultSet.getString("currency"));
+                if (null == aResultSet.getString("currency")) {
+                    aEFRIS_excise_duty_list.setCurrency("");
+                } else {
+                    aEFRIS_excise_duty_list.setCurrency(aResultSet.getString("currency"));
+                }
             } catch (Exception e) {
                 aEFRIS_excise_duty_list.setCurrency("");
             }
             try {
-                aEFRIS_excise_duty_list.setRate_perc(aResultSet.getString("rate_perc"));
+                if (null == aResultSet.getString("rate_perc")) {
+                    aEFRIS_excise_duty_list.setRate_perc("");
+                } else {
+                    aEFRIS_excise_duty_list.setRate_perc(aResultSet.getString("rate_perc"));
+                }
             } catch (Exception e) {
                 aEFRIS_excise_duty_list.setRate_perc("");
             }
             try {
-                aEFRIS_excise_duty_list.setRate_value(aResultSet.getString("rate_value"));
+                if (null == aResultSet.getString("rate_value")) {
+                    aEFRIS_excise_duty_list.setRate_value("");
+                } else {
+                    aEFRIS_excise_duty_list.setRate_value(aResultSet.getString("rate_value"));
+                }
             } catch (Exception e) {
                 aEFRIS_excise_duty_list.setRate_value("");
             }
