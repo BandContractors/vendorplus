@@ -15,9 +15,9 @@ public class Transaction_item_excise implements Serializable {
     private String rate_name;
     private double rate_perc;
     private double rate_value;
-    private double excise_tax;
-    private String currency_code_tax;
-    private String unit_code_tax;
+    private double calc_excise_tax_amount;
+    private String rate_currency_code_tax;
+    private String rate_unit_code_tax;
 
     /**
      * @return the transaction_item_excise_id
@@ -104,44 +104,44 @@ public class Transaction_item_excise implements Serializable {
     }
 
     /**
-     * @return the excise_tax
+     * @return the calc_excise_tax_amount
      */
-    public double getExcise_tax() {
-        return excise_tax;
+    public double getCalc_excise_tax_amount() {
+        return calc_excise_tax_amount;
     }
 
     /**
-     * @param excise_tax the excise_tax to set
+     * @param calc_excise_tax_amount the calc_excise_tax_amount to set
      */
-    public void setExcise_tax(double excise_tax) {
-        this.excise_tax = excise_tax;
+    public void setCalc_excise_tax_amount(double calc_excise_tax_amount) {
+        this.calc_excise_tax_amount = calc_excise_tax_amount;
     }
 
     /**
-     * @return the currency_code_tax
+     * @return the rate_currency_code_tax
      */
-    public String getCurrency_code_tax() {
-        return currency_code_tax;
+    public String getRate_currency_code_tax() {
+        return rate_currency_code_tax;
     }
 
     /**
-     * @param currency_code_tax the currency_code_tax to set
+     * @param rate_currency_code_tax the rate_currency_code_tax to set
      */
-    public void setCurrency_code_tax(String currency_code_tax) {
-        this.currency_code_tax = currency_code_tax;
+    public void setRate_currency_code_tax(String rate_currency_code_tax) {
+        this.rate_currency_code_tax = rate_currency_code_tax;
     }
 
     /**
-     * @return the unit_code_tax
+     * @return the rate_unit_code_tax
      */
-    public String getUnit_code_tax() {
-        return unit_code_tax;
+    public String getRate_unit_code_tax() {
+        return rate_unit_code_tax;
     }
 
     /**
-     * @param unit_code_tax the unit_code_tax to set
+     * @param rate_unit_code_tax the rate_unit_code_tax to set
      */
-    public void setUnit_code_tax(String unit_code_tax) {
-        this.unit_code_tax = unit_code_tax;
+    public void setRate_unit_code_tax(String rate_unit_code_tax) {
+        this.rate_unit_code_tax = rate_unit_code_tax;
     }
 }
