@@ -531,7 +531,26 @@ public class T124 implements Serializable {
                 if (savedGoodsCommodity == 1) {
                     //set total number of goods commodities already downloaded
                     downloadedUNSPC = downloadedUNSPC + arList.size();
+
+                    //UPDATE THE DOWNLOAD STATUS 
+                    DownloadStatus downloadStatus = new DownloadStatus();
+                    downloadStatus.setDownload_name("GOODS COMMODITY");
+                    downloadStatus.setTotal_amount(totalUNSPC);
+                    downloadStatus.setTotal_downloaded(downloadedUNSPC);
+                    if (totalUNSPC == downloadedUNSPC) {
+                        downloadStatus.setDownload_status(1);
+                        downloadStatus.setDownload_status_msg("SUCCESS");
+                    } else {
+                        downloadStatus.setDownload_status(2);
+                        downloadStatus.setDownload_status_msg("PROGRESS/FAILED");
+                    }
+                    new DownloadStatusBean().updateTotalDownloaded(downloadStatus);
                 }
+            }
+
+            //merge Goodd commodity into item_UNSPSC
+            if (totalUNSPC == downloadedUNSPC) {
+                new EFRIS_goods_commodityBean().mergeGoodCommodity_Item_UNSPSC();
             }
         } catch (Exception e) {
             LOGGER.log(Level.INFO, output);
@@ -683,9 +702,9 @@ public class T124 implements Serializable {
                     new DownloadStatusBean().updateTotalDownloaded(downloadStatus);
                 }
             }
-            
+
             //merge Goodd commodity into item_UNSPSC
-            if (totalUNSPC == downloadedUNSPC){
+            if (totalUNSPC == downloadedUNSPC) {
                 new EFRIS_goods_commodityBean().mergeGoodCommodity_Item_UNSPSC();
             }
         } catch (Exception e) {

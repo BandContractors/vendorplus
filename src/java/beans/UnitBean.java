@@ -95,6 +95,64 @@ public class UnitBean implements Serializable {
         }
     }
 
+    public int saveUnit_tax_list(Unit_tax_list aUnit_tax_list) {
+        int saved = 0;
+        try {
+            //save Unit_tax_list
+            saved = this.insertUnit_tax_list(aUnit_tax_list);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return saved;
+    }
+
+    public int saveUnit_tax_list(List<Unit_tax_list> aUnit_tax_list) {
+        int saved = 0;
+        try {
+            int Unit_tax_listSaved = 0;
+            //save Unit_tax_list
+            for (int i = 0, size = aUnit_tax_list.size(); i < size; i++) {
+                Unit_tax_listSaved = Unit_tax_listSaved + this.insertUnit_tax_list(aUnit_tax_list.get(i));
+            }
+
+            if (Unit_tax_listSaved == aUnit_tax_list.size()) {
+                saved = 1;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return saved;
+    }
+
+    public int insertUnit_tax_list(Unit_tax_list aUnit_tax_list) {
+        int saved = 0;
+        String sql = "INSERT INTO unit_tax_list"
+                + "(unit_symbol_tax, unit_name_tax)"
+                + "VALUES"
+                + "(?,?);";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            //unit_symbol_tax, unit_name_tax
+            if (aUnit_tax_list.getUnit_symbol_tax()!= null) {
+                ps.setString(1, aUnit_tax_list.getUnit_symbol_tax());
+            } else {
+                ps.setString(1, "");
+            }
+            if (aUnit_tax_list.getUnit_name_tax()!= null) {
+                ps.setString(2, aUnit_tax_list.getUnit_name_tax());
+            } else {
+                ps.setString(2, "");
+            }
+            
+            ps.executeUpdate();
+            saved = 1;
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return saved;
+    }
+
     public void saveUnit(Unit unit, Unit_tax_list aUnit_tax_listObj) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -402,6 +460,21 @@ public class UnitBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
         return lst;
+    }
+
+    public int deleteUnit_tax_list_All() {
+        int IsDeleted = 0;
+        String sql = "DELETE FROM unit_tax_list WHERE unit_tax_list_id > ?";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, 0);
+            ps.executeUpdate();
+            IsDeleted = 1;
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return IsDeleted;
     }
 
     public Unit getUnitByItemCodeTax(long aItemId, String aUnitCodeTax) {

@@ -463,8 +463,10 @@ public class EFRIS_goods_commodityBean implements Serializable {
             }
             //if item_unspsc is empty
             if (Item_unspscList.size() > 0) {
+                //then delete previous records
                 int isItemUNSPSCDeleted = new ItemBean().deleteItem_unspsc_All();
                 if (isItemUNSPSCDeleted == 1){
+                    //then save new records
                     new ItemBean().saveItem_unspsc(Item_unspscList);
                 }
             }
