@@ -239,6 +239,12 @@ CREATE TABLE transaction_packacge_item_unit (
 
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',240,Now(),'6.0','');
 
+ALTER TABLE transaction_item_excise 
+CHANGE COLUMN excise_tax calc_excise_tax_amount DOUBLE NULL DEFAULT NULL AFTER rate_unit_code_tax,
+CHANGE COLUMN currency_code_tax rate_currency_code_tax VARCHAR(50) NULL DEFAULT NULL ,
+CHANGE COLUMN unit_code_tax rate_unit_code_tax VARCHAR(50) NULL DEFAULT NULL ;
+
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',247,Now(),'6.0','');
 
 
 
