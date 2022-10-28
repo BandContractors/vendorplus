@@ -5150,7 +5150,7 @@ public class TransItemBean implements Serializable {
 
     public List<TransItem> getTransItemsOutput(long aTransactionId) {
         String sql;
-        sql = "{call sp_search_transaction_item_by_transaction_id4(?)}";
+        sql = "{call sp_search_transaction_package_item_by_transaction_id(?)}";
         ResultSet rs = null;
         List<TransItem> tis = new ArrayList<>();
         try (
@@ -11447,7 +11447,7 @@ public class TransItemBean implements Serializable {
         try {
             String ItemCode = aSelectedTransItem.getItemCode();
             if (ItemCode.equals("P")) {
-                new TransactionPackageBean().addTransItemCallCEC(aStoreId, aTransTypeId, aTransReasonId, aSaleType, aTrans, aStatusBean, null, aActiveTransItems, aSelectedTransItem);
+               // new TransactionPackageBean().addTransItemCallCEC(aStoreId, aTransTypeId, aTransReasonId, aSaleType, aTrans, aStatusBean, null, aActiveTransItems, aSelectedTransItem);
             } else if (ItemCode.startsWith("ST")) {
                 new TransBean().loadTransferForInvoiceTrans(aTrans, aActiveTransItems, aSelectedTransItem);
             } else {

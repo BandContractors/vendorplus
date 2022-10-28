@@ -14770,6 +14770,7 @@ DROP PROCEDURE IF EXISTS sp_insert_transaction_package;
 DELIMITER //
 CREATE PROCEDURE sp_insert_transaction_package(
     IN in_transaction_number varchar(255),
+    IN in_transaction_id bigint(20),
     IN in_transaction_date datetime,
 	IN in_store_id int,
 	IN in_store2_id int,
@@ -14856,7 +14857,8 @@ BEGIN
     currency_code,
     location_id,
     status_code,
-    status_date
+    status_date, 
+    transaction_id
 	) 
     VALUES
 	(
@@ -14882,7 +14884,8 @@ BEGIN
 		in_currency_code,
 		@location_id,
 		in_status_code,
-		in_status_date
+		in_status_date,
+        in_transaction_id
 	); 
 SET out_transaction_package_id=LAST_INSERT_ID();
 END//
@@ -14968,3 +14971,5 @@ VALUES
 SET out_transaction_package_item_id=LAST_INSERT_ID();
 END//
 DELIMITER ;
+
+

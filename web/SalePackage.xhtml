@@ -235,11 +235,13 @@
 
             <h:panelGrid id="pgrdCommands" styleClass="clsGridMainCommands" columns="1">
                 <h:panelGrid styleClass="clsGridMainCommands1" columns="7">
+                    <h:selectBooleanCheckbox value="#{transactionPackageBean.autoPrintAfterSave}"/>
+                    <h:outputLabel value="#{langsys['Print']}#{langsys['After']}#{langsys['Save']}" style="color: white"/>
                     <p:commandButton styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['SAVE']} (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
-                        <p:ajax listener="#{transactionPackageBean.saveTransCECcallFromSINew(generalUserSetting.currentStore.storeId, generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans, transactionPackage, transactionPackageItemBean.transPackageItemList)}" process="@form" update="pnlHeader gridTransItem pgrdSpecific dtblTransactionItem pgrdTotals pgrdMsgs growl1 pnlgOutput"/>
+                        <p:ajax listener="#{transactionPackageBean.saveTransPackageCECNew('PARENT',generalUserSetting.currentStore.storeId, generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans, transactionPackage, transactionPackageItemBean.transPackageItemList)}" process="@form" update="pnlHeader gridTransItem pgrdSpecific dtblTransactionItem pgrdTotals pgrdMsgs growl1 pnlgOutput"/>
                     </p:commandButton>
                     <p:commandButton id="cmdbClear" styleClass="clsButtonBig" value="#{langsys['CLEAR']} (ALT+C)" accesskey="c">
                         <p:ajax listener="#{transBean.clearAll2(trans,transItemBean.activeTransItems,transItem,itemBean.selectedItem,transactorBean.selectedTransactor,2,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor,null,null)}" process="@form" update="pnlHeader gridTransItem pgrdSpecific dtblTransactionItem pgrdTotals pgrdMsgs pnlgOutput"/>

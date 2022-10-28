@@ -21,7 +21,6 @@ import org.eclipse.persistence.jpa.jpql.parser.DateTime;
 public class TransactionPackage implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
     private long transactionPackageId;
     private long transactionId;
     private String transactionNumber;
