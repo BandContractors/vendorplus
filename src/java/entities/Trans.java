@@ -69,6 +69,7 @@ public class Trans implements Serializable {
     private double TotalExemptVatableAmount;
     private double TotalDeemedVatableAmount;
     private double TotalDeemedVat;
+    private double TotalExciseDutyTaxAmount;
     private double VatPerc;
     private String IsCashDiscountVatLiable;
     //for report
@@ -2006,5 +2007,19 @@ public class Trans implements Serializable {
      */
     public void setaTransItemsDetailsList(List<TransItem> aTransItemsDetailsList) {
         this.aTransItemsDetailsList = aTransItemsDetailsList;
+    }
+
+    /**
+     * @return the TotalExciseDutyTaxAmount
+     */
+    public double getTotalExciseDutyTaxAmount() {
+        return TotalExciseDutyTaxAmount;
+    }
+
+    /**
+     * @param TotalExciseDutyTaxAmount the TotalExciseDutyTaxAmount to set
+     */
+    public void setTotalExciseDutyTaxAmount(double TotalExciseDutyTaxAmount) {
+        this.TotalExciseDutyTaxAmount = TotalExciseDutyTaxAmount;
     }
 }
