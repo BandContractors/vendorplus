@@ -822,6 +822,79 @@ public class AccCurrencyBean implements Serializable {
         return lst;
     }
 
+    public int saveAcc_currency_tax_list(Acc_currency_tax_list aAcc_currency_tax_list) {
+        int saved = 0;
+        try {
+            //save Acc_currency_tax_list
+            saved = this.insertAcc_currency_tax_list(aAcc_currency_tax_list);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return saved;
+    }
+
+    public int saveAcc_currency_tax_list(List<Acc_currency_tax_list> aAcc_currency_tax_list) {
+        int saved = 0;
+        try {
+            int Acc_currency_tax_listSaved = 0;
+            //save Acc_currency_tax_list
+            for (int i = 0, size = aAcc_currency_tax_list.size(); i < size; i++) {
+                Acc_currency_tax_listSaved = Acc_currency_tax_listSaved + this.insertAcc_currency_tax_list(aAcc_currency_tax_list.get(i));
+            }
+
+            if (Acc_currency_tax_listSaved == aAcc_currency_tax_list.size()) {
+                saved = 1;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return saved;
+    }
+
+    public int insertAcc_currency_tax_list(Acc_currency_tax_list aAcc_currency_tax_list) {
+        int saved = 0;
+        String sql = "INSERT INTO acc_currency_tax_list"
+                + "(currency_code_tax, currency_name_tax)"
+                + "VALUES"
+                + "(?,?);";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            //currency_code_tax, currency_name_tax
+            if (aAcc_currency_tax_list.getCurrency_code_tax()!= null) {
+                ps.setString(1, aAcc_currency_tax_list.getCurrency_code_tax());
+            } else {
+                ps.setString(1, "");
+            }
+            if (aAcc_currency_tax_list.getCurrency_name_tax()!= null) {
+                ps.setString(2, aAcc_currency_tax_list.getCurrency_name_tax());
+            } else {
+                ps.setString(2, "");
+            }
+            
+            ps.executeUpdate();
+            saved = 1;
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return saved;
+    }
+
+    public int deleteAcc_currency_tax_list_All() {
+        int IsDeleted = 0;
+        String sql = "DELETE FROM acc_currency_tax_list WHERE acc_currency_list_id > ?";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, 0);
+            ps.executeUpdate();
+            IsDeleted = 1;
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return IsDeleted;
+    }
+
     public void refreshAcc_currency_tax_lists() {
         this.setAcc_currency_tax_lists(this.getAcc_currency_tax_lists());
     }
