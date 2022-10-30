@@ -1213,6 +1213,10 @@ public class UtilityBean implements Serializable {
         new T115().downloadRateUnitThread();
     }
 
+    public void callDownloadCurrencyType() {
+        new T115().downloadCurrencyTypeThread();
+    }
+
     public void cleanSaleInvoiceTranss() {
         try {
             Runnable task = new Runnable() {
