@@ -112,7 +112,7 @@
                         </p:column>
                         <p:column headerText="#{langsys['Total']} #{langsys['Value']} #{langsys['Disposed']}" style="text-align: right;">
                             <h:outputText value="#{sm.grandTotal}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                     </p:dataTable>
@@ -157,7 +157,7 @@
                 </p:column>
                 <p:column headerText="#{langsys['Disposed']} #{langsys['Amount']}" style="text-align: right;">
                     <h:outputText value="#{itm.grandTotal}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(3).transactionUserLabel)}">

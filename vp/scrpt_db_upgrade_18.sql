@@ -68,3 +68,183 @@ INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_
 INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
 VALUES (98, 'COMPANY_SETTING', 'COUNTRY_NAME', 'UGANDA','Country of Registration for the company or Branch; this should be the full name e.g UGANDA');
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',70,Now(),'6.0','');
+
+create table efris_excise_duty_list (
+	efris_excise_duty_list_id bigint primary key auto_increment,
+	id varchar(20) not null,
+	exciseDutyCode varchar(20) not null,
+    goodService varchar(500),
+    parentCode varchar(20),
+    rateText varchar(50) not null,
+    isLeafNode varchar(1),
+    effectiveDate varchar(100),
+    unit varchar(3),
+    currency varchar(100) not null,
+    rate_perc varchar(500),
+    rate_value varchar(500),
+    add_date datetime not null
+)ENGINE=InnoDB;
+
+create table item_excise_duty_map (
+	item_excise_duty_map_id bigint primary key auto_increment,
+	item_id bigint(20) not null,
+	efris_excise_duty_list_id bigint not null
+)ENGINE=InnoDB;
+
+create table transaction_item_excise(
+                        transaction_item_excise_id bigint(20) primary key auto_increment,
+                        transaction_item_id bigint(20),
+                        rate_name varchar(250),
+                        rate_perc double,
+                        rate_value double,
+                        excise_tax double,
+                        currency_code_tax varchar(50),
+                        unit_code_tax varchar(50)
+                        )ENGINE=InnoDB;
+
+create table transaction_tax(
+                        transaction_tax_id bigint(20) primary key auto_increment,
+                        transaction_id bigint(20),
+                        tax_category varchar(50),
+                        tax_rate_name varchar(50),
+                        tax_rate double,
+                        taxable_amount double,
+                        tax_amount double
+                        )ENGINE=InnoDB;
+
+CREATE TABLE transaction_package (
+  transaction_package_id bigint(20) NOT NULL AUTO_INCREMENT,
+  transaction_number varchar(50) NOT NULL,
+  transaction_date date NOT NULL,
+  store_id int(11) NOT NULL,
+  store2_id int(11) DEFAULT NULL,
+  transactor_id bigint(20) DEFAULT NULL,
+  transaction_type_id int(11) NOT NULL,
+  transaction_reason_id int(11) NOT NULL,
+  sub_total double NOT NULL,
+  total_trade_discount double NOT NULL,
+  total_tax double NOT NULL,
+  cash_discount double DEFAULT NULL,
+  grand_total double NOT NULL,
+  transaction_ref varchar(100) DEFAULT NULL,
+  transaction_comment varchar(255) DEFAULT NULL,
+  add_user_detail_id int(11) NOT NULL,
+  add_date datetime NOT NULL,
+  edit_user_detail_id int(11) DEFAULT NULL,
+  edit_date datetime DEFAULT NULL,
+  transaction_user_detail_id int(11) DEFAULT NULL,
+  currency_code varchar(10) DEFAULT NULL,
+  location_id bigint(20) DEFAULT NULL,
+  status_code varchar(20) DEFAULT NULL,
+  status_date datetime DEFAULT NULL,
+  PRIMARY KEY (transaction_package_id),
+  KEY idp_trans_number (transaction_number)
+) ENGINE=InnoDB;
+
+create table transaction_package_tax(
+                        transaction_package_tax_id bigint(20) primary key auto_increment,
+                        transaction_package_id bigint(20),
+                        tax_category varchar(50),
+                        tax_rate_name varchar(50),
+                        tax_rate double,
+                        taxable_amount double,
+                        tax_amount double
+                        )ENGINE=InnoDB;
+
+CREATE TABLE transaction_package_item (
+  transaction_package_item_id bigint(20) NOT NULL AUTO_INCREMENT,
+  transaction_package_id bigint(20) NOT NULL,
+  item_id bigint(20) DEFAULT NULL,
+  unit_id int,
+  batchno varchar(100) DEFAULT NULL,
+  code_specific varchar(250) DEFAULT NULL,
+  desc_specific varchar(250) DEFAULT NULL,
+  desc_more varchar(250) DEFAULT NULL,
+  item_qty double NOT NULL,
+  base_unit_qty double NOT NULL,
+  unit_price double DEFAULT NULL,
+  unit_trade_discount double DEFAULT NULL,
+  unit_vat double DEFAULT NULL,
+  excise_rate_name varchar(250),
+  excise_rate_perc double,
+  excise_rate_value double,
+  excise_tax double,
+  excise_currency_code_tax varchar(50),
+  excise_unit_code_tax varchar(50),
+  amount double DEFAULT NULL,
+  vat_rated varchar(50) DEFAULT NULL,
+  vat_perc double DEFAULT NULL,
+  narration varchar(100) DEFAULT NULL,
+  PRIMARY KEY (transaction_package_item_id)
+) ENGINE=InnoDB;
+
+INSERT INTO transaction_type (transaction_type_id, transaction_type_name, transactor_label, transaction_number_label, transaction_output_label, transaction_date_label, transaction_user_label, is_transactor_mandatory, is_transaction_user_mandatory, is_transaction_ref_mandatory, is_authorise_user_mandatory, is_authorise_date_mandatory, is_delivery_address_mandatory, is_delivery_date_mandatory, is_pay_due_date_mandatory, is_expiry_date_mandatory, description, group_name, print_file_name1, print_file_name2, default_print_file, transaction_type_code, default_currency_code, trans_number_format) 
+VALUES ('88', 'PACKAGING', '', 'Packaging No', 'PACKAGING', 'Packaging Date', 'Packed By', 'No', 'No', 'No', 'No', 'No', 'No', 'No', 'No', 'No', 'No', 'Packaging', 'OutputPCG_General', 'OutputPCG_General', '1', 'PCG', 'UGX', 'CYMDX');
+INSERT INTO transaction_reason (transaction_reason_id, transaction_reason_name, transaction_type_id, description) 
+VALUES ('135', 'SALES PACKAGING', '88', 'Pack items to be sold');
+
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',186,Now(),'6.0','');
+
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (99, 'ROUNDING_DECIMAL_PLACES', 'ROUND_DECIMAL_PLACES_ITEM', '0','Rounding off decimal places for (transaction item amounts). Put 0 for currency decimal places to take  or specify the number of decimal places');
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (100, 'ROUNDING_DECIMAL_PLACES', 'ROUND_DECIMAL_PLACES_TOTAL', '0','Rounding off decimal places for (transaction grand total). Put 0 for currency decimal places to take precedence or specify the number of decimal places');
+INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
+VALUES (101, 'ROUNDING_DECIMAL_PLACES', 'ROUND_DECIMAL_PLACES_TOTAL_OTHER', '0','Rounding off decimal places for (transaction totals excluding grand total). Put 0 for currency decimal places to take precedence or specify the number of decimal places');
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',194,Now(),'6.0','');
+
+ALTER TABLE item_excise_duty_map CHANGE COLUMN efris_excise_duty_list_id excise_duty_code VARCHAR(50) NOT NULL ;
+create table efris_goods_commodity (
+	efris_goods_commodity_id bigint primary key auto_increment,
+    commodityCategoryCode varchar(18) not null default '',
+    parentCode varchar(18) not null default '',
+    commodityCategoryName varchar(200) not null default '',
+    commodityCategoryLevel varchar(1) not null default '',
+    rate varchar(4) not null default '',
+    isLeafNode varchar(3) not null default '',
+    serviceMark varchar(3) not null default '',
+    isZeroRate varchar(3) not null default '',
+    zeroRateStartDate varchar(100) not null default '',
+    zeroRateEndDate varchar(100) not null default '',
+    isExempt varchar(3) not null default '',
+    exemptRateStartDate varchar(100) not null default '',
+    exemptRateEndDate varchar(100) not null default '',
+    enableStatusCode varchar(1) not null default '',
+    exclusion varchar(1) not null default '',
+    add_date datetime not null
+)ENGINE=InnoDB;
+
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',217,Now(),'6.0','');
+
+create table download_status (
+	download_status_id int primary key auto_increment,
+    download_name varchar(50) not null unique,
+	download_status int not null,
+	download_status_msg varchar(50) not null,
+	total_amount int not null,
+	total_downloaded int not null,
+    add_date datetime not null
+)ENGINE=InnoDB;
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',228,Now(),'6.0','');
+
+ALTER TABLE transaction_item_excise ADD COLUMN excise_duty_code VARCHAR(50) NULL AFTER transaction_item_id;
+INSERT INTO download_status (download_name, download_status, download_status_msg, total_amount, total_downloaded, add_date) VALUES ('GOODS COMMODITY', '3', 'NEW', '0','0',Now());
+
+CREATE TABLE transaction_packacge_item_unit (
+  transaction_packacge_item_unit_id bigint(20) NOT NULL DEFAULT '0',
+  unit_id int(11) NOT NULL,
+  base_unit_qty double NOT NULL,
+  PRIMARY KEY (transaction_packacge_item_unit_id)
+) ENGINE=InnoDB;
+
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',240,Now(),'6.0','');
+
+ALTER TABLE transaction_item_excise 
+CHANGE COLUMN excise_tax calc_excise_tax_amount DOUBLE NULL DEFAULT NULL AFTER rate_unit_code_tax,
+CHANGE COLUMN currency_code_tax rate_currency_code_tax VARCHAR(50) NULL DEFAULT NULL ,
+CHANGE COLUMN unit_code_tax rate_unit_code_tax VARCHAR(50) NULL DEFAULT NULL ;
+
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',247,Now(),'6.0','');
+
+
+

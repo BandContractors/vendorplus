@@ -131,12 +131,12 @@
                 </p:column>
                 <p:column headerText="#{langsys['Grand']} #{langsys['Total']}" style="text-align: right;">
                     <h:outputText value="#{ta.grand_total}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Amount']} #{langsys['Tendered']}" style="text-align: right;">
                     <h:outputText value="#{ta.amount_tendered}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Action']}" exportable="false" style="min-width: 125px">
@@ -202,15 +202,15 @@
                                     </p:column>
                                     <p:column>
                                         <!-- column header -->
-                                        <f:facet name="header">#{langout['QTY']}(#{utilityBean.formatNumber('###,###.###',transItemBean.getTransItemsTotalQty(transaction_approvalBean.transItemList))})</f:facet>
+                                        <f:facet name="header">#{langout['QTY']}(#{utilityBean.formatNumber('###,###,###.########',transItemBean.getTransItemsTotalQty(transaction_approvalBean.transItemList))})</f:facet>
                                         <!-- row record -->
                                         <h:outputLabel style="font-size: 10px;" value="#{ti.itemQty}">
-                                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                         </h:outputLabel> 
                                         <h:outputLabel style="font-size: 10px;" value="#{unitBean.getUnit(ti.unit_id).unitSymbol}"/>
                                         <h:outputLabel style="font-size: 10px;" value="@" rendered="#{ti.hide_unit_price_invoice eq 0}"/>
                                         <h:outputLabel style="font-size: 10px;" value="#{ti.unitPriceIncVat}" rendered="#{ti.hide_unit_price_invoice eq 0}">
-                                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                         </h:outputLabel>
                                     </p:column>
                                     <p:column>
@@ -218,7 +218,7 @@
                                         <f:facet name="header">#{langout['AMOUNT']}</f:facet>
                                         <!-- row record -->
                                         <h:outputLabel style="font-size: 12px;" value="#{ti.amountIncVat}">
-                                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                         </h:outputLabel>
                                     </p:column>
                                 </p:dataTable>
@@ -231,7 +231,7 @@
                                 </h:outputLabel>
                                 <h:outputLabel style="font-size: 12px; font-weight: bold;" value="#{langout['TENDERED']} #{langout['AMOUNT']}:"/>
                                 <h:outputLabel style="font-size: 12px; font-weight: bold;" id="IolblSalesInvoiceAmountTendered" value="#{transaction_approval.amount_tendered}">
-                                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputLabel>
                             </h:panelGrid>
 

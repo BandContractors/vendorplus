@@ -121,7 +121,7 @@
                 </p:column>
                 <p:column headerText="#{langsys['Total']} #{langsys['Paid']}">
                     <h:outputText value="#{utilityBean.convertStringAsDouble(itm.grossAmount)}" style="width: 60px;color: #ffffff !important;text-align: right !important;">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Added']} #{langsys['By']}" visible="false">

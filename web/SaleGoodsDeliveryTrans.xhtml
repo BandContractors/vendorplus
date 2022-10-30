@@ -130,7 +130,7 @@
                     <p:ajax listener="#{itemBean.changeItemUnitSales(itemBean.selectedItem,transItem,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentStore.storeId,trans)}" process="@this autcItem"/>
                 </p:selectOneMenu>
                 <h:inputText id="itxtQty" styleClass="clsInputTransItem" value="#{transItem.itemQty}" autocomplete="off" style="width: 60px;height: 24px;">
-                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
                 <h:inputText id="itxtBatchno" styleClass="clsInputTransItem" value="#{transItem.batchno}" style="height: 24px;">
                 </h:inputText>
@@ -182,7 +182,7 @@
                     <f:facet name="header">#{langsys['Ordered']}/#{langsys['Sold']} #{langsys['Qty']}</f:facet>
                     <!-- row record -->
                     <h:inputText value="#{ati.qty_taken}" style="width: 50px;" disabled="true">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
                 </p:column>
                 <p:column>
@@ -190,7 +190,7 @@
                     <f:facet name="header">#{langsys['Delivered']} #{langsys['Qty']}</f:facet>
                     <!-- row record -->
                     <h:inputText value="#{ati.qty_total}" style="width: 50px;" disabled="true">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:inputText>
                 </p:column>
                 <p:column>
@@ -198,7 +198,7 @@
                     <f:facet name="header">#{langsys['Qty']} #{langsys['to']} #{langsys['Deliver']}</f:facet>
                     <!-- row record -->
                     <h:inputText value="#{ati.itemQty}" style="width: 50px;">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         <f:ajax event="change" listener="#{transItemBean.updateBaseUnityQty(ati)}" execute="dtblTransactionItem" render="dtblTransactionItem"/>
                     </h:inputText>
                 </p:column>

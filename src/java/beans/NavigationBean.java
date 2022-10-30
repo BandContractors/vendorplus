@@ -1805,6 +1805,23 @@ public class NavigationBean implements Serializable {
         return "ReportProductionDetail?faces-redirect=true";
     }
 
+    public String redirectToSalesPackaging() {
+        //update seesion
+        FacesContext context = FacesContext.getCurrentInstance();
+        HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+        HttpSession httpSession = request.getSession(false);
+        httpSession.setAttribute("TRANSACTION_REASON_ID", 135);
+        httpSession.setAttribute("TRANSACTION_TYPE_ID", 88);
+        httpSession.setAttribute("TRANSACTION_TYPE_NAME", "PACKAGING");
+        TransactionType TempTransType = new TransactionTypeBean().getTransactionType(88);
+        if (TempTransType != null) {
+            httpSession.setAttribute("TRANSACTOR_LABEL", TempTransType.getTransactorLabel());
+            httpSession.setAttribute("TRANSACTION_NUMBER_LABEL", TempTransType.getTransactionNumberLabel());
+            httpSession.setAttribute("TRANSACTION_OUTPUT_LABEL", TempTransType.getTransactionOutputLabel());
+        }
+        return "SalePackage?faces-redirect=true";
+    }
+
     public String redirectToReportProdInputOutputDetail() {
         return "ReportProdInputOutput?faces-redirect=true";
     }

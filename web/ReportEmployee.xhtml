@@ -98,12 +98,12 @@
                 </p:column>
                 <p:column headerText="Gross Pay" style="text-align: right;">
                     <h:outputText value="#{rts.monthGrossPay}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="Net Pay" style="text-align: right;">
                     <h:outputText value="#{rts.monthNetPay}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="AccountDetails" style="text-align: left;">

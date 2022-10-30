@@ -78,16 +78,16 @@
                                     rcmdCopyRetailWhole();
                                     return false;
                                 }">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
                         <h:outputLabel value="#{langsys['Wholesale']} #{langsys['Price']}:"/>
                         <h:inputText id="itxtUnitWholesalePrice" value="#{itemBean.itemObj.unitWholesalePrice}" autocomplete="off" style="width: 233px">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
 
                         <h:outputLabel value="#{langsys['Unit']} #{langsys['Cost']} #{langsys['Price']}:"/>
                         <h:inputText id="itxtUnitCostPrice" value="#{itemBean.itemObj.unitCostPrice}" autocomplete="off" style="width: 233px">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
                         <p:commandLink value="#{langsys['Reorder']} #{langsys['Level']}:" action="#{itemBean.displayItemReorderLevels()}" oncomplete="PF('sbarItemReorder').show()" update="formMain:pnlgItemReorder1 formMain:pnlgItemReorder2" style="color: blue;text-decoration: none;"/>
                         <h:inputText id="itxtReorderLevel" value="#{itemBean.itemObj.reorderLevel}" autocomplete="off" style="width: 233px"/>
@@ -188,11 +188,11 @@
 
                         <h:outputLabel value="#{langsys['Special']} #{langsys['Price']}:"/>
                         <h:inputText id="itxtUnitSpecialsalePrice" value="#{itemBean.itemObj.unit_special_price}" autocomplete="off" style="width: 233px">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
                         <h:outputLabel value="#{langsys['Unit']} #{langsys['Hire']} #{langsys['Price']}:"/>
                         <h:inputText id="itxtUnitHirePrice" value="#{itemBean.itemObj.unit_hire_price}" autocomplete="off" style="width: 233px" disabled="#{itemBean.itemObj.is_hire==0}">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
 
                         <h:outputLabel value="#{langsys['Expiry']} #{langsys['Band']} (U,H,M,L):"/>
@@ -210,7 +210,7 @@
                         </h:selectOneMenu>
                         <h:outputLabel value="#{langsys['Unit']} #{langsys['Weight']}(#{parameter_listBean.getParameter_listByContextNameMemory('ITEM','DEFAULT_MEASURE_UNIT').parameter_value}):"/>
                         <h:inputText value="#{itemBean.itemObj.unit_weight}" autocomplete="off" style="width: 233px">
-                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
 
                         <h:outputLabel value="#{langsys['Specify']} #{langsys['Size']}:"/>
@@ -227,15 +227,19 @@
                         <p:remoteCommand name="rcmdCopyRetailWhole" actionListener="#{itemBean.setRetailToWhole()}" update="itxtUnitWholesalePrice"/>
                     </h:panelGrid>
                     <h:panelGrid columns="1">  
-                        <p:commandLink value="Bar Code" rendered="#{itemBean.itemObj.itemCode.length()>0}">
+                        <p:commandLink value="Bar Code" rendered="#{itemBean.itemObj.itemCode.length()>0}" style="color: blue;text-decoration: none;">
                             <p:printer target="gnlgBarCodeOnly" rendered="false"/>
                         </p:commandLink>
                         <h:panelGrid id="gnlgBarCodeOnly" rendered="#{itemBean.itemObj.itemCode.length()>0}">  
                             <p:barcode id="barcItemCode" value="#{itemBean.itemObj.itemCode}" type="code128" style="width: 176px;height: 128px;"/>
                         </h:panelGrid>
-                        <p:commandLink value="Tax #{langsys['Code']}" action="#{itemBean.displayUNSPSC()}" oncomplete="PF('sbarUNSPSC').show()" update="formMain:tabvUNSPC:pnlgManage" style="color: blue;text-decoration: none;"/>
-                        <h:inputText id="itxtUNSPSC" value="#{itemBean.itemObj.item_code_tax}" autocomplete="off" style="width: 233px;color:#{itemBean.itemObj.is_synced_tax eq 1 ? '#238823':'#d2222d'};"/>
-                        <h:outputLabel value="VAT #{langsys['Rated']}"/>
+                        <h:panelGrid columns="2">
+                            <p:commandLink value="Tax #{langsys['Code']}" action="#{itemBean.displayUNSPSC()}" oncomplete="PF('sbarUNSPSC').show()" update="formMain:tabvUNSPC:pnlgManage" style="color: blue;text-decoration: none;"/>
+                            <p:commandLink value="#{langsys['Excise']} #{langsys['Code']}" action="#{itemBean.displayUNSPSC()}" oncomplete="PF('sbarUNSPSC').show()" update="formMain:tabvUNSPC:pnlgManage" style="color: blue;text-decoration: none;"/>
+                            <h:inputText id="itxtUNSPSC" value="#{itemBean.itemObj.item_code_tax}" autocomplete="off" style="width: 110px;color:#{itemBean.itemObj.is_synced_tax eq 1 ? '#238823':'#d2222d'};"/>
+                            <h:inputText id="itxtExcise" value="#{itemBean.itemObj.excise_duty_code}" autocomplete="off" style="width: 110px;color:#{itemBean.itemObj.is_synced_tax eq 1 ? '#238823':'#d2222d'};"/>
+                        </h:panelGrid>
+                        <h:outputLabel value="VAT #{langsys['Rate']}"/>
                         <p:selectCheckboxMenu id="menuVatRateds" value="#{itemBean.itemObj.selectedVatRateds}" multiple="true" style="width: 240px;">
                             <f:selectItem itemLabel="#{langsys['STANDARD']}" itemValue="STANDARD"/>
                             <f:selectItem itemLabel="#{langsys['ZERO']}" itemValue="ZERO"/>
@@ -366,7 +370,7 @@
             </p:dataTable>
             <p:sidebar widgetVar="sbarUNSPSC" position="bottom" baseZIndex="10000" style="height: 600px;">
                 <p:tabView id="tabvUNSPC">
-                    <p:tab title="Search">
+                    <p:tab title="#{langsys['Tax']} #{langsys['Code']}">
                         <h:panelGrid columns="1">
                             <h:outputLabel value="#{langsys['United']} #{langsys['Nations']} #{langsys['Standard']} #{langsys['Products']} #{langsys['and']} #{langsys['Services']} #{langsys['Code']} (UNSPSC)" style="font-weight: bold;"/>
                         </h:panelGrid>
@@ -381,7 +385,7 @@
                                          paginator="true" rows="5" 
                                          paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}" 
                                          rowsPerPageTemplate="5,10">
-                                <p:column headerText="Code" style="text-align: left;font-size: 14px;">
+                                <p:column headerText="#" style="text-align: left;font-size: 14px;">
                                     <h:outputText value="#{rowIndex+1} "/>
                                     <h:outputText value="#{langsys['Service']}" rendered="#{unspsc.service_mark.equals('Y')}"/>
                                     <h:outputText value="#{langsys['Product']}" rendered="#{unspsc.service_mark.equals('N')}"/>
@@ -403,14 +407,59 @@
                                 <p:column headerText="#{langsys['Segment']}" style="text-align: left;font-size: 14px;">
                                     <h:outputText value="#{unspsc.segment_name}"/>
                                 </p:column>
-                                <p:column headerText="Tax #{langsys['Rates']}" style="text-align: left;font-size: 14px;">
-                                    <h:outputText value="VAT (Standard:#{unspsc.vat_rate},Zero:#{unspsc.zero_rate},Exempt:#{unspsc.exempt_rate}) "/>
-                                    <h:outputText value="ExciseDuty (#{unspsc.excise_duty_product_type})"/>
+                                <p:column headerText="VAT #{langsys['Rate']}" style="text-align: left;font-size: 14px;">
+                                    <h:outputText value="Standard(#{unspsc.vat_rate}) " rendered="#{unspsc.vat_rate.length()>0}"/>
+                                    <h:outputText value="Zero(0) " rendered="#{unspsc.vat_rate.equals('Y')}"/>
+                                    <h:outputText value="Exempt(-) " rendered="#{unspsc.exempt_rate.equals('Y')}"/>
                                 </p:column>
                             </p:dataTable>
                         </h:panelGrid>
                     </p:tab>
-                    <p:tab title="Manage">
+                    <p:tab title="#{langsys['Excise']} #{langsys['Code']}">
+                        <h:panelGrid columns="1" style="text-align: center;">
+                            <h:panelGrid columns="4">
+                                <h:outputLabel value="#{langsys['Enter']} #{langsys['text']}:"/>
+                                <h:inputText id="itxtExciseSearch" value="#{itemBean.searchExcise}"/>
+                                <p:commandButton id="cmdbtnSearchExcise" value="Search" actionListener="#{itemBean.refreshExciseList(itemBean.searchExcise)}" update="formMain:tabvUNSPC:tblExcise"/>
+                                <h:outputLabel value=""/>
+                            </h:panelGrid>
+                            <p:dataTable id="tblExcise" rowIndexVar="rowIndex" tableStyle="width:auto;" var="edc" value="#{itemBean.exciseList}" 
+                                         paginator="true" rows="5" 
+                                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}" 
+                                         rowsPerPageTemplate="5,10">
+                                <p:column headerText="#" style="text-align: left;font-size: 14px;">
+                                    <h:outputText value="#{rowIndex+1} "/>
+                                </p:column>
+                                <p:column headerText="#{langsys['Excise']} #{langsys['Duty']} #{langsys['Code']}" style="text-align: left;font-size: 14px;">
+                                    <p:commandLink value="#{edc.exciseDutyCode}"  oncomplete="PF('sbarUNSPSC').hide()">
+                                        <f:ajax listener="#{itemBean.updateItemFromExcise(itemBean.itemObj,edc)}" render="formMain:itxtExcise"/>
+                                    </p:commandLink>
+                                </p:column>
+                                <p:column headerText="#{langsys['Good']}/#{langsys['Service']}" style="text-align: left;font-size: 14px;">
+                                    <h:outputText value="#{edc.goodService}"/>
+                                </p:column>
+                                <p:column headerText="#{langsys['Category']}" style="text-align: left;font-size: 14px;">
+                                    <h:outputText value="#{edc.parentName}"/>
+                                </p:column>
+                                <p:column headerText="#{langsys['Rate']} #{langsys['Name']}" style="text-align: left;font-size: 14px;">
+                                    <h:outputText value="#{edc.rateText}"/>
+                                </p:column>
+                                <p:column headerText="#{langsys['Unit']}" style="text-align: left;font-size: 14px;">
+                                    <h:inputText value="#{edc.unit}" style="width: 50px;"/>
+                                </p:column>
+                                <p:column headerText="#{langsys['Currency']}" style="text-align: left;font-size: 14px;">
+                                    <h:inputText value="#{edc.currency}" style="width: 50px;"/>
+                                </p:column>
+                                <p:column headerText="#{langsys['Rate']} %" style="text-align: left;font-size: 14px;">
+                                    <h:inputText value="#{edc.rate_perc}" style="width: 50px;"/>
+                                </p:column>
+                                <p:column headerText="#{langsys['Rate']} #{langsys['Value']}" style="text-align: left;font-size: 14px;">
+                                    <h:inputText value="#{edc.rate_value}" style="width: 50px;"/>
+                                </p:column>
+                            </p:dataTable>
+                        </h:panelGrid>
+                    </p:tab>
+                    <p:tab title="#{langsys['Manage']}">
                         <h:panelGrid id="pnlgManage" columns="2">
                             <h:panelGrid columns="1">
                                 <h:inputText value="Local Configuration for ID:#{itemBean.item_tax_mapObj.item_id_tax}" disabled="true" style="width: 280px;background-color: black;color: white;"/>
@@ -513,7 +562,7 @@
                                  rowStyleClass="#{iu.is_active eq 1 ? 'white' : 'red'}">
                         <p:column headerText="#{langsys['Base']} #{langsys['Unit']} #{langsys['Qty']}" style="text-align: left;">
                             <h:outputText value="#{iu.base_qty}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{langsys['Base']} #{langsys['Unit']}">
@@ -521,7 +570,7 @@
                         </p:column>
                         <p:column headerText="#{langsys['Other']} #{langsys['Unit']} #{langsys['Qty']}" style="text-align: left;">
                             <h:outputText value="#{iu.other_qty}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{langsys['Other']} #{langsys['Unit']}">
@@ -529,12 +578,12 @@
                         </p:column>
                         <p:column headerText="#{langsys['Retail']} #{langsys['Price']}" style="text-align: left;">
                             <h:outputText value="#{iu.other_unit_retailsale_price}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{langsys['Wholesale']} #{langsys['Price']}" style="text-align: left;">
                             <h:outputText value="#{iu.other_unit_wholesale_price}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{langsys['Default']} #{langsys['for']} #{langsys['Purchase']}">

@@ -136,7 +136,7 @@
                         </p:column>
                         <p:column headerText="#{langsys['Total']} #{langsys['Number']}" style="text-align: right;">
                             <h:outputText value="#{sm.outputQty}">
-                                <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
                     </p:dataTable>
@@ -177,7 +177,7 @@
                 </p:column>
                 <p:column headerText="#{langsys['Order']} #{langsys['Qty']}">
                     <h:outputText value="#{itm.orderedQty}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Order']} #{langsys['Unit']}">
@@ -189,7 +189,7 @@
                 </p:column>
                 <p:column headerText="#{langsys['Produced']} #{langsys['Qty']}">
                     <h:outputText value="#{itm.outputQty}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{langsys['Produced']} #{langsys['Unit']}">
@@ -198,7 +198,7 @@
                 </p:column>
                 <p:column headerText="#{langsys['Unit']} #{langsys['Cost']}">
                     <h:outputText value="#{itm.outputUnitCost}">
-                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(70).transactionDateLabel)}" rendered="#{transProductionBean.dateType.equals('Production Date')}">

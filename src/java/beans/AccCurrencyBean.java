@@ -287,6 +287,25 @@ public class AccCurrencyBean implements Serializable {
         return ac;
     }
 
+    public AccCurrency getCurrencyByTaxCode(String aCurrencyTaxCode) {
+        String sql;
+        sql = "SELECT * FROM acc_currency WHERE currency_code_tax='" + aCurrencyTaxCode + "'";
+        ResultSet rs = null;
+        AccCurrency ac = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                ac = new AccCurrency();
+                this.setAccCurrencyFromResultset(ac, rs);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return ac;
+    }
+
     public void deleteAccCurrency(AccCurrency aAccCurrency) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -605,6 +624,35 @@ public class AccCurrencyBean implements Serializable {
         }
     }
 
+    public double roundAmount(String aCurrencyCode, double aMount, String aRoundObject) {
+        double RoundedAmount = 0;
+        try {
+            AccCurrency currency = new AccCurrencyBean().getCurrency(aCurrencyCode);
+            String DecPlacesStr = "0";
+            if (aRoundObject.equals("ITEM")) {
+                DecPlacesStr = new Parameter_listBean().getParameter_listByContextName("ROUNDING_DECIMAL_PLACES", "ROUND_DECIMAL_PLACES_ITEM").getParameter_value();
+            } else if (aRoundObject.equals("TOTAL")) {
+                DecPlacesStr = new Parameter_listBean().getParameter_listByContextName("ROUNDING_DECIMAL_PLACES", "ROUND_DECIMAL_PLACES_TOTAL").getParameter_value();
+            } else if (aRoundObject.equals("TOTAL_OTHER")) {
+                DecPlacesStr = new Parameter_listBean().getParameter_listByContextName("ROUNDING_DECIMAL_PLACES", "ROUND_DECIMAL_PLACES_TOTAL_OTHER").getParameter_value();
+            }
+            int DecimalPlaces = 0;
+            if (null != DecPlacesStr) {
+                try {
+                    DecimalPlaces = Integer.parseInt(DecPlacesStr);
+                } catch (Exception e) {
+                }
+            }
+            if (DecimalPlaces == 0) {
+                DecimalPlaces = currency.getDecimal_places();
+            }
+            int RoundingMode = currency.getRounding_mode();
+            RoundedAmount = Precision.round(aMount, DecimalPlaces, RoundingMode);
+        } catch (Exception e) {
+        }
+        return RoundedAmount;
+    }
+
     public double roundAmount(String aCurrencyCode, double aMount) {
         double RoundedAmount = 0;
         try {
@@ -664,7 +712,7 @@ public class AccCurrencyBean implements Serializable {
         }
         return RoundedAmount;
     }
-    
+
     public double roundDoubleToXDps(double aDouble, int aDecimalPlaces) {
         double RoundedDouble = 0;
         try {

@@ -81,32 +81,32 @@
                                 <td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" align="left" valign="top"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;" value="#{transItemBean.showItemDescriptionCEC(ti)}" escape="false"/></td>
                                 <td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" align="right" valign="top">
                                     <h:outputText value="#{ti.qty_taken}" style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                     </h:outputText>
                                 </td>
                                 <td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" align="right" valign="top">
                                     <h:outputText value="#{ti.qty_total+ti.qty_damage_total}" style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                     </h:outputText>
                                 </td>
                                 <td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" align="right" valign="top" bgcolor="#F2F2F2">
                                     <h:outputText value="#{ti.itemQty}" style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                     </h:outputText>
                                 </td>
                                 <td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" align="right" valign="top" bgcolor="#F2F2F2">
                                     <h:outputText value="#{ti.qty_damage}" style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                     </h:outputText>
                                 </td>
                                 <td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" align="right" valign="top">
                                     <h:outputText value="#{ti.qty_taken-(ti.qty_total+ti.qty_damage_total)}" style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                     </h:outputText>
                                 </td>
                                 <td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 2px solid #000000" align="right" valign="top">
                                     <h:outputText value="#{ti.duration_passed}" style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                     </h:outputText>
                                 </td>
                             </tr>

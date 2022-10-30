@@ -82,6 +82,28 @@
                         -->
                     </h:panelGrid>
                 </p:tab>
+                <p:tab title="Get Excise Duty List">
+                    <h:panelGrid columns="3">
+                        <p:commandButton styleClass="clsButtonBig" id="cmdbGetExciseDutyList" value="Download Excise Duty" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                            <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                                <p:graphicImage name="/images/ajax-loader.gif"/>
+                            </p:dialog>
+                            <p:ajax listener="#{utilityBean.callDownloadExciseDuty_list()}" process="@form" update="@form" />
+                        </p:commandButton>
+                        <p:commandButton styleClass="clsButtonBig" id="cmdbGetRateUnit" value="Download Unit Tax" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                            <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                                <p:graphicImage name="/images/ajax-loader.gif"/>
+                            </p:dialog>
+                            <p:ajax listener="#{utilityBean.callDownloadRateUnit()}" process="@form" update="@form" />
+                        </p:commandButton>
+                        <p:commandButton styleClass="clsButtonBig" id="cmdbGetCurrencyType" value="Download Currency" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                            <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                                <p:graphicImage name="/images/ajax-loader.gif"/>
+                            </p:dialog>
+                            <p:ajax listener="#{utilityBean.callDownloadExciseDuty_list()}" process="@form" update="@form" />
+                        </p:commandButton>
+                    </h:panelGrid>
+                </p:tab>
                 <p:tab title="Clean Invoice (TotalPaid Not Updated)">
                     <h:panelGrid columns="1">
                         <p:commandButton styleClass="clsButtonBig" id="cmdbCleanInvoice" value="Clean.Invoice" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">

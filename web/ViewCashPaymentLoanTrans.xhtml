@@ -46,15 +46,15 @@
                     <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="6">
                         <h:outputLabel value="#{langsys['Principal']} #{langsys['Amount']}"/>
                         <h:inputText value="#{payBean.payObj.principalAmount}" disabled="true">
-                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
                         <h:outputLabel value="#{langsys['Interest']} #{langsys['Amount']}"/>
                         <h:inputText value="#{payBean.payObj.interestAmount}" disabled="true">
-                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
                         <h:outputLabel value="#{langsys['Amount']} #{langsys['Paid']}"/>
                         <h:inputText value="#{payBean.payObj.paidAmount}" disabled="true">
-                            <f:convertNumber pattern="###,###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                            <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                         </h:inputText>
 
                         <h:outputLabel value="#{langsys['Currency']}:"/>
