@@ -342,7 +342,7 @@
                     <h:panelGrid columns="1">
 
                         <p:dataTable rowIndexVar="rowIndex" id="dtblTransactionItem" value="#{transBean.selectedTransItemsList}" var="sItem" 
-                                     styleClass="cls-table" tableStyle="width:700px" rowStyleClass="selecteItemRowStyle">  
+                                     styleClass="cls-table" tableStyle="width:700px; background-color:green" rowStyleClass="selecteItemRowStyle">  
                             <f:facet name="header">
                                 <h:outputLabel value="#{'Split'} #{'Order'}"/>
                             </f:facet>
@@ -445,8 +445,6 @@
                                   process="@form" update="TransactionFormSales:dtblTransList TransactionFormSales:pnlgMessage pnlHeader frmMenu growl1"/>
                     </p:commandButton>
                 </h:panelGrid>
-
-
             </p:sidebar>
         </h:form>
     </h:body>

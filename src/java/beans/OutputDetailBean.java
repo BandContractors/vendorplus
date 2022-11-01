@@ -31,8 +31,8 @@ public class OutputDetailBean implements Serializable {
 
     public OutputDetailBean() {
     }
-    
-     public void refreshPackageOutput(String aLevel, String aSource) {
+
+    public void refreshPackageOutput(String aLevel, String aSource) {
         try {
             TransBean tb = new TransBean();
             OutputDetail aOutputDetail = new OutputDetail();
@@ -40,12 +40,12 @@ public class OutputDetailBean implements Serializable {
                 case "PARENT":
                     try {
                         aOutputDetail.setTrans(new TransBean().getTrans(new GeneralUserSetting().getCurrentTransactionId()));
+                        aOutputDetail.setTransactionPackage(new TransactionPackageBean().getTransactionPackageOut(aOutputDetail.getTrans().getTransactionId()));
+                        aOutputDetail.getTransactionPackage().setTransactionType(new TransactionTypeBean().getTransactionType(aOutputDetail.getTrans().getTransactionTypeId()));
+                        aOutputDetail.getTransactionPackage().setaTransactionPackageItemsList(new TransactionPackageItemBean().getTransactionPackageItemOutput(aOutputDetail.getTrans().getTransactionId()));
+                        aOutputDetail.getTransactionPackage().setAddUserDetail(new UserDetailBean().getUserDetail(aOutputDetail.getTrans().getAddUserDetailId()));
+                        aOutputDetail.getTransactionPackage().getAddUserDetailId();
                     } catch (Exception e) {
-                    }
-                    try {
-                        aOutputDetail.setPay(new PayBean().getPay(new GeneralUserSetting().getCurrentPayId()));
-                    } catch (Exception e) {
-                        aOutputDetail.setPay(new Pay());
                     }
                     break;
                 case "CHILD":
@@ -74,7 +74,7 @@ public class OutputDetailBean implements Serializable {
             //get tax invoice number
             String DeviceNo = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value();
             if (null != aOutputDetail.getTrans()) {
-                if (DeviceNo.length() > 0 && (aOutputDetail.getTrans().getTransactionTypeId() == 2 || aOutputDetail.getTrans().getTransactionTypeId() == 82 || aOutputDetail.getTrans().getTransactionTypeId() == 83)) {
+                if (DeviceNo.length() > 0 && (aOutputDetail.getTrans().getTransactionTypeId() == 88)) {
                     Transaction_tax_map ttm = new Transaction_tax_mapBean().getTransaction_tax_map(aOutputDetail.getTrans().getTransactionId(), aOutputDetail.getTrans().getTransactionTypeId());
                     if (null != ttm) {
                         aOutputDetail.getTrans().setReference_number_tax(ttm.getReference_number_tax());
@@ -85,33 +85,27 @@ public class OutputDetailBean implements Serializable {
                     }
                 }
             }
-            
+
             try {
                 //aOutputDetail.setTrans_items(new TransItemBean().getTransItemsByTransactionIdCEC(aOutputDetail.getTrans().getTransactionId()));
-                aOutputDetail.setTransactionPackageItems(new TransactionPackageItemBean().getTransactionPackageItemOutput(aOutputDetail.getTrans().getTransactionId()));
+               // aOutputDetail.setTransactionPackageItems(new TransactionPackageItemBean().getTransactionPackageItemOutput(aOutputDetail.getTrans().getTransactionId()));
+
             } catch (Exception e) {
             }
-             try {
+            try {
                 if (aOutputDetail.getTransactionPackage().getTransactionTypeId() == 88) {
                     new UtilityBean().calcUpdateTransDeemedAmount(aOutputDetail.getTrans(), aOutputDetail.getTrans_items());
                 }
             } catch (Exception e) {
             }
-            try {
-                aOutputDetail.setStore2(new StoreBean().getStore(aOutputDetail.getTrans().getStore2Id()));
-            } catch (Exception e) {
+            aOutputDetail.setTotal_items(aOutputDetail.getTransactionPackage().getaTransactionPackageItemsList().size());
+            //aOutputDetail.setTotal_items_list(new ArrayList<>());
+            List<Integer> itmlist = new ArrayList<>();
+            for (int x = 1; x <= (10 - aOutputDetail.getTotal_items()); x++) {//changed from 15 to 10 to avoid 2 pages
+                itmlist.add(x);
             }
-            try {
-                aOutputDetail.setTotal_items(aOutputDetail.getTransactionPackageItems().size());
-                //aOutputDetail.setTotal_items_list(new ArrayList<>());
-                List<Integer> itmlist = new ArrayList<>();
-                for (int x = 1; x <= (10 - aOutputDetail.getTotal_items()); x++) {//changed from 15 to 10 to avoid 2 pages
-                    itmlist.add(x);
-                }
-                aOutputDetail.setTotal_items_list(itmlist);
-            } catch (Exception e) {
-                //e.printStackTrace();
-            }
+            aOutputDetail.setTotal_items_list(itmlist);
+
             //refresh amount in words
             try {
                 if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "OUTPUT_SHOW_AMOUNT_IN_WORDS").getParameter_value().equals("1")) {
@@ -146,7 +140,6 @@ public class OutputDetailBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
 
     public void refreshOutput(String aLevel, String aSource) {
         try {

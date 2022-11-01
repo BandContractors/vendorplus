@@ -1,15 +1,10 @@
 package beans;
 
-import api_tax.efris_bean.InvoiceBean;
-import static beans.ItemBean.LOGGER;
-import static beans.TransBean.LOGGER;
-import static beans.TransItemBean.LOGGER;
-import static beans.TransactionPackageItemBean.LOGGER;
 import connections.DBConnection;
-import entities.AccCoa;
 import entities.CompanySetting;
+import entities.GroupRight;
 import entities.Item;
-import entities.Item_code_other;
+import entities.Item_unit;
 
 import entities.Store;
 import entities.Trans;
@@ -18,10 +13,10 @@ import entities.TransactionPackage;
 import entities.TransactionPackageItem;
 import entities.TransactionReason;
 import entities.TransactionType;
+import entities.Transaction_approval;
 import entities.Transaction_item_unit;
 import entities.Transactor;
 import entities.UserDetail;
-import entities.UserItemEarn;
 import java.io.Serializable;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -30,7 +25,6 @@ import java.sql.ResultSet;
 import static java.sql.Types.VARCHAR;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -71,14 +65,49 @@ public class TransactionPackageBean implements Serializable {
     public void setTransactionPackageFromResultset(TransactionPackage transPackage, ResultSet aResultSet) {
         try {
             try {
+                transPackage.setTransactionNumber(aResultSet.getString("transaction_number"));
+            } catch (Exception npe) {
+                transPackage.setTransactionNumber("");
+            }
+            try {
                 transPackage.setTransactionPackageId(aResultSet.getLong("transaction_package_id"));
             } catch (Exception npe) {
                 transPackage.setTransactionPackageId(0);
             }
             try {
-                transPackage.setTransactionNumber(aResultSet.getString("transaction_number"));
+                transPackage.setTransactionId(aResultSet.getLong("transaction_id"));
             } catch (Exception npe) {
-                transPackage.setTransactionNumber("");
+                transPackage.setTransactionId(0);
+            }
+            try {
+                transPackage.setTransactionReasonId(aResultSet.getInt("transaction_reason_id"));
+            } catch (Exception npe) {
+                transPackage.setTransactionReasonId(0);
+            }
+            try {
+                transPackage.setTransactionTypeId(aResultSet.getInt("transaction_type_id"));
+            } catch (Exception npe) {
+                transPackage.setTransactionTypeId(0);
+            }
+            try {
+                transPackage.setTransactionRef(aResultSet.getString("transaction_ref"));
+            } catch (Exception npe) {
+                transPackage.setTransactionRef("");
+            }
+            try {
+                transPackage.setTotalTax(aResultSet.getDouble("total_tax"));
+            } catch (Exception npe) {
+                transPackage.setTotalTax(0);
+            }
+            try {
+                transPackage.setTransactionDate(aResultSet.getDate("transaction_date"));
+            } catch (Exception npe) {
+                transPackage.setTransactionDate(null);
+            }
+            try {
+                transPackage.setAddDate(aResultSet.getDate("add_date"));
+            } catch (Exception npe) {
+                transPackage.setAddDate(null);
             }
             try {
                 transPackage.setGrandTotal(aResultSet.getDouble("grand_total"));
@@ -95,7 +124,7 @@ public class TransactionPackageBean implements Serializable {
         }
     }
 
-    public void saveTransPackageCECNew(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, Trans trans, TransactionPackage transactionPage, List<TransactionPackageItem> aTransactionPackageItemList) {
+    public void saveTransPackageCECNew(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, Trans trans, TransactionPackage transactionPage, List<TransactionPackageItem> aTransactionPackageItemList, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
         try {
@@ -116,7 +145,7 @@ public class TransactionPackageBean implements Serializable {
         TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
         TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
         //Store store = new StoreBean().getStore(aStoreId);
-        //String ValidationMessage = this.validateTransCEC(aStoreId, aTransTypeId, aTransReasonId, aSaleType, trans, aActiveTransItems, aSelectedTransactor, aSelectedBillTransactor);
+        ValidationMessage = this.validateTransCEC(aStoreId, aTransTypeId, aTransReasonId, "", trans, aTransactionPackageItemList, aSelectedTransactor, aSelectedBillTransactor);
         long payid = 0;
         //-------
         String sql = null;
@@ -173,7 +202,7 @@ public class TransactionPackageBean implements Serializable {
                     FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
                 } else {
 
-                    //save transaction package
+                    //save transaction package67
                     Long transactionPackageId = this.insertTransactionPackage(aStoreId, aTransTypeId, aTransReasonId, transactionPage, trans, aTransactionPackageItemList);
 
                     //set store2 for transfer in session!
@@ -232,13 +261,12 @@ public class TransactionPackageBean implements Serializable {
                                 case "PARENT":
                                     httpSession.setAttribute("CURRENT_TRANSACTION_ID", 0);
                                     httpSession.setAttribute("CURRENT_PAY_ID", 0);
-                                    httpSession.setAttribute("CURRENT_TRANSACTION_PACKAGE_ID", 0);
+                                    // httpSession.setAttribute("CURRENT_TRANSACTION_PACKAGE_ID", 0);
                                     this.setActionMessage("Transaction Not Saved");
                                     break;
                                 case "CHILD":
                                     httpSession.setAttribute("CURRENT_TRANSACTION_ID_CHILD", 0);
                                     httpSession.setAttribute("CURRENT_PAY_ID_CHILD", 0);
-                                    httpSession.setAttribute("CURRENT_TRANSACTION_PACKAGE_ID", 0);
                                     this.setActionMessageChild("Transaction Not Saved");
                                     break;
                             }
@@ -293,12 +321,84 @@ public class TransactionPackageBean implements Serializable {
             }
         }
     }
+
+    public String validateTransCEC(int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransactionPackageItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor) {
+        String msg = "";
+        Store store2 = new StoreBean().getStore(trans.getStore2Id());
+        int Store2Id = 0;
+        try {
+            Store2Id = store2.getStoreId();
+        } catch (Exception e) {
+            Store2Id = 0;
+        }
+        try {
+            TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
+            TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
+            Store store = new StoreBean().getStore(aStoreId);
+
+            String ItemMessage = "";
+
+            int IsNewTransNoUsed = 0;
+            if (transtype.getTransactionTypeId() == 2 && trans.getTransactionId() == 0 && trans.getTransactionNumber().length() > 0) {
+                IsNewTransNoUsed = new Trans_number_controlBean().getIsTrans_number_used(transtype.getTransactionTypeId(), trans.getTransactionNumber());
+            }
+            String MsgCkeckApproval = "";
+            if (trans.getTransaction_approval_id() > 0) {
+                Transaction_approval apprtrans = new Transaction_approvalBean().getTransaction_approval(trans.getTransaction_approval_id());
+                if (null == apprtrans) {
+                    MsgCkeckApproval = "Invalid Approval Transaction Reference";
+                } else {
+                    if (apprtrans.getGrand_total() != trans.getGrandTotal() || apprtrans.getAmount_tendered() != trans.getAmountTendered() || apprtrans.getTransactor_id() != trans.getTransactorId()) {
+                        MsgCkeckApproval = "Approved and Transaction to Save  are Different";
+                    }
+                    if (apprtrans.getApproval_status() != 1) {
+                        MsgCkeckApproval = "Transaction is Not Approved for Processing";
+                    }
+                }
+            }
+            UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
+            List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
+            GroupRightBean grb = new GroupRightBean();
+
+            if (null == transtype) {
+                msg = "Invalid Transaction";
+            } else if (trans.getTransactionId() == 0 && grb.IsUserGroupsFunctionAccessAllowed(aCurrentUserDetail, aCurrentGroupRights, Integer.toString(transreason.getTransactionReasonId()), "Add") == 0) {
+                msg = "Access Denied";
+            } else if (IsNewTransNoUsed == 1) {
+                msg = "Specify New Transaction Number";
+            } else if (trans.getTransactionDate() == null) {
+                msg = "Select " + transtype.getTransactionDateLabel();
+                if ("UNPACK".equals(transtype.getTransactionTypeName())) {
+                    aActiveTransItems.clear();
+                }
+            } else if ((new GeneralUserSetting().getDaysFromDateToLicenseExpiryDate(trans.getTransactionDate()) <= 0 || new GeneralUserSetting().getDaysFromDateToLicenseExpiryDate(new CompanySetting().getCURRENT_SERVER_DATE()) <= 0) && CompanySetting.getLicenseType() != 9) {
+                msg = "Server Date is Wrong or Lincese is Expired";
+            } else if (trans.getTransactorId() == 0 && transtype.getIsTransactorMandatory().equals("Yes")) {
+                msg = "Select Valid Customer";
+            } else if (aActiveTransItems.size() < 1 & !"UNPACK".equals(transtype.getTransactionTypeName()) & trans.getTransactionId() == 0) {
+                msg = "Item not Found for " + transtype.getTransactionOutputLabel();
+            } else if (aSelectedTransactor != null && aSelectedTransactor.getIsSuspended().equals("Yes")) {
+                msg = "Suspended ##" + aSelectedTransactor.getTransactorNames() + " for " + aSelectedTransactor.getSuspendedReason();
+            } else if (aSelectedBillTransactor != null && aSelectedBillTransactor.getIsSuspended().equals("Yes")) {
+                msg = "Suspended ##" + aSelectedBillTransactor.getTransactorNames() + " for " + aSelectedBillTransactor.getSuspendedReason();
+            }
+
+            /*else if (trans.getTransactionId() > 0 && new TransItemBean().countItemsWithQtyChanged(new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans), transtype.getTransactionTypeName()) == 0) {
+             msg = "Cannot Save where Item Qty has Not Changed";
+             } */
+        } catch (Exception e) {
+            msg = "An Error has Occured During the Validation Process";
+            //System.err.println("--:validateTransCEC:--" + e.getMessage());
+            LOGGER.log(Level.ERROR, e);
+        }
+        return msg;
+    }
+
     //create a sale package
     //save/update sale packege
     //get sale packege by id
     //get sale packege by status
     //get sale packege by date
-
     public TransactionPackage createTransactionPackage(int aStoreId, int aTransTypeId, Trans aTrans, int aTransReasonId, TransactionPackage tPackage, List<TransactionPackageItem> aTransactionPackageItemList) {
         tPackage.setAddUserDetailId(aStoreId);
         tPackage.setCurrencyCode(aTrans.getCurrencyCode());
@@ -707,7 +807,6 @@ public class TransactionPackageBean implements Serializable {
                 } else {
                     cs.setTimestamp("in_transaction_date", new java.sql.Timestamp(tPackage.getTransactionDate().getTime()));
                 }
-
                 //save
                 cs.executeUpdate();
                 InsertedTransId = cs.getLong("out_transaction_package_id");
@@ -720,7 +819,7 @@ public class TransactionPackageBean implements Serializable {
         return InsertedTransId;
     }
 
-    public void initClearAllCEC(String aLevel, Trans t, List<TransactionPackageItem> aActiveTransItems, TransactionPackageItem ti, Item aSelectedItem, Transactor aSelectedTransactor, int ClearNo, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor) {//Clear No: 0-do not clear, 1 - clear trans item only, 2 - clear all  
+    public void initClearAllCEC(String aLevel, Trans t, List<TransactionPackageItem> aActiveTransItems, TransactionPackage transPackage, TransactionPackageItem ti, Item aSelectedItem, Transactor aSelectedTransactor, int ClearNo, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor) {//Clear No: 0-do not clear, 1 - clear trans item only, 2 - clear all  
         if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) {
             // Skip ajax requests.
         } else {
@@ -752,6 +851,8 @@ public class TransactionPackageBean implements Serializable {
                 //clear transaction user / service offered by
                 new UserDetailBean().clearUserDetail(aTransUserDetail);
 
+                this.clearTransactionPackage(transPackage);
+
                 //clear current trans and pay ids in session
                 FacesContext context = FacesContext.getCurrentInstance();
                 HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
@@ -770,6 +871,66 @@ public class TransactionPackageBean implements Serializable {
             }
             new OutputDetailBean().refreshOutput(aLevel, "");
             //new OutputDetailBean().clearOutput(aLevel, "");
+        }
+    }
+
+    public void clearTransactionPackage(TransactionPackage transPackage) {
+        if (null != transPackage) {
+            transPackage.setTransactionId(0);
+
+            try {
+                transPackage.setTransactionDate(new CompanySetting().getCURRENT_SERVER_DATE());
+            } catch (NullPointerException npe) {
+                transPackage.setTransactionDate(new CompanySetting().getCURRENT_SERVER_DATE());
+            }
+            transPackage.setStoreId(0);
+            transPackage.setStore2Id(0);
+            transPackage.setTransactorId(0);
+            transPackage.setTransactionTypeId(0);//
+            transPackage.setTransactionReasonId(0);//
+            transPackage.setCashDiscount(0);
+            //transPackage.setTransactionComment("");
+            transPackage.setAddUserDetailId(0);
+            //trans.setAddDate(null);//
+            transPackage.setEditUserDetailId(0);
+            //trans.setEditDate(null);//
+            transPackage.setTransactionRef("");
+
+            transPackage.setSubTotal(0);
+
+            transPackage.setSubTotal(0);
+            transPackage.setTotalTradeDiscount(0);
+            transPackage.setTotalTax(0);
+            transPackage.setGrandTotal(0);
+
+            //clear current trans and pay ids in session
+            FacesContext context = FacesContext.getCurrentInstance();
+            HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+            HttpSession httpSession = request.getSession(true);
+            httpSession.setAttribute("APPROVE_USER_ID", 0);
+            httpSession.setAttribute("APPROVE_DISCOUNT_STATUS", "");
+            httpSession.setAttribute("APPROVE_POINTS_STATUS", "");
+            //for profit margin
+
+            transPackage.setTransactionNumber("");
+
+            //init currency
+            int TransTypeId = transPackage.getTransactionTypeId();
+            if (TransTypeId == 0) {
+                TransTypeId = new GeneralUserSetting().getCurrentTransactionTypeId();
+            }
+            // if (TransTypeId > 0) {
+            //      this.initCurrencyCode(TransTypeId, transPackage);
+            //  }
+            //init other trans type defaults
+            if (TransTypeId > 0) {
+                try {
+                    TransactionType TransType = new TransactionTypeBean().getTransactionType(TransTypeId);
+                    //trans.setTermsConditions(TransType.getDefault_term_condition());
+                } catch (Exception e) {
+                    //do nothing
+                }
+            }
         }
     }
 
@@ -810,6 +971,27 @@ public class TransactionPackageBean implements Serializable {
         return getTransactionPackageList();
     }
 
+    public TransactionPackage getTransactionPackageOut(long aTransactionId) {
+        String sql = "{call sp_search_transaction_package_transaction_by_id(?)}";
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aTransactionId);
+            rs = ps.executeQuery();
+            TransactionPackage t = new TransactionPackage();
+            if (rs.next()) {
+                this.setTransactionPackageFromResultset(t, rs);
+                return t;
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+            return null;
+        }
+    }
+
     public TransactionPackage findTransactionPackage(long packageId) {
         String sql = "{call sp_search_transaction_package_by_id(?)}";
         ResultSet rs = null;
@@ -828,6 +1010,111 @@ public class TransactionPackageBean implements Serializable {
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
             return null;
+        }
+    }
+
+    public void loadPackageForInvoiceTrans(Trans aTrans, List<TransItem> aActiveTransItems, TransItem aTransItem) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
+        String msg = "";
+        long TransferId = 0;
+        String TransferNumber = aTransItem.getItemCode();
+        try {
+            TransactionType transtype = new TransactionTypeBean().getTransactionType(new GeneralUserSetting().getCurrentTransactionTypeId());
+            TransactionReason transreason = new TransactionReasonBean().getTransactionReason(new GeneralUserSetting().getCurrentTransactionReasonId());
+            Store store = new StoreBean().getStore(new GeneralUserSetting().getCurrentStore().getStoreId());
+            if (TransferNumber.length() > 0) {
+                Trans packageTrans = new Trans();
+                List<TransItem> TransferItems = new ArrayList<>();
+                this.setTransFromPackage(packageTrans, TransferNumber, store.getStoreId());
+                TransferId = packageTrans.getTransactionId();
+                if (TransferId > 0) {
+                    new TransItemBean().setTransItemsByTransactionId(TransferItems, TransferId);
+                }
+                if (TransferId > 0 && TransferItems.size() > 0) {
+                    //some cleanups and reset
+                    //1. for trans
+                    //trans.setTransactionNumber("");
+                    //trans.setTransactionRef(TransferNumber);
+                    //2. for trans items
+                    TransItemBean tib = new TransItemBean();
+                    ItemBean ib = new ItemBean();
+                    Item item = null;
+                    TransItem transitem = null;
+                    for (int i = 0; i < TransferItems.size(); i++) {
+                        item = new ItemBean().getItem(TransferItems.get(i).getItemId());
+                        transitem = new TransItem();
+                        transitem.setItemId(item.getItemId());
+                        transitem.setItemQty(TransferItems.get(i).getItemQty());
+                        try {
+                            if (null == TransferItems.get(i).getBatchno()) {
+                                transitem.setBatchno("");
+                            } else {
+                                transitem.setBatchno(TransferItems.get(i).getBatchno());
+                            }
+                        } catch (NullPointerException npe) {
+                            transitem.setBatchno("");
+                        }
+                        try {
+                            if (null == TransferItems.get(i).getCodeSpecific()) {
+                                transitem.setCodeSpecific("");
+                            } else {
+                                transitem.setCodeSpecific(TransferItems.get(i).getCodeSpecific());
+                            }
+                        } catch (NullPointerException npe) {
+                            transitem.setCodeSpecific("");
+                        }
+                        try {
+                            if (null == TransferItems.get(i).getDescSpecific()) {
+                                transitem.setDescSpecific("");
+                            } else {
+                                transitem.setDescSpecific(TransferItems.get(i).getDescSpecific());
+                            }
+                        } catch (NullPointerException npe) {
+                            transitem.setDescSpecific("");
+                        }
+                        transitem.setAccountCode(tib.getTransItemInventCostAccount(transtype, transreason, item));
+                        transitem.setUnit_id(TransferItems.get(i).getUnit_id());
+                        transitem.setBase_unit_qty(TransferItems.get(i).getBase_unit_qty());
+                        Item_unit iu = new ItemBean().getItemUnitFrmDb(transitem.getItemId(), transitem.getUnit_id());
+                        if (null != iu) {
+                            item.setUnitRetailsalePrice(iu.getUnit_retailsale_price());
+                            item.setUnitWholesalePrice(iu.getUnit_wholesale_price());
+                            item.setUnitSymbol(iu.getUnit_symbol());
+                        }
+                        tib.updateModelTransItemAutoAddFrmTransfer(store, transtype, transreason, new GeneralUserSetting().getCurrentSaleType(), aTrans, new StatusBean(), aActiveTransItems, transitem, item);
+                    }
+                    tib.clearTransItem(aTransItem);
+                } else {
+                    msg = "Select Valid Transfer Number";
+                    FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+                    this.setActionMessage(ub.translateWordsInText(BaseName, msg));
+                }
+            } else {
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void setTransFromPackage(Trans aTrans, String aTransTransferNumber, int aStore2Id) {
+        String sql = "";
+        sql = "SELECT * FROM transaction WHERE transaction_type_id=88 AND transaction_number='" + aTransTransferNumber + "' and store_id=" + aStore2Id;
+        ResultSet rs = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            //ps.setLong(1, aTransactionHistId);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                new TransBean().setTransFromResultset(aTrans, rs);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
