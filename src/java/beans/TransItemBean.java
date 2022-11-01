@@ -15,12 +15,14 @@ import entities.UserDetail;
 import entities.ItemMap;
 import entities.DiscountPackageItem;
 import entities.Item_code_other;
+import entities.Item_excise_duty_map;
 import entities.Item_unit;
 import entities.Stock_out;
 import entities.Store;
 import entities.SubCategory;
 import entities.Trans;
 import entities.TransactionReason;
+import entities.Transaction_item_excise;
 import entities.Transaction_item_hist_unit;
 import entities.Transaction_item_unit;
 import java.io.Serializable;
@@ -5726,20 +5728,12 @@ public class TransItemBean implements Serializable {
                     }
                 }
             }
-
             //for dispose,consume; apply unit cost price of the stock/batch
             if (aSelectedItem.getIsTrack() == 1 && null != st && ("DISPOSE STOCK".equals(transtype.getTransactionTypeName()) || "STOCK CONSUMPTION".equals(transtype.getTransactionTypeName()))) {
-                //double UnitCost = 0;//new StockBean().getItemUnitCostPrice(store.getStoreId(), NewTransItem.getItemId(), NewTransItem.getBatchno(), NewTransItem.getCodeSpecific(), NewTransItem.getDescSpecific());
-                //int FrmUnitId = new ItemBean().getItem(aSelectedItem.getItemId()).getUnitId();
-                //int ToUnitId = NewTransItem.getUnit_id();
-                //double UnitConversionRate = new ItemBean().getUnitConversionRate(aSelectedItem.getItemId(), FrmUnitId, ToUnitId);
-                //UnitCost = st.getUnitCost() * UnitConversionRate;
-                //NewTransItem.setUnitCostPrice(xrate * UnitCost);
                 NewTransItem.setUnitPrice(NewTransItem.getUnitCostPrice());
                 NewTransItem.setUnitPriceExcVat(NewTransItem.getUnitCostPrice());
                 NewTransItem.setAmountExcVat(NewTransItem.getItemQty() * NewTransItem.getUnitPriceExcVat());
             }
-
             if (NewTransItem.getItemQty() <= 0) {
                 status = "Enter Item Quantity";
                 StockFail3 = 1;
@@ -5822,6 +5816,22 @@ public class TransItemBean implements Serializable {
                     ti.setUnitVat(0);
                     ti.setUnitPriceIncVat(NewTransItem.getUnitPrice());
                     ti.setUnitPriceExcVat(NewTransItem.getUnitPrice());
+                }
+
+                //Excise Duty
+                double ExciseTaxAmount = 0;
+                ti.setExciseDutyCode(NewTransItem.getExciseDutyCode());
+                if (transtype.getTransactionTypeName().equals("SALE INVOICE") && NewTransItem.getExciseDutyCode().length() > 0) {
+                    Transaction_item_excise tiExcise = null;
+                    if ("Yes".equals(CompanySetting.getIsVatInclusive())) {
+                        tiExcise = new TransItemExtBean().getExciseDutyTax(ti.getExciseDutyCode(), ti.getItemId(), ti.getUnit_id(), aTrans.getCurrencyCode(), NewTransItem.getItemQty(), ti.getUnitPriceExcVat(), 1);
+                    } else {
+                        tiExcise = new TransItemExtBean().getExciseDutyTax(ti.getExciseDutyCode(), ti.getItemId(), ti.getUnit_id(), aTrans.getCurrencyCode(), NewTransItem.getItemQty(), ti.getUnitPriceExcVat(), 0);
+                    }
+                    if (null != tiExcise) {
+                        ExciseTaxAmount = tiExcise.getCalc_excise_tax_amount();
+                    }
+                    ti.setExciseDutyTaxAmount(ExciseTaxAmount);
                 }
                 if (aSelectedItem.getIsTrack() == 1) {
                     try {
@@ -6074,6 +6084,7 @@ public class TransItemBean implements Serializable {
         aTransItem.setAmount(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getAmount(), "ITEM"));
         aTransItem.setAmountIncVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getAmountIncVat(), "ITEM"));
         aTransItem.setAmountExcVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getAmountExcVat(), "ITEM"));
+        aTransItem.setExciseDutyTaxAmount(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getExciseDutyTaxAmount(), "ITEM"));
     }
 
     public void addTransItemCallCEC(int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aTrans, StatusBean aStatusBean, List<TransItem> aActiveTransItems, TransItem NewTransItem, Item aSelectedItem) {
@@ -10334,6 +10345,8 @@ public class TransItemBean implements Serializable {
             tri.setUnit_id(0);
             tri.setBase_unit_qty(0);
             tri.setQty_total(0);
+            tri.setExciseDutyCode("");
+            tri.setExciseDutyTaxAmount(0);
         }
     }
 
@@ -10903,6 +10916,15 @@ public class TransItemBean implements Serializable {
                 } else {
                     aTransItemToUpdate.setAmount(aTransItemToUpdate.getItemQty() * aTransItemToUpdate.getUnitPrice());
                 }
+                //check if item has Excise Duty
+                Item_excise_duty_map edm = new ItemBean().getItem_excise_duty_mapByItem(aTransItemToUpdate.getItemId());
+                String ExciseDutyCode = "";
+                if (null != edm) {
+                    if (null != edm.getExcise_duty_code()) {
+                        ExciseDutyCode = edm.getExcise_duty_code();
+                    }
+                }
+                aTransItemToUpdate.setExciseDutyCode(ExciseDutyCode);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);

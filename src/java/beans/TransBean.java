@@ -2196,11 +2196,11 @@ public class TransBean implements Serializable {
                     }
                     if (DeleteInserted == 1) {
                         //delete inserted
-                        int deleted1 = new TransItemBean().deleteTransItemsCEC(trans.getTransactionId());
+                        int deleted1 = new TransItemExtBean().deleteTransItemsUnitByTransId(trans.getTransactionId());
                         int deleted2 = 0;
                         int deleted3 = 0;
                         if (deleted1 == 1) {
-                            deleted2 = new TransItemExtBean().deleteTransItemsUnitByTransId(trans.getTransactionId());
+                            deleted2 = new TransItemBean().deleteTransItemsCEC(trans.getTransactionId());
                         }
                         if (deleted2 == 1) {
                             deleted3 = this.deleteTransCEC(trans.getTransactionId());
@@ -8004,6 +8004,7 @@ public class TransBean implements Serializable {
             //others
             trans.setShift_id(0);
             trans.setMode_code(0);
+            trans.setTotalExciseDutyTaxAmount(0);
         }
     }
 

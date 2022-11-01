@@ -292,7 +292,7 @@ public class TransItemExtBean implements Serializable {
         return deleted;
     }
 
-    public Transaction_item_excise setExciseDutyTax(String aExciseDutyCode, long aItemId, int aToUnitId, String aToCurrencyCode, double aQty, double aUnitPrice) {
+    public Transaction_item_excise getExciseDutyTax(String aExciseDutyCode, long aItemId, int aToUnitId, String aToCurrencyCode, double aQty, double aUnitPrice, int aIncludesED) {
         Transaction_item_excise obj = new Transaction_item_excise();
         double ExciseTaxAmount = 0;
         try {
@@ -321,9 +321,21 @@ public class TransItemExtBean implements Serializable {
                             }
                         }
                     }
-                    double RatePerc = Double.parseDouble(ExciseDutyDtl.getRate_perc());
-                    double FromRateVal = Double.parseDouble(ExciseDutyDtl.getRate_value());
-                    double ToRateVal = Double.parseDouble(ExciseDutyDtl.getRate_value());
+                    double RatePerc = 0;
+                    double FromRateVal = 0;
+                    double ToRateVal = 0;
+                    try {
+                        RatePerc = Double.parseDouble(ExciseDutyDtl.getRate_perc());
+                    } catch (Exception e) {
+                    }
+                    try {
+                        FromRateVal = Double.parseDouble(ExciseDutyDtl.getRate_value());
+                    } catch (Exception e) {
+                    }
+                    try {
+                        ToRateVal = Double.parseDouble(ExciseDutyDtl.getRate_value());
+                    } catch (Exception e) {
+                    }
                     double TaxViaPerc = 0;
                     double TaxViaValue = 0;
                     double UnitConvertRatio = 1.0;
@@ -337,13 +349,25 @@ public class TransItemExtBean implements Serializable {
                         }
                     }
                     if (RatePerc > 0) {
-                        TaxViaPerc = 0.01 * RatePerc * UnitConvertRatio * aQty * aUnitPrice;
+                        if (aIncludesED == 1) {
+                            TaxViaPerc = UnitConvertRatio * aQty * (aUnitPrice - (aUnitPrice / (1 + (0.01 * RatePerc))));
+                        } else {
+                            TaxViaPerc = 0.01 * RatePerc * UnitConvertRatio * aQty * aUnitPrice;
+                        }
                     }
                     if (FromRateVal > 0) {
-                        if (aToCurrencyCode.length() > 0 && FromCurrencyCode.length() > 0) {
-                            ToRateVal = new AccXrateBean().convertCurrency(FromRateVal, FromCurrencyCode, aToCurrencyCode);
+                        if (aIncludesED == 1) {
+                            if (aToCurrencyCode.length() > 0 && FromCurrencyCode.length() > 0) {
+                                ToRateVal = new AccXrateBean().convertCurrency(FromRateVal, FromCurrencyCode, aToCurrencyCode);
+                            }
+                            //TaxViaValue = (aUnitPrice - ToRateVal) * UnitConvertRatio * aQty;
+                            TaxViaValue = ToRateVal * UnitConvertRatio * aQty;
+                        } else {
+                            if (aToCurrencyCode.length() > 0 && FromCurrencyCode.length() > 0) {
+                                ToRateVal = new AccXrateBean().convertCurrency(FromRateVal, FromCurrencyCode, aToCurrencyCode);
+                            }
+                            TaxViaValue = ToRateVal * UnitConvertRatio * aQty;
                         }
-                        TaxViaValue = ToRateVal * UnitConvertRatio * aQty;
                     }
                     if (TaxViaPerc >= TaxViaValue) {
                         ExciseTaxAmount = TaxViaPerc;
