@@ -6,11 +6,13 @@
 package beans;
 
 import static beans.ItemBean.LOGGER;
+import static beans.TransItemBean.LOGGER;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import connections.DBConnection;
 import entities.AccCoa;
+import entities.CompanySetting;
 import entities.DiscountPackageItem;
 import entities.Item;
 import entities.Store;
@@ -38,6 +40,7 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import sessions.GeneralUserSetting;
 import utilities.UtilityBean;
 
 /**
@@ -56,7 +59,114 @@ public class TransactionPackageItemBean implements Serializable {
     @ManagedProperty("#{menuItemBean}")
     private MenuItemBean menuItemBean;
 
-    public void saveTransactionPackageItem(int aStoreId, int aTransTypeId, int aTransReasonId, TransactionPackageItem transPackageItem) {
+    public void setTransactionPackageItemFromResultset(TransactionPackageItem transPackageItem, ResultSet aResultSet) {
+        try {
+            try {
+                transPackageItem.setTransactionPackageItemId(aResultSet.getLong("transaction_package_item_id"));
+            } catch (Exception npe) {
+                transPackageItem.setTransactionPackageItemId(0);
+            }
+            try {
+                transPackageItem.setTransactionPackageId(aResultSet.getLong("transaction_package_id"));
+            } catch (Exception npe) {
+                transPackageItem.setTransactionPackageId(0);
+            }
+            try {
+                transPackageItem.setAmount(aResultSet.getDouble("amount"));
+            } catch (Exception npe) {
+                transPackageItem.setAmount(0);
+            }
+            try {
+                transPackageItem.setItemQty(aResultSet.getDouble("item_qty"));
+            } catch (Exception npe) {
+                transPackageItem.setItemQty(0);
+            }
+            try {
+                transPackageItem.setUnitPrice(aResultSet.getInt("unit_price"));
+            } catch (Exception npe) {
+                transPackageItem.setUnitPrice(0);
+            }
+            try {
+                transPackageItem.setExciseTax(aResultSet.getDouble("excise_tax"));
+            } catch (Exception npe) {
+                transPackageItem.setExciseTax(0);
+            }
+            try {
+                transPackageItem.setVatPerc(aResultSet.getInt("vat_perc"));
+            } catch (Exception npe) {
+                transPackageItem.setVatPerc(0);
+            }
+
+            try {
+                transPackageItem.setItemDescription(aResultSet.getString("item_description"));
+            } catch (Exception e) {
+                transPackageItem.setItemDescription("");
+            }
+            try {
+                transPackageItem.setTransactionPackageId(aResultSet.getLong("transaction_package_id"));
+            } catch (Exception e) {
+                transPackageItem.setTransactionPackageId(0);
+            }
+            try {
+                transPackageItem.setTransactionPackageItemId(aResultSet.getLong("transaction_package_item_id"));
+            } catch (Exception e) {
+                transPackageItem.setTransactionPackageItemId(0);
+            }
+
+            try {
+                transPackageItem.setUnitVat(aResultSet.getDouble("unit_vat"));
+            } catch (Exception e) {
+                transPackageItem.setUnitVat(0);
+            }
+            try {
+                transPackageItem.setBatchNo(aResultSet.getString("batchno"));
+            } catch (Exception e) {
+                transPackageItem.setBatchNo("");
+            }
+            try {
+                transPackageItem.setUnitSymbol(aResultSet.getString("unit_symbol"));
+            } catch (Exception e) {
+                transPackageItem.setUnitSymbol("");
+            }
+            try {
+                transPackageItem.setItemId(aResultSet.getLong("item_id"));
+            } catch (Exception e) {
+                transPackageItem.setItemId(0);
+            }
+            try {
+                transPackageItem.setUnitTradeDiscount(aResultSet.getDouble("item_code"));
+            } catch (Exception e) {
+                transPackageItem.setUnitTradeDiscount(0);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public List<TransactionPackageItem> getTransactionPackageItemOutput(long aTransactionId) {
+        String sql;
+        sql = "{call sp_search_transaction_package_item_by_transaction_id(?)}";
+        ResultSet rs = null;
+        List<TransactionPackageItem> tis = new ArrayList<>();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aTransactionId);
+            rs = ps.executeQuery();
+            int i = 0;
+            while (rs.next()) {
+                i = i + 1;
+                TransactionPackageItem tpi = new TransactionPackageItem();
+                this.setTransactionPackageItemFromResultset(tpi, rs);
+                tis.add(tpi);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return tis;
+    }
+
+    public void saveTransactionPackageItem(int aStoreId, int aTransTypeId, int aTransReasonId, Trans trans, TransactionPackageItem transPackageItem) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
         try {
@@ -168,6 +278,27 @@ public class TransactionPackageItemBean implements Serializable {
         }
     }
 
+    public int saveTransPackageItemsCEC(int aStoreId, int aTransTypeId, int aTransReasonId, Trans aTrans, List<TransactionPackageItem> aTransPackageItemList, long transactionPackageId) {
+        int insertedItems = 0;
+        try {
+            List<TransactionPackageItem> ati = aTransPackageItemList;
+            int ListItemIndex = 0;
+            int ListItemNo = ati.size();
+            int inserted = 0;
+            while (ListItemIndex < ListItemNo) {
+                ati.get(ListItemIndex).setTransactionPackageId(transactionPackageId);
+
+                this.saveTransactionPackageItem(aStoreId, aTransTypeId, aTransReasonId, aTrans, ati.get(ListItemIndex));
+                //insertedItems = insertedItems + inserted;
+                ListItemIndex = ListItemIndex + 1;
+                insertedItems = ListItemIndex;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return insertedItems;
+    }
+
     public long insertTransaction_item_unit(TransactionPackageItemUnit aTransactionPackageItemUnit) {
         long newId = 0;
         String sql = "INSERT INTO transaction_package_item_unit"
@@ -207,16 +338,11 @@ public class TransactionPackageItemBean implements Serializable {
         return success;
     }
 
-    
-
-
     public void addTransPackageItemToList(int aTransTypeId, int aTransReasonId, TransactionPackage aTransPackage, List<TransactionPackageItem> aTransactionPackageItemList, TransItem NewTransItem, Item aSelectedItem) {
         UtilityBean ub = new UtilityBean();
         Gson gson = new Gson();
         String BaseName = "language_en";
-
         BaseName = getMenuItemBean().getMenuItemObj().getLANG_BASE_NAME_SYS();
-
         double BaseQty = new ItemBean().getBaseUnitQty(NewTransItem.getItemId(), NewTransItem.getUnit_id(), NewTransItem.getItemQty());
         if (BaseQty > 0) {
             NewTransItem.setBase_unit_qty(BaseQty);
@@ -225,7 +351,6 @@ public class TransactionPackageItemBean implements Serializable {
             NewTransItem.setBase_unit_qty(NewTransItem.getItemQty());
         }
         TransactionPackage ti = new TransactionPackage();
-
         TransactionPackageItem tPackageItem = gson.fromJson(gson.toJson(ti), TransactionPackageItem.class);
 
         //bms veraibales
@@ -309,17 +434,119 @@ public class TransactionPackageItemBean implements Serializable {
             NewTransPackageItem.setItemDescription(aSelectedItem.getDescription());
 
             JsonObject trans = (JsonObject) new JsonParser().parse(gson.toJson(NewTransPackageItem));
-            this.clearAll(aTrans, aTransactionPackageItemList, NewTransPackageItem, aSelectedItem, null, 1, null);
+            this.clearAll(aTrans, aTransactionPackageItemList, NewTransPackageItem, null, aSelectedItem, null, 1, null);
             TransactionPackageItem transIt = new TransactionPackageItem();
             transIt = gson.fromJson(trans, TransactionPackageItem.class);
             this.TransPackageItemList.add(transIt);
             //  this.addTransItemCEC(aStoreId, aTransTypeId, aTransReasonId, TransactionPackage, aTransPackageItemList, NewTransPackageItem, aSelectedItem);
             //}
-            transactionPackage.setSubTotal(new TransactionPackageBean().getSubTotal(aTransactionPackageItemList));
-            transactionPackage.setGrandTotal(new TransactionPackageBean().getGrandTotal(aTransactionPackageItemList));
+           // transactionPackage.setSubTotal(new TransactionPackageBean().getSubTotal(aTransactionPackageItemList));
+           // transactionPackage.setGrandTotal(new TransactionPackageBean().getGrandTotal(aTransactionPackageItemList));
+            this.setTransTotalsAndUpdateCEC(aTransTypeId,aTransReasonId, aTrans,transactionPackage, aTransactionPackageItemList);
             this.clearTransactionPackageItem(NewTransPackageItem);
             new ItemBean().clearSelectedItem();
 
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void updateBaseUnityQty(TransactionPackageItem aTransPackageItem) {
+        try {
+            double BaseQty = new ItemBean().getBaseUnitQty(aTransPackageItem.getItemId(), aTransPackageItem.getUnitId(), aTransPackageItem.getItemQty());
+            if (BaseQty >= 0) {
+                aTransPackageItem.setBaseUnitQty(BaseQty);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void editTransPackageItemCEC(int aTransTypeId, Trans aTrans, TransactionPackage transactionPackageItem, List<TransactionPackageItem> aActiveTransItems, TransactionPackageItem ti) {
+        try {
+            TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
+            this.updateBaseUnityQty(ti);
+            if (ti.getItemQty() < 0) {
+                ti.setItemQty(0);
+            }
+            if (aTransTypeId == 88) {//PACKAGING
+                ti.setAmount((ti.getUnitPrice() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+            }
+            //round off amounts basing on currency rules
+            this.roundTransItemsAmount(aTrans, ti);
+            //update totals
+            this.setTransTotalsAndUpdateCEC(aTransTypeId, 0, aTrans, transactionPackageItem, aActiveTransItems);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public double getTotalTradeDiscountCEC(Trans aTrans, List<TransactionPackageItem> aActiveTransItems) {
+        List<TransactionPackageItem> ati = aActiveTransItems;
+        int ListItemIndex = 0;
+        int ListItemNo = ati.size();
+        double TotTradeDisc = 0;
+        while (ListItemIndex < ListItemNo) {
+            TotTradeDisc = TotTradeDisc + (ati.get(ListItemIndex).getUnitTradeDiscount() * ati.get(ListItemIndex).getItemQty());
+            ListItemIndex = ListItemIndex + 1;
+        }
+        TotTradeDisc = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), TotTradeDisc, "TOTAL_OTHER");
+        return TotTradeDisc;
+    }
+
+    public double getTotalVat(List<TransactionPackageItem> aActiveTransItems) {
+        List<TransactionPackageItem> ati = aActiveTransItems;
+        int ListItemIndex = 0;
+        int ListItemNo = ati.size();
+        double TVat = 0;
+        while (ListItemIndex < ListItemNo) {
+            TVat = TVat + (ati.get(ListItemIndex).getUnitVat() * ati.get(ListItemIndex).getItemQty());
+            ListItemIndex = ListItemIndex + 1;
+        }
+        return TVat;
+    }
+
+    public void setTransTotalsAndUpdateCEC(int aTransTypeId, int aTransReasonId, Trans aTrans, TransactionPackage transactionPackage, List<TransactionPackageItem> aActiveTransItems) {
+        aTrans.setSubTotal((transactionPackage.getSubTotal() + aTrans.getTotalVat()) - (transactionPackage.getTotalTradeDiscount() + transactionPackage.getCashDiscount()));
+        aTrans.setTotalTradeDiscount(this.getTotalTradeDiscountCEC(aTrans, aActiveTransItems));
+        aTrans.setTotalVat(this.getTotalVat(aActiveTransItems));
+        aTrans.setGrandTotal(this.getGrandTotal(transactionPackage));
+
+        transactionPackage.setSubTotal((aTrans.getSubTotal() + transactionPackage.getTotalTax()) - (transactionPackage.getTotalTradeDiscount() + transactionPackage.getCashDiscount()));
+        transactionPackage.setTotalTradeDiscount(this.getTotalTradeDiscountCEC(aTrans, aActiveTransItems));
+        transactionPackage.setTotalTax(this.getTotalVat(aActiveTransItems));
+        transactionPackage.setGrandTotal(this.getGrandTotal(transactionPackage));
+
+        //Customer Display
+        String PortName = new Parameter_listBean().getParameter_listByContextName("CUSTOMER_DISPLAY", "COM_PORT_NAME").getParameter_value();
+        String ClientPcName = new GeneralUserSetting().getClientComputerName();
+        String SizeStr = new Parameter_listBean().getParameter_listByContextName("CUSTOMER_DISPLAY", "MAX_CHARACTERS_PER_LINE").getParameter_value();
+        int Size = 0;
+        if (SizeStr.length() > 0) {
+            Size = Integer.parseInt(SizeStr);
+        }
+        if (PortName.length() > 0 && ClientPcName.length() > 0 && Size > 0 && (aTransTypeId == 2 || aTransTypeId == 11)) {
+            UtilityBean ub = new UtilityBean();
+            ub.invokeLocalCustomerDisplay(ClientPcName, PortName, Size, ub.formatDoubleToString(aTrans.getGrandTotal()), "");
+        }
+    }
+
+    public double getGrandTotal(TransactionPackage aTransPackage) {
+        double GTotal = 0;
+        GTotal = (aTransPackage.getSubTotal() + aTransPackage.getTotalTax()) - (aTransPackage.getTotalTradeDiscount() + aTransPackage.getCashDiscount());
+        return GTotal;
+    }
+
+    public void roundTransItemsAmount(Trans aTrans, TransactionPackageItem aTransPackageItem) {
+        aTransPackageItem.setUnitVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransPackageItem.getUnitVat(), "ITEM"));
+        aTransPackageItem.setAmount(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransPackageItem.getAmount(), "ITEM"));
+    }
+
+    public void removeTransItemCEC(int aTransTypeId, Trans aTrans,TransactionPackage transactionPackage, List<TransactionPackageItem> aActiveTransItems, TransactionPackageItem ti) {
+        try {
+            aActiveTransItems.remove(ti);
+            //update totals
+            this.setTransTotalsAndUpdateCEC(aTransTypeId, 0, aTrans,transactionPackage, aActiveTransItems);
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -330,7 +557,8 @@ public class TransactionPackageItemBean implements Serializable {
             tri.setTransactionPackageId(0);
             tri.setItemId(0);
             tri.setBatchNo("");
-            tri.setItemQty(1);
+            tri.setItemQty(0);
+            tri.setUnitSymbol("");
             tri.setUnitPrice(0);
             tri.setAmount(0);
             tri.setUnitVat(0);
@@ -359,7 +587,7 @@ public class TransactionPackageItemBean implements Serializable {
         aStatusBean.setShowItemNotAddedStatus(showNotAdded);
     }
 
-    public void clearAll(Trans t, List<TransactionPackageItem> aTransactionPackageItemList, TransactionPackageItem ti, Item aSelectedItem, Transactor aSelectedTransactor, int ClearNo, AccCoa aSelectedAccCoa) {
+    public void clearAll(Trans t, List<TransactionPackageItem> aTransactionPackageItemList, TransactionPackageItem ti, TransactionPackage transactionPackage, Item aSelectedItem, Transactor aSelectedTransactor, int ClearNo, AccCoa aSelectedAccCoa) {
 //Clear No: 0-do not clear, 1 - clear trans item only, 2 - clear all  
         TransactionPackageItemBean tib = new TransactionPackageItemBean();
         ItemBean itmB = new ItemBean();
@@ -415,8 +643,110 @@ public class TransactionPackageItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
-  
+
+    public Double getTransPackageItemsTotalQty(List<TransactionPackageItem> aTransactionPackageItemList) {
+        Double nQty = 0.0;
+        try {
+            for (int i = 0; i < aTransactionPackageItemList.size(); i++) {
+                nQty = nQty + aTransactionPackageItemList.get(i).getItemQty();
+            }
+        } catch (Exception e) {
+            //
+        }
+        return nQty;
+    }
+
+    public List<TransactionPackageItem> getTransPackageItemsByTransactionPackageId(long aTransactionPackageId) {
+        String sql;
+        sql = "{call sp_search_transaction_package_item_by_transaction_package_id(?)}";
+        ResultSet rs = null;
+        this.setTransPackageItemList(new ArrayList<TransactionPackageItem>());
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aTransactionPackageId);
+            rs = ps.executeQuery();
+            TransactionPackageItem ti = null;
+            while (rs.next()) {
+                ti = new TransactionPackageItem();
+                this.setTransactionPackageItemFromResultset(ti, rs);
+                getTransPackageItemList().add(ti);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return getTransPackageItemList();
+    }
+
+    public void setTransPackageItemsByTransactionId(List<TransactionPackageItem> transactionPackageItem, long aTransactionId) {
+        String sql;
+        sql = "{call sp_search_transaction_item_by_transaction_id(?)}";
+        ResultSet rs = null;
+        transactionPackageItem.clear();
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aTransactionId);
+            rs = ps.executeQuery();
+            TransactionPackageItem tp = new TransactionPackageItem();
+            while (rs.next()) {
+                this.setTransactionPackageItemFromResultset(tp, rs);
+                transactionPackageItem.add(tp);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public int deleteTransPackageItemsUnitByTransPackageItemId(long aTransPackageItemId) {
+        int deleted = 0;
+        String sql = "DELETE FROM transaction_package_item_unit WHERE transaction_package_item_unit_id IN("
+                + "SELECT ti.transaction_package_item_id FROM transaction_package_item ti WHERE ti.transaction_package_id=?"
+                + ")";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aTransPackageItemId);
+            ps.executeUpdate();
+            deleted = 1;
+        } catch (Exception e) {
+            deleted = 0;
+            LOGGER.log(Level.ERROR, e);
+        }
+        return deleted;
+    }
+
+    public int deleteTransPackageItemsCEC(long aTransPackageId) {
+        int deleted = 0;
+        String sql = "DELETE FROM transaction_package_item WHERE transaction_package_item_id>0 && transaction_id=?";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aTransPackageId);
+            ps.executeUpdate();
+            deleted = 1;
+        } catch (Exception e) {
+            deleted = 0;
+            LOGGER.log(Level.ERROR, e);
+        }
+        return deleted;
+    }
+
+    public int deleteTransactionPackageByTransId(long transactionId) {
+        int deleted = 0;
+        String sql = "DELETE FROM transaction_package WHERE transaction_id=?";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, transactionId);
+            ps.executeUpdate();
+            deleted = 1;
+        } catch (Exception e) {
+            deleted = 0;
+            LOGGER.log(Level.ERROR, e);
+        }
+        return deleted;
+    }
 
     /**
      * @return the menuItemBean

@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import org.eclipse.persistence.jpa.jpql.parser.DateTime;
 
 /*
  * To change this template, choose Tools | Templates
@@ -21,7 +20,6 @@ import org.eclipse.persistence.jpa.jpql.parser.DateTime;
 public class TransactionPackage implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
     private long transactionPackageId;
     private long transactionId;
     private String transactionNumber;
@@ -47,6 +45,8 @@ public class TransactionPackage implements Serializable {
     private String statusCode;
     private Date statusDate;
     private List<TransactionPackageItem> aTransactionPackageItemsList = new ArrayList<>();
+    private TransactionType transactionType;
+    private UserDetail addUserDetail;
 
     /**
      * @return the transactionPackageId
@@ -396,6 +396,34 @@ public class TransactionPackage implements Serializable {
      */
     public void setaTransactionPackageItemsList(List<TransactionPackageItem> aTransactionPackageItemsList) {
         this.aTransactionPackageItemsList = aTransactionPackageItemsList;
+    }
+
+    /**
+     * @return the transactionType
+     */
+    public TransactionType getTransactionType() {
+        return transactionType;
+    }
+
+    /**
+     * @param transactionType the transactionType to set
+     */
+    public void setTransactionType(TransactionType transactionType) {
+        this.transactionType = transactionType;
+    }
+
+    /**
+     * @return the addUserDetail
+     */
+    public UserDetail getAddUserDetail() {
+        return addUserDetail;
+    }
+
+    /**
+     * @param addUserDetail the addUserDetail to set
+     */
+    public void setAddUserDetail(UserDetail addUserDetail) {
+        this.addUserDetail = addUserDetail;
     }
 
 }

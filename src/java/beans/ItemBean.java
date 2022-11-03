@@ -2041,6 +2041,7 @@ public class ItemBean implements Serializable {
                 aItem.setItemId(0);
                 aItem.setItemCode("");
                 aItem.setDescription("");
+                aItem.setUnitSymbol("");
                 aItem.setCategoryId(0);
                 aItem.setSubCategoryId(0);
                 aItem.setUnitId(0);
