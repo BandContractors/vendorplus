@@ -9,26 +9,11 @@
         <title>Sales Package</title>
         <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
-        <script  language="javascript">
-            function confirmDelete()
-            {
-                return confirm('Are you sure you want to delete this current record?');
-            }
-            function alertSave()
-            {
-                return alert('Record saved successfully!');
-            }
-            function doPrintHiddenClick() {
-                document.getElementById("TransactionFormSales:cmdbPrint").click();
-            }
-            function doPrintHiddenClickOrder() {
-                document.getElementById("TransactionFormSales:cmdbvPrintOrder").click();
-            }
-        </script> 
+        <script  language="javascript"></script> 
     </h:head>
     <f:metadata>
         <f:viewAction action="#{accCurrencyBean.refreshCurrencyListActive()}"/>
-        <f:viewAction action="#{transactionPackageBean.initClearAllCEC('PARENT',trans,transactionPackageItemBean.transPackageItemList,transactionPackageItem,itemBean.selectedItem,transactorBean.selectedTransactor,2,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor)}" />
+        <f:viewAction action="#{transactionPackageBean.initClearAllCEC('PARENT',trans,transactionPackageItemBean.transPackageItemList,transPackage, transactionPackageItem,itemBean.selectedItem,transactorBean.selectedTransactor,2,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor)}" />
         <f:viewAction action="#{transBean.initCurrencyCode(generalUserSetting.currentTransactionTypeId,trans)}"/>
         <f:viewAction action="#{transBean.initTransType(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId)}"/>
         <f:viewAction action="#{utilityBean.clearList(alert_generalBean.alertList)}"/>
@@ -146,7 +131,7 @@
                             execute="@form" render="gridTransItem pgrdSpecific dtblTransactionItem pgrdTotals pgrdMsgs"/>
                 </h:commandButton>
                 <h:commandButton styleClass="clsButtonMedium" value="#{langsys['Clear']} #{langsys['Item']} (ALT+R)" accesskey="r">
-                    <f:ajax listener="#{transactionPackageItemBean.clearAll(trans,transactionPackageItemBean,transactionPackageItem,itemBean.selectedItem,transactorBean.selectedTransactor,1,null)}" execute="@form" render="gridTransItem pgrdSpecific"/>
+                    <f:ajax listener="#{transactionPackageItemBean.clearAll(trans,transactionPackageItemBean.transPackageItemList,transactionPackageItem,transactionPackage, itemBean.selectedItem,transactorBean.selectedTransactor,1,null)}" execute="@form" render="gridTransItem pgrdSpecific"/>
                 </h:commandButton>
             </h:panelGrid>
 
@@ -178,7 +163,7 @@
                     <!-- row record -->
                     <h:inputText value="#{ati.itemQty}" style="width: 50px;">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                        <f:ajax event="change" listener="#{transItemBean.editTransItemCEC(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,'',trans, transItemBean.activeTransItems,ati)}" execute="dtblTransactionItem" render="dtblTransactionItem TransactionPackageForm:pgrdTotals TransactionPackageForm:pgrdMsgs"/>
+                        <f:ajax event="change" listener="#{transactionPackageItemBean.editTransPackageItemCEC(generalUserSetting.currentTransactionTypeId, trans,transactionPackage, transactionPackageItemBean.transPackageItemList,ati)}" execute="dtblTransactionItem" render="dtblTransactionItem TransactionPackageForm:pgrdTotals TransactionPackageForm:pgrdMsgs"/>
                     </h:inputText>
                 </p:column>
                 <p:column>
@@ -218,7 +203,7 @@
                     <f:facet name="header">#{langsys['Action']}</f:facet>
                     <!-- row record -->
                     <h:commandButton id="cmdbRemoveItem" value="-">
-                        <f:ajax listener="#{transItemBean.removeTransItemCEC(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans,transItemBean.activeTransItems,ati)}" execute="@form" render="dtblTransactionItem TransactionFormSales:pgrdTotals"/>
+                        <f:ajax listener="#{transactionPackageItemBean.removeTransItemCEC(generalUserSetting.currentTransactionTypeId, trans, transactionPackage, transactionPackageItemBean.transPackageItemList,ati)}" execute="@form" render="dtblTransactionItem TransactionFormSales:pgrdTotals"/>
                     </h:commandButton>
                 </p:column> 
             </p:dataTable>
@@ -250,11 +235,13 @@
 
             <h:panelGrid id="pgrdCommands" styleClass="clsGridMainCommands" columns="1">
                 <h:panelGrid styleClass="clsGridMainCommands1" columns="7">
+                    <h:selectBooleanCheckbox value="#{transactionPackageBean.autoPrintAfterSave}"/>
+                    <h:outputLabel value="#{langsys['Print']}#{langsys['After']}#{langsys['Save']}" style="color: white"/>
                     <p:commandButton styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['SAVE']} (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
-                        <p:ajax listener="#{transactionPackageBean.saveTransCECcallFromSINew(generalUserSetting.currentStore.storeId, generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans, transactionPackage, transactionPackageItemBean.transPackageItemList)}" process="@form" update="pnlHeader gridTransItem pgrdSpecific dtblTransactionItem pgrdTotals pgrdMsgs growl1 pnlgOutput"/>
+                        <p:ajax listener="#{transactionPackageBean.saveTransPackageCECNew('PARENT',generalUserSetting.currentStore.storeId, generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans, transactionPackage, transactionPackageItemBean.transPackageItemList,transactorBean.selectedSchemeTransactor,transBean.authorisedByUserDetail)}" process="@form" update="pnlHeader gridTransItem pgrdSpecific dtblTransactionItem pgrdTotals pgrdMsgs growl1 pnlgOutput"/>
                     </p:commandButton>
                     <p:commandButton id="cmdbClear" styleClass="clsButtonBig" value="#{langsys['CLEAR']} (ALT+C)" accesskey="c">
                         <p:ajax listener="#{transBean.clearAll2(trans,transItemBean.activeTransItems,transItem,itemBean.selectedItem,transactorBean.selectedTransactor,2,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor,null,null)}" process="@form" update="pnlHeader gridTransItem pgrdSpecific dtblTransactionItem pgrdTotals pgrdMsgs pnlgOutput"/>
@@ -289,4 +276,3 @@
         </h:form>
     </h:body>
 </html>
-

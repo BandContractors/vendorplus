@@ -1,5 +1,7 @@
 package beans;
 
+import api_tax.efris.EFRIS_excise_duty_list;
+import api_tax.efris_bean.EFRIS_excise_duty_listBean;
 import sessions.GeneralUserSetting;
 import connections.DBConnection;
 import entities.AccCoa;
@@ -1215,6 +1217,7 @@ public class TransItemBean implements Serializable {
             //save
             cs.executeUpdate();
             long InsertedId1 = cs.getLong("out_transaction_item_id");
+            //multi-unit
             try {
                 if (InsertedId1 > 0) {
                     Transaction_item_unit tiu = new Transaction_item_unit();
@@ -1247,6 +1250,15 @@ public class TransItemBean implements Serializable {
                 } catch (Exception e) {
                     LOGGER.log(Level.ERROR, e);
                 }
+            }
+            //Excise Duty
+            try {
+                if (InsertedId1 > 0 && transitem.getTransItemExciseObj().getExcise_duty_code().length() > 0 && transitem.getTransItemExciseObj().getCalc_excise_tax_amount() > 0) {
+                    transitem.getTransItemExciseObj().setTransaction_item_id(InsertedId1);
+                    new TransItemExtBean().insertTransaction_item_excise(transitem.getTransItemExciseObj());
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
             }
             inserted = 1;
         } catch (Exception e) {
@@ -5152,7 +5164,7 @@ public class TransItemBean implements Serializable {
 
     public List<TransItem> getTransItemsOutput(long aTransactionId) {
         String sql;
-        sql = "{call sp_search_transaction_item_by_transaction_id4(?)}";
+        sql = "{call sp_search_transaction_package_item_by_transaction_id(?)}";
         ResultSet rs = null;
         List<TransItem> tis = new ArrayList<>();
         try (
@@ -5238,7 +5250,7 @@ public class TransItemBean implements Serializable {
 
     public void setTransItemsByTransactionId(List<TransItem> aTransItems, long aTransactionId) {
         String sql;
-        sql = "{call sp_search_transaction_item_by_transaction_id(?)}";
+        sql = "{call sp_search_transaction_package_item_by_transaction_id(?)}";
         ResultSet rs = null;
         aTransItems.clear();
         try (
@@ -5818,21 +5830,12 @@ public class TransItemBean implements Serializable {
                     ti.setUnitPriceExcVat(NewTransItem.getUnitPrice());
                 }
 
-                //Excise Duty
-                double ExciseTaxAmount = 0;
-                ti.setExciseDutyCode(NewTransItem.getExciseDutyCode());
-                if (transtype.getTransactionTypeName().equals("SALE INVOICE") && NewTransItem.getExciseDutyCode().length() > 0) {
-                    Transaction_item_excise tiExcise = null;
-                    if ("Yes".equals(CompanySetting.getIsVatInclusive())) {
-                        tiExcise = new TransItemExtBean().getExciseDutyTax(ti.getExciseDutyCode(), ti.getItemId(), ti.getUnit_id(), aTrans.getCurrencyCode(), NewTransItem.getItemQty(), ti.getUnitPriceExcVat(), 1);
-                    } else {
-                        tiExcise = new TransItemExtBean().getExciseDutyTax(ti.getExciseDutyCode(), ti.getItemId(), ti.getUnit_id(), aTrans.getCurrencyCode(), NewTransItem.getItemQty(), ti.getUnitPriceExcVat(), 0);
-                    }
-                    if (null != tiExcise) {
-                        ExciseTaxAmount = tiExcise.getCalc_excise_tax_amount();
-                    }
-                    ti.setExciseDutyTaxAmount(ExciseTaxAmount);
+                //Excise Duty - Start
+                ti.getTransItemExciseObj().setExcise_duty_code(NewTransItem.getTransItemExciseObj().getExcise_duty_code());
+                if (transtype.getTransactionTypeName().equals("SALE INVOICE") && NewTransItem.getTransItemExciseObj().getExcise_duty_code().length() > 0) {
+                    new TransItemExtBean().setExciseDutyTax(ti.getTransItemExciseObj(), ti.getItemId(), ti.getUnit_id(), aTrans.getCurrencyCode(), NewTransItem.getItemQty(), ti.getUnitPriceExcVat(), 1);
                 }
+                //Excise Duty - End
                 if (aSelectedItem.getIsTrack() == 1) {
                     try {
                         ti.setItemExpryDate(st.getItemExpDate());
@@ -6084,7 +6087,7 @@ public class TransItemBean implements Serializable {
         aTransItem.setAmount(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getAmount(), "ITEM"));
         aTransItem.setAmountIncVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getAmountIncVat(), "ITEM"));
         aTransItem.setAmountExcVat(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getAmountExcVat(), "ITEM"));
-        aTransItem.setExciseDutyTaxAmount(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getExciseDutyTaxAmount(), "ITEM"));
+        aTransItem.getTransItemExciseObj().setCalc_excise_tax_amount(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransItem.getTransItemExciseObj().getCalc_excise_tax_amount(), "ITEM"));
     }
 
     public void addTransItemCallCEC(int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aTrans, StatusBean aStatusBean, List<TransItem> aActiveTransItems, TransItem NewTransItem, Item aSelectedItem) {
@@ -10345,8 +10348,7 @@ public class TransItemBean implements Serializable {
             tri.setUnit_id(0);
             tri.setBase_unit_qty(0);
             tri.setQty_total(0);
-            tri.setExciseDutyCode("");
-            tri.setExciseDutyTaxAmount(0);
+            new TransItemExtBean().clearTransItemExcise(tri.getTransItemExciseObj());
         }
     }
 
@@ -10924,7 +10926,7 @@ public class TransItemBean implements Serializable {
                         ExciseDutyCode = edm.getExcise_duty_code();
                     }
                 }
-                aTransItemToUpdate.setExciseDutyCode(ExciseDutyCode);
+                aTransItemToUpdate.getTransItemExciseObj().setExcise_duty_code(ExciseDutyCode);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -11468,8 +11470,8 @@ public class TransItemBean implements Serializable {
     public void updateModelTransItemAutoAddCECCall(int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aTrans, TransItem aTransItemToUpdate, StatusBean aStatusBean, List<TransItem> aActiveTransItems, TransItem aSelectedTransItem, Item aSelectedItem, String aEntryMode) {//auto=1 for itemCode, auto=0 is for desc/code    ,2 is for other
         try {
             String ItemCode = aSelectedTransItem.getItemCode();
-            if (ItemCode.equals("P")) {
-                new TransactionPackageBean().addTransItemCallCEC(aStoreId, aTransTypeId, aTransReasonId, aSaleType, aTrans, aStatusBean, null, aActiveTransItems, aSelectedTransItem);
+            if (ItemCode.startsWith("PCG")) {
+                new TransactionPackageBean().loadPackageForInvoiceTrans(aTrans, aActiveTransItems, aSelectedTransItem);
             } else if (ItemCode.startsWith("ST")) {
                 new TransBean().loadTransferForInvoiceTrans(aTrans, aActiveTransItems, aSelectedTransItem);
             } else {

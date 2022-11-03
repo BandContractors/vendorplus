@@ -133,7 +133,7 @@ public class T125 implements Serializable {
                             temp.setRate_perc(edl.getRate());
                             temp.setCurrency(edl.getCurrency());
                         } else {
-                            temp.setRate_value(edl.getRate());
+                            temp.setRate_qty(edl.getRate());
                             temp.setUnit(edl.getUnit());
                             if (edl.getCurrency() == null) {
                                 temp.setCurrency(edl.getCurrency());
@@ -144,7 +144,7 @@ public class T125 implements Serializable {
                     temp.setUnit("");
                     temp.setCurrency("");
                     temp.setRate_perc("");
-                    temp.setRate_value("");
+                    temp.setRate_qty("");
                 }
                 arList.add(temp);
             }
@@ -236,7 +236,7 @@ public class T125 implements Serializable {
                                 temp.setCurrency(edl.getCurrency());
                             }
                         } else {
-                            temp.setRate_value(edl.getRate());
+                            temp.setRate_qty(edl.getRate());
                             temp.setUnit(edl.getUnit());
                             if (temp.getCurrency() == null || "".equals(temp.getCurrency())) {
                                 temp.setCurrency(edl.getCurrency());
@@ -247,7 +247,7 @@ public class T125 implements Serializable {
                     temp.setUnit("");
                     temp.setCurrency("");
                     temp.setRate_perc("");
-                    temp.setRate_value("");
+                    temp.setRate_qty("");
                 }
                 arList.add(temp);
             }
