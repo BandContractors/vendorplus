@@ -2181,6 +2181,10 @@ public class TransBean implements Serializable {
                             DeleteInserted = 1;
                         }
                         if (DeleteInserted == 0 && InsertedTransItems == aActiveTransItems.size()) {
+                            //insert transaction taxes summary
+                            if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && trans.getTotalExciseDutyTaxAmount() > 0) {
+                                int ed = new TransExtBean().insertTransTaxes(trans, aActiveTransItems);
+                            }
                             //SMbi API insert PointsTransaction for both the awarded and spent points to the stage area
                             String scope = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_SMBI_SCOPE").getParameter_value();
                             if (scope.isEmpty() || scope.contains("LOYALTY")) {
@@ -2196,14 +2200,18 @@ public class TransBean implements Serializable {
                     }
                     if (DeleteInserted == 1) {
                         //delete inserted
-                        int deleted1 = new TransItemExtBean().deleteTransItemsUnitByTransId(trans.getTransactionId());
+                        int deleted1 = new TransItemExtBean().deleteTransItemExciseByTransId(trans.getTransactionId());
                         int deleted2 = 0;
                         int deleted3 = 0;
+                        int deleted4 = 0;
                         if (deleted1 == 1) {
-                            deleted2 = new TransItemBean().deleteTransItemsCEC(trans.getTransactionId());
+                            deleted2 = new TransItemExtBean().deleteTransItemsUnitByTransId(trans.getTransactionId());
                         }
                         if (deleted2 == 1) {
-                            deleted3 = this.deleteTransCEC(trans.getTransactionId());
+                            deleted3 = new TransItemBean().deleteTransItemsCEC(trans.getTransactionId());
+                        }
+                        if (deleted3 == 1) {
+                            deleted4 = this.deleteTransCEC(trans.getTransactionId());
                         }
                         //display msg
                         switch (aLevel) {
@@ -8005,6 +8013,7 @@ public class TransBean implements Serializable {
             trans.setShift_id(0);
             trans.setMode_code(0);
             trans.setTotalExciseDutyTaxAmount(0);
+            trans.setTotalExciseDutableAmount(0);
         }
     }
 
@@ -10590,6 +10599,8 @@ public class TransBean implements Serializable {
         aTrans.setTotalZeroVatableAmount(this.getTotalZeroVatableAmountCEC(aTrans, aTransTypeId, aTransReasonId, aActiveTransItems));
         aTrans.setTotalExemptVatableAmount(this.getTotalExemptVatableAmountCEC(aTrans, aTransTypeId, aTransReasonId, aActiveTransItems));
         aTrans.setTotalVat(this.getTotalVatCEC(aTrans, aActiveTransItems));
+        aTrans.setTotalExciseDutableAmount(this.getTotalExciseDutableAmount(aTrans, aTransTypeId, aTransReasonId, aActiveTransItems));
+        aTrans.setTotalExciseDutyTaxAmount(this.getTotalExciseDutyTaxAmount(aTrans, aTransTypeId, aTransReasonId, aActiveTransItems));
         aTrans.setGrandTotal(this.getGrandTotalCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems));
         if (aTransTypeId == 19) {//EXPENSE ENTRY
             aTrans.setAmountTendered(aTrans.getGrandTotal());
@@ -10846,6 +10857,23 @@ public class TransBean implements Serializable {
         }
         TVat = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), TVat, "TOTAL_OTHER");
         return TVat;
+    }
+
+    public double getTotalExciseDutyTaxAmount(Trans aTrans, int aTransTypeId, int aTransReasonId, List<TransItem> aActiveTransItems) {
+        double TED = 0;
+        TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
+        TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
+        if ("SALE QUOTATION".equals(transtype.getTransactionTypeName()) || "SALE ORDER".equals(transtype.getTransactionTypeName()) || "SALE INVOICE".equals(transtype.getTransactionTypeName()) || "PURCHASE INVOICE".equals(transtype.getTransactionTypeName()) || "PURCHASE ORDER".equals(transtype.getTransactionTypeName()) || "EXPENSE ENTRY".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE RETURN INVOICE".equals(transtype.getTransactionTypeName())) {
+            List<TransItem> ati = aActiveTransItems;
+            int ListItemIndex = 0;
+            int ListItemNo = ati.size();
+            while (ListItemIndex < ListItemNo) {
+                TED = TED + ati.get(ListItemIndex).getTransItemExciseObj().getCalc_excise_tax_amount();
+                ListItemIndex = ListItemIndex + 1;
+            }
+            TED = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), TED, "TOTAL_OTHER");
+        }
+        return TED;
     }
 
     public void resetPurchaseItemsUnitVAT(List<TransItem> aActiveTransItems) {
@@ -11177,6 +11205,27 @@ public class TransBean implements Serializable {
             }
         }
         return GTotalStdVatableAmount;
+    }
+
+    public double getTotalExciseDutableAmount(Trans aTrans, int aTransTypeId, int aTransReasonId, List<TransItem> aActiveTransItems) {
+        TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
+        TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
+        double TotalExciseDutableAmount = 0;
+        List<TransItem> ati = aActiveTransItems;
+
+        int ListItemIndex = 0;
+        int ListItemNo = ati.size();
+        TotalExciseDutableAmount = 0;
+        if ("SALE QUOTATION".equals(transtype.getTransactionTypeName()) || "SALE ORDER".equals(transtype.getTransactionTypeName()) || "SALE INVOICE".equals(transtype.getTransactionTypeName()) || "PURCHASE INVOICE".equals(transtype.getTransactionTypeName()) || "PURCHASE ORDER".equals(transtype.getTransactionTypeName()) || "EXPENSE ENTRY".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE RETURN INVOICE".equals(transtype.getTransactionTypeName())) {
+            while (ListItemIndex < ListItemNo) {
+                if (ati.get(ListItemIndex).getTransItemExciseObj().getCalc_excise_tax_amount() > 0) {
+                    TotalExciseDutableAmount = TotalExciseDutableAmount + ati.get(ListItemIndex).getAmountExcVat();
+                }
+                ListItemIndex = ListItemIndex + 1;
+            }
+        }
+        TotalExciseDutableAmount = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), TotalExciseDutableAmount, "TOTAL_OTHER");
+        return TotalExciseDutableAmount;
     }
 
     public double getTotalStdVatableAmountCEC(Trans aTrans, int aTransTypeId, int aTransReasonId, List<TransItem> aActiveTransItems) {

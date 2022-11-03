@@ -456,6 +456,7 @@
                 <h:selectBooleanCheckbox label="#{langsys['Bill']} #{langsys['Other']}?" value="#{trans.billOther}">
                     <f:ajax render="pgrdScheme"/>
                 </h:selectBooleanCheckbox>
+                <h:inputText id="itxtED" value="Inc.ED: #{utilityBean.formatDoubleToString(trans.totalExciseDutyTaxAmount)}" styleClass="clsInputTransItem" style="width: 150px;height: 24px;background-color: yellow;font-size: 12px;" disabled="true" rendered="#{trans.totalExciseDutyTaxAmount gt 0}"/>
                 <p:dialog header="#{langsys['Cash']} #{langsys['Discount']}" widgetVar="dlgCashDiscount" modal="true" height="170">
                     <p:ajax event="open" process="@this" update="pnlgFilter1"/>
                     <h:panelGrid id="pnlgFilter1" columns="2">

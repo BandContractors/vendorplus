@@ -30,7 +30,9 @@ public class EFRIS_excise_duty_list implements Serializable {
     private String unit; //unit_code_tax
     private String currency; //currency_code_tax
     private String rate_perc;
-    private String rate_value;
+    private String rate_qty;
+    private String rateText_perc;
+    private String rateText_qty;
 
     //Additionals
     //private String added_by;
@@ -192,17 +194,17 @@ public class EFRIS_excise_duty_list implements Serializable {
     }
 
     /**
-     * @return the rate_value
+     * @return the rate_qty
      */
-    public String getRate_value() {
-        return rate_value;
+    public String getRate_qty() {
+        return rate_qty;
     }
 
     /**
-     * @param rate_value the rate_value to set
+     * @param rate_qty the rate_qty to set
      */
-    public void setRate_value(String rate_value) {
-        this.rate_value = rate_value;
+    public void setRate_qty(String rate_qty) {
+        this.rate_qty = rate_qty;
     }
 
     /**
@@ -245,5 +247,33 @@ public class EFRIS_excise_duty_list implements Serializable {
      */
     public void setParentName(String parentName) {
         this.parentName = parentName;
+    }
+
+    /**
+     * @return the rateText_perc
+     */
+    public String getRateText_perc() {
+        return rateText_perc;
+    }
+
+    /**
+     * @param rateText_perc the rateText_perc to set
+     */
+    public void setRateText_perc(String rateText_perc) {
+        this.rateText_perc = rateText_perc;
+    }
+
+    /**
+     * @return the rateText_qty
+     */
+    public String getRateText_qty() {
+        return rateText_qty;
+    }
+
+    /**
+     * @param rateText_qty the rateText_qty to set
+     */
+    public void setRateText_qty(String rateText_qty) {
+        this.rateText_qty = rateText_qty;
     }
 }

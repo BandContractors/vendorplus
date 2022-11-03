@@ -43,8 +43,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.Executor;
@@ -354,8 +356,11 @@ public class UtilityBean implements Serializable {
     }
 
 //    public static void main(String[] args) {
-//        Double x = 123452212.10;
-//        System.out.println(new UtilityBean().formatDoubleToStringPlain(x, 2));
+//         Map<String, Double> lstEDTaxes = new HashMap<>();
+//         lstEDTaxes.put("A", 10000.0);
+//         lstEDTaxes.put("B", 20000.0);
+//         lstEDTaxes.put("B", 50000.0);
+//         System.out.println(lstEDTaxes.get("B"));
 //    }
     
     public String formatDoubleToStringHide(double aAmount, int aHideResult) {

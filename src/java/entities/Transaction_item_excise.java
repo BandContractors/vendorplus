@@ -12,8 +12,9 @@ public class Transaction_item_excise implements Serializable {
     private long transaction_item_excise_id;
     private long transaction_item_id;
     private String excise_duty_code;
+    private String rate_text;
     private String rate_name;
-    private double rate_perc;
+    private String rate_name_type;
     private double rate_value;
     private double calc_excise_tax_amount;
     private String rate_currency_code_tax;
@@ -76,20 +77,6 @@ public class Transaction_item_excise implements Serializable {
     }
 
     /**
-     * @return the rate_perc
-     */
-    public double getRate_perc() {
-        return rate_perc;
-    }
-
-    /**
-     * @param rate_perc the rate_perc to set
-     */
-    public void setRate_perc(double rate_perc) {
-        this.rate_perc = rate_perc;
-    }
-
-    /**
      * @return the rate_value
      */
     public double getRate_value() {
@@ -143,5 +130,33 @@ public class Transaction_item_excise implements Serializable {
      */
     public void setRate_unit_code_tax(String rate_unit_code_tax) {
         this.rate_unit_code_tax = rate_unit_code_tax;
+    }
+
+    /**
+     * @return the rate_text
+     */
+    public String getRate_text() {
+        return rate_text;
+    }
+
+    /**
+     * @param rate_text the rate_text to set
+     */
+    public void setRate_text(String rate_text) {
+        this.rate_text = rate_text;
+    }
+
+    /**
+     * @return the rate_name_type
+     */
+    public String getRate_name_type() {
+        return rate_name_type;
+    }
+
+    /**
+     * @param rate_name_type the rate_name_type to set
+     */
+    public void setRate_name_type(String rate_name_type) {
+        this.rate_name_type = rate_name_type;
     }
 }

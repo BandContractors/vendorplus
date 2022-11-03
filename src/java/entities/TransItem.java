@@ -130,8 +130,7 @@ public class TransItem implements Serializable {
     private Item_unit Item_unitObj;
     private String transactionPackageNumber;
     private long transactionPackageId;
-    private String ExciseDutyCode;
-    private double ExciseDutyTaxAmount;
+    private Transaction_item_excise TransItemExciseObj = new Transaction_item_excise();
 
     /**
      * @return the TransactionItemId
@@ -1590,31 +1589,17 @@ public class TransItem implements Serializable {
     }
 
     /**
-     * @return the ExciseDutyCode
+     * @return the TransItemExciseObj
      */
-    public String getExciseDutyCode() {
-        return ExciseDutyCode;
+    public Transaction_item_excise getTransItemExciseObj() {
+        return TransItemExciseObj;
     }
 
     /**
-     * @param ExciseDutyCode the ExciseDutyCode to set
+     * @param TransItemExciseObj the TransItemExciseObj to set
      */
-    public void setExciseDutyCode(String ExciseDutyCode) {
-        this.ExciseDutyCode = ExciseDutyCode;
-    }
-
-    /**
-     * @return the ExciseDutyTaxAmount
-     */
-    public double getExciseDutyTaxAmount() {
-        return ExciseDutyTaxAmount;
-    }
-
-    /**
-     * @param ExciseDutyTaxAmount the ExciseDutyTaxAmount to set
-     */
-    public void setExciseDutyTaxAmount(double ExciseDutyTaxAmount) {
-        this.ExciseDutyTaxAmount = ExciseDutyTaxAmount;
+    public void setTransItemExciseObj(Transaction_item_excise TransItemExciseObj) {
+        this.TransItemExciseObj = TransItemExciseObj;
     }
 
 }
