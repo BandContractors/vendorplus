@@ -5164,7 +5164,7 @@ public class TransItemBean implements Serializable {
 
     public List<TransItem> getTransItemsOutput(long aTransactionId) {
         String sql;
-        sql = "{call sp_search_transaction_item_by_transaction_id4(?)}";
+        sql = "{call sp_search_transaction_package_item_by_transaction_id(?)}";
         ResultSet rs = null;
         List<TransItem> tis = new ArrayList<>();
         try (
@@ -5250,7 +5250,7 @@ public class TransItemBean implements Serializable {
 
     public void setTransItemsByTransactionId(List<TransItem> aTransItems, long aTransactionId) {
         String sql;
-        sql = "{call sp_search_transaction_item_by_transaction_id(?)}";
+        sql = "{call sp_search_transaction_package_item_by_transaction_id(?)}";
         ResultSet rs = null;
         aTransItems.clear();
         try (
@@ -11470,8 +11470,8 @@ public class TransItemBean implements Serializable {
     public void updateModelTransItemAutoAddCECCall(int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans aTrans, TransItem aTransItemToUpdate, StatusBean aStatusBean, List<TransItem> aActiveTransItems, TransItem aSelectedTransItem, Item aSelectedItem, String aEntryMode) {//auto=1 for itemCode, auto=0 is for desc/code    ,2 is for other
         try {
             String ItemCode = aSelectedTransItem.getItemCode();
-            if (ItemCode.equals("P")) {
-                new TransactionPackageBean().addTransItemCallCEC(aStoreId, aTransTypeId, aTransReasonId, aSaleType, aTrans, aStatusBean, null, aActiveTransItems, aSelectedTransItem);
+            if (ItemCode.startsWith("PCG")) {
+                new TransactionPackageBean().loadPackageForInvoiceTrans(aTrans, aActiveTransItems, aSelectedTransItem);
             } else if (ItemCode.startsWith("ST")) {
                 new TransBean().loadTransferForInvoiceTrans(aTrans, aActiveTransItems, aSelectedTransItem);
             } else {

@@ -32,6 +32,115 @@ public class OutputDetailBean implements Serializable {
     public OutputDetailBean() {
     }
 
+    public void refreshPackageOutput(String aLevel, String aSource) {
+        try {
+            TransBean tb = new TransBean();
+            OutputDetail aOutputDetail = new OutputDetail();
+            switch (aLevel) {
+                case "PARENT":
+                    try {
+                        aOutputDetail.setTrans(new TransBean().getTrans(new GeneralUserSetting().getCurrentTransactionId()));
+                        aOutputDetail.setTransactionPackage(new TransactionPackageBean().getTransactionPackageOut(aOutputDetail.getTrans().getTransactionId()));
+                        aOutputDetail.getTransactionPackage().setTransactionType(new TransactionTypeBean().getTransactionType(aOutputDetail.getTrans().getTransactionTypeId()));
+                        aOutputDetail.getTransactionPackage().setaTransactionPackageItemsList(new TransactionPackageItemBean().getTransactionPackageItemOutput(aOutputDetail.getTrans().getTransactionId()));
+                        aOutputDetail.getTransactionPackage().setAddUserDetail(new UserDetailBean().getUserDetail(aOutputDetail.getTrans().getAddUserDetailId()));
+                        aOutputDetail.getTransactionPackage().getAddUserDetailId();
+                    } catch (Exception e) {
+                    }
+                    break;
+                case "CHILD":
+                    try {
+                        aOutputDetail.setTrans(new TransBean().getTrans(new GeneralUserSetting().getCurrentTransactionIdChild()));
+                    } catch (Exception e) {
+                    }
+                    try {
+                        aOutputDetail.setPay(new PayBean().getPay(new GeneralUserSetting().getCurrentPayIdChild()));
+                    } catch (Exception e) {
+                        aOutputDetail.setPay(new Pay());
+                    }
+                    break;
+            }
+            //tb.updateLookup(aOutputDetail.getTrans());
+            //get location name
+            if (null != aOutputDetail.getTrans()) {
+                if (aOutputDetail.getTrans().getLocation_id() > 0) {
+                    try {
+                        aOutputDetail.getTrans().setLocation_name(new LocationBean().getLocation(aOutputDetail.getTrans().getLocation_id()).getLocationName());
+                    } catch (Exception e) {
+                        aOutputDetail.getTrans().setLocation_name("");
+                    }
+                }
+            }
+            //get tax invoice number
+            String DeviceNo = new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value();
+            if (null != aOutputDetail.getTrans()) {
+                if (DeviceNo.length() > 0 && (aOutputDetail.getTrans().getTransactionTypeId() == 88)) {
+                    Transaction_tax_map ttm = new Transaction_tax_mapBean().getTransaction_tax_map(aOutputDetail.getTrans().getTransactionId(), aOutputDetail.getTrans().getTransactionTypeId());
+                    if (null != ttm) {
+                        aOutputDetail.getTrans().setReference_number_tax(ttm.getReference_number_tax());
+                        aOutputDetail.getTrans().setTransaction_number_tax(ttm.getTransaction_number_tax());
+                        aOutputDetail.getTrans().setVerification_code_tax(ttm.getVerification_code_tax());
+                        aOutputDetail.getTrans().setQr_code_tax(ttm.getQr_code_tax());
+                        aOutputDetail.getTrans().setFdn_ref(ttm.getFdn_ref());
+                    }
+                }
+            }
+
+            try {
+                //aOutputDetail.setTrans_items(new TransItemBean().getTransItemsByTransactionIdCEC(aOutputDetail.getTrans().getTransactionId()));
+               // aOutputDetail.setTransactionPackageItems(new TransactionPackageItemBean().getTransactionPackageItemOutput(aOutputDetail.getTrans().getTransactionId()));
+
+            } catch (Exception e) {
+            }
+            try {
+                if (aOutputDetail.getTransactionPackage().getTransactionTypeId() == 88) {
+                    new UtilityBean().calcUpdateTransDeemedAmount(aOutputDetail.getTrans(), aOutputDetail.getTrans_items());
+                }
+            } catch (Exception e) {
+            }
+            aOutputDetail.setTotal_items(aOutputDetail.getTransactionPackage().getaTransactionPackageItemsList().size());
+            //aOutputDetail.setTotal_items_list(new ArrayList<>());
+            List<Integer> itmlist = new ArrayList<>();
+            for (int x = 1; x <= (10 - aOutputDetail.getTotal_items()); x++) {//changed from 15 to 10 to avoid 2 pages
+                itmlist.add(x);
+            }
+            aOutputDetail.setTotal_items_list(itmlist);
+
+            //refresh amount in words
+            try {
+                if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "OUTPUT_SHOW_AMOUNT_IN_WORDS").getParameter_value().equals("1")) {
+                    aOutputDetail.setTransAmountInWords(new ConvertNumToWordBean().convertNumToWord(aOutputDetail.getTrans().getGrandTotal(), aOutputDetail.getTrans().getCurrencyCode()));
+                } else {
+                    aOutputDetail.setTransAmountInWords("");
+                }
+            } catch (Exception e) {
+                aOutputDetail.setTransAmountInWords("");
+            }
+            try {
+                if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "OUTPUT_SHOW_AMOUNT_IN_WORDS").getParameter_value().equals("1")) {
+                    aOutputDetail.setPayAmountInWords(new ConvertNumToWordBean().convertNumToWord(aOutputDetail.getPay().getPaidAmount(), aOutputDetail.getPay().getCurrencyCode()));
+                } else {
+                    aOutputDetail.setPayAmountInWords("");
+                }
+            } catch (Exception e) {
+                aOutputDetail.setPayAmountInWords("");
+            }
+            FacesContext context = FacesContext.getCurrentInstance();
+            HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+            HttpSession httpSession = request.getSession(false);
+            switch (aLevel) {
+                case "PARENT":
+                    httpSession.setAttribute("OUTPUT_DETAIL_PARENT", aOutputDetail);
+                    break;
+                case "CHILD":
+                    httpSession.setAttribute("OUTPUT_DETAIL_CHILD", aOutputDetail);
+                    break;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public void refreshOutput(String aLevel, String aSource) {
         try {
             TransBean tb = new TransBean();

@@ -11,6 +11,8 @@ import entities.Store;
 import entities.Trans;
 import entities.TransProduction;
 import entities.TransProductionItem;
+import entities.TransactionPackage;
+import entities.TransactionPackageItem;
 import entities.TransactionReason;
 import entities.TransactionType;
 import java.io.Serializable;
@@ -51,6 +53,8 @@ public class OutputDetail implements Serializable {
     private String TransAmountInWords;
     private String PayAmountInWords;
     private UserDetail approve_user_detail;
+    private TransactionPackage transactionPackage;
+    private List<TransactionPackageItem> transactionPackageItems = new ArrayList<>();
 
     public OutputDetail() {
     }
@@ -417,5 +421,33 @@ public class OutputDetail implements Serializable {
      */
     public void setApprove_user_detail(UserDetail approve_user_detail) {
         this.approve_user_detail = approve_user_detail;
+    }
+
+    /**
+     * @return the transactionPackageItems
+     */
+    public List<TransactionPackageItem> getTransactionPackageItems() {
+        return transactionPackageItems;
+    }
+
+    /**
+     * @param transactionPackageItems the TransactionPackageItems to set
+     */
+    public void setTransactionPackageItems(List<TransactionPackageItem> transactionPackageItems) {
+        this.transactionPackageItems = transactionPackageItems;
+    }
+
+    /**
+     * @return the transactionPackage
+     */
+    public TransactionPackage getTransactionPackage() {
+        return transactionPackage;
+    }
+
+    /**
+     * @param transactionPackage the transactionPackage to set
+     */
+    public void setTransactionPackage(TransactionPackage transactionPackage) {
+        this.transactionPackage = transactionPackage;
     }
 }
