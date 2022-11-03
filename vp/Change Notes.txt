@@ -1,0 +1,13 @@
+Multi-Units:
+-Test for Open Balance
+-Test Stock Adjustment for New Trans and CrDrNote at the reverse for orders sent to another store. 
+-Test for Stock Take
+-SMbi Impact: general, loyalty, sales, cr, dr, stock.
+-Check why TransItem Add adds twice for UnPack
+
+Excise:
+-Journal Entries for Excise Duty should Change.
+-Profit Margin for Items with Excise Duty.
+-Excise Duty on Cr/Dr Notes.
+-
+

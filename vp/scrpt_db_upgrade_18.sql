@@ -246,5 +246,19 @@ CHANGE COLUMN unit_code_tax rate_unit_code_tax VARCHAR(50) NULL DEFAULT NULL ;
 
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',247,Now(),'6.0','');
 
+ALTER TABLE efris_excise_duty_list 
+CHANGE COLUMN rate_value rate_qty VARCHAR(500) NULL DEFAULT NULL,
+ADD COLUMN rateText_perc VARCHAR(500) NULL AFTER rateText,
+ADD COLUMN rateText_qty VARCHAR(500) NULL AFTER rateText_perc;
+
+ALTER TABLE transaction_item_excise 
+DROP COLUMN rate_perc,
+ADD COLUMN rate_text VARCHAR(100) NULL AFTER excise_duty_code,
+ADD COLUMN rate_name_type VARCHAR(10) NULL AFTER rate_name;
+
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',259,Now(),'6.0','');
+
+
+
 
 
