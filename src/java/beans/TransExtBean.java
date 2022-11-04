@@ -704,8 +704,8 @@ public class TransExtBean implements Serializable {
                     transtax.setTax_category("VAT");
                     transtax.setTax_rate_name("Deemed");
                     transtax.setTax_rate(aTrans.getVatPerc());
-                    transtax.setTaxable_amount(DeemedTotalAmount);
-                    transtax.setTax_amount(DeemedTotalVat);
+                    transtax.setTaxable_amount(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), DeemedTotalAmount, "TOTAL_OTHER"));
+                    transtax.setTax_amount(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), DeemedTotalVat, "TOTAL_OTHER"));
                     long x = this.insertTransaction_tax(transtax);
                 }
                 //B. Excise Duty
@@ -721,14 +721,14 @@ public class TransExtBean implements Serializable {
                             transtax.setTax_category("Excise Duty");
                             transtax.setTax_rate_name(tie.getRate_name());
                             transtax.setTax_rate(tie.getRate_value());
-                            transtax.setTaxable_amount(ti.getAmountExcVat() - tie.getCalc_excise_tax_amount());
-                            transtax.setTax_amount(tie.getCalc_excise_tax_amount());
+                            transtax.setTaxable_amount(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), (ti.getAmountExcVat() - tie.getCalc_excise_tax_amount()), "TOTAL_OTHER"));
+                            transtax.setTax_amount(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), tie.getCalc_excise_tax_amount(), "TOTAL_OTHER"));
                             int ItemFoundAtIndex = this.getIndexByTaxRateName(TransTaxList, transtax.getTax_rate_name());
                             if (ItemFoundAtIndex < 0) {
                                 TransTaxList.add(transtax);
                             } else {
-                                transtax.setTaxable_amount(transtax.getTaxable_amount() + TransTaxList.get(ItemFoundAtIndex).getTaxable_amount());
-                                transtax.setTax_amount(transtax.getTax_amount() + TransTaxList.get(ItemFoundAtIndex).getTax_amount());
+                                transtax.setTaxable_amount(transtax.getTaxable_amount() + new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), TransTaxList.get(ItemFoundAtIndex).getTaxable_amount(), "TOTAL_OTHER"));
+                                transtax.setTax_amount(transtax.getTax_amount() + new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), TransTaxList.get(ItemFoundAtIndex).getTax_amount(), "TOTAL_OTHER"));
                                 TransTaxList.add(ItemFoundAtIndex, transtax);
                                 TransTaxList.remove(ItemFoundAtIndex + 1);
                             }

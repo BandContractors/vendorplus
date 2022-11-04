@@ -258,7 +258,8 @@ ADD COLUMN rate_name_type VARCHAR(10) NULL AFTER rate_name;
 
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',259,Now(),'6.0','');
 
+ALTER TABLE transaction_package MODIFY transaction_date datetime;
+ALTER TABLE transaction_package ADD COLUMN transaction_id bigint(20);
 
-
-
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',264,Now(),'6.0','');
 
