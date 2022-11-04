@@ -29,6 +29,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import utilities.Security;
 import utilities.SecurityPKI;
+import utilities.UtilityBean;
 
 /**
  *
@@ -225,6 +226,35 @@ public class T125 implements Serializable {
             for (int i = 0; i < exciseDutyList.length(); i++) {
                 Gson g = new Gson();
                 EFRIS_excise_duty_list temp = g.fromJson(exciseDutyList.get(i).toString(), EFRIS_excise_duty_list.class);
+                //set rateText_perc, rateText_qty
+                if (temp.getRateText() != null) {
+                    if (temp.getRateText().length() > 0) {
+                        if (temp.getRateText().contains("%,")) {
+                            String[] percQtyArray = new UtilityBean().getStringArrayFromXSeperatedStr(temp.getRateText(), "%,");
+                            temp.setRateText_perc(percQtyArray[0] + "%");
+                            temp.setRateText_qty(percQtyArray[1]);
+                        } else if (temp.getRateText().contains("%") && temp.getRateText().contains(",")) {
+                            String[] percQtyArray = new UtilityBean().getStringArrayFromCommaSeperatedStr(temp.getRateText());
+                            temp.setRateText_perc(percQtyArray[percQtyArray.length - 1]);
+                            temp.setRateText_qty("");
+                            for (int a = 0; a < percQtyArray.length - 1; a++) {
+                                temp.setRateText_qty(temp.getRateText_qty() + percQtyArray[a]);
+                            }
+                        } else if (temp.getRateText().contains("%")) {
+                            temp.setRateText_perc(temp.getRateText());
+                            temp.setRateText_qty("");
+                        } else {
+                            temp.setRateText_perc("");
+                            temp.setRateText_qty(temp.getRateText());
+                        }
+                    } else {
+                        temp.setRateText_perc("");
+                        temp.setRateText_qty("");
+                    }
+                } else {
+                    temp.setRateText_perc("");
+                    temp.setRateText_qty("");
+                }
 
                 //set unit, currency, rate_perc, rate_value
                 if (temp.getExciseDutyDetailsList().size() > 0) {
