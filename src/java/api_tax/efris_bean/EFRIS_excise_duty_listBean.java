@@ -165,15 +165,24 @@ public class EFRIS_excise_duty_listBean implements Serializable {
         int saved = 0;
         try {
             int goodsSaved = 0;
-            //save goods commodity
-            for (int i = 0, size = aEFRIS_excise_duty_lists.size(); i < size; i++) {
-                //check if EFRIS_excise_duty_list is already in the db
-                EFRIS_excise_duty_list aEFRIS_excise_duty_list = this.getEFRIS_invoice_detailByExciseDutyCode(aEFRIS_excise_duty_lists.get(i).getExciseDutyCode());
-                if (aEFRIS_excise_duty_list == null) {
-                    goodsSaved = goodsSaved + this.insertEFRIS_excise_duty_list(aEFRIS_excise_duty_lists.get(i));
-                } else {
-                    //EFRIS_excise_duty_list already exists
-                    goodsSaved = goodsSaved + 1;
+
+            //if efris_excise_duty_list is not empty
+            if (aEFRIS_excise_duty_lists.size() > 0) {
+                //then delete previous records
+                int isExciseDutyListDeleted = this.deleteEFRIS_excise_duty_list_All();
+                if (isExciseDutyListDeleted == 1) {
+                    //then save new records
+                    //save goods commodity
+                    for (int i = 0, size = aEFRIS_excise_duty_lists.size(); i < size; i++) {
+                        //check if EFRIS_excise_duty_list is already in the db
+                        EFRIS_excise_duty_list aEFRIS_excise_duty_list = this.getEFRIS_invoice_detailByExciseDutyCode(aEFRIS_excise_duty_lists.get(i).getExciseDutyCode());
+                        if (aEFRIS_excise_duty_list == null) {
+                            goodsSaved = goodsSaved + this.insertEFRIS_excise_duty_list(aEFRIS_excise_duty_lists.get(i));
+                        } else {
+                            //EFRIS_excise_duty_list already exists
+                            goodsSaved = goodsSaved + 1;
+                        }
+                    }
                 }
             }
 
@@ -331,5 +340,20 @@ public class EFRIS_excise_duty_listBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
         return aEFRIS_excise_duty_list;
+    }
+
+    public int deleteEFRIS_excise_duty_list_All() {
+        int IsDeleted = 0;
+        String sql = "DELETE FROM efris_excise_duty_list WHERE efris_excise_duty_list_id > ?";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, 0);
+            ps.executeUpdate();
+            IsDeleted = 1;
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return IsDeleted;
     }
 }
