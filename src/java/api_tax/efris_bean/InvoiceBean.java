@@ -344,7 +344,6 @@ public class InvoiceBean implements Serializable {
                         gd.setItem(itm.getDescription());
                     }
                     gd.setItemCode(im.getItem_id_tax());
-                    //gd.setQty(ub.formatDoublePlain2DP(transitems.get(i).getItemQty()));
                     gd.setQty(ub.formatDoubleToStringPlain(transitems.get(i).getItemQty(), 8));
                     try {
                         String UnitSymbolTax = new UnitBean().getUnit(transitems.get(i).getUnit_id()).getUnit_symbol_tax();
@@ -397,23 +396,15 @@ public class InvoiceBean implements Serializable {
                         transitems.get(i).setAmountIncVat(transitems.get(i).getAmountIncVat() + ExcludedVat);
                     }
                     Double UnitPriceIncVat = transitems.get(i).getAmountIncVat() / Qty;
-                    //Double UnitPriceIncVatRd = acb.roundAmountMinTwoDps(trans.getCurrencyCode(), UnitPriceIncVat);
                     Double UnitPriceIncVatRd = acb.roundDoubleToXDps(UnitPriceIncVat, 8);
                     Double AmountIncVat = UnitPriceIncVatRd * Qty;
-                    //Double AmountIncVatRd = acb.roundAmountMinTwoDps(trans.getCurrencyCode(), AmountIncVat);
                     Double AmountIncVatRd = acb.roundDoubleToXDps(AmountIncVat, 2);
                     //formulae 
                     Double UnitPriceExcVat = UnitPriceIncVatRd / (1 + tr);
                     Double UnitVat = UnitPriceIncVatRd - UnitPriceExcVat;
                     Double TaxAmount = UnitVat * Qty;
-                    //Double TaxAmountRd = acb.roundAmountMinTwoDps(trans.getCurrencyCode(), TaxAmount);
                     Double TaxAmountRd = acb.roundDoubleToXDps(TaxAmount, 2);
                     //assign
-                    /*
-                     gd.setTotal(ub.formatDoublePlain2DP(AmountIncVatRd));
-                     gd.setUnitPrice(ub.formatDoublePlain2DP(UnitPriceIncVatRd));
-                     gd.setTax(ub.formatDoublePlain2DP(TaxAmountRd));
-                     */
                     gd.setTotal(ub.formatDoubleToStringPlain(AmountIncVatRd, 2));
                     gd.setUnitPrice(ub.formatDoubleToStringPlain(UnitPriceIncVatRd, 2));
                     gd.setTax(ub.formatDoubleToStringPlain(TaxAmountRd, 2));
@@ -445,14 +436,6 @@ public class InvoiceBean implements Serializable {
                     OrderNo = OrderNo + 1;
                 }
             }
-            /*
-             Double TotalVatAR = acb.roundAmountMinTwoDps(trans.getCurrencyCode(), TotalVatA);
-             Double TotalVatDR = acb.roundAmountMinTwoDps(trans.getCurrencyCode(), TotalVatD);
-             Double TotalAmountIncVatAR = acb.roundAmountMinTwoDps(trans.getCurrencyCode(), TotalAmountIncVatA);
-             Double TotalAmountIncVatDR = acb.roundAmountMinTwoDps(trans.getCurrencyCode(), TotalAmountIncVatD);
-             Double TotalAmountExemptR = acb.roundAmountMinTwoDps(trans.getCurrencyCode(), TotalAmountExempt);
-             Double TotalAmountZeroR = acb.roundAmountMinTwoDps(trans.getCurrencyCode(), TotalAmountZero);
-             */
             Double TotalVatAR = acb.roundDoubleToXDps(TotalVatA, 2);
             Double TotalVatDR = acb.roundDoubleToXDps(TotalVatD, 2);
             Double TotalAmountIncVatAR = acb.roundDoubleToXDps(TotalAmountIncVatA, 2);
@@ -475,72 +458,56 @@ public class InvoiceBean implements Serializable {
                 td.setTaxRateName("VAT-Standard");//free entry
                 Double vatPerc = trans.getVatPerc();
                 Double tr = vatPerc / 100;
-                //td.setTaxRate(ub.formatDoublePlain2DP(tr));
                 td.setTaxRate(ub.formatDoubleToStringPlain(tr, 2));
-                //td.setTaxAmount(ub.formatDoublePlain2DP(TotalVatAR));
                 td.setTaxAmount(ub.formatDoubleToStringPlain(TotalVatAR, 2));
-                //Double NetAmountAR = acb.roundAmountMinTwoDps(trans.getCurrencyCode(), TotalAmountIncVatAR - TotalVatAR);
                 Double NetAmountAR = acb.roundDoubleToXDps((TotalAmountIncVatAR - TotalVatAR), 2);
-                //td.setNetAmount(ub.formatDoublePlain2DP(NetAmountAR));
                 td.setNetAmount(ub.formatDoubleToStringPlain(NetAmountAR, 2));
                 taxDetails.add(td);
             }
             //Deemed
             if (TotalVatD > 0) {
                 td = new TaxDetails();
-                //td.setGrossAmount(ub.formatDoublePlain2DP(TotalAmountIncVatDR));
                 td.setGrossAmount(ub.formatDoubleToStringPlain(TotalAmountIncVatDR, 2));
                 td.setTaxCategoryCode("04");
                 td.setTaxCategory("Deemed");
                 td.setTaxRateName("VAT-Deemed");//free entry
                 Double vatPerc = trans.getVatPerc();
                 Double tr = vatPerc / 100;
-                //td.setTaxRate(ub.formatDoublePlain2DP(tr));
                 td.setTaxRate(ub.formatDoubleToStringPlain(tr, 2));
-                //td.setTaxAmount(ub.formatDoublePlain2DP(TotalVatDR));
                 td.setTaxAmount(ub.formatDoubleToStringPlain(TotalVatDR, 2));
-                //Double NetAmountDR = acb.roundAmountMinTwoDps(trans.getCurrencyCode(), TotalAmountIncVatDR - TotalVatDR);
                 Double NetAmountDR = acb.roundDoubleToXDps((TotalAmountIncVatDR - TotalVatDR), 2);
-                //td.setNetAmount(ub.formatDoublePlain2DP(NetAmountDR));
                 td.setNetAmount(ub.formatDoubleToStringPlain(NetAmountDR, 2));
                 taxDetails.add(td);
             }
             //Exempt
             if (TotalAmountExempt > 0) {
                 td = new TaxDetails();
-                //td.setGrossAmount(ub.formatDoublePlain2DP(TotalAmountExemptR));
                 td.setGrossAmount(ub.formatDoubleToStringPlain(TotalAmountExemptR, 2));
                 td.setTaxCategoryCode("03");
                 td.setTaxCategory("Exempt");
                 td.setTaxRateName("VAT-Exempt");//free entry
                 td.setTaxRate("-");
                 td.setTaxAmount("0");
-                //td.setNetAmount(ub.formatDoublePlain2DP(TotalAmountExemptR));
                 td.setNetAmount(ub.formatDoubleToStringPlain(TotalAmountExemptR, 2));
                 taxDetails.add(td);
             }
             //Zero
             if (TotalAmountZero > 0) {
                 td = new TaxDetails();
-                //td.setGrossAmount(ub.formatDoublePlain2DP(TotalAmountZeroR));
                 td.setGrossAmount(ub.formatDoubleToStringPlain(TotalAmountZeroR, 2));
                 td.setTaxCategoryCode("02");
                 td.setTaxCategory("Zero");
                 td.setTaxRateName("VAT-Zero");//free entry
                 td.setTaxRate("0");
                 td.setTaxAmount("0");
-                //td.setNetAmount(ub.formatDoublePlain2DP(TotalAmountZeroR));
                 td.setNetAmount(ub.formatDoubleToStringPlain(TotalAmountZeroR, 2));
                 taxDetails.add(td);
             }
             //summary
             Double GrossAmountSummaryR = (TotalAmountIncVatAR + TotalAmountIncVatDR + TotalAmountExemptR + TotalAmountZeroR) - TotalVatDR;
-            //summary.setGrossAmount(ub.formatDoublePlain2DP(acb.roundAmountMinTwoDps(trans.getCurrencyCode(), GrossAmountSummaryR)));
             summary.setGrossAmount(ub.formatDoubleToStringPlain(acb.roundDoubleToXDps(GrossAmountSummaryR, 2), 2));
-            //summary.setTaxAmount(ub.formatDoublePlain2DP(acb.roundAmountMinTwoDps(trans.getCurrencyCode(), TotalVatAR)));
             summary.setTaxAmount(ub.formatDoubleToStringPlain(acb.roundDoubleToXDps(TotalVatAR, 2), 2));
             Double NetAmountSummary = GrossAmountSummaryR - TotalVatAR;
-            //summary.setNetAmount(ub.formatDoublePlain2DP(acb.roundAmountMinTwoDps(trans.getCurrencyCode(), NetAmountSummary)));
             summary.setNetAmount(ub.formatDoubleToStringPlain(acb.roundDoubleToXDps(NetAmountSummary, 2), 2));
             summary.setItemCount(Integer.toString(goodsDetails.size()));
             summary.setModeCode("1");
