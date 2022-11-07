@@ -16,6 +16,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
@@ -102,14 +103,19 @@ public class TransItemExtBean implements Serializable {
                 aTransaction_item_excise.setExcise_duty_code("");
             }
             try {
+                aTransaction_item_excise.setRate_text(aResultSet.getString("rate_text"));
+            } catch (Exception e) {
+                aTransaction_item_excise.setRate_text("");
+            }
+            try {
                 aTransaction_item_excise.setRate_name(aResultSet.getString("rate_name"));
             } catch (Exception e) {
                 aTransaction_item_excise.setRate_name("");
             }
             try {
-                aTransaction_item_excise.setRate_perc(aResultSet.getDouble("rate_perc"));
+                aTransaction_item_excise.setRate_name_type(aResultSet.getString("rate_name_type"));
             } catch (Exception e) {
-                aTransaction_item_excise.setRate_perc(0);
+                aTransaction_item_excise.setRate_name_type("");
             }
             try {
                 aTransaction_item_excise.setRate_value(aResultSet.getDouble("rate_value"));
@@ -233,20 +239,22 @@ public class TransItemExtBean implements Serializable {
     public long insertTransaction_item_excise(Transaction_item_excise aTransaction_item_excise) {
         long newId = 0;
         String sql = "INSERT INTO transaction_item_excise"
-                + "(transaction_item_id,excise_duty_code,rate_name,rate_perc,rate_value,calc_excise_tax_amount,rate_currency_code_tax,rate_unit_code_tax)"
+                + "(transaction_item_id,excise_duty_code,rate_text,rate_name,rate_name_type,rate_value,rate_currency_code_tax,"
+                + "rate_unit_code_tax,calc_excise_tax_amount)"
                 + " VALUES"
-                + "(?,?,?,?,?,?,?,?)";
+                + "(?,?,?,?,?,?,?,?,?)";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
             ps.setLong(1, aTransaction_item_excise.getTransaction_item_id());
             ps.setString(2, aTransaction_item_excise.getExcise_duty_code());
-            ps.setString(3, aTransaction_item_excise.getRate_name());
-            ps.setDouble(4, aTransaction_item_excise.getRate_perc());
-            ps.setDouble(5, aTransaction_item_excise.getRate_value());
-            ps.setDouble(6, aTransaction_item_excise.getCalc_excise_tax_amount());
+            ps.setString(3, aTransaction_item_excise.getRate_text());
+            ps.setString(4, aTransaction_item_excise.getRate_name());
+            ps.setString(5, aTransaction_item_excise.getRate_name_type());
+            ps.setDouble(6, aTransaction_item_excise.getRate_value());
             ps.setString(7, aTransaction_item_excise.getRate_currency_code_tax());
             ps.setString(8, aTransaction_item_excise.getRate_unit_code_tax());
+            ps.setDouble(9, aTransaction_item_excise.getCalc_excise_tax_amount());
             ps.executeUpdate();
             ResultSet rs = ps.getGeneratedKeys();
             if (rs.next()) {
@@ -292,7 +300,142 @@ public class TransItemExtBean implements Serializable {
         return deleted;
     }
 
-    public Transaction_item_excise getExciseDutyTax(String aExciseDutyCode, long aItemId, int aToUnitId, String aToCurrencyCode, double aQty, double aUnitPrice, int aIncludesED) {
+    public int deleteTransItemExciseByTransId(long aTransId) {
+        int deleted = 0;
+        String sql = "DELETE FROM transaction_item_excise WHERE transaction_item_excise_id>0 AND transaction_item_id IN"
+                + "("
+                + "SELECT ti.transaction_item_id FROM transaction_item ti WHERE ti.transaction_id=?"
+                + ")";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aTransId);
+            ps.executeUpdate();
+            deleted = 1;
+        } catch (Exception e) {
+            deleted = 0;
+            LOGGER.log(Level.ERROR, e);
+        }
+        return deleted;
+    }
+
+    public int deleteTransItemExciseByTransItemId(long aTransItemId) {
+        int deleted = 0;
+        String sql = "DELETE FROM transaction_item_excise WHERE transaction_item_excise_id>0 AND transaction_item_id=?";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aTransItemId);
+            ps.executeUpdate();
+            deleted = 1;
+        } catch (Exception e) {
+            deleted = 0;
+            LOGGER.log(Level.ERROR, e);
+        }
+        return deleted;
+    }
+
+    public void setExciseDutyTax(Transaction_item_excise obj, long aItemId, int aToUnitId, String aToCurrencyCode, double aQty, double aUnitPrice, int aIncludesED) {
+        double ExciseTaxAmount = 0;
+        try {
+            EFRIS_excise_duty_list ExciseDutyDtl = null;
+            String FromUnitCodeTax = "";
+            int FromUnitId = 0;
+            String FromCurrencyCodeTax = "";
+            String FromCurrencyCode = "";
+            if (obj.getExcise_duty_code().length() > 0) {
+                ExciseDutyDtl = new EFRIS_excise_duty_listBean().getEFRIS_invoice_detailByExciseDutyCode(obj.getExcise_duty_code());
+                if (null != ExciseDutyDtl) {
+                    FromUnitCodeTax = ExciseDutyDtl.getUnit();
+                    FromCurrencyCodeTax = ExciseDutyDtl.getCurrency();
+                    if (null == FromUnitCodeTax) {
+                        FromUnitCodeTax = "";
+                    }
+                    if (null == FromCurrencyCodeTax) {
+                        FromCurrencyCodeTax = "";
+                    }
+                    if (FromCurrencyCodeTax.length() > 0) {
+                        AccCurrency AccCur = new AccCurrencyBean().getCurrencyByTaxCode(FromCurrencyCodeTax);
+                        if (null != AccCur) {
+                            FromCurrencyCode = AccCur.getCurrencyCode();
+                            if (null == FromCurrencyCode) {
+                                FromCurrencyCode = "";
+                            }
+                        }
+                    }
+                    double RatePerc = 0;
+                    double FromRateQty = 0;
+                    double ToRateQty = 0;
+                    try {
+                        RatePerc = Double.parseDouble(ExciseDutyDtl.getRate_perc());
+                    } catch (Exception e) {
+                    }
+                    try {
+                        FromRateQty = Double.parseDouble(ExciseDutyDtl.getRate_qty());
+                    } catch (Exception e) {
+                    }
+                    try {
+                        ToRateQty = Double.parseDouble(ExciseDutyDtl.getRate_qty());
+                    } catch (Exception e) {
+                    }
+                    double TaxViaPerc = 0;
+                    double TaxViaQty = 0;
+                    double UnitConvertRatio = 1.0;
+                    if (FromUnitCodeTax.length() > 0) {
+                        Item_unit iu = new ItemBean().getItemUnitFrmDb(aItemId, FromUnitCodeTax);
+                        if (null != iu) {
+                            FromUnitId = iu.getUnit_id();
+                        }
+                        if (FromUnitId > 0 && aToUnitId > 0) {
+                            UnitConvertRatio = new ItemBean().getUnitConversionRate(aItemId, FromUnitId, aToUnitId);
+                        }
+                    }
+                    if (RatePerc > 0) {
+                        if (aIncludesED == 1) {
+                            TaxViaPerc = UnitConvertRatio * aQty * (aUnitPrice - (aUnitPrice / (1 + (0.01 * RatePerc))));
+                        } else {
+                            TaxViaPerc = 0.01 * RatePerc * UnitConvertRatio * aQty * aUnitPrice;
+                        }
+                    }
+                    if (FromRateQty > 0) {
+                        if (aIncludesED == 1) {
+                            if (aToCurrencyCode.length() > 0 && FromCurrencyCode.length() > 0) {
+                                ToRateQty = new AccXrateBean().convertCurrency(FromRateQty, FromCurrencyCode, aToCurrencyCode);
+                            }
+                            //TaxViaValue = (aUnitPrice - ToRateQty) * UnitConvertRatio * aQty;
+                            TaxViaQty = ToRateQty * UnitConvertRatio * aQty;
+                        } else {
+                            if (aToCurrencyCode.length() > 0 && FromCurrencyCode.length() > 0) {
+                                ToRateQty = new AccXrateBean().convertCurrency(FromRateQty, FromCurrencyCode, aToCurrencyCode);
+                            }
+                            TaxViaQty = ToRateQty * UnitConvertRatio * aQty;
+                        }
+                    }
+                    //update the obj
+                    obj.setRate_text(ExciseDutyDtl.getRateText());
+                    obj.setRate_currency_code_tax(FromCurrencyCodeTax);
+                    obj.setRate_unit_code_tax(FromUnitCodeTax);
+                    if (TaxViaPerc >= TaxViaQty) {
+                        ExciseTaxAmount = TaxViaPerc;
+                        obj.setCalc_excise_tax_amount(ExciseTaxAmount);
+                        obj.setRate_name(ExciseDutyDtl.getRateText_perc());
+                        obj.setRate_name_type("PERC");
+                        obj.setRate_value(RatePerc);
+                    } else {
+                        ExciseTaxAmount = TaxViaQty;
+                        obj.setCalc_excise_tax_amount(ExciseTaxAmount);
+                        obj.setRate_name(ExciseDutyDtl.getRateText_qty());
+                        obj.setRate_name_type("QTY");
+                        obj.setRate_value(ToRateQty);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public Transaction_item_excise getExciseDutyTax_old(String aExciseDutyCode, long aItemId, int aToUnitId, String aToCurrencyCode, double aQty, double aUnitPrice, int aIncludesED) {
         Transaction_item_excise obj = new Transaction_item_excise();
         double ExciseTaxAmount = 0;
         try {
@@ -322,22 +465,22 @@ public class TransItemExtBean implements Serializable {
                         }
                     }
                     double RatePerc = 0;
-                    double FromRateVal = 0;
-                    double ToRateVal = 0;
+                    double FromRateQty = 0;
+                    double ToRateQty = 0;
                     try {
                         RatePerc = Double.parseDouble(ExciseDutyDtl.getRate_perc());
                     } catch (Exception e) {
                     }
                     try {
-                        FromRateVal = Double.parseDouble(ExciseDutyDtl.getRate_value());
+                        FromRateQty = Double.parseDouble(ExciseDutyDtl.getRate_qty());
                     } catch (Exception e) {
                     }
                     try {
-                        ToRateVal = Double.parseDouble(ExciseDutyDtl.getRate_value());
+                        ToRateQty = Double.parseDouble(ExciseDutyDtl.getRate_qty());
                     } catch (Exception e) {
                     }
                     double TaxViaPerc = 0;
-                    double TaxViaValue = 0;
+                    double TaxViaQty = 0;
                     double UnitConvertRatio = 1.0;
                     if (FromUnitCodeTax.length() > 0) {
                         Item_unit iu = new ItemBean().getItemUnitFrmDb(aItemId, FromUnitCodeTax);
@@ -355,39 +498,63 @@ public class TransItemExtBean implements Serializable {
                             TaxViaPerc = 0.01 * RatePerc * UnitConvertRatio * aQty * aUnitPrice;
                         }
                     }
-                    if (FromRateVal > 0) {
+                    if (FromRateQty > 0) {
                         if (aIncludesED == 1) {
                             if (aToCurrencyCode.length() > 0 && FromCurrencyCode.length() > 0) {
-                                ToRateVal = new AccXrateBean().convertCurrency(FromRateVal, FromCurrencyCode, aToCurrencyCode);
+                                ToRateQty = new AccXrateBean().convertCurrency(FromRateQty, FromCurrencyCode, aToCurrencyCode);
                             }
-                            //TaxViaValue = (aUnitPrice - ToRateVal) * UnitConvertRatio * aQty;
-                            TaxViaValue = ToRateVal * UnitConvertRatio * aQty;
+                            //TaxViaValue = (aUnitPrice - ToRateQty) * UnitConvertRatio * aQty;
+                            TaxViaQty = ToRateQty * UnitConvertRatio * aQty;
                         } else {
                             if (aToCurrencyCode.length() > 0 && FromCurrencyCode.length() > 0) {
-                                ToRateVal = new AccXrateBean().convertCurrency(FromRateVal, FromCurrencyCode, aToCurrencyCode);
+                                ToRateQty = new AccXrateBean().convertCurrency(FromRateQty, FromCurrencyCode, aToCurrencyCode);
                             }
-                            TaxViaValue = ToRateVal * UnitConvertRatio * aQty;
+                            TaxViaQty = ToRateQty * UnitConvertRatio * aQty;
                         }
                     }
-                    if (TaxViaPerc >= TaxViaValue) {
-                        ExciseTaxAmount = TaxViaPerc;
-                    } else {
-                        ExciseTaxAmount = TaxViaValue;
-                    }
                     //update the obj
-                    obj.setCalc_excise_tax_amount(ExciseTaxAmount);
                     obj.setExcise_duty_code(aExciseDutyCode);
-                    obj.setRate_name(ExciseDutyDtl.getRateText());
-                    obj.setRate_perc(RatePerc);
-                    obj.setRate_value(FromRateVal);
+                    obj.setRate_text(ExciseDutyDtl.getRateText());
                     obj.setRate_currency_code_tax(FromCurrencyCodeTax);
                     obj.setRate_unit_code_tax(FromUnitCodeTax);
+                    if (TaxViaPerc >= TaxViaQty) {
+                        ExciseTaxAmount = TaxViaPerc;
+                        obj.setCalc_excise_tax_amount(ExciseTaxAmount);
+                        obj.setRate_name(ExciseDutyDtl.getRateText_perc());
+                        obj.setRate_name_type("PERC");
+                        obj.setRate_value(RatePerc);
+                    } else {
+                        ExciseTaxAmount = TaxViaQty;
+                        obj.setCalc_excise_tax_amount(ExciseTaxAmount);
+                        obj.setRate_name(ExciseDutyDtl.getRateText_qty());
+                        obj.setRate_name_type("QTY");
+                        obj.setRate_value(ToRateQty);
+                    }
                 }
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
         return obj;
+    }
+
+    public void clearTransItemExcise(Transaction_item_excise aObj) {
+        try {
+            if (aObj != null) {
+                aObj.setTransaction_item_excise_id(0);
+                aObj.setTransaction_item_id(0);
+                aObj.setCalc_excise_tax_amount(0);
+                aObj.setExcise_duty_code("");
+                aObj.setRate_currency_code_tax("");
+                aObj.setRate_name("");
+                aObj.setRate_name_type("");
+                aObj.setRate_text("");
+                aObj.setRate_unit_code_tax("");
+                aObj.setRate_value(0);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
     }
 
     /**

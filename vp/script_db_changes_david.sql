@@ -1,14 +1,7 @@
 -- put here changes to script_db_upgrade
-ALTER TABLE transaction_package MODIFY transaction_date datetime;
-ALTER TABLE transaction_package ADD COLUMN transaction_id bigint(20);
 
-
-
-
-
-
--- ************************************************************************
 -- put here changes to SPs
+<<<<<<< HEAD
 DROP PROCEDURE IF EXISTS sp_search_transaction_item_by_transaction_id;
 DELIMITER //
 CREATE PROCEDURE sp_search_transaction_item_by_transaction_id
@@ -136,6 +129,10 @@ BEGIN
 	WHERE transaction_package_item_id=in_transaction_package_item_id; 
 END//
 DELIMITER ;
+=======
+
+-- put here changes to Views
+>>>>>>> 3127f2b04d2ab1dc028dc4862ad467ef83be6b38
 
 DROP PROCEDURE IF EXISTS sp_update_transaction_package;
 DELIMITER //
