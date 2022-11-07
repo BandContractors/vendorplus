@@ -11470,6 +11470,7 @@ public class TransItemBean implements Serializable {
             String ItemCode = aSelectedTransItem.getItemCode();
             if (ItemCode.startsWith("PCG")) {
                 new TransactionPackageBean().loadPackageForInvoiceTrans(aTrans, aActiveTransItems, aSelectedTransItem);
+                aTrans.setTransactionNumber(ItemCode);
             } else if (ItemCode.startsWith("ST")) {
                 new TransBean().loadTransferForInvoiceTrans(aTrans, aActiveTransItems, aSelectedTransItem);
             } else {
