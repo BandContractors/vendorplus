@@ -111,10 +111,11 @@ public class AccClassBean implements Serializable {
         }
         return accclass;
     }
-    
+
     public List<AccClass> getAccClassObjectListAll() {
         String sql;
-        sql = "{select * from acc_class order by acc_class_name asc}";
+        //sql = "{select * from acc_class order by acc_class_name asc}";
+        sql = "select * from acc_class order by acc_class_name asc";
         ResultSet rs = null;
         this.setAccClassObjectList(new ArrayList<AccClass>());
         try (
