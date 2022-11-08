@@ -230,7 +230,7 @@ INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_
 ALTER TABLE transaction_item_excise ADD COLUMN excise_duty_code VARCHAR(50) NULL AFTER transaction_item_id;
 INSERT INTO download_status (download_name, download_status, download_status_msg, total_amount, total_downloaded, add_date) VALUES ('GOODS COMMODITY', '3', 'NEW', '0','0',Now());
 
-CREATE TABLE transaction_packacge_item_unit (
+CREATE TABLE transaction_package_item_unit (
   transaction_packacge_item_unit_id bigint(20) NOT NULL DEFAULT '0',
   unit_id int(11) NOT NULL,
   base_unit_qty double NOT NULL,
@@ -262,4 +262,8 @@ ALTER TABLE transaction_package MODIFY transaction_date datetime;
 ALTER TABLE transaction_package ADD COLUMN transaction_id bigint(20);
 
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',264,Now(),'6.0','');
+
+ALTER TABLE transaction_packacge_item_unit rename transaction_package_item_unit;
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',267,Now(),'6.0','');
+
 

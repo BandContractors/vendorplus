@@ -1,7 +1,7 @@
 -- put here changes to script_db_upgrade
 
 -- put here changes to SPs
-<<<<<<< HEAD
+
 DROP PROCEDURE IF EXISTS sp_search_transaction_item_by_transaction_id;
 DELIMITER //
 CREATE PROCEDURE sp_search_transaction_item_by_transaction_id
@@ -129,10 +129,10 @@ BEGIN
 	WHERE transaction_package_item_id=in_transaction_package_item_id; 
 END//
 DELIMITER ;
-=======
+
 
 -- put here changes to Views
->>>>>>> 3127f2b04d2ab1dc028dc4862ad467ef83be6b38
+
 
 DROP PROCEDURE IF EXISTS sp_update_transaction_package;
 DELIMITER //
@@ -167,12 +167,5 @@ DELIMITER ;
 
 
 
-select * from transaction_package where description ="ALKALINE BATTERY"22267
-select * from item where description like '%ALKALINE%'
 
-select * from transaction_package_item_unit 
-where transaction_package_id = (Select transaction_package_id from transaction_package where transaction_number='PCG22110103')
 
-select t.*, i.description from transaction_package_item t, item i where t.item_id = i.item_id and i.description like '%CHOPPERS%'
-
-select * from transaction_package where transaction = 'PCG22110706'
