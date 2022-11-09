@@ -4,6 +4,7 @@ import connections.DBConnection;
 import entities.Pay;
 import entities.PayTrans;
 import entities.Transaction_approval;
+import entities.Transaction_tax;
 import entities.Transaction_tax_map;
 import sessions.GeneralUserSetting;
 import java.io.Serializable;
@@ -88,7 +89,7 @@ public class OutputDetailBean implements Serializable {
 
             try {
                 //aOutputDetail.setTrans_items(new TransItemBean().getTransItemsByTransactionIdCEC(aOutputDetail.getTrans().getTransactionId()));
-               // aOutputDetail.setTransactionPackageItems(new TransactionPackageItemBean().getTransactionPackageItemOutput(aOutputDetail.getTrans().getTransactionId()));
+                // aOutputDetail.setTransactionPackageItems(new TransactionPackageItemBean().getTransactionPackageItemOutput(aOutputDetail.getTrans().getTransactionId()));
 
             } catch (Exception e) {
             }
@@ -256,8 +257,20 @@ public class OutputDetailBean implements Serializable {
             } catch (Exception e) {
             }
             try {
-                //aOutputDetail.setTrans_items(new TransItemBean().getTransItemsByTransactionIdCEC(aOutputDetail.getTrans().getTransactionId()));
+                if (aOutputDetail.getTrans().getTransactionTypeId() == 2) {
+                    Transaction_tax tt = new TransExtBean().getTransTaxByCategory(aOutputDetail.getTrans().getTransactionId(), "Excise Duty");
+                    if (null != tt) {
+                        aOutputDetail.getTrans().setTotalExciseDutyTaxAmount(tt.getTax_amount());
+                        aOutputDetail.getTrans().setTotalExciseDutableAmount(tt.getTaxable_amount());
+                    }
+                }
+            } catch (Exception e) {
+            }
+            try {
                 aOutputDetail.setTrans_items(new TransItemBean().getTransItemsOutput(aOutputDetail.getTrans().getTransactionId()));
+                if (aOutputDetail.getTrans().getTransactionTypeId() == 2) {
+                    new TransItemExtBean().setTransaction_item_exciseListByTransItem(aOutputDetail.getTrans_items());
+                }
             } catch (Exception e) {
             }
             try {
@@ -323,7 +336,8 @@ public class OutputDetailBean implements Serializable {
             }
             try {
                 if (aOutputDetail.getTrans().getTransactionTypeId() == 2) {
-                    new UtilityBean().calcUpdateTransDeemedAmount(aOutputDetail.getTrans(), aOutputDetail.getTrans_items());
+                    //new UtilityBean().calcUpdateTransDeemedAmount(aOutputDetail.getTrans(), aOutputDetail.getTrans_items());
+                    aOutputDetail.setTransTaxList(new TransExtBean().getTransaction_taxListByTrans(aOutputDetail.getTrans().getTransactionId()));
                 }
             } catch (Exception e) {
             }

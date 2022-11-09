@@ -203,7 +203,7 @@
                     <p:commandButton id="cmdbEdit" icon="fa fa-fw fa-edit" title="#{langsys['Edit']}" value="#{langsys['Edit']}" style="width: 120px;height: 55px;float: left;">
                         <p:ajax listener="#{transBean.quickOrderActions(trans,transBean.transList,'Edit')}" process="@form" update="dtblTransList growl1"/>
                     </p:commandButton>
-                      <p:commandButton id="cmdbSplit" icon="fa fa-fw fa-columns" title="#{langsys['Split']}" value="#{langsys['Split']}" style="width: 120px;height: 55px;float: left;">
+                    <p:commandButton id="cmdbSplit" icon="fa fa-fw fa-columns" title="#{langsys['Split']}" value="#{langsys['Split']}" style="width: 120px;height: 55px;float: left;">
                         <p:ajax listener="#{transBean.quickOrderActions(trans,transBean.transList,'Split')}"
                                 process="@form"  update="TransactionFormSales:dtblFirstTransactionItem  dtblTransactionItem TransactionFormSales:dtblTransList dtblTransList growl1"/>
                     </p:commandButton>

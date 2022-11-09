@@ -15,6 +15,7 @@ import entities.TransactionPackage;
 import entities.TransactionPackageItem;
 import entities.TransactionReason;
 import entities.TransactionType;
+import entities.Transaction_tax;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +56,7 @@ public class OutputDetail implements Serializable {
     private UserDetail approve_user_detail;
     private TransactionPackage transactionPackage;
     private List<TransactionPackageItem> transactionPackageItems = new ArrayList<>();
+    private List<Transaction_tax> transTaxList = new ArrayList<>();
 
     public OutputDetail() {
     }
@@ -449,5 +451,19 @@ public class OutputDetail implements Serializable {
      */
     public void setTransactionPackage(TransactionPackage transactionPackage) {
         this.transactionPackage = transactionPackage;
+    }
+
+    /**
+     * @return the transTaxList
+     */
+    public List<Transaction_tax> getTransTaxList() {
+        return transTaxList;
+    }
+
+    /**
+     * @param transTaxList the transTaxList to set
+     */
+    public void setTransTaxList(List<Transaction_tax> transTaxList) {
+        this.transTaxList = transTaxList;
     }
 }

@@ -3441,7 +3441,7 @@ public class TransItemBean implements Serializable {
             }
             try {
                 transitem.setDescription(aResultSet.getString("description"));
-            } catch (NullPointerException | SQLException npe) {
+            } catch (Exception e) {
                 transitem.setDescription("");
             }
             try {
@@ -3451,122 +3451,122 @@ public class TransItemBean implements Serializable {
             }
             try {
                 transitem.setTransactionDate(new Date(aResultSet.getDate("transaction_date").getTime()));
-            } catch (NullPointerException | SQLException npe) {
+            } catch (Exception e) {
                 transitem.setTransactionDate(null);
             }
             try {
                 transitem.setAddDate(new Date(aResultSet.getTimestamp("add_date").getTime()));
-            } catch (NullPointerException | SQLException npe) {
+            } catch (Exception e) {
                 transitem.setAddDate(null);
             }
             try {
                 transitem.setEditDate(new Date(aResultSet.getTimestamp("edit_date").getTime()));
-            } catch (NullPointerException | SQLException npe) {
+            } catch (Exception e) {
                 transitem.setEditDate(null);
             }
             try {
                 transitem.setStoreName(aResultSet.getString("store_name"));
-            } catch (NullPointerException | SQLException npe) {
+            } catch (Exception e) {
                 transitem.setStoreName("");
             }
             try {
                 transitem.setStoreName2(aResultSet.getString("store_name2"));
-            } catch (NullPointerException | SQLException npe) {
+            } catch (Exception e) {
                 transitem.setStoreName2("");
             }
             try {
                 transitem.setTransactorNames(aResultSet.getString("transactor_names"));
-            } catch (NullPointerException | SQLException npe) {
+            } catch (Exception e) {
                 transitem.setTransactorNames("");
             }
             try {
                 transitem.setBillTransactorName(aResultSet.getString("bill_transactor_names"));
-            } catch (NullPointerException | SQLException npe) {
+            } catch (Exception e) {
                 transitem.setBillTransactorName("");
             }
             try {
                 transitem.setTransactionTypeName(aResultSet.getString("transaction_type_name"));
-            } catch (NullPointerException | SQLException npe) {
+            } catch (Exception e) {
                 transitem.setTransactionTypeName("");
             }
             try {
                 transitem.setTransactionReasonName(aResultSet.getString("transaction_reason_name"));
-            } catch (NullPointerException | SQLException npe) {
+            } catch (Exception e) {
                 transitem.setTransactionReasonName("");
             }
             try {
                 transitem.setAddUserDetailName(aResultSet.getString("add_user_detail_name"));
-            } catch (NullPointerException | SQLException npe) {
+            } catch (Exception e) {
                 transitem.setAddUserDetailName("");
             }
             try {
                 transitem.setEditUserDetailName(aResultSet.getString("edit_user_detail_name"));
-            } catch (NullPointerException | SQLException npe) {
+            } catch (Exception e) {
                 transitem.setEditUserDetailName("");
             }
             try {
                 transitem.setTransactionUserDetailName(aResultSet.getString("transaction_user_detail_name"));
-            } catch (NullPointerException | SQLException npe) {
+            } catch (Exception e) {
                 transitem.setTransactionUserDetailName("");
             }
             try {
                 transitem.setUnitCostPrice(aResultSet.getDouble("unit_cost_price"));
-            } catch (NullPointerException | SQLException npe) {
+            } catch (Exception e) {
                 transitem.setUnitCostPrice(0);
             }
             try {
                 transitem.setUnitProfitMargin(aResultSet.getDouble("unit_profit_margin"));
-            } catch (NullPointerException | SQLException npe) {
+            } catch (Exception e) {
                 transitem.setUnitProfitMargin(0);
             }
             try {
                 transitem.setEarnPerc(aResultSet.getDouble("earn_perc"));
-            } catch (NullPointerException | SQLException npe) {
+            } catch (Exception e) {
                 transitem.setEarnPerc(0);
             }
             try {
                 transitem.setEarnAmount(aResultSet.getDouble("earn_amount"));
-            } catch (NullPointerException | SQLException npe) {
+            } catch (Exception e) {
                 transitem.setEarnAmount(0);
             }
             try {
                 transitem.setTransactionUserDetailId(aResultSet.getInt("transaction_user_detail_id"));
-            } catch (NullPointerException | SQLException npe) {
+            } catch (Exception e) {
                 transitem.setTransactionUserDetailId(0);
             }
             try {
                 transitem.setBillTransactorId(aResultSet.getLong("bill_transactor_id"));
-            } catch (NullPointerException | SQLException npe) {
+            } catch (Exception e) {
                 transitem.setBillTransactorId(0);
             }
             try {
                 transitem.setCodeSpecific(aResultSet.getString("code_specific"));
-            } catch (NullPointerException | SQLException npe) {
+            } catch (Exception e) {
                 transitem.setCodeSpecific("");
             }
             try {
                 transitem.setDescSpecific(aResultSet.getString("desc_specific"));
-            } catch (NullPointerException | SQLException npe) {
+            } catch (Exception e) {
                 transitem.setDescSpecific("");
             }
             try {
                 transitem.setDescMore(aResultSet.getString("desc_more"));
-            } catch (NullPointerException | SQLException npe) {
+            } catch (Exception e) {
                 transitem.setDescMore("");
             }
             try {
                 transitem.setWarrantyDesc(aResultSet.getString("warranty_desc"));
-            } catch (NullPointerException | SQLException npe) {
+            } catch (Exception e) {
                 transitem.setWarrantyDesc("");
             }
             try {
                 transitem.setAddDate(new Date(aResultSet.getDate("warranty_expiry_date").getTime()));
-            } catch (NullPointerException | SQLException npe) {
+            } catch (Exception e) {
                 transitem.setAddDate(null);
             }
             try {
                 transitem.setAccountCode(aResultSet.getString("account_code"));
-            } catch (NullPointerException | SQLException npe) {
+            } catch (Exception e) {
                 transitem.setAccountCode("");
             }
             try {
@@ -3601,17 +3601,17 @@ public class TransItemBean implements Serializable {
             }
             try {
                 transitem.setResidualValue(aResultSet.getDouble("residual_value"));
-            } catch (NullPointerException | SQLException npe) {
+            } catch (Exception e) {
                 transitem.setResidualValue(0);
             }
             try {
                 transitem.setNarration(aResultSet.getString("narration"));
-            } catch (NullPointerException | SQLException npe) {
+            } catch (Exception e) {
                 transitem.setNarration("");
             }
             try {
                 transitem.setQty_balance(aResultSet.getDouble("qty_balance"));
-            } catch (NullPointerException | SQLException npe) {
+            } catch (Exception e) {
                 transitem.setQty_balance(0);
             }
             try {
@@ -3621,7 +3621,7 @@ public class TransItemBean implements Serializable {
             }
             try {
                 transitem.setQty_damage(aResultSet.getDouble("qty_damage"));
-            } catch (NullPointerException | SQLException npe) {
+            } catch (Exception e) {
                 transitem.setQty_damage(0);
             }
             try {
@@ -3660,12 +3660,12 @@ public class TransItemBean implements Serializable {
             //TransItem transitem = new TransItem();
             try {
                 transitem.setTransactionItemId(aResultSet.getLong("transaction_item_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setTransactionItemId(0);
             }
             try {
                 transitem.setTransactionId(aResultSet.getLong("transaction_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setTransactionId(0);
             }
             try {
@@ -3679,101 +3679,101 @@ public class TransItemBean implements Serializable {
             }
             try {
                 transitem.setItemId(aResultSet.getLong("item_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setItemId(0);
             }
             try {
                 transitem.setBatchno(aResultSet.getString("batchno"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setBatchno("");
             }
             try {
                 transitem.setItemQty(aResultSet.getDouble("item_qty"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setItemQty(0);
             }
 
             try {
                 transitem.setUnitPrice(aResultSet.getDouble("unit_price"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setUnitPrice(0);
             }
 
             try {
                 transitem.setItemMnfDate(new Date(aResultSet.getDate("item_mnf_date").getTime()));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setItemMnfDate(null);
             }
 
             try {
                 transitem.setItemExpryDate(new Date(aResultSet.getDate("item_expiry_date").getTime()));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setItemExpryDate(null);
             }
 
             try {
                 transitem.setUnitTradeDiscount(aResultSet.getDouble("unit_trade_discount"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setUnitTradeDiscount(0);
             }
 
             try {
                 transitem.setUnitVat(aResultSet.getDouble("unit_vat"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setUnitVat(0);
             }
 
             try {
                 transitem.setAmount(aResultSet.getDouble("amount"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setAmount(0);
             }
 
             try {
                 transitem.setVatRated(aResultSet.getString("vat_rated"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setVatRated("");
             }
 
             try {
                 transitem.setVatPerc(aResultSet.getDouble("vat_perc"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setVatPerc(0);
             }
 
             try {
                 transitem.setUnitPriceIncVat(aResultSet.getDouble("unit_price_inc_vat"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setUnitPriceIncVat(0);
             }
 
             try {
                 transitem.setUnitPriceExcVat(aResultSet.getDouble("unit_price_exc_vat"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setUnitPriceExcVat(0);
             }
 
             try {
                 transitem.setAmountIncVat(aResultSet.getDouble("amount_inc_vat"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setAmountIncVat(0);
             }
 
             try {
                 transitem.setAmountExcVat(aResultSet.getDouble("amount_exc_vat"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setAmountExcVat(0);
             }
 
             try {
                 transitem.setStockEffect(aResultSet.getString("stock_effect"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setStockEffect("");
             }
 
             try {
                 transitem.setIsTradeDiscountVatLiable(aResultSet.getString("is_trade_discount_vat_liable"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setIsTradeDiscountVatLiable("");
             }
 
@@ -3910,32 +3910,32 @@ public class TransItemBean implements Serializable {
             }
             try {
                 transitem.setPurchaseDate(new Date(aResultSet.getDate("purchase_date").getTime()));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setPurchaseDate(null);
             }
             try {
                 transitem.setDepStartDate(new Date(aResultSet.getDate("dep_start_date").getTime()));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setDepStartDate(null);
             }
             try {
                 transitem.setDepMethodId(aResultSet.getInt("dep_method_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setDepMethodId(0);
             }
             try {
                 transitem.setDepRate(aResultSet.getDouble("dep_rate"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setDepRate(0);
             }
             try {
                 transitem.setAverageMethodId(aResultSet.getInt("average_method_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setAverageMethodId(0);
             }
             try {
                 transitem.setEffectiveLife(aResultSet.getInt("effective_life"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setEffectiveLife(0);
             }
             try {
@@ -3955,7 +3955,7 @@ public class TransItemBean implements Serializable {
             }
             try {
                 transitem.setDuration_value(aResultSet.getDouble("duration_value"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setDuration_value(0);
             }
             try {
@@ -3965,7 +3965,7 @@ public class TransItemBean implements Serializable {
             }
             try {
                 transitem.setDuration_passed(aResultSet.getDouble("duration_passed"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setDuration_passed(0);
             }
             try {
@@ -3974,7 +3974,7 @@ public class TransItemBean implements Serializable {
                 } else {
                     transitem.setSpecific_size(1);
                 }
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 transitem.setSpecific_size(1);
             }
         } catch (Exception e) {
@@ -5164,7 +5164,7 @@ public class TransItemBean implements Serializable {
 
     public List<TransItem> getTransItemsOutput(long aTransactionId) {
         String sql;
-        sql = "{call sp_search_transaction_package_item_by_transaction_id(?)}";
+        sql = "{call sp_search_transaction_item_by_transaction_id4(?)}";
         ResultSet rs = null;
         List<TransItem> tis = new ArrayList<>();
         try (
