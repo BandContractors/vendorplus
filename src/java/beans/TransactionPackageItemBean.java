@@ -12,6 +12,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import connections.DBConnection;
 import entities.AccCoa;
+import entities.AccCurrency;
 import entities.CompanySetting;
 import entities.DiscountPackageItem;
 import entities.Item;
@@ -32,7 +33,9 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import static java.sql.Types.VARCHAR;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -53,7 +56,7 @@ public class TransactionPackageItemBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
     static Logger LOGGER = Logger.getLogger(TransactionPackageItemBean.class.getName());
-
+    private List<Trans> TransListHist = new ArrayList<>();
     private List<TransactionPackageItem> TransPackageItemList = new ArrayList<>();
 
     @ManagedProperty("#{menuItemBean}")
@@ -96,7 +99,6 @@ public class TransactionPackageItemBean implements Serializable {
             } catch (Exception npe) {
                 transPackageItem.setVatPerc(0);
             }
-
             try {
                 transPackageItem.setItemDescription(aResultSet.getString("item_description"));
             } catch (Exception e) {
@@ -112,7 +114,6 @@ public class TransactionPackageItemBean implements Serializable {
             } catch (Exception e) {
                 transPackageItem.setTransactionPackageItemId(0);
             }
-
             try {
                 transPackageItem.setUnitVat(aResultSet.getDouble("unit_vat"));
             } catch (Exception e) {
@@ -134,7 +135,7 @@ public class TransactionPackageItemBean implements Serializable {
                 transPackageItem.setItemId(0);
             }
             try {
-                transPackageItem.setUnitTradeDiscount(aResultSet.getDouble("item_code"));
+                transPackageItem.setUnitTradeDiscount(aResultSet.getDouble("unit_trade_discount"));
             } catch (Exception e) {
                 transPackageItem.setUnitTradeDiscount(0);
             }
@@ -440,9 +441,9 @@ public class TransactionPackageItemBean implements Serializable {
             this.TransPackageItemList.add(transIt);
             //  this.addTransItemCEC(aStoreId, aTransTypeId, aTransReasonId, TransactionPackage, aTransPackageItemList, NewTransPackageItem, aSelectedItem);
             //}
-           // transactionPackage.setSubTotal(new TransactionPackageBean().getSubTotal(aTransactionPackageItemList));
-           // transactionPackage.setGrandTotal(new TransactionPackageBean().getGrandTotal(aTransactionPackageItemList));
-            this.setTransTotalsAndUpdateCEC(aTransTypeId,aTransReasonId, aTrans,transactionPackage, aTransactionPackageItemList);
+            transactionPackage.setSubTotal(new TransactionPackageBean().getSubTotal(aTransactionPackageItemList));
+            transactionPackage.setGrandTotal(new TransactionPackageBean().getGrandTotal(aTransactionPackageItemList));
+            this.setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, transactionPackage, aTransactionPackageItemList);
             this.clearTransactionPackageItem(NewTransPackageItem);
             new ItemBean().clearSelectedItem();
 
@@ -462,7 +463,7 @@ public class TransactionPackageItemBean implements Serializable {
         }
     }
 
-    public void editTransPackageItemCEC(int aTransTypeId, Trans aTrans, TransactionPackage transactionPackageItem, List<TransactionPackageItem> aActiveTransItems, TransactionPackageItem ti) {
+    public void editTransPackageItemCEC(int aTransTypeId, Trans aTrans, TransactionPackage transactionPackage, List<TransactionPackageItem> aActiveTransItems, TransactionPackageItem ti) {
         try {
             TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
             this.updateBaseUnityQty(ti);
@@ -475,7 +476,7 @@ public class TransactionPackageItemBean implements Serializable {
             //round off amounts basing on currency rules
             this.roundTransItemsAmount(aTrans, ti);
             //update totals
-            this.setTransTotalsAndUpdateCEC(aTransTypeId, 0, aTrans, transactionPackageItem, aActiveTransItems);
+            this.setTransTotalsAndUpdateCEC(aTransTypeId, 0, aTrans, transactionPackage, aActiveTransItems);
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -487,7 +488,11 @@ public class TransactionPackageItemBean implements Serializable {
         int ListItemNo = ati.size();
         double TotTradeDisc = 0;
         while (ListItemIndex < ListItemNo) {
-            TotTradeDisc = TotTradeDisc + (ati.get(ListItemIndex).getUnitTradeDiscount() * ati.get(ListItemIndex).getItemQty());
+            if (ati.get(ListItemIndex).getUnitTradeDiscount() > 0) {
+                TotTradeDisc = TotTradeDisc + (ati.get(ListItemIndex).getUnitTradeDiscount() * ati.get(ListItemIndex).getItemQty());
+            } else {
+                TotTradeDisc = TotTradeDisc + ati.get(ListItemIndex).getItemQty();
+            }
             ListItemIndex = ListItemIndex + 1;
         }
         TotTradeDisc = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), TotTradeDisc, "TOTAL_OTHER");
@@ -500,21 +505,26 @@ public class TransactionPackageItemBean implements Serializable {
         int ListItemNo = ati.size();
         double TVat = 0;
         while (ListItemIndex < ListItemNo) {
-            TVat = TVat + (ati.get(ListItemIndex).getUnitVat() * ati.get(ListItemIndex).getItemQty());
+            if (ati.get(ListItemIndex).getUnitVat() > 0) {
+                TVat = TVat + (ati.get(ListItemIndex).getUnitVat() * ati.get(ListItemIndex).getItemQty());
+            } else {
+                TVat = TVat + ati.get(ListItemIndex).getItemQty();
+            }
             ListItemIndex = ListItemIndex + 1;
         }
         return TVat;
     }
 
-    public void setTransTotalsAndUpdateCEC(int aTransTypeId, int aTransReasonId, Trans aTrans, TransactionPackage transactionPackage, List<TransactionPackageItem> aActiveTransItems) {
-        aTrans.setSubTotal((transactionPackage.getSubTotal() + aTrans.getTotalVat()) - (transactionPackage.getTotalTradeDiscount() + transactionPackage.getCashDiscount()));
-        aTrans.setTotalTradeDiscount(this.getTotalTradeDiscountCEC(aTrans, aActiveTransItems));
-        aTrans.setTotalVat(this.getTotalVat(aActiveTransItems));
-        aTrans.setGrandTotal(this.getGrandTotal(transactionPackage));
+    public void setTransTotalsAndUpdateCEC(int aTransTypeId, int aTransReasonId, Trans aTrans, TransactionPackage transactionPackage, List<TransactionPackageItem> aTransactionPackageItemList) {
+        aTrans.setGrandTotal(new TransactionPackageBean().getSubTotal(aTransactionPackageItemList));
+
+        aTrans.setSubTotal(new TransactionPackageBean().getSubTotal(aTransactionPackageItemList));
+        aTrans.setTotalTradeDiscount(this.getTotalTradeDiscountCEC(aTrans, aTransactionPackageItemList));
+        aTrans.setTotalVat(this.getTotalVat(aTransactionPackageItemList));
 
         transactionPackage.setSubTotal((aTrans.getSubTotal() + transactionPackage.getTotalTax()) - (transactionPackage.getTotalTradeDiscount() + transactionPackage.getCashDiscount()));
-        transactionPackage.setTotalTradeDiscount(this.getTotalTradeDiscountCEC(aTrans, aActiveTransItems));
-        transactionPackage.setTotalTax(this.getTotalVat(aActiveTransItems));
+        transactionPackage.setTotalTradeDiscount(this.getTotalTradeDiscountCEC(aTrans, aTransactionPackageItemList));
+        transactionPackage.setTotalTax(this.getTotalVat(aTransactionPackageItemList));
         transactionPackage.setGrandTotal(this.getGrandTotal(transactionPackage));
 
         //Customer Display
@@ -531,6 +541,46 @@ public class TransactionPackageItemBean implements Serializable {
         }
     }
 
+    public boolean updateTransPackageItems(long aTransactionId, List<TransactionPackageItem> aNewTransPackageItems) {
+        try {
+            //get trans items that was moved to the history table
+
+            //1. Reverse and update all trans items whoose qty has changed
+            int NewListItemIndex = 0;
+            int NewListItemNo = aNewTransPackageItems.size();
+            TransactionPackageItem nti = null;
+            while (NewListItemIndex < NewListItemNo) {
+                nti = aNewTransPackageItems.get(NewListItemIndex);//new TransactionPackageItem();
+                this.updateTransPackageItemCEC(nti);
+                NewListItemIndex = NewListItemIndex + 1;
+            }
+            return true;
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+            return false;
+        }
+    }
+
+    public void updateTransPackageItemCEC(TransactionPackageItem transPackageItem) {
+        int success = 0;
+        String sql = "{call sp_update_transaction_package_item(?,?,?,?,?,?)}";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                CallableStatement cs = conn.prepareCall(sql);) {
+            cs.setLong("in_transaction_package_item_id", transPackageItem.getTransactionPackageItemId());
+            cs.setDouble("in_item_qty", transPackageItem.getItemQty());
+            cs.setDouble("in_unit_price", transPackageItem.getUnitPrice());
+            cs.setDouble("in_unit_trade_discount", transPackageItem.getUnitTradeDiscount());
+            cs.setDouble("in_unit_vat", transPackageItem.getUnitVat());
+            cs.setDouble("in_amount", transPackageItem.getAmount());
+            cs.executeUpdate();
+            success = new TransItemExtBean().updateTransaction_item_unit(transPackageItem.getTransactionPackageItemId(), transPackageItem.getBaseUnitQty());
+        } catch (Exception e) {
+            success = 0;
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public double getGrandTotal(TransactionPackage aTransPackage) {
         double GTotal = 0;
         GTotal = (aTransPackage.getSubTotal() + aTransPackage.getTotalTax()) - (aTransPackage.getTotalTradeDiscount() + aTransPackage.getCashDiscount());
@@ -542,11 +592,11 @@ public class TransactionPackageItemBean implements Serializable {
         aTransPackageItem.setAmount(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), aTransPackageItem.getAmount(), "ITEM"));
     }
 
-    public void removeTransItemCEC(int aTransTypeId, Trans aTrans,TransactionPackage transactionPackage, List<TransactionPackageItem> aActiveTransItems, TransactionPackageItem ti) {
+    public void removeTransItemCEC(int aTransTypeId, Trans aTrans, TransactionPackage transactionPackage, List<TransactionPackageItem> aActiveTransItems, TransactionPackageItem ti) {
         try {
             aActiveTransItems.remove(ti);
             //update totals
-            this.setTransTotalsAndUpdateCEC(aTransTypeId, 0, aTrans,transactionPackage, aActiveTransItems);
+            this.setTransTotalsAndUpdateCEC(aTransTypeId, 0, aTrans, transactionPackage, aActiveTransItems);
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -632,13 +682,15 @@ public class TransactionPackageItemBean implements Serializable {
                 new ItemBean().clearItem(aItem);
             } else {
                 aTransPackageItemToUpdate.setItemId(aItem.getItemId());
-                aTransPackageItemToUpdate.setUnitPrice(aItem.getUnitCostPrice());
+                aTransPackageItemToUpdate.setUnitPrice(aItem.getUnitRetailsalePrice());
                 aTransPackageItemToUpdate.setVatRated(aItem.getVatRated());
                 aTransPackageItemToUpdate.setItemQty(1);
                 aTransPackageItemToUpdate.setUnitId(aItem.getUnitId());
                 aTransPackageItemToUpdate.setItemDescription(aItem.getDescription());
-                aTransPackageItemToUpdate.setAmount(aItem.getUnitCostPrice());
+                aTransPackageItemToUpdate.setAmount(aItem.getUnitRetailsalePrice());
+                //for where item currency is different from trans currency, we first get the factor to convert to trans currency
             }
+
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -680,22 +732,48 @@ public class TransactionPackageItemBean implements Serializable {
 
     public void setTransPackageItemsByTransactionId(List<TransactionPackageItem> transactionPackageItem, long aTransactionId) {
         String sql;
-        sql = "{call sp_search_transaction_item_by_transaction_id(?)}";
+        sql = "{call sp_search_transaction_package_item_by_transaction_id(?)}";
         ResultSet rs = null;
-        transactionPackageItem.clear();
+        if (transactionPackageItem != null) {
+            if (transactionPackageItem.size() > 0) {
+                transactionPackageItem.clear();
+            }
+        }
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             ps.setLong(1, aTransactionId);
             rs = ps.executeQuery();
-            TransactionPackageItem tp = new TransactionPackageItem();
+            TransactionPackageItem tp = null;
             while (rs.next()) {
+                tp = new TransactionPackageItem();
                 this.setTransactionPackageItemFromResultset(tp, rs);
                 transactionPackageItem.add(tp);
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
+    }
+
+    public String getSpecificSizeQtyFromQtyAndSizeStr(TransactionPackageItem transactionPackageItem) {
+        String outpstr = "";
+        double outp = 1.0;
+        double qty = 0;
+        double sze = 1;
+        if (null != transactionPackageItem) {
+            qty = transactionPackageItem.getItemQty();
+            //sze = transactionPackageItem.getgetSpecific_size();
+            sze = 1;
+            if (sze > 0) {
+                outp = qty / sze;
+            }
+        }
+        if (sze == 1) {
+            //do nothng
+        } else {
+            outpstr = " (" + new UtilityBean().formatDoubleToString(outp) + "PCs)";
+        }
+        return outpstr;
     }
 
     public int deleteTransPackageItemsUnitByTransPackageItemId(long aTransPackageItemId) {
@@ -777,5 +855,19 @@ public class TransactionPackageItemBean implements Serializable {
      */
     public void setTransPackageItemList(List<TransactionPackageItem> TransPackageItemList) {
         this.TransPackageItemList = TransPackageItemList;
+    }
+
+    /**
+     * @return the TransListHist
+     */
+    public List<Trans> getTransListHist() {
+        return TransListHist;
+    }
+
+    /**
+     * @param TransListHist the TransListHist to set
+     */
+    public void setTransListHist(List<Trans> TransListHist) {
+        this.TransListHist = TransListHist;
     }
 }

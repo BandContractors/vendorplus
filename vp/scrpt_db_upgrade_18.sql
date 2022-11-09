@@ -263,3 +263,7 @@ ALTER TABLE transaction_package ADD COLUMN transaction_id bigint(20);
 
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',264,Now(),'6.0','');
 
+ALTER TABLE transaction_packacge_item_unit rename transaction_package_item_unit;
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',267,Now(),'6.0','');
+
+
