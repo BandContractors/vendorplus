@@ -42,7 +42,7 @@ VALUES('scrpt_db_upgrade_18',39,Now(),'6.0','');
 INSERT INTO parameter_list (parameter_list_id, context, parameter_name, parameter_value, description) 
 VALUES (97, 'GENERAL', 'FORCE_UNIT_SELECTION', '0','0:No and 1:Yes. If Yes, Unit will be selected manually at each transaction. If No, default unit is be selected automatically. Applies to Items with multiple units');
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',44,Now(),'6.0','');
-
+-- ***NOTE*** 1) FIRST RUN STORED PROCEDURES BEFORE PROCEEDING TO 2) NEXT STATEMENT ON LINE 47 BELOW **NOTE**
 -- Replace db_name with database name such as daytoday_sm_branch
 CALL sp_alter_stock_ledger_tables_trans_item_id("db_name");
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',48,Now(),'6.0','');
@@ -231,10 +231,10 @@ ALTER TABLE transaction_item_excise ADD COLUMN excise_duty_code VARCHAR(50) NULL
 INSERT INTO download_status (download_name, download_status, download_status_msg, total_amount, total_downloaded, add_date) VALUES ('GOODS COMMODITY', '3', 'NEW', '0','0',Now());
 
 CREATE TABLE transaction_package_item_unit (
-  transaction_packacge_item_unit_id bigint(20) NOT NULL DEFAULT '0',
+  transaction_package_item_unit_id bigint(20) NOT NULL DEFAULT '0',
   unit_id int(11) NOT NULL,
   base_unit_qty double NOT NULL,
-  PRIMARY KEY (transaction_packacge_item_unit_id)
+  PRIMARY KEY (transaction_package_item_unit_id)
 ) ENGINE=InnoDB;
 
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',240,Now(),'6.0','');
