@@ -2,19 +2,22 @@ package beans;
 
 import connections.DBConnection;
 import entities.AccCoa;
+import entities.CompanySetting;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import sessions.GeneralUserSetting;
 import utilities.UtilityBean;
 /*
  * To change this template, choose Tools | Templates
@@ -34,6 +37,10 @@ public class AccCoaBean implements Serializable {
     private String ActionMessage = null;
     private List<AccCoa> AccCoaObjectList;
     private AccCoa AccCoaObject;
+    private AccCoa AccCoaDetail = null;
+
+    @ManagedProperty("#{menuItemBean}")
+    private MenuItemBean menuItemBean;
 
     public void setAccCoaFromResultset(AccCoa acccoa, ResultSet aResultSet) {
         try {
@@ -485,6 +492,155 @@ public class AccCoaBean implements Serializable {
         }
     }
 
+    public void clearAccCoaDetail() {
+        if (null != AccCoaDetail) {
+            AccCoaDetail.setAccCoaId(0);
+            AccCoaDetail.setAccountCode("");
+            AccCoaDetail.setAccountName("");
+            AccCoaDetail.setAccountDesc("");
+            AccCoaDetail.setAccClassId(0);
+            AccCoaDetail.setAccTypeId(0);
+            AccCoaDetail.setAccGroupId(0);
+            AccCoaDetail.setAccCategoryId(0);
+            AccCoaDetail.setOrderCoa(0);
+            AccCoaDetail.setIsActive(0);
+            AccCoaDetail.setIsDeleted(0);
+            AccCoaDetail.setIsChild(0);
+            AccCoaDetail.setIsTransactorMandatory(0);
+            AccCoaDetail.setIsSystemAccount(0);
+            AccCoaDetail.setAddBy(0);
+            AccCoaDetail.setLastEditBy(0);
+            AccCoaDetail.setAddDate(null);
+            AccCoaDetail.setLastEditDate(null);
+        }
+    }
+
+    public void displayAccCoaDetail(AccCoa aFromAccCoa, AccCoa aToAccCoa) {
+        try {
+            this.clearAccCoaDetail();
+            aToAccCoa.setAccCoaId(aFromAccCoa.getAccCoaId());
+            aToAccCoa.setAccountCode(aFromAccCoa.getAccountCode());
+            aToAccCoa.setAccountName(aFromAccCoa.getAccountName());
+            aToAccCoa.setAccountDesc(aFromAccCoa.getAccountDesc());
+            aToAccCoa.setAccClassId(aFromAccCoa.getAccClassId());
+            aToAccCoa.setAccTypeId(aFromAccCoa.getAccTypeId());
+            aToAccCoa.setAccGroupId(aFromAccCoa.getAccGroupId());
+            aToAccCoa.setAccCategoryId(aFromAccCoa.getAccCategoryId());
+            aToAccCoa.setOrderCoa(aFromAccCoa.getOrderCoa());
+            aToAccCoa.setIsActive(aFromAccCoa.getIsActive());
+            aToAccCoa.setIsDeleted(aFromAccCoa.getIsDeleted());
+            aToAccCoa.setIsChild(aFromAccCoa.getIsChild());
+            aToAccCoa.setIsTransactorMandatory(aFromAccCoa.getIsTransactorMandatory());
+            aToAccCoa.setIsSystemAccount(aFromAccCoa.getIsSystemAccount());
+            aToAccCoa.setAddBy(aFromAccCoa.getAddBy());
+            aToAccCoa.setLastEditBy(aFromAccCoa.getLastEditBy());
+            aToAccCoa.setAddDate(aFromAccCoa.getAddDate());
+            aToAccCoa.setLastEditDate(aFromAccCoa.getLastEditDate());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void saveAccCoa(AccCoa aAccCoa) {
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
+        String msg;
+        String sql = null;
+        try {
+            try {
+                BaseName = getMenuItemBean().getMenuItemObj().getLANG_BASE_NAME_SYS();
+            } catch (Exception e) {
+            }
+                long saved = 0;
+                if (aAccCoa.getAccCoaId()== 0) {
+                    saved = this.insertAccCoa(aAccCoa);
+                } else if (aAccCoa.getAccCoaId()> 0) {
+                    saved = this.updateAccCoa(aAccCoa);
+                }
+                if (saved > 0) {
+                    msg = "Chart of Account Saved Successfully";
+                    this.clearAccCoa(aAccCoa);
+                } else {
+                    msg = "Chart of Account NOT Saved";
+                }
+                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public int insertAccCoa(AccCoa aAccCoa) {
+        int saved = 0;
+        String sql = "INSERT INTO acc_coa (account_code,account_name,account_desc,acc_class_id,acc_type_id,acc_group_id,acc_category_id,order_coa,"
+                + "is_active,is_deleted,is_child,is_transactor_mandatory,is_system_account,add_date,add_by,last_edit_date,last_edit_by) "
+                + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            //account_code,account_name,account_desc,acc_class_id,acc_type_id,acc_group_id,acc_category_id,order_coa
+            ps.setString(1, aAccCoa.getAccountCode());
+            ps.setString(2, aAccCoa.getAccountName());
+            ps.setString(3, aAccCoa.getAccountDesc());
+            ps.setInt(4, aAccCoa.getAccClassId());
+            ps.setInt(5, aAccCoa.getAccTypeId());
+            ps.setInt(6, aAccCoa.getAccGroupId());
+            ps.setInt(7, aAccCoa.getAccCategoryId());
+            ps.setInt(8, aAccCoa.getOrderCoa());
+            //is_active,is_deleted,is_child,is_transactor_mandatory,is_system_account,add_date,add_by,last_edit_date,last_edit_by
+            ps.setInt(9, aAccCoa.getIsActive());
+            ps.setInt(10, aAccCoa.getIsDeleted());
+            ps.setInt(11, aAccCoa.getIsChild());
+            ps.setInt(12, aAccCoa.getIsTransactorMandatory());
+            ps.setInt(13, aAccCoa.getIsSystemAccount());
+            ps.setTimestamp(14, new java.sql.Timestamp(new CompanySetting().getCURRENT_SERVER_DATE().getTime()));
+            ps.setInt(15, new GeneralUserSetting().getCurrentUser().getUserDetailId());
+            ps.setTimestamp(16, null);
+            ps.setInt(17, aAccCoa.getLastEditBy());
+
+            ps.executeUpdate();
+            saved = 1;
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return saved;
+    }
+
+    public int updateAccCoa(AccCoa aAccCoa) {
+        int IsUpdated = 0;
+        String sql = "UPDATE acc_coa SET account_code=?,account_name=?,account_desc=? ,acc_class_id=?,acc_type_id=?,acc_group_id=?,"
+                + "acc_category_id=?,order_coa=?,is_active=?,is_deleted=?,is_child=?,is_transactor_mandatory=?,is_system_account=?,"
+                + "add_date=?,add_by=?,last_edit_date=?,last_edit_by=? WHERE acc_coa_id=?";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+
+            ps.setString(1, aAccCoa.getAccountCode());
+            ps.setString(2, aAccCoa.getAccountName());
+            ps.setString(3, aAccCoa.getAccountDesc());
+            ps.setInt(4, aAccCoa.getAccClassId());
+            ps.setInt(5, aAccCoa.getAccTypeId());
+            ps.setInt(6, aAccCoa.getAccGroupId());
+            ps.setInt(7, aAccCoa.getAccCategoryId());
+            ps.setInt(8, aAccCoa.getOrderCoa());
+            ps.setInt(9, aAccCoa.getIsActive());
+            ps.setInt(10, aAccCoa.getIsDeleted());
+            ps.setInt(11, aAccCoa.getIsChild());
+            ps.setInt(12, aAccCoa.getIsTransactorMandatory());
+            ps.setInt(13, aAccCoa.getIsSystemAccount());
+            ps.setTimestamp(14, new java.sql.Timestamp(aAccCoa.getAddDate().getTime()));
+            ps.setInt(15, aAccCoa.getAddBy());
+            ps.setTimestamp(16, new java.sql.Timestamp(new CompanySetting().getCURRENT_SERVER_DATE().getTime()));
+            ps.setInt(17, new GeneralUserSetting().getCurrentUser().getUserDetailId());
+            ps.setInt(18, aAccCoa.getAccCoaId());
+
+            ps.executeUpdate();
+            IsUpdated = 1;
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return IsUpdated;
+    }
+
     /**
      * @return the AccCoaObjectList
      */
@@ -525,6 +681,34 @@ public class AccCoaBean implements Serializable {
      */
     public void setActionMessage(String ActionMessage) {
         this.ActionMessage = ActionMessage;
+    }
+
+    /**
+     * @return the AccCoaDetail
+     */
+    public AccCoa getAccCoaDetail() {
+        return AccCoaDetail;
+    }
+
+    /**
+     * @param AccCoaDetail the AccCoaDetail to set
+     */
+    public void setAccCoaDetail(AccCoa AccCoaDetail) {
+        this.AccCoaDetail = AccCoaDetail;
+    }
+
+    /**
+     * @return the menuItemBean
+     */
+    public MenuItemBean getMenuItemBean() {
+        return menuItemBean;
+    }
+
+    /**
+     * @param menuItemBean the menuItemBean to set
+     */
+    public void setMenuItemBean(MenuItemBean menuItemBean) {
+        this.menuItemBean = menuItemBean;
     }
 
 }
