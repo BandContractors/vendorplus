@@ -25,9 +25,7 @@ import java.sql.Statement;
 import static java.sql.Types.VARCHAR;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import org.apache.log4j.Level;
@@ -761,6 +759,78 @@ public class TransExtBean implements Serializable {
             ListItemIndex = ListItemIndex + 1;
         }
         return ItemFoundAtIndex;
+    }
+
+    public List<Transaction_tax> getTransaction_taxListByTrans(Long aTransaction_id) {
+        String sql = "SELECT * FROM transaction_tax WHERE transaction_id=? ORDER BY tax_category DESC,tax_rate_name ASC";
+        ResultSet rs = null;
+        List<Transaction_tax> lst = new ArrayList<>();
+        Transaction_tax obj = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aTransaction_id);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                obj = new Transaction_tax();
+                this.setTransaction_taxFromResultset(obj, rs);
+                lst.add(obj);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return lst;
+    }
+
+    public List<Transaction_tax> getTransaction_taxListByTrans(Long aTransaction_id, String aTax_category) {
+        String sql = "SELECT * FROM transaction_tax WHERE transaction_id=? AND tax_category=?";
+        ResultSet rs = null;
+        List<Transaction_tax> lst = new ArrayList<>();
+        Transaction_tax obj = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aTransaction_id);
+            ps.setString(2, aTax_category);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                obj = new Transaction_tax();
+                this.setTransaction_taxFromResultset(obj, rs);
+                lst.add(obj);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return lst;
+    }
+
+    public Transaction_tax getTransTaxByCategory(Long aTransaction_id, String aTax_category) {
+        String sql = "SELECT sum(taxable_amount) as taxable_amount,sum(tax_amount) as tax_amount FROM transaction_tax WHERE transaction_id=? AND tax_category=?";
+        ResultSet rs = null;
+        Transaction_tax obj = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aTransaction_id);
+            ps.setString(2, aTax_category);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                obj = new Transaction_tax();
+                try {
+                    obj.setTaxable_amount(rs.getDouble("taxable_amount"));
+                } catch (Exception e) {
+                    obj.setTaxable_amount(0);
+                }
+                try {
+                    obj.setTax_amount(rs.getDouble("tax_amount"));
+                } catch (Exception e) {
+                    obj.setTax_amount(0);
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return obj;
     }
 
     public void reverseShowDetail() {
