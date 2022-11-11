@@ -32,8 +32,6 @@ xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
             <h:panelGrid style="width: 290px; margin: 0px;" columns="2">
                 <h:outputLabel style="font-size: 12px;" value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_OUT,generalUserSetting.outputDetailParent.transactionPackage.transactionType.transactionNumberLabel)}:"/>
                 <h:outputLabel style="font-size: 20px;font-weight: bold;" value="#{generalUserSetting.outputDetailParent.transactionPackage.transactionNumber}"/>
-                <h:outputLabel style="font-size: 12px;" value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_OUT,generalUserSetting.outputDetailParent.transactionPackage.transactionType.transactionRefLabel)}:"/>
-                <h:outputLabel style="font-size: 12px;font-weight: bold;" value="#{generalUserSetting.outputDetailParent.trans.transactionRef}"/>
                 <h:outputLabel style="font-size: 12px;" value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_OUT,generalUserSetting.outputDetailParent.transactionPackage.transactionType.transactionDateLabel)}:"/>
                 <h:outputLabel style="font-size: 12px;" value="#{utilityBean.formatDateTime(generalUserSetting.outputDetailParent.transactionPackage.addDate)}"/>
             </h:panelGrid>
@@ -51,7 +49,7 @@ xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
                         <h:outputLabel style="font-size: 12px;" value="#{ti.itemDescription}" escape="false" />
                         <h:outputLabel style="font-size: 10px;" value=" BN:#{ti.batchNo}" escape="false" rendered="#{ti.batchNo.length() gt 0}"/>
                     </h:column>
-                    <h:column>
+                     <h:column>
                         <!-- column header -->
                         <f:facet name="header">#{langout['QTY']}(#{utilityBean.formatNumber('###,###,###.########',transactionPackageItemBean.getTransPackageItemsTotalQty(generalUserSetting.outputDetailParent.transactionPackage.getaTransactionPackageItemsList()))})</f:facet>
                         <!-- row record -->
@@ -60,14 +58,18 @@ xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
                         </h:outputLabel> 
                         <h:outputLabel style="font-size: 10px;" value="#{ti.unitSymbol}"/>
                     </h:column>
+                     <h:column>
+                        <!-- column header -->
+                        <f:facet name="header">#{langout['AMOUNT']}</f:facet>
+                        <!-- row record -->
+                        <h:outputLabel style="font-size: 10px;" value="#{ti.amount}">
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:outputLabel> 
+                    </h:column>
                 </h:dataTable>
             </h:panelGrid>
             <h:panelGrid id="IpgrdSalesInvoiceFooter1" style="width: 290px; margin: 0px;border-bottom-style: groove;" columns="2">
                 <h:outputLabel value="#{generalUserSetting.outputDetailParent.transactionPackage.transactionType.transactionUserLabel}: "/>
-                <h:outputLabel value="#{generalUserSetting.outputDetailParent.trans_user_detail.firstName} #{generalUserSetting.outputDetailParent.trans_user_detail.secondName}"/>
-            </h:panelGrid>
-            <h:panelGrid id="IpgrdSalesInvoiceFooter12" style="width: 290px; margin: 0px;border-bottom-style: dotted" columns="2" rendered="#{generalUserSetting.outputDetailParent.trans.transactionUserDetailId!=generalUserSetting.outputDetailParent.transactionPackage.addUserDetailId}">
-                <h:outputLabel value="#{langout['Added']} #{langout['by']}: "/>
                 <h:outputLabel value="#{generalUserSetting.outputDetailParent.transactionPackage.addUserDetail.firstName} #{generalUserSetting.outputDetailParent.transactionPackage.addUserDetail.secondName}"/>
             </h:panelGrid>
             <h:panelGrid id="gnlgBarCodeOnly" rendered="#{generalUserSetting.outputDetailParent.transactionPackage.transactionNumber.length()>0}">  

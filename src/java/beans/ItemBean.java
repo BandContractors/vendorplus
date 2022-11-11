@@ -5032,7 +5032,7 @@ public class ItemBean implements Serializable {
                     transactionPackageItem.setUnitTradeDiscount(aItem.getUnitRetailsalePrice() * dpi.getRetailsaleDiscountAmt() / 100);
                 }
             }
-            //new TransItemBean().editTransItemUponUnitChange(aTransTypeId, aTransReasId, transactionPackageItem);
+            new TransactionPackageItemBean().editTransItemUponUnitChange(aTransTypeId, aTransReasId, transactionPackageItem);
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }

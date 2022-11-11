@@ -17301,6 +17301,7 @@ public class TransBean implements Serializable {
 
     public void onRowSelect(SelectEvent event) {
         Gson gson = new Gson();
+        double originalValue = 0.0;
         boolean exists = true;
         try {
             TransItem tit = (TransItem) event.getObject();
@@ -17313,6 +17314,7 @@ public class TransBean implements Serializable {
                     }
                 } else {
                     if (tit.getItemQty() > 0) {
+                        tit.setItemQty(0);
                         this.getSelectedTransItemsList().add(tit);
                         this.setTransTotalsAndUpdateCEC(getNewTransAtSplit().getTransactionTypeId(), getNewTransAtSplit().getTransactionReasonId(), getNewTransAtSplit(), this.getSelectedTransItemsList());
                     }
@@ -17321,6 +17323,7 @@ public class TransBean implements Serializable {
 
             if (!exists) {
                 if (tit.getItemQty() > 0) {
+                     tit.setItemQty(0);
                     this.getSelectedTransItemsList().add(tit);
                     this.setTransTotalsAndUpdateCEC(getNewTransAtSplit().getTransactionTypeId(), getNewTransAtSplit().getTransactionReasonId(), getNewTransAtSplit(), this.getSelectedTransItemsList());
                 }
@@ -17330,11 +17333,15 @@ public class TransBean implements Serializable {
             for (JsonElement transIt : this.getOriginalTransItemJsonArray()) {
                 JsonObject trans = transIt.getAsJsonObject();
                 if (tit.getTransactionItemId() == trans.get("TransactionItemId").getAsLong() && tit.getUnit_id() == trans.get("unit_id").getAsLong()) {
-                    trans.addProperty("ItemQty", 0);//update value in the json arry
-                    trans.addProperty("AmountIncVat", 0);
-                    trans.addProperty("Amount", 0);
-                    trans.addProperty("AmountExcVat", 0);
+                    new TransItemBean().addQtyTransItemCEC(getNewTransAtSplit().getTransactionTypeId(), getNewTransAtSplit().getTransactionReasonId(), getNewTransAtSplit(), getSelectedTransItemsList(), tit);
+                    originalValue = trans.get("ItemQty").getAsDouble();
+                    trans.addProperty("ItemQty", originalValue - 1);//update value in the json arry
+                    trans.addProperty("AmountIncVat", trans.get("AmountIncVat").getAsDouble() - tit.getUnitPriceIncVat());
+                    trans.addProperty("Amount", trans.get("Amount").getAsDouble() - tit.getUnitPrice());
+                    trans.addProperty("AmountExcVat", trans.get("AmountExcVat").getAsDouble() - tit.getUnitPriceExcVat());
                     transIt = gson.fromJson(trans.toString(), JsonElement.class);
+                    // this._addQtyTransItemCEC(getNewTransAtSplit().getTransactionTypeId(), getNewTransAtSplit().getTransactionReasonId(), getNewTransAtSplit(), getSelectedTransItemsList(), tit);
+
                 }
             }
             this.getTransItemList().clear();
@@ -17385,13 +17392,13 @@ public class TransBean implements Serializable {
         Gson gson = new Gson();
         double originalValue = 0.0;
 
-         for (JsonElement transIt : this.getOriginalTransItemJsonArray()) {
+        for (JsonElement transIt : this.getOriginalTransItemJsonArray()) {
             JsonObject trans = transIt.getAsJsonObject();
             for (JsonElement statictransIt : this.getOriginalStaticTransItemJsonArray()) {
                 JsonObject statictrans = statictransIt.getAsJsonObject();
                 if (ti.getTransactionItemId() == trans.get("TransactionItemId").getAsLong() && ti.getUnit_id() == trans.get("unit_id").getAsLong() && trans.get("TransactionItemId").getAsLong() == statictrans.get("TransactionItemId").getAsLong()) {
                     if (ti.getItemQty() <= statictrans.get("ItemQty").getAsDouble() && 0 <= ti.getItemQty() - 1) {
-                       new TransItemBean().subtractQtyTransItemCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems, ti);
+                        new TransItemBean().subtractQtyTransItemCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems, ti);
                         originalValue = trans.get("ItemQty").getAsDouble();
                         trans.addProperty("ItemQty", originalValue + 1);//update value in the json arry
                         trans.addProperty("AmountIncVat", trans.get("AmountIncVat").getAsDouble() + ti.getUnitPriceIncVat());
@@ -17422,7 +17429,7 @@ public class TransBean implements Serializable {
                 //getting the original object values 
                 for (JsonElement statictransIt : this.getOriginalStaticTransItemJsonArray()) {
                     JsonObject statictrans = statictransIt.getAsJsonObject();
-                    if (ti.getItemId() == statictrans.get("ItemId").getAsLong() && ti.getUnit_id() == trans.get("unit_id").getAsLong()) {
+                    if (ti.getTransactionItemId() == statictrans.get("TransactionItemId").getAsLong() && ti.getUnit_id() == trans.get("unit_id").getAsLong()) {
                         if (statictrans.get("ItemQty").getAsDouble() - ti.getItemQty() >= 0 || statictrans.get("ItemQty").getAsDouble() - ti.getItemQty() > statictrans.get("ItemQty").getAsDouble()) {
                             trans.addProperty("ItemQty", statictrans.get("ItemQty").getAsDouble() - ti.getItemQty());//update value in the json arry
                             trans.addProperty("AmountIncVat", statictrans.get("AmountIncVat").getAsDouble() - ti.getAmountIncVat());
@@ -17537,6 +17544,7 @@ public class TransBean implements Serializable {
 
             this.refreshTransListQuickOrderManage(trans);
             this.setActionMessage(ub.translateWordsInText(BaseName, message));
+            org.primefaces.PrimeFaces.current().executeScript("PF('sbarReviewOrder').hide()");
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
