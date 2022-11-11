@@ -265,5 +265,3 @@ INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_
 
 ALTER TABLE transaction_packacge_item_unit rename transaction_package_item_unit;
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',267,Now(),'6.0','');
-
-

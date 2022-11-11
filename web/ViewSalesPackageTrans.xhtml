@@ -172,7 +172,7 @@
                     <h:panelGrid styleClass="clsGridMainCommands" columns="2" style="width: 100%">
                         <h:panelGrid styleClass="clsGridMainCommands1" columns="3" rendered="#{transactionPackageBean.actionType ne 'None'}">
                             <h:commandButton styleClass="clsButtonVeryBig" id="cmdbUpdate" value="#{langsys['UPDATE']} (ALT+U)" onclick="return confirmUpdate();" accesskey="u" rendered="#{transactionPackageBean.actionType.equalsIgnoreCase('Edit') and generalUserSetting.currentStore.storeId==transactionPackageBean.transObj.storeId}">
-                                <f:ajax listener="#{transactionPackageBean.updateTransPackage('PARENT',transactionPackageBean.transObj.storeId, transactionPackageBean.transObj.transactionTypeId, transactionPackageBean.transObj.transactionReasonId, transactionPackageBean.transObj, transactionPackageBean.transactionPackage, transactionPackageBean.transactionPackageItemist)}" execute="pnlTransaction" render="pnlTransaction pnlgOutput"/>
+                                <p:ajax listener="#{transactionPackageBean.updateTransPackage('PARENT',transactionPackageBean.transObj.storeId, transactionPackageBean.transObj.transactionTypeId, transactionPackageBean.transObj.transactionReasonId, transactionPackageBean.transObj, transactionPackageBean.transactionPackage, transactionPackageBean.transactionPackageItemist)}" process="pnlTransaction" update="pnlTransaction dtblTransactionItem pnlgOutput"/>
                             </h:commandButton>
                         </h:panelGrid>
                         <h:panelGrid columns="1">

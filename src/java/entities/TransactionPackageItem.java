@@ -43,9 +43,13 @@ public class TransactionPackageItem implements Serializable {
     private String vatRated;
     private double vatPerc;
     private String narration;
+    private long stockId;
     //variables for report ONLY
     private String itemDescription;
     private String unitSymbol;
+    private String itemCode;
+      private int isTaxSynced;
+      
 
     /**
      * @return the transactionPackageItemId
@@ -395,5 +399,47 @@ public class TransactionPackageItem implements Serializable {
      */
     public void setUnitSymbol(String unitSymbol) {
         this.unitSymbol = unitSymbol;
+    }
+
+    /**
+     * @return the itemCode
+     */
+    public String getItemCode() {
+        return itemCode;
+    }
+
+    /**
+     * @param itemCode the itemCode to set
+     */
+    public void setItemCode(String itemCode) {
+        this.itemCode = itemCode;
+    }
+
+    /**
+     * @return the isTaxSynced
+     */
+    public int getIsTaxSynced() {
+        return isTaxSynced;
+    }
+
+    /**
+     * @param isTaxSynced the isTaxSynced to set
+     */
+    public void setIsTaxSynced(int isTaxSynced) {
+        this.isTaxSynced = isTaxSynced;
+    }
+
+    /**
+     * @return the stockId
+     */
+    public long getStockId() {
+        return stockId;
+    }
+
+    /**
+     * @param stockId the stockId to set
+     */
+    public void setStockId(long stockId) {
+        this.stockId = stockId;
     }
 }
