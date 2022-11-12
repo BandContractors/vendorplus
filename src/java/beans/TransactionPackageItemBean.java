@@ -16,6 +16,7 @@ import entities.AccCurrency;
 import entities.CompanySetting;
 import entities.DiscountPackageItem;
 import entities.Item;
+import entities.Stock;
 import entities.Store;
 import entities.Trans;
 import entities.TransItem;
@@ -139,6 +140,7 @@ public class TransactionPackageItemBean implements Serializable {
             } catch (Exception e) {
                 transPackageItem.setUnitTradeDiscount(0);
             }
+
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -408,48 +410,296 @@ public class TransactionPackageItemBean implements Serializable {
         aStatusBean.setShowItemNotAddedStatus(0);
         try {
             //check
-           /* if (aTransTypeId == 71 && NewTransPackageItem.getNarration().length() == 0) {//STOCK ADJUSTMENT
-             status = "Select Adjustment Type";
-             } else if (aTransTypeId == 71 && NewTransPackageItem.getUnitPrice() == 0) {//STOCK ADJUSTMENT
-             status = "Enter Unit Cost";
-             } else if (NewTransPackageItem.getCodeSpecific().length() > 250) {
-             status = "Code cannot be more than 250 Characters";
-             } else if (NewTransPackageItem.getDescSpecific().length() > 250) {
-             status = "Name cannot be more than 250 Characters";
-             } else if (NewTransPackageItem.getDescMore().length() > 250) {
-             status = "More Description cannot be more than 250 Characters";
-             } else if (NewTransPackageItem.getUnitPrice() < 0 || NewTransPackageItem.getAmount() < 0 || NewTransPackageItem.getUnitTradeDiscount() < 0) {
-             status = "Prices cannot be Negative";
-             } else {
-             double BaseQty = new ItemBean().getBaseUnitQty(NewTransPackageItem.getItemId(), NewTransPackageItem.getUnitId(), NewTransPackageItem.getItemQty());
-             if (BaseQty > 0) {
-             NewTransPackageItem.setBaseUnitQty(BaseQty);
-             } else {
+            if (NewTransPackageItem.getCodeSpecific().length() > 250) {
+                status = "Code cannot be more than 250 Characters";
+            } else if (NewTransPackageItem.getDescSpecific().length() > 250) {
+                status = "Name cannot be more than 250 Characters";
+            } else if (NewTransPackageItem.getDescMore().length() > 250) {
+                status = "More Description cannot be more than 250 Characters";
+            } else if (NewTransPackageItem.getUnitPrice() < 0 || NewTransPackageItem.getAmount() < 0 || NewTransPackageItem.getUnitTradeDiscount() < 0) {
+                status = "Prices cannot be Negative";
+            } else {
+                double BaseQty = new ItemBean().getBaseUnitQty(NewTransPackageItem.getItemId(), NewTransPackageItem.getUnitId(), NewTransPackageItem.getItemQty());
+                if (BaseQty > 0) {
+                    NewTransPackageItem.setBaseUnitQty(BaseQty);
+                } else {
 
-             }
-             */
-            // TransactionPackageItem transPackageItem = 
+                }
+                // TransactionPackageItem transPackageItem = 
+               // NewTransPackageItem.setUnitId(aSelectedItem.getUnitId());
+                NewTransPackageItem.setItemId(aSelectedItem.getItemId());
+                NewTransPackageItem.setItemDescription(aSelectedItem.getDescription());
 
-            NewTransPackageItem.setUnitId(aSelectedItem.getUnitId());
-            NewTransPackageItem.setItemId(aSelectedItem.getItemId());
-            NewTransPackageItem.setItemDescription(aSelectedItem.getDescription());
+                try {
+                    if (null == aSelectedItem.getItemCode()) {
+                        NewTransPackageItem.setItemCode("");
+                    } else {
+                        NewTransPackageItem.setItemCode(aSelectedItem.getItemCode());
+                    }
+                } catch (Exception e) {
+                    NewTransPackageItem.setItemCode("");
+                }
+                if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
+                    if (null == new Item_tax_mapBean().getItem_tax_mapSynced(NewTransPackageItem.getItemId())) {
+                        NewTransPackageItem.setIsTaxSynced(0);
+                    } else {
+                        NewTransPackageItem.setIsTaxSynced(1);
+                    }
+                } else {
+                    NewTransPackageItem.setIsTaxSynced(1);
+                }
 
-            JsonObject trans = (JsonObject) new JsonParser().parse(gson.toJson(NewTransPackageItem));
-            this.clearAll(aTrans, aTransactionPackageItemList, NewTransPackageItem, null, aSelectedItem, null, 1, null);
-            TransactionPackageItem transIt = new TransactionPackageItem();
-            transIt = gson.fromJson(trans, TransactionPackageItem.class);
-            this.TransPackageItemList.add(transIt);
-            //  this.addTransItemCEC(aStoreId, aTransTypeId, aTransReasonId, TransactionPackage, aTransPackageItemList, NewTransPackageItem, aSelectedItem);
-            //}
-            transactionPackage.setSubTotal(new TransactionPackageBean().getSubTotal(aTransactionPackageItemList));
-            transactionPackage.setGrandTotal(new TransactionPackageBean().getGrandTotal(aTransactionPackageItemList));
-            this.setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, transactionPackage, aTransactionPackageItemList);
-            this.clearTransactionPackageItem(NewTransPackageItem);
-            new ItemBean().clearSelectedItem();
+                //aTransactionPackageItemList.add(transIt);
+                // this.addTransItemCEC(aStoreId, aTransTypeId, aTransReasonId, aTrans, aTransactionPackageItemList, NewTransPackageItem, aSelectedItem);
+                int ItemFoundAtIndex = 1 - 2;//==-1
+                ItemFoundAtIndex = itemExists(aTransactionPackageItemList, NewTransPackageItem.getItemId(), NewTransPackageItem.getBatchNo(), NewTransPackageItem.getCodeSpecific(), NewTransPackageItem.getDescSpecific(), NewTransPackageItem.getUnitId());
+                if (ItemFoundAtIndex == -1) {
+                    JsonObject trans = (JsonObject) new JsonParser().parse(gson.toJson(NewTransPackageItem));
+                    TransactionPackageItem transIt = new TransactionPackageItem();
+                    transIt = gson.fromJson(trans, TransactionPackageItem.class);
+                    if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "LIST_ITEMS_APPEND").getParameter_value().equals("0")) {
+                        this.updateLookUpsUI(transIt);
+                        aTransactionPackageItemList.add(0, transIt);
+                    } else {
+                        this.updateLookUpsUI(transIt);
+                        aTransactionPackageItemList.add(transIt);
+                    }
+                } else {
+                    NewTransPackageItem.setItemQty(NewTransPackageItem.getItemQty() + aTransactionPackageItemList.get(ItemFoundAtIndex).getItemQty());
+                    NewTransPackageItem.setAmount(NewTransPackageItem.getUnitPrice() * NewTransPackageItem.getItemQty());
+                    NewTransPackageItem.setAmount((NewTransPackageItem.getUnitPrice() - NewTransPackageItem.getUnitTradeDiscount()) * NewTransPackageItem.getItemQty());
+                    JsonObject trans = (JsonObject) new JsonParser().parse(gson.toJson(NewTransPackageItem));
+                    TransactionPackageItem transIt = new TransactionPackageItem();
+                    transIt = gson.fromJson(trans, TransactionPackageItem.class);
+                    this.updateLookUpsUI(transIt);
+                    aTransactionPackageItemList.add(ItemFoundAtIndex, transIt);
+                    aTransactionPackageItemList.remove(ItemFoundAtIndex + 1);
+                }
+                this.clearAll(aTrans, aTransactionPackageItemList, NewTransPackageItem, null, aSelectedItem, null, 1, null);
+                //this.TransPackageItemList = aTransactionPackageItemList;
+                //}
+                transactionPackage.setSubTotal(new TransactionPackageBean().getSubTotal(aTransactionPackageItemList));
+                transactionPackage.setGrandTotal(new TransactionPackageBean().getGrandTotal(aTransactionPackageItemList));
+                this.setTransTotalsAndUpdateCEC(aTransTypeId, aTransReasonId, aTrans, transactionPackage, aTransactionPackageItemList);
+                this.clearTransactionPackageItem(NewTransPackageItem);
+                new ItemBean().clearSelectedItem();
 
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
+    }
+
+    public void editTransItemUponUnitChange(int aTransTypeId, int aTransReasonId, TransactionPackageItem ti) {
+        TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
+        TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
+        //first update unit prices
+        double IncludedVat;
+        double ExcludedVat;
+        double VatPercent = ti.getVatPerc();
+        //this is a vatable item
+
+        //calculate prices
+        if (ti.getItemQty() < 0) {
+            ti.setItemQty(0);
+        }
+        ti.setAmount(ti.getUnitPrice() * ti.getItemQty());
+    }
+
+    public void updateLookUpsUI(TransactionPackageItem aTransItem) {
+        try {
+            Item item = null;
+            if (null == aTransItem) {
+                //do nothing
+            } else {
+                item = new ItemBean().getItem(aTransItem.getItemId());
+                try {
+                    aTransItem.setItemDescription(item.getDescription());
+                } catch (NullPointerException npe) {
+                    aTransItem.setItemDescription("");
+                }
+
+                try {
+                    if (aTransItem.getUnitId() > 0) {
+                        aTransItem.setUnitSymbol(new UnitBean().getUnit(aTransItem.getUnitId()).getUnitSymbol());
+                    } else {
+                        aTransItem.setUnitSymbol(new UnitBean().getUnit(item.getUnitId()).getUnitSymbol());
+                    }
+                } catch (NullPointerException npe) {
+                    aTransItem.setUnitSymbol("");
+                }
+
+                try {
+                    if (null == item.getItemCode()) {
+                        aTransItem.setItemCode("");
+                    } else {
+                        aTransItem.setItemCode(item.getItemCode());
+                    }
+                } catch (Exception e) {
+                    aTransItem.setItemCode("");
+                }
+                if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "TAX_BRANCH_NO").getParameter_value().length() > 0) {
+                    if (null == new Item_tax_mapBean().getItem_tax_mapSynced(aTransItem.getItemId())) {
+                        aTransItem.setIsTaxSynced(0);
+                    } else {
+                        aTransItem.setIsTaxSynced(1);
+                    }
+                } else {
+                    aTransItem.setIsTaxSynced(1);
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public double getListTotalItemBatchQty(List<TransactionPackageItem> aActiveTransItems, Long aItemI, String aBatchN, String aCodeSpec, String aDescSpec) {
+        List<TransactionPackageItem> ati = aActiveTransItems;
+        int ListItemIndex = 0;
+        int ListItemNo = ati.size();
+        double TQty = 0;
+        while (ListItemIndex < ListItemNo) {
+            String CodeSp = "";
+            String DescSp = "";
+            String BatcNo = "";
+            try {
+                BatcNo = ati.get(ListItemIndex).getBatchNo();
+            } catch (NullPointerException npe) {
+                BatcNo = "";
+            }
+            try {
+                CodeSp = ati.get(ListItemIndex).getCodeSpecific();
+            } catch (NullPointerException npe) {
+                CodeSp = "";
+            }
+            try {
+                DescSp = ati.get(ListItemIndex).getDescSpecific();
+            } catch (NullPointerException npe) {
+                DescSp = "";
+            }
+            if (ati.get(ListItemIndex).getItemId() == aItemI && aBatchN.equals(BatcNo) && aCodeSpec.equals(CodeSp) && aDescSpec.equals(DescSp)) {
+                //TQty = TQty + ati.get(ListItemIndex).getItemQty();
+                TQty = TQty + ati.get(ListItemIndex).getBaseUnitQty();
+            }
+            ListItemIndex = ListItemIndex + 1;
+        }
+        return TQty;
+    }
+
+    public String addTransItemCEC(int aStoreId, int aTransTypeId, int aTransReasonId, Trans aTrans, List<TransactionPackageItem> aActiveTransItems, TransactionPackageItem NewTransPackageItem, Item aSelectedItem) {
+        String status = "";
+        double IncludedVat;
+        double ExcludedVat;
+        double VatPercent;
+        double xrate = 1;
+        double XrateMultiply = 1;
+        Gson gson = new Gson();
+
+        TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
+        TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
+        Store store = new StoreBean().getStore(aStoreId);
+
+        try {
+            //for where item currency is different from trans currency, we first get the factor to convert to trans currency
+            AccCurrency LocalCurrency = null;
+            LocalCurrency = new AccCurrencyBean().getLocalCurrency();
+            try {
+                xrate = new AccXrateBean().getXrate(aSelectedItem.getCurrencyCode(), aTrans.getCurrencyCode());
+            } catch (NullPointerException npe) {
+                xrate = 1;
+            }
+            try {
+                if (aSelectedItem.getCurrencyCode().equals(LocalCurrency.getCurrencyCode()) && !aTrans.getCurrencyCode().equals(LocalCurrency.getCurrencyCode())) {
+                    XrateMultiply = 1 / xrate;
+                } else {
+                    XrateMultiply = xrate;
+                }
+            } catch (NullPointerException npe) {
+                XrateMultiply = 1;
+            }
+            //check for selected specific stock item
+            try {
+                if (NewTransPackageItem.getStockId() > 0) {
+                    //this.updateTransItemBatchSpecific(NewTransPackageItem, NewTransPackageItem.getStockId());
+                }
+            } catch (Exception e) {
+            }
+
+            if (null == NewTransPackageItem.getBatchNo()) {
+                NewTransPackageItem.setBatchNo("");
+            }
+            if (null == NewTransPackageItem.getCodeSpecific()) {
+                NewTransPackageItem.setCodeSpecific("");
+            }
+            if (null == NewTransPackageItem.getDescSpecific()) {
+                NewTransPackageItem.setDescSpecific("");
+            }
+            if (null == NewTransPackageItem.getNarration()) {
+                NewTransPackageItem.setNarration("");
+            }
+
+            //check if itme+batchno already exists
+            int ItemFoundAtIndex = 1 - 2;//==-1
+            ItemFoundAtIndex = itemExists(aActiveTransItems, NewTransPackageItem.getItemId(), NewTransPackageItem.getBatchNo(), NewTransPackageItem.getCodeSpecific(), NewTransPackageItem.getDescSpecific(), NewTransPackageItem.getUnitId());
+
+            if (NewTransPackageItem.getAmount() < 0) {
+                status = "Discount cannot exceed Unit Price";
+            } else {
+                if (ItemFoundAtIndex == -1) {
+                    //round off amounts basing on currency rules
+                    this.roundTransItemsAmount(aTrans, NewTransPackageItem);
+                    //add
+                    if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "LIST_ITEMS_APPEND").getParameter_value().equals("0")) {
+                        aActiveTransItems.add(0, NewTransPackageItem);
+                    } else {
+                        aActiveTransItems.add(NewTransPackageItem);
+                    }
+
+                    NewTransPackageItem.setItemQty(NewTransPackageItem.getItemQty() + aActiveTransItems.get(ItemFoundAtIndex).getItemQty());
+                    NewTransPackageItem.setAmount(NewTransPackageItem.getUnitPrice() * NewTransPackageItem.getItemQty());
+                }
+                //round off amounts basing on currency rules
+                this.roundTransItemsAmount(aTrans, NewTransPackageItem);
+                //add
+                aActiveTransItems.add(ItemFoundAtIndex, NewTransPackageItem);
+                aActiveTransItems.remove(ItemFoundAtIndex + 1);
+            }
+
+            //get item's stock details
+            //get and check number of batches
+            StockBean sb = new StockBean();
+            Stock st = new Stock();
+            st = sb.getStock(store.getStoreId(), NewTransPackageItem.getItemId(), NewTransPackageItem.getBatchNo(), NewTransPackageItem.getCodeSpecific(), NewTransPackageItem.getDescSpecific());
+
+            //unpacking - AutoUnPackModule
+            //process items that might need to be unpacked
+            int StockFail1 = 0, StockFail2 = 0, StockFail3 = 0;
+
+            //for dispose,consume; apply unit cost price of the stock/batch
+            if (aSelectedItem.getIsTrack() == 1 && null != st && ("DISPOSE STOCK".equals(transtype.getTransactionTypeName()) || "STOCK CONSUMPTION".equals(transtype.getTransactionTypeName()))) {
+                NewTransPackageItem.setUnitPrice(NewTransPackageItem.getUnitPrice());
+                NewTransPackageItem.setAmount(NewTransPackageItem.getItemQty() * NewTransPackageItem.getUnitPrice());
+            }
+            if (NewTransPackageItem.getItemQty() <= 0) {
+                status = "Enter Item Quantity";
+                StockFail3 = 1;
+            }
+            if (StockFail1 == 0 && StockFail2 == 0 && StockFail3 == 0) {
+
+                TransactionPackageItem ti = new TransactionPackageItem();
+                ti = gson.fromJson(gson.toJson(NewTransPackageItem), TransactionPackageItem.class);
+
+                this.roundTransItemsAmount(aTrans, ti);
+                ti.setItemQty(ti.getItemQty() + aActiveTransItems.get(ItemFoundAtIndex).getItemQty());
+                ti.setAmount(ti.getUnitPrice() * ti.getItemQty());
+                aActiveTransItems.add(ItemFoundAtIndex, ti);
+                aActiveTransItems.remove(ItemFoundAtIndex + 1);
+            }
+        } catch (Exception e) {
+            status = "Item Not Saved due to Error";
+            LOGGER.log(Level.ERROR, e);
+        }
+        return status;
     }
 
     public void updateBaseUnityQty(TransactionPackageItem aTransPackageItem) {
@@ -544,14 +794,20 @@ public class TransactionPackageItemBean implements Serializable {
     public boolean updateTransPackageItems(long aTransactionId, List<TransactionPackageItem> aNewTransPackageItems) {
         try {
             //get trans items that was moved to the history table
-
             //1. Reverse and update all trans items whoose qty has changed
             int NewListItemIndex = 0;
             int NewListItemNo = aNewTransPackageItems.size();
             TransactionPackageItem nti = null;
             while (NewListItemIndex < NewListItemNo) {
                 nti = aNewTransPackageItems.get(NewListItemIndex);//new TransactionPackageItem();
-                this.updateTransPackageItemCEC(nti);
+                if (nti.getItemQty() > 0) {
+                    this.updateTransPackageItemCEC(nti);
+                } else {
+                    int delete = this.deleteTransPackageItemsById(nti.getTransactionPackageItemId());
+                    if (delete == 1) {
+                        deleteTransPackageItemsUnitByTransPackageItemId(nti.getTransactionPackageItemId());
+                    }
+                }
                 NewListItemIndex = NewListItemIndex + 1;
             }
             return true;
@@ -801,6 +1057,22 @@ public class TransactionPackageItemBean implements Serializable {
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             ps.setLong(1, aTransPackageId);
+            ps.executeUpdate();
+            deleted = 1;
+        } catch (Exception e) {
+            deleted = 0;
+            LOGGER.log(Level.ERROR, e);
+        }
+        return deleted;
+    }
+
+    public int deleteTransPackageItemsById(long aTransPackageItemId) {
+        int deleted = 0;
+        String sql = "DELETE FROM transaction_package_item WHERE transaction_package_item_id=?";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aTransPackageItemId);
             ps.executeUpdate();
             deleted = 1;
         } catch (Exception e) {

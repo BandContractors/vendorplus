@@ -99,24 +99,24 @@
                          rowsPerPageTemplate="50,100,200,400">
                 <f:facet name="header">
                     <p:dataTable id="tblSummary" var="sm" value="#{transBean.transListSummary}">
-                        <p:column headerText="" style="text-align: left;" rendered="#{transBean.fieldName.equals('')}">
+                        <p:column headerText="" style="text-align: left;" rendered="#{transBean.fieldName.equalsIgnoreCase('')}">
                         </p:column>
                         <p:column headerText="#{langsys['Added']} #{langsys['By']}" style="text-align: left;" rendered="#{transBean.fieldName.equals('add_user_detail_id')}">
                             <h:outputText value="#{userDetailBean.getUserDetail(sm.addUserDetailId).userName}" rendered="#{sm.addUserDetailId>0}"/>
                         </p:column>
-                        <p:column headerText="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(88).transactionUserLabel)}" style="text-align: left;" rendered="#{transBean.fieldName.equals('transaction_user_detail_id')}">
+                        <p:column headerText="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(88).transactionUserLabel)}" style="text-align: left;" rendered="#{transBean.fieldName.equalsIgnoreCase('transaction_user_detail_id')}">
                             <h:outputText value="#{userDetailBean.getUserDetail(sm.transactionUserDetailId).userName}"/>
                         </p:column>
-                        <p:column headerText="#{langsys['Bill']} #{langsys['For']}" style="text-align: left;" rendered="#{transBean.fieldName.equals('bill_transactor_id')}">
+                        <p:column headerText="#{langsys['Bill']} #{langsys['For']}" style="text-align: left;" rendered="#{transBean.fieldName.equalsIgnoreCase('bill_transactor_id')}">
                             <h:outputText value="#{transactorBean.getTransactor(sm.billTransactorId).transactorNames}"/>
                         </p:column>
-                        <p:column headerText="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}" style="text-align: left;" rendered="#{transBean.fieldName.equals('transactor_id')}">
+                        <p:column headerText="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}" style="text-align: left;" rendered="#{transBean.fieldName.equalsIgnoreCase('transactor_id')}">
                             <h:outputText value="#{transactorBean.getTransactor(sm.transactorId).transactorNames}"/>
                         </p:column>
-                        <p:column headerText="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(88).transactionDateLabel)}" style="text-align: left;" rendered="#{transBean.fieldName.equals('transaction_date')}">
+                        <p:column headerText="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(88).transactionDateLabel)}" style="text-align: left;" rendered="#{transBean.fieldName.equalsIgnoreCase('transaction_date')}">
                             <h:outputText value="#{utilityBean.formatDate(sm.transactionDate)}"/>
                         </p:column>
-                        <p:column headerText="#{companySetting.getStoreEquivName()}" style="text-align: left;" rendered="#{transBean.fieldName.equals('store_id')}">
+                        <p:column headerText="#{companySetting.getStoreEquivName()}" style="text-align: left;" rendered="#{transBean.fieldName.equalsIgnoreCase('store_id')}">
                             <h:outputText value="#{sm.storeName}" rendered="#{sm.storeId>0}"/>
                         </p:column>
                         <p:column headerText="#{langsys['Currency']}" style="text-align: left;">
@@ -169,13 +169,13 @@
                     <p:commandButton id="cmdbView" icon="ui-icon-search" oncomplete="PF('dlgSalesInvoice').show();" actionListener="#{transactionPackageBean.initSalesPackageSession(itm.transactionId,'View')}" update=":formTransaction"/>
                 </p:column>
                 <p:column headerText="#{langsys['Edit']}" exportable="false" visible="false">
-                    <p:commandButton id="cmdbEdit" icon="ui-icon-pencil" oncomplete="PF('dlgSalesInvoice').show();" actionListener="#{transactionPackageBean.initSalesPackageSession(itm.transactionId,'Edit')}" update=":formTransaction"/>
+                    <p:commandButton id="cmdbEdit" icon="ui-icon-pencil" oncomplete="PF('dlgSalesInvoice').show();" actionListener="#{transactionPackageBean.initSalesPackageSession(itm.transactionId,'Edit')}" update=":formTransaction" rendered="#{itm.status_code != '2'}"/>
                 </p:column>
                 <p:column headerText="#{langsys['Action']}" exportable="false" visible="true">
                     <p:splitButton value="#{langsys['Select']}" icon="ui-icon-pencil">
                         <p:menuitem value="#{langsys['View']}" icon="ui-icon-search" oncomplete="PF('dlgSalesInvoice').show();" actionListener="#{transactionPackageBean.initSalesPackageSession(itm.transactionId,'View')}" update=":formTransaction"/>
-                        <p:menuitem value="#{langsys['Edit']}" icon="ui-icon-pencil" oncomplete="PF('dlgSalesInvoice').show();" actionListener="#{transactionPackageBean.initSalesPackageSession(itm.transactionId,'Edit')}" update=":formTransaction"/>
-                        <p:menuitem value="#{langsys['Reject']}" icon="ui-icon-pencil" actionListener="#{transactionPackageBean.updatePackageStatus(itm.transactionId, 0, itm,transBean)}" process="formReport:tblDetail tblDetail" update="formReport:pnlgMessage tblDetail" rendered="#{itm.status_code != '2'}">
+                        <p:menuitem value="#{langsys['Edit']}" icon="ui-icon-pencil" oncomplete="PF('dlgSalesInvoice').show();" actionListener="#{transactionPackageBean.initSalesPackageSession(itm.transactionId,'Edit')}" update=":formTransaction" rendered="#{itm.status_code != '2' &amp;&amp; itm.status_code != '0'}"/>
+                        <p:menuitem value="#{langsys['Reject']}" icon="ui-icon-pencil" actionListener="#{transactionPackageBean.updatePackageStatus(itm.transactionId, 0, itm,transBean)}" process="formReport:tblDetail tblDetail" update="formReport:pnlgMessage tblDetail" rendered="#{itm.status_code != '2' &amp;&amp; itm.status_code != '0'}">
                         </p:menuitem>
                     </p:splitButton>
                 </p:column>

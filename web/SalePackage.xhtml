@@ -9,7 +9,12 @@
         <title>Sales Package</title>
         <link href="resources/images/sys_icon.ico" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
-        <script  language="javascript"></script> 
+        <script  language="javascript">
+            function doClearClick() {
+                document.getElementById("TransactionPackageForm:cmdbClear").click();
+            }
+        </script> 
+
     </h:head>
     <f:metadata>
         <f:viewAction action="#{accCurrencyBean.refreshCurrencyListActive()}"/>
@@ -34,7 +39,7 @@
                 <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Stock']}:#{langsys['No']} #{langsys['effect']}"/>
                 <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Ledger']}:#{langsys['No']} #{langsys['effect']}"/>
             </h:panelGrid>
-            <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="7">
+            <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="3">
                 <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeObj.transactionNumberLabel)}"/>
                 <h:outputLabel  value="#{langsys['Currency']}"/>
                 <h:outputLabel  value="#{transBean.transTypeObj.transactionDateLabel}"/>
@@ -136,7 +141,8 @@
             </h:panelGrid>
 
             <p:dataTable rowIndexVar="rowIndex" id="dtblTransactionItem" value="#{transactionPackageItemBean.transPackageItemList}" var="ati" 
-                         styleClass="cls-table" tableStyle="width:auto;">
+                         styleClass="cls-table" tableStyle="width:auto;"
+                         rowStyleClass="#{ati.isTaxSynced eq 0 ? 'red' : null}">
                 <p:column>
                     <!-- column header -->
                     <f:facet name="header">
@@ -223,7 +229,7 @@
                 </h:inputText>
                 <h:inputText id="itxtCashDiscount" value="#{trans.cashDiscount}" styleClass="clsInputTransItem" style="width: 150px;height: 24px;" autocomplete="off" disabled="#{companySetting.getBoolIsAllowDiscount()}">
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                    <f:ajax event="blur" listener="#{transactionPackageBean.setTransTotalsAndUpdateCEC(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans, transItemBean.activeTransItems)}" render="cmdlCashDiscount itxtGrandTotal itxtTotalVat"/>
+                    <f:ajax event="blur" listener="#{transactionPackageBean.setTransTotalsAndUpdateCEC(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans, transactionPackage, transactionPackageItemBean.transPackageItemList)}" render="cmdlCashDiscount itxtGrandTotal itxtTotalVat"/>
                 </h:inputText>
                 <h:inputText id="itxtTotalVat" value="#{transactionPackage.totalTax}" styleClass="clsInputTransItem" style="width: 150px;height: 24px;" disabled="true">
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -241,10 +247,10 @@
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
-                        <p:ajax listener="#{transactionPackageBean.saveTransPackageCECNew('PARENT',generalUserSetting.currentStore.storeId, generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans, transactionPackage, transactionPackageItemBean.transPackageItemList,transactorBean.selectedSchemeTransactor,transBean.authorisedByUserDetail)}" process="@form" update="pnlHeader gridTransItem pgrdSpecific dtblTransactionItem pgrdTotals pgrdMsgs growl1 pnlgOutput"/>
+                        <p:ajax listener="#{transactionPackageBean.saveTransPackageCECNew('PARENT',generalUserSetting.currentStore.storeId, generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans, transactionPackage, transactionPackageItemBean.transPackageItemList,transactorBean.selectedSchemeTransactor,transBean.authorisedByUserDetail)}" process="@form" update="pnlHeader gridTransItem pgrdSpecific dtblTransactionItem pgrdTotals pgrdMsgs growl1 pnlgOutput itxtSubTotal"/>
                     </p:commandButton>
                     <p:commandButton id="cmdbClear" styleClass="clsButtonBig" value="#{langsys['CLEAR']} (ALT+C)" accesskey="c">
-                        <p:ajax listener="#{transBean.clearAll2(trans,transItemBean.activeTransItems,transItem,itemBean.selectedItem,transactorBean.selectedTransactor,2,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor,null,null)}" process="@form" update="pnlHeader gridTransItem pgrdSpecific dtblTransactionItem pgrdTotals pgrdMsgs pnlgOutput"/>
+                        <p:ajax listener="#{transactionPackageBean.clearAll2(trans,transactionPackage, transactionPackageItemBean.transPackageItemList,transactionPackageItem,itemBean.selectedItem,transactorBean.selectedTransactor,2,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor,null,null)}" process="@form" update="pnlHeader gridTransItem pgrdSpecific dtblTransactionItem pgrdTotals pgrdMsgs pnlgOutput"/>
                     </p:commandButton>
                     <p:commandButton styleClass="clsButtonBig" id="cmdbSaveDraft" value="#{langsys['NEW']} #{langsys['DRAFT']}" onclick="PF('statusDialog2').show()" onsuccess="PF('statusDialog2').hide()">
                         <p:dialog widgetVar="statusDialog2" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">

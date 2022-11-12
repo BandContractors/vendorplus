@@ -1,6 +1,7 @@
 package beans;
 
 import connections.DBConnection;
+import entities.AccCoa;
 import entities.CompanySetting;
 import entities.GroupRight;
 import entities.Item;
@@ -134,6 +135,7 @@ public class TransactionPackageBean implements Serializable {
     }
 
     public void saveTransPackageCECNew(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, Trans trans, TransactionPackage transactionPage, List<TransactionPackageItem> aTransactionPackageItemList, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor) {
+        
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
         try {
@@ -284,8 +286,9 @@ public class TransactionPackageBean implements Serializable {
                         } else {
                         //insert approvals
 
-                            //clear
-                            //this.clearAll2(trans, aActiveTransItems, null, null, aSelectedTransactor, 2, aSelectedBillTransactor, aTransUserDetail, aSelectedSchemeTransactor, aAuthorisedByUserDetail, aSelectedAccCoa);
+                            //  clearAll2(Trans t, TransactionPackage transactionPackage, List<TransactionPackageItem> aActiveTransItems, TransactionPackageItem ti, Item aSelectedItem, aSelectedTransactor, 2, Transactor aSelectedBillTransactor, aTransUserDetail, aSelectedSchemeTransactor, aAuthorisedByUserDetail, aSelectedAccCoa) {
+                            org.primefaces.PrimeFaces.current().executeScript("doClearClick()");
+                            
                             TransItemBean = null;
                             switch (aLevel) {
                                 case "PARENT":
@@ -1614,9 +1617,46 @@ public class TransactionPackageBean implements Serializable {
             aTransBean.setDate1(null);
             aTransBean.setDate2(null);
             aTransBean.setFieldName("");
-            new TransBean().getTransList().clear();
-            new TransBean().getTransListSummary().clear();
+            this.getTransList().clear();
+            this.getTransListSummary().clear();
         } catch (NullPointerException npe) {
+        }
+    }
+
+    public void clearAll2(Trans t, TransactionPackage transactionPackage, List<TransactionPackageItem> aActiveTransItems, TransactionPackageItem ti, Item aSelectedItem, Transactor aSelectedTransactor, int ClearNo, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa) {//Clear No: 0-do not clear, 1 - clear trans item only, 2 - clear all  
+        TransactionPackageItemBean tib = new TransactionPackageItemBean();
+        ItemBean itmB = new ItemBean();
+        TransactorBean trB = new TransactorBean();
+        AccCoaBean acBean = new AccCoaBean();
+
+        if (ClearNo == 1 || ClearNo == 2) {//Clear No: 0-do not clear, 1 - clear trans item only, 2 - clear all
+            //clear autoCompletetd item
+            itmB.clearSelectedItem();
+            itmB.clearItem(aSelectedItem);
+            //clear the selcted trans item
+            tib.clearTransactionPackageItem(ti);
+            this.clearTransactionPackage(transactionPackage);
+            //clear selected AccCoa
+            acBean.clearAccCoa(aSelectedAccCoa);
+        }
+        if (ClearNo == 2) {//Clear No: 0-do not clear, 1 - clear trans item only, 2 - clear all
+            trB.clearTransactor(aSelectedTransactor);
+            //code for clearing BILL customer/supplier/transactor
+            //trB.clearSelectedBillTransactor();
+            trB.clearTransactor(aSelectedBillTransactor);
+            trB.clearTransactor(aSelectedSchemeTransactor);
+            //clear all the item LIST
+            //--//tib.getActiveTransItems().clear();
+            aActiveTransItems.clear();
+             this.clearTransactionPackage(transactionPackage);
+            //clear Trans inc. payments
+            new TransBean().clearTrans(t);
+
+            //clear TransUser / Service Offered by
+            new UserDetailBean().clearUserDetail(aTransUserDetail);
+
+            //clear Authorised By UserDetail
+            new UserDetailBean().clearUserDetail(aAuthorisedByUserDetail);
         }
     }
 

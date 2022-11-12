@@ -1,4 +1,5 @@
 -- put here changes to script_db_upgrade
+ALTER TABLE transaction_package_item_unit CHANGE COLUMN transaction_packacge_item_unit_id transaction_package_item_unit_id bigint;
 
 -- put here changes to SPs
 
