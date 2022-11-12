@@ -714,10 +714,46 @@ public class AccCurrencyBean implements Serializable {
     }
 
     public double roundDoubleToXDps(double aDouble, int aDecimalPlaces) {
+        //HALF UP 4,HALF DOWN 5,HALF EVEN 6,UP 0,DOWN 1,CEILING 2,FLOOR 3
         double RoundedDouble = 0;
         try {
             int DecimalPlaces = aDecimalPlaces;
-            int RoundingMode = 4;//4 is BigDecimal.ROUND_HALF_UP
+            int RoundingMode = 4;
+            RoundedDouble = Precision.round(aDouble, DecimalPlaces, RoundingMode);
+        } catch (Exception e) {
+        }
+        return RoundedDouble;
+    }
+
+    public double roundDoubleToXDps(double aDouble, int aDecimalPlaces, String aRoundMode) {
+        //HALF UP 4,HALF DOWN 5,HALF EVEN 6,UP 0,DOWN 1,CEILING 2,FLOOR 3
+        double RoundedDouble = 0;
+        try {
+            int DecimalPlaces = aDecimalPlaces;
+            int RoundingMode = 4;
+            switch (aRoundMode) {
+                case "HALF UP":
+                    RoundingMode = 4;
+                    break;
+                case "HALF DOWN":
+                    RoundingMode = 5;
+                    break;
+                case "HALF EVEN":
+                    RoundingMode = 6;
+                    break;
+                case "UP":
+                    RoundingMode = 0;
+                    break;
+                case "DOWN":
+                    RoundingMode = 1;
+                    break;
+                case "CEILING":
+                    RoundingMode = 2;
+                    break;
+                case "FLOOR":
+                    RoundingMode = 3;
+                    break;
+            }
             RoundedDouble = Precision.round(aDouble, DecimalPlaces, RoundingMode);
         } catch (Exception e) {
         }
@@ -861,17 +897,17 @@ public class AccCurrencyBean implements Serializable {
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
             //currency_code_tax, currency_name_tax
-            if (aAcc_currency_tax_list.getCurrency_code_tax()!= null) {
+            if (aAcc_currency_tax_list.getCurrency_code_tax() != null) {
                 ps.setString(1, aAcc_currency_tax_list.getCurrency_code_tax());
             } else {
                 ps.setString(1, "");
             }
-            if (aAcc_currency_tax_list.getCurrency_name_tax()!= null) {
+            if (aAcc_currency_tax_list.getCurrency_name_tax() != null) {
                 ps.setString(2, aAcc_currency_tax_list.getCurrency_name_tax());
             } else {
                 ps.setString(2, "");
             }
-            
+
             ps.executeUpdate();
             saved = 1;
         } catch (Exception e) {
