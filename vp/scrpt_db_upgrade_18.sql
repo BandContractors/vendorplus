@@ -231,15 +231,7 @@ ALTER TABLE transaction_item_excise ADD COLUMN excise_duty_code VARCHAR(50) NULL
 INSERT INTO download_status (download_name, download_status, download_status_msg, total_amount, total_downloaded, add_date) VALUES ('GOODS COMMODITY', '3', 'NEW', '0','0',Now());
 
 CREATE TABLE transaction_package_item_unit (
-<<<<<<< HEAD
-<<<<<<< HEAD
   transaction_package_item_unit_id bigint(20) NOT NULL DEFAULT '0',
-=======
-  transaction_packacge_item_unit_id bigint(20) NOT NULL DEFAULT '0',
->>>>>>> e2fe40d8f6f65c507849dded2717785833784ca3
-=======
-  transaction_package_item_unit_id bigint(20) NOT NULL DEFAULT '0',
->>>>>>> 111b0af7bf6128855be5d6160f4e2db1c74bbcb9
   unit_id int(11) NOT NULL,
   base_unit_qty double NOT NULL,
   PRIMARY KEY (transaction_package_item_unit_id)
