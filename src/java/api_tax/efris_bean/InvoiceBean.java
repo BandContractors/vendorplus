@@ -38,6 +38,7 @@ import entities.Api_tax_error_log;
 import entities.CompanySetting;
 import entities.Item;
 import entities.Item_tax_map;
+import entities.Item_unit;
 import entities.Trans;
 import entities.TransItem;
 import entities.Transaction_tax;
@@ -453,9 +454,34 @@ public class InvoiceBean implements Serializable {
                                 EdRate = transitems.get(i).getTransItemExciseObj().getRate_value();
                                 gd.setExciseRule(Integer.toString(2));
                                 gd.setExciseRate(ub.formatDoubleToStringPlain(EdRate, 2));
-                                gd.setPack(Integer.toString(1));
-                                gd.setStick(Integer.toString(1));
                                 gd.setExciseUnit(transitems.get(i).getTransItemExciseObj().getRate_unit_code_tax());
+                                String UnitExcise = gd.getExciseUnit();
+                                String UnitTransItem = gd.getUnitOfMeasure();
+                                /*
+                                 if (UnitExcise.equals(UnitTransItem)) {
+                                 gd.setPack(Integer.toString(1));
+                                 gd.setStick(Integer.toString(1));
+                                 } else {
+                                 Item_unit iu = new ItemBean().getItemUnitFrmDb(transitems.get(i).getItemId(), UnitExcise);
+                                 if (null != iu) {
+                                 gd.setPack(Double.toString(iu.getBase_qty()));
+                                 gd.setStick(Double.toString(iu.getOther_qty()));
+                                 }
+                                 }
+                                 */
+                                Item_unit iu = new ItemBean().getItemUnitFrmDb(transitems.get(i).getItemId(), UnitExcise);
+                                if (null != iu) {
+                                    if (iu.getIs_base() == 0) {
+                                        gd.setPack(Double.toString(iu.getBase_qty()));
+                                        gd.setStick(Double.toString(iu.getOther_qty()));
+                                    } else {
+                                        gd.setPack(Integer.toString(1));
+                                        gd.setStick(Integer.toString(1));
+                                    }
+                                } else {
+                                    gd.setPack(Integer.toString(1));
+                                    gd.setStick(Integer.toString(1));
+                                }
                                 String CurCodeTax = transitems.get(i).getTransItemExciseObj().getRate_currency_code_tax();
                                 String CurCode = "";
                                 if (ub.getEmptyIfNull(CurCodeTax).length() > 0) {
@@ -548,13 +574,19 @@ public class InvoiceBean implements Serializable {
                 if (null != EdTransTaxes) {
                     for (int i = 0; i < EdTransTaxes.size(); i++) {
                         td = new TaxDetails();
-                        td.setGrossAmount(ub.formatDoubleToStringPlain((EdTransTaxes.get(i).getTaxable_amount() + EdTransTaxes.get(i).getTax_amount()), 2));
+                        //netAmount+taxAmount=grossAmount
+                        double AmtNet = acb.roundDoubleToXDps(EdTransTaxes.get(i).getTaxable_amount(), 2, "HALF UP");
+                        double AmtTax = acb.roundDoubleToXDps(EdTransTaxes.get(i).getTax_amount(), 2, "HALF UP");
+                        double AmtGross = acb.roundDoubleToXDps((AmtNet + AmtTax), 2, "HALF UP");
+                        System.out.println("AmtNet:" + AmtNet + " AmtTax=" + AmtTax + " AmtGross=" + AmtGross);
+                        td.setGrossAmount(ub.formatDoubleToStringPlain(AmtGross, 2));
                         td.setTaxCategoryCode("05");
                         td.setTaxCategory("Excise Duty");
                         td.setTaxRateName(EdTransTaxes.get(i).getTax_rate_name());//free entry
                         td.setTaxRate(ub.formatDoubleToStringPlain(EdTransTaxes.get(i).getTax_rate(), 2));
-                        td.setTaxAmount(ub.formatDoubleToStringPlain(EdTransTaxes.get(i).getTax_amount(), 2));
-                        td.setNetAmount(ub.formatDoubleToStringPlain(EdTransTaxes.get(i).getTaxable_amount(), 2));
+                        td.setTaxAmount(ub.formatDoubleToStringPlain(AmtTax, 2));
+                        //td.setNetAmount(ub.formatDoubleToStringPlain(EdTransTaxes.get(i).getTaxable_amount(), 2));
+                        td.setNetAmount(ub.formatDoubleToStringPlain(AmtNet, 2));
                         taxDetails.add(td);
                     }
                 }
