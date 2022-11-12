@@ -37,7 +37,7 @@ public class AccCoaBean implements Serializable {
     private String ActionMessage = null;
     private List<AccCoa> AccCoaObjectList;
     private AccCoa AccCoaObject;
-    private AccCoa AccCoaDetail = null;
+    private String AccountCode;
 
     @ManagedProperty("#{menuItemBean}")
     private MenuItemBean menuItemBean;
@@ -480,7 +480,7 @@ public class AccCoaBean implements Serializable {
             aAccCoa.setAccGroupId(0);
             aAccCoa.setAccCategoryId(0);
             aAccCoa.setOrderCoa(0);
-            aAccCoa.setIsActive(0);
+            aAccCoa.setIsActive(1);
             aAccCoa.setIsDeleted(0);
             aAccCoa.setIsChild(0);
             aAccCoa.setIsTransactorMandatory(0);
@@ -489,35 +489,12 @@ public class AccCoaBean implements Serializable {
             aAccCoa.setLastEditBy(0);
             aAccCoa.setAddDate(null);
             aAccCoa.setLastEditDate(null);
+            this.setAccountCode("");
         }
     }
 
-    public void clearAccCoaDetail() {
-        if (null != AccCoaDetail) {
-            AccCoaDetail.setAccCoaId(0);
-            AccCoaDetail.setAccountCode("");
-            AccCoaDetail.setAccountName("");
-            AccCoaDetail.setAccountDesc("");
-            AccCoaDetail.setAccClassId(0);
-            AccCoaDetail.setAccTypeId(0);
-            AccCoaDetail.setAccGroupId(0);
-            AccCoaDetail.setAccCategoryId(0);
-            AccCoaDetail.setOrderCoa(0);
-            AccCoaDetail.setIsActive(0);
-            AccCoaDetail.setIsDeleted(0);
-            AccCoaDetail.setIsChild(0);
-            AccCoaDetail.setIsTransactorMandatory(0);
-            AccCoaDetail.setIsSystemAccount(0);
-            AccCoaDetail.setAddBy(0);
-            AccCoaDetail.setLastEditBy(0);
-            AccCoaDetail.setAddDate(null);
-            AccCoaDetail.setLastEditDate(null);
-        }
-    }
-
-    public void displayAccCoaDetail(AccCoa aFromAccCoa, AccCoa aToAccCoa) {
+    public void displayAccCoa(AccCoa aFromAccCoa, AccCoa aToAccCoa) {
         try {
-            this.clearAccCoaDetail();
             aToAccCoa.setAccCoaId(aFromAccCoa.getAccCoaId());
             aToAccCoa.setAccountCode(aFromAccCoa.getAccountCode());
             aToAccCoa.setAccountName(aFromAccCoa.getAccountName());
@@ -541,6 +518,36 @@ public class AccCoaBean implements Serializable {
         }
     }
 
+    public void setAccCoaCode(String aFromAccCoaCode, AccCoa aToAccCoa) {
+        aToAccCoa.setAccountCode(aFromAccCoaCode);
+    }
+
+    public void setAccCoaCode(AccCoa aToAccCoa) {
+        try {
+            UtilityBean ub = new UtilityBean();
+            String BaseName = "language_en";
+            String msg;
+            String accountCode;
+            try {
+                BaseName = getMenuItemBean().getMenuItemObj().getLANG_BASE_NAME_SYS();
+            } catch (Exception e) {
+            }
+            accountCode = aToAccCoa.getAccountCode() + "-" + this.getAccountCode();
+            AccCoa AccCoaObj = this.getAccCoaByCodeOrId(accountCode, 0);
+            if (AccCoaObj != null) {
+                msg = "Account Code " + this.getAccountCode() + " Already Exist";
+                aToAccCoa.setAccountCode(aToAccCoa.getAccountCode());
+            } else {
+                msg = "Account Code " + this.getAccountCode() + " is Available";
+                aToAccCoa.setAccountCode(aToAccCoa.getAccountCode() + "-" + this.getAccountCode());
+            }
+
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public void saveAccCoa(AccCoa aAccCoa) {
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -551,19 +558,20 @@ public class AccCoaBean implements Serializable {
                 BaseName = getMenuItemBean().getMenuItemObj().getLANG_BASE_NAME_SYS();
             } catch (Exception e) {
             }
-                long saved = 0;
-                if (aAccCoa.getAccCoaId()== 0) {
-                    saved = this.insertAccCoa(aAccCoa);
-                } else if (aAccCoa.getAccCoaId()> 0) {
-                    saved = this.updateAccCoa(aAccCoa);
-                }
-                if (saved > 0) {
-                    msg = "Chart of Account Saved Successfully";
-                    this.clearAccCoa(aAccCoa);
-                } else {
-                    msg = "Chart of Account NOT Saved";
-                }
-                FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
+            long saved = 0;
+            if (aAccCoa.getAccCoaId() == 0) {
+                saved = this.insertAccCoa(aAccCoa);
+            } else if (aAccCoa.getAccCoaId() > 0) {
+                saved = this.updateAccCoa(aAccCoa);
+            }
+            if (saved > 0) {
+                msg = "Chart of Account Saved Successfully";
+                this.clearAccCoa(aAccCoa);
+                this.reportChartOfAccountsDetail(aAccCoa,this);
+            } else {
+                msg = "Chart of Account NOT Saved";
+            }
+            FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }
@@ -581,7 +589,9 @@ public class AccCoaBean implements Serializable {
             ps.setString(1, aAccCoa.getAccountCode());
             ps.setString(2, aAccCoa.getAccountName());
             ps.setString(3, aAccCoa.getAccountDesc());
-            ps.setInt(4, aAccCoa.getAccClassId());
+            //ps.setInt(4, aAccCoa.getAccClassId());
+            // set int as null; java.sql.Types.INTEGER = 4;
+            ps.setNull(4, 4);
             ps.setInt(5, aAccCoa.getAccTypeId());
             ps.setInt(6, aAccCoa.getAccGroupId());
             ps.setInt(7, aAccCoa.getAccCategoryId());
@@ -617,7 +627,9 @@ public class AccCoaBean implements Serializable {
             ps.setString(1, aAccCoa.getAccountCode());
             ps.setString(2, aAccCoa.getAccountName());
             ps.setString(3, aAccCoa.getAccountDesc());
-            ps.setInt(4, aAccCoa.getAccClassId());
+            //ps.setInt(4, aAccCoa.getAccClassId());
+            // set int as null; java.sql.Types.INTEGER = 4;
+            ps.setNull(4, 4);
             ps.setInt(5, aAccCoa.getAccTypeId());
             ps.setInt(6, aAccCoa.getAccGroupId());
             ps.setInt(7, aAccCoa.getAccCategoryId());
@@ -684,20 +696,6 @@ public class AccCoaBean implements Serializable {
     }
 
     /**
-     * @return the AccCoaDetail
-     */
-    public AccCoa getAccCoaDetail() {
-        return AccCoaDetail;
-    }
-
-    /**
-     * @param AccCoaDetail the AccCoaDetail to set
-     */
-    public void setAccCoaDetail(AccCoa AccCoaDetail) {
-        this.AccCoaDetail = AccCoaDetail;
-    }
-
-    /**
      * @return the menuItemBean
      */
     public MenuItemBean getMenuItemBean() {
@@ -709,6 +707,20 @@ public class AccCoaBean implements Serializable {
      */
     public void setMenuItemBean(MenuItemBean menuItemBean) {
         this.menuItemBean = menuItemBean;
+    }
+
+    /**
+     * @return the AccountCode
+     */
+    public String getAccountCode() {
+        return AccountCode;
+    }
+
+    /**
+     * @param AccountCode the AccountCode to set
+     */
+    public void setAccountCode(String AccountCode) {
+        this.AccountCode = AccountCode;
     }
 
 }
