@@ -426,7 +426,7 @@ public class TransactionPackageItemBean implements Serializable {
 
                 }
                 // TransactionPackageItem transPackageItem = 
-               // NewTransPackageItem.setUnitId(aSelectedItem.getUnitId());
+                // NewTransPackageItem.setUnitId(aSelectedItem.getUnitId());
                 NewTransPackageItem.setItemId(aSelectedItem.getItemId());
                 NewTransPackageItem.setItemDescription(aSelectedItem.getDescription());
 
@@ -708,6 +708,56 @@ public class TransactionPackageItemBean implements Serializable {
             if (BaseQty >= 0) {
                 aTransPackageItem.setBaseUnitQty(BaseQty);
             }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+    
+        public void addQtyTransItemCEC(TransactionPackageItem ti) {
+        try {
+            ti.setItemQty(ti.getItemQty() + 1);
+            if (ti.getItemQty() < 0) {
+                ti.setItemQty(0);
+            }
+            //update amount
+            ti.setAmount(ti.getItemQty() * ti.getUnitPrice());
+        } catch (Exception e) {
+        }
+    }
+
+    public void subtractQtyTransItemCEC(TransactionPackageItem ti) {
+        try {
+            ti.setItemQty(ti.getItemQty() - 1);
+            if (ti.getItemQty() < 0) {
+                ti.setItemQty(0);
+            }
+            //update amount
+            ti.setAmount(ti.getItemQty() * ti.getUnitPrice());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
+    public void addQtyTransPackageItemCEC(int aTransTypeId, Trans aTrans, TransactionPackage transactionPackage, List<TransactionPackageItem> aActiveTransItems, TransactionPackageItem ti) {
+        try {
+            ti.setItemQty(ti.getItemQty() + 1);
+            if (ti.getItemQty() < 0) {
+                ti.setItemQty(0);
+            }
+            //update totals
+            this.editTransPackageItemCEC(aTransTypeId, aTrans, transactionPackage, aActiveTransItems, ti);
+        } catch (Exception e) {
+        }
+    }
+
+    public void subtractQtyTransPackageItemCEC(int aTransTypeId, Trans aTrans, TransactionPackage transactionPackage, List<TransactionPackageItem> aActiveTransItems, TransactionPackageItem ti) {
+        try {
+            ti.setItemQty(ti.getItemQty() - 1);
+            if (ti.getItemQty() < 0) {
+                ti.setItemQty(0);
+            }
+            //update totals
+            this.editTransPackageItemCEC(aTransTypeId, aTrans, transactionPackage, aActiveTransItems, ti);
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }

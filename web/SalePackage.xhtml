@@ -39,25 +39,30 @@
                 <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Stock']}:#{langsys['No']} #{langsys['effect']}"/>
                 <h:outputLabel style="background-color:#00B461;color: white;" value="#{langsys['Ledger']}:#{langsys['No']} #{langsys['effect']}"/>
             </h:panelGrid>
-            <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="3">
+            <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="5">
                 <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeObj.transactionNumberLabel)}"/>
+                <h:outputLabel styleClass="clsLabelTransItem" style="width: 100px" value=""/>
                 <h:outputLabel  value="#{langsys['Currency']}"/>
+                <h:outputLabel styleClass="clsLabelTransItem" style="width: 100px" value=""/>
                 <h:outputLabel  value="#{transBean.transTypeObj.transactionDateLabel}"/>
 
                 <h:inputText style="width: 120px;height: 24px;" styleClass="clsInput" id="itxtTransactionNo" value="#{trans.transactionNumber}" autocomplete="off">
                 </h:inputText>
+                <h:outputLabel styleClass="clsLabelTransItem" style="width: 100px" value=""/>
                 <h:selectOneMenu style="width: 80px;height: 30px;" styleClass="clsMenu" id="menuCurrency" value="#{trans.currencyCode}">
                     <f:selectItems value="#{accCurrencyBean.currencyList}" var="ac" itemLabel="#{ac.currencyCode}" itemValue="#{ac.currencyCode}"/>
                     <f:ajax event="change" execute="@this" render="@this"/>
                 </h:selectOneMenu>
-
+                <h:outputLabel styleClass="clsLabelTransItem" style="width: 100px" value=""/>
                 <p:calendar styleClass="clsInput" id="calTransactionDate"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.transactionDate}" size="8" />
 
             </h:panelGrid>
-            <h:panelGrid id="gridTransItem" styleClass="clsGridMainInput" columns="5">
+            <h:panelGrid id="gridTransItem" styleClass="clsGridMainInput" columns="7">
                 <p:commandLink actionListener="#{itemBean.openChildItem('Stock',transItem.itemId)}" value="#{langsys['Item']} #{langsys['Description']}"/>
                 <h:outputLabel styleClass="clsLabelTransItem" style="width: 50px" value="#{langsys['Unit']}"/>
+                <h:outputLabel styleClass="clsLabelTransItem" style="width: 50px" value=""/>
                 <h:outputLabel styleClass="clsLabelTransItem" style="width: 50px" value="#{langsys['Qty']}"/>
+                <h:outputLabel styleClass="clsLabelTransItem" style="width: 50px" value=""/>
                 <h:outputLabel styleClass="clsLabelTransItem" style="width: 100px" value="#{langsys['Unit']} #{langsys['Price']}"/>
                 <h:outputLabel styleClass="clsLabelTransItem" style="width: 100px" value="#{langsys['Amount']}"/>
 
@@ -107,17 +112,25 @@
                     <f:selectItems value="#{itemBean.item_unitList}" var="iu" itemLabel="#{iu.unit_symbol}" itemValue="#{iu.unit_id}"/>
                     <p:ajax listener="#{itemBean.changeItemUnitSales(itemBean.selectedItem,transactionPackageItem,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentStore.storeId,trans)}" process="@this autcItem" update="itxtAmount itxtUnitPrice"/>
                 </p:selectOneMenu>
+                <h:commandButton value="+" style="width: 34px;height: 30px;">
+                    <f:ajax listener="#{transactionPackageItemBean.addQtyTransItemCEC(transactionPackageItem)}" execute="@this itxtQty" render="itxtQty itxtAmount"/>
+                </h:commandButton>
                 <h:inputText id="itxtQty" styleClass="clsInputTransItem" style="width: 50px;height: 24px;" value="#{transactionPackageItem.itemQty}" autocomplete="off">
                     <f:ajax event="blur" listener="#{transactionPackageItem.setAmount(transactionPackageItem.itemQty*transactionPackageItem.unitPrice)}" render="itxtAmount"/>
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
+
+                <h:commandButton value="-" style="width: 34px;height: 30px;">
+                    <f:ajax listener="#{transactionPackageItemBean.subtractQtyTransItemCEC(transactionPackageItem)}" execute="@this itxtQty" render="itxtQty itxtAmount"/>
+                </h:commandButton>
                 <h:inputText id="itxtUnitPrice" styleClass="clsInputTransItem" style="width: 100px;height: 24px;" disabled="#{itemBean.selectedItem.isGeneral==0}" value="#{transactionPackageItem.unitPrice}" autocomplete="off">
                     <f:ajax event="blur" listener="#{transactionPackageItem.setAmount(transactionPackageItem.itemQty*transactionPackageItem.unitPrice)}" render="itxtAmount"/>
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                </h:inputText>             
+                </h:inputText> 
                 <h:inputText id="itxtAmount" styleClass="clsInputTransItem" style="width: 100px;height: 24px;" disabled="true" value="#{transactionPackageItem.amount}">
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
-                </h:inputText>             
+                </h:inputText> 
+
             </h:panelGrid>
 
             <h:panelGrid id="pgrdSpecific">
@@ -167,10 +180,16 @@
                     <!-- column header -->
                     <f:facet name="header">#{langsys['Qty']}</f:facet>
                     <!-- row record -->
+                    <h:commandButton id="cmdbAddQty" value="+" style="width: 34px;">
+                        <f:ajax listener="#{transactionPackageItemBean.addQtyTransPackageItemCEC(generalUserSetting.currentTransactionTypeId, trans,transactionPackage, transactionPackageItemBean.transPackageItemList,ati)}" execute="dtblTransactionItem" render="dtblTransactionItem TransactionPackageForm:pgrdTotals TransactionPackageForm:pgrdMsgs"/>
+                    </h:commandButton>
                     <h:inputText value="#{ati.itemQty}" style="width: 50px;">
                         <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                         <f:ajax event="change" listener="#{transactionPackageItemBean.editTransPackageItemCEC(generalUserSetting.currentTransactionTypeId, trans,transactionPackage, transactionPackageItemBean.transPackageItemList,ati)}" execute="dtblTransactionItem" render="dtblTransactionItem TransactionPackageForm:pgrdTotals TransactionPackageForm:pgrdMsgs"/>
                     </h:inputText>
+                    <h:commandButton id="cmdbRemoveQty" value="-" style="width: 34px;">
+                        <f:ajax listener="#{transactionPackageItemBean.subtractQtyTransPackageItemCEC(generalUserSetting.currentTransactionTypeId, trans,transactionPackage, transactionPackageItemBean.transPackageItemList,ati)}" execute="dtblTransactionItem" render="dtblTransactionItem TransactionPackageForm:pgrdTotals TransactionPackageForm:pgrdMsgs"/>
+                    </h:commandButton>
                 </p:column>
                 <p:column>
                     <!-- column header -->
@@ -270,7 +289,7 @@
                 </h:panelGrid>
             </h:panelGrid>
             <h:panelGrid id="pgrdMsgs" styleClass="clsGridMainMessages" columns="1">
-                <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{transBean.actionMessage}"/>
+                <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{transactionPackageBean.actionMessage}"/>
                 <h:messages id="msgsMainMessage" style="color: red"/><br/>
             </h:panelGrid>
             <p:growl id="growl1"/>
