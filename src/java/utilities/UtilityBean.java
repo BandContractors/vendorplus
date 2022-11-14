@@ -356,13 +356,17 @@ public class UtilityBean implements Serializable {
     }
 
 //    public static void main(String[] args) {
-//         Map<String, Double> lstEDTaxes = new HashMap<>();
-//         lstEDTaxes.put("A", 10000.0);
-//         lstEDTaxes.put("B", 20000.0);
-//         lstEDTaxes.put("B", 50000.0);
-//         System.out.println(lstEDTaxes.get("B"));
+//        AccCurrencyBean cb = new AccCurrencyBean();
+//        double x = 847457.627119, y = 847457.627119, z = 847457.627119;
+//        //UP 0,DOWN 1,CEILING 2,FLOOR 3
+//        System.out.println(cb.roundDoubleToXDps(x, 2, "HALF UP"));
+//        System.out.println(cb.roundDoubleToXDps(y, 2, "HALF DOWN"));
+//        System.out.println(cb.roundDoubleToXDps(z, 2, "HALF EVEN"));
+//        System.out.println(cb.roundDoubleToXDps(x, 2, "UP"));
+//        System.out.println(cb.roundDoubleToXDps(x, 2, "DOWN"));
+//        System.out.println(cb.roundDoubleToXDps(x, 2, "CEILING"));
+//        System.out.println(cb.roundDoubleToXDps(x, 2, "FLOOR"));
 //    }
-    
     public String formatDoubleToStringHide(double aAmount, int aHideResult) {
         String aString = "";
         //DecimalFormat myFormatter = new DecimalFormat("###,###.###;(###,###.###)");
