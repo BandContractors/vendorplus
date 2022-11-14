@@ -5954,8 +5954,11 @@ public class TransItemBean implements Serializable {
                 if (!"HIRE RETURN INVOICE".equals(transtype.getTransactionTypeName())) {
                     ItemFoundAtIndex = itemExists(aActiveTransItems, ti.getItemId(), ti.getBatchno(), ti.getCodeSpecific(), ti.getDescSpecific(), ti.getUnit_id());
                 }
+                String vMsgExcise = new TransItemExtBean().validateExciseDuty(aTransTypeId, ti);
                 if (ti.getAmount() < 0 || ti.getAmountExcVat() < 0 || ti.getAmountExcVat() < 0) {
                     status = "Discount cannot exceed Unit Price";
+                } else if (vMsgExcise.length() > 0) {
+                    status = vMsgExcise;
                 } else {
                     if (ItemFoundAtIndex == -1) {
                         //round off amounts basing on currency rules
@@ -6916,6 +6919,11 @@ public class TransItemBean implements Serializable {
             TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
             TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
             this.updateBaseUnityQty(ti);
+            //Excise Duty - Start
+            if (transtype.getTransactionTypeName().equals("SALE INVOICE") && ti.getTransItemExciseObj().getExcise_duty_code().length() > 0) {
+                new TransItemExtBean().setExciseDutyTax(ti.getTransItemExciseObj(), ti.getItemId(), ti.getUnit_id(), aTrans.getCurrencyCode(), ti.getItemQty(), ti.getUnitPriceExcVat(), 1);
+            }
+            //Excise Duty - End
             if (ti.getItemQty() < 0) {
                 ti.setItemQty(0);
             }
@@ -7400,6 +7408,12 @@ public class TransItemBean implements Serializable {
                 ti.setItemExpryDate(null);
                 ti.setItemMnfDate(null);
             }
+            //Excise Duty - Start
+            ti.getTransItemExciseObj().setExcise_duty_code(NewTransItem.getTransItemExciseObj().getExcise_duty_code());
+            if ("SALE INVOICE".equals(new GeneralUserSetting().getCurrentTransactionTypeName()) && NewTransItem.getTransItemExciseObj().getExcise_duty_code().length() > 0) {
+                new TransItemExtBean().setExciseDutyTax(ti.getTransItemExciseObj(), ti.getItemId(), ti.getUnit_id(), aTrans.getCurrencyCode(), NewTransItem.getItemQty(), ti.getUnitPriceExcVat(), 1);
+            }
+            //Excise Duty - End
             ti.setAmountIncVat((ti.getUnitPriceIncVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
             ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
 
@@ -10091,10 +10105,6 @@ public class TransItemBean implements Serializable {
             if (ti.getItemQty() < 0) {
                 ti.setItemQty(0);
             }
-//            double BaseQty = new ItemBean().getBaseUnitQty(ti.getItemId(), ti.getUnit_id(), ti.getItemQty());
-//            if (BaseQty > 0) {
-//                ti.setBase_unit_qty(BaseQty);
-//            }
             //update totals
             this.editTransItemCEC(aTransTypeId, aTransReasonId, "", aTrans, aActiveTransItems, ti);
         } catch (Exception e) {
@@ -10107,10 +10117,6 @@ public class TransItemBean implements Serializable {
             if (ti.getItemQty() < 0) {
                 ti.setItemQty(0);
             }
-//            double BaseQty = new ItemBean().getBaseUnitQty(ti.getItemId(), ti.getUnit_id(), ti.getItemQty());
-//            if (BaseQty > 0) {
-//                ti.setBase_unit_qty(BaseQty);
-//            }
             //update totals
             this.editTransItemCEC(aTransTypeId, aTransReasonId, "", aTrans, aActiveTransItems, ti);
         } catch (Exception e) {
@@ -11685,7 +11691,17 @@ public class TransItemBean implements Serializable {
                 } catch (Exception e) {
                     aSelectedTransItem.setDescSpecific("");
                 }
-                //if ((aSelectedTransItem.getItemQty() + this.getListTotalItemBatchQty(aActiveTransItems, aSelectedTransItem.getItemId(), aSelectedTransItem.getBatchno(), aSelectedTransItem.getCodeSpecific(), aSelectedTransItem.getDescSpecific())) > st.getCurrentqty() && "SALE INVOICE".equals(transtype.getTransactionTypeName())) {
+
+                //check if item has Excise Duty
+                Item_excise_duty_map edm = new ItemBean().getItem_excise_duty_mapByItem(aSelectedTransItem.getItemId());
+                String ExciseDutyCode = "";
+                if (null != edm) {
+                    if (null != edm.getExcise_duty_code()) {
+                        ExciseDutyCode = edm.getExcise_duty_code();
+                    }
+                }
+                aSelectedTransItem.getTransItemExciseObj().setExcise_duty_code(ExciseDutyCode);
+
                 if ((aSelectedTransItem.getBase_unit_qty() + this.getListTotalItemBatchQty(aActiveTransItems, aSelectedTransItem.getItemId(), aSelectedTransItem.getBatchno(), aSelectedTransItem.getCodeSpecific(), aSelectedTransItem.getDescSpecific())) > st.getCurrentqty() && "SALE INVOICE".equals(transtype.getTransactionTypeName())) {
                     //BACK
                     //check if supplied qty + existing qty is more than total current stock qty
