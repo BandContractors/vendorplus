@@ -215,9 +215,7 @@ public class TransactionPackageItemBean implements Serializable {
                     cs.setLong("in_transaction_package_id", transPackageItem.getTransactionPackageId());
                     cs.setLong("in_item_id", transPackageItem.getItemId());
                     cs.setString("in_batchno", transPackageItem.getBatchNo());
-
                     cs.setInt("in_unit_id", transPackageItem.getUnitId());
-
                     cs.setDouble("in_base_unit_qty", transPackageItem.getBaseUnitQty());
                     cs.setDouble("in_item_qty", transPackageItem.getItemQty());
                     cs.setDouble("in_unit_price", transPackageItem.getUnitPrice());
@@ -233,7 +231,6 @@ public class TransactionPackageItemBean implements Serializable {
                     cs.setDouble("in_amount", transPackageItem.getAmount());
                     cs.setString("in_vat_rated", transPackageItem.getVatRated());
                     cs.setDouble("in_vat_perc", transPackageItem.getVatPerc());
-
                     try {
                         cs.setString("in_code_specific", transPackageItem.getCodeSpecific());
                     } catch (NullPointerException npe) {
