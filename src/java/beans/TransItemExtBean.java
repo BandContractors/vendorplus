@@ -584,6 +584,39 @@ public class TransItemExtBean implements Serializable {
         return tie;
     }
 
+    public String validateExciseDuty(int aTransTypeId, TransItem aTransItem) {
+        String msg = "";
+        try {
+            if (aTransTypeId == 2 && aTransItem.getTransItemExciseObj().getExcise_duty_code().length() > 0) {
+                double vatamt = aTransItem.getUnitVat() * aTransItem.getItemQty();
+                double taxamt = aTransItem.getTransItemExciseObj().getCalc_excise_tax_amount() + vatamt;
+                if (taxamt > aTransItem.getAmountIncVat()) {
+                    msg = "Total Tax Cannot be Greater Than Item Amount for ##" + new ItemBean().getItem(aTransItem.getItemId()).getDescription();
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return msg;
+    }
+
+    public String validateExciseDuty(int aTransTypeId, List<TransItem> aTransItemList) {
+        String msg = "";
+        try {
+            if (aTransTypeId == 2) {
+                for (int i = 0; i < aTransItemList.size(); i++) {
+                    msg = this.validateExciseDuty(aTransTypeId, aTransItemList.get(i));
+                    if (msg.length() > 0) {
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return msg;
+    }
+
     /**
      * @return the menuItemBean
      */

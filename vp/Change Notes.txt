@@ -9,5 +9,10 @@ Excise:
 -Journal Entries for Excise Duty should Change.
 -Profit Margin for Items with Excise Duty.
 -Excise Duty on Cr/Dr Notes.
--
+-Excise Duty on QuickOrder.
+-Excise Duty on Purchase Invoice.
+-Excise Duty on ST and PACKAGING import.
+-Excise Duty on Draft Sales.
+-Excise Duty on Approval Sales.
+
 

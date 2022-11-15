@@ -173,6 +173,22 @@
                         </p:dataTable>
                     </h:panelGrid>
                 </p:tab>
+                <p:tab title="Back up Database">
+                    <h:panelGrid columns="2">
+                        <h:outputLabel id="lbldbName"  value="Database Name"/>
+                        <h:inputText value="#{utilityBean.dbName}" autocomplete="yes"/>
+                        <h:outputLabel id="lbldbUser"  value="Database User"/>
+                        <h:inputText value="#{utilityBean.dbUser}" autocomplete="yes"/>
+                        <h:outputLabel id="lbldbPass"  value="Password"/>
+                        <h:inputSecret value="#{utilityBean.dbPass}" autocomplete="yes"/>
+                        <p:commandButton styleClass="clsButtonBig" id="cmdbBackUpDB" value="Back up Database" accesskey="t" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                            <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                                <p:graphicImage name="/images/ajax-loader.gif"/>
+                            </p:dialog>
+                            <p:ajax listener="#{utilityBean.backUpDB()}" process="@form" update="@form" />
+                        </p:commandButton>
+                    </h:panelGrid>
+                </p:tab>
             </p:accordionPanel>
             <h:panelGrid styleClass="clsGridMainMessages" columns="1">
                 <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{transBean.actionMessage}"/>

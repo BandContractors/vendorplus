@@ -789,6 +789,7 @@ public class TransBean implements Serializable {
                     }
                 }
             }
+            String vExcise = new TransItemExtBean().validateExciseDuty(aTransTypeId, aActiveTransItems);
             UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
             List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
             GroupRightBean grb = new GroupRightBean();
@@ -920,6 +921,8 @@ public class TransBean implements Serializable {
                 msg = MsgCkeckApproval;
             } else if (trans.getTransactionId() == 0 && new Transaction_approvalBean().approvalRequiredTrans(trans, aTransTypeId, aTransReasonId) == 1) {
                 msg = "Send this Transaction for Approval";
+            } else if (vExcise.length() > 0) {
+                msg = vExcise;
             }
             /*else if (trans.getTransactionId() > 0 && new TransItemBean().countItemsWithQtyChanged(new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans), transtype.getTransactionTypeName()) == 0) {
              msg = "Cannot Save where Item Qty has Not Changed";
@@ -17323,7 +17326,7 @@ public class TransBean implements Serializable {
 
             if (!exists) {
                 if (tit.getItemQty() > 0) {
-                     tit.setItemQty(0);
+                    tit.setItemQty(0);
                     this.getSelectedTransItemsList().add(tit);
                     this.setTransTotalsAndUpdateCEC(getNewTransAtSplit().getTransactionTypeId(), getNewTransAtSplit().getTransactionReasonId(), getNewTransAtSplit(), this.getSelectedTransItemsList());
                 }
