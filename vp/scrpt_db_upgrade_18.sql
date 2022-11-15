@@ -265,3 +265,39 @@ INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_
 
 ALTER TABLE transaction_packacge_item_unit rename transaction_package_item_unit;
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',267,Now(),'6.0','');
+
+-- *** This should only be run once when the transaction_tax table is empty, check using the query below before running the query***
+-- SELECT count(*) FROM transaction_tax
+INSERT INTO transaction_tax(transaction_id,tax_category,tax_rate_name,tax_rate,taxable_amount,tax_amount) 
+		select 
+		t.transaction_id,
+		"VAT" as tax_category,
+		"Standard" as tax_rate_name,
+		t.vat_perc as tax_rate,
+		t.total_std_vatable_amount as taxable_amount,
+		t.total_vat as tax_amount 
+		from transaction t where t.transaction_type_id=2 and t.total_std_vatable_amount>0 and t.total_vat>0 
+	UNION 
+		select 
+		t.transaction_id,
+		"VAT" as tax_category,
+		"Exempt" as tax_rate_name,
+		0 as tax_rate,
+		t.total_exempt_vatable_amount as taxable_amount,
+		0 as tax_amount 
+		from transaction t where t.transaction_type_id=2 and t.total_exempt_vatable_amount>0 
+	UNION 
+		select 
+		t.transaction_id,
+		"VAT" as tax_category,
+		"Zero" as tax_rate_name,
+		0 as tax_rate,
+		t.total_zero_vatable_amount as taxable_amount,
+		0 as tax_amount 
+		from transaction t where t.transaction_type_id=2 and t.total_zero_vatable_amount>0 
+	UNION 
+		 select ti.transaction_id,"VAT" as tax_category,"Deemed" as tax_rate_name,18 as tax_rate,
+		 sum(ti.amount_exc_vat) as taxable_amount,sum(0.18*ti.amount_exc_vat) as tax_amount from transaction_item ti 
+		 where ti.vat_rated='DEEMED' group by ti.transaction_id
+;
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',303,Now(),'6.0','');
