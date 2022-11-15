@@ -5830,70 +5830,6 @@ public class TransItemBean implements Serializable {
                     ti.setUnitPriceExcVat(NewTransItem.getUnitPrice());
                 }
 
-                //Excise Duty - Start
-                ti.getTransItemExciseObj().setExcise_duty_code(NewTransItem.getTransItemExciseObj().getExcise_duty_code());
-                if (transtype.getTransactionTypeName().equals("SALE INVOICE") && NewTransItem.getTransItemExciseObj().getExcise_duty_code().length() > 0) {
-                    new TransItemExtBean().setExciseDutyTax(ti.getTransItemExciseObj(), ti.getItemId(), ti.getUnit_id(), aTrans.getCurrencyCode(), NewTransItem.getItemQty(), ti.getUnitPriceExcVat(), 1);
-                }
-                //Excise Duty - End
-                if (aSelectedItem.getIsTrack() == 1) {
-                    try {
-                        ti.setItemExpryDate(st.getItemExpDate());
-                    } catch (NullPointerException npe) {
-                        ti.setItemExpryDate(null);
-                    }
-                    try {
-                        ti.setItemMnfDate(st.getItemMnfDate());
-                    } catch (NullPointerException npe) {
-                        ti.setItemMnfDate(null);
-                    }
-                } else {
-                    ti.setItemExpryDate(null);
-                    ti.setItemMnfDate(null);
-                }
-                if ("HIRE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE QUOTATION".equals(transtype.getTransactionTypeName())) {
-                    ti.setAmountIncVat((ti.getUnitPriceIncVat() - ti.getUnitTradeDiscount()) * ti.getItemQty() * ti.getDuration_value());
-                    ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty() * ti.getDuration_value());
-                } else if ("HIRE RETURN INVOICE".equals(transtype.getTransactionTypeName())) {
-                    if (NewTransItem.getNarration().equals("DAMAGED/LOST")) {
-                        ti.setAmountIncVat((ti.getUnitPriceIncVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
-                        ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
-                    } else {
-                        ti.setAmountIncVat((ti.getUnitPriceIncVat() - ti.getUnitTradeDiscount()) * ti.getItemQty() * ti.getDuration_value());
-                        ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty() * ti.getDuration_value());
-                    }
-                } else {
-                    ti.setAmountIncVat((ti.getUnitPriceIncVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
-                    ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
-                }
-                //for profit margin
-                if ("SALE INVOICE".equals(transtype.getTransactionTypeName())) {
-                    if (aSelectedItem.getIsTrack() == 1) {
-                        //ti.setUnitCostPrice(XrateMultiply * new StockBean().getItemUnitCostPrice(store.getStoreId(), NewTransItem.getItemId(), NewTransItem.getBatchno(), NewTransItem.getCodeSpecific(), NewTransItem.getDescSpecific()));
-                        double UnitCost = new StockBean().getItemUnitCostPrice(store.getStoreId(), NewTransItem.getItemId(), NewTransItem.getBatchno(), NewTransItem.getCodeSpecific(), NewTransItem.getDescSpecific());
-                        int FrmUnitId = new ItemBean().getItem(aSelectedItem.getItemId()).getUnitId();
-                        int ToUnitId = ti.getUnit_id();
-                        double UnitConversionRate = new ItemBean().getUnitConversionRate(aSelectedItem.getItemId(), FrmUnitId, ToUnitId);
-                        UnitCost = UnitCost * UnitConversionRate;
-                        ti.setUnitCostPrice(XrateMultiply * UnitCost);
-                    } else {
-                        ti.setUnitCostPrice(XrateMultiply * aSelectedItem.getUnitCostPrice());
-                    }
-                    double UnitCostExcVat = 0;
-                    if (ti.getUnitVat() > 0) {
-                        UnitCostExcVat = ti.getUnitCostPrice() / (1 + (ti.getVatPerc() / 100));
-                    } else {
-                        UnitCostExcVat = ti.getUnitCostPrice();
-                    }
-                    ti.setUnitProfitMargin((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) - UnitCostExcVat);
-                } else if ("STOCK ADJUSTMENT".equals(transtype.getTransactionTypeName()) || "DISPOSE STOCK".equals(transtype.getTransactionTypeName()) || "STOCK CONSUMPTION".equals(transtype.getTransactionTypeName())) {
-                    //ti.setUnitCostPrice(0);//(this has been already set from UI)
-                    ti.setUnitProfitMargin(0);
-                } else {
-                    ti.setUnitCostPrice(0);
-                    ti.setUnitProfitMargin(0);
-                }
-
                 //bms veriabales
                 try {
                     ti.setCodeSpecific(NewTransItem.getCodeSpecific());
@@ -5954,6 +5890,76 @@ public class TransItemBean implements Serializable {
                 if (!"HIRE RETURN INVOICE".equals(transtype.getTransactionTypeName())) {
                     ItemFoundAtIndex = itemExists(aActiveTransItems, ti.getItemId(), ti.getBatchno(), ti.getCodeSpecific(), ti.getDescSpecific(), ti.getUnit_id());
                 }
+                //Excise Duty - Start
+                ti.getTransItemExciseObj().setExcise_duty_code(NewTransItem.getTransItemExciseObj().getExcise_duty_code());
+                if (transtype.getTransactionTypeName().equals("SALE INVOICE") && NewTransItem.getTransItemExciseObj().getExcise_duty_code().length() > 0) {
+                    double EDqty = 0;
+                    if (ItemFoundAtIndex == -1) {
+                        EDqty = ti.getItemQty();
+                    } else {
+                        EDqty = ti.getItemQty() + aActiveTransItems.get(ItemFoundAtIndex).getItemQty();
+                    }
+                    new TransItemExtBean().setExciseDutyTax(ti.getTransItemExciseObj(), ti.getItemId(), ti.getUnit_id(), aTrans.getCurrencyCode(), EDqty, ti.getUnitPriceExcVat(), 1);
+                }
+                //Excise Duty - End
+                if (aSelectedItem.getIsTrack() == 1) {
+                    try {
+                        ti.setItemExpryDate(st.getItemExpDate());
+                    } catch (NullPointerException npe) {
+                        ti.setItemExpryDate(null);
+                    }
+                    try {
+                        ti.setItemMnfDate(st.getItemMnfDate());
+                    } catch (NullPointerException npe) {
+                        ti.setItemMnfDate(null);
+                    }
+                } else {
+                    ti.setItemExpryDate(null);
+                    ti.setItemMnfDate(null);
+                }
+                if ("HIRE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE QUOTATION".equals(transtype.getTransactionTypeName())) {
+                    ti.setAmountIncVat((ti.getUnitPriceIncVat() - ti.getUnitTradeDiscount()) * ti.getItemQty() * ti.getDuration_value());
+                    ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty() * ti.getDuration_value());
+                } else if ("HIRE RETURN INVOICE".equals(transtype.getTransactionTypeName())) {
+                    if (NewTransItem.getNarration().equals("DAMAGED/LOST")) {
+                        ti.setAmountIncVat((ti.getUnitPriceIncVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+                        ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+                    } else {
+                        ti.setAmountIncVat((ti.getUnitPriceIncVat() - ti.getUnitTradeDiscount()) * ti.getItemQty() * ti.getDuration_value());
+                        ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty() * ti.getDuration_value());
+                    }
+                } else {
+                    ti.setAmountIncVat((ti.getUnitPriceIncVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+                    ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
+                }
+                //for profit margin
+                if ("SALE INVOICE".equals(transtype.getTransactionTypeName())) {
+                    if (aSelectedItem.getIsTrack() == 1) {
+                        //ti.setUnitCostPrice(XrateMultiply * new StockBean().getItemUnitCostPrice(store.getStoreId(), NewTransItem.getItemId(), NewTransItem.getBatchno(), NewTransItem.getCodeSpecific(), NewTransItem.getDescSpecific()));
+                        double UnitCost = new StockBean().getItemUnitCostPrice(store.getStoreId(), NewTransItem.getItemId(), NewTransItem.getBatchno(), NewTransItem.getCodeSpecific(), NewTransItem.getDescSpecific());
+                        int FrmUnitId = new ItemBean().getItem(aSelectedItem.getItemId()).getUnitId();
+                        int ToUnitId = ti.getUnit_id();
+                        double UnitConversionRate = new ItemBean().getUnitConversionRate(aSelectedItem.getItemId(), FrmUnitId, ToUnitId);
+                        UnitCost = UnitCost * UnitConversionRate;
+                        ti.setUnitCostPrice(XrateMultiply * UnitCost);
+                    } else {
+                        ti.setUnitCostPrice(XrateMultiply * aSelectedItem.getUnitCostPrice());
+                    }
+                    double UnitCostExcVat = 0;
+                    if (ti.getUnitVat() > 0) {
+                        UnitCostExcVat = ti.getUnitCostPrice() / (1 + (ti.getVatPerc() / 100));
+                    } else {
+                        UnitCostExcVat = ti.getUnitCostPrice();
+                    }
+                    ti.setUnitProfitMargin((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) - UnitCostExcVat);
+                } else if ("STOCK ADJUSTMENT".equals(transtype.getTransactionTypeName()) || "DISPOSE STOCK".equals(transtype.getTransactionTypeName()) || "STOCK CONSUMPTION".equals(transtype.getTransactionTypeName())) {
+                    //ti.setUnitCostPrice(0);//(this has been already set from UI)
+                    ti.setUnitProfitMargin(0);
+                } else {
+                    ti.setUnitCostPrice(0);
+                    ti.setUnitProfitMargin(0);
+                }
+
                 String vMsgExcise = new TransItemExtBean().validateExciseDuty(aTransTypeId, ti);
                 if (ti.getAmount() < 0 || ti.getAmountExcVat() < 0 || ti.getAmountExcVat() < 0) {
                     status = "Discount cannot exceed Unit Price";
@@ -7408,10 +7414,101 @@ public class TransItemBean implements Serializable {
                 ti.setItemExpryDate(null);
                 ti.setItemMnfDate(null);
             }
+            //bms veraibales
+            try {
+                if (null == NewTransItem.getBatchno()) {
+                    ti.setBatchno("");
+                } else {
+                    ti.setBatchno(NewTransItem.getBatchno());
+                }
+            } catch (Exception e) {
+                ti.setBatchno("");
+            }
+            try {
+                if (null == NewTransItem.getCodeSpecific()) {
+                    ti.setCodeSpecific("");
+                } else {
+                    ti.setCodeSpecific(NewTransItem.getCodeSpecific());
+                }
+            } catch (Exception e) {
+                ti.setCodeSpecific("");
+            }
+            try {
+                if (null == NewTransItem.getDescSpecific()) {
+                    ti.setDescSpecific("");
+                } else {
+                    ti.setDescSpecific(NewTransItem.getDescSpecific());
+                }
+            } catch (Exception e) {
+                ti.setDescSpecific("");
+            }
+            try {
+                ti.setDescMore(NewTransItem.getDescMore());
+            } catch (Exception e) {
+                ti.setDescMore("");
+            }
+            try {
+                ti.setWarrantyDesc(NewTransItem.getWarrantyDesc());
+            } catch (Exception e) {
+                ti.setWarrantyDesc("");
+            }
+            try {
+                ti.setWarrantyExpiryDate(NewTransItem.getWarrantyExpiryDate());
+            } catch (Exception e) {
+                ti.setWarrantyExpiryDate(null);
+            }
+            try {
+                ti.setAccountCode(NewTransItem.getAccountCode());
+            } catch (Exception e) {
+                ti.setAccountCode("");
+            }
+            try {
+                ti.setNarration(NewTransItem.getNarration());
+            } catch (Exception e) {
+                ti.setNarration("");
+            }
+            try {
+                ti.setQty_balance(NewTransItem.getQty_balance());
+            } catch (Exception e) {
+                ti.setQty_balance(0);
+            }
+            try {
+                ti.setDuration_value(NewTransItem.getDuration_value());
+            } catch (Exception e) {
+                ti.setDuration_value(0);
+            }
+            try {
+                ti.setQty_damage(NewTransItem.getQty_damage());
+            } catch (Exception e) {
+                ti.setQty_damage(0);
+            }
+            try {
+                ti.setDuration_passed(NewTransItem.getDuration_passed());
+            } catch (Exception e) {
+                ti.setDuration_passed(0);
+            }
+            try {
+                if (NewTransItem.getSpecific_size() > 0) {
+                    ti.setSpecific_size(NewTransItem.getSpecific_size());
+                } else {
+                    ti.setSpecific_size(1);
+                }
+            } catch (Exception e) {
+                ti.setSpecific_size(1);
+            }
+            //check if itme+batchno already exists
+            int ItemFoundAtIndex = itemExists(aActiveTransItems, ti.getItemId(), ti.getBatchno(), ti.getCodeSpecific(), ti.getDescSpecific(), ti.getUnit_id());
+
             //Excise Duty - Start
             ti.getTransItemExciseObj().setExcise_duty_code(NewTransItem.getTransItemExciseObj().getExcise_duty_code());
             if ("SALE INVOICE".equals(new GeneralUserSetting().getCurrentTransactionTypeName()) && NewTransItem.getTransItemExciseObj().getExcise_duty_code().length() > 0) {
-                new TransItemExtBean().setExciseDutyTax(ti.getTransItemExciseObj(), ti.getItemId(), ti.getUnit_id(), aTrans.getCurrencyCode(), NewTransItem.getItemQty(), ti.getUnitPriceExcVat(), 1);
+                double EDqty = 0;
+                if (ItemFoundAtIndex == -1) {
+                    EDqty = ti.getItemQty();
+                } else {
+                    EDqty = ti.getItemQty() + aActiveTransItems.get(ItemFoundAtIndex).getItemQty();
+                }
+                new TransItemExtBean().setExciseDutyTax(ti.getTransItemExciseObj(), ti.getItemId(), ti.getUnit_id(), aTrans.getCurrencyCode(), EDqty, ti.getUnitPriceExcVat(), 1);
             }
             //Excise Duty - End
             ti.setAmountIncVat((ti.getUnitPriceIncVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
@@ -7444,90 +7541,6 @@ public class TransItemBean implements Serializable {
                 ti.setUnitProfitMargin(0);
             }
 
-            //bms veraibales
-            try {
-                if (null == NewTransItem.getBatchno()) {
-                    ti.setBatchno("");
-                } else {
-                    ti.setBatchno(NewTransItem.getBatchno());
-                }
-            } catch (NullPointerException npe) {
-                ti.setBatchno("");
-            }
-            try {
-                if (null == NewTransItem.getCodeSpecific()) {
-                    ti.setCodeSpecific("");
-                } else {
-                    ti.setCodeSpecific(NewTransItem.getCodeSpecific());
-                }
-            } catch (NullPointerException npe) {
-                ti.setCodeSpecific("");
-            }
-            try {
-                if (null == NewTransItem.getDescSpecific()) {
-                    ti.setDescSpecific("");
-                } else {
-                    ti.setDescSpecific(NewTransItem.getDescSpecific());
-                }
-            } catch (NullPointerException npe) {
-                ti.setDescSpecific("");
-            }
-            try {
-                ti.setDescMore(NewTransItem.getDescMore());
-            } catch (NullPointerException npe) {
-                ti.setDescMore("");
-            }
-            try {
-                ti.setWarrantyDesc(NewTransItem.getWarrantyDesc());
-            } catch (NullPointerException npe) {
-                ti.setWarrantyDesc("");
-            }
-            try {
-                ti.setWarrantyExpiryDate(NewTransItem.getWarrantyExpiryDate());
-            } catch (NullPointerException npe) {
-                ti.setWarrantyExpiryDate(null);
-            }
-            try {
-                ti.setAccountCode(NewTransItem.getAccountCode());
-            } catch (NullPointerException npe) {
-                ti.setAccountCode("");
-            }
-            try {
-                ti.setNarration(NewTransItem.getNarration());
-            } catch (NullPointerException npe) {
-                ti.setNarration("");
-            }
-            try {
-                ti.setQty_balance(NewTransItem.getQty_balance());
-            } catch (NullPointerException npe) {
-                ti.setQty_balance(0);
-            }
-            try {
-                ti.setDuration_value(NewTransItem.getDuration_value());
-            } catch (NullPointerException npe) {
-                ti.setDuration_value(0);
-            }
-            try {
-                ti.setQty_damage(NewTransItem.getQty_damage());
-            } catch (NullPointerException npe) {
-                ti.setQty_damage(0);
-            }
-            try {
-                ti.setDuration_passed(NewTransItem.getDuration_passed());
-            } catch (NullPointerException npe) {
-                ti.setDuration_passed(0);
-            }
-            try {
-                if (NewTransItem.getSpecific_size() > 0) {
-                    ti.setSpecific_size(NewTransItem.getSpecific_size());
-                } else {
-                    ti.setSpecific_size(1);
-                }
-            } catch (NullPointerException npe) {
-                ti.setSpecific_size(1);
-            }
-            //check if itme+batchno already exists
-            int ItemFoundAtIndex = itemExists(aActiveTransItems, ti.getItemId(), ti.getBatchno(), ti.getCodeSpecific(), ti.getDescSpecific(), ti.getUnit_id());
             if (ItemFoundAtIndex == -1) {
                 //round off amounts basing on currency rules
                 this.roundTransItemsAmount(aTrans, ti);
@@ -7563,7 +7576,8 @@ public class TransItemBean implements Serializable {
             aStatusBean.setShowItemNotAddedStatus(0);
 
             //update totals
-            new TransBean().setTransTotalsAndUpdate(aTrans, aActiveTransItems);
+            //new TransBean().setTransTotalsAndUpdate(aTrans, aActiveTransItems);
+            new TransBean().setTransTotalsAndUpdateCEC(new GeneralUserSetting().getCurrentTransactionTypeId(), new GeneralUserSetting().getCurrentTransactionReasonId(), aTrans, aActiveTransItems);
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }

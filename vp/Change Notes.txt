@@ -14,5 +14,6 @@ Excise:
 -Excise Duty on ST and PACKAGING import.
 -Excise Duty on Draft Sales.
 -Excise Duty on Approval Sales.
+-Issue of decimal places on display, refer to Iv22111209
 
 
