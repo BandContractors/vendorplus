@@ -26,7 +26,7 @@ CREATE PROCEDURE sp_search_transaction_package_item_by_transaction_package_id
 BEGIN 
 		SELECT tpi.*,tiu.unit_id,tiu.base_unit_qty FROM transaction_package_item tpi 
         INNER JOIN transaction_package_item_unit tiu ON tpi.transaction_package_item_id=tiu.transaction_package_item_unit_id 
-		WHERE tpi.transaction_package_id=in_transaction_package_id ORDER BY tpi.transaction_package_item_id ASC;
+		WHERE tpi.transaction_package_id=208 ORDER BY tpi.transaction_package_item_id ASC;
 END//
 DELIMITER ;
 
@@ -150,7 +150,16 @@ DELIMITER ;
 -- put here changes to Views
 
 
+-- select transaction_id from transaction_package where transaction_package_id=175;
+-- select * from transaction_package where transaction_number= 'PCG22111619';
+-- select * from transaction where transaction_number= 'PCG22111620';
+-- select * from transaction_package where transaction_id =413571;
+-- select * from transaction_package_item where transaction_package_id =208
 
+-- select * from transaction_package_item_unit where transaction_package_item_unit_id =195
+
+-- select * from item where item_id=13087
+	
 
 
 

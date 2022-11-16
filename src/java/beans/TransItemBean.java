@@ -7408,12 +7408,14 @@ public class TransItemBean implements Serializable {
                 ti.setItemExpryDate(null);
                 ti.setItemMnfDate(null);
             }
+            /*
             //Excise Duty - Start
             ti.getTransItemExciseObj().setExcise_duty_code(NewTransItem.getTransItemExciseObj().getExcise_duty_code());
             if ("SALE INVOICE".equals(new GeneralUserSetting().getCurrentTransactionTypeName()) && NewTransItem.getTransItemExciseObj().getExcise_duty_code().length() > 0) {
                 new TransItemExtBean().setExciseDutyTax(ti.getTransItemExciseObj(), ti.getItemId(), ti.getUnit_id(), aTrans.getCurrencyCode(), NewTransItem.getItemQty(), ti.getUnitPriceExcVat(), 1);
             }
             //Excise Duty - End
+            */
             ti.setAmountIncVat((ti.getUnitPriceIncVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
             ti.setAmountExcVat((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) * ti.getItemQty());
 

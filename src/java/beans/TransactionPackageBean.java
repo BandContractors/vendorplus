@@ -137,7 +137,7 @@ public class TransactionPackageBean implements Serializable {
         }
     }
 
-    public void saveTransPackageCECNew(String statusCode, String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, Trans trans, TransactionPackage transactionPage, List<TransactionPackageItem> aTransactionPackageItemList, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor) {
+    public void saveTransPackageCECNew(String statusCode, String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, Trans trans, TransactionPackage aTransactionPackage, List<TransactionPackageItem> aTransactionPackageItemList, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor) {
 
         UtilityBean ub = new UtilityBean();
         String BaseName = "language_en";
@@ -182,11 +182,19 @@ public class TransactionPackageBean implements Serializable {
                 break;
         }
         if (statusCode.length() > 0) {
-            transactionPage.setStatusCode(statusCode);
-            trans.setStatus_code(statusCode);
-            if(statusCode.equals("1")&& transactionPage.getTransactionId()>0 && trans.getTransactionId()>0){
-                 this.deleteTranPackagesFromHist(trans.getTransactionId(), transactionPage.getTransactionPackageId());
+            TransactionPackage transactionPackage = null;
+            if (trans.getTransactionId() > 0) {
+                transactionPackage = this.getTransactionPackageOut(trans.getTransactionId());
+
+                if (statusCode.equals("1") && trans.getTransactionId() > 0) {
+                    this.deleteTranPackagesFromHist(trans.getTransactionId(), aTransactionPackage.getTransactionPackageId());
+                }
             }
+            if (transactionPackage != null) {
+                aTransactionPackage = transactionPackage;
+            }
+            aTransactionPackage.setStatusCode(statusCode);
+            trans.setStatus_code(statusCode);
         }
         if (ValidationMessage.length() > 0) {
             switch (aLevel) {
@@ -223,7 +231,7 @@ public class TransactionPackageBean implements Serializable {
                 } else {
 
                     //save transaction package88
-                    Long transactionPackageId = this.insertTransactionPackage(aStoreId, aTransTypeId, aTransReasonId, transactionPage, trans, aTransactionPackageItemList);
+                    Long transactionPackageId = this.insertTransactionPackage(aStoreId, aTransTypeId, aTransReasonId, aTransactionPackage, trans, aTransactionPackageItemList);
 
                     //set store2 for transfer in session!
                     switch (aLevel) {
@@ -369,11 +377,11 @@ public class TransactionPackageBean implements Serializable {
         try {
             if (aTransactionId > 0) {
                 aTrans = new TransBean().getTrans(aTrans.getTransactionId());
-                 new TransactionPackageItemBean().setTransPackageItemsByTransactionId(aActiveTransPackageItems, aTransactionId);
-                     this.transactionPackageItemist= new ArrayList<>();
-                 for(TransactionPackageItem t: aActiveTransPackageItems){
-                     this.transactionPackageItemist.add(t);
-                 }
+                new TransactionPackageItemBean().setTransPackageItemsByTransactionId(aActiveTransPackageItems, aTransactionId);
+                this.transactionPackageItemist = new ArrayList<>();
+                for (TransactionPackageItem t : aActiveTransPackageItems) {
+                    this.transactionPackageItemist.add(t);
+                }
                 try {
                     if (aTrans.getTransactorId() > 0) {
                         aTransactorBean.setSelectedTransactor(new TransactorBean().getTransactor(aTrans.getTransactorId()));
@@ -405,8 +413,8 @@ public class TransactionPackageBean implements Serializable {
                         aUserDetailBean.setSelectedUserDetail(null);
                     }
                 } catch (NullPointerException npe) {
-                } 
-                 //Customer Display
+                }
+                //Customer Display
                 if (new GeneralUserSetting().getCurrentTransactionTypeId() == 2) {
                     String PortName = new Parameter_listBean().getParameter_listByContextNameMemory("CUSTOMER_DISPLAY", "COM_PORT_NAME").getParameter_value();
                     String ClientPcName = new GeneralUserSetting().getClientComputerName();
@@ -437,17 +445,15 @@ public class TransactionPackageBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
 
-        if (aTransactionId > 0 && aTransactionPackageId > 0) {
-            try (
-                    Connection conn = DBConnection.getMySQLConnection();
-                    PreparedStatement ps = conn.prepareStatement(sql);) {
-                ps.setLong(1, aTransactionId);
-                ps.setLong(2, aTransactionPackageId);
-                ps.executeUpdate();
-                this.refreshTranssDraft(new GeneralUserSetting().getCurrentStore().getStoreId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), new GeneralUserSetting().getCurrentTransactionTypeId(), new GeneralUserSetting().getCurrentTransactionReasonId());
-            } catch (Exception e) {
-                LOGGER.log(Level.ERROR, e);
-            }
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aTransactionId);
+            ps.setLong(2, aTransactionPackageId);
+            ps.executeUpdate();
+            this.refreshTranssDraft(new GeneralUserSetting().getCurrentStore().getStoreId(), new GeneralUserSetting().getCurrentUser().getUserDetailId(), new GeneralUserSetting().getCurrentTransactionTypeId(), new GeneralUserSetting().getCurrentTransactionReasonId());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
         }
     }
 
