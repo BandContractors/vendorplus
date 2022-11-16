@@ -301,3 +301,20 @@ INSERT INTO transaction_tax(transaction_id,tax_category,tax_rate_name,tax_rate,t
 		 where ti.vat_rated='DEEMED' group by ti.transaction_id
 ;
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',303,Now(),'6.0','');
+
+CREATE TABLE transaction_item_hist_excise (
+  transaction_item_hist_excise_id bigint(20) NOT NULL AUTO_INCREMENT,
+  transaction_item_hist_id bigint(20) NOT NULL,
+  transaction_item_excise_id bigint(20) NOT NULL,
+  transaction_item_id bigint(20) NOT NULL,
+  excise_duty_code varchar(50) DEFAULT NULL,
+  rate_text varchar(100) DEFAULT NULL,
+  rate_name varchar(250) DEFAULT NULL,
+  rate_name_type varchar(10) DEFAULT NULL,
+  rate_value double DEFAULT NULL,
+  rate_currency_code_tax varchar(50) DEFAULT NULL,
+  rate_unit_code_tax varchar(50) DEFAULT NULL,
+  calc_excise_tax_amount double DEFAULT NULL,
+  PRIMARY KEY (transaction_item_hist_excise_id)
+) ENGINE=InnoDB;
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',320,Now(),'6.0','');
