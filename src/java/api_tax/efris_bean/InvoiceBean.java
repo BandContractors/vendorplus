@@ -578,7 +578,7 @@ public class InvoiceBean implements Serializable {
                         double AmtNet = acb.roundDoubleToXDps(EdTransTaxes.get(i).getTaxable_amount(), 2, "HALF UP");
                         double AmtTax = acb.roundDoubleToXDps(EdTransTaxes.get(i).getTax_amount(), 2, "HALF UP");
                         double AmtGross = acb.roundDoubleToXDps((AmtNet + AmtTax), 2, "HALF UP");
-                        System.out.println("AmtNet:" + AmtNet + " AmtTax=" + AmtTax + " AmtGross=" + AmtGross);
+                        //System.out.println("AmtNet:" + AmtNet + " AmtTax=" + AmtTax + " AmtGross=" + AmtGross);
                         td.setGrossAmount(ub.formatDoubleToStringPlain(AmtGross, 2));
                         td.setTaxCategoryCode("05");
                         td.setTaxCategory("Excise Duty");
@@ -695,7 +695,7 @@ public class InvoiceBean implements Serializable {
             eFRISInvoice.setTaxDetails(taxDetails);
             Gson gson = new Gson();
             String json = gson.toJson(eFRISInvoice);
-            System.out.println("json:" + json);
+            //System.out.println("json:" + json);
 
             com.sun.jersey.api.client.Client client = com.sun.jersey.api.client.Client.create();
             WebResource webResource = client.resource(new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_TAX_URL_ONLINE").getParameter_value());

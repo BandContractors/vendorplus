@@ -5242,6 +5242,7 @@ public class TransBean implements Serializable {
             if (TransHistId > 0) {
                 this.setTransFromHist(aTrans, TransHistId);
                 new TransItemBean().setTransItemsFromHist(aActiveTransItems, TransHistId);
+                this.setTransTotalsAndUpdateCEC(aTrans.getTransactionTypeId(), aTrans.getTransactionReasonId(), aTrans, aActiveTransItems);
                 try {
                     if (aTrans.getTransactorId() > 0) {
                         aTransactorBean.setSelectedTransactor(new TransactorBean().getTransactor(aTrans.getTransactorId()));
