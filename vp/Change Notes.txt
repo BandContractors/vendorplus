@@ -12,7 +12,13 @@ Excise:
 -Excise Duty on QuickOrder.
 -Excise Duty on Purchase Invoice.
 -Excise Duty on ST and PACKAGING import.
--Excise Duty on Draft Sales.
+--Excise Duty on Draft Sales.
 -Excise Duty on Approval Sales.
+-Issue of decimal places on display, refer to Iv22111209.
+-Excise duty on reports especially for sales.
+
+Excise and Unit: Test sales picked from reference orders.
+
+Next: Journal Entry for Excise Duty
 
 
