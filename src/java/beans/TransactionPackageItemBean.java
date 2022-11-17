@@ -205,6 +205,7 @@ public class TransactionPackageItemBean implements Serializable {
 
         if (1 == 2) {
         } else {
+            transPackageItem.setTransactionPackageItemId(0);
             if (transPackageItem.getTransactionPackageItemId() == 0) {
                 sql = "{call sp_insert_transaction_package_item(?,?,?,?,?,"
                         + "?,?,?,?,?,"
@@ -1152,7 +1153,7 @@ public class TransactionPackageItemBean implements Serializable {
 
     public int deleteTransPackageItemsCEC(long aTransPackageId) {
         int deleted = 0;
-        String sql = "DELETE FROM transaction_package_item WHERE transaction_package_item_id>0 && transaction_id=?";
+        String sql = "DELETE FROM transaction_package_item WHERE transaction_package_item_id>0 && transaction_package_id=?";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
