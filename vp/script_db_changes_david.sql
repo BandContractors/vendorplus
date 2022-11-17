@@ -26,7 +26,7 @@ CREATE PROCEDURE sp_search_transaction_package_item_by_transaction_package_id
 BEGIN 
 		SELECT tpi.*,tiu.unit_id,tiu.base_unit_qty FROM transaction_package_item tpi 
         INNER JOIN transaction_package_item_unit tiu ON tpi.transaction_package_item_id=tiu.transaction_package_item_unit_id 
-		WHERE tpi.transaction_package_id=in_transaction_package_id ORDER BY tpi.transaction_package_item_id ASC;
+		WHERE tpi.transaction_package_id=208 ORDER BY tpi.transaction_package_item_id ASC;
 END//
 DELIMITER ;
 
@@ -59,56 +59,6 @@ BEGIN
 END//
 DELIMITER ;
 
-
-
-
-DROP PROCEDURE IF EXISTS sp_update_transaction2;
-DELIMITER //
-CREATE PROCEDURE sp_update_transaction2
-(
-	IN in_transaction_id bigint,
-	IN in_cash_discount double,
-	IN in_total_vat double,
-	IN in_edit_user_detail_id int,
-	IN in_sub_total double,
-	IN in_grand_total double,
-	IN in_total_trade_discount double,
-	IN in_points_awarded double,
-	IN in_card_number varchar(10),
-	IN in_total_std_vatable_amount double,
-	IN in_total_zero_vatable_amount double,
-	IN in_total_exempt_vatable_amount double,
-	IN in_amount_tendered double,
-	IN in_change_amount double,
-	IN in_total_profit_margin double,
-    IN in_spent_points_amount double
-) 
-BEGIN 
-
-	SET @cur_sys_datetime=null;
-	CALL sp_get_current_system_datetime(@cur_sys_datetime);
-
-	UPDATE transaction SET 
-		cash_discount=in_cash_discount,
-		total_vat=in_total_vat,
-		edit_user_detail_id=in_edit_user_detail_id,
-		edit_date=@cur_sys_datetime,
-		sub_total=in_sub_total,
-		grand_total=in_grand_total,
-		total_trade_discount=in_total_trade_discount,
-		points_awarded=in_points_awarded,
-		card_number=in_card_number,
-		total_std_vatable_amount=in_total_std_vatable_amount,
-		total_zero_vatable_amount=in_total_zero_vatable_amount,
-		total_exempt_vatable_amount=in_total_exempt_vatable_amount,
-		amount_tendered=in_amount_tendered,
-		change_amount=in_change_amount,
-		total_profit_margin=in_total_profit_margin,
-        spent_points_amount=in_spent_points_amount 
-	WHERE transaction_id=in_transaction_id; 
-END//
-DELIMITER ;
-
 DROP PROCEDURE IF EXISTS sp_update_transaction_package_item;
 DELIMITER //
 CREATE PROCEDURE sp_update_transaction_package_item
@@ -130,10 +80,6 @@ BEGIN
 	WHERE transaction_package_item_id=in_transaction_package_item_id; 
 END//
 DELIMITER ;
-
-
--- put here changes to Views
-
 
 DROP PROCEDURE IF EXISTS sp_update_transaction_package;
 DELIMITER //
@@ -165,8 +111,55 @@ BEGIN
 END//
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS sp_search_transaction_package_draft_by_user_type;
+DELIMITER //
+CREATE PROCEDURE sp_search_transaction_package_draft_by_user_type
+(
+	IN in_transaction_type_id int,
+    IN in_transaction_reason_id int,
+    IN in_store_id int,
+	IN in_add_user_detail_id int
+) 
+BEGIN 
+		SET @cur_sys_datetime=null;
+		CALL sp_get_current_system_datetime(@cur_sys_datetime);
+
+		SELECT * FROM transaction th 
+		WHERE th.transaction_type_id=88 AND th.transaction_reason_id=135 AND status_code='100' AND
+		th.store_id=1 AND th.add_user_detail_id=1 AND
+		DATE_FORMAT(@cur_sys_datetime,'%Y-%m-%d')=DATE_FORMAT(th.transaction_date,'%Y-%m-%d') 
+		ORDER BY transaction_id DESC;
+        
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS sp_delete_transaction_package_draft_id;
+DELIMITER //
+CREATE PROCEDURE sp_delete_transaction_package_draft_id
+(
+	IN in_transaction_id bigint,
+    IN in_transaction_package_item_id bigint
+) 
+BEGIN 
+	DELETE FROM transaction_package_item WHERE transaction_package_item_id=in_transaction_package_item_id;
+    DELETE FROM transaction_package WHERE transaction_id=in_transaction_id;
+	DELETE FROM transaction WHERE transaction_id=in_transaction_id;
+END//
+DELIMITER ;
+
+-- put here changes to Views
 
 
+-- select transaction_id from transaction_package where transaction_package_id=175;
+-- select * from transaction_package where transaction_number= 'PCG22111619';
+-- select * from transaction where transaction_number= 'PCG22111620';
+-- select * from transaction_package where transaction_id =413571;
+-- select * from transaction_package_item where transaction_package_id =208
+
+-- select * from transaction_package_item_unit where transaction_package_item_unit_id =195
+
+-- select * from item where item_id=13087
+	
 
 
 

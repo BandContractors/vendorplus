@@ -14996,7 +14996,7 @@ CREATE PROCEDURE sp_search_transaction_package_item_by_transaction_package_id
 BEGIN 
 		SELECT tpi.*,tiu.unit_id,tiu.base_unit_qty FROM transaction_package_item tpi 
         INNER JOIN transaction_package_item_unit tiu ON tpi.transaction_package_item_id=tiu.transaction_package_item_unit_id 
-		WHERE tpi.transaction_package_id=56 ORDER BY tpi.transaction_package_item_id ASC;
+		WHERE tpi.transaction_package_id=in_transaction_package_id ORDER BY tpi.transaction_package_item_id ASC;
 END//
 DELIMITER ;
 
