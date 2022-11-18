@@ -91,6 +91,11 @@ public class TransactionPackageItemBean implements Serializable {
                 transPackageItem.setUnitPrice(0);
             }
             try {
+                transPackageItem.setUnitId(aResultSet.getInt("unit_id"));
+            } catch (Exception npe) {
+                transPackageItem.setUnitId(0);
+            }
+            try {
                 transPackageItem.setExciseTax(aResultSet.getDouble("excise_tax"));
             } catch (Exception npe) {
                 transPackageItem.setExciseTax(0);
@@ -140,6 +145,21 @@ public class TransactionPackageItemBean implements Serializable {
             } catch (Exception e) {
                 transPackageItem.setUnitTradeDiscount(0);
             }
+            try {
+                transPackageItem.setCodeSpecific(aResultSet.getString("code_specific"));
+            } catch (Exception e) {
+                transPackageItem.setCodeSpecific("");
+            }
+            try {
+                transPackageItem.setDescSpecific(aResultSet.getString("desc_specific"));
+            } catch (Exception e) {
+                transPackageItem.setDescSpecific("");
+            }
+             try {
+                transPackageItem.setDescMore(aResultSet.getString("desc_more"));
+            } catch (Exception e) {
+                transPackageItem.setDescMore("");
+            }
 
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -185,6 +205,7 @@ public class TransactionPackageItemBean implements Serializable {
 
         if (1 == 2) {
         } else {
+            transPackageItem.setTransactionPackageItemId(0);
             if (transPackageItem.getTransactionPackageItemId() == 0) {
                 sql = "{call sp_insert_transaction_package_item(?,?,?,?,?,"
                         + "?,?,?,?,?,"
@@ -207,71 +228,101 @@ public class TransactionPackageItemBean implements Serializable {
                 Store store = new StoreBean().getStore(aStoreId);
                 //Store store2 = new StoreBean().getStore(aTrans.getStore2Id());
 
-                if (transPackageItem.getTransactionPackageItemId() == 0) {
-                    //clean batch
-                    if (transPackageItem.getBatchNo() == null) {
-                        transPackageItem.setBatchNo("");
-                    }
-                    cs.setLong("in_transaction_package_id", transPackageItem.getTransactionPackageId());
-                    cs.setLong("in_item_id", transPackageItem.getItemId());
-                    cs.setString("in_batchno", transPackageItem.getBatchNo());
-
-                    cs.setInt("in_unit_id", transPackageItem.getUnitId());
-
-                    cs.setDouble("in_base_unit_qty", transPackageItem.getBaseUnitQty());
-                    cs.setDouble("in_item_qty", transPackageItem.getItemQty());
-                    cs.setDouble("in_unit_price", transPackageItem.getUnitPrice());
-                    cs.setDouble("in_unit_trade_discount", transPackageItem.getUnitTradeDiscount());
-                    cs.setDouble("in_unit_vat", transPackageItem.getUnitVat());
-                    cs.registerOutParameter("out_transaction_package_item_id", VARCHAR);
-                    cs.setString("in_excise_rate_name", transPackageItem.getExciseRateName());
-                    cs.setDouble("in_excise_rate_perc", transPackageItem.getExciseRatePerc());
-                    cs.setDouble("in_excise_rate_value", transPackageItem.getExciseRatePerc());
-                    cs.setDouble("in_excise_tax", transPackageItem.getExciseTax());
-                    cs.setDouble("in_excise_currency_code_tax", transPackageItem.getExciseCurrencyCodeTax());
-                    cs.setDouble("in_excise_unit_code_tax", transPackageItem.getExciseUnitCodeTax());
-                    cs.setDouble("in_amount", transPackageItem.getAmount());
-                    cs.setString("in_vat_rated", transPackageItem.getVatRated());
-                    cs.setDouble("in_vat_perc", transPackageItem.getVatPerc());
-
-                    try {
-                        cs.setString("in_code_specific", transPackageItem.getCodeSpecific());
-                    } catch (NullPointerException npe) {
-                        cs.setString("in_code_specific", "");
-                    }
-                    try {
-                        cs.setString("in_desc_specific", transPackageItem.getDescSpecific());
-                    } catch (NullPointerException npe) {
-                        cs.setString("in_desc_specific", "");
-                    }
-                    try {
-                        cs.setString("in_desc_more", transPackageItem.getDescMore());
-                    } catch (NullPointerException npe) {
-                        cs.setString("in_desc_more", "");
-                    }
-                    try {
-                        cs.setString("in_narration", transPackageItem.getNarration());
-                    } catch (NullPointerException npe) {
-                        cs.setString("in_narration", "");
-                    }
-
-                    cs.registerOutParameter("out_transaction_package_item_id", VARCHAR);
-                    //save
-                    cs.executeUpdate();
-                    long InsertedId1 = cs.getLong("out_transaction_package_item_id");
-                    long InsertedId2 = 0;
-                    try {
-                        if (InsertedId1 > 0) {
-                            TransactionPackageItemUnit tiu = new TransactionPackageItemUnit();
-                            tiu.setTransactionItemId(InsertedId1);
-                            tiu.setUnitId(transPackageItem.getUnitId());
-                            tiu.setBaseUnitQty(transPackageItem.getBaseUnitQty());
-                            this.insertTransaction_item_unit(tiu);//transaction package item unit
-                        }
-                    } catch (Exception e) {
-                        LOGGER.log(Level.ERROR, e);
-                    }
+                if (transPackageItem.getTransactionPackageItemId() > 0) {
+                    transPackageItem.setTransactionPackageItemId(0);
                 }
+                //clean batch
+                if (transPackageItem.getBatchNo() == null) {
+                    transPackageItem.setBatchNo("");
+                }
+                cs.setLong("in_transaction_package_id", transPackageItem.getTransactionPackageId());
+                cs.setLong("in_item_id", transPackageItem.getItemId());
+                cs.setString("in_batchno", transPackageItem.getBatchNo());
+                cs.setInt("in_unit_id", transPackageItem.getUnitId());
+                cs.setDouble("in_base_unit_qty", transPackageItem.getBaseUnitQty());
+                cs.setDouble("in_item_qty", transPackageItem.getItemQty());
+                cs.setDouble("in_unit_price", transPackageItem.getUnitPrice());
+                cs.setDouble("in_unit_trade_discount", transPackageItem.getUnitTradeDiscount());
+                cs.setDouble("in_unit_vat", transPackageItem.getUnitVat());
+                cs.registerOutParameter("out_transaction_package_item_id", VARCHAR);
+                cs.setDouble("in_amount", transPackageItem.getAmount());
+                cs.setString("in_vat_rated", transPackageItem.getVatRated());
+                cs.setDouble("in_vat_perc", transPackageItem.getVatPerc());
+
+                try {
+                    cs.setString("in_excise_rate_name", transPackageItem.getExciseRateName());
+                } catch (NullPointerException npe) {
+                    cs.setString("in_excise_rate_name", "");
+                }
+
+                try {
+                    cs.setDouble("in_excise_rate_perc", transPackageItem.getExciseRatePerc());
+                } catch (NullPointerException npe) {
+                    cs.setDouble("in_excise_rate_perc", 0);
+                }
+
+                try {
+                    cs.setDouble("in_excise_rate_value", transPackageItem.getExciseRateValue());
+                } catch (NullPointerException npe) {
+                    cs.setDouble("in_excise_rate_value", 0);
+                }
+
+                try {
+                    cs.setDouble("in_excise_tax", transPackageItem.getExciseTax());
+                } catch (NullPointerException npe) {
+                    cs.setDouble("in_excise_tax", 0);
+                }
+
+                try {
+                    cs.setDouble("in_excise_currency_code_tax", transPackageItem.getExciseCurrencyCodeTax());
+                } catch (NullPointerException npe) {
+                    cs.setDouble("in_excise_currency_code_tax", 0);
+                }
+
+                try {
+                    cs.setDouble("in_excise_unit_code_tax", transPackageItem.getExciseUnitCodeTax());
+                } catch (NullPointerException npe) {
+                    cs.setDouble("in_excise_unit_code_tax", 0);
+                }
+
+                try {
+                    cs.setString("in_code_specific", transPackageItem.getCodeSpecific());
+                } catch (NullPointerException npe) {
+                    cs.setString("in_code_specific", "");
+                }
+                try {
+                    cs.setString("in_desc_specific", transPackageItem.getDescSpecific());
+                } catch (NullPointerException npe) {
+                    cs.setString("in_desc_specific", "");
+                }
+                try {
+                    cs.setString("in_desc_more", transPackageItem.getDescMore());
+                } catch (NullPointerException npe) {
+                    cs.setString("in_desc_more", "");
+                }
+                try {
+                    cs.setString("in_narration", transPackageItem.getNarration());
+                } catch (NullPointerException npe) {
+                    cs.setString("in_narration", "");
+                }
+
+                cs.registerOutParameter("out_transaction_package_item_id", VARCHAR);
+                //save
+                cs.executeUpdate();
+                long InsertedId1 = cs.getLong("out_transaction_package_item_id");
+                long InsertedId2 = 0;
+                try {
+                    if (InsertedId1 > 0) {
+                        TransactionPackageItemUnit tiu = new TransactionPackageItemUnit();
+                        tiu.setTransactionItemId(InsertedId1);
+                        tiu.setUnitId(transPackageItem.getUnitId());
+                        tiu.setBaseUnitQty(transPackageItem.getBaseUnitQty());
+                        this.insertTransaction_item_unit(tiu);//transaction package item unit
+                    }
+                } catch (Exception e) {
+                    LOGGER.log(Level.ERROR, e);
+                }
+
             } catch (Exception e) {
                 LOGGER.log(Level.ERROR, e);
                 //this.setActionMessage(ub.translateWordsInText(BaseName, "Transaction Item Not Saved"));
@@ -712,8 +763,8 @@ public class TransactionPackageItemBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
     }
-    
-        public void addQtyTransItemCEC(TransactionPackageItem ti) {
+
+    public void addQtyTransItemCEC(TransactionPackageItem ti) {
         try {
             ti.setItemQty(ti.getItemQty() + 1);
             if (ti.getItemQty() < 0) {
@@ -1102,7 +1153,7 @@ public class TransactionPackageItemBean implements Serializable {
 
     public int deleteTransPackageItemsCEC(long aTransPackageId) {
         int deleted = 0;
-        String sql = "DELETE FROM transaction_package_item WHERE transaction_package_item_id>0 && transaction_id=?";
+        String sql = "DELETE FROM transaction_package_item WHERE transaction_package_item_id>0 && transaction_package_id=?";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {

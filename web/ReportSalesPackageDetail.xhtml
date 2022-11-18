@@ -94,7 +94,7 @@
             </h:panelGrid>
             <p:dataTable id="tblDetail" tableStyle="table-layout: auto;" var="itm" value="#{transactionPackageBean.transList}" 
                          paginator="true" rows="50" 
-                         rowStyleClass="#{(itm.status_code) eq '2' ? 'green' : (itm.status_code) eq '0' ? 'red' : 'amber'}"
+                         rowStyleClass="#{(itm.status_code) eq '2' ? 'green' : (itm.status_code) eq '0' ? 'red' : (itm.status_code) eq '1' ? 'amber':'light-grey'}"
                          paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
                          rowsPerPageTemplate="50,100,200,400">
                 <f:facet name="header">

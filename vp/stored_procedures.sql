@@ -12165,6 +12165,8 @@ CREATE PROCEDURE sp_delete_transaction_hist_by_id
 	IN in_transaction_hist_id bigint 
 ) 
 BEGIN 
+	DELETE FROM transaction_item_hist_unit WHERE transaction_item_hist_id IN(SELECT I2.transaction_item_hist_id FROM transaction_item_hist I2 where I2.transaction_hist_id=in_transaction_hist_id);
+    DELETE FROM transaction_item_hist_excise WHERE transaction_item_hist_excise_id>0 AND transaction_item_hist_id IN(SELECT I2.transaction_item_hist_id FROM transaction_item_hist I2 where I2.transaction_hist_id=in_transaction_hist_id);
 	DELETE FROM transaction_item_hist WHERE transaction_hist_id=in_transaction_hist_id;
 	DELETE FROM transaction_hist WHERE transaction_hist_id=in_transaction_hist_id;
 END//
@@ -14994,7 +14996,7 @@ CREATE PROCEDURE sp_search_transaction_package_item_by_transaction_package_id
 BEGIN 
 		SELECT tpi.*,tiu.unit_id,tiu.base_unit_qty FROM transaction_package_item tpi 
         INNER JOIN transaction_package_item_unit tiu ON tpi.transaction_package_item_id=tiu.transaction_package_item_unit_id 
-		WHERE tpi.transaction_package_id=56 ORDER BY tpi.transaction_package_item_id ASC;
+		WHERE tpi.transaction_package_id=in_transaction_package_id ORDER BY tpi.transaction_package_item_id ASC;
 END//
 DELIMITER ;
 
