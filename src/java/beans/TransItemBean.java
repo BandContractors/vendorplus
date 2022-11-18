@@ -4752,6 +4752,12 @@ public class TransItemBean implements Serializable {
                 transitem.setItem_type(rs.getString("item_type"));
                 transitem.setAmountExcVat(rs.getDouble("amount_exc_vat"));
                 transitem.setAmountIncVat(rs.getDouble("amount_inc_vat"));
+                Transaction_item_excise tie = new Transaction_item_excise();
+                try {
+                    tie.setCalc_excise_tax_amount(rs.getDouble("calc_excise_tax_amount"));
+                } catch (Exception e) {
+                }
+                transitem.setTransItemExciseObj(tie);
                 transitems.add(transitem);
             }
         } catch (Exception e) {
@@ -5973,7 +5979,12 @@ public class TransItemBean implements Serializable {
                     } else {
                         UnitCostExcVat = ti.getUnitCostPrice();
                     }
-                    ti.setUnitProfitMargin((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) - UnitCostExcVat);
+                    double UnitExciseDutyTax = 0;
+                    try {
+                        UnitExciseDutyTax = ti.getTransItemExciseObj().getCalc_excise_tax_amount() / ti.getItemQty();
+                    } catch (Exception e) {
+                    }
+                    ti.setUnitProfitMargin((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) - UnitCostExcVat - UnitExciseDutyTax);
                 } else if ("STOCK ADJUSTMENT".equals(transtype.getTransactionTypeName()) || "DISPOSE STOCK".equals(transtype.getTransactionTypeName()) || "STOCK CONSUMPTION".equals(transtype.getTransactionTypeName())) {
                     //ti.setUnitCostPrice(0);//(this has been already set from UI)
                     ti.setUnitProfitMargin(0);
@@ -7565,7 +7576,12 @@ public class TransItemBean implements Serializable {
                     } else {
                         UnitCostExcVat = ti.getUnitCostPrice();
                     }
-                    ti.setUnitProfitMargin((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) - UnitCostExcVat);
+                    double UnitExciseDutyTax = 0;
+                    try {
+                        UnitExciseDutyTax = ti.getTransItemExciseObj().getCalc_excise_tax_amount() / ti.getItemQty();
+                    } catch (Exception e) {
+                    }
+                    ti.setUnitProfitMargin((ti.getUnitPriceExcVat() - ti.getUnitTradeDiscount()) - UnitCostExcVat - UnitExciseDutyTax);
                 } else {
                     ti.setUnitCostPrice(0);
                     ti.setUnitProfitMargin(0);

@@ -6,19 +6,17 @@ Multi-Units:
 -Check why TransItem Add adds twice for UnPack
 
 Excise:
--Journal Entries for Excise Duty should Change.
--Profit Margin for Items with Excise Duty.
--Excise Duty on Cr/Dr Notes.
--Excise Duty on QuickOrder.
--Excise Duty on Purchase Invoice.
+-Excise Duty on Cr/Dr Notes (Profit Margin, Journal).
+-Excise Duty on QuickOrder (Profit Margin, Journal,etc).
+-Excise Duty on Purchase Invoice (Journal, etc).
 -Excise Duty on ST and PACKAGING import.
---Excise Duty on Draft Sales.
--Excise Duty on Approval Sales.
 -Issue of decimal places on display, refer to Iv22111209.
--Excise duty on reports especially for sales.
 
-Excise and Unit: Test sales picked from reference orders.
-
-Next: Journal Entry for Excise Duty
-
-
+Test Excise Duty:
+-Draft Sales
+-Approval Sales
+-Quick Order
+-Sales Barcode
+-Sales from Transfer
+-Sales from Packaging
+-Sales picked from Order Reference

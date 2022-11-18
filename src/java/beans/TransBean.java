@@ -38,6 +38,7 @@ import entities.Trans;
 import entities.TransactionPackage;
 import entities.TransactionReason;
 import entities.Transaction_approval;
+import entities.Transaction_tax;
 import entities.Transaction_tax_map;
 import java.io.Serializable;
 import java.sql.CallableStatement;
@@ -2374,6 +2375,22 @@ public class TransBean implements Serializable {
                     List<TransItem> tis = new TransItemBean().getTransItemsByTransactionId(t.getTransactionId());
                     TransactionType tt = new TransactionTypeBean().getTransactionType(t.getTransactionTypeId());
                     TransactionReason tr = new TransactionReasonBean().getTransactionReason(t.getTransactionReasonId());
+                    try {
+                        if (tt.getTransactionTypeId() == 2) {
+                            Transaction_tax ttax = new TransExtBean().getTransTaxByCategory(t.getTransactionId(), "Excise Duty");
+                            if (null != ttax) {
+                                t.setTotalExciseDutyTaxAmount(ttax.getTax_amount());
+                                t.setTotalExciseDutableAmount(ttax.getTaxable_amount());
+                            }
+                        }
+                    } catch (Exception e) {
+                    }
+                    try {
+                        if (tt.getTransactionTypeId() == 2) {
+                            new TransItemExtBean().setTransaction_item_exciseListByTransItem(tis);
+                        }
+                    } catch (Exception e) {
+                    }
                     try {
                         new TransItemBean().adjustStockForTransItems(t, tis);
                     } catch (Exception e) {
@@ -7095,122 +7112,122 @@ public class TransBean implements Serializable {
 
             try {
                 trans.setStore2Id(aResultSet.getInt("store2_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setStore2Id(0);
             }
             try {
                 trans.setTransactorId(aResultSet.getLong("transactor_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setTransactorId(0);
             }
             try {
                 trans.setTransactionTypeId(aResultSet.getInt("transaction_type_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setTransactionTypeId(0);
             }
             try {
                 trans.setTransactionReasonId(aResultSet.getInt("transaction_reason_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setTransactionReasonId(0);
             }
             try {
                 trans.setSubTotal(aResultSet.getDouble("sub_total"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setSubTotal(0);
             }
             try {
                 trans.setTotalTradeDiscount(aResultSet.getDouble("total_trade_discount"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setTotalTradeDiscount(0);
             }
             try {
                 trans.setTotalVat(aResultSet.getDouble("total_vat"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setTotalVat(0);
             }
             try {
                 trans.setCashDiscount(aResultSet.getDouble("cash_discount"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setCashDiscount(0);
             }
             try {
                 trans.setGrandTotal(aResultSet.getDouble("grand_total"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setGrandTotal(0);
             }
             try {
                 trans.setTransactionRef(aResultSet.getString("transaction_ref"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setTransactionRef("");
             }
             try {
                 trans.setTransactionComment(aResultSet.getString("transaction_comment"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setTransactionComment("");
             }
             try {
                 trans.setAddUserDetailId(aResultSet.getInt("add_user_detail_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setAddUserDetailId(0);
             }
             try {
                 trans.setAddDate(new Date(aResultSet.getTimestamp("add_date").getTime()));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setAddDate(null);
             }
             try {
                 trans.setEditUserDetailId(aResultSet.getInt("edit_user_detail_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setEditUserDetailId(0);
             }
             try {
                 trans.setEditDate(new Date(aResultSet.getTimestamp("edit_date").getTime()));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setEditDate(null);
             }
             try {
                 trans.setPointsAwarded(aResultSet.getDouble("points_awarded"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setPointsAwarded(0);
             }
             try {
                 trans.setCardNumber(aResultSet.getString("card_number"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setCardNumber("");
             }
             try {
                 trans.setTotalStdVatableAmount(aResultSet.getDouble("total_std_vatable_amount"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setTotalStdVatableAmount(0);
             }
             try {
                 trans.setTotalZeroVatableAmount(aResultSet.getDouble("total_zero_vatable_amount"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setTotalZeroVatableAmount(0);
             }
             try {
                 trans.setTotalExemptVatableAmount(aResultSet.getDouble("total_exempt_vatable_amount"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setTotalExemptVatableAmount(0);
             }
             try {
                 trans.setVatPerc(aResultSet.getDouble("vat_perc"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setVatPerc(0);
             }
             try {
                 trans.setAmountTendered(aResultSet.getDouble("amount_tendered"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setAmountTendered(0);
             }
             try {
                 trans.setChangeAmount(aResultSet.getDouble("change_amount"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setChangeAmount(0);
             }
             try {
                 trans.setIsCashDiscountVatLiable(aResultSet.getString("is_cash_discount_vat_liable"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setIsCashDiscountVatLiable("");
             }
 
@@ -7253,31 +7270,31 @@ public class TransBean implements Serializable {
 
             try {
                 trans.setTotalProfitMargin(aResultSet.getDouble("total_profit_margin"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setTotalProfitMargin(0);
             }
 
             try {
                 trans.setTransactionUserDetailId(aResultSet.getInt("transaction_user_detail_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setTransactionUserDetailId(0);
             }
 
             try {
                 trans.setBillTransactorId(aResultSet.getLong("bill_transactor_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setBillTransactorId(0);
             }
 
             try {
                 trans.setSchemeTransactorId(aResultSet.getLong("scheme_transactor_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setSchemeTransactorId(0);
             }
 
             try {
                 trans.setPrincSchemeMember(aResultSet.getString("princ_scheme_member"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setPrincSchemeMember("");
             }
 
@@ -7344,42 +7361,42 @@ public class TransBean implements Serializable {
             }
             try {
                 trans.setFrom_date(new Date(aResultSet.getDate("from_date").getTime()));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setFrom_date(null);
             }
             try {
                 trans.setTo_date(new Date(aResultSet.getDate("to_date").getTime()));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setTo_date(null);
             }
             try {
                 trans.setDuration_type(aResultSet.getString("duration_type"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setDuration_type("");
             }
             try {
                 trans.setSite_id(aResultSet.getLong("site_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setSite_id(0);
             }
             try {
                 trans.setTransactor_rep(aResultSet.getString("transactor_rep"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setTransactor_rep("");
             }
             try {
                 trans.setTransactor_vehicle(aResultSet.getString("transactor_vehicle"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setTransactor_vehicle("");
             }
             try {
                 trans.setTransactor_driver(aResultSet.getString("transactor_driver"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setTransactor_driver("");
             }
             try {
                 trans.setDuration_value(aResultSet.getDouble("duration_value"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setDuration_value(0);
             }
             try {
@@ -7389,7 +7406,7 @@ public class TransBean implements Serializable {
             }
             try {
                 trans.setLocation_id(aResultSet.getLong("location_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setLocation_id(0);
             }
             if (null == aResultSet.getString("status_code")) {
@@ -7399,7 +7416,7 @@ public class TransBean implements Serializable {
             }
             try {
                 trans.setStatus_date(new Date(aResultSet.getTimestamp("status_date").getTime()));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setStatus_date(null);
             }
             if (null == aResultSet.getString("delivery_mode")) {
@@ -7409,32 +7426,32 @@ public class TransBean implements Serializable {
             }
             try {
                 trans.setIs_processed(aResultSet.getInt("is_processed"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setIs_processed(0);
             }
             try {
                 trans.setIs_paid(aResultSet.getInt("is_paid"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setIs_paid(0);
             }
             try {
                 trans.setIs_cancel(aResultSet.getInt("is_cancel"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setIs_cancel(0);
             }
             try {
                 trans.setIs_invoiced(aResultSet.getInt("is_invoiced"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setIs_invoiced(0);
             }
             try {
                 trans.setIs_delivered(aResultSet.getInt("is_delivered"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setIs_delivered(0);
             }
             try {
                 trans.setSource_code(aResultSet.getString("source_code"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setSource_code("");
             }
             try {
@@ -11790,12 +11807,15 @@ public class TransBean implements Serializable {
             aTransBean.setActionMessage(ub.translateWordsInText(BaseName, msg));
             FacesContext.getCurrentInstance().addMessage("Report", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
-            String sql = "SELECT * FROM transaction WHERE transaction_type_id IN(2,65,68)";
+            //String sql = "SELECT * FROM transaction WHERE transaction_type_id IN(2,65,68)";
+            String sql = "SELECT * FROM view_sales_invoice_detail WHERE transaction_type_id IN(2,65,68)";
             String sqlsum = "";
             if (aTransBean.getFieldName().length() > 0) {
-                sqlsum = "SELECT " + aTransBean.getFieldName() + ",currency_code,sum(grand_total) as grand_total,sum(total_profit_margin) as total_profit_margin,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount,sum(spent_points_amount) as spent_points_amount FROM transaction WHERE transaction_type_id IN(2,65,68)";
+                //sqlsum = "SELECT " + aTransBean.getFieldName() + ",currency_code,sum(grand_total) as grand_total,sum(total_profit_margin) as total_profit_margin,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount,sum(spent_points_amount) as spent_points_amount FROM transaction WHERE transaction_type_id IN(2,65,68)";
+                sqlsum = "SELECT " + aTransBean.getFieldName() + ",currency_code,sum(grand_total) as grand_total,sum(total_profit_margin) as total_profit_margin,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount,sum(spent_points_amount) as spent_points_amount,sum(TotalExciseDutyTaxAmount) as TotalExciseDutyTaxAmount FROM view_sales_invoice_detail WHERE transaction_type_id IN(2,65,68)";
             } else {
-                sqlsum = "SELECT currency_code,sum(grand_total) as grand_total,sum(total_profit_margin) as total_profit_margin,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount,sum(spent_points_amount) as spent_points_amount FROM transaction WHERE transaction_type_id IN(2,65,68)";
+                //sqlsum = "SELECT currency_code,sum(grand_total) as grand_total,sum(total_profit_margin) as total_profit_margin,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount,sum(spent_points_amount) as spent_points_amount FROM transaction WHERE transaction_type_id IN(2,65,68)";
+                sqlsum = "SELECT currency_code,sum(grand_total) as grand_total,sum(total_profit_margin) as total_profit_margin,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount,sum(spent_points_amount) as spent_points_amount,sum(TotalExciseDutyTaxAmount) as TotalExciseDutyTaxAmount FROM view_sales_invoice_detail WHERE transaction_type_id IN(2,65,68)";
             }
             String wheresql = "";
             String ordersql = "";
@@ -11850,6 +11870,7 @@ public class TransBean implements Serializable {
                     PreparedStatement ps = conn.prepareStatement(sql);) {
                 rs = ps.executeQuery();
                 Trans trans = null;
+                TransExtBean teb = new TransExtBean();
                 while (rs.next()) {
                     trans = new Trans();
                     this.setTransFromResultset(trans, rs);
@@ -11861,6 +11882,10 @@ public class TransBean implements Serializable {
                         trans.setIs_paid(2);
                     } else {
                         trans.setIs_paid(0);
+                    }
+                    try {
+                        trans.setTotalExciseDutyTaxAmount(rs.getDouble("TotalExciseDutyTaxAmount"));
+                    } catch (Exception e) {
                     }
                     this.TransList.add(trans);
                 }
@@ -11880,28 +11905,28 @@ public class TransBean implements Serializable {
                             case "add_user_detail_id":
                                 try {
                                     transsum.setAddUserDetailId(rs.getInt("add_user_detail_id"));
-                                } catch (NullPointerException npe) {
+                                } catch (Exception e) {
                                     transsum.setAddUserDetailId(0);
                                 }
                                 break;
                             case "transaction_user_detail_id":
                                 try {
                                     transsum.setTransactionUserDetailId(rs.getInt("transaction_user_detail_id"));
-                                } catch (NullPointerException npe) {
+                                } catch (Exception e) {
                                     transsum.setTransactionUserDetailId(0);
                                 }
                                 break;
                             case "bill_transactor_id":
                                 try {
                                     transsum.setBillTransactorId(rs.getLong("bill_transactor_id"));
-                                } catch (NullPointerException npe) {
+                                } catch (Exception e) {
                                     transsum.setBillTransactorId(0);
                                 }
                                 break;
                             case "transactor_id":
                                 try {
                                     transsum.setTransactorId(rs.getLong("transactor_id"));
-                                } catch (NullPointerException npe) {
+                                } catch (Exception e) {
                                     transsum.setTransactorId(0);
                                 }
                                 break;
@@ -11917,7 +11942,7 @@ public class TransBean implements Serializable {
                                     transsum.setStoreId(rs.getInt("store_id"));
                                     Store st = new StoreBean().getStore(transsum.getStoreId());
                                     transsum.setStoreName(st.getStoreName());
-                                } catch (NullPointerException npe) {
+                                } catch (Exception e) {
                                     transsum.setStoreName("");
                                 }
                                 break;
@@ -11925,33 +11950,37 @@ public class TransBean implements Serializable {
                     }
                     try {
                         transsum.setCurrencyCode(rs.getString("currency_code"));
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         transsum.setCurrencyCode("");
                     }
                     try {
                         transsum.setGrandTotal(rs.getDouble("grand_total"));
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         transsum.setGrandTotal(0);
                     }
                     try {
                         transsum.setTotalProfitMargin(rs.getDouble("total_profit_margin"));
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         transsum.setTotalProfitMargin(0);
                     }
                     try {
                         transsum.setTotalVat(rs.getDouble("total_vat"));
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         transsum.setTotalVat(0);
                     }
                     try {
                         transsum.setCashDiscount(rs.getDouble("cash_discount"));
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         transsum.setCashDiscount(0);
                     }
                     try {
                         transsum.setSpendPointsAmount(rs.getDouble("spent_points_amount"));
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         transsum.setSpendPointsAmount(0);
+                    }
+                    try {
+                        transsum.setTotalExciseDutyTaxAmount(rs.getDouble("TotalExciseDutyTaxAmount"));
+                    } catch (Exception e) {
                     }
                     this.TransListSummary.add(transsum);
                 }

@@ -175,6 +175,11 @@
                                 <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </p:column>
+                        <p:column headerText="#{langsys['Excise']} #{langsys['Duty']}" style="text-align: right;">
+                            <h:outputText value="#{sm.totalExciseDutyTaxAmount}">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </p:column>
                         <p:column headerText="VAT" style="text-align: right;">
                             <h:outputText value="#{sm.totalVat}">
                                 <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -252,6 +257,11 @@
                 </p:column>
                 <p:column headerText="#{langsys['Discount']}" style="text-align: right;">
                     <h:outputText value="#{itm.cashDiscount+itm.spendPointsAmount}">
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['Excise']}" style="text-align: right;">
+                    <h:outputText value="#{itm.totalExciseDutyTaxAmount}">
                         <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                     </h:outputText>
                 </p:column>

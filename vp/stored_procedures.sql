@@ -2396,8 +2396,9 @@ CREATE PROCEDURE sp_search_trans_item_summary_by_item_type
 	IN in_transaction_id bigint 
 ) 
 BEGIN 
-		SELECT i.item_type,sum(ti.amount_exc_vat) as amount_exc_vat,sum(ti.amount_inc_vat) as amount_inc_vat FROM transaction_item ti 
-		INNER JOIN item i ON ti.item_id=i.item_id  
+		SELECT i.item_type,sum(ti.amount_exc_vat) as amount_exc_vat,sum(ti.amount_inc_vat) as amount_inc_vat,sum(ifnull(ed.calc_excise_tax_amount,0)) as calc_excise_tax_amount FROM transaction_item ti 
+		INNER JOIN item i ON ti.item_id=i.item_id 
+        LEFT JOIN transaction_item_excise ed ON ti.transaction_item_id=ed.transaction_item_id 
 		WHERE ti.transaction_id=in_transaction_id GROUP BY i.item_type;
 END//
 DELIMITER ;
