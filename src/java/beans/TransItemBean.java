@@ -5272,7 +5272,7 @@ public class TransItemBean implements Serializable {
 
     public void setTransItemsByTransactionId(List<TransItem> aTransItems, long aTransactionId) {
         String sql;
-        sql = "{call sp_search_transaction_package_item_by_transaction_id(?)}";
+        sql = "{call sp_search_transaction_item_by_transaction_id(?)}";
         ResultSet rs = null;
         aTransItems.clear();
         try (
@@ -11848,6 +11848,16 @@ public class TransItemBean implements Serializable {
                 }
                 aSelectedTransItem.setVatRated(new UtilityBean().getFirstStringFromCommaSeperatedStr(aSelectedItem.getVatRated()));
                 aSelectedTransItem.setItemCode(aSelectedItem.getItemCode());
+
+                //check if item has Excise Duty
+                Item_excise_duty_map edm = new ItemBean().getItem_excise_duty_mapByItem(aSelectedTransItem.getItemId());
+                String ExciseDutyCode = "";
+                if (null != edm) {
+                    if (null != edm.getExcise_duty_code()) {
+                        ExciseDutyCode = edm.getExcise_duty_code();
+                    }
+                }
+                aSelectedTransItem.getTransItemExciseObj().setExcise_duty_code(ExciseDutyCode);
 
                 //for profit margin
                 if ("SALE INVOICE".equals(aTransType.getTransactionTypeName())) {
