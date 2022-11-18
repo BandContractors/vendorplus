@@ -20,6 +20,19 @@ public class Transaction_item_excise implements Serializable {
     private String rate_currency_code_tax;
     private String rate_unit_code_tax;
 
+    public Transaction_item_excise() {
+        this.transaction_item_excise_id = 0;
+        this.transaction_item_id = 0;
+        this.excise_duty_code = "";
+        this.rate_text = "";
+        this.rate_name = "";
+        this.rate_name_type = "";
+        this.rate_value = 0.0;
+        this.calc_excise_tax_amount = 0.0;
+        this.rate_currency_code_tax = "";
+        this.rate_unit_code_tax = "";
+    }
+
     /**
      * @return the transaction_item_excise_id
      */

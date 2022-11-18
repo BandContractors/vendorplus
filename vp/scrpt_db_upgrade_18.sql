@@ -318,3 +318,11 @@ CREATE TABLE transaction_item_hist_excise (
   PRIMARY KEY (transaction_item_hist_excise_id)
 ) ENGINE=InnoDB;
 INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',320,Now(),'6.0','');
+
+CREATE TABLE acc_default_account (
+  acc_default_account_id bigint(20) NOT NULL AUTO_INCREMENT,
+  category_code varchar(50) DEFAULT NULL,
+  account_code varchar(50) DEFAULT NULL,
+  transaction_name varchar(100) DEFAULT NULL UNIQUE,
+  PRIMARY KEY (acc_default_account_id)
+) ENGINE=InnoDB;

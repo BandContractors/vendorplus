@@ -317,7 +317,7 @@ public class TransItemExtBean implements Serializable {
         }
         return newId;
     }
-    
+
     public Transaction_item_excise getTransaction_item_exciseByItemHistId(long aTransItemHistId) {
         String sql = "SELECT * FROM transaction_item_hist_excise WHERE transaction_item_hist_id=" + aTransItemHistId;
         ResultSet rs = null;
@@ -636,10 +636,20 @@ public class TransItemExtBean implements Serializable {
         }
     }
 
+    public void initTransaction_item_exciseListByTransItem(List<TransItem> aTransItemList) {
+        try {
+            for (int i = 0; i < aTransItemList.size(); i++) {
+                aTransItemList.get(i).setTransItemExciseObj(new Transaction_item_excise());
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+    }
+
     public Transaction_item_excise getTransaction_item_exciseByTransItem(long aTransItemId) {
         String sql = "SELECT * FROM transaction_item_excise WHERE transaction_item_id=" + aTransItemId;
         ResultSet rs = null;
-        Transaction_item_excise tie = null;
+        Transaction_item_excise tie = new Transaction_item_excise();
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {

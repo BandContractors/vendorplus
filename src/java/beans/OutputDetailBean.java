@@ -270,6 +270,8 @@ public class OutputDetailBean implements Serializable {
                 aOutputDetail.setTrans_items(new TransItemBean().getTransItemsOutput(aOutputDetail.getTrans().getTransactionId()));
                 if (aOutputDetail.getTrans().getTransactionTypeId() == 2) {
                     new TransItemExtBean().setTransaction_item_exciseListByTransItem(aOutputDetail.getTrans_items());
+                } else {
+                    new TransItemExtBean().initTransaction_item_exciseListByTransItem(aOutputDetail.getTrans_items());
                 }
             } catch (Exception e) {
             }
