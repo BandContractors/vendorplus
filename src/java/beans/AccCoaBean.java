@@ -532,14 +532,24 @@ public class AccCoaBean implements Serializable {
                 BaseName = getMenuItemBean().getMenuItemObj().getLANG_BASE_NAME_SYS();
             } catch (Exception e) {
             }
-            accountCode = aToAccCoa.getAccountCode() + "-" + this.getAccountCode();
-            AccCoa AccCoaObj = this.getAccCoaByCodeOrId(accountCode, 0);
-            if (AccCoaObj != null) {
-                msg = "Account Code " + this.getAccountCode() + " Already Exist";
-                aToAccCoa.setAccountCode(aToAccCoa.getAccountCode());
+            if (this.getAccountCode().length() == 3) {
+                accountCode = aToAccCoa.getAccountCode() + "-" + this.getAccountCode();
+                AccCoa AccCoaObj = this.getAccCoaByCodeOrId(accountCode, 0);
+                if (AccCoaObj != null) {
+                    msg = "Account Code " + this.getAccountCode() + " Already Exist";
+                    aToAccCoa.setAccountCode(aToAccCoa.getAccountCode());
+                } else {
+                    msg = "Account Code " + this.getAccountCode() + " is Available";
+                    aToAccCoa.setAccountCode(aToAccCoa.getAccountCode() + "-" + this.getAccountCode());
+                }
+            } else if (this.getAccountCode().length() > 0) {
+                msg = "Account Code Length MUST be 3";
+                new AccCategoryBean().getAccCategoryById(aToAccCoa.getAccCategoryId());
+                aToAccCoa.setAccountCode(new AccCategoryBean().getAccCategoryById(aToAccCoa.getAccCategoryId()).getCategoryCode());
             } else {
-                msg = "Account Code " + this.getAccountCode() + " is Available";
-                aToAccCoa.setAccountCode(aToAccCoa.getAccountCode() + "-" + this.getAccountCode());
+                msg = "Account Code is Empty";
+                new AccCategoryBean().getAccCategoryById(aToAccCoa.getAccCategoryId());
+                aToAccCoa.setAccountCode(new AccCategoryBean().getAccCategoryById(aToAccCoa.getAccCategoryId()).getCategoryCode());
             }
 
             FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
@@ -567,7 +577,7 @@ public class AccCoaBean implements Serializable {
             if (saved > 0) {
                 msg = "Chart of Account Saved Successfully";
                 this.clearAccCoa(aAccCoa);
-                this.reportChartOfAccountsDetail(aAccCoa,this);
+                this.reportChartOfAccountsDetail(aAccCoa, this);
             } else {
                 msg = "Chart of Account NOT Saved";
             }
