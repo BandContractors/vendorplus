@@ -146,7 +146,7 @@
                             <f:selectItems value="#{accTypeBean.getAccTypeObjectListAll()}" var="t" itemLabel="#{t.accTypeName}" itemValue="#{t.accTypeId}"/>
                             <p:ajax event="change" listener="#{accCoaBean.setAccCoaCode(accTypeBean.getAccTypeById(accCoa.accTypeId).typeCode, accCoa)}" process="@this" update="dtlTypeHidden dtlGroup dtlCategory dtlAccountCode accountCode"/>
                         </p:selectOneMenu>
-                        
+
                         <h:outputLabel value="#{langsys['Group']}:"/>
                         <p:selectOneMenu id="dtlGroup" value="#{accCoa.accGroupId}" style="width: 305px" disabled="#{accCoa.accCoaId>0}">
                             <f:selectItem itemValue="" itemLabel=""/>
@@ -161,20 +161,23 @@
                             <p:ajax event="change" listener="#{accCoaBean.setAccCoaCode(accCategoryBean.getAccCategoryById(accCoa.accCategoryId).categoryCode, accCoa)}" process="@this" update="dtlCategoryHidden dtlAccountCode accountCode takenAccountCode"/>
                         </p:selectOneMenu>
 
-                        <h:outputLabel value="#{langsys['Account']} #{langsys['Code']}:" rendered="#{accCoa.accCoaId==0}"/>
-                        <p:inputText id="accountCode" style="width: 320px" value="#{accCoaBean.accountCode}" autocomplete="off" maxlength="3" size="3" placeholder="e.g 101" rendered="#{accCoa.accCoaId==0}" readonly="#{accCoa.accTypeId==0 or accCoa.accGroupId==0 or accCoa.accCategoryId==0 or accCoa.accountCode.length() lt 8}">
-                            <p:ajax event="change" listener="#{accCoaBean.setAccCoaCode(accCoa)}" process="@this" update="dtlAccountCode formReport:cmdbSave formReport:growl1"/>
-                        </p:inputText>
-
-                        <h:outputLabel value="#{langsys['Taken']} #{langsys['Account']} #{langsys['Code']}:" rendered="#{accCoa.accCoaId==0}"/>
+                        <h:outputLabel value="#{langsys['Existing']} #{langsys['Account']} #{langsys['Code']}:" rendered="#{accCoa.accCoaId==0}"/>
                         <p:selectOneMenu id="takenAccountCode" style="width: 305px" rendered="#{accCoa.accCoaId==0}">
                             <f:selectItem itemValue="" itemLabel=""/>
                             <f:selectItems value="#{accCoaBean.getAccsByCategory(accCoa.accCategoryId)}" var="tac" itemLabel="#{tac.accountCode} #{tac.accountName}" itemValue="#{tac.accountCode}"/>
                         </p:selectOneMenu>
+                        
+                        <h:outputLabel value="#{langsys['Account']} #{langsys['Code']}:" rendered="#{accCoa.accCoaId gt 0}"/>
+                        <p:inputText style="width: 320px" value="#{accCoa.accountCode}" autocomplete="off" maxlength="12" rendered="#{accCoa.accCoaId gt 0}" readonly="true" />
 
-                        <h:outputLabel value="#{langsys['Full']} #{langsys['Account']} #{langsys['Code']}:"/>
-                        <p:inputText id="dtlAccountCode" style="width: 320px" value="#{accCoa.accountCode}" autocomplete="off" readonly="true" />                        
-
+                        <h:outputLabel value="#{langsys['Account']} #{langsys['Code']}:" rendered="#{accCoa.accCoaId==0}"/>
+                        <h:panelGrid columns="2" rendered="#{accCoa.accCoaId==0}">
+                            <p:inputText id="accountCode" style="width: 80px" value="#{accCoaBean.accountCode}" autocomplete="off" maxlength="3" size="3" placeholder="e.g 101" rendered="#{accCoa.accCoaId==0}" readonly="#{accCoa.accTypeId==0 or accCoa.accGroupId==0 or accCoa.accCategoryId==0 or accCoa.accountCode.length() lt 8}">
+                                <p:ajax event="change" listener="#{accCoaBean.setAccCoaCode(accCoa)}" process="@this" update="dtlAccountCode formReport:cmdbSave formReport:growl1"/>
+                            </p:inputText>
+                            <p:inputText id="dtlAccountCode" style="width: 220px" value="#{accCoa.accountCode}" autocomplete="off" maxlength="12" readonly="true" />
+                        </h:panelGrid>
+                        
                         <h:outputLabel value="#{langsys['Account']} #{langsys['Name']}:"/>
                         <p:inputText style="width: 320px" value="#{accCoa.accountName}" autocomplete="off">
                             <p:ajax event="change" process="@this" update="formReport:cmdbSave"/>
