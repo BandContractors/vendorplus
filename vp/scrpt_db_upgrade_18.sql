@@ -326,3 +326,66 @@ CREATE TABLE acc_default_account (
   transaction_name varchar(100) DEFAULT NULL UNIQUE,
   PRIMARY KEY (acc_default_account_id)
 ) ENGINE=InnoDB;
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',329,Now(),'6.0','');
+
+CREATE TABLE transaction_cr_dr_note_tax (
+  transaction_cr_dr_note_tax_id bigint(20) NOT NULL AUTO_INCREMENT,
+  transaction_id bigint(20) DEFAULT NULL,
+  tax_category varchar(50) DEFAULT NULL,
+  tax_rate_name varchar(50) DEFAULT NULL,
+  tax_rate double DEFAULT NULL,
+  taxable_amount double DEFAULT NULL,
+  tax_amount double DEFAULT NULL,
+  PRIMARY KEY (transaction_cr_dr_note_tax_id)
+) ENGINE=InnoDB;
+
+-- *** This should only be run once when the transaction_cr_dr_note_tax table is empty, check using the query below before running the query***
+-- SELECT count(*) FROM transaction_cr_dr_note_tax
+INSERT INTO transaction_cr_dr_note_tax(transaction_id,tax_category,tax_rate_name,tax_rate,taxable_amount,tax_amount) 
+		select 
+		t.transaction_id,
+		"VAT" as tax_category,
+		"Standard" as tax_rate_name,
+		t.vat_perc as tax_rate,
+		t.total_std_vatable_amount as taxable_amount,
+		t.total_vat as tax_amount 
+		from transaction_cr_dr_note t where t.total_std_vatable_amount!=0 and t.total_vat!=0 
+	UNION 
+		select 
+		t.transaction_id,
+		"VAT" as tax_category,
+		"Exempt" as tax_rate_name,
+		0 as tax_rate,
+		t.total_exempt_vatable_amount as taxable_amount,
+		0 as tax_amount 
+		from transaction_cr_dr_note t where t.total_exempt_vatable_amount!=0 
+	UNION 
+		select 
+		t.transaction_id,
+		"VAT" as tax_category,
+		"Zero" as tax_rate_name,
+		0 as tax_rate,
+		t.total_zero_vatable_amount as taxable_amount,
+		0 as tax_amount 
+		from transaction_cr_dr_note t where t.total_zero_vatable_amount!=0 
+	UNION 
+		 select ti.transaction_id,"VAT" as tax_category,"Deemed" as tax_rate_name,18 as tax_rate,
+		 sum(ti.amount_exc_vat) as taxable_amount,sum(0.18*ti.amount_exc_vat) as tax_amount from transaction_item_cr_dr_note ti 
+		 where ti.vat_rated='DEEMED' group by ti.transaction_id
+;
+
+CREATE TABLE transaction_item_cr_dr_note_excise (
+  transaction_item_cr_dr_note_excise_id bigint(20) NOT NULL AUTO_INCREMENT,
+  transaction_item_id bigint(20) DEFAULT NULL,
+  excise_duty_code varchar(50) DEFAULT NULL,
+  rate_text varchar(100) DEFAULT NULL,
+  rate_name varchar(250) DEFAULT NULL,
+  rate_name_type varchar(10) DEFAULT NULL,
+  rate_value double DEFAULT NULL,
+  rate_currency_code_tax varchar(50) DEFAULT NULL,
+  rate_unit_code_tax varchar(50) DEFAULT NULL,
+  calc_excise_tax_amount double DEFAULT NULL,
+  PRIMARY KEY (transaction_item_cr_dr_note_excise_id)
+) ENGINE=InnoDB;
+
+INSERT INTO upgrade_control(script_name,line_no,upgrade_date,version_no,upgrade_detail) VALUES('scrpt_db_upgrade_18',391,Now(),'6.0','');
