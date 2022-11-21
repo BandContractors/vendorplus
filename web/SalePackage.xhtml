@@ -190,7 +190,7 @@
                     <!-- column header -->
                     <f:facet name="header">#{langsys['Item']} #{langsys['Description']}</f:facet>
                     <!-- row record -->
-                    <p:outputLabel value="#{ati.itemDescription}" escape="false"/>
+                    <p:outputLabel value="#{transactionPackageItemBean.showItemDescriptionCEC(ati)}" escape="false"/>
                 </p:column>
                 <p:column>
                     <!-- column header -->

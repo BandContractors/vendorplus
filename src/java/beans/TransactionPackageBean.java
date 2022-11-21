@@ -1248,7 +1248,7 @@ public class TransactionPackageBean implements Serializable {
             Store store = new StoreBean().getStore(new GeneralUserSetting().getCurrentStore().getStoreId());
             if (PackageNumber.length() > 0) {
                 Trans packageTrans = new Trans();
-                List<TransItem> TransferItems = new ArrayList<>();
+                List<TransactionPackageItem> packageItems = new ArrayList<>();
                 this.setTransFromPackageNumber(packageTrans, PackageNumber, store.getStoreId());
                 if ("0".equals(packageTrans.getStatus_code())) {
                     msg = "Package " + PackageNumber + " was reject";
@@ -1261,9 +1261,9 @@ public class TransactionPackageBean implements Serializable {
                 } else {
                     TransferId = packageTrans.getTransactionId();
                     if (TransferId > 0) {
-                        new TransItemBean().setTransItemsByTransactionId(TransferItems, TransferId);
+                        new TransactionPackageItemBean().setTransPackageItemsByTransactionId(packageItems, TransferId);
                     }
-                    if (TransferId > 0 && TransferItems.size() > 0) {
+                    if (TransferId > 0 && packageItems.size() > 0) {
                         //some cleanups and reset
                         //1. for trans
                         //trans.setTransactionNumber("");
@@ -1273,41 +1273,44 @@ public class TransactionPackageBean implements Serializable {
                         ItemBean ib = new ItemBean();
                         Item item = null;
                         TransItem transitem = null;
-                        for (int i = 0; i < TransferItems.size(); i++) {
-                            item = new ItemBean().getItem(TransferItems.get(i).getItemId());
+                        for (int i = 0; i < packageItems.size(); i++) {
+                            item = new ItemBean().getItem(packageItems.get(i).getItemId());
                             transitem = new TransItem();
                             transitem.setItemId(item.getItemId());
-                            transitem.setItemQty(TransferItems.get(i).getItemQty());
+                            transitem.setItemQty(packageItems.get(i).getItemQty());
                             try {
-                                if (null == TransferItems.get(i).getBatchno()) {
-                                    transitem.setBatchno("");
-                                } else {
-                                    transitem.setBatchno(TransferItems.get(i).getBatchno());
-                                }
-                            } catch (NullPointerException npe) {
+                                transitem.setBatchno(packageItems.get(i).getBatchNo());
+                            } catch (Exception npe) {
                                 transitem.setBatchno("");
                             }
                             try {
-                                if (null == TransferItems.get(i).getCodeSpecific()) {
-                                    transitem.setCodeSpecific("");
-                                } else {
-                                    transitem.setCodeSpecific(TransferItems.get(i).getCodeSpecific());
-                                }
-                            } catch (NullPointerException npe) {
+                                transitem.setCodeSpecific(packageItems.get(i).getCodeSpecific());
+                            } catch (Exception npe) {
                                 transitem.setCodeSpecific("");
                             }
                             try {
-                                if (null == TransferItems.get(i).getDescSpecific()) {
-                                    transitem.setDescSpecific("");
-                                } else {
-                                    transitem.setDescSpecific(TransferItems.get(i).getDescSpecific());
-                                }
-                            } catch (NullPointerException npe) {
+                                transitem.setDescSpecific(packageItems.get(i).getDescSpecific());
+                            } catch (Exception npe) {
                                 transitem.setDescSpecific("");
                             }
+                            try {
+                                transitem.setTransactionPackageId(packageItems.get(i).getTransactionPackageId());
+                            } catch (Exception npe) {
+                                transitem.setTransactionPackageId(0);
+                            }
+                            try {
+                                transitem.setTransactionPackageItemId(packageItems.get(i).getTransactionPackageItemId());
+                            } catch (Exception npe) {
+                                transitem.setTransactionPackageId(0);
+                            }
+                            try {
+                                transitem.setTransactionPackageNumber(PackageNumber);
+                            } catch (Exception npe) {
+                                transitem.setTransactionPackageNumber("");
+                            }
                             transitem.setAccountCode(tib.getTransItemInventCostAccount(transtype, transreason, item));
-                            transitem.setUnit_id(TransferItems.get(i).getUnit_id());
-                            transitem.setBase_unit_qty(TransferItems.get(i).getBase_unit_qty());
+                            transitem.setUnit_id(packageItems.get(i).getUnitId());
+                            transitem.setBase_unit_qty(packageItems.get(i).getBaseUnitQty());
                             Item_unit iu = new ItemBean().getItemUnitFrmDb(transitem.getItemId(), transitem.getUnit_id());
                             if (null != iu) {
                                 item.setUnitRetailsalePrice(iu.getUnit_retailsale_price());
