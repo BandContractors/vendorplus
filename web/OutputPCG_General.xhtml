@@ -46,7 +46,7 @@
                                     <!-- column header -->
                                     <f:facet name="header">#{langout['ITEMS']}(#{generalUserSetting.outputDetailParent.transactionPackage.getaTransactionPackageItemsList().size()})</f:facet>
                                     <!-- row record -->
-                                    <h:outputLabel style="font-size: 12px;" value="#{ti.itemDescription}" escape="false" />
+                                    <h:outputLabel style="font-size: 12px;" value="#{transactionPackageItemBean.showItemDescriptionCEC(ti)}" escape="false" />
                                     <h:outputLabel style="font-size: 10px;" value=" BN:#{ti.batchNo}" escape="false" rendered="#{ti.batchNo.length() gt 0}"/>
                                 </h:column>
                                 <h:column>
@@ -70,14 +70,6 @@
                         </h:panelGrid>
 
                         <h:panelGrid style="margin: 0px;text-align: right;float: right;" columns="2">
-                            <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langout['Subtotal']}"/>
-                            <h:inputText id="itxtvSubTotal" value="#{generalUserSetting.outputDetailParent.transactionPackage.subTotal-generalUserSetting.outputDetailParent.trans.totalExciseDutyTaxAmount}" styleClass="clsInputTransItem" style="width: 150px;border: none;text-align: right;" disabled="true">
-                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
-                            </h:inputText>
-                            <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langout['Tax']}"/>
-                            <h:inputText id="itxtvTotalVat" value="#{generalUserSetting.outputDetailParent.transactionPackage.totalTax+generalUserSetting.outputDetailParent.trans.totalExciseDutyTaxAmount}" styleClass="clsInputTransItem" style="width: 150px;border: none;text-align: right;" disabled="true">
-                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
-                            </h:inputText>
                             <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langout['TOTAL']}"/>
                             <h:inputText id="itxtvGrandTotal" value="#{generalUserSetting.outputDetailParent.trans.grandTotal}" styleClass="clsInputTransItem" style="width: 150px;border: none;text-align: right;" disabled="true">
                                 <f:convertNumber pattern="#{accCurrencyBean.getNumberFormatByCurrency(generalUserSetting.outputDetailParent.transactionPackage.currencyCode)}" locale="#{utilityBean.convertLocaleToString()}"/>

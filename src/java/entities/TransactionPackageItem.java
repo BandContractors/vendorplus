@@ -48,8 +48,12 @@ public class TransactionPackageItem implements Serializable {
     private String itemDescription;
     private String unitSymbol;
     private String itemCode;
-      private int isTaxSynced;
-      
+    private int isTaxSynced;
+    private String alias_name;
+    private int display_alias_name;
+    private int is_override_price;
+    private int override_gen_name;
+    private int is_general;
 
     /**
      * @return the transactionPackageItemId
@@ -441,5 +445,75 @@ public class TransactionPackageItem implements Serializable {
      */
     public void setStockId(long stockId) {
         this.stockId = stockId;
+    }
+
+    /**
+     * @return the alias_name
+     */
+    public String getAlias_name() {
+        return alias_name;
+    }
+
+    /**
+     * @param alias_name the alias_name to set
+     */
+    public void setAlias_name(String alias_name) {
+        this.alias_name = alias_name;
+    }
+
+    /**
+     * @return the display_alias_name
+     */
+    public int getDisplay_alias_name() {
+        return display_alias_name;
+    }
+
+    /**
+     * @param display_alias_name the display_alias_name to set
+     */
+    public void setDisplay_alias_name(int display_alias_name) {
+        this.display_alias_name = display_alias_name;
+    }
+
+    /**
+     * @return the is_override_price
+     */
+    public int getIs_override_price() {
+        return is_override_price;
+    }
+
+    /**
+     * @param is_override_price the is_override_price to set
+     */
+    public void setIs_override_price(int is_override_price) {
+        this.is_override_price = is_override_price;
+    }
+
+    /**
+     * @return the override_gen_name
+     */
+    public int getOverride_gen_name() {
+        return override_gen_name;
+    }
+
+    /**
+     * @param override_gen_name the override_gen_name to set
+     */
+    public void setOverride_gen_name(int override_gen_name) {
+        this.override_gen_name = override_gen_name;
+    }
+
+    /**
+     * @return the is_general
+     */
+    public int getIs_general() {
+        return is_general;
+    }
+
+    /**
+     * @param is_general the is_general to set
+     */
+    public void setIs_general(int is_general) {
+        this.is_general = is_general;
     }
 }

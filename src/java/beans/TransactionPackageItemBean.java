@@ -1198,6 +1198,89 @@ public class TransactionPackageItemBean implements Serializable {
         }
         return deleted;
     }
+    
+    
+      public String showItemDescriptionCEC(TransactionPackageItem aTransactionPackageItem) {
+        int NewLineEachName = 0;//NEW_LINE_EACH_NAME
+        int LinesBtnNames = 1;//LINES_BTN_NAMES
+        NewLineEachName = Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("GENERAL_NAME", "NEW_LINE_EACH_NAME").getParameter_value());
+        LinesBtnNames = Integer.parseInt(new Parameter_listBean().getParameter_listByContextNameMemory("GENERAL_NAME", "LINES_BTN_NAMES").getParameter_value());
+        String NewLineStr = " ";
+        String AliasName = "";
+        try {
+            if (null == aTransactionPackageItem.getAlias_name()) {
+                AliasName = "";
+            } else {
+                AliasName = aTransactionPackageItem.getAlias_name();
+            }
+        } catch (Exception e) {
+            AliasName = "";
+        }
+        if (NewLineEachName == 1 && LinesBtnNames > 0) {
+            for (int i = 1; i <= LinesBtnNames; i++) {
+                NewLineStr = NewLineStr + "<br /> ";
+            }
+        }
+        String FullItemDesc = "";
+        try {
+            if (aTransactionPackageItem.getDescSpecific().length() <= 0 && aTransactionPackageItem.getCodeSpecific().length() <= 0) { //indicator for non-general item
+                if (AliasName.length() > 0 && aTransactionPackageItem.getDisplay_alias_name() == 1) {
+                    FullItemDesc = AliasName;
+                } else {
+                    FullItemDesc = aTransactionPackageItem.getItemDescription();
+                }
+            } else {
+                if (new Parameter_listBean().getParameter_listByContextNameMemory("COMPANY_SETTING", "SHOW_GEN_ITEM_NAME").getParameter_value().equals("1")) {
+                    if (AliasName.length() > 0 && aTransactionPackageItem.getDisplay_alias_name() == 1) {
+                        FullItemDesc = AliasName;
+                    } else {
+                        FullItemDesc = aTransactionPackageItem.getItemDescription();
+                    }
+                }
+                if (aTransactionPackageItem.getOverride_gen_name() == 1) {
+                    if (AliasName.length() > 0 && aTransactionPackageItem.getDisplay_alias_name() == 1) {
+                        FullItemDesc = AliasName;
+                    } else {
+                        FullItemDesc = aTransactionPackageItem.getItemDescription();
+                    }
+                } else if (aTransactionPackageItem.getOverride_gen_name() == 2) {
+                    FullItemDesc = "";
+                }
+            }
+        } catch (Exception npe) {
+        }
+        try {
+            if (aTransactionPackageItem.getDescSpecific().length() > 0) {
+                if (FullItemDesc.length() > 0) {
+                    FullItemDesc = FullItemDesc + NewLineStr + aTransactionPackageItem.getDescSpecific();
+                } else {
+                    FullItemDesc = aTransactionPackageItem.getDescSpecific();
+                }
+            }
+        } catch (NullPointerException npe) {
+        }
+        try {
+            if (aTransactionPackageItem.getCodeSpecific().length() > 0) {
+                if (FullItemDesc.length() > 0) {
+                    FullItemDesc = FullItemDesc + NewLineStr + aTransactionPackageItem.getCodeSpecific();
+                } else {
+                    FullItemDesc = aTransactionPackageItem.getCodeSpecific();
+                }
+            }
+        } catch (NullPointerException npe) {
+        }
+        try {
+            if (aTransactionPackageItem.getDescMore().length() > 0) {
+                if (FullItemDesc.length() > 0) {
+                    FullItemDesc = FullItemDesc + NewLineStr + aTransactionPackageItem.getDescMore();
+                } else {
+                    FullItemDesc = aTransactionPackageItem.getDescMore();
+                }
+            }
+        } catch (NullPointerException npe) {
+        }
+        return FullItemDesc;
+    }
 
     /**
      * @return the menuItemBean
