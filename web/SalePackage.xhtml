@@ -257,22 +257,22 @@
 
             <h:panelGrid id="pgrdTotals" styleClass="clsGridMainInput" columns="5">
                 <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Subtotal']}"/>
-                <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Discount']}"/>
-                <p:commandLink id="cmdlCashDiscount"  onclick="PF('dlgCashDiscount').show();" value="#{langsys['Cash']} #{langsys['Discount']} (#{utilityBean.formatDoubleToString(trans.cash_dicsount_perc)}%)" disabled="#{companySetting.getBoolIsAllowDiscount()}"/>
-                <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="VAT"/>
+                <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px; display: none;" value="#{langsys['Discount']}"/>
+                <p:commandLink id="cmdlCashDiscount"  onclick="PF('dlgCashDiscount').show();" style="width: 150px; display: none;" value="#{langsys['Cash']} #{langsys['Discount']} (#{utilityBean.formatDoubleToString(trans.cash_dicsount_perc)}%)" disabled="#{companySetting.getBoolIsAllowDiscount()}"/>
+                <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px; display: none;" value="VAT"/>
                 <p:commandLink id="cmdlCashDiscount2" onclick="PF('dlgCashDiscount2').show();" value="#{langsys['TOTAL']} (#{trans.currencyCode})" disabled="#{companySetting.getBoolIsAllowDiscount()}"/>
 
                 <h:inputText id="itxtSubTotal" value="#{transactionPackage.subTotal}" styleClass="clsInputTransItem" style="width: 150px;height: 24px;" disabled="true">
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
-                <h:inputText id="itxtTotalTradeDiscount" value="#{transactionPackage.totalTradeDiscount}" styleClass="clsInputTransItem" style="width: 150px;height: 24px;" autocomplete="off" disabled="true"> 
+                <h:inputText id="itxtTotalTradeDiscount" value="#{transactionPackage.totalTradeDiscount}" styleClass="clsInputTransItem" style="width: 150px;height: 24px;display: none;" autocomplete="off" disabled="true"> 
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
-                <h:inputText id="itxtCashDiscount" value="#{trans.cashDiscount}" styleClass="clsInputTransItem" style="width: 150px;height: 24px;" autocomplete="off" disabled="#{companySetting.getBoolIsAllowDiscount()}">
+                <h:inputText id="itxtCashDiscount" value="#{trans.cashDiscount}" styleClass="clsInputTransItem" style="width: 150px;height: 24px;display: none;" autocomplete="off" disabled="#{companySetting.getBoolIsAllowDiscount()}">
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                     <f:ajax event="blur" listener="#{transactionPackageBean.setTransTotalsAndUpdateCEC(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans, transactionPackage, transactionPackageItemBean.transPackageItemList)}" render="cmdlCashDiscount itxtGrandTotal itxtTotalVat"/>
                 </h:inputText>
-                <h:inputText id="itxtTotalVat" value="#{transactionPackage.totalTax}" styleClass="clsInputTransItem" style="width: 150px;height: 24px;" disabled="true">
+                <h:inputText id="itxtTotalVat" value="#{transactionPackage.totalTax}" styleClass="clsInputTransItem" style="width: 150px;height: 24px;display: none;" disabled="true">
                     <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
                 <h:inputText id="itxtGrandTotal" value="#{transactionPackage.grandTotal}" styleClass="clsInputTransItem" style="width: 180px;background-color: yellow;font-weight: bold;font-size: 20px;height: 24px;" disabled="true">

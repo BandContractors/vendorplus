@@ -113,12 +113,12 @@ public class TransactionPackageBean implements Serializable {
                 transPackage.setTotalTax(0);
             }
             try {
-                transPackage.setTransactionDate(aResultSet.getDate("transaction_date"));
+                transPackage.setTransactionDate(new Date(aResultSet.getTimestamp("transaction_date").getTime()));
             } catch (Exception npe) {
                 transPackage.setTransactionDate(null);
             }
             try {
-                transPackage.setAddDate(aResultSet.getDate("add_date"));
+                transPackage.setAddDate(new Date(aResultSet.getTimestamp("add_date").getTime()));
             } catch (Exception npe) {
                 transPackage.setAddDate(null);
             }
