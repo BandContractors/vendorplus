@@ -6,10 +6,10 @@ import javax.faces.bean.SessionScoped;
 
 @ManagedBean
 @SessionScoped
-public class Transaction_item_excise implements Serializable {
+public class Transaction_item_cr_dr_note_excise implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private long transaction_item_excise_id;
+    private long transaction_item_cr_dr_note_excise_id;
     private long transaction_item_id;
     private String excise_duty_code;
     private String rate_text;
@@ -20,8 +20,8 @@ public class Transaction_item_excise implements Serializable {
     private String rate_currency_code_tax;
     private String rate_unit_code_tax;
 
-    public Transaction_item_excise() {
-        this.transaction_item_excise_id = 0;
+    public Transaction_item_cr_dr_note_excise() {
+        this.transaction_item_cr_dr_note_excise_id = 0;
         this.transaction_item_id = 0;
         this.excise_duty_code = "";
         this.rate_text = "";
@@ -34,17 +34,17 @@ public class Transaction_item_excise implements Serializable {
     }
 
     /**
-     * @return the transaction_item_excise_id
+     * @return the transaction_item_cr_dr_note_excise_id
      */
-    public long getTransaction_item_excise_id() {
-        return transaction_item_excise_id;
+    public long getTransaction_item_cr_dr_note_excise_id() {
+        return transaction_item_cr_dr_note_excise_id;
     }
 
     /**
-     * @param transaction_item_excise_id the transaction_item_excise_id to set
+     * @param transaction_item_cr_dr_note_excise_id the transaction_item_cr_dr_note_excise_id to set
      */
-    public void setTransaction_item_excise_id(long transaction_item_excise_id) {
-        this.transaction_item_excise_id = transaction_item_excise_id;
+    public void setTransaction_item_cr_dr_note_excise_id(long transaction_item_cr_dr_note_excise_id) {
+        this.transaction_item_cr_dr_note_excise_id = transaction_item_cr_dr_note_excise_id;
     }
 
     /**

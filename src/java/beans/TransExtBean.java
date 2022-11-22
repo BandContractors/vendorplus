@@ -9,6 +9,7 @@ import entities.Trans;
 import entities.TransItem;
 import entities.TransactionReason;
 import entities.TransactionType;
+import entities.Transaction_item_excise;
 import entities.Transaction_item_unit;
 import entities.Transaction_tax;
 import entities.Transaction_tax_map;
@@ -22,6 +23,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import static java.sql.Types.VARCHAR;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
@@ -640,6 +642,195 @@ public class TransExtBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
         return newId;
+    }
+
+    public int insertTransTaxes(Trans aTrans, List<TransItem> aTransItemList) {
+        int saved = 0;
+        try {
+            if (null != aTrans && null != aTransItemList) {
+                //set for deemed
+                double DeemedTotalAmount = 0;
+                double DeemedTotalVat = 0;
+                double VatPercent = aTrans.getVatPerc();
+                for (int i = 0; i < aTransItemList.size(); i++) {
+                    if (aTransItemList.get(i).getVatRated().equals("DEEMED") && VatPercent > 0) {
+                        double ExcludedVat = (VatPercent / 100) * aTransItemList.get(i).getAmountExcVat();
+                        DeemedTotalVat = DeemedTotalVat + ExcludedVat;
+                        DeemedTotalAmount = DeemedTotalAmount + aTransItemList.get(i).getAmountExcVat();
+                    }
+                }
+                //insert Trans Taxes
+                Transaction_tax transtax = null;
+                //A. VAT
+                if (aTrans.getTotalStdVatableAmount() > 0) {
+                    transtax = new Transaction_tax();
+                    transtax.setTransaction_tax_id(0);
+                    transtax.setTransaction_id(aTrans.getTransactionId());
+                    transtax.setTax_category("VAT");
+                    transtax.setTax_rate_name("Standard");
+                    transtax.setTax_rate(aTrans.getVatPerc());
+                    transtax.setTaxable_amount(aTrans.getTotalStdVatableAmount());
+                    transtax.setTax_amount(aTrans.getTotalVat());
+                    long x = this.insertTransaction_tax(transtax);
+                }
+                if (aTrans.getTotalExemptVatableAmount() > 0) {
+                    transtax = new Transaction_tax();
+                    transtax.setTransaction_tax_id(0);
+                    transtax.setTransaction_id(aTrans.getTransactionId());
+                    transtax.setTax_category("VAT");
+                    transtax.setTax_rate_name("Exempt");
+                    transtax.setTax_rate(0);
+                    transtax.setTaxable_amount(aTrans.getTotalExemptVatableAmount());
+                    transtax.setTax_amount(0);
+                    long x = this.insertTransaction_tax(transtax);
+                }
+                if (aTrans.getTotalZeroVatableAmount() > 0) {
+                    transtax = new Transaction_tax();
+                    transtax.setTransaction_tax_id(0);
+                    transtax.setTransaction_id(aTrans.getTransactionId());
+                    transtax.setTax_category("VAT");
+                    transtax.setTax_rate_name("Zero");
+                    transtax.setTax_rate(0);
+                    transtax.setTaxable_amount(aTrans.getTotalZeroVatableAmount());
+                    transtax.setTax_amount(0);
+                    long x = this.insertTransaction_tax(transtax);
+                }
+                if (DeemedTotalAmount > 0) {
+                    transtax = new Transaction_tax();
+                    transtax.setTransaction_tax_id(0);
+                    transtax.setTransaction_id(aTrans.getTransactionId());
+                    transtax.setTax_category("VAT");
+                    transtax.setTax_rate_name("Deemed");
+                    transtax.setTax_rate(aTrans.getVatPerc());
+                    transtax.setTaxable_amount(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), DeemedTotalAmount, "TOTAL_OTHER"));
+                    transtax.setTax_amount(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), DeemedTotalVat, "TOTAL_OTHER"));
+                    long x = this.insertTransaction_tax(transtax);
+                }
+                //B. Excise Duty
+                if (aTrans.getTotalExciseDutableAmount() > 0) {
+                    List<Transaction_tax> TransTaxList = new ArrayList<>();
+                    for (int i = 0; i < aTransItemList.size(); i++) {
+                        TransItem ti = aTransItemList.get(i);
+                        Transaction_item_excise tie = ti.getTransItemExciseObj();
+                        if (tie.getCalc_excise_tax_amount() > 0) {
+                            transtax = new Transaction_tax();
+                            transtax.setTransaction_tax_id(0);
+                            transtax.setTransaction_id(aTrans.getTransactionId());
+                            transtax.setTax_category("Excise Duty");
+                            transtax.setTax_rate_name(tie.getRate_name());
+                            transtax.setTax_rate(tie.getRate_value());
+                            transtax.setTaxable_amount(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), (ti.getAmountExcVat() - tie.getCalc_excise_tax_amount()), "TOTAL_OTHER"));
+                            transtax.setTax_amount(new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), tie.getCalc_excise_tax_amount(), "TOTAL_OTHER"));
+                            int ItemFoundAtIndex = this.getIndexByTaxRateName(TransTaxList, transtax.getTax_rate_name());
+                            if (ItemFoundAtIndex < 0) {
+                                TransTaxList.add(transtax);
+                            } else {
+                                transtax.setTaxable_amount(transtax.getTaxable_amount() + new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), TransTaxList.get(ItemFoundAtIndex).getTaxable_amount(), "TOTAL_OTHER"));
+                                transtax.setTax_amount(transtax.getTax_amount() + new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), TransTaxList.get(ItemFoundAtIndex).getTax_amount(), "TOTAL_OTHER"));
+                                TransTaxList.add(ItemFoundAtIndex, transtax);
+                                TransTaxList.remove(ItemFoundAtIndex + 1);
+                            }
+                        }
+                    }
+                    for (int i = 0; i < TransTaxList.size(); i++) {
+                        long x = this.insertTransaction_tax(TransTaxList.get(i));
+                    }
+                }
+                saved = 1;
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return saved;
+    }
+
+    public int getIndexByTaxRateName(List<Transaction_tax> aTransaction_taxList, String aTax_rate_name) {
+        List<Transaction_tax> lst = aTransaction_taxList;
+        int ItemFoundAtIndex = -1;
+        int ListItemIndex = 0;
+        int ListItemNo = lst.size();
+        while (ListItemIndex < ListItemNo) {
+            if (lst.get(ListItemIndex).getTax_rate_name().equals(aTax_rate_name)) {
+                ItemFoundAtIndex = ListItemIndex;
+                break;
+            } else {
+                ItemFoundAtIndex = -1;
+            }
+            ListItemIndex = ListItemIndex + 1;
+        }
+        return ItemFoundAtIndex;
+    }
+
+    public List<Transaction_tax> getTransaction_taxListByTrans(Long aTransaction_id) {
+        String sql = "SELECT * FROM transaction_tax WHERE transaction_id=? ORDER BY tax_category DESC,tax_rate_name ASC";
+        ResultSet rs = null;
+        List<Transaction_tax> lst = new ArrayList<>();
+        Transaction_tax obj = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aTransaction_id);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                obj = new Transaction_tax();
+                this.setTransaction_taxFromResultset(obj, rs);
+                lst.add(obj);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return lst;
+    }
+
+    public List<Transaction_tax> getTransaction_taxListByTrans(Long aTransaction_id, String aTax_category) {
+        String sql = "SELECT * FROM transaction_tax WHERE transaction_id=? AND tax_category=?";
+        ResultSet rs = null;
+        List<Transaction_tax> lst = new ArrayList<>();
+        Transaction_tax obj = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aTransaction_id);
+            ps.setString(2, aTax_category);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                obj = new Transaction_tax();
+                this.setTransaction_taxFromResultset(obj, rs);
+                lst.add(obj);
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return lst;
+    }
+
+    public Transaction_tax getTransTaxByCategory(Long aTransaction_id, String aTax_category) {
+        String sql = "SELECT sum(taxable_amount) as taxable_amount,sum(tax_amount) as tax_amount FROM transaction_tax WHERE transaction_id=? AND tax_category=?";
+        ResultSet rs = null;
+        Transaction_tax obj = null;
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, aTransaction_id);
+            ps.setString(2, aTax_category);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                obj = new Transaction_tax();
+                try {
+                    obj.setTaxable_amount(rs.getDouble("taxable_amount"));
+                } catch (Exception e) {
+                    obj.setTaxable_amount(0);
+                }
+                try {
+                    obj.setTax_amount(rs.getDouble("tax_amount"));
+                } catch (Exception e) {
+                    obj.setTax_amount(0);
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return obj;
     }
 
     public void reverseShowDetail() {

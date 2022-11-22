@@ -83,24 +83,32 @@
                     </h:panelGrid>
                 </p:tab>
                 <p:tab title="Get Excise Duty List">
-                    <h:panelGrid columns="3">
+                    <h:panelGrid columns="1">
                         <p:commandButton styleClass="clsButtonBig" id="cmdbGetExciseDutyList" value="Download Excise Duty" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                             <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                                 <p:graphicImage name="/images/ajax-loader.gif"/>
                             </p:dialog>
                             <p:ajax listener="#{utilityBean.callDownloadExciseDuty_list()}" process="@form" update="@form" />
                         </p:commandButton>
+                    </h:panelGrid>
+                </p:tab>
+                <p:tab title="Get Unit Tax List">
+                    <h:panelGrid columns="1">
                         <p:commandButton styleClass="clsButtonBig" id="cmdbGetRateUnit" value="Download Unit Tax" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                             <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                                 <p:graphicImage name="/images/ajax-loader.gif"/>
                             </p:dialog>
                             <p:ajax listener="#{utilityBean.callDownloadRateUnit()}" process="@form" update="@form" />
                         </p:commandButton>
+                    </h:panelGrid>
+                </p:tab>
+                <p:tab title="Get Currency List">
+                    <h:panelGrid columns="1">
                         <p:commandButton styleClass="clsButtonBig" id="cmdbGetCurrencyType" value="Download Currency" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                             <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                                 <p:graphicImage name="/images/ajax-loader.gif"/>
                             </p:dialog>
-                            <p:ajax listener="#{utilityBean.callDownloadExciseDuty_list()}" process="@form" update="@form" />
+                            <p:ajax listener="#{utilityBean.callDownloadCurrencyType()}" process="@form" update="@form" />
                         </p:commandButton>
                     </h:panelGrid>
                 </p:tab>
@@ -163,6 +171,22 @@
                                 #{t.type}
                             </p:column>
                         </p:dataTable>
+                    </h:panelGrid>
+                </p:tab>
+                <p:tab title="Back up Database">
+                    <h:panelGrid columns="2">
+                        <h:outputLabel id="lbldbName"  value="Database Name"/>
+                        <h:inputText value="#{utilityBean.dbName}" autocomplete="yes"/>
+                        <h:outputLabel id="lbldbUser"  value="Database User"/>
+                        <h:inputText value="#{utilityBean.dbUser}" autocomplete="yes"/>
+                        <h:outputLabel id="lbldbPass"  value="Password"/>
+                        <h:inputSecret value="#{utilityBean.dbPass}" autocomplete="yes"/>
+                        <p:commandButton styleClass="clsButtonBig" id="cmdbBackUpDB" value="Back up Database" accesskey="t" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                            <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                                <p:graphicImage name="/images/ajax-loader.gif"/>
+                            </p:dialog>
+                            <p:ajax listener="#{utilityBean.backUpDB()}" process="@form" update="@form" />
+                        </p:commandButton>
                     </h:panelGrid>
                 </p:tab>
             </p:accordionPanel>

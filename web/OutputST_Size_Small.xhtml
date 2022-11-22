@@ -42,7 +42,7 @@
                             <h:outputLabel style="font-size: 12px;font-weight: bold;" value="#{generalUserSetting.outputDetailParent.store2.storeName}"/>
                         </h:panelGrid>
                         <h:panelGrid id="IpgrdSalesInvoiceItems">
-                            <h:dataTable id="IdtblSalesInvoiceItems" value="#{generalUserSetting.outputDetailParent.transactionPackageItems}" var="tpi" 
+                            <h:dataTable id="IdtblSalesInvoiceItems" value="#{generalUserSetting.outputDetailParent.trans_items}" var="tpi" 
                                          styleClass="cls-table-SalesInvoice-very-small" 
                                          headerClass="cls-table-header-SalesInvoice" 
                                          rowClasses="cls-table-odd-row-SalesInvoice,cls-table-even-row-SalesInvoice" 
@@ -50,7 +50,7 @@
                                          > 
                                 <h:column>
                                     <!-- column header -->
-                                    <f:facet name="header">#{langout['ITEMS']}(#{generalUserSetting.outputDetailParent.transactionPackageItems.size()})</f:facet>
+                                    <f:facet name="header">#{langout['ITEMS']}(#{generalUserSetting.outputDetailParent.trans_items.size()})</f:facet>
                                     <!-- row record -->
                                     <h:outputLabel style="font-size: 12px;" value="#{transItemBean.showItemDescriptionCEC(tpi)}" escape="false" />
                                     <h:outputLabel style="font-size: 10px;" value=" BN:#{ti.batchno}" escape="false" rendered="#{ti.batchno.length() gt 0}"/>
@@ -58,7 +58,7 @@
                                 </h:column>
                                 <h:column>
                                     <!-- column header -->
-                                    <f:facet name="header">#{langout['QTY']}(#{utilityBean.formatNumber('###,###,###.########',transItemBean.getTransItemsTotalQty(generalUserSetting.outputDetailParent.transactionPackageItems))})</f:facet>
+                                    <f:facet name="header">#{langout['QTY']}(#{utilityBean.formatNumber('###,###,###.########',transItemBean.getTransItemsTotalQty(generalUserSetting.outputDetailParent.trans_items))})</f:facet>
                                     <!-- row record -->
                                     <h:outputLabel style="font-size: 10px;" value="#{tpi.itemQty}">
                                         <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>

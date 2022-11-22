@@ -43,8 +43,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.Executor;
@@ -81,6 +83,9 @@ public class UtilityBean implements Serializable {
     private int downloadedUNSPC = 0;
     private int totalUNSPC = 0;
     private double downloadedUNSPCPercentage = 0;
+    private String dbUser = "";
+    private String dbPass = "";
+    private String dbName = "";
 
     public boolean isTime24Hour(String time) {
         pattern = Pattern.compile(TIME24HOURS_PATTERN);
@@ -354,10 +359,17 @@ public class UtilityBean implements Serializable {
     }
 
 //    public static void main(String[] args) {
-//        Double x = 123452212.10;
-//        System.out.println(new UtilityBean().formatDoubleToStringPlain(x, 2));
+//        AccCurrencyBean cb = new AccCurrencyBean();
+//        double x = 847457.627119, y = 847457.627119, z = 847457.627119;
+//        //UP 0,DOWN 1,CEILING 2,FLOOR 3
+//        System.out.println(cb.roundDoubleToXDps(x, 2, "HALF UP"));
+//        System.out.println(cb.roundDoubleToXDps(y, 2, "HALF DOWN"));
+//        System.out.println(cb.roundDoubleToXDps(z, 2, "HALF EVEN"));
+//        System.out.println(cb.roundDoubleToXDps(x, 2, "UP"));
+//        System.out.println(cb.roundDoubleToXDps(x, 2, "DOWN"));
+//        System.out.println(cb.roundDoubleToXDps(x, 2, "CEILING"));
+//        System.out.println(cb.roundDoubleToXDps(x, 2, "FLOOR"));
 //    }
-    
     public String formatDoubleToStringHide(double aAmount, int aHideResult) {
         String aString = "";
         //DecimalFormat myFormatter = new DecimalFormat("###,###.###;(###,###.###)");
@@ -1213,6 +1225,10 @@ public class UtilityBean implements Serializable {
         new T115().downloadRateUnitThread();
     }
 
+    public void callDownloadCurrencyType() {
+        new T115().downloadCurrencyTypeThread();
+    }
+
     public void cleanSaleInvoiceTranss() {
         try {
             Runnable task = new Runnable() {
@@ -1409,6 +1425,10 @@ public class UtilityBean implements Serializable {
         }
     }
 
+    public void backUpDB() {
+        new DbBackUpBean().Backupdbtosql(this.dbName, this.dbUser, this.dbPass);
+    }
+
     /**
      * @return the pattern
      */
@@ -1526,6 +1546,48 @@ public class UtilityBean implements Serializable {
      */
     public void setDownloadedUNSPCPercentage(double downloadedUNSPCPercentage) {
         this.downloadedUNSPCPercentage = downloadedUNSPCPercentage;
+    }
+
+    /**
+     * @return the dbUser
+     */
+    public String getDbUser() {
+        return dbUser;
+    }
+
+    /**
+     * @param dbUser the dbUser to set
+     */
+    public void setDbUser(String dbUser) {
+        this.dbUser = dbUser;
+    }
+
+    /**
+     * @return the dbPass
+     */
+    public String getDbPass() {
+        return dbPass;
+    }
+
+    /**
+     * @param dbPass the dbPass to set
+     */
+    public void setDbPass(String dbPass) {
+        this.dbPass = dbPass;
+    }
+
+    /**
+     * @return the dbName
+     */
+    public String getDbName() {
+        return dbName;
+    }
+
+    /**
+     * @param dbName the dbName to set
+     */
+    public void setDbName(String dbName) {
+        this.dbName = dbName;
     }
 
 }

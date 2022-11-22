@@ -128,7 +128,94 @@
                 <p:column headerText="#{langsys['Account']} #{langsys['Name']}">
                     <h:outputLabel value="#{itm.accountName}"/>
                 </p:column>
+                <p:column headerText="#{langsys['Action']}">
+                    <p:commandButton update="formReport:modalCOADetail" actionListener="#{accCoaBean.displayAccCoa(itm, accCoa)}" oncomplete="PF('dlgCOADetail').show();" icon="ui-icon-pencil" title="Edit Chart of Account" style="color: white; background-color: #00B259" >
+                    </p:commandButton>
+                    &nbsp;
+                    <p:commandButton update="formReport:modalCOADetail" actionListener="#{accCoaBean.clearAccCoa(accCoa)}" oncomplete="PF('dlgCOADetail').show();" icon="ui-icon-plus" title="New Chart of Account" style="color: white;" >
+                    </p:commandButton>
+                    &nbsp;
+                </p:column>
             </p:dataTable>
+            <p:dialog rendered="true" dynamic="true" header="#{langsys['Chart']} #{langsys['of']} #{langsys['Account']}" widgetVar="dlgCOADetail" id="modalCOADetail" modal="true">
+                <h:panelGroup id="popup">
+                    <h:panelGrid columns="2">
+                        <h:outputLabel  value="#{langsys['Type']}:"/>
+                        <p:selectOneMenu id="dtlType" value="#{accCoa.accTypeId}" style="width: 305px" disabled="#{accCoa.accCoaId>0}">
+                            <f:selectItem itemLabel="" itemValue="0"/>
+                            <f:selectItems value="#{accTypeBean.getAccTypeObjectListAll()}" var="t" itemLabel="#{t.accTypeName}" itemValue="#{t.accTypeId}"/>
+                            <p:ajax event="change" listener="#{accCoaBean.setAccCoaCode(accTypeBean.getAccTypeById(accCoa.accTypeId).typeCode, accCoa)}" process="@this" update="dtlTypeHidden dtlGroup dtlCategory dtlAccountCode accountCode"/>
+                        </p:selectOneMenu>
+
+                        <h:outputLabel value="#{langsys['Group']}:"/>
+                        <p:selectOneMenu id="dtlGroup" value="#{accCoa.accGroupId}" style="width: 305px" disabled="#{accCoa.accCoaId>0}">
+                            <f:selectItem itemValue="" itemLabel=""/>
+                            <f:selectItems value="#{accGroupBean.getAccGroupsByType(accCoa.accTypeId)}" var="g" itemLabel="#{g.accGroupName}" itemValue="#{g.accGroupId}"/>
+                            <p:ajax event="change" listener="#{accCoaBean.setAccCoaCode(accGroupBean.getAccGroupById(accCoa.accGroupId).groupCode, accCoa)}" process="@this" update="dtlGroupHidden dtlCategory dtlAccountCode accountCode"/>
+                        </p:selectOneMenu>
+
+                        <h:outputLabel value="#{langsys['Category']}:"/>
+                        <p:selectOneMenu id="dtlCategory" value="#{accCoa.accCategoryId}" style="width: 305px" disabled="#{accCoa.accCoaId>0}">
+                            <f:selectItem itemValue="" itemLabel=""/>
+                            <f:selectItems value="#{accCategoryBean.getAccCategoriesByGroup(accCoa.accGroupId)}" var="c" itemLabel="#{c.accCategoryName}" itemValue="#{c.accCategoryId}"/>
+                            <p:ajax event="change" listener="#{accCoaBean.setAccCoaCode(accCategoryBean.getAccCategoryById(accCoa.accCategoryId).categoryCode, accCoa)}" process="@this" update="dtlCategoryHidden dtlAccountCode accountCode takenAccountCode"/>
+                        </p:selectOneMenu>
+
+                        <h:outputLabel value="#{langsys['Existing']} #{langsys['Account']} #{langsys['Code']}:" rendered="#{accCoa.accCoaId==0}"/>
+                        <p:selectOneMenu id="takenAccountCode" style="width: 305px" rendered="#{accCoa.accCoaId==0}">
+                            <f:selectItem itemValue="" itemLabel=""/>
+                            <f:selectItems value="#{accCoaBean.getAccsByCategory(accCoa.accCategoryId)}" var="tac" itemLabel="#{tac.accountCode} #{tac.accountName}" itemValue="#{tac.accountCode}"/>
+                        </p:selectOneMenu>
+                        
+                        <h:outputLabel value="#{langsys['Account']} #{langsys['Code']}:" rendered="#{accCoa.accCoaId gt 0}"/>
+                        <p:inputText style="width: 320px" value="#{accCoa.accountCode}" autocomplete="off" maxlength="12" rendered="#{accCoa.accCoaId gt 0}" readonly="true" />
+
+                        <h:outputLabel value="#{langsys['Account']} #{langsys['Code']}:" rendered="#{accCoa.accCoaId==0}"/>
+                        <h:panelGrid columns="2" rendered="#{accCoa.accCoaId==0}">
+                            <p:inputText id="accountCode" style="width: 80px" value="#{accCoaBean.accountCode}" autocomplete="off" maxlength="3" size="3" placeholder="e.g 101" rendered="#{accCoa.accCoaId==0}" readonly="#{accCoa.accTypeId==0 or accCoa.accGroupId==0 or accCoa.accCategoryId==0 or accCoa.accountCode.length() lt 8}">
+                                <p:ajax event="change" listener="#{accCoaBean.setAccCoaCode(accCoa)}" process="@this" update="dtlAccountCode formReport:cmdbSave formReport:growl1"/>
+                            </p:inputText>
+                            <p:inputText id="dtlAccountCode" style="width: 220px" value="#{accCoa.accountCode}" autocomplete="off" maxlength="12" readonly="true" />
+                        </h:panelGrid>
+                        
+                        <h:outputLabel value="#{langsys['Account']} #{langsys['Name']}:"/>
+                        <p:inputText style="width: 320px" value="#{accCoa.accountName}" autocomplete="off">
+                            <p:ajax event="change" process="@this" update="formReport:cmdbSave"/>
+                        </p:inputText>
+
+                        <h:outputLabel value="#{langsys['Is']} #{langsys['Active']}:"/>
+                        <p:selectOneMenu id="dtlActive" value="#{accCoa.isActive}" style="width: 40px">
+                            <f:selectItem itemValue="1" itemLabel="YES"/>
+                            <f:selectItem itemValue="0" itemLabel="NO"/>
+                        </p:selectOneMenu> 
+
+                        <p:inputText value="#{accCoa.accCoaId}" type="hidden" />
+                        <p:inputText id="dtlTypeHidden" value="#{accCoa.accTypeId}" type="hidden" disabled="#{accCoa.accCoaId==0}" />
+                        <p:inputText id="dtlGroupHidden" value="#{accCoa.accGroupId}" type="hidden" disabled="#{accCoa.accCoaId==0}" />
+                        <p:inputText id="dtlCategoryHidden" value="#{accCoa.accCategoryId}" type="hidden" disabled="#{accCoa.accCoaId==0}" />
+                    </h:panelGrid>
+
+                    <!--<h:panelGrid styleClass="clsGridMainCommands" columns="1">-->
+                    <h:panelGrid style="background-color: #00B461" width="100%" columns="1">
+                        <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
+                            <p:commandButton id="cmdbSave"  update="formReport:tblDetail formReport:popup formReport:growl1" actionListener="#{accCoaBean.saveAccCoa(accCoa)}" styleClass="clsButtonBig" value="#{langsys['SAVE']}" disabled="#{accCoa.accountCode.length() lt 12 or accCoa.accountName.length() lt 1}" style="color: white; background-color: #00B259" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                                <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                                    <p:graphicImage name="/images/ajax-loader.gif"/>
+                                </p:dialog>
+                            </p:commandButton>
+                            <p:commandButton update="formReport:popup" actionListener="#{accCoaBean.clearAccCoa(accCoa)}" styleClass="clsButtonBig" id="cmdbClear" value="#{langsys['CLEAR']}" style="color: white; background-color: #FF0000">
+                            </p:commandButton>
+                        </h:panelGrid>
+                    </h:panelGrid>
+
+                    <h:panelGrid styleClass="clsGridMainMessages" columns="1">
+                        <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{accCoaBean.actionMessage}"/>
+                        <h:messages id="msgsMainMessage" style="color: red"/><br/>
+                    </h:panelGrid>
+                    <p:growl id="growl1"/>
+
+                </h:panelGroup>
+            </p:dialog>
         </h:form>
     </h:body>
 </html>

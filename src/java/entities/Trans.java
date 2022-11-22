@@ -69,6 +69,8 @@ public class Trans implements Serializable {
     private double TotalExemptVatableAmount;
     private double TotalDeemedVatableAmount;
     private double TotalDeemedVat;
+    private double TotalExciseDutableAmount;
+    private double TotalExciseDutyTaxAmount;
     private double VatPerc;
     private String IsCashDiscountVatLiable;
     //for report
@@ -160,6 +162,7 @@ public class Trans implements Serializable {
     private int mode_code;
     private List<Item> TransItemsList;
     private List<TransItem> aTransItemsDetailsList;
+
     /**
      * @return the TransactionId
      */
@@ -2006,5 +2009,33 @@ public class Trans implements Serializable {
      */
     public void setaTransItemsDetailsList(List<TransItem> aTransItemsDetailsList) {
         this.aTransItemsDetailsList = aTransItemsDetailsList;
+    }
+
+    /**
+     * @return the TotalExciseDutyTaxAmount
+     */
+    public double getTotalExciseDutyTaxAmount() {
+        return TotalExciseDutyTaxAmount;
+    }
+
+    /**
+     * @param TotalExciseDutyTaxAmount the TotalExciseDutyTaxAmount to set
+     */
+    public void setTotalExciseDutyTaxAmount(double TotalExciseDutyTaxAmount) {
+        this.TotalExciseDutyTaxAmount = TotalExciseDutyTaxAmount;
+    }
+
+    /**
+     * @return the TotalExciseDutableAmount
+     */
+    public double getTotalExciseDutableAmount() {
+        return TotalExciseDutableAmount;
+    }
+
+    /**
+     * @param TotalExciseDutableAmount the TotalExciseDutableAmount to set
+     */
+    public void setTotalExciseDutableAmount(double TotalExciseDutableAmount) {
+        this.TotalExciseDutableAmount = TotalExciseDutableAmount;
     }
 }

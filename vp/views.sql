@@ -675,3 +675,11 @@ UNION
 SELECT loyalty_transaction_id as transaction_smbi_map_id, loyalty_transaction_id as transaction_id,1010 as transaction_type_id,1010 as transaction_reason_id, 
 card_number as transaction_number,add_date,status_sync,status_date,status_desc, 'LOYALTY' as transaction_type_name 
 FROM loyalty_transaction;
+
+CREATE OR REPLACE VIEW view_sales_invoice_detail AS 
+SELECT t.*,ifnull(ted.tax_amount,0) as TotalExciseDutyTaxAmount 
+FROM transaction t LEFT JOIN 
+(
+	SELECT tt.transaction_id,SUM(tt.taxable_amount) as taxable_amount,SUM(tt.tax_amount) as tax_amount FROM transaction_tax tt WHERE  tt.tax_category='Excise Duty' GROUP BY tt.transaction_id
+) ted ON t.transaction_id=ted.transaction_id 
+WHERE t.transaction_type_id IN(2,65,68);

@@ -203,7 +203,7 @@
                     <p:commandButton id="cmdbEdit" icon="fa fa-fw fa-edit" title="#{langsys['Edit']}" value="#{langsys['Edit']}" style="width: 120px;height: 55px;float: left;">
                         <p:ajax listener="#{transBean.quickOrderActions(trans,transBean.transList,'Edit')}" process="@form" update="dtblTransList growl1"/>
                     </p:commandButton>
-                      <p:commandButton id="cmdbSplit" icon="fa fa-fw fa-columns" title="#{langsys['Split']}" value="#{langsys['Split']}" style="width: 120px;height: 55px;float: left;">
+                    <p:commandButton id="cmdbSplit" icon="fa fa-fw fa-columns" title="#{langsys['Split']}" value="#{langsys['Split']}" style="width: 120px;height: 55px;float: left;">
                         <p:ajax listener="#{transBean.quickOrderActions(trans,transBean.transList,'Split')}"
                                 process="@form"  update="TransactionFormSales:dtblFirstTransactionItem  dtblTransactionItem TransactionFormSales:dtblTransList dtblTransList growl1"/>
                     </p:commandButton>
@@ -291,7 +291,7 @@
                 <p:graphicImage name="/images/ajax-loader.gif"/>
             </p:dialog>
 
-            <p:sidebar widgetVar="sbarReviewOrder" position="bottom" baseZIndex="10000" style="height: 600px;">
+            <p:sidebar widgetVar="sbarReviewOrder" position="bottom" baseZIndex="10000" style="height: 600px; overflow-y:scroll;">
                 <h:panelGrid id="pnlgReviewOrder" columns="1" style=" background-color: #DEDEDE;width: 100%;">
                     <h1 style="font-weight:bolder">#{langsys['SPLIT']} #{langsys['ORDER']}</h1>
                 </h:panelGrid>
@@ -304,7 +304,7 @@
                     <h:panelGrid columns="1" style=" margin-left: 100px;">
 
                         <p:dataTable var="itemdf" id="dtblFirstTransactionItem"  rowIndexVar="rowIndex"  value="#{transBean.transItemList}"
-                                     selection="#{transBean.selectedTransItem}" rowKey="#{itemdf.itemId}" selectionMode="single"
+                                     selection="#{transBean.selectedTransItem}" rowKey="#{itemdf.transactionItemId}" selectionMode="single"
                                      tableStyle="width:500px;">  
                             <p:ajax event="rowSelect" listener="#{transBean.onRowSelect}"
                                     process="@form" update="TransactionFormSales:dtblTransactionItem TransactionFormSales:pnlSaveBtn TransactionFormSales:pgrdTotals  TransactionFormSales:dtblFirstTransactionItem"/>
@@ -329,6 +329,16 @@
 
                             <p:column>
                                 <!-- column header -->
+                                <f:facet name="header">#{langsys['Unit']}</f:facet>
+                                <!-- row record -->
+                                <h:outputLabel value="#{itemdf.unitSymbol}">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputLabel>
+                            </p:column>
+
+
+                            <p:column>
+                                <!-- column header -->
                                 <f:facet name="header">#{langsys['Amount']}</f:facet>
                                 <!-- row record -->
                                 <h:outputLabel value="#{itemdf.amountIncVat}">
@@ -342,7 +352,7 @@
                     <h:panelGrid columns="1">
 
                         <p:dataTable rowIndexVar="rowIndex" id="dtblTransactionItem" value="#{transBean.selectedTransItemsList}" var="sItem" 
-                                     styleClass="cls-table" tableStyle="width:700px" rowStyleClass="selecteItemRowStyle">  
+                                     styleClass="cls-table" tableStyle="width:700px; background-color:green" rowStyleClass="background-color:green">  
                             <f:facet name="header">
                                 <h:outputLabel value="#{'Split'} #{'Order'}"/>
                             </f:facet>
@@ -364,6 +374,9 @@
                             <p:column>
                                 <!-- column header -->
                                 <f:facet name="header">#{langsys['Qty']}</f:facet>
+                                <h:commandButton id="cmdbAddQty" value="+" style="width: 30px;">
+                                    <p:ajax listener="#{transBean._addQtyTransItemCEC(generalUserSetting.currentTransactionTypeId, generalUserSetting.currentTransactionReasonId,transBean.newTransAtSplit, transBean.selectedTransItemsList,sItem)}" process="@form" update="dtblTransactionItem TransactionFormSales:pnlSaveBtn TransactionFormSales:dtblFirstTransactionItem TransactionFormSales:pgrdTotals"/>
+                                </h:commandButton>
                                 <!-- row record -->
                                 <h:inputText value="#{sItem.itemQty}" style="width: 30px;">
                                     <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
@@ -374,6 +387,15 @@
                                     <p:ajax listener="#{transBean._subtractQtyTransItemCEC(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,transBean.newTransAtSplit,transBean.selectedTransItemsList,sItem)}" 
                                             process="@form" update="dtblTransactionItem TransactionFormSales:pnlSaveBtn TransactionFormSales:dtblFirstTransactionItem TransactionFormSales:pgrdTotals"/>
                                 </h:commandButton>
+                            </p:column>
+
+                            <p:column>
+                                <!-- column header -->
+                                <f:facet name="header">#{langsys['Unit']}</f:facet>
+                                <!-- row record -->
+                                <h:outputLabel value="#{sItem.unitSymbol}">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputLabel>
                             </p:column>
 
                             <p:column>
@@ -445,8 +467,6 @@
                                   process="@form" update="TransactionFormSales:dtblTransList TransactionFormSales:pnlgMessage pnlHeader frmMenu growl1"/>
                     </p:commandButton>
                 </h:panelGrid>
-
-
             </p:sidebar>
         </h:form>
     </h:body>

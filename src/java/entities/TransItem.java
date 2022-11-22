@@ -130,6 +130,8 @@ public class TransItem implements Serializable {
     private Item_unit Item_unitObj;
     private String transactionPackageNumber;
     private long transactionPackageId;
+    private long transactionPackageItemId;
+    private Transaction_item_excise TransItemExciseObj = new Transaction_item_excise();
 
     /**
      * @return the TransactionItemId
@@ -1585,6 +1587,34 @@ public class TransItem implements Serializable {
      */
     public void setTransactionPackageId(long transactionPackageId) {
         this.transactionPackageId = transactionPackageId;
+    }
+
+    /**
+     * @return the TransItemExciseObj
+     */
+    public Transaction_item_excise getTransItemExciseObj() {
+        return TransItemExciseObj;
+    }
+
+    /**
+     * @param TransItemExciseObj the TransItemExciseObj to set
+     */
+    public void setTransItemExciseObj(Transaction_item_excise TransItemExciseObj) {
+        this.TransItemExciseObj = TransItemExciseObj;
+    }
+
+    /**
+     * @return the transactionPackageItemId
+     */
+    public long getTransactionPackageItemId() {
+        return transactionPackageItemId;
+    }
+
+    /**
+     * @param transactionPackageItemId the transactionPackageItemId to set
+     */
+    public void setTransactionPackageItemId(long transactionPackageItemId) {
+        this.transactionPackageItemId = transactionPackageItemId;
     }
 
 }

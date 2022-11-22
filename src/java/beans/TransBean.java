@@ -35,8 +35,10 @@ import entities.Stock;
 import entities.Stock_out;
 import entities.Store;
 import entities.Trans;
+import entities.TransactionPackage;
 import entities.TransactionReason;
 import entities.Transaction_approval;
+import entities.Transaction_tax;
 import entities.Transaction_tax_map;
 import java.io.Serializable;
 import java.sql.CallableStatement;
@@ -788,6 +790,7 @@ public class TransBean implements Serializable {
                     }
                 }
             }
+            String vExcise = new TransItemExtBean().validateExciseDuty(aTransTypeId, aActiveTransItems);
             UserDetail aCurrentUserDetail = new GeneralUserSetting().getCurrentUser();
             List<GroupRight> aCurrentGroupRights = new GeneralUserSetting().getCurrentGroupRights();
             GroupRightBean grb = new GroupRightBean();
@@ -919,6 +922,8 @@ public class TransBean implements Serializable {
                 msg = MsgCkeckApproval;
             } else if (trans.getTransactionId() == 0 && new Transaction_approvalBean().approvalRequiredTrans(trans, aTransTypeId, aTransReasonId) == 1) {
                 msg = "Send this Transaction for Approval";
+            } else if (vExcise.length() > 0) {
+                msg = vExcise;
             }
             /*else if (trans.getTransactionId() > 0 && new TransItemBean().countItemsWithQtyChanged(new TransItemBean().getTransItemListCurLessPrevQty(aActiveTransItems, trans), transtype.getTransactionTypeName()) == 0) {
              msg = "Cannot Save where Item Qty has Not Changed";
@@ -1567,6 +1572,9 @@ public class TransBean implements Serializable {
         trans.setChangeAmount(this.getChangeAmount(trans));
         //get some details
         String OrderTransNo = trans.getTransactionRef();
+
+        String PackaginTransNo = trans.getTransactionNumber();
+        trans.setTransactionNumber("");
         //save
         this.saveTransCECNew(aLevel, aStoreId, aTransTypeId, aTransReasonId, aSaleType, trans, aActiveTransItems, aSelectedTransactor, aSelectedBillTransactor, aTransUserDetail, aSelectedSchemeTransactor, aAuthorisedByUserDetail, aSelectedAccCoa);
         //update a few things needed after sales invoice saving
@@ -1584,6 +1592,11 @@ public class TransBean implements Serializable {
             } else if (trans.getAmountTendered() > 0 && trans.getAmountTendered() < trans.getGrandTotal()) {
                 this.updateOrderStatus(OrderTrans.getTransactionId(), "is_paid", 2);
             }
+        }
+        //added by david to update transaction package table after selling a package
+        trans = this.getTransByTransNumber(PackaginTransNo);
+        if (PackaginTransNo.startsWith("PCG")) {
+            new TransactionPackageBean().updatePackageStatus(trans.getTransactionId(), 2, trans, null);//package sold
         }
     }
 
@@ -2181,6 +2194,11 @@ public class TransBean implements Serializable {
                             DeleteInserted = 1;
                         }
                         if (DeleteInserted == 0 && InsertedTransItems == aActiveTransItems.size()) {
+                            //insert transaction taxes summary
+                            if ("SALE INVOICE".equals(transtype.getTransactionTypeName()) && trans.getTotalExciseDutyTaxAmount() > 0) {
+                                trans.setVatPerc(CompanySetting.getVatPerc());
+                                int ed = new TransExtBean().insertTransTaxes(trans, aActiveTransItems);
+                            }
                             //SMbi API insert PointsTransaction for both the awarded and spent points to the stage area
                             String scope = new Parameter_listBean().getParameter_listByContextNameMemory("API", "API_SMBI_SCOPE").getParameter_value();
                             if (scope.isEmpty() || scope.contains("LOYALTY")) {
@@ -2196,14 +2214,18 @@ public class TransBean implements Serializable {
                     }
                     if (DeleteInserted == 1) {
                         //delete inserted
-                        int deleted1 = new TransItemBean().deleteTransItemsCEC(trans.getTransactionId());
+                        int deleted1 = new TransItemExtBean().deleteTransItemExciseByTransId(trans.getTransactionId());
                         int deleted2 = 0;
                         int deleted3 = 0;
+                        int deleted4 = 0;
                         if (deleted1 == 1) {
                             deleted2 = new TransItemExtBean().deleteTransItemsUnitByTransId(trans.getTransactionId());
                         }
                         if (deleted2 == 1) {
-                            deleted3 = this.deleteTransCEC(trans.getTransactionId());
+                            deleted3 = new TransItemBean().deleteTransItemsCEC(trans.getTransactionId());
+                        }
+                        if (deleted3 == 1) {
+                            deleted4 = this.deleteTransCEC(trans.getTransactionId());
                         }
                         //display msg
                         switch (aLevel) {
@@ -2353,6 +2375,22 @@ public class TransBean implements Serializable {
                     List<TransItem> tis = new TransItemBean().getTransItemsByTransactionId(t.getTransactionId());
                     TransactionType tt = new TransactionTypeBean().getTransactionType(t.getTransactionTypeId());
                     TransactionReason tr = new TransactionReasonBean().getTransactionReason(t.getTransactionReasonId());
+                    try {
+                        if (tt.getTransactionTypeId() == 2) {
+                            Transaction_tax ttax = new TransExtBean().getTransTaxByCategory(t.getTransactionId(), "Excise Duty");
+                            if (null != ttax) {
+                                t.setTotalExciseDutyTaxAmount(ttax.getTax_amount());
+                                t.setTotalExciseDutableAmount(ttax.getTaxable_amount());
+                            }
+                        }
+                    } catch (Exception e) {
+                    }
+                    try {
+                        if (tt.getTransactionTypeId() == 2) {
+                            new TransItemExtBean().setTransaction_item_exciseListByTransItem(tis);
+                        }
+                    } catch (Exception e) {
+                    }
                     try {
                         new TransItemBean().adjustStockForTransItems(t, tis);
                     } catch (Exception e) {
@@ -5221,6 +5259,7 @@ public class TransBean implements Serializable {
             if (TransHistId > 0) {
                 this.setTransFromHist(aTrans, TransHistId);
                 new TransItemBean().setTransItemsFromHist(aActiveTransItems, TransHistId);
+                this.setTransTotalsAndUpdateCEC(aTrans.getTransactionTypeId(), aTrans.getTransactionReasonId(), aTrans, aActiveTransItems);
                 try {
                     if (aTrans.getTransactorId() > 0) {
                         aTransactorBean.setSelectedTransactor(new TransactorBean().getTransactor(aTrans.getTransactorId()));
@@ -7073,122 +7112,122 @@ public class TransBean implements Serializable {
 
             try {
                 trans.setStore2Id(aResultSet.getInt("store2_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setStore2Id(0);
             }
             try {
                 trans.setTransactorId(aResultSet.getLong("transactor_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setTransactorId(0);
             }
             try {
                 trans.setTransactionTypeId(aResultSet.getInt("transaction_type_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setTransactionTypeId(0);
             }
             try {
                 trans.setTransactionReasonId(aResultSet.getInt("transaction_reason_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setTransactionReasonId(0);
             }
             try {
                 trans.setSubTotal(aResultSet.getDouble("sub_total"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setSubTotal(0);
             }
             try {
                 trans.setTotalTradeDiscount(aResultSet.getDouble("total_trade_discount"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setTotalTradeDiscount(0);
             }
             try {
                 trans.setTotalVat(aResultSet.getDouble("total_vat"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setTotalVat(0);
             }
             try {
                 trans.setCashDiscount(aResultSet.getDouble("cash_discount"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setCashDiscount(0);
             }
             try {
                 trans.setGrandTotal(aResultSet.getDouble("grand_total"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setGrandTotal(0);
             }
             try {
                 trans.setTransactionRef(aResultSet.getString("transaction_ref"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setTransactionRef("");
             }
             try {
                 trans.setTransactionComment(aResultSet.getString("transaction_comment"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setTransactionComment("");
             }
             try {
                 trans.setAddUserDetailId(aResultSet.getInt("add_user_detail_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setAddUserDetailId(0);
             }
             try {
                 trans.setAddDate(new Date(aResultSet.getTimestamp("add_date").getTime()));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setAddDate(null);
             }
             try {
                 trans.setEditUserDetailId(aResultSet.getInt("edit_user_detail_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setEditUserDetailId(0);
             }
             try {
                 trans.setEditDate(new Date(aResultSet.getTimestamp("edit_date").getTime()));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setEditDate(null);
             }
             try {
                 trans.setPointsAwarded(aResultSet.getDouble("points_awarded"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setPointsAwarded(0);
             }
             try {
                 trans.setCardNumber(aResultSet.getString("card_number"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setCardNumber("");
             }
             try {
                 trans.setTotalStdVatableAmount(aResultSet.getDouble("total_std_vatable_amount"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setTotalStdVatableAmount(0);
             }
             try {
                 trans.setTotalZeroVatableAmount(aResultSet.getDouble("total_zero_vatable_amount"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setTotalZeroVatableAmount(0);
             }
             try {
                 trans.setTotalExemptVatableAmount(aResultSet.getDouble("total_exempt_vatable_amount"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setTotalExemptVatableAmount(0);
             }
             try {
                 trans.setVatPerc(aResultSet.getDouble("vat_perc"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setVatPerc(0);
             }
             try {
                 trans.setAmountTendered(aResultSet.getDouble("amount_tendered"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setAmountTendered(0);
             }
             try {
                 trans.setChangeAmount(aResultSet.getDouble("change_amount"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setChangeAmount(0);
             }
             try {
                 trans.setIsCashDiscountVatLiable(aResultSet.getString("is_cash_discount_vat_liable"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setIsCashDiscountVatLiable("");
             }
 
@@ -7231,31 +7270,31 @@ public class TransBean implements Serializable {
 
             try {
                 trans.setTotalProfitMargin(aResultSet.getDouble("total_profit_margin"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setTotalProfitMargin(0);
             }
 
             try {
                 trans.setTransactionUserDetailId(aResultSet.getInt("transaction_user_detail_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setTransactionUserDetailId(0);
             }
 
             try {
                 trans.setBillTransactorId(aResultSet.getLong("bill_transactor_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setBillTransactorId(0);
             }
 
             try {
                 trans.setSchemeTransactorId(aResultSet.getLong("scheme_transactor_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setSchemeTransactorId(0);
             }
 
             try {
                 trans.setPrincSchemeMember(aResultSet.getString("princ_scheme_member"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setPrincSchemeMember("");
             }
 
@@ -7322,42 +7361,42 @@ public class TransBean implements Serializable {
             }
             try {
                 trans.setFrom_date(new Date(aResultSet.getDate("from_date").getTime()));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setFrom_date(null);
             }
             try {
                 trans.setTo_date(new Date(aResultSet.getDate("to_date").getTime()));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setTo_date(null);
             }
             try {
                 trans.setDuration_type(aResultSet.getString("duration_type"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setDuration_type("");
             }
             try {
                 trans.setSite_id(aResultSet.getLong("site_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setSite_id(0);
             }
             try {
                 trans.setTransactor_rep(aResultSet.getString("transactor_rep"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setTransactor_rep("");
             }
             try {
                 trans.setTransactor_vehicle(aResultSet.getString("transactor_vehicle"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setTransactor_vehicle("");
             }
             try {
                 trans.setTransactor_driver(aResultSet.getString("transactor_driver"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setTransactor_driver("");
             }
             try {
                 trans.setDuration_value(aResultSet.getDouble("duration_value"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setDuration_value(0);
             }
             try {
@@ -7367,7 +7406,7 @@ public class TransBean implements Serializable {
             }
             try {
                 trans.setLocation_id(aResultSet.getLong("location_id"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setLocation_id(0);
             }
             if (null == aResultSet.getString("status_code")) {
@@ -7377,7 +7416,7 @@ public class TransBean implements Serializable {
             }
             try {
                 trans.setStatus_date(new Date(aResultSet.getTimestamp("status_date").getTime()));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setStatus_date(null);
             }
             if (null == aResultSet.getString("delivery_mode")) {
@@ -7387,32 +7426,32 @@ public class TransBean implements Serializable {
             }
             try {
                 trans.setIs_processed(aResultSet.getInt("is_processed"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setIs_processed(0);
             }
             try {
                 trans.setIs_paid(aResultSet.getInt("is_paid"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setIs_paid(0);
             }
             try {
                 trans.setIs_cancel(aResultSet.getInt("is_cancel"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setIs_cancel(0);
             }
             try {
                 trans.setIs_invoiced(aResultSet.getInt("is_invoiced"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setIs_invoiced(0);
             }
             try {
                 trans.setIs_delivered(aResultSet.getInt("is_delivered"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setIs_delivered(0);
             }
             try {
                 trans.setSource_code(aResultSet.getString("source_code"));
-            } catch (NullPointerException npe) {
+            } catch (Exception e) {
                 trans.setSource_code("");
             }
             try {
@@ -8004,6 +8043,8 @@ public class TransBean implements Serializable {
             //others
             trans.setShift_id(0);
             trans.setMode_code(0);
+            trans.setTotalExciseDutyTaxAmount(0);
+            trans.setTotalExciseDutableAmount(0);
         }
     }
 
@@ -10589,6 +10630,8 @@ public class TransBean implements Serializable {
         aTrans.setTotalZeroVatableAmount(this.getTotalZeroVatableAmountCEC(aTrans, aTransTypeId, aTransReasonId, aActiveTransItems));
         aTrans.setTotalExemptVatableAmount(this.getTotalExemptVatableAmountCEC(aTrans, aTransTypeId, aTransReasonId, aActiveTransItems));
         aTrans.setTotalVat(this.getTotalVatCEC(aTrans, aActiveTransItems));
+        aTrans.setTotalExciseDutableAmount(this.getTotalExciseDutableAmount(aTrans, aTransTypeId, aTransReasonId, aActiveTransItems));
+        aTrans.setTotalExciseDutyTaxAmount(this.getTotalExciseDutyTaxAmount(aTrans, aTransTypeId, aTransReasonId, aActiveTransItems));
         aTrans.setGrandTotal(this.getGrandTotalCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems));
         if (aTransTypeId == 19) {//EXPENSE ENTRY
             aTrans.setAmountTendered(aTrans.getGrandTotal());
@@ -10845,6 +10888,23 @@ public class TransBean implements Serializable {
         }
         TVat = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), TVat, "TOTAL_OTHER");
         return TVat;
+    }
+
+    public double getTotalExciseDutyTaxAmount(Trans aTrans, int aTransTypeId, int aTransReasonId, List<TransItem> aActiveTransItems) {
+        double TED = 0;
+        TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
+        TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
+        if ("SALE QUOTATION".equals(transtype.getTransactionTypeName()) || "SALE ORDER".equals(transtype.getTransactionTypeName()) || "SALE INVOICE".equals(transtype.getTransactionTypeName()) || "PURCHASE INVOICE".equals(transtype.getTransactionTypeName()) || "PURCHASE ORDER".equals(transtype.getTransactionTypeName()) || "EXPENSE ENTRY".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE RETURN INVOICE".equals(transtype.getTransactionTypeName())) {
+            List<TransItem> ati = aActiveTransItems;
+            int ListItemIndex = 0;
+            int ListItemNo = ati.size();
+            while (ListItemIndex < ListItemNo) {
+                TED = TED + ati.get(ListItemIndex).getTransItemExciseObj().getCalc_excise_tax_amount();
+                ListItemIndex = ListItemIndex + 1;
+            }
+            TED = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), TED, "TOTAL_OTHER");
+        }
+        return TED;
     }
 
     public void resetPurchaseItemsUnitVAT(List<TransItem> aActiveTransItems) {
@@ -11176,6 +11236,27 @@ public class TransBean implements Serializable {
             }
         }
         return GTotalStdVatableAmount;
+    }
+
+    public double getTotalExciseDutableAmount(Trans aTrans, int aTransTypeId, int aTransReasonId, List<TransItem> aActiveTransItems) {
+        TransactionType transtype = new TransactionTypeBean().getTransactionType(aTransTypeId);
+        TransactionReason transreason = new TransactionReasonBean().getTransactionReason(aTransReasonId);
+        double TotalExciseDutableAmount = 0;
+        List<TransItem> ati = aActiveTransItems;
+
+        int ListItemIndex = 0;
+        int ListItemNo = ati.size();
+        TotalExciseDutableAmount = 0;
+        if ("SALE QUOTATION".equals(transtype.getTransactionTypeName()) || "SALE ORDER".equals(transtype.getTransactionTypeName()) || "SALE INVOICE".equals(transtype.getTransactionTypeName()) || "PURCHASE INVOICE".equals(transtype.getTransactionTypeName()) || "PURCHASE ORDER".equals(transtype.getTransactionTypeName()) || "EXPENSE ENTRY".equals(transtype.getTransactionTypeName()) || "HIRE INVOICE".equals(transtype.getTransactionTypeName()) || "HIRE RETURN INVOICE".equals(transtype.getTransactionTypeName())) {
+            while (ListItemIndex < ListItemNo) {
+                if (ati.get(ListItemIndex).getTransItemExciseObj().getCalc_excise_tax_amount() > 0) {
+                    TotalExciseDutableAmount = TotalExciseDutableAmount + ati.get(ListItemIndex).getAmountExcVat();
+                }
+                ListItemIndex = ListItemIndex + 1;
+            }
+        }
+        TotalExciseDutableAmount = (double) new AccCurrencyBean().roundAmount(aTrans.getCurrencyCode(), TotalExciseDutableAmount, "TOTAL_OTHER");
+        return TotalExciseDutableAmount;
     }
 
     public double getTotalStdVatableAmountCEC(Trans aTrans, int aTransTypeId, int aTransReasonId, List<TransItem> aActiveTransItems) {
@@ -11726,12 +11807,15 @@ public class TransBean implements Serializable {
             aTransBean.setActionMessage(ub.translateWordsInText(BaseName, msg));
             FacesContext.getCurrentInstance().addMessage("Report", new FacesMessage(ub.translateWordsInText(BaseName, msg)));
         } else {
-            String sql = "SELECT * FROM transaction WHERE transaction_type_id IN(2,65,68)";
+            //String sql = "SELECT * FROM transaction WHERE transaction_type_id IN(2,65,68)";
+            String sql = "SELECT * FROM view_sales_invoice_detail WHERE transaction_type_id IN(2,65,68)";
             String sqlsum = "";
             if (aTransBean.getFieldName().length() > 0) {
-                sqlsum = "SELECT " + aTransBean.getFieldName() + ",currency_code,sum(grand_total) as grand_total,sum(total_profit_margin) as total_profit_margin,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount,sum(spent_points_amount) as spent_points_amount FROM transaction WHERE transaction_type_id IN(2,65,68)";
+                //sqlsum = "SELECT " + aTransBean.getFieldName() + ",currency_code,sum(grand_total) as grand_total,sum(total_profit_margin) as total_profit_margin,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount,sum(spent_points_amount) as spent_points_amount FROM transaction WHERE transaction_type_id IN(2,65,68)";
+                sqlsum = "SELECT " + aTransBean.getFieldName() + ",currency_code,sum(grand_total) as grand_total,sum(total_profit_margin) as total_profit_margin,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount,sum(spent_points_amount) as spent_points_amount,sum(TotalExciseDutyTaxAmount) as TotalExciseDutyTaxAmount FROM view_sales_invoice_detail WHERE transaction_type_id IN(2,65,68)";
             } else {
-                sqlsum = "SELECT currency_code,sum(grand_total) as grand_total,sum(total_profit_margin) as total_profit_margin,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount,sum(spent_points_amount) as spent_points_amount FROM transaction WHERE transaction_type_id IN(2,65,68)";
+                //sqlsum = "SELECT currency_code,sum(grand_total) as grand_total,sum(total_profit_margin) as total_profit_margin,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount,sum(spent_points_amount) as spent_points_amount FROM transaction WHERE transaction_type_id IN(2,65,68)";
+                sqlsum = "SELECT currency_code,sum(grand_total) as grand_total,sum(total_profit_margin) as total_profit_margin,sum(total_vat) as total_vat,sum(cash_discount) as cash_discount,sum(spent_points_amount) as spent_points_amount,sum(TotalExciseDutyTaxAmount) as TotalExciseDutyTaxAmount FROM view_sales_invoice_detail WHERE transaction_type_id IN(2,65,68)";
             }
             String wheresql = "";
             String ordersql = "";
@@ -11786,6 +11870,7 @@ public class TransBean implements Serializable {
                     PreparedStatement ps = conn.prepareStatement(sql);) {
                 rs = ps.executeQuery();
                 Trans trans = null;
+                TransExtBean teb = new TransExtBean();
                 while (rs.next()) {
                     trans = new Trans();
                     this.setTransFromResultset(trans, rs);
@@ -11797,6 +11882,10 @@ public class TransBean implements Serializable {
                         trans.setIs_paid(2);
                     } else {
                         trans.setIs_paid(0);
+                    }
+                    try {
+                        trans.setTotalExciseDutyTaxAmount(rs.getDouble("TotalExciseDutyTaxAmount"));
+                    } catch (Exception e) {
                     }
                     this.TransList.add(trans);
                 }
@@ -11816,28 +11905,28 @@ public class TransBean implements Serializable {
                             case "add_user_detail_id":
                                 try {
                                     transsum.setAddUserDetailId(rs.getInt("add_user_detail_id"));
-                                } catch (NullPointerException npe) {
+                                } catch (Exception e) {
                                     transsum.setAddUserDetailId(0);
                                 }
                                 break;
                             case "transaction_user_detail_id":
                                 try {
                                     transsum.setTransactionUserDetailId(rs.getInt("transaction_user_detail_id"));
-                                } catch (NullPointerException npe) {
+                                } catch (Exception e) {
                                     transsum.setTransactionUserDetailId(0);
                                 }
                                 break;
                             case "bill_transactor_id":
                                 try {
                                     transsum.setBillTransactorId(rs.getLong("bill_transactor_id"));
-                                } catch (NullPointerException npe) {
+                                } catch (Exception e) {
                                     transsum.setBillTransactorId(0);
                                 }
                                 break;
                             case "transactor_id":
                                 try {
                                     transsum.setTransactorId(rs.getLong("transactor_id"));
-                                } catch (NullPointerException npe) {
+                                } catch (Exception e) {
                                     transsum.setTransactorId(0);
                                 }
                                 break;
@@ -11853,7 +11942,7 @@ public class TransBean implements Serializable {
                                     transsum.setStoreId(rs.getInt("store_id"));
                                     Store st = new StoreBean().getStore(transsum.getStoreId());
                                     transsum.setStoreName(st.getStoreName());
-                                } catch (NullPointerException npe) {
+                                } catch (Exception e) {
                                     transsum.setStoreName("");
                                 }
                                 break;
@@ -11861,33 +11950,37 @@ public class TransBean implements Serializable {
                     }
                     try {
                         transsum.setCurrencyCode(rs.getString("currency_code"));
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         transsum.setCurrencyCode("");
                     }
                     try {
                         transsum.setGrandTotal(rs.getDouble("grand_total"));
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         transsum.setGrandTotal(0);
                     }
                     try {
                         transsum.setTotalProfitMargin(rs.getDouble("total_profit_margin"));
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         transsum.setTotalProfitMargin(0);
                     }
                     try {
                         transsum.setTotalVat(rs.getDouble("total_vat"));
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         transsum.setTotalVat(0);
                     }
                     try {
                         transsum.setCashDiscount(rs.getDouble("cash_discount"));
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         transsum.setCashDiscount(0);
                     }
                     try {
                         transsum.setSpendPointsAmount(rs.getDouble("spent_points_amount"));
-                    } catch (NullPointerException npe) {
+                    } catch (Exception e) {
                         transsum.setSpendPointsAmount(0);
+                    }
+                    try {
+                        transsum.setTotalExciseDutyTaxAmount(rs.getDouble("TotalExciseDutyTaxAmount"));
+                    } catch (Exception e) {
                     }
                     this.TransListSummary.add(transsum);
                 }
@@ -16452,7 +16545,6 @@ public class TransBean implements Serializable {
                 } else {
                     trans.setTransItemsString(tib.getTransItemsString(trans.getTransactionId(), 0));
                 }
-
                 this.TransList.add(trans);
             }
             //refresh summary total
@@ -17163,6 +17255,32 @@ public class TransBean implements Serializable {
         return totalAmount;
     }
 
+    public void setTransItemUnit(TransItem transitem) {
+        Item_unit iu = new ItemBean().getItemUnitFrmDb(transitem.getItemId(), transitem.getUnit_id());
+        String sql = "SELECT  ti.item_id, u.unit_id, u.unit_symbol, i.description\n"
+                + "FROM transaction_item ti \n"
+                + "INNER JOIN transaction_item_unit tiu ON ti.transaction_item_id = tiu.transaction_item_id\n"
+                + "INNER JOIN unit u ON tiu.unit_id = u.unit_id\n"
+                + "INNER JOIN item i ON ti.item_id = i.item_id\n"
+                + "Where tiu.transaction_item_id =" + transitem.getTransactionItemId();
+
+        ResultSet rs = null;
+        if (transitem.getTransactionItemId() > 0) {
+            try (
+                    Connection conn = DBConnection.getMySQLConnection();
+                    PreparedStatement ps = conn.prepareStatement(sql);) {
+                rs = ps.executeQuery();
+                while (rs.next()) {
+                    transitem.setUnitSymbol(rs.getString("unit_symbol"));
+                    transitem.setUnit_id(rs.getInt("unit_id"));
+                    transitem.setDescription(rs.getString("description"));
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, e);
+            }
+        }
+    }
+
     //by david for quick order split
     public void reviewViewOrderForSpliting(Trans aOrderTrans) {
         UtilityBean ub = new UtilityBean();
@@ -17171,6 +17289,7 @@ public class TransBean implements Serializable {
         Gson gson = new Gson();
         setTransObj(aOrderTrans);
         setNewTransAtSplit(aOrderTrans);
+        this.setActionMessage("");
 
         try {
             this.setOrderItemList(aOrderTrans.getTransItemsList());
@@ -17184,7 +17303,7 @@ public class TransBean implements Serializable {
                 return;
             }
             if (aOrderTrans.getIs_cancel() == 1) {
-                FacesContext.getCurrentInstance().addMessage("Retrieve PO", new FacesMessage(ub.translateWordsInText(BaseName, "This order is a canceled")));
+                FacesContext.getCurrentInstance().addMessage("Retrieve PO", new FacesMessage(ub.translateWordsInText(BaseName, "This order is canceled")));
                 return;
             }
             if (aOrderTrans.getIs_invoiced() == 1) {
@@ -17196,13 +17315,13 @@ public class TransBean implements Serializable {
             if ((this.getTransItemList() != null) && (this.getOrderItemList() != null)) {
                 if (this.getTransItemList().size() > 0) {
                     for (TransItem titm : this.getTransItemList()) {
-                        for (Item it : iL) {
-                            if (titm.getItemId() == (it.getItemId())) {
-                                titm.setDescription(it.getDescription());
-                                getOriginalTransItemJsonArray().add(new JsonParser().parse(gson.toJson(titm)).getAsJsonObject());
-                                getOriginalStaticTransItemJsonArray().add(new JsonParser().parse(gson.toJson(titm)).getAsJsonObject());
-                            }
-                        }
+                        // for (Item it : iL) {
+                        // if (titm.getItemId() == (it.getItemId())) {
+                        setTransItemUnit(titm);
+                        getOriginalTransItemJsonArray().add(new JsonParser().parse(gson.toJson(titm)).getAsJsonObject());
+                        getOriginalStaticTransItemJsonArray().add(new JsonParser().parse(gson.toJson(titm)).getAsJsonObject());
+                        //}
+                        //}
                     }
                     org.primefaces.PrimeFaces.current().executeScript("PF('sbarReviewOrder').show()");
                 }
@@ -17215,41 +17334,55 @@ public class TransBean implements Serializable {
 
     public void onRowSelect(SelectEvent event) {
         Gson gson = new Gson();
+        double originalValue = 0.0;
         boolean exists = true;
         try {
             TransItem tit = (TransItem) event.getObject();
             if (this.getSelectedTransItemsList() != null) {
                 if (this.getSelectedTransItemsList().size() > 0) {
                     for (TransItem t : this.getSelectedTransItemsList()) {
-                        if (t.getItemId() != tit.getItemId()) {
+                        if (t.getTransactionItemId() != tit.getTransactionItemId() && t.getUnit_id() != tit.getUnit_id()) {
                             exists = false;
                         }
                     }
                 } else {
+                    if (tit.getItemQty() > 0) {
+                        tit.setItemQty(0);
+                        this.getSelectedTransItemsList().add(tit);
+                        this.setTransTotalsAndUpdateCEC(getNewTransAtSplit().getTransactionTypeId(), getNewTransAtSplit().getTransactionReasonId(), getNewTransAtSplit(), this.getSelectedTransItemsList());
+                    }
+                }
+            }
+
+            if (!exists) {
+                if (tit.getItemQty() > 0) {
+                    tit.setItemQty(0);
                     this.getSelectedTransItemsList().add(tit);
                     this.setTransTotalsAndUpdateCEC(getNewTransAtSplit().getTransactionTypeId(), getNewTransAtSplit().getTransactionReasonId(), getNewTransAtSplit(), this.getSelectedTransItemsList());
                 }
             }
 
-            if (!exists) {
-                this.getSelectedTransItemsList().add(tit);
-                this.setTransTotalsAndUpdateCEC(getNewTransAtSplit().getTransactionTypeId(), getNewTransAtSplit().getTransactionReasonId(), getNewTransAtSplit(), this.getSelectedTransItemsList());
-            }
-
             //qty changes
             for (JsonElement transIt : this.getOriginalTransItemJsonArray()) {
                 JsonObject trans = transIt.getAsJsonObject();
-                if (tit.getItemId() == trans.get("ItemId").getAsLong()) {
-                    trans.addProperty("ItemQty", 0);//update value in the json arry
-                    trans.addProperty("AmountIncVat", 0);
-                    trans.addProperty("Amount", 0);
-                    trans.addProperty("AmountExcVat", 0);
+                if (tit.getTransactionItemId() == trans.get("TransactionItemId").getAsLong() && tit.getUnit_id() == trans.get("unit_id").getAsLong()) {
+                    new TransItemBean().addQtyTransItemCEC(getNewTransAtSplit().getTransactionTypeId(), getNewTransAtSplit().getTransactionReasonId(), getNewTransAtSplit(), getSelectedTransItemsList(), tit);
+                    originalValue = trans.get("ItemQty").getAsDouble();
+                    trans.addProperty("ItemQty", originalValue - 1);//update value in the json arry
+                    trans.addProperty("AmountIncVat", trans.get("AmountIncVat").getAsDouble() - tit.getUnitPriceIncVat());
+                    trans.addProperty("Amount", trans.get("Amount").getAsDouble() - tit.getUnitPrice());
+                    trans.addProperty("AmountExcVat", trans.get("AmountExcVat").getAsDouble() - tit.getUnitPriceExcVat());
                     transIt = gson.fromJson(trans.toString(), JsonElement.class);
+                    // this._addQtyTransItemCEC(getNewTransAtSplit().getTransactionTypeId(), getNewTransAtSplit().getTransactionReasonId(), getNewTransAtSplit(), getSelectedTransItemsList(), tit);
+
                 }
             }
             this.getTransItemList().clear();
             for (JsonElement transIt : this.getOriginalTransItemJsonArray()) {
                 TransItem itm = gson.fromJson(transIt, TransItem.class);
+                if (itm.getItemQty() < 0) {
+                    itm.setItemQty(0);
+                }
                 this.getTransItemList().add(itm);
             }
         } catch (Exception e) {
@@ -17257,21 +17390,57 @@ public class TransBean implements Serializable {
         }
     }
 
+    public void _addQtyTransItemCEC(int aTransTypeId, int aTransReasonId, Trans aTrans, List<TransItem> aActiveTransItems, TransItem ti) {
+
+        Gson gson = new Gson();
+        double originalValue = 0.0;
+
+        for (JsonElement transIt : this.getOriginalTransItemJsonArray()) {
+            JsonObject trans = transIt.getAsJsonObject();
+            for (JsonElement statictransIt : this.getOriginalStaticTransItemJsonArray()) {
+                JsonObject statictrans = statictransIt.getAsJsonObject();
+                if (ti.getTransactionItemId() == trans.get("TransactionItemId").getAsLong() && ti.getUnit_id() == trans.get("unit_id").getAsLong() && trans.get("TransactionItemId").getAsLong() == statictrans.get("TransactionItemId").getAsLong()) {
+                    if (ti.getItemQty() + 1 <= statictrans.get("ItemQty").getAsDouble() && -1 <= ti.getItemQty() - 1) {
+                        new TransItemBean().addQtyTransItemCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems, ti);
+                        originalValue = trans.get("ItemQty").getAsDouble();
+                        trans.addProperty("ItemQty", originalValue - 1);//update value in the json arry
+                        trans.addProperty("AmountIncVat", trans.get("AmountIncVat").getAsDouble() - ti.getUnitPriceIncVat());
+                        trans.addProperty("Amount", trans.get("Amount").getAsDouble() - ti.getUnitPrice());
+                        trans.addProperty("AmountExcVat", trans.get("AmountExcVat").getAsDouble() - ti.getUnitPriceExcVat());
+                        transIt = gson.fromJson(trans.toString(), JsonElement.class);
+                        break;
+                    }
+                }
+            }
+        }
+        this.getTransItemList().clear();
+
+        for (JsonElement transIt : this.getOriginalTransItemJsonArray()) {
+            TransItem itm = gson.fromJson(transIt, TransItem.class);
+            this.getTransItemList().add(itm);
+        }
+    }
+
     public void _subtractQtyTransItemCEC(int aTransTypeId, int aTransReasonId, Trans aTrans, List<TransItem> aActiveTransItems, TransItem ti) {
         Gson gson = new Gson();
         double originalValue = 0.0;
-        new TransItemBean().subtractQtyTransItemCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems, ti);
+
         for (JsonElement transIt : this.getOriginalTransItemJsonArray()) {
             JsonObject trans = transIt.getAsJsonObject();
-
-            if (ti.getItemId() == trans.get("ItemId").getAsLong()) {
-                originalValue = trans.get("ItemQty").getAsDouble();
-                trans.addProperty("ItemQty", originalValue + 1);//update value in the json arry
-                trans.addProperty("AmountIncVat", trans.get("AmountIncVat").getAsDouble() + ti.getUnitPriceIncVat());
-                trans.addProperty("Amount", trans.get("Amount").getAsDouble() + ti.getUnitPrice());
-                trans.addProperty("AmountExcVat", trans.get("AmountExcVat").getAsDouble() + ti.getUnitPriceExcVat());
-                transIt = gson.fromJson(trans.toString(), JsonElement.class);
-                System.out.println("Adjusted new order==== " + gson.toJson(transIt));
+            for (JsonElement statictransIt : this.getOriginalStaticTransItemJsonArray()) {
+                JsonObject statictrans = statictransIt.getAsJsonObject();
+                if (ti.getTransactionItemId() == trans.get("TransactionItemId").getAsLong() && ti.getUnit_id() == trans.get("unit_id").getAsLong() && trans.get("TransactionItemId").getAsLong() == statictrans.get("TransactionItemId").getAsLong()) {
+                    if (ti.getItemQty() <= statictrans.get("ItemQty").getAsDouble() && 0 <= ti.getItemQty() - 1) {
+                        new TransItemBean().subtractQtyTransItemCEC(aTransTypeId, aTransReasonId, aTrans, aActiveTransItems, ti);
+                        originalValue = trans.get("ItemQty").getAsDouble();
+                        trans.addProperty("ItemQty", originalValue + 1);//update value in the json arry
+                        trans.addProperty("AmountIncVat", trans.get("AmountIncVat").getAsDouble() + ti.getUnitPriceIncVat());
+                        trans.addProperty("Amount", trans.get("Amount").getAsDouble() + ti.getUnitPrice());
+                        trans.addProperty("AmountExcVat", trans.get("AmountExcVat").getAsDouble() + ti.getUnitPriceExcVat());
+                        transIt = gson.fromJson(trans.toString(), JsonElement.class);
+                        break;
+                    }
+                }
             }
         }
         this.getTransItemList().clear();
@@ -17284,21 +17453,33 @@ public class TransBean implements Serializable {
 
     public void _editTransItemCEC(int aTransTypeId, int aTransReasonId, String aSaleType, Trans aTrans, List<TransItem> aActiveTransItems, TransItem ti) {
         Gson gson = new Gson();
+        boolean isQtyRight = false;
         new TransItemBean().editTransItemCEC(aTransTypeId, aTransReasonId, "", aTrans, aActiveTransItems, ti);
         for (JsonElement transIt : this.getOriginalTransItemJsonArray()) {
             JsonObject trans = transIt.getAsJsonObject();
-            if (ti.getItemId() == trans.get("ItemId").getAsLong()) {
+            if (ti.getTransactionItemId() == trans.get("TransactionItemId").getAsLong()) {
 
                 //getting the original object values 
                 for (JsonElement statictransIt : this.getOriginalStaticTransItemJsonArray()) {
                     JsonObject statictrans = statictransIt.getAsJsonObject();
-                    if (ti.getItemId() == statictrans.get("ItemId").getAsLong()) {
-                        trans.addProperty("ItemQty", statictrans.get("ItemQty").getAsDouble() - ti.getItemQty());//update value in the json arry
-                        trans.addProperty("AmountIncVat", statictrans.get("AmountIncVat").getAsDouble() - ti.getAmountIncVat());
-                        trans.addProperty("Amount", statictrans.get("Amount").getAsDouble() - ti.getAmount());
-                        trans.addProperty("AmountExcVat", statictrans.get("AmountExcVat").getAsDouble() - ti.getAmountExcVat());
-
-                        transIt = gson.fromJson(trans.toString(), JsonElement.class);
+                    if (ti.getTransactionItemId() == statictrans.get("TransactionItemId").getAsLong() && ti.getUnit_id() == trans.get("unit_id").getAsLong()) {
+                        if (statictrans.get("ItemQty").getAsDouble() - ti.getItemQty() >= 0 || statictrans.get("ItemQty").getAsDouble() - ti.getItemQty() > statictrans.get("ItemQty").getAsDouble()) {
+                            trans.addProperty("ItemQty", statictrans.get("ItemQty").getAsDouble() - ti.getItemQty());//update value in the json arry
+                            trans.addProperty("AmountIncVat", statictrans.get("AmountIncVat").getAsDouble() - ti.getAmountIncVat());
+                            trans.addProperty("Amount", statictrans.get("Amount").getAsDouble() - ti.getAmount());
+                            trans.addProperty("AmountExcVat", statictrans.get("AmountExcVat").getAsDouble() - ti.getAmountExcVat());
+                            transIt = gson.fromJson(trans.toString(), JsonElement.class);
+                        } else {
+                            ti.setItemQty(statictrans.get("ItemQty").getAsDouble());
+                            ti.setAmountIncVat(statictrans.get("AmountIncVat").getAsDouble());
+                            ti.setAmount(statictrans.get("Amount").getAsDouble());
+                            ti.setAmountExcVat(statictrans.get("AmountExcVat").getAsDouble());
+                            trans.addProperty("ItemQty", 0);//update value in the json arry
+                            trans.addProperty("AmountIncVat", 0);
+                            trans.addProperty("Amount", 0);
+                            trans.addProperty("AmountExcVat", 0);
+                            transIt = gson.fromJson(trans.toString(), JsonElement.class);
+                        }
                     }
                 }
             }
@@ -17306,6 +17487,9 @@ public class TransBean implements Serializable {
         this.getTransItemList().clear();
         for (JsonElement transIt : this.getOriginalTransItemJsonArray()) {
             TransItem itm = gson.fromJson(transIt, TransItem.class);
+            if (itm.getItemQty() < 0) {
+                itm.setItemQty(0);
+            }
             this.getTransItemList().add(itm);
         }
     }
@@ -17317,7 +17501,7 @@ public class TransBean implements Serializable {
 
             for (JsonElement transIt : this.getOriginalTransItemJsonArray()) {
                 JsonObject trans = transIt.getAsJsonObject();
-                if (ti.getItemId() == trans.get("ItemId").getAsLong()) {
+                if (ti.getItemId() == trans.get("ItemId").getAsLong() && ti.getUnit_id() == trans.get("unit_id").getAsLong()) {
                     for (JsonElement statictransIt : this.getOriginalStaticTransItemJsonArray()) {
                         JsonObject staticTrans = statictransIt.getAsJsonObject();
 
@@ -17393,6 +17577,7 @@ public class TransBean implements Serializable {
 
             this.refreshTransListQuickOrderManage(trans);
             this.setActionMessage(ub.translateWordsInText(BaseName, message));
+            org.primefaces.PrimeFaces.current().executeScript("PF('sbarReviewOrder').hide()");
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
         }

@@ -125,18 +125,36 @@ public class EFRIS_excise_duty_listBean implements Serializable {
                 aEFRIS_excise_duty_list.setRate_perc("");
             }
             try {
-                if (null == aResultSet.getString("rate_value")) {
-                    aEFRIS_excise_duty_list.setRate_value("");
+                if (null == aResultSet.getString("rate_qty")) {
+                    aEFRIS_excise_duty_list.setRate_qty("");
                 } else {
-                    aEFRIS_excise_duty_list.setRate_value(aResultSet.getString("rate_value"));
+                    aEFRIS_excise_duty_list.setRate_qty(aResultSet.getString("rate_qty"));
                 }
             } catch (Exception e) {
-                aEFRIS_excise_duty_list.setRate_value("");
+                aEFRIS_excise_duty_list.setRate_qty("");
             }
             try {
                 aEFRIS_excise_duty_list.setAdd_date(new Date(aResultSet.getTimestamp("add_date").getTime()));
             } catch (Exception e) {
                 aEFRIS_excise_duty_list.setAdd_date(null);
+            }
+            try {
+                if (null == aResultSet.getString("rateText_perc")) {
+                    aEFRIS_excise_duty_list.setRateText_perc("");
+                } else {
+                    aEFRIS_excise_duty_list.setRateText_perc(aResultSet.getString("rateText_perc"));
+                }
+            } catch (Exception e) {
+                aEFRIS_excise_duty_list.setRateText_perc("");
+            }
+            try {
+                if (null == aResultSet.getString("rateText_qty")) {
+                    aEFRIS_excise_duty_list.setRateText_qty("");
+                } else {
+                    aEFRIS_excise_duty_list.setRateText_qty(aResultSet.getString("rateText_qty"));
+                }
+            } catch (Exception e) {
+                aEFRIS_excise_duty_list.setRateText_qty("");
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, e);
@@ -147,15 +165,24 @@ public class EFRIS_excise_duty_listBean implements Serializable {
         int saved = 0;
         try {
             int goodsSaved = 0;
-            //save goods commodity
-            for (int i = 0, size = aEFRIS_excise_duty_lists.size(); i < size; i++) {
-                //check if EFRIS_excise_duty_list is already in the db
-                EFRIS_excise_duty_list aEFRIS_excise_duty_list = this.getEFRIS_invoice_detailByExciseDutyCode(aEFRIS_excise_duty_lists.get(i).getExciseDutyCode());
-                if (aEFRIS_excise_duty_list == null) {
-                    goodsSaved = goodsSaved + this.insertEFRIS_excise_duty_list(aEFRIS_excise_duty_lists.get(i));
-                } else {
-                    //EFRIS_excise_duty_list already exists
-                    goodsSaved = goodsSaved + 1;
+
+            //if efris_excise_duty_list is not empty
+            if (aEFRIS_excise_duty_lists.size() > 0) {
+                //then delete previous records
+                int isExciseDutyListDeleted = this.deleteEFRIS_excise_duty_list_All();
+                if (isExciseDutyListDeleted == 1) {
+                    //then save new records
+                    //save goods commodity
+                    for (int i = 0, size = aEFRIS_excise_duty_lists.size(); i < size; i++) {
+                        //check if EFRIS_excise_duty_list is already in the db
+                        EFRIS_excise_duty_list aEFRIS_excise_duty_list = this.getEFRIS_invoice_detailByExciseDutyCode(aEFRIS_excise_duty_lists.get(i).getExciseDutyCode());
+                        if (aEFRIS_excise_duty_list == null) {
+                            goodsSaved = goodsSaved + this.insertEFRIS_excise_duty_list(aEFRIS_excise_duty_lists.get(i));
+                        } else {
+                            //EFRIS_excise_duty_list already exists
+                            goodsSaved = goodsSaved + 1;
+                        }
+                    }
                 }
             }
 
@@ -172,9 +199,9 @@ public class EFRIS_excise_duty_listBean implements Serializable {
         int saved = 0;
         String sql = "INSERT INTO efris_excise_duty_list"
                 + "(id, exciseDutyCode, goodService, parentCode, rateText, isLeafNode, effectiveDate, unit,"
-                + "currency, rate_perc, rate_value, add_date)"
+                + "currency, rate_perc, rate_qty, add_date,rateText_perc,rateText_qty)"
                 + "VALUES"
-                + "(?,?,?,?,?,?,?,?,?,?,?,?);";
+                + "(?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
@@ -219,7 +246,7 @@ public class EFRIS_excise_duty_listBean implements Serializable {
             } else {
                 ps.setString(8, "");
             }
-            //currency, rate_perc, rate_value, add_date
+            //currency, rate_perc, rate_qty, add_date
             if (aEFRIS_excise_duty_list.getCurrency() != null) {
                 ps.setString(9, aEFRIS_excise_duty_list.getCurrency());
             } else {
@@ -230,12 +257,22 @@ public class EFRIS_excise_duty_listBean implements Serializable {
             } else {
                 ps.setString(10, "");
             }
-            if (aEFRIS_excise_duty_list.getRate_value() != null) {
-                ps.setString(11, aEFRIS_excise_duty_list.getRate_value());
+            if (aEFRIS_excise_duty_list.getRate_qty() != null) {
+                ps.setString(11, aEFRIS_excise_duty_list.getRate_qty());
             } else {
                 ps.setString(11, "");
             }
             ps.setTimestamp(12, new java.sql.Timestamp(new CompanySetting().getCURRENT_SERVER_DATE().getTime()));
+            if (aEFRIS_excise_duty_list.getRateText_perc() != null) {
+                ps.setString(13, aEFRIS_excise_duty_list.getRateText_perc());
+            } else {
+                ps.setString(13, "");
+            }
+            if (aEFRIS_excise_duty_list.getRateText_qty() != null) {
+                ps.setString(14, aEFRIS_excise_duty_list.getRateText_qty());
+            } else {
+                ps.setString(14, "");
+            }
             ps.executeUpdate();
             saved = 1;
         } catch (Exception e) {
@@ -303,5 +340,20 @@ public class EFRIS_excise_duty_listBean implements Serializable {
             LOGGER.log(Level.ERROR, e);
         }
         return aEFRIS_excise_duty_list;
+    }
+
+    public int deleteEFRIS_excise_duty_list_All() {
+        int IsDeleted = 0;
+        String sql = "DELETE FROM efris_excise_duty_list WHERE efris_excise_duty_list_id > ?";
+        try (
+                Connection conn = DBConnection.getMySQLConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);) {
+            ps.setLong(1, 0);
+            ps.executeUpdate();
+            IsDeleted = 1;
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, e);
+        }
+        return IsDeleted;
     }
 }

@@ -507,6 +507,14 @@ public class AccJournalBean implements Serializable {
             } catch (NullPointerException npe) {
                 SalesDiscAccountId = 0;
             }
+            //Sales Excise Duty Tax
+            int SalesEDAccountId = 0;
+            String SalesEDAccountCode = "2-00-000-100";
+            try {
+                SalesEDAccountId = new AccCoaBean().getAccCoaByCodeOrId(SalesEDAccountCode, 0).getAccCoaId();
+            } catch (NullPointerException npe) {
+                SalesEDAccountId = 0;
+            }
             double GrossSalesAmount = 0;
             double NetSalesAmount = 0;
             double PaidCashAmount = 0;
@@ -514,18 +522,20 @@ public class AccJournalBean implements Serializable {
             double ReceivableAmount = 0;
             double VatOutputTaxAmount = 0;
             double CashDiscountAmount = 0;
+            double EDOutputTaxAmount = 0;//Sales/Output Excise Duty Tax
 
             GrossSalesAmount = aTrans.getGrandTotal();
             LoyaltyAmountExpense = aTrans.getSpendPointsAmount();
+            EDOutputTaxAmount = aTrans.getTotalExciseDutyTaxAmount();
             if ((aTrans.getChangeAmount() > 0)) {
-                PaidCashAmount = aTrans.getGrandTotal();// - aTrans.getSpendPointsAmount();
+                PaidCashAmount = aTrans.getGrandTotal();
             } else {
                 PaidCashAmount = aTrans.getAmountTendered();
             }
-            ReceivableAmount = aTrans.getGrandTotal() - PaidCashAmount;// + PaidLoyaltyAmount);
+            ReceivableAmount = aTrans.getGrandTotal() - PaidCashAmount;
             VatOutputTaxAmount = aTrans.getTotalVat();
             CashDiscountAmount = aTrans.getCashDiscount();
-            NetSalesAmount = GrossSalesAmount - VatOutputTaxAmount;//-CashDiscountAmount;
+            NetSalesAmount = GrossSalesAmount - VatOutputTaxAmount - EDOutputTaxAmount;
 
             AccJournal accjournal = new AccJournal();
             //get job Id
@@ -624,7 +634,7 @@ public class AccJournalBean implements Serializable {
                 this.saveAccJournal(accjournal);
             }
             //SALES REVENUE
-            //1. Sales revues per Sales Account
+            //1. Sales revenues per Sales Account
             List<TransItem> ati = new TransItemBean().getTransItemsSummaryByItemType(aTrans.getTransactionId());
             //2. post account sales revenue
             int ListItemIndex = 0;
@@ -632,6 +642,7 @@ public class AccJournalBean implements Serializable {
             String ItemSalesAccountCode = "";
             int ItemSalesAccountId = 0;
             double ItemNetSalesAmount = 0;//Amt exc VAT
+            double ItemEDAmount = 0;//Item Excise Duty Amount
             while (ListItemIndex < ListItemNo) {
                 accjournal.setAccChildAccountId(0);
                 if (aBillTransactor != null) {
@@ -642,7 +653,8 @@ public class AccJournalBean implements Serializable {
                 } else if (ati.get(ListItemIndex).getItem_type().equals("SERVICE")) {//4-10-000-020 - SALES Services	
                     ItemSalesAccountCode = "4-10-000-020";
                 }
-                ItemNetSalesAmount = ati.get(ListItemIndex).getAmountExcVat();
+                ItemEDAmount = ati.get(ListItemIndex).getTransItemExciseObj().getCalc_excise_tax_amount();
+                ItemNetSalesAmount = ati.get(ListItemIndex).getAmountExcVat() - ItemEDAmount;
                 try {
                     ItemSalesAccountId = new AccCoaBean().getAccCoaByCodeOrId(ItemSalesAccountCode, 0).getAccCoaId();
                 } catch (NullPointerException npe) {
@@ -658,7 +670,18 @@ public class AccJournalBean implements Serializable {
                 }
                 ListItemIndex = ListItemIndex + 1;
             }
-
+            //EXCISE DUTY OUTPUT
+            if (EDOutputTaxAmount > 0) {
+                //accjournal.setAccChildAccountId(aTrans.getAccChildAccountId());
+                accjournal.setAccChildAccountId(0);
+                accjournal.setBillTransactorId(0);
+                accjournal.setAccCoaId(SalesEDAccountId);
+                accjournal.setAccountCode(SalesEDAccountCode);
+                accjournal.setDebitAmount(0);
+                accjournal.setCreditAmount(EDOutputTaxAmount);
+                accjournal.setNarration("EXCISE DUTY SALES/OUTPUT PAYABLE");
+                this.saveAccJournal(accjournal);
+            }
             //CREDIT COS - InventoryAcc
             //1. Cost by InventoryAcc
             List<TransItem> ati2 = new TransItemBean().getInventoryCostByTrans(aTrans.getTransactionId());

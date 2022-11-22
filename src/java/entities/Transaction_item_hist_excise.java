@@ -6,9 +6,11 @@ import javax.faces.bean.SessionScoped;
 
 @ManagedBean
 @SessionScoped
-public class Transaction_item_excise implements Serializable {
+public class Transaction_item_hist_excise implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    private long transaction_item_hist_excise_id;
+    private long transaction_item_hist_id;
     private long transaction_item_excise_id;
     private long transaction_item_id;
     private String excise_duty_code;
@@ -19,19 +21,6 @@ public class Transaction_item_excise implements Serializable {
     private double calc_excise_tax_amount;
     private String rate_currency_code_tax;
     private String rate_unit_code_tax;
-
-    public Transaction_item_excise() {
-        this.transaction_item_excise_id = 0;
-        this.transaction_item_id = 0;
-        this.excise_duty_code = "";
-        this.rate_text = "";
-        this.rate_name = "";
-        this.rate_name_type = "";
-        this.rate_value = 0.0;
-        this.calc_excise_tax_amount = 0.0;
-        this.rate_currency_code_tax = "";
-        this.rate_unit_code_tax = "";
-    }
 
     /**
      * @return the transaction_item_excise_id
@@ -171,5 +160,34 @@ public class Transaction_item_excise implements Serializable {
      */
     public void setRate_name_type(String rate_name_type) {
         this.rate_name_type = rate_name_type;
+    }
+
+    /**
+     * @return the transaction_item_hist_excise_id
+     */
+    public long getTransaction_item_hist_excise_id() {
+        return transaction_item_hist_excise_id;
+    }
+
+    /**
+     * @param transaction_item_hist_excise_id the
+     * transaction_item_hist_excise_id to set
+     */
+    public void setTransaction_item_hist_excise_id(long transaction_item_hist_excise_id) {
+        this.transaction_item_hist_excise_id = transaction_item_hist_excise_id;
+    }
+
+    /**
+     * @return the transaction_item_hist_id
+     */
+    public long getTransaction_item_hist_id() {
+        return transaction_item_hist_id;
+    }
+
+    /**
+     * @param transaction_item_hist_id the transaction_item_hist_id to set
+     */
+    public void setTransaction_item_hist_id(long transaction_item_hist_id) {
+        this.transaction_item_hist_id = transaction_item_hist_id;
     }
 }

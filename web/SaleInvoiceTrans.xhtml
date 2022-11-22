@@ -277,7 +277,7 @@
                     <p:ajax listener="#{transItemBean.addTransItemCallCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentSaleType,trans,statusBean,transItemBean.activeTransItems,transItem,itemBean.selectedItem)}" process="@form" update="gridTransItem pgrdOverrideWarranty pgrdSpecific gridItemStatus dtblTransactionItem pgrdTotals pgrdScheme pgrdPayment pgrdMsgs"/>
                 </p:commandButton>
                 <p:focus for="#{menuItemBean.menuItemObj.DEFAULT_FOCUS_CONTROL_ID}" rendered="#{menuItemBean.menuItemObj.DEFAULT_FOCUS_CONTROL_ID.length()>0}"/>
-                <p:remoteCommand name="barcode" actionListener="#{transItemBean.updateModelTransItemAutoAddCECCall(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentSaleType,trans,transItem,statusBean,transItemBean.activeTransItems,transItem,itemBean.selectedItem,'BarCode')}" process="@this itxtItemCode" update="gridTransItem gridItemStatus dtblTransactionItem pgrdTotals pgrdPayment">
+                <p:remoteCommand name="barcode" actionListener="#{transItemBean.updateModelTransItemAutoAddCECCall(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentSaleType,trans,transItem,statusBean,transItemBean.activeTransItems,transItem,itemBean.selectedItem,'BarCode')}" process="@this itxtItemCode" update="gridTransItem gridItemStatus dtblTransactionItem pgrdTotals pgrdPayment TransactionFormSales:pgrdMsgs">
                 </p:remoteCommand>
             </h:panelGrid>
             <h:panelGrid id="pgrdOverrideWarranty" columns="2">
@@ -456,6 +456,7 @@
                 <h:selectBooleanCheckbox label="#{langsys['Bill']} #{langsys['Other']}?" value="#{trans.billOther}">
                     <f:ajax render="pgrdScheme"/>
                 </h:selectBooleanCheckbox>
+                <h:inputText id="itxtED" value="ED: #{utilityBean.formatDoubleToString(trans.totalExciseDutyTaxAmount)}" styleClass="clsInputTransItem" style="width: 150px;height: 24px;background-color: yellow;font-size: 12px;" disabled="true" rendered="#{trans.totalExciseDutyTaxAmount gt 0}" title="#{langsys['Excise']} #{langsys['Duty']} #{langsys['Amount']} #{langsys['Included']} #{langsys['in']} #{langsys['the']} #{langsys['Subtotal']}"/>
                 <p:dialog header="#{langsys['Cash']} #{langsys['Discount']}" widgetVar="dlgCashDiscount" modal="true" height="170">
                     <p:ajax event="open" process="@this" update="pnlgFilter1"/>
                     <h:panelGrid id="pnlgFilter1" columns="2">
@@ -723,7 +724,7 @@
                         </h:selectOneMenu>
                     </h:panelGrid>
                 </h:panelGrid>
-           </h:panelGrid>
+            </h:panelGrid>
             <h:panelGrid id="pgrdMsgs" styleClass="clsGridMainMessages" columns="1">
                 <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{transBean.actionMessage}"/>
                 <h:messages id="msgsMainMessage" style="color: red"/><br/>
